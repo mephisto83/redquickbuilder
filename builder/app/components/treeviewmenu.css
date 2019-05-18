@@ -1,0 +1,9 @@
+.treeview .treeviewmenu {
+    transition: all;
+    transition-duration: 1s;
+    transform: scale(0);
+}
+
+.treeview.menu-open.active .treeviewmenu {
+    transform: scale(1);
+}
