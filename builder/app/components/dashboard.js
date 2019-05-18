@@ -12,6 +12,7 @@ import NavBarMenu from './navbarmenu';
 import DropDownMenu from './dropdown';
 import DropDownMenuItem from './dropdownmenuitem';
 import MainSideBar from './mainsidebar';
+import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
 import TreeViewItem from './treeviewitem';
@@ -21,6 +22,7 @@ import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
 import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
+import * as VC from '../constants/visual';
 import MindMap from './mindmap';
 class Dashboard extends Component {
 
@@ -56,10 +58,16 @@ class Dashboard extends Component {
                         </Header>
                         <MainSideBar>
                             <SideBarMenu>
-                                <TreeViewMenu open={UIA.Visual(state, 'treeview-menu')} active={UIA.Visual(state, 'treeview-menu')} title={'menu'} toggle={() => {
-                                    this.props.toggleVisual('treeview-menu')
-                                }}>
-                                    <TreeViewItem title={'asdf'} />
+                                <TreeViewMenu
+                                    open={UIA.Visual(state, VC.GraphOperationMenu)}
+                                    active={UIA.Visual(state, VC.GraphOperationMenu)}
+                                    title={Titles.GraphOperations}
+                                    toggle={() => {
+                                        this.props.toggleVisual(VC.GraphOperationMenu)
+                                    }}>
+                                    <TreeViewItem title={Titles.AddNode} onClick={() => {
+                                        this.props.graphOperation(UIA.NEW_NODE);
+                                    }} />
                                     <TreeViewItem title={'asdf'} />
                                     <TreeViewItem title={'asdf'} />
                                     <TreeViewItem title={'asdf'} />
@@ -73,7 +81,7 @@ class Dashboard extends Component {
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
-                            <MindMap></MindMap>
+                            <MindMap graph={UIA.Graphs(state, UIA.Application(state, UIA.CURRENT_GRAPH))}></MindMap>
                         </Content>
                         <SideBar open={UIA.Visual(state, 'side-panel-open')}>
                             <SideBarTabs>

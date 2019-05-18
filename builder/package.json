@@ -256,7 +256,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.5.0",
-    "d3": "^5.9.2",
+    "d3": "^4.12.2",
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "electron-log": "^2.2.17",

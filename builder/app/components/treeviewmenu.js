@@ -26,7 +26,7 @@ export default class TreeViewMenu extends Component {
                         <i className="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
-                <ul class="treeview-menu" style={{ display: this.display() }}>
+                <ul className="treeview-menu" style={{ display: this.display() }}>
                     {this.props.children}
                 </ul>
             </li>

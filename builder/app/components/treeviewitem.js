@@ -9,7 +9,10 @@ export default class TreeViewItem extends Component {
     render() {
         return (
             <li>
-                <a>
+                <a onClick={() => {
+                    if (this.props.onClick)
+                        this.props.onClick();
+                }}>
                     <i className={this.icon()}></i>
                     {this.props.title}
                 </a>
