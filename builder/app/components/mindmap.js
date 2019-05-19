@@ -20,11 +20,11 @@ export default class MindMap extends Component {
             id: `id-${Date.now()}`,
             graph: {
                 "nodes": [
-                    { "name": "a", "width": 60, "height": 40 },
-                    { "name": "b", "width": 60, "height": 40 },
-                    { "name": "c", "width": 60, "height": 40 },
-                    { "name": "d", "width": 60, "height": 40 },
-                    { "name": "e", "width": 60, "height": 40 }
+                    // { "name": "a", "width": 60, "height": 40 },
+                    // { "name": "b", "width": 60, "height": 40 },
+                    // { "name": "c", "width": 60, "height": 40 },
+                    // { "name": "d", "width": 60, "height": 40 },
+                    // { "name": "e", "width": 60, "height": 40 }
                 ].map(t => { t.id = t.name; return t; }),
                 links: [],
                 "groups": [
@@ -373,7 +373,7 @@ export default class MindMap extends Component {
             }
             if (graph.links && this.state && this.state.graph && this.state.graph.links) {
                 var removedLinks = this.state.graph.links.relativeCompliment(graph.links, (x, y) => x.id === y).map(t => {
-                    return this.state.graph.nodes.indexOf(t);
+                    return this.state.graph.links.indexOf(t);
                 });
                 this.state.graph.links.removeIndices(removedLinks);
                 var newLinks = graph.links.relativeCompliment(this.state.graph.links, (x, y) => x === y.id);

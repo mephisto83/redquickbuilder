@@ -1,24 +1,17 @@
 import * as GraphMethods from '../methods/graph_methods';
+import * as NodeConstants from '../constants/nodetypes';
+import * as Titles from '../components/titles';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
 export const DASHBOARD_MENU = 'DASHBOARD_MENU';
-
-
-export const NodeTypes = {
-    Concept: 'concept',
-    Model: 'model',
-    Property: 'model-property',
-    Screen: 'screen'
-}
-
-export const NodeTypeColors = {
-    [NodeTypes.Concept]: '#DD4B39',
-    [NodeTypes.Model]: '#713E5A',
-    [NodeTypes.Property]: '#484349',
-    [NodeTypes.Screen]: '#3A405A',
-    ['unknown']: '#414770',
-}
+export const SELECTED_NODE_BB = 'SELECTED_NODE_BB';
+export const NodeTypes = NodeConstants.NodeTypes;
+export const NodeTypeColors = NodeConstants.NodeTypeColors;
+export const NodeProperties = NodeConstants.NodeProperties;
+export const LinkProperties = NodeConstants.LinkProperties;
+export const NodeAttributePropertyTypes = NodeConstants.NodeAttributePropertyTypes;
+export const ValidationRules = NodeConstants.ValidationRules;
 
 export const UI_UPDATE = 'UI_UPDATE';
 export function GetC(state, section, item) {
@@ -30,6 +23,10 @@ export function GetC(state, section, item) {
 export function Visual(state, key) {
     return GetC(state, VISUAL, key);
 }
+export function IsCurrentNodeA(state, type) {
+    var currentNode = Node(state, Visual(state, SELECTED_NODE));
+    return currentNode && currentNode.properties && currentNode.properties.nodeType === type;
+}
 export function VisualEq(state, key, value) {
     return Visual(state, key) === value;
 }
@@ -38,7 +35,9 @@ export function Node(state, nodeId) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     if (currentGraph) {
         currentGraph = Graphs(state, currentGraph);
-        return currentGraph.nodeLib[nodeId];
+        if (currentGraph && currentGraph.nodeLib) {
+            return currentGraph.nodeLib[nodeId];
+        }
     }
     return null;
 }
@@ -98,11 +97,41 @@ export function SelectedNode(nodeId) {
 export function toggleDashboardMinMax() {
     return toggleVisual(DASHBOARD_MENU);
 }
+export function GetNodeTitle(node) {
+    if (!node) { return Titles.Unknown }
+    return node.properties ? node.properties.text || node.id : node.id;
+}
+export function NodesByType(state, nodeType) {
+    var currentGraph = GetCurrentGraph(state);
+    if (currentGraph) {
+        return currentGraph.nodes
+            .filter(x => currentGraph.nodeLib[x].properties &&
+                currentGraph.nodeLib[x].properties[NodeProperties.NODEType] === nodeType)
+            .map(x => currentGraph.nodeLib[x]);
+    }
+    return [];
+}
+export function GetCurrentGraph(state) {
+    var currentGraph = Application(state, CURRENT_GRAPH);
+    if (currentGraph) {
+        currentGraph = Graphs(state, currentGraph);
+    }
+    return currentGraph;
+}
 export const NEW_NODE = 'NEW_NODE';
+export const REMOVE_NODE = 'REMOVE_NODE';
 export const NEW_LINK = 'NEW_LINK';
 export const CHANGE_NODE_TEXT = 'CHANGE_NODE_TEXT';
 export const CURRENT_GRAPH = 'CURRENT_GRAPH';
 export const CHANGE_NODE_PROPERTY = 'CHANGE_NODE_PROPERTY';
+export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE';
+export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
+export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
+export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
+export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
+export const NEW_VALIDATION_ITEM_NODE = 'NEW_VALIDATION_ITEM_NODE';
+export const NEW_CHOICE_TYPE = 'NEW_CHOICE_TYPE';
+export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
@@ -118,15 +147,49 @@ export function graphOperation(operation, options) {
         switch (operation) {
             case NEW_NODE:
                 currentGraph = GraphMethods.newNode(currentGraph);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case REMOVE_NODE:
+                currentGraph = GraphMethods.removeNode(currentGraph, options);
                 break;
             case NEW_LINK:
                 currentGraph = GraphMethods.newLink(currentGraph, options)
+                break;
+            case ADD_LINK_BETWEEN_NODES:
+                currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options)
+                break;
+            case REMOVE_LINK_BETWEEN_NODES:
+                currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options)
                 break;
             case CHANGE_NODE_TEXT:
                 currentGraph = GraphMethods.updateNodeProperty(currentGraph, { ...options, prop: 'text' });
                 break;
             case CHANGE_NODE_PROPERTY:
                 currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
+                break;
+            case NEW_PROPERTY_NODE:
+                currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_ATTRIBUTE_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_VALIDATION_TYPE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_CHOICE_TYPE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_CHOICE_ITEM_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceListItem);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_VALIDATION_ITEM_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
         }
 

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-
+import * as Titles from './titles';
 
 export default class SelectInput extends Component {
     label() {
@@ -20,17 +20,18 @@ export default class SelectInput extends Component {
     render() {
         return (
             <div className="form-group">
-                <label>Select</label>
-                <select className="form-control" onChange={(evt) => {
+                <label>{this.label()}</label>
+                <select className="form-control" onSelect={(evt) => {
                     if (this.props.onChange) {
                         this.props.onChange(evt.target.value);
                     }
-                }} value={this.value()}>
-                    {/* <option>option 1</option>
-                    <option>option 2</option>
-                    <option>option 3</option>
-                    <option>option 4</option>
-                    <option>option 5</option> */}
+                }}
+                    onChange={(evt) => {
+                        if (this.props.onChange) {
+                            this.props.onChange(evt.target.value);
+                        }
+                    }} value={this.value()}>
+                    <option value={null}>{Titles.Select}</option>
                     {this.options()}
                 </select>
             </div>

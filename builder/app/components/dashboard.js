@@ -24,6 +24,13 @@ import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
 import * as VC from '../constants/visual';
 import MindMap from './mindmap';
+import ModelActivityMenu from './modelactivitymenu';
+import PropertyActivityMenu from './propertyactivitymenu';
+import AttributeFormControl from './attributeformcontrol';
+import ChoiceActivityMenu from './choiceactivitymenu';
+import ValidationActivityMenu from './validationactivitymenu';
+import ValidationItemFormControl from './validationitemactivitymenu';
+
 import { GooMenuSVG } from './goomenu';
 import GooMenu from './goomenu';
 import FormControl from './formcontrol';
@@ -109,6 +116,13 @@ class Dashboard extends Component {
                                     }}>
                                     <TreeViewItem title={Titles.AddNode} onClick={() => {
                                         this.props.graphOperation(UIA.NEW_NODE);
+                                        this.props.setVisual(SIDE_PANEL_OPEN, true);
+                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                    }} />
+                                    <TreeViewItem title={Titles.RemoveNode} onClick={() => {
+                                        this.props.graphOperation(UIA.REMOVE_NODE);
+                                        this.props.setVisual(SIDE_PANEL_OPEN, false);
+                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
                                     }} />
                                 </TreeViewMenu>
                                 {/* <TreeViewMenu title={'menu'}>
@@ -162,23 +176,30 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
                                 {currentNode ? (<FormControl>
                                     <TextInput
-                                        label={Titles.Label}
+                                        label={Titles.NodeLabel}
                                         value={currentNode.properties ? currentNode.properties.text : ''}
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
                                         }} />
                                     <SelectInput
-                                        options={Object.keys(UIA.NodeTypes).map(x => {
+                                        label={Titles.NodeType}
+                                        options={Object.keys(UIA.NodeTypes).sort((a, b) => a.localeCompare(b)).map(x => {
                                             return {
                                                 value: UIA.NodeTypes[x],
                                                 title: x
                                             }
                                         })}
                                         onChange={(value) => {
-                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: 'nodeType', id: currentNode.id, value })
+                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: UIA.NodeProperties.NODEType, id: currentNode.id, value })
                                         }}
                                         value={currentNode.properties ? currentNode.properties.nodeType : ''} />
                                 </FormControl>) : null}
+                                <AttributeFormControl />
+                                <ModelActivityMenu />
+                                <PropertyActivityMenu />
+                                <ValidationItemFormControl />
+                                <ChoiceActivityMenu />
+                                <ValidationActivityMenu />
                             </SideBarContent>) : null}
                         </SideBar>
                     </div>
