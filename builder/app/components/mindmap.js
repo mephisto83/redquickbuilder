@@ -7,6 +7,7 @@ import * as Cola from 'webcola'
 import * as GraphMethods from '../methods/graph_methods';
 // @flow
 import React, { Component } from 'react';
+import { NodeTypeColors } from '../actions/uiactions';
 
 
 export default class MindMap extends Component {
@@ -14,6 +15,7 @@ export default class MindMap extends Component {
         super();
         this.textSize = {};
         this.mapScale = 1;
+        this.mapTranslate = { x: 0, y: 0 };
         this.state = {
             id: `id-${Date.now()}`,
             graph: {
@@ -33,6 +35,9 @@ export default class MindMap extends Component {
             }
         }
         this.draw = this.draw.bind(this);
+        this.mouseDown = this.mouseDown.bind(this);
+        this.mouseUp = this.mouseUp.bind(this);
+        this.mouseMove = this.mouseMove.bind(this);
     }
     componentDidMount() {
         // Draw for the first time to initialize.
@@ -40,9 +45,32 @@ export default class MindMap extends Component {
 
         // Redraw based on the new size whenever the browser window is resized.
         window.addEventListener("resize", this.draw);
+        window.addEventListener('mousemove', this.mouseMove);
+        window.addEventListener('mouseup', this.mouseUp);
+        window.addEventListener('mousedown', this.mouseDown);
+    }
+    mouseDown(evt) {
+        this.mouseStartEvent = evt;
+    }
+    mouseUp(evt) {
+        this.mouseStartEvent = null;
+        this.mouseMoved = null;
+    }
+    mouseMove(evt) {
+        if (this.mouseStartEvent) {
+            this.mouseMoveEvt = evt;
+            this.mouseMoved = {
+                x: evt.clientX - this.mouseStartEvent.clientX,
+                y: evt.clientY - this.mouseStartEvent.clientY
+            }
+        }
+
     }
     componentWillUnmount() {
         window.removeEventListener("resize", this.draw);
+        window.removeEventListener('mousemove', this.mouseMove);
+        window.removeEventListener('mousedown', this.mouseUp);
+        window.removeEventListener('mouseup', this.mouseDown);
     }
     calculateNodeTextSize(text, pad) {
         var div = document.querySelector('#secret-div-space');
@@ -54,9 +82,9 @@ export default class MindMap extends Component {
             div.style.position = 'absolute';
             div.classList.add('label');
             div.style.whiteSpace = 'normal';
-            div.style.maxWidth = `150px`;
+            div.style.maxWidth = `200px`;
             div.style.top = '-10000px';
-            div.style.padding = pad + 'px';
+            div.style.padding = (pad * 2) + 'px';
             document.querySelector(`#${this.state.id}`).appendChild(div);
         }
         div.innerHTML = text;
@@ -71,21 +99,13 @@ export default class MindMap extends Component {
         var width = bb.width - 10;// 960;
         var height = bb.height - 10;// 800;
         var color = d3.scaleOrdinal(d3.schemeCategory10)
-        var pad = 20
 
+        var margin = 6, pad = 12;;
         force
             .linkDistance(280)
             .avoidOverlaps(true)
             .handleDisconnected(false)
-            .size([width, height])
-        var gX = null,
-            gY = null,
-            currentTransform = null;
-
-        // var svg = d3.select(`#${this.state.id}`).append("svg")
-        //     .attr("class", "view")
-        //     .attr("width", width)
-        //     .attr("height", height);
+            .size([width, height]);
 
         var svg = makeSVG();
         function makeSVG() {
@@ -106,81 +126,46 @@ export default class MindMap extends Component {
                 .attr('stroke-width', '0px')
                 .attr('fill', '#555');
 
-            var zoomBox = outer.append('rect')
-                .attr('class', 'background')
-                .attr('width', "100%")
-                .attr('height', "100%")
 
             var vis = outer.append('g');
-            var redraw = (transition) => (transition ? vis.transition() : vis)
-                .attr("transform", d3Zoom.zoomTransform(vis));
-
             outer.on("wheel", function (d) {
-                var direction = d3.event.wheelDelta < 0 ? 'down' : 'up';
-                // zoom(direction === 'up' ? d : d.parent);
-                me.mapScale += d3.event.wheelDelta / 10000;
-                vis.attr('transform', `scale(${me.mapScale || 1})`);
+                me.mapScale += d3.event.wheelDelta / (me.props.zoomFactor || 5000);
+                redraw();
             });
+            function redraw() {
+                var { x = 0, y = 0 } = (me.mouseMoved || {});
+                vis.attr('transform', `scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`);
+            }
             outer.on('mousemove', function (x, v) {
-                console.log(v);
-                // debugger;
-                console.log(d3Event);
+                console.log(`outer : me.mouseMoved`);
+                console.log(me.mouseMoved);
+                if (me.panning) {
+                    redraw();
+                }
             });
+
             outer.on("mousedown", function (d) {
                 me.panning = true;
-                console.log('panning');
             });
             outer.on("mouseup", function (d) {
                 me.panning = false;
-                console.log('not panning');
+
+                if (me.mouseMoved && me.mapTranslate) {
+                    me.mapTranslate = {
+                        x: me.mapTranslate.x + me.mouseMoved.x,
+                        y: me.mapTranslate.y + me.mouseMoved.y
+                    }
+                }
             });
 
+            redraw();
             return vis;
         }
-        // if (currentTransform) {
-        //     //   view.attr('transform', currentTransform);
-        // }
-        // var xScale = d3.scaleLinear()
-        //     .domain([-width / 2, width / 2])
-        //     .range([0, width]);
-
-        // var yScale = d3.scaleLinear()
-        //     .domain([-height / 2, height / 2])
-        //     .range([height, 0]);
-        // var xAxis = d3.axisBottom(xScale)
-        //     .ticks((width + 2) / (height + 2) * 10)
-        //     .tickSize(height)
-        //     .tickPadding(8 - height);
-        // var yAxis = d3.axisRight(yScale)
-        //     .ticks(10)
-        //     .tickSize(width)
-        //     .tickPadding(8 - width);
-        // gX = svg.append("g")
-        //     .attr("class", "axis axis--x")
-        //     .call(xAxis);
-        // gY = svg.append("g")
-        //     .attr("class", "axis axis--y")
-        //     .call(yAxis);
-        // var zoom = d3.zoom()
-        //     .scaleExtent([0.5, 5])
-        //     .translateExtent([
-        //         [-width * 2, -height * 2],
-        //         [width * 2, height * 2]
-        //     ]).on("zoom", zoomed);
-
-        // function zoomed() {
-        //     // currentTransform = d3.event.transform;
-        //     // view.attr("transform", currentTransform);
-        //     gX.call(xAxis.scale(d3Event.transform.rescaleX(xScale)));
-        //     gY.call(yAxis.scale(d3Event.transform.rescaleY(yScale)));
-        //     svg.attr("transform", d3Event.transform)
-        // }
-        // svg.call(zoom);
 
         var graph = this.state.graph;
 
         graph.nodes.forEach(function (v) {
-            var bb = me.calculateNodeTextSize(v.name, pad);
+            var bb = me.calculateNodeTextSize(getLabelText(v), pad);
             v.width = Math.max(30, bb.width);
             v.height = Math.max(30, bb.height);
         })
@@ -199,16 +184,14 @@ export default class MindMap extends Component {
             .style("fill", function (d, i) { return color(i) })
             .call(force.drag)
 
-
+        var node = svg.selectAll(".node");
+        this.$node = node;
+        this.buildNode(graph, force, color);
         var link = svg.selectAll(".link")
             .data(graph.links)
             .enter().append("line")
             .attr("class", "link")
             .style("stroke-width", function (d) { return Math.sqrt(d.value); });
-
-        var node = svg.selectAll(".node");
-        this.$node = node;
-        this.buildNode(graph, force, color);
 
         var label = svg.selectAll(".label")
             .data(graph.nodes)
@@ -218,10 +201,29 @@ export default class MindMap extends Component {
         label.on('click', (d, index, els) => {
             if (me.props.onNodeClick && d && d.id) {
                 me.props.onNodeClick(d.id, els[index].getBoundingClientRect());
-                console.log(d);
             }
         })
-        label.append('xhtml:div')
+
+        var features = svg.selectAll('.features')
+            .data(graph.nodes)
+            .enter()
+            .append('g')
+            .attr('class', 'features')
+
+        features.append("rect")
+            .attr("width", function (d) { return d.selected ? 5 : 0; })
+            .attr("height", function (d) { return d.height - 10; })
+            .attr('x', 3)
+            .attr('y', 5)
+            .attr("rx", 5).attr("ry", 5)
+            .style("fill", function (d) {
+                if (d.selected && me.props.selectedColor) {
+                    return me.props.selectedColor;
+                }
+                return color(graph.groups.length)
+            })
+
+        var titles = label.append('xhtml:div')
             .style('width', x => {
                 return `${x.width - pad / 2}px`
             })
@@ -240,15 +242,30 @@ export default class MindMap extends Component {
             $color: color
         })
 
+        function getLabelText(d) {
+            return d && d.properties ? d.properties.text || d.name : d.name;
+        }
 
         function tick() {
-            link.attr("x1", function (d) { return d.source.x; })
-                .attr("y1", function (d) { return d.source.y; })
-                .attr("x2", function (d) { return d.target.x; })
-                .attr("y2", function (d) { return d.target.y; });
+            if (me.$_nodes) {
+                me.$_nodes.each(function (d) {
+                    var bb = me.calculateNodeTextSize(getLabelText(d), pad);
+                    d.width = Math.max(30, bb.width);
+                    d.height = Math.max(30, bb.height)
+                    d.innerBounds = d.bounds.inflate(- margin);
+                });
+            }
+
+            // link.attr("x1", function (d) { return d.source.x; })
+            //     .attr("y1", function (d) { return d.source.y; })
+            //     .attr("x2", function (d) { return d.target.x; })
+            //     .attr("y2", function (d) { return d.target.y; });
+
 
             if (me.$_nodes) {
                 me.$_nodes
+                    .attr("width", function (d) { return d.width; })
+                    .attr("height", function (d) { return d.height; })
                     .attr("x", function (d) { return d.x - d.width / 2 })
                     .attr("y", function (d) { return d.y - d.height / 2 })
             }
@@ -257,6 +274,22 @@ export default class MindMap extends Component {
                 .attr("y", function (d) { return d.bounds.y })
                 .attr("width", function (d) { return d.bounds.width() })
                 .attr("height", function (d) { return d.bounds.height() })
+
+            link.each(function (d) {
+                d.route = Cola.makeEdgeBetween(d.source.innerBounds, d.target.innerBounds, 5);
+            });
+
+            link.attr("x1", function (d) { return d.route.sourceIntersection.x; })
+                .attr("y1", function (d) { return d.route.sourceIntersection.y; })
+                .attr("x2", function (d) { return d.route.arrowStart.x; })
+                .attr("y2", function (d) { return d.route.arrowStart.y; });
+
+            features.attr("transform", function (d) {
+                var y = d.y - d.height / 2;
+                var x = d.x - d.width / 2;
+                return `translate(${x},${y})`;
+            })
+
 
             label
                 .attr("x", function (d) {
@@ -267,6 +300,12 @@ export default class MindMap extends Component {
 
                     return d.y + h / 2 - d.height + pad / 2;
                 })
+            titles.text(function (d) {
+                if (d.properties) {
+                    return `${d.properties.text}`
+                }
+                return `${d.name}`
+            })
         }
         force.start();
     }
@@ -279,18 +318,18 @@ export default class MindMap extends Component {
             .attr("height", function (d) { return d.height; })
             .attr("rx", 5).attr("ry", 5)
             .style("fill", function (d) {
-                if (d.selected && me.props.selectedColor) {
-                    return me.props.selectedColor;
+                if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
+                    return NodeTypeColors[d.properties.nodeType]
                 }
                 return color(graph.groups.length)
             })
             .on('click', (d, index, els) => {
                 if (me.props.onNodeClick && d) {
                     me.props.onNodeClick(d.id, els[index].getBoundingClientRect());
-                    console.log(d);
                 }
             })
             .call(cola.drag);
+
         node.exit().remove();
         this.$_nodes = temp;
     }
@@ -323,6 +362,12 @@ export default class MindMap extends Component {
                         nn.selected = props.selectedNodes.indexOf(nn.id) !== -1;
                     })
                 }
+                this.state.graph.nodes.map(nn => {
+                    var nl = graph.nodeLib[nn.id];
+                    if (nl && nl.properties) {
+                        nn.properties = { ...nl.properties };
+                    }
+                })
 
                 draw = true;
             }

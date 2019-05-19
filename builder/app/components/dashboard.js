@@ -26,6 +26,11 @@ import * as VC from '../constants/visual';
 import MindMap from './mindmap';
 import { GooMenuSVG } from './goomenu';
 import GooMenu from './goomenu';
+import FormControl from './formcontrol';
+import TextInput from './textinput';
+import SelectInput from './selectinput';
+
+const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 class Dashboard extends Component {
@@ -57,6 +62,7 @@ class Dashboard extends Component {
             menu_top = selected_node_bb.top;
         }
         var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
                 height: 'auto',
@@ -66,12 +72,12 @@ class Dashboard extends Component {
                     <GooMenuSVG />
                     <GooMenu
                         visible={UIA.Visual(state, UIA.SELECTED_NODE)}
-                        left={menu_left}
+                        left={menu_left - 20}
                         open={UIA.Visual(state, NODE_MENU)}
                         onToggle={() => {
                             this.props.toggleVisual(NODE_MENU);
                         }}
-                        top={menu_top}
+                        top={menu_top + 30}
                         menuItems={nodeSelectionMenuItems}
                     />
                     <div data-tid="container">
@@ -104,16 +110,13 @@ class Dashboard extends Component {
                                     <TreeViewItem title={Titles.AddNode} onClick={() => {
                                         this.props.graphOperation(UIA.NEW_NODE);
                                     }} />
-                                    <TreeViewItem title={'asdf'} />
-                                    <TreeViewItem title={'asdf'} />
-                                    <TreeViewItem title={'asdf'} />
                                 </TreeViewMenu>
-                                <TreeViewMenu title={'menu'}>
+                                {/* <TreeViewMenu title={'menu'}>
                                     <TreeViewItem title={'asdf'} />
                                     <TreeViewItem title={'asdf'} />
                                     <TreeViewItem title={'asdf'} />
                                     <TreeViewItem title={'asdf'} />
-                                </TreeViewMenu>
+                                </TreeViewMenu> */}
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
@@ -131,6 +134,7 @@ class Dashboard extends Component {
                                         if ([UIA.Visual(state, UIA.SELECTED_NODE)].indexOf(nodeId) === -1) {
                                             this.props.SelectedNode(nodeId);
                                             this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
+                                            this.props.setVisual(SIDE_PANEL_OPEN, true);
                                         }
                                         else {
                                             this.props.SelectedNode(null);
@@ -141,11 +145,41 @@ class Dashboard extends Component {
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
                                 graph={UIA.Graphs(state, UIA.Application(state, UIA.CURRENT_GRAPH))}></MindMap>
                         </Content>
-                        <SideBar open={UIA.Visual(state, 'side-panel-open')}>
+                        <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)}>
                             <SideBarTabs>
-                                <SideBarTab />
+                                <SideBarTab
+                                    icon="fa fa-cog"
+                                    active={UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB)} onClick={() => {
+                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                    }} />
+                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, 'more')} onClick={() => {
+                                    this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                }} />
+                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, 'more2')} onClick={() => {
+                                    this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                }} />
                             </SideBarTabs>
-                            <SideBarContent></SideBarContent>
+                            {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
+                                {currentNode ? (<FormControl>
+                                    <TextInput
+                                        label={Titles.Label}
+                                        value={currentNode.properties ? currentNode.properties.text : ''}
+                                        onChange={(value) => {
+                                            this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
+                                        }} />
+                                    <SelectInput
+                                        options={Object.keys(UIA.NodeTypes).map(x => {
+                                            return {
+                                                value: UIA.NodeTypes[x],
+                                                title: x
+                                            }
+                                        })}
+                                        onChange={(value) => {
+                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: 'nodeType', id: currentNode.id, value })
+                                        }}
+                                        value={currentNode.properties ? currentNode.properties.nodeType : ''} />
+                                </FormControl>) : null}
+                            </SideBarContent>) : null}
                         </SideBar>
                     </div>
                 </div >
@@ -153,4 +187,6 @@ class Dashboard extends Component {
         );
     }
 }
+const SELECTED_TAB = 'SELECTED_TAB';
+const DEFAULT_TAB = 'DEFAULT_TAB';
 export default UIConnect(Dashboard)

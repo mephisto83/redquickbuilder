@@ -7,7 +7,7 @@ export default class SideBarTab extends Component {
         return this.props.icon || "fa fa-wrench";
     }
     active() {
-        return this.props.active || "";
+        return this.props.active ? 'active' : "";
     }
     ariaExapanded() {
         return this.props.active ? 'true' : 'false';
@@ -15,7 +15,11 @@ export default class SideBarTab extends Component {
     render() {
         return (
             <li className={this.active()}>
-                <a data-toggle="tab" aria-expanded={this.ariaExapanded()}>
+                <a data-toggle="tab" onClick={() => {
+                    if (this.props.onClick) {
+                        this.props.onClick();
+                    }
+                }} aria-expanded={this.ariaExapanded()}>
                     <i className={this.icon()}></i>
                 </a>
             </li>

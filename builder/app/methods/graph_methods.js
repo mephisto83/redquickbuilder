@@ -32,6 +32,33 @@ export function newLink(graph, options) {
     }
     return graph;
 }
+export function updateNodeText(graph, options) {
+    var { id, value } = options;
+    if (id && graph.nodeLib && graph.nodeLib[id]) {
+        graph.nodeLib[id] = {
+            ...graph.nodeLib[id], ...{
+                properties: {
+                    ...(graph.nodeLib[id].properties || {}),
+                    text: value
+                }
+            }
+        }
+    }
+}
+export function updateNodeProperty(graph, options) {
+    var { id, value, prop } = options;
+    if (id && prop && graph.nodeLib && graph.nodeLib[id]) {
+        graph.nodeLib[id] = {
+            ...graph.nodeLib[id], ...{
+                properties: {
+                    ...(graph.nodeLib[id].properties || {}),
+                    [prop]: value
+                }
+            }
+        }
+    }
+}
+
 function noSameLink(graph, ops) {
     return !graph.links.some(x => {
         var temp = graph.linkLib[x];
