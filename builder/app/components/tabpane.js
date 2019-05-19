@@ -8,7 +8,7 @@ export default class TabPane extends Component {
     render() {
         return (
             <div className={`tab-pane ${this.active()}`}>
-                {this.props.children}
+                {this.props.active ? this.props.children : null}
             </div>
         );
     }

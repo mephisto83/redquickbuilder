@@ -8,7 +8,12 @@ export const NodeTypes = {
     ChoiceList: 'choice-list',
     ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
-    ValidationListItem: 'validation-list-item'
+    ValidationListItem: 'validation-list-item',
+    OptionList: 'option-list',
+    OptionListItem: 'option-list-item',
+    OptionCustom: 'option-custom',
+    ExtensionTypeList: 'extension-type-list',
+    ExtensionType: 'extension-type'
 }
 
 export const NodeTypeColors = {
@@ -19,7 +24,12 @@ export const NodeTypeColors = {
     [NodeTypes.Attribute]: '#414770',
     [NodeTypes.ChoiceList]: '#457B9D',
     [NodeTypes.ValidationList]: '#A8DADC',
-    [NodeTypes.ValidationListItem]: '#EA526F'
+    [NodeTypes.ValidationListItem]: '#EA526F',
+    [NodeTypes.OptionList]: '#2EC4B6',
+    [NodeTypes.OptionListItem]: '#856A5D',
+    [NodeTypes.OptionCustom]: '#403F4C',
+    [NodeTypes.ExtensionTypeList]: '#2C2B3C',
+    [NodeTypes.ExtensionType]: '#1B2432'
 }
 
 export const NodeProperties = {
@@ -27,6 +37,20 @@ export const NodeProperties = {
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',
+    // Property has a dependent property
+    UIDependsOn: 'uiDependsOn',
+    UseUIDependsOn: 'UseuiDependsOn',
+    UseUIOptions: 'UseuiOptions',
+    UIOptionType: 'uiOptionType',
+    //Use a custom option
+    UseCustomUIOption: 'useCustomUIOption',
+    UIOptionTypeCustom: 'uiOptionTypeCustom',
+    //An option
+    UIOption: 'uiOption',
+    //Use Extensions
+    UseUIExtensionList: 'UseuiExtensionList',
+    UIExtensionList: 'uiExtensionList',
+    UIExtension: 'uiExtension',
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
@@ -35,7 +59,12 @@ export const NodeProperties = {
 
 export const LinkType = {
     Choice: 'choice',
-    Validation: 'validation'
+    Validation: 'validation',
+    Option: 'option',
+    OptionCustom: 'option-custom',
+    DependsOn: 'depends-on',
+    ExtensionList: 'extension-list',
+    Extension: 'extension'
 }
 export const LinkProperties = {
     ChoiceLink: {
@@ -43,6 +72,22 @@ export const LinkProperties = {
     },
     ValdationLink: {
         type: LinkType.Validation
+    },
+    OptionLink: {
+        type: LinkType.Option
+    },
+    // Options for custom defined options, that need to be made later.
+    OptionCustomLink: {
+        type: LinkType.OptionCustom
+    },
+    DependsOnLink: {
+        type: LinkType.DependsOn
+    },
+    ExtensionListLink: {
+        type: LinkType.ExtensionList
+    },
+    ExtensionLink: {
+        type: LinkType.Extension
     }
 }
 
@@ -65,6 +110,20 @@ export const ValidationRules = {
     Zip: "zip",
     SocialSecurity: "socialsecurity",
 }
+export const ExtensionDefinitionTypes = {
+    DictionaryStringString: 'DictionaryStringString',
+    DictionaryStringDictionary: 'DictionaryStringDictionary',
+}
+export const CollectionTypes = {
+    DebitCard: 'DebitCard',
+    Email: 'Email',
+    Telephone: 'Telephone'
+}
+
+export const OptionsTypes = {
+    CHOICELIST: 'CHOICELIST',
+    CAPITALIZE_FIRST_LETTER: 'CAPITALIZE_FIRST_LETTER'
+}
 
 export const NodeAttributePropertyTypes = {
 
@@ -83,10 +142,8 @@ export const NodeAttributePropertyTypes = {
     INCH: "INCH",
     DIMENSION: "DIMENSION",
     MONEY: "MONEY",
-    CAPITALIZE_FIRST_LETTER: "CAPITALIZE_FIRST_LETTER",
     COUNTRY: "COUNTRY",
     DEBIT: "DEBIT",
-    CHOICELIST: "CHOICELIST",
     MONTH: "MONTH",
     STATE: "STATE",
     CHOICE: "CHOICE",

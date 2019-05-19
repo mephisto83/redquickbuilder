@@ -14,7 +14,7 @@ export default class CheckBox extends Component {
             <div className="form-group">
                 <div className="checkbox">
                     <label>
-                        <input type="checkbox" value={this.value()} onChange={(v) => {
+                        <input type="checkbox" checked={this.value()} onChange={(v) => {
                             if (this.props.onChange) {
                                 this.props.onChange(v.target.checked);
                             }

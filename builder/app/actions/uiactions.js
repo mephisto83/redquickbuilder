@@ -12,6 +12,7 @@ export const NodeProperties = NodeConstants.NodeProperties;
 export const LinkProperties = NodeConstants.LinkProperties;
 export const NodeAttributePropertyTypes = NodeConstants.NodeAttributePropertyTypes;
 export const ValidationRules = NodeConstants.ValidationRules;
+export const OptionsTypes = NodeConstants.OptionsTypes;
 
 export const UI_UPDATE = 'UI_UPDATE';
 export function GetC(state, section, item) {
@@ -26,6 +27,9 @@ export function Visual(state, key) {
 export function IsCurrentNodeA(state, type) {
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     return currentNode && currentNode.properties && currentNode.properties.nodeType === type;
+}
+export function Use(node, prop) {
+    return node && node.properties && node.properties[prop];
 }
 export function VisualEq(state, key, value) {
     return Visual(state, key) === value;
@@ -132,6 +136,12 @@ export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
 export const NEW_VALIDATION_ITEM_NODE = 'NEW_VALIDATION_ITEM_NODE';
 export const NEW_CHOICE_TYPE = 'NEW_CHOICE_TYPE';
 export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
+export const NEW_OPTION_ITEM_NODE = 'NEW_OPTION_ITEM_NODE';
+export const NEW_OPTION_NODE = 'NEW_OPTION_NODE';
+export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
+export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
+export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
+
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
@@ -187,8 +197,28 @@ export function graphOperation(operation, options) {
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceListItem);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
+            case NEW_OPTION_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionList);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_CUSTOM_OPTION:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_EXTENSION_LIST_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
             case NEW_VALIDATION_ITEM_NODE:
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_EXTENTION_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionType);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_OPTION_ITEM_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
         }

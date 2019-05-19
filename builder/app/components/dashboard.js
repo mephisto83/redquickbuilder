@@ -31,7 +31,9 @@ import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
-
+import OptionActivityMenu from './optionactivitymenu';
+import OptionItemFormControl from './optionitemformcontrol';
+import ExtensionListActivityMenu from './ExtensionListActivityMenu';
 import { GooMenuSVG } from './goomenu';
 import GooMenu from './goomenu';
 import FormControl from './formcontrol';
@@ -213,6 +215,9 @@ class Dashboard extends Component {
                                 <ValidationItemFormControl />
                                 <ChoiceActivityMenu />
                                 <ValidationActivityMenu />
+                                <OptionActivityMenu />
+                                <ExtensionListActivityMenu />
+                                <OptionItemFormControl /> 
                             </SideBarContent>) : null}
                         </SideBar>
                     </div>

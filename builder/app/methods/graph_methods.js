@@ -17,9 +17,9 @@ export function newNode(graph) {
 }
 export function removeNode(graph, options = {}) {
     var { id } = options;
-    
+
     graph = clearLinks(graph, options);
-    
+
     delete graph.nodeLib[id];
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = [...graph.nodes.filter(x => x !== id)];
@@ -59,8 +59,8 @@ export function addNewNodeOfType(graph, options, nodeType) {
 }
 
 export function newLink(graph, options) {
-    var { target, source } = options;
-    var link = createLink(target, source);
+    var { target, source, properties } = options;
+    var link = createLink(target, source, properties);
     return addLink(graph, options, link);
 }
 

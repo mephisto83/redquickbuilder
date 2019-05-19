@@ -28,7 +28,22 @@ class AttributeFormControl extends Component {
             }
         });
         var show_choice = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UIAttributeType] == UIA.NodeAttributePropertyTypes.CHOICE;
-        var show_validations = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIValidations];
+        var show_validations = UIA.Use(currentNode, UIA.NodeProperties.UseUIValidations);
+        var show_options = UIA.Use(currentNode, UIA.NodeProperties.UseUIOptions);
+        var show_extenions = UIA.Use(currentNode, UIA.NodeProperties.UseUIExtensionList);
+        var option_nodes = UIA.NodesByType(state, UIA.NodeTypes.OptionList).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
+        var extension_nodes = UIA.NodesByType(state, UIA.NodeTypes.ExtensionTypeList).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
+        
         return (
             <TabPane active={active}>
                 {currentNode ? (<FormControl>
@@ -76,7 +91,7 @@ class AttributeFormControl extends Component {
                                 target: value,
                                 source: id,
                                 properties: { ...UIA.LinkProperties.ChoiceLink }
-                            })
+                            });
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIChoiceType] : ''} />) : null}
                     {show_choice ? (
@@ -136,6 +151,89 @@ class AttributeFormControl extends Component {
                             }} icon={'fa fa-puzzle-piece'}
                                 title={Titles.AddValidationList}
                                 description={Titles.AddValidationListDescription} />
+                        </ControlSideBarMenu>
+                    ) : null}
+                    <CheckBox
+                        label={Titles.UseUIOptions}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseUIOptions] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UseUIOptions,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
+                    {show_options ? (<SelectInput
+                        label={Titles.OptionsType}
+                        options={option_nodes}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.UIOptionType],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIOptionType,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.OptionLink }
+                            })
+                        }}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIOptionType] : ''} />) : null}
+                    {show_options ? (
+                        <ControlSideBarMenu>
+                            <ControlSideBarMenuItem onClick={() => {
+                                this.props.graphOperation(UIA.NEW_OPTION_NODE, {});
+                            }} icon={'fa fa-puzzle-piece'}
+                                title={Titles.AddOptionList}
+                                description={Titles.AddOptionListDescription} />
+                        </ControlSideBarMenu>
+                    ) : null}
+
+
+                    <CheckBox
+                        label={Titles.UseUIExtensions}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseUIExtensionList] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UseUIExtensionList,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
+
+                    {show_extenions ? (<SelectInput
+                        label={Titles.ExtensionTypes}
+                        options={extension_nodes}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.UIExtensionList],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionList,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.ExtensionListLink }
+                            })
+                        }}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIExtensionList] : ''} />) : null}
+                    {show_extenions ? (
+                        <ControlSideBarMenu>
+                            <ControlSideBarMenuItem onClick={() => {
+                                this.props.graphOperation(UIA.NEW_EXTENSION_LIST_NODE, {});
+                            }} icon={'fa fa-puzzle-piece'}
+                                title={Titles.AddExtensionList}
+                                description={Titles.AddExtensionListDescription} />
                         </ControlSideBarMenu>
                     ) : null}
                 </FormControl>) : null}
