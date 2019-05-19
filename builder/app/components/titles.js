@@ -49,3 +49,4 @@ export const AddExtensionNode = 'Add Extension';
 export const ExtensionOptions = 'Extension(s)';
 export const ExtensionDefinitionTypes = 'Extension Definition Types';
 export const AddExtensionNodeDescription = 'Add extension node description';
+export const ExtensionDefinition = 'Extension Definition';

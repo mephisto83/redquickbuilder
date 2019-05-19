@@ -19,6 +19,10 @@ export default class DropDownMenu extends Component {
         return null;//<span className="label label-success">4</span>
     }
     render() {
+        var ops = {};
+        if (this.props.width) {
+            ops.style = { width: this.props.width }
+        }
         return (
             <li className={`dropdown ${this.menuType()} ${this.open()}`}>
                 <a className="dropdown-toggle" data-toggle="dropdown" aria-expanded={this.ariaExpanded()} onClick={() => {
@@ -29,7 +33,7 @@ export default class DropDownMenu extends Component {
                     <i className={this.icon()}></i>
                     {this.label()}
                 </a>
-                <ul className="dropdown-menu">
+                <ul className="dropdown-menu" {...ops}>
                     {this.props.headerText ? <li className="header">{this.props.headerText}</li> : null}
                     <li>
                         <ul className="menu">

@@ -40,6 +40,7 @@ import FormControl from './formcontrol';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import Slider from './slider';
+import ExtensionDefinitionMenu from './extensiondefinitionmenu';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -98,12 +99,12 @@ class Dashboard extends Component {
                             <DashboardNavBar>
                                 <SidebarToggle />
                                 <NavBarMenu>
-                                    <DropDownMenu open={UIA.Visual(state, 'dashboard-menu')} onClick={() => {
+                                    <ExtensionDefinitionMenu />
+                                    {/* <DropDownMenu open={UIA.Visual(state, 'dashboard-menu')} onClick={() => {
                                         this.props.toggleVisual('dashboard-menu')
                                     }}>
                                         <DropDownMenuItem icon={"ion ion-ios-gear-outline"} title={'title'} description="as aksd lasdf"></DropDownMenuItem>
-                                    </DropDownMenu>
-
+                                    </DropDownMenu> */}
                                     <NavBarButton onClick={() => {
                                         this.props.toggleVisual('side-panel-open')
                                     }} />
@@ -217,7 +218,7 @@ class Dashboard extends Component {
                                 <ValidationActivityMenu />
                                 <OptionActivityMenu />
                                 <ExtensionListActivityMenu />
-                                <OptionItemFormControl /> 
+                                <OptionItemFormControl />
                             </SideBarContent>) : null}
                         </SideBar>
                     </div>
