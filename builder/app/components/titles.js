@@ -1,6 +1,7 @@
 export const AddNode = 'Add Node';
 export const RemoveNode = 'Remove Node';
 export const GraphOperations = 'Graph Operations';
+export const GraphPropertiesMenu = 'Graph Properties';
 export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';
 export const Label = 'Label';

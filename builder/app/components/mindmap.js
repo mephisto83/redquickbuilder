@@ -19,13 +19,7 @@ export default class MindMap extends Component {
         this.state = {
             id: `id-${Date.now()}`,
             graph: {
-                "nodes": [
-                    // { "name": "a", "width": 60, "height": 40 },
-                    // { "name": "b", "width": 60, "height": 40 },
-                    // { "name": "c", "width": 60, "height": 40 },
-                    // { "name": "d", "width": 60, "height": 40 },
-                    // { "name": "e", "width": 60, "height": 40 }
-                ].map(t => { t.id = t.name; return t; }),
+                "nodes": [].map(t => { t.id = t.name; return t; }),
                 links: [],
                 "groups": [
                     // { "leaves": [0], "groups": [1] },
@@ -102,7 +96,7 @@ export default class MindMap extends Component {
 
         var margin = 6, pad = 12;;
         force
-            .linkDistance(280)
+            .linkDistance(this.props.linkDistance || 280)
             .avoidOverlaps(true)
             .handleDisconnected(false)
             .size([width, height]);

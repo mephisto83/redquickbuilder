@@ -29,7 +29,8 @@ export function removeNode(graph, options = {}) {
 export function clearLinks(graph, options) {
     var { id } = options;
     var linksToRemove = getAllLinksWithNode(graph, id);
-    for (var i = 0; i < linksToRemove; i++) {
+    for (var i = 0; i < linksToRemove.length; i++) {
+        var link = linksToRemove[i];
         graph = removeLink(graph, link);
     }
     return graph;
@@ -88,7 +89,7 @@ export function findLinkInstance(graph, options) {
     return link;
 }
 export function getAllLinksWithNode(graph, id) {
-    return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === x);
+    return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === id);
 }
 export function removeLinkBetweenNodes(graph, options) {
     var link = findLinkInstance(graph, options);

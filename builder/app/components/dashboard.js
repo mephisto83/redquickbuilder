@@ -28,6 +28,7 @@ import ModelActivityMenu from './modelactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
 import AttributeFormControl from './attributeformcontrol';
 import ChoiceActivityMenu from './choiceactivitymenu';
+import TreeViewItemContainer from './treeviewitemcontainer';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
 
@@ -36,10 +37,12 @@ import GooMenu from './goomenu';
 import FormControl from './formcontrol';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
+import Slider from './slider';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
+const LINK_DISTANCE = 'LINK_DISTANCE';
 class Dashboard extends Component {
 
     minified() {
@@ -120,21 +123,31 @@ class Dashboard extends Component {
                                         this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
                                     }} />
                                     <TreeViewItem title={Titles.RemoveNode} onClick={() => {
-                                        this.props.graphOperation(UIA.REMOVE_NODE);
+                                        this.props.graphOperation(UIA.REMOVE_NODE, { id: UIA.Visual(state, UIA.SELECTED_NODE) });
                                         this.props.setVisual(SIDE_PANEL_OPEN, false);
                                         this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
                                     }} />
                                 </TreeViewMenu>
-                                {/* <TreeViewMenu title={'menu'}>
-                                    <TreeViewItem title={'asdf'} />
-                                    <TreeViewItem title={'asdf'} />
-                                    <TreeViewItem title={'asdf'} />
-                                    <TreeViewItem title={'asdf'} />
-                                </TreeViewMenu> */}
+                                <TreeViewMenu
+                                    open={UIA.Visual(state, VC.GraphPropertiesMenu)}
+                                    active={UIA.Visual(state, VC.GraphPropertiesMenu)}
+                                    title={Titles.GraphPropertiesMenu}
+                                    toggle={() => {
+                                        this.props.toggleVisual(VC.GraphPropertiesMenu)
+                                    }}>
+                                    <TreeViewItemContainer>
+                                        <Slider min={30} max={500}
+                                            onChange={(value) => {
+                                                this.props.setVisual(LINK_DISTANCE, value);
+                                            }}
+                                            value={UIA.Visual(state, LINK_DISTANCE)} />
+                                    </TreeViewItemContainer>
+                                </TreeViewMenu>
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
                             <MindMap
+                                linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                                 onNodeClick={(nodeId, boundingBox) => {
                                     if (UIA.Visual(state, CONNECTING_NODE)) {
                                         this.props.graphOperation(UIA.NEW_LINK, {
