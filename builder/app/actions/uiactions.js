@@ -43,17 +43,37 @@ export function UIC(section, item, value) {
 export function toggleVisual(key) {
     return (dispatch, getState) => {
         var state = getState();
-        console.log(state);
         dispatch(UIC(VISUAL, key, !!!GetC(state, VISUAL, key)))
     }
 
+}
+
+export function GUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+export function setVisual(key, value) {
+    return (dispatch, getState) => {
+        var state = getState();
+        dispatch(UIC(VISUAL, key, value))
+    }
+
+}
+export const SELECTED_NODE = 'SELECTED_NODE';
+export function SelectedNode(nodeId) {
+    return (dispatch, getState) => {
+        dispatch(UIC(VISUAL, SELECTED_NODE, nodeId));
+    }
 }
 export function toggleDashboardMinMax() {
     return toggleVisual(DASHBOARD_MENU);
 }
 export const NEW_NODE = 'NEW_NODE';
+export const NEW_LINK = 'NEW_LINK';
 export const CURRENT_GRAPH = 'CURRENT_GRAPH';
-export function graphOperation(operation) {
+export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
         var currentGraph = Application(state, CURRENT_GRAPH);
@@ -69,9 +89,15 @@ export function graphOperation(operation) {
             case NEW_NODE:
                 currentGraph = GraphMethods.newNode(currentGraph);
                 break;
+            case NEW_LINK:
+                currentGraph = GraphMethods.newLink(currentGraph, options)
+                break;
         }
 
         SaveGraph(currentGraph, dispatch)
     }
 }
 
+export const Colors = {
+    SelectedNode: '#f1f121'
+};

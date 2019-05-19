@@ -1,3 +1,5 @@
+@import url('goo-menu.css');
+
 .treeview .treeview-menu {
     transition: all;
     transition-duration: .4s;
@@ -35,7 +37,16 @@
 .mindmap .label {
     fill: white;
     font-family: Verdana;
-    font-size: 25px;
+    font-size: 16px;
     text-anchor: middle;
     cursor: move;
+}
+
+.mindmap .axis path {
+    display: none;
+}
+
+.mindmap .axis line {
+    stroke-opacity: 0.3;
+    shape-rendering: crispEdges;
 }
