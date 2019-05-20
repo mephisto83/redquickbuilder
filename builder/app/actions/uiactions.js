@@ -31,6 +31,9 @@ export function IsCurrentNodeA(state, type) {
 export function Use(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+export function GetNodeProp(node, prop) {
+    return node && node.properties && node.properties[prop];
+}
 export function VisualEq(state, key, value) {
     return Visual(state, key) === value;
 }
@@ -141,6 +144,7 @@ export const NEW_OPTION_NODE = 'NEW_OPTION_NODE';
 export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
 export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
 export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
+export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
 
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
@@ -220,6 +224,8 @@ export function graphOperation(operation, options) {
             case NEW_OPTION_ITEM_NODE:
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                 break;
         }
 

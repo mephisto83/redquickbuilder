@@ -51,6 +51,8 @@ export const NodeProperties = {
     UseUIExtensionList: 'UseuiExtensionList',
     UIExtensionList: 'uiExtensionList',
     UIExtension: 'uiExtension',
+    UIExtensionDefinition: 'uiExtensionDefinition',
+    
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',

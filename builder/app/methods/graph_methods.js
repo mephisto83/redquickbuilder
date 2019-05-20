@@ -15,6 +15,15 @@ export function newNode(graph) {
     var node = createNode();
     return addNode(graph, node);
 }
+export function createExtensionDefinition() {
+    return {
+        config: {},
+        definition: {}
+    }
+}
+export function defaultExtensionDefinitionType() {
+    return 'string';
+}
 export function removeNode(graph, options = {}) {
     var { id } = options;
 

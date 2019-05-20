@@ -21,6 +21,9 @@ export default class Box extends Component {
                 <div className="box-body">
                     {this.props.children}
                 </div>
+                <div className="box-footer">
+                    {this.props.footer}
+                </div>
             </div>
         );
     }
