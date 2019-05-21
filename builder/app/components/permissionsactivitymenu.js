@@ -21,7 +21,6 @@ class PermissionActivityMenu extends Component {
             update: false,
             delete: false,
             getall: false,
-            getbyowner: false
         } : null;
         var model_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => {
             return {
@@ -31,6 +30,18 @@ class PermissionActivityMenu extends Component {
         });
         return (
             <TabPane active={active}>
+                <ControlSideBarMenuHeader title={Titles.PermissionAttributes} />
+                <CheckBox 
+                    title={Titles.OwnedResourcesDescription}
+                    label={Titles.OwnedResources}
+                    value={currentNode.properties[UIA.NodeProperties.IsOwned] }
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.IsOwned,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />
                 <ControlSideBarMenuHeader title={Titles.PermissionActions} />
                 {permissions ? (<FormControl>{(Object.keys(permissions).map(key => {
                     return (<CheckBox key={`permissions-${key}`}

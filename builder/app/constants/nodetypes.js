@@ -37,6 +37,7 @@ export const NodeTypeColors = {
 export const NodeProperties = {
     IsAgent: 'isAgent',
     UIPermissions: 'uiPermissions',
+    IsOwned: 'isOwned',
     UIName: 'uiName',
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',

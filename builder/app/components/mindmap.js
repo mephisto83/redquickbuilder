@@ -223,7 +223,7 @@ export default class MindMap extends Component {
             })
             .style('white-space', 'normal')
             .style('text-align', 'start')
-            .style('word-break', 'break-all')
+            //.style('word-break', 'break-all')
             .style('height', x => {
                 return `${x.height - pad / 2}px`
             })

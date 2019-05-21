@@ -9,11 +9,14 @@ export default class CheckBox extends Component {
     value() {
         return this.props.value || '';
     }
+    title(){
+        return this.props.title || '';
+    }
     render() {
         return (
             <div className="form-group">
                 <div className="checkbox">
-                    <label>
+                    <label title={this.title()}>
                         <input type="checkbox" checked={this.value()} onChange={(v) => {
                             if (this.props.onChange) {
                                 this.props.onChange(v.target.checked);

@@ -19,7 +19,10 @@ export const PropertyValueType = 'Property value type';
 export const Enumerable = 'Enumerable';
 export const Value = 'Value';
 export const IsAgent = 'Agent';
+export const OwnedResources = 'Owned Resources';
 export const PermissionType = 'Permissions';
+export const PermissionAttributes = 'Permission Attributes';
+export const OwnedResourcesDescription = 'Check if permissions are for resources owned by source model.'
 export const PermissionActions = 'Permission Actions';
 export const Permissions = {
     create: 'Create',
