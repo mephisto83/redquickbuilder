@@ -5,7 +5,8 @@ import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } 
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
-class ChoiceActivityMenu extends Component {
+import Box from './box';
+class ChoiceListItemActivityMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ChoiceList);
@@ -15,17 +16,6 @@ class ChoiceActivityMenu extends Component {
 
         return (
             <TabPane active={active}>
-                {/* <ControlSideBarMenuHeader title={Titles.ChoiceListActions} />
-                <ControlSideBarMenu>
-                    <ControlSideBarMenuItem onClick={() => {
-                        this.props.graphOperation(UIA.NEW_CHOICE_ITEM_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
-                        });
-                    }}
-                        icon={'fa fa-puzzle-piece'}
-                        title={Titles.AddChoiceItem}
-                        description={Titles.AddChoiceItemDescription} />
-                </ControlSideBarMenu> */}
                 <ul>
                     {def ? Object.keys(def.definition).map((x, xi) => {
                         return (<li key={`clist${x}-${xi}`}>{x}</li>);
@@ -36,4 +26,4 @@ class ChoiceActivityMenu extends Component {
     }
 }
 
-export default UIConnect(ChoiceActivityMenu)
+export default UIConnect(ChoiceListItemActivityMenu)

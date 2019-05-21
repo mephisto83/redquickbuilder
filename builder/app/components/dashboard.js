@@ -34,7 +34,9 @@ import ValidationItemFormControl from './validationitemactivitymenu';
 import OptionActivityMenu from './optionactivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
 import ExtensionListActivityMenu from './ExtensionListActivityMenu';
+import PermissionActivityMenu from './permissionsactivitymenu';
 import { GooMenuSVG } from './goomenu';
+import ChoiceListItemActivityMenu from './choicelistitemactivitymenu';
 import GooMenu from './goomenu';
 import FormControl from './formcontrol';
 import TextInput from './textinput';
@@ -182,8 +184,8 @@ class Dashboard extends Component {
                                     active={UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB)} onClick={() => {
                                         this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
                                     }} />
-                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, 'more')} onClick={() => {
-                                    this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB)} onClick={() => {
+                                    this.props.setVisual(SELECTED_TAB, PARAMETER_TAB)
                                 }} />
                                 <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, 'more2')} onClick={() => {
                                     this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
@@ -210,6 +212,9 @@ class Dashboard extends Component {
                                         }}
                                         value={currentNode.properties ? currentNode.properties.nodeType : ''} />
                                 </FormControl>) : null}
+                                <ChoiceListItemActivityMenu />
+                            </SideBarContent>) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
                                 <AttributeFormControl />
                                 <ModelActivityMenu />
                                 <PropertyActivityMenu />
@@ -219,6 +224,7 @@ class Dashboard extends Component {
                                 <OptionActivityMenu />
                                 <ExtensionListActivityMenu />
                                 <OptionItemFormControl />
+                                <PermissionActivityMenu />
                             </SideBarContent>) : null}
                         </SideBar>
                     </div>
@@ -229,4 +235,5 @@ class Dashboard extends Component {
 }
 const SELECTED_TAB = 'SELECTED_TAB';
 const DEFAULT_TAB = 'DEFAULT_TAB';
+const PARAMETER_TAB = 'PARAMETER_TAB';
 export default UIConnect(Dashboard)

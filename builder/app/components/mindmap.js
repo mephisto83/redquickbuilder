@@ -9,7 +9,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import React, { Component } from 'react';
 import { NodeTypeColors } from '../actions/uiactions';
 
-
+const MIN_DIMENSIONAL_SIZE = 20;
 export default class MindMap extends Component {
     constructor() {
         super();
@@ -160,8 +160,8 @@ export default class MindMap extends Component {
 
         graph.nodes.forEach(function (v) {
             var bb = me.calculateNodeTextSize(getLabelText(v), pad);
-            v.width = Math.max(30, bb.width);
-            v.height = Math.max(30, bb.height);
+            v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
+            v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
         })
         graph.groups.forEach(function (g) { g.padding = pad })
 
@@ -244,8 +244,8 @@ export default class MindMap extends Component {
             if (me.$_nodes) {
                 me.$_nodes.each(function (d) {
                     var bb = me.calculateNodeTextSize(getLabelText(d), pad);
-                    d.width = Math.max(30, bb.width);
-                    d.height = Math.max(30, bb.height)
+                    d.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
+                    d.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height)
                     d.innerBounds = d.bounds.inflate(- margin);
                 });
             }

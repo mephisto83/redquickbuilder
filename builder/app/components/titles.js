@@ -4,6 +4,7 @@ export const GraphOperations = 'Graph Operations';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';
+export const Models = 'Models';
 export const Label = 'Label';
 export const New = 'New';
 export const ModelActions = 'Model Actions';
@@ -15,10 +16,25 @@ export const UIName = 'UI Name';
 export const UISingular = 'UI Singular';
 export const Unknown = 'Unknown';
 export const PropertyValueType = 'Property value type';
+export const Enumerable = 'Enumerable';
+export const Value = 'Value';
+export const IsAgent = 'Agent';
+export const PermissionType = 'Permissions';
+export const PermissionActions = 'Permission Actions';
+export const Permissions = {
+    create: 'Create',
+    get: 'Read',
+    getall: 'Read All',
+    delete: 'Delete',
+    getbyowner: 'Get by owner',
+    update: 'Update'
+};
 export const ChoiceTypes = 'Choice types';
 export const ChoiceListActions = 'Choice Actions';
 export const AddChoice = 'Add Choice';
 export const AddChoiceDescription = 'Add choice type';
+export const AddPermissionDescription = 'Permission nodes describe the ability of connected models on downstream models';
+export const AddPermission = 'Add permission nodes'
 export const AddChoiceItem = 'Add choice item';
 export const AddChoiceItemDescription = 'Add a new choice item';
 export const Select = 'Select';

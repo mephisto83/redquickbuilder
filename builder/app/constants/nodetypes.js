@@ -6,7 +6,8 @@ export const NodeTypes = {
     Screen: 'screen',
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
-    ChoiceListItem: 'choice-list-item',
+    Permission: 'permission',
+    // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
     OptionList: 'option-list',
@@ -29,10 +30,13 @@ export const NodeTypeColors = {
     [NodeTypes.OptionListItem]: '#856A5D',
     [NodeTypes.OptionCustom]: '#403F4C',
     [NodeTypes.ExtensionTypeList]: '#2C2B3C',
-    [NodeTypes.ExtensionType]: '#1B2432'
+    [NodeTypes.ExtensionType]: '#1B2432',
+    [NodeTypes.Permission]: '#383F51'
 }
 
 export const NodeProperties = {
+    IsAgent: 'isAgent',
+    UIPermissions: 'uiPermissions',
     UIName: 'uiName',
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
@@ -52,7 +56,7 @@ export const NodeProperties = {
     UIExtensionList: 'uiExtensionList',
     UIExtension: 'uiExtension',
     UIExtensionDefinition: 'uiExtensionDefinition',
-    
+
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
@@ -66,11 +70,19 @@ export const LinkType = {
     OptionCustom: 'option-custom',
     DependsOn: 'depends-on',
     ExtensionList: 'extension-list',
-    Extension: 'extension'
+    Extension: 'extension',
+    Permission: 'permission',
+    AppliedPermissionLink: 'applied-permission'
 }
 export const LinkProperties = {
     ChoiceLink: {
         type: LinkType.Choice
+    },
+    PermissionLink: {
+        type: LinkType.Permission
+    },
+    AppliedPermissionLink: {
+        type: LinkType.AppliedPermissionLink
     },
     ValdationLink: {
         type: LinkType.Validation

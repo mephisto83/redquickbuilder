@@ -132,6 +132,7 @@ export const CHANGE_NODE_TEXT = 'CHANGE_NODE_TEXT';
 export const CURRENT_GRAPH = 'CURRENT_GRAPH';
 export const CHANGE_NODE_PROPERTY = 'CHANGE_NODE_PROPERTY';
 export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE';
+export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
 export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
 export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
 export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
@@ -197,8 +198,8 @@ export function graphOperation(operation, options) {
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
-            case NEW_CHOICE_ITEM_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceListItem);
+            case NEW_PERMISSION_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Permission);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
             case NEW_OPTION_NODE:

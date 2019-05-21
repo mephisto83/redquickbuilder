@@ -17,7 +17,15 @@ export function newNode(graph) {
 }
 export function createExtensionDefinition() {
     return {
-        config: {},
+        //The code generation will define the unique 'value'.
+        config: {
+            //If this definition is a list or some sort of collection.
+            isEnumeration: false,
+            // If not, then it is a dictionary, and will have some sort of property that will  be considered the value.
+            dictionary: {},
+            // A list of objects, with the same shape as the dictionary.
+            list: []
+        },
         definition: {}
     }
 }
