@@ -33,12 +33,14 @@ export const NodeTypeColors = {
     [NodeTypes.ExtensionType]: '#1B2432',
     [NodeTypes.Permission]: '#383F51'
 }
-
 export const NodeProperties = {
     IsAgent: 'isAgent',
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
     UIName: 'uiName',
+
+    UIText: 'text',
+
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',
@@ -61,8 +63,19 @@ export const NodeProperties = {
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
-    UIAttributeType: 'uiAttributeType'
+    UIAttributeType: 'uiAttributeType',
+    //The name used for code.
+    CodeName: 'codeName'
 }
+
+export const DIRTY_PROP_EXT = '$ _dirty_ $';
+export const NodePropertiesDirtyChain = {
+    [NodeProperties.UIText]: {
+        dirtyProp: NodeProperties.CodeName + DIRTY_PROP_EXT,
+        chainProp: NodeProperties.CodeName
+    }
+}
+
 
 export const LinkType = {
     Choice: 'choice',
@@ -73,7 +86,8 @@ export const LinkType = {
     ExtensionList: 'extension-list',
     Extension: 'extension',
     Permission: 'permission',
-    AppliedPermissionLink: 'applied-permission'
+    AppliedPermissionLink: 'applied-permission',
+    ExtensionDependencyLink: 'extension-dependency-link'
 }
 export const LinkProperties = {
     ChoiceLink: {
@@ -103,6 +117,11 @@ export const LinkProperties = {
     },
     ExtensionLink: {
         type: LinkType.Extension
+    },
+    //This link is between an extension with a dependsOn property
+    // It describes a link between a property and a secondary property.
+    ExtensionDependencyLink: {
+        type: LinkType.ExtensionDependencyLink
     }
 }
 
@@ -139,7 +158,12 @@ export const OptionsTypes = {
     CHOICELIST: 'CHOICELIST',
     CAPITALIZE_FIRST_LETTER: 'CAPITALIZE_FIRST_LETTER'
 }
-
+export const NodePropertyTypes = {
+    STRING: 'STRING',
+    INT: 'INT',
+    FLOAT: 'FLOAT',
+    BOOLEAN: 'BOOLEAN'
+}
 export const NodeAttributePropertyTypes = {
 
     ROUTINGNUMBER: "ROUTINGNUMBER",

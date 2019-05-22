@@ -31,7 +31,7 @@ class PermissionActivityMenu extends Component {
         return (
             <TabPane active={active}>
                 <ControlSideBarMenuHeader title={Titles.PermissionAttributes} />
-                <CheckBox 
+               {currentNode ? (<CheckBox 
                     title={Titles.OwnedResourcesDescription}
                     label={Titles.OwnedResources}
                     value={currentNode.properties[UIA.NodeProperties.IsOwned] }
@@ -41,7 +41,7 @@ class PermissionActivityMenu extends Component {
                             id: currentNode.id,
                             value
                         });
-                    }} />
+                    }} />) : null}
                 <ControlSideBarMenuHeader title={Titles.PermissionActions} />
                 {permissions ? (<FormControl>{(Object.keys(permissions).map(key => {
                     return (<CheckBox key={`permissions-${key}`}

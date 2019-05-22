@@ -6,11 +6,13 @@ export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
 export const DASHBOARD_MENU = 'DASHBOARD_MENU';
 export const SELECTED_NODE_BB = 'SELECTED_NODE_BB';
+export const SIDE_PANEL_EXTRA_WIDTH = 'SIDE_PANEL_EXTRA_WIDTH';
 export const NodeTypes = NodeConstants.NodeTypes;
 export const NodeTypeColors = NodeConstants.NodeTypeColors;
 export const NodeProperties = NodeConstants.NodeProperties;
 export const LinkProperties = NodeConstants.LinkProperties;
 export const NodeAttributePropertyTypes = NodeConstants.NodeAttributePropertyTypes;
+export const NodePropertyTypes = NodeConstants.NodePropertyTypes;
 export const ValidationRules = NodeConstants.ValidationRules;
 export const OptionsTypes = NodeConstants.OptionsTypes;
 
@@ -117,6 +119,17 @@ export function NodesByType(state, nodeType) {
             .map(x => currentGraph.nodeLib[x]);
     }
     return [];
+}
+export function NodesConnectedTo(state, nodeId) {
+    var currentGraph = GetCurrentGraph(state);
+    if (currentGraph) {
+        return (t) => {
+            if (currentGraph.linkLib[t.id]) {
+                return currentGraph.linkLib[t.id][nodeId];
+            }
+        }
+    }
+    return () => false;
 }
 export function GetCurrentGraph(state) {
     var currentGraph = Application(state, CURRENT_GRAPH);

@@ -49,6 +49,7 @@ class AttributeFormControl extends Component {
                 {currentNode ? (<FormControl>
                     <TextInput
                         label={Titles.UIName}
+                        title={Titles.UINameDescription}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIName] : ''}
                         onChange={(value) => {
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

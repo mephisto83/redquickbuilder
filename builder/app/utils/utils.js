@@ -46,6 +46,29 @@ export function UIConnect(component) {
             Object.defineProperty(array, 'relativeCompliment', extrasection_relativeCompliment);
         }
     }
+    if (!array.unique) {
+        Object.defineProperty(array, 'unique', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var result = [];
+                var finalresult = [];
+                func = func || function (x) { return x; };
+                var collection = this;
+                for (var i = 0; i < collection.length; i++) {
+                    //if (func(collection[i])) {
+                    if (result.indexOf(func(collection[i])) === -1) {
+                        result.push(func(collection[i]));
+                        finalresult.push(collection[i]);
+                    }
+                    //}
+                }
+                return finalresult;
+                //return result;
+            }
+        });
+    }
     if (!array.removeIndices) {
         //removeIndices
         Object.defineProperty(array, 'removeIndices', {

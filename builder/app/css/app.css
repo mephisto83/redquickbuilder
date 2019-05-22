@@ -116,3 +116,12 @@
     cursor: pointer;
     /* Cursor on hover */
 }
+
+.control-sidebar.extra-wide {
+    width: 500px;
+    right: -500px;
+}
+.control-sidebar.extra-wide.control-sidebar-open {
+    width: 500px;
+    right: 0px;
+}

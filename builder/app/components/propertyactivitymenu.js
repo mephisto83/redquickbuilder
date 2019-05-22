@@ -60,6 +60,34 @@ class PropertyActivityMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIDependsOn] : ''} />) : null}
                 </FormControl>) : null}
+                {currentNode ? (<FormControl>
+                    <TextInput
+                        label={Titles.UIName}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIName] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIName,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
+                    <SelectInput
+                        options={Object.keys(UIA.NodePropertyTypes).sort((a, b) => a.localeCompare(b)).map(x => {
+                            return {
+                                value: UIA.NodePropertyTypes[x],
+                                title: x
+                            }
+                        })}
+                        label={Titles.PropertyValueType}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIAttributeType,
+                                id: currentNode.id,
+                                value
+                            });
+                        }}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIAttributeType] : ''} />
+                </FormControl>) : null}
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {

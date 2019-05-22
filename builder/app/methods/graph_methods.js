@@ -1,10 +1,11 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain } from '../constants/nodetypes';
 export function createGraph() {
     return {
         id: uuidv4(),
         nodeLib: {},
         nodes: [],
+        nodeLinks: {},
         linkLib: {},
         links: [],
         updated: null
@@ -89,8 +90,23 @@ export function addLink(graph, options, link) {
                 graph.linkLib[link.id] = link;
                 graph.linkLib = { ...graph.linkLib };
                 graph.links = [...graph.links, link.id];
-                graph = { ...graph };
+                //Keeps track of the number of links between nodes.
+                graph.nodeLinks[link.source] = {
+                    ...(graph.nodeLinks[link.source] || {}),
+                    ...{
+                        [link.target]: graph.nodeLinks[link.source] ? (graph.nodeLinks[link.source][link.target] || 0) + 1 : 1
+                    }
+                };
+                //Keeps track of the number of links between nodes.
+                graph.nodeLinks[link.target] = {
+                    ...graph.nodeLinks[link.target],
+                    ...{
+                        [link.source]: graph.nodeLinks[link.target] ? (graph.nodeLinks[link.target][link.source] || 0) + 1 : 1
+                    }
+                };
             }
+            graph.nodeLinks = { ...graph.nodeLinks }
+            graph = { ...graph };
         }
     }
     return graph;
@@ -117,6 +133,24 @@ export function removeLink(graph, link) {
         graph.links = [...graph.links.filter(x => x !== link)];
         delete graph.linkLib[link]
         graph.linkLib = { ...graph.linkLib };
+        graph.nodeLinks[link.source] = {
+            ...graph.nodeLinks[link.source],
+            ...{
+                [link.target]: (graph.nodeLinks[link.source][link.target] || 0) - 1
+            }
+        };
+        if (!graph.nodeLinks[link.source][link.target]) {
+            delete graph.nodeLinks[link.source][link.target];
+        }
+        graph.nodeLinks[link.target] = {
+            ...graph.nodeLinks[link.target],
+            ...{
+                [link.source]: (graph.nodeLinks[link.target][link.source] || 0) - 1
+            }
+        };
+        if (!graph.nodeLinks[link.target][link.source]) {
+            delete graph.nodeLinks[link.target][link.source];
+        }
     }
     return { ...graph };
 
@@ -137,10 +171,18 @@ export function updateNodeText(graph, options) {
 export function updateNodeProperty(graph, options) {
     var { id, value, prop } = options;
     if (id && prop && graph.nodeLib && graph.nodeLib[id]) {
+        if (NodePropertiesDirtyChain[prop]) {
+            var temp = NodePropertiesDirtyChain[prop];
+            var additionalChange = { [prop + DIRTY_PROP_EXT]: true };
+            if (!graph.nodeLib[id].properties[temp.dirtyProp]) {
+                additionalChange[temp.chainProp] = value;
+            }
+        }
         graph.nodeLib[id] = {
             ...graph.nodeLib[id], ...{
                 properties: {
                     ...(graph.nodeLib[id].properties || {}),
+                    ...additionalChange,
                     [prop]: value
                 }
             }

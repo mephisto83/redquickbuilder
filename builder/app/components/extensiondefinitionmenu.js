@@ -66,7 +66,6 @@ class ExtensionDefinitionMenu extends Component {
             </div>) : null;
             var tab_key = currentNode ? this.tabKey(currentNode.id) : null;
             var btns = (<div className="pull-left">
-
                 <div className="btn-group">
                     <button onClick={() => this.props.setVisual(tab_key, Titles.ExtensionDefinition)}
                         type="button"
@@ -75,6 +74,19 @@ class ExtensionDefinitionMenu extends Component {
                     <button onClick={() => this.props.setVisual(tab_key, Titles.ExtensionConfig)}
                         type="button" title={Titles.ExtensionConfig}
                         className="btn btn-default btn-flat"><i className="fa fa-book" /></button>
+                    <button onClick={() => {
+                        if (!def) {
+                            def = createExtensionDefinition();
+                        }
+                        this.props.setVisual(tab_key, Titles.DependsOn);
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.UIExtensionDefinition,
+                            id: currentNode.id,
+                            value: def
+                        });
+                    }}
+                        type="button" title={Titles.DependsOn}
+                        className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
                 </div>
                 <div className="btn-group">
                     {UIA.VisualEq(state, tab_key, Titles.ExtensionDefinition) ? (<button onClick={() => {
@@ -110,113 +122,161 @@ class ExtensionDefinitionMenu extends Component {
         var footer = this.footer();
         var tab_key = currentNode ? this.tabKey(currentNode.id) : null;
         var def = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIExtensionDefinition);
+        var properties = currentNode ? UIA.NodesByType(state, UIA.NodeTypes.Property).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        }) : [];
         return (
-            <DropDownMenu
-                usermode={true}
-                icon={'fa fa-cog'}
-                width={500}
-                open={UIA.Visual(state, EXTENSION_DEFINITION_MENU)}
-                onClick={() => {
-                    this.props.toggleVisual(EXTENSION_DEFINITION_MENU)
-                }}
-                header={currentNode ? (null) : null}
-                footer={footer}>
-                <TabContainer>
-                    <TabContent>
-                        <TabPane active={UIA.VisualEq(state, tab_key, Titles.ExtensionConfig)}>
-                            {def ? <CheckBox
-                                label={Titles.Enumerable}
-                                value={def.config.isEnumeration}
+            <TabPane active={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+                {!UIA.VisualEq(state, tab_key, Titles.DependsOn) ? (<FormControl>
+                    {def ? <CheckBox
+                        label={Titles.Enumerable}
+                        value={def.config.isEnumeration}
+                        onChange={(value) => {
+                            def.config.isEnumeration = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionDefinition,
+                                id: currentNode.id,
+                                value: { ...def, config: { ...def.config } }
+                            });
+                        }} /> : null}
+
+                    <TextInput
+                        value={this.state.property}
+                        label={Titles.Property}
+                        onChange={(val) => {
+                            this.setState({ property: val });
+                        }} />
+                </FormControl>) : null}
+                {def && UIA.VisualEq(state, tab_key, Titles.ExtensionConfig) ? (
+                    <EnumeratedTable columns={Object.keys(def.definition).map(key => {
+                        return { title: key, value: key }
+                    })}
+                        dataFunc={(x, key, index) => {
+                            return (<TextInput
+                                label={Titles.Value}
+                                value={x}
                                 onChange={(value) => {
-                                    def.config.isEnumeration = value;
+                                    if (def.config.isEnumeration) {
+                                        if (def.config && def.config.list && def.config.list[index]) {
+                                            def.config.list[index][key] = value;
+                                        }
+                                    }
+                                    else {
+                                        if (def.config && def.config.dictionary) {
+                                            def.config.dictionary[key] = value;
+                                        }
+                                    }
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         prop: UIA.NodeProperties.UIExtensionDefinition,
                                         id: currentNode.id,
-                                        value: { ...def, config: { ...def.config } }
+                                        value: { ...def, config: { ...def.config, dictionary: { ...def.config.dictionary }, list: [...def.config.list] } }
                                     });
-                                }} /> : null}
-                            {def ? (
-                                <EnumeratedTable columns={Object.keys(def.definition).map(key => {
-                                    return { title: key, value: key }
-                                })}
-                                    dataFunc={(x, key, index) => {
-                                        return (<TextInput
-                                            label={Titles.Value}
-                                            value={x}
-                                            onChange={(value) => {
-                                                if (def.config.isEnumeration) {
-                                                    if (def.config && def.config.list && def.config.list[index]) {
-                                                        def.config.list[index][key] = value;
-                                                    }
-                                                }
-                                                else {
-                                                    if (def.config && def.config.dictionary) {
-                                                        def.config.dictionary[key] = value;
-                                                    }
-                                                }
-                                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                                    prop: UIA.NodeProperties.UIExtensionDefinition,
-                                                    id: currentNode.id,
-                                                    value: { ...def, config: { ...def.config, dictionary: { ...def.config.dictionary }, list: [...def.config.list] } }
-                                                });
-                                            }}
-                                        />)
-                                    }}
-                                    columnButtons={def.config.isEnumeration ? [(x, xi) => {
-                                        return <div className="pull-right"><button onClick={() => {
-                                            if (def.config.isEnumeration) {
-                                                if (def.config && def.config.list && def.config.list[xi]) {
-                                                    def.config.list = [...def.config.list.filter((a, i) => i !== xi)];
-                                                }
-                                                // delete def.definition[x.name];
-                                                // def.definition = { ...def.definition };
-                                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                                    prop: UIA.NodeProperties.UIExtensionDefinition,
-                                                    id: currentNode.id,
-                                                    value: { ...def }
-                                                });
-                                            }
-
-                                        }} className="btn btn-block btn-default"><i className="fa fa-trash" /></button></div>
-                                    }] : []}
-                                    data={(def.config.isEnumeration ? def.config.list.map(obj => {
-                                        return {
-                                            ...obj
-                                        }
-                                    }) : ([{ ...def.config.dictionary }]))}
-                                />
-                            ) : null}
-                        </TabPane>
-                        <TabPane active={UIA.VisualEq(state, tab_key, Titles.ExtensionDefinition)}>
-                            <TextInput
-                                value={this.state.property}
-                                label={Titles.Property}
-                                onChange={(val) => {
-                                    this.setState({ property: val });
-                                }} />
-                            {def ? <EnumeratedTable columns={[{ title: Titles.Name, value: 'name' }]}
-                                columnButtons={[(x) => {
-                                    return <div className="pull-right"><button onClick={() => {
-                                        delete def.definition[x.name];
-                                        def.definition = { ...def.definition };
-                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                            prop: UIA.NodeProperties.UIExtensionDefinition,
-                                            id: currentNode.id,
-                                            value: { ...def }
-                                        });
-
-                                    }} className="btn btn-block btn-default">x</button></div>
-                                }]}
-                                data={Object.keys(def.definition).map(key => {
-                                    return {
-                                        name: key
+                                }}
+                            />)
+                        }}
+                        columnButtons={def.config.isEnumeration ? [(x, xi) => {
+                            return <div className="pull-right"><button onClick={() => {
+                                if (def.config.isEnumeration) {
+                                    if (def.config && def.config.list && def.config.list[xi]) {
+                                        def.config.list = [...def.config.list.filter((a, i) => i !== xi)];
                                     }
-                                })}
-                            /> : null}
-                        </TabPane>
-                    </TabContent>
-                </TabContainer>
-            </DropDownMenu>
+                                    // delete def.definition[x.name];
+                                    // def.definition = { ...def.definition };
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        prop: UIA.NodeProperties.UIExtensionDefinition,
+                                        id: currentNode.id,
+                                        value: { ...def }
+                                    });
+                                }
+
+                            }} className="btn btn-block btn-default"><i className="fa fa-trash" /></button></div>
+                        }] : []}
+                        data={(def.config.isEnumeration ? def.config.list.map(obj => {
+                            return {
+                                ...obj
+                            }
+                        }) : ([{ ...def.config.dictionary }]))}
+                    />
+                ) : null}
+                {def && UIA.VisualEq(state, tab_key, Titles.ExtensionDefinition) ? <EnumeratedTable columns={[{ title: Titles.Name, value: 'name' }]}
+                    columnButtons={[(x) => {
+                        return <div className="pull-right"><button onClick={() => {
+                            delete def.definition[x.name];
+                            def.definition = { ...def.definition };
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionDefinition,
+                                id: currentNode.id,
+                                value: { ...def }
+                            });
+
+                        }} className="btn btn-block btn-default">x</button></div>
+                    }]}
+                    data={Object.keys(def.definition).map(key => {
+                        return {
+                            name: key
+                        }
+                    })}
+                /> : null}
+                {def && UIA.VisualEq(state, tab_key, Titles.DependsOn) ? (<FormControl>
+                    <CheckBox
+                        label={Titles.DependsOn}
+                        title={Titles.DependsOnDescription}
+                        value={def.definition.dependsOn}
+                        onChange={(value) => {
+                            def.definition.dependsOn = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionDefinition,
+                                id: currentNode.id,
+                                value: { ...def, definition: { ...def.definition } }
+                            });
+                        }} />
+                    <SelectInput
+                        label={Titles.DependentProperty}
+                        title={Titles.DependentPropertyDescription}
+                        options={properties}
+                        value={def.definition.property}
+                        onChange={(value) => {
+                            def.definition.property = value;
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.UIChoiceType],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIChoiceType,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.ExtensionDependencyLink }
+                            });
+
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionDefinition,
+                                id: currentNode.id,
+                                value: { ...def, definition: { ...def.definition } }
+                            });
+                        }} />
+                    <TextInput
+                        label={Titles.MatchingValue}
+                        title={Titles.MatchingValueDescription}
+                        value={def.definition.match}
+                        onChange={(value) => {
+                            def.definition.match = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UIExtensionDefinition,
+                                id: currentNode.id,
+                                value: { ...def, definition: { ...def.definition } }
+                            });
+                        }} />
+                </FormControl>) : null}
+                {footer}
+            </TabPane>
         );
     }
 }

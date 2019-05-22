@@ -101,7 +101,6 @@ class Dashboard extends Component {
                             <DashboardNavBar>
                                 <SidebarToggle />
                                 <NavBarMenu>
-                                    <ExtensionDefinitionMenu />
                                     {/* <DropDownMenu open={UIA.Visual(state, 'dashboard-menu')} onClick={() => {
                                         this.props.toggleVisual('dashboard-menu')
                                     }}>
@@ -177,7 +176,7 @@ class Dashboard extends Component {
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
                                 graph={UIA.Graphs(state, UIA.Application(state, UIA.CURRENT_GRAPH))}></MindMap>
                         </Content>
-                        <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)}>
+                        <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
                             <SideBarTabs>
                                 <SideBarTab
                                     icon="fa fa-cog"
@@ -225,6 +224,7 @@ class Dashboard extends Component {
                                 <ExtensionListActivityMenu />
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
+                                <ExtensionDefinitionMenu />
                             </SideBarContent>) : null}
                         </SideBar>
                     </div>
