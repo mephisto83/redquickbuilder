@@ -74,7 +74,8 @@ export const NodeProperties = {
     NODEType: 'nodeType',
     UIAttributeType: 'uiAttributeType',
     //The name used for code.
-    CodeName: 'codeName'
+    CodeName: 'codeName',
+    CodePropertyType:'codeProperty'
 }
 
 export const DIRTY_PROP_EXT = '$ _dirty_ $';

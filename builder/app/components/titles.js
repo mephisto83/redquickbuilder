@@ -27,6 +27,7 @@ export const AddParameterDescription = 'Parameters are the required things need 
 export const AddFunctionOutput = 'Add Function Output';
 export const AddFunctionOutputDescription  = 'The output of the function';
 export const IsAgent = 'Agent';
+export const ParameterType = 'Parameter Type';
 export const OwnedResources = 'Owned Resources';
 export const PermissionType = 'Permissions';
 export const PermissionAttributes = 'Permission Attributes';
