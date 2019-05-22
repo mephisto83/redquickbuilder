@@ -25,6 +25,7 @@ import NavBarButton from './navbarbutton';
 import * as VC from '../constants/visual';
 import MindMap from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
+import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
 import AttributeFormControl from './attributeformcontrol';
 import ChoiceActivityMenu from './choiceactivitymenu';
@@ -43,6 +44,7 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import Slider from './slider';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
+import CommonActivityMenu from './commonactivitymenu';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -214,6 +216,8 @@ class Dashboard extends Component {
                                 <ChoiceListItemActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
+                                <CommonActivityMenu />
+                                <FunctionActivityMenu />
                                 <AttributeFormControl />
                                 <ModelActivityMenu />
                                 <PropertyActivityMenu />

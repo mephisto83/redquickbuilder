@@ -14,7 +14,10 @@ export const NodeTypes = {
     OptionListItem: 'option-list-item',
     OptionCustom: 'option-custom',
     ExtensionTypeList: 'extension-type-list',
-    ExtensionType: 'extension-type'
+    ExtensionType: 'extension-type',
+    Function: 'function',
+    Parameter: 'parameter',
+    FunctionOutput: 'function-output'
 }
 
 export const NodeTypeColors = {
@@ -31,10 +34,16 @@ export const NodeTypeColors = {
     [NodeTypes.OptionCustom]: '#403F4C',
     [NodeTypes.ExtensionTypeList]: '#2C2B3C',
     [NodeTypes.ExtensionType]: '#1B2432',
-    [NodeTypes.Permission]: '#383F51'
+    [NodeTypes.Permission]: '#383F51',
+    [NodeTypes.Function]: '#553D36',
+    [NodeTypes.Parameter]: '#684A52',
+    [NodeTypes.FunctionOutput]: '#857885'
 }
 export const NodeProperties = {
     IsAgent: 'isAgent',
+
+
+    IsSharedResource: 'isSharedResource', // Not sure if this helps anything.
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
     UIName: 'uiName',
@@ -70,10 +79,20 @@ export const NodeProperties = {
 
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
 export const NodePropertiesDirtyChain = {
-    [NodeProperties.UIText]: {
-        dirtyProp: NodeProperties.CodeName + DIRTY_PROP_EXT,
-        chainProp: NodeProperties.CodeName
-    }
+    [NodeProperties.UIText]: [{
+        chainProp: NodeProperties.CodeName,
+        chainFunc: (x) => {
+            if (typeof x === 'string') {
+                return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890'.indexOf(y.toLowerCase()) !== -1).join('');
+            }
+            return x;
+        }
+    }, {
+        chainProp: NodeProperties.UIName,
+        chainFunc: (x) => {
+            return x;
+        }
+    }]
 }
 
 
@@ -87,9 +106,13 @@ export const LinkType = {
     Extension: 'extension',
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
-    ExtensionDependencyLink: 'extension-dependency-link'
+    ExtensionDependencyLink: 'extension-dependency-link',
+    FunctionOperator: 'function-operator'
 }
 export const LinkProperties = {
+    FunctionOperator: {
+        type: LinkType.FunctionOperator
+    },
     ChoiceLink: {
         type: LinkType.Choice
     },
@@ -160,6 +183,7 @@ export const OptionsTypes = {
 }
 export const NodePropertyTypes = {
     STRING: 'STRING',
+    LISTOFSTRINGS: 'LISTOFSTRINGS',
     INT: 'INT',
     FLOAT: 'FLOAT',
     BOOLEAN: 'BOOLEAN'

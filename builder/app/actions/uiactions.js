@@ -150,6 +150,8 @@ export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
 export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
 export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
 export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
+export const NEW_PARAMETER_NODE = 'NEW_PARAMETER_NODE';
+export const NEW_FUNCTION_OUTPUT_NODE = 'NEW_FUNCTION_OUTPUT_NODE';
 export const NEW_VALIDATION_ITEM_NODE = 'NEW_VALIDATION_ITEM_NODE';
 export const NEW_CHOICE_TYPE = 'NEW_CHOICE_TYPE';
 export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
@@ -209,6 +211,14 @@ export function graphOperation(operation, options) {
                 break;
             case NEW_CHOICE_TYPE:
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_PARAMETER_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Parameter);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case NEW_FUNCTION_OUTPUT_NODE:
+                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.FunctionOutput);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
             case NEW_PERMISSION_NODE:

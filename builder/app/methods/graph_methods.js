@@ -1,5 +1,5 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain } from '../constants/nodetypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT } from '../constants/nodetypes';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -131,25 +131,32 @@ export function removeLinkBetweenNodes(graph, options) {
 export function removeLink(graph, link) {
     if (link) {
         graph.links = [...graph.links.filter(x => x !== link)];
+        var del_link = graph.linkLib[link];
         delete graph.linkLib[link]
         graph.linkLib = { ...graph.linkLib };
-        graph.nodeLinks[link.source] = {
-            ...graph.nodeLinks[link.source],
+        graph.nodeLinks[del_link.source] = {
+            ...graph.nodeLinks[del_link.source],
             ...{
-                [link.target]: (graph.nodeLinks[link.source][link.target] || 0) - 1
+                [del_link.target]: graph.nodeLinks[del_link.source] ? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1 : 0
             }
         };
-        if (!graph.nodeLinks[link.source][link.target]) {
-            delete graph.nodeLinks[link.source][link.target];
+        if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
+            delete graph.nodeLinks[del_link.source][del_link.target];
+            if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
+                delete graph.nodeLinks[del_link.source];
+            }
         }
-        graph.nodeLinks[link.target] = {
-            ...graph.nodeLinks[link.target],
+        graph.nodeLinks[del_link.target] = {
+            ...graph.nodeLinks[del_link.target],
             ...{
-                [link.source]: (graph.nodeLinks[link.target][link.source] || 0) - 1
+                [del_link.source]: graph.nodeLinks[del_link.target] ? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1 : 0
             }
         };
-        if (!graph.nodeLinks[link.target][link.source]) {
-            delete graph.nodeLinks[link.target][link.source];
+        if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
+            delete graph.nodeLinks[del_link.target][del_link.source];
+            if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
+                delete graph.nodeLinks[del_link.target];
+            }
         }
     }
     return { ...graph };
@@ -160,10 +167,16 @@ export function updateNodeText(graph, options) {
     if (id && graph.nodeLib && graph.nodeLib[id]) {
         graph.nodeLib[id] = {
             ...graph.nodeLib[id], ...{
-                properties: {
+                _properties: {
                     ...(graph.nodeLib[id].properties || {}),
                     i: value
-                }
+                },
+                get properties() {
+                    return this._properties;
+                },
+                set properties(value) {
+                    this._properties = value;
+                },
             }
         }
     }
@@ -172,18 +185,24 @@ export function updateNodeProperty(graph, options) {
     var { id, value, prop } = options;
     if (id && prop && graph.nodeLib && graph.nodeLib[id]) {
         if (NodePropertiesDirtyChain[prop]) {
-            var temp = NodePropertiesDirtyChain[prop];
-            var additionalChange = { [prop + DIRTY_PROP_EXT]: true };
-            if (!graph.nodeLib[id].properties[temp.dirtyProp]) {
-                additionalChange[temp.chainProp] = value;
-            }
+            var additionalChange = {};
+            var temps = NodePropertiesDirtyChain[prop];
+            temps.map(temp => {
+                if (!graph.nodeLib[id].dirty[temp.chainProp]) {
+                    additionalChange[temp.chainProp] = temp.chainFunc(value);
+                }
+            });
         }
         graph.nodeLib[id] = {
             ...graph.nodeLib[id], ...{
+                dirty: {
+                    [prop]: true,
+                    ...(graph.nodeLib[id].dirty || {})
+                },
                 properties: {
                     ...(graph.nodeLib[id].properties || {}),
+                    [prop]: value,
                     ...additionalChange,
-                    [prop]: value
                 }
             }
         }
@@ -200,6 +219,9 @@ function noSameLink(graph, ops) {
 function createNode(nodeType) {
     return {
         id: uuidv4(),
+        dirty: {
+
+        },
         properties: {
             text: nodeType || Titles.Unknown
         }
