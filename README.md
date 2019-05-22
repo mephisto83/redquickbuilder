@@ -140,21 +140,48 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
 
 
         public async Task<bool> CanSendMessage(string id, string resourceHeadId) {
-            var resourceHead = await arbiter.Get<Conversation>(resourceHeadId);
+            if(arbiter != null) { 
+                var resourceHead = await arbiter.Get<Conversation>(resourceHeadId);
 
-            if(resourceHead.Participants.Contains(id)) {
-                return true;
+                if(resourceHead != null && resourceHead.Participants !== null && resourceHead.Participants.Contains(id)) {
+                    return true;
+                }
             }
-
             return false;
         }
-
+        
+        //assumes identifier properties are strings.
         public async Task<bool> Can{{function.codeName}}(string {{agent_id}}, string {{resource_id}}) {
             var {{resource}} = await arbiter.Get<{{resourceType}}>({{resource_id}});
 
             if({{resource}}.{{defining_property}}.Contains(agent_id)) {
                 return true;
             }
-            
+
             return false;
+        }
+
+### {{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}) // ConversationMessageChange.CreateConversationMessage
+
+        // Identifing the agent and parent object are the only crucial parts.
+        // This would be better if the "string message' was "ConversationMessage message"
+        public ConversationMessageChange CreateConversationMessage(string participantId, string conversationId, string message) {
+            return new ConversationMessageChange {
+                StreamType = "ConversationMessage",
+                Response = Guid.NewGuid(),
+                Participant = participant,
+                Conversation = conversationId,
+                ConversationMessage = message
+            }
+        }
+        
+        //The better version.
+        public ConversationMessageChange CreateConversationMessage(string participantId, string conversationId, ConversationMessage message) {
+            return new ConversationMessageChange {
+                StreamType = "ConversationMessage",
+                Response = Guid.NewGuid(),
+                Participant = participant,
+                Conversation = conversationId,
+                ConversationMessage = message
+            }
         }
