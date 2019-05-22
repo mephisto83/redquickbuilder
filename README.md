@@ -8,7 +8,7 @@ Building Native IOS, Android and Web apps from a mind map.
 
 Defining common patterns used in RedQuick. These patterns aren't exclusive to RedQuick at all. So writing them out, to use as templates is a worth while activity.
 
-
+        //Original Version.
         public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, string ConversationId, string message) { 
 
             if(await CanSendMessage(customer.Id , ConversationId).ConfigureAwait(false))) {
@@ -33,3 +33,19 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
             }
             return new List<{{model}}>();
         }
+
+* {{model}}
+
+   Model represents the Type of Model which will be the output. In this case it should return a list of that type.
+
+* {{function.codeName}}
+* {{user}}
+* {{user_instance}}
+* {{resourceHead}}
+* {{resource_identifier}}
+* {{value_type}}
+* {{value}}
+* {{agent_type_instance}}
+* {{AgentType}}
+* {{user_id}}
+* {{determining_property}}
