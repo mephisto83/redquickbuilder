@@ -7,21 +7,21 @@ Building Native IOS, Android and Web apps from a mind map.
 ## Class, CRUD and Result combinations.
 
 * Create/Parent-Child/Agent/Value => IList<Child>
-   Update
-   Delete
-   Get
+   * Update
+   * Delete
+   * Get
 * Create/Object/Agent/Value => IList<Object>
-   Update
-   Delete
-   Get
+   * Update
+   * Delete
+   * Get
 * Create/Parent-Child/Agent/Value => Child
-   Update
-   Delete
-   Get
+   * Update
+   * Delete
+   * Get
 * Create/Object/Agent/Value => Object
-   Update
-   Delete
-   Get
+   * Update
+   * Delete
+   * Get
 
 ## Ceremony Template parts
 
