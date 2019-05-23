@@ -1,3 +1,6 @@
+import * as Titles from '../components/titles';
+import fs from 'fs';
+
 export const FunctionTypes = {
     //Functions with List<Child> result
     Create_Parent$Child_Agent_Value__IListChild: 'Create/Parent-Child/Agent/Value => IList<Child>',
@@ -37,28 +40,43 @@ export const FunctionTemplateKeys = {
     Value: 'value'
 }
 
+export const FunctionConstraintKeys = {
+    IsAgent: 'isAgent',
+    IsUser: 'isUser',
+    IsTypeOf: 'isTypeOf',
+    IsParent: 'isParent',
+    IsChild: 'isChild',
+    IsList: 'isList'
+}
+// Synchronous read
+
 export const Functions = {
-    [Create_Parent$Child_Agent_Value__IListChild]: {
-        template: require('../templates/create_agent_childparent_listchild.tpl'),
+    [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
+        title: Titles.Create_Parent$Child_Agent_Value__IListChild,
+        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: {
             [FunctionTemplateKeys.Model]: {
-                isChild: 'parent'
+                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent
             },
             [FunctionTemplateKeys.Parent]: {
-                isParent: 'model'
+                [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model
             },
             [FunctionTemplateKeys.AgentType]: {
-                isAgent: true
+                [FunctionConstraintKeys.IsAgent]: true
             },
             [FunctionTemplateKeys.User]: {
-                isUser: true
+                [FunctionConstraintKeys.IsUser]: true
             },
             [FunctionTemplateKeys.UserInstance]: {
-                isType: 'user'
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User
             },
             [FunctionTemplateKeys.Value]: {
-                isType: 'model'
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model
             }
+        },
+        output: {
+            [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+            [FunctionConstraintKeys.IsList]: true
         }
     }
 }

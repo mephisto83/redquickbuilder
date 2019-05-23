@@ -6,6 +6,9 @@ export default class NavBarButton extends Component {
     icon() {
         return this.props.icon || "fa fa-gears"
     }
+    title(){
+        return this.props.title || '';
+    }
     render() {
         return (
             <li>
@@ -13,7 +16,7 @@ export default class NavBarButton extends Component {
                     if (this.props.onClick) {
                         this.props.onClick();
                     }
-                }} data-toggle="control-sidebar">
+                }} title={this.title()} data-toggle="control-sidebar">
                     <i className={this.icon()}></i>
                 </a>
             </li>

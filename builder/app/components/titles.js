@@ -25,7 +25,7 @@ export const CodeName = 'Code Name';
 export const AddParameter = 'Add parameter';
 export const AddParameterDescription = 'Parameters are the required things need for the function to execute successfully';
 export const AddFunctionOutput = 'Add Function Output';
-export const AddFunctionOutputDescription  = 'The output of the function';
+export const AddFunctionOutputDescription = 'The output of the function';
 export const IsAgent = 'Agent';
 export const ParameterType = 'Parameter Type';
 export const OwnedResources = 'Owned Resources';
@@ -90,3 +90,7 @@ export const DependsOnDescription = 'Defines if a the property associated with t
 export const DependentPropertyDescription = 'The property that the current property will be associated.';
 export const MatchingValue = 'Matching Value';
 export const MatchingValueDescription = 'The value that the associated property will have to equal, to enable the current property';
+
+
+export const FunctionTypes = 'Function Types';
+export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child => IList<Child>';

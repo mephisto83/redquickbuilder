@@ -1,11 +1,13 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT } from '../constants/nodetypes';
+import { Functions } from '../constants/functiontypes';
 export function createGraph() {
     return {
         id: uuidv4(),
         nodeLib: {},
         nodes: [],
-        nodeLinks: {},
+        nodeLinks: {}, // A library of nodes, and each nodes that it connects.
+        nodeConnections: {}, // A library of nodes, and each nodes links
         linkLib: {},
         links: [],
         updated: null
@@ -76,12 +78,54 @@ export function addNewNodeOfType(graph, options, nodeType) {
     return graph;
 }
 
+export function applyFunctionConstraints(graph, options) {
+    var { id, value } = options;
+
+    var functionConstraints = Functions[value];
+    if (functionConstraints) {
+        // [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
+        //     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
+        //     template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
+        //     constraints: {
+        //         [FunctionTemplateKeys.Model]: {
+        //             [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent
+        //         },
+        //         [FunctionTemplateKeys.Parent]: {
+        //             [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model
+        //         },
+        //         [FunctionTemplateKeys.AgentType]: {
+        //             [FunctionConstraintKeys.IsAgent]: true
+        //         },
+        //         [FunctionTemplateKeys.User]: {
+        //             [FunctionConstraintKeys.IsUser]: true
+        //         },
+        //         [FunctionTemplateKeys.UserInstance]: {
+        //             [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User
+        //         },
+        //         [FunctionTemplateKeys.Value]: {
+        //             [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model
+        //         }
+        //     },
+        //     output: {
+        //         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+        //         [FunctionConstraintKeys.IsList]: true
+        //     }
+        // }
+        if (functionConstraints.constraints) {
+
+        }
+    }
+
+    return graph;
+}
+
 export function newLink(graph, options) {
     var { target, source, properties } = options;
     var link = createLink(target, source, properties);
     return addLink(graph, options, link);
 }
-
+export const SOURCE = 'SOURCE';
+export const TARGET = 'TARGET';
 export function addLink(graph, options, link) {
     var { target, source } = options;
     if (target && source) {
@@ -90,6 +134,23 @@ export function addLink(graph, options, link) {
                 graph.linkLib[link.id] = link;
                 graph.linkLib = { ...graph.linkLib };
                 graph.links = [...graph.links, link.id];
+
+                //Keeps track of the links for each node.
+                graph.nodeConnections[link.source] = {
+                    ...(graph.nodeConnections[link.source] || {}),
+                    ...{
+                        [link.id]: SOURCE
+                    }
+                }
+
+                //Keeps track of the links for each node.
+                graph.nodeConnections[link.target] = {
+                    ...(graph.nodeConnections[link.target] || {}),
+                    ...{
+                        [link.id]: TARGET
+                    }
+                }
+
                 //Keeps track of the number of links between nodes.
                 graph.nodeLinks[link.source] = {
                     ...(graph.nodeLinks[link.source] || {}),
@@ -158,6 +219,23 @@ export function removeLink(graph, link) {
                 delete graph.nodeLinks[del_link.target];
             }
         }
+
+        //Keeps track of the links for each node.
+        if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
+            delete graph.nodeConnections[del_link.source][del_link.id];
+        }
+        if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
+            delete graph.nodeConnections[del_link.source];
+        }
+
+        //Keeps track of the links for each node.
+        if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
+            delete graph.nodeConnections[del_link.target][del_link.id];
+        }
+        if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
+            delete graph.nodeConnections[del_link.target];
+        }
+
     }
     return { ...graph };
 

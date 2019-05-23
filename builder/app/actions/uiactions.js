@@ -161,6 +161,7 @@ export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
 export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
 export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
 export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
+export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
 
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
@@ -248,6 +249,9 @@ export function graphOperation(operation, options) {
             case NEW_OPTION_ITEM_NODE:
                 currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
                 setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                break;
+            case APPLY_FUNCTION_CONSTRAINTS:
+                currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
                 break;
             case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                 break;

@@ -109,6 +109,18 @@ class Dashboard extends Component {
                                     }}>
                                         <DropDownMenuItem icon={"ion ion-ios-gear-outline"} title={'title'} description="as aksd lasdf"></DropDownMenuItem>
                                     </DropDownMenu> */}
+
+                                    <NavBarButton icon={'fa fa-plus'} onClick={() => {
+                                        this.props.graphOperation(UIA.NEW_NODE);
+                                        this.props.setVisual(SIDE_PANEL_OPEN, true);
+                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                    }} />
+
+                                    <NavBarButton icon={'fa fa-minus'} onClick={() => {
+                                        this.props.graphOperation(UIA.REMOVE_NODE, { id: UIA.Visual(state, UIA.SELECTED_NODE) });
+                                        this.props.setVisual(SIDE_PANEL_OPEN, false);
+                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                    }} />
                                     <NavBarButton onClick={() => {
                                         this.props.toggleVisual('side-panel-open')
                                     }} />

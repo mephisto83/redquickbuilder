@@ -9,6 +9,7 @@ import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import TextBox from './textinput';
+import { Functions } from '../constants/functiontypes';
 
 class FunctionActivityMenu extends Component {
     render() {
@@ -21,7 +22,12 @@ class FunctionActivityMenu extends Component {
                 title: UIA.GetNodeTitle(node)
             }
         });
-        var ceremony_types  = [];
+        var function_types = Object.keys(Functions).map(funcKey => {
+            return {
+                title: Functions[funcKey].title || funcKey,
+                value: funcKey
+            }
+        })
         return (
             <TabPane active={active}>
                 {/* {currentNode ? (<FormControl>
@@ -59,26 +65,29 @@ class FunctionActivityMenu extends Component {
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
                 {currentNode ? (<SelectInput
-                    label={Titles.CeromonyType}
-                    options={ceremony_types}
+                    label={Titles.FunctionTypes}
+                    options={function_types}
                     onChange={(value) => {
-                        var id = currentNode.id;
                         // this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                         //     target: currentNode.properties[UIA.NodeProperties.UIExtension],
                         //     source: id
                         // })
-                        // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        //     prop: UIA.NodeProperties.UIExtension,
-                        //     id: currentNode.id,
-                        //     value
-                        // });
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.FunctionType,
+                            id: currentNode.id,
+                            value
+                        });
+                        this.props.graphOperation(UIA.APPLY_FUNCTION_CONSTRAINTS, {
+                            id: currentNode.id,
+                            value
+                        });
                         // this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                         //     target: value,
                         //     source: id,
                         //     properties: { ...UIA.LinkProperties.FunctionOperator }
                         // });
                     }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
                 <ControlSideBarMenu>
                     {currentNode ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_PARAMETER_NODE, {
