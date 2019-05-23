@@ -139,7 +139,7 @@ A set of crud functions with a return value of the list of child type objects.
 *Customer* IAgent
 *Model's Parent Type* Conversation // This relationship must be established in the graph.
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
@@ -465,13 +465,14 @@ IAgent, IHasAllowedCollection
                 case Permission :>   true|false
             }
         }
-* Given a Agent, determine if it can based on a role.
+
+* Given a Agent, determine if it can based on a role. (The sames as the previous)
 
         (IAgent) => { 
             SWITCH(IAgent.Role) => true
         }
 
-* Given and Agent, determing if a property matches a value in a list.
+* Given and Agent, determing if a property matches a value in a list. (The same as the previous) but with a list
 
         (IAgent) => {
             ValidValues.Contains(IAgent.[Property]) => true
