@@ -41,7 +41,7 @@ export const NodeTypeColors = {
 }
 export const NodeProperties = {
     IsAgent: 'isAgent',
-
+    IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
 
     IsSharedResource: 'isSharedResource', // Not sure if this helps anything.
     UIPermissions: 'uiPermissions',
@@ -110,9 +110,15 @@ export const LinkType = {
     AppliedPermissionLink: 'applied-permission',
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',
-    PropertyLink: 'property-link'
+    PropertyLink: 'property-link',
+    ParentLink: 'parent-link',
+    FunctionConstraintLink: 'function-constraint-link'
 }
 export const LinkStyles = {
+    [LinkType.FunctionConstraintLink]: {
+        type: LinkType.FunctionConstraintLink,
+        stroke: NodeTypeColors[NodeTypes.Function]
+    },
     [LinkType.FunctionOperator]: {
         type: LinkType.FunctionOperator,
         stroke: NodeTypeColors[NodeTypes.Function]
@@ -165,9 +171,18 @@ export const LinkStyles = {
         stroke: NodeTypeColors[NodeTypes.ExtensionTypeList]
     }
 }
+
+export const LinkPropertyKeys = {
+    TYPE: 'type',
+    CONSTRAINTS: 'constraints'
+}
+
 export const LinkProperties = {
     FunctionOperator: {
         type: LinkType.FunctionOperator
+    },
+    FunctionConstraintLink: {
+        type: LinkType.FunctionConstraintLink
     },
     ChoiceLink: {
         type: LinkType.Choice
@@ -204,6 +219,9 @@ export const LinkProperties = {
     },
     PropertyLink: {
         type: LinkType.PropertyLink
+    },
+    ParentLink: {
+        type: LinkType.ParentLink
     }
 }
 

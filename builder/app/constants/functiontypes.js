@@ -48,7 +48,6 @@ export const FunctionConstraintKeys = {
     IsChild: 'isChild',
     IsList: 'isList'
 }
-// Synchronous read
 
 export const Functions = {
     [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {

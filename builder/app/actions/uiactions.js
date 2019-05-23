@@ -36,6 +36,11 @@ export function Use(node, prop) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+
+export function GetLinkProperty(link, prop) {
+    return link && link.properties && link.properties[prop]
+}
+
 export function VisualEq(state, key, value) {
     return Visual(state, key) === value;
 }

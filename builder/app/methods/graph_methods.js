@@ -1,6 +1,7 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT } from '../constants/nodetypes';
-import { Functions } from '../constants/functiontypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { Functions, FunctionTemplateKeys, FunctionConstraintKeys } from '../constants/functiontypes';
+import { GetNodeProp, GetLinkProperty } from '../actions/uiactions';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -112,13 +113,179 @@ export function applyFunctionConstraints(graph, options) {
         //     }
         // }
         if (functionConstraints.constraints) {
+            let node = graph.nodeLib[id];
 
+            if (graph.nodeConnections[id]) {
+                Object.keys(graph.nodeConnections[id]).filter(link => {
+                    return GetLinkProperty(graph.linkLib[link], LinkPropertyKeys.TYPE) === LinkType.FunctionConstraintLink;
+                }).map(link => graph.linkLib[link]).map(link => {
+                    var link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
+                    
+                });
+            }
+
+
+            if (graph.nodeConnections[id]) {
+                Object.keys(graph.nodeConnections[id]).map(link => {
+                    //check if link has a constraint attached.
+                    let { properties } = graph.linkLib[link];
+                    let _link = graph.linkLib[link];
+                    if (properties) {
+                        let { constraints } = properties;
+                        if (constraints) {
+                            Object.keys(FunctionTemplateKeys).map(functionTemplateKey => {
+                                let constraintObj = constraints[functionTemplateKey];
+                                if (constraintObj) {
+                                    if (FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph)) {
+
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         }
     }
 
     return graph;
 }
 
+export const FunctionMeetsConstraint = {
+    meets: (constraintObj, constraints, link, node, graph) => {
+        var result = true;
+        if (constraintObj) {
+            var targetNode = graph.nodeLibs[link.target];;
+            Object.keys(constraintObj).map(constraint => {
+                if (result === false) {
+                    return;
+                }
+                switch (constraint) {
+                    case FunctionConstraintKeys.IsAgent:
+                        if (targetNode) {
+                            if (!GetNodeProp(targetNode, NodeProperties.IsAgent)) {
+                                result = false;
+                            }
+                        }
+                        else {
+                            result = false;
+                        }
+                        break;
+                    case FunctionConstraintKeys.IsUser:
+                        if (targetNode) {
+                            if (!GetNodeProp(targetNode, NodeProperties.IsUser)) {
+                                result = false;
+                            }
+                        }
+                        else {
+                            result = false;
+                        }
+                        break;
+                    case FunctionConstraintKeys.IsTypeOf:
+                        if (targetNode) {
+                            var targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
+                            var targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                            // The targetNodeType should match the other node.
+                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                            if (linkWithConstraints.length) {
+                                var links = linkWithConstraints.filter(linkWithConstraint => {
+
+                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
+                                    var nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
+                                    return (nodeToMatchWithType !== targetNodeType);
+                                });
+                                if (links.length === 0) {
+                                    result = false;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                        else {
+                            result = false;
+                        }
+                        break;
+                    case FunctionConstraintKeys.IsChild:
+                        if (targetNode) {
+                            // var targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
+                            var targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                            // The targetNodeType should match the other node.
+                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                            if (linkWithConstraints) {
+                                var links = linkWithConstraints.filter(linkWithConstraint => {
+                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
+                                    var relationshipLink = findLink(graph, { target: node.id, source: nodeToMatchWith.id })
+                                    if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
+                                        return false;
+                                    }
+                                    return true;
+                                });
+
+                                if (links.length === 0) {
+                                    result = false;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                        else {
+                            result = false;
+                        }
+                        break;
+                    case FunctionConstraintKeys.IsParent:
+                        if (targetNode) {
+                            var targetConstraint = constraintObj[constraint];
+                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                            if (linkWithConstraints) {
+                                var links = linkWithConstraints.filter(linkWithConstraint => {
+                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
+                                    var relationshipLink = findLink(graph, { target: nodeToMatchWith.id, source: node.id })
+                                    if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
+                                        return false;
+                                    }
+                                    return true;
+                                });
+
+                                if (links.length === 0) {
+                                    result = false;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                        else {
+                            result = false;
+                        }
+                        break;
+                }
+            });
+        }
+
+        return false;
+    }
+}
+function findLinkWithConstraint(nodeId, graph, targetConstraint) {
+    Object.keys(graph.nodeConnections[nodeId]).filter(t => graph.nodeConnections[nodeId][t] === SOURCE).filter(link => {
+        if (link && graph.linkLib && graph.linkLib[link] && graph.linkLib[link].properties && graph.linkLib[link].properties.constraints
+            && graph.linkLib[link].properties.constraints[targetConstraint]) {
+            return graph.linkLib[link];
+        }
+        return false;
+    }).map(link => graph.linkLib[link]);
+}
+function findLink(graph, options) {
+    var { target, source } = options;
+    var res = graph.links.find(link => {
+        return graph.linkLib && graph.linkLib[link] && graph.linkLib[link].target === target && graph.linkLib[link].source === source;
+    });
+    if (res) {
+        return graph.linkLib[res];
+    }
+    return null;
+}
 export function newLink(graph, options) {
     var { target, source, properties } = options;
     var link = createLink(target, source, properties);
@@ -139,7 +306,7 @@ export function addLink(graph, options, link) {
                 graph.nodeConnections[link.source] = {
                     ...(graph.nodeConnections[link.source] || {}),
                     ...{
-                        [link.id]: SOURCE
+                        [link.id]: TARGET
                     }
                 }
 
@@ -147,7 +314,7 @@ export function addLink(graph, options, link) {
                 graph.nodeConnections[link.target] = {
                     ...(graph.nodeConnections[link.target] || {}),
                     ...{
-                        [link.id]: TARGET
+                        [link.id]: SOURCE
                     }
                 }
 
