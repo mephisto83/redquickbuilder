@@ -42,7 +42,10 @@ class ModelActivityMenu extends Component {
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_PROPERTY_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            linkProperties: {
+                                properties: { ...UIA.LinkProperties.PropertyLink }
+                            }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddProperty} description={Titles.AddPropertyDescription} />
                 </ControlSideBarMenu>
@@ -61,7 +64,10 @@ class ModelActivityMenu extends Component {
                 <ControlSideBarMenu>
                     {is_agent ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_PERMISSION_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            linkProperties: {
+                                properties: { ...UIA.LinkProperties.PermissionLink }
+                            }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddPermission} description={Titles.AddPermissionDescription} />) : null}
                 </ControlSideBarMenu>

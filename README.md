@@ -110,7 +110,90 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
             }
             return new List<ConversationMessage>();
         }
+#### Create function for a Model is IHasParentObject, User, Customer is IAgent, 
+        
+*Model* IHasParentObject ConversationMesage
+*User* Login user
+*Customer* IAgent
+*Model's Parent Type* Conversation // This relationship must be established in the graph.
+        
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
+            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+                var {{model}}ChangeParameters = Create{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.CreateMessage({{model}}ChangeParameters);
+                await StreamProcess.{{model}}({{model}}Change);
+
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
+            }
+            return new List<{{model}}>();
+        }
+        
+The ConversationMessage is a IHasParentObject, which means that it is an object with a conceptual/logical parent. Which may or may not dictate certain behaviors.
+
+The Customer class is assumed to be of Type IAgent/Agent. ConversationMessage will be assumed to be of type IAgentCreateable. Which means it will have an agent owner id. That will mean that each IAgentCreateable class will need to have a property that will be guarenteed to exist that will contain this Agent's id.
+
+CreateConversationMessageParameters.Create will be able to create a CreateConversationMessageParameter object with an IAgentCreateable Type and IAgent/Agent. It should produce a class that looks like.
+
+#### Update funcion for a Model is IHasParentObject, User, Customer is IAgent
+
+*Model* IHasParentObject ConversationMesage
+*User* Login user
+*Customer* IAgent
+*Model's Parent Type* Conversation // This relationship must be established in the graph.
+        
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+                var {{model}}ChangeParameters = Update{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.UpdateMessage({{model}}ChangeParameters);
+                await StreamProcess.{{model}}({{model}}Change);
+
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
+            }
+            return new List<{{model}}>();
+        }
+
+#### Delete funcion for a Model is IHasParentObject, User, Customer is IAgent
+
+*Model* IHasParentObject ConversationMesage
+*User* Login user
+*Customer* IAgent
+*Model's Parent Type* Conversation // This relationship must be established in the graph.
+        
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+                var {{model}}ChangeParameters = Delete{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.UpdateMessage({{model}}ChangeParameters);
+                await StreamProcess.{{model}}({{model}}Change);
+
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
+            }
+            return new List<{{model}}>();
+        }
+
+
+#### Get All funcion for a Model is IHasParentObject, User, Customer is IAgent
+
+*Model* IHasParentObject ConversationMesage
+*User* Login user
+*Customer* IAgent
+*Model's Parent Type* Conversation // This relationship must be established in the graph.
+        
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
+            }
+            return new List<{{model}}>();
+        }
+
+        
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
@@ -123,10 +206,12 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
             }
             return new List<{{model}}>();
         }
-The ConversationMessage is a IHasParentObject, which means that it is an object with a conceptual/logical parent. Which may or may not dictate certain behaviors.
-The Customer class is assumed to be of Type IAgent/Agent. ConversationMessage will be assumed to be of type IAgentCreateable. Which means it will have an agent owner id. That will mean that each IAgentCreateable class will need to have a property that will be guarenteed to exist that will contain this Agent's id.
+        
 
-CreateConversationMessageParameters.Create will be able to create a CreateConversationMessageParameter object with an IAgentCreateable Type and IAgent/Agent. It should produce a class that looks like.
+
+
+
+
 
 
         public class CreateConversationMessageParameters {

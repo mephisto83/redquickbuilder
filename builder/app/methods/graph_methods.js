@@ -66,11 +66,11 @@ export function addNewPropertyNode(graph, options) {
 }
 
 export function addNewNodeOfType(graph, options, nodeType) {
-    var { parent } = options;
+    var { parent, linkProperties } = options;
     var node = createNode(nodeType);
     graph = addNode(graph, node);
     if (parent) {
-        graph = newLink(graph, { source: parent, target: node.id });
+        graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
     }
     graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType })
     return graph;

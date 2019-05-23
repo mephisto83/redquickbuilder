@@ -75,7 +75,7 @@ export const NodeProperties = {
     UIAttributeType: 'uiAttributeType',
     //The name used for code.
     CodeName: 'codeName',
-    CodePropertyType:'codeProperty'
+    CodePropertyType: 'codeProperty'
 }
 
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
@@ -108,7 +108,61 @@ export const LinkType = {
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
     ExtensionDependencyLink: 'extension-dependency-link',
-    FunctionOperator: 'function-operator'
+    FunctionOperator: 'function-operator',
+    PropertyLink: 'property-link'
+}
+export const LinkStyles = {
+    [LinkType.FunctionOperator]: {
+        type: LinkType.FunctionOperator,
+        stroke: NodeTypeColors[NodeTypes.Function]
+    },
+    [LinkType.PropertyLink]: {
+        type: LinkType.PropertyLink,
+        stroke: NodeTypeColors[NodeTypes.Property]
+    },
+    [LinkType.Choice]: {
+        type: LinkType.Choice,
+        stroke: NodeTypeColors[NodeTypes.ChoiceList]
+    },
+    [LinkType.Permission]: {
+        type: LinkType.Permission,
+        stroke: NodeTypeColors[NodeTypes.Permission]
+    },
+    [LinkType.AppliedPermissionLink]: {
+        type: LinkType.AppliedPermissionLink,
+        stroke: NodeTypeColors[NodeTypes.Permission]
+    },
+    [LinkType.Validation]: {
+        type: LinkType.Validation,
+        stroke: NodeTypeColors[NodeTypes.ValidationList]
+    },
+    [LinkType.Option]: {
+        type: LinkType.Option,
+        stroke: NodeTypeColors[NodeTypes.OptionList]
+    },
+    // Options for custom defined options, that need to be made later.
+    [LinkType.OptionCustom]: {
+        type: LinkType.OptionCustom,
+        stroke: NodeTypeColors[NodeTypes.OptionCustom]
+    },
+    [LinkType.DependsOn]: {
+        type: LinkType.DependsOn,
+        stroke: NodeTypeColors[NodeTypes.Property]
+    },
+    [LinkType.ExtensionList]: {
+        type: LinkType.ExtensionList,
+        stroke: NodeTypeColors[NodeTypes.ExtensionTypeList]
+    },
+    [LinkType.Extension]: {
+        type: LinkType.Extension,
+        stroke: NodeTypeColors[NodeTypes.ExtensionType]
+    },
+    //This link is between an extension with a dependsOn property
+    // It describes a link between a property and a secondary property.
+    [LinkType.ExtensionDependencyLink]: {
+        type: LinkType.ExtensionDependencyLink,
+        stroke: NodeTypeColors[NodeTypes.ExtensionTypeList]
+    }
 }
 export const LinkProperties = {
     FunctionOperator: {
@@ -146,6 +200,9 @@ export const LinkProperties = {
     // It describes a link between a property and a secondary property.
     ExtensionDependencyLink: {
         type: LinkType.ExtensionDependencyLink
+    },
+    PropertyLink: {
+        type: LinkType.PropertyLink
     }
 }
 
