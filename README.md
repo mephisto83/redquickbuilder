@@ -3,6 +3,26 @@ Red Quick builder
 
 Building Native IOS, Android and Web apps from a mind map.
 
+
+## Class, CRUD and Result combinations.
+
+* Create/Parent-Child/Agent/Value => IList<Child>
+   Update
+   Delete
+   Get
+* Create/Object/Agent/Value => IList<Object>
+   Update
+   Delete
+   Get
+* Create/Parent-Child/Agent/Value => Child
+   Update
+   Delete
+   Get
+* Create/Object/Agent/Value => Object
+   Update
+   Delete
+   Get
+
 ## Ceremony Template parts
 
 * {{model}}
@@ -362,7 +382,8 @@ A list of CRUD functions with a return function of a list of Objects.
 
                 var parameters = ConversationChangeParameters.Create(customer, conversation);
 
-                await StreamProcess.Conversation(parameters);
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var newConversation = await StreamProcess.Conversation(parameters);
 
                 // This is probably going to be pretty slow.
                 return await arbiter.GetBy<Conversation>(x => x.Participants.Contains(customer.Id));
