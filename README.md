@@ -61,7 +61,9 @@ Building Native IOS, Android and Web apps from a mind map.
 
 Defining common patterns used in RedQuick. These patterns aren't exclusive to RedQuick at all. So writing them out, to use as templates is a worth while activity.
 
-### Create/Parent-Child/Agent/Value
+### Create/Parent-Child/Agent/Value => IList<Child>
+
+A set of crud functions with a return value of the list of child type objects.
 
         //Original Version.
         public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, string ConversationId, string message) { 
@@ -122,7 +124,7 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}ChangeParameters = Create{{model}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.CreateMessage({{model}}ChangeParameters);
+                var {{model}}Change = {{model}}Change.Create({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -148,7 +150,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}ChangeParameters = Update{{model}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.UpdateMessage({{model}}ChangeParameters);
+                var {{model}}Change = {{model}}Change.Update({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -168,7 +170,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}ChangeParameters = Delete{{model}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.UpdateMessage({{model}}ChangeParameters);
+                var {{model}}Change = {{model}}Change.Delete({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -198,10 +200,6 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = Create{{model}}Parameters.Create(customer, {{value}});
-                var {{model}}Change = {{model}}Change.CreateMessage({{model}}ChangeParameters);
-                await StreamProcess.{{model}}({{model}}Change);
-
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
             }
             return new List<{{model}}>();
@@ -349,3 +347,81 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         Required Node links : model
         Required Functions: {{model}}Change.Create{{model}}
         Required Classes: {{model}}Change
+
+
+### Create/Object/Agent/Value
+
+A list of CRUD functions with a return function of a list of Objects.
+
+        //Original Version.
+        public async Task<IList<Conversation>> CreateConversation(User user, Conversation conversation) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+
+            if(await CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
+
+                var parameters = ConversationChangeParameters.Create(customer, conversation);
+
+                await StreamProcess.Conversation(parameters);
+
+                // This is probably going to be pretty slow.
+                return await arbiter.GetBy<Conversation>(x => x.Participants.Contains(customer.Id));
+                // This might be a faster way.
+                // Putting a cache of user conversations may be a 
+                // var customerConversation = await arbiter.Get<CustomerConversations>(customer.Id);
+                // var ids = customerConversations.Conversations.Select(x => x.Id);
+                // return await arbiter.GetBy<Conversation>(x => ids.Contains(x.Id));
+
+            }
+            return new List<ConversationMessage>();
+        }
+
+        //Templated Version.
+        public async Task<IList<{{model}}>> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
+
+            if(await CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
+
+                await StreamProcess.{{model}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}}.Contains({{agent}}.Id));
+                // This might be a faster way.
+                // Putting a cache of user {{value}}s may be a 
+                // var {{agent}}{{model}} = await arbiter.Get<{{agent_type}}{{model}}s>({{agent}}.Id);
+                // var ids = {{agent}}{{model}}s.{{model}}s.Select(x => x.Id);
+                // return await arbiter.GetBy<{{model}}>(x => ids.Contains(x.Id));
+
+            }
+            return new List<{{model}}Message>();
+        }
+
+        //Templated Version.
+        public async Task<IList<{{model}}>> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
+
+            if(await CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{model}}ChangeParameters.Update({{agent}}, {{value}});
+
+                await StreamProcess.{{model}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}}.Contains({{agent}}.Id));
+                // This might be a faster way.
+                // Putting a cache of user {{value}}s may be a 
+                // var {{agent}}{{model}} = await arbiter.Get<{{agent_type}}{{model}}s>({{agent}}.Id);
+                // var ids = {{agent}}{{model}}s.{{model}}s.Select(x => x.Id);
+                // return await arbiter.GetBy<{{model}}>(x => ids.Contains(x.Id));
+
+            }
+            return new List<{{model}}Message>();
+        }
+
+
+        
+*(DeterminingProperty + IAgent) [ => ]=   x => x.{{determining_property}}.Contains({{agent}}.Id)*

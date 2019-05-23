@@ -119,7 +119,12 @@ export default class MindMap extends Component {
                 .append('svg:path')
                 .attr('d', 'M0,-5L10,0L0,5L2,0')
                 .attr('stroke-width', '0px')
-                .attr('fill', '#555');
+                .attr('fill', function (d) {
+                    if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
+                        return LinkStyles[d.properties.type].stroke;
+                    }
+                    return '#555';
+                });
 
 
             var vis = outer.append('g');
