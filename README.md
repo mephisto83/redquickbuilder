@@ -244,7 +244,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 
             var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
 
-            if(await CanCreateConversation(customer.Id).ConfigureAwait(false))) {
+            if(await customerPermissions.CanCreateConversation(customer.Id).ConfigureAwait(false))) {
 
                 await StreamProcess.Conversation(CreateConversation(customer.Id , conversation));
 
@@ -378,7 +378,7 @@ A list of CRUD functions with a return function of a list of Objects.
 
             var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
 
-            if(await CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
+            if(await customerPermissions.CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
 
                 var parameters = ConversationChangeParameters.Create(customer, conversation);
 
@@ -402,7 +402,7 @@ A list of CRUD functions with a return function of a list of Objects.
 
             var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
 
-            if(await CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
 
@@ -425,7 +425,7 @@ A list of CRUD functions with a return function of a list of Objects.
 
             var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
 
-            if(await CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}ChangeParameters.Update({{agent}}, {{value}});
 
@@ -443,6 +443,44 @@ A list of CRUD functions with a return function of a list of Objects.
             return new List<{{model}}Message>();
         }
 
+        public class {{model}}Maestro() { 
+            public {{model}}Maestro(I{{agent_type}}Permissions {{agent_type}}Permissions, IRedArbiter<{{agent_type}}> {{agent_type}}Arbiter, , IRedArbiter<{{model}}> {{model}}Arbiter) {
+
+            }
+        }
+
 
         
 *(DeterminingProperty + IAgent) [ => ]=   x => x.{{determining_property}}.Contains({{agent}}.Id)*
+sounds like
+*(IAgent, IHasAllowedCollection) => checks(IHasAllowedCollection) for (IAgent.Id);*
+
+await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}, {{agent_type}}Permissions.CAN_SEND_MESSAGE).ConfigureAwait(false))
+IAgent, IHasAllowedCollection
+
+*  Given an Agent and Permission, determing the permission based on a role
+
+        (IAgent, Permission) => {
+            SWITCH(IAgent.Role) => {
+                case Permission :>   true|false
+            }
+        }
+* Given a Agent, determine if it can based on a role.
+
+        (IAgent) => { 
+            SWITCH(IAgent.Role) => true
+        }
+
+* Given and Agent, determing if a property matches a value in a list.
+
+        (IAgent) => {
+            ValidValues.Contains(IAgent.[Property]) => true
+        }
+
+* Given an Agent, determine if a property doesn't match a value in the list, deny.
+
+        (IAgent) => {
+            InvalidValues.Contains(IAgent.[Property]) => false
+        }
+
+        *(IAgent, IHasAllowedCollection) => checks(IHasAllowedCollection) for (IAgent.Id);*
