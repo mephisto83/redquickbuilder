@@ -95,6 +95,45 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
         Required Functions: Can{{codeName}}, {{model}}Change.Create{{model}}
         Required Classes: {{model}}Change
 
+        //Single Object parameter
+        //Create{{model}}Parameters
+        //Single Object Parameter Version.
+        public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, ConversationMessasge message) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            if(await CanCustomerSendMessage(customer.Id , message).ConfigureAwait(false))) {
+                var conversationMessageChangeParameters = CreateConversationMessageParameters.Create(customer, message);
+                var conversationMessageChange = ConversationMessageChange.CreateMessage();
+                await StreamProcess.ConversationMessage(conversationMessageChange);
+
+                return await arbiter.GetConversationMessagesByConversationId(ConversationId);
+            }
+            return new List<ConversationMessage>();
+        }
+
+        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+                var {{model}}ChangeParameters = Create{{model}}Parameters.Create(customer, {{value}});
+                var {{model}}Change = {{model}}Change.CreateMessage({{model}}ChangeParameters);
+                await StreamProcess.{{model}}({{model}}Change);
+
+                return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
+            }
+            return new List<{{model}}>();
+        }
+The ConversationMessage is a IHasParentObject, which means that it is an object with a conceptual/logical parent. Which may or may not dictate certain behaviors.
+The Customer class is assumed to be of Type IAgent/Agent. ConversationMessage will be assumed to be of type IAgentCreateable. Which means it will have an agent owner id. That will mean that each IAgentCreateable class will need to have a property that will be guarenteed to exist that will contain this Agent's id.
+
+CreateConversationMessageParameters.Create will be able to create a CreateConversationMessageParameter object with an IAgentCreateable Type and IAgent/Agent. It should produce a class that looks like.
+
+
+        public class CreateConversationMessageParameters {
+            public string AgentId { get; set; }
+            public ConversationMessage Data { get; set; }
+        }
+
 ### Create/Object/Agent/Value
 
         //Original Version.
@@ -154,12 +193,16 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
         public async Task<bool> Can{{function.codeName}}(string {{agent_id}}, string {{resource_id}}) {
             var {{resource}} = await arbiter.Get<{{resourceType}}>({{resource_id}});
 
-            if({{resource}}.{{defining_property}}.Contains(agent_id)) {
+            if({{resource}}.{{determining_property}}.Contains(agent_id)) {
                 return true;
             }
 
             return false;
         }
+        
+        Required Node links : agent_id, resource_id, determining_property
+        Required Functions: Can{{codeName}}, {{model}}Change.Create{{model}}
+        Required Classes: {{model}}Change
 
 ### {{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}) // ConversationMessageChange.CreateConversationMessage
 
@@ -174,7 +217,7 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
                 ConversationMessage = message
             }
         }
-        
+
         //The better version.
         public ConversationMessageChange CreateConversationMessage(string participantId, string conversationId, ConversationMessage message) {
             return new ConversationMessageChange {
@@ -185,3 +228,39 @@ Defining common patterns used in RedQuick. These patterns aren't exclusive to Re
                 ConversationMessage = message
             }
         }
+
+
+        public {{model}}Change Create{{model}}(string {{agent_id}}, string {{resourceHead}}, {{model}} {{value}}) {
+            return new {{model}}Change {
+                StreamType = "{{model}}",
+                Response = Guid.NewGuid(),
+                {{property*}} = {{agent_id}},
+                {{resourceHead_type}} = {{resourceHead}},
+                {{model}}Object = {{value}}
+            }
+        }
+        
+        Required Node links : model, agent_id, resourceHead, value, property*, resourceHead_type
+        Required Functions: {{model}}Change.Create{{model}}
+        Required Classes: {{model}}Change
+
+
+        //The even better version.
+        public ConversationMessageChange CreateConversationMessage(CreateConversationParameters parameters) {
+            return new ConversationMessageChange {
+                StreamType = "ConversationMessage",
+                Response = Guid.NewGuid(),
+                CreateConversationParameters = parameters
+            }
+        }
+        
+        public {{model}}Change Create{{model}}(Create{{model}}Parameters parameters) {
+            return new {{model}}Change {
+                StreamType = "{{model}}",
+                Response = Guid.NewGuid(),
+                Create{{model}}Parameters = parameters
+            }
+        }
+        Required Node links : model
+        Required Functions: {{model}}Change.Create{{model}}
+        Required Classes: {{model}}Change
