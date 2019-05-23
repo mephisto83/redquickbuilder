@@ -16,7 +16,7 @@ export function createGraph() {
 }
 
 export function newNode(graph) {
-    var node = createNode();
+    let node = createNode();
     return addNode(graph, node);
 }
 export function createExtensionDefinition() {
@@ -37,7 +37,7 @@ export function defaultExtensionDefinitionType() {
     return 'string';
 }
 export function removeNode(graph, options = {}) {
-    var { id } = options;
+    let { id } = options;
 
     graph = clearLinks(graph, options);
 
@@ -48,15 +48,16 @@ export function removeNode(graph, options = {}) {
     return graph;
 }
 export function clearLinks(graph, options) {
-    var { id } = options;
-    var linksToRemove = getAllLinksWithNode(graph, id);
-    for (var i = 0; i < linksToRemove.length; i++) {
-        var link = linksToRemove[i];
+    let { id } = options;
+    let linksToRemove = getAllLinksWithNode(graph, id);
+    for (let i = 0; i < linksToRemove.length; i++) {
+        let link = linksToRemove[i];
         graph = removeLink(graph, link);
     }
     return graph;
 
 }
+
 export function addNode(graph, node) {
     graph.nodeLib[node.id] = node;
     graph.nodeLib = { ...graph.nodeLib };
@@ -64,25 +65,31 @@ export function addNode(graph, node) {
     graph = { ...graph };
     return graph;
 }
+
 export function addNewPropertyNode(graph, options) {
     return addNewNodeOfType(graph, options, NodeTypes.Property);
 }
 
-export function addNewNodeOfType(graph, options, nodeType) {
-    var { parent, linkProperties } = options;
-    var node = createNode(nodeType);
+export function addNewNodeOfType(graph, options, nodeType, callback) {
+    let { parent, linkProperties } = options;
+    let node = createNode(nodeType);
     graph = addNode(graph, node);
     if (parent) {
         graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
     }
-    graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType })
+    graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
+
+    if (callback) {
+        callback(node);
+    }
+
     return graph;
 }
 
 export function applyFunctionConstraints(graph, options) {
-    var { id, value } = options;
+    let { id, value } = options;
 
-    var functionConstraints = Functions[value];
+    let functionConstraints = Functions[value];
     if (functionConstraints) {
         // [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         //     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
@@ -116,13 +123,41 @@ export function applyFunctionConstraints(graph, options) {
             let node = graph.nodeLib[id];
 
             if (graph.nodeConnections[id]) {
-                Object.keys(graph.nodeConnections[id]).filter(link => {
-                    return GetLinkProperty(graph.linkLib[link], LinkPropertyKeys.TYPE) === LinkType.FunctionConstraintLink;
-                }).map(link => graph.linkLib[link]).map(link => {
-                    var link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
-                    
+                getNodeFunctionConstraintLinks(graph, { id }).map(link => {
+                    let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
+                    if (!hasMatchingConstraints(link_constraints, functionConstraints.constraints)) {
+                        let nodeToRemove = GetTargetNode(graph, link.id);
+                        if (nodeToRemove) {
+                            graph = removeNode(graph, { id: nodeToRemove.id })
+                        }
+                        else {
+                            console.warn("No nodes were removed as exepected");
+                        }
+                    }
                 });
             }
+            var existMatchinLinks = getNodeFunctionConstraintLinks(graph, { id });
+            var constraintKeys = existMatchinLinks.map(c => {
+                let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
+                return findMatchingConstraints(link_constraints, functionConstraints.constraints);
+            })
+
+            Object.keys(functionConstraints.constraints).filter(x => constraintKeys.indexOf(x) === -1).map(constraint => {
+                //Create links to new nodes representing those constraints.
+                graph = addNewNodeOfType(graph, {
+                    parent: node.id,
+                    linkProperties: {
+                        properties: {
+                            constraints: {
+                                ...functionConstraints.constraints[constraint]
+                            }
+                        }
+                    }
+                }, NodeTypes.Parameter, (new_node) => {
+                    graph = updateNodeProperty(graph, { id: new_node.id, prop: NodeProperties.UIText, value: constraint })
+                });
+
+            })
 
 
             if (graph.nodeConnections[id]) {
@@ -133,8 +168,9 @@ export function applyFunctionConstraints(graph, options) {
                     if (properties) {
                         let { constraints } = properties;
                         if (constraints) {
-                            Object.keys(FunctionTemplateKeys).map(functionTemplateKey => {
-                                let constraintObj = constraints[functionTemplateKey];
+                            Object.keys(FunctionTemplateKeys).map(ftk => {
+                                var functionTemplateKey = FunctionTemplateKeys[ftk]
+                                let constraintObj = functionConstraints.constraints[functionTemplateKey];
                                 if (constraintObj) {
                                     if (FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph)) {
 
@@ -151,124 +187,146 @@ export function applyFunctionConstraints(graph, options) {
     return graph;
 }
 
+function hasMatchingConstraints(linkConstraint, functionConstraints) {
+    return !!findMatchingConstraints(linkConstraint, functionConstraints);
+}
+function findMatchingConstraints(linkConstraint, functionConstraints) {
+    let lcj = JSON.stringify(linkConstraint);
+    return Object.keys(functionConstraints).find(f => JSON.stringify(functionConstraints[f]) === lcj)
+}
+
+function getNodeFunctionConstraintLinks(graph, options) {
+    let { id } = options;
+    if (graph && graph.nodeConnections && graph.nodeConnections[id]) {
+        return Object.keys(graph.nodeConnections[id]).filter(link => {
+            return GetLinkProperty(graph.linkLib[link], LinkPropertyKeys.TYPE) === LinkType.FunctionConstraintLink;
+        }).map(link => graph.linkLib[link]);
+    }
+
+    return [];
+}
+
 export const FunctionMeetsConstraint = {
     meets: (constraintObj, constraints, link, node, graph) => {
-        var result = true;
+        let result = true;
         if (constraintObj) {
-            var targetNode = graph.nodeLibs[link.target];;
-            Object.keys(constraintObj).map(constraint => {
-                if (result === false) {
-                    return;
-                }
-                switch (constraint) {
-                    case FunctionConstraintKeys.IsAgent:
-                        if (targetNode) {
-                            if (!GetNodeProp(targetNode, NodeProperties.IsAgent)) {
-                                result = false;
-                            }
-                        }
-                        else {
-                            result = false;
-                        }
-                        break;
-                    case FunctionConstraintKeys.IsUser:
-                        if (targetNode) {
-                            if (!GetNodeProp(targetNode, NodeProperties.IsUser)) {
-                                result = false;
-                            }
-                        }
-                        else {
-                            result = false;
-                        }
-                        break;
-                    case FunctionConstraintKeys.IsTypeOf:
-                        if (targetNode) {
-                            var targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                            var targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
-                            // The targetNodeType should match the other node.
-                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
-                            if (linkWithConstraints.length) {
-                                var links = linkWithConstraints.filter(linkWithConstraint => {
-
-                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
-                                    var nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
-                                    return (nodeToMatchWithType !== targetNodeType);
-                                });
-                                if (links.length === 0) {
+            let _targetNode = graph.nodeLib[link.target];
+            var nextNodes = getNodesLinkedFrom(graph, { id: _targetNode.id });
+            return nextNodes.find(targetNode => {
+                return Object.keys(constraintObj).find(constraint => {
+                    if (result === false) {
+                        return;
+                    }
+                    switch (constraint) {
+                        case FunctionConstraintKeys.IsAgent:
+                            if (targetNode) {
+                                if (!GetNodeProp(targetNode, NodeProperties.IsAgent)) {
                                     result = false;
                                 }
                             }
                             else {
                                 result = false;
                             }
-                        }
-                        else {
-                            result = false;
-                        }
-                        break;
-                    case FunctionConstraintKeys.IsChild:
-                        if (targetNode) {
-                            // var targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                            var targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
-                            // The targetNodeType should match the other node.
-                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
-                            if (linkWithConstraints) {
-                                var links = linkWithConstraints.filter(linkWithConstraint => {
-                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
-                                    var relationshipLink = findLink(graph, { target: node.id, source: nodeToMatchWith.id })
-                                    if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
-                                        return false;
+                            break;
+                        case FunctionConstraintKeys.IsUser:
+                            if (targetNode) {
+                                if (!GetNodeProp(targetNode, NodeProperties.IsUser)) {
+                                    result = false;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                            break;
+                        case FunctionConstraintKeys.IsTypeOf:
+                            if (targetNode) {
+                                let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
+                                let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                                // The targetNodeType should match the other node.
+                                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                                if (linkWithConstraints.length) {
+                                    let links = linkWithConstraints.filter(linkWithConstraint => {
+
+                                        let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
+                                        let nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
+                                        return (nodeToMatchWithType !== targetNodeType);
+                                    });
+                                    if (links.length === 0) {
+                                        result = false;
                                     }
-                                    return true;
-                                });
-
-                                if (links.length === 0) {
+                                }
+                                else {
                                     result = false;
                                 }
                             }
                             else {
                                 result = false;
                             }
-                        }
-                        else {
-                            result = false;
-                        }
-                        break;
-                    case FunctionConstraintKeys.IsParent:
-                        if (targetNode) {
-                            var targetConstraint = constraintObj[constraint];
-                            var linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
-                            if (linkWithConstraints) {
-                                var links = linkWithConstraints.filter(linkWithConstraint => {
-                                    var nodeToMatchWith = graph.nodeLibs[linkWithConstraint.target];;
-                                    var relationshipLink = findLink(graph, { target: nodeToMatchWith.id, source: node.id })
-                                    if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
-                                        return false;
+                            break;
+                        case FunctionConstraintKeys.IsChild:
+                            if (targetNode) {
+                                // let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
+                                let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                                // The targetNodeType should match the other node.
+                                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                                if (linkWithConstraints) {
+                                    let links = linkWithConstraints.filter(linkWithConstraint => {
+                                        let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
+                                        let relationshipLink = findLink(graph, { target: node.id, source: nodeToMatchWith.id })
+                                        if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
+                                            return false;
+                                        }
+                                        return true;
+                                    });
+
+                                    if (links.length === 0) {
+                                        result = false;
                                     }
-                                    return true;
-                                });
-
-                                if (links.length === 0) {
+                                }
+                                else {
                                     result = false;
                                 }
                             }
                             else {
                                 result = false;
                             }
-                        }
-                        else {
-                            result = false;
-                        }
-                        break;
-                }
-            });
+                            break;
+                        case FunctionConstraintKeys.IsParent:
+                            if (targetNode) {
+                                let targetConstraint = constraintObj[constraint];
+                                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                                if (linkWithConstraints) {
+                                    let links = linkWithConstraints.filter(linkWithConstraint => {
+                                        let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
+                                        let relationshipLink = findLink(graph, { target: nodeToMatchWith.id, source: node.id })
+                                        if (!relationshipLink || !GetLinkProperty(relationshipLink, LinkProperties.ParentLink.type)) {
+                                            return false;
+                                        }
+                                        return true;
+                                    });
+
+                                    if (links.length === 0) {
+                                        result = false;
+                                    }
+                                }
+                                else {
+                                    result = false;
+                                }
+                            }
+                            else {
+                                result = false;
+                            }
+                            break;
+                    }
+                });
+            })
         }
 
         return false;
     }
 }
 function findLinkWithConstraint(nodeId, graph, targetConstraint) {
-    Object.keys(graph.nodeConnections[nodeId]).filter(t => graph.nodeConnections[nodeId][t] === SOURCE).filter(link => {
+    return Object.keys(graph.nodeConnections[nodeId]).filter(t => graph.nodeConnections[nodeId][t] === SOURCE).filter(link => {
         if (link && graph.linkLib && graph.linkLib[link] && graph.linkLib[link].properties && graph.linkLib[link].properties.constraints
             && graph.linkLib[link].properties.constraints[targetConstraint]) {
             return graph.linkLib[link];
@@ -277,8 +335,8 @@ function findLinkWithConstraint(nodeId, graph, targetConstraint) {
     }).map(link => graph.linkLib[link]);
 }
 function findLink(graph, options) {
-    var { target, source } = options;
-    var res = graph.links.find(link => {
+    let { target, source } = options;
+    let res = graph.links.find(link => {
         return graph.linkLib && graph.linkLib[link] && graph.linkLib[link].target === target && graph.linkLib[link].source === source;
     });
     if (res) {
@@ -287,14 +345,29 @@ function findLink(graph, options) {
     return null;
 }
 export function newLink(graph, options) {
-    var { target, source, properties } = options;
-    var link = createLink(target, source, properties);
+    let { target, source, properties } = options;
+    let link = createLink(target, source, properties);
     return addLink(graph, options, link);
 }
+
+export function GetTargetNode(graph, linkId) {
+    if (graph && graph.linkLib && graph.graphLib && graph.linkLib[linkId]) {
+        let target = graph.linkLib[linkId].target;
+        return graph.graphLib[target];
+    }
+    return null;
+}
+
+export function getNodesLinkedFrom(graph, options) {
+    var { id } = options;
+    var nodeLinks = graph.nodeConnections[id];
+    return Object.keys(nodeLinks).filter(x => nodeLinks[x] === SOURCE).map(id => graph.nodeLib[graph.linkLib[id]].target);
+}
+
 export const SOURCE = 'SOURCE';
 export const TARGET = 'TARGET';
 export function addLink(graph, options, link) {
-    var { target, source } = options;
+    let { target, source } = options;
     if (target && source) {
         if (graph.nodeLib[target] && graph.nodeLib[source]) {
             if (noSameLink(graph, { target, source })) {
@@ -306,7 +379,7 @@ export function addLink(graph, options, link) {
                 graph.nodeConnections[link.source] = {
                     ...(graph.nodeConnections[link.source] || {}),
                     ...{
-                        [link.id]: TARGET
+                        [link.id]: SOURCE
                     }
                 }
 
@@ -314,7 +387,7 @@ export function addLink(graph, options, link) {
                 graph.nodeConnections[link.target] = {
                     ...(graph.nodeConnections[link.target] || {}),
                     ...{
-                        [link.id]: SOURCE
+                        [link.id]: TARGET
                     }
                 }
 
@@ -340,26 +413,29 @@ export function addLink(graph, options, link) {
     return graph;
 }
 export function addLinkBetweenNodes(graph, options) {
-    var { target, source, properties } = options;
-    var link = createLink(target, source, properties);
-    return addLink(graph, options, link);
+    let { target, source, properties } = options;
+    if (target !== source) {
+        let link = createLink(target, source, properties);
+        return addLink(graph, options, link);
+    }
+    return graph;
 }
 export function findLinkInstance(graph, options) {
-    var { target, source } = options;
-    var link = graph.links.find(x => graph.linkLib[x].source === source && graph.linkLib[x].target == target);
+    let { target, source } = options;
+    let link = graph.links.find(x => graph.linkLib[x].source === source && graph.linkLib[x].target == target);
     return link;
 }
 export function getAllLinksWithNode(graph, id) {
     return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === id);
 }
 export function removeLinkBetweenNodes(graph, options) {
-    var link = findLinkInstance(graph, options);
+    let link = findLinkInstance(graph, options);
     return removeLink(graph, link);
 }
 export function removeLink(graph, link) {
     if (link) {
         graph.links = [...graph.links.filter(x => x !== link)];
-        var del_link = graph.linkLib[link];
+        let del_link = graph.linkLib[link];
         delete graph.linkLib[link]
         graph.linkLib = { ...graph.linkLib };
         graph.nodeLinks[del_link.source] = {
@@ -408,7 +484,7 @@ export function removeLink(graph, link) {
 
 }
 export function updateNodeText(graph, options) {
-    var { id, value } = options;
+    let { id, value } = options;
     if (id && graph.nodeLib && graph.nodeLib[id]) {
         graph.nodeLib[id] = {
             ...graph.nodeLib[id], ...{
@@ -427,11 +503,11 @@ export function updateNodeText(graph, options) {
     }
 }
 export function updateNodeProperty(graph, options) {
-    var { id, value, prop } = options;
+    let { id, value, prop } = options;
+    let additionalChange = {};
     if (id && prop && graph.nodeLib && graph.nodeLib[id]) {
         if (NodePropertiesDirtyChain[prop]) {
-            var additionalChange = {};
-            var temps = NodePropertiesDirtyChain[prop];
+            let temps = NodePropertiesDirtyChain[prop];
             temps.map(temp => {
                 if (!graph.nodeLib[id].dirty[temp.chainProp]) {
                     additionalChange[temp.chainProp] = temp.chainFunc(value);
@@ -457,7 +533,7 @@ export function updateNodeProperty(graph, options) {
 
 function noSameLink(graph, ops) {
     return !graph.links.some(x => {
-        var temp = graph.linkLib[x];
+        let temp = graph.linkLib[x];
         return temp.source === ops.source && temp.target === ops.target;
     })
 }
@@ -496,7 +572,7 @@ export function duplicateLink(nn, nodes) {
 
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }

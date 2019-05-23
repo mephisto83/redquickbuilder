@@ -55,22 +55,28 @@ export const Functions = {
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: {
             [FunctionTemplateKeys.Model]: {
-                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent
+                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent,
+                key: FunctionTemplateKeys.Model
             },
             [FunctionTemplateKeys.Parent]: {
-                [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model
+                [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model,
+                key: FunctionTemplateKeys.Parent
             },
             [FunctionTemplateKeys.AgentType]: {
-                [FunctionConstraintKeys.IsAgent]: true
+                [FunctionConstraintKeys.IsAgent]: true,
+                key: FunctionTemplateKeys.AgentType
             },
             [FunctionTemplateKeys.User]: {
-                [FunctionConstraintKeys.IsUser]: true
+                [FunctionConstraintKeys.IsUser]: true,
+                key: FunctionTemplateKeys.User
             },
             [FunctionTemplateKeys.UserInstance]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
+                key: FunctionTemplateKeys.UserInstance
             },
             [FunctionTemplateKeys.Value]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+                key: FunctionTemplateKeys.Value
             }
         },
         output: {

@@ -257,6 +257,7 @@ export function graphOperation(operation, options) {
                 break;
             case APPLY_FUNCTION_CONSTRAINTS:
                 currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
+                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                 break;
             case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                 break;

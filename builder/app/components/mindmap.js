@@ -137,8 +137,6 @@ export default class MindMap extends Component {
                 vis.attr('transform', `scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`);
             }
             outer.on('mousemove', function (x, v) {
-                console.log(`outer : me.mouseMoved`);
-                console.log(me.mouseMoved);
                 if (me.panning) {
                     redraw();
                 }
@@ -239,7 +237,7 @@ export default class MindMap extends Component {
             .style('height', x => {
                 return `${x.height - pad / 2}px`
             })
-            .text(function (d) { return `${d.name}` })
+            .text(function (d) { return `${getLabelText(d)}` })
             .call(force.drag);
 
         this.$force = force;
@@ -249,7 +247,7 @@ export default class MindMap extends Component {
         })
 
         function getLabelText(d) {
-            return d && d.properties ? d.properties.text || d.name : d.name;
+            return d && d.properties ? d.id || d.properties.text || d.name : d.name;
         }
 
         function tick() {
@@ -307,10 +305,7 @@ export default class MindMap extends Component {
                     return d.y + h / 2 - d.height + pad / 2;
                 })
             titles.text(function (d) {
-                if (d.properties) {
-                    return `${d.properties.text}`
-                }
-                return `${d.name}`
+                return getLabelText(d);
             })
         }
         force.start();
@@ -385,12 +380,19 @@ export default class MindMap extends Component {
                 var newLinks = graph.links.relativeCompliment(this.state.graph.links, (x, y) => x === y.id);
                 newLinks.map(nn => {
                     this.state.graph.links.push(
-                        (GraphMethods.duplicateLink(graph.linkLib[nn], graph.nodes))
+                        (duplicateLink(graph.linkLib[nn], this.state.graph.nodes))
                     );
                 });
 
+                this.state.graph.links.sort((a, b) => {
+                    graph.nodes.indexOf(a.b)
+                })
+
                 draw = true;
             }
+
+
+
             if (draw) {
                 this.draw();
             }
@@ -405,4 +407,12 @@ export default class MindMap extends Component {
             </div>
         );
     }
+}
+
+function duplicateLink(nn, nodes) {
+    return {
+        ...nn,
+        source: this.state.graph.nodes.findIndex(x => x.id == nn.source),
+        target: this.state.graph.nodes.findIndex(x => x.id == nn.target)
+    };
 }

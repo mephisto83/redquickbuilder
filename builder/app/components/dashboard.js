@@ -169,9 +169,11 @@ class Dashboard extends Component {
                                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                                 onNodeClick={(nodeId, boundingBox) => {
                                     if (UIA.Visual(state, CONNECTING_NODE)) {
+                                        let selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
+                                        console.log(`selectedId:${selectedId} => nodeId:${nodeId}`)
                                         this.props.graphOperation(UIA.NEW_LINK, {
                                             target: nodeId,
-                                            source: UIA.Visual(state, UIA.SELECTED_NODE)
+                                            source: selectedId
                                         });
                                         this.props.setVisual(CONNECTING_NODE, false);
                                         this.props.setVisual(UIA.SELECTED_NODE, null);
