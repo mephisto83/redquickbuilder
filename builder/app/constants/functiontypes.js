@@ -93,30 +93,49 @@ const COMMON_CONSTRAINTS = {
         [FunctionConstraintKeys.IsInputVariable]: true
     }
 };
+
+const COMMON_OUTPUT = {
+    LIST: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsList]: true
+    }
+}
+export const INTERNAL_TEMPLATE_REQUIREMENTS = {
+    METHODS: 'methods',
+    METHOD: {
+        CREATE: 'Create'
+    }
+}
 export const Functions = {
     [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
-            [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-            [FunctionConstraintKeys.IsList]: true
+            ...COMMON_OUTPUT.LIST
+        },
+        classes: {
+            'Create{{model}}Parameters': {
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
+                        
+                    }
+                }
+            }
         }
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
-            [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-            [FunctionConstraintKeys.IsList]: true
-        }
+            ...COMMON_OUTPUT.LIST
+        },
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
-            [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-            [FunctionConstraintKeys.IsList]: true
+            ...COMMON_OUTPUT.LIST
         }
     }
 }

@@ -98,6 +98,10 @@ export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child 
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 
+export const Functions = 'Functions';
+export const AddFunction = 'Add function';
+export const MaestroDetails = 'Maestro Details';
+
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const UserModel = 'User Model';

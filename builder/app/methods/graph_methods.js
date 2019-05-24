@@ -250,29 +250,32 @@ export const FunctionMeetsConstraint = {
                             }
                             break;
                         case FunctionConstraintKeys.IsTypeOf:
-                            if (targetNode) {
-                                debugger;
-                                let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                                let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
-                                // The targetNodeType should match the other node.
-                                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
-                                if (linkWithConstraints.length) {
-                                    let links = linkWithConstraints.filter(linkWithConstraint => {
+                            //If it is an input variable, then we will all anything.
+                            if (!constraintObj[FunctionConstraintKeys.IsInputVariable]) {
+                                if (targetNode) {
+                                    debugger;
+                                    let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
+                                    let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                                    // The targetNodeType should match the other node.
+                                    let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                                    if (linkWithConstraints.length) {
+                                        let links = linkWithConstraints.filter(linkWithConstraint => {
 
-                                        let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
-                                        let nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
-                                        return (nodeToMatchWithType !== targetNodeType);
-                                    });
-                                    if (links.length === 0) {
+                                            let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
+                                            let nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
+                                            return (nodeToMatchWithType !== targetNodeType);
+                                        });
+                                        if (links.length === 0) {
+                                            result = false;
+                                        }
+                                    }
+                                    else {
                                         result = false;
                                     }
                                 }
                                 else {
                                     result = false;
                                 }
-                            }
-                            else {
-                                result = false;
                             }
                             break;
                         case FunctionConstraintKeys.IsChild:
@@ -436,9 +439,17 @@ export function getNodesLinkedTo(graph, options) {
 export function getNodeLinkedTo(graph, options) {
     return getNodeLinked(graph, { ...(options || {}), direction: SOURCE });
 }
+export function matchOneWay(obj1, obj2) {
+    for (var i in obj1) {
+        if (obj1[i] !== obj2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 export function getNodeLinked(graph, options) {
     if (options) {
-        var { id, direction } = options;
+        var { id, direction, constraints } = options;
         if (graph && graph.nodeConnections && id) {
             var nodeLinks = graph.nodeConnections[id];
             if (nodeLinks) {
@@ -448,8 +459,18 @@ export function getNodeLinked(graph, options) {
                         console.warn('Missing value in linkLib');
                         return null;
                     }
+                    if (constraints) {
+                        let link = graph.linkLib[_id];
+                        let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
+                        if (matchOneWay(constraints, link_constraints)) {
+                            return graph.nodeLib[target];
+                        }
+                        else {
+                            return null;
+                        }
+                    }
                     return graph.nodeLib[target];
-                });
+                }).filter(x => x);
             }
         }
     }

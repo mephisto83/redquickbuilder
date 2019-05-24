@@ -45,7 +45,9 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import Slider from './slider';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
+import MaestroDetailsMenu from './maestrodetailsmenu';
 import CommonActivityMenu from './commonactivitymenu';
+import MaestroActivityMenu from './maestroactivitymenu';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -162,6 +164,7 @@ class Dashboard extends Component {
                                             value={UIA.Visual(state, LINK_DISTANCE)} />
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
+                                <MaestroDetailsMenu />
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
@@ -239,6 +242,7 @@ class Dashboard extends Component {
                                 <PropertyActivityMenu />
                                 <ValidationItemFormControl />
                                 <ChoiceActivityMenu />
+                                <MaestroActivityMenu />
                                 <ValidationActivityMenu />
                                 <OptionActivityMenu />
                                 <ExtensionListActivityMenu />

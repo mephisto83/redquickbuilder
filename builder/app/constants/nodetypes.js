@@ -17,7 +17,9 @@ export const NodeTypes = {
     ExtensionType: 'extension-type',
     Function: 'function',
     Parameter: 'parameter',
-    FunctionOutput: 'function-output'
+    FunctionOutput: 'function-output',
+    Controller: 'controller',
+    Maestro: 'maestro'
 }
 export const ColorStates = {
     Error: 'Error'
@@ -115,6 +117,8 @@ export const LinkType = {
     AppliedPermissionLink: 'applied-permission',
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',
+    FunctionLink: 'function-link',
+    FunctionVariable: 'function-variable',
     PropertyLink: 'property-link',
     ParentLink: 'parent-link',
     FunctionConstraintLink: 'function-constraint-link',
@@ -122,6 +126,10 @@ export const LinkType = {
     UserLink: 'user-link' // A link between a user and a personal ([Customer, Manager, Hero])
 }
 export const LinkStyles = {
+    [LinkType.FunctionLink]: {
+        type: LinkType.FunctionLink,
+        stroke: NodeTypeColors[NodeTypes.Function]
+    },
     [LinkType.ErrorLink]: {
         type: LinkType.ErrorLink,
         stroke: NodeTypeColors[ColorStates.Error]
@@ -186,10 +194,18 @@ export const LinkStyles = {
 export const LinkPropertyKeys = {
     TYPE: 'type',
     CONSTRAINTS: 'constraints',
-    VALID_CONSTRAINTS: 'valid-constraints'
+    VALID_CONSTRAINTS: 'valid-constraints',
+    FUNCTION_ID: 'function-id'
 }
 
 export const LinkProperties = {
+    FunctionVariable: {
+        type: LinkType.FunctionVariable,
+        [LinkPropertyKeys.FUNCTION_ID]: null
+    },
+    FunctionLink: {
+        type: LinkType.FunctionLink
+    },
     FunctionOperator: {
         type: LinkType.FunctionOperator
     },
