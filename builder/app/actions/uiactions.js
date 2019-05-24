@@ -270,7 +270,7 @@ export function graphOperation(operation, options) {
             case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                 break;
         }
-
+        currentGraph = GraphMethods.applyConstraints(currentGraph);
         SaveGraph(currentGraph, dispatch)
     }
 }

@@ -11,6 +11,7 @@ export function createGraph() {
         nodeConnections: {}, // A library of nodes, and each nodes links
         linkLib: {},
         links: [],
+        functionNodes: {}, // A function nodes will be run through for checking constraints.
         updated: null
     }
 }
@@ -85,40 +86,68 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
 
     return graph;
 }
+export function GetNode(graph, id) {
+    if (graph && graph.nodeLib) {
+        return graph.nodeLib[id];
+    }
+    return null;
+}
+export function applyConstraints(graph) {
+    let functionNodes = graph.functionNodes;
+    if (functionNodes) {
+        for (let i in functionNodes) {
+            let node = GetNode(graph, i);
+            if (node) {
+                var functionType = GetNodeProp(node, NodeProperties.FunctionType);
+                if (functionType) {
+                    var functionConstraintObject = Functions[functionType];
+                    if (functionConstraintObject) {
+                        graph = checkConstraints(graph, { id: i, functionConstraints: functionConstraintObject });
+                    }
+                }
+            }
+        }
+    }
+    return graph;
+}
+
+export function checkConstraints(graph, options) {
+    var { id, functionConstraints } = options;
+    if (graph.nodeConnections[id]) {
+        let node = graph.nodeLib[id];
+        Object.keys(graph.nodeConnections[id]).map(link => {
+            //check if link has a constraint attached.
+            let { properties } = graph.linkLib[link];
+            let _link = graph.linkLib[link];
+            if (properties) {
+                let { constraints } = properties;
+                if (constraints) {
+                    Object.keys(FunctionTemplateKeys).map(ftk => {
+                        let functionTemplateKey = FunctionTemplateKeys[ftk]
+                        let constraintObj = functionConstraints.constraints[functionTemplateKey];
+                        if (constraintObj && _link && _link.properties && _link.properties.constraints && _link.properties.constraints.key) {
+                            if (_link.properties.constraints.key === constraintObj.key) {
+                                let valid = FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph);
+                                graph = updateLinkProperty(graph, {
+                                    id: _link.id,
+                                    prop: LinkPropertyKeys.VALID_CONSTRAINTS,
+                                    value: !!valid
+                                })
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+    return graph;
+}
 
 export function applyFunctionConstraints(graph, options) {
     let { id, value } = options;
 
     let functionConstraints = Functions[value];
     if (functionConstraints) {
-        // [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
-        //     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
-        //     template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
-        //     constraints: {
-        //         [FunctionTemplateKeys.Model]: {
-        //             [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent
-        //         },
-        //         [FunctionTemplateKeys.Parent]: {
-        //             [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model
-        //         },
-        //         [FunctionTemplateKeys.AgentType]: {
-        //             [FunctionConstraintKeys.IsAgent]: true
-        //         },
-        //         [FunctionTemplateKeys.User]: {
-        //             [FunctionConstraintKeys.IsUser]: true
-        //         },
-        //         [FunctionTemplateKeys.UserInstance]: {
-        //             [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User
-        //         },
-        //         [FunctionTemplateKeys.Value]: {
-        //             [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model
-        //         }
-        //     },
-        //     output: {
-        //         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-        //         [FunctionConstraintKeys.IsList]: true
-        //     }
-        // }
         if (functionConstraints.constraints) {
             let node = graph.nodeLib[id];
 
@@ -175,7 +204,6 @@ export function applyFunctionConstraints(graph, options) {
                                 if (constraintObj && _link && _link.properties && _link.properties.constraints && _link.properties.constraints.key) {
                                     if (_link.properties.constraints.key === constraintObj.key) {
                                         let valid = FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph);
-
                                         graph = updateLinkProperty(graph, {
                                             id: _link.id,
                                             prop: LinkPropertyKeys.VALID_CONSTRAINTS,
@@ -253,7 +281,6 @@ export const FunctionMeetsConstraint = {
                             //If it is an input variable, then we will all anything.
                             if (!constraintObj[FunctionConstraintKeys.IsInputVariable]) {
                                 if (targetNode) {
-                                    debugger;
                                     let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
                                     let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
                                     // The targetNodeType should match the other node.
@@ -637,6 +664,15 @@ export function updateNodeProperty(graph, options) {
                     [prop]: value,
                     ...additionalChange,
                 }
+            }
+        }
+        if (prop === NodeProperties.NODEType && value === NodeTypes.Function) {
+            graph.functionNodes = { ...graph.functionNodes, ...{ [id]: true } };
+        }
+        else {
+            if (graph.functionNodes[id] && prop === NodeProperties.NODEType) {
+                delete graph.functionNodes[id];
+                graph.functionNodes = { ...graph.functionNodes };
             }
         }
     }
