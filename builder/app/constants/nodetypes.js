@@ -19,8 +19,11 @@ export const NodeTypes = {
     Parameter: 'parameter',
     FunctionOutput: 'function-output'
 }
-
+export const ColorStates = {
+    Error: 'Error'
+}
 export const NodeTypeColors = {
+    [ColorStates.Error]: '#FF0000',
     [NodeTypes.Concept]: '#DD4B39',
     [NodeTypes.Model]: '#713E5A',
     [NodeTypes.Property]: '#484349',
@@ -115,9 +118,14 @@ export const LinkType = {
     PropertyLink: 'property-link',
     ParentLink: 'parent-link',
     FunctionConstraintLink: 'function-constraint-link',
+    ErrorLink: 'error-link',
     UserLink: 'user-link' // A link between a user and a personal ([Customer, Manager, Hero])
 }
 export const LinkStyles = {
+    [LinkType.ErrorLink]: {
+        type: LinkType.ErrorLink,
+        stroke: NodeTypeColors[ColorStates.Error]
+    },
     [LinkType.FunctionConstraintLink]: {
         type: LinkType.FunctionConstraintLink,
         stroke: NodeTypeColors[NodeTypes.Function]
@@ -177,7 +185,8 @@ export const LinkStyles = {
 
 export const LinkPropertyKeys = {
     TYPE: 'type',
-    CONSTRAINTS: 'constraints'
+    CONSTRAINTS: 'constraints',
+    VALID_CONSTRAINTS: 'valid-constraints'
 }
 
 export const LinkProperties = {

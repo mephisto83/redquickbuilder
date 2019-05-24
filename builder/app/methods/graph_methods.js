@@ -174,9 +174,13 @@ export function applyFunctionConstraints(graph, options) {
                                 let constraintObj = functionConstraints.constraints[functionTemplateKey];
                                 if (constraintObj && _link && _link.properties && _link.properties.constraints && _link.properties.constraints.key) {
                                     if (_link.properties.constraints.key === constraintObj.key) {
-                                        if (FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph)) {
+                                        let valid = FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph);
 
-                                        }
+                                        graph = updateLinkProperty(graph, {
+                                            id: _link.id,
+                                            prop: LinkPropertyKeys.VALID_CONSTRAINTS,
+                                            value: !!valid
+                                        })
                                     }
                                 }
                             });
@@ -221,6 +225,10 @@ export const FunctionMeetsConstraint = {
                         return;
                     }
                     switch (constraint) {
+                        //Instance variable are always ok
+                        // case FunctionConstraintKeys.IsInstanceVariable:
+                        //     result = true;
+                        //     break;
                         case FunctionConstraintKeys.IsAgent:
                             if (targetNode) {
                                 if (!GetNodeProp(targetNode, NodeProperties.IsAgent)) {
@@ -243,6 +251,7 @@ export const FunctionMeetsConstraint = {
                             break;
                         case FunctionConstraintKeys.IsTypeOf:
                             if (targetNode) {
+                                debugger;
                                 let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
                                 let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
                                 // The targetNodeType should match the other node.
@@ -606,6 +615,21 @@ export function updateNodeProperty(graph, options) {
                     ...(graph.nodeLib[id].properties || {}),
                     [prop]: value,
                     ...additionalChange,
+                }
+            }
+        }
+    }
+    return graph;
+}
+
+export function updateLinkProperty(graph, options) {
+    let { id, value, prop } = options;
+    if (id && prop && graph.linkLib && graph.linkLib[id]) {
+        graph.linkLib[id] = {
+            ...graph.linkLib[id], ...{
+                properties: {
+                    ...(graph.linkLib[id].properties || {}),
+                    [prop]: value
                 }
             }
         }

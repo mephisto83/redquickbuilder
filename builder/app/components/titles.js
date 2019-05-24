@@ -96,6 +96,7 @@ export const MatchingValueDescription = 'The value that the associated property 
 export const FunctionTypes = 'Function Types';
 export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child => IList<Child>';
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
+export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';

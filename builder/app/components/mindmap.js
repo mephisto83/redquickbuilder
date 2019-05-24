@@ -8,7 +8,7 @@ import * as GraphMethods from '../methods/graph_methods';
 // @flow
 import React, { Component } from 'react';
 import { NodeTypeColors } from '../actions/uiactions';
-import { LinkStyles } from '../constants/nodetypes';
+import { LinkStyles, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
 
 const MIN_DIMENSIONAL_SIZE = 20;
 export default class MindMap extends Component {
@@ -190,10 +190,26 @@ export default class MindMap extends Component {
             .enter().append("line")
             .attr("class", "link")
             .style('stroke', function (d) {
-                if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
+
+                if (d && d.properties && d.properties.type === LinkType.FunctionConstraintLink && !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]) {
+                    return LinkStyles[LinkType.ErrorLink].stroke;
+                }
+                else if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
                     return LinkStyles[d.properties.type].stroke;
                 }
                 return '#555';
+            })
+            .style("stroke-dasharray", function (d) {
+                if (d && d.properties && d.properties.type === LinkType.FunctionConstraintLink && !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]) {
+                    return '5,5';
+                }
+                return '';
+            })
+            .style("d", function (d) {
+                if (d && d.properties && d.properties.type === LinkType.FunctionConstraintLink && !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]) {
+                    return 'M5 20 l215 0';
+                }
+                return '';
             })
             .style("stroke-width", function (d) { return Math.sqrt(d.value); });
 
@@ -383,6 +399,14 @@ export default class MindMap extends Component {
                         (duplicateLink(graph.linkLib[nn], this.state.graph.nodes))
                     );
                 });
+
+                this.state.graph.links.map(nn => {
+                    var nl = graph.linkLib[nn.id];
+                    if (nl && nl.properties) {
+                        nn.properties = { ...nl.properties };
+                    }
+                });
+
 
                 // this.state.graph.links.sort((a, b) => {
                 //     graph.nodes.indexOf(a.b)
