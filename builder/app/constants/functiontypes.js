@@ -33,6 +33,7 @@ export const FunctionTypes = {
 
 export const FunctionTemplateKeys = {
     Model: 'model',
+    Property: 'property',
     Parent: 'parent',
     AgentType: 'agent_type',
     User: 'user',
@@ -102,10 +103,88 @@ const COMMON_OUTPUT = {
 }
 export const INTERNAL_TEMPLATE_REQUIREMENTS = {
     METHODS: 'methods',
+    PARAMETERS: 'parameters',
+    PARAMETERSCLASS: 'Parameters', // Classes hold the parameters, that go to Change classes. See create____.tpl templates.
+    CHANGECLASS: 'Change', // Class objects are passed to streams for processing
+    RESPONSECLASS: 'Response', // When stream processing completes, these are sent back.
+    STREAMPROCESS: 'StreamProcess',
+    DETERMINING_PROPERTY: 'determining_property',
+    PARENTS_ID_PROPERTY: 'parentIdProperty',
+    MODEL: 'model',
+    PARENT: 'parent',
+    PROPERTY: 'property',
     METHOD: {
-        CREATE: 'Create'
+        CREATE: 'Create',
+        UPDATE: 'Update',
+        PROCESS: 'Process'
     }
 }
+const COMMON_FUNCTION_REQUIREMENTS = {
+
+    classes: {
+        [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
+                        FunctionTemplateKeys.AgentType,
+                        FunctionTemplateKeys.Model
+                    ]
+                },
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.UPDATE]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
+                        FunctionTemplateKeys.AgentType,
+                        FunctionTemplateKeys.Model
+                    ]
+                }
+            }
+        },
+        [INTERNAL_TEMPLATE_REQUIREMENTS.CHANGECLASS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
+                        INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS
+                    ]
+                }
+            }
+        },
+        [INTERNAL_TEMPLATE_REQUIREMENTS.RESPONSECLASS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
+                        INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS
+                    ]
+                }
+            }
+        }
+    },
+    attachment_methods: {
+        [INTERNAL_TEMPLATE_REQUIREMENTS.STREAMPROCESS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
+                [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.PROCESS]: {
+                    [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
+                        INTERNAL_TEMPLATE_REQUIREMENTS.CHANGECLASS
+                    ]
+                }
+            }
+        }
+    },
+    propreties: {
+        [INTERNAL_TEMPLATE_REQUIREMENTS.DETERMINING_PROPERTY]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.PROPERTY]: FunctionTemplateKeys.Property,
+        },
+        [INTERNAL_TEMPLATE_REQUIREMENTS.PARENTS_ID_PROPERTY]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.PARENT]: FunctionTemplateKeys.Parent,
+            [INTERNAL_TEMPLATE_REQUIREMENTS.PROPERTY]: FunctionTemplateKeys.Property,
+        }
+    }
+}
+
 export const Functions = {
     [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
@@ -114,15 +193,7 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
-        classes: {
-            'Create{{model}}Parameters': {
-                [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
-                    [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
-                        
-                    }
-                }
-            }
-        }
+        ...COMMON_FUNCTION_REQUIREMENTS
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
@@ -130,13 +201,15 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
+        ...COMMON_FUNCTION_REQUIREMENTS
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
             ...COMMON_OUTPUT.LIST
-        }
+        },
+        ...COMMON_FUNCTION_REQUIREMENTS
     }
 }
 
