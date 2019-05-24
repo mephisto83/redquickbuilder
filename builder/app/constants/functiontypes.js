@@ -111,6 +111,8 @@ export const INTERNAL_TEMPLATE_REQUIREMENTS = {
     DETERMINING_PROPERTY: 'determining_property',
     PARENTS_ID_PROPERTY: 'parentIdProperty',
     MODEL: 'model',
+    CONSTRUCTORS: 'constructors',
+    TEMPLATE: 'template',
     PARENT: 'parent',
     PROPERTY: 'property',
     METHOD: {
@@ -120,13 +122,13 @@ export const INTERNAL_TEMPLATE_REQUIREMENTS = {
     }
 }
 const COMMON_FUNCTION_REQUIREMENTS = {
-
     classes: {
         [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
-                    [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
                     [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERS]: [
                         FunctionTemplateKeys.AgentType,
                         FunctionTemplateKeys.Model
@@ -141,6 +143,8 @@ const COMMON_FUNCTION_REQUIREMENTS = {
             }
         },
         [INTERNAL_TEMPLATE_REQUIREMENTS.CHANGECLASS]: {
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process_change_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process_change_class.tpl', 'utf-8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {

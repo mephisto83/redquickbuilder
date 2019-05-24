@@ -50,14 +50,6 @@ class MaestroActivityMenu extends Component {
                         });
                         
                         inputVariables.map(inputVariable => {
-                            // this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                            //     target: inputVariable.id,
-                            //     source: id,
-                            //     properties: {
-                            //         ...UIA.LinkProperties.FunctionVariable,
-                            //         [LinkPropertyKeys.FUNCTION_ID]: value
-                            //     }
-                            // });
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 source: inputVariable.id,
                                 target: id,
