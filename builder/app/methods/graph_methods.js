@@ -1,6 +1,6 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
-import { Functions, FunctionTemplateKeys, FunctionConstraintKeys } from '../constants/functiontypes';
+import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
 import { GetNodeProp, GetLinkProperty } from '../actions/uiactions';
 export function createGraph() {
     return {
@@ -111,6 +111,49 @@ export function applyConstraints(graph) {
     return graph;
 }
 
+export function constraintSideEffects(graph) {
+    let functionNodes = graph.functionNodes;
+
+    if (functionNodes) {
+        let classes_that_must_exist = [];
+        for (let i in functionNodes) {
+            var node = GetNode(graph, i);
+            if (node) {
+                var functionType = GetNodeProp(node, NodeProperties.FunctionType);
+                if (functionType) {
+                    var functionConstraintObject = Functions[functionType];
+                    if (functionConstraintObject && functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES]) {
+                        let functionConstraintRequiredClasses = functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES];
+                        if (functionConstraintRequiredClasses) {
+                            for (let j in functionConstraintRequiredClasses) {
+                                //Get the model constraint key.
+                                //Should be able to find the singular model that is connected to the functionNode and children, if it exists.
+                                let constraintModelKey = functionConstraintRequiredClasses[j][INTERNAL_TEMPLATE_REQUIREMENTS.MODEL];
+                                if (constraintModelKey) {
+                                    debugger;
+                                    var constraint_node = getNodesFunctionsConnected(graph, { id: i, constraintKey: constraintModelKey })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return graph;
+}
+
+export function getNodesFunctionsConnected(graph, options) {
+    var { id, constraintKey } = options;
+    var result = [];
+
+    let links = getNodeLinksWithKey(graph, { id, key: constraintKey });
+
+    return result;
+}
+
+
 export function checkConstraints(graph, options) {
     var { id, functionConstraints } = options;
     if (graph.nodeConnections[id]) {
@@ -220,6 +263,21 @@ export function applyFunctionConstraints(graph, options) {
     }
 
     return graph;
+}
+
+function getNodeLinksWithKey(graph, options) {
+    var { id, key } = options;
+    var result = [];
+    if (graph.nodeConnections[id]) {
+        return Object.keys(graph.nodeConnections[id]).map(link => {
+            let _link = graph.linkLib[link];
+            return _link;
+        }).filter(_link => {
+            return _link && _link.source === id && _link.properties && _link.properties.constraints && _link.properties.constraints.key === key;
+        })
+    }
+
+    return result;
 }
 
 function hasMatchingConstraints(linkConstraint, functionConstraints) {

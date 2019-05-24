@@ -121,8 +121,11 @@ export const INTERNAL_TEMPLATE_REQUIREMENTS = {
         PROCESS: 'Process'
     }
 }
+export const FUNCTION_REQUIREMENT_KEYS = {
+    CLASSES: 'classes'
+}
 const COMMON_FUNCTION_REQUIREMENTS = {
-    classes: {
+    [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {
         [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS]: {
             [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
