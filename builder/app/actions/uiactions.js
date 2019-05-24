@@ -115,6 +115,13 @@ export function GetNodeTitle(node) {
     if (!node) { return Titles.Unknown }
     return node.properties ? node.properties.text || node.id : node.id;
 }
+export function GetNodes(state) {
+    var currentGraph = GetCurrentGraph(state);
+    if (currentGraph) {
+        return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])];
+    }
+    return [];
+}
 export function NodesByType(state, nodeType) {
     var currentGraph = GetCurrentGraph(state);
     if (currentGraph) {
@@ -125,6 +132,7 @@ export function NodesByType(state, nodeType) {
     }
     return [];
 }
+
 export function NodesConnectedTo(state, nodeId) {
     var currentGraph = GetCurrentGraph(state);
     if (currentGraph) {

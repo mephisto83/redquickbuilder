@@ -46,39 +46,60 @@ export const FunctionConstraintKeys = {
     IsTypeOf: 'isTypeOf',
     IsParent: 'isParent',
     IsChild: 'isChild',
-    IsList: 'isList'
+    IsList: 'isList',
+    IsSingleLink: '$single$link',
+    IsModel: 'isModel'
 }
 
+const COMMON_CONSTRAINTS = {
+    [FunctionTemplateKeys.Model]: {
+        [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.Model
+    },
+    [FunctionTemplateKeys.Parent]: {
+        [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.Parent
+    },
+    [FunctionTemplateKeys.AgentType]: {
+        [FunctionConstraintKeys.IsAgent]: true,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.AgentType
+    },
+    [FunctionTemplateKeys.User]: {
+        [FunctionConstraintKeys.IsUser]: true,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.User
+    },
+    [FunctionTemplateKeys.UserInstance]: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        key: FunctionTemplateKeys.UserInstance
+    },
+    [FunctionTemplateKeys.Value]: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        key: FunctionTemplateKeys.Value
+    }
+};
 export const Functions = {
     [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
-        constraints: {
-            [FunctionTemplateKeys.Model]: {
-                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent,
-                key: FunctionTemplateKeys.Model
-            },
-            [FunctionTemplateKeys.Parent]: {
-                [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model,
-                key: FunctionTemplateKeys.Parent
-            },
-            [FunctionTemplateKeys.AgentType]: {
-                [FunctionConstraintKeys.IsAgent]: true,
-                key: FunctionTemplateKeys.AgentType
-            },
-            [FunctionTemplateKeys.User]: {
-                [FunctionConstraintKeys.IsUser]: true,
-                key: FunctionTemplateKeys.User
-            },
-            [FunctionTemplateKeys.UserInstance]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
-                key: FunctionTemplateKeys.UserInstance
-            },
-            [FunctionTemplateKeys.Value]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-                key: FunctionTemplateKeys.Value
-            }
-        },
+        constraints: { ...COMMON_CONSTRAINTS },
+        output: {
+            [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+            [FunctionConstraintKeys.IsList]: true
+        }
+    }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
+        title: Titles.Update_Parent$Child_Agent_Value__IListChild,
+        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
+        constraints: { ...COMMON_CONSTRAINTS },
         output: {
             [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
             [FunctionConstraintKeys.IsList]: true

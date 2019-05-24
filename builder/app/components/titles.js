@@ -27,6 +27,7 @@ export const AddParameterDescription = 'Parameters are the required things need 
 export const AddFunctionOutput = 'Add Function Output';
 export const AddFunctionOutputDescription = 'The output of the function';
 export const IsAgent = 'Agent';
+export const IsUser = 'User';
 export const ParameterType = 'Parameter Type';
 export const OwnedResources = 'Owned Resources';
 export const PermissionType = 'Permissions';
@@ -94,3 +95,8 @@ export const MatchingValueDescription = 'The value that the associated property 
 
 export const FunctionTypes = 'Function Types';
 export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child => IList<Child>';
+export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
+
+export const ParentTo = 'Parent to';
+export const IsParent = 'Is parent';
+export const UserModel = 'User Model';

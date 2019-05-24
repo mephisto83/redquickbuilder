@@ -41,8 +41,9 @@ export const NodeTypeColors = {
 }
 export const NodeProperties = {
     IsAgent: 'isAgent',
+    IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
     IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
-
+    UIUser: 'uiUser',
     IsSharedResource: 'isSharedResource', // Not sure if this helps anything.
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
@@ -53,6 +54,7 @@ export const NodeProperties = {
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',
+    UIChoiceNode: 'uiChoiceNode', //A node that the "parameter" node points to.
     // Property has a dependent property
     UIDependsOn: 'uiDependsOn',
     UseUIDependsOn: 'UseuiDependsOn',
@@ -112,7 +114,8 @@ export const LinkType = {
     FunctionOperator: 'function-operator',
     PropertyLink: 'property-link',
     ParentLink: 'parent-link',
-    FunctionConstraintLink: 'function-constraint-link'
+    FunctionConstraintLink: 'function-constraint-link',
+    UserLink: 'user-link' // A link between a user and a personal ([Customer, Manager, Hero])
 }
 export const LinkStyles = {
     [LinkType.FunctionConstraintLink]: {
@@ -222,6 +225,9 @@ export const LinkProperties = {
     },
     ParentLink: {
         type: LinkType.ParentLink
+    },
+    UserLink: {
+        type: LinkType.UserLink
     }
 }
 

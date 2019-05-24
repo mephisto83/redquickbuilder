@@ -247,7 +247,7 @@ export default class MindMap extends Component {
         })
 
         function getLabelText(d) {
-            return d && d.properties ? d.id || d.properties.text || d.name : d.name;
+            return d && d.properties ? d.properties.text || d.name : d.name;
         }
 
         function tick() {
@@ -384,9 +384,9 @@ export default class MindMap extends Component {
                     );
                 });
 
-                this.state.graph.links.sort((a, b) => {
-                    graph.nodes.indexOf(a.b)
-                })
+                // this.state.graph.links.sort((a, b) => {
+                //     graph.nodes.indexOf(a.b)
+                // })
 
                 draw = true;
             }
@@ -412,7 +412,7 @@ export default class MindMap extends Component {
 function duplicateLink(nn, nodes) {
     return {
         ...nn,
-        source: this.state.graph.nodes.findIndex(x => x.id == nn.source),
-        target: this.state.graph.nodes.findIndex(x => x.id == nn.target)
+        source: nodes.findIndex(x => x.id === nn.source),
+        target: nodes.findIndex(x => x.id === nn.target)
     };
 }
