@@ -131,7 +131,13 @@ export function constraintSideEffects(graph) {
                                 let constraintModelKey = functionConstraintRequiredClasses[j][INTERNAL_TEMPLATE_REQUIREMENTS.MODEL];
                                 if (constraintModelKey) {
                                     debugger;
-                                    var constraint_node = getNodesFunctionsConnected(graph, { id: i, constraintKey: constraintModelKey })
+                                    var constraint_nodes = getNodesFunctionsConnected(graph, { id: i, constraintKey: constraintModelKey });
+                                    var nodes_one_step_down_the_line = [];
+                                    constraint_nodes.map(cn => {
+                                        var nextNodes = getNodesLinkedTo(graph, { id: cn.id });
+                                        nodes_one_step_down_the_line.push(...nextNodes);
+                                    });
+                                    debugger;
                                 }
                             }
                         }
@@ -150,7 +156,9 @@ export function getNodesFunctionsConnected(graph, options) {
 
     let links = getNodeLinksWithKey(graph, { id, key: constraintKey });
 
-    return result;
+    return links.map(link => {
+        return graph.nodeLib[link.target];
+    })
 }
 
 
