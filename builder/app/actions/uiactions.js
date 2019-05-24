@@ -1,3 +1,6 @@
+const { dialog } = require('electron').remote;
+var fs = require('fs');
+
 import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
@@ -144,6 +147,10 @@ export function NodesConnectedTo(state, nodeId) {
     }
     return () => false;
 }
+let _getState;
+export function GetState() {
+    return _getState();
+}
 export function GetCurrentGraph(state) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     if (currentGraph) {
@@ -278,3 +285,37 @@ export function graphOperation(operation, options) {
 export const Colors = {
     SelectedNode: '#f39c12'
 };
+
+export function openRedQuickBuilderGraph() {
+    return (dispatch, getState) => {
+
+    }
+}
+export function saveGraphToFile() {
+    return (dispatch, getState) => {
+        var currentGraph = GetCurrentGraph(getState());
+        // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+        if (currentGraph) {
+            dialog.showSaveDialog({
+                filters: [{
+                    extensions: 'rqb',
+                    name: 'Red Quick Builder'
+                }]
+            }, (fileName) => {
+                if (fileName === undefined) {
+                    console.log("You didn't save the file");
+                    return;
+                }
+                var content = JSON.stringify(content);
+                // fileName is a string that contains the path and filename created in the save file dialog.  
+                fs.writeFile(fileName, content, (err) => {
+                    if (err) {
+                        alert("An error ocurred creating the file " + err.message)
+                    }
+
+                    alert("The file has been succesfully saved");
+                });
+            });
+        }
+    }
+}

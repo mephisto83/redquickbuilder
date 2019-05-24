@@ -25,6 +25,7 @@ export const CodeName = 'Code Name';
 export const AddParameter = 'Add parameter';
 export const AddParameterDescription = 'Parameters are the required things need for the function to execute successfully';
 export const AddFunctionOutput = 'Add Function Output';
+export const Menu = 'Menu';
 export const AddFunctionOutputDescription = 'The output of the function';
 export const IsAgent = 'Agent';
 export const IsUser = 'User';
@@ -101,6 +102,9 @@ export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => ILi
 export const Functions = 'Functions';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';
+
+export const Save = 'Save';
+export const Open = 'Open';
 
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';

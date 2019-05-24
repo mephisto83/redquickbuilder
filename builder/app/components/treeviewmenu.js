@@ -20,11 +20,14 @@ export default class TreeViewMenu extends Component {
                 <a onClick={() => {
                     if (this.props.toggle)
                         this.props.toggle()
+                    if (this.props.onClick) {
+                        this.props.onClick();
+                    }
                 }}>
                     <i className={`${this.icon()}`}></i> <span>{this.props.title}</span>
-                    <span className="pull-right-container">
+                    {this.props.hideArrow ? null : (<span className="pull-right-container">
                         <i className="fa fa-angle-left pull-right"></i>
-                    </span>
+                    </span>)}
                 </a>
                 <ul className="treeview-menu" style={{ display: this.display() }}>
                     {this.props.children}

@@ -48,6 +48,7 @@ import ExtensionDefinitionMenu from './extensiondefinitionmenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
 import CommonActivityMenu from './commonactivitymenu';
 import MaestroActivityMenu from './maestroactivitymenu';
+import SidebarButton from './sidebarbutton';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -131,24 +132,12 @@ class Dashboard extends Component {
                         </Header>
                         <MainSideBar>
                             <SideBarMenu>
-                                <TreeViewMenu
-                                    open={UIA.Visual(state, VC.GraphOperationMenu)}
-                                    active={UIA.Visual(state, VC.GraphOperationMenu)}
-                                    title={Titles.GraphOperations}
-                                    toggle={() => {
-                                        this.props.toggleVisual(VC.GraphOperationMenu)
-                                    }}>
-                                    <TreeViewItem title={Titles.AddNode} onClick={() => {
-                                        this.props.graphOperation(UIA.NEW_NODE);
-                                        this.props.setVisual(SIDE_PANEL_OPEN, true);
-                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
-                                    }} />
-                                    <TreeViewItem title={Titles.RemoveNode} onClick={() => {
-                                        this.props.graphOperation(UIA.REMOVE_NODE, { id: UIA.Visual(state, UIA.SELECTED_NODE) });
-                                        this.props.setVisual(SIDE_PANEL_OPEN, false);
-                                        this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
-                                    }} />
-                                </TreeViewMenu>
+                                <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
+                                    this.props.openRedQuickBuilderGraph();
+                                }} />
+                                <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                                    this.props.saveGraphToFile();
+                                }} />
                                 <TreeViewMenu
                                     open={UIA.Visual(state, VC.GraphPropertiesMenu)}
                                     active={UIA.Visual(state, VC.GraphPropertiesMenu)}
