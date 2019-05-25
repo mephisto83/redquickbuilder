@@ -58,14 +58,14 @@ export function newGroup(graph, callback) {
     let group = createGroup();
     let result = addGroup(graph, group);
     if (callback) {
-        callback(result);
+        callback(group);
     }
     return result;
 }
 export function addLeaf(graph, ops) {
     var { leaf, id } = ops;
     let leaves = graph.groupLib[id].leaves || [];
-    leaves = [...leaves, leaf];
+    leaves = [...leaves, leaf].unique(x => x);
 
     //Groups => nodes
     graph.groupsNodes[id] = graph.groupsNodes[id] || {}
@@ -105,15 +105,15 @@ export function removeLeaf(graph, ops) {
         }
     }
 
-    if (graph.nodeGroups[leaf]) {
-        if (graph.nodeGroups[leaf][id]) {
-            delete graph.nodeGroups[leaf][id];
+    if (graph.nodesGroups[leaf]) {
+        if (graph.nodesGroups[leaf][id]) {
+            delete graph.nodesGroups[leaf][id];
         }
-        if (Object.keys(graph.nodeGroups[leaf]).length === 0) {
-            delete graph.nodeGroups[leaf];
+        if (Object.keys(graph.nodesGroups[leaf]).length === 0) {
+            delete graph.nodesGroups[leaf];
         }
-        graph.nodeGroups = {
-            ...graph.nodeGroups
+        graph.nodesGroups = {
+            ...graph.nodesGroups
         }
     }
 
@@ -128,7 +128,7 @@ export function addGroupToGroup(graph, ops) {
     let group = graph.groupLib[id];
     let groups = group.groups || [];
 
-    group.groups = [...groups, groupId];
+    group.groups = [...groups, groupId].unique(x => x);
     graph.groupLib[id] = group;
     graph.groupLib = { ...graph.groupLib };
 
@@ -225,9 +225,9 @@ export function removeNode(graph, options = {}) {
 export function removeNodeFromGroups(graph, options) {
     let { id } = options;
     let groupsContainingNode = [];
-    //nodeGroups
-    if (graph.nodeGroups[id]) {
-        groupsContainingNode = Object.keys(graph.nodeGroups[id]);
+    //nodesGroups
+    if (graph.nodesGroups[id]) {
+        groupsContainingNode = Object.keys(graph.nodesGroups[id]);
         groupsContainingNode.map(group => {
             graph = removeLeaf(graph, { leaf: id, group })
         })
@@ -269,7 +269,7 @@ export function addNode(graph, node) {
 export function addGroup(graph, group) {
     graph.groupLib[group.id] = group;
     graph.groupLib = { ...graph.groupLib };
-    graph.groups = [...graph.groups, group.id];
+    graph.groups = [...graph.groups, group.id].unique(x => x);
     graph = { ...graph };
     return graph;
 }
@@ -488,31 +488,6 @@ export function applyFunctionConstraints(graph, options) {
     let functionConstraints = Functions[value];
     if (functionConstraints) {
         if (functionConstraints.constraints) {
-            let internal_group = null; //Internal scope group
-            let external_group = null; //API Group
-            let node = graph.nodeLib[id];
-            debugger;
-            if (!graph.nodeGroups[id]) {
-                graph = newGroup(graph, (_group) => {
-                    internal_group = _group
-                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: false });
-                });
-                graph = newGroup(graph, (_group) => {
-                    external_group = _group
-                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: true });
-                });
-            }
-            else {
-                for (let node_group_id in graph.nodeGroups[id]) {
-                    let tempGroup = GetGroup(graph, node_group_id);
-                    if (GetGroupProperty(tempGroup, GroupProperties.IsExternal)) {
-                        external_group = tempGroup;
-                    }
-                    else {
-                        internal_group = internal_group;
-                    }
-                }
-            }
             if (graph.nodeConnections[id]) {
                 getNodeFunctionConstraintLinks(graph, { id }).map(link => {
                     let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
@@ -527,6 +502,37 @@ export function applyFunctionConstraints(graph, options) {
                     }
                 });
             }
+            let internal_group = null; //Internal scope group
+            let external_group = null; //API Group
+            let node = graph.nodeLib[id];
+            debugger;
+            if (graph.nodesGroups[id]) {
+                for (let node_group_id in graph.nodesGroups[id]) {
+                    let tempGroup = GetGroup(graph, node_group_id);
+                    if (GetGroupProperty(tempGroup, GroupProperties.IsExternal)) {
+                        external_group = tempGroup;
+                    }
+                    else {
+                        internal_group = tempGroup;
+                    }
+                }
+            }
+            if (!internal_group) {
+                graph = newGroup(graph, (_group) => {
+                    internal_group = _group
+                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: false });
+                });
+            }
+
+            if (!external_group) {
+                graph = newGroup(graph, (_group) => {
+                    external_group = _group
+                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: true });
+                });
+            }
+            graph = addGroupToGroup(graph, { groupId: internal_group.id, id: external_group.id });
+
+
             var existMatchinLinks = getNodeFunctionConstraintLinks(graph, { id });
             var constraintKeys = existMatchinLinks.map(link => {
                 let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
@@ -546,7 +552,14 @@ export function applyFunctionConstraints(graph, options) {
                         }
                     }
                 }, NodeTypes.Parameter, (new_node) => {
-                    graph = updateNodeProperty(graph, { id: new_node.id, prop: NodeProperties.UIText, value: constraint })
+                    graph = updateNodeProperty(graph, { id: new_node.id, prop: NodeProperties.UIText, value: constraint });
+                    if (functionConstraints.constraints[constraint] &&
+                        functionConstraints.constraints[constraint][FunctionConstraintKeys.IsInputVariable]) {
+                        graph = addLeaf(graph, { leaf: new_node.id, id: external_group.id })
+                    }
+                    else {
+                        graph = addLeaf(graph, { leaf: new_node.id, id: internal_group.id })
+                    }
                 });
 
             })
