@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes } from '../constants/nodetypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty } from '../actions/uiactions';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -155,7 +155,15 @@ export function removeGroupFromGroup(graph, ops) {
                 delete graph.groupsGroups[id];
             }
         }
+
+        if (graph.groupsGroups[groupId]) {
+            delete graph.groupsGroups[groupId][id];
+            if (!Object.keys(graph.groupsGroups[groupId]).length) {
+                delete graph.groupsGroups[groupId];
+            }
+        }
         graph = clearGroup(graph, { id })
+        graph = clearGroup(graph, { id: groupId })
     }
 
     return graph;
@@ -288,6 +296,12 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
 export function GetNode(graph, id) {
     if (graph && graph.nodeLib) {
         return graph.nodeLib[id];
+    }
+    return null;
+}
+export function GetGroup(graph, id) {
+    if (graph && graph.groupLib) {
+        return graph.groupLib[id];
     }
     return null;
 }
@@ -474,8 +488,31 @@ export function applyFunctionConstraints(graph, options) {
     let functionConstraints = Functions[value];
     if (functionConstraints) {
         if (functionConstraints.constraints) {
+            let internal_group = null; //Internal scope group
+            let external_group = null; //API Group
             let node = graph.nodeLib[id];
-
+            debugger;
+            if (!graph.nodeGroups[id]) {
+                graph = newGroup(graph, (_group) => {
+                    internal_group = _group
+                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: false });
+                });
+                graph = newGroup(graph, (_group) => {
+                    external_group = _group
+                    graph = updateGroupProperty(graph, { id: _group.id, prop: GroupProperties.IsExternal, value: true });
+                });
+            }
+            else {
+                for (let node_group_id in graph.nodeGroups[id]) {
+                    let tempGroup = GetGroup(graph, node_group_id);
+                    if (GetGroupProperty(tempGroup, GroupProperties.IsExternal)) {
+                        external_group = tempGroup;
+                    }
+                    else {
+                        internal_group = internal_group;
+                    }
+                }
+            }
             if (graph.nodeConnections[id]) {
                 getNodeFunctionConstraintLinks(graph, { id }).map(link => {
                     let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
@@ -1056,6 +1093,21 @@ export function updateLinkProperty(graph, options) {
     return graph;
 }
 
+export function updateGroupProperty(graph, options) {
+    let { id, value, prop } = options;
+    if (id && prop && graph.groupLib && graph.groupLib[id]) {
+        graph.groupLib[id] = {
+            ...graph.groupLib[id], ...{
+                properties: {
+                    ...(graph.groupLib[id].properties || {}),
+                    [prop]: value
+                }
+            }
+        }
+    }
+    return graph;
+}
+
 function noSameLink(graph, ops) {
     return !graph.links.some(x => {
         let temp = graph.linkLib[x];
@@ -1065,6 +1117,7 @@ function noSameLink(graph, ops) {
 function createGroup() {
     return {
         id: uuidv4(),
+        properties: {}
     }
 }
 function createNode(nodeType) {

@@ -46,6 +46,9 @@ export const NodeTypeColors = {
     [NodeTypes.FunctionOutput]: '#857885',
     [NodeTypes.ClassNode]: '#C3BAAA'
 }
+export const GroupProperties = {
+    IsExternal: 'isExternal'
+}
 export const NodeProperties = {
     IsAgent: 'isAgent',
     IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
