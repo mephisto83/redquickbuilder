@@ -43,7 +43,8 @@ export const NodeTypeColors = {
     [NodeTypes.Permission]: '#383F51',
     [NodeTypes.Function]: '#553D36',
     [NodeTypes.Parameter]: '#684A52',
-    [NodeTypes.FunctionOutput]: '#857885'
+    [NodeTypes.FunctionOutput]: '#857885',
+    [NodeTypes.ClassNode]: '#C3BAAA'
 }
 export const NodeProperties = {
     IsAgent: 'isAgent',

@@ -24,6 +24,32 @@ class ParameterActivityMenu extends Component {
 
         return false;
     }
+    mustBeProperty(currentNode) {
+        var { state } = this.props;
+        var links = getNodeLinks(UIA.GetCurrentGraph(state), currentNode.id, GraphMethods.TARGET);
+        for (var i = 0; i < links.length; i++) {
+            var x = links[i];
+            var constraint = UIA.GetLinkProperty(x, LinkPropertyKeys.CONSTRAINTS)
+            if (constraint && constraint[FunctionConstraintKeys.IsProperty]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    mustBeFunction(currentNode) {
+        var { state } = this.props;
+        var links = getNodeLinks(UIA.GetCurrentGraph(state), currentNode.id, GraphMethods.TARGET);
+        for (var i = 0; i < links.length; i++) {
+            var x = links[i];
+            var constraint = UIA.GetLinkProperty(x, LinkPropertyKeys.CONSTRAINTS)
+            if (constraint && constraint[FunctionConstraintKeys.IsFunction]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Parameter);
@@ -35,6 +61,22 @@ class ParameterActivityMenu extends Component {
             var musBeModel = this.mustBeModel(currentNode);
             if (musBeModel) {
                 nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => {
+                    return {
+                        value: node.id,
+                        title: UIA.GetNodeTitle(node)
+                    }
+                });
+            }
+            else if (this.mustBeProperty(currentNode)) {
+                nodes = UIA.NodesByType(state, UIA.NodeTypes.Property).map(node => {
+                    return {
+                        value: node.id,
+                        title: UIA.GetNodeTitle(node)
+                    }
+                });
+            }
+            else if (this.mustBeFunction(currentNode)) {
+                nodes = UIA.NodesByType(state, UIA.NodeTypes.Function).map(node => {
                     return {
                         value: node.id,
                         title: UIA.GetNodeTitle(node)

@@ -125,9 +125,9 @@ export function constraintSideEffects(graph) {
     if (functionNodes) {
         let classes_that_must_exist = [];
         for (let i in functionNodes) {
-            var node = GetNode(graph, i);
-            if (node) {
-                var functionType = GetNodeProp(node, NodeProperties.FunctionType);
+            var function_node = GetNode(graph, i);
+            if (function_node) {
+                var functionType = GetNodeProp(function_node, NodeProperties.FunctionType);
                 if (functionType) {
                     var functionConstraintObject = Functions[functionType];
                     if (functionConstraintObject && functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES]) {
@@ -147,7 +147,7 @@ export function constraintSideEffects(graph) {
                                     nodes_one_step_down_the_line.map(node => {
                                         classes_that_must_exist.push({
                                             nodeId: node.id,
-                                            codeName: GetNodeProp(node, NodeProperties.CodeName),
+                                            functionNode: function_node.id,
                                             key: constraintModelKey,
                                             class: j
                                         })
@@ -190,7 +190,7 @@ export function constraintSideEffects(graph) {
                 if (matching_nodes.length === 0) {
                     //Create new classNodes
                     graph = addNewNodeOfType(graph, {
-                        parent: cls.nodeId,
+                        parent: cls.functionNode,
                         linkProperties: {
                             properties: { ...LinkProperties.RequiredClassLink }
                         }
@@ -198,7 +198,10 @@ export function constraintSideEffects(graph) {
                         graph = updateNodeProperty(graph, {
                             id: new_node.id,
                             prop: NodeProperties.UIText,
-                            value: RequiredClassName(cls.class, cls[NodeProperties.CodeName])
+                            value: RequiredClassName(
+                                cls.class,
+                                GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName)
+                            )
                         });
                         graph = updateNodeProperty(graph, {
                             id: new_node.id,
@@ -213,7 +216,7 @@ export function constraintSideEffects(graph) {
                     graph = updateNodeProperty(graph, {
                         id: _cnode.id,
                         prop: NodeProperties.UIText,
-                        value: RequiredClassName(cls.class, cls[NodeProperties.CodeName])
+                        value: RequiredClassName(cls.class, GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName))
                     });
                 }
                 else {

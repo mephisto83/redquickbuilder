@@ -99,6 +99,8 @@ export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child 
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 
+export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent In Valid List';
+
 export const Functions = 'Functions';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';

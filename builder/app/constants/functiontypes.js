@@ -27,12 +27,17 @@ export const FunctionTypes = {
     Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
     //Function with bool result
-    IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
+    Can_Execute_Agent_Parent_In_Valid_List: 'Can_Execute_Agent_Parent_In_Valid_List'
+    // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 }
 
 
 export const FunctionTemplateKeys = {
     Model: 'model',
+    Bool: 'bool',
+    CanExecute: 'can-execute',
+    ModelDeterminingProperty: 'model-determining-property',
+    AgentDeterminingProperty: 'agent-determining-property',
     Property: 'property',
     Parent: 'parent',
     AgentType: 'agent_type',
@@ -50,16 +55,30 @@ export const FunctionConstraintKeys = {
     IsList: 'isList',
     IsSingleLink: '$single$link',
     IsModel: 'isModel',
+    IsFunction: 'isFunction',
+    IsProperty: 'isProperty',
+    IsEnumerable: 'isEnumerable',
     IsInstanceVariable: 'isInstanceVariable',
     IsInputVariable: 'isInputVariable'
 }
 
 const COMMON_CONSTRAINTS = {
+    [FunctionTemplateKeys.CanExecute]: {
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsFunction]: true,
+        key: FunctionTemplateKeys.CanExecute
+    },
     [FunctionTemplateKeys.Model]: {
         [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Parent,
         [FunctionConstraintKeys.IsSingleLink]: true,
         [FunctionConstraintKeys.IsModel]: true,
         key: FunctionTemplateKeys.Model
+    },
+    [FunctionTemplateKeys.ModelDeterminingProperty]: {
+        [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsProperty]: true,
+        key: FunctionTemplateKeys.ModelDeterminingProperty
     },
     [FunctionTemplateKeys.Parent]: {
         [FunctionConstraintKeys.IsParent]: FunctionTemplateKeys.Model,
@@ -99,6 +118,9 @@ const COMMON_OUTPUT = {
     LIST: {
         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
         [FunctionConstraintKeys.IsList]: true
+    },
+    BOOL: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Bool
     }
 }
 export const INTERNAL_TEMPLATE_REQUIREMENTS = {
@@ -127,8 +149,8 @@ export const FUNCTION_REQUIREMENT_KEYS = {
 const COMMON_FUNCTION_REQUIREMENTS = {
     [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {
         [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS]: {
-            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
-            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process_parameter_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf-8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
@@ -184,10 +206,6 @@ const COMMON_FUNCTION_REQUIREMENTS = {
         [INTERNAL_TEMPLATE_REQUIREMENTS.DETERMINING_PROPERTY]: {
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.PROPERTY]: FunctionTemplateKeys.Property,
-        },
-        [INTERNAL_TEMPLATE_REQUIREMENTS.PARENTS_ID_PROPERTY]: {
-            [INTERNAL_TEMPLATE_REQUIREMENTS.PARENT]: FunctionTemplateKeys.Parent,
-            [INTERNAL_TEMPLATE_REQUIREMENTS.PROPERTY]: FunctionTemplateKeys.Property,
         }
     }
 }
@@ -217,6 +235,42 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         ...COMMON_FUNCTION_REQUIREMENTS
+    },
+    [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
+        title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
+        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
+        constraints: {
+            [FunctionTemplateKeys.AgentType]: {
+                [FunctionConstraintKeys.IsAgent]: true,
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                [FunctionConstraintKeys.IsModel]: true,
+                key: FunctionTemplateKeys.AgentType
+            },
+            [FunctionTemplateKeys.AgentDeterminingProperty]: {
+                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.AgentType,
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                [FunctionConstraintKeys.IsProperty]: true,
+                key: FunctionTemplateKeys.AgentDeterminingProperty
+            },
+            [FunctionTemplateKeys.Model]: {
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                [FunctionConstraintKeys.IsModel]: true,
+                key: FunctionTemplateKeys.Model
+            },
+            [FunctionTemplateKeys.ModelDeterminingProperty]: {
+                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Model,
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                [FunctionConstraintKeys.IsProperty]: true,
+                [FunctionConstraintKeys.IsEnumerable]: true,
+                key: FunctionTemplateKeys.ModelDeterminingProperty
+            },
+        },
+        output: {
+            ...COMMON_OUTPUT.BOOL
+        },
+        [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {},
+        attachment_methods: {},
+        propreties: {}
     }
 }
 
