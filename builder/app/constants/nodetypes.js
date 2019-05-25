@@ -82,6 +82,10 @@ export const NodeProperties = {
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
     UIAttributeType: 'uiAttributeType',
+
+    UseScopeGraph: 'UseScopeGraph',
+    ScopeGraph: 'scopedGraph',
+
     //The name used for code.
     CodeName: 'codeName',
     CodePropertyType: 'codeProperty',

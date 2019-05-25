@@ -5,18 +5,68 @@ import { GetNodeProp, GetLinkProperty, GetNodeTitle } from '../actions/uiactions
 export function createGraph() {
     return {
         id: uuidv4(),
+        path: [],
+        groups: [],
+        groupLib: {},
         nodeLib: {},
         nodes: [],
         nodeLinks: {}, // A library of nodes, and each nodes that it connects.
         nodeConnections: {}, // A library of nodes, and each nodes links
         linkLib: {},
         links: [],
+        graphs: {},
         classNodes: {},
         functionNodes: {}, // A function nodes will be run through for checking constraints.
         updated: null
     }
 }
+export function getScopedGraph(graph, options) {
+    var { scope } = options;
+    if (scope && scope.length) {
 
+        scope.map((s, i) => {
+            graph = graph.graphs[s];
+        });
+    }
+    return graph;
+}
+
+export function setScopedGraph(root, options) {
+    var { scope, graph } = options;
+    if (scope && scope.length) {
+        var currentGraph = root;
+        scope.map((s, i) => {
+            if (i === scope.length - 1) {
+                currentGraph.graphs[s] = graph;
+            } else {
+                currentGraph = currentGraph.graphs[s];
+            }
+        });
+    }
+    else {
+        root = graph;
+    }
+    return root;
+}
+
+export function newGroup(graph) {
+    let group = createGroup();
+    return addGroup(graph, group);
+}
+export function addLeaf(graph, ops) {
+    var { leaf, id } = ops;
+    let leaves = graph.groupLib[id].leaves || [];
+    leaves = [...leaves, leaf];
+    graph.groupLib[id].leaves = leaves;
+    return graph;
+}
+export function addGroup(graph, ops) {
+    let { group, id } = ops;
+    let groups = graph.groupLib[id].groups || [];
+    groups = [...groups, group];
+    graph.groupLib[id].groups = groups;
+    return graph;
+}
 export function newNode(graph) {
     let node = createNode();
     return addNode(graph, node);
@@ -71,6 +121,13 @@ export function addNode(graph, node) {
     graph.nodeLib[node.id] = node;
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = [...graph.nodes, node.id];
+    graph = { ...graph };
+    return graph;
+}
+export function addGroup(graph, group) {
+    graph.groupLib[group.id] = group;
+    graph.groupLib = { ...graph.groupLib };
+    graph.groups = [...graph.groups, group.id];
     graph = { ...graph };
     return graph;
 }
@@ -870,6 +927,11 @@ function noSameLink(graph, ops) {
         let temp = graph.linkLib[x];
         return temp.source === ops.source && temp.target === ops.target;
     })
+}
+function createGroup() {
+    return {
+        id: uuidv4(),
+    }
 }
 function createNode(nodeType) {
     return {

@@ -165,6 +165,7 @@ export const REMOVE_NODE = 'REMOVE_NODE';
 export const NEW_LINK = 'NEW_LINK';
 export const CHANGE_NODE_TEXT = 'CHANGE_NODE_TEXT';
 export const CURRENT_GRAPH = 'CURRENT_GRAPH';
+export const GRAPH_SCOPE = 'GRAPH_SCOPE';
 export const CHANGE_NODE_PROPERTY = 'CHANGE_NODE_PROPERTY';
 export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE';
 export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
@@ -188,100 +189,120 @@ export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
+        let rootGraph = null;
         var currentGraph = Application(state, CURRENT_GRAPH);
+        let scope = Application(state, GRAPH_SCOPE) || [];
         if (!currentGraph) {
             currentGraph = GraphMethods.createGraph();
             SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
+            rootGraph = currentGraph
         }
         else {
             currentGraph = Graphs(state, currentGraph);
+            rootGraph = currentGraph;
+            if (scope.length) {
+                currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
+            }
         }
+        var operations = operation;
+        if (!Array.isArray(operation)) {
+            operations = [{ operation: operation, options }]
+        }
+        operations.map(op => {
+            let { operation, options } = op;
+            switch (operation) {
+                case NEW_NODE:
+                    currentGraph = GraphMethods.newNode(currentGraph);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case REMOVE_NODE:
+                    currentGraph = GraphMethods.removeNode(currentGraph, options);
+                    break;
+                case NEW_LINK:
+                    currentGraph = GraphMethods.newLink(currentGraph, options)
+                    break;
+                case ADD_LINK_BETWEEN_NODES:
+                    currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options)
+                    break;
+                case REMOVE_LINK_BETWEEN_NODES:
+                    currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options)
+                    break;
+                case CHANGE_NODE_TEXT:
+                    currentGraph = GraphMethods.updateNodeProperty(currentGraph, { ...options, prop: 'text' });
+                    break;
+                case CHANGE_NODE_PROPERTY:
+                    currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
+                    break;
+                case NEW_PROPERTY_NODE:
+                    currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_ATTRIBUTE_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_VALIDATION_TYPE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_CHOICE_TYPE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_PARAMETER_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Parameter);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_FUNCTION_OUTPUT_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.FunctionOutput);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_PERMISSION_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Permission);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_OPTION_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionList);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_CUSTOM_OPTION:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_EXTENSION_LIST_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_VALIDATION_ITEM_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_EXTENTION_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionType);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_OPTION_ITEM_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case APPLY_FUNCTION_CONSTRAINTS:
+                    currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
+                    // setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
+                    break;
+            }
+            currentGraph = GraphMethods.applyConstraints(currentGraph);
+            currentGraph = GraphMethods.constraintSideEffects(currentGraph);
+        })
 
-        switch (operation) {
-            case NEW_NODE:
-                currentGraph = GraphMethods.newNode(currentGraph);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case REMOVE_NODE:
-                currentGraph = GraphMethods.removeNode(currentGraph, options);
-                break;
-            case NEW_LINK:
-                currentGraph = GraphMethods.newLink(currentGraph, options)
-                break;
-            case ADD_LINK_BETWEEN_NODES:
-                currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options)
-                break;
-            case REMOVE_LINK_BETWEEN_NODES:
-                currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options)
-                break;
-            case CHANGE_NODE_TEXT:
-                currentGraph = GraphMethods.updateNodeProperty(currentGraph, { ...options, prop: 'text' });
-                break;
-            case CHANGE_NODE_PROPERTY:
-                currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
-                break;
-            case NEW_PROPERTY_NODE:
-                currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_ATTRIBUTE_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_VALIDATION_TYPE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_CHOICE_TYPE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_PARAMETER_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Parameter);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_FUNCTION_OUTPUT_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.FunctionOutput);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_PERMISSION_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Permission);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_OPTION_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionList);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_CUSTOM_OPTION:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_EXTENSION_LIST_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_VALIDATION_ITEM_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_EXTENTION_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionType);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case NEW_OPTION_ITEM_NODE:
-                currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
-                setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case APPLY_FUNCTION_CONSTRAINTS:
-                currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
-                // setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
-                break;
-            case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
-                break;
+        if (scope.length) {
+            rootGraph = GraphMethods.setScopedGraph(rootGraph, { scope, graph: currentGraph });
         }
-        currentGraph = GraphMethods.applyConstraints(currentGraph);
-        currentGraph = GraphMethods.constraintSideEffects(currentGraph);
-        SaveGraph(currentGraph, dispatch)
+        else {
+            rootGraph = currentGraph;
+        }
+        SaveGraph(rootGraph, dispatch)
     }
 }
 

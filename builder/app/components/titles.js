@@ -111,3 +111,7 @@ export const Open = 'Open';
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
+
+
+export const CustomFunction = 'Custom Function';
+export const CustomFunctionDescription = 'Function can be constructed in an internal graph.';

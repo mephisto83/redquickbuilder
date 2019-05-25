@@ -30,19 +30,6 @@ class FunctionActivityMenu extends Component {
         })
         return (
             <TabPane active={active}>
-                {/* {currentNode ? (<FormControl>
-                    <CheckBox
-                        label={Titles.IsAgent}
-                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsAgent] : ''}
-                        onChange={(value) => {
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.IsAgent,
-                                id: currentNode.id,
-                                value
-                            });
-                        }} />
-                </FormControl>) : null} */}
-
                 {currentNode ? (<SelectInput
                     label={Titles.AgentOperator}
                     options={agent_nodes}
@@ -64,14 +51,21 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
-                {currentNode ? (<SelectInput
+                <CheckBox
+                    label={Titles.CustomFunction}
+                    title={Titles.CustomFunctionDescription}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseScopeGraph] : ''}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.UseScopeGraph,
+                            id: currentNode.id,
+                            value: value
+                        });
+                    }} />
+                {currentNode && !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<SelectInput
                     label={Titles.FunctionTypes}
                     options={function_types}
                     onChange={(value) => {
-                        // this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                        //     target: currentNode.properties[UIA.NodeProperties.UIExtension],
-                        //     source: id
-                        // })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.FunctionType,
                             id: currentNode.id,
@@ -81,14 +75,12 @@ class FunctionActivityMenu extends Component {
                             id: currentNode.id,
                             value
                         });
-                        // this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                        //     target: value,
-                        //     source: id,
-                        //     properties: { ...UIA.LinkProperties.FunctionOperator }
-                        // });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
                 <ControlSideBarMenu>
+                    {currentNode && currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<ControlSideBarMenuItem onClick={() => {
+                        this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.CustomFunction} description={Titles.CustomFunctionDescription} />) : null}
                     {currentNode ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_PARAMETER_NODE, {
                             parent: UIA.Visual(state, UIA.SELECTED_NODE)
