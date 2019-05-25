@@ -322,6 +322,8 @@ export function openRedQuickBuilderGraph() {
                     try {
                         var opened_graph = JSON.parse(res);
                         if (opened_graph) {
+                            var default_graph = GraphMethods.createGraph();
+                            opened_graph = { ...default_graph, ...opened_graph };
                             SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
                             SaveGraph(opened_graph, dispatch);
                         }

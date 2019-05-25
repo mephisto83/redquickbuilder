@@ -19,7 +19,8 @@ export const NodeTypes = {
     Parameter: 'parameter',
     FunctionOutput: 'function-output',
     Controller: 'controller',
-    Maestro: 'maestro'
+    Maestro: 'maestro',
+    ClassNode: 'class-node'
 }
 export const ColorStates = {
     Error: 'Error'
@@ -83,7 +84,8 @@ export const NodeProperties = {
     //The name used for code.
     CodeName: 'codeName',
     CodePropertyType: 'codeProperty',
-    FunctionType: 'functionType'
+    FunctionType: 'functionType',
+    ClassConstructionInformation: 'ClassConstructionInformation'
 }
 
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
@@ -123,6 +125,7 @@ export const LinkType = {
     ParentLink: 'parent-link',
     FunctionConstraintLink: 'function-constraint-link',
     ErrorLink: 'error-link',
+    RequiredClassLink: 'required-class-link',
     UserLink: 'user-link' // A link between a user and a personal ([Customer, Manager, Hero])
 }
 export const LinkStyles = {
@@ -202,6 +205,9 @@ export const LinkProperties = {
     FunctionVariable: {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
+    },
+    RequiredClassLink: {
+        type: LinkType.RequiredClassLink
     },
     FunctionLink: {
         type: LinkType.FunctionLink

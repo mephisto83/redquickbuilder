@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle } from '../actions/uiactions';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -11,6 +11,7 @@ export function createGraph() {
         nodeConnections: {}, // A library of nodes, and each nodes links
         linkLib: {},
         links: [],
+        classNodes: {},
         functionNodes: {}, // A function nodes will be run through for checking constraints.
         updated: null
     }
@@ -41,7 +42,14 @@ export function removeNode(graph, options = {}) {
     let { id } = options;
 
     graph = clearLinks(graph, options);
-
+    if (graph.functionNodes && graph.functionNodes[id]) {
+        delete graph.functionNodes[id];
+        graph.functionNodes = { ...graph.functionNodes };
+    }
+    if (graph.classNodes && graph.classNodes[id]) {
+        delete graph.classNodes[id];
+        graph.classNodes = { ...graph.classNodes };
+    }
     delete graph.nodeLib[id];
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = [...graph.nodes.filter(x => x !== id)];
@@ -130,24 +138,78 @@ export function constraintSideEffects(graph) {
                                 //Should be able to find the singular model that is connected to the functionNode and children, if it exists.
                                 let constraintModelKey = functionConstraintRequiredClasses[j][INTERNAL_TEMPLATE_REQUIREMENTS.MODEL];
                                 if (constraintModelKey) {
-                                    debugger;
                                     var constraint_nodes = getNodesFunctionsConnected(graph, { id: i, constraintKey: constraintModelKey });
                                     var nodes_one_step_down_the_line = [];
                                     constraint_nodes.map(cn => {
                                         var nextNodes = getNodesLinkedTo(graph, { id: cn.id });
                                         nodes_one_step_down_the_line.push(...nextNodes);
                                     });
-                                    debugger;
+                                    nodes_one_step_down_the_line.map(node => {
+                                        classes_that_must_exist.push({
+                                            nodeId: node.id,
+                                            key: constraintModelKey,
+                                            class: j
+                                        })
+                                    })
                                 }
                             }
                         }
                     }
                 }
             }
+            classes_that_must_exist = [...classes_that_must_exist.unique(x => {
+                return JSON.stringify(x);
+            })]
+            //Remove class nodes that are no longer cool.
+            Object.keys(graph.classNodes).map(i => {
+                if (!classes_that_must_exist.find(cls => {
+                    let _cnode = graph.nodeLib[i];
+                    var res = GetNodeProp(_cnode, NodeProperties.ClassConstructionInformation);
+                    return matchObject(res, cls);
+                })) {
+                    graph = removeNode(graph, { id: i })
+                }
+                else {
+
+                }
+            });
+            //Could make this faster by using a dictionary 
+            classes_that_must_exist.map(cls => {
+                if (Object.keys(graph.classNodes).filter(i => {
+                    debugger    
+                    let _cnode = graph.nodeLib[i];
+                    var res = GetNodeProp(_cnode, NodeProperties.ClassConstructionInformation);
+                    if (matchObject(res, cls)) {
+                        //The existing classNodes can be updated with any new dependent values. e.g. Text/title
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }).length === 0) {
+                    //Create new classNodes
+                    graph = addNewNodeOfType(graph, {
+                        parent: cls.nodeId,
+                        linkProperties: {
+                            properties: { ...LinkProperties.RequiredClassLink }
+                        }
+                    }, NodeTypes.ClassNode, (new_node) => {
+                        graph = updateNodeProperty(graph, {
+                            id: new_node.id,
+                            prop: NodeProperties.UIText,
+                            value: RequiredClassName(cls.class, GetNodeTitle(new_node))
+                        });
+                    })
+                }
+            })
         }
     }
 
     return graph;
+}
+
+export function RequiredClassName(cls, node_name) {
+    return `${cls}${node_name}`;
 }
 
 export function getNodesFunctionsConnected(graph, options) {
@@ -540,6 +602,18 @@ export function matchOneWay(obj1, obj2) {
     }
     return true;
 }
+export function matchObject(obj1, obj2) {
+    if (Object.keys(obj1).length !== Object.keys(obj2).length) {
+        return false;
+    }
+    for (var i in obj1) {
+        if (obj1[i] !== obj2[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
 export function getNodeLinked(graph, options) {
     if (options) {
         var { id, direction, constraints } = options;
@@ -739,6 +813,16 @@ export function updateNodeProperty(graph, options) {
             if (graph.functionNodes[id] && prop === NodeProperties.NODEType) {
                 delete graph.functionNodes[id];
                 graph.functionNodes = { ...graph.functionNodes };
+            }
+        }
+
+        if (prop === NodeProperties.NODEType && value === NodeTypes.ClassNode) {
+            graph.classNodes = { ...graph.classNodes, ...{ [id]: true } };
+        }
+        else {
+            if (graph.classNodes[id] && prop === NodeProperties.NODEType) {
+                delete graph.classNodes[id];
+                graph.classNodes = { ...graph.classNodes };
             }
         }
     }
