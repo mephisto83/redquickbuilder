@@ -456,7 +456,7 @@ export default class MindMap extends Component {
                     return this.state.graph.groups.indexOf(t);
                 });
                 this.state.graph.groups.removeIndices(removedGroups);
-                let newGroups = graph.links.relativeCompliment(this.state.graph.groups, (x, y) => x.id === y);
+                let newGroups = graph.groups.relativeCompliment(this.state.graph.groups, (x, y) => x.id === y);
                 newGroups.map(nn => {
                     this.state.graph.groups.push(
                         (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes, this.state.graph.groups))
