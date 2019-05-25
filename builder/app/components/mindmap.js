@@ -77,7 +77,7 @@ export default class MindMap extends Component {
             div.style.position = 'absolute';
             div.classList.add('label');
             div.style.whiteSpace = 'normal';
-            div.style.maxWidth = `200px`;
+            div.style.maxWidth = (text || '').split(' ').length > 1 ? `200px` : '300px';
             div.style.top = '-10000px';
             div.style.padding = (pad * 2) + 'px';
             document.querySelector(`#${this.state.id}`).appendChild(div);

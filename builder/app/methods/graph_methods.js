@@ -147,6 +147,7 @@ export function constraintSideEffects(graph) {
                                     nodes_one_step_down_the_line.map(node => {
                                         classes_that_must_exist.push({
                                             nodeId: node.id,
+                                            codeName: GetNodeProp(node, NodeProperties.CodeName),
                                             key: constraintModelKey,
                                             class: j
                                         })
@@ -175,18 +176,18 @@ export function constraintSideEffects(graph) {
             });
             //Could make this faster by using a dictionary 
             classes_that_must_exist.map(cls => {
-                if (Object.keys(graph.classNodes).filter(i => {
-                    debugger    
+                var matching_nodes = Object.keys(graph.classNodes).filter(i => {
+
                     let _cnode = graph.nodeLib[i];
                     var res = GetNodeProp(_cnode, NodeProperties.ClassConstructionInformation);
                     if (matchObject(res, cls)) {
-                        //The existing classNodes can be updated with any new dependent values. e.g. Text/title
-                        return false;
-                    }
-                    else {
                         return true;
                     }
-                }).length === 0) {
+                    else {
+                        return false;
+                    }
+                });
+                if (matching_nodes.length === 0) {
                     //Create new classNodes
                     graph = addNewNodeOfType(graph, {
                         parent: cls.nodeId,
@@ -197,9 +198,26 @@ export function constraintSideEffects(graph) {
                         graph = updateNodeProperty(graph, {
                             id: new_node.id,
                             prop: NodeProperties.UIText,
-                            value: RequiredClassName(cls.class, GetNodeTitle(new_node))
+                            value: RequiredClassName(cls.class, cls[NodeProperties.CodeName])
+                        });
+                        graph = updateNodeProperty(graph, {
+                            id: new_node.id,
+                            prop: NodeProperties.ClassConstructionInformation,
+                            value: cls
                         });
                     })
+                }
+                else if (matching_nodes.length === 1) {
+                    var _cnode = graph.nodeLib[matching_nodes[0]];
+                    //The existing classNodes can be updated with any new dependent values. e.g. Text/title
+                    graph = updateNodeProperty(graph, {
+                        id: _cnode.id,
+                        prop: NodeProperties.UIText,
+                        value: RequiredClassName(cls.class, cls[NodeProperties.CodeName])
+                    });
+                }
+                else {
+                    console.error('There should never be more than one');
                 }
             })
         }
@@ -209,7 +227,7 @@ export function constraintSideEffects(graph) {
 }
 
 export function RequiredClassName(cls, node_name) {
-    return `${cls}${node_name}`;
+    return `${node_name}${cls}`;
 }
 
 export function getNodesFunctionsConnected(graph, options) {
