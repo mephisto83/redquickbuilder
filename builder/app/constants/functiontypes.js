@@ -168,8 +168,8 @@ const COMMON_FUNCTION_REQUIREMENTS = {
             }
         },
         [INTERNAL_TEMPLATE_REQUIREMENTS.CHANGECLASS]: {
-            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process_change_class.tpl', 'utf-8'),
-            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process_change_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf-8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {

@@ -1,4 +1,4 @@
-public {{model}}Parameter {{method}}({{parameters}}) {
+public static {{model}}Parameter {{method}}({{parameters}}) {
     var result = new {{model}}Parameter();
 
     {{parameters_property}}
