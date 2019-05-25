@@ -431,11 +431,11 @@ export default class MindMap extends Component {
                 draw = true;
             }
             if (graph.links && this.state && this.state.graph && this.state.graph.links) {
-                var removedLinks = this.state.graph.links.relativeCompliment(graph.links, (x, y) => x.id === y).map(t => {
+                let removedLinks = this.state.graph.links.relativeCompliment(graph.links, (x, y) => x.id === y).map(t => {
                     return this.state.graph.links.indexOf(t);
                 });
                 this.state.graph.links.removeIndices(removedLinks);
-                var newLinks = graph.links.relativeCompliment(this.state.graph.links, (x, y) => x === y.id);
+                let newLinks = graph.links.relativeCompliment(this.state.graph.links, (x, y) => x === y.id);
                 newLinks.map(nn => {
                     this.state.graph.links.push(
                         (duplicateLink(graph.linkLib[nn], this.state.graph.nodes))
@@ -443,20 +443,26 @@ export default class MindMap extends Component {
                 });
 
                 this.state.graph.links.map(nn => {
-                    var nl = graph.linkLib[nn.id];
+                    let nl = graph.linkLib[nn.id];
                     if (nl && nl.properties) {
                         nn.properties = { ...nl.properties };
                     }
                 });
-
-
-                // this.state.graph.links.sort((a, b) => {
-                //     graph.nodes.indexOf(a.b)
-                // })
-
                 draw = true;
             }
 
+            if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
+                let removedGroups = this.state.graph.groups.relativeCompliment(graph.groups, (x, y) => x.id === y).map(t => {
+                    return this.state.graph.groups.indexOf(t);
+                });
+                this.state.graph.groups.removeIndices(removedGroups);
+                let newGroups = graph.links.relativeCompliment(this.state.graph.groups, (x, y) => x.id === y);
+                newGroups.map(nn => {
+                    this.state.graph.groups.push(
+                        (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes, this.state.graph.groups))
+                    )
+                })
+            }
 
 
             if (draw) {
@@ -481,4 +487,20 @@ function duplicateLink(nn, nodes) {
         source: nodes.findIndex(x => x.id === nn.source),
         target: nodes.findIndex(x => x.id === nn.target)
     };
+}
+
+function duplicateGroup(nn, nodes, groups) {
+    let temp = {
+        ...nn,
+    };
+    if (nn.leaves) {
+        let leaves = nn.leaves.map(l => nodes.findIndex(x => x.id === l));
+        temp.leaves = leaves;
+    }
+    if (nn.groups) {
+        let groups = nn.groups.map(l => groups.findIndex(x => x.id === l));
+        temp.groups = groups;
+    }
+
+    return temp;
 }

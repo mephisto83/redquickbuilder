@@ -6,8 +6,13 @@ export function createGraph() {
     return {
         id: uuidv4(),
         path: [],
+        //Groups
         groups: [],
         groupLib: {},
+        groupsNodes: {}, // group => { node}
+        nodesGroups: {}, // node => {group}
+        groupsGroups: {}, // group => {group}
+        //Groups 
         nodeLib: {},
         nodes: [],
         nodeLinks: {}, // A library of nodes, and each nodes that it connects.
@@ -49,24 +54,123 @@ export function setScopedGraph(root, options) {
     return root;
 }
 
-export function newGroup(graph) {
+export function newGroup(graph, callback) {
     let group = createGroup();
-    return addGroup(graph, group);
+    let result = addGroup(graph, group);
+    if (callback) {
+        callback(result);
+    }
+    return result;
 }
 export function addLeaf(graph, ops) {
     var { leaf, id } = ops;
     let leaves = graph.groupLib[id].leaves || [];
     leaves = [...leaves, leaf];
+
+    //Groups => nodes
+    graph.groupsNodes[id] = graph.groupsNodes[id] || {}
+    graph.groupsNodes[id][leaf] = true;
+    graph.groupsNodes = {
+        ...graph.groupsNodes
+    }
+
+    //Nodes => groups
+    graph.nodesGroups[leaf] = graph.nodesGroups[leaf] || {}
+    graph.nodesGroups[leaf][id] = true;
+    graph.nodesGroups = {
+        ...graph.nodesGroups
+    }
+
+
+
     graph.groupLib[id].leaves = leaves;
     return graph;
 }
-export function addGroup(graph, ops) {
-    let { group, id } = ops;
-    let groups = graph.groupLib[id].groups || [];
-    groups = [...groups, group];
-    graph.groupLib[id].groups = groups;
+export function removeLeaf(graph, ops) {
+    var { leaf, id } = ops;
+    let leaves = graph.groupLib[id].leaves || [];
+    leaves = [...leaves.filter(t => t !== leaf)];
+    graph.groupLib[id].leaves = leaves;
+
+    if (graph.groupsNodes[id]) {
+        if (graph.groupsNodes[id][leaf]) {
+            delete graph.groupsNodes[id][leaf];
+        }
+        if (Object.keys(graph.groupsNodes[id]).length === 0) {
+            delete graph.groupsNodes[id];
+            graph = clearGroup(graph, { id });
+        }
+        graph.groupsNodes = {
+            ...graph.groupsNodes
+        }
+    }
+
+    if (graph.nodeGroups[leaf]) {
+        if (graph.nodeGroups[leaf][id]) {
+            delete graph.nodeGroups[leaf][id];
+        }
+        if (Object.keys(graph.nodeGroups[leaf]).length === 0) {
+            delete graph.nodeGroups[leaf];
+        }
+        graph.nodeGroups = {
+            ...graph.nodeGroups
+        }
+    }
+
+
     return graph;
 }
+
+export const CONTAINS_GROUP = 'CONTAINS_GROUP';
+export const CONTAINED_BY_GROUP = 'CONTAINED_BY_GROUP';
+export function addGroupToGroup(graph, ops) {
+    let { groupId, id } = ops;
+    let group = graph.groupLib[id];
+    let groups = group.groups || [];
+
+    group.groups = [...groups, groupId];
+    graph.groupLib[id] = group;
+    graph.groupLib = { ...graph.groupLib };
+
+    //Groups need to know who contains them,
+    graph.groupsGroups[id] = graph.groupsGroups[id] || {};
+    graph.groupsGroups[id][groupId] = CONTAINS_GROUP;
+    // and also the containers to know about the groups
+    graph.groupsGroups[groupId] = graph.groupsGroups[groupId] || {};
+    graph.groupsGroups[groupId][id] = CONTAINED_BY_GROUP;
+
+
+    return graph;
+}
+export function removeGroupFromGroup(graph, ops) {
+    let { groupId, id } = ops;
+    let group = graph.groupLib[id];
+
+    group.groups = [...group.groups.filter(x => x !== groupId)];
+    graph.groupLib[id] = { ...group };
+    if (graph.groupsGroups) {
+        if (graph.groupsGroups[id]) {
+            delete graph.groupsGroups[id][groupId];
+            if (!Object.keys(graph.groupsGroups[id]).length) {
+                delete graph.groupsGroups[id];
+            }
+        }
+        graph = clearGroup(graph, { id })
+    }
+
+    return graph;
+}
+
+export function clearGroup(graph, ops) {
+    var { id } = ops
+    //If groupsGroups and groupsNodes are empty, then remove the group all together.
+    if (!graph.groupsGroups[id] && !graph.groupsNodes[id]) {
+        graph.groups = [...graph.groups.filter(x => x !== id)];
+        delete graph.groupLib[id]
+    }
+    return graph;
+}
+
 export function newNode(graph) {
     let node = createNode();
     return addNode(graph, node);
@@ -90,8 +194,12 @@ export function defaultExtensionDefinitionType() {
 }
 export function removeNode(graph, options = {}) {
     let { id } = options;
-
+    //links
     graph = clearLinks(graph, options);
+
+    //groups 
+    graph = removeNodeFromGroups(graph, options);
+
     if (graph.functionNodes && graph.functionNodes[id]) {
         delete graph.functionNodes[id];
         graph.functionNodes = { ...graph.functionNodes };
@@ -105,6 +213,32 @@ export function removeNode(graph, options = {}) {
     graph.nodes = [...graph.nodes.filter(x => x !== id)];
 
     return graph;
+}
+export function removeNodeFromGroups(graph, options) {
+    let { id } = options;
+    let groupsContainingNode = [];
+    //nodeGroups
+    if (graph.nodeGroups[id]) {
+        groupsContainingNode = Object.keys(graph.nodeGroups[id]);
+        groupsContainingNode.map(group => {
+            graph = removeLeaf(graph, { leaf: id, group })
+        })
+    }
+
+    //groupNodes
+    if (graph.groupNodes) {
+        groupsContainingNode.map(group => {
+            if (graph.groupNodes[group]) {
+                if (graph.groupNodes[group][id]) {
+                    delete graph.groupNodes[group][id]
+                }
+                if (Object.keys(graph.groupNodes[group]).length === 0) {
+                    delete graph.groupNodes[group];
+                }
+            }
+        })
+    }
+
 }
 export function clearLinks(graph, options) {
     let { id } = options;
