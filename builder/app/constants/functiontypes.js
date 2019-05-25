@@ -294,3 +294,29 @@ export const ReturnTypes = {
     LISTOBJECT: 'LISTOBJECT', //May end up being a different dimension,
     BOOL: 'BOOL'
 }
+
+export function hasTemplate(templateString) {
+    var singularSymbol = '@';
+    var regex = new RegExp('({{)[A-Za-z0-9_.' + singularSymbol + ' ,\'\|]*(}})', 'g');
+    var hasTemplate = regex.test(templateString);
+    return hasTemplate;
+}
+
+export function bindTemplate(templateString, data) {
+    var val;
+    var singularSymbol = '@';
+    var regex = new RegExp('({{)[A-Za-z0-9_.' + singularSymbol + ' ,\'\|]*(}})', 'g');
+    var hasTemplate = regex.test(templateString);
+    if (hasTemplate) {
+        var res = templateString.match(regex);
+
+        res.reverse().unique().map(function (x) {
+            return x.split('').subset(2, x.length - 2).join('');
+        }).map(function (t) {
+            subregex = new RegExp('({{)' + t + '(}})', 'g');
+            templateString = templateString.replace(subregex, val === null || val === undefined ? '' : val);
+        });
+    }
+    return templateString;
+
+}
