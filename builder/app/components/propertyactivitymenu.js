@@ -9,7 +9,7 @@ import FormControl from './formcontrol';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
-import { NodeTypes } from '../constants/nodetypes';
+import { NodeTypes, LinkProperties } from '../constants/nodetypes';
 class PropertyActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -153,7 +153,12 @@ class PropertyActivityMenu extends Component {
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_ATTRIBUTE_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
+                            linkProperties:{
+                                ...LinkProperties.AttributeLink
+                            }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddAttribute} description={Titles.AddAttributeDescription} />
                 </ControlSideBarMenu>

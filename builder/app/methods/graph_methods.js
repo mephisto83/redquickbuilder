@@ -134,6 +134,8 @@ export function removeLeaf(graph, ops) {
         }
         if (Object.keys(graph.groupsNodes[id]).length === 0) {
             delete graph.groupsNodes[id];
+            graph.groups = [...graph.groups.filter(x => x !== id)];
+            delete graph.groupLib[id];
         }
         graph.groupsNodes = {
             ...graph.groupsNodes
@@ -342,7 +344,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
 
     graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
     if (groupProperties) {
-        updateNodeGroup(graph, { id: node.id, groupProperties, parent })
+        graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
     }
     if (callback) {
         callback(node);
@@ -360,10 +362,11 @@ export function updateNodeGroup(graph, options) {
             id: parent,
             value: { group: group.id },
             prop: NodeProperties.Groups
-        })
+        });
+        graph = addLeaf(graph, { leaf: parent, id: group.id });
     }
     else {
-        let nodeGroupProp = GetNodeProp(group.nodeLib[parent], NodeProperties.Groups);
+        let nodeGroupProp = GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups);
         group = getGroup(graph, nodeGroupProp.group);
     }
 
@@ -377,7 +380,7 @@ function getGroup(graph, id) {
     return graph.groupLib[id];
 }
 function hasGroup(graph, parent) {
-    return !!(group.nodeLib[parent] && GetNodeProp(group.nodeLib[parent], NodeProperties.Groups));
+    return !!(graph.nodeLib[parent] && GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups));
 }
 export function GetNode(graph, id) {
     if (graph && graph.nodeLib) {

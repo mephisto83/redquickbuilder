@@ -148,7 +148,8 @@ export const LinkType = {
     RequiredClassLink: 'required-class-link',
     ModelTypeLink: 'model-type-link',
     UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
-    MaestroLink: 'maestro-link'
+    MaestroLink: 'maestro-link',
+    AttributeLink: 'attribute-link'
 }
 export const LinkStyles = {
     [LinkType.FunctionLink]: {
@@ -227,6 +228,9 @@ export const LinkProperties = {
     FunctionVariable: {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
+    },
+    AttributeLink: {
+        type: LinkType.AttributeLink
     },
     ModelTypeLink: {
         type: LinkType.ModelTypeLink
