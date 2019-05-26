@@ -26,7 +26,7 @@ export default class TreeViewMenu extends Component {
                 }}>
                     {this.props.hideIcon ? null : <i className={`${this.icon()}`}></i>}
                     <span>{this.props.title}</span>
-                    {this.props.right ? (<span class="pull-right-container">
+                    {this.props.right ? (<span className="pull-right-container">
                         {this.props.right}
                     </span>) : null}
                     {this.props.hideArrow ? null : (<span className="pull-right-container">

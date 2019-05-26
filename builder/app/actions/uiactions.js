@@ -275,7 +275,7 @@ export function graphOperation(operation, options) {
         if (!Array.isArray(operation)) {
             operations = [{ operation: operation, options }]
         }
-        operations.map(op => {
+        operations.filter(x => x).map(op => {
             let { operation, options } = op;
             switch (operation) {
                 case NEW_NODE:

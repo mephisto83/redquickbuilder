@@ -9,6 +9,7 @@ import FormControl from './formcontrol';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
+import { NodeTypes } from '../constants/nodetypes';
 class PropertyActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -16,6 +17,7 @@ class PropertyActivityMenu extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (currentNode) {
             var show_dependent = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIDependsOn];;
+            var use_model_as_type = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseModelAsType);
             var property_nodes = UIA.NodesByType(state, UIA.NodeTypes.Property).filter(x => {
                 return x.id !== currentNode.id;
             }).map(node => {
@@ -60,6 +62,7 @@ class PropertyActivityMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIDependsOn] : ''} />) : null}
                 </FormControl>) : null}
+
                 {currentNode ? (<FormControl>
                     <TextInput
                         label={Titles.UIName}
@@ -71,7 +74,34 @@ class PropertyActivityMenu extends Component {
                                 value
                             });
                         }} />
-                    <SelectInput
+
+                </FormControl>) : null}
+                {currentNode ? (<FormControl>
+                    <CheckBox
+                        label={Titles.UseModelAsType}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseModelAsType] : ''}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation([value ? null : {
+                                operation: UIA.REMOVE_LINK_BETWEEN_NODES, options: {
+                                    target: currentNode.properties[UIA.NodeProperties.UIModelType],
+                                    source: id
+                                }
+                            }, {
+                                operation: UIA.CHANGE_NODE_PROPERTY, options: {
+                                    prop: UIA.NodeProperties.UseModelAsType,
+                                    id: currentNode.id,
+                                    value
+                                }
+                            }, !value || !currentNode.properties[UIA.NodeProperties.UIModelType] ? null : {
+                                operation: UIA.ADD_LINK_BETWEEN_NODES, options: {
+                                    target: currentNode.properties[UIA.NodeProperties.UIModelType],
+                                    source: id,
+                                    properties: { ...UIA.LinkProperties.ModelTypeLink }
+                                }
+                            }]);
+                        }} />
+                    {!use_model_as_type ? (<SelectInput
                         options={Object.keys(UIA.NodePropertyTypes).sort((a, b) => a.localeCompare(b)).map(x => {
                             return {
                                 value: UIA.NodePropertyTypes[x],
@@ -86,7 +116,38 @@ class PropertyActivityMenu extends Component {
                                 value
                             });
                         }}
-                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIAttributeType] : ''} />
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIAttributeType] : ''} />) : null}
+                    {use_model_as_type ? (<SelectInput
+                        options={UIA.NodesByType(state, NodeTypes.Model).map(x => {
+                            return {
+                                value: x.id,
+                                title: UIA.GetNodeTitle(x)
+                            }
+                        })}
+                        label={Titles.PropertyModelType}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation([{
+                                operation: UIA.REMOVE_LINK_BETWEEN_NODES, options: {
+                                    target: currentNode.properties[UIA.NodeProperties.UIModelType],
+                                    source: id
+                                }
+                            }, {
+                                operation: UIA.CHANGE_NODE_PROPERTY, options: {
+                                    prop: UIA.NodeProperties.UIModelType,
+                                    id: currentNode.id,
+                                    value
+                                }
+                            }, {
+                                operation: UIA.ADD_LINK_BETWEEN_NODES, options: {
+                                    target: value,
+                                    source: id,
+                                    properties: { ...UIA.LinkProperties.ModelTypeLink }
+                                }
+                            }]);
+
+                        }}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIModelType] : ''} />) : null}
                 </FormControl>) : null}
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />
                 <ControlSideBarMenu>

@@ -17,6 +17,7 @@ export const UINameDescription = 'The text that will be visible to the client.';
 export const UISingular = 'UI Singular';
 export const Unknown = 'Unknown';
 export const PropertyValueType = 'Property value type';
+export const PropertyModelType = 'Property model type';
 export const FunctionSetup = 'Function Setup';
 export const AgentOperator = 'Agent Operator';
 export const Enumerable = 'Enumerable';
@@ -114,7 +115,7 @@ export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
 
-
+export const UseModelAsType = 'Use Model as Type';
 export const CustomFunction = 'Custom Function';
 export const CustomFunctionDescription = 'Function can be constructed in an internal graph.';
 

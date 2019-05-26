@@ -78,6 +78,7 @@ export const NodeProperties = {
     UseUIDependsOn: 'UseuiDependsOn',
     UseUIOptions: 'UseuiOptions',
     UIOptionType: 'uiOptionType',
+
     //Use a custom option
     UseCustomUIOption: 'useCustomUIOption',
     UIOptionTypeCustom: 'uiOptionTypeCustom',
@@ -93,6 +94,8 @@ export const NodeProperties = {
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
     UIAttributeType: 'uiAttributeType',
+    UseModelAsType: 'useModelAsType',
+    UIModelType: 'uiModelType',
 
     UseScopeGraph: 'UseScopeGraph',
     ScopeGraph: 'scopedGraph',
@@ -143,6 +146,7 @@ export const LinkType = {
     FunctionConstraintLink: 'function-constraint-link',
     ErrorLink: 'error-link',
     RequiredClassLink: 'required-class-link',
+    ModelTypeLink: 'model-type-link',
     UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
     MaestroLink: 'maestro-link'
 }
@@ -223,6 +227,9 @@ export const LinkProperties = {
     FunctionVariable: {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
+    },
+    ModelTypeLink: {
+        type: LinkType.ModelTypeLink
     },
     RequiredClassLink: {
         type: LinkType.RequiredClassLink

@@ -22,7 +22,7 @@ class SectionList extends Component {
                     <TreeViewItem
                         key={sg.id}
                         title={sg.title || Titles.Unknown}
-                        right={<span class="label label-primary pull-right">{sg.nodes.length}</span>}
+                        right={<span className="label label-primary pull-right">{sg.nodes.length}</span>}
                         onClick={() => {
                             me.props.setApplication(UIA.GRAPH_SCOPE, [sg.id]);
                         }} ></TreeViewItem>
@@ -34,7 +34,7 @@ class SectionList extends Component {
             body = (
                 <TreeViewMenu
                     hideIcon={true}
-                    right={<span class="label label-primary pull-right">{rootGraph.nodes.length}</span>}
+                    right={<span className="label label-primary pull-right">{rootGraph.nodes.length}</span>}
                     title={rootGraph.title || Titles.Unknown}
                     hideArrow={true}
                     open={true}

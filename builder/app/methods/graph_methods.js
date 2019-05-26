@@ -47,8 +47,9 @@ export function removeSubGraph(graph, id) {
 }
 
 export function getSubGraphs(graph) {
-    return graph.graphs ? Object.keys(graph.graphs).map(t => graph.graphs[t]) : [];
+    return graph && graph.graphs ? Object.keys(graph.graphs || {}).map(t => graph.graphs[t]) : [];
 }
+
 export function getSubGraph(graph, scopes) {
     var result = graph;
 
@@ -332,19 +333,51 @@ export function addNewPropertyNode(graph, options) {
 }
 
 export function addNewNodeOfType(graph, options, nodeType, callback) {
-    let { parent, linkProperties } = options;
+    let { parent, linkProperties, groupProperties } = options;
     let node = createNode(nodeType);
     graph = addNode(graph, node);
     if (parent) {
         graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
     }
-    graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
 
+    graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
+    if (groupProperties) {
+        updateNodeGroup(graph, { id: node.id, groupProperties, parent })
+    }
     if (callback) {
         callback(node);
     }
 
     return graph;
+}
+export function updateNodeGroup(graph, options) {
+    var { id, groupProperties, parent } = options;
+    var group = null;
+    if (!hasGroup(graph, parent)) {
+        var group = createGroup();
+        graph = addGroup(graph, group);
+        graph = updateNodeProperty(graph, {
+            id: parent,
+            value: { group: group.id },
+            prop: NodeProperties.Groups
+        })
+    }
+    else {
+        let nodeGroupProp = GetNodeProp(group.nodeLib[parent], NodeProperties.Groups);
+        group = getGroup(graph, nodeGroupProp.group);
+    }
+
+    if (group) {
+        graph = addLeaf(graph, { leaf: id, id: group.id });
+    }
+
+    return graph;
+}
+function getGroup(graph, id) {
+    return graph.groupLib[id];
+}
+function hasGroup(graph, parent) {
+    return !!(group.nodeLib[parent] && GetNodeProp(group.nodeLib[parent], NodeProperties.Groups));
 }
 export function GetNode(graph, id) {
     if (graph && graph.nodeLib) {
