@@ -44,7 +44,8 @@ export const NodeTypeColors = {
     [NodeTypes.Function]: '#553D36',
     [NodeTypes.Parameter]: '#684A52',
     [NodeTypes.FunctionOutput]: '#857885',
-    [NodeTypes.ClassNode]: '#C3BAAA'
+    [NodeTypes.ClassNode]: '#C3BAAA',
+    [NodeTypes.Maestro]: '#780116'
 }
 
 export const FunctionGroups = {
@@ -97,6 +98,7 @@ export const NodeProperties = {
     ScopeGraph: 'scopedGraph',
 
     //The name used for code.
+    Groups: 'groups',
     CodeName: 'codeName',
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
@@ -141,7 +143,8 @@ export const LinkType = {
     FunctionConstraintLink: 'function-constraint-link',
     ErrorLink: 'error-link',
     RequiredClassLink: 'required-class-link',
-    UserLink: 'user-link' // A link between a user and a personal ([Customer, Manager, Hero])
+    UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
+    MaestroLink: 'maestro-link'
 }
 export const LinkStyles = {
     [LinkType.FunctionLink]: {
@@ -274,6 +277,9 @@ export const LinkProperties = {
     },
     UserLink: {
         type: LinkType.UserLink
+    },
+    MaestroLink: {
+        type: LinkType.MaestroLink
     }
 }
 

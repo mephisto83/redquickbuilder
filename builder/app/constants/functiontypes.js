@@ -40,6 +40,7 @@ export const FunctionTemplateKeys = {
     AgentDeterminingProperty: 'agent-determining-property',
     Property: 'property',
     Parent: 'parent',
+    AgentInstance: 'agent_instance',
     AgentType: 'agent_type',
     User: 'user',
     UserInstance: 'user_instance',
@@ -264,6 +265,20 @@ export const Functions = {
                 [FunctionConstraintKeys.IsEnumerable]: true,
                 key: FunctionTemplateKeys.ModelDeterminingProperty
             },
+            [FunctionTemplateKeys.AgentInstance]: {
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.AgentType,
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                key: FunctionTemplateKeys.AgentInstance,
+                [FunctionConstraintKeys.IsInstanceVariable]: true,
+                [FunctionConstraintKeys.IsInputVariable]: true
+            },
+            [FunctionTemplateKeys.Value]: {
+                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+                [FunctionConstraintKeys.IsSingleLink]: true,
+                key: FunctionTemplateKeys.Value,
+                [FunctionConstraintKeys.IsInstanceVariable]: true,
+                [FunctionConstraintKeys.IsInputVariable]: true
+            }
         },
         output: {
             ...COMMON_OUTPUT.BOOL

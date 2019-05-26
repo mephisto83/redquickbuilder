@@ -49,6 +49,8 @@ import MaestroDetailsMenu from './maestrodetailsmenu';
 import CommonActivityMenu from './commonactivitymenu';
 import MaestroActivityMenu from './maestroactivitymenu';
 import SidebarButton from './sidebarbutton';
+import ControllerDetailsMenu from './controllerdetailsmenu';
+import ControllerActivityMenu from './controlleractivitymenu';
 
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -154,6 +156,7 @@ class Dashboard extends Component {
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
                                 <MaestroDetailsMenu />
+                                <ControllerDetailsMenu />
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
@@ -223,6 +226,7 @@ class Dashboard extends Component {
                                 <ChoiceListItemActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
+                                <ControllerActivityMenu />
                                 <CommonActivityMenu />
                                 <FunctionActivityMenu />
                                 <AttributeFormControl />

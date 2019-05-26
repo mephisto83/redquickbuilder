@@ -105,6 +105,8 @@ export const Functions = 'Functions';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';
 
+export const AddMaestros = 'Add Maestro';
+export const Maestros = 'Maestros';
 export const Save = 'Save';
 export const Open = 'Open';
 

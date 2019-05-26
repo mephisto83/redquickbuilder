@@ -13,9 +13,9 @@ import { Functions } from '../constants/functiontypes';
 import { getNodesLinkedFrom, getNodesLinkedTo } from '../methods/graph_methods';
 import TreeViewMenu from './treeviewmenu';
 import TreeViewItem from './treeviewitem';
-const MAESTRO_DETAILS_MENU = 'MAESTRO_DETAILS_MENU';
+const CONTROLLER_DETAILS_MENU = 'CONTROLLER_DETAILS_MENU';
 
-class MaestroDetailsMenu extends Component {
+class ControllerDetailsMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Maestro);
@@ -26,15 +26,15 @@ class MaestroDetailsMenu extends Component {
         }
         return (
             <TreeViewMenu
-                open={UIA.Visual(state, MAESTRO_DETAILS_MENU)}
-                active={UIA.Visual(state, MAESTRO_DETAILS_MENU)}
+                open={UIA.Visual(state, CONTROLLER_DETAILS_MENU)}
+                active={UIA.Visual(state, CONTROLLER_DETAILS_MENU)}
                 title={Titles.MaestroDetails}
                 toggle={() => {
-                    this.props.toggleVisual(MAESTRO_DETAILS_MENU)
+                    this.props.toggleVisual(CONTROLLER_DETAILS_MENU)
                 }}>
                 {othernodes.map((onode, index) => {
                     return (
-                        <TreeViewItem key={`tree-view-item-maestro-details${index}`} title={`${UIA.GetNodeTitle(onode)}`} onClick={() => {
+                        <TreeViewItem key={`tree-view-item-controller-details${index}`} title={`${UIA.GetNodeTitle(onode)}`} onClick={() => {
                             var id = currentNode.id;
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: onode.id,
@@ -48,4 +48,4 @@ class MaestroDetailsMenu extends Component {
     }
 }
 
-export default UIConnect(MaestroDetailsMenu)
+export default UIConnect(ControllerDetailsMenu)
