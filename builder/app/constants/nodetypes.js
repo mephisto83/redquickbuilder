@@ -46,8 +46,15 @@ export const NodeTypeColors = {
     [NodeTypes.FunctionOutput]: '#857885',
     [NodeTypes.ClassNode]: '#C3BAAA'
 }
+
+export const FunctionGroups = {
+    External: 'external',
+    Internal: 'internal',
+    Core: 'core'
+}
 export const GroupProperties = {
-    IsExternal: 'isExternal'
+    IsExternal: 'isExternal',
+    FunctionGroup: 'FunctionGroup'
 }
 export const NodeProperties = {
     IsAgent: 'isAgent',

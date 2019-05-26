@@ -452,18 +452,28 @@ export default class MindMap extends Component {
             }
 
             if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
-                let removedGroups = this.state.graph.groups.relativeCompliment(graph.groups, (x, y) => x.id === y).map(t => {
+                let graph_groups = graph.groups.filter(x => graph.groupLib[x].leaves || graph.groupLib[x].groups);
+                let removedGroups = this.state.graph.groups.relativeCompliment(graph_groups, (x, y) => x.id === y).map(t => {
                     return this.state.graph.groups.indexOf(t);
                 });
                 this.state.graph.groups.removeIndices(removedGroups);
-                let newGroups = graph.groups
-                    .relativeCompliment(this.state.graph.groups, (x, y) => x.id === y)
+                let newGroups = graph_groups
+                    .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
                     .filter(x => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
                 newGroups.map(nn => {
                     this.state.graph.groups.push(
-                        (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes, this.state.graph.groups))
+                        (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
                     )
                 })
+                graph_groups.forEach(group => {
+                    let g = this.state.graph.groups.find(x => x.id === group);
+                    applyGroup(g, graph.groupLib[group], this.state.graph.groups, this.state.graph.nodes);
+                    // (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
+                })
+
+                // this.state.graph.groups.map(group => {
+                //     var _group = graph.groupLib[group.id];
+                // })
             }
 
 
@@ -490,19 +500,41 @@ function duplicateLink(nn, nodes) {
         target: nodes.findIndex(x => x.id === nn.target)
     };
 }
+function applyGroup(mindmapgroup, _group, groups, nodes) {
+    if (_group) {
+        if (_group.leaves && _group.leaves.length) {
+            mindmapgroup.leaves = (mindmapgroup.leaves || []);
+            mindmapgroup.leaves.length = 0
+            mindmapgroup.leaves.push(..._group.leaves.map(l => nodes.findIndex(x => x.id === l)));
+        }
+        else {
+            delete mindmapgroup.leaves
+        }
 
+        if (_group.groups && _group.groups.length) {
+            mindmapgroup.groups = (mindmapgroup.groups || []);
+            mindmapgroup.groups.length = 0;
+            mindmapgroup.groups.push(..._group.groups.map(l => groups.findIndex(x => x.id === l)));
+        }
+        else {
+            delete mindmapgroup.groups
+        }
+
+        // if (nn.leaves) {
+        //     let leaves = nn.leaves.map(l => nodes.findIndex(x => x.id === l));
+        //     temp.leaves = leaves;
+        // }
+        // if (groups && nn.groups) {
+        //     let groups = nn.groups.map(l => groups.findIndex(x => x.id === l));
+        //     temp.groups = groups;
+        // }
+    }
+}
 function duplicateGroup(nn, nodes, groups) {
     let temp = {
         ...nn,
     };
-    if (nn.leaves) {
-        let leaves = nn.leaves.map(l => nodes.findIndex(x => x.id === l));
-        temp.leaves = leaves;
-    }
-    if (nn.groups) {
-        let groups = nn.groups.map(l => groups.findIndex(x => x.id === l));
-        temp.groups = groups;
-    }
-
+    delete temp.leaves;
+    delete temp.groups;
     return temp;
 }

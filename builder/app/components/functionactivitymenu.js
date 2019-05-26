@@ -51,7 +51,7 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
-                <CheckBox
+                {currentNode ? (<CheckBox
                     label={Titles.CustomFunction}
                     title={Titles.CustomFunctionDescription}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseScopeGraph] : ''}
@@ -61,7 +61,7 @@ class FunctionActivityMenu extends Component {
                             id: currentNode.id,
                             value: value
                         });
-                    }} />
+                    }} />) : null}
                 {currentNode && !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<SelectInput
                     label={Titles.FunctionTypes}
                     options={function_types}

@@ -46,8 +46,8 @@ export function GetLinkProperty(link, prop) {
     return link && link.properties && link.properties[prop]
 }
 
-export function GetGroupProperty(link, prop) {
-    return link && link.properties && link.properties[prop]
+export function GetGroupProperty(group, prop) {
+    return group && group.properties && group.properties[prop]
 }
 
 export function VisualEq(state, key, value) {
