@@ -51,7 +51,9 @@ import MaestroActivityMenu from './maestroactivitymenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
-
+import GraphMenu from './graphmenu';
+import SectionList from './sectionlist';
+import SectionEdit from './sectionedit';;
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -86,6 +88,7 @@ class Dashboard extends Component {
         }
         var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let graph = UIA.GetCurrentGraph(state);
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
                 height: 'auto',
@@ -109,12 +112,7 @@ class Dashboard extends Component {
                             <DashboardNavBar>
                                 <SidebarToggle />
                                 <NavBarMenu>
-                                    {/* <DropDownMenu open={UIA.Visual(state, 'dashboard-menu')} onClick={() => {
-                                        this.props.toggleVisual('dashboard-menu')
-                                    }}>
-                                        <DropDownMenuItem icon={"ion ion-ios-gear-outline"} title={'title'} description="as aksd lasdf"></DropDownMenuItem>
-                                    </DropDownMenu> */}
-
+                                    <GraphMenu />
                                     <NavBarButton icon={'fa fa-plus'} onClick={() => {
                                         this.props.graphOperation(UIA.NEW_NODE);
                                         this.props.setVisual(SIDE_PANEL_OPEN, true);
@@ -155,6 +153,8 @@ class Dashboard extends Component {
                                             value={UIA.Visual(state, LINK_DISTANCE)} />
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
+                                <SectionEdit />
+                                <SectionList />
                                 <MaestroDetailsMenu />
                                 <ControllerDetailsMenu />
                             </SideBarMenu>
@@ -186,7 +186,7 @@ class Dashboard extends Component {
                                 }}
                                 selectedColor={UIA.Colors.SelectedNode}
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
-                                graph={UIA.Graphs(state, UIA.Application(state, UIA.CURRENT_GRAPH))}></MindMap>
+                                graph={graph}></MindMap>
                         </Content>
                         <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
                             <SideBarTabs>

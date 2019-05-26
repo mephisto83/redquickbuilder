@@ -117,3 +117,10 @@ export const UserModel = 'User Model';
 
 export const CustomFunction = 'Custom Function';
 export const CustomFunctionDescription = 'Function can be constructed in an internal graph.';
+
+export const AddNewSection = 'Add New Section';
+export const Sections = 'Sections';
+export const AddNewSectionDescription = 'Adds a new section to the root graph.';
+export const SectionEdit = 'Enter sub graph name';
+export const DefaultGraphTitle = 'Red Quick Graph';
+export const DefaultSubGraphTitle = 'Red Quick Sub Graph';

@@ -55,12 +55,9 @@ export function VisualEq(state, key, value) {
 }
 export function Node(state, nodeId) {
 
-    var currentGraph = Application(state, CURRENT_GRAPH);
-    if (currentGraph) {
-        currentGraph = Graphs(state, currentGraph);
-        if (currentGraph && currentGraph.nodeLib) {
-            return currentGraph.nodeLib[nodeId];
-        }
+    var currentGraph = GetCurrentGraph(state);
+    if (currentGraph && currentGraph.nodeLib) {
+        return currentGraph.nodeLib[nodeId];
     }
     return null;
 }
@@ -108,6 +105,13 @@ export function setVisual(key, value) {
     return (dispatch, getState) => {
         var state = getState();
         dispatch(UIC(VISUAL, key, value))
+    }
+
+}
+export function setApplication(key, value) {
+    return (dispatch, getState) => {
+        var state = getState();
+        dispatch(UIC(APPLICATION, key, value))
     }
 
 }
@@ -159,11 +163,70 @@ export function GetState() {
 }
 export function GetCurrentGraph(state) {
     var currentGraph = Application(state, CURRENT_GRAPH);
+    var scopedGraph = GetCurrentScopedGraph(state);
+    return scopedGraph;
+    // if (currentGraph) {
+    //     currentGraph = Graphs(state, currentGraph);
+    // }
+    // return currentGraph;
+}
+export function GetRootGraph(state, dispatch) {
+    var currentGraph = Application(state, CURRENT_GRAPH);
     if (currentGraph) {
         currentGraph = Graphs(state, currentGraph);
     }
+    else if (dispatch) {
+        currentGraph = GraphMethods.createGraph();
+        SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
+    }
+
     return currentGraph;
 }
+export function GetSubGraphs(state) {
+    var currentGraph = Application(state, CURRENT_GRAPH);
+    if (currentGraph) {
+        currentGraph = Graphs(state, currentGraph);
+        let subgraphs = GraphMethods.getSubGraphs(currentGraph);
+        return subgraphs;
+    }
+    return null;
+}
+export function addNewSubGraph() {
+    return (dispatch, getState) => {
+        var rootGraph = GetRootGraph(getState(), dispatch);
+        rootGraph = GraphMethods.addNewSubGraph(rootGraph);
+        SaveGraph(rootGraph, dispatch);
+    };
+}
+export function GetCurrentScopedGraph(state, dispatch) {
+    var currentGraph = Application(state, CURRENT_GRAPH);
+    let scope = Application(state, GRAPH_SCOPE) || [];
+
+    if (!currentGraph) {
+        if (dispatch) {
+            currentGraph = GraphMethods.createGraph();
+            SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
+        }
+    }
+    else {
+        currentGraph = Graphs(state, currentGraph);
+        if (scope.length) {
+            currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
+        }
+    }
+    return currentGraph
+}
+export function GetSelectedSubgraph(state) {
+    var root = GetRootGraph(state);
+    if (root) {
+        var scope = Application(state, GRAPH_SCOPE);
+        if (scope && scope.length) {
+            return GraphMethods.getSubGraph(root, scope);
+        }
+    }
+    return null;
+}
+export const UPDATE_GRAPH_TITLE = 'UPDATE_GRAPH_TITLE';
 export const NEW_NODE = 'NEW_NODE';
 export const REMOVE_NODE = 'REMOVE_NODE';
 export const NEW_LINK = 'NEW_LINK';
@@ -221,6 +284,9 @@ export function graphOperation(operation, options) {
                     break;
                 case REMOVE_NODE:
                     currentGraph = GraphMethods.removeNode(currentGraph, options);
+                    break;
+                case UPDATE_GRAPH_TITLE:
+                    currentGraph = GraphMethods.updateGraphTitle(currentGraph, options);
                     break;
                 case NEW_LINK:
                     currentGraph = GraphMethods.newLink(currentGraph, options)
@@ -369,7 +435,7 @@ export const RED_QUICK_FILE_EXT = '.rqb';
 export const RED_QUICK_FILE_EXT$ = 'rqb';
 export function saveGraphToFile() {
     return (dispatch, getState) => {
-        var currentGraph = GetCurrentGraph(getState());
+        var currentGraph = GetRootGraph(getState());
         // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
         if (currentGraph) {
             var content = JSON.stringify(currentGraph);

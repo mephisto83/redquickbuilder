@@ -5,6 +5,7 @@ import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty } from '..
 export function createGraph() {
     return {
         id: uuidv4(),
+        title: Titles.DefaultGraphTitle,
         path: [],
         //Groups
         groups: [],
@@ -25,6 +26,37 @@ export function createGraph() {
         functionNodes: {}, // A function nodes will be run through for checking constraints.
         updated: null
     }
+}
+
+
+export function updateGraphTitle(graph, ops) {
+    var { text } = ops;
+    graph.title = text;
+    return graph;
+}
+
+export function addNewSubGraph(graph) {
+    var newgraph = createGraph();
+    newgraph.title = Titles.DefaultSubGraphTitle;
+    graph.graphs[newgraph.id] = newgraph;
+    return graph;
+}
+export function removeSubGraph(graph, id) {
+    delete graph.graphs[id];
+    return graph
+}
+
+export function getSubGraphs(graph) {
+    return graph.graphs ? Object.keys(graph.graphs).map(t => graph.graphs[t]) : [];
+}
+export function getSubGraph(graph, scopes) {
+    var result = graph;
+
+    scopes.map(scope => {
+        result = graph.graphs[scope];
+    });
+
+    return result;
 }
 export function getScopedGraph(graph, options) {
     var { scope } = options;

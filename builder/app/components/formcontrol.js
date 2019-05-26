@@ -3,9 +3,12 @@ import React, { Component } from 'react';
 
 
 export default class FormControl extends Component {
+    _class() {
+        return this.props.sidebarform ? 'sidebar-form' : '';
+    }
     render() {
         return (
-            <form role="form">
+            <form role="form" className={this._class()}>
                 {this.props.children}
             </form>
         );

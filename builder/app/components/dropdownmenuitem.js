@@ -10,7 +10,11 @@ export default class DropDownMenuItem extends Component {
     render() {
         return (
             <li>
-                <a>
+                <a onClick={() => {
+                    if (this.props.onClick) {
+                        this.props.onClick();
+                    }
+                }}>
                     <div className="pull-left">
                         <i style={{ fontSize: 34 }} className={this.icon()}></i>
                     </div>

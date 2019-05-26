@@ -24,7 +24,11 @@ export default class TreeViewMenu extends Component {
                         this.props.onClick();
                     }
                 }}>
-                    <i className={`${this.icon()}`}></i> <span>{this.props.title}</span>
+                    {this.props.hideIcon ? null : <i className={`${this.icon()}`}></i>}
+                    <span>{this.props.title}</span>
+                    {this.props.right ? (<span class="pull-right-container">
+                        {this.props.right}
+                    </span>) : null}
                     {this.props.hideArrow ? null : (<span className="pull-right-container">
                         <i className="fa fa-angle-left pull-right"></i>
                     </span>)}

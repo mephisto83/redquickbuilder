@@ -15,7 +15,11 @@ export default class TreeViewItem extends Component {
                 }}>
                     <i className={this.icon()}></i>
                     {this.props.title}
+                    {this.props.right ? (<span class="pull-right-container">
+                        {this.props.right}
+                    </span>) : null}
                 </a>
+                {this.props.children}
             </li>
         );
     }
