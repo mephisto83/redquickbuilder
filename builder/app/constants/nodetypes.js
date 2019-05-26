@@ -102,6 +102,7 @@ export const NodeProperties = {
 
     //The name used for code.
     Groups: 'groups',
+    GroupParent: 'groupParent',
     CodeName: 'codeName',
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',

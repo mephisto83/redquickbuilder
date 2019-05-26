@@ -271,6 +271,52 @@ export function removeNode(graph, options = {}) {
 
     return graph;
 }
+function isEmpty(obj) {
+    return obj && Object.keys(obj).length === 0;
+}
+function clearGroupDeep(graph, options) {
+    var { id, callback } = options;
+    var success = true;
+    if (graph.childGroups[id]) {
+        for (var i in graph.childGroups[id]) {
+            var ok = false;
+            graph = clearGroupDeep(graph, {
+                id: i,
+                callback: (v) => {
+                    ok = v;
+                    success = success && v;
+                }
+            })
+            delete graph.childGroups[id][i];
+        }
+    }
+    if (success) {
+        //If the children were empty this can be cleared out
+        if (!graph.groupLib[id] || !graph.groupLib[id].leaves || !graph.groupLib[id].leaves.length) {
+            if (!graph.groupLib[id] || !graph.groupLib[id].groups || !graph.groupLib[id].groups.length) {
+                //if these conditions are met.
+                delete graph.groupLib[id];
+                graph.groups = [...graph.groups.filter(x => x !== id)];
+                delete graph.childGroups[id];
+                if (graph.parentGroup[id]) {
+                    for (var i in graph.parentGroup[id]) {
+                        graph = removeGroupFromGroup(graph, { groupId: id, id: i });
+                        graph = clearGroupDeep(graph, { id: i });
+                        if (graph.childGroups[i])
+                            delete graph.childGroups[i][id]
+                    }
+                    delete graph.parentGroup[id];
+                }
+            }
+        }
+    }
+    else {
+        if (callback) {
+            callback(false);
+        }
+    }
+    return graph;
+}
 export function removeNodeFromGroups(graph, options) {
     let { id } = options;
     let groupsContainingNode = [];
@@ -289,19 +335,16 @@ export function removeNodeFromGroups(graph, options) {
                 if (graph.groupsNodes[group][id]) {
                     delete graph.groupsNodes[group][id]
                 }
+
                 if (Object.keys(graph.groupsNodes[group]).length === 0) {
-                    if (graph.parentGroup && graph.parentGroup[group]) {
-                        if (!graph.childGroups[group] || !Object.keys(graph.childGroups[group]).length) {
-                            Object.keys(graph.parentGroup[group]).map(_t => {
-                                graph = removeGroupFromGroup(graph, { id: _id, groupId: group })
-                            })
-                        }
-                    }
                     delete graph.groupsNodes[group];
                 }
             }
+            graph = clearGroupDeep(graph, { id: group });
         })
     }
+
+
     return graph;
 }
 export function clearLinks(graph, options) {
@@ -364,6 +407,23 @@ export function updateNodeGroup(graph, options) {
             prop: NodeProperties.Groups
         });
         graph = addLeaf(graph, { leaf: parent, id: group.id });
+        var grandParent = GetNodeProp(graph.nodeLib[parent], NodeProperties.GroupParent);
+        if (grandParent && graph.groupLib[grandParent]) {
+            var gparentGroup = graph.groupLib[grandParent];
+            if (gparentGroup) {
+                var ancestores = getGroupAncenstors(graph, gparentGroup.id);
+                graph = addGroupToGroup(graph, {
+                    id: gparentGroup.id,
+                    groupId: group.id
+                });
+                ancestores.map(anc => {
+                    graph = addGroupToGroup(graph, {
+                        id: anc,
+                        groupId: group.id
+                    });
+                })
+            }
+        }
     }
     else {
         let nodeGroupProp = GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups);
@@ -372,9 +432,23 @@ export function updateNodeGroup(graph, options) {
 
     if (group) {
         graph = addLeaf(graph, { leaf: id, id: group.id });
+        graph = updateNodeProperty(graph, {
+            id,
+            value: group.id,
+            prop: NodeProperties.GroupParent
+        });
     }
 
     return graph;
+}
+function getGroupAncenstors(graph, id) {
+    var result = [];
+    if (graph.parentGroup[id]) {
+        for (var i in graph.parentGroup[id]) {
+            result = [...result, ...getGroupAncenstors(graph, i)];
+        }
+    }
+    return result;
 }
 function getGroup(graph, id) {
     return graph.groupLib[id];
@@ -688,8 +762,7 @@ export function applyFunctionConstraints(graph, options) {
             });
 
             var nodes_with_link = getNodeFunctionConstraintLinks(graph, { id: node.id });
-            // //  debugger;
-            //
+
             nodes_with_link.map((link) => {
                 let new_node = graph.nodeLib[link.target];
                 var constraint = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
