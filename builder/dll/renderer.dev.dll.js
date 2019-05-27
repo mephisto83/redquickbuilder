@@ -255,6 +255,18 @@ eval("module.exports = react-router-dom;\n\n//# sourceURL=webpack://renderer/ext
 
 /***/ }),
 
+/***/ "react-syntax-highlighter":
+/*!*******************************************!*\
+  !*** external "react-syntax-highlighter" ***!
+  \*******************************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports) {
+
+eval("module.exports = react-syntax-highlighter;\n\n//# sourceURL=webpack://renderer/external_%22react-syntax-highlighter%22?");
+
+/***/ }),
+
 /***/ "redux":
 /*!************************!*\
   !*** external "redux" ***!
