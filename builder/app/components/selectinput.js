@@ -17,11 +17,14 @@ export default class SelectInput extends Component {
         }
         return [];
     }
+    disabled() {
+        return this.props.disabled ? 'disabled' : '';
+    }
     render() {
         return (
             <div className="form-group">
                 <label>{this.label()}</label>
-                <select className="form-control" onSelect={(evt) => {
+                <select className="form-control" disabled={this.disabled()} onSelect={(evt) => {
                     if (this.props.onChange) {
                         this.props.onChange(evt.target.value);
                     }

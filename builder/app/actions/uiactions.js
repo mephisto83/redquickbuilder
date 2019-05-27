@@ -135,15 +135,34 @@ export function GetNodes(state) {
     }
     return [];
 }
-export function NodesByType(state, nodeType) {
-    var currentGraph = GetCurrentGraph(state);
+export function CanChangeType(node){
+    var nodeType = GetNodeProp(node, NodeProperties.NODEType);
+    switch(nodeType){
+        case NodeTypes.ReferenceNode: 
+            return false;
+        default:
+            return true;
+    }
+}
+export function NodesByType(state, nodeType, options = {}) {
+
+    var currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);
     if (currentGraph) {
         return currentGraph.nodes
             .filter(x => currentGraph.nodeLib[x].properties &&
-                currentGraph.nodeLib[x].properties[NodeProperties.NODEType] === nodeType)
+                currentGraph.nodeLib[x].properties[NodeProperties.NODEType] === nodeType ||
+                currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType)
             .map(x => currentGraph.nodeLib[x]);
     }
     return [];
+}
+
+export function GetNodeFromRoot(state, id) {
+    var graph = GetRootGraph(state);
+    if (graph) {
+        return GraphMethods.GetNode(graph, id);
+    }
+    return null;
 }
 
 export function NodesConnectedTo(state, nodeId) {
@@ -252,6 +271,7 @@ export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
 export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
 export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
 export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
+export const ADD_NEW_REFERENCE_NODE = 'ADD_NEW_REFERENCE_NODE;'
 
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
@@ -339,6 +359,10 @@ export function graphOperation(operation, options) {
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
+                case ADD_NEW_REFERENCE_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ReferenceNode);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
                 case NEW_EXTENSION_LIST_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
@@ -372,6 +396,7 @@ export function graphOperation(operation, options) {
         else {
             rootGraph = currentGraph;
         }
+        rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
         SaveGraph(rootGraph, dispatch)
     }
 }
@@ -427,7 +452,14 @@ export function openRedQuickBuilderGraph() {
 
     }
 }
-
+export function newRedQuickBuilderGraph() {
+    return (dispatch, getState) => {
+        var default_graph = GraphMethods.createGraph();
+        var opened_graph = { ...default_graph };
+        SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
+        SaveGraph(opened_graph, dispatch);
+    }
+}
 ipcRenderer.on('save-graph-to-file-reply', (event, arg) => {
     console.log(arg) // prints "pong"
 })

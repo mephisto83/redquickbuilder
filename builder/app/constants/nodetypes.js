@@ -20,10 +20,14 @@ export const NodeTypes = {
     FunctionOutput: 'function-output',
     Controller: 'controller',
     Maestro: 'maestro',
+    ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node'
 }
 export const ColorStates = {
     Error: 'Error'
+}
+export const NotSelectableNodeTypes = {
+    [NodeTypes.ReferenceNode]: true
 }
 export const NodeTypeColors = {
     [ColorStates.Error]: '#FF0000',
@@ -45,7 +49,8 @@ export const NodeTypeColors = {
     [NodeTypes.Parameter]: '#684A52',
     [NodeTypes.FunctionOutput]: '#857885',
     [NodeTypes.ClassNode]: '#C3BAAA',
-    [NodeTypes.Maestro]: '#780116'
+    [NodeTypes.Maestro]: '#780116',
+    [NodeTypes.ReferenceNode]: '#F7B538'
 }
 
 export const FunctionGroups = {
@@ -93,6 +98,8 @@ export const NodeProperties = {
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
+    ReferenceType:'referenceType', //Reference nodes will have this type.
+    
     UIAttributeType: 'uiAttributeType',
     UseModelAsType: 'useModelAsType',
     UIModelType: 'uiModelType',

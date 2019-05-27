@@ -1,7 +1,4 @@
-// @flow
 import React, { Component } from 'react';
-
-
 export default class TextInput extends Component {
     label() {
         return this.props.label || '{label}';
@@ -12,11 +9,14 @@ export default class TextInput extends Component {
     placeholder() {
         return this.props.placeholder || '';
     }
+    disabled() {
+        return this.props.disabled ? 'disabled' : '';
+    }
     render() {
         return (
             <div className={this.props.inputgroup ? 'input-group' : "form-group"}>
                 {this.props.inputgroup ? null : <label>{this.label()}</label>}
-                <input type="text" className={"form-control"} value={this.value()} onChange={(v) => {
+                <input type="text" disabled={this.disabled()} className={"form-control"} value={this.value()} onChange={(v) => {
                     if (this.props.onChange) {
                         this.props.onChange(v.target.value);
                     }

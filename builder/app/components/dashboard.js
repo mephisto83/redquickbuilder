@@ -37,6 +37,7 @@ import ParameterActivityMenu from './parameteractivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
 import ExtensionListActivityMenu from './ExtensionListActivityMenu';
 import PermissionActivityMenu from './permissionsactivitymenu';
+import ReferenceActivityMenu from './referenceactivitymenu';
 import { GooMenuSVG } from './goomenu';
 import ChoiceListItemActivityMenu from './choicelistitemactivitymenu';
 import GooMenu from './goomenu';
@@ -53,7 +54,8 @@ import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
-import SectionEdit from './sectionedit';;
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes } from '../constants/nodetypes';
+;
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -132,6 +134,9 @@ class Dashboard extends Component {
                         </Header>
                         <MainSideBar>
                             <SideBarMenu>
+                                <TreeViewMenu hideArrow={true} title={Titles.New} icon={'fa fa-plus'} onClick={() => {
+                                    this.props.newRedQuickBuilderGraph();
+                                }} />
                                 <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
                                     this.props.openRedQuickBuilderGraph();
                                 }} />
@@ -198,8 +203,8 @@ class Dashboard extends Component {
                                 <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB)} onClick={() => {
                                     this.props.setVisual(SELECTED_TAB, PARAMETER_TAB)
                                 }} />
-                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, 'more2')} onClick={() => {
-                                    this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+                                <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB)} onClick={() => {
+                                    this.props.setVisual(SELECTED_TAB, SCOPE_TAB)
                                 }} />
                             </SideBarTabs>
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
@@ -211,8 +216,9 @@ class Dashboard extends Component {
                                             this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
                                         }} />
                                     <SelectInput
+                                        disabled={!UIA.CanChangeType(currentNode)}
                                         label={Titles.NodeType}
-                                        options={Object.keys(UIA.NodeTypes).sort((a, b) => a.localeCompare(b)).map(x => {
+                                        options={Object.keys(UIA.NodeTypes).filter(x => !NotSelectableNodeTypes[UIA.NodeTypes[x]]).sort((a, b) => a.localeCompare(b)).map(x => {
                                             return {
                                                 value: UIA.NodeTypes[x],
                                                 title: x
@@ -221,7 +227,7 @@ class Dashboard extends Component {
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: UIA.NodeProperties.NODEType, id: currentNode.id, value })
                                         }}
-                                        value={currentNode.properties ? currentNode.properties.nodeType : ''} />
+                                        value={currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null} />
                                 </FormControl>) : null}
                                 <ChoiceListItemActivityMenu />
                             </SideBarContent>) : null}
@@ -243,6 +249,9 @@ class Dashboard extends Component {
                                 <PermissionActivityMenu />
                                 <ExtensionDefinitionMenu />
                             </SideBarContent>) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
+                                <ReferenceActivityMenu />
+                            </SideBarContent>) : null}
                         </SideBar>
                     </div>
                 </div >
@@ -253,4 +262,5 @@ class Dashboard extends Component {
 const SELECTED_TAB = 'SELECTED_TAB';
 const DEFAULT_TAB = 'DEFAULT_TAB';
 const PARAMETER_TAB = 'PARAMETER_TAB';
+const SCOPE_TAB = 'SCOPE_TAB';
 export default UIConnect(Dashboard)

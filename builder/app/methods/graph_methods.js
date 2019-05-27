@@ -15,6 +15,9 @@ export function createGraph() {
         childGroups: {}, // group => {group}
         parentGroup: {}, // group => {group}
         //Groups 
+        //Reference nodes
+        referenceNodes: {},
+        //Reference nodes
         nodeLib: {},
         nodes: [],
         nodeLinks: {}, // A library of nodes, and each nodes that it connects.
@@ -376,10 +379,27 @@ export function addGroup(graph, group) {
 export function addNewPropertyNode(graph, options) {
     return addNewNodeOfType(graph, options, NodeTypes.Property);
 }
-
+function updateNode(node, options) {
+    if (options.node) {
+        Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
+    }
+}
 export function addNewNodeOfType(graph, options, nodeType, callback) {
     let { parent, linkProperties, groupProperties } = options;
     let node = createNode(nodeType);
+    if (options.node) {
+        updateNode(node, options);
+        if (nodeType === NodeTypes.ReferenceNode) {
+            if (options.rootNode) {
+                options.rootNode.referenceNodes[graph.id] = {
+                    ...(options.rootNode.referenceNodes[graph.id] || {}),
+                    ...({
+                        [node.id]: options.node.id
+                    })
+                }
+            }
+        }
+    }
     graph = addNode(graph, node);
     if (parent) {
         graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
@@ -486,7 +506,28 @@ export function applyConstraints(graph) {
     }
     return graph;
 }
+export function updateReferenceNodes(root) {
+    if (root && root.referenceNodes) {
+        for (var scope in root.referenceNodes) {
+            if (root.graphs && root.graphs[scope]) {
+                let scopedGraph = root.graphs[scope];
+                for (let nodeId in root.referenceNodes[scope]) {
+                    var masterNode = root.nodeLib[root.referenceNodes[scope][nodeId]];
+                    if (masterNode) {
+                        var refNode = GetNode(scopedGraph, nodeId);
+                        if (refNode) {
+                            //may be more properties later.
+                            refNode.properties.text = masterNode.properties.text;
+                            refNode.properties.referenceType = masterNode.properties.nodeType;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    return root;
+}
 export function constraintSideEffects(graph) {
     let functionNodes = graph.functionNodes;
 

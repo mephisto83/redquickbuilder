@@ -18,6 +18,7 @@ export const UISingular = 'UI Singular';
 export const Unknown = 'Unknown';
 export const PropertyValueType = 'Property value type';
 export const PropertyModelType = 'Property model type';
+export const AddReference = 'Add reference node';
 export const FunctionSetup = 'Function Setup';
 export const AgentOperator = 'Agent Operator';
 export const Enumerable = 'Enumerable';

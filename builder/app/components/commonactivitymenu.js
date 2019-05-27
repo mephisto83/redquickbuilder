@@ -16,6 +16,7 @@ class CommonActivityMenu extends Component {
                 {currentNode ? (<FormControl>
                     <TextBox
                         label={Titles.CodeName}
+                        disabled={!UIA.CanChangeType(currentNode)}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.CodeName] : ''}
                         onChange={(value) => {
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
