@@ -62,7 +62,12 @@ export const GroupProperties = {
     IsExternal: 'isExternal',
     FunctionGroup: 'FunctionGroup'
 }
+export const NameSpace = {
+    Model: '.Models'
+}
+
 export const NodeProperties = {
+    NameSpace: 'namespace',
     IsAgent: 'isAgent',
     IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
     IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
@@ -98,8 +103,8 @@ export const NodeProperties = {
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
-    ReferenceType:'referenceType', //Reference nodes will have this type.
-    
+    ReferenceType: 'referenceType', //Reference nodes will have this type.
+
     UIAttributeType: 'uiAttributeType',
     UseModelAsType: 'useModelAsType',
     UIModelType: 'uiModelType',
@@ -305,6 +310,8 @@ export const LinkProperties = {
 export const ValidationRules = {
     CVV: "cvv",
     AlphaNumericLike: "alphanumericlike",
+    AlphaOnly: "alphaonly",
+    AlphaOnlyWithSpaces: "alphaonlywithspaces",
     NotEmpty: "notempty",
     UrlEmpty: "url_empty",
     Url: "url",
@@ -340,7 +347,33 @@ export const NodePropertyTypes = {
     LISTOFSTRINGS: 'LISTOFSTRINGS',
     INT: 'INT',
     FLOAT: 'FLOAT',
-    BOOLEAN: 'BOOLEAN'
+    DOUBLE: 'DOUBLE',
+    BOOLEAN: 'BOOLEAN',
+    EMAIL: 'EMAIL',
+    PHONENUMBER: 'PHONENUMBER'
+}
+
+export const ProgrammingLanguages = {
+    CSHARP: 'csharp'
+}
+export const NodePropertyTypesByLanguage = {
+    [ProgrammingLanguages.CSHARP]: {
+        [NodePropertyTypes.STRING]: 'string',
+        [NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
+        [NodePropertyTypes.INT]: 'int',
+        [NodePropertyTypes.FLOAT]: 'float',
+        [NodePropertyTypes.DOUBLE]: 'double',
+        [NodePropertyTypes.BOOLEAN]: 'bool',
+        [NodePropertyTypes.EMAIL]: 'Email',
+        [NodePropertyTypes.PHONENUMBER]: 'PhoneNumber'
+    }
+}
+export const RED_QUICK_DATA = 'RedQuick.Data';
+export const Usings = {
+    [ProgrammingLanguages.CSHARP]: {
+        [NodePropertyTypes.EMAIL]: [RED_QUICK_DATA],
+        [NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA]
+    }
 }
 export const NodeAttributePropertyTypes = {
 

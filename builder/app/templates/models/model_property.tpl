@@ -1,2 +1,3 @@
-{{attributes}}
-public {{property_type}} {{property}} { get; set; }
+        {{attributes}}
+        public {{property_type}} {{property}} { get; set; }
+        

@@ -217,6 +217,16 @@ export function addNewSubGraph() {
         SaveGraph(rootGraph, dispatch);
     };
 }
+
+export function setRootGraph(key, value) {
+    return (dispatch, getState) => {
+        var rootGraph = GetRootGraph(getState(), dispatch);
+        rootGraph = {
+            ...rootGraph, ...{ [key]: value }
+        };
+        SaveGraph(rootGraph, dispatch);
+    };
+}
 export function GetCurrentScopedGraph(state, dispatch) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     let scope = Application(state, GRAPH_SCOPE) || [];

@@ -1,3 +1,4 @@
-public class {{model}} {
-    {{properties}}
-}
+    public class {{model}} 
+    {
+        {{properties}}
+    }

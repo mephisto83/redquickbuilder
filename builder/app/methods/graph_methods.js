@@ -7,6 +7,7 @@ export function createGraph() {
         id: uuidv4(),
         title: Titles.DefaultGraphTitle,
         path: [],
+        namespace: '',
         //Groups
         groups: [],
         groupLib: {},
@@ -30,7 +31,9 @@ export function createGraph() {
         updated: null
     }
 }
-
+export const GraphKeys = {
+    NAMESPACE: 'namespace'
+}
 
 export function updateGraphTitle(graph, ops) {
     var { text } = ops;
@@ -1117,6 +1120,15 @@ export function getNodeLinkedTo(graph, options) {
     return getNodeLinked(graph, { ...(options || {}), direction: SOURCE });
 }
 export function matchOneWay(obj1, obj2) {
+    if (obj1 === obj2) {
+        return true;
+    }
+    if (!obj1) {
+        return false;
+    }
+    if (!obj2) {
+        return false;
+    }
     for (var i in obj1) {
         if (obj1[i] !== obj2[i]) {
             return false;
@@ -1135,6 +1147,33 @@ export function matchObject(obj1, obj2) {
     }
 
     return true;
+}
+export function getNodesByLinkType(graph, options) {
+    if (options) {
+        var { id, direction, type } = options;
+        if (graph && graph.nodeConnections && id) {
+            var nodeLinks = graph.nodeConnections[id];
+            if (nodeLinks) {
+                return Object.keys(nodeLinks)
+                    .filter(x => nodeLinks[x])
+                    .map(_id => {
+                        var target = graph.linkLib[_id] ? (direction === TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target) : null;
+
+                        if (!target) {
+                            console.warn('Missing value in linkLib');
+                            return null;
+                        }
+
+                        if (graph.linkLib[_id].properties &&
+                            graph.linkLib[_id].properties.type === type) {
+                            return graph.nodeLib[target];
+                        }
+                        return null;
+                    }).filter(x => x);
+            }
+        }
+
+    }
 }
 export function getNodeLinked(graph, options) {
     if (options) {
