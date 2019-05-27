@@ -237,7 +237,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
             public ConversationMessage Data { get; set; }
         }
 
-### Create/Object/Agent/Value
+### Create/Object/Agent/Value => IList<Object>
 
         //Original Version.
         public async Task<IList<Conversation>> CreateConversation(User user, Conversation conversation) { 
@@ -369,7 +369,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         Required Classes: {{model}}Change
 
 
-### Create/Object/Agent/Value
+### Create/Object/Agent/Value => IList<Object>
 
 A list of CRUD functions with a return function of a list of Objects.
 
@@ -417,7 +417,7 @@ A list of CRUD functions with a return function of a list of Objects.
                 // return await arbiter.GetBy<{{model}}>(x => ids.Contains(x.Id));
 
             }
-            return new List<{{model}}Message>();
+            return new List<{{model}}>();
         }
 
         //Templated Version.
@@ -440,7 +440,7 @@ A list of CRUD functions with a return function of a list of Objects.
                 // return await arbiter.GetBy<{{model}}>(x => ids.Contains(x.Id));
 
             }
-            return new List<{{model}}Message>();
+            return new List<{{model}}>();
         }
 
         public class {{model}}Maestro() { 
@@ -485,3 +485,225 @@ IAgent, IHasAllowedCollection
         }
 
         *(IAgent, IHasAllowedCollection) => checks(IHasAllowedCollection) for (IAgent.Id);*
+
+### Create/Object/Agent/Value => Object
+
+        //Original Version.
+        public async Task<Conversation> CreateConversation(User user, Conversation conversation) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+
+            if(await customerPermissions.CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
+
+                var parameters = ConversationChangeParameters.Create(customer, conversation);
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var newConversation = await StreamProcess.Conversation(parameters);
+
+                // This is probably going to be pretty slow.
+                return await arbiter.Get<Conversation>(newConversation.Id);
+                // This might be a faster way.
+                // Putting a cache of user conversations may be a 
+                // var customerConversation = await arbiter.Get<CustomerConversations>(customer.Id);
+                // var ids = customerConversations.Conversations.Select(x => x.Id);
+                // return await arbiter.GetBy<Conversation>(x => ids.Contains(x.Id));
+
+            }
+            return null;
+        }
+
+        //Templated version.
+        public async Task<{{model}}> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
+
+                var result = await StreamProcess.{{model}}(parameters);
+
+                return await arbiter{{model#upper}}.Get<{{model}}>(result.Id);
+            }
+            return null;
+        }
+### Update/Object/Agent/Value => Object
+
+        //Original Version.
+        public async Task<Conversation> UpdateConversation(User user, Conversation conversation) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+
+            if(await customerPermissions.CanUpdateConversation(customer , conversation).ConfigureAwait(false))) {
+
+                var parameters = ConversationChangeParameters.Update(customer, conversation);
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var newConversation = await StreamProcess.Conversation(parameters);
+
+                return await arbiter.Get<Conversation>(newConversation.Id);
+            }
+            return null;
+        }
+
+        //Templated version.
+        public async Task<{{model}}> Update{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanUpdate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{model}}ChangeParameters.Update({{agent}}, {{value}});
+
+                var result = await StreamProcess.{{model}}(parameters);
+
+                return await arbiter{{model#upper}}.Get<{{model}}>(result.Id);
+            }
+            return null;
+        }
+
+### Get/Object/Agent/Value => Object
+
+        //Original Version.
+        public async Task<Conversation> GetConversation(User user, Conversation conversation) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+
+            if(await customerPermissions.CanGetConversation(customer , conversation).ConfigureAwait(false))) {
+
+                return await arbiter.Get<Conversation>(newConversation.Id);
+            }
+            return null;
+        }
+
+        //Templated version.
+        public async Task<{{model}}> Get{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanGet{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+                return await arbiter{{model#upper}}.Get<{{model}}>({{value}}.Id);
+            }
+            return null;
+        }
+
+
+### Delete/Object/Agent/Value => bool
+
+        //Original Version.
+        public async Task<Conversation> DeleteConversation(User user, Conversation conversation) { 
+
+            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+
+            if(await customerPermissions.CanDeleteConversation(customer , conversation).ConfigureAwait(false))) {
+
+                var parameters = ConversationChangeParameters.Delete(customer, conversation);
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var result = await StreamProcess.Conversation(parameters);
+
+                // This is probably going to be pretty slow.
+                return result.Value;
+            }
+            return false;
+        }
+
+        //Templated version.
+        public async Task<{{model}}> Get{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanGet{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+                var parameters = {{model}}ChangeParameters.Delete({{customer}}, {{value}});
+
+                var result = await StreamProcess.{{model}}(parameters);
+
+                return result.Value;
+            }
+            return null;
+        }
+
+
+### Create/Agent/Value => Agent
+
+        //Templated version.
+        public async Task<{{agent_type}}> Create{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
+
+            if(await {{user}}Permissions.CanCreate{{agent_type}}({{user_instance}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{agent_type}}ChangeParameters.Create({{user_instance}}, {{agent_type}});
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var result = await StreamProcess.{{user}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return await {{agent_type}}Arbiter.Get<{{agent_type}>(result.Id);
+            }
+
+            return null;
+        }
+
+
+### Update/Agent/Value => Agent
+
+        //Templated version.
+        public async Task<{{agent_type}}> Update{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanUpdate{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{agent_type}}ChangeParameters.Update({{agent}}, {{value}});
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var result = await StreamProcess.{{agent_type}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return await {{agent_type}}Arbiter.Get<{{agent_type}>(result.Id);
+            }
+            
+            return null;
+        }
+
+
+### Get/Agent/Value => Agent
+
+        //Templated version.
+        public async Task<{{agent_type}}> Get{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanGet{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{agent_type}}ChangeParameters.Get({{agent}}, {{value}});
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var result = await StreamProcess.{{agent_type}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return await {{agent_type}}Arbiter.Get<{{agent_type}>(result.Id);
+            }
+            
+            return null;
+        }
+
+### Delete/Agent/Value => bool
+
+        //Templated version.
+        public async Task<bool> Delete{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
+
+            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+
+            if(await {{agent_type}}Permissions.CanDelete{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+
+                var parameters = {{agent_type}}ChangeParameters.Delete({{agent}}, {{value}});
+
+                // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
+                var result = await StreamProcess.{{agent_type}}(parameters);
+
+                // This is probably going to be pretty slow.
+                return result.Value;
+            }
+            
+            return false;
+        }
