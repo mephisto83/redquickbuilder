@@ -16,7 +16,10 @@ class OptionActivityMenu extends Component {
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_OPTION_ITEM_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            linkProperties: {
+                                properties: { ...UIA.LinkProperties.OptionItemLink }
+                            }
                         });
                     }}
                         icon={'fa fa-puzzle-piece'}

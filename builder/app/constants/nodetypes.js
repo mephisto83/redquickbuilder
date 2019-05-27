@@ -75,7 +75,7 @@ export const NodeProperties = {
     IsSharedResource: 'isSharedResource', // Not sure if this helps anything.
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
-    UIName: 'uiName',
+    UIName: 'uiName', // The name used in the ui.
 
     UIText: 'text',
 
@@ -143,7 +143,9 @@ export const NodePropertiesDirtyChain = {
 export const LinkType = {
     Choice: 'choice',
     Validation: 'validation',
+    ValidationItem: 'validation-item',
     Option: 'option',
+    OptionItem: 'option-item',
     OptionCustom: 'option-custom',
     DependsOn: 'depends-on',
     ExtensionList: 'extension-list',
@@ -272,8 +274,14 @@ export const LinkProperties = {
     ValdationLink: {
         type: LinkType.Validation
     },
+    ValidationLinkItem: {
+        type: LinkType.ValidationItem
+    },
     OptionLink: {
         type: LinkType.Option
+    },
+    OptionItemLink: {
+        type: LinkType.OptionItem
     },
     // Options for custom defined options, that need to be made later.
     OptionCustomLink: {

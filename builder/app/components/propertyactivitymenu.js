@@ -156,8 +156,8 @@ class PropertyActivityMenu extends Component {
                             parent: UIA.Visual(state, UIA.SELECTED_NODE),
                             groupProperties: {
                             },
-                            linkProperties:{
-                                ...LinkProperties.AttributeLink
+                            linkProperties: {
+                                properties: { ...LinkProperties.AttributeLink }
                             }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddAttribute} description={Titles.AddAttributeDescription} />

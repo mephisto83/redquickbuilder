@@ -16,7 +16,12 @@ class ValidationActivityMenu extends Component {
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_VALIDATION_ITEM_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            linkProperties: {
+                                properties: {
+                                    ...UIA.LinkProperties.ValidationLinkItem
+                                }
+                            }
                         });
                     }}
                         icon={'fa fa-puzzle-piece'}
