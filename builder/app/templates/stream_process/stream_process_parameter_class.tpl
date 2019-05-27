@@ -1,4 +1,4 @@
-public class {{model}}Parameters() {
+public class {{model}}Parameters : ProcessParameters {
     {{constructor}}
 
     {{properties}}
