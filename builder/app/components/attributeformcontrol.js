@@ -37,7 +37,7 @@ class AttributeFormControl extends Component {
                 title: UIA.GetNodeTitle(node)
             }
         });
-        var extension_nodes = UIA.NodesByType(state, UIA.NodeTypes.ExtensionTypeList).map(node => {
+        var extension_nodes = UIA.NodesByType(state, UIA.NodeTypes.ExtensionType).map(node => {
             return {
                 value: node.id,
                 title: UIA.GetNodeTitle(node)
@@ -224,7 +224,7 @@ class AttributeFormControl extends Component {
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 target: value,
                                 source: id,
-                                properties: { ...UIA.LinkProperties.ExtensionListLink }
+                                properties: { ...UIA.LinkProperties.ExtensionLink }
                             })
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIExtensionList] : ''} />) : null}

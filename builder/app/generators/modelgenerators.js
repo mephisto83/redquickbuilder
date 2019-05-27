@@ -84,9 +84,11 @@ export default class ModelGenerator {
                     let options = options_list && options_list.length ? bindTemplate(`Options = new string[] { {{options_list}} },`, {
                         options_list: options_list.map(t => `${t}`).join(', ')
                     }) : '';
+
                     let validation_rules = validations && validations.length ? bindTemplate(`ValidationRules = new string[] { {{validation_list}} }),`, {
                         validation_list: validations.map(t => `${t}`).join(', ')
                     }) : '';
+
                     let choice_type_list = [];
                     let choice_type = choice_type_list && choice_type_list.length ? bindTemplate('ChoiceType = {{choice_type}},', {
                         choice_type: choice_types.map(t => 'ChoiceType.' + t)
