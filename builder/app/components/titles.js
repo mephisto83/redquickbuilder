@@ -91,6 +91,7 @@ export const ExtensionOptions = 'Extension(s)';
 export const ExtensionDefinitionTypes = 'Extension Definition Types';
 export const AddExtensionNodeDescription = 'Add extension node description';
 export const ExtensionDefinition = 'Extension Definition';
+export const Extensions = 'Extensions';
 export const ExtensionDefinitionMenu = 'Define custom extensions';
 export const ExtensionConfig = 'Extension Config';
 export const DependsOn = 'Depends On';

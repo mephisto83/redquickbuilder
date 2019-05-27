@@ -63,7 +63,8 @@ export const GroupProperties = {
     FunctionGroup: 'FunctionGroup'
 }
 export const NameSpace = {
-    Model: '.Models'
+    Model: '.Models',
+    Extensions: '.Extensions'
 }
 
 export const NodeProperties = {

@@ -11,8 +11,6 @@ import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import DropDownMenu from './dropdown';
 import Box from './box';
-import Tabs from './tabs';
-import Tab from './tab';
 import TabContent from './tabcontent';
 import UserFooter from './userfooter';
 import TabContainer from './tabcontainer';
