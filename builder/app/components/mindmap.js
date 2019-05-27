@@ -66,6 +66,10 @@ export default class MindMap extends Component {
         window.removeEventListener('mousemove', this.mouseMove);
         window.removeEventListener('mousedown', this.mouseUp);
         window.removeEventListener('mouseup', this.mouseDown);
+        var domObj = document.querySelector(`#${this.state.id}`);
+        if (domObj) {
+            domObj.innerHTML = '';
+        }
     }
     calculateNodeTextSize(text, pad) {
         var div = document.querySelector('#secret-div-space');
@@ -88,6 +92,7 @@ export default class MindMap extends Component {
     draw() {
         var me = this;
         var domObj = document.querySelector(`#${this.state.id}`);
+        
         domObj.innerHTML = '';
         var bb = domObj.getBoundingClientRect();
         var force = Cola.d3adaptor(d3);

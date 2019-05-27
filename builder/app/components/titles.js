@@ -24,6 +24,8 @@ export const AgentOperator = 'Agent Operator';
 export const Enumerable = 'Enumerable';
 export const Value = 'Value';
 export const CodeName = 'Code Name';
+export const FileMenu = 'File Menu';
+export const MainNavigation = 'Main Navigation';
 export const AddParameter = 'Add parameter';
 export const AddParameterDescription = 'Parameters are the required things need for the function to execute successfully';
 export const AddFunctionOutput = 'Add Function Output';
@@ -111,6 +113,9 @@ export const AddMaestros = 'Add Maestro';
 export const Maestros = 'Maestros';
 export const Save = 'Save';
 export const Open = 'Open';
+
+export const MindMap = 'Mind Map';
+export const CodeView = 'Code View';
 
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';

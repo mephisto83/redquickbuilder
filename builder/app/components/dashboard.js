@@ -12,6 +12,7 @@ import NavBarMenu from './navbarmenu';
 import DropDownMenu from './dropdown';
 import DropDownMenuItem from './dropdownmenuitem';
 import MainSideBar from './mainsidebar';
+import SideBarHeader from './sidebarheader';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
@@ -55,11 +56,14 @@ import ControllerActivityMenu from './controlleractivitymenu';
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes } from '../constants/nodetypes';
-;
+import CodeView from './codeview';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 const LINK_DISTANCE = 'LINK_DISTANCE';
+const MAIN_CONTENT = 'MAIN_CONTENT';
+const MIND_MAP = 'MIND_MAP';
+const CODE_VIEW = 'CODE_VIEW';
 class Dashboard extends Component {
 
     minified() {
@@ -91,6 +95,7 @@ class Dashboard extends Component {
         var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let graph = UIA.GetCurrentGraph(state);
+        let main_content = UIA.Visual(state, MAIN_CONTENT);
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
                 height: 'auto',
@@ -134,6 +139,14 @@ class Dashboard extends Component {
                         </Header>
                         <MainSideBar>
                             <SideBarMenu>
+                                <SideBarHeader title={Titles.MainNavigation} />
+                                <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
+                                    this.props.setVisual(MAIN_CONTENT, MIND_MAP);
+                                }} />
+                                <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
+                                    this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
+                                }} />
+                                <SideBarHeader title={Titles.FileMenu} />
                                 <TreeViewMenu hideArrow={true} title={Titles.New} icon={'fa fa-plus'} onClick={() => {
                                     this.props.newRedQuickBuilderGraph();
                                 }} />
@@ -165,6 +178,7 @@ class Dashboard extends Component {
                             </SideBarMenu>
                         </MainSideBar>
                         <Content>
+                            <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
                             <MindMap
                                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                                 onNodeClick={(nodeId, boundingBox) => {
