@@ -8,6 +8,9 @@ import FormControl from './formcontrol';
 import TextBox from './textinput';
 import TopViewer from './topviewer';
 import Box from './box';
+import SelectInput from './selectinput';
+import { NodeTypes } from '../constants/nodetypes';
+const SELECTED_CODE_VIEW_TYPE = 'SELECTED_CODE_VIEW_TYPE';
 class CodeView extends Component {
     active() {
         return !!this.props.active;
@@ -15,18 +18,31 @@ class CodeView extends Component {
     render() {
         var { state } = this.props;
         let active = this.active();
+        let models = UIA.NodesByType(state, NodeTypes.Model, { useRoot: true, excludeRefs: true }).map(t => {
+            return {
+                title: UIA.GetNodeTitle(t),
+                value: t.id
+            }
+        })
         return (
             <TopViewer active={active}>
-                <div className="section">
+                <section className="content">
                     <div className="row">
                         <div className="col-md-2">
-                            <Box></Box>
+                            <Box primary={true} title={Titles.Models}>
+                                <SelectInput options={models}
+                                    label={Titles.Models}
+                                    onChange={(value) => {
+                                        this.props.setVisual(SELECTED_CODE_VIEW_TYPE, value)
+                                    }}
+                                    value={UIA.Visual(state, SELECTED_CODE_VIEW_TYPE)} />
+                            </Box>
                         </div>
                         <div className="col-md-10">
-                            <Box></Box>
+                            <Box title={Titles.Code}></Box>
                         </div>
                     </div>
-                </div>
+                </section>
             </TopViewer>
         );
     }

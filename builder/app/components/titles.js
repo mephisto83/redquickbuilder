@@ -25,6 +25,7 @@ export const Enumerable = 'Enumerable';
 export const Value = 'Value';
 export const CodeName = 'Code Name';
 export const FileMenu = 'File Menu';
+export const Code = 'Code';
 export const MainNavigation = 'Main Navigation';
 export const AddParameter = 'Add parameter';
 export const AddParameterDescription = 'Parameters are the required things need for the function to execute successfully';
@@ -103,6 +104,10 @@ export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child 
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 
+export const Create_Object_Agent_Value__IListObject = 'Create Object by Agent => IList<Object>';
+export const Update_Object_Agent_Value__IListObject = 'Update Object by Agent => IList<Object>';
+export const Delete_Object_Agent_Value__IListObject = 'Delete Object by Agent => IList<Object>';
+export const Get_Object_Agent_Value__IListObject = 'Get Object by Agent => IList<Object>';
 export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent In Valid List';
 
 export const Functions = 'Functions';

@@ -135,10 +135,10 @@ export function GetNodes(state) {
     }
     return [];
 }
-export function CanChangeType(node){
+export function CanChangeType(node) {
     var nodeType = GetNodeProp(node, NodeProperties.NODEType);
-    switch(nodeType){
-        case NodeTypes.ReferenceNode: 
+    switch (nodeType) {
+        case NodeTypes.ReferenceNode:
             return false;
         default:
             return true;
@@ -151,7 +151,7 @@ export function NodesByType(state, nodeType, options = {}) {
         return currentGraph.nodes
             .filter(x => currentGraph.nodeLib[x].properties &&
                 currentGraph.nodeLib[x].properties[NodeProperties.NODEType] === nodeType ||
-                currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType)
+                (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
             .map(x => currentGraph.nodeLib[x]);
     }
     return [];

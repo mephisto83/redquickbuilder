@@ -115,6 +115,42 @@ const COMMON_CONSTRAINTS = {
     }
 };
 
+
+
+const COMMON_CONSTRAINTS_AGENT_OBJECT = {
+    [FunctionTemplateKeys.Model]: {
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.Model
+    },
+    [FunctionTemplateKeys.AgentType]: {
+        [FunctionConstraintKeys.IsAgent]: true,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.AgentType
+    },
+    [FunctionTemplateKeys.User]: {
+        [FunctionConstraintKeys.IsUser]: true,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        [FunctionConstraintKeys.IsModel]: true,
+        key: FunctionTemplateKeys.User
+    },
+    [FunctionTemplateKeys.UserInstance]: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        key: FunctionTemplateKeys.UserInstance,
+        [FunctionConstraintKeys.IsInstanceVariable]: true,
+        [FunctionConstraintKeys.IsInputVariable]: true
+    },
+    [FunctionTemplateKeys.Value]: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsSingleLink]: true,
+        key: FunctionTemplateKeys.Value,
+        [FunctionConstraintKeys.IsInstanceVariable]: true,
+        [FunctionConstraintKeys.IsInputVariable]: true
+    }
+};
+
 const COMMON_OUTPUT = {
     LIST: {
         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
@@ -212,7 +248,39 @@ const COMMON_FUNCTION_REQUIREMENTS = {
 }
 
 export const Functions = {
-    [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
+    [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
+        title: Titles.Create_Object_Agent_Value__IListObject,
+        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf-8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        }
+    }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
+        title: Titles.Update_Object_Agent_Value__IListObject,
+        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf-8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        }
+    }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
+        title: Titles.Delete_Object_Agent_Value__IListObject,
+        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf-8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        }
+    }, [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
+        title: Titles.Get_Object_Agent_Value__IListObject,
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf-8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        }
+    }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS },
@@ -236,8 +304,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         ...COMMON_FUNCTION_REQUIREMENTS
-    },
-    [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
+    }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
         constraints: {

@@ -12,9 +12,12 @@ export default class Box extends Component {
     title() {
         return this.props.title || '{title}';
     }
+    primary() {
+        return this.props.primary ? 'box-primary' : '';
+    }
     render() {
         return (
-            <div className="box">
+            <div className={`box ${this.primary()}`}>
                 <div className="box-header with-border">
                     <h3 className="box-title">{this.title()}</h3>
                 </div>
