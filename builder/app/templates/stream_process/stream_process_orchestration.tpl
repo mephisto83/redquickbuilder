@@ -50,22 +50,7 @@ public class {{model}}StagedChangesOrchestration : IStagedChangesOrchestration<{
             try
             {
                 switch(change.AgentType) {
-                    case AgentTypes.{{agent_type}}:
-                        switch (change.ChangeType)
-                        {
-                            case {{model}}Change.CREATE:
-                                await {{agent_type}}Create(change);
-                                break;
-                            case {{model}}Change.UPDATE:
-                                await {{agent_type}}Update(change);
-                                break;
-                            case {{model}}Change.DELETE:
-                                await {{agent_type}}Delete(change);
-                                break;
-                            default:
-                                throw NotImplementedException();
-                        }
-                        break;
+                    {{agent_method_executions}}
                 }
                
             }
@@ -74,14 +59,5 @@ public class {{model}}StagedChangesOrchestration : IStagedChangesOrchestration<{
             }
         }
     }
-    public async Task Create({{model}}Change change) {
-        {{agent_type}} agent = await {{agent_type}}Arbiter.Get(change.AgentId);
-        {{model}} data = change.Data;
-        if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, MethodType.CREATE)) {
-            var result = await {{model}}Arbiter.Create(data);
-        }
-        else {
-            await {{model}}ResponseArbiter.Create({{model}}Response.CreateFailed(change));
-        }
-    }
+{{agent_type_methods}}    
 }
