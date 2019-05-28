@@ -8,10 +8,21 @@ const EXTENSION_CLASS_TEMPLATE = './app/templates/extensions/extensions.tpl';
 const EXTENSION_PROPERTY_TEMPLATE = './app/templates/extensions/extension_properties.tpl';
 const EXTENSION_NEW_INSTANCE = './app/templates/extensions/extension_new_instance.tpl';
 const EXTENSION_NEW_PROPERTY = './app/templates/extensions/extension_new_instance_properties.tpl';
+
 const EXTENSION_NEW_INSTANCE_LIST = './app/templates/extensions/extension_new_instance_list.tpl';
 const EXTENSION_NEW_INSTANCE_LIST_ADD = './app/templates/extensions/extension_new_instance_list_add.tpl';
 
+const EXTENSION_NEW_INSTANCE_DICTIONARY = './app/templates/extensions/extension_new_instance_dictionary.tpl';
+const EXTENSION_NEW_INSTANCE_DICTIONARY_ADD = './app/templates/extensions/extension_new_instance_dictionary_add.tpl';
+
 export default class ExtensionGenerator {
+    static Tabs(c) {
+        let res = '';
+        for (var i = 0; i < c; c++) {
+            res += TAB;
+        }
+        return res;
+    }
     static Generate(options) {
         var { state } = options;
         let extensions = NodesByType(state, NodeTypes.ExtensionType);
@@ -22,6 +33,8 @@ export default class ExtensionGenerator {
         let _extensionNewProperty = fs.readFileSync(EXTENSION_NEW_PROPERTY, 'utf-8');
         let _extensionNewInstanceList = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST, 'utf-8');
         let _extensionNewInstanceListAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST_ADD, 'utf-8');
+        let _extensionNewInstanceDictionary = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY, 'utf-8');
+        let _extensionNewInstanceDictionaryAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY_ADD, 'utf-8');
         let result = {};
         extensions.map(extension => {
             let extensionClassTemplate = _extensionClassTemplate;
@@ -45,6 +58,7 @@ export default class ExtensionGenerator {
                     }).join('');
                     if (config) {
                         var instances = [];
+                        let instance = '';
                         if (config.isEnumeration) {
                             instances = config.list.map((item, item_index) => {
                                 item = { ...item, Value: (item_index + 1) }
@@ -59,11 +73,35 @@ export default class ExtensionGenerator {
                                 }).join(`,${NL}`);
                                 temp = _extensionNewInstance;
                                 temp = bindTemplate(temp, {
-                                    properties: props,
+                                    properties: jNL + ExtensionGenerator.Tabs(4) + props,
                                     model: modelName
                                 });
                                 return temp;
                             })
+                        }
+                        else {
+                            let temp;
+                            let props = Object.keys(config.dictionary).map(key => {
+                                let temp = _extensionNewProperty;
+                                let item = { ...config.dictionary };
+                                temp = bindTemplate(temp, {
+                                    property: key,
+                                    value: `"${item[key]}"`
+                                });
+                                return temp;
+                            }).join(`,${NL}`);
+                            temp = _extensionNewInstance;
+                            temp = bindTemplate(temp, {
+                                properties: jNL + ExtensionGenerator.Tabs(4) + props,
+                                model: modelName
+                            });
+                            instance = temp;
+                            let temp_instance = _extensionNewInstanceDictionary;
+                            temp_instance = bindTemplate(temp_instance, {
+                                instance,
+                                model: modelName
+                            });
+                            instance = temp_instance;
                         }
                         instances = instances.map(inst => {
                             let temp = _extensionNewInstanceListAdd;
@@ -78,7 +116,7 @@ export default class ExtensionGenerator {
                         statics = bindTemplate(templist, {
                             addings: instances.join(''),
                             model: modelName
-                        })
+                        }) + jNL + instance;
                     }
                 }
             }
@@ -96,3 +134,6 @@ export default class ExtensionGenerator {
 }
 const NL = `
                     `
+const jNL = `
+`
+const TAB = `   `;
