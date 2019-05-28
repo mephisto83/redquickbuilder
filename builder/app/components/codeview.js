@@ -90,7 +90,7 @@ class CodeView extends Component {
                                     label={Titles.Extensions}
                                     onChange={(value) => {
                                         var code = NamespaceGenerator.Generate({
-                                            tempate: value,
+                                            template: value,
                                             usings: [],
                                             namespace,
                                             space: NameSpace.Extensions

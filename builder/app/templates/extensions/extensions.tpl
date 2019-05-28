@@ -1,3 +1,6 @@
     public class {{name}} {
-{{properties}}    
+        public const string Name = "{{name}}";
+
+{{properties}}
+{{statics}}
     }

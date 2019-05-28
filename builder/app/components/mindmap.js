@@ -1,7 +1,8 @@
 
 import * as d3Zoom from 'd3-zoom'
-import { select as d3Select } from 'd3-selection';
-import { event as d3Event } from 'd3-selection';
+// import { select as d3Select } from 'd3-selection';
+// import { event as d3Event } from 'd3-selection';
+// import * as d3 from 'd3';
 import * as d3 from 'd3';
 import * as Cola from 'webcola'
 import * as GraphMethods from '../methods/graph_methods';
