@@ -27,6 +27,7 @@ const MODEL_CODE = 'MODEL_CODE';
 const SELECTED_CODE_VIEW_TYPE = 'SELECTED_CODE_VIEW_TYPE';
 const EXTENSION = 'EXTENSION';
 const CODE_VIEW_TAB = 'CODE_VIEW_TAB';
+const EXTENSION_CODE = 'EXTENSION_CODE';
 class CodeView extends Component {
     active() {
         return !!this.props.active;
@@ -61,6 +62,13 @@ class CodeView extends Component {
                 }
             });
         }
+        var extension_code = UIA.Visual(state, EXTENSION);
+        var code = extension_code ? NamespaceGenerator.Generate({
+            template: extension_code,
+            usings: [],
+            namespace,
+            space: NameSpace.Extensions
+        }) : null;
         return (
             <TopViewer active={active}>
                 <section className="content">
@@ -89,13 +97,8 @@ class CodeView extends Component {
                                 <SelectInput options={extensions}
                                     label={Titles.Extensions}
                                     onChange={(value) => {
-                                        var code = NamespaceGenerator.Generate({
-                                            template: value,
-                                            usings: [],
-                                            namespace,
-                                            space: NameSpace.Extensions
-                                        })
-                                        this.props.setVisual(EXTENSION, code);
+
+                                        this.props.setVisual(EXTENSION, value);
                                     }}
                                     value={UIA.Visual(state, EXTENSION)} />
                             </Box>
@@ -121,7 +124,7 @@ class CodeView extends Component {
                                 </TabPane>
                                 <TabPane active={UIA.VisualEq(state, CODE_VIEW_TAB, Titles.Extensions)}>
                                     <Box title={Titles.Code} primary={true}>
-                                        {UIA.Visual(state, EXTENSION) ? <SyntaxHighlighter language='csharp' style={docco}>{UIA.Visual(state, EXTENSION)}</SyntaxHighlighter> : null}
+                                        {code ? <SyntaxHighlighter language='csharp' style={docco}>{code}</SyntaxHighlighter> : null}
                                     </Box>
                                 </TabPane>
                             </TabContent>
