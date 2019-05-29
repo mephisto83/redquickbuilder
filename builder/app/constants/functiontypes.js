@@ -246,7 +246,29 @@ const COMMON_FUNCTION_REQUIREMENTS = {
         }
     }
 }
-
+export const TEMPLATE_KEY_MODIFIERS = {
+    lower: 'lower',
+    alllower: 'alllower',
+    upper: 'upper'
+}
+export function ToInterface(i) {
+    return `I${i}`;
+}
+export const HTTP_METHODS = {
+    POST: 'HttpPost',
+    GET: 'HttpGet',
+    DELETE: 'HttpDelete',
+    PATCH: 'HttpPatch'
+}
+export const COMMON_FUNCTION_TEMPLATE_KEYS = {
+    model: 'model',
+    function_name: 'function_name',
+    user: 'user',
+    user_instance: 'user_instance',
+    value: 'value',
+    agent: 'agent',
+    agent_type: 'agent_type'
+}
 export const Functions = {
     [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
         title: Titles.Create_Object_Agent_Value__IListObject,
@@ -255,7 +277,8 @@ export const Functions = {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
             ...COMMON_OUTPUT.LIST
-        }
+        },
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
         title: Titles.Update_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf-8'),
@@ -263,7 +286,8 @@ export const Functions = {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
             ...COMMON_OUTPUT.LIST
-        }
+        },
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf-8'),
@@ -271,7 +295,8 @@ export const Functions = {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
             ...COMMON_OUTPUT.LIST
-        }
+        },
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf-8'),
@@ -279,7 +304,8 @@ export const Functions = {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
             ...COMMON_OUTPUT.LIST
-        }
+        },
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
@@ -287,7 +313,8 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
-        ...COMMON_FUNCTION_REQUIREMENTS
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
@@ -295,7 +322,8 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
-        ...COMMON_FUNCTION_REQUIREMENTS
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
@@ -303,7 +331,8 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
-        ...COMMON_FUNCTION_REQUIREMENTS
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
@@ -352,7 +381,8 @@ export const Functions = {
         },
         [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {},
         attachment_methods: {},
-        propreties: {}
+        propreties: {},
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }
 }
 

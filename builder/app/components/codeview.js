@@ -13,6 +13,7 @@ import { NodeTypes, NodeProperties, NameSpace } from '../constants/nodetypes';
 import ModelGenerator from '../generators/modelgenerators';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import ExtensionsGenerator from '../generators/extensiongenerator';
+import ControllerGenerator from '../generators/controllergenerator';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import TextInput from './textinput';
@@ -25,8 +26,10 @@ import Tabs from './tabs';
 
 const MODEL_CODE = 'MODEL_CODE';
 const SELECTED_CODE_VIEW_TYPE = 'SELECTED_CODE_VIEW_TYPE';
+const SELECTED_CODE_TYPE = 'SELECTED_CODE_TYPE';
 const EXTENSION = 'EXTENSION';
 const CODE_VIEW_TAB = 'CODE_VIEW_TAB';
+const CONTROLLER = 'CONTROLLER';
 const EXTENSION_CODE = 'EXTENSION_CODE';
 class CodeView extends Component {
     active() {
@@ -62,6 +65,18 @@ class CodeView extends Component {
                 }
             });
         }
+
+        let controllers = [];
+        if (state && graphRoot) {
+            let temp = ControllerGenerator.Generate({ state });
+            controllers = Object.keys(temp).map(t => {
+                return {
+                    value: temp[t],
+                    title: t
+                }
+            })
+        }
+
         var extension_code = UIA.Visual(state, EXTENSION);
         var code = extension_code ? NamespaceGenerator.Generate({
             template: extension_code,
@@ -69,6 +84,22 @@ class CodeView extends Component {
             namespace,
             space: NameSpace.Extensions
         }) : null;
+
+        var controller_codes = UIA.Visual(state, CONTROLLER);
+        var controller_code = controller_codes ? NamespaceGenerator.Generate({
+            template: controller_codes,
+            usings: [],
+            namespace,
+            space: NameSpace.Controllers
+        }) : null;
+
+        var code_types = [
+            Titles.Controllers,
+            Titles.Models,
+            Titles.Extensions,
+            Titles.Maestros
+        ];
+
         return (
             <TopViewer active={active}>
                 <section className="content">
@@ -82,7 +113,18 @@ class CodeView extends Component {
                                     label={Titles.NameSpace}
                                     value={namespace} />
                             </Box>
-                            <Box primary={true} title={Titles.Models}>
+                            <Box primary={true} title={Titles.CodeTypes}>
+                                <SelectInput options={code_types.map(t => ({
+                                    title: t,
+                                    value: t
+                                }))}
+                                    label={Titles.CodeTypes}
+                                    onChange={(value) => {
+                                        this.props.setVisual(SELECTED_CODE_TYPE, value);
+                                    }}
+                                    value={UIA.Visual(state, SELECTED_CODE_TYPE)} />
+                            </Box>
+                            {UIA.VisualEq(state, SELECTED_CODE_TYPE, Titles.Models) ? (<Box primary={true} title={Titles.Models}>
                                 <SelectInput options={models}
                                     label={Titles.Models}
                                     onChange={(value) => {
@@ -92,8 +134,8 @@ class CodeView extends Component {
                                         this.props.setVisual(MODEL_CODE, modelCode);
                                     }}
                                     value={UIA.Visual(state, SELECTED_CODE_VIEW_TYPE)} />
-                            </Box>
-                            <Box title={Titles.Extensions}>
+                            </Box>) : null}
+                            {UIA.VisualEq(state, SELECTED_CODE_TYPE, Titles.Extensions) ? (<Box title={Titles.Extensions}>
                                 <SelectInput options={extensions}
                                     label={Titles.Extensions}
                                     onChange={(value) => {
@@ -101,7 +143,16 @@ class CodeView extends Component {
                                         this.props.setVisual(EXTENSION, value);
                                     }}
                                     value={UIA.Visual(state, EXTENSION)} />
-                            </Box>
+                            </Box>) : null}
+                            {UIA.VisualEq(state, SELECTED_CODE_TYPE, Titles.Controllers) ? (<Box title={Titles.Controllers}>
+                                <SelectInput options={controllers}
+                                    label={Titles.Controllers}
+                                    onChange={(value) => {
+
+                                        this.props.setVisual(CONTROLLER, value);
+                                    }}
+                                    value={UIA.Visual(state, CONTROLLER)} />
+                            </Box>) : null}
                         </div>
                         <div className="col-md-10">
                             <TabContainer>
@@ -114,6 +165,10 @@ class CodeView extends Component {
                                         title={Titles.Extensions} onClick={() => {
                                             this.props.setVisual(CODE_VIEW_TAB, Titles.Extensions)
                                         }} />
+                                    <Tab active={UIA.VisualEq(state, CODE_VIEW_TAB, Titles.Controllers)}
+                                        title={Titles.Controllers} onClick={() => {
+                                            this.props.setVisual(CODE_VIEW_TAB, Titles.Controllers)
+                                        }} />
                                 </Tabs>
                             </TabContainer>
                             <TabContent>
@@ -125,6 +180,11 @@ class CodeView extends Component {
                                 <TabPane active={UIA.VisualEq(state, CODE_VIEW_TAB, Titles.Extensions)}>
                                     <Box title={Titles.Code} primary={true}>
                                         {code ? <SyntaxHighlighter language='csharp' style={docco}>{code}</SyntaxHighlighter> : null}
+                                    </Box>
+                                </TabPane>
+                                <TabPane active={UIA.VisualEq(state, CODE_VIEW_TAB, Titles.Controllers)}>
+                                    <Box title={Titles.Code} primary={true}>
+                                        {controller_code ? <SyntaxHighlighter language='csharp' style={docco}>{controller_code}</SyntaxHighlighter> : null}
                                     </Box>
                                 </TabPane>
                             </TabContent>

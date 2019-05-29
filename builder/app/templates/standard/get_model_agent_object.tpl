@@ -1,5 +1,5 @@
 //Templated version.
-public async Task<{{model}}> Get{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
     var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 

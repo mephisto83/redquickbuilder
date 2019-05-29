@@ -64,11 +64,15 @@ export const GroupProperties = {
 }
 export const NameSpace = {
     Model: '.Models',
-    Extensions: '.Extensions'
+    Extensions: '.Extensions',
+    Controllers: '.Controllers'
 }
 
 export const NodeProperties = {
     NameSpace: 'namespace',
+    CodeUser: 'codeUser',
+    HttpRoute: 'HttpRoute',
+    HttpMethod: 'HttpMethod',
     IsAgent: 'isAgent',
     IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
     IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
@@ -129,6 +133,14 @@ export const NodePropertiesDirtyChain = {
         chainFunc: (x) => {
             if (typeof x === 'string') {
                 return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890'.indexOf(y.toLowerCase()) !== -1).join('');
+            }
+            return x;
+        }
+    }, {
+        chainProp: NodeProperties.HttpRoute,
+        chainFunc: (x) => {
+            if (typeof x === 'string') {
+                return x.split(' ').join('/').toLowerCase();
             }
             return x;
         }

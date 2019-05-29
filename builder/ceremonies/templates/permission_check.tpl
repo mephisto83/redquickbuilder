@@ -16,7 +16,7 @@ public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instan
 
     if(await CanSendMessage({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 
-        await StreamProcess.{{model}}({{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}));
+        await StreamProcess.{{model}}({{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}));
 
         return await arbiter.GetBy<{{model}}(conversationMessage => conversationMessage.{{determining_property}} == resourceHead);
     }

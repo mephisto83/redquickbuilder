@@ -14,11 +14,11 @@ const EXTENSION_NEW_INSTANCE_LIST_ADD = './app/templates/extensions/extension_ne
 
 const EXTENSION_NEW_INSTANCE_DICTIONARY = './app/templates/extensions/extension_new_instance_dictionary.tpl';
 const EXTENSION_NEW_INSTANCE_DICTIONARY_ADD = './app/templates/extensions/extension_new_instance_dictionary_add.tpl';
-
+const PROPERTY_TABS = 6;
 export default class ExtensionGenerator {
     static Tabs(c) {
         let res = '';
-        for (var i = 0; i < c; c++) {
+        for (var i = 0; i < c; i++) {
             res += TAB;
         }
         return res;
@@ -73,7 +73,7 @@ export default class ExtensionGenerator {
                                 }).join(`,${NL}`);
                                 temp = _extensionNewInstance;
                                 temp = bindTemplate(temp, {
-                                    properties: jNL + ExtensionGenerator.Tabs(4) + props,
+                                    properties: jNL + ExtensionGenerator.Tabs(PROPERTY_TABS) + props,
                                     model: modelName
                                 });
                                 return temp;
@@ -92,7 +92,7 @@ export default class ExtensionGenerator {
                             }).join(`,${NL}`);
                             temp = _extensionNewInstance;
                             temp = bindTemplate(temp, {
-                                properties: jNL + ExtensionGenerator.Tabs(4) + props,
+                                properties: jNL + ExtensionGenerator.Tabs(PROPERTY_TABS) + props,
                                 model: modelName
                             });
                             instance = temp;

@@ -1,6 +1,6 @@
-[Authorize]
-[RoutePrefix("api/{{codeName#alllower}}")]
-public class {{codeName}} : BaseController
-{
-    {{functions}}
-}
+    [Authorize]
+    [RoutePrefix("api/{{codeName#alllower}}")]
+    public class {{codeName}}Controller : BaseController
+    {
+        {{functions}}
+    }

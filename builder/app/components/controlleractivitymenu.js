@@ -8,10 +8,10 @@ import * as Titles from './titles';
 import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
-import TextBox from './textinput';
-import { Functions, FunctionConstraintKeys } from '../constants/functiontypes';
+import TextInput from './textinput';
+import { Functions, FunctionConstraintKeys, HTTP_METHODS } from '../constants/functiontypes';
 import { getNodesLinkedTo } from '../methods/graph_methods';
-import { LinkPropertyKeys } from '../constants/nodetypes';
+import { LinkPropertyKeys, NodeProperties } from '../constants/nodetypes';
 
 class ControllerActivityMenu extends Component {
     render() {
@@ -43,6 +43,16 @@ class ControllerActivityMenu extends Component {
                         });
                     }}
                     value={''} />) : null}
+                {currentNode ? (<TextInput
+                    label={Titles.CodeUser}
+                    value={UIA.GetNodeProp(currentNode, NodeProperties.CodeUser)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            id: currentNode.id,
+                            value,
+                            prop: NodeProperties.CodeUser
+                        })
+                    }} />) : null}
             </TabPane>
         );
     }

@@ -8,8 +8,9 @@ import * as Titles from './titles';
 import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
-import TextBox from './textinput';
-import { Functions } from '../constants/functiontypes';
+import TextInput from './textinput';
+import { Functions, HTTP_METHODS } from '../constants/functiontypes';
+import { NodeProperties } from '../constants/nodetypes';
 
 class FunctionActivityMenu extends Component {
     render() {
@@ -77,6 +78,28 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
+
+                {currentNode ? (<SelectInput
+                    label={Titles.HttpMethod}
+                    options={Object.keys(HTTP_METHODS).map(t => ({ title: t, value: HTTP_METHODS[t] }))}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            id: currentNode.id,
+                            value,
+                            prop: NodeProperties.HttpMethod
+                        })
+                    }}
+                    value={UIA.GetNodeProp(currentNode, NodeProperties.HttpMethod)} />) : null}
+                {currentNode ? (<TextInput
+                    label={Titles.HttpRoute}
+                    value={UIA.GetNodeProp(currentNode, NodeProperties.HttpRoute)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            id: currentNode.id,
+                            value,
+                            prop: NodeProperties.HttpRoute
+                        })
+                    }} />) : null}
                 <ControlSideBarMenu>
                     {currentNode && currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])

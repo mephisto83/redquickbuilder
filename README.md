@@ -106,7 +106,7 @@ A set of crud functions with a return value of the list of child type objects.
 
             if(await Can{{function.codeName}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 
-                await StreamProcess.{{model}}({{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}));
+                await StreamProcess.{{model}}({{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}));
 
                 return await arbiter.GetBy<{{model}}(conversationMessage => conversationMessage.{{determining_property}} == resourceHead);
             }
@@ -114,11 +114,11 @@ A set of crud functions with a return value of the list of child type objects.
         }
         
         Required Node links : model, user, resourceHead_type, value_type, AgentType, determining_property
-        Required Functions: Can{{codeName}}, {{model}}Change.Create{{model}}
+        Required Functions: Can{{codeName}}, {{model}}Change.{{function_name}}
         Required Classes: {{model}}Change
 
         //Single Object parameter
-        //Create{{model}}Parameters
+        //{{function_name}}Parameters
         //Single Object Parameter Version.
         public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, ConversationMessasge message) { 
 
@@ -143,7 +143,7 @@ A set of crud functions with a return value of the list of child type objects.
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = Create{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Create({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
@@ -169,7 +169,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = Update{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Update({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
@@ -189,7 +189,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 
             var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = Delete{{model}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Delete({{model}}ChangeParameters);
                 await StreamProcess.{{model}}({{model}}Change);
 
@@ -260,7 +260,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 
             if(await Can{{function.codeName}}({{agent_type_instance}}.Id).ConfigureAwait(false))) {
 
-                await StreamProcess.{{model}}({{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{value}}));
+                await StreamProcess.{{model}}({{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{value}}));
 
                 // return await arbiter.GetBy<{{model}}(conversationMessage => conversationMessage.{{determining_property}} == resourceHead);
                 return await arbiter.GetBy<{{model}}({{determining_function}});   
@@ -269,7 +269,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
         
         Required Node links : model, user, value_type, AgentType, determining_property
-        Required Functions: Can{{codeName}}, {{model}}Change.Create{{model}}
+        Required Functions: Can{{codeName}}, {{model}}Change.{{function_name}}
         Required Classes: {{model}}Change
 
 
@@ -304,10 +304,10 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
         
         Required Node links : agent_id, resource_id, determining_property
-        Required Functions: Can{{codeName}}, {{model}}Change.Create{{model}}
+        Required Functions: Can{{codeName}}, {{model}}Change.{{function_name}}
         Required Classes: {{model}}Change
 
-### {{model}}Change.Create{{model}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}) // ConversationMessageChange.CreateConversationMessage
+### {{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}) // ConversationMessageChange.CreateConversationMessage
 
         // Identifing the agent and parent object are the only crucial parts.
         // This would be better if the "string message' was "ConversationMessage message"
@@ -333,7 +333,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
 
 
-        public {{model}}Change Create{{model}}(string {{agent_id}}, string {{resourceHead}}, {{model}} {{value}}) {
+        public {{model}}Change {{function_name}}(string {{agent_id}}, string {{resourceHead}}, {{model}} {{value}}) {
             return new {{model}}Change {
                 StreamType = "{{model}}",
                 Response = Guid.NewGuid(),
@@ -344,7 +344,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
         
         Required Node links : model, agent_id, resourceHead, value, property*, resourceHead_type
-        Required Functions: {{model}}Change.Create{{model}}
+        Required Functions: {{model}}Change.{{function_name}}
         Required Classes: {{model}}Change
 
 
@@ -357,15 +357,15 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
             }
         }
         
-        public {{model}}Change Create{{model}}(Create{{model}}Parameters parameters) {
+        public {{model}}Change {{function_name}}({{function_name}}Parameters parameters) {
             return new {{model}}Change {
                 StreamType = "{{model}}",
                 Response = Guid.NewGuid(),
-                Create{{model}}Parameters = parameters
+                {{function_name}}Parameters = parameters
             }
         }
         Required Node links : model
-        Required Functions: {{model}}Change.Create{{model}}
+        Required Functions: {{model}}Change.{{function_name}}
         Required Classes: {{model}}Change
 
 
@@ -398,7 +398,7 @@ A list of CRUD functions with a return function of a list of Objects.
         }
 
         //Templated Version.
-        public async Task<IList<{{model}}>> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
 
@@ -421,7 +421,7 @@ A list of CRUD functions with a return function of a list of Objects.
         }
 
         //Templated Version.
-        public async Task<IList<{{model}}>> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
 
@@ -513,7 +513,7 @@ IAgent, IHasAllowedCollection
         }
 
         //Templated version.
-        public async Task<{{model}}> Create{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 
@@ -547,7 +547,7 @@ IAgent, IHasAllowedCollection
         }
 
         //Templated version.
-        public async Task<{{model}}> Update{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 
@@ -577,7 +577,7 @@ IAgent, IHasAllowedCollection
         }
 
         //Templated version.
-        public async Task<{{model}}> Get{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 
@@ -609,7 +609,7 @@ IAgent, IHasAllowedCollection
         }
 
         //Templated version.
-        public async Task<{{model}}> Get{{model}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 
