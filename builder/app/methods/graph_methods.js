@@ -766,16 +766,16 @@ export function applyFunctionConstraints(graph, options) {
                 });
             }
 
-            if (!graph.groupsNodes[core_group.id] || !graph.groupsNodes[core_group.id][id]) {
-                graph = addLeaf(graph, { leaf: id, id: core_group.id })
+            if (!graph.groupsNodes[external_group.id] || !graph.groupsNodes[external_group.id][id]) {
+                graph = addLeaf(graph, { leaf: id, id: external_group.id })
             }
 
-            if (!graph.childGroups[internal_group.id] || !graph.childGroups[internal_group.id][core_group.id]) {
-                graph = addGroupToGroup(graph, { groupId: core_group.id, id: internal_group.id });
-            }
-
-            if (!graph.childGroups[external_group.id] || !graph.childGroups[external_group.id][internal_group.id]) {
+            if (!graph.childGroups[internal_group.id] || !graph.childGroups[internal_group.id][external_group.id]) {
                 graph = addGroupToGroup(graph, { groupId: internal_group.id, id: external_group.id });
+            }
+
+            if (!graph.childGroups[core_group.id] || !graph.childGroups[core_group.id][internal_group.id]) {
+                graph = addGroupToGroup(graph, { groupId: core_group.id, id: internal_group.id });
             }
 
 
@@ -812,10 +812,10 @@ export function applyFunctionConstraints(graph, options) {
                 var constraint = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
                 if (constraint && constraint.key && functionConstraints.constraints[constraint.key] &&
                     functionConstraints.constraints[constraint.key][FunctionConstraintKeys.IsInputVariable]) {
-                    graph = addLeaf(graph, { leaf: new_node.id, id: external_group.id });
+                    graph = addLeaf(graph, { leaf: new_node.id, id: internal_group.id });
                 }
                 else {
-                    graph = addLeaf(graph, { leaf: new_node.id, id: internal_group.id })
+                    graph = addLeaf(graph, { leaf: new_node.id, id: core_group.id })
                 }
             });
 
@@ -1164,7 +1164,7 @@ export function getNodesByLinkType(graph, options) {
                             return null;
                         }
 
-                        if (graph.linkLib[_id].properties &&
+                        if (!type || graph.linkLib[_id].properties &&
                             graph.linkLib[_id].properties.type === type) {
                             return graph.nodeLib[target];
                         }
@@ -1429,6 +1429,8 @@ function noSameLink(graph, ops) {
 function createGroup() {
     return {
         id: uuidv4(),
+        leaves: [],
+        groups: [],
         properties: {}
     }
 }
@@ -1452,6 +1454,11 @@ function createLink(target, source, properties) {
         properties
     }
 }
+function copyLink(link) {
+    return {
+        ...(JSON.parse(JSON.stringify(link)))
+    }
+}
 export function duplicateNode(nn) {
     return {
         ...nn
@@ -1470,4 +1477,277 @@ function uuidv4() {
         let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
+}
+function GetNodesInsideGroup(graph, t, seenGroups = {}) {
+    var res = [...Object.keys(graph.groupsNodes[t])];
+    for (var i in graph.childGroups[t]) {
+        if (!seenGroups[i]) {
+            seenGroups = {
+                ...seenGroups,
+                [i]: true
+            };
+            res = [...res, ...GetNodesInsideGroup(graph, i, seenGroups)]
+        }
+    }
+
+    return res;
+}
+export function VisualProcess(graph) {
+    let vgraph = createGraph();
+    vgraph.id = graph.id;
+    let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
+    let nodesToCheck = [...collapsedNodes];
+    let checkedNodes = [];
+    let done = true;
+    let mashedNodeLib = {};
+    let nodeMashedToLib = {};
+    let collapsingGroups = {};
+    collapsedNodes.map(t => {
+        if (graph.nodesGroups[t]) {
+            var sortedGroups = Object.keys(graph.nodesGroups[t]).sort((b, a) => {
+                return Object.keys(groupsNodes[a]).length - Object.keys(groupsNodes[b]).length;
+            });
+            if (sortedGroups.length) {
+                collapsingGroups[sortedGroups[0]] = true;
+            }
+        }
+    });
+    let smallestsNonCrossingGroups = Object.keys(collapsingGroups).filter(cg => {
+        for (var g_ in graph.parentGroup[cg]) {
+            if (collapsingGroups[g_]) {
+                return false;
+            }
+        }
+        return true;
+    });
+    let disappearingNodes = {};
+    smallestsNonCrossingGroups.map(t => {
+        let dt = {};
+        let head = null;
+        let _nodes = GetNodesInsideGroup(graph, t);
+        _nodes.filter(t => {
+            var type = GetGroupProperty(graph.nodeLib[t], NodeProperties.NODEType);
+            if (type !== NodeTypes.Model && type !== NodeTypes.Function) {
+                dt[t] = true;
+            }
+            else {
+                head = t;
+            }
+        });
+        for (var i in dt) {
+            dt[i] = head;
+        }
+        disappearingNodes = { ...disappearingNodes, ...dt };
+    });
+
+    // do {
+    //     done = true;
+    //     let checkedNodesCount = checkedNodes.length;
+    //     let nextbatch = [];
+    //     let cn = nodesToCheck.map(t => {
+    //         let linked_nodes = getNodesByLinkType(graph, { id: t, direction: SOURCE });
+    //         if (GetNodeProp(graph.nodeLib[t], NodeProperties.Collapsed)) {
+    //             linked_nodes.map(t => {
+    //                 graph = updateNodeProperty(graph, {
+    //                     id: t.id,
+    //                     prop: NodeProperties.Collapsed,
+    //                     value: true
+    //                 });
+    //             });
+    //             mashedNodeLib[t] = [...linked_nodes.map(_t => {
+    //                 if (_t.id !== t) {
+    //                     disappearingNodes[_t.id] = true;
+    //                     nodeMashedToLib[_t.id] = t;
+    //                 }
+    //                 return _t.id;
+    //             })];
+    //         }
+    //         nextbatch.push(...linked_nodes.map(t => t.id));
+    //         return t;
+    //     });
+    //     nodesToCheck = [...nextbatch].unique(x => x);
+    //     checkedNodes = [...checkedNodes, ...cn].unique(x => x);
+    //     if (checkedNodesCount !== checkedNodes.length) {
+    //         done = false;
+    //     }
+    // } while (!done);
+
+    vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])]
+    vgraph.nodeLib = {};
+    vgraph.nodes.map(t => { vgraph.nodeLib[t] = graph.nodeLib[t] });
+    vgraph.links = graph.links.map(x => {
+        //Find any link that should be disappearing, and make it go away
+        var { source, target } = graph.linkLib[x];
+        var dupLink;
+        if (disappearingNodes[source] && disappearingNodes[target]) {
+            // the link is going totally away;
+            return false;
+        }
+        else if (disappearingNodes[source]) {
+            dupLink = copyLink(graph.linkLib[x]);
+            dupLink.source = disappearingNodes[source];
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        else if (disappearingNodes[target]) {
+            dupLink = copyLink(graph.linkLib[x]);
+            dupLink.target = disappearingNodes[target];
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        else {
+            dupLink = copyLink(graph.linkLib[x]);
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        if (dupLink.source === dupLink.target) {
+            return false;
+        }
+        return dupLink.id;
+    }).filter(x => x);
+
+    var vgroups = graph.groups.map((group, groupIndex) => {
+        let oldgroup = graph.groupLib[group];
+        let newgroup = createGroup();
+        newgroup.id = `${oldgroup.id}`;
+        if (oldgroup && oldgroup.leaves) {
+            oldgroup.leaves.map(leaf => {
+                if (vgraph.nodeLib[leaf]) {
+                    newgroup.leaves.push(leaf);
+                }
+            })
+        }
+        if (newgroup.leaves.length) {
+            vgraph.groupLib[newgroup.id] = newgroup;
+
+            return newgroup.id
+        }
+        return null;
+    }).filter(x => x);
+    vgroups.map((group) => {
+        vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(og => {
+            if (vgraph.groupLib[og]) {
+                return true;
+            }
+            return false;
+        })
+    })
+    vgraph.groups = vgroups;
+    return vgraph;
+}
+
+export function _VisualProcess(graph) {
+    let vgraph = createGraph();
+    vgraph.id = graph.id;
+    let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
+    let nodesToCheck = [...collapsedNodes];
+    let checkedNodes = [];
+    let done = true;
+    let mashedNodeLib = {};
+    let nodeMashedToLib = {};
+    let disappearingNodes = {};
+    do {
+        done = true;
+        let checkedNodesCount = checkedNodes.length;
+        let nextbatch = [];
+        let cn = nodesToCheck.map(t => {
+            let linked_nodes = getNodesByLinkType(graph, { id: t, direction: SOURCE });
+            if (GetNodeProp(graph.nodeLib[t], NodeProperties.Collapsed)) {
+                linked_nodes.map(t => {
+                    graph = updateNodeProperty(graph, {
+                        id: t.id,
+                        prop: NodeProperties.Collapsed,
+                        value: true
+                    });
+                });
+                mashedNodeLib[t] = [...linked_nodes.map(_t => {
+                    if (_t.id !== t) {
+                        disappearingNodes[_t.id] = true;
+                        nodeMashedToLib[_t.id] = t;
+                    }
+                    return _t.id;
+                })];
+            }
+            nextbatch.push(...linked_nodes.map(t => t.id));
+            return t;
+        });
+        nodesToCheck = [...nextbatch].unique(x => x);
+        checkedNodes = [...checkedNodes, ...cn].unique(x => x);
+        if (checkedNodesCount !== checkedNodes.length) {
+            done = false;
+        }
+    } while (!done);
+
+    vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])]
+    vgraph.nodeLib = {};
+    vgraph.nodes.map(t => { vgraph.nodeLib[t] = graph.nodeLib[t] });
+    vgraph.links = graph.links.map(x => {
+        //Find any link that should be disappearing, and make it go away
+        var { source, target } = graph.linkLib[x];
+        var dupLink;
+        if (disappearingNodes[source] && disappearingNodes[target]) {
+            // the link is going totally away;
+            return false;
+        }
+        else if (disappearingNodes[source]) {
+            dupLink = copyLink(graph.linkLib[x]);
+            var orgSource = dupLink.source;
+            var nextSource = orgSource;
+            do {
+                nextSource = nodeMashedToLib[nextSource];
+            } while (disappearingNodes[nextSource] && nextSource);
+            dupLink.source = nextSource;
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        else if (disappearingNodes[target]) {
+            dupLink = copyLink(graph.linkLib[x]);
+            var orgSource = dupLink.target;
+            var nextSource = orgSource;
+            do {
+                nextSource = nodeMashedToLib[nextSource];
+            } while (disappearingNodes[nextSource] && nextSource);
+            dupLink.target = nextSource;
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        else {
+            dupLink = copyLink(graph.linkLib[x]);
+            dupLink.id = `${dupLink.source}${dupLink.target}`;
+            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+        }
+        if (dupLink.source === dupLink.target) {
+            return false;
+        }
+        return dupLink.id;
+    }).filter(x => x);
+
+    var vgroups = graph.groups.map((group, groupIndex) => {
+        let oldgroup = graph.groupLib[group];
+        let newgroup = createGroup();
+        newgroup.id = `${oldgroup.id}`;
+        if (oldgroup && oldgroup.leaves) {
+            oldgroup.leaves.map(leaf => {
+                if (vgraph.nodeLib[leaf]) {
+                    newgroup.leaves.push(leaf);
+                }
+            })
+        }
+        if (newgroup.leaves.length) {
+            vgraph.groupLib[newgroup.id] = newgroup;
+
+            return newgroup.id
+        }
+        return null;
+    }).filter(x => x);
+    vgroups.map((group) => {
+        vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(og => {
+            if (vgraph.groupLib[og]) {
+                return true;
+            }
+            return false;
+        })
+    })
+    vgraph.groups = vgroups;
+    return vgraph;
 }

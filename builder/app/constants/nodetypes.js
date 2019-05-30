@@ -70,6 +70,7 @@ export const NameSpace = {
 
 export const NodeProperties = {
     NameSpace: 'namespace',
+    Collapsed: 'collapsed',
     CodeUser: 'codeUser',
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',

@@ -9,6 +9,7 @@ import * as Titles from '../components/titles';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
+export const VISUAL_GRAPH = 'VISUAL_GRAPH';
 export const DASHBOARD_MENU = 'DASHBOARD_MENU';
 export const SELECTED_NODE_BB = 'SELECTED_NODE_BB';
 export const SIDE_PANEL_EXTRA_WIDTH = 'SIDE_PANEL_EXTRA_WIDTH';
@@ -64,6 +65,10 @@ export function Node(state, nodeId) {
 export function Application(state, key) {
     return GetC(state, APPLICATION, key);
 }
+export function GetVisualGraph(state) {
+    var currentGraph = GetCurrentGraph(state);
+    return currentGraph ? GetC(state, VISUAL_GRAPH, currentGraph.id) : null;
+}
 export function SaveApplication(value, key, dispatch) {
     dispatch(UIC(APPLICATION, key, value));
 }
@@ -77,6 +82,9 @@ export function SaveGraph(graph, dispatch) {
             updated: Date.now()
         }
     };
+    let visualGraph = GraphMethods.VisualProcess(graph);
+    if (visualGraph)
+        dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
     dispatch(UIC(GRAPHS, graph.id, graph));
 }
 export function UIC(section, item, value) {

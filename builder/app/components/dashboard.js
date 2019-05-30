@@ -23,6 +23,7 @@ import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
 import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
+import CheckBox from './checkbox';
 import * as VC from '../constants/visual';
 import MindMap from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
@@ -95,6 +96,7 @@ class Dashboard extends Component {
         var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let graph = UIA.GetCurrentGraph(state);
+        let vgraph = UIA.GetVisualGraph(state);
         let main_content = UIA.Visual(state, MAIN_CONTENT);
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
@@ -205,7 +207,7 @@ class Dashboard extends Component {
                                 }}
                                 selectedColor={UIA.Colors.SelectedNode}
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
-                                graph={graph}></MindMap>
+                                graph={vgraph || graph}></MindMap>
                         </Content>
                         <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
                             <SideBarTabs>
@@ -242,6 +244,16 @@ class Dashboard extends Component {
                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: UIA.NodeProperties.NODEType, id: currentNode.id, value })
                                         }}
                                         value={currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null} />
+                                    <CheckBox
+                                        label={Titles.Collapsed}
+                                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}
+                                        onChange={(value) => {
+                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                prop: UIA.NodeProperties.Collapsed,
+                                                id: currentNode.id,
+                                                value
+                                            });
+                                        }} />
                                 </FormControl>) : null}
                                 <ChoiceListItemActivityMenu />
                             </SideBarContent>) : null}
