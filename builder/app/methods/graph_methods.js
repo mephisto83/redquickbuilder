@@ -1492,6 +1492,18 @@ function GetNodesInsideGroup(graph, t, seenGroups = {}) {
 
     return res;
 }
+export const GroupImportanceOrder = {
+    [NodeTypes.Model]: 1,
+    [NodeTypes.Function]: 1,
+    [NodeTypes.Property]: 4,
+    [NodeTypes.ValidationList]: 5,
+    [NodeTypes.OptionList]: 6,
+    [NodeTypes.Parameter]: 4,
+    [NodeTypes.Attribute]: 8,
+    [NodeTypes.ValidationList]: 10,
+    [NodeTypes.ValidationListItem]: 12
+}
+
 export function VisualProcess(graph) {
     let vgraph = createGraph();
     vgraph.id = graph.id;
@@ -1504,8 +1516,28 @@ export function VisualProcess(graph) {
     let collapsingGroups = {};
     collapsedNodes.map(t => {
         if (graph.nodesGroups[t]) {
-            var sortedGroups = Object.keys(graph.nodesGroups[t]).sort((b, a) => {
-                return Object.keys(groupsNodes[a]).length - Object.keys(groupsNodes[b]).length;
+            let t_importance = GroupImportanceOrder[GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)] || 1000;
+            var sortedGroups = Object.keys(graph.nodesGroups[t]).filter(nodeGroupKey => {
+
+                let nodesInGroup = GetNodesInsideGroup(graph, nodeGroupKey);
+                var moreImportantNode = nodesInGroup.find(n => {
+                    if (n === t) {
+                        return false;
+                    }
+                    var _type = GetNodeProp(graph.nodeLib[n], NodeProperties.NODEType);
+                    let n_importance = GroupImportanceOrder[_type] || 1000;
+
+                    if (n_importance > t_importance) {
+                        return false;
+                    }
+                    return true;
+                });
+                if (moreImportantNode) {
+                    return false;
+                }
+                return true;
+            }).sort((b, a) => {
+                return Object.keys(graph.groupsNodes[a]).length - Object.keys(graph.groupsNodes[b]).length;
             });
             if (sortedGroups.length) {
                 collapsingGroups[sortedGroups[0]] = true;
@@ -1524,16 +1556,17 @@ export function VisualProcess(graph) {
     smallestsNonCrossingGroups.map(t => {
         let dt = {};
         let head = null;
+        let mostimportant = 10000;
         let _nodes = GetNodesInsideGroup(graph, t);
         _nodes.filter(t => {
             var type = GetGroupProperty(graph.nodeLib[t], NodeProperties.NODEType);
-            if (type !== NodeTypes.Model && type !== NodeTypes.Function) {
-                dt[t] = true;
-            }
-            else {
+            dt[t] = true;
+            if (GroupImportanceOrder[type] < mostimportant) {
                 head = t;
+                mostimportant = GroupImportanceOrder[type];
             }
         });
+        delete dt[head];
         for (var i in dt) {
             dt[i] = head;
         }

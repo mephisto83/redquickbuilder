@@ -17,6 +17,8 @@ class ValidationActivityMenu extends Component {
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_VALIDATION_ITEM_NODE, {
                             parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
                             linkProperties: {
                                 properties: {
                                     ...UIA.LinkProperties.ValidationLinkItem
