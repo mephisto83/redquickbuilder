@@ -1,8 +1,9 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
+import NamespaceGenerator from './namespacegenerator';
 
 const CONTROLLER_CLASS_TEMPLATE = './app/templates/controller/controller.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
@@ -17,14 +18,17 @@ export default class ControllerGenerator {
         return res;
     }
     static Generate(options) {
-        var { state } = options;
+        var { state, key } = options;
+        let graphRoot = GetRootGraph(state);
+        let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+
         let controllers = NodesByType(state, NodeTypes.Controller);
 
         let _controllerTemplateClass = fs.readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf-8');
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
         let result = {};
-        controllers.map(controller => {
+        controllers.filter(t => t.id === key).map(controller => {
             let controllerTemplateClass = _controllerTemplateClass;
             let functions = '';
             let statics = '';
@@ -96,13 +100,34 @@ export default class ControllerGenerator {
                     functions
                 });
             });
-            result[GetNodeProp(controller, NodeProperties.CodeName)] = controllerTemplateClass;
+            result[controller.id] = {
+                id: controller.id,
+                name: GetNodeProp(controller, NodeProperties.CodeName),
+                template: NamespaceGenerator.Generate({
+                    template: controllerTemplateClass,
+                    usings: [...STANDARD_CONTROLLER_USING],
+                    namespace,
+                    space: NameSpace.Controllers
+                })
+            };
         })
 
         return result;
 
     }
 }
+const STANDARD_CONTROLLER_USING = [
+    'Newtonsoft.Json',
+    'Newtonsoft.Json.Linq',
+    'System',
+    'System.Collections',
+    'System.Collections.Generic',
+    'System.Linq',
+    'System.Net',
+    'System.Net.Http',
+    'System.Threading.Tasks',
+    'System.Web.Http'
+]
 const NL = `
                     `
 const jNL = `
