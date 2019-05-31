@@ -1,7 +1,7 @@
-public class {{model}}Change : StagedChanged
-{
-    public {{model}} Data { get; set; }
-    
-    {{constructors}}
-    
-}
+    public class {{model}}Change : StagedChanged
+    {
+        public {{model}} Data { get; set; }
+        
+        {{constructors}}
+        
+    }

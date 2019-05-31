@@ -71,7 +71,8 @@ export const GroupProperties = {
 export const NameSpace = {
     Model: '.Models',
     Extensions: '.Extensions',
-    Controllers: '.Controllers'
+    Controllers: '.Controllers',
+    Parameters: '.Parameters'
 }
 
 export const NodeProperties = {
@@ -128,6 +129,7 @@ export const NodeProperties = {
     Groups: 'groups',
     GroupParent: 'groupParent',
     CodeName: 'codeName',
+    AgentName: 'agentName',
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
     ClassConstructionInformation: 'ClassConstructionInformation'
@@ -335,6 +337,12 @@ export const LinkProperties = {
     }
 }
 
+export const Methods = {
+    Create: 'Create',
+    Get: 'Get',
+    Update: 'Update',
+    Delete: 'Delete'
+}
 export const ValidationRules = {
     CVV: "cvv",
     AlphaNumericLike: "alphanumericlike",

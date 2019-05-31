@@ -1,20 +1,13 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
-const EXTENSION_CLASS_TEMPLATE = './app/templates/extensions/extensions.tpl';
-const EXTENSION_PROPERTY_TEMPLATE = './app/templates/extensions/extension_properties.tpl';
-const EXTENSION_NEW_INSTANCE = './app/templates/extensions/extension_new_instance.tpl';
-const EXTENSION_NEW_PROPERTY = './app/templates/extensions/extension_new_instance_properties.tpl';
+const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = './app/templates/stream_process/stream_process_change_class_extention.tpl';
+const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = './app/templates/stream_process/stream_process_change_class_constructor.tpl';
 
-const EXTENSION_NEW_INSTANCE_LIST = './app/templates/extensions/extension_new_instance_list.tpl';
-const EXTENSION_NEW_INSTANCE_LIST_ADD = './app/templates/extensions/extension_new_instance_list_add.tpl';
-
-const EXTENSION_NEW_INSTANCE_DICTIONARY = './app/templates/extensions/extension_new_instance_dictionary.tpl';
-const EXTENSION_NEW_INSTANCE_DICTIONARY_ADD = './app/templates/extensions/extension_new_instance_dictionary_add.tpl';
 const PROPERTY_TABS = 6;
 export default class ChangeParameterGenerator {
     static Tabs(c) {
@@ -26,117 +19,49 @@ export default class ChangeParameterGenerator {
     }
     static Generate(options) {
         var { state, key } = options;
-        let extensions = NodesByType(state, NodeTypes.ExtensionType);
+        let models = NodesByType(state, NodeTypes.Model);
+        let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let _extensionClassTemplate = fs.readFileSync(EXTENSION_CLASS_TEMPLATE, 'utf-8');
-        let _extensionPropertyTemplate = fs.readFileSync(EXTENSION_PROPERTY_TEMPLATE, 'utf-8');
-        let _extensionNewInstance = fs.readFileSync(EXTENSION_NEW_INSTANCE, 'utf-8');
-        let _extensionNewProperty = fs.readFileSync(EXTENSION_NEW_PROPERTY, 'utf-8');
-        let _extensionNewInstanceList = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST, 'utf-8');
-        let _extensionNewInstanceListAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST_ADD, 'utf-8');
-        let _extensionNewInstanceDictionary = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY, 'utf-8');
-        let _extensionNewInstanceDictionaryAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY_ADD, 'utf-8');
+        let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
+        let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
         let result = {};
-        extensions.filter(x => x.id === key).map(extension => {
-            let extensionClassTemplate = _extensionClassTemplate;
+        models.filter(x => x.id === key).map(model => {
+            let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
             let properties = '';
             let statics = '';
-            let uiExtensionDefinition = GetNodeProp(extension, NodeProperties.UIExtensionDefinition);
-            if (uiExtensionDefinition) {
-                let modelName = GetNodeProp(extension, NodeProperties.CodeName);
-                let { config, definition } = uiExtensionDefinition;
-                if (definition) {
-                    definition = { ...definition, Value: 'string' };
-                    properties = Object.keys(definition).map(e => {
-                        var extensionPropertyTemplate = _extensionPropertyTemplate;
+            let constructors = [];
+            agents.map(agent => {
+                Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 
-                        extensionPropertyTemplate = bindTemplate(extensionPropertyTemplate, {
-                            name: modelName,
-                            property: e,
-                            type: definition[e]
-                        });
-                        return extensionPropertyTemplate;
-                    }).join('');
-                    if (config) {
-                        var instances = [];
-                        let instance = '';
-                        if (config.isEnumeration) {
-                            instances = config.list.map((item, item_index) => {
-                                item = { ...item, Value: (item_index + 1) }
-                                let temp;
-                                let props = Object.keys(item).map(key => {
-                                    let temp = _extensionNewProperty;
-                                    temp = bindTemplate(temp, {
-                                        property: key,
-                                        value: `"${item[key]}"`
-                                    });
-                                    return temp;
-                                }).join(`,${NL}`);
-                                temp = _extensionNewInstance;
-                                temp = bindTemplate(temp, {
-                                    properties: jNL + ChangeParameterGenerator.Tabs(PROPERTY_TABS) + props,
-                                    model: modelName
-                                });
-                                return temp;
-                            })
-                        }
-                        else {
-                            let temp;
-                            let props = Object.keys(config.dictionary).map(key => {
-                                let temp = _extensionNewProperty;
-                                let item = { ...config.dictionary };
-                                temp = bindTemplate(temp, {
-                                    property: key,
-                                    value: `"${item[key]}"`
-                                });
-                                return temp;
-                            }).join(`,${NL}`);
-                            temp = _extensionNewInstance;
-                            temp = bindTemplate(temp, {
-                                properties: jNL + ChangeParameterGenerator.Tabs(PROPERTY_TABS) + props,
-                                model: modelName
-                            });
-                            instance = temp;
-                            let temp_instance = _extensionNewInstanceDictionary;
-                            temp_instance = bindTemplate(temp_instance, {
-                                instance,
-                                model: modelName
-                            });
-                            instance = temp_instance;
-                        }
-                        instances = instances.map(inst => {
-                            let temp = _extensionNewInstanceListAdd;
+                    let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
 
-                            temp = bindTemplate(temp, {
-                                instance: inst
-                            })
-                            return temp;
-                        });
+                    streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
+                        model: GetNodeProp(model, NodeProperties.CodeName),
+                        
+                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                        method
+                    });
+                    constructors.push(streamProcessChangeClassConstructors);
 
-                        let templist = _extensionNewInstanceList;
-                        statics = bindTemplate(templist, {
-                            addings: instances.join(''),
-                            model: modelName
-                        }) + jNL + instance;
-                    }
-                }
-            }
-            extensionClassTemplate = bindTemplate(extensionClassTemplate, {
-                name: GetNodeProp(extension, NodeProperties.CodeName),
-                properties,
-                statics: statics
+                })
+            }).join(jNL);
+
+            streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
+                model: GetNodeProp(model, NodeProperties.CodeName),
+                constructors
             });
 
-            result[extension.id] = {
-                id: extension.id,
-                name: GetNodeProp(extension, NodeProperties.CodeName),
+            result[model.id] = {
+                id: model.id,
+                name: GetNodeProp(model, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
-                    template: extensionClassTemplate,
+                    template: streamProcessChangeClassExtension,
                     usings: [...STANDARD_CONTROLLER_USING],
                     namespace,
-                    space: NameSpace.Extensions
+                    space: NameSpace.Parameters
                 })
             };
         })
