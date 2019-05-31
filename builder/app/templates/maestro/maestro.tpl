@@ -1,11 +1,11 @@
-public class {{codeName}} : I{{codeName}}
-{
-    {{properties}}
-
-    public {{codeName}}({{injected_services}})
+    public class {{codeName}} : I{{codeName}}
     {
-        {{set_properties}}
-    }
+{{properties}}
 
-    {{functions}}
-}
+        public {{codeName}}({{injected_services}})
+        {
+            {{set_properties}}
+        }
+
+{{functions}}
+    }

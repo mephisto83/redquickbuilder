@@ -3,13 +3,13 @@
 
             var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
 
-            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent}}Permissions.CanCreate{{model}}({{agent}}, {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
 
                 var result = await StreamProcess.{{model}}(parameters);
 
-                return await arbiter{{model#upper}}.GetByOwnerId<{{model}}>(agent.Id);
+                return await arbiter{{model}}.GetByOwnerId<{{model}}>(agent.Id);
             }
             
             return null;

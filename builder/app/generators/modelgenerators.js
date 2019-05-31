@@ -1,18 +1,37 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules } from '../constants/nodetypes';
+import { GetNodeProp, NodeProperties, GetRootGraph } from '../actions/uiactions';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
+import NamespaceGenerator from './namespacegenerator';
 const MODEL_TEMPLATE = './app/templates/models/model.tpl';
-const NAME_SPACE_TEMPLATE = './app/templates/namespace.tpl';
 const MODEL_PROPERTY_TEMPLATE = './app/templates/models/model_property.tpl';
 const MODEL_ATTRIBUTE_TEMPLATE = './app/templates/models/model_attributes.tpl';
 export default class ModelGenerator {
+    static Generate(options) {
+        var { state, key } = options;
+        let graphRoot = GetRootGraph(state);
+        return {
+            [key]: ModelGenerator.GenerateModel({
+                graph: graphRoot,
+                nodeId: key,
+                state
+            })
+        };
+    }
     static GenerateModel(options) {
-        var { graph, nodeId } = options;
+        var { state, graph, nodeId } = options;
+        var key = nodeId;
         var usings = [];
         var templateSwapDictionary = {};
+        let graphRoot = GetRootGraph(state);
+        let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+
+
         var node = GraphMethods.GetNode(graph, nodeId);
+        if (!node) {
+            return null;
+        }
         templateSwapDictionary.model = GetNodeProp(node, NodeProperties.CodeName);
         var connectedProperties = GraphMethods.getNodesByLinkType(graph, {
             id: node.id,
@@ -128,10 +147,17 @@ export default class ModelGenerator {
         let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf-8');
         modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
-        return {
-            template: modelTemplate,
-            usings
+        var result = {
+            id: node.id,
+            name: GetNodeProp(node, NodeProperties.CodeName),
+            template: NamespaceGenerator.Generate({
+                template: modelTemplate,
+                usings,
+                namespace,
+                space: NameSpace.Model
+            })
         };
+        return result;
     }
     static tabs(c) {
         let res = '';

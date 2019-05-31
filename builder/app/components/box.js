@@ -16,12 +16,17 @@ export default class Box extends Component {
         return this.props.primary ? 'box-primary' : '';
     }
     render() {
+        var style = {};
+        if (this.props.maxheight) {
+            style.maxHeight = `${this.props.maxheight}px`;
+            style.overflowY = 'scroll';
+        }
         return (
             <div className={`box ${this.primary()}`}>
                 <div className="box-header with-border">
                     <h3 className="box-title">{this.title()}</h3>
                 </div>
-                <div className="box-body">
+                <div className="box-body" style={{ ...style }}>
                     {this.props.children}
                 </div>
                 <div className="box-footer">

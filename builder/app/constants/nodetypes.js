@@ -23,6 +23,12 @@ export const NodeTypes = {
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node'
 }
+export const GeneratedTypes = {
+    ChangeParameter: 'change-parameter'
+}
+export const GeneratedTypesMatch = {
+    [GeneratedTypes.ChangeParameter]: NodeTypes.Model
+}
 export const ColorStates = {
     Error: 'Error'
 }
@@ -133,7 +139,7 @@ export const NodePropertiesDirtyChain = {
         chainProp: NodeProperties.CodeName,
         chainFunc: (x) => {
             if (typeof x === 'string') {
-                return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890'.indexOf(y.toLowerCase()) !== -1).join('');
+                return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1).join('');
             }
             return x;
         }

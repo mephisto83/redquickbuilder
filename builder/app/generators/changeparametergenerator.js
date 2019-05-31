@@ -16,7 +16,7 @@ const EXTENSION_NEW_INSTANCE_LIST_ADD = './app/templates/extensions/extension_ne
 const EXTENSION_NEW_INSTANCE_DICTIONARY = './app/templates/extensions/extension_new_instance_dictionary.tpl';
 const EXTENSION_NEW_INSTANCE_DICTIONARY_ADD = './app/templates/extensions/extension_new_instance_dictionary_add.tpl';
 const PROPERTY_TABS = 6;
-export default class ExtensionGenerator {
+export default class ChangeParameterGenerator {
     static Tabs(c) {
         let res = '';
         for (var i = 0; i < c; i++) {
@@ -76,7 +76,7 @@ export default class ExtensionGenerator {
                                 }).join(`,${NL}`);
                                 temp = _extensionNewInstance;
                                 temp = bindTemplate(temp, {
-                                    properties: jNL + ExtensionGenerator.Tabs(PROPERTY_TABS) + props,
+                                    properties: jNL + ChangeParameterGenerator.Tabs(PROPERTY_TABS) + props,
                                     model: modelName
                                 });
                                 return temp;
@@ -95,7 +95,7 @@ export default class ExtensionGenerator {
                             }).join(`,${NL}`);
                             temp = _extensionNewInstance;
                             temp = bindTemplate(temp, {
-                                properties: jNL + ExtensionGenerator.Tabs(PROPERTY_TABS) + props,
+                                properties: jNL + ChangeParameterGenerator.Tabs(PROPERTY_TABS) + props,
                                 model: modelName
                             });
                             instance = temp;

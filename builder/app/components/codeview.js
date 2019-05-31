@@ -9,7 +9,7 @@ import TextBox from './textinput';
 import TopViewer from './topviewer';
 import Box from './box';
 import SelectInput from './selectinput';
-import { NodeTypes, NodeProperties, NameSpace } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NameSpace, GeneratedTypes, GeneratedTypesMatch } from '../constants/nodetypes';
 import ModelGenerator from '../generators/modelgenerators';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import ExtensionsGenerator from '../generators/extensiongenerator';
@@ -48,31 +48,44 @@ class CodeView extends Component {
         if (state && graphRoot) {
             var viewTab = UIA.Visual(state, CODE_VIEW_TAB);
             var classKey = UIA.Visual(state, CLASS_KEY);
-            var temp = Generator.generate({
-                type: viewTab,
-                key: classKey,
-                state
-            });
-            if (temp && temp[classKey]) {
-                codeString = temp[classKey].template;
+            if (classKey) {
+                var temp = Generator.generate({
+                    type: viewTab,
+                    key: classKey,
+                    state
+                });
+                if (temp && temp[classKey]) {
+                    codeString = temp[classKey].template;
+                }
             }
         }
 
 
         var code_types = [
             NodeTypes.Controller,
-            // NodeTypes.Model,
-            // NodeTypes.ExtensionTypeList,
-            // NodeTypes.Maestro
+            NodeTypes.Model,
+            NodeTypes.ExtensionType,
+            NodeTypes.Maestro,
+            GeneratedTypes.ChangeParameter
         ];
         let modelType = UIA.Visual(state, CODE_VIEW_TAB);
-        let models = modelType ? UIA.NodesByType(state, modelType, { useRoot: true, excludeRefs: true }).map(t => {
-            return {
-                title: UIA.GetNodeTitle(t),
-                value: t.id
-            }
-        }) : [];
-
+        let models = [];
+        if (modelType && Object.values(NodeTypes).indexOf(modelType) !== -1) {
+            models = UIA.NodesByType(state, modelType, { useRoot: true, excludeRefs: true }).map(t => {
+                return {
+                    title: UIA.GetNodeTitle(t),
+                    value: t.id
+                }
+            });
+        }
+        else if (modelType && Object.values(GeneratedTypes).indexOf(modelType) !== -1) {
+            models = UIA.NodesByType(state, GeneratedTypesMatch[modelType], { useRoot: true, excludeRefs: true }).map(t => {
+                return {
+                    title: UIA.GetNodeTitle(t),
+                    value: t.id
+                }
+            });
+        }
         return (
             <TopViewer active={active}>
                 <section className="content">
@@ -109,7 +122,7 @@ class CodeView extends Component {
                             </TabContainer>
                             <TabContent>
                                 <TabPane active={UIA.Visual(state, CODE_VIEW_TAB)}>
-                                    <Box title={Titles.Code} primary={true}>
+                                    <Box title={Titles.Code} primary={true} maxheight={700}>
                                         {codeString ? <SyntaxHighlighter language='csharp' style={docco}>{codeString}</SyntaxHighlighter> : null}
                                     </Box>
                                 </TabPane>
