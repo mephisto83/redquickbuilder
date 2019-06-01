@@ -32,6 +32,8 @@ class PermissionActivityMenu extends Component {
         });
         var graph = UIA.GetCurrentGraph(state);
         var targetNodeId = graph && currentNode && currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionTarget] : '';
+
+        var requestorNodeId = graph && currentNode && currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionRequester] : '';
         var propertyNodes = null;
         if (targetNodeId) {
             propertyNodes = getNodesByLinkType(graph, { id: targetNodeId, direction: SOURCE, type: LinkType.PropertyLink });
@@ -42,7 +44,16 @@ class PermissionActivityMenu extends Component {
                 }
             })
         }
-
+        var requestorPropertyNodes = null;
+        if (requestorNodeId) {
+            requestorPropertyNodes = getNodesByLinkType(graph, { id: requestorNodeId, direction: SOURCE, type: LinkType.PropertyLink });
+            requestorPropertyNodes = requestorPropertyNodes.map(node => {
+                return {
+                    value: node.id,
+                    title: UIA.GetNodeTitle(node)
+                }
+            })
+        }
         return (
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.PermissionAttributes} />
@@ -97,6 +108,32 @@ class PermissionActivityMenu extends Component {
                             });
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionRequester] : ''} />) : null
+                }
+                {
+                    requestorPropertyNodes && requestorPropertyNodes.length ? (<SelectInput
+                        label={Titles.PermissionDependsOnProperties}
+                        options={requestorPropertyNodes}
+                        onChange={(value) => {
+
+                            this.props.graphOperation(UIA.NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE, {
+                                parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                                links: [{
+                                    target: value,
+                                    linkProperties: {
+                                        properties: { ...UIA.LinkProperties.ExistLink }
+                                    }
+                                }],
+                                properties: {
+                                    [NodeProperties.UIText]: UIA.GetNodeProp(graph.nodeLib[value], NodeProperties.UIText)
+                                },
+                                groupProperties: {
+                                },
+                                linkProperties: {
+                                    properties: { ...UIA.LinkProperties.PermissionPropertyDependencyLink }
+                                }
+                            });
+                        }}
+                        value={''} />) : null
                 }
                 {
                     currentNode ? (<SelectInput

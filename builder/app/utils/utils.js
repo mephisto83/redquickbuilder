@@ -56,6 +56,28 @@ String.prototype.padding = function (n, c) {
             Object.defineProperty(array, 'relativeCompliment', extrasection_relativeCompliment);
         }
     }
+
+    if (!array.intersection) {
+        Object.defineProperty(array, 'intersection', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (othercollection, func) {
+                var collection = this;
+                var result = [];
+                func = func || function (x, y) { return x === y; };
+                for (var i = collection.length; i--;/**/) {
+                    for (var j = othercollection.length; j--;/**/) {
+                        if ((func(othercollection[j], collection[i]))) {
+                            result.push(collection[i]);
+                            break;
+                        }
+                    }
+                }
+                return result;
+            }
+        });
+    }
     if (!array.unique) {
         Object.defineProperty(array, 'unique', {
             enumerable: false,

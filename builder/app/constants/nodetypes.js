@@ -85,10 +85,12 @@ export const NameSpace = {
 
 export const NodeProperties = {
     Enumeration: 'Enumeration',
-    AllowedEnumValues:'AllowedEnumerationValue',
+    AllowedExtensionValues: 'AllowedExtensionValues',
+    AllowedEnumValues: 'AllowedEnumerationValue',
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
     Collapsed: 'collapsed',
+    UseExtension: 'usextension',
     CodeUser: 'codeUser',
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',
