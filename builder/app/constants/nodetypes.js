@@ -202,8 +202,8 @@ export function ConstantsDeclaration(options) {
 }
 
 export function CreateStringList(options) {
-    var { name, list } = options;
-    return `public IList<string> ${name} = new List<string> {
+    var { name, list, instance } = options;
+    return `${instance ? '' : 'public'} IList<string> ${name} = new List<string> {
         ${list}
     }`
 }
@@ -236,7 +236,8 @@ export const LinkType = {
     MaestroLink: 'maestro-link',
     AttributeLink: 'attribute-link',
     Exist: 'exist', //A node that points with this link type, requires that the node exists, if it doesn't the link and the other node should dissapear.
-    PermissionPropertyDependency: 'permission-property-dependency' //There is a link between a permision and a property.
+    PermissionPropertyDependency: 'permission-property-dependency', //There is a link between a permision and a property.
+    PermissionDependencyProperty: 'permission-dependency-property' //There is a link bewteen a property and a dependency
 }
 export const LinkStyles = {
     [LinkType.FunctionLink]: {
@@ -319,6 +320,9 @@ export const LinkProperties = {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
     },
+    PermissionDependencyPropertyLink: {
+        type: LinkType.PermissionDependencyProperty
+    },
     PermissionPropertyDependencyLink: {
         type: LinkType.PermissionPropertyDependency
     },
@@ -326,7 +330,7 @@ export const LinkProperties = {
         type: LinkType.AttributeLink
     },
     ExistLink: {
-        type: LinkType.Exist
+        exist: LinkType.Exist
     },
     ModelTypeLink: {
         type: LinkType.ModelTypeLink

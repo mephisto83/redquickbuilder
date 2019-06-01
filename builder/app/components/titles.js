@@ -19,6 +19,7 @@ export const AddProperty = 'Add Property';
 export const UICheckBox = 'UI Checkbox';
 export const PermissionsDependencyAttribute = 'Permission Dependency Attribute';
 export const GeneratedConstants = 'Generated Constants';
+export const KeyField = 'Key fields, are used as constants through out the app.'
 export const GeneratedMethodsConstants = 'Generated Methods Constants';
 export const TargetModel = 'Target Model';
 export const UseEnumeration = 'Use Enumeration';

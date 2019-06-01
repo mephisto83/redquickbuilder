@@ -24,6 +24,7 @@ export default class Generator {
             case GeneratedTypes.ChangeParameter:
                 return ChangeParameterGenerator.Generate({ state, key });
             case GeneratedTypes.Constants:
+                //Add enumerations here.
                 return ConstantsGenerator.Generate({
                     values: [{
                         name: GeneratedConstants.Methods,

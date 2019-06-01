@@ -120,7 +120,10 @@ class PermissionActivityMenu extends Component {
                                 links: [{
                                     target: value,
                                     linkProperties: {
-                                        properties: { ...UIA.LinkProperties.ExistLink }
+                                        properties: {
+                                            ...UIA.LinkProperties.ExistLink,
+                                            ...UIA.LinkProperties.PermissionDependencyPropertyLink
+                                        }
                                     }
                                 }],
                                 properties: {
@@ -170,7 +173,10 @@ class PermissionActivityMenu extends Component {
                                 links: [{
                                     target: value,
                                     linkProperties: {
-                                        properties: { ...UIA.LinkProperties.ExistLink }
+                                        properties: {
+                                            ...UIA.LinkProperties.ExistLink,
+                                            ...UIA.LinkProperties.PermissionDependencyPropertyLink
+                                        }
                                     }
                                 }],
                                 properties: {

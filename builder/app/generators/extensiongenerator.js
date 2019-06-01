@@ -25,6 +25,18 @@ export default class ExtensionGenerator {
         }
         return res;
     }
+    static GetExtensionNodeValues(extensionNode) {
+        var def = GetNodeProp(extensionNode, NodeProperties.UIExtensionDefinition);
+        if (def && def.config) {
+            if (def.config.isEnumeration) {
+                var extensionValues = def.config.list.map(t => {
+                    return def.config.keyField ? t[def.config.keyField] : t[Object.keys(t)[0]];
+                });
+                return extensionValues
+            }
+        }
+        throw new Error("unhandled - getting extensions nodes not as an enumeration")
+    }
     static CreateListInstanceTemplate(options) {
         let { node, name } = options;
         let _newTemplateList = fs.readFileSync(EXTENSION_NEW_TEMPLATE_LIST, 'utf-8');

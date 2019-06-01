@@ -1165,7 +1165,7 @@ export function matchObject(obj1, obj2) {
 }
 export function getNodesByLinkType(graph, options) {
     if (options) {
-        var { id, direction, type } = options;
+        var { id, direction, type, exist } = options;
         if (graph && graph.nodeConnections && id) {
             var nodeLinks = graph.nodeConnections[id];
             if (nodeLinks) {
@@ -1178,7 +1178,9 @@ export function getNodesByLinkType(graph, options) {
                             console.warn('Missing value in linkLib');
                             return null;
                         }
-
+                        if (!exist && graph.linkLib[_id].properties && graph.linkLib[_id].properties.exist) {
+                            return graph.nodeLib[target];
+                        }
                         if (!type || graph.linkLib[_id].properties &&
                             graph.linkLib[_id].properties.type === type) {
                             return graph.nodeLib[target];

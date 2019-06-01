@@ -201,16 +201,29 @@ class ExtensionDefinitionMenu extends Component {
                 ) : null}
                 {def && UIA.VisualEq(state, tab_key, Titles.ExtensionDefinition) ? <EnumeratedTable columns={[{ title: Titles.Name, value: 'name' }]}
                     columnButtons={[(x) => {
-                        return <div className="pull-right"><button onClick={() => {
-                            delete def.definition[x.name];
-                            def.definition = { ...def.definition };
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.UIExtensionDefinition,
-                                id: currentNode.id,
-                                value: { ...def }
-                            });
+                        return <div className="pull-right">
+                            <div class="btn-group">
+                                <button title={Titles.KeyField} onClick={() => {
+                                    def.config = { ...def.config, keyField: x.name };
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        prop: UIA.NodeProperties.UIExtensionDefinition,
+                                        id: currentNode.id,
+                                        value: { ...def }
+                                    });
 
-                        }} className="btn btn-block btn-default">x</button></div>
+                                }} className={`btn   ${x.name === def.config.keyField ? 'btn-success' : 'btn-default'}`}><i className={`fa fa-anchor`} /></button>
+                                <button onClick={() => {
+                                    delete def.definition[x.name];
+                                    def.definition = { ...def.definition };
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        prop: UIA.NodeProperties.UIExtensionDefinition,
+                                        id: currentNode.id,
+                                        value: { ...def }
+                                    });
+
+                                }} className="btn btn-default">x</button>
+                            </div>
+                        </div>
                     }]}
                     data={Object.keys(def.definition).map(key => {
                         return {

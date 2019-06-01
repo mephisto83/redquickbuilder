@@ -133,7 +133,7 @@ class PermissionDependencyActivityMenu extends Component {
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIExtension] : ''} />) : null
                 }
                 {
-                    currentNode && currentNode.properties[UIA.NodeProperties.UseEnUseUIExtensionsumeration] ? (<SelectInput
+                    currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? (<SelectInput
                         label={Titles.Enumeration}
                         options={enumeration_nodes}
                         onChange={(value) => {
