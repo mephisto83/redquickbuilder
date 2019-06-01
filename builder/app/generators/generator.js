@@ -6,6 +6,7 @@ import ExtensionGenerator from "./extensiongenerator";
 import MaestroGenerator from "./maestrogenerator";
 import ChangeParameterGenerator from "./changeparametergenerator";
 import ConstantsGenerator from "./constantsgenerator";
+import PermissionGenerator from "./permissiongenerator";
 
 export default class Generator {
     static generate(options) {
@@ -27,10 +28,12 @@ export default class Generator {
                     values: [{
                         name: GeneratedConstants.Methods,
                         model: Methods
-                    }], 
-                    state, 
+                    }],
+                    state,
                     key
                 });
+            case GeneratedTypes.Permissions:
+                return PermissionGenerator.Generate({ state, key });
         }
     }
 }

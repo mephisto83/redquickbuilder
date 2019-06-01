@@ -104,7 +104,7 @@ class PermissionActivityMenu extends Component {
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 target: value,
                                 source: id,
-                                properties: { ...UIA.LinkProperties.AppliedPermissionLink }
+                                properties: { ...UIA.LinkProperties.RequestorPermissionLink }
                             });
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionRequester] : ''} />) : null

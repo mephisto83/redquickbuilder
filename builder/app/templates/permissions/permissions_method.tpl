@@ -1,13 +1,18 @@
-public Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}}) {
-    if(value == null) {
-        return false;
-    }
-    if(agent == null){
-        return false;
-    }
+        public Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}}) {
+            if(value == null) {
+                return false;
+            }
+            if(agent == null){
+                return false;
+            }
 
-    var allowedCreateState = AllowedCreateStateValues.Contains(value.State);
-    if(allowedCreateState && ) {
+            // var allowed{{extension}} = {{extension}}.List();
 
-    }
-}
+            var allowedCreateState = allowed{{extension}}.Any(x => x === value.State);
+            var allowedCreateState = AllowedCreateStateValues.Any(x => x.Value === value.State);
+            {{!-- var allowedCreateState = AllowedCreateStateValues.Any(x => x === value.State);
+            var allowedCreateState = AllowedCreateStateValues.Any(x => x === value.State); --}}
+            if(allowedCreateState && ) {
+
+            }
+        }

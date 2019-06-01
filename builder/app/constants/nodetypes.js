@@ -27,7 +27,8 @@ export const NodeTypes = {
 }
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
-    Constants: 'constants'
+    Constants: 'constants',
+    Permissions: 'permissions-generated'
 }
 export const GeneratedConstants = {
     Methods: 'Methods'
@@ -176,7 +177,36 @@ export const NodePropertiesDirtyChain = {
         }
     }]
 }
+const letters = 'abcdefghijklmnopqrstuvwxyz';
+const alphanumerics = letters + '0123456789';
+const allowedchars = alphanumerics + ' ';
+export function MakeConstant(val) {
+    if (val) {
+        if (!isNaN(val)) {
+            return `"${val}"`;
+        }
+        val = `${val}`;
+        val = val.split('').filter(x => allowedchars.indexOf(x.toLowerCase()) !== -1).join('');
+        if (letters.indexOf(val[0].toLowerCase()) === -1) {
+            val = '_' + val;
+        }
+        return val.split(' ').join('_').toUpperCase();
+    }
+    throw 'needs to have value';
+}
 
+export function ConstantsDeclaration(options) {
+    var { name, value } = options;
+
+    return `public const string ${name} = ${value};`;
+}
+
+export function CreateStringList(options) {
+    var { name, list } = options;
+    return `public IList<string> ${name} = new List<string> {
+        ${list}
+    }`
+}
 
 export const LinkType = {
     Choice: 'choice',
@@ -191,6 +221,7 @@ export const LinkType = {
     Enumeration: 'enumeration',
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
+    RequestorPermissionLink: 'request-permission-link',//the agent/node that is requesting permissions 
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',
     FunctionLink: 'function-link',
@@ -320,6 +351,9 @@ export const LinkProperties = {
     },
     AppliedPermissionLink: {
         type: LinkType.AppliedPermissionLink
+    },
+    RequestorPermissionLink: {
+        type: LinkType.RequestorPermissionLink
     },
     ValdationLink: {
         type: LinkType.Validation
