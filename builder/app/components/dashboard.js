@@ -54,8 +54,10 @@ import MaestroActivityMenu from './maestroactivitymenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
+import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu';
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
+import EnumerationActivityMenu from './enumerationactivitymenu'
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes } from '../constants/nodetypes';
 import CodeView from './codeview';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -274,6 +276,8 @@ class Dashboard extends Component {
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
                                 <ExtensionDefinitionMenu />
+                                <PermissionDependencyActivityMenu />
+                                <EnumerationActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
                                 <ReferenceActivityMenu />

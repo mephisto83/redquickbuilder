@@ -8,6 +8,7 @@ export const NodeTypes = {
     ChoiceList: 'choice-list',
     Permission: 'permission',
     PermissionDependency: 'permission-dependency',
+    Enumeration: 'enumeration', //Basically a list of const string.
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
@@ -83,6 +84,9 @@ export const NameSpace = {
 }
 
 export const NodeProperties = {
+    Enumeration: 'Enumeration',
+    AllowedEnumValues:'AllowedEnumerationValue',
+    UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
     Collapsed: 'collapsed',
     CodeUser: 'codeUser',
@@ -182,6 +186,7 @@ export const LinkType = {
     DependsOn: 'depends-on',
     ExtensionList: 'extension-list',
     Extension: 'extension',
+    Enumeration: 'enumeration',
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
     ExtensionDependencyLink: 'extension-dependency-link',
@@ -274,6 +279,9 @@ export const LinkPropertyKeys = {
 }
 
 export const LinkProperties = {
+    EnumerationLink: {
+        type: LinkType.Enumeration
+    },
     FunctionVariable: {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
