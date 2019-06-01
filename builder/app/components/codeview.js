@@ -9,7 +9,7 @@ import TextBox from './textinput';
 import TopViewer from './topviewer';
 import Box from './box';
 import SelectInput from './selectinput';
-import { NodeTypes, NodeProperties, NameSpace, GeneratedTypes, GeneratedTypesMatch } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NameSpace, GeneratedTypes, GeneratedTypesMatch, GeneratedConstants } from '../constants/nodetypes';
 import ModelGenerator from '../generators/modelgenerators';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import ExtensionsGenerator from '../generators/extensiongenerator';
@@ -66,7 +66,7 @@ class CodeView extends Component {
             NodeTypes.Model,
             NodeTypes.ExtensionType,
             NodeTypes.Maestro,
-            GeneratedTypes.ChangeParameter
+            ...Object.values(GeneratedTypes)
         ];
         let modelType = UIA.Visual(state, CODE_VIEW_TAB);
         let models = [];
@@ -77,6 +77,9 @@ class CodeView extends Component {
                     value: t.id
                 }
             });
+        }
+        else if (modelType === GeneratedTypes.Constants) {
+            models = [{ title: Titles.GeneratedMethodsConstants, value: GeneratedConstants.Methods }]
         }
         else if (modelType && Object.values(GeneratedTypes).indexOf(modelType) !== -1) {
             models = UIA.NodesByType(state, GeneratedTypesMatch[modelType], { useRoot: true, excludeRefs: true }).map(t => {

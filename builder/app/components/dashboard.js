@@ -231,7 +231,7 @@ class Dashboard extends Component {
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
                                         }} />
-                                    <SelectInput
+                                    {NotSelectableNodeTypes[currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null] ? null : (<SelectInput
                                         disabled={!UIA.CanChangeType(currentNode)}
                                         label={Titles.NodeType}
                                         options={Object.keys(UIA.NodeTypes).filter(x => !NotSelectableNodeTypes[UIA.NodeTypes[x]]).sort((a, b) => a.localeCompare(b)).map(x => {
@@ -243,7 +243,7 @@ class Dashboard extends Component {
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: UIA.NodeProperties.NODEType, id: currentNode.id, value })
                                         }}
-                                        value={currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null} />
+                                        value={currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null} />)}
                                     <CheckBox
                                         label={Titles.Collapsed}
                                         value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}

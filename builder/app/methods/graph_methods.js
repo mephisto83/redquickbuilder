@@ -257,6 +257,8 @@ export function defaultExtensionDefinitionType() {
 }
 export function removeNode(graph, options = {}) {
     let { id } = options;
+    let existNodes = getNodesByLinkType(graph, { id, direction: TARGET, type: LinkType.Exist });
+
     //links
     graph = clearLinks(graph, options);
 
@@ -274,7 +276,11 @@ export function removeNode(graph, options = {}) {
     delete graph.nodeLib[id];
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = [...graph.nodes.filter(x => x !== id)];
-
+    if (existNodes) {
+        existNodes.map(en => {
+            graph = removeNode(graph, { id: en.id });
+        })
+    }
     return graph;
 }
 function isEmpty(obj) {
@@ -407,8 +413,17 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
     if (parent) {
         graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
     }
-
+    if (options.links) {
+        options.links.map(link => {
+            graph = newLink(graph, { source: node.id, target: link.target, properties: link.linkProperties ? link.linkProperties.properties : null });
+        })
+    }
     graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
+    if (options.properties) {
+        for (var p in options.properties) {
+            graph = updateNodeProperty(graph, { id: node.id, prop: p, value: options.properties[p] });
+        }
+    }
     if (groupProperties) {
         graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
     }
@@ -1499,6 +1514,7 @@ export const GroupImportanceOrder = {
     [NodeTypes.ValidationList]: 5,
     [NodeTypes.OptionList]: 6,
     [NodeTypes.Parameter]: 4,
+    [NodeTypes.Permission]: 4,
     [NodeTypes.Attribute]: 8,
     [NodeTypes.ValidationList]: 10,
     [NodeTypes.ValidationListItem]: 12

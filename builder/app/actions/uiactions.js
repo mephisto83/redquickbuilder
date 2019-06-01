@@ -285,6 +285,7 @@ export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
 export const NEW_OPTION_ITEM_NODE = 'NEW_OPTION_ITEM_NODE';
 export const NEW_OPTION_NODE = 'NEW_OPTION_NODE';
 export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
+export const NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE = 'NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE';
 export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
 export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
 export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
@@ -351,6 +352,10 @@ export function graphOperation(operation, options) {
                     break;
                 case NEW_VALIDATION_TYPE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.PermissionDependency);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
                 case NEW_CHOICE_TYPE:

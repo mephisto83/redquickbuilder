@@ -39,9 +39,10 @@ export default class ChangeParameterGenerator {
 
                     streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
                         model: GetNodeProp(model, NodeProperties.CodeName),
-                        
+                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
                         agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                         agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                        change_type: `Methods.${method}`,
                         method
                     });
                     constructors.push(streamProcessChangeClassConstructors);
@@ -59,7 +60,7 @@ export default class ChangeParameterGenerator {
                 name: GetNodeProp(model, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
-                    usings: [...STANDARD_CONTROLLER_USING],
+                    usings: [...STANDARD_CONTROLLER_USING, `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.Parameters
                 })

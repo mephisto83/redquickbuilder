@@ -7,6 +7,7 @@ export const NodeTypes = {
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
     Permission: 'permission',
+    PermissionDependency: 'permission-dependency',
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
@@ -24,7 +25,11 @@ export const NodeTypes = {
     ClassNode: 'class-node'
 }
 export const GeneratedTypes = {
-    ChangeParameter: 'change-parameter'
+    ChangeParameter: 'change-parameter',
+    Constants: 'constants'
+}
+export const GeneratedConstants = {
+    Methods: 'Methods'
 }
 export const GeneratedTypesMatch = {
     [GeneratedTypes.ChangeParameter]: NodeTypes.Model
@@ -33,7 +38,8 @@ export const ColorStates = {
     Error: 'Error'
 }
 export const NotSelectableNodeTypes = {
-    [NodeTypes.ReferenceNode]: true
+    [NodeTypes.ReferenceNode]: true,
+    [NodeTypes.PermissionDependency]: true
 }
 export const NodeTypeColors = {
     [ColorStates.Error]: '#FF0000',
@@ -72,6 +78,7 @@ export const NameSpace = {
     Model: '.Models',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
+    Constants: '.Constants',
     Parameters: '.Parameters'
 }
 
@@ -96,6 +103,8 @@ export const NodeProperties = {
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',
     UIChoiceNode: 'uiChoiceNode', //A node that the "parameter" node points to.
+    PermissionRequester: 'permissions-requester',// The agent that is requesting permission to do something
+    PermissionTarget: 'permissions-target',
     // Property has a dependent property
     UIDependsOn: 'uiDependsOn',
     UseUIDependsOn: 'UseuiDependsOn',
@@ -129,7 +138,8 @@ export const NodeProperties = {
     Groups: 'groups',
     GroupParent: 'groupParent',
     CodeName: 'codeName',
-    AgentName: 'agentName',
+    ValueName: 'valueName',//The name of the instance variable to be used 
+    AgentName: 'agentName',//The name of the instance variable to be used 
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
     ClassConstructionInformation: 'ClassConstructionInformation'
@@ -186,7 +196,9 @@ export const LinkType = {
     ModelTypeLink: 'model-type-link',
     UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
     MaestroLink: 'maestro-link',
-    AttributeLink: 'attribute-link'
+    AttributeLink: 'attribute-link',
+    Exist: 'exist', //A node that points with this link type, requires that the node exists, if it doesn't the link and the other node should dissapear.
+    PermissionPropertyDependency: 'permission-property-dependency' //There is a link between a permision and a property.
 }
 export const LinkStyles = {
     [LinkType.FunctionLink]: {
@@ -266,8 +278,14 @@ export const LinkProperties = {
         type: LinkType.FunctionVariable,
         [LinkPropertyKeys.FUNCTION_ID]: null
     },
+    PermissionPropertyDependencyLink: {
+        type: LinkType.PermissionPropertyDependency
+    },
     AttributeLink: {
         type: LinkType.AttributeLink
+    },
+    ExistLink: {
+        type: LinkType.Exist
     },
     ModelTypeLink: {
         type: LinkType.ModelTypeLink
