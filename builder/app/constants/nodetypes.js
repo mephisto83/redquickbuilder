@@ -81,7 +81,9 @@ export const NameSpace = {
     Extensions: '.Extensions',
     Controllers: '.Controllers',
     Constants: '.Constants',
-    Parameters: '.Parameters'
+    Permissions: '.Permissions',
+    Parameters: '.Parameters',
+    Interface: '.Interface'
 }
 
 export const NodeProperties = {
@@ -406,6 +408,7 @@ export const LinkProperties = {
 export const Methods = {
     Create: 'Create',
     Get: 'Get',
+    GetAll: 'GetAll',
     Update: 'Update',
     Delete: 'Delete'
 }

@@ -9,7 +9,7 @@ import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import { getNodesLinkedTo, getNodesByLinkType, SOURCE } from '../methods/graph_methods';
-import { NodeTypes, LinkType, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, LinkType, NodeProperties, Methods } from '../constants/nodetypes';
 
 class PermissionActivityMenu extends Component {
     render() {
@@ -17,13 +17,7 @@ class PermissionActivityMenu extends Component {
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Permission);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
-        var permissions = currentNode ? currentNode.properties[UIA.NodeProperties.UIPermissions] || {
-            create: false,
-            get: false,
-            update: false,
-            delete: false,
-            getall: false,
-        } : null;
+        var permissions = currentNode ? { ...Methods, ...(currentNode.properties[UIA.NodeProperties.UIPermissions] || {}) } : null;
         var model_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => {
             return {
                 value: node.id,
@@ -79,7 +73,9 @@ class PermissionActivityMenu extends Component {
                                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                     prop: UIA.NodeProperties.UIPermissions,
                                     id: currentNode.id,
-                                    value: { ...permissions }
+                                    value: {
+                                        ...permissions
+                                    }
                                 });
                             }} />);
                     }))}</FormControl>) : null

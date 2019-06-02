@@ -11,6 +11,7 @@ const PERMISSIONS_CASE_EXTENSION = './app/templates/permissions/permissions_case
 const PERMISSIONS_CASE_ENUMERATION = './app/templates/permissions/permissions_case_enumeration.tpl';
 const PERMISSIONS_METHODS = './app/templates/permissions/permissions_method.tpl';
 const PERMISSIONS_IMPL = './app/templates/permissions/permissions_impl.tpl';
+const PERMISSIONS_INTERFACE_METHODS = './app/templates/permissions/permissions_interface_methods.tpl';
 
 const PROPERTY_TABS = 6;
 export default class PermissionGenerator {
@@ -28,29 +29,26 @@ export default class PermissionGenerator {
     static createInstanceEnumerationListName(dNode, enu, method, type = 'Enums') {
         return `list${type}${GetNodeProp(dNode, NodeProperties.CodeName)}${GetNodeProp(enu, NodeProperties.CodeName)}${method}`
     }
-    static createEnumerationInstanceList(dNode, enumerationNode, method) {
-        let name = PermissionGenerator.createInstanceEnumerationListName(dNode, enumerationNode, method);
+    static createEnumerationInstanceList(dpNode, enumerationNode, method) {
+        let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
         var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedEnumValues) || [];
         let enumerationName = GetNodeProp(enumerationNode, NodeProperties.CodeName);
         let constants_allowed = ext_allowed.map(ea => {
             return `${enumerationName}.${MakeConstant(ea)}`
         })
-        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(4)).join('')} }`
+        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL}};${jNL}`
     }
     static createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
         let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extensionNode, method, 'Extensions');
         var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedExtensionValues) || [];
         let extensionName = GetNodeProp(extensionNode, NodeProperties.CodeName);
-        // let listTemplate = ExtensionGenerator.CreateListInstanceTemplate({
-        //     node: extensionNode,
-        //     name
-        // });
-        4
+
+
         let constants_allowed = ext_allowed.map(ea => {
             return `${extensionName}.${MakeConstant(ea)}`
         });
 
-        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(4)).join('')} }`
+        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL}};${jNL}`
 
     }
     static GetExtensionNodeValues(graph, permission, method, agent, model) {
@@ -74,46 +72,54 @@ export default class PermissionGenerator {
             let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
             let useExtension = GetNodeProp(dpNode, NodeProperties.UseExtension);
 
-            debugger;
             if (useEnumeration) {
                 let permissionCaseEnumerationTemplate = fs.readFileSync(PERMISSIONS_CASE_ENUMERATION, 'utf-8');
                 let enumInstance = PermissionGenerator.createEnumerationInstanceList(dpNode, enumerationNode, method);
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
-                let temp = bindTemplate(permissionCaseEnumerationTemplate, {
+                var tempBindingValues = {
                     method,
                     value: value_string,
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
-                    extension_propery_key: GetNodeProp(propertyNodesForExtensions[0], NodeProperties.CodeName),
-                    extension_value_property: 'Value',
                     'allowed-values-list': name,
+                    extension: GetNodeProp(extentionNode, NodeProperties.CodeName),
                     instance_list: enumInstance
-                });
+                };
+                let temp = bindTemplate(permissionCaseEnumerationTemplate, tempBindingValues);
 
-                listOfCases.push(temp);
+                listOfCases.push({
+                    variable: `can${tempBindingValues.method}${tempBindingValues.model}${tempBindingValues.casename}`,
+                    template: temp
+                });
 
             }
 
             if (useExtension) {
+                let definition = GetNodeProp(extentionNode, NodeProperties.UIExtensionDefinition);
                 let permissionCaseExtensionTemplate = fs.readFileSync(PERMISSIONS_CASE_EXTENSION, 'utf-8');
                 let extensionInstance = PermissionGenerator.createExtensionInstanceList(dpNode, extentionNode, method);
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
-                let temp = bindTemplate(permissionCaseExtensionTemplate, {
+                let tempBindingValues = {
                     method,
                     value: value_string,
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
-                    extension_propery_key: GetNodeProp(extentionNode, NodeProperties.CodeName),
+                    extension_propery_key: definition && definition.config ? definition.config.keyField : null,
                     extension_value_property: 'Value',
                     'allowed-values-list': name,
+                    extension: GetNodeProp(extentionNode, NodeProperties.CodeName),
                     instance_list: extensionInstance
-                });
+                };
+                let temp = bindTemplate(permissionCaseExtensionTemplate, tempBindingValues);
 
-                listOfCases.push(temp);
+                listOfCases.push({
+                    variable: `can${tempBindingValues.method}${tempBindingValues.model}${tempBindingValues.casename}`,
+                    template: temp
+                });
             }
-          
+
             if (false)
                 if (extensionNode) {
                     var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedExtensionValues) || [];
@@ -166,22 +172,21 @@ export default class PermissionGenerator {
                         }
                     }
                 }
-        })
+        });
+
+        return listOfCases;
     }
     static GenerateCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
 
-        // dependingPermissionNodes.map(dpNode => {
-        //     if (GetNodeProp(dpNode, NodeProperties.UseExtension)) {
-        //         var extensionNodeId = dpNode && dpNode.properties ? dpNode.properties[NodeProperties.UIExtension] : '';
-        //         if (extensionNodeId) {
-        //             var extensionNode = GraphMethods.GetNode(graph, extensionNodeId);
-        //         }
-        //     }
-        // })
+        let result = {};
         for (var method in Methods) {
-            PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
+            var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
+            let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
+
+            result[method] = cases;
         }
+        return result;
     }
     static Generate(options) {
         var { state, key } = options;
@@ -194,54 +199,86 @@ export default class PermissionGenerator {
 
         let _permissionInterface = fs.readFileSync(PERMISSIONS_INTERFACE, 'utf-8');
         let _permissionImplementation = fs.readFileSync(PERMISSIONS_IMPL, 'utf-8');
+        let _permissionInterfaceMethods = fs.readFileSync(PERMISSIONS_INTERFACE_METHODS, 'utf-8');
+        let _permissionMethods = fs.readFileSync(PERMISSIONS_METHODS, 'utf-8');
         let result = {};
 
         agents.map(agent => {
             var agentPermissionFunctions = {};
+            let streamProcessChangeClassExtension = _permissionImplementation;
+            let permissionInterface = _permissionInterface;
+            let methodImplementations = [];
+            let methodInterfaces = [];
             models.map(model => {
                 let matchingPermissionNodes = permissions.filter(permission => PermissionGenerator.PermissionMatches(state, permission, agent, model));
                 if (!matchingPermissionNodes || !matchingPermissionNodes.length) {
                     return;
                 }
+                let permissionCases = [];
                 matchingPermissionNodes.map(matchingPermissionNode => {
                     if (matchingPermissionNode) {
-                        PermissionGenerator.GenerateCases(state, matchingPermissionNode, agent, model);
+                        let temp = PermissionGenerator.GenerateCases(state, matchingPermissionNode, agent, model);
+                        permissionCases.push(temp);
                     }
                 })
-                let streamProcessChangeClassExtension = _permissionInterface;
-                let properties = '';
-                let statics = '';
-                let constructors = [];
-                Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
+                permissionCases.map(perms => {
+                    for (var permKey in perms) {
+                        let cases = perms[permKey];
 
-                    let streamProcessChangeClassConstructors = _permissionImplementation;
+                        let permissionMethods = _permissionMethods;
+                        let permissionInterfaceMethods = _permissionInterfaceMethods;
+                        permissionMethods = bindTemplate(permissionMethods, {
+                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            method: permKey,
+                            cases: cases.map(c => jNL + Tabs(4) + c.template).join(''),
+                            case_result: jNL + Tabs(4) + `result = ${cases.map(c => c.variable).join(' && ')};`
+                        });
+                        permissionInterfaceMethods = bindTemplate(permissionInterfaceMethods, {
+                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            method: permKey
+                        });
+                        methodInterfaces.push(permissionInterfaceMethods);
+                        methodImplementations.push(permissionMethods);
 
-                    streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
-                        model: GetNodeProp(model, NodeProperties.CodeName),
-                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
-                        change_type: `Methods.${method}`,
-                        method
-                    });
-                    constructors.push(streamProcessChangeClassConstructors);
+                    }
+                });
 
-                })
             }).join(jNL);
 
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
-                model: GetNodeProp(model, NodeProperties.CodeName),
-                constructors
+                agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                methods: methodImplementations.join(jNL + jNL)
             });
-
-            result[model.id] = {
-                id: model.id,
-                name: GetNodeProp(model, NodeProperties.CodeName),
+            permissionInterface = bindTemplate(permissionInterface, {
+                agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                methods: methodInterfaces.join(jNL + jNL)
+            });
+            result[GetNodeProp(agent, NodeProperties.CodeName)] = {
+                name: GetNodeProp(agent, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
-                    usings: [...STANDARD_CONTROLLER_USING, `${namespace}${NameSpace.Constants}`],
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.Constants}`],
                     namespace,
-                    space: NameSpace.Parameters
+                    space: NameSpace.Permissions
+                }),
+                interface: NamespaceGenerator.Generate({
+                    template: permissionInterface,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.Model}`
+                    ],
+                    namespace,
+                    space: NameSpace.Interface
                 })
             };
         })

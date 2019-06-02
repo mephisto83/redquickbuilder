@@ -1,3 +1,3 @@
-    public interface IPermissions<{{model}}> {
+    public interface IPermissions{{agent_type}} {
 {{methods}}
     }

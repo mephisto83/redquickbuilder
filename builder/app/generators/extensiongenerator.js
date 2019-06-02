@@ -60,7 +60,7 @@ export default class ExtensionGenerator {
         let _extensionNewInstanceDictionary = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY, 'utf-8');
         let _extensionNewInstanceDictionaryAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY_ADD, 'utf-8');
         let result = {};
-        extensions.filter(x => x.id === key).map(extension => {
+        extensions.map(extension => {
             let extensionClassTemplate = _extensionClassTemplate;
             let properties = '';
             let statics = '';

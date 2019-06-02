@@ -24,6 +24,7 @@ import TabContainer from './tabcontainer';
 import TabContent from './tabcontent';
 import Tabs from './tabs';
 import Generator from '../generators/generator';
+import ButtonList from './buttonlist';
 
 const MODEL_CODE = 'MODEL_CODE';
 const SELECTED_CODE_TYPE = 'SELECTED_CODE_TYPE';
@@ -31,6 +32,10 @@ const CLASS_KEY = 'CLASS_KEY';
 const CODE_VIEW_TAB = 'CODE_VIEW_TAB';
 
 class CodeView extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
     active() {
         return !!this.props.active;
     }
@@ -45,18 +50,20 @@ class CodeView extends Component {
 
 
         let controllers = [];
+        let generatedContent = null;
         if (state && graphRoot) {
             var viewTab = UIA.Visual(state, CODE_VIEW_TAB);
-            var classKey = UIA.Visual(state, CLASS_KEY);
-            if (classKey) {
-                var temp = Generator.generate({
-                    type: viewTab,
-                    key: classKey,
-                    state
-                });
-                if (temp && temp[classKey]) {
-                    codeString = temp[classKey].template;
-                }
+            var classKey = this.state[UIA.Visual(state, CODE_VIEW_TAB)];
+
+            var temp = Generator.generate({
+                type: viewTab,
+                key: classKey,
+                state
+            });
+            generatedContent = temp;
+
+            if (temp && temp[classKey]) {
+                codeString = temp[classKey].template;
             }
         }
 
@@ -70,25 +77,16 @@ class CodeView extends Component {
         ];
         let modelType = UIA.Visual(state, CODE_VIEW_TAB);
         let models = [];
-        if (modelType && Object.values(NodeTypes).indexOf(modelType) !== -1) {
-            models = UIA.NodesByType(state, modelType, { useRoot: true, excludeRefs: true }).map(t => {
-                return {
-                    title: UIA.GetNodeTitle(t),
-                    value: t.id
-                }
-            });
+        if (generatedContent) {
+            Object.keys(generatedContent).map(gcKey => {
+                models.push({
+                    id: gcKey,
+                    title: generatedContent[gcKey].name,
+                    value: generatedContent[gcKey].name
+                })
+            })
         }
-        else if (modelType === GeneratedTypes.Constants) {
-            models = [{ title: Titles.GeneratedMethodsConstants, value: GeneratedConstants.Methods }]
-        }
-        else if (modelType && Object.values(GeneratedTypes).indexOf(modelType) !== -1) {
-            models = UIA.NodesByType(state, GeneratedTypesMatch[modelType], { useRoot: true, excludeRefs: true }).map(t => {
-                return {
-                    title: UIA.GetNodeTitle(t),
-                    value: t.id
-                }
-            });
-        }
+
         return (
             <TopViewer active={active}>
                 <section className="content">
@@ -103,13 +101,17 @@ class CodeView extends Component {
                                     value={namespace} />
                             </Box>
                             <Box primary={true} title={Titles.CodeTypes}>
-                                <SelectInput options={models}
-                                    label={Titles.Code}
-                                    onChange={(value) => {
-                                        this.props.setVisual(CLASS_KEY, value);
-                                    }}
-                                    value={UIA.Visual(state, CLASS_KEY)} />
+                                <ButtonList active={true} isSelected={(item) => {
+                                    return item && this.state[UIA.Visual(state, CODE_VIEW_TAB)] === item.id;
+                                }}
+                                    items={models}
+                                    onClick={(item) => {
+                                        this.setState({
+                                            [UIA.Visual(state, CODE_VIEW_TAB)]: item.id
+                                        });
+                                    }} />
                             </Box>
+
                         </div>
                         <div className="col-md-10">
                             <TabContainer>

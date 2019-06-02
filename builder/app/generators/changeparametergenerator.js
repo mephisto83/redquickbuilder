@@ -27,7 +27,7 @@ export default class ChangeParameterGenerator {
         let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
         let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
         let result = {};
-        models.filter(x => x.id === key).map(model => {
+        models.map(model => {
             let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
             let properties = '';
             let statics = '';

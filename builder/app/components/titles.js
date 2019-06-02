@@ -58,12 +58,13 @@ export const PermissionAttributes = 'Permission Attributes';
 export const OwnedResourcesDescription = 'Check if permissions are for resources owned by source model.'
 export const PermissionActions = 'Permission Actions';
 export const Permissions = {
-    create: 'Create',
-    get: 'Read',
-    getall: 'Read All',
-    delete: 'Delete',
-    getbyowner: 'Get by owner',
-    update: 'Update'
+    Create: 'Create',
+    Get: 'Read',
+    GetAll: 'Read All',
+    Getall: 'Read All',
+    Delete: 'Delete',
+    Getbyowner: 'Get by owner',
+    Update: 'Update'
 };
 export const ChoiceTypes = 'Choice types';
 export const ChoiceListActions = 'Choice Actions';

@@ -28,7 +28,7 @@ export default class MaestroGenerator {
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
         let result = {};
-        maestros.filter(t => t.id === key).map(maestro => {
+        maestros.map(maestro => {
             let maestroTemplateClass = _maestroTemplateClass;
             let functions = '';
             let statics = '';
@@ -124,11 +124,11 @@ export default class MaestroGenerator {
             arbiters = arbiters.unique();
             permissions = permissions.unique(x => `${x.agent_type}`);
             var injectedServices = arbiters.map(x => `IRedArbiter<${x}> _arbiter${x}`);
-            var injectedPermissionServices = permissions.map(x => `IPermissions<${x.agent_type}> _${x.agent_type.toLowerCase()}Permissions`);
+            var injectedPermissionServices = permissions.map(x => `IPermission${x.agent_type} _${x.agent_type.toLowerCase()}Permissions`);
             var set_properties = arbiters.map(x => jNL + MaestroGenerator.Tabs(4) + `arbiter${x} = _arbiter${x};`);
             var set_permissions = permissions.map(x => jNL + MaestroGenerator.Tabs(4) + `${x.agent_type.toLowerCase()}Permissions = ${x.agent_type.toLowerCase()}Permissions;`);
             var properties = arbiters.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IRedArbiter<${x}> arbiter${x};`);
-            var permissions_properties = permissions.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IPermissions<${x.agent_type}> ${x.agent_type.toLowerCase()}Permissions;`);
+            var permissions_properties = permissions.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IPermission${x.agent_type} ${x.agent_type.toLowerCase()}Permissions;`);
 
             maestroTemplateClass = bindTemplate(maestroTemplateClass, {
                 codeName: codeName,
@@ -138,8 +138,8 @@ export default class MaestroGenerator {
                 'codeName#alllower': codeName.toLowerCase(),
                 functions
             });
-            result[maestro.id] = {
-                id: maestro.id,
+            result[GetNodeProp(maestro, NodeProperties.CodeName)] = {
+                id: GetNodeProp(maestro, NodeProperties.CodeName),
                 name: GetNodeProp(maestro, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: maestroTemplateClass,

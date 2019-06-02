@@ -28,7 +28,7 @@ export default class ControllerGenerator {
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
         let result = {};
-        controllers.filter(t => t.id === key).map(controller => {
+        controllers.map(controller => {
             let controllerTemplateClass = _controllerTemplateClass;
             let functions = '';
             let statics = '';

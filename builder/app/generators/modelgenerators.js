@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, GetRootGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -11,13 +11,18 @@ export default class ModelGenerator {
     static Generate(options) {
         var { state, key } = options;
         let graphRoot = GetRootGraph(state);
-        return {
-            [key]: ModelGenerator.GenerateModel({
+        let models = NodesByType(state, NodeTypes.Model);
+        let result = {};
+        models.map(model => {
+            var res = ModelGenerator.GenerateModel({
                 graph: graphRoot,
-                nodeId: key,
+                nodeId: model.id,
                 state
-            })
-        };
+            });
+            result[res.id] = res;
+        });
+
+        return result;
     }
     static GenerateModel(options) {
         var { state, graph, nodeId } = options;
@@ -148,7 +153,7 @@ export default class ModelGenerator {
         modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
         var result = {
-            id: node.id,
+            id: GetNodeProp(node, NodeProperties.CodeName),
             name: GetNodeProp(node, NodeProperties.CodeName),
             template: NamespaceGenerator.Generate({
                 template: modelTemplate,
