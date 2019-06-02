@@ -1,5 +1,5 @@
             
-        public async Task<DistributionReport> ProcessStagedChanges<{{model}}Change>(Distribution distribution = null)
+        public async Task<DistributionReport> Process{{model}}Changes (Distribution distribution = null)
         {
             DistributionReport result = null;
             IList<{{model}}Change> changes = null;
