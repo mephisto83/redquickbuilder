@@ -28,10 +28,30 @@ export const NodeTypes = {
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
     Constants: 'constants',
-    Permissions: 'permissions-generated'
+    Permissions: 'permissions-generated',
+    StreamProcess: 'stream-process',
+    StreamProcessOrchestration: 'stream-process-orchestration'
 }
+export const STANDARD_CONTROLLER_USING = [
+    'Newtonsoft.Json',
+    'Newtonsoft.Json.Linq',
+    'RedQuick.Data',
+    'RedQuick.Attributes',
+    'RedQuick.Interfaces',
+    'RedQuick.Interfaces.Data',
+    'RedQuick.UI',
+    'System',
+    'System.Collections',
+    'System.Collections.Generic',
+    'System.Linq',
+    'System.Net',
+    'System.Net.Http',
+    'System.Threading.Tasks',
+    'System.Web.Http'
+]
 export const GeneratedConstants = {
-    Methods: 'Methods'
+    Methods: 'Methods',
+    StreamTypes: 'StreamTypes'
 }
 export const GeneratedTypesMatch = {
     [GeneratedTypes.ChangeParameter]: NodeTypes.Model
@@ -78,6 +98,7 @@ export const GroupProperties = {
 }
 export const NameSpace = {
     Model: '.Models',
+    StreamProcess: '.StreamProcess',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
     Constants: '.Constants',
