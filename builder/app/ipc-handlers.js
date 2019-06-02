@@ -42,13 +42,17 @@ function handle(msg) {
 }
 
 function scaffoldProject(body) {
-    let { workspace } = body;
+    let { workspace, solutionName } = body;
     return ensureDirectory(workspace).then(() => {
         return copyFile(`./app/cake/build.cake`, path.join(workspace, 'build.cake'));
     }).then(() => {
         return copyFile(`./app/cake/build.ps1`, path.join(workspace, 'build.ps1'));
     }).then(() => {
-        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', 'CreateWorkSpace', `-WorkSpace=${workspace}`], { cwd: workspace })
+        return copyFile(`./app/cake/build.js`, path.join(workspace, 'build.js'));
+    }).then(() => {
+        return writeJsonToFile({ workspace, solutionName }, path.join(workspace, 'workspace.json'));
+    }).then(() => {
+        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', 'CreateWorkSpace'], { cwd: workspace })
     }).then(() => {
         console.log('Scaffoled the project successfully');
         return true;
@@ -72,6 +76,12 @@ function copyFile(source, destination) {
             }
             console.log('source.txt was copied to destination.txt');
         });
+    });
+}
+function writeJsonToFile(json, destination) {
+    var text = JSON.stringify(json);
+    return Promise.resolve().then(() => {
+        fs.writeFileSync(destination, text, 'utf-8');
     });
 }
 function ensureDirectory(dir) {

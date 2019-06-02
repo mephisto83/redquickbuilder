@@ -36,6 +36,7 @@ export function scaffoldProject() {
         var state = getState();
         let root = GetRootGraph(state);
         send(HandlerEvents.scaffold.message, {
+            solutionName: root.title.split(' ').join('.'),
             workspace: path.join(root.workspace, root.title)
         }).then(res => {
             console.log(res)
