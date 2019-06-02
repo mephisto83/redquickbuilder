@@ -100,8 +100,8 @@ export default class ControllerGenerator {
                     functions
                 });
             });
-            result[controller.id] = {
-                id: controller.id,
+            result[GetNodeProp(controller, NodeProperties.CodeName)] = {
+                id: GetNodeProp(controller, NodeProperties.CodeName),
                 name: GetNodeProp(controller, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: controllerTemplateClass,

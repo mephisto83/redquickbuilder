@@ -3,14 +3,20 @@ import { uuidv4 } from '../methods/graph_methods';
 import { GetRootGraph } from './uiactions';
 const { ipcRenderer } = require('electron');
 import path from 'path';
+import { GeneratedTypes, NodeTypes } from '../constants/nodetypes';
+import Generator from '../generators/generator';
+import { fstat, writeFileSync } from 'fs';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
     console.log(arg) // prints "pong"
     let reply = JSON.parse(arg);
-    hub[reply.id].resolve(reply.msg);
+    if (hub[reply.id]) {
+        hub[reply.id].resolve(reply.msg);
+    }
     delete hub[reply.id];
-})
+});
+
 function message(msg, body) {
     return {
         msg,
@@ -31,15 +37,59 @@ function send(mess, body) {
     return result;
 }
 
-export function scaffoldProject() {
+export function scaffoldProject(filesAndContent) {
     return (dispatch, getState) => {
         var state = getState();
         let root = GetRootGraph(state);
-        send(HandlerEvents.scaffold.message, {
-            solutionName: root.title.split(' ').join('.'),
-            workspace: path.join(root.workspace, root.title)
-        }).then(res => {
-            console.log(res)
-        });
+        let solutionName = root.title.split(' ').join('.');
+        // send(HandlerEvents.scaffold.message, {
+        //     solutionName,
+        //     workspace: path.join(root.workspace, root.title)
+        // }).then(res => {
+        //     console.log('Finished Scaffolding.');
+
+        // });
+        generateFiles(path.join(root.workspace, root.title), solutionName, state);
     }
+}
+
+function generateFiles(workspace, solutionName, state) {
+
+
+    var code_types = [
+        NodeTypes.Controller,
+        NodeTypes.Model,
+        NodeTypes.ExtensionType,
+        NodeTypes.Maestro,
+        ...Object.values(GeneratedTypes)
+    ];
+    code_types.map(code_type => {
+
+        var temp = Generator.generate({
+            type: code_type,
+            state
+        });
+        let area = CodeTypeToArea[code_type];
+        path.join();
+        for (var fileName in temp) {
+            writeFileSync(path.join(workspace, solutionName + area, `${fileName}.cs`), temp[fileName].template)
+            if (temp[fileName].interface) {
+                writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${fileName}.cs`), temp[fileName].interface);            }
+        }
+        debugger;
+    })
+
+}
+
+const CodeTypeToArea = {
+    [NodeTypes.Controller]: path.join('.Web', 'Controllers'),
+    [NodeTypes.Model]: '.Models',
+    [NodeTypes.ExtensionType]: '.Models',
+    [NodeTypes.Maestro]: '.Controllers',
+    [GeneratedTypes.ChangeParameter]: '.Models',
+    [GeneratedTypes.Constants]: '.Models',
+    [GeneratedTypes.Permissions]: '.Controllers',
+    [GeneratedTypes.StreamProcess]: '.Controllers',
+    [GeneratedTypes.StreamProcessOrchestration]: '.Controllers'
+
 }

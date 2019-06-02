@@ -162,8 +162,8 @@ export default class ExtensionGenerator {
                 constants: constants.unique(x => x).map(co => jNL + ExtensionGenerator.Tabs(3) + ConstantsDeclaration(co)).join('')
             });
 
-            result[extension.id] = {
-                id: extension.id,
+            result[GetNodeProp(extension, NodeProperties.CodeName)] = {
+                id: GetNodeProp(extension, NodeProperties.CodeName),
                 name: GetNodeProp(extension, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: extensionClassTemplate,

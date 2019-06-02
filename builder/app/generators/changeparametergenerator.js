@@ -55,8 +55,8 @@ export default class ChangeParameterGenerator {
                 constructors
             });
 
-            result[model.id] = {
-                id: model.id,
+            result[GetNodeProp(model, NodeProperties.CodeName)] = {
+                id: GetNodeProp(model, NodeProperties.CodeName),
                 name: GetNodeProp(model, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,

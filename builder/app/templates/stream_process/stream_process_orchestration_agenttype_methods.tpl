@@ -72,7 +72,7 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Update)) {
                 var result = await {{model#lower}}Arbiter.Update(data);
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.Create(change, result));
+                await {{model#lower}}ResponseArbiter.Create({{model}}Response.Update(change, result));
             }
             else {
                 await {{model#lower}}ResponseArbiter.Create({{model}}Response.UpdateFailed(change));
