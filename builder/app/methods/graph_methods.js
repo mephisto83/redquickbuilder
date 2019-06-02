@@ -5,6 +5,12 @@ import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty } from '..
 export function createGraph() {
     return {
         id: uuidv4(),
+        version: {
+            major: 0,
+            minor: 0,
+            build: 0
+        },
+        workspace: '',
         title: Titles.DefaultGraphTitle,
         path: [],
         namespace: '',
@@ -33,6 +39,26 @@ export function createGraph() {
 }
 export const GraphKeys = {
     NAMESPACE: 'namespace'
+}
+export function updateWorkSpace(graph, options) {
+    let { workspace } = options;
+    graph.workspace = workspace;
+    return graph;
+}
+
+export function incrementBuild(graph) {
+    graph.version.build++;
+    return graph;
+}
+
+export function incrementMinor(graph) {
+    graph.version.minor++;
+    return graph;
+}
+
+export function incrementMajor(graph) {
+    graph.version.major++;
+    return graph;
 }
 
 export function updateGraphTitle(graph, ops) {
@@ -259,6 +285,7 @@ export function removeNode(graph, options = {}) {
     let { id } = options;
     let existNodes = getNodesByLinkType(graph, { id, direction: TARGET, type: LinkType.Exist });
 
+    graph = incrementBuild(graph);
     //links
     graph = clearLinks(graph, options);
 
@@ -375,6 +402,7 @@ export function addNode(graph, node) {
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = [...graph.nodes, node.id];
     graph = { ...graph };
+    graph = incrementBuild(graph);
     return graph;
 }
 export function addGroup(graph, group) {
@@ -1489,7 +1517,7 @@ export function duplicateLink(nn, nodes) {
     };
 }
 
-function uuidv4() {
+export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);

@@ -13,6 +13,7 @@
 import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import IPCHandlers from './ipc-handlers';
 // import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -68,7 +69,7 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
-
+  IPCHandlers.setup();
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,

@@ -141,6 +141,9 @@ export const Maestros = 'Maestros';
 export const Save = 'Save';
 export const Open = 'Open';
 
+export const Scaffold = 'Scaffold';
+export const SetWorkingDirectory = 'Set Working Directory';
+
 export const MindMap = 'Mind Map';
 export const CodeView = 'Code View';
 

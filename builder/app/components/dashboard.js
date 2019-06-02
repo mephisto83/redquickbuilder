@@ -98,8 +98,15 @@ class Dashboard extends Component {
         var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let graph = UIA.GetCurrentGraph(state);
+        let rootGraph = UIA.GetRootGraph(state);
         let vgraph = UIA.GetVisualGraph(state);
         let main_content = UIA.Visual(state, MAIN_CONTENT);
+        let version = '0.0.0';
+        let workspace = null;
+        if (rootGraph) {
+            version = `${rootGraph.version.major}.${rootGraph.version.minor}.${rootGraph.version.build}`;
+            workspace = rootGraph.workspace;
+        }
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
                 height: 'auto',
@@ -160,6 +167,16 @@ class Dashboard extends Component {
                                 <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
                                     this.props.saveGraphToFile();
                                 }} />
+                                <SideBarHeader title={Titles.Project} />
+                                <SideBarHeader title={version} />
+                                <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-cog'} onClick={() => {
+                                    this.props.scaffoldProject();
+                                }} />
+                                <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                                    this.props.setWorkingDirectory();
+                                }} />
+                                {workspace ? <SideBarHeader hideArrow={true} title={workspace} icon={'fa fa-cog'}/> : null}
+
                                 <TreeViewMenu
                                     open={UIA.Visual(state, VC.GraphPropertiesMenu)}
                                     active={UIA.Visual(state, VC.GraphPropertiesMenu)}

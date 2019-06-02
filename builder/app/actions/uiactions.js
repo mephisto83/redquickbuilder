@@ -524,3 +524,27 @@ export function saveGraphToFile() {
         }
     }
 }
+
+export function setWorkingDirectory() {
+    return (dispatch, getState) => {
+        var currentGraph = GetRootGraph(getState());
+        // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+        if (currentGraph) {
+            dialog.showOpenDialog(
+                remote.getCurrentWindow(),
+                {
+                    properties: ['openDirectory']
+                },
+                (fileName) => {
+                    if (fileName === undefined) {
+                        console.log("You didn't save the file");
+                        return;
+                    }
+
+                    console.log(fileName);
+                    currentGraph = GraphMethods.updateWorkSpace(currentGraph, { workspace: fileName[0] });
+                    SaveGraph(currentGraph, dispatch)
+                });
+        }
+    }
+}

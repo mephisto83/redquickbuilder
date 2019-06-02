@@ -1,6 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as UIA from '../actions/uiactions';
+import * as IPCEvents from '../actions/ipcActions';
 export function mapStateToProps(state) {
     return {
         state
@@ -8,7 +9,7 @@ export function mapStateToProps(state) {
 }
 
 export function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ ...UIA }, dispatch);
+    return bindActionCreators({ ...UIA, ...IPCEvents }, dispatch);
 }
 
 
