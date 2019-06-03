@@ -42,14 +42,14 @@ export function scaffoldProject(filesAndContent) {
         var state = getState();
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');
-        // send(HandlerEvents.scaffold.message, {
-        //     solutionName,
-        //     workspace: path.join(root.workspace, root.title)
-        // }).then(res => {
-        //     console.log('Finished Scaffolding.');
+        send(HandlerEvents.scaffold.message, {
+            solutionName,
+            workspace: path.join(root.workspace, root.title)
+        }).then(res => {
+            console.log('Finished Scaffolding.');
 
-        // });
-        generateFiles(path.join(root.workspace, root.title), solutionName, state);
+            generateFiles(path.join(root.workspace, root.title), solutionName, state);
+        });
     }
 }
 
@@ -74,9 +74,9 @@ function generateFiles(workspace, solutionName, state) {
         for (var fileName in temp) {
             writeFileSync(path.join(workspace, solutionName + area, `${fileName}.cs`), temp[fileName].template)
             if (temp[fileName].interface) {
-                writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${fileName}.cs`), temp[fileName].interface);            }
+                writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${fileName}.cs`), temp[fileName].interface);
+            }
         }
-        debugger;
     })
 
 }

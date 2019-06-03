@@ -1,4 +1,4 @@
-    public class {{name}} : IExtension {
+    public class {{name}} {
         public const string Name = "{{name}}";
 {{constants}}
 
