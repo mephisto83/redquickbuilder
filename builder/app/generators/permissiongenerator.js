@@ -260,13 +260,15 @@ export default class PermissionGenerator {
                 methods: methodInterfaces.join(jNL + jNL)
             });
             result[GetNodeProp(agent, NodeProperties.CodeName)] = {
-                name: `Permission${GetNodeProp(agent, NodeProperties.CodeName)}`,
-                iname: `IPermission${GetNodeProp(agent, NodeProperties.CodeName)}`,
+                name: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}`,
+                iname: `IPermissions${GetNodeProp(agent, NodeProperties.CodeName)}`,
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.Extensions}`,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Interface}`, 
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.Permissions

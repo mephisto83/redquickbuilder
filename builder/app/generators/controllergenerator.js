@@ -105,7 +105,11 @@ export default class ControllerGenerator {
                 name: GetNodeProp(controller, NodeProperties.CodeName),
                 template: NamespaceGenerator.Generate({
                     template: controllerTemplateClass,
-                    usings: [...STANDARD_CONTROLLER_USING],
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        'Microsoft.AspNetCore.Mvc'
+                    ],
                     namespace,
                     space: NameSpace.Controllers
                 })
@@ -115,7 +119,7 @@ export default class ControllerGenerator {
         return result;
 
     }
-} 
+}
 const NL = `
                     `
 const jNL = `

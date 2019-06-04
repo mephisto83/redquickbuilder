@@ -45,8 +45,7 @@ export const STANDARD_CONTROLLER_USING = [
     'System.Linq',
     'System.Net',
     'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
+    'System.Threading.Tasks'
 ]
 export const GeneratedConstants = {
     Methods: 'Methods',

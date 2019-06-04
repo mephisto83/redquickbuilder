@@ -56,7 +56,8 @@ export default class ModelGenerator {
             if (Usings[ProgrammingLanguages.CSHARP][np]) {
                 usings.push(
                     ...Usings[ProgrammingLanguages.CSHARP][np],
-                    `${namespace}${NameSpace.Model}`)
+                    `${namespace}${NameSpace.Model}`,
+                    `${namespace}${NameSpace.Extensions}`)
             }
             let propType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
             let propSwapDictionary = {
@@ -121,7 +122,7 @@ export default class ModelGenerator {
                         options_list: options_list.map(t => `${t}`).join(', ')
                     }) : '';
 
-                    let validation_rules = validations && validations.length ? bindTemplate(`ValidationRules = new string[] { {{validation_list}} }),`, {
+                    let validation_rules = validations && validations.length ? bindTemplate(`ValidationRules = new string[] { {{validation_list}} },`, {
                         validation_list: validations.map(t => `${t}`).join(', ')
                     }) : '';
 

@@ -51,8 +51,8 @@ export default class StreamProcessOrchestrationGenerator {
 
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
-            result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = ProjectStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL)
-            result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = ProjectStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
+            result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = RedStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL)
+            result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
 
         })
 

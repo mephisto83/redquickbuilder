@@ -2,6 +2,6 @@
         [{{http_method}}]
         public async Task<{{output_type}}> {{functionName}}([FromBody] {{input_type}} obj)
         {
-            var maestro = ProjectStrapper.Resolve<{{maestro_interface}}>();
+            var maestro = RedStrapper.Resolve<{{maestro_interface}}>();
             return await maestro.{{maestro_function}}({{user_instance}}, obj).ConfigureAwait(false);
         }
