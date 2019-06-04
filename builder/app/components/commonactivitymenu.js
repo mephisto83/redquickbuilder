@@ -25,6 +25,28 @@ class CommonActivityMenu extends Component {
                                 value
                             });
                         }} />
+                    <TextBox
+                        label={Titles.ValueName}
+                        disabled={!UIA.CanChangeType(currentNode)}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ValueName] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.ValueName,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
+                    <TextBox
+                        label={Titles.AgentName}
+                        disabled={!UIA.CanChangeType(currentNode)}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.AgentName] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.AgentName,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
                 </FormControl>) : null}
             </TabPane>
         );

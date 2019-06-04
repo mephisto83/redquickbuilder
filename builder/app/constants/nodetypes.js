@@ -173,16 +173,24 @@ export const NodeProperties = {
     ClassConstructionInformation: 'ClassConstructionInformation'
 }
 
+function codeTypeWord(x) {
+    if (typeof x === 'string') {
+        return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1).join('');
+    }
+    return x;
+}
+
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
 export const NodePropertiesDirtyChain = {
     [NodeProperties.UIText]: [{
         chainProp: NodeProperties.CodeName,
-        chainFunc: (x) => {
-            if (typeof x === 'string') {
-                return x.split('').filter(y => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1).join('');
-            }
-            return x;
-        }
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.AgentName,
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.ValueName,
+        chainFunc: codeTypeWord,
     }, {
         chainProp: NodeProperties.HttpRoute,
         chainFunc: (x) => {

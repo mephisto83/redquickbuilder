@@ -1,8 +1,8 @@
         public async Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}}) {
-            if(value == null) {
+            if({{value}} == null) {
                 return false;
             }
-            if(agent == null){
+            if({{agent}} == null){
                 return false;
             }
             var result = false;

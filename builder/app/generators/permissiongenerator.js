@@ -78,7 +78,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
                 var tempBindingValues = {
                     method,
-                    value: value_string,
+                    value: GetNodeProp(model, NodeProperties.ValueName),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -119,59 +119,6 @@ export default class PermissionGenerator {
                     template: temp
                 });
             }
-
-            if (false)
-                if (extensionNode) {
-                    var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedExtensionValues) || [];
-                    var ext_disallowed = [];
-                    var def = GetNodeProp(extensionNode, NodeProperties.UIExtensionDefinition);
-
-                    let propertyNodesForExtensions = GraphMethods.getNodesByLinkType(graph, {
-                        id: dpNode.id,
-                        type: LinkType.Extension,
-                        direction: GraphMethods.SOURCE
-                    });
-                    let propertyNodesForEnumerations = GraphMethods.getNodesByLinkType(graph, {
-                        id: dpNode.id,
-                        type: LinkType.Enumeration,
-                        direction: GraphMethods.SOURCE
-                    });
-                    if (propertyNodesForExtensions.length || propertyNodesForEnumerations.length) {
-                        if (def && def.config) {
-                            if (def.config.isEnumeration) {
-                                var extensionValues = def.config.list.map(t => {
-                                    return def.config.keyField ? t[def.config.keyField] : t[Object.keys(t)[0]];
-                                });
-                                let extensionName = GetNodeProp(extensionNode, NodeProperties.CodeName);
-                                let listTemplate = ExtensionGenerator.CreateListInstanceTemplate({
-                                    node: extensionNode,
-                                    name: `list${extensionName}`
-                                });
-
-                                ext_allowed = ext_allowed.intersection(extensionValues);
-                                let constants_allowed = ext_allowed.map(ea => {
-                                    return `${extensionName}.${MakeConstant(ea)}`
-                                })
-                                ext_disallowed = extensionValues.relativeCompliment(ext_allowed);
-                                let constants_notallowed = ext_disallowed.map(ea => {
-                                    return `${extensionName}.${MakeConstant(ea)}`
-                                });
-
-                                let allowedListItems = CreateStringList({
-                                    name: `allowedList${extensionName}`,
-                                    instance: true,
-                                    list: constants_allowed
-                                });
-                                let disallowedListItems = CreateStringList({
-                                    name: `disallowedList${extensionName}`,
-                                    instance: true,
-                                    list: constants_notallowed
-                                });
-
-                            }
-                        }
-                    }
-                }
         });
 
         return listOfCases;
