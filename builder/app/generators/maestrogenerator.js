@@ -1,11 +1,12 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
+const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
 
 const PROPERTY_TABS = 6;
@@ -25,12 +26,14 @@ export default class MaestroGenerator {
         let maestros = NodesByType(state, NodeTypes.Maestro);
 
         let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf-8');
+        let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
         let result = {};
         maestros.map(maestro => {
             let maestroTemplateClass = _maestroTemplateClass;
             let functions = '';
+            let functionsInterface = '';
             let statics = '';
             let codeName = `${GetNodeProp(maestro, NodeProperties.CodeName)}`;
 
@@ -44,11 +47,13 @@ export default class MaestroGenerator {
             let permissions = [];
             let maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
             maestro_functions = tempfunctions;
+            let interface_functions = [];
             if (maestro_functions.length) {
                 maestro_functions.map(maestro_function => {
                     var ft = Functions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                     if (ft) {
                         let tempFunction = ft.template;
+                        let interfaceFunction = ft.interface;
                         let codeNode = GetNodeProp(maestro_function, NodeProperties.CodeName);
                         let tempfunctions = GraphMethods.getNodesByLinkType(root, {
                             id: maestro_function.id,
@@ -92,8 +97,7 @@ export default class MaestroGenerator {
 
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
-
-                        tempFunction = bindTemplate(tempFunction, {
+                        let bindOptions = {
                             function_name: functionName,
                             agent_type: agent_type,
                             agent: agent,
@@ -107,7 +111,9 @@ export default class MaestroGenerator {
                             output_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}',
                             maestro_interface: ToInterface(maestroName),
                             input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}'
-                        })
+                        };
+                        tempFunction = bindTemplate(tempFunction, bindOptions);
+                        interfaceFunction = bindTemplate(interfaceFunction, bindOptions)
                         // let template = ft.template;
                         // if (ft.template_keys) {
                         //     for (var template_key in template_key) {
@@ -117,6 +123,7 @@ export default class MaestroGenerator {
                         //     }
                         // }
                         functions += jNL + tempFunction;
+                        functionsInterface += jNL + interfaceFunction;
                     }
 
                 })
@@ -132,21 +139,47 @@ export default class MaestroGenerator {
 
             maestroTemplateClass = bindTemplate(maestroTemplateClass, {
                 codeName: codeName,
-                set_properties: [...set_properties, ...set_permissions],
+                set_properties: [...set_properties, ...set_permissions].join(jNL),
                 properties: [...permissions_properties, ...properties].join(' '),
                 injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => (jNL + MaestroGenerator.Tabs(7) + t)).join(','),
                 'codeName#alllower': codeName.toLowerCase(),
                 functions
             });
+            let maestro_interface_template = bindTemplate(_MAESTRO_INTERFACE_TEMPLATE, {
+                codeName: codeName,
+                set_properties: [...set_properties, ...set_permissions].join(jNL),
+                properties: [...permissions_properties, ...properties].join(' '),
+                injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => (jNL + MaestroGenerator.Tabs(7) + t)).join(','),
+                'codeName#alllower': codeName.toLowerCase(),
+                functions: functionsInterface
+            })
             result[GetNodeProp(maestro, NodeProperties.CodeName)] = {
                 id: GetNodeProp(maestro, NodeProperties.CodeName),
                 name: GetNodeProp(maestro, NodeProperties.CodeName),
+                iname: `I${GetNodeProp(maestro, NodeProperties.CodeName)}`,
                 template: NamespaceGenerator.Generate({
                     template: maestroTemplateClass,
-                    usings: [...STANDARD_CONTROLLER_USING, `${namespace}${NameSpace.Model}`],
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.StreamProcess}`,
+                        `${namespace}${NameSpace.Permissions}`,
+                        `${namespace}${NameSpace.Parameters}`],
                     namespace,
                     space: NameSpace.Controllers
-                })
+                }),
+                interface: NamespaceGenerator.Generate({
+                    template: maestro_interface_template,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Permissions}`,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.Parameters}`],
+                    namespace,
+                    space: NameSpace.Controllers
+                }),
             };
         })
 
@@ -154,23 +187,6 @@ export default class MaestroGenerator {
 
     }
 }
-const STANDARD_CONTROLLER_USING = [
-    'RedQuick.Data',
-    'RedQuick.Attributes',
-    'RedQuick.Interfaces',
-    'RedQuick.Interfaces.Data',
-    'RedQuick.UI',
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
-    'System',
-    'System.Collections',
-    'System.Collections.Generic',
-    'System.Linq',
-    'System.Net',
-    'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
-]
 const NL = `
                     `
 const jNL = `

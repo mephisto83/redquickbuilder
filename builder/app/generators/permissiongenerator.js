@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -260,7 +260,8 @@ export default class PermissionGenerator {
                 methods: methodInterfaces.join(jNL + jNL)
             });
             result[GetNodeProp(agent, NodeProperties.CodeName)] = {
-                name: GetNodeProp(agent, NodeProperties.CodeName),
+                name: `Permission${GetNodeProp(agent, NodeProperties.CodeName)}`,
+                iname: `IPermission${GetNodeProp(agent, NodeProperties.CodeName)}`,
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
                     usings: [
@@ -285,24 +286,7 @@ export default class PermissionGenerator {
 
         return result;
     }
-}
-const STANDARD_CONTROLLER_USING = [
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
-    'RedQuick.Data',
-    'RedQuick.Attributes',
-    'RedQuick.Interfaces',
-    'RedQuick.Interfaces.Data',
-    'RedQuick.UI',
-    'System',
-    'System.Collections',
-    'System.Collections.Generic',
-    'System.Linq',
-    'System.Net',
-    'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
-]
+} 
 const NL = `
                     `
 const jNL = `

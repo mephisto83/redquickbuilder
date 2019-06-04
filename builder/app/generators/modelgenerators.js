@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -54,7 +54,9 @@ export default class ModelGenerator {
             let property_instance_template = propertyTemplate;
             let np = GetNodeProp(propNode, NodeProperties.UIAttributeType);
             if (Usings[ProgrammingLanguages.CSHARP][np]) {
-                usings.push(...Usings[ProgrammingLanguages.CSHARP][np])
+                usings.push(
+                    ...Usings[ProgrammingLanguages.CSHARP][np],
+                    `${namespace}${NameSpace.Model}`)
             }
             let propType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
             let propSwapDictionary = {
@@ -157,7 +159,8 @@ export default class ModelGenerator {
             name: GetNodeProp(node, NodeProperties.CodeName),
             template: NamespaceGenerator.Generate({
                 template: modelTemplate,
-                usings,
+                usings: [...usings,
+                ...STANDARD_CONTROLLER_USING],
                 namespace,
                 space: NameSpace.Model
             })

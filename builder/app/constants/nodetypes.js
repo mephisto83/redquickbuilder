@@ -33,11 +33,10 @@ export const GeneratedTypes = {
     StreamProcessOrchestration: 'stream-process-orchestration'
 }
 export const STANDARD_CONTROLLER_USING = [
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
     'RedQuick.Data',
     'RedQuick.Attributes',
     'RedQuick.Interfaces',
+    'RedQuick.Interfaces.Arbiter',
     'RedQuick.Interfaces.Data',
     'RedQuick.UI',
     'System',
@@ -51,7 +50,7 @@ export const STANDARD_CONTROLLER_USING = [
 ]
 export const GeneratedConstants = {
     Methods: 'Methods',
-    StreamTypes: 'StreamTypes'
+    StreamTypes: 'StreamType'
 }
 export const GeneratedTypesMatch = {
     [GeneratedTypes.ChangeParameter]: NodeTypes.Model
@@ -98,7 +97,7 @@ export const GroupProperties = {
 }
 export const NameSpace = {
     Model: '.Models',
-    StreamProcess: '.StreamProcess',
+    StreamProcess: '.ActionStream',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
     Constants: '.Constants',
@@ -495,10 +494,11 @@ export const NodePropertyTypesByLanguage = {
     }
 }
 export const RED_QUICK_DATA = 'RedQuick.Data';
+export const RED_QUICK_ATTRIBUTES = 'RedQuick.Attributes';
 export const Usings = {
     [ProgrammingLanguages.CSHARP]: {
-        [NodePropertyTypes.EMAIL]: [RED_QUICK_DATA],
-        [NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA]
+        [NodePropertyTypes.EMAIL]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+        [NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
     }
 }
 export const NodeAttributePropertyTypes = {

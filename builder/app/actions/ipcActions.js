@@ -72,9 +72,9 @@ function generateFiles(workspace, solutionName, state) {
         let area = CodeTypeToArea[code_type];
         path.join();
         for (var fileName in temp) {
-            writeFileSync(path.join(workspace, solutionName + area, `${fileName}.cs`), temp[fileName].template)
+            writeFileSync(path.join(workspace, solutionName + area, `${temp[fileName].name}.cs`), temp[fileName].template)
             if (temp[fileName].interface) {
-                writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${fileName}.cs`), temp[fileName].interface);
+                writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${temp[fileName].iname || fileName}.cs`), temp[fileName].interface);
             }
         }
     })

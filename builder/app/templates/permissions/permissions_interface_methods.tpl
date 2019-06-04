@@ -1,1 +1,1 @@
-        Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}}) 
+        Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}});

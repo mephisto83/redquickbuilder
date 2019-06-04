@@ -135,6 +135,24 @@ function createWorkSpace() {
         var relPath = build.solutionName + '.Models/' + build.solutionName + '.Models.csproj';
         //dotnet sln todo.sln add todo-app/todo-app.csproj
         return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+    }).then(() => {
+        //D:\dev\redquick\RedQuick\RedQuickCore
+        //Add nuget packages.
+        let source = `D:/dev/redquick/RedQuick/RedQuickCore`;
+
+        let projects = [
+            build.solutionName + '.Controllers/' + build.solutionName + '.Controllers.csproj',
+            build.solutionName + '.Web/' + build.solutionName + '.Web.csproj',
+            build.solutionName + '.Models/' + build.solutionName + '.Models.csproj',
+            build.solutionName + '.Interfaces/' + build.solutionName + '.Interfaces.csproj',
+        ];
+        var promise = Promise.resolve();
+        projects.map(project => {
+            promise = promise.then(() => {
+                return executeSpawnCmd('dotnet', ['add', project, 'package', 'RedQuick', '-s', source], {});
+            });
+        })
+        return promise;
     }).catch(e => {
         console.log(e);
     });

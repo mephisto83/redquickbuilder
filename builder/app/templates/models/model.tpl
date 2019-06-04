@@ -1,4 +1,4 @@
-    public class {{model}} 
+    public class {{model}} : DBaseData
     {
 {{properties}}
     }

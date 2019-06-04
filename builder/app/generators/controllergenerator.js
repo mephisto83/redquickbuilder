@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -115,19 +115,7 @@ export default class ControllerGenerator {
         return result;
 
     }
-}
-const STANDARD_CONTROLLER_USING = [
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
-    'System',
-    'System.Collections',
-    'System.Collections.Generic',
-    'System.Linq',
-    'System.Net',
-    'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
-]
+} 
 const NL = `
                     `
 const jNL = `

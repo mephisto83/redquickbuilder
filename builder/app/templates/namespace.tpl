@@ -1,6 +1,6 @@
 {{imports}}
 
-public {{namespace}}{{space}} 
+namespace {{namespace}}{{space}} 
 {
 {{body}}
 }

@@ -283,7 +283,7 @@ export function defaultExtensionDefinitionType() {
 }
 export function removeNode(graph, options = {}) {
     let { id } = options;
-    let existNodes = getNodesByLinkType(graph, { id, direction: TARGET, type: LinkType.Exist });
+    let existNodes = getNodesByLinkType(graph, { exist: true, id, direction: TARGET, type: LinkType.Exist });
 
     graph = incrementBuild(graph);
     //links
@@ -1206,7 +1206,7 @@ export function getNodesByLinkType(graph, options) {
                             console.warn('Missing value in linkLib');
                             return null;
                         }
-                        if (!exist && graph.linkLib[_id].properties && graph.linkLib[_id].properties.exist) {
+                        if (exist && graph.linkLib[_id].properties && graph.linkLib[_id].properties.exist) {
                             return graph.nodeLib[target];
                         }
                         if (!type || graph.linkLib[_id].properties &&

@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -52,15 +52,18 @@ export default class ChangeParameterGenerator {
 
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                 model: GetNodeProp(model, NodeProperties.CodeName),
-                constructors
+                constructors: constructors.join(jNL)
             });
 
             result[GetNodeProp(model, NodeProperties.CodeName)] = {
                 id: GetNodeProp(model, NodeProperties.CodeName),
-                name: GetNodeProp(model, NodeProperties.CodeName),
+                name: `${GetNodeProp(model, NodeProperties.CodeName)}Change`,
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
-                    usings: [...STANDARD_CONTROLLER_USING, `${namespace}${NameSpace.Constants}`],
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Constants}`,
+                        `${namespace}${NameSpace.Model}`],
                     namespace,
                     space: NameSpace.Parameters
                 })
@@ -69,24 +72,7 @@ export default class ChangeParameterGenerator {
 
         return result;
     }
-}
-const STANDARD_CONTROLLER_USING = [
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
-    'RedQuick.Data',
-    'RedQuick.Attributes',
-    'RedQuick.Interfaces',
-    'RedQuick.Interfaces.Data',
-    'RedQuick.UI',
-    'System',
-    'System.Collections',
-    'System.Collections.Generic',
-    'System.Linq',
-    'System.Net',
-    'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
-]
+} 
 const NL = `
                     `
 const jNL = `

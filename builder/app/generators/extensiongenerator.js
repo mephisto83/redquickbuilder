@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, MakeConstant, ConstantsDeclaration } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, MakeConstant, ConstantsDeclaration, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -176,24 +176,7 @@ export default class ExtensionGenerator {
 
         return result;
     }
-}
-const STANDARD_CONTROLLER_USING = [
-    'Newtonsoft.Json',
-    'Newtonsoft.Json.Linq',
-    'RedQuick.Data',
-    'RedQuick.Attributes',
-    'RedQuick.Interfaces',
-    'RedQuick.Interfaces.Data',
-    'RedQuick.UI',
-    'System',
-    'System.Collections',
-    'System.Collections.Generic',
-    'System.Linq',
-    'System.Net',
-    'System.Net.Http',
-    'System.Threading.Tasks',
-    'System.Web.Http'
-]
+} 
 const NL = `
                     `
 const jNL = `

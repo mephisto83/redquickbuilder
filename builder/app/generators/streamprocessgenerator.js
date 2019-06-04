@@ -42,7 +42,11 @@ export default class StreamProcessGenerator {
                 name: 'StreamProcess',
                 template: NamespaceGenerator.Generate({
                     template: _streamProcessTemplate,
-                    usings: [...STANDARD_CONTROLLER_USING, `${namespace}${NameSpace.Model}`],
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Constants}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Model}`],
                     namespace,
                     space: NameSpace.StreamProcess
                 })
