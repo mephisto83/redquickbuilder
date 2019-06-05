@@ -10,6 +10,7 @@ import PermissionGenerator from "./permissiongenerator";
 import StreamProcessGenerator from "./streamprocessgenerator";
 import { NodesByType, GetNodeProp } from "../actions/uiactions";
 import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgenerator";
+import ChangeResponseGenerator from "./changeresponsegenerator";
 
 export default class Generator {
     static generate(options) {
@@ -26,6 +27,8 @@ export default class Generator {
                 return MaestroGenerator.Generate({ state, key });
             case GeneratedTypes.ChangeParameter:
                 return ChangeParameterGenerator.Generate({ state, key });
+            case GeneratedTypes.ChangeResponse:
+                return ChangeResponseGenerator.Generate({ state, key });
             case GeneratedTypes.Constants:
                 //Add enumerations here.
                 let models = NodesByType(state, NodeTypes.Model);

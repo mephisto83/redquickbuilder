@@ -45,7 +45,7 @@
                             await Delete(change);
                             break;
                         default:
-                            throw NotImplementedException();
+                            throw new NotImplementedException();
                     }
                 }
                 catch (Exception e)
@@ -56,7 +56,7 @@
         
         
         public async Task Create({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get(change.AgentId);
+            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Create)) {
                 var result = await {{model#lower}}Arbiter.Create(data);
@@ -68,7 +68,7 @@
         }
 
         public async Task Update({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get(change.AgentId);
+            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Update)) {
                 var result = await {{model#lower}}Arbiter.Update(data);
@@ -80,7 +80,7 @@
         }
 
         public async Task Delete({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get(change.AgentId);
+            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Delete)) {
                 var result = await {{model#lower}}Arbiter.Delete(data);

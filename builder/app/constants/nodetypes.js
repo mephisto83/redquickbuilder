@@ -27,6 +27,7 @@ export const NodeTypes = {
 }
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
+    ChangeResponse: 'change-response',
     Constants: 'constants',
     Permissions: 'permissions-generated',
     StreamProcess: 'stream-process',
@@ -37,6 +38,7 @@ export const STANDARD_CONTROLLER_USING = [
     'RedQuick.Attributes',
     'RedQuick.Interfaces',
     'RedQuick.Interfaces.Arbiter',
+    'RedQuick.Util',
     'RedQuick.Interfaces.Data',
     'RedQuick.UI',
     'System',

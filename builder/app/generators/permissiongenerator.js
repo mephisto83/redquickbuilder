@@ -51,6 +51,15 @@ export default class PermissionGenerator {
         return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL}};${jNL}`
 
     }
+    static IsRequestor(graph, model, permission) {
+        var requestorNodes = GraphMethods.getNodesByLinkType(graph, {
+            id: permission.id,
+            type: LinkType.RequestorPermissionLink
+        });
+        return !!requestorNodes.find(node => {
+            return node.id === model.id;
+        })
+    }
     static GetExtensionNodeValues(graph, permission, method, agent, model) {
         const value_string = 'value';
         var dependingPermissionNodes = GraphMethods.getNodesByLinkType(graph, {
@@ -67,6 +76,18 @@ export default class PermissionGenerator {
             if (!propertyNodeLinkedToByDependencyPermissionNode) {
                 return;
             }
+            let propertyNodes = GraphMethods.getNodesByLinkType(graph, {
+                id: propertyNodeLinkedToByDependencyPermissionNode.id,
+                type: LinkType.PermissionDependencyProperty
+            });
+            let propertyNode = null;
+            if (propertyNodes.length === 1) {
+                propertyNode = propertyNodes[0];
+            }
+            else {
+                return;
+            }
+            var agentLinkExists = GraphMethods.existsLinkBetween(graph, { target: propertyNode.id, source: agent.id, type: LinkType.PropertyLink });
             let enumerationNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.Enumeration));
             let extentionNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.UIExtension));
             let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
@@ -78,7 +99,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
                 var tempBindingValues = {
                     method,
-                    value: GetNodeProp(model, NodeProperties.ValueName),
+                    value: agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -102,7 +123,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
                 let tempBindingValues = {
                     method,
-                    value: value_string,
+                    value: agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -215,7 +236,7 @@ export default class PermissionGenerator {
                         ...STANDARD_CONTROLLER_USING,
                         `${namespace}${NameSpace.Extensions}`,
                         `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Interface}`, 
+                        `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.Permissions
@@ -235,7 +256,7 @@ export default class PermissionGenerator {
 
         return result;
     }
-} 
+}
 const NL = `
                     `
 const jNL = `

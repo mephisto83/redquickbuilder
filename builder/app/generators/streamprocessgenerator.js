@@ -44,6 +44,7 @@ export default class StreamProcessGenerator {
                     template: _streamProcessTemplate,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
+                        'System.Threading',
                         `${namespace}${NameSpace.Constants}`,
                         `${namespace}${NameSpace.Parameters}`,
                         `${namespace}${NameSpace.Model}`],

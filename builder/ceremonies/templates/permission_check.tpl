@@ -12,7 +12,7 @@ public async Task<IList<ConversationMessage>> SendMessageToConversation(User use
 
 public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{resourceHead_identifier}} {{resourceHead}}, {{value_type}} {{value}}) { 
 
-    var {{agent_type_instance}} = await arbiter.GetByOwnerId<{{AgentType}}({{user_id}});
+    var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}({{user_id}});
 
     if(await CanSendMessage({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 

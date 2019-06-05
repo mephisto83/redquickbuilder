@@ -10,5 +10,5 @@
             await Delete(change);
             break;
         default:
-            throw NotImplementedException();
+            throw new NotImplementedException();
     }

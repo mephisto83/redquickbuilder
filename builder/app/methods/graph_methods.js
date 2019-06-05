@@ -552,6 +552,15 @@ export function applyConstraints(graph) {
     }
     return graph;
 }
+
+export function existsLinkBetween(graph, options) {
+    var { source, target, type } = options;
+    var link = findLink(graph, { source, target })
+    if (link) {
+        return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type;
+    }
+    return false;
+}
 export function updateReferenceNodes(root) {
     if (root && root.referenceNodes) {
         for (var scope in root.referenceNodes) {

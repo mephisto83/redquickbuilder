@@ -88,7 +88,7 @@ A set of crud functions with a return value of the list of child type objects.
         //Original Version.
         public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, string ConversationId, string message) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await CanSendMessage(customer.Id , ConversationId).ConfigureAwait(false))) {
 
@@ -102,7 +102,7 @@ A set of crud functions with a return value of the list of child type objects.
         // The templated version.        
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{resourceHead_type}} {{resourceHead}}, {{value_type}} {{value}}) { 
 
-            var {{agent_type_instance}} = await arbiter.GetByOwnerId<{{AgentType}}>({{user_id}});
+            var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}>({{user_id}});
 
             if(await Can{{function.codeName}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 
@@ -122,7 +122,7 @@ A set of crud functions with a return value of the list of child type objects.
         //Single Object Parameter Version.
         public async Task<IList<ConversationMessage>> SendMessageToConversation(User user, ConversationMessasge message) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
             if(await CanCustomerSendMessage(customer.Id , message).ConfigureAwait(false))) {
                 var conversationMessageChangeParameters = CreateConversationMessageParameters.Create(customer, message);
                 var conversationMessageChange = ConversationMessageChange.CreateMessage();
@@ -141,10 +141,10 @@ A set of crud functions with a return value of the list of child type objects.
         
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.Create({{model}}ChangeParameters);
+                var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.Create({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -167,10 +167,10 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.Update({{model}}ChangeParameters);
+                var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.Update({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -187,10 +187,10 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
-                var {{model}}ChangeParameters = {{function_name}}Parameters.Create({{agent}}, {{value}});
-                var {{model}}Change = {{model}}Change.Delete({{model}}ChangeParameters);
+                var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
+                var {{model}}Change = {{model}}Change.Delete({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
 
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
@@ -208,7 +208,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
             }
@@ -218,7 +218,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{{AgentType}}>({{user}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
             if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
             }
@@ -242,7 +242,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         //Original Version.
         public async Task<IList<Conversation>> CreateConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanCreateConversation(customer.Id).ConfigureAwait(false))) {
 
@@ -256,7 +256,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         // The templated version.        
         public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
-            var {{agent_type_instance}} = await arbiter.GetByOwnerId<{{AgentType}}>({{user_id}});
+            var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}>({{user_id}});
 
             if(await Can{{function.codeName}}({{agent_type_instance}}.Id).ConfigureAwait(false))) {
 
@@ -376,7 +376,7 @@ A list of CRUD functions with a return function of a list of Objects.
         //Original Version.
         public async Task<IList<Conversation>> CreateConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
 
@@ -400,11 +400,11 @@ A list of CRUD functions with a return function of a list of Objects.
         //Templated Version.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{agent_type}>({{user_instance}}.Id);
 
             if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
+                var parameters = {{model}}Change.Create({{agent}}, {{value}});
 
                 await StreamProcess.{{model}}(parameters);
 
@@ -423,11 +423,11 @@ A list of CRUD functions with a return function of a list of Objects.
         //Templated Version.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter.GetByOwnerId<{{agent_type}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter.GetOwnedBy<{{agent_type}>({{user_instance}}.Id);
 
             if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{model}}ChangeParameters.Update({{agent}}, {{value}});
+                var parameters = {{model}}Change.Update({{agent}}, {{value}});
 
                 await StreamProcess.{{model}}(parameters);
 
@@ -491,7 +491,7 @@ IAgent, IHasAllowedCollection
         //Original Version.
         public async Task<Conversation> CreateConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanCreateConversation(customer , conversation).ConfigureAwait(false))) {
 
@@ -515,11 +515,11 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{model}}ChangeParameters.Create({{agent}}, {{value}});
+                var parameters = {{model}}Change.Create({{agent}}, {{value}});
 
                 var result = await StreamProcess.{{model}}(parameters);
 
@@ -532,7 +532,7 @@ IAgent, IHasAllowedCollection
         //Original Version.
         public async Task<Conversation> UpdateConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanUpdateConversation(customer , conversation).ConfigureAwait(false))) {
 
@@ -549,11 +549,11 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanUpdate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{model}}ChangeParameters.Update({{agent}}, {{value}});
+                var parameters = {{model}}Change.Update({{agent}}, {{value}});
 
                 var result = await StreamProcess.{{model}}(parameters);
 
@@ -567,7 +567,7 @@ IAgent, IHasAllowedCollection
         //Original Version.
         public async Task<Conversation> GetConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanGetConversation(customer , conversation).ConfigureAwait(false))) {
 
@@ -579,7 +579,7 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanGet{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
                 return await arbiter{{model}}.Get<{{model}}>({{value}}.Id);
@@ -593,7 +593,7 @@ IAgent, IHasAllowedCollection
         //Original Version.
         public async Task<Conversation> DeleteConversation(User user, Conversation conversation) { 
 
-            var customer = await arbiter.GetByOwnerId<Customer>(user.Id);
+            var customer = await arbiter.GetOwnedBy<Customer>(user.Id);
 
             if(await customerPermissions.CanDeleteConversation(customer , conversation).ConfigureAwait(false))) {
 
@@ -611,10 +611,10 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanGet{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
-                var parameters = {{model}}ChangeParameters.Delete({{customer}}, {{value}});
+                var parameters = {{model}}Change.Delete({{customer}}, {{value}});
 
                 var result = await StreamProcess.{{model}}(parameters);
 
@@ -631,7 +631,7 @@ IAgent, IHasAllowedCollection
 
             if(await {{user}}Permissions.CanCreate{{agent_type}}({{user_instance}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{agent_type}}ChangeParameters.Create({{user_instance}}, {{agent_type}});
+                var parameters = {{agent_type}}Change.Create({{user_instance}}, {{agent_type}});
 
                 // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
                 var result = await StreamProcess.{{user}}(parameters);
@@ -649,11 +649,11 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{agent_type}}> Update{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanUpdate{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{agent_type}}ChangeParameters.Update({{agent}}, {{value}});
+                var parameters = {{agent_type}}Change.Update({{agent}}, {{value}});
 
                 // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
                 var result = await StreamProcess.{{agent_type}}(parameters);
@@ -671,11 +671,11 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<{{agent_type}}> Get{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanGet{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{agent_type}}ChangeParameters.Get({{agent}}, {{value}});
+                var parameters = {{agent_type}}Change.Get({{agent}}, {{value}});
 
                 // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
                 var result = await StreamProcess.{{agent_type}}(parameters);
@@ -692,11 +692,11 @@ IAgent, IHasAllowedCollection
         //Templated version.
         public async Task<bool> Delete{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
 
-            var {{agent}} = await arbiter{{agent_type}}.GetByOwnerId<{{agent_type}}>({{user_instance}}.Id);
+            var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type}}Permissions.CanDelete{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-                var parameters = {{agent_type}}ChangeParameters.Delete({{agent}}, {{value}});
+                var parameters = {{agent_type}}Change.Delete({{agent}}, {{value}});
 
                 // The newConversation could be added to the result, if the caching option is used. then we wouldnt have to wait for the caching stream to complete.
                 var result = await StreamProcess.{{agent_type}}(parameters);

@@ -17,6 +17,7 @@ export default class MaestroGenerator {
             res += TAB;
         }
         return res;
+        
     }
     static Generate(options) {
         var { state, key } = options;

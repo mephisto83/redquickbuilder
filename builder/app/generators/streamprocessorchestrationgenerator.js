@@ -6,7 +6,9 @@ import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/stream_process_orchestration.tpl';
+const STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE = './app/templates/stream_process/stream_process_orchestration_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS = './app/templates/stream_process/stream_process_orchestration_agenttype_methods.tpl';
+const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE = './app/templates/stream_process/stream_process_orchestration_agenttype_methods_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES = './app/templates/stream_process/stream_process_orchestration_selected_staged_changes.tpl';
 
 export default class StreamProcessOrchestrationGenerator {
@@ -30,6 +32,26 @@ export default class StreamProcessOrchestrationGenerator {
         let models = NodesByType(state, NodeTypes.Model);
         let agents = models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
         let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS, 'utf-8');
+
+        let result = [];
+        agents.map(agent => {
+            models.map(model => {
+                var res = bindTemplate(_streamAgentMethods, {
+                    model: GetNodeProp(model, NodeProperties.CodeName),
+                    'model#lower': GetNodeProp(model, NodeProperties.CodeName).toLowerCase(),
+                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                    'agent_type#lower': GetNodeProp(agent, NodeProperties.CodeName).toLowerCase()
+                })
+                result.push(res);
+            });
+        });
+
+        return result.join('')
+    }
+    static GenerateAgentInterfaceMethods(state) {
+        let models = NodesByType(state, NodeTypes.Model);
+        let agents = models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
+        let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf-8');
 
         let result = [];
         agents.map(agent => {
@@ -76,7 +98,9 @@ export default class StreamProcessOrchestrationGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
         let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE, 'utf-8');
+        let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf-8');
         let agent_methods = StreamProcessOrchestrationGenerator.GenerateAgentMethods(state);
+        let agent_methods_interface = StreamProcessOrchestrationGenerator.GenerateAgentInterfaceMethods(state);
         let statics = StreamProcessOrchestrationGenerator.GenerateStaticMethods(models);
         let strappers = StreamProcessOrchestrationGenerator.GenerateStrappers(models);
         let strapperInstances = StreamProcessOrchestrationGenerator.GenerateStrappersInstances(models);
@@ -85,17 +109,35 @@ export default class StreamProcessOrchestrationGenerator {
             agent_type_methods: agent_methods,
             arbiters_strappers: strappers,
             arbiter_instances: strapperInstances
-        })
+        });
+        _streamProcessInterfaceTemplate = bindTemplate(_streamProcessInterfaceTemplate, {
+            agent_type_methods: agent_methods_interface
+        });
         const StreamProcessOrchestration = 'StreamProcessOrchestration';
         return {
             [StreamProcessOrchestration]: {
                 id: StreamProcessOrchestration,
                 name: StreamProcessOrchestration,
+                iname: `I${StreamProcessOrchestration}`,
                 template: NamespaceGenerator.Generate({
                     template: _streamProcessTemplate,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
+                        'System.Linq.Expressions',
                         `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.Constants}`],
+                    namespace,
+                    space: NameSpace.StreamProcess
+                }),
+                interface: NamespaceGenerator.Generate({
+                    template: _streamProcessInterfaceTemplate,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.StreamProcess

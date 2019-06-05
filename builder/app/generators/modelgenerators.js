@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType, NodePropertyTypes } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -150,6 +150,20 @@ export default class ModelGenerator {
 
             return property_instance_template;
         });
+        if (GetNodeProp(node, NodeProperties.IsUser)) {
+            var agenNodes = NodesByType(state, NodeTypes.Model).filter(x => x.id !== node.id && GetNodeProp(x, NodeProperties.IsAgent));
+            agenNodes.map(agent => {
+
+                let property_instance_template = propertyTemplate;
+                let propSwapDictionary = {
+                    property_type: NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][NodePropertyTypes.STRING],
+                    property: GetNodeProp(agent, NodeProperties.CodeName),
+                    attributes: ''
+                }
+                property_instance_template = bindTemplate(property_instance_template, propSwapDictionary);
+                properties.push(property_instance_template);
+            })
+        }
         templateSwapDictionary.properties = properties.join('');
         console.log(templateSwapDictionary.properties)
         let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf-8');

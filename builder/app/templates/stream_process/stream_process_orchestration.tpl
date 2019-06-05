@@ -5,10 +5,10 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class StagedChangesOrchestration : IStagedChangesOrchestration
+    public class StreamProcessOrchestration : IStreamProcessOrchestration
     {
 {{arbiter_instances}}
-        public StagedChangesOrchestration()
+        public StreamProcessOrchestration()
         {
 {{arbiters_strappers}}
         }
