@@ -60,10 +60,10 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Create)) {
                 var result = await {{model#lower}}Arbiter.Create(data);
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.Create(change, result));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
             }
             else {
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.CreateFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailed(change));
             }
         }
 
@@ -72,10 +72,10 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Update)) {
                 var result = await {{model#lower}}Arbiter.Update(data);
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.Update(change, result));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
             }
             else {
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.UpdateFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailed(change));
             }
         }
 
@@ -84,9 +84,9 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Delete)) {
                 var result = await {{model#lower}}Arbiter.Delete(data);
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.Delete(change, result));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
             }
             else {
-                await {{model#lower}}ResponseArbiter.Create({{model}}Response.DeleteFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailed(change));
             }
         }

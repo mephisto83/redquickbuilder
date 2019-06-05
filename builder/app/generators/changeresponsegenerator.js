@@ -7,6 +7,7 @@ import NamespaceGenerator from './namespacegenerator';
 
 const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = './app/templates/stream_process/stream_process_response_class_extention.tpl';
 const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = './app/templates/stream_process/stream_process_response_class_extention_constructor.tpl';
+const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_FAILED = './app/templates/stream_process/stream_process_response_class_extention_constructor_failed.tpl';
 
 const PROPERTY_TABS = 6;
 export default class ChangeResponseGenerator {
@@ -26,36 +27,62 @@ export default class ChangeResponseGenerator {
 
         let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
         let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
+        let _streamProcessChangeClassConstructorsFailed = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_FAILED, 'utf-8');
+
         let result = {};
         agents.map(agent => {
             let constructors = [];
             let properties = '';
             let statics = '';
             let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
-            models.map(model => {
-                Object.values(Methods).filter(x => x !== Methods.Get && x !== Methods.GetAll).map(method => {
+            models.map(model2 => {
+                models.map(model => {
+                    Object.values(Methods).filter(x => x !== Methods.Get && x !== Methods.GetAll).map(method => {
 
-                    let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
-                    let parameterTemplate = `${GetNodeProp(agent, NodeProperties.CodeName)}Change change, ${GetNodeProp(model, NodeProperties.CodeName)} ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}`;
-                    let parameter_properties = `
-            result.IdValue = ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}.Id;
-            result.Response = change.Id;
+                        let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
+                        let streamProcessChangeClassConstructorsFailed = _streamProcessChangeClassConstructorsFailed;
+                        let parameterTemplate = null;
+                        if (method === Methods.Delete) {
+                            parameterTemplate = `${GetNodeProp(model2, NodeProperties.CodeName)}Change change, bool res`;
+                        }
+                        else {
+                            parameterTemplate = `${GetNodeProp(model2, NodeProperties.CodeName)}Change change, ${GetNodeProp(model, NodeProperties.CodeName)} ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}`;
+                        }
+                        let parameter_properties = `
+            ${method === Methods.Delete ? '' : (`result.IdValue = ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}.Id;`)}
+            result.Response = change.Response;
             result.ChangeType = change.ChangeType;
-                    `
-                    streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
-                        model: GetNodeProp(model, NodeProperties.CodeName),
-                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
-                        change_type: `Methods.${method}`,
-                        method,
-                        parameters: parameterTemplate,
-                        parameters_property: parameter_properties
-                    });
-                    constructors.push(streamProcessChangeClassConstructors);
+            `
+                        streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
+                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            change_type: `Methods.${method} `,
+                            method,
+                            parameters: parameterTemplate,
+                            parameters_property: parameter_properties
+                        });
 
+                        streamProcessChangeClassConstructorsFailed = bindTemplate(streamProcessChangeClassConstructorsFailed, {
+                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            change_type: `Methods.${method} `,
+                            method,
+                            parameters: parameterTemplate,
+                            parameters_property: parameter_properties
+                        });
+                        if (constructors.indexOf(streamProcessChangeClassConstructors) === -1)
+                            constructors.push(streamProcessChangeClassConstructors);
+
+                        if (constructors.indexOf(streamProcessChangeClassConstructorsFailed) === -1)
+                            constructors.push(streamProcessChangeClassConstructorsFailed);
+
+                    })
                 })
-            }).join(jNL);
+            });
 
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                 model: GetNodeProp(agent, NodeProperties.CodeName),
@@ -70,8 +97,8 @@ export default class ChangeResponseGenerator {
                     template: streamProcessChangeClassExtension,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Constants}`,
-                        `${namespace}${NameSpace.Model}`],
+                        `${namespace} ${NameSpace.Constants} `,
+                        `${namespace} ${NameSpace.Model} `],
                     namespace,
                     space: NameSpace.Parameters
                 })
@@ -82,7 +109,7 @@ export default class ChangeResponseGenerator {
     }
 }
 const NL = `
-                    `
+                `
 const jNL = `
-`
+                `
 const TAB = `   `;

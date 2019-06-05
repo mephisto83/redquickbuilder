@@ -74,9 +74,10 @@ export default class StreamProcessOrchestrationGenerator {
 
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
-            result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = RedStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL)
-            result.push(Tabs(4) + `${modelName.toLowerCase()}ChangeArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Change>>();` + jNL)
-            result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
+            result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = RedStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL);
+            result.push(Tabs(4) + `${modelName.toLowerCase()}ChangeArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Change>>();` + jNL);
+            if (GetNodeProp(model, NodeProperties.IsAgent))
+                result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
 
         })
 
@@ -89,7 +90,8 @@ export default class StreamProcessOrchestrationGenerator {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
             result.push(Tabs(3) + `public IRedArbiter<${modelName}> ${modelName.toLowerCase()}Arbiter;` + jNL)
             result.push(Tabs(3) + `public IRedArbiter<${modelName}Change> ${modelName.toLowerCase()}ChangeArbiter;` + jNL)
-            result.push(Tabs(3) + `public IRedArbiter<${modelName}Response> ${modelName.toLowerCase()}ResponseArbiter;` + jNL);
+            if (GetNodeProp(model, NodeProperties.IsAgent))
+                result.push(Tabs(3) + `public IRedArbiter<${modelName}Response> ${modelName.toLowerCase()}ResponseArbiter;` + jNL);
 
         })
 
