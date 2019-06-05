@@ -27,23 +27,30 @@ export default class ChangeResponseGenerator {
         let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
         let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
         let result = {};
-        models.map(model => {
-            let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
+        agents.map(agent => {
+            let constructors = [];
             let properties = '';
             let statics = '';
-            let constructors = [];
-            agents.map(agent => {
-                Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
+            let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
+            models.map(model => {
+                Object.values(Methods).filter(x => x !== Methods.Get && x !== Methods.GetAll).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
-
+                    let parameterTemplate = `${GetNodeProp(agent, NodeProperties.CodeName)}Change change, ${GetNodeProp(model, NodeProperties.CodeName)} ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}`;
+                    let parameter_properties = `
+            result.IdValue = ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}.Id;
+            result.Response = change.Id;
+            result.ChangeType = change.ChangeType;
+                    `
                     streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
                         model: GetNodeProp(model, NodeProperties.CodeName),
                         value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
                         agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                         agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
-                        method
+                        method,
+                        parameters: parameterTemplate,
+                        parameters_property: parameter_properties
                     });
                     constructors.push(streamProcessChangeClassConstructors);
 
@@ -51,13 +58,14 @@ export default class ChangeResponseGenerator {
             }).join(jNL);
 
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
-                model: GetNodeProp(model, NodeProperties.CodeName),
-                constructors: constructors.join(jNL)
+                model: GetNodeProp(agent, NodeProperties.CodeName),
+                constructors: constructors.join(jNL),
+                properties: ''
             });
 
-            result[GetNodeProp(model, NodeProperties.CodeName)] = {
-                id: GetNodeProp(model, NodeProperties.CodeName),
-                name: `${GetNodeProp(model, NodeProperties.CodeName)}Response`,
+            result[GetNodeProp(agent, NodeProperties.CodeName)] = {
+                id: GetNodeProp(agent, NodeProperties.CodeName),
+                name: `${GetNodeProp(agent, NodeProperties.CodeName)}Response`,
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
                     usings: [
@@ -68,11 +76,11 @@ export default class ChangeResponseGenerator {
                     space: NameSpace.Parameters
                 })
             };
-        })
+        });
 
         return result;
     }
-} 
+}
 const NL = `
                     `
 const jNL = `

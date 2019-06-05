@@ -8,7 +8,7 @@
         {
             IRedArbiter<StagedResponse> stagedResponseArbiter = RedStrapper.Resolve<IRedArbiter<StagedResponse>>();
             IRedArbiter<StagedChanged> stagedChangeArbiter = RedStrapper.Resolve<IRedArbiter<StagedChanged>>();
-            IStagedChangesOrchestration orchestration = RedStrapper.Resolve<IStagedChangesOrchestration>();
+            IStreamProcessOrchestration orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
             change = await stagedChangeArbiter.Create(change);
             StagedResponse stagedChangeResponse = null;
 

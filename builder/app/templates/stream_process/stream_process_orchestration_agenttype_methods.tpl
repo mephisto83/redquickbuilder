@@ -6,11 +6,11 @@
             if (Distribution.Ok(distribution))
             {
                 Expression<Func<{{model}}Change, bool>> funct = (c) => (c.StreamType == distribution.Stream);
-                changes = (await stagedChangedArbiter.Query(distribution.RedExpression<{{model}}Change>().And(funct))).ToList();
+                changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}Change>().And(funct))).ToList();
             }
             else
             {
-                changes = await stagedChangedArbiter.GetAll<{{model}}Change>();
+                changes = await {{model#lower}}ChangeArbiter.GetAll<{{model}}Change>();
             }
 
             result = DistributionReport.Create(changes);
@@ -19,13 +19,13 @@
         
         }
 
-        async Task ProcessSelectedStagedChanges(IList<{{model}}Change> changes)
+        public async Task ProcessSelectedStagedChanges(IList<{{model}}Change> changes)
         {
             foreach (var change in changes)
             {
                 try
                 {
-                    await stagedChangedArbiter.Delete(change.Id);
+                    await {{model#lower}}ChangeArbiter.Delete(change.Id);
                 }
                 catch (Exception e) { }
             }
