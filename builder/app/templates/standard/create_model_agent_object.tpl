@@ -6,7 +6,7 @@ public async Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{mod
 
         var parameters = {{model}}Change.Create({{agent}}, {{value}});
 
-        var result = await StreamProcess.{{model}}(parameters);
+        var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
 
         return await arbiter{{model}}.Get<{{model}}>(result.Id);
     }

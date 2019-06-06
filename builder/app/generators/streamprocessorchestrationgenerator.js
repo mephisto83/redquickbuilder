@@ -35,6 +35,14 @@ export default class StreamProcessOrchestrationGenerator {
         let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS, 'utf-8');
 
         let result = [];
+        let modelexecution = [];
+        models.map(model => {
+            modelexecution.push(Tabs(4) + `await Process${GetNodeProp(model, NodeProperties.CodeName)}Changes();` + jNL);
+        })
+        result.push(`public async Task ProcessStagedChanges() {
+${modelexecution.join('')}
+        }
+`)
         agents.map(agent => {
             models.map(model => {
                 var res = bindTemplate(_streamAgentMethods, {
@@ -55,6 +63,7 @@ export default class StreamProcessOrchestrationGenerator {
         let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf-8');
 
         let result = [];
+        result.push(`Task ProcessStagedChanges();`)
         agents.map(agent => {
             models.map(model => {
                 var res = bindTemplate(_streamAgentMethods, {
@@ -71,7 +80,7 @@ export default class StreamProcessOrchestrationGenerator {
     }
     static GenerateStrappers(models) {
         let result = [];
-
+        result.push(Tabs(4) + `validator = RedStrapper.Resolve<IValidator>();` + jNL);
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
             result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = RedStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL);
@@ -86,6 +95,7 @@ export default class StreamProcessOrchestrationGenerator {
     static GenerateStrappersInstances(models) {
         let result = [];
 
+        result.push(Tabs(3) + `public IValidator validator;` + jNL);
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
             result.push(Tabs(3) + `public IRedArbiter<${modelName}> ${modelName.toLowerCase()}Arbiter;` + jNL)

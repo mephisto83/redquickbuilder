@@ -38,6 +38,7 @@ export const STANDARD_CONTROLLER_USING = [
     'RedQuick.Attributes',
     'RedQuick.Interfaces',
     'RedQuick.Interfaces.Arbiter',
+    'RedQuick.Configuration',
     'RedQuick.Util',
     'RedQuick.Interfaces.Data',
     'RedQuick.UI',

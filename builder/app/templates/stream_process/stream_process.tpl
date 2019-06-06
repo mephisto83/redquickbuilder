@@ -4,13 +4,15 @@
         
 {{static_methods}}
 
-        static async Task<StagedResponse> Stream(StagedChanged change, bool noWait = false)
+        static async Task<U> Stream<T, U>(T change, bool noWait = false)
+            where T : StagedChanged
+            where U : StagedResponse
         {
-            IRedArbiter<StagedResponse> stagedResponseArbiter = RedStrapper.Resolve<IRedArbiter<StagedResponse>>();
-            IRedArbiter<StagedChanged> stagedChangeArbiter = RedStrapper.Resolve<IRedArbiter<StagedChanged>>();
+            IRedArbiter<U> stagedResponseArbiter = RedStrapper.Resolve<IRedArbiter<U>>();
+            IRedArbiter<T> stagedChangeArbiter = RedStrapper.Resolve<IRedArbiter<T>>();
             IStreamProcessOrchestration orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
             change = await stagedChangeArbiter.Create(change);
-            StagedResponse stagedChangeResponse = null;
+            U stagedChangeResponse = null;
 
             if (RedConfiguration.SingleThread)
             {

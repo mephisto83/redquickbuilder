@@ -7,7 +7,7 @@
 
                 var parameters = {{model}}Change.Create({{agent}}, {{value}});
 
-                var result = await StreamProcess.{{model}}(parameters);
+                var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
 
                 return await arbiter{{model}}.GetOwnedBy<{{model}}>({{agent}}.Id);
             }

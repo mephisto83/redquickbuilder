@@ -33,7 +33,7 @@ export default class ControllerGenerator {
             let functions = '';
             let statics = '';
             let codeName = `${GetNodeProp(controller, NodeProperties.CodeName)}`;
-
+            let userNode = NodesByType(state, NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser));
             let maestro_functions = [];
             let maestros = GraphMethods.getNodesByLinkType(root, {
                 id: controller.id,
@@ -71,13 +71,20 @@ export default class ControllerGenerator {
                                     direction: GraphMethods.SOURCE
                                 }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
                             }
+                            let output_type = '{controller_generator_missing_model}';
+                            if (modelNode) {
+                                output_type = GetNodeProp(modelNode, NodeProperties.CodeName) || output_type;
+                                if (ft.isList) {
+                                    output_type = `IList<${output_type}>`;
+                                }
+                            }
                             tempFunction = bindTemplate(tempFunction, {
                                 functionName: functionName,
                                 maestro_function: functionName,
                                 http_route: httpRoute || '{controller_generator_http_method',
                                 http_method: httpMethod || '{controller_generator_http_method',
-                                user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name',
-                                output_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{controller_generator_missing_model}',
+                                user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name}',
+                                output_type: output_type,
                                 maestro_interface: ToInterface(maestroName),
                                 input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{controller_generator_missing_model}'
                             })
@@ -97,6 +104,8 @@ export default class ControllerGenerator {
                 controllerTemplateClass = bindTemplate(controllerTemplateClass, {
                     codeName: codeName,
                     'codeName#alllower': codeName.toLowerCase(),
+                    user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name}',
+                    user: userNode  ? GetNodeProp(userNode , NodeProperties.CodeName) : '{controller_generator_code_name}',
                     functions
                 });
             });

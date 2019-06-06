@@ -10,19 +10,22 @@ const STREAM_PROCESS_FUNCTION_TEMPLATE = './app/templates/stream_process/stream_
 
 export default class StreamProcessGenerator {
     static GenerateStaticMethods(models) {
-
+        let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         let _streamProcessFunctionTemplate = fs.readFileSync(STREAM_PROCESS_FUNCTION_TEMPLATE, 'utf-8');
-        let staticMethods = models.map(model => {
-            let streamProcessFunctionTemplate = _streamProcessFunctionTemplate;
-            let modelCode = GetNodeProp(model, NodeProperties.CodeName);
-            let res = bindTemplate(streamProcessFunctionTemplate, {
-                model: modelCode,
-                [`model#allupper`]: modelCode.toUpperCase()
+        let staticMethods = [];
+        agents.map(agent => {
+            models.map(model => {
+                let streamProcessFunctionTemplate = _streamProcessFunctionTemplate;
+                let modelCode = GetNodeProp(model, NodeProperties.CodeName);
+                let res = bindTemplate(streamProcessFunctionTemplate, {
+                    model: modelCode,
+                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                    [`model#allupper`]: modelCode.toUpperCase()
+                });
+
+                staticMethods.push(res + jNL);
             });
-
-            return res + jNL
         });
-
         return staticMethods;
     }
     static Generate(options) {

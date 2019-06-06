@@ -280,6 +280,7 @@ export const Functions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
         title: Titles.Update_Object_Agent_Value__IListObject,
@@ -290,6 +291,7 @@ export const Functions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
@@ -300,6 +302,7 @@ export const Functions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
@@ -310,6 +313,7 @@ export const Functions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
@@ -319,6 +323,7 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
@@ -329,6 +334,7 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
@@ -339,6 +345,7 @@ export const Functions = {
         output: {
             ...COMMON_OUTPUT.LIST
         },
+        isList: true,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {

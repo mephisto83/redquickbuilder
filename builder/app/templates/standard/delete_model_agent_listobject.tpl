@@ -6,7 +6,7 @@ public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}
     if(await {{agent_type}}Permissions.CanDelete{{model}}({{agent}}, {{value}}).ConfigureAwait(false))) {
         var parameters = {{model}}Change.Delete({{customer}}, {{value}});
 
-        var result = await StreamProcess.{{model}}(parameters);
+        var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
 
         return await {{model}}Arbiter.GetOwnedBy({{agent}}.Id);
     }
