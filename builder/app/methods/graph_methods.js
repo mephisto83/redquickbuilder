@@ -34,7 +34,29 @@ export function createGraph() {
         graphs: {},
         classNodes: {},
         functionNodes: {}, // A function nodes will be run through for checking constraints.
-        updated: null
+        updated: null,
+        appConfig: {
+            "Logging": {
+                "IncludeScopes": false,
+                "LogLevel": {
+                    "Default": "Debug",
+                    "System": "Information",
+                    "Microsoft": "Information"
+                }
+            },
+            "AppSettings": {
+                "Local-AuthorizationKey": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+                "Local-EndPointUrl": "https://localhost:8081",
+                "use_local": "true",
+                "EndPointUrl": "",
+                "AuthorizationKey": "",
+                "DatabaseId": "red-db-001",
+                "AssemblyPrefixes": "RedQuick",
+                "Use-SingleCollection": "true",
+                "storage-key": "UseDevelopmentStorage=true",
+                "single-thread": true
+            }
+        }
     }
 }
 export const GraphKeys = {

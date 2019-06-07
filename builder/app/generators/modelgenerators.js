@@ -6,6 +6,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 const MODEL_TEMPLATE = './app/templates/models/model.tpl';
 const MODEL_PROPERTY_TEMPLATE = './app/templates/models/model_property.tpl';
+const MODEL_STATIC_TEMPLATES = './app/templates/models/model_statics.tpl';
 const MODEL_ATTRIBUTE_TEMPLATE = './app/templates/models/model_attributes.tpl';
 export default class ModelGenerator {
     static Generate(options) {
@@ -45,6 +46,8 @@ export default class ModelGenerator {
         });
         let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf-8');
         let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf-8');
+        let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
+        let staticFunctions = [];
         let properties = connectedProperties.map(propNode => {
             var connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
                 id: propNode.id,
@@ -61,6 +64,7 @@ export default class ModelGenerator {
             }
             let propType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
             let propSwapDictionary = {
+                model: GetNodeProp(node, NodeProperties.CodeName),
                 property_type: propType,
                 property: GetNodeProp(propNode, NodeProperties.CodeName),
                 attributes: connectedAttributes.map(attr => {
@@ -147,9 +151,13 @@ export default class ModelGenerator {
             }
 
             property_instance_template = bindTemplate(property_instance_template, propSwapDictionary);
-
             return property_instance_template;
         });
+        let staticDic = {
+            model: GetNodeProp(node, NodeProperties.CodeName)
+        };
+        staticFunctions.push(bindTemplate(staticFunctionTemplate, staticDic));
+        
         if (GetNodeProp(node, NodeProperties.IsUser)) {
             var agenNodes = NodesByType(state, NodeTypes.Model).filter(x => x.id !== node.id && GetNodeProp(x, NodeProperties.IsAgent));
             agenNodes.map(agent => {
@@ -165,6 +173,7 @@ export default class ModelGenerator {
             })
         }
         templateSwapDictionary.properties = properties.join('');
+        templateSwapDictionary.staticFunctions = staticFunctions.unique(x => x).join('\n');
         console.log(templateSwapDictionary.properties)
         let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf-8');
         modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);

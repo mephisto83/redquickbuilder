@@ -1,12 +1,14 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
+const TEST_CLASS = './app/templates/tests/tests.tpl';
 const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = './app/templates/stream_process/stream_process_change_class_extention.tpl';
 const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = './app/templates/stream_process/stream_process_change_class_constructor.tpl';
+const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS = './app/templates/stream_process/tests/stream_process_change_class_constructor.tpl';
 
 const PROPERTY_TABS = 6;
 export default class ChangeParameterGenerator {
@@ -24,40 +26,62 @@ export default class ChangeParameterGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
         let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
         let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
+        let _streamProcessChangeClassConstrictorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, 'utf-8');
         let result = {};
-        models.map(model => {
+        models.map(agent => {
             let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
+            let testClass = _testClass;
             let properties = '';
             let statics = '';
             let constructors = [];
-            agents.map(agent => {
+            let tests = [];
+            models.map(model => {
                 Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
 
                     streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
-                        model: GetNodeProp(model, NodeProperties.CodeName),
-                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                        model: GetNodeProp(agent, NodeProperties.CodeName),
+                        value: GetNodeProp(agent, NodeProperties.ValueName) || 'value',
+                        agent_type: GetNodeProp(model, NodeProperties.CodeName),
+                        agent: GetNodeProp(model, NodeProperties.AgentName) || 'agent',
+                        change_type: `Methods.${method}`,
+                        method
+                    });
+                    let streamProcessChangeClassConstrictorsTest = _streamProcessChangeClassConstrictorsTest;
+
+                    streamProcessChangeClassConstrictorsTest = bindTemplate(streamProcessChangeClassConstrictorsTest, {
+                        model: GetNodeProp(agent, NodeProperties.CodeName),
+                        value: GetNodeProp(agent, NodeProperties.ValueName) || 'value',
+                        agent_type: GetNodeProp(model, NodeProperties.CodeName),
+                        agent: GetNodeProp(model, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
                         method
                     });
                     constructors.push(streamProcessChangeClassConstructors);
+                    tests.push(streamProcessChangeClassConstrictorsTest);
 
                 })
             }).join(jNL);
 
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
-                model: GetNodeProp(model, NodeProperties.CodeName),
+                model: GetNodeProp(agent, NodeProperties.CodeName),
                 constructors: constructors.join(jNL)
             });
 
-            result[GetNodeProp(model, NodeProperties.CodeName)] = {
-                id: GetNodeProp(model, NodeProperties.CodeName),
-                name: `${GetNodeProp(model, NodeProperties.CodeName)}Change`,
+            testClass = bindTemplate(testClass, {
+                name: GetNodeProp(agent, NodeProperties.CodeName),
+                tests: tests.unique(x => x).join('')
+            })
+
+
+            result[GetNodeProp(agent, NodeProperties.CodeName)] = {
+                id: GetNodeProp(agent, NodeProperties.CodeName),
+                name: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`,
+                tname: `${GetNodeProp(agent, NodeProperties.CodeName)}ChangeTests`,
                 template: NamespaceGenerator.Generate({
                     template: streamProcessChangeClassExtension,
                     usings: [
@@ -66,13 +90,24 @@ export default class ChangeParameterGenerator {
                         `${namespace}${NameSpace.Model}`],
                     namespace,
                     space: NameSpace.Parameters
+                }),
+                test: NamespaceGenerator.Generate({
+                    template: testClass,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        ...STANDARD_TEST_USING,
+                        `${namespace}${NameSpace.Constants}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Model}`],
+                    namespace,
+                    space: NameSpace.Tests
                 })
             };
         })
 
         return result;
     }
-} 
+}
 const NL = `
                     `
 const jNL = `

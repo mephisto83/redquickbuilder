@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs');
+const cheerio = require('cheerio')
 // import path from 'path';
 var path = require('path');
 var child_process = require('child_process'),
@@ -56,7 +57,13 @@ for (let j = 0; j < process.argv.length; j++) {
         command = process.argv[j];
     }
 }
-
+const appSettingsCopySettings = `
+<ItemGroup>
+<None Update="appsettings.json">
+  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+</None>
+</ItemGroup>
+`;
 function createWorkSpace() {
     var build = fs.readFileSync('./workspace.json', 'utf-8');
     build = JSON.parse(build);
@@ -136,10 +143,34 @@ function createWorkSpace() {
         //dotnet sln todo.sln add todo-app/todo-app.csproj
         return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
     }).then(() => {
+        //dotnet add app/app.csproj reference lib/lib.csproj
+        var projectPath = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
+        var relPath = build.solutionName + '.Models/' + build.solutionName + '.Models.csproj';
+        //dotnet sln todo.sln add todo-app/todo-app.csproj
+        return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+    }).then(() => {
+        //dotnet add app/app.csproj reference lib/lib.csproj
+        var projectPath = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
+        var relPath = build.solutionName + '.Interfaces/' + build.solutionName + '.Interfaces.csproj';
+        //dotnet sln todo.sln add todo-app/todo-app.csproj
+        return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+    }).then(() => {
+        //dotnet add app/app.csproj reference lib/lib.csproj
+        var projectPath = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
+        var relPath = build.solutionName + '.Controllers/' + build.solutionName + '.Controllers.csproj';
+        //dotnet sln todo.sln add todo-app/todo-app.csproj
+        return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+    }).then(() => {
+        //dotnet add app/app.csproj reference lib/lib.csproj
+        var projectPath = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
+        var relPath = build.solutionName + '.Web/' + build.solutionName + '.Web.csproj';
+        //dotnet sln todo.sln add todo-app/todo-app.csproj
+        return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+    }).then(() => {
         //D:\dev\redquick\RedQuick\RedQuickCore
         //Add nuget packages.
         let source = `D:/dev/redquick/RedQuick/RedQuickCore`;
-
+        let testProject = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
         let projects = [
             build.solutionName + '.Controllers/' + build.solutionName + '.Controllers.csproj',
             build.solutionName + '.Web/' + build.solutionName + '.Web.csproj',
@@ -147,10 +178,38 @@ function createWorkSpace() {
             build.solutionName + '.Interfaces/' + build.solutionName + '.Interfaces.csproj',
         ];
         var promise = Promise.resolve();
+        let dependencies = [
+            'Microsoft.Extensions.Configuration.Json',
+            'Microsoft.Extensions.Identity.Core',
+            'Autofac',
+            'Microsoft.Azure.DocumentDB.Core',
+            'Microsoft.Azure.DocumentDB',
+            'Moq'];
         projects.map(project => {
             promise = promise.then(() => {
                 return executeSpawnCmd('dotnet', ['add', project, 'package', 'RedQuick', '-s', source], {});
             });
+        });
+        dependencies.map(depen => {
+            promise = promise.then(() => {
+                return executeSpawnCmd('dotnet', ['add', testProject, 'package', depen], {});
+            });
+        })
+
+        promise = promise.then(() => {
+            console.log('updating the tests project output setting');
+            let tp = fs.readFileSync(testProject, 'utf-8');
+            const $ = cheerio.load(tp, {
+                xmlMode: true
+            });
+            var settingsEl = $('[Update="appsettings.json"]');
+
+            if (!settingsEl || settingsEl.length === 0) {
+                $('[Sdk="Microsoft.NET.Sdk"]').append(appSettingsCopySettings);
+                var res = $.xml();
+                fs.writeFileSync(testProject, res, 'utf-8');
+            }
+            console.log('completed the tests project output setting');
         })
         return promise;
     }).catch(e => {

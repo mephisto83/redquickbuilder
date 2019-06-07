@@ -63,6 +63,7 @@ function generateFiles(workspace, solutionName, state) {
         NodeTypes.Maestro,
         ...Object.values(GeneratedTypes)
     ];
+    let root = GetRootGraph(state);
     code_types.map(code_type => {
 
         var temp = Generator.generate({
@@ -76,9 +77,15 @@ function generateFiles(workspace, solutionName, state) {
             if (temp[fileName].interface) {
                 writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${temp[fileName].iname || fileName}.cs`), temp[fileName].interface);
             }
+            if (temp[fileName].test) {
+                writeFileSync(path.join(workspace, solutionName + '.Tests', `${temp[fileName].tname || fileName}.cs`), temp[fileName].test);
+
+            }
         }
     })
-
+    if (root) {
+        writeFileSync(path.join(workspace, solutionName + '.Tests', `appsettings.json`), JSON.stringify(root.appConfig, null, 4));
+    }
 }
 
 const CodeTypeToArea = {

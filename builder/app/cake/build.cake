@@ -6,8 +6,14 @@ Task("Default")
   Information("Hello World!");
 });
 
-
+Task("InstallNPM")
+  .Does(()=>{
+    StartProcess("powershell" , new ProcessSettings { 
+      Arguments = "npm install"
+    });
+  });
 Task("CreateWorkSpace")
+    .IsDependentOn("InstallNPM")
     .Does(() => {
         if(workSpace == string.Empty) {
             Information("Work space is empty");

@@ -33,6 +33,12 @@ export const GeneratedTypes = {
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration'
 }
+export const STANDARD_TEST_USING = [
+    'Microsoft.VisualStudio.TestTools.UnitTesting',
+    'Moq',
+    'Autofac',
+    'Microsoft.Extensions.Configuration.Json'
+]
 export const STANDARD_CONTROLLER_USING = [
     'RedQuick.Data',
     'RedQuick.Attributes',
@@ -100,6 +106,7 @@ export const GroupProperties = {
 export const NameSpace = {
     Model: '.Models',
     StreamProcess: '.ActionStream',
+    Tests: '.Tests',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
     Constants: '.Constants',

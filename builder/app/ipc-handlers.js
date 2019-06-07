@@ -50,6 +50,8 @@ function scaffoldProject(body) {
     }).then(() => {
         return copyFile(`./app/cake/build.js`, path.join(workspace, 'build.js'));
     }).then(() => {
+        return copyFile(`./app/cake/package.json`, path.join(workspace, 'package.json'));
+    }).then(() => {
         return writeJsonToFile({ workspace, solutionName }, path.join(workspace, 'workspace.json'));
     }).then(() => {
         return executeSpawnCmd('powershell', ['./build.ps1', '-Target', 'CreateWorkSpace'], { cwd: workspace })
