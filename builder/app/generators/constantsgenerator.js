@@ -32,7 +32,7 @@ export default class ConstantsGenerator {
                     name: key,
                     value: model[key]
                 });
-                return ConstantsGenerator.Tabs(2) + temp;
+                return ConstantsGenerator.Tabs(3) + temp;
             }).join(jNL)
 
             constantsClass = bindTemplate(constantsClass, {

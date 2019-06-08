@@ -1,3 +1,4 @@
-    public class {{constants_type}} {
+    public class {{constants_type}} 
+    {
 {{constants}}
     }

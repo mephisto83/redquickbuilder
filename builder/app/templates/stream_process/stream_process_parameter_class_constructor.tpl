@@ -1,3 +1,4 @@
-public {{model}}Parameter() {
+        public {{model}}Parameter() 
+        {
 
-} 
+        } 

@@ -1,10 +1,11 @@
-public static {{model}}Parameter {{method}}({{parameters}}) {
-    
-    var result = new {{model}}Parameter();
-    
-    result.Stream = StreamTypes.{{model}};
+        public static {{model}}Parameter {{method}}({{parameters}}) 
+        {
+            
+            var result = new {{model}}Parameter();
+            
+            result.Stream = StreamTypes.{{model}};
 
-    {{parameters_property}}
+            {{parameters_property}}
 
-    return result;
-}
+            return result;
+        }

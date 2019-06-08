@@ -37,9 +37,9 @@ function send(mess, body) {
     return result;
 }
 
-export function scaffoldProject(options) {
-    var { options } = options;
-    return (filesOnly, getState) => {
+export function scaffoldProject(options = {}) {
+    var { filesOnly } = options;
+    return (dispatch, getState) => {
         var state = getState();
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');

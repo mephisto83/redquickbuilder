@@ -1,5 +1,6 @@
 export const AddNode = 'Add Node';
 export const RemoveNode = 'Remove Node';
+export const RemoveValidation = 'Remove Validation';
 export const GraphOperations = 'Graph Operations';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const NodeLabel = 'Node Label';
@@ -12,6 +13,8 @@ export const CodeTypes = 'Code Types';
 export const Project = 'Project';
 export const NameSpace = 'NameSpace';
 export const Collapsed = 'Collapsed';
+export const Agents = 'Agents';
+export const SelectProperty = 'Select Property';
 export const DisallowedEnums = 'Disallowed values';
 export const AllowedEnums = 'Allowed values';
 export const ModelActions = 'Model Actions';
@@ -144,7 +147,8 @@ export const Maestros = 'Maestros';
 export const Save = 'Save';
 export const Open = 'Open';
 
-export const PublishFiles = 'Publish Files'
+export const Validator = 'Validator';
+export const PublishFiles = 'Publish Files';
 export const Scaffold = 'Scaffold';
 export const SetWorkingDirectory = 'Set Working Directory';
 

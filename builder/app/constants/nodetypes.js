@@ -12,6 +12,7 @@ export const NodeTypes = {
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
+    Validator: 'validator',
     OptionList: 'option-list',
     OptionListItem: 'option-list-item',
     OptionCustom: 'option-custom',
@@ -91,6 +92,7 @@ export const NodeTypeColors = {
     [NodeTypes.FunctionOutput]: '#857885',
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
+    [NodeTypes.Validator]: '#151522',
     [NodeTypes.ReferenceNode]: '#F7B538'
 }
 
@@ -119,8 +121,12 @@ export const NodeProperties = {
     Enumeration: 'Enumeration',
     AllowedExtensionValues: 'AllowedExtensionValues',
     AllowedEnumValues: 'AllowedEnumerationValue',
+    ValidatorModel: 'ValidatorModel',
+    ValidatorFunction: 'ValidatorFunction',
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
+    Validator: 'Validator',
+    ValidatorAgent: 'ValidatorAgent',
     Collapsed: 'collapsed',
     UseExtension: 'usextension',
     CodeUser: 'codeUser',
@@ -246,11 +252,18 @@ export function CreateStringList(options) {
         ${list}
     }`
 }
-
+export const LinkEvents = {
+    Remove: 'remove'
+}
 export const LinkType = {
     Choice: 'choice',
     Validation: 'validation',
     ValidationItem: 'validation-item',
+    Validator: 'validator',
+    ValidatorProperty: 'validator-property',
+    ValidatorModel: 'validator-model',
+    ValidatorFunction: 'validator-function',
+    ValidatorAgent: 'validator-agent',
     Option: 'option',
     OptionItem: 'option-item',
     OptionCustom: 'option-custom',
@@ -314,6 +327,10 @@ export const LinkStyles = {
     [LinkType.Validation]: {
         type: LinkType.Validation,
         stroke: NodeTypeColors[NodeTypes.ValidationList]
+    },
+    [LinkType.Validator]: {
+        type: LinkType.Validator,
+        stroke: NodeTypeColors[NodeTypes.Validator]
     },
     [LinkType.Option]: {
         type: LinkType.Option,
@@ -404,6 +421,18 @@ export const LinkProperties = {
     ValidationLinkItem: {
         type: LinkType.ValidationItem
     },
+    ValidatorAgentLink: {
+        type: LinkType.ValidatorAgent
+    },
+    ValidatorModelLink: {
+        type: LinkType.ValidatorModel
+    },
+    ValidatorPropertyLink: {
+        type: LinkType.ValidatorProperty
+    },
+    ValidatorFunctionLink: {
+        type: LinkType.ValidatorFunction
+    },
     OptionLink: {
         type: LinkType.Option
     },
@@ -469,7 +498,10 @@ export const ValidationRules = {
     ZipEmpty: "zipempty",
     Zip: "zip",
     SocialSecurity: "socialsecurity",
+    OneOf: 'one-of'
 }
+
+
 export const ExtensionDefinitionTypes = {
     DictionaryStringString: 'DictionaryStringString',
     DictionaryStringDictionary: 'DictionaryStringDictionary',
@@ -487,6 +519,7 @@ export const OptionsTypes = {
 export const NodePropertyTypes = {
     STRING: 'STRING',
     LISTOFSTRINGS: 'LISTOFSTRINGS',
+    DATETIME: 'DATETIME',
     INT: 'INT',
     FLOAT: 'FLOAT',
     DOUBLE: 'DOUBLE',
@@ -500,6 +533,7 @@ export const ProgrammingLanguages = {
 }
 export const NodePropertyTypesByLanguage = {
     [ProgrammingLanguages.CSHARP]: {
+        [NodePropertyTypes.DATETIME]: 'DateTime',
         [NodePropertyTypes.STRING]: 'string',
         [NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
         [NodePropertyTypes.INT]: 'int',
@@ -555,4 +589,109 @@ export const NodeAttributePropertyTypes = {
     GEOLOCATION: "GEOLOCATION",
     YEAR: "YEAR"
 
+}
+
+const COMMON_DATETIME_ARGS = {
+    value: {
+        type: NodePropertyTypes.DATETIME,
+        nodeType: NodeTypes.Property
+    }
+}
+
+const COMMON_STRING_ARGS = {
+    value: {
+        type: NodePropertyTypes.STRING,
+        nodeType: NodeTypes.Property
+    }
+}
+
+
+export const ValidationUI = {
+    [ValidationRules.OneOf]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'OneOfAttribute'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Enumeration
+        }
+    },
+    [ValidationRules.SocialSecurity]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'SocialSecurityAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Zip]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ZipAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.ZipEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ZipEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.PastDate]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'PastDateAttribute'
+        },
+        arguments: { ...COMMON_DATETIME_ARGS }
+    },
+    [ValidationRules.BeforeNow]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'BeforeNowAttribute'
+        },
+        arguments: { ...COMMON_DATETIME_ARGS }
+    },
+    [ValidationRules.Email]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Credit]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'CreditCardAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.EmailEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Url]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'UrlAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.UrlEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'UrlEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaNumericLike]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'AlphaNumericLinkAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaOnly]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'AlphaOnlyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaOnlyWithSpaces]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'NotEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    }
 }

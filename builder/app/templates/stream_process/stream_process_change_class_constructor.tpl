@@ -1,6 +1,7 @@
 
         // Per {{method}}
-        public static {{model}}Change {{method}}({{agent_type}} acting{{agent}}, {{model}} {{value}}) {
+        public static {{model}}Change {{method}}({{agent_type}} acting{{agent}}, {{model}} {{value}}) 
+        {
         
             var result = new {{model}}Change();
             result.AgentType = acting{{agent}}.GetType().FullName;

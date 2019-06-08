@@ -1,5 +1,5 @@
 import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups } from '../constants/nodetypes';
+import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
 import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty } from '../actions/uiactions';
 export function createGraph() {
@@ -281,6 +281,29 @@ export function clearGroup(graph, ops) {
 
     return graph;
 }
+export function createValidator() {
+    return {
+        properties: {}
+    }
+}
+export function createValidatorProperty() {
+    return {
+        validators: {
+        }
+    }
+}
+export function addValidatator(validator, options) {
+    validator.properties[options.id] = validator.properties[options.id] || createValidatorProperty();
+    if (options.validator)
+        validator.properties[options.id].validators[options.validator] = options.validatorArgs;
+
+    return validator;
+}
+export function removeValidator(validator, options) {
+    delete validator.properties[options.id];
+    return validator;
+}
+
 
 export function newNode(graph) {
     let node = createNode();
@@ -1348,10 +1371,60 @@ export function removeLinkBetweenNodes(graph, options) {
     let link = findLinkInstance(graph, options);
     return removeLink(graph, link);
 }
+export function executeEvents(graph, link, evt) {
+    switch (evt) {
+        case LinkEvents.Remove:
+            graph = executeRemoveEvents(graph, link);
+            break;
+    }
+    return graph;
+}
+export const EventFunctions = {};
+export function addEventFunction(key, func) {
+    EventFunctions[key] = func;
+}
+export function removeEventFunction(key) {
+    delete EventFunctions[key];
+}
+export function executeRemoveEvents(graph, link) {
+    if (link && link.properties && link.properties.on && link.properties.on[LinkEvents.Remove]) {
+        link.properties.on[LinkEvents.Remove].map(args => {
+            if (args.function && EventFunctions[args.function]) {
+                graph = EventFunctions[args.function](graph, link, args.function)
+            }
+        });
+    }
+    return graph;
+}
+
+addEventFunction('OnRemoveValidationPropConnection', (graph, link, func) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    if (node && node.properties)
+        removeValidator(GetNodeProp(node, NodeProperties.Validator), { id: target });
+    return graph;
+});
+export function createEventProp(type, options = {}) {
+    var res = { on: {} };
+    switch (type) {
+        case LinkEvents.Remove:
+            res.on[type] = [{
+                ...options
+            }];
+            break;
+    }
+
+    return res;
+}
 export function removeLink(graph, link) {
     if (link) {
         graph.links = [...graph.links.filter(x => x !== link)];
         let del_link = graph.linkLib[link];
+        if (del_link.properties) {
+            if (del_link.properties.on && del_link.properties.on[LinkEvents.Remove]) {
+                graph = executeEvents(graph, del_link, LinkEvents.Remove);
+            }
+        }
         delete graph.linkLib[link]
         graph.linkLib = { ...graph.linkLib };
         graph.nodeLinks[del_link.source] = {

@@ -1,6 +1,7 @@
 
         [TestMethod]
-        public async Task {{method}}{{agent_type}}{{model}}(){
+        public async Task {{method}}{{agent_type}}{{model}}()
+        {
             // Arrange
             var agent = {{agent_type}}.Create();
             agent.Id = Guid.NewGuid().ToString();

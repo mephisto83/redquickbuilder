@@ -34,9 +34,12 @@ import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
+import ValidatorActivityMenu from './validatoractivitymenu';
 import OptionActivityMenu from './optionactivitymenu';
 import ParameterActivityMenu from './parameteractivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
+import ValidatorPropertyMenu from './validatorpropertymenu';
+import ValidatorPropertyActivityMenu from './validatorpropertyactivitymenu';
 import ExtensionListActivityMenu from './ExtensionListActivityMenu';
 import PermissionActivityMenu from './permissionsactivitymenu';
 import ReferenceActivityMenu from './referenceactivitymenu';
@@ -295,6 +298,7 @@ class Dashboard extends Component {
                                 <AttributeFormControl />
                                 <ParameterActivityMenu />
                                 <ModelActivityMenu />
+                                <ValidatorActivityMenu />
                                 <PropertyActivityMenu />
                                 <ValidationItemFormControl />
                                 <ChoiceActivityMenu />
@@ -309,8 +313,10 @@ class Dashboard extends Component {
                                 <EnumerationActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
+                                <ValidatorPropertyMenu />
                                 <ReferenceActivityMenu />
                             </SideBarContent>) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                         </SideBar>
                     </div>
                 </div >
