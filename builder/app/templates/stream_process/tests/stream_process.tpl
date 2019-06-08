@@ -26,4 +26,5 @@
 
             //Assert
             Assert.IsNotNull(res);
+            Assert.IsNotNull(res.Id, change.Response);
         }

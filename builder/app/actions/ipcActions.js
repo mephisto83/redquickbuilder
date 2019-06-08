@@ -37,15 +37,16 @@ function send(mess, body) {
     return result;
 }
 
-export function scaffoldProject(filesAndContent) {
-    return (dispatch, getState) => {
+export function scaffoldProject(options) {
+    var { options } = options;
+    return (filesOnly, getState) => {
         var state = getState();
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');
-        send(HandlerEvents.scaffold.message, {
+        (filesOnly ? Promise.resolve() : send(HandlerEvents.scaffold.message, {
             solutionName,
             workspace: path.join(root.workspace, root.title)
-        }).then(res => {
+        })).then(res => {
             console.log('Finished Scaffolding.');
 
             generateFiles(path.join(root.workspace, root.title), solutionName, state);

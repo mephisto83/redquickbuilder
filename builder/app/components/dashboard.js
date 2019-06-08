@@ -158,24 +158,36 @@ class Dashboard extends Component {
                                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                                 }} />
                                 <SideBarHeader title={Titles.FileMenu} />
-                                <TreeViewMenu hideArrow={true} title={Titles.New} icon={'fa fa-plus'} onClick={() => {
-                                    this.props.newRedQuickBuilderGraph();
-                                }} />
-                                <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
-                                    this.props.openRedQuickBuilderGraph();
-                                }} />
-                                <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
-                                    this.props.saveGraphToFile();
-                                }} />
+
+                                <TreeViewMenu
+                                    open={UIA.Visual(state, VC.ApplicationMenu)}
+                                    active={UIA.Visual(state, VC.ApplicationMenu)}
+                                    title={Titles.AppMenu}
+                                    toggle={() => {
+                                        this.props.toggleVisual(VC.ApplicationMenu)
+                                    }}>
+                                    <TreeViewMenu hideArrow={true} title={Titles.New} icon={'fa fa-plus'} onClick={() => {
+                                        this.props.newRedQuickBuilderGraph();
+                                    }} />
+                                    <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
+                                        this.props.openRedQuickBuilderGraph();
+                                    }} />
+                                    <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                                        this.props.saveGraphToFile();
+                                    }} />
+                                    <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-cog'} onClick={() => {
+                                        this.props.scaffoldProject();
+                                    }} />
+                                    <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa fa-cog'} onClick={() => {
+                                        this.props.scaffoldProject({ filesOnly: true });
+                                    }} />
+                                    <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                                        this.props.setWorkingDirectory();
+                                    }} />
+                                </TreeViewMenu>
                                 <SideBarHeader title={Titles.Project} />
                                 <SideBarHeader title={version} />
-                                <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-cog'} onClick={() => {
-                                    this.props.scaffoldProject();
-                                }} />
-                                <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
-                                    this.props.setWorkingDirectory();
-                                }} />
-                                {workspace ? <SideBarHeader hideArrow={true} title={workspace} icon={'fa fa-cog'}/> : null}
+                                {workspace ? <SideBarHeader hideArrow={true} title={workspace} icon={'fa fa-cog'} /> : null}
 
                                 <TreeViewMenu
                                     open={UIA.Visual(state, VC.GraphPropertiesMenu)}

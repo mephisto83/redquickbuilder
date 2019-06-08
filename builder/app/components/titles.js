@@ -40,8 +40,9 @@ export const FunctionSetup = 'Function Setup';
 export const AgentOperator = 'Agent Operator';
 export const Enumerable = 'Enumerable';
 export const Value = 'Value';
+export const AppMenu = 'Application Menu';
 export const CodeName = 'Code Name';
-export const ValueName  ='Value Name';
+export const ValueName = 'Value Name';
 export const AgentName = 'Agent Name';
 export const FileMenu = 'File Menu';
 export const Code = 'Code';
@@ -143,6 +144,7 @@ export const Maestros = 'Maestros';
 export const Save = 'Save';
 export const Open = 'Open';
 
+export const PublishFiles = 'Publish Files'
 export const Scaffold = 'Scaffold';
 export const SetWorkingDirectory = 'Set Working Directory';
 

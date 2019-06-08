@@ -2,6 +2,6 @@
     {
         public {{model}} Data { get; set; }
         
-        {{constructors}}
+{{constructors}}
         
     }

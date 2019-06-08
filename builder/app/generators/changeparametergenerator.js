@@ -10,6 +10,7 @@ const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = './app/templates/stream_process/st
 const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = './app/templates/stream_process/stream_process_change_class_constructor.tpl';
 const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS = './app/templates/stream_process/tests/stream_process_change_class_constructor.tpl';
 
+const MODEL_STATIC_TEMPLATES = './app/templates/models/model_statics.tpl';
 const PROPERTY_TABS = 6;
 export default class ChangeParameterGenerator {
     static Tabs(c) {
@@ -38,6 +39,7 @@ export default class ChangeParameterGenerator {
             let statics = '';
             let constructors = [];
             let tests = [];
+            let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
             models.map(model => {
                 Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 
@@ -67,13 +69,17 @@ export default class ChangeParameterGenerator {
                 })
             }).join(jNL);
 
+            let staticDic = {
+                model: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`
+            };
+            constructors.push(bindTemplate(staticFunctionTemplate, staticDic));
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                 model: GetNodeProp(agent, NodeProperties.CodeName),
                 constructors: constructors.join(jNL)
             });
 
             testClass = bindTemplate(testClass, {
-                name: GetNodeProp(agent, NodeProperties.CodeName),
+                name: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`,
                 tests: tests.unique(x => x).join('')
             })
 
