@@ -1,5 +1,5 @@
 @import url('goo-menu.css');
-.treeview .treeview-menu {
+.treeview > .treeview-menu {
     transition: all;
     transition-duration: .4s;
     transform: scale(0) translateY(-123px);
@@ -8,7 +8,7 @@
     overflow: hidden;
 }
 
-.treeview.menu-open.active .treeview-menu {
+.treeview.menu-open.active > .treeview-menu {
     transform: scale(1) translateY(0);
     opacity: 1;
     height: auto;

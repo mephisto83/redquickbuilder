@@ -1,6 +1,9 @@
 export const AddNode = 'Add Node';
 export const RemoveNode = 'Remove Node';
 export const RemoveValidation = 'Remove Validation';
+export const SelectValidation = 'Select Validation';
+export const SelectedValidations = 'Selected Validations';
+export const Remove = 'Remove';
 export const GraphOperations = 'Graph Operations';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const NodeLabel = 'Node Label';

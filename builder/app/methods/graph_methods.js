@@ -299,6 +299,12 @@ export function addValidatator(validator, options) {
 
     return validator;
 }
+export function removeValidatorValidation(_validator, options) {
+    var { property, validator } = options;
+    delete _validator.properties[property].validators[validator];
+
+    return _validator;
+}
 export function removeValidator(validator, options) {
     delete validator.properties[options.id];
     return validator;

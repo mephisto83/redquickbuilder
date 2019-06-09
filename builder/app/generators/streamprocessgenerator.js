@@ -48,7 +48,7 @@ export default class StreamProcessGenerator {
                 staticMethods.push(res + jNL);
             });
         });
-        return staticMethods;
+        return staticMethods.unique(x => x);
     }
     static Generate(options) {
         var { state, key } = options;

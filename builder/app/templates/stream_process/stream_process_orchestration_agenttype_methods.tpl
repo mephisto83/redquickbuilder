@@ -58,7 +58,8 @@
         public async Task Create({{model}}Change change) {
             var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Create)) {
+            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+            {
                 var result = await {{model#lower}}Arbiter.Create(data);
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
             }
@@ -70,7 +71,8 @@
         public async Task Update({{model}}Change change) {
             var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Update)) {
+            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+            {
                 var result = await {{model#lower}}Arbiter.Update(data);
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
             }
@@ -82,7 +84,8 @@
         public async Task Delete({{model}}Change change) {
             var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
             var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}>(data, agent, Methods.Delete)) {
+            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+            {
                 var result = await {{model#lower}}Arbiter.Delete(data);
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
             }
