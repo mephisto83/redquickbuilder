@@ -45,6 +45,8 @@ export const STANDARD_CONTROLLER_USING = [
     'RedQuick.Data',
     'RedQuick.Attributes',
     'RedQuick.Interfaces',
+    'RedQuick.Validation',
+    'RedQuickCore.Validation.Rules',
     'RedQuick.Interfaces.Arbiter',
     'RedQuick.Configuration',
     'RedQuick.Util',
@@ -612,7 +614,202 @@ const COMMON_STRING_ARGS = {
     }
 }
 
+export const ValidationCases = {
+    [ValidationRules.SocialSecurity]: {
+        cases: {
+            '$true': function (e) {
+                return `"${[].interpolate(0, 9, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'long': function () {
+                return `"${[].interpolate(0, 12, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'short': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'invalid': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('a')}"`
+            },
+            'empty': function () {
+                return `"${[].interpolate(0, 0, e => Math.floor(Math.random() * 10)).join('')}"`
+            }
+        },
+    },
+    [ValidationRules.Zip]: {
+        cases: {
+            '$true': function (e) {
+                return `"${[].interpolate(0, 5, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'long': function () {
+                return `"${[].interpolate(0, 12, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'short': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'invalid': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('a')}"`
+            },
+            'empty': function () {
+                return `"${[].interpolate(0, 0, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+        },
+    },
+    [ValidationRules.ZipEmpty]: {
+        cases: {
+            '$true': function () {
+                return `"${[].interpolate(0, 5, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'long': function () {
+                return `"${[].interpolate(0, 12, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'short': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            '$empty': function () {
+                return `"${[].interpolate(0, 0, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'invalid': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('a')}"`
+            },
+            'invalid2': function () {
+                return `"${[].interpolate(0, 5, e => 'a').join('')}"`
+            },
+        },
+    },
+    [ValidationRules.PastDate]: {
+        cases: {
+            '$true': function (e) {
+                return `Date.UtcNow().AddDays(1)`
+            },
+            'false': function () {
+                return `Date.UtcNow().AddDays(-1)`
+            },
+        }
+    },
 
+    [ValidationRules.BeforeNow]: {
+        cases: {
+            '$true': function (e) {
+                return `Date.UtcNow().AddDays(-1)`
+            },
+            'false': function () {
+                return `Date.UtcNow().AddDays(1)`
+            },
+        }
+    },
+    [ValidationRules.Email]: {
+        cases: {
+            '$true': function (e) {
+                return `"asdf@asdf.com"`
+            },
+            'false': function () {
+                return `"asdf@asdfdd@asdf@.com"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.Email]: {
+        cases: {
+            '$true': function (e) {
+                return `"asadf@asdf.com"`
+            },
+            'false': function () {
+                return `"asdf@afsdfdd@asdf@.com"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.Credit]: {
+        cases: {
+            '$true': function () {
+                return `"${[].interpolate(0, 16, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'long': function () {
+                return `"${[].interpolate(0, 23, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'short': function () {
+                return `"${[].interpolate(0, 3, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            '$empty': function () {
+                return `"${[].interpolate(0, 0, e => Math.floor(Math.random() * 10)).join('')}"`
+            },
+            'invalid': function () {
+                return `"${[].interpolate(0, 16, e => Math.floor(Math.random() * 10)).join('a')}"`
+            },
+            'invalid2': function () {
+                return `"${[].interpolate(0, 16, e => 'a').join('')}"`
+            },
+        },
+    },
+    [ValidationRules.Url]: {
+        cases: {
+            '$true': function (e) {
+                return `"http://yahoo.com"`
+            },
+            'false': function () {
+                return `"asdf@afsdfdd@asdf@.com"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.Url]: {
+        cases: {
+            '$true': function (e) {
+                return `"http://yahoo.com"`
+            },
+            'false': function () {
+                return `"asdf@afsdfdd@asdf@.com"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.AlphaNumericLike]: {
+        cases: {
+            '$true': function (e) {
+                return `"httas21dfaom"`
+            },
+            'false': function () {
+                return `"asdf@ afsdfdd@asdf@.com"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.AlphaOnly]: {
+        cases: {
+            '$true': function (e) {
+                return `"httasdfaom"`
+            },
+            'false': function () {
+                return `"asdf@ afsdfdd@asdf12f@.com"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.AlphaOnlyWithSpaces]: {
+        cases: {
+            '$true': function (e) {
+                return `"httas dfaom"`
+            },
+            'false': function () {
+                return `"asdf@ afsdfdd@asdf12f@.com"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
+}
 export const ValidationUI = {
     [ValidationRules.OneOf]: {
         code: {
@@ -688,7 +885,7 @@ export const ValidationUI = {
     },
     [ValidationRules.AlphaNumericLike]: {
         code: {
-            [ProgrammingLanguages.CSHARP]: 'AlphaNumericLinkAttribute'
+            [ProgrammingLanguages.CSHARP]: 'AlphaNumericLikeAttribute'
         },
         arguments: { ...COMMON_STRING_ARGS }
     },
@@ -705,3 +902,6 @@ export const ValidationUI = {
         arguments: { ...COMMON_STRING_ARGS }
     }
 }
+Object.keys(ValidationUI).map(t => {
+    ValidationUI[t].type = t;
+})

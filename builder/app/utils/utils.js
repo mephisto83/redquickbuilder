@@ -119,6 +119,25 @@ String.prototype.padding = function (n, c) {
             }
         });
     }
+    if (!array.interpolate) {
+        Object.defineProperty(array, 'interpolate', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (start, stop, func) {
+                var collection = this;
+                func = func || function (x) { return x; };
+                for (var i = start; i < stop; i++) {
+                    if (collection instanceof Float32Array) {
+                        collection[i - start] = (func(i));
+                    }
+                    else
+                        collection.push(func(i, i - start));
+                }
+                return collection;
+            }
+        });
+    }
     if (!array.orderBy) {
         Object.defineProperty(array, 'orderBy', {
             enumerable: false,

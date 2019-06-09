@@ -96,6 +96,7 @@ const CodeTypeToArea = {
     [NodeTypes.Maestro]: '.Controllers',
     [GeneratedTypes.ChangeParameter]: '.Models',
     [GeneratedTypes.ChangeResponse]: '.Models',
+    [GeneratedTypes.ValidationRule]: '.Models',
     [GeneratedTypes.Constants]: '.Models',
     [GeneratedTypes.Permissions]: '.Controllers',
     [GeneratedTypes.StreamProcess]: '.Controllers',
