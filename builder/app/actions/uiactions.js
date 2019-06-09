@@ -156,9 +156,12 @@ export function NodesByType(state, nodeType, options = {}) {
 
     var currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);
     if (currentGraph) {
+        if (!Array.isArray(nodeType)) {
+            nodeType = [nodeType];
+        }
         return currentGraph.nodes
             .filter(x => currentGraph.nodeLib[x].properties &&
-                currentGraph.nodeLib[x].properties[NodeProperties.NODEType] === nodeType ||
+                (nodeType.indexOf(currentGraph.nodeLib[x].properties[NodeProperties.NODEType]) !== -1) ||
                 (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
             .map(x => currentGraph.nodeLib[x]);
     }

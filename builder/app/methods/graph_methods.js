@@ -310,6 +310,14 @@ export function removeValidator(validator, options) {
     return validator;
 }
 
+export function getValidatorItem(item, options) {
+    var { property, validator } = options;
+    return item.properties[property].validators[validator];
+}
+
+export function getValidatorProperties(validator) {
+    return validator.properties;
+}
 
 export function newNode(graph) {
     let node = createNode();
@@ -601,9 +609,46 @@ export function applyConstraints(graph) {
             }
         }
     }
+    let validationNodes = NodesByType(graph, NodeTypes.Validator);
+    validationNodes.map(x => {
+        graph = applyValidationNodeRules(graph, x);
+    })
     return graph;
 }
 
+function applyValidationNodeRules(graph, node) {
+
+    let validator = GetNodeProp(node, NodeProperties.Validator);
+    if (validator) {
+        var nodesLinks = getNodesLinkedTo(graph, { id: node.id });
+        var validatorProperties = getValidatorProperties(validator);
+        Object.keys(validatorProperties).map(property => {
+            if (graph.nodeLinks[property] && graph.nodeLinks[property][node.id]) {
+                //link between nodes exists.
+            }
+            else {
+                //link between nodes exists.
+            }
+        });
+    }
+    return graph;
+}
+
+function NodesByType(graph, nodeType, options = {}) {
+
+    var currentGraph = graph;
+    if (currentGraph) {
+        if (!Array.isArray(nodeType)) {
+            nodeType = [nodeType];
+        }
+        return currentGraph.nodes
+            .filter(x => currentGraph.nodeLib[x].properties &&
+                (nodeType.indexOf(currentGraph.nodeLib[x].properties[NodeProperties.NODEType]) !== -1) ||
+                (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
+            .map(x => currentGraph.nodeLib[x]);
+    }
+    return [];
+}
 export function existsLinkBetween(graph, options) {
     var { source, target, type } = options;
     var link = findLink(graph, { source, target })
@@ -1396,13 +1441,32 @@ export function executeRemoveEvents(graph, link) {
     if (link && link.properties && link.properties.on && link.properties.on[LinkEvents.Remove]) {
         link.properties.on[LinkEvents.Remove].map(args => {
             if (args.function && EventFunctions[args.function]) {
-                graph = EventFunctions[args.function](graph, link, args.function)
+                graph = EventFunctions[args.function](graph, link, args.function, args)
             }
         });
     }
     return graph;
 }
-
+export function isUIExtensionEnumerable(node) {
+    let _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
+    if (_node && _node.config) {
+        return _node.config.isEnumeration
+    }
+}
+export function GetUIExentionEnumeration(node) {
+    if (isUIExtensionEnumerable(node)) {
+        let _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
+        return _node.config.list;
+    }
+    return null;
+}
+export function GetUIExentionKeyField(node) {
+    if (isUIExtensionEnumerable(node)) {
+        let _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
+        return _node.config.keyField;
+    }
+    return null;
+}
 addEventFunction('OnRemoveValidationPropConnection', (graph, link, func) => {
     var { source, target } = link;
     var node = GetNode(graph, source);
@@ -1410,6 +1474,26 @@ addEventFunction('OnRemoveValidationPropConnection', (graph, link, func) => {
         removeValidator(GetNodeProp(node, NodeProperties.Validator), { id: target });
     return graph;
 });
+addEventFunction('OnRemoveValidationItemPropConnection', (graph, link, func, args) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    var { property, validator } = (args || {});
+
+    let _validator = GetNodeProp(node, NodeProperties.Validator);
+    if (node && node.properties &&
+        _validator.properties &&
+        _validator.properties[property] &&
+        _validator.properties[property].validators &&
+        _validator.properties[property].validators[validator] &&
+        _validator.properties[property].validators[validator].node === target) {
+        removeValidatorItem(_validator, { ...args, id: target, });
+    }
+    return graph;
+});
+export function removeValidatorItem(_validator, options) {
+    var { property, validator } = options;
+    delete _validator.properties[property].validators[validator]
+}
 export function createEventProp(type, options = {}) {
     var res = { on: {} };
     switch (type) {

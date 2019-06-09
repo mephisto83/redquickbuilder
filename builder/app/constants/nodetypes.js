@@ -263,6 +263,7 @@ export const LinkType = {
     ValidatorProperty: 'validator-property',
     ValidatorModel: 'validator-model',
     ValidatorFunction: 'validator-function',
+    ValidatorModelItem: 'validator-model-item',
     ValidatorAgent: 'validator-agent',
     Option: 'option',
     OptionItem: 'option-item',
@@ -426,6 +427,9 @@ export const LinkProperties = {
     },
     ValidatorModelLink: {
         type: LinkType.ValidatorModel
+    },
+    ValidatorModelItemLink: {
+        type: LinkType.ValidatorModelItem
     },
     ValidatorPropertyLink: {
         type: LinkType.ValidatorProperty
@@ -613,7 +617,10 @@ export const ValidationUI = {
         },
         arguments: {
             ...COMMON_STRING_ARGS,
-            nodeType: NodeTypes.Enumeration
+            nodeType: NodeTypes.Enumeration,
+            reference: {
+                types: [NodeTypes.Enumeration, NodeTypes.ExtensionType]
+            }
         }
     },
     [ValidationRules.SocialSecurity]: {

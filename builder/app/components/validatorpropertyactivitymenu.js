@@ -9,11 +9,12 @@ import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import SideBar from './sidebar';
 import TreeViewMenu from './treeviewmenu';
+import ValidatorItem from './validatoritem';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import { NodeProperties, NodeTypes, LinkEvents, LinkType, ValidationUI } from '../constants/nodetypes';
-import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, removeValidator, removeValidatorValidation } from '../methods/graph_methods';
+import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, removeValidator, removeValidatorValidation, uuidv4 } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 
 class ValidatorPropertyActivityMenu extends Component {
@@ -38,7 +39,7 @@ class ValidatorPropertyActivityMenu extends Component {
                     return (
                         <TreeViewMenu
                             key={`${v}-v-v`}
-                            title={v}
+                            title={_validates.validators && _validates.validators[v] && _validates.validators[v].type ? _validates.validators[v].type : v}
                             open={UIA.Visual(state, selKInner)}
                             active={UIA.Visual(state, selKInner)}
                             toggle={() => {
@@ -52,13 +53,18 @@ class ValidatorPropertyActivityMenu extends Component {
                                 onClick={() => {
                                     let id = currentNode.id;
                                     let validator = UIA.GetNodeProp(currentNode, NodeProperties.Validator) || createValidator();
-                                    validator = removeValidatorValidation(validator, { property: key, validator: v })
+ 
+
+                                    let _validates = validator.properties[key];
+                                    delete _validates.validators[v] 
+
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         id,
                                         prop: NodeProperties.Validator,
                                         value: validator
                                     })
                                 }} />
+                            <ValidatorItem node={currentNode.id} property={key} validator={v} />
                         </TreeViewMenu>
                     )
                 })
@@ -74,8 +80,9 @@ class ValidatorPropertyActivityMenu extends Component {
                                 var validator = UIA.GetNodeProp(currentNode, NodeProperties.Validator) || createValidator();
                                 validator = addValidatator(validator, {
                                     id: key,
-                                    validator: valiationUi,
+                                    validator: uuidv4(),
                                     validatorArgs: {
+                                        type: valiationUi,
                                         ...ValidationUI[valiationUi]
                                     }
                                 });

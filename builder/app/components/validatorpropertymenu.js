@@ -36,6 +36,33 @@ class ValidatorPropertyMenu extends Component {
             });
             validator = UIA.GetNodeProp(currentNode, NodeProperties.Validator);
         }
+        let propertyValidations = [];
+        if (validator && validator.properties) {
+            propertyValidations = Object.keys(validator.properties).map(key => {
+                let visualKey = `ValidatorPropertyMenu${key}-${currentNode.id}`;
+                return (
+                    <TreeViewMenu
+                        key={visualKey}
+                        open={UIA.Visual(state, visualKey)}
+                        active={UIA.Visual(state, visualKey)}
+                        title={UIA.GetNodeTitle(GetNode(graph, key))}
+                        toggle={() => {
+                            this.props.toggleVisual(visualKey)
+                        }}>
+                    </TreeViewMenu>
+                );
+            });
+            propertyValidations = (
+                <div style={{ position: 'relative' }}>
+                    <MainSideBar>
+                        <SideBar>
+                            <SideBarMenu>
+                                {propertyValidations}
+                            </SideBarMenu>
+                        </SideBar>
+                    </MainSideBar>
+                </div>);
+        }
 
         return (
             <TabPane active={active}>
@@ -66,6 +93,7 @@ class ValidatorPropertyMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ValidatorModel] : ''} />
                 </FormControl>) : null}
+                {propertyValidations}
             </TabPane>
         );
     }
