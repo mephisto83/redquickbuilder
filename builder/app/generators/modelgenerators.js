@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType, NodePropertyTypes } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
+import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType, NodePropertyTypes, NEW_LINK } from '../actions/uiactions';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes, STANDARD_CONTROLLER_USING, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -39,6 +39,7 @@ export default class ModelGenerator {
             return null;
         }
         templateSwapDictionary.model = GetNodeProp(node, NodeProperties.CodeName);
+        templateSwapDictionary.attributes = '';
         var connectedProperties = GraphMethods.getNodesByLinkType(graph, {
             id: node.id,
             type: LinkType.PropertyLink,
@@ -47,6 +48,14 @@ export default class ModelGenerator {
         let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf-8');
         let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf-8');
         let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
+
+        let validatorFunctions = GraphMethods.getNodesByLinkType(graph, {
+            id: nodeId,
+            type: LinkType.ValidatorModel,
+            direction: GraphMethods.TARGET
+        }).map(t => GetNodeProp(t, NodeProperties.CodeName)).map(t => ModelGenerator.tabs(1) + `[${t}]` + NEW_LINE);
+        templateSwapDictionary.attributes = validatorFunctions;
+
         let staticFunctions = [];
         let properties = connectedProperties.map(propNode => {
             var connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
@@ -157,7 +166,7 @@ export default class ModelGenerator {
             model: GetNodeProp(node, NodeProperties.CodeName)
         };
         staticFunctions.push(bindTemplate(staticFunctionTemplate, staticDic));
-        
+
         if (GetNodeProp(node, NodeProperties.IsUser)) {
             var agenNodes = NodesByType(state, NodeTypes.Model).filter(x => x.id !== node.id && GetNodeProp(x, NodeProperties.IsAgent));
             agenNodes.map(agent => {
@@ -184,6 +193,7 @@ export default class ModelGenerator {
             template: NamespaceGenerator.Generate({
                 template: modelTemplate,
                 usings: [...usings,
+                `${namespace}${NameSpace.Validations}`,
                 ...STANDARD_CONTROLLER_USING],
                 namespace,
                 space: NameSpace.Model

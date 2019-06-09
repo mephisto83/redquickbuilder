@@ -1,6 +1,6 @@
 import ControllerGenerator from "./controllergenerator";
 import * as Titles from "../components/titles";
-import { NodeTypes, GeneratedTypes, Methods, GeneratedConstants, NodeProperties } from "../constants/nodetypes";
+import { NodeTypes, GeneratedTypes, Methods, GeneratedConstants, NodeProperties, ConstantsDeclaration, MakeConstant } from "../constants/nodetypes";
 import ModelGenerator from "./modelgenerators";
 import ExtensionGenerator from "./extensiongenerator";
 import MaestroGenerator from "./maestrogenerator";
@@ -11,6 +11,7 @@ import StreamProcessGenerator from "./streamprocessgenerator";
 import { NodesByType, GetNodeProp } from "../actions/uiactions";
 import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgenerator";
 import ChangeResponseGenerator from "./changeresponsegenerator";
+import ValidationRuleGenerator from "./validationrulegenerator";
 
 export default class Generator {
     static generate(options) {
@@ -32,10 +33,22 @@ export default class Generator {
             case GeneratedTypes.Constants:
                 //Add enumerations here.
                 let models = NodesByType(state, NodeTypes.Model);
+                let enumerations = NodesByType(state, NodeTypes.Enumeration).map(node => {
+                    var enums = GetNodeProp(node, NodeProperties.Enumeration);
+                    var larg = {};
+                    enums.map(t => {
+                        larg[MakeConstant(t)] = t;
+                    })
+                    return {
+                        name: GetNodeProp(node, NodeProperties.CodeName),
+                        model: larg
+                    }
+                });
                 let streamTypes = {};
                 models.map(t => {
                     streamTypes[GetNodeProp(t, NodeProperties.CodeName).toUpperCase()] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
                 })
+
                 return ConstantsGenerator.Generate({
                     values: [{
                         name: GeneratedConstants.Methods,
@@ -43,7 +56,7 @@ export default class Generator {
                     }, {
                         name: GeneratedConstants.StreamTypes,
                         model: streamTypes
-                    }],
+                    }, ...enumerations],
                     state,
                     key
                 });
@@ -53,6 +66,8 @@ export default class Generator {
                 return StreamProcessGenerator.Generate({ state, key });
             case GeneratedTypes.StreamProcessOrchestration:
                 return StreamProcessOrchestrationGenerator.Generate({ state, key });
+            case GeneratedTypes.ValidationRule:
+                return ValidationRuleGenerator.Generate({ state, key });
         }
     }
 }

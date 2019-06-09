@@ -1,3 +1,4 @@
+{{attributes}}    
     public class {{model}} : DBaseData
     {
 {{staticFunctions}}

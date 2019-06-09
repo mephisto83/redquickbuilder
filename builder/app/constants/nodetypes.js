@@ -32,7 +32,8 @@ export const GeneratedTypes = {
     Constants: 'constants',
     Permissions: 'permissions-generated',
     StreamProcess: 'stream-process',
-    StreamProcessOrchestration: 'stream-process-orchestration'
+    StreamProcessOrchestration: 'stream-process-orchestration',
+    ValidationRule: 'validation-rule'
 }
 export const STANDARD_TEST_USING = [
     'Microsoft.VisualStudio.TestTools.UnitTesting',
@@ -111,6 +112,7 @@ export const NameSpace = {
     Tests: '.Tests',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
+    Validations: '.Validations',
     Constants: '.Constants',
     Permissions: '.Permissions',
     Parameters: '.Parameters',
@@ -531,7 +533,8 @@ export const NodePropertyTypes = {
     EMAIL: 'EMAIL',
     PHONENUMBER: 'PHONENUMBER'
 }
-
+export const NEW_LINE = `
+`;
 export const ProgrammingLanguages = {
     CSHARP: 'csharp'
 }
