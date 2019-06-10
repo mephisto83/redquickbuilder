@@ -13,6 +13,7 @@ export const NodeTypes = {
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
     Validator: 'validator',
+    Executor: 'executor', // performs the final acts or data manipulation.
     OptionList: 'option-list',
     OptionListItem: 'option-list-item',
     OptionCustom: 'option-custom',
@@ -96,6 +97,7 @@ export const NodeTypeColors = {
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
     [NodeTypes.Validator]: '#151522',
+    [NodeTypes.Executor]: '#f1913f',
     [NodeTypes.ReferenceNode]: '#F7B538'
 }
 
@@ -130,6 +132,7 @@ export const NodeProperties = {
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
     Validator: 'Validator',
+    Executor: 'Executor',
     ValidatorAgent: 'ValidatorAgent',
     Collapsed: 'collapsed',
     UseExtension: 'usextension',
@@ -791,7 +794,7 @@ export const ValidationCases = {
             'false': function () {
                 return `"asdf@ afsdfdd@asdf12f@.com"`
             },
-            '$empty': function () {
+            'empty': function () {
                 return `""`
             },
         }
@@ -801,10 +804,10 @@ export const ValidationCases = {
             '$true': function (e) {
                 return `"httas dfaom"`
             },
-            'false': function () {
+            '$false': function () {
                 return `"asdf@ afsdfdd@asdf12f@.com"`
             },
-            '$empty': function () {
+            'empty': function () {
                 return `""`
             },
         }

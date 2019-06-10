@@ -1,4 +1,4 @@
-
+        [TestMethod]
         public async Task {{test_name}} ()
         {
             //Arrange 
