@@ -10,7 +10,7 @@ const STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE = './app/templates/stream_
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS = './app/templates/stream_process/stream_process_orchestration_agenttype_methods.tpl';
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE = './app/templates/stream_process/stream_process_orchestration_agenttype_methods_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES = './app/templates/stream_process/stream_process_orchestration_selected_staged_changes.tpl';
-
+const TEST_CLASS = './app/templates/tests/tests.tpl';
 export default class StreamProcessOrchestrationGenerator {
     static GenerateStaticMethods(models) {
 
@@ -114,6 +114,7 @@ ${modelexecution.join('')}
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
         let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE, 'utf-8');
         let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf-8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
         let agent_methods = StreamProcessOrchestrationGenerator.GenerateAgentMethods(state);
         let agent_methods_interface = StreamProcessOrchestrationGenerator.GenerateAgentInterfaceMethods(state);
         let statics = StreamProcessOrchestrationGenerator.GenerateStaticMethods(models);
@@ -125,6 +126,9 @@ ${modelexecution.join('')}
             arbiters_strappers: strappers,
             arbiter_instances: strapperInstances
         });
+        let testTemplate = bindTemplate(_testClass, {
+
+        })
         _streamProcessInterfaceTemplate = bindTemplate(_streamProcessInterfaceTemplate, {
             agent_type_methods: agent_methods_interface
         });
@@ -134,7 +138,8 @@ ${modelexecution.join('')}
                 id: StreamProcessOrchestration,
                 name: StreamProcessOrchestration,
                 iname: `I${StreamProcessOrchestration}`,
-                template: NamespaceGenerator.Generate({
+                tname: `${StreamProcessOrchestration}Tests`,
+                template: NamespaceGenerator.Generate({ 
                     template: _streamProcessTemplate,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
@@ -157,6 +162,18 @@ ${modelexecution.join('')}
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.StreamProcess
+                }),
+                test: NamespaceGenerator.Generate({
+                    template: testTemplate,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.StreamProcess}`,
+                        `${namespace}${NameSpace.Constants}`],
+                    namespace,
+                    space: NameSpace.Tests
                 })
             }
         };
