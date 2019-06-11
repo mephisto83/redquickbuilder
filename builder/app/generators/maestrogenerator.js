@@ -165,6 +165,7 @@ export default class MaestroGenerator {
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.StreamProcess}`,
+                        `${namespace}${NameSpace.Constants}`,
                         `${namespace}${NameSpace.Permissions}`,
                         `${namespace}${NameSpace.Parameters}`],
                     namespace,

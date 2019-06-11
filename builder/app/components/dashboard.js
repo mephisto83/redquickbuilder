@@ -36,8 +36,11 @@ import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
 import ValidatorActivityMenu from './validatoractivitymenu';
 import OptionActivityMenu from './optionactivitymenu';
+import ExecutorPropertyMenu from './executorpropertymenu';
 import ParameterActivityMenu from './parameteractivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
+import ExecutorPropertyActivityMenu from './executorpropertyactivitymenu';
+import ExecutorActivityMenu from './executoractivitymenu';
 import ValidatorPropertyMenu from './validatorpropertymenu';
 import ValidatorPropertyActivityMenu from './validatorpropertyactivitymenu';
 import ExtensionListActivityMenu from './ExtensionListActivityMenu';
@@ -299,6 +302,7 @@ class Dashboard extends Component {
                                 <ParameterActivityMenu />
                                 <ModelActivityMenu />
                                 <ValidatorActivityMenu />
+                                <ExecutorActivityMenu />
                                 <PropertyActivityMenu />
                                 <ValidationItemFormControl />
                                 <ChoiceActivityMenu />
@@ -315,8 +319,10 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
                                 <ValidatorPropertyMenu />
                                 <ReferenceActivityMenu />
+                                <ExecutorPropertyMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}
                         </SideBar>
                     </div>
                 </div >

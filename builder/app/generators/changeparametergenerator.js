@@ -40,7 +40,7 @@ export default class ChangeParameterGenerator {
             let constructors = [];
             let tests = [];
             let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
-            models.map(model => {
+            agents.map(model => {
                 Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;

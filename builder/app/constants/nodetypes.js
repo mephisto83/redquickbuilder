@@ -32,6 +32,7 @@ export const GeneratedTypes = {
     ChangeResponse: 'change-response',
     Constants: 'constants',
     Permissions: 'permissions-generated',
+    Executors: 'executors',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
     ValidationRule: 'validation-rule'
@@ -63,7 +64,8 @@ export const STANDARD_CONTROLLER_USING = [
 ]
 export const GeneratedConstants = {
     Methods: 'Methods',
-    StreamTypes: 'StreamType'
+    StreamTypes: 'StreamType',
+    FunctionName: 'FunctionName'
 }
 export const GeneratedTypesMatch = {
     [GeneratedTypes.ChangeParameter]: NodeTypes.Model
@@ -97,7 +99,7 @@ export const NodeTypeColors = {
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
     [NodeTypes.Validator]: '#151522',
-    [NodeTypes.Executor]: '#f1913f',
+    [NodeTypes.Executor]: '#2176FF',
     [NodeTypes.ReferenceNode]: '#F7B538'
 }
 
@@ -113,6 +115,7 @@ export const GroupProperties = {
 export const NameSpace = {
     Model: '.Models',
     StreamProcess: '.ActionStream',
+    Executors: '.Executors',
     Tests: '.Tests',
     Extensions: '.Extensions',
     Controllers: '.Controllers',
@@ -128,6 +131,10 @@ export const NodeProperties = {
     AllowedExtensionValues: 'AllowedExtensionValues',
     AllowedEnumValues: 'AllowedEnumerationValue',
     ValidatorModel: 'ValidatorModel',
+    ExecutorAgent: 'ExecutorAgent',
+    ExecutorFunction: 'ExecutorFunction',
+    ExecutorModel: 'ExecutorModel',
+    ExecutorFunctionType: 'ExecutorFunctionType',
     ValidatorFunction: 'ValidatorFunction',
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
@@ -180,6 +187,7 @@ export const NodeProperties = {
 
     UIAttributeType: 'uiAttributeType',
     UseModelAsType: 'useModelAsType',
+    MethodType: "MethodType",
     UIModelType: 'uiModelType',
 
     UseScopeGraph: 'UseScopeGraph',
@@ -264,11 +272,19 @@ export const LinkEvents = {
 }
 export const LinkType = {
     Choice: 'choice',
+
+    Executor: 'executor',
+    ExecutorItem: 'executor-item',
+    ExecutorProperty: 'executor-property',
+    ExecutorModel: 'executor-model',
+
     Validation: 'validation',
     ValidationItem: 'validation-item',
     Validator: 'validator',
     ValidatorProperty: 'validator-property',
     ValidatorModel: 'validator-model',
+
+    ExecutorFunction: 'executor-function',
     ValidatorFunction: 'validator-function',
     ValidatorModelItem: 'validator-model-item',
     ValidatorAgent: 'validator-agent',
@@ -441,8 +457,31 @@ export const LinkProperties = {
     ValidatorPropertyLink: {
         type: LinkType.ValidatorProperty
     },
+
+    ExecutorLink: {
+        type: LinkType.Validation
+    },
+    ExecutorLinkItem: {
+        type: LinkType.ValidationItem
+    },
+    ExecutorAgentLink: {
+        type: LinkType.ValidatorAgent
+    },
+    ExecutorModelLink: {
+        type: LinkType.ExecutorModel
+    },
+    ExecutorModelItemLink: {
+        type: LinkType.ValidatorModelItem
+    },
+    ExecutorPropertyLink: {
+        type: LinkType.ValidatorProperty
+    },
+
     ValidatorFunctionLink: {
         type: LinkType.ValidatorFunction
+    },
+    ExecutorFunctionLink: {
+        type: LinkType.ExecutorFunction
     },
     OptionLink: {
         type: LinkType.Option
@@ -813,6 +852,46 @@ export const ValidationCases = {
         }
     },
 }
+export const ExecutorRules = {
+    ModelReference: 'model-reference',
+    Copy: 'copy',
+    AgentReference: 'agent-reference',
+}
+export const ExecutorUI = {
+    [ExecutorRules.ModelReference]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ModelReference'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Model,
+            reference: {
+                types: [NodeTypes.Model]
+            }
+        }
+    },
+    [ExecutorRules.AgentReference]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'AgentReference'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Model,
+            reference: {
+                types: [NodeTypes.Model]
+            }
+        }
+    },
+    [ExecutorRules.Copy]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'copy'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    }
+}
+Object.keys(ExecutorUI).map(t => {
+    ExecutorUI[t].type = t;
+})
 export const ValidationUI = {
     [ValidationRules.OneOf]: {
         code: {

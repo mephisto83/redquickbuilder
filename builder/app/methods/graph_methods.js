@@ -286,6 +286,8 @@ export function createValidator() {
         properties: {}
     }
 }
+export const createExecutor = createValidator;
+
 export function createValidatorProperty() {
     return {
         validators: {
@@ -1474,6 +1476,13 @@ addEventFunction('OnRemoveValidationPropConnection', (graph, link, func) => {
         removeValidator(GetNodeProp(node, NodeProperties.Validator), { id: target });
     return graph;
 });
+addEventFunction('OnRemoveExecutorPropConnection', (graph, link, func) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    if (node && node.properties)
+        removeValidator(GetNodeProp(node, NodeProperties.Executor), { id: target });
+    return graph;
+});
 addEventFunction('OnRemoveValidationItemPropConnection', (graph, link, func, args) => {
     var { source, target } = link;
     var node = GetNode(graph, source);
@@ -1490,6 +1499,25 @@ addEventFunction('OnRemoveValidationItemPropConnection', (graph, link, func, arg
     }
     return graph;
 });
+
+addEventFunction('OnRemoveExecutorItemPropConnection', (graph, link, func, args) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    var { property, validator } = (args || {});
+
+    let _validator = GetNodeProp(node, NodeProperties.Executor);
+    if (node && node.properties &&
+        _validator.properties &&
+        _validator.properties[property] &&
+        _validator.properties[property].validators &&
+        _validator.properties[property].validators[validator] &&
+        _validator.properties[property].validators[validator].node === target) {
+        removeValidatorItem(_validator, { ...args, id: target, });
+    }
+    return graph;
+});
+
+
 export function removeValidatorItem(_validator, options) {
     var { property, validator } = options;
     delete _validator.properties[property].validators[validator]

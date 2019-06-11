@@ -10,7 +10,7 @@ import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { Functions, HTTP_METHODS } from '../constants/functiontypes';
-import { NodeProperties } from '../constants/nodetypes';
+import { NodeProperties, Methods } from '../constants/nodetypes';
 
 class FunctionActivityMenu extends Component {
     render() {
@@ -78,7 +78,17 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
-
+                <SelectInput
+                    label={Titles.Methods}
+                    options={Object.keys(Methods).map(t => ({ title: t, value: Methods[t] }))}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.MethodType,
+                            id: currentNode.id,
+                            value
+                        }); 
+                    }}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.MethodType] : ''} />
                 {currentNode ? (<SelectInput
                     label={Titles.HttpMethod}
                     options={Object.keys(HTTP_METHODS).map(t => ({ title: t, value: HTTP_METHODS[t] }))}

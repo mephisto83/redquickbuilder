@@ -1,5 +1,6 @@
 import * as Titles from '../components/titles';
 import fs from 'fs';
+import { Methods } from './nodetypes';
 
 export const FunctionTypes = {
     //Functions with List<Child> result
@@ -281,6 +282,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.Create,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
         title: Titles.Update_Object_Agent_Value__IListObject,
@@ -292,6 +294,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.Update,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
@@ -303,6 +306,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.Delete,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
@@ -314,6 +318,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.GetAll,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
@@ -324,6 +329,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.Create,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
@@ -335,6 +341,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.Update,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
@@ -346,6 +353,7 @@ export const Functions = {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        method: Methods.GetAll,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {

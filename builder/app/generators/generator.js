@@ -12,6 +12,7 @@ import { NodesByType, GetNodeProp } from "../actions/uiactions";
 import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgenerator";
 import ChangeResponseGenerator from "./changeresponsegenerator";
 import ValidationRuleGenerator from "./validationrulegenerator";
+import ExecutorGenerator from "./executiongenerator";
 
 export default class Generator {
     static generate(options) {
@@ -33,6 +34,7 @@ export default class Generator {
             case GeneratedTypes.Constants:
                 //Add enumerations here.
                 let models = NodesByType(state, NodeTypes.Model);
+                let functions = NodesByType(state, NodeTypes.Function);
                 let enumerations = NodesByType(state, NodeTypes.Enumeration).map(node => {
                     var enums = GetNodeProp(node, NodeProperties.Enumeration);
                     var larg = {};
@@ -48,7 +50,10 @@ export default class Generator {
                 models.map(t => {
                     streamTypes[GetNodeProp(t, NodeProperties.CodeName).toUpperCase()] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
                 })
-
+                let functionsTypes = {};
+                functions.map(t => {
+                    functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
+                })
                 return ConstantsGenerator.Generate({
                     values: [{
                         name: GeneratedConstants.Methods,
@@ -56,6 +61,9 @@ export default class Generator {
                     }, {
                         name: GeneratedConstants.StreamTypes,
                         model: streamTypes
+                    }, {
+                        name: GeneratedConstants.FunctionName,
+                        model: functionsTypes
                     }, ...enumerations],
                     state,
                     key
@@ -68,6 +76,8 @@ export default class Generator {
                 return StreamProcessOrchestrationGenerator.Generate({ state, key });
             case GeneratedTypes.ValidationRule:
                 return ValidationRuleGenerator.Generate({ state, key });
+            case GeneratedTypes.Executors:
+                return ExecutorGenerator.Generate({ state, key });
         }
     }
 }

@@ -93,7 +93,6 @@ class ValidatorPropertyMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ValidatorModel] : ''} />
                 </FormControl>) : null}
-                {propertyValidations}
             </TabPane>
         );
     }

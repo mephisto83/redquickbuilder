@@ -60,6 +60,7 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
             {
+                data = await {{model}}Executor.Create(data, agent, change);
                 var result = await {{model#lower}}Arbiter.Create(data);
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
             }
@@ -73,6 +74,7 @@
             var data = change.Data;
             if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
             {
+                data = await {{model}}Executor.Update(data, agent, change);
                 var result = await {{model#lower}}Arbiter.Update(data);
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
             }
