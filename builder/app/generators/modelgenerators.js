@@ -53,7 +53,7 @@ export default class ModelGenerator {
             id: nodeId,
             type: LinkType.ValidatorModel,
             direction: GraphMethods.TARGET
-        }).map(t => GetNodeProp(t, NodeProperties.CodeName)).map(t => ModelGenerator.tabs(1) + `[${t}]` + NEW_LINE);
+        }).map(t => GetNodeProp(t, NodeProperties.CodeName)).map(t => ModelGenerator.tabs(1) + `[${t}]` + NEW_LINE).join('');
         templateSwapDictionary.attributes = validatorFunctions;
 
         let staticFunctions = [];

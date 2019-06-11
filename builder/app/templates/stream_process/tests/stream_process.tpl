@@ -5,7 +5,7 @@
             //Arrange
             var response = Guid.NewGuid().ToString();
             var agent = {{agent_type}}.Create();
-            var change = {{model}}Change.Create(agent, {{model}}.Create());
+            var change = {{model}}Change.Create(agent, {{model}}.Create(), "func");
             change.Response = response;
 
             RedStrapper.Clear();

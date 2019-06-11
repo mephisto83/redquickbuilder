@@ -154,7 +154,7 @@ export default class ExecutorGenerator {
                             values: ValidationCases[validators.type]
                         });
                     }
-                    let template = `result{{model_property}} = item{{model_property}};`;
+                    let template = `result{{model_property}} = data{{model_property}};`;
                     switch (validators.type) {
                         case ExecutorRules.AgentReference:
                             template = `result{{model_property}} = agent.Id;`
@@ -199,7 +199,7 @@ export default class ExecutorGenerator {
                         projected_value = projected_value();
                     }
                     successCase = successCase && (_case || [false])[0] === '$';
-                    return ExecutorGenerator.Tabs(3) + `item.${validation_test_vectors[vindex].property} = ${projected_value};`;
+                    return ExecutorGenerator.Tabs(3) + `data.${validation_test_vectors[vindex].property} = ${projected_value};`;
                 }).join(NEW_LINE);
                 let temp = bindTemplate(_executor_create, {
                     model: GetNodeProp(modelNode, NodeProperties.CodeName),

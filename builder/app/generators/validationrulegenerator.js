@@ -60,6 +60,7 @@ export default class ValidationRuleGenerator {
             var model = GetNodeProp(node, NodeProperties.ValidatorModel);
             var modelNode = GraphMethods.GetNode(graph, model);
             var funct = GetNodeProp(node, NodeProperties.ValidatorFunction);
+            var functNode = GraphMethods.GetNode(graph, funct);
             var validator = GetNodeProp(node, NodeProperties.Validator);
             let validatorProperties = GraphMethods.getValidatorProperties(validator);
             var validation_test_vectors = [];
@@ -140,6 +141,7 @@ export default class ValidationRuleGenerator {
 
             var templateRes = bindTemplate(_validation_class, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
+                function_name: GetNodeProp(functNode, NodeProperties.CodeName),
                 properties: propertyValidationStatements,
                 type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
             });
@@ -150,6 +152,7 @@ export default class ValidationRuleGenerator {
 
             templateRes = bindTemplate(_validation_class, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
+                function_name: GetNodeProp(functNode, NodeProperties.CodeName),
                 properties: propertyValidationStatements,
                 type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
             });
