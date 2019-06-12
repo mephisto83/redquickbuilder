@@ -85,9 +85,10 @@ ${modelexecution.join('')}
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
             result.push(Tabs(4) + `${modelName.toLowerCase()}Arbiter = RedStrapper.Resolve<IRedArbiter<${modelName}>>();` + jNL);
             result.push(Tabs(4) + `${modelName.toLowerCase()}ChangeArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Change>>();` + jNL);
-            if (GetNodeProp(model, NodeProperties.IsAgent))
+            if (GetNodeProp(model, NodeProperties.IsAgent)) {
                 result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
-
+                result.push(Tabs(4) + `${modelName.toLowerCase()}Executor = RedStrapper.Resolve<I${modelName}Executor>();` + jNL);
+            }
         })
 
         return result.join('');
@@ -100,8 +101,10 @@ ${modelexecution.join('')}
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
             result.push(Tabs(3) + `public IRedArbiter<${modelName}> ${modelName.toLowerCase()}Arbiter;` + jNL)
             result.push(Tabs(3) + `public IRedArbiter<${modelName}Change> ${modelName.toLowerCase()}ChangeArbiter;` + jNL)
-            if (GetNodeProp(model, NodeProperties.IsAgent))
+            if (GetNodeProp(model, NodeProperties.IsAgent)) {
                 result.push(Tabs(3) + `public IRedArbiter<${modelName}Response> ${modelName.toLowerCase()}ResponseArbiter;` + jNL);
+                result.push(Tabs(3) + `public I${modelName}Executor ${modelName.toLowerCase()}Executor;` + jNL);
+            }
 
         })
 
@@ -109,6 +112,7 @@ ${modelexecution.join('')}
     }
     static Generate(options) {
         var { state, key } = options;
+        const StreamProcessOrchestration = 'StreamProcessOrchestration';
         let models = NodesByType(state, NodeTypes.Model);
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
@@ -127,19 +131,18 @@ ${modelexecution.join('')}
             arbiter_instances: strapperInstances
         });
         let testTemplate = bindTemplate(_testClass, {
-
+            name: StreamProcessOrchestration
         })
         _streamProcessInterfaceTemplate = bindTemplate(_streamProcessInterfaceTemplate, {
             agent_type_methods: agent_methods_interface
         });
-        const StreamProcessOrchestration = 'StreamProcessOrchestration';
         return {
             [StreamProcessOrchestration]: {
                 id: StreamProcessOrchestration,
                 name: StreamProcessOrchestration,
                 iname: `I${StreamProcessOrchestration}`,
                 tname: `${StreamProcessOrchestration}Tests`,
-                template: NamespaceGenerator.Generate({ 
+                template: NamespaceGenerator.Generate({
                     template: _streamProcessTemplate,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,

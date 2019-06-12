@@ -7,12 +7,15 @@ import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
+const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
 const EXECUTOR_CREATE = './app/templates/executor/create.tpl';
 const EXECUTOR_ENTRY_METHODS = './app/templates/executor/executor_entry_methods.tpl';
+const EXECUTOR_ENTRY_METHODS_INTERFACE = './app/templates/executor/executor_entry_methods_interface.tpl';
 const EXECUTOR_METHOD_CASE = './app/templates/executor/entry_method_case.tpl';
 const EXECUTOR_UPDATE = './app/templates/executor/update.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const EXECUTOR_METHODS = './app/templates/executor/executor_methods.tpl';
+const EXECUTOR_METHODS_INTERFACE = './app/templates/executor/executor_methods_interface.tpl';
 
 export default class ExecutorGenerator {
     static enumerateValidationTestVectors(validation_test_vectors) {
@@ -55,13 +58,17 @@ export default class ExecutorGenerator {
 
         let nodes = NodesByType(state, NodeTypes.Executor);
         let _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf-8');
+        let _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf-8');
         let _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf-8');
+        let _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf-8');
         let _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf-8');
         let _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf-8');
         let _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf-8');
+        let _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf-8');
         let _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf-8');
         let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
         let agentFunctionDic = {};
+        let agentFunctionInterfaceDic = {};
         let executor_entry_methods = [];
         let agentModelDic = {};
         let agmCombos = [];
@@ -189,31 +196,6 @@ export default class ExecutorGenerator {
 
             var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
-            let testProps = vectors.map((vector, index) => {
-                let validation_test = _executor_create;
-                let successCase = true;
-                let properylines = vector.map((v, vindex) => {
-                    var projected_value = Object.values(validation_test_vectors[vindex].values.cases)[v];
-                    var _case = Object.keys(validation_test_vectors[vindex].values.cases)[v];
-                    if (typeof (projected_value) === 'function') {
-                        projected_value = projected_value();
-                    }
-                    successCase = successCase && (_case || [false])[0] === '$';
-                    return ExecutorGenerator.Tabs(3) + `data.${validation_test_vectors[vindex].property} = ${projected_value};`;
-                }).join(NEW_LINE);
-                let temp = bindTemplate(_executor_create, {
-                    model: GetNodeProp(modelNode, NodeProperties.CodeName),
-                    test_name: `Test${index}`,
-                    attribute_parameters: "",
-                    expected_value: successCase ? 'true' : 'false',
-                    set_properties: properylines,
-                    attribute_type: `${GetNodeProp(node, NodeProperties.CodeName)}Attribute`,
-                    properties: templateRes,
-                    type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
-                });
-
-                return temp;
-            });
 
             var templateRes = bindTemplate(_executor_methods, {
                 model: GetNodeProp(modelNode, NodeProperties.CodeName),
@@ -228,17 +210,32 @@ export default class ExecutorGenerator {
                 change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`,
                 method_guts: templateRes,
             });
+            var templateResInterface = bindTemplate(_executor_methods_interface, {
+                model: GetNodeProp(modelNode, NodeProperties.CodeName),
+                method_name: GetNodeProp(functionNode, NodeProperties.CodeName),
+                parameters: bindTemplate(`{{data}} data, {{agent}} agent, {{change}} change`, {
+                    data: GetNodeProp(modelNode, NodeProperties.CodeName),
+                    agent: GetNodeProp(agentNode, NodeProperties.CodeName),
+                    change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`
+                }),
+                data: GetNodeProp(modelNode, NodeProperties.CodeName),
+                agent: GetNodeProp(agentNode, NodeProperties.CodeName),
+                change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`,
+                method_guts: templateRes,
+            });
+            
             // var testTemplate = bindTemplate(_testClass, {
             //     name: GetNodeProp(node, NodeProperties.CodeName),
             //     tests: testProps.join(NEW_LINE)
             // });
+            agentFunctionInterfaceDic[agent] = agentFunctionInterfaceDic[agent] || [];
             agentFunctionDic[agent] = agentFunctionDic[agent] || [];
             agentFunctionDic[agent].push(templateRes)
+            agentFunctionInterfaceDic[agent].push(templateResInterface)
 
         });
+        let lastCase;
         let static_methods = agmCombos.map(amd => {
-            let lastfunctType = null;
-            let lastCase = null;
             var {
                 agent,
                 model,
@@ -251,19 +248,30 @@ export default class ExecutorGenerator {
                     functType,
                     funct
                 } = _cases;
-                lastCase = _cases;
                 let _case = bindTemplate(_exe_case, {
                     agent,
                     model,
                     func_name: funct
                 });
-                lastfunctType = functType;
                 return _case + NEW_LINE;
             }).join('');
             return bindTemplate(_exe_method, {
                 agent,
                 model,
                 cases,
+                change: `${model}`,
+                method
+            }) + NEW_LINE
+        });
+        let static_methods_interface = agmCombos.map(amd => {
+            var {
+                agent,
+                model,
+                method,
+            } = amd;
+            return bindTemplate(_exe_method_interface, {
+                agent,
+                model,
                 change: `${model}`,
                 method
             }) + NEW_LINE
@@ -277,21 +285,40 @@ export default class ExecutorGenerator {
                 staticentry: static_methods.join('')
             });
 
+            let templateInterfaceRes = bindTemplate(_executor_class_interface, {
+                model: GetNodeProp(node, NodeProperties.CodeName),
+                methods: agentFunctionInterfaceDic[agent].join(''),
+                staticentry: static_methods_interface.join('')
+
+            })
+
 
 
             result[GetNodeProp(node, NodeProperties.CodeName)] = {
                 id: GetNodeProp(node, NodeProperties.CodeName),
                 name: `${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
                 tname: `${GetNodeProp(node, NodeProperties.CodeName)}ExecutorTests`,
+                iname: `I${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
                 template: NamespaceGenerator.Generate({
                     template: templateRes,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.Executors
+                }),
+                interface: NamespaceGenerator.Generate({
+                    template: templateInterfaceRes,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Constants}`],
+                    namespace,
+                    space: NameSpace.Interface
                 }),
                 // test: NamespaceGenerator.Generate({
                 //     template: testTemplate,

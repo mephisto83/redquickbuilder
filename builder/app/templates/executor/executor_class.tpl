@@ -1,4 +1,4 @@
-    public class {{model}}Executor
+    public class {{model}}Executor : I{{model}}Executor
     {
 
 {{staticentry}}
