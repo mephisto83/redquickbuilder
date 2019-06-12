@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, STANDARD_TEST_USING, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate } from '../constants/functiontypes';
+import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/stream_process_orchestration.tpl';
@@ -10,6 +10,7 @@ const STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE = './app/templates/stream_
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS = './app/templates/stream_process/stream_process_orchestration_agenttype_methods.tpl';
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE = './app/templates/stream_process/stream_process_orchestration_agenttype_methods_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES = './app/templates/stream_process/stream_process_orchestration_selected_staged_changes.tpl';
+const STREAM_METHOD_TESTS = './app/templates/stream_process/tests/stream_process_execution_tests.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 export default class StreamProcessOrchestrationGenerator {
     static GenerateStaticMethods(models) {
@@ -110,6 +111,45 @@ ${modelexecution.join('')}
 
         return result.join('');
     }
+    static GenerateProcessTests(state) {
+        let graph = GetRootGraph(state);
+        let functions = NodesByType(state, NodeTypes.Function);
+        let res = '';
+        // STREAM_METHOD_TESTS
+        let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf-8');
+
+        res = functions.map((func, index) => {
+            let models = GraphMethods.getNodesLinkedTo(graph, {
+                id: func.id,
+                constraints: {
+                    key: FunctionTemplateKeys.Model
+                }
+            });
+            if (models && models[0]) {
+                models = GraphMethods.getNodesLinkedTo(graph, {
+                    id: models[0].id
+                })
+            }
+            let agents = GraphMethods.getNodesLinkedTo(graph, {
+                id: func.id,
+                constraints: {
+                    key: FunctionTemplateKeys.AgentType
+                }
+            });
+            if (agents && agents[0]) {
+                agents = GraphMethods.getNodesLinkedTo(graph, {
+                    id: agents[0].id
+                })
+            }
+            return bindTemplate(_stramMethodTests, {
+                model: GetNodeProp(models[0], NodeProperties.CodeName),
+                agent_type: GetNodeProp(agents[0], NodeProperties.CodeName),
+                function_name: GetNodeProp(func, NodeProperties.CodeName),
+                test_name: `${GetNodeProp(func, NodeProperties.CodeName)}Test`
+            });
+        }).join(NEW_LINE);
+        return res;
+    }
     static Generate(options) {
         var { state, key } = options;
         const StreamProcessOrchestration = 'StreamProcessOrchestration';
@@ -130,8 +170,10 @@ ${modelexecution.join('')}
             arbiters_strappers: strappers,
             arbiter_instances: strapperInstances
         });
+        let stream_process_tests = StreamProcessOrchestrationGenerator.GenerateProcessTests(state);
         let testTemplate = bindTemplate(_testClass, {
-            name: StreamProcessOrchestration
+            name: StreamProcessOrchestration,
+            tests: stream_process_tests
         })
         _streamProcessInterfaceTemplate = bindTemplate(_streamProcessInterfaceTemplate, {
             agent_type_methods: agent_methods_interface
@@ -170,6 +212,7 @@ ${modelexecution.join('')}
                     template: testTemplate,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
+                        ...STANDARD_TEST_USING,
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Parameters}`,
                         `${namespace}${NameSpace.Interface}`,

@@ -78,7 +78,7 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
-                <SelectInput
+                {currentNode ? (<SelectInput
                     label={Titles.Methods}
                     options={Object.keys(Methods).map(t => ({ title: t, value: Methods[t] }))}
                     onChange={(value) => {
@@ -86,9 +86,9 @@ class FunctionActivityMenu extends Component {
                             prop: UIA.NodeProperties.MethodType,
                             id: currentNode.id,
                             value
-                        }); 
+                        });
                     }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.MethodType] : ''} />
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.MethodType] : ''} />) : null}
                 {currentNode ? (<SelectInput
                     label={Titles.HttpMethod}
                     options={Object.keys(HTTP_METHODS).map(t => ({ title: t, value: HTTP_METHODS[t] }))}
