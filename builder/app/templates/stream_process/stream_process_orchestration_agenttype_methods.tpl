@@ -56,42 +56,66 @@
         
         
         public async Task Create({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-            var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+            try 
             {
-                data = await {{agent_type#lower}}Executor.Create(data, agent, change);
-                var result = await {{model#lower}}Arbiter.Create(data);
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
+                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
+                var data = change.Data;
+            
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                {
+                    data = await {{agent_type#lower}}Executor.Create(data, agent, change);
+                    var result = await {{model#lower}}Arbiter.Create(data);
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
+                }
+                else {
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailed(change));
+                }
             }
-            else {
+            catch(Exception e)
+            {
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailed(change));
             }
         }
 
         public async Task Update({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-            var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
-            {
-                data = await {{agent_type#lower}}Executor.Update(data, agent, change);
-                var result = await {{model#lower}}Arbiter.Update(data);
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
+            try 
+            {  
+                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
+                var data = change.Data;
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                {
+                    data = await {{agent_type#lower}}Executor.Update(data, agent, change);
+                    var result = await {{model#lower}}Arbiter.Update(data);
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
+                }
+                else {
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailed(change));
+                }
             }
-            else {
+            catch(Exception e)
+            {
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailed(change));
             }
         }
 
         public async Task Delete({{model}}Change change) {
-            var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-            var data = change.Data;
-            if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+            try
             {
-                var result = await {{model#lower}}Arbiter.Delete(data);
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
+                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
+                var data = change.Data;
+            
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                {
+                    var result = await {{model#lower}}Arbiter.Delete(data);
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
+                }
+                else {
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailed(change));
+                }
             }
-            else {
+            catch(Exception e)
+            {
                 await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailed(change));
             }
+            
         }
