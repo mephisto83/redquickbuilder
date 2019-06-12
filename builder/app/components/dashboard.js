@@ -54,6 +54,8 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import Slider from './slider';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
+import MethodActivityMenu from './methodactivitymenu';
+import MethodPropertyMenu from './methodpropertymenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
 import CommonActivityMenu from './commonactivitymenu';
 import MaestroActivityMenu from './maestroactivitymenu';
@@ -298,6 +300,7 @@ class Dashboard extends Component {
                                 <ControllerActivityMenu />
                                 <CommonActivityMenu />
                                 <FunctionActivityMenu />
+                                <MethodActivityMenu />
                                 <AttributeFormControl />
                                 <ParameterActivityMenu />
                                 <ModelActivityMenu />
@@ -320,6 +323,7 @@ class Dashboard extends Component {
                                 <ValidatorPropertyMenu />
                                 <ReferenceActivityMenu />
                                 <ExecutorPropertyMenu />
+                                <MethodPropertyMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}

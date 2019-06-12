@@ -23,7 +23,7 @@ class ExecutorActivityMenu extends Component {
             }
         });
 
-        var functionNodes = UIA.NodesByType(state, UIA.NodeTypes.Function).map(t => {
+        var functionNodes = UIA.NodesByType(state, [UIA.NodeTypes.Function, UIA.NodeTypes.Method]).map(t => {
             return {
                 title: UIA.GetNodeTitle(t),
                 value: t.id

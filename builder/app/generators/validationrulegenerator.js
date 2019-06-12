@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -83,10 +83,10 @@ export default class ValidationRuleGenerator {
                                             return temp[`${ext}`];
                                         }
                                     }).filter(x => x);
-                                    attribute_type_arguments = temp.filter(x => x).join();
+                                    // attribute_type_arguments = temp.filter(x => x).join();
                                     validation_test_vectors.push({
                                         property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                                        values: { cases: temp }
+                                        values: { cases: attribute_type_arguments.join(', ') }
                                     });
                                     attribute_type_arguments = `new List<string> () {
                 ${attribute_type_arguments}
@@ -94,6 +94,23 @@ export default class ValidationRuleGenerator {
                                 }
                                 break;
                             case NodeTypes.Enumeration:
+                                if (validators && validators.enumeration) {
+                                    let enumNode = GraphMethods.GetNode(graph, validators.node);
+                                    let enumName = GetNodeTitle(enumNode);
+                                    attribute_type_arguments = Object.keys(validators.enumeration).map(ext => {
+                                        if (validators.enumeration[ext]) {
+                                            return `${enumName}.${MakeConstant(ext)}`
+                                        }
+                                    }).filter(x => x);
+                                    // attribute_type_arguments = temp.filter(x => x).join();
+                                    validation_test_vectors.push({
+                                        property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+                                        values: { cases: attribute_type_arguments.join(', ') }
+                                    });
+                                    attribute_type_arguments = `new List<string> () {
+                    ${attribute_type_arguments}
+                }`;
+                                }
                                 break;
                         }
                     }

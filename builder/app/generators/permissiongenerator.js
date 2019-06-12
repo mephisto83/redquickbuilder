@@ -36,7 +36,7 @@ export default class PermissionGenerator {
         let constants_allowed = ext_allowed.map(ea => {
             return `${enumerationName}.${MakeConstant(ea)}`
         })
-        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL}};${jNL}`
+        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL + Tabs(5)}};${jNL}`
     }
     static createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
         let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extensionNode, method, 'Extensions');
@@ -48,7 +48,7 @@ export default class PermissionGenerator {
             return `${extensionName}.${MakeConstant(ea)}`
         });
 
-        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL}};${jNL}`
+        return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL + Tabs(5)}};${jNL}`
 
     }
     static IsRequestor(graph, model, permission) {
@@ -99,7 +99,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
                 var tempBindingValues = {
                     method,
-                    value: agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName),
+                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -123,7 +123,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
                 let tempBindingValues = {
                     method,
-                    value: agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName),
+                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -197,18 +197,18 @@ export default class PermissionGenerator {
                         let permissionInterfaceMethods = _permissionInterfaceMethods;
                         permissionMethods = bindTemplate(permissionMethods, {
                             model: GetNodeProp(model, NodeProperties.CodeName),
-                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            value: `${GetNodeProp(model, NodeProperties.ValueName) || 'value'}`.toLowerCase(),
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            agent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
                             method: permKey,
                             cases: cases.map(c => jNL + Tabs(4) + c.template).join(''),
                             case_result: jNL + Tabs(4) + `result = ${cases.map(c => c.variable).join(' && ')};`
                         });
                         permissionInterfaceMethods = bindTemplate(permissionInterfaceMethods, {
                             model: GetNodeProp(model, NodeProperties.CodeName),
-                            value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                            value: `${GetNodeProp(model, NodeProperties.ValueName) || 'value'}`.toLowerCase(),
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                            agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                            agent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
                             method: permKey
                         });
                         methodInterfaces.push(permissionInterfaceMethods);

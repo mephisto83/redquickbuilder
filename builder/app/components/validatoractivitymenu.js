@@ -23,7 +23,7 @@ class ValidatorActivityMenu extends Component {
             }
         });
 
-        var functionNodes = UIA.NodesByType(state, UIA.NodeTypes.Function).map(t => {
+        var functionNodes = UIA.NodesByType(state, [UIA.NodeTypes.Method, UIA.NodeTypes.Function]).map(t => {
             return {
                 title: UIA.GetNodeTitle(t),
                 value: t.id

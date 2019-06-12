@@ -20,6 +20,7 @@ export const NodeTypes = {
     ExtensionTypeList: 'extension-type-list',
     ExtensionType: 'extension-type',
     Function: 'function',
+    Method: 'method',
     Parameter: 'parameter',
     FunctionOutput: 'function-output',
     Controller: 'controller',
@@ -179,7 +180,7 @@ export const NodeProperties = {
     UIExtensionList: 'uiExtensionList',
     UIExtension: 'uiExtension',
     UIExtensionDefinition: 'uiExtensionDefinition',
-
+    MethodProps: 'methodProperties',
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',

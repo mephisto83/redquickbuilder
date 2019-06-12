@@ -34,7 +34,7 @@ export default class Generator {
             case GeneratedTypes.Constants:
                 //Add enumerations here.
                 let models = NodesByType(state, NodeTypes.Model);
-                let functions = NodesByType(state, NodeTypes.Function);
+                let functions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
                 let enumerations = NodesByType(state, NodeTypes.Enumeration).map(node => {
                     var enums = GetNodeProp(node, NodeProperties.Enumeration);
                     var larg = {};

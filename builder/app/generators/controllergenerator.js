@@ -62,15 +62,9 @@ export default class ControllerGenerator {
                             let functionName = `${GetNodeProp(maestro_function, NodeProperties.CodeName)}`;
                             let httpMethod = `${GetNodeProp(maestro_function, NodeProperties.HttpMethod)}`;
                             let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
+                            let methodProperties = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                             let userNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.UserInstance);
-                            let modelNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.Model);
-                            if (modelNode) {
-                                modelNode = GraphMethods.getNodesByLinkType(root, {
-                                    id: modelNode.id,
-                                    type: LinkType.Choice,
-                                    direction: GraphMethods.SOURCE
-                                }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
-                            }
+                            let modelNode =  GraphMethods.GetNode(root, methodProperties.model);
                             let output_type = '{controller_generator_missing_model}';
                             if (modelNode) {
                                 output_type = GetNodeProp(modelNode, NodeProperties.CodeName) || output_type;

@@ -19,7 +19,7 @@ class MaestroActivityMenu extends Component {
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Maestro);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var graph = UIA.GetCurrentGraph(state);
-        var functions = UIA.NodesByType(state, UIA.NodeTypes.Function).map(funcKey => {
+        var functions = UIA.NodesByType(state, [UIA.NodeTypes.Function, UIA.NodeTypes.Method]).map(funcKey => {
             return {
                 title: UIA.GetNodeTitle(funcKey),
                 value: funcKey.id
@@ -48,7 +48,7 @@ class MaestroActivityMenu extends Component {
                                 [FunctionConstraintKeys.IsInputVariable]: true
                             }
                         });
-                        
+
                         inputVariables.map(inputVariable => {
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 source: inputVariable.id,

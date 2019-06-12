@@ -74,7 +74,7 @@ export default class ExecutorGenerator {
         let agmCombos = [];
         let allmodels = NodesByType(state, NodeTypes.Model);
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
-        let allfunctions = NodesByType(state, NodeTypes.Function);
+        let allfunctions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
         allmodels.map(model => {
             allagents.map(agent => {
                 Object.keys(Methods).map(meth => {

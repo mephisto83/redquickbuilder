@@ -31,12 +31,13 @@ class PermissionActivityMenu extends Component {
         var propertyNodes = null;
         if (targetNodeId) {
             propertyNodes = getNodesByLinkType(graph, { id: targetNodeId, direction: SOURCE, type: LinkType.PropertyLink });
-            propertyNodes = propertyNodes.map(node => {
-                return {
-                    value: node.id,
-                    title: UIA.GetNodeTitle(node)
-                }
-            })
+            if (propertyNodes)
+                propertyNodes = propertyNodes.map(node => {
+                    return {
+                        value: node.id,
+                        title: UIA.GetNodeTitle(node)
+                    }
+                })
         }
         var requestorPropertyNodes = null;
         if (requestorNodeId) {

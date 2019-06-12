@@ -17,7 +17,7 @@ export default class MaestroGenerator {
             res += TAB;
         }
         return res;
-        
+
     }
     static Generate(options) {
         var { state, key } = options;
@@ -65,35 +65,19 @@ export default class MaestroGenerator {
                         let functionName = `${GetNodeProp(maestro_function, NodeProperties.CodeName)}`;
                         let httpMethod = `${GetNodeProp(maestro_function, NodeProperties.HttpMethod)}`;
                         let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
-                        let agentType = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.AgentType);
-                        let userNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.User);
-                        let userTypeNode = null;
-                        if (userNode) {
-                            userTypeNode = GraphMethods.getNodesByLinkType(root, {
-                                id: userNode.id,
-                                type: LinkType.Choice,
-                                direction: GraphMethods.SOURCE
-                            }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
-                        }
                         let agentTypeNode = null;
-                        if (agentType) {
-                            agentTypeNode = GraphMethods.getNodesByLinkType(root, {
-                                id: agentType.id,
-                                type: LinkType.Choice,
-                                direction: GraphMethods.SOURCE
-                            }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
+                        let userTypeNode = null;
+                        let modelNode = null;
+                        let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
+                        if (methodProps) {
+                            agentTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType]);
+                            modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
+                            userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
+
                         }
-                        let modelNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.Model);
-                        let modelNodeType = null;
-                        if (modelNode) {
-                            modelNodeType = GraphMethods.getNodesByLinkType(root, {
-                                id: modelNode.id,
-                                type: LinkType.Choice,
-                                direction: GraphMethods.SOURCE
-                            }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
-                        }
+
                         let agent = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_agentTypeNode}`;
-                        let model_type = modelNodeType ? GetNodeProp(modelNodeType, NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
+                        let model_type = modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
 
                         arbiters.push(agent_type, model_type);
@@ -108,7 +92,7 @@ export default class MaestroGenerator {
                             user: userTypeNode ? GetNodeProp(userTypeNode, NodeProperties.CodeName) : `{maestro_generator_mising_user}`,
                             http_route: httpRoute || '{maestro_generator_http_method',
                             http_method: httpMethod || '{maestro_generator_http_method',
-                            user_instance: userNode ? `${GetNodeProp(userNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_userNode}`,
+                            user_instance: userTypeNode ? `${GetNodeProp(userTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_userNode}`,
                             output_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}',
                             maestro_interface: ToInterface(maestroName),
                             input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}'
