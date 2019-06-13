@@ -29,17 +29,26 @@ export default class PermissionGenerator {
     static createInstanceEnumerationListName(dNode, enu, method, type = 'Enums') {
         return `list${type}${GetNodeProp(dNode, NodeProperties.CodeName)}${GetNodeProp(enu, NodeProperties.CodeName)}${method}`
     }
-    static createEnumerationInstanceList(dpNode, enumerationNode, method) {
-        let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
+    static _createEnumerationInstanceList(dpNode, enumerationNode, method) {
         var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedEnumValues) || [];
         let enumerationName = GetNodeProp(enumerationNode, NodeProperties.CodeName);
         let constants_allowed = ext_allowed.map(ea => {
             return `${enumerationName}.${MakeConstant(ea)}`
         })
+        return constants_allowed
+    }
+    static createEnumerationInstanceList(dpNode, enumerationNode, method) {
+
+        let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
+        let constants_allowed = PermissionGenerator._createEnumerationInstanceList(dpNode, enumerationNode, method);
+        // var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedEnumValues) || [];
+        // let enumerationName = GetNodeProp(enumerationNode, NodeProperties.CodeName);
+        // let constants_allowed = ext_allowed.map(ea => {
+        //     return `${enumerationName}.${MakeConstant(ea)}`
+        // })
         return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL + Tabs(5)}};${jNL}`
     }
-    static createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
-        let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extensionNode, method, 'Extensions');
+    static _createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
         var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedExtensionValues) || [];
         let extensionName = GetNodeProp(extensionNode, NodeProperties.CodeName);
 
@@ -47,6 +56,14 @@ export default class PermissionGenerator {
         let constants_allowed = ext_allowed.map(ea => {
             return `${extensionName}.${MakeConstant(ea)}`
         });
+
+        return constants_allowed;
+
+    }
+    static createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
+        let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extensionNode, method, 'Extensions');
+
+        let constants_allowed = PermissionGenerator._createExtensionInstanceList(dpNode, extensionNode, method, type);
 
         return `var ${name} = new List<string> { ${constants_allowed.map(t => jNL + Tabs(5) + t).join()} ${jNL + Tabs(5)}};${jNL}`
 
@@ -144,15 +161,93 @@ export default class PermissionGenerator {
 
         return listOfCases;
     }
+    static GetTestExtensionNodeValues(graph, permission, method, agent, model) {
+        const value_string = 'value';
+        var dependingPermissionNodes = GraphMethods.getNodesByLinkType(graph, {
+            id: permission.id,
+            type: LinkType.PermissionPropertyDependency
+        });
+        let listOfCases = [];
+        dependingPermissionNodes.map(dpNode => {
+            let propertyNodeLinkedToByDependencyPermissionNodes = GraphMethods.getNodesByLinkType(graph, {
+                id: dpNode.id,
+                type: LinkType.PermissionDependencyPropertyLink
+            });
+            let propertyNodeLinkedToByDependencyPermissionNode = propertyNodeLinkedToByDependencyPermissionNodes[0];
+            if (!propertyNodeLinkedToByDependencyPermissionNode) {
+                return;
+            }
+            let propertyNodes = GraphMethods.getNodesByLinkType(graph, {
+                id: propertyNodeLinkedToByDependencyPermissionNode.id,
+                type: LinkType.PermissionDependencyProperty
+            });
+            let propertyNode = null;
+            if (propertyNodes.length === 1) {
+                propertyNode = propertyNodes[0];
+            }
+            else {
+                return;
+            }
+            var agentLinkExists = GraphMethods.existsLinkBetween(graph, { target: propertyNode.id, source: agent.id, type: LinkType.PropertyLink });
+            let enumerationNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.Enumeration));
+            let extentionNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.UIExtension));
+            let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
+            let useExtension = GetNodeProp(dpNode, NodeProperties.UseExtension);
+
+            if (useEnumeration) {
+                let permissionCaseEnumerationTemplate = fs.readFileSync(PERMISSIONS_CASE_ENUMERATION, 'utf-8');
+                let enumInstance = PermissionGenerator._createEnumerationInstanceList(dpNode, enumerationNode, method);
+                let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
+                let property = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
+
+                listOfCases.push({
+                    name,
+                    property
+                });
+
+            }
+
+            if (useExtension) {
+                let definition = GetNodeProp(extentionNode, NodeProperties.UIExtensionDefinition);
+                let permissionCaseExtensionTemplate = fs.readFileSync(PERMISSIONS_CASE_EXTENSION, 'utf-8');
+                let extensionInstance = PermissionGenerator._createExtensionInstanceList(dpNode, extentionNode, method);
+                let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
+                let property = definition && definition.config ? definition.config.keyField : null;
+
+                listOfCases.push({
+                    name,
+                    property
+                });
+            }
+        });
+
+        return listOfCases;
+    }
     static GenerateCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
 
         let result = {};
         for (var method in Methods) {
             var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
-            let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
+            if (permissionsEnabledFor && permissionsEnabledFor[method]) {
+                let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
 
-            result[method] = cases;
+                result[method] = cases;
+            }
+        }
+        return result;
+    }
+    static GenerateTestCases(state, permission, agent, model) {
+        var graph = GetCurrentGraph(state);
+
+        let result = {};
+        for (var method in Methods) {
+            var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
+            if (permissionsEnabledFor && permissionsEnabledFor[method]) {
+                let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
+
+                result[method] = cases;
+            }
         }
         return result;
     }
@@ -183,9 +278,11 @@ export default class PermissionGenerator {
                     return;
                 }
                 let permissionCases = [];
+                let testPermissionCases = [];
                 matchingPermissionNodes.map(matchingPermissionNode => {
                     if (matchingPermissionNode) {
                         let temp = PermissionGenerator.GenerateCases(state, matchingPermissionNode, agent, model);
+                        let testTemp = PermissionGenerator.GenerateTestCases(state, matchingPermissionNode, agent, model);
                         permissionCases.push(temp);
                     }
                 })
