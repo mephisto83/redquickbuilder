@@ -202,7 +202,8 @@ export default class PermissionGenerator {
 
                 listOfCases.push({
                     name,
-                    property
+                    property,
+                    values: enumInstance
                 });
 
             }
@@ -216,7 +217,8 @@ export default class PermissionGenerator {
 
                 listOfCases.push({
                     name,
-                    property
+                    property,
+                    values: extensionInstance
                 });
             }
         });
