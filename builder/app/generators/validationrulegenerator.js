@@ -13,7 +13,9 @@ const VALIDATION_PROPERTY = './app/templates/validation/validation_property.tpl'
 
 export default class ValidationRuleGenerator {
     static enumerateValidationTestVectors(validation_test_vectors) {
-        var vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
+        var vects = validation_test_vectors.map(x => {
+            return Object.keys(x.values.cases).length
+        });
 
         var enumeration = ValidationRuleGenerator.enumerate(vects);
         return enumeration;
@@ -76,20 +78,20 @@ export default class ValidationRuleGenerator {
                         switch (GetNodeProp(node, NodeProperties.NODEType)) {
                             case NodeTypes.ExtensionType:
                                 if (validators && validators.extension) {
-                                    let temp = { '_ _': '"_____"' };
+                                    let temp = { '_ _': '"__ _ __"' };
                                     attribute_type_arguments = Object.keys(validators.extension).map(ext => {
                                         if (validators.extension[ext]) {
-                                            temp[`${ext}`] = `${GetNodeProp(node, NodeProperties.CodeName)}.${MakeConstant(ext)}`;
-                                            return temp[`${ext}`];
+                                            temp[`$${ext}`] = `${GetNodeProp(node, NodeProperties.CodeName)}.${MakeConstant(ext)}`;
+                                            return temp[`$${ext}`];
                                         }
                                     }).filter(x => x);
                                     // attribute_type_arguments = temp.filter(x => x).join();
                                     validation_test_vectors.push({
                                         property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                                        values: { cases: attribute_type_arguments.join(', ') }
+                                        values: { cases: temp, invalid: { '_ _': true } }
                                     });
                                     attribute_type_arguments = `new List<string> () {
-                ${attribute_type_arguments}
+                ${attribute_type_arguments.join(', ')}
             }`;
                                 }
                                 break;
@@ -105,10 +107,10 @@ export default class ValidationRuleGenerator {
                                     // attribute_type_arguments = temp.filter(x => x).join();
                                     validation_test_vectors.push({
                                         property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                                        values: { cases: attribute_type_arguments.join(', ') }
+                                        values: { cases: [...attribute_type_arguments], invalid: { '_ _': true }  }
                                     });
                                     attribute_type_arguments = `new List<string> () {
-                    ${attribute_type_arguments}
+                    ${attribute_type_arguments.join(', ')}
                 }`;
                                 }
                                 break;
@@ -138,6 +140,11 @@ export default class ValidationRuleGenerator {
                     var _case = Object.keys(validation_test_vectors[vindex].values.cases)[v];
                     if (typeof (projected_value) === 'function') {
                         projected_value = projected_value();
+                    }
+                    else {
+                        if (validation_test_vectors[vindex] && validation_test_vectors[vindex].values && validation_test_vectors[vindex].values.invalid && !validation_test_vectors[vindex].values.invalid[_case]) {
+                            _case = '$$';
+                        }
                     }
                     successCase = successCase && (_case || [false])[0] === '$';
                     return ValidationRuleGenerator.Tabs(3) + `item.${validation_test_vectors[vindex].property} = ${projected_value};`;
