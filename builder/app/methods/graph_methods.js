@@ -318,7 +318,7 @@ export function getValidatorItem(item, options) {
 }
 
 export function getValidatorProperties(validator) {
-    return validator.properties;
+    return validator ? validator.properties : null;
 }
 
 export function newNode(graph) {

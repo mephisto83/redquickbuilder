@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -98,7 +98,7 @@ export default class ValidationRuleGenerator {
                             case NodeTypes.Enumeration:
                                 if (validators && validators.enumeration) {
                                     let enumNode = GraphMethods.GetNode(graph, validators.node);
-                                    let enumName = GetNodeTitle(enumNode);
+                                    let enumName = GetNodeProp(enumNode, NodeProperties.CodeName);
                                     attribute_type_arguments = Object.keys(validators.enumeration).map(ext => {
                                         if (validators.enumeration[ext]) {
                                             return `${enumName}.${MakeConstant(ext)}`
