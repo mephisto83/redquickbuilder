@@ -96,6 +96,11 @@ class PermissionDependencyActivityMenu extends Component {
                             id: currentNode.id,
                             value: [...ext_allowed].filter(x => x !== _enum)
                         });
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.DisallowedExtensionValues,
+                            id: currentNode.id,
+                            value: extensionValues.relativeCompliment([...ext_allowed].filter(x => x !== _enum))
+                        });
                     }} > {_enum}</div>;
                 }) : null}
                 {currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
@@ -105,6 +110,11 @@ class PermissionDependencyActivityMenu extends Component {
                             prop: UIA.NodeProperties.AllowedExtensionValues,
                             id: currentNode.id,
                             value: [...ext_allowed, _enum].unique()
+                        });
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.DisallowedExtensionValues,
+                            id: currentNode.id,
+                            value: extensionValues.relativeCompliment([...ext_allowed, _enum].unique())
                         });
                     }} > {_enum}</div>;
                 }) : null}
@@ -159,20 +169,32 @@ class PermissionDependencyActivityMenu extends Component {
                 {currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.AllowedEnums} /> : null}
                 {active && allowed && allowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? allowed.map((_enum) => {
                     return <div key={`allowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
+                        var disallowed = enumerationValues.relativeCompliment([...allowed].filter(x => x !== _enum));
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.AllowedEnumValues,
                             id: currentNode.id,
                             value: [...allowed].filter(x => x !== _enum)
+                        });
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.DisallowedEnumValues,
+                            id: currentNode.id,
+                            value: disallowed
                         });
                     }} > {_enum}</div>;
                 }) : null}
                 {currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
                 {active && disallowed && disallowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? disallowed.map((_enum) => {
                     return <div key={`disallowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
+                        var disallowed = enumerationValues.relativeCompliment([...allowed, _enum].unique());
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.AllowedEnumValues,
                             id: currentNode.id,
                             value: [...allowed, _enum].unique()
+                        });
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.DisallowedEnumValues,
+                            id: currentNode.id,
+                            value: disallowed
                         });
                     }} > {_enum}</div>;
                 }) : null}

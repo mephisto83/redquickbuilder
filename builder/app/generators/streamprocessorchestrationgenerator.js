@@ -40,7 +40,7 @@ export default class StreamProcessOrchestrationGenerator {
         models.map(model => {
             modelexecution.push(Tabs(4) + `await Process${GetNodeProp(model, NodeProperties.CodeName)}Changes();` + jNL);
         })
-        result.push(`public async Task ProcessStagedChanges() {
+        result.push(`       public async Task ProcessStagedChanges() {
 ${modelexecution.join('')}
         }
 `)

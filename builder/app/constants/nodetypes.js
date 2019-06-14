@@ -130,7 +130,9 @@ export const NameSpace = {
 export const NodeProperties = {
     Enumeration: 'Enumeration',
     AllowedExtensionValues: 'AllowedExtensionValues',
+    DisallowedExtensionValues: 'DisallowedExtensionValues',
     AllowedEnumValues: 'AllowedEnumerationValue',
+    DisallowedEnumValues: 'DisallowedEnumValues',
     ValidatorModel: 'ValidatorModel',
     ExecutorAgent: 'ExecutorAgent',
     ExecutorFunction: 'ExecutorFunction',

@@ -42,6 +42,14 @@ export default class PermissionGenerator {
         })
         return constants_allowed
     }
+    static _getNotAllowedConstances(dpNode, enumerationNode, method) {
+        var ext_disallowed = GetNodeProp(dpNode, NodeProperties.DisallowedEnumValues) || [];
+        let enumerationName = GetNodeProp(enumerationNode, NodeProperties.CodeName);
+        let constants_notallowed = ext_disallowed.map(ea => {
+            return `${enumerationName}.${MakeConstant(ea)}`
+        })
+        return constants_notallowed
+    }
     static createEnumerationInstanceList(dpNode, enumerationNode, method) {
 
         let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
@@ -63,6 +71,18 @@ export default class PermissionGenerator {
         });
 
         return constants_allowed;
+
+    }
+    static _getNotAllowedExtectionConstances(dpNode, extensionNode, method, type = 'Enums') {
+        var ext_disallowed = GetNodeProp(dpNode, NodeProperties.DisallowedExtensionValues) || [];
+        let extensionName = GetNodeProp(extensionNode, NodeProperties.CodeName);
+
+
+        let constants_disallowed = ext_disallowed.map(ea => {
+            return `${extensionName}.${MakeConstant(ea)}`
+        });
+
+        return constants_disallowed;
 
     }
     static createExtensionInstanceList(dpNode, extensionNode, method, type = 'Enums') {
@@ -221,6 +241,7 @@ export default class PermissionGenerator {
 
             if (useEnumeration) {
                 let enumInstance = PermissionGenerator._createEnumerationInstanceList(dpNode, enumerationNode, method);
+                let enumNotAllowed = PermissionGenerator._getNotAllowedConstances(dpNode, enumerationNode, method);
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
                 let property = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
 
@@ -228,6 +249,7 @@ export default class PermissionGenerator {
                     name,
                     property,
                     values: enumInstance,
+                    neg: enumNotAllowed,
                     isAppliedPermission
                 });
 
@@ -236,6 +258,7 @@ export default class PermissionGenerator {
             if (useExtension) {
                 let definition = GetNodeProp(extentionNode, NodeProperties.UIExtensionDefinition);
                 let extensionInstance = PermissionGenerator._createExtensionInstanceList(dpNode, extentionNode, method);
+                let extensionsNotAllowed = PermissionGenerator._getNotAllowedExtectionConstances(dpNode, extentionNode, method);
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
                 let property = definition && definition.config ? definition.config.keyField : null;
 
@@ -243,6 +266,7 @@ export default class PermissionGenerator {
                     name,
                     property,
                     values: extensionInstance,
+                    neg: extensionsNotAllowed,
                     isAppliedPermission
                 });
             }
@@ -265,7 +289,9 @@ export default class PermissionGenerator {
         return result;
     }
     static EnumerateCases(cases) {
-        let vects = cases.map(x => x && x.values ? x.values.length : 0);
+        let vects = cases.map(x => {
+            return (x && x.values ? x.values.length : 0) + (x && x.neg ? x.neg.length : 0);
+        });
         return enumerate(vects);
     }
     static GenerateTestCases(state, permission, agent, model) {
@@ -281,9 +307,11 @@ export default class PermissionGenerator {
                 let res = enums.map((_enum, testIndex) => {
                     let itemProps = [];
                     let agentProps = [];
+                    let ispositive = true;
                     _enum.map((which, index) => {
                         let _case = cases[index];
-                        let value = _case.values[which];
+                        ispositive = ispositive && _case.values.length > which;
+                        let value = _case.values.length <= which ? _case.neg[which - _case.values.length] : _case.values[which];
                         let temp = bindTemplate(testCaseProperty, {
                             model: _case.isAppliedPermission ? 'model' : 'agent',
                             property: `.${_case.property}`,
@@ -303,7 +331,7 @@ export default class PermissionGenerator {
                         model: GetNodeProp(model, NodeProperties.CodeName),
                         method,
                         test: `${testIndex}`,
-                        result: 'true',
+                        result: ispositive ? 'true' : 'false',
                         function_name: GetNodeProp(permission, NodeProperties.CodeName) + method
                     });
                 });
@@ -419,7 +447,7 @@ export default class PermissionGenerator {
                 test: NamespaceGenerator.Generate({
                     template: bindTemplate(testPermission, {
                         tests: testMethodPermisionCases.join(NEW_LINE),
-                        name: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}Tests`
+                        name: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}`
                     }),
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
