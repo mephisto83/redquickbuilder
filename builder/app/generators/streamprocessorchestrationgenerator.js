@@ -113,37 +113,23 @@ ${modelexecution.join('')}
     }
     static GenerateProcessTests(state) {
         let graph = GetRootGraph(state);
-        let functions = NodesByType(state, NodeTypes.Function);
+        let functions = NodesByType(state, NodeTypes.Method);
         let res = '';
         // STREAM_METHOD_TESTS
         let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf-8');
 
         res = functions.map((func, index) => {
-            let models = GraphMethods.getNodesLinkedTo(graph, {
-                id: func.id,
-                constraints: {
-                    key: FunctionTemplateKeys.Model
-                }
-            });
-            if (models && models[0]) {
-                models = GraphMethods.getNodesLinkedTo(graph, {
-                    id: models[0].id
-                })
-            }
-            let agents = GraphMethods.getNodesLinkedTo(graph, {
-                id: func.id,
-                constraints: {
-                    key: FunctionTemplateKeys.AgentType
-                }
-            });
-            if (agents && agents[0]) {
-                agents = GraphMethods.getNodesLinkedTo(graph, {
-                    id: agents[0].id
-                })
+            let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
+            if (methodProps) {
+                var agentTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.AgentType]);
+                var modelNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
+                var userTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.User]);
+                var permissionNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Permission]);
+
             }
             return bindTemplate(_stramMethodTests, {
-                model: GetNodeProp(models[0], NodeProperties.CodeName),
-                agent_type: GetNodeProp(agents[0], NodeProperties.CodeName),
+                model: GetNodeProp(modelNode, NodeProperties.CodeName),
+                agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
                 function_name: GetNodeProp(func, NodeProperties.CodeName),
                 test_name: `${GetNodeProp(func, NodeProperties.CodeName)}Test`
             });
