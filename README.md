@@ -402,7 +402,7 @@ A list of CRUD functions with a return function of a list of Objects.
 
             var {{agent}} = await arbiter.GetOwnedBy<{{agent_type}>({{user_instance}}.Id);
 
-            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent_type}}Permissions.{{permission_function}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}Change.Create({{agent}}, {{value}});
 
@@ -425,7 +425,7 @@ A list of CRUD functions with a return function of a list of Objects.
 
             var {{agent}} = await arbiter.GetOwnedBy<{{agent_type}>({{user_instance}}.Id);
 
-            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent_type}}Permissions.{{permission_function}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}Change.Update({{agent}}, {{value}});
 
@@ -455,7 +455,7 @@ A list of CRUD functions with a return function of a list of Objects.
 sounds like
 *(IAgent, IHasAllowedCollection) => checks(IHasAllowedCollection) for (IAgent.Id);*
 
-await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}, {{agent_type}}Permissions.CAN_SEND_MESSAGE).ConfigureAwait(false))
+await {{agent_type}}Permissions.{{permission_function}}({{agent}} , {{value}}, {{agent_type}}Permissions.CAN_SEND_MESSAGE).ConfigureAwait(false))
 IAgent, IHasAllowedCollection
 
 *  Given an Agent and Permission, determing the permission based on a role
@@ -517,7 +517,7 @@ IAgent, IHasAllowedCollection
 
             var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
-            if(await {{agent_type}}Permissions.CanCreate{{model}}({{agent}} , {{value}}).ConfigureAwait(false))) {
+            if(await {{agent_type}}Permissions.{{permission_function}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
                 var parameters = {{model}}Change.Create({{agent}}, {{value}});
 

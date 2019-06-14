@@ -67,19 +67,21 @@ export default class MaestroGenerator {
                         let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
                         let agentTypeNode = null;
                         let userTypeNode = null;
+                        let permissionNode = null;
                         let modelNode = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         if (methodProps) {
                             agentTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType]);
                             modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
+                            permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
 
                         }
 
                         let agent = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_agentTypeNode}`;
                         let model_type = modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
-
+                        let methodType = GetNodeProp(maestro_function, NodeProperties.MethodType);
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
                         let bindOptions = {
@@ -95,6 +97,7 @@ export default class MaestroGenerator {
                             user_instance: userTypeNode ? `${GetNodeProp(userTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_userNode}`,
                             output_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}',
                             maestro_interface: ToInterface(maestroName),
+                            permission_function: permissionNode ? GetNodeProp(permissionNode, NodeProperties.CodeName) + methodType : `{MISSING_PERMISSION_FUNCTION}`,
                             input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}'
                         };
                         tempFunction = bindTemplate(tempFunction, bindOptions);

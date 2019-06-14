@@ -9,10 +9,15 @@
             });
             var permission = RedStrapper.Resolve<IPermissions{{agent_type}}>();
             var agent = {{agent_type}}.Create();
-            var item = {{model}}.Create();
+            //Set Agent Properties
+{{set_agent_properties}}
+
+            var model = {{model}}.Create();
+            //Set Model Properties
+{{set_model_properties}}
 
             //Act
-            var res = await permission.Can{{method}}{{model}}(agent, item);
+            var res = await permission.{{function_name}}(agent, model);
 
             //Assert
             Assert.AreEqual(res, {{result}});

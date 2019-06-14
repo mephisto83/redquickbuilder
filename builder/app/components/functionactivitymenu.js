@@ -31,7 +31,7 @@ class FunctionActivityMenu extends Component {
         })
         return (
             <TabPane active={active}>
-                {currentNode ? (<SelectInput
+                  {currentNode ? (<SelectInput
                     label={Titles.AgentOperator}
                     options={agent_nodes}
                     onChange={(value) => {
@@ -52,6 +52,7 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
+              
                 {currentNode ? (<CheckBox
                     label={Titles.CustomFunction}
                     title={Titles.CustomFunctionDescription}

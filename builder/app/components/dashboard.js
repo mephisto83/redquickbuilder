@@ -30,6 +30,7 @@ import ModelActivityMenu from './modelactivitymenu';
 import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
 import AttributeFormControl from './attributeformcontrol';
+import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import ValidationActivityMenu from './validationactivitymenu';
@@ -324,6 +325,7 @@ class Dashboard extends Component {
                                 <ReferenceActivityMenu />
                                 <ExecutorPropertyMenu />
                                 <MethodPropertyMenu />
+                                <PermissionMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}

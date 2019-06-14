@@ -23,6 +23,12 @@ class MethodActivityMenu extends Component {
                 title: UIA.GetNodeTitle(node)
             }
         });
+        var permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
         var function_types = Object.keys(Functions).map(funcKey => {
             return {
                 title: Functions[funcKey].title || funcKey,
@@ -52,17 +58,27 @@ class MethodActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
-                {currentNode ? (<CheckBox
-                    label={Titles.CustomFunction}
-                    title={Titles.CustomFunctionDescription}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseScopeGraph] : ''}
+                {currentNode ? (<SelectInput
+                    label={Titles.PermissionImpl}
+                    options={permission_nodes}
                     onChange={(value) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                            target: currentNode.properties[UIA.NodeProperties.PermissionImpl],
+                            source: id
+                        })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.UseScopeGraph,
+                            prop: UIA.NodeProperties.PermissionImpl,
                             id: currentNode.id,
-                            value: value
+                            value
                         });
-                    }} />) : null}
+                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                            target: value,
+                            source: id,
+                            properties: { ...UIA.LinkProperties.PermissionLink }
+                        });
+                    }}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionImpl] : ''} />) : null}
                 {currentNode && !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<SelectInput
                     label={Titles.FunctionTypes}
                     options={function_types}

@@ -1298,6 +1298,12 @@ export function matchObject(obj1, obj2) {
 
     return true;
 }
+export function GetLinkByNodes(graph, options) {
+    var { source, target } = options;
+    return Object.values(graph.linkLib).find(t => {
+        return t.source === source && t.target === target;
+    })
+}
 export function getNodesByLinkType(graph, options) {
     if (options) {
         var { id, direction, type, exist } = options;

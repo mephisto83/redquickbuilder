@@ -131,7 +131,7 @@ export const DependentPropertyDescription = 'The property that the current prope
 export const MatchingValue = 'Matching Value';
 export const MatchingValueDescription = 'The value that the associated property will have to equal, to enable the current property';
 
-
+export const PermissionImpl = 'Permission Implementation';
 export const FunctionTypes = 'Function Types';
 export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child => IList<Child>';
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';

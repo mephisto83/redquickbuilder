@@ -150,3 +150,23 @@ String.prototype.padding = function (n, c) {
         });
     };
 })(Array.prototype)
+
+
+export function enumerate(vects, j = 0) {
+    var results = [];
+
+    if (j < vects.length)
+        for (var i = 0; i < vects[j]; i++) {
+            var rest = enumerate(vects, j + 1);
+            var temp = [i];
+            if (rest.length) {
+                rest.map(r => {
+                    results.push([...temp, ...r])
+                });
+            }
+            else {
+                results.push(temp);
+            }
+        }
+    return results;
+}

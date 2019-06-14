@@ -5,6 +5,7 @@ import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
+import { enumerate } from '../utils/utils';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
 const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
@@ -21,26 +22,11 @@ export default class ExecutorGenerator {
     static enumerateValidationTestVectors(validation_test_vectors) {
         var vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
 
-        var enumeration = ExecutorGenerator.enumerate(vects);
+        var enumeration = ExecutorGenerator.EnumerateCases(vects);
         return enumeration;
     }
-    static enumerate(vects, j = 0) {
-        var results = [];
-
-        if (j < vects.length)
-            for (var i = 0; i < vects[j]; i++) {
-                var rest = ExecutorGenerator.enumerate(vects, j + 1);
-                var temp = [i];
-                if (rest.length) {
-                    rest.map(r => {
-                        results.push([...temp, ...r])
-                    });
-                }
-                else {
-                    results.push(temp);
-                }
-            }
-        return results;
+    static EnumerateCases(vects, j = 0) {
+        return enumerate(vects, j);
     }
     static Tabs(c) {
         let res = '';
@@ -89,7 +75,7 @@ export default class ExecutorGenerator {
                         });
                     });
                     if (!found) {
-                        
+
                         agmCombos.push({
                             agent: GetNodeProp(agent, NodeProperties.CodeName),
                             model: GetNodeProp(model, NodeProperties.CodeName),
@@ -223,7 +209,7 @@ export default class ExecutorGenerator {
                 change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`,
                 method_guts: templateRes,
             });
-            
+
             // var testTemplate = bindTemplate(_testClass, {
             //     name: GetNodeProp(node, NodeProperties.CodeName),
             //     tests: testProps.join(NEW_LINE)

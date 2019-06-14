@@ -202,6 +202,7 @@ export const NodeProperties = {
     AgentName: 'agentName',//The name of the instance variable to be used 
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
+    PermissionImpl: 'permission-implementation',
     ClassConstructionInformation: 'ClassConstructionInformation'
 }
 
@@ -312,6 +313,7 @@ export const LinkType = {
     UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
     MaestroLink: 'maestro-link',
     AttributeLink: 'attribute-link',
+    PermissionFunction: 'permission-function',
     Exist: 'exist', //A node that points with this link type, requires that the node exists, if it doesn't the link and the other node should dissapear.
     PermissionPropertyDependency: 'permission-property-dependency', //There is a link between a permision and a property.
     PermissionDependencyProperty: 'permission-dependency-property' //There is a link bewteen a property and a dependency
@@ -396,6 +398,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    PermissionFunctionLink: {
+        type: LinkType.PermissionFunction
     },
     FunctionVariable: {
         type: LinkType.FunctionVariable,

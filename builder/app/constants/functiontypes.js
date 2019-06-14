@@ -44,6 +44,7 @@ export const FunctionTemplateKeys = {
     AgentInstance: 'agent_instance',
     AgentType: 'agent_type',
     User: 'user',
+    Permission: 'permission',
     UserInstance: 'user_instance',
     Value: 'value'
 }
@@ -167,6 +168,10 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
         [NodeProperties.IsUser]: true,
         key: FunctionTemplateKeys.User,
         nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Permission]: {
+        key: FunctionTemplateKeys.Permission,
+        nodeTypes: [NodeTypes.Permission]
     }
 };
 

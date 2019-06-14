@@ -1,4 +1,4 @@
-        public async Task<bool> Can{{method}}{{model}}({{agent_type}} {{agent}}, {{model}} {{value}}) {
+        public async Task<bool> {{function_name}}({{agent_type}} {{agent}}, {{model}} {{value}}) {
             if({{value}} == null) {
                 return false;
             }
