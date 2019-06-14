@@ -1,8 +1,10 @@
 
         [TestMethod]
-        public async Task {{function_name}}Test()
+        public async Task {{test_name}}Test()
         {
-            //Arrange
+            //Arrange 
+            RedStrapper.Clear();
+            
             var agentArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}>>();
             var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
             RedStrapper.Add(builder =>
@@ -14,12 +16,12 @@
 {{set_agent_propeties}}
             agent = await agentArbiter.Create(agent);
 
-            var item = {{model}}.Create();
+            var model = {{model}}.Create();
 {{set_model_properties}}
 
             var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
             var change = {{model}}Change.Create();
-            change.Data = item;
+            change.Data = model;
             change.AgentId = agent.Id;
             change.FunctionName = FunctionName.{{function_name}};
 
@@ -32,18 +34,26 @@
             //Assert
             var response = (await responseArbiter.GetBy(x => x.Response == change.Response)).Single();
             Assert.IsNotNull(response);
-            Assert.IsFalse(response.Failed);
-            Assert.IsNotNull(response.IdValue);
-            var new{{model}} = await modelArbiter.Get<{{model}}>(response.IdValue);
-            Assert.IsNotNull(new{{model}});
-            Assert.AreEqual(new{{model}}.{{agent_type}}, agent.Id);
+            Assert.AreEqual(response.Failed, {{test_result}});
+            if(response.Failed)
+            { 
+                Assert.IsNull(response.IdValue);
+            }
+            else 
+            {
+                Assert.IsNotNull(response.IdValue);
+                var new{{model}} = await modelArbiter.Get<{{model}}>(response.IdValue);
+                Assert.IsNotNull(new{{model}});
+                Assert.AreEqual(new{{model}}.{{agent_type}}, agent.Id);
+            }
         }
 
 
         [TestMethod]
-        public async Task {{function_name}}Test_Failed()
+        public async Task {{test_name}}Test_Failed()
         {
             //Arrange
+            RedStrapper.Clear();
             RedStrapper.Add(builder =>
             {
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();

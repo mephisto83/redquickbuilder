@@ -294,36 +294,49 @@ export default class PermissionGenerator {
         });
         return enumerate(vects);
     }
+    static EnumeratePermissionCases(graph, permission, method, agent, model) {
+        let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
+        let enums = PermissionGenerator.EnumerateCases(cases);
+        let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf-8');
+        let res = enums.map((_enum, testIndex) => {
+            let itemProps = [];
+            let agentProps = [];
+            let ispositive = true;
+            _enum.map((which, index) => {
+                let _case = cases[index];
+                ispositive = ispositive && _case.values.length > which;
+                let value = _case.values.length <= which ? _case.neg[which - _case.values.length] : _case.values[which];
+                let temp = bindTemplate(testCaseProperty, {
+                    model: _case.isAppliedPermission ? 'model' : 'agent',
+                    property: `.${_case.property}`,
+                    value: value
+                });
+                if (_case.isAppliedPermission) {
+                    itemProps.push(temp);
+                }
+                else {
+                    agentProps.push(temp);
+                }
+            });
+            return {
+                agentProps,
+                itemProps,
+                resultSuccess: ispositive
+            }
+        });
+
+        return res;
+    }
     static GenerateTestCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
         let testCase = fs.readFileSync(TEST_CASE, 'utf-8');
-        let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf-8');
         let result = []
         for (var method in Methods) {
             var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
             if (permissionsEnabledFor && permissionsEnabledFor[method]) {
-                let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
-                let enums = PermissionGenerator.EnumerateCases(cases);
-                let res = enums.map((_enum, testIndex) => {
-                    let itemProps = [];
-                    let agentProps = [];
-                    let ispositive = true;
-                    _enum.map((which, index) => {
-                        let _case = cases[index];
-                        ispositive = ispositive && _case.values.length > which;
-                        let value = _case.values.length <= which ? _case.neg[which - _case.values.length] : _case.values[which];
-                        let temp = bindTemplate(testCaseProperty, {
-                            model: _case.isAppliedPermission ? 'model' : 'agent',
-                            property: `.${_case.property}`,
-                            value: value
-                        });
-                        if (_case.isAppliedPermission) {
-                            itemProps.push(temp);
-                        }
-                        else {
-                            agentProps.push(temp);
-                        }
-                    });
+                let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
+                res = res.map((t, testIndex) => {
+                    var { agentProps, itemProps, resultSuccess } = t;
                     return bindTemplate(testCase, {
                         set_agent_properties: agentProps.join(NEW_LINE),
                         set_model_properties: itemProps.join(NEW_LINE),
@@ -331,10 +344,10 @@ export default class PermissionGenerator {
                         model: GetNodeProp(model, NodeProperties.CodeName),
                         method,
                         test: `${testIndex}`,
-                        result: ispositive ? 'true' : 'false',
+                        result: resultSuccess ? 'true' : 'false',
                         function_name: GetNodeProp(permission, NodeProperties.CodeName) + method
                     });
-                });
+                })
                 result = [...result, ...res];
             }
         }

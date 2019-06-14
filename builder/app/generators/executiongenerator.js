@@ -180,7 +180,7 @@ export default class ExecutorGenerator {
                 model: `${GetNodeProp(modelNode, NodeProperties.CodeName)}`
             });
 
-            var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
+            // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
 
             var templateRes = bindTemplate(_executor_methods, {

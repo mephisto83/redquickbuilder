@@ -4,6 +4,9 @@ import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_C
 import fs from 'fs';
 import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import PermissionGenerator from './permissiongenerator';
+import ValidationRuleGenerator from './validationrulegenerator';
+import { enumerate } from '../utils/utils';
 
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/stream_process_orchestration.tpl';
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE = './app/templates/stream_process/stream_process_orchestration_interface.tpl';
@@ -11,6 +14,7 @@ const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS = './app/templates/stream_proce
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE = './app/templates/stream_process/stream_process_orchestration_agenttype_methods_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES = './app/templates/stream_process/stream_process_orchestration_selected_staged_changes.tpl';
 const STREAM_METHOD_TESTS = './app/templates/stream_process/tests/stream_process_execution_tests.tpl';
+const CREATE_MODEL_TESTS = './app/templates/stream_process/tests/create_model_tests.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 export default class StreamProcessOrchestrationGenerator {
     static GenerateStaticMethods(models) {
@@ -117,15 +121,20 @@ ${modelexecution.join('')}
         let res = '';
         // STREAM_METHOD_TESTS
         let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf-8');
+        let _createModelTests = fs.readFileSync(CREATE_MODEL_TESTS, 'utf-8');
 
         res = functions.map((func, index) => {
             let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
+            let method = GetNodeProp(func, NodeProperties.MethodType);
+            let cases = null;
             if (methodProps) {
                 var agentTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.AgentType]);
                 var modelNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
                 var userTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.User]);
                 var permissionNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Permission]);
-
+                if (graph && permissionNode && method && agentTypeNode && modelNode) {
+                    cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, method, agentTypeNode, modelNode);
+                }
             }
             return bindTemplate(_stramMethodTests, {
                 model: GetNodeProp(modelNode, NodeProperties.CodeName),
@@ -134,7 +143,62 @@ ${modelexecution.join('')}
                 test_name: `${GetNodeProp(func, NodeProperties.CodeName)}Test`
             });
         }).join(NEW_LINE);
-        return res;
+        let func_Cases = [];
+        functions.map((func, index) => {
+            let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
+            let method = GetNodeProp(func, NodeProperties.MethodType);
+            let cases = null;
+            if (methodProps) {
+                var agentTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.AgentType]);
+                var modelNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
+                var userTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.User]);
+                var permissionNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Permission]);
+                if (graph && permissionNode && method && agentTypeNode && modelNode) {
+                    //  cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, method, agentTypeNode, modelNode);
+                    let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, func);
+                    let validatorCases = null;
+                    if (validators && validators.length) {
+
+                        validatorCases = validators.map(validator => {
+                            return {
+                                cases: ValidationRuleGenerator.GenerateValidationCases(graph, validator),
+                                isModel: GetNodeProp(validator, NodeProperties.ValidatorModel) === methodProps[FunctionTemplateKeys.Model]
+                            };
+                        })
+                    }
+                    enumerate(validatorCases.map(x => x.cases.length)).map((_enum, caseindex) => {
+                        let v1 = validatorCases[0].cases[_enum[0]];
+                        let v2 = validatorCases[1].cases[_enum[1]];
+                        let agent_properties = '';
+                        let model_properties = '';
+                        if (!validatorCases[1].isModel) {
+                            agent_properties = bindTemplate(v2.set_properties, { model: "agent" });
+                            model_properties = bindTemplate(v1.set_properties, { model: "model" });
+                        }
+                        else {
+                            agent_properties = bindTemplate(v2.set_properties, { model: "model" });
+                            model_properties = bindTemplate(v1.set_properties, { model: "agent" });
+                        }
+                        // cases.map((_case, caseindex) => {
+                        func_Cases.push(bindTemplate(_createModelTests, {
+                            model: GetNodeProp(modelNode, NodeProperties.CodeName),
+                            agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
+                            set_agent_propeties: agent_properties,
+                            set_model_properties: model_properties,
+                            function_name: GetNodeProp(func, NodeProperties.CodeName),
+                            test_result: !(v1.resultSuccess && v2.resultSuccess),
+                            test_name: `${GetNodeProp(func, NodeProperties.CodeName)}${caseindex}Test`
+                        }));
+
+                    })
+                    //  });
+                }
+            }
+        }).join(NEW_LINE);
+        return res + NEW_LINE + func_Cases.join(NEW_LINE);
+    }
+    static GetFunctionValidators(state, funct) {
+        return NodesByType(state, NodeTypes.Validator).filter(x => GetNodeProp(x, NodeProperties.ValidatorFunction) === funct.id);
     }
     static Generate(options) {
         var { state, key } = options;
@@ -203,6 +267,8 @@ ${modelexecution.join('')}
                         `${namespace}${NameSpace.Parameters}`,
                         `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.StreamProcess}`,
+                        `${namespace}${NameSpace.Executors}`,
+                        `${namespace}${NameSpace.Extensions}`,
                         `${namespace}${NameSpace.Constants}`],
                     namespace,
                     space: NameSpace.Tests

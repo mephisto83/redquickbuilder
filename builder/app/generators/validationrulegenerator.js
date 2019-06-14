@@ -45,6 +45,98 @@ export default class ValidationRuleGenerator {
         }
         return res;
     }
+    static GenerateValidationCases(graph, validatorNode) {
+
+        var model = GetNodeProp(validatorNode, NodeProperties.ValidatorModel);
+        var validator = GetNodeProp(validatorNode, NodeProperties.Validator);
+        let validatorProperties = GraphMethods.getValidatorProperties(validator);
+        var validation_test_vectors = [];
+        Object.keys(validatorProperties).map(property => {
+            let propertyNode = GraphMethods.GetNode(graph, property);
+            let validatorPs = validatorProperties[property];
+
+            return Object.keys(validatorPs.validators).map(vld => {
+                let validators = validatorPs.validators[vld];
+                let node = GraphMethods.GetNode(graph, validators.node);
+                let attribute_type_arguments = '';
+                if (node) {
+                    switch (GetNodeProp(node, NodeProperties.NODEType)) {
+                        case NodeTypes.ExtensionType:
+                            if (validators && validators.extension) {
+                                let temp = { '_ _': '"__ _ __"' };
+                                attribute_type_arguments = Object.keys(validators.extension).map(ext => {
+                                    if (validators.extension[ext]) {
+                                        temp[`$${ext}`] = `${GetNodeProp(node, NodeProperties.CodeName)}.${MakeConstant(ext)}`;
+                                        return temp[`$${ext}`];
+                                    }
+                                }).filter(x => x);
+                                // attribute_type_arguments = temp.filter(x => x).join();
+                                validation_test_vectors.push({
+                                    property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+                                    values: { cases: temp, invalid: { '_ _': true } }
+                                });
+                                attribute_type_arguments = `new List<string> () {
+                ${attribute_type_arguments.join(', ')}
+            }`;
+                            }
+                            break;
+                        case NodeTypes.Enumeration:
+                            if (validators && validators.enumeration) {
+                                let enumNode = GraphMethods.GetNode(graph, validators.node);
+                                let enumName = GetNodeProp(enumNode, NodeProperties.CodeName);
+                                attribute_type_arguments = Object.keys(validators.enumeration).map(ext => {
+                                    if (validators.enumeration[ext]) {
+                                        return `${enumName}.${MakeConstant(ext)}`
+                                    }
+                                }).filter(x => x);
+                                // attribute_type_arguments = temp.filter(x => x).join();
+                                validation_test_vectors.push({
+                                    property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+                                    values: { cases: [...attribute_type_arguments], invalid: { '_ _': true } }
+                                });
+                                attribute_type_arguments = `new List<string> () {
+                    ${attribute_type_arguments.join(', ')}
+                }`;
+                            }
+                            break;
+                    }
+                }
+                if (ValidationCases[validators.type]) {
+                    validation_test_vectors.push({
+                        property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+                        values: ValidationCases[validators.type]
+                    });
+                }
+            });
+        });
+        var vectors = ValidationRuleGenerator.enumerateValidationTestVectors(validation_test_vectors);
+
+        let testProps = vectors.map((vector, index) => {
+            let successCase = true;
+            let properylines = vector.map((v, vindex) => {
+                var projected_value = Object.values(validation_test_vectors[vindex].values.cases)[v];
+                var _case = Object.keys(validation_test_vectors[vindex].values.cases)[v];
+                if (typeof (projected_value) === 'function') {
+                    projected_value = projected_value();
+                }
+                else {
+                    if (validation_test_vectors[vindex] && validation_test_vectors[vindex].values && validation_test_vectors[vindex].values.invalid && !validation_test_vectors[vindex].values.invalid[_case]) {
+                        _case = '$$';
+                    }
+                }
+                successCase = successCase && (_case || [false])[0] === '$';
+                return ValidationRuleGenerator.Tabs(3) + `{{model}}.${validation_test_vectors[vindex].property} = ${projected_value};`;
+            }).join(NEW_LINE);
+            let temp = {
+                resultSuccess: successCase,
+                set_properties: properylines,
+                type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
+            };
+
+            return temp;
+        });
+        return testProps;
+    }
     static Generate(options) {
         var { state, key } = options;
         let graphRoot = GetRootGraph(state);
@@ -107,7 +199,7 @@ export default class ValidationRuleGenerator {
                                     // attribute_type_arguments = temp.filter(x => x).join();
                                     validation_test_vectors.push({
                                         property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                                        values: { cases: [...attribute_type_arguments], invalid: { '_ _': true }  }
+                                        values: { cases: [...attribute_type_arguments], invalid: { '_ _': true } }
                                     });
                                     attribute_type_arguments = `new List<string> () {
                     ${attribute_type_arguments.join(', ')}
@@ -147,7 +239,7 @@ export default class ValidationRuleGenerator {
                         }
                     }
                     successCase = successCase && (_case || [false])[0] === '$';
-                    return ValidationRuleGenerator.Tabs(3) + `item.${validation_test_vectors[vindex].property} = ${projected_value};`;
+                    return ValidationRuleGenerator.Tabs(3) + `model.${validation_test_vectors[vindex].property} = ${projected_value};`;
                 }).join(NEW_LINE);
                 let temp = bindTemplate(_validation_test, {
                     model: GetNodeProp(modelNode, NodeProperties.CodeName),
