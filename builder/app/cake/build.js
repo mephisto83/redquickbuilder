@@ -169,7 +169,7 @@ function createWorkSpace() {
     }).then(() => {
         //D:\dev\redquick\RedQuick\RedQuickCore
         //Add nuget packages.
-        let source = `D:/dev/redquick/RedQuick/RedQuickCore`;
+        let source = `D:/dev/redquick/RedQuick/RedQuickCore/bin/Debug`;
         let testProject = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
         let projects = [
             build.solutionName + '.Controllers/' + build.solutionName + '.Controllers.csproj',

@@ -44,7 +44,7 @@ export default class StreamProcessOrchestrationGenerator {
         models.map(model => {
             modelexecution.push(Tabs(4) + `await Process${GetNodeProp(model, NodeProperties.CodeName)}Changes();` + jNL);
         })
-        result.push(`       public async Task ProcessStagedChanges() {
+        result.push(`       public async Task ProcessStagedChanges(Distribution distribution = null) {
 ${modelexecution.join('')}
         }
 `)
@@ -68,7 +68,6 @@ ${modelexecution.join('')}
         let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf-8');
 
         let result = [];
-        result.push(`Task ProcessStagedChanges();`)
         agents.map(agent => {
             models.map(model => {
                 var res = bindTemplate(_streamAgentMethods, {

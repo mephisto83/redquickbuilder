@@ -53,6 +53,7 @@ export const STANDARD_CONTROLLER_USING = [
     'RedQuick.Interfaces.Arbiter',
     'RedQuick.Configuration',
     'RedQuick.Util',
+    'RedQuick.Interfaces',
     'RedQuick.Interfaces.Data',
     'RedQuick.UI',
     'System',

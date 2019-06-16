@@ -1,11 +1,6 @@
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    public interface IStreamProcessOrchestration
+    public interface IStreamProcessOrchestration : IRedStreamProcessOrchestration
     {
 {{agent_type_methods}}    
     }

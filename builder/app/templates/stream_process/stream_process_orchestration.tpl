@@ -15,7 +15,6 @@
 
 
 
-
 {{agent_type_methods}}    
     }
 

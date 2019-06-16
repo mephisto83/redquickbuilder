@@ -1,14 +1,18 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import StreamProcessOrchestrationGenerator from './streamprocessorchestrationgenerator';
+import ValidationRuleGenerator from './validationrulegenerator';
+import PermissionGenerator from './permissiongenerator';
 
 const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
 const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
-
+const TEST_CLASS = './app/templates/tests/tests.tpl';
+const MAESTRO_FUNCTION_TESTS = './app/templates/maestro/tests/maestro.tpl';
 const PROPERTY_TABS = 6;
 export default class MaestroGenerator {
     static Tabs(c) {
@@ -30,6 +34,7 @@ export default class MaestroGenerator {
         let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
+        let graph = GetCurrentGraph(state);
         let result = {};
         maestros.map(maestro => {
             let maestroTemplateClass = _maestroTemplateClass;
@@ -48,19 +53,12 @@ export default class MaestroGenerator {
             let permissions = [];
             let maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
             maestro_functions = tempfunctions;
-            let interface_functions = [];
             if (maestro_functions.length) {
                 maestro_functions.map(maestro_function => {
                     var ft = Functions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                     if (ft) {
                         let tempFunction = ft.template;
                         let interfaceFunction = ft.interface;
-                        let codeNode = GetNodeProp(maestro_function, NodeProperties.CodeName);
-                        let tempfunctions = GraphMethods.getNodesByLinkType(root, {
-                            id: maestro_function.id,
-                            type: LinkType.FunctionConstraintLink,
-                            direction: GraphMethods.SOURCE
-                        });
 
                         let functionName = `${GetNodeProp(maestro_function, NodeProperties.CodeName)}`;
                         let httpMethod = `${GetNodeProp(maestro_function, NodeProperties.HttpMethod)}`;
@@ -102,16 +100,22 @@ export default class MaestroGenerator {
                         };
                         tempFunction = bindTemplate(tempFunction, bindOptions);
                         interfaceFunction = bindTemplate(interfaceFunction, bindOptions)
-                        // let template = ft.template;
-                        // if (ft.template_keys) {
-                        //     for (var template_key in template_key) {
-                        //         for (var modifiers in TEMPLATE_KEY_MODIFIERS) {
 
-                        //         }
-                        //     }
-                        // }
                         functions += jNL + tempFunction;
                         functionsInterface += jNL + interfaceFunction;
+
+                        var cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, methodType, agentTypeNode, modelNode);
+                        let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, maestro_function);
+                        let validatorCases = null;
+                        if (validators && validators.length) {
+
+                            validatorCases = validators.map(validator => {
+                                return {
+                                    cases: ValidationRuleGenerator.GenerateValidationCases(graph, validator),
+                                    isModel: GetNodeProp(validator, NodeProperties.ValidatorModel) === methodProps[FunctionTemplateKeys.Model]
+                                };
+                            })
+                        }
                     }
 
                 })
@@ -121,7 +125,7 @@ export default class MaestroGenerator {
             var injectedServices = arbiters.map(x => `IRedArbiter<${x}> _arbiter${x}`);
             var injectedPermissionServices = permissions.map(x => `IPermissions${x.agent_type} _${x.agent_type.toLowerCase()}Permissions`);
             var set_properties = arbiters.map(x => jNL + MaestroGenerator.Tabs(4) + `arbiter${x} = _arbiter${x};`);
-            var set_permissions = permissions.map(x => jNL + MaestroGenerator.Tabs(4) + `${x.agent_type.toLowerCase()}Permissions = ${x.agent_type.toLowerCase()}Permissions;`);
+            var set_permissions = permissions.map(x => jNL + MaestroGenerator.Tabs(4) + `${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`);
             var properties = arbiters.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IRedArbiter<${x}> arbiter${x};`);
             var permissions_properties = permissions.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IPermissions${x.agent_type} ${x.agent_type.toLowerCase()}Permissions;`);
 
