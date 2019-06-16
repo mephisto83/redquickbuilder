@@ -116,6 +116,9 @@ export default class MaestroGenerator {
                                 };
                             })
                         }
+                        if (validatorCases && cases) {
+                            // Do analysis on whether these validations are completely bonk.
+                        }
                     }
 
                 })

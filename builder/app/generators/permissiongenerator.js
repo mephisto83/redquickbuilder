@@ -300,7 +300,9 @@ export default class PermissionGenerator {
         let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf-8');
         let res = enums.map((_enum, testIndex) => {
             let itemProps = [];
+            let itemProperties = [];
             let agentProps = [];
+            let agentProperties = [];
             let ispositive = true;
             _enum.map((which, index) => {
                 let _case = cases[index];
@@ -313,14 +315,24 @@ export default class PermissionGenerator {
                 });
                 if (_case.isAppliedPermission) {
                     itemProps.push(temp);
+                    itemProperties.push({
+                        property: _case.property,
+                        value
+                    })
                 }
                 else {
                     agentProps.push(temp);
+                    agentProperties.push({
+                        property: _case.property,
+                        value
+                    })
                 }
             });
             return {
                 agentProps,
                 itemProps,
+                agentProperties,
+                itemProperties,
                 resultSuccess: ispositive
             }
         });
