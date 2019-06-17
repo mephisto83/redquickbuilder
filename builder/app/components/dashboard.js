@@ -33,6 +33,7 @@ import AttributeFormControl from './attributeformcontrol';
 import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
+import ModelFilterActivityMenu from './modelfilteractivitymenu';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
 import ValidatorActivityMenu from './validatoractivitymenu';
@@ -51,6 +52,7 @@ import { GooMenuSVG } from './goomenu';
 import ChoiceListItemActivityMenu from './choicelistitemactivitymenu';
 import GooMenu from './goomenu';
 import FormControl from './formcontrol';
+import ModelFilterMenu from './modelfiltermenu';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import Slider from './slider';
@@ -317,6 +319,7 @@ class Dashboard extends Component {
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
                                 <ExtensionDefinitionMenu />
+                                <ModelFilterActivityMenu />
                                 <PermissionDependencyActivityMenu />
                                 <EnumerationActivityMenu />
                             </SideBarContent>) : null}
@@ -326,6 +329,7 @@ class Dashboard extends Component {
                                 <ExecutorPropertyMenu />
                                 <MethodPropertyMenu />
                                 <PermissionMenu />
+                                <ModelFilterMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}

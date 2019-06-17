@@ -9,7 +9,16 @@
 
                 var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
 
-                return await arbiter{{model}}.GetOwnedBy<{{model}}>(agent.Id);
+                if(result.Failed) 
+                {
+                    {{agent_type}}Exceptions.ThrowException(result);
+                }
+                else {
+                
+                    var list = await arbiter{{model}}.GetBy({{agent_type}}Get.Get{{model}}(agent));
+
+                    return {{agent_type}}Return.Return{{model}}(list, agent);
+                }
             }
             
             return null;

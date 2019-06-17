@@ -46,6 +46,7 @@ export const FunctionTemplateKeys = {
     User: 'user',
     Permission: 'permission',
     UserInstance: 'user_instance',
+    ModelFilter: 'model_filter',
     Value: 'value'
 }
 
@@ -172,6 +173,10 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
     [FunctionTemplateKeys.Permission]: {
         key: FunctionTemplateKeys.Permission,
         nodeTypes: [NodeTypes.Permission]
+    },
+    [FunctionTemplateKeys.ModelFilter]: {
+        key: FunctionTemplateKeys.ModelFilter,
+        nodeTypes: [NodeTypes.ModelFilter]
     }
 };
 

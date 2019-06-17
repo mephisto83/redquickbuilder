@@ -13,7 +13,7 @@ import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgen
 import ChangeResponseGenerator from "./changeresponsegenerator";
 import ValidationRuleGenerator from "./validationrulegenerator";
 import ExecutorGenerator from "./executiongenerator";
-
+import ModelGetGenerator from './modelgetgenerators';
 export default class Generator {
     static generate(options) {
         var { state, type, key } = options;
@@ -78,6 +78,8 @@ export default class Generator {
                 return ValidationRuleGenerator.Generate({ state, key });
             case GeneratedTypes.Executors:
                 return ExecutorGenerator.Generate({ state, key });
+            case GeneratedTypes.ModelGet:
+                return ModelGetGenerator.Generate({ state, key });
         }
     }
 }

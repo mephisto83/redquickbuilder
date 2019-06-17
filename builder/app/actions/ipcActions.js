@@ -117,6 +117,7 @@ const CodeTypeToArea = {
     [GeneratedTypes.ChangeResponse]: '.Models',
     [GeneratedTypes.ValidationRule]: '.Models',
     [GeneratedTypes.Executors]: '.Controllers',
+    [GeneratedTypes.ModelGet]: '.Controllers',
     [GeneratedTypes.Constants]: '.Models',
     [GeneratedTypes.Permissions]: '.Controllers',
     [GeneratedTypes.StreamProcess]: '.Controllers',

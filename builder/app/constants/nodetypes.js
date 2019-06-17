@@ -3,6 +3,7 @@ export const NodeTypes = {
     Concept: 'concept',
     Model: 'model',
     Property: 'model-property',
+    ModelFilter: 'model-filter',
     Screen: 'screen',
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
@@ -34,6 +35,7 @@ export const GeneratedTypes = {
     Constants: 'constants',
     Permissions: 'permissions-generated',
     Executors: 'executors',
+    ModelGet: 'model-get',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
     ValidationRule: 'validation-rule'
@@ -105,6 +107,7 @@ export const NodeTypeColors = {
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
     [NodeTypes.Validator]: '#151522',
+    [NodeTypes.ModelFilter]: '#312313',
     [NodeTypes.Executor]: '#2176FF',
     [NodeTypes.ReferenceNode]: '#F7B538'
 }
@@ -146,6 +149,7 @@ export const NodeProperties = {
     ValidatorFunction: 'ValidatorFunction',
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
+    FilterModel: 'filtermodel',
     Validator: 'Validator',
     Executor: 'Executor',
     ValidatorAgent: 'ValidatorAgent',
@@ -188,6 +192,7 @@ export const NodeProperties = {
     UIExtension: 'uiExtension',
     UIExtensionDefinition: 'uiExtensionDefinition',
     MethodProps: 'methodProperties',
+    FilterPropreties: 'filterproperties',
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
