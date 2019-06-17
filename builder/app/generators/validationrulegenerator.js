@@ -113,6 +113,7 @@ export default class ValidationRuleGenerator {
 
         let testProps = vectors.map((vector, index) => {
             let successCase = true;
+            let propertyInformation = [];
             let properylines = vector.map((v, vindex) => {
                 var projected_value = Object.values(validation_test_vectors[vindex].values.cases)[v];
                 var _case = Object.keys(validation_test_vectors[vindex].values.cases)[v];
@@ -125,10 +126,17 @@ export default class ValidationRuleGenerator {
                     }
                 }
                 successCase = successCase && (_case || [false])[0] === '$';
-                return ValidationRuleGenerator.Tabs(3) + `{{model}}.${validation_test_vectors[vindex].property} = ${projected_value};`;
+                let propline = ValidationRuleGenerator.Tabs(3) + `{{model}}.${validation_test_vectors[vindex].property} = ${projected_value};`;
+                propertyInformation.push({
+                    set_properties: propline,
+                    property: validation_test_vectors[vindex].property,
+                    type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
+                })
+                return propline;
             }).join(NEW_LINE);
             let temp = {
                 resultSuccess: successCase,
+                propertyInformation,
                 set_properties: properylines,
                 type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
             };

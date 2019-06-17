@@ -51,7 +51,7 @@ export function createGraph() {
                 "EndPointUrl": "",
                 "AuthorizationKey": "",
                 "DatabaseId": "red-db-001",
-                "AssemblyPrefixes": "RedQuick",
+                "AssemblyPrefixes": "Smash;RedQuick",
                 "Use-SingleCollection": "true",
                 "storage-key": "UseDevelopmentStorage=true",
                 "single-thread": true

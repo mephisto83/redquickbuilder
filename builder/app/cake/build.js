@@ -75,7 +75,7 @@ function createWorkSpace() {
     }).then(() => {
         return executeSpawnCmd('dotnet', ['new', 'mstest', '--force', '-n', build.solutionName + '.Tests'], {});
     }).then(() => {
-        return executeSpawnCmd('dotnet', ['new', 'webapi', '--force', '-n', build.solutionName + '.Web'], {});
+        return executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', build.solutionName + '.Web'], {});
     }).then(() => {
         return executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', build.solutionName + '.Models'], {});
     }).then(() => {
@@ -171,6 +171,7 @@ function createWorkSpace() {
         //Add nuget packages.
         let source = `D:/dev/redquick/RedQuick/RedQuickCore/bin/Debug`;
         let testProject = build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj';
+        let webProject = build.solutionName + '.Web/' + build.solutionName + '.Web.csproj';
         let projects = [
             build.solutionName + '.Controllers/' + build.solutionName + '.Controllers.csproj',
             build.solutionName + '.Web/' + build.solutionName + '.Web.csproj',
@@ -189,7 +190,85 @@ function createWorkSpace() {
             promise = promise.then(() => {
                 return executeSpawnCmd('dotnet', ['add', project, 'package', 'RedQuick', '-s', source], {});
             });
-        });
+        }); 
+
+        let webProjectDeps = [
+            // 'Microsoft.AspNetCore',
+            // "Microsoft.AspNetCore.Authentication" ,
+            // "Microsoft.AspNetCore.Hosting.Server.Abstractions" ,
+            // "Microsoft.AspNetCore.Html.Abstractions" ,
+            // "Microsoft.AspNetCore.Http" ,
+            // "Microsoft.AspNetCore.Http.Abstractions" ,
+            // "Microsoft.AspNetCore.Http.Extensions" ,
+            // "Microsoft.AspNetCore.Http.Features" ,
+            // "Microsoft.AspNetCore.HttpOverrides" ,
+            // "Microsoft.AspNetCore.JsonPatch" ,
+            // "Microsoft.AspNetCore.Localization" ,
+            // "Microsoft.AspNetCore.Mvc.Abstractions" ,
+            // "Microsoft.AspNetCore.Mvc.Analyzers" ,
+            // "Microsoft.AspNetCore.Mvc.ApiExplorer" ,
+            // "Microsoft.AspNetCore.Mvc.Cors" ,
+            // "Microsoft.AspNetCore.Mvc.DataAnnotations" ,
+            // "Microsoft.AspNetCore.Mvc.Formatters.Json" ,
+            // "Microsoft.AspNetCore.Mvc.Localization" ,
+            // "Microsoft.AspNetCore.Mvc.Razor" ,
+            // "Microsoft.AspNetCore.Mvc.Razor.Design" ,
+            // "Microsoft.AspNetCore.Mvc.RazorPages" ,
+            // "Microsoft.AspNetCore.Mvc.Razor.Extensions" ,
+            // "Microsoft.AspNetCore.Mvc.TagHelpers" ,
+            // "Microsoft.AspNetCore.Authentication.Abstractions" ,
+            // 'Microsoft.AspNetCore.Antiforgery',
+            // 'Microsoft.AspNetCore.Hosting',
+            // 'Microsoft.AspNetCore.Hosting.Abstractions',
+            // 'Microsoft.AspNetCore.HostFiltering',
+            // 'Microsoft.AspNetCore.Authentication',
+            // 'Microsoft.AspNetCore.Authentication.Core',
+            // 'Microsoft.AspNetCore.Authorization',
+            // 'Microsoft.AspNetCore.Authorization.Policy',
+            // 'Microsoft.AspNetCore.Authentication.Abstractions',
+            // 'Microsoft.AspNetCore.Connections.Abstractions',
+            // 'Microsoft.AspNetCore.Mvc',
+            // 'Microsoft.AspNetCore.Mvc.Core',
+            // 'Microsoft.AspNetCore.Cors',
+            // 'Microsoft.Extensions.Identity.Core',
+            // 'Microsoft.Extensions.Identity.Stores',
+            // 'Microsoft.Azure.DocumentDB',
+            // 'Microsoft.Azure.DocumentDB.Core',
+            // 'Microsoft.Azure.EventHubs',
+            // 'Microsoft.Azure.WebJobs',
+            // 'Microsoft.Azure.WebJobs.Extensions',
+            // 'Microsoft.Azure.WebJobs.Extensions.EventHubs',
+            // 'Microsoft.Azure.WebJobs.Extensions.Storage',
+            // 'Microsoft.Azure.WebJobs.ServiceBus',
+            // 'Microsoft.CSharp',
+            // 'Microsoft.Extensions.Identity.Core',
+            // 'Microsoft.AspNetCore.Razor.Design',
+            // 'Microsoft.AspNetCore.Mvc.ViewFeatures',
+            // 'Microsoft.Extensions.Identity.Stores',
+            // 'System.Configuration.ConfigurationManager',
+            // 'WindowsAzure.Storage',
+            // 'Microsoft.AspNetCore.Authentication.Cookies',
+            // 'Microsoft.AspNetCore.Cryptography.Internal',
+            // 'Microsoft.AspNetCore.Cryptography.KeyDerivation',
+            // 'Microsoft.AspNetCore.DataProtection',
+            // 'Microsoft.AspNetCore.DataProtection.Abstractions',
+            // 'Microsoft.AspNetCore.Diagnostics',
+            // 'Microsoft.AspNetCore.Diagnostics.Abstractions',
+            // 'Microsoft.AspNetCore.Identity'
+        ];
+        // promise = promise.then(() => {
+        //     return executeSpawnCmd('dotnet', ['remove', webProject, 'package', 'Microsoft.AspNetCore', '-s', source], {});
+        // });
+        // promise = promise.then(() => {
+        //     return executeSpawnCmd('dotnet', ['remove', webProject, 'package', 'Microsoft.AspNetCore.App', '-s', source], {});
+        // });
+        
+        webProjectDeps.map(dep => {
+            promise = promise.then(() => {
+                return executeSpawnCmd('dotnet', ['add', webProject, 'package', dep, '-s', source], {});
+            });
+        })
+
         dependencies.map(depen => {
             promise = promise.then(() => {
                 return executeSpawnCmd('dotnet', ['add', testProject, 'package', depen], {});

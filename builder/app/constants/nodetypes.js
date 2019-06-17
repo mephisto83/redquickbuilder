@@ -40,8 +40,12 @@ export const GeneratedTypes = {
 }
 export const STANDARD_TEST_USING = [
     'Microsoft.VisualStudio.TestTools.UnitTesting',
+    'RedQuick.Storage',
+    'RedQuickCore.Worker',
     'Moq',
     'Autofac',
+    'RedQuickCore.Worker.Hosts',
+    'RedQuick.Configuration',
     'Microsoft.Extensions.Configuration.Json'
 ]
 export const STANDARD_CONTROLLER_USING = [

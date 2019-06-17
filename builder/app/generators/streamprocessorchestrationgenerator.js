@@ -196,6 +196,46 @@ ${modelexecution.join('')}
         }).join(NEW_LINE);
         return res + NEW_LINE + func_Cases.join(NEW_LINE);
     }
+    static EnumerateFunctionValidators(state, func) {
+        let graph = GetRootGraph(state);
+        let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
+        let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, func);
+        let validatorCases = null;
+        if (validators && validators.length) {
+            validatorCases = validators.map(validator => {
+                return {
+                    cases: ValidationRuleGenerator.GenerateValidationCases(graph, validator),
+                    isModel: GetNodeProp(validator, NodeProperties.ValidatorModel) === methodProps[FunctionTemplateKeys.Model]
+                };
+            })
+        }
+        return enumerate(validatorCases.map(x => x.cases.length)).map((_enum, caseindex) => {
+            let v1 = validatorCases[0].cases[_enum[0]];
+            let v2 = validatorCases[1].cases[_enum[1]];
+            let agent_properties = '';
+            let model_properties = '';
+            if (!validatorCases[1].isModel) {
+                agent_properties = bindTemplate(v2.set_properties, { model: "agent" });
+                model_properties = bindTemplate(v1.set_properties, { model: "model" });
+                v2.propertyInformation.map(t => t.set_properties = bindTemplate(t.set_properties, { model: "agent" }));
+                v1.propertyInformation.map(t => t.set_properties = bindTemplate(t.set_properties, { model: "model" }));
+                return {
+                    agent: v2,
+                    model: v1
+                }
+            }
+            else {
+                agent_properties = bindTemplate(v2.set_properties, { model: "model" });
+                model_properties = bindTemplate(v1.set_properties, { model: "agent" });
+                v2.propertyInformation.map(t => t.set_properties = bindTemplate(t.set_properties, { model: "model" }));
+                v1.propertyInformation.map(t => t.set_properties = bindTemplate(t.set_properties, { model: "agent" }));
+                return {
+                    model: v2,
+                    agent: v1
+                }
+            }
+        });
+    }
     static GetFunctionValidators(state, funct) {
         return NodesByType(state, NodeTypes.Validator).filter(x => GetNodeProp(x, NodeProperties.ValidatorFunction) === funct.id);
     }

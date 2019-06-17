@@ -238,6 +238,13 @@ export function setRootGraph(key, value) {
         SaveGraph(rootGraph, dispatch);
     };
 }
+export function setAppsettingsAssemblyPrefixes(prefixes) {
+    return (dispatch, getState) => {
+        var rootGraph = GetRootGraph(getState(), dispatch);
+        rootGraph.appConfig.AppSettings.AssemblyPrefixes = ['RedQuick', prefixes].unique(x => x).join(';')
+        SaveGraph(rootGraph, dispatch);
+    }
+}
 export function GetCurrentScopedGraph(state, dispatch) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     let scope = Application(state, GRAPH_SCOPE) || [];

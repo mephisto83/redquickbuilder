@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -32,7 +32,8 @@ export default class MaestroGenerator {
 
         let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf-8');
         let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
-        let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
+        let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf-8');
         let root = GetRootGraph(state);
         let graph = GetCurrentGraph(state);
         let result = {};
@@ -53,6 +54,7 @@ export default class MaestroGenerator {
             let permissions = [];
             let maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
             maestro_functions = tempfunctions;
+            let permissionValidationCases = [];
             if (maestro_functions.length) {
                 maestro_functions.map(maestro_function => {
                     var ft = Functions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
@@ -105,18 +107,81 @@ export default class MaestroGenerator {
                         functionsInterface += jNL + interfaceFunction;
 
                         var cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, methodType, agentTypeNode, modelNode);
-                        let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, maestro_function);
-                        let validatorCases = null;
-                        if (validators && validators.length) {
+                        let validators = StreamProcessOrchestrationGenerator.EnumerateFunctionValidators(state, maestro_function);
+                        if (validators && cases) {
+                            validators.map(validator => {
+                                cases.map(_case => {
+                                    let pvc = {};
+                                    let pvc2 = {};
+                                    if (validator && validator.agent && _case.agentProperties) {
+                                        var temp = [
+                                            ...validator.agent.propertyInformation.map(t => t.set_properties),
+                                            ..._case.agentProperties.map((t, index) => {
+                                                if (validator.agent.propertyInformation.findIndex(x => x.property === t.property) !== -1) {
+                                                    return false;
+                                                }
+                                                return _case.agentProps[index];
+                                            }).filter(x => x)
+                                        ].join(NEW_LINE);
+                                        pvc.agent = (temp);
+                                    }
+                                    if (validator && validator.model && _case.itemProperties) {
+                                        var temp = [
+                                            ...validator.model.propertyInformation.map(t => t.set_properties),
+                                            ..._case.itemProperties.map((t, index) => {
+                                                if (validator.model.propertyInformation.findIndex(x => x.property === t.property) !== -1) {
+                                                    return false;
+                                                }
+                                                return _case.itemProps[index];
+                                            }).filter(x => x)
+                                        ].join(NEW_LINE);
+                                        pvc.model = (temp);
+                                    }
 
-                            validatorCases = validators.map(validator => {
-                                return {
-                                    cases: ValidationRuleGenerator.GenerateValidationCases(graph, validator),
-                                    isModel: GetNodeProp(validator, NodeProperties.ValidatorModel) === methodProps[FunctionTemplateKeys.Model]
-                                };
+                                    if (validator && validator.agent && _case.agentProperties) {
+                                        var temp = [
+                                            ..._case.agentProperties.map((t, index) => _case.agentProps[index]),
+                                            ...validator.agent.propertyInformation.map((t, index) => {
+                                                if (_case.agentProperties.findIndex(x => x.property === t.property) !== -1) {
+                                                    return false;
+                                                }
+                                                return validator.agent.propertyInformation[index].set_properties;
+                                            }).filter(x => x)
+                                        ].join(NEW_LINE);
+                                        pvc2.agent = (temp);
+                                    }
+                                    if (validator && validator.model && _case.itemProperties) {
+                                        var temp = [
+                                            ..._case.itemProperties.map((t, index) => _case.itemProps[index]),
+                                            ...validator.model.propertyInformation.map((t, index) => {
+                                                if (_case.itemProperties.findIndex(x => x.property === t.property) !== -1) {
+                                                    return false;
+                                                }
+                                                return validator.model.propertyInformation[index].set_properties;
+                                            }).filter(x => x)
+                                        ].join(NEW_LINE);
+                                        pvc2.model = (temp);
+                                    }
+
+                                    permissionValidationCases.push(pvc2);
+                                    permissionValidationCases.push(pvc);
+                                })
                             })
-                        }
-                        if (validatorCases && cases) {
+
+                            permissionValidationCases = permissionValidationCases.map((pvc, index) => {
+                                //Generate tests.
+                                return bindTemplate(testFunctionTemplate, {
+                                    agent: agent_type,
+                                    value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
+                                    model: model_type,
+                                    function_name: functionName,
+                                    maestro: maestroName,
+                                    set_agent_properties: pvc.agent,
+                                    user: userTypeNode ? GetNodeProp(userTypeNode, NodeProperties.CodeName) : `{maestro_generator_mising_user}`,
+                                    set_model_properties: pvc.model,
+                                    testname: `${functionName}Test${index}`
+                                });
+                            });
                             // Do analysis on whether these validations are completely bonk.
                         }
                     }
@@ -131,7 +196,10 @@ export default class MaestroGenerator {
             var set_permissions = permissions.map(x => jNL + MaestroGenerator.Tabs(4) + `${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`);
             var properties = arbiters.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IRedArbiter<${x}> arbiter${x};`);
             var permissions_properties = permissions.map(x => jNL + MaestroGenerator.Tabs(3) + `private readonly IPermissions${x.agent_type} ${x.agent_type.toLowerCase()}Permissions;`);
-
+            let testTemplate = bindTemplate(_testClass, {
+                name: codeName,
+                tests: permissionValidationCases.join(NEW_LINE)
+            })
             maestroTemplateClass = bindTemplate(maestroTemplateClass, {
                 codeName: codeName,
                 set_properties: [...set_properties, ...set_permissions].join(jNL),
@@ -152,6 +220,7 @@ export default class MaestroGenerator {
                 id: GetNodeProp(maestro, NodeProperties.CodeName),
                 name: GetNodeProp(maestro, NodeProperties.CodeName),
                 iname: `I${GetNodeProp(maestro, NodeProperties.CodeName)}`,
+                tname: `${GetNodeProp(maestro, NodeProperties.CodeName)}Tests`,
                 template: NamespaceGenerator.Generate({
                     template: maestroTemplateClass,
                     usings: [
@@ -174,6 +243,23 @@ export default class MaestroGenerator {
                     namespace,
                     space: NameSpace.Controllers
                 }),
+                test: NamespaceGenerator.Generate({
+                    template: testTemplate,
+                    usings: [
+                        ...STANDARD_CONTROLLER_USING,
+                        ...STANDARD_TEST_USING,
+                        `${namespace}${NameSpace.Model}`,
+                        `${namespace}${NameSpace.Parameters}`,
+                        `${namespace}${NameSpace.Interface}`,
+                        `${namespace}${NameSpace.StreamProcess}`,
+                        `${namespace}${NameSpace.Permissions}`,
+                        `${namespace}${NameSpace.Controllers}`,
+                        `${namespace}${NameSpace.Executors}`,
+                        `${namespace}${NameSpace.Extensions}`,
+                        `${namespace}${NameSpace.Constants}`],
+                    namespace,
+                    space: NameSpace.Tests
+                })
             };
         })
 

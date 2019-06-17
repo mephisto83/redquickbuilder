@@ -1,18 +1,18 @@
 
         [TestMethod]
-        public async Task {{function_name}}()
+        public async Task {{testname}}()
         {
             //Arrange
             await RedStorage.Clear();
-
+            RedConfiguration.WaitTime = 1;
             RedStrapper.Clear();
             RedStrapper.Add(builder =>
             {
-                builder.RegisterType<{{agent_permission}}>().As<I{{agent_permission}}>();
+                builder.RegisterType<Permissions{{agent}}>().As<IPermissions{{agent}}>();
                 builder.RegisterType<{{maestro}}>().As<I{{maestro}}>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IRedStreamProcessOrchestration>();
-                builder.RegisterType<{{executor}}>().As<I{{executor}}>();
+                builder.RegisterType<{{agent}}Executor>().As<I{{agent}}Executor>();
                 var streams = Helper.GetConstantValues<StreamType>().ToList();
                 var mockIStreamTypeService = new Mock<IStreamTypeService>();
                 mockIStreamTypeService.Setup(x => x.GetStreamTypes()).Returns(streams);
@@ -20,6 +20,7 @@
                 mockIWorkTaskService.Setup(x => x.GetWorkTasks()).Returns(new List<string> { "worktask1" });
                 var mockIHubHelperService = new Mock<IHubHelperService>();
                 mockIHubHelperService.Setup(x => x.GetEventHubNames()).ReturnsAsync(new List<string> { "hub2" });
+                var hubHelperMock = new Mock<IHubHelper>();
                 var redHost = RedMemoryHost.Create();
                 builder.RegisterInstance(redHost).As<IRedHost>();
                 builder.RegisterInstance(redHost).As<IRedEventHubClient>();
@@ -45,6 +46,8 @@
 
             var agent = {{agent}}.Create();
 {{set_agent_properties}}
+            agent = await agentArbiter.Create(agent);
+            
             user.{{agent}} = agent.Id;
             user = await userArbiter.Update(user);
 

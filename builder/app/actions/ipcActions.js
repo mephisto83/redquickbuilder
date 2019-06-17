@@ -1,6 +1,7 @@
 import { HandlerEvents } from '../ipc/handler-events';
 import { uuidv4 } from '../methods/graph_methods';
 import { GetRootGraph } from './uiactions';
+import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
 import { GeneratedTypes, NodeTypes } from '../constants/nodetypes';
@@ -74,20 +75,38 @@ function generateFiles(workspace, solutionName, state) {
         let area = CodeTypeToArea[code_type];
         path.join();
         for (var fileName in temp) {
+            ensureDirectory(path.join(workspace, solutionName + area))
             writeFileSync(path.join(workspace, solutionName + area, `${temp[fileName].name}.cs`), temp[fileName].template)
             if (temp[fileName].interface) {
+                ensureDirectory(path.join(workspace, solutionName + '.Interfaces'))
                 writeFileSync(path.join(workspace, solutionName + '.Interfaces', `${temp[fileName].iname || fileName}.cs`), temp[fileName].interface);
             }
             if (temp[fileName].test) {
+                ensureDirectory(path.join(workspace, solutionName + '.Tests'))
                 writeFileSync(path.join(workspace, solutionName + '.Tests', `${temp[fileName].tname || fileName}.cs`), temp[fileName].test);
 
             }
         }
     })
     if (root) {
+        ensureDirectory(path.join(workspace, solutionName + '.Tests'))
         writeFileSync(path.join(workspace, solutionName + '.Tests', `appsettings.json`), JSON.stringify(root.appConfig, null, 4));
     }
 }
+
+function ensureDirectory(dir) {
+    if (!fs.existsSync(dir)) {
+        console.log('doesnt exist : ' + dir);
+    }
+    else {
+    }
+
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+    else {
+    }
+};
 
 const CodeTypeToArea = {
     [NodeTypes.Controller]: path.join('.Web', 'Controllers'),

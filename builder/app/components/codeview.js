@@ -96,6 +96,7 @@ class CodeView extends Component {
                                 <TextInput
                                     onChange={(val) => {
                                         this.props.setRootGraph(GraphKeys.NAMESPACE, val);
+                                        this.props.setAppsettingsAssemblyPrefixes(val);
                                     }}
                                     label={Titles.NameSpace}
                                     value={namespace} />
