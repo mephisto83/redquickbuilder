@@ -27,11 +27,11 @@ class ModelFilterMenu extends Component {
         let properties = [];
         if (currentNode) {
             let model = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel);
-            properties = getNodesByLinkType(graph, {
+            properties = (getNodesByLinkType(graph, {
                 id: model,
                 direction: SOURCE,
                 type: LinkType.PropertyLink
-            }).map(t => {
+            }) || []).map(t => {
                 return (<CheckBox
                     key={`checkbox-${t.id}`}
                     label={UIA.GetNodeTitle(t)}

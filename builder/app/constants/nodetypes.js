@@ -35,7 +35,9 @@ export const GeneratedTypes = {
     Constants: 'constants',
     Permissions: 'permissions-generated',
     Executors: 'executors',
+    ModelReturn: 'model-return',
     ModelGet: 'model-get',
+    ModelExceptions: 'model-exceptions',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
     ValidationRule: 'validation-rule'
@@ -150,6 +152,7 @@ export const NodeProperties = {
     UseEnumeration: 'UseEnumeration',
     NameSpace: 'namespace',
     FilterModel: 'filtermodel',
+    FilterAgent: 'filteragent',
     Validator: 'Validator',
     Executor: 'Executor',
     ValidatorAgent: 'ValidatorAgent',
@@ -322,6 +325,7 @@ export const LinkType = {
     ErrorLink: 'error-link',
     RequiredClassLink: 'required-class-link',
     ModelTypeLink: 'model-type-link',
+    AgentTypeLink: 'agent-type-link',
     UserLink: 'user-link', // A link between a user and a personal ([Customer, Manager, Hero])
     MaestroLink: 'maestro-link',
     AttributeLink: 'attribute-link',
@@ -432,6 +436,9 @@ export const LinkProperties = {
     },
     ModelTypeLink: {
         type: LinkType.ModelTypeLink
+    },
+    AgentTypeLink: {
+        type: LinkType.AgentTypeLink
     },
     RequiredClassLink: {
         type: LinkType.RequiredClassLink

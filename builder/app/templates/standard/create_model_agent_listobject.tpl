@@ -17,7 +17,7 @@
                 
                     var list = await arbiter{{model}}.GetBy({{agent_type}}Get.Get{{model}}(agent));
 
-                    return {{agent_type}}Return.Return{{model}}(list, agent);
+                    return {{agent_type}}Return.{{filter_function}}(list, agent);
                 }
             }
             

@@ -68,12 +68,12 @@
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
                 }
                 else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailed(change));
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailedOnValidation(change));
                 }
             }
             catch(Exception e)
             {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailedOnException(change, e));
             }
         }
 
@@ -89,12 +89,12 @@
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
                 }
                 else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailed(change));
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailedOnValidation(change));
                 }
             }
             catch(Exception e)
             {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailedOnException(change, e));
             }
         }
 
@@ -110,12 +110,12 @@
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
                 }
                 else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailed(change));
+                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailedOnValidation(change));
                 }
             }
             catch(Exception e)
             {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailed(change));
+                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailedOnException(change, e));
             }
             
         }

@@ -68,6 +68,7 @@ export default class MaestroGenerator {
                         let agentTypeNode = null;
                         let userTypeNode = null;
                         let permissionNode = null;
+                        let modelFilterNode = null;
                         let modelNode = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         if (methodProps) {
@@ -75,6 +76,7 @@ export default class MaestroGenerator {
                             modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
+                            modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
 
                         }
 
@@ -91,6 +93,7 @@ export default class MaestroGenerator {
                             value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                             model: model_type,
                             maestro_function: functionName,
+                            filter_function: modelFilterNode ? GetNodeProp(modelFilterNode, NodeProperties.CodeName) : '{missing filter node}',
                             user: userTypeNode ? GetNodeProp(userTypeNode, NodeProperties.CodeName) : `{maestro_generator_mising_user}`,
                             http_route: httpRoute || '{maestro_generator_http_method',
                             http_method: httpMethod || '{maestro_generator_http_method',
