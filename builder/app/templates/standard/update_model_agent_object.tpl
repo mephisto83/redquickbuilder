@@ -11,5 +11,5 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
         return await arbiter{{model}}.Get<{{model}}>(result.Id);
     }
-    return null;
+    throw new PermissionException();
 }

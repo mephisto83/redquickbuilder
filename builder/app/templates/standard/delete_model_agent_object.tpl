@@ -10,5 +10,5 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
         return result.Value;
     }
-    return null;
+    throw new PermissionException();
 }

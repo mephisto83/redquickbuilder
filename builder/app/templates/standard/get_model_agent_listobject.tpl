@@ -6,5 +6,5 @@
             if(await {{agent_type#lower}}Permissions.{{permission_function}}(agent, value).ConfigureAwait(false))) {
                 return await arbiter{{model}}.GetOwnedBy<{{model}}>(agent.Id);
             }
-            return null;
+            throw new PermissionException();
         }

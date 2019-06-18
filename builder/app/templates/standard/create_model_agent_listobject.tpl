@@ -21,5 +21,5 @@
                 }
             }
             
-            return null;
+            throw new PermissionException();
         }

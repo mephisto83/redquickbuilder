@@ -47,7 +47,7 @@
             var agent = {{agent}}.Create();
 {{set_agent_properties}}
             agent = await agentArbiter.Create(agent);
-            
+
             user.{{agent}} = agent.Id;
             user = await userArbiter.Update(user);
 
@@ -58,10 +58,38 @@
             await workerMinisterArbiter.ApplyWorkToAllWorkers();
 
             //Act
-            var list = await maestro.{{function_name}}(user, model);
+            try 
+            {
+                
+                var list = await maestro.{{function_name}}(user, model);
+    
+                //Assert
+                Assert.IsNotNull(list);
+                Assert.AreEqual(list.Count, 1);
 
-            //Assert
-            await host.Stop(hubName);
-            Assert.IsNotNull(list);
-            Assert.AreEqual(list.Count, 1);
+            }
+            catch(ValidationException validationException)
+            {
+                Assert.IsNotNull(validationException.Response);
+                Assert.IsNotNull(validationException.Response.AgentId);
+                Assert.IsNotNull(validationException.Response.AgentType);
+                Assert.IsTrue(validationException.Response.ValidationFailure);
+                Assert.IsFalse(validationException.Response.ExceptionRaised);
+            }
+            catch(ThrownException thrownException)
+            {
+                Assert.IsNotNull(thrownException.Response);
+                Assert.IsNotNull(thrownException.Response.AgentId);
+                Assert.IsNotNull(thrownException.Response.AgentType);
+                Assert.IsFalse(thrownException.Response.ValidationFailure);
+                Assert.IsTrue(thrownException.Response.ExceptionRaised);
+            }
+            catch(PermissionException permissionException)
+            {
+                Assert.IsNotNull(permissionException);
+            }
+            finally
+            {
+                await host.Stop(hubName);
+            }
         }

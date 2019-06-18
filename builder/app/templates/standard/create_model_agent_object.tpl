@@ -10,5 +10,5 @@
 
                 return await arbiter{{model}}.Get<{{model}}>(result.Id);
             }
-            return null;
+            throw new PermissionException();
         }

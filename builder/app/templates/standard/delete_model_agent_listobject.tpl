@@ -10,5 +10,5 @@
 
                 return await {{model}}Arbiter.GetOwnedBy(agent.Id);
             }
-            return null;
+            throw new PermissionException();
         }
