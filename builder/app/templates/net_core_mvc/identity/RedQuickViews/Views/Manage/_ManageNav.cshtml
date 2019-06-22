@@ -1,5 +1,6 @@
-﻿@using {{namespace}}.Views.Manage
-@inject SignInManager<ApplicationUser> SignInManager
+﻿@using {{namespace}}.Models
+@using {{namespace}}.Views.Manage
+@inject SignInManager<{{model}}> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }

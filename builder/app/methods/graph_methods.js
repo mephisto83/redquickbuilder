@@ -60,7 +60,8 @@ export function createGraph() {
     }
 }
 export const GraphKeys = {
-    NAMESPACE: 'namespace'
+    NAMESPACE: 'namespace',
+    SERVER_SIDE_SETUP: 'server_side_setup'
 }
 export function updateWorkSpace(graph, options) {
     let { workspace } = options;

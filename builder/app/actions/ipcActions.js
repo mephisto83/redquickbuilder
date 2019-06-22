@@ -1,12 +1,13 @@
 import { HandlerEvents } from '../ipc/handler-events';
-import { uuidv4 } from '../methods/graph_methods';
-import { GetRootGraph } from './uiactions';
+import { uuidv4, GraphKeys } from '../methods/graph_methods';
+import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
 import { GeneratedTypes, NodeTypes } from '../constants/nodetypes';
 import Generator from '../generators/generator';
 import { fstat, writeFileSync } from 'fs';
+import { bindTemplate } from '../constants/functiontypes';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -44,6 +45,7 @@ export function scaffoldProject(options = {}) {
         var state = getState();
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');
+
         (filesOnly ? Promise.resolve() : send(HandlerEvents.scaffold.message, {
             solutionName,
             workspace: path.join(root.workspace, root.title)
@@ -51,10 +53,39 @@ export function scaffoldProject(options = {}) {
             console.log('Finished Scaffolding.');
 
             generateFiles(path.join(root.workspace, root.title), solutionName, state);
+        }).then(() => {
+
+            let namespace = root ? root[GraphKeys.NAMESPACE] : null;
+            let server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
+            let userNode = NodesByType(state, NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser));
+            if (server_side_setup) {
+
+                return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
+                    model: GetNodeProp(userNode, NodeProperties.CodeName),
+                    namespace
+                }, null, path.join(path.join(root.workspace, root.title), solutionName + path.join('.Web')));
+            }
         });
     }
 }
-
+function generateFolderStructure(dir, lib, relative, target_dir) {
+    let directories = fs.readdirSync(dir);
+    relative = relative || dir;
+    directories.map(item => {
+        let dirPath = path.join(dir, item);
+        if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+            let reldir = dir.substr(relative.length)
+            ensureDirectory(path.join(target_dir, reldir, item));
+            generateFolderStructure(dirPath, lib, relative, target_dir);
+        }
+        else if (fs.existsSync(dirPath)) {
+            let file = fs.readFileSync(dirPath, 'utf-8');
+            let reldir = dir.substr(relative.length)
+            file = bindTemplate(file, lib);
+            fs.writeFileSync(path.join(target_dir, reldir, item), file, 'utf-8');
+        }
+    })
+}
 function generateFiles(workspace, solutionName, state) {
 
 

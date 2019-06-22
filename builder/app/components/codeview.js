@@ -9,7 +9,7 @@ import TextBox from './textinput';
 import TopViewer from './topviewer';
 import Box from './box';
 import SelectInput from './selectinput';
-import { NodeTypes, NodeProperties, NameSpace, GeneratedTypes, GeneratedTypesMatch, GeneratedConstants } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NameSpace, GeneratedTypes, GeneratedTypesMatch, GeneratedConstants, IdentityManagement } from '../constants/nodetypes';
 import ModelGenerator from '../generators/modelgenerators';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import ExtensionsGenerator from '../generators/extensiongenerator';
@@ -47,6 +47,7 @@ class CodeView extends Component {
         let info = UIA.Visual(state, MODEL_CODE) || null;
         let graphRoot = UIA.GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
+        let server_side_setup = graphRoot ? graphRoot[GraphKeys.SERVER_SIDE_SETUP] : null;
 
 
         let controllers = [];
@@ -100,6 +101,15 @@ class CodeView extends Component {
                                     }}
                                     label={Titles.NameSpace}
                                     value={namespace} />
+                                <SelectInput
+                                    label={Titles.ServerSideSetup}
+                                    options={Object.keys(IdentityManagement).map(t => {
+                                        return { title: t, value: IdentityManagement[t] };
+                                    })}
+                                    onChange={(value) => {
+                                        this.props.setRootGraph(GraphKeys.SERVER_SIDE_SETUP, value);
+                                    }}
+                                    value={server_side_setup} />
                             </Box>
                             <Box primary={true} title={Titles.CodeTypes}>
                                 <ButtonList active={true} isSelected={(item) => {

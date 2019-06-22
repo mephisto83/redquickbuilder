@@ -42,6 +42,9 @@ export const GeneratedTypes = {
     StreamProcessOrchestration: 'stream-process-orchestration',
     ValidationRule: 'validation-rule'
 }
+export const IdentityManagement = {
+    RedQuickViews: 'RedQuickViews'
+}
 export const STANDARD_TEST_USING = [
     'Microsoft.VisualStudio.TestTools.UnitTesting',
     'RedQuick.Storage',

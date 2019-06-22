@@ -1,6 +1,6 @@
-
+@using RedQuickCore.Identity
 @inject Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider schemProvider
-@model {{namespace}}.SignInModel
+@model RedSignInModel
 
     @foreach(var provider in await schemProvider.GetRequestHandlerSchemesAsync())
     {

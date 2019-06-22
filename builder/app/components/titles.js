@@ -7,6 +7,7 @@ export const SelectExecution = 'Select Execution';
 export const SelectedValidations = 'Selected Validations';
 export const Remove = 'Remove';
 export const GraphOperations = 'Graph Operations';
+export const ServerSideSetup = 'Service Side Setup';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';

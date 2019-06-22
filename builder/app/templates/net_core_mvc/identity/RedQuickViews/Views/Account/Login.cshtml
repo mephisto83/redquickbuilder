@@ -1,9 +1,10 @@
-﻿@using System.Collections.Generic
+﻿@using RedQuickCore.Identity
+@using System.Collections.Generic
 @using System.Linq
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
 @model LoginViewModel
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<{{model}}> SignInManager
 
 @{
     ViewData["Title"] = "Log in";

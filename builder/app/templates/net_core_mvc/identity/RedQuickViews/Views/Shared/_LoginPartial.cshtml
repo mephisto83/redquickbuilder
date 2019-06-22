@@ -2,8 +2,8 @@
 @using {{namespace}}.Models
 @using {{namespace}}.Resources
 
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<{{model}}> SignInManager
+@inject UserManager<{{model}}> UserManager
 @inject LocService SharedLocalizer
 
 

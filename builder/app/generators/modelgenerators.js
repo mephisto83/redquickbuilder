@@ -39,6 +39,7 @@ export default class ModelGenerator {
             return null;
         }
         templateSwapDictionary.model = GetNodeProp(node, NodeProperties.CodeName);
+        templateSwapDictionary.base_model = GetNodeProp(node, NodeProperties.IsUser) ? 'RedUser' : 'DBaseData';
         templateSwapDictionary.attributes = '';
         var connectedProperties = GraphMethods.getNodesByLinkType(graph, {
             id: node.id,

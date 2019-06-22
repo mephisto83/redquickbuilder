@@ -1,6 +1,6 @@
 {{attributes}}    
     [RedAttribute]
-    public class {{model}} : DBaseData
+    public class {{model}} : {{base_model}}
     {
 {{staticFunctions}}
 
