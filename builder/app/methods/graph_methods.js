@@ -54,7 +54,17 @@ export function createGraph() {
                 "AssemblyPrefixes": "Smash;RedQuick",
                 "Use-SingleCollection": "true",
                 "storage-key": "UseDevelopmentStorage=true",
-                "single-thread": true
+                "single-thread": true,
+                "ConfirmEmailController": "Account",
+                "ConfirmEmailAction": "ConfirmEmail",
+                "HomeAction": "Index",
+                "HomeController": "Home",
+                "ResetPasswordAction": "ResetPassword",
+                "ResetPasswordController": "Account",
+                "SecurityKey": "ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf",
+                "Domain": "https://localhost:13424",
+                "TokenExpirationInMinutes": "250",
+                "DomainPort": "13424"
             }
         }
     }

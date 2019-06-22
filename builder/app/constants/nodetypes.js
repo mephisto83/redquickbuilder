@@ -26,6 +26,7 @@ export const NodeTypes = {
     FunctionOutput: 'function-output',
     Controller: 'controller',
     Maestro: 'maestro',
+    Services: 'services',
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node'
 }
@@ -109,6 +110,7 @@ export const NodeTypeColors = {
     [NodeTypes.Function]: '#553D36',
     [NodeTypes.Parameter]: '#684A52',
     [NodeTypes.FunctionOutput]: '#857885',
+    [NodeTypes.Services]: '#59FFA0',
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
     [NodeTypes.Validator]: '#151522',
@@ -143,9 +145,11 @@ export const NameSpace = {
 export const NodeProperties = {
     Enumeration: 'Enumeration',
     AllowedExtensionValues: 'AllowedExtensionValues',
+    ServiceType: 'ServiceType',
     DisallowedExtensionValues: 'DisallowedExtensionValues',
     AllowedEnumValues: 'AllowedEnumerationValue',
     DisallowedEnumValues: 'DisallowedEnumValues',
+    ServiceTypeSettings: 'ServiceTypeSettings',
     ValidatorModel: 'ValidatorModel',
     ExecutorAgent: 'ExecutorAgent',
     ExecutorFunction: 'ExecutorFunction',
@@ -233,6 +237,22 @@ function codeTypeWord(x) {
 
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
 export const NodePropertiesDirtyChain = {
+    [NodeProperties.ServiceType]: [{
+        chainProp: NodeProperties.CodeName,
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.AgentName,
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.ValueName,
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.UIName,
+        chainFunc: codeTypeWord
+    }, {
+        chainProp: NodeProperties.UIText,
+        chainFunc: codeTypeWord
+    }],
     [NodeProperties.UIText]: [{
         chainProp: NodeProperties.CodeName,
         chainFunc: codeTypeWord

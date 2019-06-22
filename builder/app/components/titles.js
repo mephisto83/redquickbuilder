@@ -15,6 +15,7 @@ export const Models = 'Models';
 export const Label = 'Label';
 export const New = 'New';
 export const Controllers = 'Controllers';
+export const ServiceActivity = 'Service Activity';
 export const CodeTypes = 'Code Types';
 export const Project = 'Project';
 export const NameSpace = 'NameSpace';

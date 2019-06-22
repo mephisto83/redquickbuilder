@@ -19,9 +19,9 @@ using {{namespace}}.Models;
 namespace {{namespace}}.Controllers
 {
     //[Route("auth")]
-    public class AuthorizationController : RedAuthorizationController<{{model}}> 
+    public class AccountController : RedAuthorizationController<{{model}}> 
     {   
-        public AuthorizationController(
+        public AccountController(
             UserManager<{{model}}> _userManager,
             SignInManager<{{model}}> _signInManager,
             ILogger<RedAuthorizationController<{{model}}>> _logger,

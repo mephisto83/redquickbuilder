@@ -21,6 +21,7 @@ import Content from './content';
 import SideBar from './sidebar';
 import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
+import ServiceActivityMenu from './serviceactivitymenu';
 import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
 import CheckBox from './checkbox';
@@ -322,6 +323,7 @@ class Dashboard extends Component {
                                 <ModelFilterActivityMenu />
                                 <PermissionDependencyActivityMenu />
                                 <EnumerationActivityMenu />
+                                <ServiceActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
                                 <ValidatorPropertyMenu />

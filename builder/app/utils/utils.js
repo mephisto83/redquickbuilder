@@ -31,125 +31,135 @@ String.prototype.padding = function (n, c) {
     //      return (n < 0) ? val + pad : pad + val;
 };
 
-((array) => {
-    if (!array.relativeCompliment) {
-        var extrasection_relativeCompliment = {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (othercollection, func, output) {
-                var collection = this;
-                var result = [];
-
-                func = func || function (x, y) { return x === y; };
-                for (var i = collection.length; i--;/**/) {//function (x) { return x == collection[i]; }
-                    if (!othercollection.some(func.bind(null, collection[i]))) {
-                        result.push(collection[i]);
-                    }
-                    else if (output) {
-                        output.push(collection[i]);
-                    }
-                }
-                return result;
-            }
-        }
+String.prototype.unCamelCase = function () {
+    var str = this || '';
+    return str
+        // insert a space between lower & upper
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        // space before last upper in a sequence followed by lower
+        .replace(/\b([A-Z]+)([A-Z])([a-z])/, '$1 $2$3')
+        // uppercase the first character
+        .replace(/^./, function (str) { return str.toUpperCase(); }).trim();
+};
+    ((array) => {
         if (!array.relativeCompliment) {
-            Object.defineProperty(array, 'relativeCompliment', extrasection_relativeCompliment);
-        }
-    }
+            var extrasection_relativeCompliment = {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (othercollection, func, output) {
+                    var collection = this;
+                    var result = [];
 
-    if (!array.intersection) {
-        Object.defineProperty(array, 'intersection', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (othercollection, func) {
-                var collection = this;
-                var result = [];
-                func = func || function (x, y) { return x === y; };
-                for (var i = collection.length; i--;/**/) {
-                    for (var j = othercollection.length; j--;/**/) {
-                        if ((func(othercollection[j], collection[i]))) {
+                    func = func || function (x, y) { return x === y; };
+                    for (var i = collection.length; i--;/**/) {//function (x) { return x == collection[i]; }
+                        if (!othercollection.some(func.bind(null, collection[i]))) {
                             result.push(collection[i]);
-                            break;
+                        }
+                        else if (output) {
+                            output.push(collection[i]);
                         }
                     }
+                    return result;
                 }
-                return result;
             }
-        });
-    }
-    if (!array.unique) {
-        Object.defineProperty(array, 'unique', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (func) {
-                var result = [];
-                var finalresult = [];
-                func = func || function (x) { return x; };
-                var collection = this;
-                for (var i = 0; i < collection.length; i++) {
-                    //if (func(collection[i])) {
-                    if (result.indexOf(func(collection[i])) === -1) {
-                        result.push(func(collection[i]));
-                        finalresult.push(collection[i]);
-                    }
-                    //}
-                }
-                return finalresult;
-                //return result;
+            if (!array.relativeCompliment) {
+                Object.defineProperty(array, 'relativeCompliment', extrasection_relativeCompliment);
             }
-        });
-    }
-    if (!array.removeIndices) {
-        //removeIndices
-        Object.defineProperty(array, 'removeIndices', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (indices) {
-                indices = indices.orderBy(function (x, y) { return y - x; });
-                var collection = this;
-                indices.map(function (index) {
-                    collection.splice(index, 1);
-                });
+        }
 
-                return collection;
-            }
-        });
-    }
-    if (!array.interpolate) {
-        Object.defineProperty(array, 'interpolate', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (start, stop, func) {
-                var collection = this;
-                func = func || function (x) { return x; };
-                for (var i = start; i < stop; i++) {
-                    if (collection instanceof Float32Array) {
-                        collection[i - start] = (func(i));
+        if (!array.intersection) {
+            Object.defineProperty(array, 'intersection', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (othercollection, func) {
+                    var collection = this;
+                    var result = [];
+                    func = func || function (x, y) { return x === y; };
+                    for (var i = collection.length; i--;/**/) {
+                        for (var j = othercollection.length; j--;/**/) {
+                            if ((func(othercollection[j], collection[i]))) {
+                                result.push(collection[i]);
+                                break;
+                            }
+                        }
                     }
-                    else
-                        collection.push(func(i, i - start));
+                    return result;
                 }
-                return collection;
-            }
-        });
-    }
-    if (!array.orderBy) {
-        Object.defineProperty(array, 'orderBy', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function (func) {
-                var collection = this.map(function (x) { return x; });
-                return collection.sort(func);
-            }
-        });
-    };
-})(Array.prototype)
+            });
+        }
+        if (!array.unique) {
+            Object.defineProperty(array, 'unique', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (func) {
+                    var result = [];
+                    var finalresult = [];
+                    func = func || function (x) { return x; };
+                    var collection = this;
+                    for (var i = 0; i < collection.length; i++) {
+                        //if (func(collection[i])) {
+                        if (result.indexOf(func(collection[i])) === -1) {
+                            result.push(func(collection[i]));
+                            finalresult.push(collection[i]);
+                        }
+                        //}
+                    }
+                    return finalresult;
+                    //return result;
+                }
+            });
+        }
+        if (!array.removeIndices) {
+            //removeIndices
+            Object.defineProperty(array, 'removeIndices', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (indices) {
+                    indices = indices.orderBy(function (x, y) { return y - x; });
+                    var collection = this;
+                    indices.map(function (index) {
+                        collection.splice(index, 1);
+                    });
+
+                    return collection;
+                }
+            });
+        }
+        if (!array.interpolate) {
+            Object.defineProperty(array, 'interpolate', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (start, stop, func) {
+                    var collection = this;
+                    func = func || function (x) { return x; };
+                    for (var i = start; i < stop; i++) {
+                        if (collection instanceof Float32Array) {
+                            collection[i - start] = (func(i));
+                        }
+                        else
+                            collection.push(func(i, i - start));
+                    }
+                    return collection;
+                }
+            });
+        }
+        if (!array.orderBy) {
+            Object.defineProperty(array, 'orderBy', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: function (func) {
+                    var collection = this.map(function (x) { return x; });
+                    return collection.sort(func);
+                }
+            });
+        };
+    })(Array.prototype)
 
 
 export function enumerate(vects, j = 0) {

@@ -122,6 +122,8 @@ function generateFiles(workspace, solutionName, state) {
     if (root) {
         ensureDirectory(path.join(workspace, solutionName + '.Tests'))
         writeFileSync(path.join(workspace, solutionName + '.Tests', `appsettings.json`), JSON.stringify(root.appConfig, null, 4));
+        ensureDirectory(path.join(workspace, solutionName + '.Web'))
+        writeFileSync(path.join(workspace, solutionName + '.Web', `appsettings.json`), JSON.stringify(root.appConfig, null, 4));
     }
 }
 
