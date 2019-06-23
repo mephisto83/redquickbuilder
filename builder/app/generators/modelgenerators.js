@@ -48,14 +48,16 @@ export default class ModelGenerator {
         {
             return new User
             {
-                Email = model.Email
+                Email = model.Email,
+                UserName = model.UserName
             };
         }
         public static User Create(RedRegisterViewModel model)
         {
             return new User
             {
-                Email = model.Email
+                Email = model.Email,
+                UserName = model.UserName
             };
         }`
         }
