@@ -125,12 +125,12 @@ namespace {{namespace}}.Controllers
 
         public override {{model}} CreateUser(RedExternalLoginViewModel model)
         {
-            throw new NotImplementedException();
+            return {{namespace}}.Models.{{model}}.Create(model);
         }
 
         public override {{model}} CreateUser(RedRegisterViewModel model)
         {
-            throw new NotImplementedException();
+            return {{namespace}}.Models.{{model}}.Create(model);
         }
 
         [HttpPost]

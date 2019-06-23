@@ -40,6 +40,25 @@ export default class ModelGenerator {
         }
         templateSwapDictionary.model = GetNodeProp(node, NodeProperties.CodeName);
         templateSwapDictionary.base_model = GetNodeProp(node, NodeProperties.IsUser) ? 'RedUser' : 'DBaseData';
+        templateSwapDictionary.account_enabling_func = '';
+        if (GetNodeProp(node, NodeProperties.IsUser)) {
+            templateSwapDictionary.account_enabling_func = `
+            
+        public static User Create(RedExternalLoginViewModel model)
+        {
+            return new User
+            {
+                Email = model.Email
+            };
+        }
+        public static User Create(RedRegisterViewModel model)
+        {
+            return new User
+            {
+                Email = model.Email
+            };
+        }`
+        }
         templateSwapDictionary.attributes = '';
         var connectedProperties = GraphMethods.getNodesByLinkType(graph, {
             id: node.id,
@@ -194,6 +213,7 @@ export default class ModelGenerator {
             template: NamespaceGenerator.Generate({
                 template: modelTemplate,
                 usings: [...usings,
+                    `RedQuickCore.Identity`,
                 `${namespace}${NameSpace.Validations}`,
                 ...STANDARD_CONTROLLER_USING],
                 namespace,
