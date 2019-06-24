@@ -1678,9 +1678,9 @@
             "ResetPasswordAction": "ResetPassword",
             "ResetPasswordController": "Account",
             "SecurityKey": "ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf",
-            "Domain": "https://localhost:13424",
+            "Domain": "https://localhost:44302",
             "TokenExpirationInMinutes": "250",
-            "DomainPort": "13424"
+            "DomainPort": "44302"
         }
     },
     "server_side_setup": "RedQuickViews"
