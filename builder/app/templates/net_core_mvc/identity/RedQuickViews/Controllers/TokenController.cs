@@ -22,15 +22,14 @@ namespace {{namespace}}.Controllers
     public class TokenController : RedTokenController<{{model}}> 
     {   
         public TokenController(
-          UserManager<{{model}}> userManager) :
-            base(userManager)
+          UserManager<{{model}}> userManager, IUserStore<{{model}}> userStore) :
+            base(userManager, userStore)
         {
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public Task<IActionResult> GenerateToken(){
-            return base.GenerateToken();
+        public Task<IActionResult> Index()
+        {
+            return GenerateToken();
         }
 
         public override IList<Claim> GetUserClaims(User user)
