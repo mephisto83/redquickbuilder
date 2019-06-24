@@ -27,18 +27,20 @@ namespace {{namespace}}.Controllers
         {
         }
 
-        public Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            return GenerateToken();
+            var res = await GenerateToken();
+
+            return res;
         }
 
         public override IList<Claim> GetUserClaims(User user)
         {
             return new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("Customer", user.Customer),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim("Customer", user.Customer ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.Id ?? string.Empty)
             };
         }
     }
