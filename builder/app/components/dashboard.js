@@ -72,6 +72,7 @@ import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties } from '../constants/nodetypes';
 import CodeView from './codeview';
+import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -92,6 +93,7 @@ class Dashboard extends Component {
             var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
             switch (UIA.GetNodeProp(currentNode, NodeProperties.NODEType)) {
                 case NodeTypes.Method:
+                case NodeTypes.Action:
                     result.push({
                         onClick: () => {
                             this.props.setVisual(CONNECTING_NODE, LinkProperties.OnScreenLink);
@@ -104,7 +106,7 @@ class Dashboard extends Component {
                             },
                             icon: 'fa  fa-trophy',
                             title: Titles.OnSuccessLink
-                        },  {
+                        }, {
                             onClick: () => {
                                 this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
                             },
@@ -116,7 +118,7 @@ class Dashboard extends Component {
                             },
                             icon: 'fa  fa-tasks',
                             title: Titles.OnAction
-                        },{
+                        }, {
                             onClick: () => {
                                 this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
                             },
@@ -124,14 +126,17 @@ class Dashboard extends Component {
                             title: Titles.OnFailureLink
                         });
                     break;
+                case NodeTypes.ScreenItem:
+                case NodeTypes.ScreenCollection:
+                case NodeTypes.ScreenContainer:
                 case NodeTypes.Screen:
-                        result.push({
-                            onClick: () => {
-                                this.props.setVisual(CONNECTING_NODE, LinkProperties.ChildLink);
-                            },
-                            icon: 'fa  fa-share-alt',
-                            title: Titles.ChildLink
-                        });
+                    result.push({
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.ChildLink);
+                        },
+                        icon: 'fa  fa-share-alt',
+                        title: Titles.ChildLink
+                    });
                     break;
             }
             result.push({
@@ -164,6 +169,10 @@ class Dashboard extends Component {
         if (rootGraph) {
             version = `${rootGraph.version.major}.${rootGraph.version.minor}.${rootGraph.version.build}`;
             workspace = rootGraph.workspace;
+        }
+        let hoveredLink = null;
+        if (UIA.Visual(state, UIA.HOVERED_LINK)) {
+            hoveredLink = getLinkInstance(rootGraph, UIA.Visual(state, UIA.HOVERED_LINK));
         }
         return (
             <div className={`skin-red sidebar-mini skin-red ${this.minified()}`} style={{
@@ -219,6 +228,8 @@ class Dashboard extends Component {
                                 <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
                                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                                 }} />
+
+                                {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                                 <SideBarHeader title={Titles.FileMenu} />
 
                                 <TreeViewMenu
@@ -311,7 +322,10 @@ class Dashboard extends Component {
                                 onLinkClick={(linkId, boundingBox) => {
                                     console.log(`link id : ${linkId}`)
                                     this.props.setVisual(UIA.SELECTED_LINK, linkId);
+
+                                    this.props.setVisual(UIA.HOVERED_LINK, linkId);
                                 }}
+
                                 selectedColor={UIA.Colors.SelectedNode}
                                 selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}

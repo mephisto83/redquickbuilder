@@ -124,6 +124,7 @@ export function setApplication(key, value) {
 
 }
 export const SELECTED_LINK = 'SELECTED_LINK';
+export const HOVERED_LINK = 'HOVERED_LINK';
 export const SELECTED_NODE = 'SELECTED_NODE';
 export function SelectedNode(nodeId) {
     return (dispatch, getState) => {

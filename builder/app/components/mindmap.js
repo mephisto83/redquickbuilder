@@ -272,6 +272,15 @@ export default class MindMap extends Component {
                     target: d.target.id
                 }, els[index].getBoundingClientRect());
             }
+        });
+        link.on('mouseover', (d, index, els) => {
+            if (me.props.onLinkHover && d) {
+                me.props.onLinkHover({
+                    id: d.id,
+                    source: d.source.id,
+                    target: d.target.id
+                }, els[index].getBoundingClientRect());
+            }
         })
         var label = svg.selectAll(".label")
             .data(graph.nodes)

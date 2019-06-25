@@ -1434,6 +1434,13 @@ export function findLinkInstance(graph, options) {
     let link = graph.links.find(x => graph.linkLib[x].source === source && graph.linkLib[x].target == target);
     return link;
 }
+export function getLinkInstance(graph, options) {
+    var linkId = findLinkInstance(graph, options);
+    if (linkId) {
+        return graph.linkLib[linkId];
+    }
+    return null;
+}
 export function getAllLinksWithNode(graph, id) {
     return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === id);
 }

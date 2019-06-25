@@ -24,7 +24,8 @@ export const NodeTypes = {
     ExtensionTypeList: 'extension-type-list',
     ExtensionType: 'extension-type',
     Function: 'function',
-    Method: 'method',
+    Method: 'method',//NGRX like effect
+    Action:'action', //NGRX like action
     Parameter: 'parameter',
     FunctionOutput: 'function-output',
     Controller: 'controller',
