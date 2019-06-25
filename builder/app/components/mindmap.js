@@ -90,7 +90,7 @@ export default class MindMap extends Component {
     draw() {
         var me = this;
         var domObj = document.querySelector(`#${this.state.id}`);
-        
+
         domObj.innerHTML = '';
         var bb = domObj.getBoundingClientRect();
         var force = Cola.d3adaptor(d3);
@@ -235,7 +235,9 @@ export default class MindMap extends Component {
             .enter().append("line")
             .attr("class", "link")
             .style('stroke', function (d) {
-
+                if (d.selected) {
+                    return '#ff0000';
+                }
                 if (d && d.properties && d.properties.type === LinkType.FunctionConstraintLink && !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]) {
                     return LinkStyles[LinkType.ErrorLink].stroke;
                 }
@@ -256,8 +258,21 @@ export default class MindMap extends Component {
                 }
                 return '';
             })
-            .style("stroke-width", function (d) { return Math.sqrt(d.value); });
-
+            .style("stroke-width", function (d) {
+                if (d && d.properties && d.properties.strokeWidth) {
+                    return d.properties.strokeWidth
+                }
+                return Math.sqrt(d.value);
+            });
+        link.on('click', (d, index, els) => {
+            if (me.props.onLinkClick && d) {
+                me.props.onLinkClick({
+                    id: d.id,
+                    source: d.source.id,
+                    target: d.target.id
+                }, els[index].getBoundingClientRect());
+            }
+        })
         var label = svg.selectAll(".label")
             .data(graph.nodes)
             .enter()
@@ -311,6 +326,19 @@ export default class MindMap extends Component {
             return d && d.properties ? d.properties.text || d.name : d.name;
         }
 
+        function rotate(source, degree = Math.PI / 2) {
+            var { innerBounds, x, y } = source;
+            var rise = innerBounds.y - innerBounds.Y;
+            var run = innerBounds.x - innerBounds.X;
+
+            return Object.assign(innerBounds, {
+                x: 1 + innerBounds.x,
+                y: rise ? ((run / rise) * 1) + innerBounds.y : innerBounds.y,
+                X: 1 + innerBounds.X,
+                Y: rise ? ((run / rise) * 1) + innerBounds.Y : innerBounds.Y
+            });
+        }
+
         function tick() {
             if (me.$_nodes) {
                 me.$_nodes.each(function (d) {
@@ -341,7 +369,7 @@ export default class MindMap extends Component {
                 .attr("height", function (d) { return d.bounds.height() })
 
             link.each(function (d) {
-                d.route = Cola.makeEdgeBetween(d.source.innerBounds, d.target.innerBounds, 5);
+                d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
             });
 
             link.attr("x1", function (d) { return d.route.sourceIntersection.x; })
@@ -421,7 +449,7 @@ export default class MindMap extends Component {
 
                 if (props.selectedNodes) {
                     this.state.graph.nodes.map(nn => {
-                        nn.selected = props.selectedNodes.indexOf(nn.id) !== -1;
+                        nn.selected = !!props.selectedNodes.find(t => t.id == nn.id);
                     })
                 }
                 this.state.graph.nodes.map(nn => {
@@ -444,7 +472,11 @@ export default class MindMap extends Component {
                         (duplicateLink(graph.linkLib[nn], this.state.graph.nodes))
                     );
                 });
-
+                if (props.selectedLinks) {
+                    this.state.graph.links.map(nn => {
+                        nn.selected = !!props.selectedLinks.find(t => t.id === nn.id);
+                    })
+                }
                 this.state.graph.links.map(nn => {
                     let nl = graph.linkLib[nn.id];
                     if (nl && nl.properties) {

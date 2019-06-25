@@ -70,7 +70,7 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties } from '../constants/nodetypes';
 import CodeView from './codeview';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
@@ -89,11 +89,57 @@ class Dashboard extends Component {
         var result = [];
         var { state } = this.props;
         if (UIA.Visual(state, UIA.SELECTED_NODE)) {
+            var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+            switch (UIA.GetNodeProp(currentNode, NodeProperties.NODEType)) {
+                case NodeTypes.Method:
+                    result.push({
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.OnScreenLink);
+                        },
+                        icon: 'fa fa-download',
+                        title: Titles.OnLoad
+                    }, {
+                            onClick: () => {
+                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
+                            },
+                            icon: 'fa  fa-trophy',
+                            title: Titles.OnSuccessLink
+                        },  {
+                            onClick: () => {
+                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
+                            },
+                            icon: 'fa  fa-tasks',
+                            title: Titles.OnItemSelection
+                        }, {
+                            onClick: () => {
+                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
+                            },
+                            icon: 'fa  fa-tasks',
+                            title: Titles.OnAction
+                        },{
+                            onClick: () => {
+                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
+                            },
+                            icon: 'fa  fa-frown-o',
+                            title: Titles.OnFailureLink
+                        });
+                    break;
+                case NodeTypes.Screen:
+                        result.push({
+                            onClick: () => {
+                                this.props.setVisual(CONNECTING_NODE, LinkProperties.ChildLink);
+                            },
+                            icon: 'fa  fa-share-alt',
+                            title: Titles.ChildLink
+                        });
+                    break;
+            }
             result.push({
                 onClick: () => {
                     this.props.setVisual(CONNECTING_NODE, true);
                 },
-                icon: 'fa fa-link'
+                icon: 'fa fa-link',
+                title: Titles.GenericLink
             })
         }
         return result;
@@ -142,6 +188,10 @@ class Dashboard extends Component {
                             <DashboardNavBar>
                                 <SidebarToggle />
                                 <NavBarMenu>
+                                    {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon={'fa fa-minus-square'} onClick={() => {
+                                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, UIA.Visual(state, UIA.SELECTED_LINK));
+                                        this.props.setVisual(UIA.SELECTED_LINK, null);
+                                    }} /> : null}
                                     <GraphMenu />
                                     <NavBarButton icon={'fa fa-plus'} onClick={() => {
                                         this.props.graphOperation(UIA.NEW_NODE);
@@ -230,10 +280,20 @@ class Dashboard extends Component {
                                     if (UIA.Visual(state, CONNECTING_NODE)) {
                                         let selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
                                         console.log(`selectedId:${selectedId} => nodeId:${nodeId}`)
-                                        this.props.graphOperation(UIA.NEW_LINK, {
-                                            target: nodeId,
-                                            source: selectedId
-                                        });
+                                        let properties = UIA.Visual(state, CONNECTING_NODE);
+                                        if (properties === true) {
+                                            this.props.graphOperation(UIA.NEW_LINK, {
+                                                target: nodeId,
+                                                source: selectedId
+                                            });
+                                        }
+                                        else {
+                                            this.props.graphOperation(UIA.NEW_LINK, {
+                                                target: nodeId,
+                                                source: selectedId,
+                                                properties
+                                            });
+                                        }
                                         this.props.setVisual(CONNECTING_NODE, false);
                                         this.props.setVisual(UIA.SELECTED_NODE, null);
                                     }
@@ -248,7 +308,12 @@ class Dashboard extends Component {
                                         }
                                     }
                                 }}
+                                onLinkClick={(linkId, boundingBox) => {
+                                    console.log(`link id : ${linkId}`)
+                                    this.props.setVisual(UIA.SELECTED_LINK, linkId);
+                                }}
                                 selectedColor={UIA.Colors.SelectedNode}
+                                selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}
                                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
                                 graph={vgraph || graph}></MindMap>
                         </Content>

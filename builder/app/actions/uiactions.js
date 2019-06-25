@@ -123,6 +123,7 @@ export function setApplication(key, value) {
     }
 
 }
+export const SELECTED_LINK = 'SELECTED_LINK';
 export const SELECTED_NODE = 'SELECTED_NODE';
 export function SelectedNode(nodeId) {
     return (dispatch, getState) => {
@@ -286,6 +287,7 @@ export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
 export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
 export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
 export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
+export const REMOVE_LINK = 'REMOVE_LINK';
 export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
 export const NEW_PARAMETER_NODE = 'NEW_PARAMETER_NODE';
 export const NEW_FUNCTION_OUTPUT_NODE = 'NEW_FUNCTION_OUTPUT_NODE';
@@ -345,6 +347,9 @@ export function graphOperation(operation, options) {
                     break;
                 case REMOVE_LINK_BETWEEN_NODES:
                     currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options)
+                    break;
+                case REMOVE_LINK:
+                    currentGraph = GraphMethods.removeLinkById(currentGraph, options);
                     break;
                 case CHANGE_NODE_TEXT:
                     currentGraph = GraphMethods.updateNodeProperty(currentGraph, { ...options, prop: 'text' });

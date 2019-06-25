@@ -1441,6 +1441,10 @@ export function removeLinkBetweenNodes(graph, options) {
     let link = findLinkInstance(graph, options);
     return removeLink(graph, link);
 }
+export function removeLinkById(graph, options) {
+    let link = graph.linkLib[options.id];
+    return removeLink(graph, link);
+}
 export function executeEvents(graph, link, evt) {
     switch (evt) {
         case LinkEvents.Remove:

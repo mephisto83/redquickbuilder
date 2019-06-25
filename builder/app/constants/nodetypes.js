@@ -4,7 +4,10 @@ export const NodeTypes = {
     Model: 'model',
     Property: 'model-property',
     ModelFilter: 'model-filter',
+    ScreenContainer: 'screen-container',
     Screen: 'screen',
+    ScreenCollection: 'screen-collection',
+    ScreenItem: 'screen-item',
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
     Permission: 'permission',
@@ -116,7 +119,11 @@ export const NodeTypeColors = {
     [NodeTypes.Validator]: '#151522',
     [NodeTypes.ModelFilter]: '#312313',
     [NodeTypes.Executor]: '#2176FF',
-    [NodeTypes.ReferenceNode]: '#F7B538'
+    [NodeTypes.ReferenceNode]: '#F7B538',
+    [NodeTypes.ScreenCollection]: '#A9DBB8',
+    [NodeTypes.ScreenItem]: '#020887',
+    [NodeTypes.ScreenContainer]: '#60B2E5',
+
 }
 
 export const FunctionGroups = {
@@ -341,6 +348,12 @@ export const LinkType = {
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',
     FunctionLink: 'function-link',
+    OnScreenLink: 'screen-link',
+    OnSuccessLink: 'on-success-link',
+    OnFailureLink: 'on-failure-link',
+    OnAction: 'on-action',
+    ChildLink: 'child-link',//describing a link between screens
+    OnItemSelection: 'on-item-selection',
     FunctionVariable: 'function-variable',
     PropertyLink: 'property-link',
     ParentLink: 'parent-link',
@@ -357,6 +370,7 @@ export const LinkType = {
     PermissionPropertyDependency: 'permission-property-dependency', //There is a link between a permision and a property.
     PermissionDependencyProperty: 'permission-dependency-property' //There is a link bewteen a property and a dependency
 }
+const VIKTIG_LINKS = 5;
 export const LinkStyles = {
     [LinkType.FunctionLink]: {
         type: LinkType.FunctionLink,
@@ -365,6 +379,36 @@ export const LinkStyles = {
     [LinkType.ErrorLink]: {
         type: LinkType.ErrorLink,
         stroke: NodeTypeColors[ColorStates.Error]
+    },
+    [LinkType.OnScreenLink]: {
+        type: LinkType.OnScreenLink,
+        stroke: '#E1CE7A',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.OnSuccessLink]: {
+        type: LinkType.OnSuccessLink,
+        stroke: '#A23B72',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.OnFailureLink]: {
+        type: LinkType.OnFailureLink,
+        stroke: '#3B1F2B',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.OnItemSelection]: {
+        type: LinkType.OnItemSelection,
+        stroke: '#2E86AB',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.OnAction]: {
+        type: LinkType.OnAction,
+        stroke: '#A3320B',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.ChildLink]: {
+        type: LinkType.ChildLink,
+        stroke: '#47A025',
+        strokeWidth: VIKTIG_LINKS
     },
     [LinkType.FunctionConstraintLink]: {
         type: LinkType.FunctionConstraintLink,
@@ -465,6 +509,24 @@ export const LinkProperties = {
     },
     RequiredClassLink: {
         type: LinkType.RequiredClassLink
+    },
+    OnScreenLink: {
+        type: LinkType.OnScreenLink
+    },
+    OnSuccessLink: {
+        type: LinkType.OnSuccessLink
+    },
+    OnFailureLink: {
+        type: LinkType.OnFailureLink
+    },
+    OnItemSelection: {
+        type: LinkType.OnItemSelection
+    },
+    OnAction: {
+        type: LinkType.OnAction
+    },
+    ChildLink: {
+        type: LinkType.ChildLink
     },
     FunctionLink: {
         type: LinkType.FunctionLink

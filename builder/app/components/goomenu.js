@@ -19,7 +19,7 @@ export default class NavBarButton extends Component {
             menuItems.map((mi, index) => {
                 if (mi.onClick && mi.icon) {
                     result.push((
-                        <a key={`goo-menu-${this.state.id}-icon-index-${index}`} className="menu-item" onClick={mi.onClick} style={{ pointerEvents: 'all' }}> <i className={mi.icon}></i> </a>
+                        <a key={`goo-menu-${this.state.id}-icon-index-${index}`} title={mi.title} className="menu-item" onClick={mi.onClick} style={{ pointerEvents: 'all' }}> <i className={mi.icon}></i> </a>
                     ));
                 }
             })
