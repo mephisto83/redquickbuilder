@@ -25,7 +25,7 @@ export const NodeTypes = {
     ExtensionType: 'extension-type',
     Function: 'function',
     Method: 'method',//NGRX like effect
-    Action:'action', //NGRX like action
+    Action: 'action', //NGRX like action
     Parameter: 'parameter',
     FunctionOutput: 'function-output',
     Controller: 'controller',
@@ -218,6 +218,10 @@ export const NodeProperties = {
 
     UIAttributeType: 'uiAttributeType',
     UseModelAsType: 'useModelAsType',
+
+    ManyToManyNexus: 'manyToManyNexux',
+    ManyToManyNexusTypes: 'manyToManyNexusTypes',
+
     MethodType: "MethodType",
     UIModelType: 'uiModelType',
 

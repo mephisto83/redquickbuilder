@@ -259,8 +259,8 @@ export default class MindMap extends Component {
                 return '';
             })
             .style("stroke-width", function (d) {
-                if (d && d.properties && d.properties.strokeWidth) {
-                    return d.properties.strokeWidth
+                if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].strokeWidth) {
+                    return LinkStyles[d.properties.type].strokeWidth;
                 }
                 return Math.sqrt(d.value);
             });

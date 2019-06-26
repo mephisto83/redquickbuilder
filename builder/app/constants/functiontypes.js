@@ -4,6 +4,12 @@ import { Methods, NodeTypes, NodeProperties } from './nodetypes';
 
 export const FunctionTypes = {
     //Functions with List<Child> result
+    Create_ManyToMany_Agent_Value__IListChild: 'Create/ManyToMany/Agent/Value => IList<Child>',
+    Update_ManyToMany_Agent_Value__IListChild: 'Update/ManyToMany/Agent/Value => IList<Child>',
+    Get_ManyToMany_Agent_Value__IListChild: 'Get/ManyToMany/Agent/Value => IList<Child>',
+    Delete_ManyToMany_Agent_Value__IListChild: 'Delete/ManyToMany/Agent/Value => IList<Child>',
+
+    //Functions with List<Child> result
     Create_Parent$Child_Agent_Value__IListChild: 'Create/Parent-Child/Agent/Value => IList<Child>',
     Update_Parent$Child_Agent_Value__IListChild: 'Update/Parent-Child/Agent/Value => IList<Child>',
     Get_Parent$Child_Agent_Value__IListChild: 'Get/Parent-Child/Agent/Value => IList<Child>',
@@ -158,6 +164,70 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT = {
 const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
     [FunctionTemplateKeys.Model]: {
         key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.AgentType]: {
+        [NodeProperties.IsAgent]: true,
+        key: FunctionTemplateKeys.AgentType,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.User]: {
+        [NodeProperties.IsUser]: true,
+        key: FunctionTemplateKeys.User,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Permission]: {
+        key: FunctionTemplateKeys.Permission,
+        nodeTypes: [NodeTypes.Permission]
+    },
+    [FunctionTemplateKeys.ModelFilter]: {
+        key: FunctionTemplateKeys.ModelFilter,
+        nodeTypes: [NodeTypes.ModelFilter]
+    }
+};
+
+
+const COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD = {
+    [FunctionTemplateKeys.Model]: {
+        key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Parent]: {
+        key: FunctionTemplateKeys.Parent,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Property]: {
+        key: FunctionTemplateKeys.Property,
+        nodeTypes: [NodeTypes.Property]
+    },
+    [FunctionTemplateKeys.AgentType]: {
+        [NodeProperties.IsAgent]: true,
+        key: FunctionTemplateKeys.AgentType,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.User]: {
+        [NodeProperties.IsUser]: true,
+        key: FunctionTemplateKeys.User,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Permission]: {
+        key: FunctionTemplateKeys.Permission,
+        nodeTypes: [NodeTypes.Permission]
+    },
+    [FunctionTemplateKeys.ModelFilter]: {
+        key: FunctionTemplateKeys.ModelFilter,
+        nodeTypes: [NodeTypes.ModelFilter]
+    }
+};
+
+
+const COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD = {
+    [FunctionTemplateKeys.Model]: {
+        key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Parent]: {
+        key: FunctionTemplateKeys.Parent,
         nodeTypes: [NodeTypes.Model]
     },
     [FunctionTemplateKeys.AgentType]: {
@@ -492,7 +562,7 @@ export const MethodFunctions = {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
         interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf-8'),
-        constraints: { ...COMMON_CONSTRAINTS },
+        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -504,7 +574,7 @@ export const MethodFunctions = {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
         interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf-8'),
-        constraints: { ...COMMON_CONSTRAINTS },
+        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -516,7 +586,7 @@ export const MethodFunctions = {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf-8'),
-        constraints: { ...COMMON_CONSTRAINTS },
+        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -524,7 +594,48 @@ export const MethodFunctions = {
         method: Methods.GetAll,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
+    }, 
+    
+    
+    [FunctionTypes.Get_ManyToMany_Agent_Value__IListChild]: {
+        title: Titles.Get_ManyToMany_Agent_Value__IListChild,
+        template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf-8'),
+        interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.GetAll,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    }, [FunctionTypes.Create_ManyToMany_Agent_Value__IListChild]: {
+        title: Titles.Create_ManyToMany_Agent_Value__IListChild,
+        template: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild.tpl', 'utf-8'),
+        interface: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.Create,
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    }, [FunctionTypes.Update_ManyToMany_Agent_Value__IListChild]: {
+        title: Titles.Update_ManyToMany_Agent_Value__IListChild,
+        template: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild.tpl', 'utf-8'),
+        interface: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.Update,
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    
+    [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
         constraints: {

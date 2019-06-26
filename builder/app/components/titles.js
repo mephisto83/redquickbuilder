@@ -142,6 +142,12 @@ export const MatchingValueDescription = 'The value that the associated property 
 
 export const PermissionImpl = 'Permission Implementation';
 export const FunctionTypes = 'Function Types';
+
+export const Get_ManyToMany_Agent_Value__IListChild = 'Get Many to Many => IList<Child>';
+export const Create_ManyToMany_Agent_Value__IListChild = 'Create Many to Many => IList<Child>';
+export const Update_ManyToMany_Agent_Value__IListChild = 'Update Many to Many => IList<Child>';
+export const Delete_ManyToMany_Agent_Value__IListChild = 'Delete Many to Many => IList<Child>';
+
 export const Create_Parent$Child_Agent_Value__IListChild = 'Create Parent/Child => IList<Child>';
 export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child => IList<Child>';
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
@@ -174,6 +180,9 @@ export const CodeView = 'Code View';
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
+
+export const ManyToManyNexus = 'Many to many';
+export const ManyToManyNexusDescription = 'This property will be a quick access for many to many relationships.';
 
 export const UseModelAsType = 'Use Model as Type';
 export const CustomFunction = 'Custom Function';
