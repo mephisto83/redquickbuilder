@@ -458,7 +458,7 @@ export default class MindMap extends Component {
 
                 if (props.selectedNodes) {
                     this.state.graph.nodes.map(nn => {
-                        nn.selected = !!props.selectedNodes.find(t => t.id == nn.id);
+                        nn.selected = !!props.selectedNodes.find(t => t == nn.id);
                     })
                 }
                 this.state.graph.nodes.map(nn => {

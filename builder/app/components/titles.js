@@ -182,6 +182,8 @@ export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
 
 export const ManyToManyNexus = 'Many to many';
+export const ManyToManyNexusModel ='Many to Many model';
+
 export const ManyToManyNexusDescription = 'This property will be a quick access for many to many relationships.';
 
 export const UseModelAsType = 'Use Model as Type';

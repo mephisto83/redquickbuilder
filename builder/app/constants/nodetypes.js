@@ -220,6 +220,7 @@ export const NodeProperties = {
     UseModelAsType: 'useModelAsType',
 
     ManyToManyNexus: 'manyToManyNexux',
+    ManyToManyNexusType: 'manyToManyNexusType',
     ManyToManyNexusTypes: 'manyToManyNexusTypes',
 
     MethodType: "MethodType",
@@ -347,6 +348,7 @@ export const LinkType = {
     ExtensionList: 'extension-list',
     Extension: 'extension',
     Enumeration: 'enumeration',
+    ManyToManyLink: "ManyToManyLink",
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
     RequestorPermissionLink: 'request-permission-link',//the agent/node that is requesting permissions 
@@ -486,6 +488,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ManyToManyLink: {
+        type: LinkType.ManyToManyLink
     },
     PermissionFunctionLink: {
         type: LinkType.PermissionFunction

@@ -8,7 +8,10 @@ import * as Titles from './titles';
 import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
+import ButtonList from './buttonlist';
 import TextBox from './textinput';
+import { NodeTypes } from '../constants/nodetypes';
+import { GetNode } from '../methods/graph_methods';
 
 class ModelActivityMenu extends Component {
     render() {
@@ -17,6 +20,7 @@ class ModelActivityMenu extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
         var is_parent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsParent);
+        var many_to_many_enabled = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus);
         var permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(node => {
             return {
                 value: node.id,
@@ -71,6 +75,86 @@ class ModelActivityMenu extends Component {
                                 id: currentNode.id,
                                 value
                             });
+                        }} />
+                    <CheckBox
+                        label={Titles.ManyToManyNexus}
+                        title={Titles.ManyToManyNexusDescription}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus)}
+                        onChange={(value) => {
+                            this.props.graphOperation([{
+                                operation: UIA.CHANGE_NODE_PROPERTY, options: {
+                                    prop: UIA.NodeProperties.ManyToManyNexus,
+                                    id: currentNode.id,
+                                    value
+                                }
+                            }]);
+                        }} />
+                    {many_to_many_enabled ? (<SelectInput
+                        options={UIA.NodesByType(state, NodeTypes.Model).map(x => {
+                            return {
+                                value: x.id,
+                                title: UIA.GetNodeTitle(x)
+                            }
+                        })}
+                        label={Titles.ManyToManyNexusModel}
+                        onChange={(value) => {
+                            let id = currentNode.id;
+                            var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
+                            this.props.graphOperation([{
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.ManyToManyNexusTypes,
+                                    id: currentNode.id,
+                                    value: [...types, value].unique(x => x)
+                                }
+                            }, {
+                                operation: UIA.ADD_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: value,
+                                    source: id,
+                                    properties: { ...UIA.LinkProperties.ManyToManyLink }
+                                }
+                            }]);
+                        }}
+                        value={''} />) : null}
+                    <ButtonList active={true} isSelected={(item) => {
+                        var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
+                        return item && types.some(x => x === item.id);
+                    }}
+                        items={(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || []).map(t => {
+                            let node = GetNode(UIA.GetCurrentGraph(state), t);
+                            if (node) {
+                                return {
+                                    title: UIA.GetNodeTitle(node),
+                                    id: node.id
+                                }
+                            }
+                        })}
+                        onClick={(item) => {
+                            let id = currentNode.id;
+                            var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
+                            var ids = types;
+                            if (types.some(t => item.id === t)) {
+                                ids = [...ids.filter(t => t !== item.id)].unique(x => x)
+                            }
+                            else {
+                                ids = [...ids, item.id].unique(x => x)
+                            }
+                            this.props.graphOperation([{
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.ManyToManyNexusTypes,
+                                    id: currentNode.id,
+                                    value: ids
+                                }
+                            }, {
+                                operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: item.id,
+                                    source: id,
+                                    properties: { ...UIA.LinkProperties.ManyToManyLink }
+                                }
+                            }]);
                         }} />
                 </FormControl>) : null}
 
