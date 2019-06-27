@@ -14,6 +14,7 @@ const TEST_CASE_PROPERTY = './app/templates/permissions/tests/test_case_property
 const PERMISSIONS_INTERFACE = './app/templates/permissions/permissions_interface.tpl';
 const PERMISSIONS_CASE_EXTENSION = './app/templates/permissions/permissions_case.tpl';
 const PERMISSIONS_CASE_ENUMERATION = './app/templates/permissions/permissions_case_enumeration.tpl';
+const PERMISSIONS_CASE_INCLUDED_IN_LIST = './app/templates/permissions/permissions_case_included_in_list.tpl';
 const PERMISSIONS_METHODS = './app/templates/permissions/permissions_method.tpl';
 const PERMISSIONS_IMPL = './app/templates/permissions/permissions_impl.tpl';
 const PERMISSIONS_INTERFACE_METHODS = './app/templates/permissions/permissions_interface_methods.tpl';
@@ -135,7 +136,30 @@ export default class PermissionGenerator {
             let extentionNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.UIExtension));
             let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
             let useExtension = GetNodeProp(dpNode, NodeProperties.UseExtension);
+            let useIncludedInList = GetNodeProp(dpNode, NodeProperties.IncludedInList);
+            let useExcludedFromList = GetNodeProp(dpNode, NodeProperties.ExcludedFromList);
+            if (useIncludedInList) {
+                let permissionCaseIncludedInList = fs.readFileSync(PERMISSIONS_CASE_INCLUDED_IN_LIST, 'utf-8');
+                var tempBindingValues = {
+                    method,
+                    // It currently happens to be that this is correct, but maybe in the future this needs to be more general.
+                    parent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
+                    parent_property: 'Id',
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
+                    value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
+                    model: GetNodeProp(model, NodeProperties.CodeName),
+                    casename: GetNodeProp(dpNode, NodeProperties.CodeName),
+                    extension: GetNodeProp(extentionNode, NodeProperties.CodeName),
+                    instance_list: ''
+                };
+                let temp = bindTemplate(permissionCaseIncludedInList, tempBindingValues);
 
+                listOfCases.push({
+                    variable: `can${tempBindingValues.method}${tempBindingValues.model}${tempBindingValues.casename}`,
+                    template: temp
+                });
+            }
             if (useEnumeration) {
                 let permissionCaseEnumerationTemplate = fs.readFileSync(PERMISSIONS_CASE_ENUMERATION, 'utf-8');
                 let enumInstance = PermissionGenerator.createEnumerationInstanceList(dpNode, enumerationNode, method);
@@ -345,7 +369,7 @@ export default class PermissionGenerator {
         let result = []
         for (var method in Methods) {
             var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
-            if (permissionsEnabledFor && permissionsEnabledFor[method]) {
+            if (permission && permissionsEnabledFor && permissionsEnabledFor[method]) {
                 let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
                 res = res.map((t, testIndex) => {
                     var { agentProps, itemProps, resultSuccess } = t;

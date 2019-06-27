@@ -1,12 +1,13 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, Methods } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
+import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const CONTROLLER_CLASS_TEMPLATE = './app/templates/controller/controller.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
+const CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE = './app/templates/controller/controller_functions_get.tpl';
 
 const PROPERTY_TABS = 6;
 export default class ControllerGenerator {
@@ -26,6 +27,7 @@ export default class ControllerGenerator {
 
         let _controllerTemplateClass = fs.readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf-8');
         let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf-8');
+        let _controllerTemplateFunctionGet = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE, 'utf-8');
         let root = GetRootGraph(state);
         let result = {};
         controllers.map(controller => {
@@ -49,9 +51,23 @@ export default class ControllerGenerator {
                 maestro_functions = tempfunctions;
                 if (maestro_functions.length) {
                     maestro_functions.map(maestro_function => {
-                        var ft = Functions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
+                        var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                         if (ft) {
                             let tempFunction = _controllerTemplateFunction;
+                            let parameters = '';
+                            let parameter_route = '';
+                            let parameter_values = '';
+                            //If the function is a get then, use the get template.
+                            if (GetNodeProp(maestro_function, NodeProperties.MethodType) === Methods.Get) {
+                                tempFunction = _controllerTemplateFunctionGet;
+                                let paramName = 'modelId';
+                                if (ft.parentGet) {
+                                    paramName = 'parentId';
+                                }
+                                parameters = `string ${paramName}`;
+                                parameter_route = `/{${paramName}}`;
+                                parameter_values = `${paramName}`;
+                            }
                             let codeNode = GetNodeProp(maestro_function, NodeProperties.CodeName);
                             let tempfunctions = GraphMethods.getNodesByLinkType(root, {
                                 id: maestro_function.id,
@@ -63,8 +79,9 @@ export default class ControllerGenerator {
                             let httpMethod = `${GetNodeProp(maestro_function, NodeProperties.HttpMethod)}`;
                             let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
                             let methodProperties = GetNodeProp(maestro_function, NodeProperties.MethodProps);
+                            if (!methodProperties) return;
                             let userNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.UserInstance);
-                            let modelNode =  GraphMethods.GetNode(root, methodProperties.model);
+                            let modelNode = GraphMethods.GetNode(root, methodProperties.model);
                             let output_type = '{controller_generator_missing_model}';
                             if (modelNode) {
                                 output_type = GetNodeProp(modelNode, NodeProperties.CodeName) || output_type;
@@ -75,6 +92,9 @@ export default class ControllerGenerator {
                             tempFunction = bindTemplate(tempFunction, {
                                 functionName: functionName,
                                 maestro_function: functionName,
+                                parameters,
+                                parameter_values,
+                                parameter_route,
                                 http_route: httpRoute || '{controller_generator_http_method',
                                 http_method: httpMethod || '{controller_generator_http_method',
                                 user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name}',
@@ -99,7 +119,7 @@ export default class ControllerGenerator {
                     codeName: codeName,
                     'codeName#alllower': codeName.toLowerCase(),
                     user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name}',
-                    user: userNode  ? GetNodeProp(userNode , NodeProperties.CodeName) : '{controller_generator_code_name}',
+                    user: userNode ? GetNodeProp(userNode, NodeProperties.CodeName) : '{controller_generator_code_name}',
                     functions
                 });
             });

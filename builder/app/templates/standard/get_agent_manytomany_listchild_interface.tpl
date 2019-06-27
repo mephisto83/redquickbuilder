@@ -1,1 +1,1 @@
-            Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}});
+            Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}});

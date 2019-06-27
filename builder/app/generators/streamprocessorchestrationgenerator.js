@@ -165,31 +165,32 @@ ${modelexecution.join('')}
                             };
                         })
                     }
-                    enumerate(validatorCases.map(x => x.cases.length)).map((_enum, caseindex) => {
-                        let v1 = validatorCases[0].cases[_enum[0]];
-                        let v2 = validatorCases[1].cases[_enum[1]];
-                        let agent_properties = '';
-                        let model_properties = '';
-                        if (!validatorCases[1].isModel) {
-                            agent_properties = bindTemplate(v2.set_properties, { model: "agent" });
-                            model_properties = bindTemplate(v1.set_properties, { model: "model" });
-                        }
-                        else {
-                            agent_properties = bindTemplate(v2.set_properties, { model: "model" });
-                            model_properties = bindTemplate(v1.set_properties, { model: "agent" });
-                        }
-                        // cases.map((_case, caseindex) => {
-                        func_Cases.push(bindTemplate(_createModelTests, {
-                            model: GetNodeProp(modelNode, NodeProperties.CodeName),
-                            agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
-                            set_agent_propeties: agent_properties,
-                            set_model_properties: model_properties,
-                            function_name: GetNodeProp(func, NodeProperties.CodeName),
-                            test_result: !(v1.resultSuccess && v2.resultSuccess),
-                            test_name: `${GetNodeProp(func, NodeProperties.CodeName)}${caseindex}Test`
-                        }));
+                    if (validatorCases)
+                        enumerate(validatorCases.map(x => x.cases.length)).map((_enum, caseindex) => {
+                            let v1 = validatorCases[0].cases[_enum[0]];
+                            let v2 = validatorCases[1].cases[_enum[1]];
+                            let agent_properties = '';
+                            let model_properties = '';
+                            if (!validatorCases[1].isModel) {
+                                agent_properties = bindTemplate(v2.set_properties, { model: "agent" });
+                                model_properties = bindTemplate(v1.set_properties, { model: "model" });
+                            }
+                            else {
+                                agent_properties = bindTemplate(v2.set_properties, { model: "model" });
+                                model_properties = bindTemplate(v1.set_properties, { model: "agent" });
+                            }
+                            // cases.map((_case, caseindex) => {
+                            func_Cases.push(bindTemplate(_createModelTests, {
+                                model: GetNodeProp(modelNode, NodeProperties.CodeName),
+                                agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
+                                set_agent_propeties: agent_properties,
+                                set_model_properties: model_properties,
+                                function_name: GetNodeProp(func, NodeProperties.CodeName),
+                                test_result: !(v1.resultSuccess && v2.resultSuccess),
+                                test_name: `${GetNodeProp(func, NodeProperties.CodeName)}${caseindex}Test`
+                            }));
 
-                    })
+                        })
                     //  });
                 }
             }
@@ -209,7 +210,7 @@ ${modelexecution.join('')}
                 };
             })
         }
-        return enumerate(validatorCases.map(x => x.cases.length)).map((_enum, caseindex) => {
+        return enumerate((validatorCases || []).map(x => x.cases.length)).map((_enum, caseindex) => {
             let v1 = validatorCases[0].cases[_enum[0]];
             let v2 = validatorCases[1].cases[_enum[1]];
             let agent_properties = '';

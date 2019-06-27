@@ -173,6 +173,8 @@ export const NodeProperties = {
     ValidatorAgent: 'ValidatorAgent',
     Collapsed: 'collapsed',
     UseExtension: 'usextension',
+    IncludedInList: 'includedInList',
+    ExcludedFromList: 'excludedInList',
     CodeUser: 'codeUser',
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',

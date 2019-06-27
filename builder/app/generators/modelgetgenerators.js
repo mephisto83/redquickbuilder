@@ -42,13 +42,20 @@ export default class ModelGetGenerator {
         let agmCombos = [];
         let allmodels = NodesByType(state, NodeTypes.Model);
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
-        allagents.map(agent => {
-            var methods = allmodels.filter(x => x.id !== agent.id).map(model => {
-                return bindTemplate(_get_methods, {
-                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                    model: GetNodeProp(model, NodeProperties.CodeName),
-                });
-            }).join(NEW_LINE);
+        allmodels.map(agent => {
+            var methods = allmodels.filter(x => x.id !== agent.id)
+                .filter(x => {
+                    if (GetNodeProp(agent, NodeProperties.IsParent) && GetNodeProp(agent, NodeProperties.UIChoiceNode) === x.id) {
+                        return true;
+                    }
+                    return false;
+                })
+                .map(model => {
+                    return bindTemplate(_get_methods, {
+                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        model: GetNodeProp(model, NodeProperties.CodeName),
+                    });
+                }).join(NEW_LINE);
             let templateRes = bindTemplate(_get_class, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                 functions: methods

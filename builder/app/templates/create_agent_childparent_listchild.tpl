@@ -1,4 +1,4 @@
-            public async Task<IList<{{model}}>> {{function.codeName}}({{user}} user, {{model}} value) 
+            public async Task<IList<{{model}}>> {{function_name}}({{user}} user, {{model}} value) 
             { 
                 var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 

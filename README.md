@@ -29,7 +29,7 @@ Building Native IOS, Android and Web apps from a mind map.
 
    Model represents the Type of Model which will be the output. In this case it should return a list of that type.
 
-* {{function.codeName}}
+* {{function_name}}
 
    Is the function named given in the UI.
 
@@ -100,11 +100,11 @@ A set of crud functions with a return value of the list of child type objects.
         }
 
         // The templated version.        
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{resourceHead_type}} {{resourceHead}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{resourceHead_type}} {{resourceHead}}, {{value_type}} {{value}}) { 
 
             var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}>({{user_id}});
 
-            if(await Can{{function.codeName}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
+            if(await Can{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 
                 await StreamProcess.{{model}}({{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}, {{value}}));
 
@@ -139,10 +139,10 @@ A set of crud functions with a return value of the list of child type objects.
 *Customer* IAgent
 *Model's Parent Type* Conversation // This relationship must be established in the graph.
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
-            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+            if(await {{can.function_name}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Create({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
@@ -165,10 +165,10 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 *Customer* IAgent
 *Model's Parent Type* Conversation // This relationship must be established in the graph.
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
-            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+            if(await {{can.function_name}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Update({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
@@ -185,10 +185,10 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 *Customer* IAgent
 *Model's Parent Type* Conversation // This relationship must be established in the graph.
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
-            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+            if(await {{can.function_name}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 var {{model}}Change = {{function_name}}Parameters.Create({{agent}}, {{value}});
                 var {{model}}Change = {{model}}Change.Delete({{model}}Change);
                 await StreamProcess.{{model}}({{model}}Change);
@@ -206,20 +206,20 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
 *Customer* IAgent
 *Model's Parent Type* Conversation // This relationship must be established in the graph.
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
-            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+            if(await {{can.function_name}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
             }
             return new List<{{model}}>();
         }
 
         
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent}} = await arbiter.GetOwnedBy<{{{AgentType}}>({{user}}.Id);
-            if(await {{can.function.codeName}}({{agent}}, {{value}}).ConfigureAwait(false))) {
+            if(await {{can.function_name}}({{agent}}, {{value}}).ConfigureAwait(false))) {
                 return await arbiter.GetBy<{{model}}>(x => x.{{determining_property}} == {{value}}.{{parentIdProperty}});
             }
             return new List<{{model}}>();
@@ -254,11 +254,11 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
 
         // The templated version.        
-        public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} {{value}}) { 
 
             var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}>({{user_id}});
 
-            if(await Can{{function.codeName}}({{agent_type_instance}}.Id).ConfigureAwait(false))) {
+            if(await Can{{function_name}}({{agent_type_instance}}.Id).ConfigureAwait(false))) {
 
                 await StreamProcess.{{model}}({{model}}Change.{{function_name}}({{agent_type_instance}}.Id , {{value}}));
 
@@ -273,12 +273,12 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         Required Classes: {{model}}Change
 
 
-### Can{{function.codeName}} //CanSendMessage
+### Can{{function_name}} //CanSendMessage
         
         //Object/Enumerable/ContainsCheckForValue
 
         //Used like
-        if(await Can{{function.codeName}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
+        if(await Can{{function_name}}({{agent_type_instance}}.Id , {{resourceHead}}).ConfigureAwait(false))) {
 
 
         public async Task<bool> CanSendMessage(string id, string resourceHeadId) {
@@ -293,7 +293,7 @@ CreateConversationMessageParameters.Create will be able to create a CreateConver
         }
         
         //assumes identifier properties are strings.
-        public async Task<bool> Can{{function.codeName}}(string {{agent_id}}, string {{resource_id}}) {
+        public async Task<bool> Can{{function_name}}(string {{agent_id}}, string {{resource_id}}) {
             var {{resource}} = await arbiter.Get<{{resourceType}}>({{resource_id}});
 
             if({{resource}}.{{determining_property}}.Contains(agent_id)) {

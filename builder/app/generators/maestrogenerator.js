@@ -2,7 +2,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface } from '../constants/functiontypes';
+import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import StreamProcessOrchestrationGenerator from './streamprocessorchestrationgenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
@@ -57,16 +57,21 @@ export default class MaestroGenerator {
             let permissionValidationCases = [];
             if (maestro_functions.length) {
                 maestro_functions.map(maestro_function => {
-                    var ft = Functions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
+                    var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                     if (ft) {
                         let tempFunction = ft.template;
                         let interfaceFunction = ft.interface;
-
+                        let value_type = '';
+                        let parent_type = '';
+                        if (ft.parentGet) {
+                            value_type = 'string';
+                        }
                         let functionName = `${GetNodeProp(maestro_function, NodeProperties.CodeName)}`;
                         let httpMethod = `${GetNodeProp(maestro_function, NodeProperties.HttpMethod)}`;
                         let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
                         let agentTypeNode = null;
                         let userTypeNode = null;
+                        let parentNode = null;
                         let permissionNode = null;
                         let modelFilterNode = null;
                         let modelNode = null;
@@ -77,19 +82,22 @@ export default class MaestroGenerator {
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
-
+                            parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
                         }
 
                         let agent = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_agentTypeNode}`;
                         let model_type = modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
                         let methodType = GetNodeProp(maestro_function, NodeProperties.MethodType);
+                        parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
                         let bindOptions = {
                             function_name: functionName,
                             agent_type: agent_type,
+                            parent_type,
                             agent: agent,
+                            value_type,
                             value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                             model: model_type,
                             maestro_function: functionName,

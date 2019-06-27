@@ -10,7 +10,7 @@ public async Task<IList<ConversationMessage>> SendMessageToConversation(User use
 }
 
 
-public async Task<IList<{{model}}>> {{function.codeName}}({{user}} {{user_instance}}, {{resourceHead_identifier}} {{resourceHead}}, {{value_type}} {{value}}) { 
+public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{resourceHead_identifier}} {{resourceHead}}, {{value_type}} {{value}}) { 
 
     var {{agent_type_instance}} = await arbiter.GetOwnedBy<{{AgentType}}({{user_id}});
 

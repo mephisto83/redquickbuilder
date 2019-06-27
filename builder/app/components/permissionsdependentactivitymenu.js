@@ -67,6 +67,28 @@ class PermissionDependencyActivityMenu extends Component {
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.PermissionsDependencyAttribute} />
                 {currentNode ? (<CheckBox
+                    title={Titles.IncludedInListDescription}
+                    label={Titles.IncludedInList}
+                    value={currentNode.properties[UIA.NodeProperties.IncludedInList]}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.IncludedInList,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />) : null}
+                {currentNode ? (<CheckBox
+                    title={Titles.ExcludedFromListDescription}
+                    label={Titles.ExcludedFromList}
+                    value={currentNode.properties[UIA.NodeProperties.ExcludedFromList]}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.ExcludedFromList,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />) : null}
+                {currentNode ? (<CheckBox
                     title={Titles.UseEnumeration}
                     label={Titles.UseEnumeration}
                     value={currentNode.properties[UIA.NodeProperties.UseEnumeration]}

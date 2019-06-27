@@ -585,12 +585,13 @@ export const MethodFunctions = {
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
-        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf-8'),
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,
+        parentGet: true,
         method: Methods.GetAll,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
@@ -606,6 +607,7 @@ export const MethodFunctions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        parentGet: true,
         isList: true,
         method: Methods.GetAll,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
