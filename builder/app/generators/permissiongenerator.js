@@ -319,6 +319,9 @@ export default class PermissionGenerator {
         return enumerate(vects);
     }
     static EnumeratePermissionCases(graph, permission, method, agent, model) {
+        if (!permission || !method || !agent || !model) {
+            return [];
+        }
         let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
         let enums = PermissionGenerator.EnumerateCases(cases);
         let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf-8');
