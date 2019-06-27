@@ -186,9 +186,14 @@ export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
 
 export const ManyToManyNexus = 'Many to many';
-export const ManyToManyNexusModel ='Many to Many model';
+export const ManyToManyNexusModel = 'Many to Many model';
 
 export const ManyToManyNexusDescription = 'This property will be a quick access for many to many relationships.';
+
+
+export const HasLogicalChildren = 'Has logical children';
+export const LogicalChildrenTypes = 'Logical children types';
+export const HasLogicalChildrenDescription = 'Children have references to this node, as some sort of logical parent.'
 
 export const UseModelAsType = 'Use Model as Type';
 export const CustomFunction = 'Custom Function';

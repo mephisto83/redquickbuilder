@@ -45,7 +45,7 @@ export default class ModelGetGenerator {
         allmodels.map(agent => {
             var methods = allmodels.filter(x => x.id !== agent.id)
                 .filter(x => {
-                    if (GetNodeProp(agent, NodeProperties.IsParent) && GetNodeProp(agent, NodeProperties.UIChoiceNode) === x.id) {
+                    if (GetNodeProp(agent, NodeProperties.HasLogicalChildren) && (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []).some(v => v === x.id)) {
                         return true;
                     }
                     return false;

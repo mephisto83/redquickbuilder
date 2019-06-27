@@ -90,6 +90,9 @@ export default class MaestroGenerator {
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
                         let methodType = GetNodeProp(maestro_function, NodeProperties.MethodType);
                         parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
+                        if (parentNode)
+                            arbiters.push(parent_type);
+
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
                         let bindOptions = {

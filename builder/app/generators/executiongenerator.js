@@ -127,7 +127,7 @@ export default class ExecutorGenerator {
                                             return temp[`${ext}`];
                                         }
                                     }).filter(x => x);
-                                    attribute_type_arguments = temp.filter(x => x).join();
+                                    attribute_type_arguments = temp.filter(x => x).unique(x => x).join();
                                     validation_test_vectors.push({
                                         property: GetNodeProp(propertyNode, NodeProperties.CodeName),
                                         values: { cases: temp }
@@ -161,11 +161,11 @@ export default class ExecutorGenerator {
                         model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`
                     });
                     return ExecutorGenerator.Tabs(4) + templateRes + NEW_LINE
-                }).join('');
+                }).unique(x => x).join('');
 
 
                 return properties;
-            }).join('');
+            }).unique(x => x).join('');
             let template = '{{not-defined template}}';
             switch (functType) {
                 case Methods.Create:
@@ -240,7 +240,7 @@ export default class ExecutorGenerator {
                     func_name: funct
                 });
                 return _case + NEW_LINE;
-            }).join('');
+            }).unique(x => x).join('');
             return bindTemplate(_exe_method, {
                 agent,
                 model,
@@ -268,13 +268,13 @@ export default class ExecutorGenerator {
             let templateRes = bindTemplate(_executor_class, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
                 methods: agentFunctionDic[agent].join(''),
-                staticentry: static_methods.join('')
+                staticentry: static_methods.unique(x => x).join('')
             });
 
             let templateInterfaceRes = bindTemplate(_executor_class_interface, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
-                methods: agentFunctionInterfaceDic[agent].join(''),
-                staticentry: static_methods_interface.join('')
+                methods: agentFunctionInterfaceDic[agent].unique(x => x).join(''),
+                staticentry: static_methods_interface.unique(x => x).join('')
 
             })
 

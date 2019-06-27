@@ -62,6 +62,7 @@ import MethodActivityMenu from './methodactivitymenu';
 import MethodPropertyMenu from './methodpropertymenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
 import CommonActivityMenu from './commonactivitymenu';
+import ModelRelationshipMenu from './modelrelationshipmenu';
 import MaestroActivityMenu from './maestroactivitymenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
@@ -408,6 +409,7 @@ class Dashboard extends Component {
                                 <ValidatorPropertyMenu />
                                 <ReferenceActivityMenu />
                                 <ExecutorPropertyMenu />
+                                <ModelRelationshipMenu />
                                 <MethodPropertyMenu />
                                 <PermissionMenu />
                                 <ModelFilterMenu />
