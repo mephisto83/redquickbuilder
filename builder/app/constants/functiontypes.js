@@ -603,7 +603,7 @@ export const MethodFunctions = {
         template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf-8'),
         interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf-8'),
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -615,7 +615,7 @@ export const MethodFunctions = {
         title: Titles.Create_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild.tpl', 'utf-8'),
         interface: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild_interface.tpl', 'utf-8'),
-        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -627,7 +627,7 @@ export const MethodFunctions = {
         title: Titles.Update_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild.tpl', 'utf-8'),
         interface: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild_interface.tpl', 'utf-8'),
-        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
         },
