@@ -193,8 +193,10 @@ export const ManyToManyNexusDescription = 'This property will be a quick access 
 
 export const HasLogicalChildren = 'Has logical children';
 export const LogicalChildrenTypes = 'Logical children types';
+export const LogicalNieceTypes  = 'Logical niece types';
 export const HasLogicalChildrenDescription = 'Children have references to this node, as some sort of logical parent.'
-
+export const HasLogicalNieces= 'Has logical nieces';
+export const HasLogicalNiecesDescription = 'Children have references to this node and others potentially as some sort of logical uncle/aunt. This is for many to many relationships.'
 export const UseModelAsType = 'Use Model as Type';
 export const CustomFunction = 'Custom Function';
 export const CustomFunctionDescription = 'Function can be constructed in an internal graph.';

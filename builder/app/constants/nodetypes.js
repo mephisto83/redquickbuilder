@@ -223,6 +223,8 @@ export const NodeProperties = {
 
     HasLogicalChildren: 'hasLogicalChildren',
     LogicalChildrenTypes: 'logicalChildrenTypes',
+    HasLogicalNieces: "hasLogicalNieces",
+    LogicalNieceTypes: 'logicalNieceTypes',
 
     ManyToManyNexus: 'manyToManyNexux',
     ManyToManyNexusType: 'manyToManyNexusType',
@@ -354,6 +356,7 @@ export const LinkType = {
     Extension: 'extension',
     Enumeration: 'enumeration',
     LogicalChildren: 'logical-children',
+    LogicalNieces: 'logical-nieces',
     ManyToManyLink: "ManyToManyLink",
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
@@ -497,6 +500,9 @@ export const LinkProperties = {
     },
     LogicalChildren: {
         type: LinkType.LogicalChildren
+    },
+    LogicalNieces: {
+        type: LinkType.LogicalNieces
     },
     ManyToManyLink: {
         type: LinkType.ManyToManyLink
