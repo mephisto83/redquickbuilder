@@ -4,7 +4,10 @@
             var agent = await arbiter{{agent_type}}.Get({{user_instance}}.{{agent_type}});
             var parent = await arbiter{{parent_type}}.Get<{{parent_type}}>(value);
             if(await {{agent}}Permissions.{{permission_function}}(agent, parent).ConfigureAwait(false))) {
-                return await arbiter.GetBy({{parent_type}}Get.Get{{model}}(parent));
+                var connections = await arbiter{{connect_type}}.GetBy({{connect_type}}Get.Get(agent.Id, value));
+                var list = await arbiter{{model}}.GetBy({{connect_type}}Get.Get{{model}}(connections));
+
+                return {{agent_type}}Return.{{filter_function}}(list, agent);
             }
 
             throw new PermissionException();

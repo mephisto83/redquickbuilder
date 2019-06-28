@@ -12,12 +12,18 @@ export default class ButtonList extends Component {
                 {(this.props.items || []).map((item) => {
                     return <div
                         key={`allowed-${item.id}`} className={`external-event ${this.props.isSelected(item) ? 'bg-red' : 'bg-green'}`}
-                        style={{ cursor: 'pointer' }} onClick={() => {
+                        style={{
+                            cursor: 'pointer',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
+                        }} onClick={() => {
                             if (this.props.onClick) {
                                 this.props.onClick(item);
                             }
                         }} > {item.title}</div>;
-                })}
-            </TabPane>)
+                })
+                }
+            </TabPane >)
     }
 }

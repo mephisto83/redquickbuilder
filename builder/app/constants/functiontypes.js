@@ -50,6 +50,7 @@ export const FunctionTemplateKeys = {
     AgentInstance: 'agent_instance',
     AgentType: 'agent_type',
     User: 'user',
+    ManyToManyModel: 'many_to_many',
     Permission: 'permission',
     UserInstance: 'user_instance',
     ModelFilter: 'model_filter',
@@ -238,6 +239,11 @@ const COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD = {
     [FunctionTemplateKeys.User]: {
         [NodeProperties.IsUser]: true,
         key: FunctionTemplateKeys.User,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.ManyToManyModel]: {
+        [NodeProperties.ManyToManyNexus]: true,
+        key: FunctionTemplateKeys.ManyToManyModel,
         nodeTypes: [NodeTypes.Model]
     },
     [FunctionTemplateKeys.Permission]: {
@@ -595,9 +601,9 @@ export const MethodFunctions = {
         method: Methods.GetAll,
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, 
-    
-    
+    },
+
+
     [FunctionTypes.Get_ManyToMany_Agent_Value__IListChild]: {
         title: Titles.Get_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf-8'),
@@ -636,7 +642,7 @@ export const MethodFunctions = {
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
-    
+
     [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),

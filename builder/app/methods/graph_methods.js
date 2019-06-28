@@ -1356,8 +1356,9 @@ export function getNodesByLinkType(graph, options) {
                     }).filter(x => x);
             }
         }
-
     }
+
+    return [];
 }
 export function getNodeLinked(graph, options) {
     if (options) {

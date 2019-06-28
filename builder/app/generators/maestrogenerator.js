@@ -74,6 +74,7 @@ export default class MaestroGenerator {
                         let parentNode = null;
                         let permissionNode = null;
                         let modelFilterNode = null;
+                        let manyToManyNode = null;
                         let modelNode = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         if (methodProps) {
@@ -83,12 +84,14 @@ export default class MaestroGenerator {
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
+                            manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                         }
 
                         let agent = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_agentTypeNode}`;
                         let model_type = modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
                         let methodType = GetNodeProp(maestro_function, NodeProperties.MethodType);
+                        let connect_type = manyToManyNode ? GetNodeProp(manyToManyNode, NodeProperties.CodeName) : '{maestro_connection_type_missing}';
                         parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                         if (parentNode)
                             arbiters.push(parent_type);
@@ -103,6 +106,7 @@ export default class MaestroGenerator {
                             value_type,
                             value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                             model: model_type,
+                            connect_type,
                             maestro_function: functionName,
                             filter_function: modelFilterNode ? GetNodeProp(modelFilterNode, NodeProperties.CodeName) : '{missing filter node}',
                             user: userTypeNode ? GetNodeProp(userTypeNode, NodeProperties.CodeName) : `{maestro_generator_mising_user}`,

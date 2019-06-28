@@ -39,9 +39,10 @@ class MethodPropertyMenu extends Component {
                     onChange={(value) => {
                         var id = currentNode.id;
                         let methodProps = UIA.GetNodeProp(currentNode, NodeProperties.MethodProps) || {};
+                        let oldConnect = methodProps[constraint.key];
                         methodProps[constraint.key] = value;
                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                            target: currentNode.properties[UIA.NodeProperties.UIExtension],
+                            target: oldConnect,
                             source: id
                         })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
