@@ -382,6 +382,21 @@ export function removeNode(graph, options = {}) {
     }
     return graph;
 }
+
+export function GetManyToManyNodes(state, ids) {
+    if (state && ids && ids.length) {
+
+        return NodesByType(state, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.ManyToManyNexus)).filter(x => {
+            return !(ids || []).some(t => {
+                return (GetNodeProp(x, NodeProperties.ManyToManyNexusTypes) || []).indexOf(t) !== -1;
+            });
+        });
+    }
+    return [];
+}
+export function getPropertyNodes(graph, id) {
+    return getNodesByLinkType(graph, { id, direction: SOURCE, type: LinkType.PropertyLink });
+}
 function isEmpty(obj) {
     return obj && Object.keys(obj).length === 0;
 }

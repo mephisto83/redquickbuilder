@@ -110,6 +110,7 @@ export const NodeTypeColors = {
     [NodeTypes.OptionCustom]: '#403F4C',
     [NodeTypes.ExtensionTypeList]: '#2C2B3C',
     [NodeTypes.ExtensionType]: '#1B2432',
+    [NodeTypes.Method]: '#FE5F55',
     [NodeTypes.Permission]: '#383F51',
     [NodeTypes.Function]: '#553D36',
     [NodeTypes.Parameter]: '#684A52',
@@ -175,6 +176,8 @@ export const NodeProperties = {
     UseExtension: 'usextension',
     IncludedInList: 'includedInList',
     ExcludedFromList: 'excludedInList',
+    UseEqual: "UseEqual",
+    IsEqualTo: 'IsEqualTo',
     CodeUser: 'codeUser',
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',
@@ -194,6 +197,7 @@ export const NodeProperties = {
     UIChoiceType: 'uiChoiceType',
     UIChoiceNode: 'uiChoiceNode', //A node that the "parameter" node points to.
     PermissionRequester: 'permissions-requester',// The agent that is requesting permission to do something
+    PermissionManyToMany: 'permissions-many-to-many',
     PermissionTarget: 'permissions-target',
     // Property has a dependent property
     UIDependsOn: 'uiDependsOn',
@@ -361,6 +365,7 @@ export const LinkType = {
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
     RequestorPermissionLink: 'request-permission-link',//the agent/node that is requesting permissions 
+    ManyToManyPermissionLink: 'many-to-many-permission-link',
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',
     FunctionLink: 'function-link',
@@ -384,7 +389,9 @@ export const LinkType = {
     PermissionFunction: 'permission-function',
     Exist: 'exist', //A node that points with this link type, requires that the node exists, if it doesn't the link and the other node should dissapear.
     PermissionPropertyDependency: 'permission-property-dependency', //There is a link between a permision and a property.
-    PermissionDependencyProperty: 'permission-dependency-property' //There is a link bewteen a property and a dependency
+    PermissionDependencyProperty: 'permission-dependency-property', //There is a link bewteen a property and a dependency
+    PermissionDependencyPropertyManyToManyLink: 'permission-dependency-property-many-to-many', //There is a link between a property and a dependency in a many to many situation.
+    PermissionPropertyDependencyManyToManyLink: 'permission-property-dependency-many-to-many'//There is a link between a permision and a property in a many to many situnation.
 }
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -517,8 +524,14 @@ export const LinkProperties = {
     PermissionDependencyPropertyLink: {
         type: LinkType.PermissionDependencyProperty
     },
+    PermissionDependencyPropertyManyToManyLink: {
+        type: LinkType.PermissionDependencyPropertyManyToManyLink
+    },
     PermissionPropertyDependencyLink: {
         type: LinkType.PermissionPropertyDependency
+    },
+    PermissionPropertyDependencyManyToManyLink: {
+        type: LinkType.PermissionPropertyDependencyManyToManyLink
     },
     AttributeLink: {
         type: LinkType.AttributeLink
@@ -573,6 +586,9 @@ export const LinkProperties = {
     },
     RequestorPermissionLink: {
         type: LinkType.RequestorPermissionLink
+    },
+    ManyToManyPermissionLink: {
+        type: LinkType.ManyToManyPermissionLink
     },
     ValdationLink: {
         type: LinkType.Validation

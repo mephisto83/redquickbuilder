@@ -12,6 +12,24 @@ import { getNodesLinkedTo, getNodesByLinkType, SOURCE, GetNode } from '../method
 import { NodeTypes, LinkType, NodeProperties } from '../constants/nodetypes';
 
 class PermissionDependencyActivityMenu extends Component {
+    getTargetNodes(graph, currentNode) {
+        let targetPropertyNodes = [];
+        if (currentNode) {
+            targetPropertyNodes = getNodesByLinkType(graph, {
+                id: currentNode.id,
+                direction: SOURCE,
+                type: LinkType.PermissionDependencyPropertyManyToManyLink
+            });
+            if (!targetPropertyNodes.length) {
+                targetPropertyNodes = getNodesByLinkType(graph, {
+                    id: currentNode.id,
+                    direction: SOURCE,
+                    type: LinkType.PermissionDependencyProperty
+                });
+            }
+        }
+        return targetPropertyNodes;
+    }
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.PermissionDependency);
@@ -63,10 +81,41 @@ class PermissionDependencyActivityMenu extends Component {
                 disallowed = enumerationValues.relativeCompliment(allowed);
             }
         }
+
+        let targetPropertyNodes = this.getTargetNodes(graph, currentNode);
+        let targetNodeType = null;
+        let targetPropertyNode = null;
+        if (targetPropertyNodes.length) {
+            targetPropertyNode = targetPropertyNodes[0];
+            targetNodeType = UIA.GetNodeProp(targetPropertyNode, UIA.NodeProperties.UIAttributeType);
+        }
         return (
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.PermissionsDependencyAttribute} />
-                {currentNode ? (<CheckBox
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.BOOLEAN ? (<CheckBox
+                    title={Titles.UseEqualDescription}
+                    label={Titles.UseEqual}
+                    value={currentNode.properties[UIA.NodeProperties.UseEqual]}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.UseEqual,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />) : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.BOOLEAN && UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseEqual) ? (<SelectInput
+                    title={Titles.IsEqualToDescription}
+                    label={Titles.IsEqualTo}
+                    options={['true', 'false'].map(t => ({ title: t, value: t }))}
+                    value={currentNode.properties[UIA.NodeProperties.IsEqualTo]}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.IsEqualTo,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />) : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.LISTOFSTRINGS ? (<CheckBox
                     title={Titles.IncludedInListDescription}
                     label={Titles.IncludedInList}
                     value={currentNode.properties[UIA.NodeProperties.IncludedInList]}
@@ -77,7 +126,7 @@ class PermissionDependencyActivityMenu extends Component {
                             value
                         });
                     }} />) : null}
-                {currentNode ? (<CheckBox
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.LISTOFSTRINGS ? (<CheckBox
                     title={Titles.ExcludedFromListDescription}
                     label={Titles.ExcludedFromList}
                     value={currentNode.properties[UIA.NodeProperties.ExcludedFromList]}
@@ -88,7 +137,7 @@ class PermissionDependencyActivityMenu extends Component {
                             value
                         });
                     }} />) : null}
-                {currentNode ? (<CheckBox
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING ? (<CheckBox
                     title={Titles.UseEnumeration}
                     label={Titles.UseEnumeration}
                     value={currentNode.properties[UIA.NodeProperties.UseEnumeration]}
@@ -99,7 +148,7 @@ class PermissionDependencyActivityMenu extends Component {
                             value
                         });
                     }} />) : null}
-                {currentNode ? (<CheckBox
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING ? (<CheckBox
                     title={Titles.UseUIExtensions}
                     label={Titles.UseUIExtensions}
                     value={currentNode.properties[UIA.NodeProperties.UseExtension]}
@@ -110,7 +159,7 @@ class PermissionDependencyActivityMenu extends Component {
                             value
                         });
                     }} />) : null}
-                {currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? <ControlSideBarMenuHeader title={Titles.AllowedEnums} /> : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseExtension] ? <ControlSideBarMenuHeader title={Titles.AllowedEnums} /> : null}
                 {active && ext_allowed && ext_allowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? ext_allowed.map((_enum) => {
                     return <div key={`ext_allowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -125,7 +174,7 @@ class PermissionDependencyActivityMenu extends Component {
                         });
                     }} > {_enum}</div>;
                 }) : null}
-                {currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseExtension] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
                 {active && ext_disallowed && ext_disallowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? ext_disallowed.map((_enum) => {
                     return <div key={`ext_disallowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -141,7 +190,7 @@ class PermissionDependencyActivityMenu extends Component {
                     }} > {_enum}</div>;
                 }) : null}
                 {
-                    currentNode && currentNode.properties[UIA.NodeProperties.UseExtension] ? (<SelectInput
+                    currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseExtension] ? (<SelectInput
                         label={Titles.Extensions}
                         options={extension_nodes}
                         onChange={(value) => {
@@ -165,7 +214,7 @@ class PermissionDependencyActivityMenu extends Component {
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIExtension] : ''} />) : null
                 }
                 {
-                    currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? (<SelectInput
+                    currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? (<SelectInput
                         label={Titles.Enumeration}
                         options={enumeration_nodes}
                         onChange={(value) => {
@@ -188,7 +237,7 @@ class PermissionDependencyActivityMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.Enumeration] : ''} />) : null
                 }
-                {currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.AllowedEnums} /> : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.AllowedEnums} /> : null}
                 {active && allowed && allowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? allowed.map((_enum) => {
                     return <div key={`allowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
                         var disallowed = enumerationValues.relativeCompliment([...allowed].filter(x => x !== _enum));
@@ -204,7 +253,7 @@ class PermissionDependencyActivityMenu extends Component {
                         });
                     }} > {_enum}</div>;
                 }) : null}
-                {currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
+                {currentNode && targetPropertyNode && targetNodeType == UIA.NodePropertyTypes.STRING && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? <ControlSideBarMenuHeader title={Titles.DisallowedEnums} /> : null}
                 {active && disallowed && disallowed.length && currentNode && currentNode.properties[UIA.NodeProperties.UseEnumeration] ? disallowed.map((_enum) => {
                     return <div key={`disallowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
                         var disallowed = enumerationValues.relativeCompliment([...allowed, _enum].unique());
