@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -16,6 +16,7 @@ const PERMISSIONS_CASE_EXTENSION = './app/templates/permissions/permissions_case
 const PERMISSIONS_CASE_ENUMERATION = './app/templates/permissions/permissions_case_enumeration.tpl';
 const PERMISSIONS_CASE_INCLUDED_IN_LIST = './app/templates/permissions/permissions_case_included_in_list.tpl';
 const PERMISSIONS_METHODS = './app/templates/permissions/permissions_method.tpl';
+const PERMISSIONS_ARBITER_PROP = './app/templates/permissions/permissions_arbiter_prop.tpl';
 const PERMISSIONS_IMPL = './app/templates/permissions/permissions_impl.tpl';
 const PERMISSIONS_INTERFACE_METHODS = './app/templates/permissions/permissions_interface_methods.tpl';
 
@@ -34,8 +35,13 @@ export default class PermissionGenerator {
             id: permission.id,
             type: LinkType.ManyToManyPermissionLink
         });
-        if (manyToManyLink && manyToManyLink.map(t => GraphMethods.GetNode(graph, t.id)).filter(x => x).length) {
-            return true;
+        if (manyToManyLink && GetNodeProp(manyToManyLink[0], NodeProperties.LogicalChildrenTypes)) {
+            let logicalChildrenTypes = GetNodeProp(manyToManyLink[0], NodeProperties.LogicalChildrenTypes);
+            var temp = [agent.id, model.id].unique(x => x).intersection(logicalChildrenTypes);
+            var temp_relCompliment = [agent.id, model.id].unique(x => x).relativeCompliment(logicalChildrenTypes)
+            if (temp.length === logicalChildrenTypes.length && temp_relCompliment.length === 0) {
+                return true;
+            }
         }
 
         return false;
@@ -315,16 +321,25 @@ export default class PermissionGenerator {
                 var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
                 if (permissionsEnabledFor && permissionsEnabledFor[method]) {
                     let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
-
-                    if (GetNodeProp(permission, NodeProperties.ManyToManyNexus)) {
+                    let manyToManyNode = GraphMethods.GetNode(graph, GetNodeProp(permission, NodeProperties.PermissionManyToMany));
+                    if (manyToManyNode) {
                         let useMatchIds = GetNodeProp(permission, NodeProperties.MatchIds);
                         let useConnectionExists = GetNodeProp(permission, NodeProperties.ConnectionExists);
                         let useExcludedFromList = GetNodeProp(permission, NodeProperties.ExcludedFromList);
                         if (useMatchIds) {
                             cases.push({
-
                                 variable: 'matchingIds',
-                                template: 'value.Id == data.Id;'
+                                template: 'var matchingIds = value.Id == data.Id;'
+                            })
+                        }
+                        if (useConnectionExists && agent.id !== model.id) {
+                            let mtmName = GetNodeProp(manyToManyNode, NodeProperties.CodeName);
+                            cases.push({
+                                arbiter: mtmName,
+                                variable: 'connectionExists',
+                                template: `
+            var connection = await arbiter${mtmName}.GetBy(${mtmName}Get.Get${mtmName}(data, value));
+            var connectionExists = connection.FirstOrDefault() != null;`
                             })
                         }
                     }
@@ -428,6 +443,7 @@ export default class PermissionGenerator {
         let _permissionImplementation = fs.readFileSync(PERMISSIONS_IMPL, 'utf-8');
         let _permissionInterfaceMethods = fs.readFileSync(PERMISSIONS_INTERFACE_METHODS, 'utf-8');
         let _permissionMethods = fs.readFileSync(PERMISSIONS_METHODS, 'utf-8');
+        let _permissionArbiters = fs.readFileSync(PERMISSIONS_ARBITER_PROP, 'utf-8');
         let result = {};
 
         agents.map(agent => {
@@ -438,6 +454,7 @@ export default class PermissionGenerator {
             let methodImplementations = [];
             let methodInterfaces = [];
             let testMethodPermisionCases = [];
+            let arbiters = [];
             models.map(model => {
                 let matchingPermissionNodes = permissions.filter(permission => PermissionGenerator.PermissionMatches(state, permission, agent, model));
                 if (!matchingPermissionNodes || !matchingPermissionNodes.length) {
@@ -457,7 +474,11 @@ export default class PermissionGenerator {
                 permissionCases.map((perms, index) => {
                     for (var permKey in perms) {
                         let cases = perms[permKey];
-
+                        cases.map(t => {
+                            if (t && t.arbiter) {
+                                arbiters.push(t);
+                            }
+                        })
                         let permissionMethods = _permissionMethods;
                         let permissionInterfaceMethods = _permissionInterfaceMethods;
                         permissionMethods = bindTemplate(permissionMethods, {
@@ -484,9 +505,14 @@ export default class PermissionGenerator {
                     }
                 });
             }).join(jNL);
-
+            arbiters = arbiters.map(t => t.arbiter).unique(x => x).map(t => {
+                return bindTemplate(_permissionArbiters, {
+                    arbiter: t
+                })
+            }).join(jNL)
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                arbiters,
                 methods: methodImplementations.join(jNL + jNL)
             });
             permissionInterface = bindTemplate(permissionInterface, {
@@ -504,7 +530,8 @@ export default class PermissionGenerator {
                         `${namespace}${NameSpace.Extensions}`,
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Interface}`,
-                        `${namespace}${NameSpace.Constants}`],
+                        arbiters && arbiters.length ? `${namespace}${NameSpace.Controllers}` : null,
+                        `${namespace}${NameSpace.Constants}`].filter(x => x),
                     namespace,
                     space: NameSpace.Permissions
                 }),
