@@ -9,6 +9,9 @@ import { enumerate } from '../utils/utils';
 
 const MODEL_GET_CLASS = './app/templates/models/gets/model_get_class.tpl';
 const MODEL_GET_FUNCTION = './app/templates/models/gets/model_get_function.tpl';
+const MODEL_GET_MANY_TO_MANY_FUNCTION = './app/templates/models/gets/model_get_many_to_many_function.tpl';
+const MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD = './app/templates/models/gets/model_get_many_to_many_function_get_child.tpl';
+
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelGetGenerator {
@@ -37,16 +40,15 @@ export default class ModelGetGenerator {
 
         let _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf-8');
         let _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf-8');
-        let agentFunctionDic = {};
-        let agentFunctionInterfaceDic = {};
-        let agmCombos = [];
+        let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf-8');
+        let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf-8');
         let allmodels = NodesByType(state, NodeTypes.Model);
-        let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         allmodels.map(agent => {
             var methods = allmodels.filter(x => x.id !== agent.id)
                 .filter(x => {
                     if (GetNodeProp(agent, NodeProperties.HasLogicalChildren) && (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []).some(v => v === x.id)) {
-                        return true;
+                        if (!GetNodeProp(agent, NodeProperties.ManyToManyNexus))
+                            return true;
                     }
                     return false;
                 })
@@ -55,10 +57,60 @@ export default class ModelGetGenerator {
                         agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                         model: GetNodeProp(model, NodeProperties.CodeName),
                     });
-                }).join(NEW_LINE);
+                });
+
+            if (GetNodeProp(agent, NodeProperties.ManyToManyNexus)) {
+                var childrenTypes = (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []);
+                if (childrenTypes && childrenTypes.length) {
+                    let namesAreUnique = childrenTypes.map(t => GetNodeProp(GraphMethods.GetNode(graph, t), NodeProperties.CodeName)).unique(x => x).length === childrenTypes.length;
+                    childrenTypes.map(ct => {
+                        methods.push(bindTemplate(_get_method_many_to_many_get_child, {
+                            model: GetNodeProp(GraphMethods.GetNode(graph, ct), NodeProperties.CodeName),
+                            many_to_many: GetNodeProp(agent, NodeProperties.CodeName)
+                        }));
+                    })
+                    enumerate([].interpolate(0, childrenTypes.length, function () {
+                        return childrenTypes.length + 1;
+                    })).filter(x => x.length === x.unique(t => t).length)
+                        .map(model => {
+                            let params = model.subset(0, model.length).map((t, index) => {
+                                if (childrenTypes.length === t) {
+                                    return false;
+                                }
+                                let paramName = `x${index}`;
+                                if (namesAreUnique) {
+                                    paramName = GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName).toLowerCase();
+                                }
+                                return bindTemplate(`{{_type}} ${paramName}`, {
+                                    _type: GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName)
+                                })
+                            }).filter(x => x);
+                            if (params.length) {
+                                methods.push(bindTemplate(_get_methods_many_to_many, {
+                                    parameters: params.join(', '),
+                                    query: model.subset(0, model.length).map((t, index) => {
+                                        if (childrenTypes.length === t) {
+                                            return false;
+                                        }
+
+                                        let paramName = `x${index}`;
+                                        if (namesAreUnique) {
+                                            paramName = GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName).toLowerCase();
+                                        }
+
+                                        return bindTemplate(`item.{{_type}} == ${paramName}.Id`, {
+                                            _type: GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName)
+                                        })
+                                    }).filter(x => x).join(' && '),// 
+                                    model: GetNodeProp(agent, NodeProperties.CodeName),
+                                }));
+                            }
+                        });
+                }
+            }
             let templateRes = bindTemplate(_get_class, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                functions: methods
+                functions: methods.unique(x => x).join(NEW_LINE)
             });
             result[GetNodeProp(agent, NodeProperties.CodeName)] = {
                 id: GetNodeProp(agent, NodeProperties.CodeName),

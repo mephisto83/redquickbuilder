@@ -175,6 +175,32 @@ String.prototype.unCamelCase = function () {
             }
         });
     };
+
+    if (!array.subset) {
+        Object.defineProperty(array, 'subset', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (start, stop) {
+                var collection = this;
+                stop = Math.min(collection.length, stop === undefined || stop === null ? collection.length : stop);
+                start = Math.min(collection.length, start === undefined || start === null ? collection.length : start);
+                start = start < 0 ? 0 : start;
+                stop = stop < 0 ? 0 : stop;
+                var result = this instanceof Float32Array ? new Float32Array(stop - start) : [];
+                for (var i = start; i < stop; i++) {
+                    if (this instanceof Float32Array) {
+                        result[i - start] = collection[i];
+                    }
+                    else {
+                        result.push(collection[i]);
+                    }
+
+                }
+                return result;
+            }
+        });
+    }
 })(Array.prototype)
 
 

@@ -51,6 +51,7 @@ export const AddAttributeDescription = 'Add an attribute to the property';
 export const UIName = 'UI Name';
 export const UINameDescription = 'The text that will be visible to the client.';
 export const UISingular = 'UI Singular';
+export const MatchIds = 'Match Ids';
 export const Unknown = 'Unknown';
 export const PropertyValueType = 'Property value type';
 export const PropertyModelType = 'Property model type';

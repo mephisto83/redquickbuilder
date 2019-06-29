@@ -52,6 +52,15 @@ class PermissionMenu extends Component {
         return (
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />
+                <CheckBox label={Titles.MatchIds}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.MatchIds)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.MatchIds,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />
                 {
                     currentNode ? (<SelectInput
                         label={Titles.ManyToManyNexus}

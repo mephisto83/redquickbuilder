@@ -198,6 +198,7 @@ export const NodeProperties = {
     UIChoiceNode: 'uiChoiceNode', //A node that the "parameter" node points to.
     PermissionRequester: 'permissions-requester',// The agent that is requesting permission to do something
     PermissionManyToMany: 'permissions-many-to-many',
+    MatchIds: 'matchs-ids',
     PermissionTarget: 'permissions-target',
     // Property has a dependent property
     UIDependsOn: 'uiDependsOn',
