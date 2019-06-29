@@ -52,7 +52,8 @@ class ModelActivityMenu extends Component {
                             var id = currentNode.id;
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.UIUser],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.UserLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.UIUser,
@@ -152,7 +153,7 @@ class ModelActivityMenu extends Component {
                                 options: {
                                     target: item.id,
                                     source: id,
-                                    properties: { ...UIA.LinkProperties.ManyToManyLink }
+                                    linkType: UIA.LinkProperties.ManyToManyLink.type
                                 }
                             }]);
                         }} />
@@ -208,7 +209,8 @@ class ModelActivityMenu extends Component {
                         var id = currentNode.id;
                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                             target: currentNode.properties[UIA.NodeProperties.UIChoiceNode],
-                            source: id
+                            source: id,
+                            linkType: UIA.LinkProperties.ParentLink.type
                         })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.UIChoiceNode,

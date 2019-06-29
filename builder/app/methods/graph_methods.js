@@ -1349,7 +1349,8 @@ export function getNodesByLinkType(graph, options) {
                             return graph.nodeLib[target];
                         }
                         if (!type || graph.linkLib[_id].properties &&
-                            graph.linkLib[_id].properties.type === type) {
+                            (graph.linkLib[_id].properties.type === type ||
+                                graph.linkLib[_id].properties[type])) {
                             return graph.nodeLib[target];
                         }
                         return null;
@@ -1431,6 +1432,18 @@ export function addLink(graph, options, link) {
                     }
                 };
             }
+            else {
+                var oldLink = findLink(graph, { target, source });
+                if (oldLink) {
+                    //  the type won't change onces its set
+                    // But the other properties can be 
+                    oldLink.properties = {
+                        ...oldLink.properties,
+                        ...link.properties,
+                        ...({ type: oldLink.properties.type })
+                    };
+                }
+            }
             graph.nodeLinks = { ...graph.nodeLinks }
             graph = { ...graph };
         }
@@ -1462,7 +1475,7 @@ export function getAllLinksWithNode(graph, id) {
 }
 export function removeLinkBetweenNodes(graph, options) {
     let link = findLinkInstance(graph, options);
-    return removeLink(graph, link);
+    return removeLink(graph, link, options);
 }
 export function removeLinkById(graph, options) {
     let link = graph.linkLib[options.id];
@@ -1578,7 +1591,18 @@ export function createEventProp(type, options = {}) {
 
     return res;
 }
-export function removeLink(graph, link) {
+export function removeLink(graph, link, options = {}) {
+    if (link && options.linkType) {
+        let update_link = graph.linkLib[link];
+        if (update_link && update_link.properties && update_link.properties[options.linkType]) {
+            delete update_link.properties[options.linkType];
+
+            //If only the type is on the property
+        }
+        if (update_link && Object.keys(update_link.properties).length > 1) {
+            return { ...graph };
+        }
+    }
     if (link) {
         graph.links = [...graph.links.filter(x => x !== link)];
         let del_link = graph.linkLib[link];

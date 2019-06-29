@@ -43,7 +43,8 @@ class MethodPropertyMenu extends Component {
                         methodProps[constraint.key] = value;
                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                             target: oldConnect,
-                            source: id
+                            source: id,
+                            linkType: UIA.LinkProperties.FunctionOperator.type
                         })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.MethodProps,

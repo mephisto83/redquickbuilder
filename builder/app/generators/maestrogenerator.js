@@ -95,7 +95,10 @@ export default class MaestroGenerator {
                         parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                         if (parentNode)
                             arbiters.push(parent_type);
-
+                        let manyNodes = GraphMethods.GetManyToManyNodes(graphRoot, [modelNode ? modelNode.id : false, agentTypeNode ? agentTypeNode.id : null].filter(x => x)) || [];
+                        arbiters.push(...manyNodes.map(manyNode => {
+                            return GetNodeProp(manyNode, NodeProperties.CodeName);
+                        }));
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
                         let bindOptions = {

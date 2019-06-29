@@ -61,6 +61,15 @@ class PermissionMenu extends Component {
                             value
                         });
                     }} />
+                <CheckBox label={Titles.ConnectionExists}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ConnectionExists)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.ConnectionExists,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />
                 {
                     currentNode ? (<SelectInput
                         label={Titles.ManyToManyNexus}
@@ -70,7 +79,8 @@ class PermissionMenu extends Component {
 
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.PermissionManyToMany],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.ManyToManyPermissionLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.PermissionManyToMany,
@@ -96,6 +106,7 @@ class PermissionMenu extends Component {
                                 links: [{
                                     target: value,
                                     linkProperties: {
+                                        mergeProperties: true,
                                         properties: {
                                             ...UIA.LinkProperties.ExistLink,
                                             ...UIA.LinkProperties.PermissionDependencyPropertyManyToManyLink
@@ -108,7 +119,10 @@ class PermissionMenu extends Component {
                                 groupProperties: {
                                 },
                                 linkProperties: {
-                                    properties: { ...UIA.LinkProperties.PermissionPropertyDependencyManyToManyLink }
+                                    mergeProperties: true,
+                                    properties: {
+                                        ...UIA.LinkProperties.PermissionPropertyDependencyManyToManyLink
+                                    }
                                 }
                             });
                         }}
@@ -123,7 +137,8 @@ class PermissionMenu extends Component {
 
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.PermissionRequester],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.RequestorPermissionLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.PermissionRequester,
@@ -176,7 +191,8 @@ class PermissionMenu extends Component {
 
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.PermissionTarget],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.AppliedPermissionLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.PermissionTarget,

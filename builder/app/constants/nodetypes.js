@@ -199,6 +199,7 @@ export const NodeProperties = {
     PermissionRequester: 'permissions-requester',// The agent that is requesting permission to do something
     PermissionManyToMany: 'permissions-many-to-many',
     MatchIds: 'matchs-ids',
+    ConnectionExists: "connection-exists",
     PermissionTarget: 'permissions-target',
     // Property has a dependent property
     UIDependsOn: 'uiDependsOn',
@@ -672,7 +673,11 @@ export const LinkProperties = {
         type: LinkType.MaestroLink
     }
 }
-
+Object.keys(LinkProperties).map(propTypes => {
+    if (LinkProperties[propTypes] && LinkProperties[propTypes].type) {
+        LinkProperties[propTypes][LinkProperties[propTypes].type] = {};
+    }
+})
 export const Methods = {
     Create: 'Create',
     Get: 'Get',

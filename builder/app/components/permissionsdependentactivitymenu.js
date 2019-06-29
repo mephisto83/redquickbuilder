@@ -61,7 +61,7 @@ class PermissionDependencyActivityMenu extends Component {
                 if (def && def.config) {
                     if (def.config.isEnumeration) {
                         var extensionValues = def.config.list.map(t => {
-                            return t[Object.keys(t)[0]];
+                            return t[def.config.keyField || Object.keys(t)[0]];
                         })
                         ext_allowed = ext_allowed.intersection(extensionValues);
                         ext_disallowed = extensionValues.relativeCompliment(ext_allowed);
@@ -198,7 +198,8 @@ class PermissionDependencyActivityMenu extends Component {
 
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.UIExtension],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.ExtensionLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.UIExtension,
@@ -222,7 +223,8 @@ class PermissionDependencyActivityMenu extends Component {
 
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                                 target: currentNode.properties[UIA.NodeProperties.Enumeration],
-                                source: id
+                                source: id,
+                                linkType: UIA.LinkProperties.EnumerationLink.type
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.Enumeration,

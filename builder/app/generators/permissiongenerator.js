@@ -30,6 +30,14 @@ export default class PermissionGenerator {
                 return true;
             }
         }
+        var manyToManyLink = GraphMethods.getNodesByLinkType(graph, {
+            id: permission.id,
+            type: LinkType.ManyToManyPermissionLink
+        });
+        if (manyToManyLink && manyToManyLink.map(t => GraphMethods.GetNode(graph, t.id)).filter(x => x).length) {
+            return true;
+        }
+
         return false;
     }
     static createInstanceEnumerationListName(dNode, enu, method, type = 'Enums') {
@@ -137,7 +145,7 @@ export default class PermissionGenerator {
             let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
             let useExtension = GetNodeProp(dpNode, NodeProperties.UseExtension);
             let useIncludedInList = GetNodeProp(dpNode, NodeProperties.IncludedInList);
-            let useExcludedFromList = GetNodeProp(dpNode, NodeProperties.ExcludedFromList);
+
             if (useIncludedInList) {
                 let permissionCaseIncludedInList = fs.readFileSync(PERMISSIONS_CASE_INCLUDED_IN_LIST, 'utf-8');
                 var tempBindingValues = {
@@ -146,9 +154,9 @@ export default class PermissionGenerator {
                     parent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
                     parent_property: 'Id',
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
+                    value: `${agentLinkExists ? 'value' : 'data'}`.toLowerCase(),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
-                    model: GetNodeProp(model, NodeProperties.CodeName),
+                    model: 'data',
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
                     extension: GetNodeProp(extentionNode, NodeProperties.CodeName),
                     instance_list: ''
@@ -166,7 +174,7 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
                 var tempBindingValues = {
                     method,
-                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
+                    value: `${agentLinkExists ? 'value' : 'data'}`.toLowerCase(),
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
@@ -190,9 +198,9 @@ export default class PermissionGenerator {
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
                 let tempBindingValues = {
                     method,
-                    value: `${agentLinkExists ? GetNodeProp(agent, NodeProperties.AgentName) : GetNodeProp(model, NodeProperties.ValueName)}`.toLowerCase(),
+                    value: `value`,
                     value_property: GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName),
-                    model: GetNodeProp(model, NodeProperties.CodeName),
+                    model: 'data',
                     casename: GetNodeProp(dpNode, NodeProperties.CodeName),
                     extension_propery_key: definition && definition.config ? definition.config.keyField : null,
                     extension_value_property: 'Value',
@@ -302,12 +310,26 @@ export default class PermissionGenerator {
         var graph = GetCurrentGraph(state);
 
         let result = {};
-        for (var method in Methods) {
-            var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
-            if (permissionsEnabledFor && permissionsEnabledFor[method]) {
-                let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
+        if (permission) {
+            for (var method in Methods) {
+                var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
+                if (permissionsEnabledFor && permissionsEnabledFor[method]) {
+                    let cases = PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
 
-                result[method] = cases;
+                    if (GetNodeProp(permission, NodeProperties.ManyToManyNexus)) {
+                        let useMatchIds = GetNodeProp(permission, NodeProperties.MatchIds);
+                        let useConnectionExists = GetNodeProp(permission, NodeProperties.ConnectionExists);
+                        let useExcludedFromList = GetNodeProp(permission, NodeProperties.ExcludedFromList);
+                        if (useMatchIds) {
+                            cases.push({
+
+                                variable: 'matchingIds',
+                                template: 'value.Id == data.Id;'
+                            })
+                        }
+                    }
+                    result[method] = cases;
+                }
             }
         }
         return result;
@@ -440,10 +462,10 @@ export default class PermissionGenerator {
                         let permissionInterfaceMethods = _permissionInterfaceMethods;
                         permissionMethods = bindTemplate(permissionMethods, {
                             model: GetNodeProp(model, NodeProperties.CodeName),
-                            value: `${GetNodeProp(model, NodeProperties.ValueName) || 'value'}`.toLowerCase(),
+                            value: `data`,
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                             function_name: permissionCodeNames[index] + permKey,
-                            agent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
+                            agent: `value`,
                             method: permKey,
                             cases: cases.map(c => jNL + Tabs(4) + c.template).join(''),
                             case_result: jNL + Tabs(4) + `result = ${cases.map(c => c.variable).join(' && ')};`
@@ -451,9 +473,9 @@ export default class PermissionGenerator {
                         permissionInterfaceMethods = bindTemplate(permissionInterfaceMethods, {
                             model: GetNodeProp(model, NodeProperties.CodeName),
                             function_name: permissionCodeNames[index] + permKey,
-                            value: `${GetNodeProp(model, NodeProperties.ValueName) || 'value'}`.toLowerCase(),
+                            value: `data`,
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                            agent: `${GetNodeProp(agent, NodeProperties.AgentName) || 'agent'}`.toLowerCase(),
+                            agent: `value`,
                             method: permKey
                         });
                         methodInterfaces.push(permissionInterfaceMethods);
