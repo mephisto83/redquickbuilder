@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType, NodePropertyTypes, NEW_LINK } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, GetRootGraph, NodesByType, NodePropertyTypes, NEW_LINK, GetCurrentGraph } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, Usings, ValidationRules, NameSpace, NodeTypes, STANDARD_CONTROLLER_USING, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -187,6 +187,18 @@ export default class ModelGenerator {
             property_instance_template = bindTemplate(property_instance_template, propSwapDictionary);
             return property_instance_template;
         });
+        if (GetNodeProp(node, NodeProperties.HasLogicalChildren) && GetNodeProp(node, NodeProperties.ManyToManyNexus)) {
+            (GetNodeProp(node, NodeProperties.LogicalChildrenTypes) || []).map(t => {
+                let propNode = GraphMethods.GetNode(GetCurrentGraph(state), t);
+                let propSwapDictionary = {
+                    property_type: NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][NodePropertyTypes.STRING],
+                    property: GetNodeProp(propNode, NodeProperties.CodeName),
+                    attributes: ''
+                };
+
+                properties.push(bindTemplate(propertyTemplate, propSwapDictionary));
+            });
+        }
         let staticDic = {
             model: GetNodeProp(node, NodeProperties.CodeName)
         };
