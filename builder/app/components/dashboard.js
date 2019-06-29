@@ -258,10 +258,10 @@ class Dashboard extends Component {
                                     <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
                                         this.props.setWorkingDirectory();
                                     }} />
+                                    <TreeViewMenu title={version} hideArrow={true} />
+                                    {workspace ? <TreeViewMenu hideArrow={true} title={workspace} icon={'fa fa-cog'} /> : null}
+                                    <SectionEdit />
                                 </TreeViewMenu>
-                                <SideBarHeader title={Titles.Project} />
-                                <SideBarHeader title={version} />
-                                {workspace ? <SideBarHeader hideArrow={true} title={workspace} icon={'fa fa-cog'} /> : null}
 
                                 <TreeViewMenu
                                     open={UIA.Visual(state, VC.GraphPropertiesMenu)}
@@ -278,7 +278,6 @@ class Dashboard extends Component {
                                             value={UIA.Visual(state, LINK_DISTANCE)} />
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
-                                <SectionEdit />
                                 <SectionList />
                                 <MaestroDetailsMenu />
                                 <ControllerDetailsMenu />
@@ -373,6 +372,16 @@ class Dashboard extends Component {
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                                 prop: UIA.NodeProperties.Collapsed,
+                                                id: currentNode.id,
+                                                value
+                                            });
+                                        }} />
+                                    <CheckBox
+                                        label={Titles.Pinned}
+                                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
+                                        onChange={(value) => {
+                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                prop: UIA.NodeProperties.Pinned,
                                                 id: currentNode.id,
                                                 value
                                             });

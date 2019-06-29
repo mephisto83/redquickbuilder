@@ -19,6 +19,7 @@ export const ServiceActivity = 'Service Activity';
 export const CodeTypes = 'Code Types';
 export const Project = 'Project';
 export const NameSpace = 'NameSpace';
+export const Pinned = 'Pinned';
 export const Collapsed = 'Collapsed';
 export const GenericLink = 'General Link';
 export const OnLoad = 'On Load';

@@ -175,6 +175,7 @@ export const NodeProperties = {
     Collapsed: 'collapsed',
     UseExtension: 'usextension',
     IncludedInList: 'includedInList',
+    Pinned: 'Pinned',
     ExcludedFromList: 'excludedInList',
     UseEqual: "UseEqual",
     IsEqualTo: 'IsEqualTo',
