@@ -20,7 +20,7 @@ class NodeManagement extends Component {
         };
     }
     toFilterString(node) {
-        return `${UIA.GetNodeProp(node, NodeProperties.CodeName)} ${UIA.GetNodeProp(node, NodeProperties.UIText)} ${UIA.GetNodeProp(node, NodeProperties.NODEType)}`.toLowerCase();
+        return `${UIA.GetNodeProp(node, NodeProperties.CodeName)} ${node.id} ${UIA.GetNodeProp(node, NodeProperties.UIText)} ${UIA.GetNodeProp(node, NodeProperties.NODEType)}`.toLowerCase();
     }
     render() {
         let me = this;

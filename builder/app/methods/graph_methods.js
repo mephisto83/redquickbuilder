@@ -1850,12 +1850,27 @@ export function SetVisible(graph) {
     });
     return graph;
 }
+function getDepth(groupId, graph) {
+    let res = 0;
+    if (graph.groupLib[groupId]) {
+        if (graph.parentGroup[groupId]) {
+            let parent = Object.keys(graph.parentGroup[groupId])[0];
+            if (parent) {
+                res = res + getDepth(parent, graph);
+            }
+        }
+        res = res + 1;
+    }
+    return res;
+}
 export function FilterGraph(graph) {
     let filteredGraph = createGraph();
     filteredGraph.id = graph.id;
     filteredGraph.linkLib = { ...graph.linkLib };
     filteredGraph.nodesGroups = { ...graph.nodesGroups };
     filteredGraph.groupsNodes = { ...graph.groupsNodes };
+    filteredGraph.groups = [...graph.groups];
+    filteredGraph.groupLib = { ...graph.groupLib };
     filteredGraph.childGroups = { ...graph.childGroups };
     filteredGraph.parentGroup = { ...graph.parentGroup };
     filteredGraph.links = [...graph.links.filter(linkId => {
@@ -1880,6 +1895,19 @@ export function FilterGraph(graph) {
             delete filteredGraph.nodesGroups[nodeId]
         }
     });
+    Object.keys(filteredGraph.groupLib).sort((b, a) => {
+        return getDepth(a, graph) - getDepth(b, graph);
+    }).map(group => {
+        if (filteredGraph.groupLib[group].leaves) {
+            filteredGraph.groupLib[group] = { ...filteredGraph.groupLib[group] };
+            filteredGraph.groupLib[group].leaves = [...filteredGraph.groupLib[group].leaves.filter(x => graph.visibleNodes[x])];
+            filteredGraph.groupLib[group].groups = [...filteredGraph.groupLib[group].groups.filter(x => filteredGraph.groupLib[x])];
+            if (!filteredGraph.groupLib[group].leaves.length && !filteredGraph.groupLib[group].groups.length) {
+                filteredGraph.groups = [...filteredGraph.groups.filter(x => x !== group)];
+                delete filteredGraph.groupLib[group]
+            }
+        }
+    })
     Object.keys(graph.childGroups).map(group => {
         if (!filteredGraph.groupsNodes[group]) {
             delete filteredGraph.childGroups[group];
@@ -1905,7 +1933,7 @@ export function FilterGraph(graph) {
                 }
             }
         }
-    })
+    });
     Object.keys(graph.visibleNodes).map(nodeId => {
         filteredGraph.nodeLib[nodeId] = graph.nodeLib[nodeId];
         filteredGraph.nodes.push(nodeId);
