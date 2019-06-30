@@ -1940,7 +1940,7 @@ export function FilterGraph(graph) {
         filteredGraph.nodeConnections[nodeId] = { ...graph.nodeConnections[nodeId] };
         filteredGraph.nodeLinks[nodeId] = { ...graph.nodeLinks[nodeId] };
 
-        Object.keys(graph.nodeLinks[nodeId]).map(t => {
+        Object.keys(graph.nodeLinks[nodeId] || {}).map(t => {
             if (!filteredGraph.linkLib[t]) {
                 filteredGraph.nodeLinks[nodeId] = { ...filteredGraph.nodeLinks[nodeId] }
                 delete filteredGraph.nodeLinks[nodeId][t];
