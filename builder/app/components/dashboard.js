@@ -64,6 +64,7 @@ import MaestroDetailsMenu from './maestrodetailsmenu';
 import NodeManagement from './nodemanagement';
 import CommonActivityMenu from './commonactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
+import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
@@ -277,6 +278,9 @@ class Dashboard extends Component {
                                                 this.props.setVisual(LINK_DISTANCE, value);
                                             }}
                                             value={UIA.Visual(state, LINK_DISTANCE)} />
+                                    </TreeViewItemContainer>
+                                    <TreeViewItemContainer>
+                                        <DepthChoice />
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
                                 <SectionList />

@@ -69,20 +69,82 @@ class NodeManagement extends Component {
         })
         return (
             <TreeViewMenu
-                title={Titles.Nodes}
+                title={`${Titles.Nodes} ${graph ? Object.keys(graph.visibleNodes || {}).length : ''}`}
                 icon={'fa fa-object-group'}
                 open={UIA.Visual(state, NODE_MANAGEMENT)}
                 active={UIA.Visual(state, NODE_MANAGEMENT)}
                 onClick={() => {
                     this.props.toggleVisual(NODE_MANAGEMENT)
                 }}>
-                <FormControl sidebarform={true}>
-                    <TextInput value={this.state.filter} onChange={(value) => {
-                        this.setState({ filter: value });
-                    }} inputgroup={true} placeholder={Titles.SectionEdit} />
-                </FormControl>
-                {body}
+
+                <TreeViewMenu
+                    icon="fa fa-dot-circle-o"
+                    open={true}
+                    active={true}>
+                    <div className="pull-left">
+                        <div className="btn-group">
+                            <button onClick={() => {
+                                // if (!def) {
+                                //     def = createExtensionDefinition();
+                                // }
+                                // this.props.setVisual(tab_key, Titles.DependsOn);
+                                // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                //     prop: UIA.NodeProperties.UIExtensionDefinition,
+                                //     id: currentNode.id,
+                                //     value: def
+                                // });
+                            }}
+                                type="button" title={Titles.ClearPinned}
+                                className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
+                        </div>
+                        <button onClick={() => {
+                            // if (!def) {
+                            //     def = createExtensionDefinition();
+                            // }
+                            // this.props.setVisual(tab_key, Titles.DependsOn);
+                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
+                            //     id: currentNode.id,
+                            //     value: def
+                            // });
+                        }}
+                            type="button" title={Titles.ClearPinned}
+                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
+                        <button onClick={() => {
+                            // if (!def) {
+                            //     def = createExtensionDefinition();
+                            // }
+                            // this.props.setVisual(tab_key, Titles.DependsOn);
+                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
+                            //     id: currentNode.id,
+                            //     value: def
+                            // });
+                        }}
+                            type="button" title={Titles.ClearPinned}
+                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
+                        <button onClick={() => {
+                            // if (!def) {
+                            //     def = createExtensionDefinition();
+                            // }
+                            // this.props.setVisual(tab_key, Titles.DependsOn);
+                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
+                            //     id: currentNode.id,
+                            //     value: def
+                            // });
+                        }}
+                            type="button" title={Titles.ClearPinned}
+                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
+                    </div>
             </TreeViewMenu>
+            <FormControl sidebarform={true}>
+                <TextInput value={this.state.filter} onChange={(value) => {
+                    this.setState({ filter: value });
+                }} inputgroup={true} placeholder={Titles.Filter} />
+            </FormControl>
+                { body }
+            </TreeViewMenu >
         );
     }
 }

@@ -8,7 +8,7 @@ export default class FormControl extends Component {
     }
     render() {
         return (
-            <form role="form" className={this._class()}>
+            <form role="form" className={this._class()} {...{ style: this.props.style || {} }}>
                 {this.props.children}
             </form>
         );

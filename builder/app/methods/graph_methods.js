@@ -332,7 +332,12 @@ export function getValidatorItem(item, options) {
 export function getValidatorProperties(validator) {
     return validator ? validator.properties : null;
 }
+export function setDepth(graph, options) {
+    var { depth } = options;
+    graph.depth = depth;
 
+    return graph;
+}
 export function newNode(graph) {
     let node = createNode();
     return addNode(graph, node);
@@ -1848,6 +1853,15 @@ export function SetVisible(graph) {
             graph.visibleNodes[t] = true;
         }
     });
+    if (graph.depth) {
+        [].interpolate(0, graph.depth, x => {
+            Object.keys(graph.visibleNodes).map(t => {
+                for (let h in graph.nodeLinks[t]) {
+                    graph.visibleNodes[h] = true;
+                }
+            })
+        })
+    }
     return graph;
 }
 function getDepth(groupId, graph) {

@@ -304,6 +304,7 @@ export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
 export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
 export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
 export const ADD_NEW_REFERENCE_NODE = 'ADD_NEW_REFERENCE_NODE;'
+export const SET_DEPTH = 'SET_DEPTH';
 
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
@@ -330,6 +331,9 @@ export function graphOperation(operation, options) {
         operations.filter(x => x).map(op => {
             let { operation, options } = op;
             switch (operation) {
+                case SET_DEPTH:
+                    currentGraph = GraphMethods.setDepth(currentGraph, options);
+                    break;
                 case NEW_NODE:
                     currentGraph = GraphMethods.newNode(currentGraph);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
