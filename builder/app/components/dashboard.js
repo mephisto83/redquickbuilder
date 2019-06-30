@@ -61,6 +61,7 @@ import ExtensionDefinitionMenu from './extensiondefinitionmenu';
 import MethodActivityMenu from './methodactivitymenu';
 import MethodPropertyMenu from './methodpropertymenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
+import NodeManagement from './nodemanagement';
 import CommonActivityMenu from './commonactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
 import MaestroActivityMenu from './maestroactivitymenu';
@@ -279,6 +280,7 @@ class Dashboard extends Component {
                                     </TreeViewItemContainer>
                                 </TreeViewMenu>
                                 <SectionList />
+                                <NodeManagement />
                                 <MaestroDetailsMenu />
                                 <ControllerDetailsMenu />
                             </SideBarMenu>

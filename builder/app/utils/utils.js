@@ -176,6 +176,24 @@ String.prototype.unCamelCase = function () {
         });
     };
 
+    if (!array.groupBy) {
+        Object.defineProperty(array, 'groupBy', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var collection = this;
+                var result = {};
+                for (var i = 0; i < collection.length; i++) {
+                    var t = func(collection[i]);
+                    result[t] = result[t] || [];
+                    result[t].push(collection[i]);
+                }
+                return result;
+            }
+        });
+    }
+
     if (!array.subset) {
         Object.defineProperty(array, 'subset', {
             enumerable: false,

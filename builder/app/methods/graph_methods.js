@@ -35,6 +35,7 @@ export function createGraph() {
         classNodes: {},
         functionNodes: {}, // A function nodes will be run through for checking constraints.
         updated: null,
+        visibleNodes: {}, //Nodes that are visible now, and used to calculate the visibility of other nodes.
         appConfig: {
             "Logging": {
                 "IncludeScopes": false,
@@ -1840,15 +1841,93 @@ export const GroupImportanceOrder = {
     [NodeTypes.ValidationListItem]: 12
 }
 
+export function SetVisible(graph) {
+    graph.visibleNodes = {}
+    graph.nodes.map(t => {
+        if (GetNodeProp(GetNode(graph, t), NodeProperties.Pinned)) {
+            graph.visibleNodes[t] = true;
+        }
+    });
+    return graph;
+}
+export function FilterGraph(graph) {
+    let filteredGraph = createGraph();
+    filteredGraph.id = graph.id;
+    filteredGraph.linkLib = { ...graph.linkLib };
+    filteredGraph.nodesGroups = { ...graph.nodesGroups };
+    filteredGraph.groupsNodes = { ...graph.groupsNodes };
+    filteredGraph.childGroups = { ...graph.childGroups };
+    filteredGraph.parentGroup = { ...graph.parentGroup };
+    filteredGraph.links = [...graph.links.filter(linkId => {
+        var { target, source } = graph.linkLib[linkId];
+        if (graph.visibleNodes[target] && graph.visibleNodes[source]) {
+            return true;
+        } else {
+            delete filteredGraph.linkLib[linkId];
+        }
+        return false;
+    })];
+    Object.keys(graph.nodesGroups).map(nodeId => {
+        if (!graph.visibleNodes[nodeId]) {
+            let temp = graph.nodesGroups[nodeId];
+            for (let i in temp) {
+                filteredGraph.groupsNodes[i] = { ...filteredGraph.groupsNodes[i] };
+                delete filteredGraph.groupsNodes[i][nodeId]
+                if (Object.keys(filteredGraph.groupsNodes[i]).length === 0) {
+                    delete filteredGraph.groupsNodes[i]
+                }
+            }
+            delete filteredGraph.nodesGroups[nodeId]
+        }
+    });
+    Object.keys(graph.childGroups).map(group => {
+        if (!filteredGraph.groupsNodes[group]) {
+            delete filteredGraph.childGroups[group];
+        }
+        else {
+            for (let t in filteredGraph.childGroups[group]) {
+                if (!filteredGraph.groupsNodes[t]) {
+                    filteredGraph.childGroups[group] = { ...filteredGraph.childGroups[group] }
+                    delete filteredGraph.childGroups[group][t]
+                }
+            }
+        }
+    })
+    Object.keys(graph.parentGroup).map(group => {
+        if (!filteredGraph.groupsNodes[group]) {
+            delete filteredGraph.parentGroup[group];
+        }
+        else {
+            for (let t in filteredGraph.parentGroup[group]) {
+                if (!filteredGraph.groupsNodes[t]) {
+                    filteredGraph.parentGroup[group] = { ...filteredGraph.parentGroup[group] }
+                    delete filteredGraph.parentGroup[group][t]
+                }
+            }
+        }
+    })
+    Object.keys(graph.visibleNodes).map(nodeId => {
+        filteredGraph.nodeLib[nodeId] = graph.nodeLib[nodeId];
+        filteredGraph.nodes.push(nodeId);
+        filteredGraph.nodeConnections[nodeId] = { ...graph.nodeConnections[nodeId] };
+        filteredGraph.nodeLinks[nodeId] = { ...graph.nodeLinks[nodeId] };
+
+        Object.keys(graph.nodeLinks[nodeId]).map(t => {
+            if (!filteredGraph.linkLib[t]) {
+                filteredGraph.nodeLinks[nodeId] = { ...filteredGraph.nodeLinks[nodeId] }
+                delete filteredGraph.nodeLinks[nodeId][t];
+            }
+        })
+    })
+
+    return filteredGraph;
+}
 export function VisualProcess(graph) {
     let vgraph = createGraph();
     vgraph.id = graph.id;
+    graph = SetVisible(graph);
+    graph = FilterGraph(graph)
     let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
-    let nodesToCheck = [...collapsedNodes];
-    let checkedNodes = [];
-    let done = true;
-    let mashedNodeLib = {};
-    let nodeMashedToLib = {};
     let collapsingGroups = {};
     collapsedNodes.map(t => {
         if (graph.nodesGroups[t]) {
@@ -1909,38 +1988,6 @@ export function VisualProcess(graph) {
         disappearingNodes = { ...disappearingNodes, ...dt };
     });
 
-    // do {
-    //     done = true;
-    //     let checkedNodesCount = checkedNodes.length;
-    //     let nextbatch = [];
-    //     let cn = nodesToCheck.map(t => {
-    //         let linked_nodes = getNodesByLinkType(graph, { id: t, direction: SOURCE });
-    //         if (GetNodeProp(graph.nodeLib[t], NodeProperties.Collapsed)) {
-    //             linked_nodes.map(t => {
-    //                 graph = updateNodeProperty(graph, {
-    //                     id: t.id,
-    //                     prop: NodeProperties.Collapsed,
-    //                     value: true
-    //                 });
-    //             });
-    //             mashedNodeLib[t] = [...linked_nodes.map(_t => {
-    //                 if (_t.id !== t) {
-    //                     disappearingNodes[_t.id] = true;
-    //                     nodeMashedToLib[_t.id] = t;
-    //                 }
-    //                 return _t.id;
-    //             })];
-    //         }
-    //         nextbatch.push(...linked_nodes.map(t => t.id));
-    //         return t;
-    //     });
-    //     nodesToCheck = [...nextbatch].unique(x => x);
-    //     checkedNodes = [...checkedNodes, ...cn].unique(x => x);
-    //     if (checkedNodesCount !== checkedNodes.length) {
-    //         done = false;
-    //     }
-    // } while (!done);
-
     vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])]
     vgraph.nodeLib = {};
     vgraph.nodes.map(t => { vgraph.nodeLib[t] = graph.nodeLib[t] });
@@ -1961,122 +2008,6 @@ export function VisualProcess(graph) {
         else if (disappearingNodes[target]) {
             dupLink = copyLink(graph.linkLib[x]);
             dupLink.target = disappearingNodes[target];
-            dupLink.id = `${dupLink.source}${dupLink.target}`;
-            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-        }
-        else {
-            dupLink = copyLink(graph.linkLib[x]);
-            dupLink.id = `${dupLink.source}${dupLink.target}`;
-            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-        }
-        if (dupLink.source === dupLink.target) {
-            return false;
-        }
-        return dupLink.id;
-    }).filter(x => x);
-
-    var vgroups = graph.groups.map((group, groupIndex) => {
-        let oldgroup = graph.groupLib[group];
-        let newgroup = createGroup();
-        newgroup.id = `${oldgroup.id}`;
-        if (oldgroup && oldgroup.leaves) {
-            oldgroup.leaves.map(leaf => {
-                if (vgraph.nodeLib[leaf]) {
-                    newgroup.leaves.push(leaf);
-                }
-            })
-        }
-        if (newgroup.leaves.length) {
-            vgraph.groupLib[newgroup.id] = newgroup;
-
-            return newgroup.id
-        }
-        return null;
-    }).filter(x => x);
-    vgroups.map((group) => {
-        vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(og => {
-            if (vgraph.groupLib[og]) {
-                return true;
-            }
-            return false;
-        })
-    })
-    vgraph.groups = vgroups;
-    return vgraph;
-}
-
-export function _VisualProcess(graph) {
-    let vgraph = createGraph();
-    vgraph.id = graph.id;
-    let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
-    let nodesToCheck = [...collapsedNodes];
-    let checkedNodes = [];
-    let done = true;
-    let mashedNodeLib = {};
-    let nodeMashedToLib = {};
-    let disappearingNodes = {};
-    do {
-        done = true;
-        let checkedNodesCount = checkedNodes.length;
-        let nextbatch = [];
-        let cn = nodesToCheck.map(t => {
-            let linked_nodes = getNodesByLinkType(graph, { id: t, direction: SOURCE });
-            if (GetNodeProp(graph.nodeLib[t], NodeProperties.Collapsed)) {
-                linked_nodes.map(t => {
-                    graph = updateNodeProperty(graph, {
-                        id: t.id,
-                        prop: NodeProperties.Collapsed,
-                        value: true
-                    });
-                });
-                mashedNodeLib[t] = [...linked_nodes.map(_t => {
-                    if (_t.id !== t) {
-                        disappearingNodes[_t.id] = true;
-                        nodeMashedToLib[_t.id] = t;
-                    }
-                    return _t.id;
-                })];
-            }
-            nextbatch.push(...linked_nodes.map(t => t.id));
-            return t;
-        });
-        nodesToCheck = [...nextbatch].unique(x => x);
-        checkedNodes = [...checkedNodes, ...cn].unique(x => x);
-        if (checkedNodesCount !== checkedNodes.length) {
-            done = false;
-        }
-    } while (!done);
-
-    vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])]
-    vgraph.nodeLib = {};
-    vgraph.nodes.map(t => { vgraph.nodeLib[t] = graph.nodeLib[t] });
-    vgraph.links = graph.links.map(x => {
-        //Find any link that should be disappearing, and make it go away
-        var { source, target } = graph.linkLib[x];
-        var dupLink;
-        if (disappearingNodes[source] && disappearingNodes[target]) {
-            // the link is going totally away;
-            return false;
-        }
-        else if (disappearingNodes[source]) {
-            dupLink = copyLink(graph.linkLib[x]);
-            var orgSource = dupLink.source;
-            var nextSource = orgSource;
-            do {
-                nextSource = nodeMashedToLib[nextSource];
-            } while (disappearingNodes[nextSource] && nextSource);
-            dupLink.source = nextSource;
-            dupLink.id = `${dupLink.source}${dupLink.target}`;
-            vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-        }
-        else if (disappearingNodes[target]) {
-            dupLink = copyLink(graph.linkLib[x]);
-            var orgSource = dupLink.target;
-            var nextSource = orgSource;
-            do {
-                nextSource = nodeMashedToLib[nextSource];
-            } while (disappearingNodes[nextSource] && nextSource);
-            dupLink.target = nextSource;
             dupLink.id = `${dupLink.source}${dupLink.target}`;
             vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
         }

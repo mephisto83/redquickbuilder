@@ -26,11 +26,12 @@ export default class TreeViewMenu extends Component {
                 }}>
                     {this.props.hideIcon ? null : <i className={`${this.icon()}`}></i>}
                     <span>{this.props.title}</span>
-                    {this.props.right ? (<span className="pull-right-container">
-                        {this.props.right}
-                    </span>) : null}
                     {this.props.hideArrow ? null : (<span className="pull-right-container">
                         <i className="fa fa-angle-left pull-right"></i>
+                        {this.props.right ? this.props.right : null}
+                    </span>)}
+                    {!this.props.hideArrow && this.props.right ? null : (<span className="pull-right-container">
+                        {this.props.right ? this.props.right : null}
                     </span>)}
                 </a>
                 <ul className="treeview-menu" style={{ display: this.display() }}>
