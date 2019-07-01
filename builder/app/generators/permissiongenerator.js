@@ -298,7 +298,8 @@ export default class PermissionGenerator {
                 let extensionInstance = PermissionGenerator._createExtensionInstanceList(dpNode, extentionNode, method);
                 let extensionsNotAllowed = PermissionGenerator._getNotAllowedExtectionConstances(dpNode, extentionNode, method);
                 let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
-                let property = definition && definition.config ? definition.config.keyField : null;
+                let property = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
+                // definition && definition.config ? definition.config.keyField : null;
 
                 listOfCases.push({
                     name,
@@ -419,7 +420,7 @@ export default class PermissionGenerator {
                         agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                         model: GetNodeProp(model, NodeProperties.CodeName),
                         method,
-                        test: `${testIndex}`,
+                        test: `_${GetNodeProp(agent, NodeProperties.CodeName)}_${GetNodeProp(model, NodeProperties.CodeName)}_${method}_${testIndex}`,
                         result: resultSuccess ? 'true' : 'false',
                         function_name: GetNodeProp(permission, NodeProperties.CodeName) + method
                     });
@@ -555,6 +556,7 @@ export default class PermissionGenerator {
                         ...STANDARD_TEST_USING,
                         `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.Permissions}`,
+                        `${namespace}${NameSpace.Extensions}`,
                         `${namespace}${NameSpace.Constants}`,
                         `${namespace}${NameSpace.Model}`
                     ],

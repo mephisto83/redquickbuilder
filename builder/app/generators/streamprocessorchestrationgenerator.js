@@ -125,23 +125,25 @@ ${modelexecution.join('')}
         res = functions.map((func, index) => {
             let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
             let method = GetNodeProp(func, NodeProperties.MethodType);
-            let cases = null;
+            //      let cases = null;
             if (methodProps) {
                 var agentTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.AgentType]);
                 var modelNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
                 var userTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.User]);
                 var permissionNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Permission]);
                 if (graph && permissionNode && method && agentTypeNode && modelNode) {
-                    cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, method, agentTypeNode, modelNode);
+                    //   cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, method, agentTypeNode, modelNode);
                 }
             }
-            return bindTemplate(_stramMethodTests, {
-                model: GetNodeProp(modelNode, NodeProperties.CodeName),
-                agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
-                function_name: GetNodeProp(func, NodeProperties.CodeName),
-                test_name: `${GetNodeProp(func, NodeProperties.CodeName)}Test`
-            });
-        }).join(NEW_LINE);
+            if (modelNode && agentTypeNode && func) {
+                return bindTemplate(_stramMethodTests, {
+                    model: GetNodeProp(modelNode, NodeProperties.CodeName),
+                    agent_type: GetNodeProp(agentTypeNode, NodeProperties.CodeName),
+                    function_name: GetNodeProp(func, NodeProperties.CodeName),
+                    test_name: `${GetNodeProp(func, NodeProperties.CodeName)}Test`
+                });
+            }
+        }).filter(x => x).join(NEW_LINE);
         let func_Cases = [];
         functions.map((func, index) => {
             let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
@@ -150,14 +152,11 @@ ${modelexecution.join('')}
             if (methodProps) {
                 var agentTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.AgentType]);
                 var modelNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
-                var userTypeNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.User]);
                 var permissionNode = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.Permission]);
                 if (graph && permissionNode && method && agentTypeNode && modelNode) {
-                    //  cases = PermissionGenerator.EnumeratePermissionCases(graph, permissionNode, method, agentTypeNode, modelNode);
                     let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, func);
                     let validatorCases = null;
                     if (validators && validators.length) {
-
                         validatorCases = validators.map(validator => {
                             return {
                                 cases: ValidationRuleGenerator.GenerateValidationCases(graph, validator),

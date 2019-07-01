@@ -11,6 +11,7 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import { NodeProperties } from '../constants/nodetypes';
 
+const NODE_MANAGEMENT_MENU = 'NODE_MANAGEMENT_MENU';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
 class NodeManagement extends Component {
     constructor(props) {
@@ -79,71 +80,37 @@ class NodeManagement extends Component {
 
                 <TreeViewMenu
                     icon="fa fa-dot-circle-o"
-                    open={true}
-                    active={true}>
+                    title={Titles.Menu}
+                    open={UIA.Visual(state, NODE_MANAGEMENT_MENU)}
+                    active={UIA.Visual(state, NODE_MANAGEMENT_MENU)}
+                    onClick={() => {
+                        this.props.toggleVisual(NODE_MANAGEMENT_MENU)
+                    }}>
                     <div className="pull-left">
                         <div className="btn-group">
                             <button onClick={() => {
-                                // if (!def) {
-                                //     def = createExtensionDefinition();
-                                // }
-                                // this.props.setVisual(tab_key, Titles.DependsOn);
-                                // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                //     prop: UIA.NodeProperties.UIExtensionDefinition,
-                                //     id: currentNode.id,
-                                //     value: def
-                                // });
+                                this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
+                                    return {
+                                        operation: UIA.CHANGE_NODE_PROPERTY,
+                                        options: {
+                                            prop: UIA.NodeProperties.Pinned,
+                                            id: node.id,
+                                            value: false
+                                        }
+                                    }
+                                }));
                             }}
                                 type="button" title={Titles.ClearPinned}
-                                className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
+                                className="btn btn-default btn-flat"><i className="fa fa-times" /></button>
                         </div>
-                        <button onClick={() => {
-                            // if (!def) {
-                            //     def = createExtensionDefinition();
-                            // }
-                            // this.props.setVisual(tab_key, Titles.DependsOn);
-                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
-                            //     id: currentNode.id,
-                            //     value: def
-                            // });
-                        }}
-                            type="button" title={Titles.ClearPinned}
-                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
-                        <button onClick={() => {
-                            // if (!def) {
-                            //     def = createExtensionDefinition();
-                            // }
-                            // this.props.setVisual(tab_key, Titles.DependsOn);
-                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
-                            //     id: currentNode.id,
-                            //     value: def
-                            // });
-                        }}
-                            type="button" title={Titles.ClearPinned}
-                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
-                        <button onClick={() => {
-                            // if (!def) {
-                            //     def = createExtensionDefinition();
-                            // }
-                            // this.props.setVisual(tab_key, Titles.DependsOn);
-                            // this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            //     prop: UIA.NodeProperties.UIExtensionDefinition,
-                            //     id: currentNode.id,
-                            //     value: def
-                            // });
-                        }}
-                            type="button" title={Titles.ClearPinned}
-                            className="btn btn-default btn-flat"><i className="fa fa-balance-scale" /></button>
                     </div>
-            </TreeViewMenu>
-            <FormControl sidebarform={true}>
-                <TextInput value={this.state.filter} onChange={(value) => {
-                    this.setState({ filter: value });
-                }} inputgroup={true} placeholder={Titles.Filter} />
-            </FormControl>
-                { body }
+                </TreeViewMenu>
+                <FormControl sidebarform={true}>
+                    <TextInput value={this.state.filter} onChange={(value) => {
+                        this.setState({ filter: value });
+                    }} inputgroup={true} placeholder={Titles.Filter} />
+                </FormControl>
+                {body}
             </TreeViewMenu >
         );
     }

@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -13,6 +13,7 @@ const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const MAESTRO_FUNCTION_TESTS = './app/templates/maestro/tests/maestro.tpl';
+const MAESTRO_FUNCTION_GET_TESTS = './app/templates/maestro/tests/maestro_get.tpl';
 const PROPERTY_TABS = 6;
 export default class MaestroGenerator {
     static Tabs(c) {
@@ -34,6 +35,7 @@ export default class MaestroGenerator {
         let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
         let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
         let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf-8');
+        let testFunctionGetTemplate = fs.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf-8');
         let root = GetRootGraph(state);
         let graph = GetCurrentGraph(state);
         let result = {};
@@ -191,7 +193,14 @@ export default class MaestroGenerator {
 
                             permissionValidationCases = permissionValidationCases.map((pvc, index) => {
                                 //Generate tests.
-                                return bindTemplate(testFunctionTemplate, {
+                                let templ = testFunctionTemplate;
+                                switch (ft.method) {
+                                    case Methods.Get:
+                                    case Methods.GetAll:
+                                        templ = testFunctionGetTemplate;
+                                        break;
+                                }
+                                return bindTemplate(templ, {
                                     agent: agent_type,
                                     value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                                     model: model_type,

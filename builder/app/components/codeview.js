@@ -43,7 +43,7 @@ class CodeView extends Component {
         var { state } = this.props;
         let active = this.active();
 
-        let codeString;
+        let codeString = '';
         let info = UIA.Visual(state, MODEL_CODE) || null;
         let graphRoot = UIA.GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
@@ -52,7 +52,7 @@ class CodeView extends Component {
 
         let controllers = [];
         let generatedContent = null;
-        if (state && graphRoot) {
+        if (state && graphRoot && active) {
             var viewTab = UIA.Visual(state, CODE_VIEW_TAB);
             var classKey = this.state[UIA.Visual(state, CODE_VIEW_TAB)];
 

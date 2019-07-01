@@ -12,6 +12,7 @@ export const NodeTypes = {
     ChoiceList: 'choice-list',
     Permission: 'permission',
     PermissionDependency: 'permission-dependency',
+    Condition: 'condition',
     Enumeration: 'enumeration', //Basically a list of const string.
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
@@ -93,7 +94,8 @@ export const ColorStates = {
 }
 export const NotSelectableNodeTypes = {
     [NodeTypes.ReferenceNode]: true,
-    [NodeTypes.PermissionDependency]: true
+    [NodeTypes.PermissionDependency]: true,
+    [NodeTypes.Condition]: true
 }
 export const NodeTypeColors = {
     [ColorStates.Error]: '#FF0000',
@@ -118,6 +120,7 @@ export const NodeTypeColors = {
     [NodeTypes.Services]: '#59FFA0',
     [NodeTypes.ClassNode]: '#C3BAAA',
     [NodeTypes.Maestro]: '#780116',
+    [NodeTypes.Condition]: '#CAFE48',
     [NodeTypes.Validator]: '#151522',
     [NodeTypes.ModelFilter]: '#312313',
     [NodeTypes.Executor]: '#2176FF',
