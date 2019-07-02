@@ -11,13 +11,13 @@ import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { Functions, FunctionConstraintKeys, HTTP_METHODS } from '../constants/functiontypes';
 import { getNodesLinkedTo } from '../methods/graph_methods';
-import { LinkPropertyKeys, NodeProperties } from '../constants/nodetypes';
+import { LinkPropertyKeys, NodeProperties, ExcludeDefaultNode } from '../constants/nodetypes';
 
 class ControllerActivityMenu extends Component {
     render() {
         var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Controller);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Controller);
         var graph = UIA.GetCurrentGraph(state);
         var functions = UIA.NodesByType(state, UIA.NodeTypes.Maestro).map(funcKey => {
             return {

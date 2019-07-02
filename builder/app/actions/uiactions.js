@@ -287,6 +287,7 @@ export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE';
 export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
 export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
 export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
+export const NEW_CONDITION_NODE = 'NEW_CONDITION_NODE';
 export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
 export const REMOVE_LINK = 'REMOVE_LINK';
 export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
@@ -368,6 +369,10 @@ export function graphOperation(operation, options) {
                     break;
                 case NEW_ATTRIBUTE_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_CONDITION_NODE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Condition);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
                 case NEW_VALIDATION_TYPE:

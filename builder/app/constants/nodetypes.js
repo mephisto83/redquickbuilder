@@ -35,6 +35,9 @@ export const NodeTypes = {
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node'
 }
+export const ExcludeDefaultNode = {
+    [NodeTypes.Condition]: true
+};
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
     ChangeResponse: 'change-response',
@@ -348,6 +351,8 @@ export const LinkType = {
     ExecutorProperty: 'executor-property',
     ExecutorModel: 'executor-model',
 
+    Condition: 'condtion',
+
     Validation: 'validation',
     ValidationItem: 'validation-item',
     Validator: 'validator',
@@ -510,6 +515,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ConditionLink: {
+        type: LinkType.Condition
     },
     LogicalChildren: {
         type: LinkType.LogicalChildren

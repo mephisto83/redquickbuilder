@@ -6,13 +6,14 @@ import TabPane from './tabpane';
 import * as Titles from './titles';
 import FormControl from './formcontrol';
 import TextBox from './textinput';
+import { ExcludeDefaultNode } from '../constants/nodetypes';
 class CommonActivityMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-
+        var active = !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)];
         return (
-            <TabPane active={true}>
+            <TabPane active={active}>
                 {currentNode ? (<FormControl>
                     <TextBox
                         label={Titles.CodeName}

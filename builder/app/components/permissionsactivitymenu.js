@@ -9,7 +9,8 @@ import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import { getNodesLinkedTo, getNodesByLinkType, SOURCE } from '../methods/graph_methods';
-import { NodeTypes, LinkType, NodeProperties, Methods } from '../constants/nodetypes';
+import { NodeTypes, LinkType, NodeProperties, Methods, LinkProperties } from '../constants/nodetypes';
+import SidebarButton from './sidebarbutton';
 
 class PermissionActivityMenu extends Component {
     render() {
@@ -81,6 +82,16 @@ class PermissionActivityMenu extends Component {
                             }} />);
                     }))}</FormControl>) : null
                 }
+                <button type="submit" className="btn btn-primary" onClick={() => {
+                    this.props.graphOperation(UIA.NEW_CONDITION_NODE, {
+                        parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                        groupProperties: {
+                        },
+                        linkProperties: {
+                            properties: { ...LinkProperties.ConditionLink }
+                        }
+                    });
+                }}>{Titles.AddCondition}</button>
             </TabPane >
         );
     }

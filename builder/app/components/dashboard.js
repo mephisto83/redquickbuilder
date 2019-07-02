@@ -40,6 +40,7 @@ import ValidationItemFormControl from './validationitemactivitymenu';
 import ValidatorActivityMenu from './validatoractivitymenu';
 import OptionActivityMenu from './optionactivitymenu';
 import ExecutorPropertyMenu from './executorpropertymenu';
+import ConditionActivityMenu from './conditionactivitymenu';
 import ParameterActivityMenu from './parameteractivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
 import ExecutorPropertyActivityMenu from './executorpropertyactivitymenu';
@@ -73,7 +74,7 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode } from '../constants/nodetypes';
 import CodeView from './codeview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -352,7 +353,7 @@ class Dashboard extends Component {
                                 }} />
                             </SideBarTabs>
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
-                                {currentNode ? (<FormControl>
+                                {currentNode && !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (<FormControl>
                                     <TextInput
                                         label={Titles.NodeLabel}
                                         value={currentNode.properties ? currentNode.properties.text : ''}
@@ -414,6 +415,7 @@ class Dashboard extends Component {
                                 <ExtensionListActivityMenu />
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
+                                <ConditionActivityMenu />
                                 <ExtensionDefinitionMenu />
                                 <ModelFilterActivityMenu />
                                 <PermissionDependencyActivityMenu />
