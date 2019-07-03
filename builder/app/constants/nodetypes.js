@@ -159,6 +159,7 @@ export const NameSpace = {
 
 export const NodeProperties = {
     Enumeration: 'Enumeration',
+    ConditionType: 'ConditionType',
     AllowedExtensionValues: 'AllowedExtensionValues',
     ServiceType: 'ServiceType',
     DisallowedExtensionValues: 'DisallowedExtensionValues',
@@ -823,6 +824,12 @@ const COMMON_STRING_ARGS = {
         type: NodePropertyTypes.STRING,
         nodeType: NodeTypes.Property
     }
+}
+
+export const ConditionTypes = {
+    InEnumerable: 'in-enumeration',
+    InExtension: 'in-extension',
+    MatchReference: 'match-reference'
 }
 
 export const ValidationCases = {

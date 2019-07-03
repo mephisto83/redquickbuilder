@@ -14,6 +14,7 @@ export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';
 export const Nodes = 'Nodes';
 export const Models = 'Models';
+export const ConditionType = 'Condition Type';
 export const Depth = 'Depth';
 export const Label = 'Label';
 export const New = 'New';

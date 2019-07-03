@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph } from '../actions/uiactions';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -1335,6 +1335,30 @@ export function GetLinkByNodes(graph, options) {
     return Object.values(graph.linkLib).find(t => {
         return t.source === source && t.target === target;
     })
+}
+export function GetLinkChain(state, options) {
+    let graph = GetCurrentGraph(state);
+    var { id, links } = options;
+    var ids = [id];
+    var result = [];
+    links.map((op, il) => {
+        var newids = [];
+        ids.map(i => {
+            let newnodes = getNodesByLinkType(graph, {
+                id: i,
+                ...op
+            });
+            if (il === links.length - 1) {
+                result = newnodes;
+            }
+            else {
+                newids = [...newids, ...newnodes.map(t => t.id)];
+            }
+        })
+        newids = newids.unique(x => x);
+        ids = newids;
+    })
+    return result
 }
 export function getNodesByLinkType(graph, options) {
     if (options) {

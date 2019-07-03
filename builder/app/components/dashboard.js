@@ -395,6 +395,7 @@ class Dashboard extends Component {
                                         }} />
                                 </FormControl>) : null}
                                 <ChoiceListItemActivityMenu />
+                                <ConditionActivityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
                                 <ControllerActivityMenu />
@@ -415,7 +416,6 @@ class Dashboard extends Component {
                                 <ExtensionListActivityMenu />
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
-                                <ConditionActivityMenu />
                                 <ExtensionDefinitionMenu />
                                 <ModelFilterActivityMenu />
                                 <PermissionDependencyActivityMenu />
