@@ -15,6 +15,7 @@ export const NodeType = 'Node Type';
 export const Nodes = 'Nodes';
 export const Models = 'Models';
 export const ConditionType = 'Condition Type';
+export const Reference = 'Reference';
 export const Depth = 'Depth';
 export const Label = 'Label';
 export const New = 'New';
@@ -149,7 +150,9 @@ export const Extensions = 'Extensions';
 export const ExtensionDefinitionMenu = 'Define custom extensions';
 export const ExtensionConfig = 'Extension Config';
 export const DependsOn = 'Depends On';
+export const UseId = 'Use Id';
 export const Property = 'Property';
+export const Condition = 'Condition';
 export const DependsOnDescription = 'Defines if a the property associated with this extension is visually dependent on the value of another property on the same object.'
 export const DependentPropertyDescription = 'The property that the current property will be associated.';
 export const MatchingValue = 'Matching Value';
@@ -197,6 +200,7 @@ export const IsParent = 'Is parent';
 export const UserModel = 'User Model';
 
 export const ManyToManyNexus = 'Many to many';
+export const ManyToManyExists = 'Many to many item must exists';
 export const ManyToManyNexusModel = 'Many to Many model';
 
 export const ManyToManyNexusDescription = 'This property will be a quick access for many to many relationships.';

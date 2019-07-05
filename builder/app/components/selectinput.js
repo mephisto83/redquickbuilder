@@ -34,7 +34,7 @@ export default class SelectInput extends Component {
                             this.props.onChange(evt.target.value);
                         }
                     }} value={this.value()}>
-                    <option value={null}>{this.props.defaultSelectText || Titles.Select}</option>
+                    <option value={''}>{this.props.defaultSelectText || Titles.Select}</option>
                     {this.options()}
                 </select>
             </div>

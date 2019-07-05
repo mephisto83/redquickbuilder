@@ -701,6 +701,35 @@ export const FunctionMethodTypes = {
     DELETE: 'DELETE',
     UPDATE: 'UPDATE'
 }
+export const ConditionTypes = {
+    InEnumerable: 'in-enumeration',
+    InExtension: 'in-extension',
+    MatchReference: 'match-reference',
+    MatchManyReferenceParameter: 'match-many-reference-parameter'
+}
+
+export const ConditionTypeOptions = {
+    IsFalse: 'is-false',
+    IsTrue: 'is-true'
+}
+
+export const ConditionFunctionSetups = {
+    [ConditionTypes.MatchReference]: {},
+    [ConditionTypes.MatchManyReferenceParameter]: {}
+}
+Object.keys(MethodFunctions).map(key => {
+    if (MethodFunctions[key].constraints) {
+        ConditionFunctionSetups[ConditionTypes.MatchReference].functions = ConditionFunctionSetups[ConditionTypes.MatchReference].functions || {}
+        ConditionFunctionSetups[ConditionTypes.MatchReference].functions[key] = {
+            constraints: { ...MethodFunctions[key].constraints }
+        };
+
+        ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions = ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions || {}
+        ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions[key] = {
+            constraints: { ...MethodFunctions[key].constraints }
+        };
+    }
+});
 
 export const FunctionPerpetrators = {
     Agent: 'Agent',

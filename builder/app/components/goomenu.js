@@ -33,7 +33,8 @@ export default class NavBarButton extends Component {
         var menuItems = this.menuItems();
         return (
             <div className="goo-menu container" style={{
-                position: 'absolute',
+                position: 'fixed',
+                transition: 'all 200ms',
                 top: this.props.top || 0,
                 left: this.props.left || 0
             }}>
