@@ -8,8 +8,9 @@ import * as Titles from './titles';
 import { LinkType, NodeProperties, NodeTypes } from '../constants/nodetypes';
 import SelectInput from './selectinput';
 import { TARGET, GetLinkChain, SOURCE, GetNode } from '../methods/graph_methods';
-import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions } from '../constants/functiontypes';
+import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters } from '../constants/functiontypes';
 import CheckBox from './checkbox';
+import TextInput from './textinput';
 class ConditionActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -64,6 +65,12 @@ class ConditionActivityMenu extends Component {
         }
         return (
             <TabPane active={active}>
+                <TextInput
+                    label={Titles.NodeLabel}
+                    value={UIA.GetNodeProp(currentNode, NodeProperties.UIText)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
+                    }} />
                 <SelectInput
                     label={Titles.ConditionType}
                     options={Object.keys(ConditionTypes).map(t => ({ title: t, value: ConditionTypes[t] }))}
@@ -77,6 +84,13 @@ class ConditionActivityMenu extends Component {
                     value={conditionType} />
                 {this.getMatchManyReferenceProperty({
                     conditionType,
+                    model_options,
+                    currentNode,
+                    methods
+                })}
+                {this.getEnumeration({
+                    conditionType,
+                    graph,
                     model_options,
                     currentNode,
                     methods
@@ -116,7 +130,7 @@ class ConditionActivityMenu extends Component {
                         options={ref1_properties}
                         onChange={(value) => {
                             var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref1Property = value;
+                            temp[ConditionTypeParameters.Ref1Property] = value;
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.MatchReference,
                                 id: currentNode.id,
@@ -188,7 +202,147 @@ class ConditionActivityMenu extends Component {
         }
         return properties;
     }
+    getEnumeration(options) {
+        var {
+            conditionType,
+            model_options,
+            graph,
+            currentNode,
+            methods,
+        } = options;
+        var { state } = this.props;
+        var temp = UIA.GetNodeProp(currentNode, NodeProperties.EnumerationReference) || {};
+        if (conditionType !== ConditionTypes.InEnumerable) {
+            return [];
+        }
 
+        let methodProps = UIA.GetNodeProp(methods ? methods[0] : null, NodeProperties.MethodProps);
+        var ref1_properties = [];
+        var ref2_properties = [];
+        var refManyToMany_properties = [];
+        var permissionNode = GetLinkChain(state, {
+            id: currentNode.id,
+            links: [{
+                type: LinkType.Condition,
+                direction: TARGET
+            }]
+        })[0]
+        var temp = UIA.GetNodeProp(currentNode, NodeProperties.EnumerationReference) || {
+            ref1: GetNodeProp(permissionNode, UIA.NodeProperties.PermissionRequester)
+        };
+        if (temp.ref2) {
+            ref2_properties = this.getProperties(methodProps, temp, state, 'ref2');
+        }
+        if (temp.ref1) {
+            ref1_properties = this.getProperties(methodProps, temp, state, 'ref1');
+        }
+
+        if (temp.refManyToMany) {
+            refManyToMany_properties = this.getProperties(methodProps, temp, state, 'refManyToMany');
+        }
+
+        var enumeration = temp && temp[UIA.NodeProperties.Enumeration] ? temp[UIA.NodeProperties.Enumeration] : '';
+        var allowed = (temp && temp[UIA.NodeProperties.AllowedEnumValues] ? temp[UIA.NodeProperties.AllowedEnumValues] : []);
+        var disallowed = [];
+        if (enumeration) {
+            var enumerationNode = GetNode(graph, enumeration);
+            if (enumerationNode) {
+                var enumerationValues = UIA.GetNodeProp(enumerationNode, NodeProperties.Enumeration) || [];
+                allowed = allowed.intersection(enumerationValues);
+                disallowed = enumerationValues.relativeCompliment(allowed);
+            }
+        }
+
+        let matchRef = { ...temp };
+        var enumeration_nodes = UIA.NodesByType(state, UIA.NodeTypes.Enumeration).toNodeSelect();
+        return [
+            (
+                <SelectInput
+                    label={Titles.Reference}
+                    options={model_options}
+                    onChange={(value) => {
+                        temp.ref1 = value;
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.EnumerationReference,
+                            id: currentNode.id,
+                            value: temp
+                        });
+                    }}
+                    value={matchRef.ref1} />
+            ),
+            <SelectInput
+                label={Titles.Property}
+                options={ref1_properties}
+                onChange={(value) => {
+                    temp.ref1Property = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.EnumerationReference,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }}
+                value={matchRef.ref1Property} />,
+            currentNode ? (<SelectInput
+                label={Titles.Enumeration}
+                options={enumeration_nodes}
+                key={`${currentNode.id}-enum`}
+                onChange={(value) => {
+                    var id = currentNode.id;
+                    let target = temp[UIA.NodeProperties.Enumeration] || '';
+                    temp[UIA.NodeProperties.Enumeration] = value;
+                    this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                        target,
+                        source: id,
+                        linkType: UIA.LinkProperties.EnumerationReferenceLink.type
+                    })
+
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.EnumerationReference,
+                        id,
+                        value: temp
+                    });
+                    this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                        target: value,
+                        source: id,
+                        properties: { ...UIA.LinkProperties.EnumerationReferenceLink }
+                    });
+                }}
+                value={temp[UIA.NodeProperties.Enumeration] || ''} />) : null,
+            <ControlSideBarMenuHeader
+                key={`${currentNode.id}-allowed-enum-title`} title={Titles.AllowedEnums} />,
+            allowed && allowed.length ? allowed.map((_enum) => {
+                return <div key={`allowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
+                    var disallowed = enumerationValues.relativeCompliment([...allowed].filter(x => x !== _enum));
+
+                    temp[UIA.NodeProperties.AllowedEnumValues] = [...allowed].filter(x => x !== _enum);
+                    temp[UIA.NodeProperties.DisallowedEnumValues] = disallowed;
+
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.EnumerationReference,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }} > {_enum}</div>;
+            }) : null,
+            <ControlSideBarMenuHeader
+                key={`${currentNode.id}-disalloweditem-title`} title={Titles.DisallowedEnums} />,
+            disallowed && disallowed.length ? disallowed.map((_enum) => {
+                return <div key={`disallowed-${_enum}`} className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
+
+                    var disallowed = enumerationValues.relativeCompliment([...allowed, _enum].unique());
+
+                    temp[UIA.NodeProperties.AllowedEnumValues] = [...allowed, _enum].unique();
+                    temp[UIA.NodeProperties.DisallowedEnumValues] = disallowed;
+
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.EnumerationReference,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }} > {_enum}</div>;
+            }) : null
+        ]
+    }
 
     getMatchManyReferenceProperty(options) {
         var {

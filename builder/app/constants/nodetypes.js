@@ -162,6 +162,7 @@ export const NodeProperties = {
     ConditionType: 'ConditionType',
     MatchReference: 'MatchReference',
     MatchManyReferenceParameter: 'MatchManyReferenceParameter',
+    EnumerationReference: 'EnumerationReference',
     AllowedExtensionValues: 'AllowedExtensionValues',
     ServiceType: 'ServiceType',
     DisallowedExtensionValues: 'DisallowedExtensionValues',
@@ -373,6 +374,7 @@ export const LinkType = {
     ExtensionList: 'extension-list',
     Extension: 'extension',
     Enumeration: 'enumeration',
+    EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
     LogicalNieces: 'logical-nieces',
     ManyToManyLink: "ManyToManyLink",
@@ -518,6 +520,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    EnumerationReferenceLink: {
+        type: LinkType.EnumerationReference
     },
     ConditionLink: {
         type: LinkType.Condition

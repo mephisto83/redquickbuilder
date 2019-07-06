@@ -215,6 +215,11 @@ const COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD = {
         key: FunctionTemplateKeys.Permission,
         nodeTypes: [NodeTypes.Permission]
     },
+    [FunctionTemplateKeys.ManyToManyModel]: {
+        [NodeProperties.ManyToManyNexus]: true,
+        key: FunctionTemplateKeys.ManyToManyModel,
+        nodeTypes: [NodeTypes.Model]
+    },
     [FunctionTemplateKeys.ModelFilter]: {
         key: FunctionTemplateKeys.ModelFilter,
         nodeTypes: [NodeTypes.ModelFilter]
@@ -714,7 +719,8 @@ export const ConditionTypeParameters = {
     Ref1: 'ref1',
     Ref2: 'ref2',
     Ref1UseId: 'ref1UseId',
-    Ref2UseId: 'ref2UseId'
+    Ref2UseId: 'ref2UseId',
+    Ref1Property: 'ref1Property'
 }
 
 export const ConditionTypeOptions = {
@@ -724,7 +730,8 @@ export const ConditionTypeOptions = {
 
 export const ConditionFunctionSetups = {
     [ConditionTypes.MatchReference]: {},
-    [ConditionTypes.MatchManyReferenceParameter]: {}
+    [ConditionTypes.MatchManyReferenceParameter]: {},
+    [ConditionTypes.InEnumerable]: {}
 }
 Object.keys(MethodFunctions).map(key => {
     if (MethodFunctions[key].constraints) {
@@ -735,6 +742,11 @@ Object.keys(MethodFunctions).map(key => {
 
         ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions = ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions || {}
         ConditionFunctionSetups[ConditionTypes.MatchManyReferenceParameter].functions[key] = {
+            constraints: { ...MethodFunctions[key].constraints }
+        };
+
+        ConditionFunctionSetups[ConditionTypes.InEnumerable].functions = ConditionFunctionSetups[ConditionTypes.InEnumerable].functions || {}
+        ConditionFunctionSetups[ConditionTypes.InEnumerable].functions[key] = {
             constraints: { ...MethodFunctions[key].constraints }
         };
     }

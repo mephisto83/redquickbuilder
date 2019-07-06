@@ -130,7 +130,7 @@ class PermissionMenu extends Component {
                 }
                 {
                     currentNode ? (<SelectInput
-                        label={Titles.Models}
+                        label={Titles.AgentName}
                         options={model_nodes}
                         onChange={(value) => {
                             var id = currentNode.id;
@@ -153,35 +153,7 @@ class PermissionMenu extends Component {
                         }}
                         value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.PermissionRequester)} />) : null
                 }
-                {
-                    requestorPropertyNodes && requestorPropertyNodes.length ? (<SelectInput
-                        label={Titles.PermissionDependsOnProperties}
-                        options={requestorPropertyNodes}
-                        onChange={(value) => {
 
-                            this.props.graphOperation(UIA.NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE, {
-                                parent: UIA.Visual(state, UIA.SELECTED_NODE),
-                                links: [{
-                                    target: value,
-                                    linkProperties: {
-                                        properties: {
-                                            ...UIA.LinkProperties.ExistLink,
-                                            ...UIA.LinkProperties.PermissionDependencyPropertyLink
-                                        }
-                                    }
-                                }],
-                                properties: {
-                                    [NodeProperties.UIText]: UIA.GetNodeProp(graph.nodeLib[value], NodeProperties.UIText),
-                                },
-                                groupProperties: {
-                                },
-                                linkProperties: {
-                                    properties: { ...UIA.LinkProperties.PermissionPropertyDependencyLink }
-                                }
-                            });
-                        }}
-                        value={''} />) : null
-                }
                 {
                     currentNode ? (<SelectInput
                         label={Titles.TargetModel}
@@ -206,37 +178,6 @@ class PermissionMenu extends Component {
                             });
                         }}
                         value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.PermissionTarget)} />) : null
-                }
-                {
-                    propertyNodes && propertyNodes.length ? (<SelectInput
-                        label={Titles.PermissionDependsOnProperties}
-                        options={propertyNodes}
-                        onChange={(value) => {
-
-                            this.props.graphOperation(UIA.NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE, {
-                                parent: UIA.Visual(state, UIA.SELECTED_NODE),
-                                links: [{
-                                    target: value,
-                                    linkProperties: {
-                                        properties: {
-                                            ...UIA.LinkProperties.ExistLink,
-                                            ...UIA.LinkProperties.PermissionDependencyPropertyLink
-                                        }
-                                    }
-                                }],
-                                properties: {
-                                    [NodeProperties.UIText]: UIA.GetNodeProp(graph.nodeLib[value], NodeProperties.UIText)
-                                },
-                                groupProperties: {
-                                },
-                                linkProperties: {
-                                    properties: {
-                                        ...UIA.LinkProperties.PermissionPropertyDependencyLink
-                                    }
-                                }
-                            });
-                        }}
-                        value={''} />) : null
                 }
                 {
                     currentNode ? <NodeList
