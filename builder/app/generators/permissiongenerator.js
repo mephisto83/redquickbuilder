@@ -2,7 +2,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate } from '../constants/functiontypes';
+import { bindTemplate, ConditionTypes, ConditionTypeParameters } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import ExtensionGenerator from './extensiongenerator';
 import { debug } from 'util';
@@ -19,6 +19,8 @@ const PERMISSIONS_METHODS = './app/templates/permissions/permissions_method.tpl'
 const PERMISSIONS_ARBITER_PROP = './app/templates/permissions/permissions_arbiter_prop.tpl';
 const PERMISSIONS_IMPL = './app/templates/permissions/permissions_impl.tpl';
 const PERMISSIONS_INTERFACE_METHODS = './app/templates/permissions/permissions_interface_methods.tpl';
+const MATCH_TO_MANY_REFERENCE_PARAMETER = './app/templates/permissions/match-many-reference-parameter.tpl';
+const MATCH_REFERENCE = './app/templates/permissions/match-reference.tpl';
 
 const PROPERTY_TABS = 6;
 export default class PermissionGenerator {
@@ -315,7 +317,8 @@ export default class PermissionGenerator {
     }
     static GenerateCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
-
+        let _manyToManyMatchCondition = fs.readFileSync(MATCH_TO_MANY_REFERENCE_PARAMETER, 'utf-8');
+        let _matchReferenceCondition = fs.readFileSync(MATCH_REFERENCE, 'utf-8');
         let result = {};
         if (permission) {
             for (var method in Methods) {
@@ -327,6 +330,7 @@ export default class PermissionGenerator {
                         let useMatchIds = GetNodeProp(permission, NodeProperties.MatchIds);
                         let useConnectionExists = GetNodeProp(permission, NodeProperties.ConnectionExists);
                         let useExcludedFromList = GetNodeProp(permission, NodeProperties.ExcludedFromList);
+
                         if (useMatchIds) {
                             cases.push({
                                 variable: 'matchingIds',
@@ -343,6 +347,86 @@ export default class PermissionGenerator {
             var connectionExists = connection.FirstOrDefault() != null;`
                             })
                         }
+                    }
+                    let conditions = GraphMethods.GetLinkChain(state, {
+                        id: permission.id,
+                        links: [{
+                            type: LinkType.Condition,
+                            direction: GraphMethods.SOURCE
+                        }]
+                    });
+                    if (conditions && conditions.length) {
+                        conditions.map((t, index) => {
+                            var variable = 'variable_' + index;
+                            switch (GetNodeProp(t, NodeProperties.ConditionType)) {
+                                case ConditionTypes.MatchReference:
+                                    //_matchReferenceCondition 
+                                    var mmrp = GetNodeProp(t, NodeProperties.MatchReference);
+                                    if (mmrp) {
+                                        var propNode = GraphMethods.GetNode(graph, mmrp[ConditionTypeParameters.Ref1]);
+                                        var methods = GraphMethods.GetLinkChain(state, {
+                                            id: permission.id,
+                                            links: [{
+                                                type: LinkType.Condition,
+                                                direction: GraphMethods.TARGET
+                                            }, {
+                                                type: LinkType.FunctionOperator,
+                                                direction: GraphMethods.TARGET
+                                            }]
+                                        });
+                                        let method = methods.find(x => x);
+                                        if (method) {
+                                            let methodProps = GetNodeProp(method, NodeProperties.MethodProps);
+                                            if (methodProps) {
+                                                var ref1UseId = mmrp[ConditionTypeParameters.Ref1UseId];// GraphMethods.GetNode(graph, methodProps[mmrp[ConditionTypeParameters.Ref1UseId]]);
+                                                var ref2UseId = mmrp[ConditionTypeParameters.Ref2UseId];// GraphMethods.GetNode(graph, methodProps[mmrp[ConditionTypeParameters.Ref2UseId]]);
+                                                cases.push({
+                                                    template: bindTemplate(_matchReferenceCondition, {
+                                                        variable,
+                                                        value_property: ref1UseId ? 'Id' : '',
+                                                        data_property: ref2UseId ? 'Id' : '',
+                                                        relationship: GetNodeProp(relationship, NodeProperties.CodeName),
+                                                        property: GetNodeProp(propNode, NodeProperties.CodeName)
+                                                    }),
+                                                    variable
+                                                });
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case ConditionTypes.MatchManyReferenceParameter:
+                                    var mmrp = GetNodeProp(t, NodeProperties.MatchManyReferenceParameter);
+                                    if (mmrp) {
+                                        var propNode = GraphMethods.GetNode(graph, mmrp[ConditionTypeParameters.RefManyToManyProperty]);
+                                        var methods = GraphMethods.GetLinkChain(state, {
+                                            id: permission.id,
+                                            links: [{
+                                                type: LinkType.Condition,
+                                                direction: GraphMethods.TARGET
+                                            }, {
+                                                type: LinkType.FunctionOperator,
+                                                direction: GraphMethods.TARGET
+                                            }]
+                                        });
+                                        let method = methods.find(x => x);
+                                        if (method) {
+                                            let methodProps = GetNodeProp(method, NodeProperties.MethodProps);
+                                            if (methodProps) {
+                                                var relationship = GraphMethods.GetNode(graph, methodProps[mmrp[ConditionTypeParameters.RefManyToMany]]);
+                                                cases.push({
+                                                    template: bindTemplate(_manyToManyMatchCondition, {
+                                                        variable,
+                                                        relationship: GetNodeProp(relationship, NodeProperties.CodeName),
+                                                        property: GetNodeProp(propNode, NodeProperties.CodeName)
+                                                    }),
+                                                    variable
+                                                });
+                                            }
+                                        }
+                                    }
+                                    break;
+                            }
+                        })
                     }
                     result[method] = cases;
                 }

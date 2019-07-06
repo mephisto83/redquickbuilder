@@ -708,6 +708,15 @@ export const ConditionTypes = {
     MatchManyReferenceParameter: 'match-many-reference-parameter'
 }
 
+export const ConditionTypeParameters = {
+    RefManyToMany: 'refManyToMany',
+    RefManyToManyProperty: 'refManyToManyProperty',
+    Ref1: 'ref1',
+    Ref2: 'ref2',
+    Ref1UseId: 'ref1UseId',
+    Ref2UseId: 'ref2UseId'
+}
+
 export const ConditionTypeOptions = {
     IsFalse: 'is-false',
     IsTrue: 'is-true'
