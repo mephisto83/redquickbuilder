@@ -37,7 +37,7 @@ class MethodActivityMenu extends Component {
         })
         return (
             <TabPane active={active}>
-                {currentNode ? (<SelectInput
+                {/* {currentNode ? (<SelectInput
                     label={Titles.AgentOperator}
                     options={agent_nodes}
                     onChange={(value) => {
@@ -78,7 +78,7 @@ class MethodActivityMenu extends Component {
                             properties: { ...UIA.LinkProperties.PermissionLink }
                         });
                     }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionImpl] : ''} />) : null}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionImpl] : ''} />) : null} */}
                 {currentNode && !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<SelectInput
                     label={Titles.FunctionTypes}
                     options={function_types}

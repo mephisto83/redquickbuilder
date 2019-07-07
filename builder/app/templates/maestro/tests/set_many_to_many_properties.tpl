@@ -1,0 +1,1 @@
+            manyToMany.{{property}} = {{value}};

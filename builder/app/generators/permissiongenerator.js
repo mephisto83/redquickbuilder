@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, ConditionTypes, ConditionTypeParameters } from '../constants/functiontypes';
+import { bindTemplate, ConditionTypes, ConditionTypeParameters, ConditionCases, FunctionTemplateKeys, MethodFunctions, FunctionTypes } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import ExtensionGenerator from './extensiongenerator';
 import { debug } from 'util';
@@ -49,8 +49,16 @@ export default class PermissionGenerator {
         return false;
     }
     static createInstanceEnumerationListName(dNode, enu, method, type = 'Enums') {
-        return `list${type}${GetNodeProp(dNode, NodeProperties.CodeName)}${GetNodeProp(enu, NodeProperties.CodeName)}${method}`
+        return `list${type}${GetNodeProp(dNode, NodeProperties.CodeName) || dNode}${GetNodeProp(enu, NodeProperties.CodeName) || enu}${method}`
     }
+
+    static _createConstantList(name, constants) {
+        let result = constants.map(ea => {
+            return `${name}.${MakeConstant(ea)}`
+        })
+        return result;
+    }
+    //Deprecated
     static _createEnumerationInstanceList(dpNode, enumerationNode, method) {
         var ext_allowed = GetNodeProp(dpNode, NodeProperties.AllowedEnumValues) || [];
         let enumerationName = GetNodeProp(enumerationNode, NodeProperties.CodeName);
@@ -254,74 +262,93 @@ export default class PermissionGenerator {
     }
     static GetTestExtensionNodeValues(graph, permission, method, agent, model) {
         const value_string = 'value';
-        var dependingPermissionNodes = GraphMethods.getNodesByLinkType(graph, {
+        var conditionNodes = GraphMethods.getNodesByLinkType(graph, {
             id: permission.id,
-            type: LinkType.PermissionPropertyDependency
+            type: LinkType.Condition
         });
         let listOfCases = [];
-        dependingPermissionNodes.map(dpNode => {
-            let propertyNodeLinkedToByDependencyPermissionNodes = GraphMethods.getNodesByLinkType(graph, {
-                id: dpNode.id,
-                type: LinkType.PermissionPropertyDependency,
-                direction: GraphMethods.SOURCE
-            });
-            let propertyNodeLinkedToByDependencyPermissionNode = propertyNodeLinkedToByDependencyPermissionNodes[0];
-            if (!propertyNodeLinkedToByDependencyPermissionNode) {
-                return;
-            }
-            let propertyNodes = GraphMethods.getNodesByLinkType(graph, {
-                id: propertyNodeLinkedToByDependencyPermissionNode.id,
-                type: LinkType.PermissionDependencyProperty,
-                direction: GraphMethods.SOURCE
-            });
-            let propertyNode = null;
-            if (propertyNodes.length === 1) {
-                propertyNode = propertyNodes[0];
-            }
-            else {
-                return;
-            }
-            let isAppliedPermission = PermissionGenerator.IsAppliedPermission(graph, permission, propertyNode);
-            let enumerationNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.Enumeration));
-            let extentionNode = GraphMethods.GetNode(graph, GetNodeProp(dpNode, NodeProperties.UIExtension));
-            let useEnumeration = GetNodeProp(dpNode, NodeProperties.UseEnumeration);
-            let useExtension = GetNodeProp(dpNode, NodeProperties.UseExtension);
+        conditionNodes.map(conditionNode => {
 
-            if (useEnumeration) {
-                let enumInstance = PermissionGenerator._createEnumerationInstanceList(dpNode, enumerationNode, method);
-                let enumNotAllowed = PermissionGenerator._getNotAllowedConstances(dpNode, enumerationNode, method);
-                let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
-                let property = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
+            // let isAppliedPermission = PermissionGenerator.IsAppliedPermission(graph, permission, propertyNode);
+            // let enumerationNode = GraphMethods.GetNode(graph, GetNodeProp(conditionNode, NodeProperties.Enumeration));
+            // let extentionNode = GraphMethods.GetNode(graph, GetNodeProp(conditionNode, NodeProperties.UIExtension));
+            let conditionType = GetNodeProp(conditionNode, NodeProperties.ConditionType);
+            switch (conditionType) {
+                case ConditionTypes.MatchReference:
+                    var mmrp = GetNodeProp(conditionNode, NodeProperties.MatchReference);
+                    listOfCases.push({
+                        type: conditionType,
+                        values: [ConditionCases[ConditionTypes.MatchReference].$matching],
+                        neg: [ConditionCases[ConditionTypes.MatchReference].notmatching],
+                        options: { ...mmrp }
+                    })
 
-                listOfCases.push({
-                    name,
-                    property,
-                    values: enumInstance,
-                    neg: enumNotAllowed,
-                    isAppliedPermission
-                });
+                    break;
+                case ConditionTypes.MatchManyReferenceParameter:
+                    var mmrp = GetNodeProp(conditionNode, NodeProperties.MatchManyReferenceParameter);
+                    listOfCases.push({
+                        type: conditionType,
+                        values: [ConditionCases[ConditionTypes.MatchManyReferenceParameter].$matching],
+                        neg: [ConditionCases[ConditionTypes.MatchManyReferenceParameter].notmatching],
+                        options: { ...mmrp }
+                    })
 
+                    break;
+                case ConditionTypes.InEnumerable:
+
+                    var enumRef = GetNodeProp(conditionNode, NodeProperties.EnumerationReference);
+                    var enumerationNodeName = PermissionGenerator.getReferencedNodeName(graph, enumRef, NodeProperties.Enumeration);
+                    var constList = PermissionGenerator.getReference(enumRef, NodeProperties.AllowedEnumValues);
+                    var disAllowedConstList = PermissionGenerator.getReference(enumRef, NodeProperties.DisallowedEnumValues);
+                    let enumInstance = PermissionGenerator._createConstantList(enumerationNodeName, constList);
+                    let enumNotAllowed = PermissionGenerator._createConstantList(enumerationNodeName, disAllowedConstList);;
+                    let nameEnum = PermissionGenerator.createInstanceEnumerationListName(conditionNode, enumerationNodeName, method);
+                    let propertyEnum = PermissionGenerator.getReferencedNodeName(graph, enumRef, ConditionTypeParameters.Ref1Property);
+
+                    listOfCases.push({
+                        type: conditionType,
+                        name: nameEnum,
+                        ref: enumRef[ConditionTypeParameters.Ref1],
+                        property: propertyEnum,
+                        values: enumInstance,
+                        neg: enumNotAllowed,
+                        options: { ...enumRef }
+                    });
+
+                    break;
+                case ConditionTypes.InExtension:
+                    let definition = GetNodeProp(conditionNode, NodeProperties.UIExtensionDefinition);
+                    let extensionInstance = PermissionGenerator._createExtensionInstanceList(conditionNode, extentionNode, method);
+                    let extensionsNotAllowed = PermissionGenerator._getNotAllowedExtectionConstances(conditionNode, extentionNode, method);
+                    let nameExt = PermissionGenerator.createInstanceEnumerationListName(conditionNode, extentionNode, method, 'Extensions');
+                    let propertyExt = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
+                    // definition && definition.config ? definition.config.keyField : null;
+
+                    listOfCases.push({
+                        type: conditionType,
+                        name: nameExt,
+                        property: propertyExt,
+                        values: extensionInstance,
+                        neg: extensionsNotAllowed,
+                        options: { ...definition }
+                    });
+                    break;
             }
 
-            if (useExtension) {
-                let definition = GetNodeProp(extentionNode, NodeProperties.UIExtensionDefinition);
-                let extensionInstance = PermissionGenerator._createExtensionInstanceList(dpNode, extentionNode, method);
-                let extensionsNotAllowed = PermissionGenerator._getNotAllowedExtectionConstances(dpNode, extentionNode, method);
-                let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, extentionNode, method, 'Extensions');
-                let property = GetNodeProp(propertyNodeLinkedToByDependencyPermissionNode, NodeProperties.CodeName);
-                // definition && definition.config ? definition.config.keyField : null;
 
-                listOfCases.push({
-                    name,
-                    property,
-                    values: extensionInstance,
-                    neg: extensionsNotAllowed,
-                    isAppliedPermission
-                });
-            }
+
         });
 
         return listOfCases;
+    }
+    static getReferencedNodeName(graph, enumRef, type) {
+        return GetNodeProp(PermissionGenerator.getReferencedValue(graph, enumRef, type), NodeProperties.CodeName);
+    }
+    static getReferencedValue(graph, enumRef, type) {
+        return GraphMethods.GetNode(graph, enumRef[type])
+    }
+    static getReference(enumRef, type) {
+        return enumRef[type]
     }
     static GenerateCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
@@ -332,30 +359,7 @@ export default class PermissionGenerator {
             for (var method in Methods) {
                 var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
                 if (permissionsEnabledFor && permissionsEnabledFor[method]) {
-                    let cases = [];//PermissionGenerator.GetExtensionNodeValues(graph, permission, method, agent, model);
-                    //         let manyToManyNode = GraphMethods.GetNode(graph, GetNodeProp(permission, NodeProperties.PermissionManyToMany));
-                    //         if (manyToManyNode) {
-                    //             let useMatchIds = GetNodeProp(permission, NodeProperties.MatchIds);
-                    //             let useConnectionExists = GetNodeProp(permission, NodeProperties.ConnectionExists);
-                    //             let useExcludedFromList = GetNodeProp(permission, NodeProperties.ExcludedFromList);
-
-                    //             if (useMatchIds) {
-                    //                 cases.push({
-                    //                     variable: 'matchingIds',
-                    //                     template: 'var matchingIds = value.Id == data.Id;'
-                    //                 })
-                    //             }
-                    //             if (useConnectionExists && agent.id !== model.id) {
-                    //                 let mtmName = GetNodeProp(manyToManyNode, NodeProperties.CodeName);
-                    //                 cases.push({
-                    //                     arbiter: mtmName,
-                    //                     variable: 'connectionExists',
-                    //                     template: `
-                    // var connection = await arbiter${mtmName}.GetBy(${mtmName}Get.Get${mtmName}(data, value));
-                    // var connectionExists = connection.FirstOrDefault() != null;`
-                    //                 })
-                    //             }
-                    //         }
+                    let cases = [];
                     let conditions = GraphMethods.GetLinkChain(state, {
                         id: permission.id,
                         links: [{
@@ -488,44 +492,174 @@ export default class PermissionGenerator {
         if (!permission || !method || !agent || !model) {
             return [];
         }
+
         let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
         let enums = PermissionGenerator.EnumerateCases(cases);
         let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf-8');
-        let res = enums.map((_enum, testIndex) => {
-            let itemProps = [];
-            let itemProperties = [];
-            let agentProps = [];
-            let agentProperties = [];
+        let methodNode = GetLinkChainItem({
+            id: permission.id,
+            links: [{
+                type: LinkType.FunctionOperator,
+                direction: GraphMethods.TARGET
+            }]
+        });
+
+        let methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps);
+
+        let res = enums.map((_enum) => {
+            let props = [];
+            let properties = [];
             let ispositive = true;
             _enum.map((which, index) => {
                 let _case = cases[index];
                 ispositive = ispositive && _case.values.length > which;
-                let value = _case.values.length <= which ? _case.neg[which - _case.values.length] : _case.values[which];
-                let temp = bindTemplate(testCaseProperty, {
-                    model: _case.isAppliedPermission ? 'model' : 'agent',
-                    property: `.${_case.property}`,
-                    value: value
-                });
-                if (_case.isAppliedPermission) {
-                    itemProps.push(temp);
-                    itemProperties.push({
-                        property: _case.property,
-                        value
-                    })
+                let is_model_parameter;
+                switch (_case.type) {
+                    case ConditionTypes.MatchManyReferenceParameter:
+                        if (_case.options &&
+                            _case.options[ConditionTypeParameters.Ref1] &&
+                            _case.options[ConditionTypeParameters.Ref2] &&
+                            methodProps &&
+                            methodProps[_case.options[ConditionTypeParameters.Ref1]] &&
+                            methodProps[_case.options[ConditionTypeParameters.Ref2]] &&
+                            _case.options[ConditionTypeParameters.Ref1] !== _case.options[ConditionTypeParameters.Ref2]) {
+                            let ref2Model = _case.options[ConditionTypeParameters.Ref2];
+                            switch (_case.options[ConditionTypeParameters.Ref2]) {
+                                case FunctionTemplateKeys.AgentType:
+                                    throw 'this should be agent now';
+                            }
+                            if (ref2Model) {
+                                let ref1Property = 'Id';
+                                if (!_case.options[ConditionTypeParameters.Ref1UseId]) {
+                                    ref1Property = _case.options[ConditionTypeParameters.Ref1Property]
+                                }
+                                let template;
+                                let propType = _case.options[ConditionTypeParameters.Ref1];
+
+                                let ref1 = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.Ref1]);
+                                let ref2 = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.Ref2]);
+                                let refManyToMany = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.RefManyToMany]);
+                                let many_to_many_register = fs.readFileSync('./app/templates/permissions/tests/many_to_many_register.tpl', 'utf-8');
+
+                                switch (propType) {
+                                    case FunctionTemplateKeys.Agent:
+                                    case FunctionTemplateKeys.Model:
+                                    case FunctionTemplateKeys.Parent:
+                                        template = bindTemplate(testCaseProperty, {
+                                            model: propType,
+                                            property: `.${ref1Property}`,
+                                            value: `${ref2Model}.Id`
+                                        });
+                                        props.push({
+                                            props: template,
+                                            templates: {
+                                                many_to_many: GetCodeName(refManyToMany),
+                                                many_to_many_register: bindTemplate(many_to_many_register, {
+                                                    ref1type: GetCodeName(ref1),
+                                                    ref1: _case.options[ConditionTypeParameters.Ref1],
+                                                    ref2type: GetCodeName(ref2),
+                                                    ref2: _case.options[ConditionTypeParameters.Ref2],
+                                                })
+                                            },
+                                            type: _case.type
+                                        });
+                                        properties.push({
+                                            property: `.${ref1Property}`,
+                                            value: `${ref2Model}.Id`
+                                        });
+                                        break;
+                                    case FunctionTemplateKeys.AgentType:
+                                        throw 'This should be agent now';
+                                    default:
+                                        throw 'this hasnt been defined yet';
+                                }
+                            }
+                        }
+                        break;
+                    case ConditionTypes.MatchReference:
+
+                        if (_case.options &&
+                            _case.options[ConditionTypeParameters.Ref1] &&
+                            _case.options[ConditionTypeParameters.Ref2] &&
+                            _case.options[ConditionTypeParameters.Ref1] !== _case.options[ConditionTypeParameters.Ref2]) {
+                            let ref2Model = _case.options[ConditionTypeParameters.Ref2];
+                            switch (_case.options[ConditionTypeParameters.Ref2]) {
+                                case FunctionTemplateKeys.AgentType:
+                                    throw 'this should be agent now';
+                            }
+
+                            if (ref2Model) {
+                                let ref1Property = 'Id';
+                                if (!_case.options[ConditionTypeParameters.Ref1UseId]) {
+                                    ref1Property = _case.options[ConditionTypeParameters.Ref1Property]
+                                }
+                                let template;
+                                let propType = _case.options[ConditionTypeParameters.Ref1];
+                                switch (propType) {
+                                    case FunctionTemplateKeys.Agent:
+                                    case FunctionTemplateKeys.Model:
+                                    case FunctionTemplateKeys.Parent:
+                                        template = bindTemplate(testCaseProperty, {
+                                            model: propType,
+                                            property: `.${ref1Property}`,
+                                            value: `${ref2Model}.Id`
+                                        });
+                                        props.push({
+                                            props: template,
+                                            type: ConditionTypes.MatchReference
+                                        });
+                                        properties.push({
+                                            property: `.${ref1Property}`,
+                                            value: `${ref2Model}.Id`
+                                        });
+                                        break;
+                                    case FunctionTemplateKeys.AgentType:
+                                        throw 'This should be agent now';
+                                    default:
+                                        throw 'this hasnt been defined yet';
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        is_model_parameter = _case.ref === 'model';
+                        let value = _case.values.length <= which ? _case.neg[which - _case.values.length] : _case.values[which];
+                        let temp = bindTemplate(testCaseProperty, {
+                            model: is_model_parameter ? 'model' : 'agent', // THis may need to expand
+                            property: `.${_case.property}`,
+                            value: value
+                        });
+                        if (is_model_parameter) {
+                            props.push({ props: temp, type: FunctionTemplateKeys.Model });
+                            properties.push({
+                                props: {
+                                    property: _case.property,
+                                    value
+                                },
+                                type: FunctionTemplateKeys.Model
+                            })
+                        }
+                        else {
+                            props.push({ props: temp, type: FunctionTemplateKeys.Agent });
+                            properties.push({
+                                props: {
+                                    property: _case.property,
+                                    value
+                                },
+                                type: FunctionTemplateKeys.Agent
+                            })
+                        }
+                        break;
                 }
-                else {
-                    agentProps.push(temp);
-                    agentProperties.push({
-                        property: _case.property,
-                        value
-                    })
-                }
+
             });
             return {
-                agentProps,
-                itemProps,
-                agentProperties,
-                itemProperties,
+                props: [
+                    ...props
+                ],
+                properties: [
+                    ...properties
+                ],
                 resultSuccess: ispositive
             }
         });
@@ -534,30 +668,87 @@ export default class PermissionGenerator {
     }
     static GenerateTestCases(state, permission, agent, model) {
         var graph = GetCurrentGraph(state);
+        let parent = null;
+        let manyToMany = null;
+        let many_to_many_register = '';
         let testCase = fs.readFileSync(TEST_CASE, 'utf-8');
-        let result = []
-        for (var method in Methods) {
-            var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
-            if (permission && permissionsEnabledFor && permissionsEnabledFor[method]) {
-                let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
-                res = res.map((t, testIndex) => {
-                    var { agentProps, itemProps, resultSuccess } = t;
-                    return bindTemplate(testCase, {
-                        set_agent_properties: agentProps.join(NEW_LINE),
-                        set_model_properties: itemProps.join(NEW_LINE),
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                        model: GetNodeProp(model, NodeProperties.CodeName),
-                        method,
-                        test: `_${GetNodeProp(agent, NodeProperties.CodeName)}_${GetNodeProp(model, NodeProperties.CodeName)}_${method}_${testIndex}`,
-                        result: resultSuccess ? 'true' : 'false',
-                        function_name: GetNodeProp(permission, NodeProperties.CodeName) + method
-                    });
-                })
-                result = [...result, ...res];
+        let result = [];
+        let methodNode = permission ? GetLinkChainItem({
+            id: permission.id,
+            links: [{
+                type: LinkType.FunctionOperator,
+                direction: GraphMethods.TARGET
+            }]
+        }) : null;
+        parent = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.Parent);
+        manyToMany = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.ManyToManyModel);
+
+        switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
+            case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                testCase = fs.readFileSync('./app/templates/permissions/tests/Get_ManyToMany_Agent_Value__IListChild.tpl', 'utf-8');
+                break;
+            case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                testCase = fs.readFileSync('./app/templates/permissions/tests/Get_Parent$Child_Agent_Value__IListChild.tpl', 'utf-8');
+                break;
+        }
+        if (methodNode) {
+            for (var method in Methods) {
+                var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
+                if (permission && permissionsEnabledFor && permissionsEnabledFor[method]) {
+                    let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
+
+                    res = res.map((t, testIndex) => {
+                        var { props, resultSuccess, templates = {} } = t;
+                        return bindTemplate(testCase, {
+                            set_agent_properties: props.filter(x => x.type === FunctionTemplateKeys.Agent).map(t => t.props).join(NEW_LINE),
+                            set_model_properties: props.filter(x => x.type === FunctionTemplateKeys.Model).map(t => t.props).join(NEW_LINE),
+                            set_parent_properties: props.filter(x => x.type === FunctionTemplateKeys.Parent).map(t => t.props).join(NEW_LINE),
+                            set_match_reference_properties: props.filter(x => x.type === ConditionTypes.MatchReference).map(t => t.props).join(NEW_LINE),
+                            set_match_many_reference_properties: props.filter(x => x.type === ConditionTypes.MatchManyReferenceParameter).map(t => t.props).join(NEW_LINE),
+                            agent_type: GetCodeName(agent),
+                            model: GetCodeName(model),
+                            manyToMany: GetCodeName(manyToMany),
+                            many_to_many_register,
+                            parent: GetCodeName(parent),
+                            method,
+                            test: `_${GetCodeName(agent)}_${GetCodeName(model)}_${method}_${testIndex}`,
+                            result: resultSuccess ? 'true' : 'false',
+                            function_name: GetCodeName(permission) + method,
+                            ...templates
+                        });
+                    })
+                    result = [...result, ...res];
+                }
             }
         }
         return result;
     }
+    // static GenerateTestCases(state, permission, agent, model) {
+    //     var graph = GetCurrentGraph(state);
+    //     let testCase = fs.readFileSync(TEST_CASE, 'utf-8');
+    //     let result = []
+    //     for (var method in Methods) {
+    //         var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
+    //         if (permission && permissionsEnabledFor && permissionsEnabledFor[method]) {
+    //             let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
+    //             res = res.map((t, testIndex) => {
+    //                 var { agentProps, itemProps, resultSuccess } = t;
+    //                 return bindTemplate(testCase, {
+    //                     set_agent_properties: agentProps.join(NEW_LINE),
+    //                     set_model_properties: itemProps.join(NEW_LINE),
+    //                     agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+    //                     model: GetNodeProp(model, NodeProperties.CodeName),
+    //                     method,
+    //                     test: `_${GetNodeProp(agent, NodeProperties.CodeName)}_${GetNodeProp(model, NodeProperties.CodeName)}_${method}_${testIndex}`,
+    //                     result: resultSuccess ? 'true' : 'false',
+    //                     function_name: GetNodeProp(permission, NodeProperties.CodeName) + method
+    //                 });
+    //             })
+    //             result = [...result, ...res];
+    //         }
+    //     }
+    //     return result;
+    // }
     static Generate(options) {
         var { state, key } = options;
         let models = NodesByType(state, NodeTypes.Model);

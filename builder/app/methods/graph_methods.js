@@ -1336,6 +1336,14 @@ export function GetLinkByNodes(graph, options) {
         return t.source === source && t.target === target;
     })
 }
+export function GetLinkChainItem(state, options) {
+    var chains = GetLinkChain(state, options);
+
+    if (chains && chains.length) {
+        return chains[0];
+    }
+    return null;
+}
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
     var { id, links } = options;

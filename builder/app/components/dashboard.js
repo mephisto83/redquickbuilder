@@ -86,6 +86,9 @@ const MIND_MAP = 'MIND_MAP';
 const CODE_VIEW = 'CODE_VIEW';
 class Dashboard extends Component {
 
+    componentDidMount() {
+        this.props.setState();
+    }
     minified() {
         var { state } = this.props;
         return UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU) ? 'sidebar-collapse' : '';

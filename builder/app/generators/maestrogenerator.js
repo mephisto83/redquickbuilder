@@ -13,6 +13,8 @@ const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const MAESTRO_FUNCTION_TESTS = './app/templates/maestro/tests/maestro.tpl';
+const MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS = './app/templates/maestro/tests/maestro_same_agent_model.tpl';
+const get_agent_manytomany_listchild_interface = './app/templates/maestro/tests/get_agent_manytomany_listchild_interface.tpl';
 const MAESTRO_FUNCTION_GET_TESTS = './app/templates/maestro/tests/maestro_get.tpl';
 const PROPERTY_TABS = 6;
 export default class MaestroGenerator {
@@ -35,6 +37,8 @@ export default class MaestroGenerator {
         let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
         let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
         let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf-8');
+        let testFunctionGetSameParentTemplate = fs.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf-8');
+
         let testFunctionGetTemplate = fs.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf-8');
         let root = GetRootGraph(state);
         let graph = GetCurrentGraph(state);
@@ -59,8 +63,10 @@ export default class MaestroGenerator {
             let permissionValidationCases = [];
             if (maestro_functions.length) {
                 maestro_functions.map(maestro_function => {
-                    var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
+                    let function_type = GetNodeProp(maestro_function, NodeProperties.FunctionType);
+                    var ft = MethodFunctions[function_type];
                     if (ft) {
+
                         let tempFunction = ft.template;
                         let interfaceFunction = ft.interface;
                         let value_type = '';
@@ -85,6 +91,7 @@ export default class MaestroGenerator {
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
+                            manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                         }
@@ -103,13 +110,25 @@ export default class MaestroGenerator {
                         }));
                         arbiters.push(agent_type, model_type);
                         permissions.push({ agent_type, model_type });
+                        let value = '';
+                        let agentAndModelIsTheSame = false;
+                        if (ft.parentGet) {
+                            value = parentNode ? `${GetNodeProp(parentNode, NodeProperties.CodeName)}`.toLowerCase() : '{missing parent name}';
+                            if (agentTypeNode && parentNode) {
+                                agentAndModelIsTheSame = agentTypeNode.id === parentNode.id;
+                            }
+                        }
+                        else {
+                            value = modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`;
+                        }
+
                         let bindOptions = {
                             function_name: functionName,
                             agent_type: agent_type,
                             parent_type,
                             agent: agent,
                             value_type,
-                            value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
+                            value,
                             model: model_type,
                             connect_type,
                             maestro_function: functionName,
@@ -139,7 +158,7 @@ export default class MaestroGenerator {
                                     if (validator && validator.agent && _case.agentProperties) {
                                         var temp = [
                                             ...validator.agent.propertyInformation.map(t => t.set_properties),
-                                            ..._case.agentProperties.map((t, index) => {
+                                            ..._case.properties.filter(x => x.type === FunctionTemplateKeys.Agent).map(t => t.props).map((t, index) => {
                                                 if (validator.agent.propertyInformation.findIndex(x => x.property === t.property) !== -1) {
                                                     return false;
                                                 }
@@ -151,7 +170,7 @@ export default class MaestroGenerator {
                                     if (validator && validator.model && _case.itemProperties) {
                                         var temp = [
                                             ...validator.model.propertyInformation.map(t => t.set_properties),
-                                            ..._case.itemProperties.map((t, index) => {
+                                            ..._case.filter(x => x.type === FunctionTemplateKeys.Model).map(t => t.props).map((t, index) => {
                                                 if (validator.model.propertyInformation.findIndex(x => x.property === t.property) !== -1) {
                                                     return false;
                                                 }
@@ -198,10 +217,21 @@ export default class MaestroGenerator {
                                     case Methods.Get:
                                     case Methods.GetAll:
                                         templ = testFunctionGetTemplate;
+                                        if (agentAndModelIsTheSame) {
+                                            templ = testFunctionGetSameParentTemplate;
+                                        }
+                                        break;
+                                }
+                                switch (function_type) {
+                                    case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                                        templ = fs.readFileSync(get_agent_manytomany_listchild_interface, 'utf-8');
                                         break;
                                 }
                                 return bindTemplate(templ, {
                                     agent: agent_type,
+                                    many_to_many: GetNodeProp(manyToManyNode, NodeProperties.CodeName),
+                                    parent: GetNodeProp(parentNode, NodeProperties.CodeName),
+                                    set_many_to_many_properties: '//{not set yet}',
                                     value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                                     model: model_type,
                                     function_name: functionName,

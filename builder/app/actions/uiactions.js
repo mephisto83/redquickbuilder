@@ -42,7 +42,19 @@ export function Use(node, prop) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
-
+export function GetLinkChainItem(options) {
+    return GraphMethods.GetLinkChainItem(GetState(), options);
+}
+export function GetCodeName(node) {
+    return GetNodeProp(node, NodeProperties.CodeName);
+}
+export function GetMethodPropNode(graph, node, key) {
+    var methodProps = GetNodeProp(node, NodeProperties.MethodProps);
+    if (methodProps) {
+        return GraphMethods.GetNode(graph, methodProps[key] || null);
+    }
+    return null;
+}
 export function GetLinkProperty(link, prop) {
     return link && link.properties && link.properties[prop]
 }
@@ -192,6 +204,11 @@ export function NodesConnectedTo(state, nodeId) {
 let _getState;
 export function GetState() {
     return _getState();
+}
+export function setState() {
+    return (dispatch, getState) => {
+        _getState = getState;
+    }
 }
 export function GetCurrentGraph(state) {
     var currentGraph = Application(state, CURRENT_GRAPH);
