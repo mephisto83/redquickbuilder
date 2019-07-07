@@ -46,6 +46,9 @@ export function GetLinkChainItem(options) {
     return GraphMethods.GetLinkChainItem(GetState(), options);
 }
 export function GetCodeName(node) {
+    if (typeof (node) === 'string') {
+        node = GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+    }
     return GetNodeProp(node, NodeProperties.CodeName);
 }
 export function GetMethodPropNode(graph, node, key) {
@@ -210,6 +213,24 @@ export function setState() {
         _getState = getState;
     }
 }
+export function GetFunctionType(methodNode) {
+    return GetNodeProp(methodNode, NodeProperties.FunctionType);
+}
+export function GetMethodNodeProp(methodNode, key) {
+    return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {})[key];
+}
+export function GetMethodProps(methodNode, key) {
+    return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {});
+}
+export function GetPermissionMethod(permission) {
+    return GetLinkChainItem({
+        id: permission.id,
+        links: [{
+            type: NodeConstants.LinkType.FunctionOperator,
+            direction: GraphMethods.TARGET
+        }]
+    })
+}
 export function GetCurrentGraph(state) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     var scopedGraph = GetCurrentScopedGraph(state);
@@ -310,6 +331,7 @@ export const REMOVE_LINK = 'REMOVE_LINK';
 export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
 export const NEW_PARAMETER_NODE = 'NEW_PARAMETER_NODE';
 export const NEW_FUNCTION_OUTPUT_NODE = 'NEW_FUNCTION_OUTPUT_NODE';
+export const NEW_MODEL_ITEM_FILTER = 'NEW_MODEL_ITEM_FILTER';
 export const NEW_VALIDATION_ITEM_NODE = 'NEW_VALIDATION_ITEM_NODE';
 export const NEW_CHOICE_TYPE = 'NEW_CHOICE_TYPE';
 export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
@@ -390,6 +412,10 @@ export function graphOperation(operation, options) {
                     break;
                 case NEW_CONDITION_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Condition);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_MODEL_ITEM_FILTER:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ModelItemFilter);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
                 case NEW_VALIDATION_TYPE:

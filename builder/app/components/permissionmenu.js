@@ -52,7 +52,7 @@ class PermissionMenu extends Component {
         return (
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />
-                <CheckBox label={Titles.MatchIds}
+                {/* <CheckBox label={Titles.MatchIds}
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.MatchIds)}
                     onChange={(value) => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -190,7 +190,7 @@ class PermissionMenu extends Component {
                             id: currentNode.id,
                             type: LinkType.PermissionPropertyDependency
                         }).toNodeSelect()} /> : null
-                }
+                } */}
             </TabPane >
         );
     }

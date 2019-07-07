@@ -10,7 +10,7 @@ import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { Functions, HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
-import { NodeProperties, Methods } from '../constants/nodetypes';
+import { NodeProperties, Methods, LinkProperties } from '../constants/nodetypes';
 
 class MethodActivityMenu extends Component {
     render() {
@@ -127,15 +127,20 @@ class MethodActivityMenu extends Component {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])
                     }} icon={'fa fa-puzzle-piece'} title={Titles.CustomFunction} description={Titles.CustomFunctionDescription} />) : null}
                     {currentNode ? (<ControlSideBarMenuItem onClick={() => {
-                        this.props.graphOperation(UIA.NEW_PARAMETER_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                        this.props.graphOperation(UIA.NEW_MODEL_ITEM_FILTER, {
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
+                            linkProperties: {
+                                properties: { ...LinkProperties.ModelItemFilter }
+                            }
                         });
-                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddParameter} description={Titles.AddParameterDescription} />) : null}
-                    {currentNode ? (<ControlSideBarMenuItem onClick={() => {
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddModelItemFilter} description={Titles.AddModelItemFilterDescription} />) : null}
+                    {/* {currentNode ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_FUNCTION_OUTPUT_NODE, {
                             parent: UIA.Visual(state, UIA.SELECTED_NODE)
                         });
-                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddFunctionOutput} description={Titles.AddFunctionOutputDescription} />) : null}
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddFunctionOutput} description={Titles.AddFunctionOutputDescription} />) : null} */}
                 </ControlSideBarMenu>
             </TabPane>
         );

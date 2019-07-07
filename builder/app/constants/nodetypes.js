@@ -13,6 +13,7 @@ export const NodeTypes = {
     Permission: 'permission',
     PermissionDependency: 'permission-dependency',
     Condition: 'condition',
+    ModelItemFilter: "model-item-filter",
     Enumeration: 'enumeration', //Basically a list of const string.
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
@@ -36,7 +37,8 @@ export const NodeTypes = {
     ClassNode: 'class-node'
 }
 export const ExcludeDefaultNode = {
-    [NodeTypes.Condition]: true
+    [NodeTypes.Condition]: true,
+    [NodeTypes.ModelItemFilter]: true
 };
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
@@ -44,6 +46,7 @@ export const GeneratedTypes = {
     Constants: 'constants',
     Permissions: 'permissions-generated',
     Executors: 'executors',
+    ModelItemFilter: 'model-item-filter',
     ModelReturn: 'model-return',
     ModelGet: 'model-get',
     ModelExceptions: 'model-exceptions',
@@ -103,6 +106,7 @@ export const NotSelectableNodeTypes = {
 export const NodeTypeColors = {
     [ColorStates.Error]: '#FF0000',
     [NodeTypes.Concept]: '#DD4B39',
+    [NodeTypes.ModelItemFilter]: '#4ECDC4',
     [NodeTypes.Model]: '#713E5A',
     [NodeTypes.Property]: '#484349',
     [NodeTypes.Screen]: '#3A405A',
@@ -180,6 +184,7 @@ export const NodeProperties = {
     FilterModel: 'filtermodel',
     FilterAgent: 'filteragent',
     Validator: 'Validator',
+    ModelItemFilter: 'ModelItemFilter',
     Executor: 'Executor',
     ValidatorAgent: 'ValidatorAgent',
     Collapsed: 'collapsed',
@@ -356,6 +361,7 @@ export const LinkType = {
     ExecutorModel: 'executor-model',
 
     Condition: 'condtion',
+    ModelItemFilter: 'model-item-filter',
 
     Validation: 'validation',
     ValidationItem: 'validation-item',
@@ -520,6 +526,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ModelItemFilter: {
+        type: LinkType.ModelItemFilter
     },
     EnumerationReferenceLink: {
         type: LinkType.EnumerationReference
@@ -1069,6 +1078,33 @@ export const ExecutorUI = {
 }
 Object.keys(ExecutorUI).map(t => {
     ExecutorUI[t].type = t;
+})
+export const FilterRules = {
+    EqualsTrue: 'equals-true',
+    EqualsFalse: 'equals-false'
+}
+export const FilterUI = {
+    [FilterRules.EqualsTrue]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsTrue'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            type: NodePropertyTypes.BOOLEAN
+        }
+    },
+    [FilterRules.EqualsFalse]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsFalse'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            type: NodePropertyTypes.BOOLEAN
+        }
+    }
+}
+Object.keys(FilterUI).map(t => {
+    FilterUI[t].type = t;
 })
 export const ValidationUI = {
     [ValidationRules.OneOf]: {

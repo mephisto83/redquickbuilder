@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem, GetPermissionMethod, GetFunctionType, GetMethodNodeProp } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, ConditionTypes, ConditionTypeParameters, ConditionCases, FunctionTemplateKeys, MethodFunctions, FunctionTypes } from '../constants/functiontypes';
@@ -24,25 +24,21 @@ const MATCH_REFERENCE = './app/templates/permissions/match-reference.tpl';
 
 const PROPERTY_TABS = 6;
 export default class PermissionGenerator {
-    static PermissionMatches(state, permission, agent, model) {
-        var graph = GetCurrentGraph(state);
-        var requestorPermissionLinks = GraphMethods.getNodesByLinkType(graph, { id: permission.id, type: LinkType.RequestorPermissionLink });
-        if (requestorPermissionLinks && requestorPermissionLinks[0] && requestorPermissionLinks[0].id === agent.id) {
-            var appliedPermissionLink = GraphMethods.getNodesByLinkType(graph, { id: permission.id, type: LinkType.AppliedPermissionLink });
-            if (appliedPermissionLink && appliedPermissionLink[0] && appliedPermissionLink[0].id === model.id) {
-                return true;
-            }
-        }
-        var manyToManyLink = GraphMethods.getNodesByLinkType(graph, {
-            id: permission.id,
-            type: LinkType.ManyToManyPermissionLink
-        });
-        if (manyToManyLink && GetNodeProp(manyToManyLink[0], NodeProperties.LogicalChildrenTypes)) {
-            let logicalChildrenTypes = GetNodeProp(manyToManyLink[0], NodeProperties.LogicalChildrenTypes);
-            var temp = [agent.id, model.id].unique(x => x).intersection(logicalChildrenTypes);
-            var temp_relCompliment = [agent.id, model.id].unique(x => x).relativeCompliment(logicalChildrenTypes)
-            if (temp.length === logicalChildrenTypes.length && temp_relCompliment.length === 0) {
-                return true;
+    static PermissionMatches(permission, agent, model) {
+        var methodNode = GetPermissionMethod(permission);
+        if (methodNode) {
+            let function_type = GetFunctionType(methodNode);
+            switch (function_type) {
+                //Add more cases as required.
+                case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                    var result = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent) === agent.id &&
+                        GetMethodNodeProp(methodNode, FunctionTemplateKeys.Parent) === model.id;
+                    return result;
+                default:
+                    var result = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent) === agent.id &&
+                        GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model) === model.id;
+                    return result;
             }
         }
 
@@ -536,11 +532,6 @@ export default class PermissionGenerator {
                                 let template;
                                 let propType = _case.options[ConditionTypeParameters.Ref1];
 
-                                let ref1 = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.Ref1]);
-                                let ref2 = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.Ref2]);
-                                let refManyToMany = GetMethodPropNode(graph, methodNode, _case.options[ConditionTypeParameters.RefManyToMany]);
-                                let many_to_many_register = fs.readFileSync('./app/templates/permissions/tests/many_to_many_register.tpl', 'utf-8');
-
                                 switch (propType) {
                                     case FunctionTemplateKeys.Agent:
                                     case FunctionTemplateKeys.Model:
@@ -548,19 +539,10 @@ export default class PermissionGenerator {
                                         template = bindTemplate(testCaseProperty, {
                                             model: propType,
                                             property: `.${ref1Property}`,
-                                            value: `${ref2Model}.Id`
+                                            value: `"wrong"`
                                         });
                                         props.push({
-                                            props: template,
-                                            templates: {
-                                                many_to_many: GetCodeName(refManyToMany),
-                                                many_to_many_register: bindTemplate(many_to_many_register, {
-                                                    ref1type: GetCodeName(ref1),
-                                                    ref1: _case.options[ConditionTypeParameters.Ref1],
-                                                    ref2type: GetCodeName(ref2),
-                                                    ref2: _case.options[ConditionTypeParameters.Ref2],
-                                                })
-                                            },
+                                            props: ispositive ? '' : template,
                                             type: _case.type
                                         });
                                         properties.push({
@@ -602,7 +584,7 @@ export default class PermissionGenerator {
                                         template = bindTemplate(testCaseProperty, {
                                             model: propType,
                                             property: `.${ref1Property}`,
-                                            value: `${ref2Model}.Id`
+                                            value: !ispositive ? '"wrong"' : `${ref2Model}.Id`
                                         });
                                         props.push({
                                             props: template,
@@ -682,13 +664,26 @@ export default class PermissionGenerator {
         }) : null;
         parent = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.Parent);
         manyToMany = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.ManyToManyModel);
+        many_to_many_register = fs.readFileSync('./app/templates/permissions/tests/many_to_many_register.tpl', 'utf-8');
 
         switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
             case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
                 testCase = fs.readFileSync('./app/templates/permissions/tests/Get_ManyToMany_Agent_Value__IListChild.tpl', 'utf-8');
+                many_to_many_register = bindTemplate(many_to_many_register, {
+                    ref1type: GetCodeName(parent),
+                    ref1: FunctionTemplateKeys.Parent,
+                    ref2type: GetCodeName(model),
+                    ref2: FunctionTemplateKeys.Model,
+                });
                 break;
             case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
                 testCase = fs.readFileSync('./app/templates/permissions/tests/Get_Parent$Child_Agent_Value__IListChild.tpl', 'utf-8');
+                many_to_many_register = bindTemplate(many_to_many_register, {
+                    ref1type: GetCodeName(parent),
+                    ref1: FunctionTemplateKeys.Parent,
+                    ref2type: GetCodeName(agent),
+                    ref2: FunctionTemplateKeys.Agent,
+                })
                 break;
         }
         if (methodNode) {
@@ -699,23 +694,26 @@ export default class PermissionGenerator {
 
                     res = res.map((t, testIndex) => {
                         var { props, resultSuccess, templates = {} } = t;
-                        return bindTemplate(testCase, {
-                            set_agent_properties: props.filter(x => x.type === FunctionTemplateKeys.Agent).map(t => t.props).join(NEW_LINE),
-                            set_model_properties: props.filter(x => x.type === FunctionTemplateKeys.Model).map(t => t.props).join(NEW_LINE),
-                            set_parent_properties: props.filter(x => x.type === FunctionTemplateKeys.Parent).map(t => t.props).join(NEW_LINE),
-                            set_match_reference_properties: props.filter(x => x.type === ConditionTypes.MatchReference).map(t => t.props).join(NEW_LINE),
-                            set_match_many_reference_properties: props.filter(x => x.type === ConditionTypes.MatchManyReferenceParameter).map(t => t.props).join(NEW_LINE),
-                            agent_type: GetCodeName(agent),
-                            model: GetCodeName(model),
-                            manyToMany: GetCodeName(manyToMany),
+
+                        return bindTemplate(bindTemplate(testCase, {
                             many_to_many_register,
-                            parent: GetCodeName(parent),
-                            method,
-                            test: `_${GetCodeName(agent)}_${GetCodeName(model)}_${method}_${testIndex}`,
-                            result: resultSuccess ? 'true' : 'false',
-                            function_name: GetCodeName(permission) + method,
-                            ...templates
-                        });
+                        }), {
+                                set_agent_properties: props.filter(x => x.type === FunctionTemplateKeys.Agent).map(t => t.props).join(NEW_LINE),
+                                set_model_properties: props.filter(x => x.type === FunctionTemplateKeys.Model).map(t => t.props).join(NEW_LINE),
+                                set_parent_properties: props.filter(x => x.type === FunctionTemplateKeys.Parent).map(t => t.props).join(NEW_LINE),
+                                set_match_reference_properties: props.filter(x => x.type === ConditionTypes.MatchReference).map(t => t.props).join(NEW_LINE),
+                                set_match_many_reference_properties: props.filter(x => x.type === ConditionTypes.MatchManyReferenceParameter).map(t => t.props).join(NEW_LINE),
+                                agent_type: GetCodeName(agent),
+                                model: GetCodeName(model),
+                                many_to_many: GetCodeName(manyToMany),
+
+                                parent: GetCodeName(parent),
+                                method,
+                                test: `_${GetCodeName(agent)}_${GetCodeName(model)}_${method}_${testIndex}`,
+                                result: resultSuccess ? 'true' : 'false',
+                                function_name: GetCodeName(permission) + method,
+                                ...templates
+                            });
                     })
                     result = [...result, ...res];
                 }
@@ -776,7 +774,7 @@ export default class PermissionGenerator {
             let testMethodPermisionCases = [];
             let arbiters = [];
             models.map(model => {
-                let matchingPermissionNodes = permissions.filter(permission => PermissionGenerator.PermissionMatches(state, permission, agent, model));
+                let matchingPermissionNodes = permissions.filter(permission => PermissionGenerator.PermissionMatches(permission, agent, model));
                 if (!matchingPermissionNodes || !matchingPermissionNodes.length) {
                     return;
                 }

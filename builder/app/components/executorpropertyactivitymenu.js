@@ -20,14 +20,15 @@ import SideBarMenu from './sidebarmenu';
 class ExecutorPropertyActivityMenu extends Component {
     render() {
         var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Executor);
+        var active = UIA.IsCurrentNodeA(state, this.props.nodeType || UIA.NodeTypes.Executor);
         var graph = UIA.GetCurrentGraph(state);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var executor;
-        if (active && currentNode && UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel)) {
+        if (active && currentNode && UIA.GetNodeProp(currentNode, this.props.modelKey || UIA.NodeProperties.ExecutorModel)) {
 
-            executor = UIA.GetNodeProp(currentNode, NodeProperties.Executor);
+            executor = UIA.GetNodeProp(currentNode, this.props.nodeProp || NodeProperties.Executor);
         }
+        let _ui = this.props.ui || ExecutorUI;
         let propertyExecutors = <div></div>;
         if (executor && executor.properties) {
             propertyExecutors = Object.keys(executor.properties).map(key => {
@@ -52,15 +53,15 @@ class ExecutorPropertyActivityMenu extends Component {
                                 icon={'fa fa-minus'}
                                 onClick={() => {
                                     let id = currentNode.id;
-                                    let validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
- 
+                                    let validator = UIA.GetNodeProp(currentNode, this.props.nodeProp || NodeProperties.Executor) || createValidator();
+
 
                                     let _validates = validator.properties[key];
-                                    delete _validates.validators[v] 
+                                    delete _validates.validators[v]
 
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         id,
-                                        prop: NodeProperties.Executor,
+                                        prop: this.props.nodeProp || NodeProperties.Executor,
                                         value: validator
                                     })
                                 }} />
@@ -68,7 +69,7 @@ class ExecutorPropertyActivityMenu extends Component {
                         </TreeViewMenu>
                     )
                 })
-                let validationUis = Object.keys(ExecutorUI).filter(x => !_validates || !_validates.validators || !_validates.validators[x]).reverse().map(executorUI => {
+                let validationUis = Object.keys(_ui).filter(x => !_validates || !_validates.validators || !_validates.validators[x]).reverse().map(executorUI => {
                     return (
                         <TreeViewMenu
                             hideArrow={true}
@@ -77,18 +78,18 @@ class ExecutorPropertyActivityMenu extends Component {
                             icon={'fa fa-plus-square-o'}
                             onClick={() => {
                                 let id = currentNode.id;
-                                var executor = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                                var executor = UIA.GetNodeProp(currentNode, this.props.nodeProp || NodeProperties.Executor) || createValidator();
                                 executor = addValidatator(executor, {
                                     id: key,
                                     validator: uuidv4(),
                                     validatorArgs: {
                                         type: executorUI,
-                                        ...ExecutorUI[executorUI]
+                                        ..._ui[executorUI]
                                     }
                                 });
                                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                     id,
-                                    prop: NodeProperties.Executor,
+                                    prop: this.props.nodeProp || NodeProperties.Executor,
                                     value: executor
                                 })
                             }} />

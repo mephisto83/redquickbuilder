@@ -1578,6 +1578,15 @@ addEventFunction('OnRemoveExecutorPropConnection', (graph, link, func) => {
         removeValidator(GetNodeProp(node, NodeProperties.Executor), { id: target });
     return graph;
 });
+
+addEventFunction('OnRemoveModelFilterPropConnection', (graph, link, func) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    if (node && node.properties)
+        removeValidator(GetNodeProp(node, NodeProperties.ModelItemFilter), { id: target });
+    return graph;
+});
+
 addEventFunction('OnRemoveValidationItemPropConnection', (graph, link, func, args) => {
     var { source, target } = link;
     var node = GetNode(graph, source);

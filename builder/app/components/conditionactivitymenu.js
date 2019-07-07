@@ -95,94 +95,13 @@ class ConditionActivityMenu extends Component {
                     currentNode,
                     methods
                 })}
-                {conditionType == ConditionTypes.MatchReference ? (
-                    <SelectInput
-                        label={Titles.Reference}
-                        options={model_options}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref1 = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }}
-                        value={matchRef.ref1} />
-                ) : null}
-                {matchRef.ref1 && conditionType == ConditionTypes.MatchReference ? (
-                    <CheckBox
-                        label={Titles.UseId}
-                        value={matchRef.ref1UseId}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref1UseId = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }} />
-                ) : null}
-                {matchRef.ref1 && !temp.ref1UseId && conditionType == ConditionTypes.MatchReference ? (
-                    <SelectInput
-                        label={Titles.Property}
-                        options={ref1_properties}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp[ConditionTypeParameters.Ref1Property] = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }}
-                        value={matchRef.ref1Property} />
-                ) : null}
-                {conditionType == ConditionTypes.MatchReference ? (
-                    <SelectInput
-                        label={Titles.Reference}
-                        options={model_options}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref2 = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }}
-                        value={matchRef.ref2} />
-                ) : null}
-                {matchRef.ref2 && conditionType == ConditionTypes.MatchReference ? (
-                    <CheckBox
-                        label={Titles.UseId}
-                        value={matchRef.ref2UseId}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref2UseId = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }} />
-                ) : null}
-                {matchRef.ref2 && !temp.ref2UseId && conditionType == ConditionTypes.MatchReference ? (
-                    <SelectInput
-                        label={Titles.Property}
-                        options={ref2_properties}
-                        onChange={(value) => {
-                            var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-                            temp.ref2Property = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.MatchReference,
-                                id: currentNode.id,
-                                value: temp
-                            });
-                        }}
-                        value={matchRef.ref2Property} />
-                ) : null}
+                {this.getMatchReferenceProperty({
+                    conditionType,
+                    model_options,
+                    currentNode,
+                    methods,
+                    graph
+                })}
             </TabPane>
         );
     }
@@ -237,7 +156,7 @@ class ConditionActivityMenu extends Component {
             ref1_properties = this.getProperties(methodProps, temp, state, 'ref1');
         }
 
-        if (temp.refManyToMany) {
+        if (temp[ConditionTypeParameters.RefManyToMany]) {
             refManyToMany_properties = this.getProperties(methodProps, temp, state, 'refManyToMany');
         }
 
@@ -368,7 +287,7 @@ class ConditionActivityMenu extends Component {
             ref1_properties = this.getProperties(methodProps, temp, state, 'ref1');
         }
 
-        if (temp.refManyToMany) {
+        if (temp[ConditionTypeParameters.RefManyToMany]) {
             refManyToMany_properties = this.getProperties(methodProps, temp, state, 'refManyToMany');
         }
 
@@ -461,14 +380,14 @@ class ConditionActivityMenu extends Component {
                     label={Titles.ManyToManyNexus}
                     options={model_options}
                     onChange={(value) => {
-                        temp.refManyToMany = value;
+                        temp[ConditionTypeParameters.RefManyToMany] = value;
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.MatchManyReferenceParameter,
                             id: currentNode.id,
                             value: temp
                         });
                     }}
-                    value={matchRef.refManyToMany} />
+                    value={matchRef[ConditionTypeParameters.RefManyToMany]} />
             ) : null,
             matchRef.ref2 && conditionType == ConditionTypes.MatchManyReferenceParameter ? (
                 <CheckBox
@@ -505,7 +424,7 @@ class ConditionActivityMenu extends Component {
                 onChange={(value) => {
                     temp.refManyToManyCondition = value;
                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.IsEqualTo,
+                        prop: UIA.NodeProperties.MatchManyReferenceParameter,
                         id: currentNode.id,
                         value
                     });
@@ -514,6 +433,172 @@ class ConditionActivityMenu extends Component {
 
             return x;
         });
+    }
+
+    getMatchReferenceProperty(options) {
+        var {
+            conditionType,
+            model_options,
+            currentNode,
+            methods,
+        } = options;
+        if (conditionType !== ConditionTypes.MatchReference) {
+            return null;
+        }
+        var { state } = this.props;
+        var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+
+        let methodProps = UIA.GetNodeProp(methods ? methods[0] : null, NodeProperties.MethodProps);
+        var ref1_properties = [];
+        var ref2_properties = [];
+        var refManyToMany_properties = [];
+        var propertyType = UIA.NodeProperties.MatchReference;
+
+        if (temp.ref2) {
+            ref2_properties = this.getProperties(methodProps, temp, state, 'ref2');
+        }
+        if (temp.ref1) {
+            ref1_properties = this.getProperties(methodProps, temp, state, 'ref1');
+        }
+
+        if (temp[ConditionTypeParameters.RefManyToMany]) {
+            refManyToMany_properties = this.getProperties(methodProps, temp, state, 'refManyToMany');
+        }
+
+        let matchRef = { ...temp };
+        return [(
+            <SelectInput
+                label={Titles.Reference}
+                options={model_options}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp.ref1 = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }}
+                value={matchRef.ref1} />
+        ),
+        matchRef.ref1 ? (
+            <CheckBox
+                label={Titles.UseId}
+                value={matchRef.ref1UseId}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp.ref1UseId = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }} />
+        ) : null,
+        matchRef.ref1 && !temp.ref1UseId ? (
+            <SelectInput
+                label={Titles.Property}
+                options={ref1_properties}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp[ConditionTypeParameters.Ref1Property] = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }}
+                value={matchRef.ref1Property} />
+        ) : null,
+        (
+            <SelectInput
+                label={Titles.Reference}
+                options={model_options}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp.ref2 = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }}
+                value={matchRef.ref2} />
+        ),
+        matchRef.ref2 ? (
+            <CheckBox
+                label={Titles.UseId}
+                value={matchRef.ref2UseId}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp.ref2UseId = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }} />
+        ) : null,
+        matchRef.ref2 && !temp.ref2UseId ? (
+            <SelectInput
+                label={Titles.Property}
+                options={ref2_properties}
+                onChange={(value) => {
+                    var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+                    temp.ref2Property = value;
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: propertyType,
+                        id: currentNode.id,
+                        value: temp
+                    });
+                }}
+                value={matchRef.ref2Property} />
+        ) : null
+        // matchRef.ref1 && matchRef.ref2 ? (
+        //     <SelectInput
+        //         label={Titles.ManyToManyNexus}
+        //         options={model_options}
+        //         onChange={(value) => {
+        //             var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+        //             temp[ConditionTypeParameters.RefManyToMany] = value;
+        //             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+        //                 prop: propertyType,
+        //                 id: currentNode.id,
+        //                 value: temp
+        //             });
+        //         }}
+        //         value={matchRef[ConditionTypeParameters.RefManyToMany]} />
+        // ) : null,
+        // matchRef.ref1 && matchRef.ref2 ? (
+        //     <SelectInput
+        //         label={Titles.Property}
+        //         options={refManyToMany_properties}
+        //         onChange={(value) => {
+        //             var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+        //             temp.refManyToManyProperty = value;
+        //             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+        //                 prop: propertyType,
+        //                 id: currentNode.id,
+        //                 value: temp
+        //             });
+        //         }}
+        //         value={matchRef.refManyToManyProperty} />
+        // ) : null,
+        // matchRef.refManyToManyProperty && matchRef.ref1 && matchRef.ref2 ? (<SelectInput
+        //     title={Titles.Condition}
+        //     label={Titles.Condition}
+        //     options={[...Object.keys(ConditionTypeOptions)].map(t => ({ title: t, value: t }))}
+        //     value={matchRef.refManyToManyCondition}
+        //     onChange={(value) => {
+        //         var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
+        //         temp.refManyToManyCondition = value;
+        //         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+        //             prop: propertyType,
+        //             id: currentNode.id,
+        //             value: temp
+        //         });
+        //    }} />) : null
+        ].filter(x => x)
     }
 }
 

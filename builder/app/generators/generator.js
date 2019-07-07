@@ -15,6 +15,7 @@ import ValidationRuleGenerator from "./validationrulegenerator";
 import ExecutorGenerator from "./executiongenerator";
 import ModelReturnGenerator from './modelreturngenerator';
 import ModelExceptionGenerator from './modelexceptiongenerator';
+import ModelItemFilter from './modelitemfiltergenerator';
 import ModelGetGenerator from './modelgetgenerators';
 export default class Generator {
     static generate(options) {
@@ -86,6 +87,8 @@ export default class Generator {
                 return ModelReturnGenerator.Generate({ state, key });
             case GeneratedTypes.ModelExceptions:
                 return ModelExceptionGenerator.Generate({ state, key });
+            case GeneratedTypes.ModelItemFilter:
+                return ModelItemFilter.Generate({ state, key });
         }
     }
 }

@@ -64,6 +64,7 @@ import MethodPropertyMenu from './methodpropertymenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
 import NodeManagement from './nodemanagement';
 import CommonActivityMenu from './commonactivitymenu';
+import ModelFilterItemActivityMenu from './modelfilteritemactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
 import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
@@ -74,7 +75,7 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI } from '../constants/nodetypes';
 import CodeView from './codeview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -402,6 +403,7 @@ class Dashboard extends Component {
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
                                 <ControllerActivityMenu />
+                                <ModelFilterItemActivityMenu />
                                 <CommonActivityMenu />
                                 <FunctionActivityMenu />
                                 <MethodActivityMenu />
@@ -436,6 +438,7 @@ class Dashboard extends Component {
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu ui={FilterUI} modelKey={NodeProperties.ModelItemFilter} nodeType={NodeTypes.ModelItemFilter} nodeProp={NodeProperties.FilterModel} />) : null}
                         </SideBar>
                     </div>
                 </div >
