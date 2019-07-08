@@ -14,7 +14,9 @@ const FILTER_PROPERTY_FUNCTION_VALUE_EQUALS = './app/templates/models/itemfilter
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelItemFilterGenerator {
-
+    static predicates(nodes) {
+        return nodes.map(x => `${GetCodeName(x)}.Filter()`)
+    }
     static Generate(options) {
         var { state, key } = options;
         let graphRoot = GetRootGraph(state);
@@ -41,15 +43,15 @@ export default class ModelItemFilterGenerator {
                             let validatorName = filterModel.properties[prop].validators[validator];
                             let validatorValue = '';
                             let _function = '==';
-                            switch (validatorName) {
-                                case FilterRules.EqualsTrue:
-                                    validatorValue = 'true';
-
-                                    break;
-                                case FilterRules.EqualsFalse:
-                                    validatorValue = 'false';
-                                    break;
-                            }
+                            if (validatorName && validatorName.type)
+                                switch (validatorName.type) {
+                                    case FilterRules.EqualsTrue:
+                                        validatorValue = 'true';
+                                        break;
+                                    case FilterRules.EqualsFalse:
+                                        validatorValue = 'false';
+                                        break;
+                                }
                             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf-8');
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {
                                 property: propName,

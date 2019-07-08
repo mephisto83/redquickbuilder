@@ -7,6 +7,7 @@ import NamespaceGenerator from './namespacegenerator';
 import StreamProcessOrchestrationGenerator from './streamprocessorchestrationgenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
 import PermissionGenerator from './permissiongenerator';
+import ModelItemFilterGenerator from './modelitemfiltergenerator';
 
 const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
 const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
@@ -85,6 +86,7 @@ export default class MaestroGenerator {
                         let manyToManyNode = null;
                         let modelNode = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
+                        let predicates = '';
                         if (methodProps) {
                             agentTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType]);
                             modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
@@ -94,6 +96,20 @@ export default class MaestroGenerator {
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
+                            var modelItemFilters = GraphMethods.GetLinkChain(state, {
+                                id: maestro_function.id,
+                                links: [{
+                                    type: LinkType.ModelItemFilter,
+                                    direction: GraphMethods.SOURCE
+                                }]
+                            });
+                            predicates = ModelItemFilterGenerator.predicates(modelItemFilters);
+                            if (predicates.length) {
+                                predicates = ',' + predicates.join();
+                            }
+                            else {
+                                predicates = '';
+                            }
                         }
 
                         let agent = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_agentTypeNode}`;
@@ -131,6 +147,7 @@ export default class MaestroGenerator {
                             value,
                             model: model_type,
                             connect_type,
+                            predicates,
                             maestro_function: functionName,
                             filter_function: modelFilterNode ? GetNodeProp(modelFilterNode, NodeProperties.CodeName) : '{missing filter node}',
                             user: userTypeNode ? GetNodeProp(userTypeNode, NodeProperties.CodeName) : `{maestro_generator_mising_user}`,

@@ -5,7 +5,7 @@
 
 {{filter}}
                 return res;
-            }
+            };
 
             return result;
         }
