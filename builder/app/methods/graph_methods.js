@@ -1877,6 +1877,7 @@ function GetNodesInsideGroup(graph, t, seenGroups = {}) {
 export const GroupImportanceOrder = {
     [NodeTypes.Model]: 1,
     [NodeTypes.Function]: 1,
+    [NodeTypes.Method]: 1,
     [NodeTypes.Property]: 4,
     [NodeTypes.ValidationList]: 5,
     [NodeTypes.OptionList]: 6,
@@ -1884,7 +1885,8 @@ export const GroupImportanceOrder = {
     [NodeTypes.Permission]: 4,
     [NodeTypes.Attribute]: 8,
     [NodeTypes.ValidationList]: 10,
-    [NodeTypes.ValidationListItem]: 12
+    [NodeTypes.ValidationListItem]: 12,
+    [NodeTypes.ModelItemFilter]: 13
 }
 
 export function SetVisible(graph) {
