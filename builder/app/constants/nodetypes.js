@@ -721,6 +721,11 @@ export const ValidationRules = {
     AlphaOnlyWithSpaces: "alphaonlywithspaces",
     NotEmpty: "notempty",
     UrlEmpty: "url_empty",
+    IsTrue: 'is_true',
+    IsFalse: 'is_false',
+    GreaterThan: 'greater_than',
+    LessThan: 'less_than',
+    EqualTo: 'equal_to',
     Url: "url",
     EmailEmpty: "email_empty",
     Credit: "credit",
@@ -845,6 +850,11 @@ const COMMON_STRING_ARGS = {
 
 export const ValidationCases = {
     [ValidationRules.SocialSecurity]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true,
+            length: true
+        },
         cases: {
             '$true': function (e) {
                 return `"${[].interpolate(0, 9, e => Math.floor(Math.random() * 10)).join('')}"`
@@ -864,6 +874,11 @@ export const ValidationCases = {
         },
     },
     [ValidationRules.Zip]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true,
+            length: true
+        },
         cases: {
             '$true': function (e) {
                 return `"${[].interpolate(0, 5, e => Math.floor(Math.random() * 10)).join('')}"`
@@ -883,6 +898,11 @@ export const ValidationCases = {
         },
     },
     [ValidationRules.ZipEmpty]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true,
+            length: true
+        },
         cases: {
             '$true': function () {
                 return `"${[].interpolate(0, 5, e => Math.floor(Math.random() * 10)).join('')}"`
@@ -905,6 +925,10 @@ export const ValidationCases = {
         },
     },
     [ValidationRules.PastDate]: {
+        types: [NodePropertyTypes.DATETIME],
+        vectors: {
+            value: true
+        },
         cases: {
             '$true': function (e) {
                 return `Date.UtcNow().AddDays(1)`
@@ -916,6 +940,10 @@ export const ValidationCases = {
     },
 
     [ValidationRules.BeforeNow]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            value: true
+        },
         cases: {
             '$true': function (e) {
                 return `Date.UtcNow().AddDays(-1)`
@@ -926,6 +954,10 @@ export const ValidationCases = {
         }
     },
     [ValidationRules.Email]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"asdf@asdf.com"`
@@ -938,7 +970,11 @@ export const ValidationCases = {
             },
         }
     },
-    [ValidationRules.Email]: {
+    [ValidationRules.EmailEmpty]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"asadf@asdf.com"`
@@ -952,6 +988,11 @@ export const ValidationCases = {
         }
     },
     [ValidationRules.Credit]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true,
+            length: true
+        },
         cases: {
             '$true': function () {
                 return `"${[].interpolate(0, 16, e => Math.floor(Math.random() * 10)).join('')}"`
@@ -974,6 +1015,10 @@ export const ValidationCases = {
         },
     },
     [ValidationRules.Url]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"http://yahoo.com"`
@@ -986,7 +1031,8 @@ export const ValidationCases = {
             },
         }
     },
-    [ValidationRules.Url]: {
+    [ValidationRules.UrlEmpty]: {
+        types: [NodePropertyTypes.STRING],
         cases: {
             '$true': function (e) {
                 return `"http://yahoo.com"`
@@ -999,7 +1045,19 @@ export const ValidationCases = {
             },
         }
     },
+    [ValidationRules.NotEmpty]: {
+        types: [NodePropertyTypes.STRING],
+        cases: {
+            '$false': function () {
+                return `"asdf"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
     [ValidationRules.AlphaNumericLike]: {
+        types: [NodePropertyTypes.STRING],
         cases: {
             '$true': function (e) {
                 return `"httas21dfaom"`
@@ -1013,6 +1071,7 @@ export const ValidationCases = {
         }
     },
     [ValidationRules.AlphaOnly]: {
+        types: [NodePropertyTypes.STRING],
         cases: {
             '$true': function (e) {
                 return `"httasdfaom"`
@@ -1026,6 +1085,7 @@ export const ValidationCases = {
         }
     },
     [ValidationRules.AlphaOnlyWithSpaces]: {
+        types: [NodePropertyTypes.STRING],
         cases: {
             '$true': function (e) {
                 return `"httas dfaom"`
@@ -1038,6 +1098,61 @@ export const ValidationCases = {
             },
         }
     },
+    [ValidationRules.IsTrue]: {
+        types: [NodePropertyTypes.BOOLEAN],
+        cases: {
+            '$true': function () {
+                return 'true';
+            },
+            'false': function () {
+                return 'false';
+            }
+        }
+    },
+    [ValidationRules.IsFalse]: {
+        types: [NodePropertyTypes.BOOLEAN],
+        cases: {
+            'true': function () {
+                return 'true';
+            },
+            '$false': function () {
+                return 'false';
+            }
+        }
+    },
+    [ValidationRules.GreaterThan]: {
+        types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        cases: {
+            '$greater': function () {
+                return ' > '
+            },
+            'notgreater': function () {
+                return ' > '
+            }
+        }
+    },
+    [ValidationRules.LessThan]: {
+        types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        cases: {
+            '$less': function () {
+                return ' < '
+            },
+            'notless': function () {
+                return ' < '
+            }
+        }
+    },
+    [ValidationRules.EqualTo]: {
+        types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        cases: {
+            '$equal_to': function () {
+                return ' = '
+            },
+            'not_equal': function () {
+                return ' = '
+            }
+        }
+    }
 }
 export const ExecutorRules = {
     ModelReference: 'model-reference',
