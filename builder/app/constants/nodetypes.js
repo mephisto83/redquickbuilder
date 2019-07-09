@@ -1033,6 +1033,9 @@ export const ValidationCases = {
     },
     [ValidationRules.UrlEmpty]: {
         types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"http://yahoo.com"`
@@ -1047,6 +1050,10 @@ export const ValidationCases = {
     },
     [ValidationRules.NotEmpty]: {
         types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true,
+            length: true
+        },
         cases: {
             '$false': function () {
                 return `"asdf"`
@@ -1057,6 +1064,9 @@ export const ValidationCases = {
         }
     },
     [ValidationRules.AlphaNumericLike]: {
+        vectors: {
+            content: true
+        },
         types: [NodePropertyTypes.STRING],
         cases: {
             '$true': function (e) {
@@ -1072,6 +1082,9 @@ export const ValidationCases = {
     },
     [ValidationRules.AlphaOnly]: {
         types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"httasdfaom"`
@@ -1086,6 +1099,9 @@ export const ValidationCases = {
     },
     [ValidationRules.AlphaOnlyWithSpaces]: {
         types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: true
+        },
         cases: {
             '$true': function (e) {
                 return `"httas dfaom"`
@@ -1100,6 +1116,9 @@ export const ValidationCases = {
     },
     [ValidationRules.IsTrue]: {
         types: [NodePropertyTypes.BOOLEAN],
+        vectors: {
+            value: true
+        },
         cases: {
             '$true': function () {
                 return 'true';
@@ -1111,6 +1130,9 @@ export const ValidationCases = {
     },
     [ValidationRules.IsFalse]: {
         types: [NodePropertyTypes.BOOLEAN],
+        vectors: {
+            value: true
+        },
         cases: {
             'true': function () {
                 return 'true';
@@ -1122,6 +1144,9 @@ export const ValidationCases = {
     },
     [ValidationRules.GreaterThan]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        vectors: {
+            value: true
+        },
         cases: {
             '$greater': function () {
                 return ' > '
@@ -1133,6 +1158,9 @@ export const ValidationCases = {
     },
     [ValidationRules.LessThan]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        vectors: {
+            value: true
+        },
         cases: {
             '$less': function () {
                 return ' < '
@@ -1144,6 +1172,9 @@ export const ValidationCases = {
     },
     [ValidationRules.EqualTo]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        vectors: {
+            value: true
+        },
         cases: {
             '$equal_to': function () {
                 return ' = '
