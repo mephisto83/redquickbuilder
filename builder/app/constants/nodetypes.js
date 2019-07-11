@@ -714,18 +714,28 @@ export const Methods = {
     Update: 'Update',
     Delete: 'Delete'
 }
+export const ValidationVector = {
+    Content: 'content'
+}
 export const ValidationRules = {
     CVV: "cvv",
     AlphaNumericLike: "alphanumericlike",
+    AlphaNumericPuncLike: 'alphaNumericpunclike',
     AlphaOnly: "alphaonly",
+    NumericOnly: 'numericonly',
+    Numeric: 'numeric',
+    Empty: 'empty',
     AlphaOnlyWithSpaces: "alphaonlywithspaces",
     NotEmpty: "notempty",
     UrlEmpty: "url_empty",
     IsTrue: 'is_true',
     IsFalse: 'is_false',
     GreaterThan: 'greater_than',
+    GreaterThanOrEqualTo: 'greater_than_equal_to',
     LessThan: 'less_than',
+    LessThanOrEqualTo: 'less_than_equal_to',
     EqualTo: 'equal_to',
+    Any: 'any',
     Url: "url",
     EmailEmpty: "email_empty",
     Credit: "credit",
@@ -847,12 +857,32 @@ const COMMON_STRING_ARGS = {
     }
 }
 
+export function GetValidationsFor(type) {
+    let result = {};
+    Object.keys(ValidationCases).filter(x => {
+        return ValidationCases[x].types.some(v => v === type);
+    }).map(t => {
+        result[t] = ValidationCases[t];
+    });
+
+    return result;
+}
+
+export function GetValidationParent(type, vector) {
+    var vc = ValidationCases[type];
+    if (vc) {
+        var vects = vc.vectors[vector];
+        if (Array.isArray(vects)) {
+            return vects.map(t => ValidationCases[t]).filter(x => x);
+        }
+    }
+}
 
 export const ValidationCases = {
     [ValidationRules.SocialSecurity]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true,
+            content: [ValidationRules.Numeric],
             length: true
         },
         cases: {
@@ -876,7 +906,7 @@ export const ValidationCases = {
     [ValidationRules.Zip]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true,
+            content: [ValidationRules.ZipEmpty],
             length: true
         },
         cases: {
@@ -1017,7 +1047,7 @@ export const ValidationCases = {
     [ValidationRules.Url]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true
+            content: [ValidationRules.UrlEmpty]
         },
         cases: {
             '$true': function (e) {
@@ -1034,7 +1064,7 @@ export const ValidationCases = {
     [ValidationRules.UrlEmpty]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true
+            content: [ValidationRules.Any]
         },
         cases: {
             '$true': function (e) {
@@ -1048,10 +1078,25 @@ export const ValidationCases = {
             },
         }
     },
+    [ValidationRules.Empty]: {
+        types: [NodePropertyTypes.STRING],
+        vectors: {
+            content: [ValidationRules.Any],
+            length: true
+        },
+        cases: {
+            'false': function () {
+                return `"asdf"`
+            },
+            '$empty': function () {
+                return `""`
+            },
+        }
+    },
     [ValidationRules.NotEmpty]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true,
+            content: [ValidationRules.Any],
             length: true
         },
         cases: {
@@ -1063,9 +1108,58 @@ export const ValidationCases = {
             },
         }
     },
+    [ValidationRules.NumericOnly]: {
+        vectors: {
+            content: [ValidationRules.Numeric]
+        },
+        types: [NodePropertyTypes.STRING],
+        cases: {
+            '$true': function (e) {
+                return `"1234"`
+            },
+            'false': function () {
+                return `"asdf@ afsdfdd@asdf@.com"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
+    [ValidationRules.Numeric]: {
+        vectors: {
+            content: [ValidationRules.AlphaNumericPuncLike]
+        },
+        types: [NodePropertyTypes.STRING],
+        cases: {
+            '$true': function (e) {
+                return `"1234.34"`
+            },
+            'false': function () {
+                return `"12QW"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
+    //Cant be empty, that would  be the only difference between it and Any.
+    [ValidationRules.AlphaNumericPuncLike]: {
+        vectors: {
+            content: [ValidationRules.Any]
+        },
+        types: [NodePropertyTypes.STRING],
+        cases: {
+            '$true': function (e) {
+                return `"httas21df.!@#$ #$%^^&*^&*()aom"`
+            },
+            'empty': function () {
+                return `""`
+            },
+        }
+    },
     [ValidationRules.AlphaNumericLike]: {
         vectors: {
-            content: true
+            content: [ValidationRules.AlphaNumericPuncLike]
         },
         types: [NodePropertyTypes.STRING],
         cases: {
@@ -1083,7 +1177,7 @@ export const ValidationCases = {
     [ValidationRules.AlphaOnly]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true
+            content: [ValidationRules.AlphaOnlyWithSpaces]
         },
         cases: {
             '$true': function (e) {
@@ -1100,7 +1194,7 @@ export const ValidationCases = {
     [ValidationRules.AlphaOnlyWithSpaces]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: true
+            content: [ValidationRules.AlphaNumericPuncLike]
         },
         cases: {
             '$true': function (e) {
@@ -1117,7 +1211,7 @@ export const ValidationCases = {
     [ValidationRules.IsTrue]: {
         types: [NodePropertyTypes.BOOLEAN],
         vectors: {
-            value: true
+            value: [ValidationRules.Any]
         },
         cases: {
             '$true': function () {
@@ -1131,7 +1225,7 @@ export const ValidationCases = {
     [ValidationRules.IsFalse]: {
         types: [NodePropertyTypes.BOOLEAN],
         vectors: {
-            value: true
+            value: [ValidationRules.Any]
         },
         cases: {
             'true': function () {
@@ -1142,10 +1236,56 @@ export const ValidationCases = {
             }
         }
     },
+    [ValidationRules.GreaterThanOrEqualTo]: {
+        types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
+        vectors: {
+            value: {
+                [ValidationRules.GreaterThan]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.EqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.LessThan]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                },
+                [ValidationRules.LessThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                }
+            }
+        },
+        cases: {
+            '$greater': function () {
+                return ' >= '
+            },
+            'notgreater': function () {
+                return ' >= '
+            }
+        }
+    },
     [ValidationRules.GreaterThan]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
         vectors: {
-            value: true
+            value: {
+                [ValidationRules.GreaterThan]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.EqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.LessThan]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                },
+                [ValidationRules.LessThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                }
+            }
         },
         cases: {
             '$greater': function () {
@@ -1159,7 +1299,23 @@ export const ValidationCases = {
     [ValidationRules.LessThan]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
         vectors: {
-            value: true
+            value: {
+                [ValidationRules.GreaterThan]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.EqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.LessThan]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                },
+                [ValidationRules.LessThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                }
+            }
         },
         cases: {
             '$less': function () {
@@ -1173,7 +1329,23 @@ export const ValidationCases = {
     [ValidationRules.EqualTo]: {
         types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
         vectors: {
-            value: true
+            value: {
+                [ValidationRules.GreaterThan]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.EqualTo]: function (self, b) {
+                    // based on a parameter, determining which validation is most restrictive should be possible.
+                },
+                [ValidationRules.LessThan]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                },
+                [ValidationRules.LessThanOrEqualTo]: function (self, b) {
+                    // based on a parameter, determine if there are any possible success cases.
+                }
+            }
         },
         cases: {
             '$equal_to': function () {
@@ -1185,6 +1357,9 @@ export const ValidationCases = {
         }
     }
 }
+Object.keys(ValidationCases).map(t => {
+    ValidationCases[t].id = t;
+})
 export const ExecutorRules = {
     ModelReference: 'model-reference',
     Copy: 'copy',
