@@ -872,7 +872,7 @@ export function GetValidationsFor(type) {
 export function GetMoreCompatibles(a, vector, result = []) {
     var parents = GetValidationParents(a, vector).map(t => t.id);
     parents = parents.filter(t => result.indexOf(t) === -1);
-    result = [...result, ...parents];
+    result = [a, ...result, ...parents].unique();
     parents.map(t => {
         if (result.indexOf(t) !== -1) {
             result = GetMoreCompatibles(t, vector, result);
@@ -886,6 +886,25 @@ export function AreCompatible(a, b, vector = ValidationVector.Content) {
     var v = GetMoreCompatibles(b, vector);
 
     return !!t.intersection(v).length;
+}
+export function SortValidation(a, b, vector) {
+    if (a === b) {
+        return 0;
+    }
+    var t = GetMoreCompatibles(a, vector);
+    var v = GetMoreCompatibles(b, vector);
+    var bIsIncluded = t.some(_t => _t === b);
+    var aIsIncluded = v.some(_v => _v === a);
+    if (bIsIncluded && aIsIncluded) {
+        return 0;
+    }
+    else if (bIsIncluded) {
+        return -1;
+    }
+    else if (aIsIncluded) {
+        return 1;
+    }
+    return 0;
 }
 export function GetValidationParents(type, vector) {
     var vc = ValidationCases[type];
