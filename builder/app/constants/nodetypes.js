@@ -1,3 +1,4 @@
+import * as _ from '../utils/array';
 
 export const NodeTypes = {
     Concept: 'concept',
@@ -868,21 +869,45 @@ export function GetValidationsFor(type) {
     return result;
 }
 
-export function GetValidationParent(type, vector) {
+export function GetMoreCompatibles(a, vector, result = []) {
+    var parents = GetValidationParents(a, vector).map(t => t.id);
+    parents = parents.filter(t => result.indexOf(t) === -1);
+    result = [...result, ...parents];
+    parents.map(t => {
+        if (result.indexOf(t) !== -1) {
+            result = GetMoreCompatibles(t, vector, result);
+        }
+    });
+
+    return result;
+}
+export function AreCompatible(a, b, vector = ValidationVector.Content) {
+    var t = GetMoreCompatibles(a, vector);
+    var v = GetMoreCompatibles(b, vector);
+
+    return !!t.intersection(v).length;
+}
+export function GetValidationParents(type, vector) {
     var vc = ValidationCases[type];
     if (vc) {
         var vects = vc.vectors[vector];
         if (Array.isArray(vects)) {
             return vects.map(t => ValidationCases[t]).filter(x => x);
         }
+        else {
+            return Object.keys(vects).map(t => {
+                return ValidationCases[t]
+            }).filter(x => x);
+        }
     }
+    return [];
 }
 
 export const ValidationCases = {
     [ValidationRules.SocialSecurity]: {
         types: [NodePropertyTypes.STRING],
         vectors: {
-            content: [ValidationRules.Numeric],
+            content: [ValidationRules.AlphaNumericPuncLike],
             length: true
         },
         cases: {
