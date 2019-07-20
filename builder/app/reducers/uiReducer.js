@@ -1,12 +1,12 @@
 // @flow
 import * as UIA from '../actions/uiactions';
-function updateUI(state, action) {
+export function updateUI(state, action) {
     var newstate = { ...state };
     newstate[action.section] = { ...newstate[action.section] || {} }
     newstate[action.section][action.item] = action.value;
     return newstate;
 }
-function makeDefaultState() {
+export function makeDefaultState() {
     return {};
 }
 export default function uiReducer(state, action) {

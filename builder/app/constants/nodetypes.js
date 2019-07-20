@@ -750,6 +750,7 @@ export const ValidationRules = {
     ZipEmpty: "zipempty",
     Zip: "zip",
     SocialSecurity: "socialsecurity",
+    ListOfGuids: 'listofguids',
     OneOf: 'one-of'
 }
 
@@ -921,8 +922,36 @@ export function GetValidationParents(type, vector) {
     }
     return [];
 }
+export function GetValidationTypes(type) {
+    var results = [];
+
+    Object.values(ValidationCases).map(t => {
+        if (t && t.types && t.types.indexOf(type) !== -1)
+            results.push(t);
+    })
+
+    return results;
+}
 
 export const ValidationCases = {
+    [ValidationRules.ListOfGuids]: {
+        types: [NodePropertyTypes.LISTOFSTRINGS],
+        vectors: {
+            content: [ValidationRules.Any],
+            length: true
+        },
+        cases: {
+            '$true': function (e) {
+                return `new List<string> { "${_.uuidv4()}"}`
+            },
+            'long': function () {
+                return `new List<string> { "${_.uuidv4()}asdf" }`
+            },
+            '$empty': function () {
+                return `new List<string>()`
+            }
+        }
+    },
     [ValidationRules.SocialSecurity]: {
         types: [NodePropertyTypes.STRING],
         vectors: {

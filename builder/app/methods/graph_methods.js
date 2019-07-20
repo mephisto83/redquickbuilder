@@ -2,6 +2,7 @@ import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
 import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph } from '../actions/uiactions';
+import { uuidv4 } from '../utils/array';
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -128,7 +129,7 @@ export function getSubGraph(graph, scopes) {
 export function getScopedGraph(graph, options) {
     var { scope } = options;
     if (scope && scope.length) {
-
+        console.log(scope);
         scope.map((s, i) => {
             graph = graph.graphs[s];
         });
@@ -1854,12 +1855,6 @@ export function duplicateLink(nn, nodes) {
     };
 }
 
-export function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
 function GetNodesInsideGroup(graph, t, seenGroups = {}) {
     var res = [...Object.keys(graph.groupsNodes[t])];
     for (var i in graph.childGroups[t]) {
