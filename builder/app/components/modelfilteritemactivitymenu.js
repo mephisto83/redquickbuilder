@@ -36,6 +36,9 @@ class ModelFilterItemActivityMenu extends Component {
             var methodProps = UIA.GetMethodProps(methodNode);
             if (methodProps) {
                 switch (UIA.GetFunctionType(methodNode)) {
+                    case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                        node = GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
+                        break;
                     case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
                         node = GetNode(graph, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                         break;
@@ -66,14 +69,14 @@ class ModelFilterItemActivityMenu extends Component {
                         label={Titles.Property}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            let executor = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createExecutor();
-                            executor = addValidatator(executor, { id: value });
+                            let filterModel = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createExecutor();
+                            filterModel = addValidatator(filterModel, { id: value });
                             this.props.graphOperation([{
                                 operation: UIA.CHANGE_NODE_PROPERTY,
                                 options: {
                                     id,
                                     prop: NodeProperties.FilterModel,
-                                    value: executor
+                                    value: filterModel
                                 }
                             }, {
                                 operation: UIA.CHANGE_NODE_PROPERTY,

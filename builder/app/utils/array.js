@@ -1,3 +1,4 @@
+import { GetNodeTitle } from "../actions/uiactions";
 
 export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -63,7 +64,7 @@ export function uuidv4() {
                 return collection.map(node => {
                     return {
                         value: node.id,
-                        title: UIA.GetNodeTitle(node)
+                        title: GetNodeTitle(node)
                     }
                 })
             }

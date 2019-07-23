@@ -88,7 +88,7 @@ export default class MaestroGenerator {
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         let predicates = '';
                         if (methodProps) {
-                            agentTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType]);
+                            agentTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType] || methodProps[FunctionTemplateKeys.Agent]);
                             modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
@@ -141,6 +141,7 @@ export default class MaestroGenerator {
                         let bindOptions = {
                             function_name: functionName,
                             agent_type: agent_type,
+                            'agent_type#lower': `${agent_type}`.toLowerCase(),
                             parent_type,
                             agent: agent,
                             value_type,

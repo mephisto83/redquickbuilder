@@ -54,6 +54,7 @@ export default class ModelGetGenerator {
                 })
                 .map(model => {
                     return bindTemplate(_get_methods, {
+                        item_property: GetNodeProp(model, NodeProperties.IsOwnedByAgents) ? 'Owner' : GetNodeProp(agent, NodeProperties.CodeName),
                         agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                         model: GetNodeProp(model, NodeProperties.CodeName),
                     });

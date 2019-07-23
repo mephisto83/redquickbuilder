@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as _ from './array';
 import * as UIA from '../actions/uiactions';
 import * as IPCEvents from '../actions/ipcActions';
+import * as RemoteActions from '../actions/remoteActions';
 export function mapStateToProps(state) {
     return {
         state
@@ -10,7 +11,11 @@ export function mapStateToProps(state) {
 }
 
 export function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ ...UIA, ...IPCEvents }, dispatch);
+    return bindActionCreators({
+        ...UIA,
+        ...IPCEvents,
+        ...RemoteActions
+    }, dispatch);
 }
 
 

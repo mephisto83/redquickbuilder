@@ -78,6 +78,17 @@ class ModelActivityMenu extends Component {
                             });
                         }} />
                     <CheckBox
+                        label={Titles.IsOwnedByAgents}
+                        title={Titles.IsOwnedByAgentsDescriptions}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsOwnedByAgents] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.IsOwnedByAgents,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
+                    <CheckBox
                         label={Titles.ManyToManyNexus}
                         title={Titles.ManyToManyNexusDescription}
                         value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus)}

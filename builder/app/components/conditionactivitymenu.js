@@ -426,7 +426,7 @@ class ConditionActivityMenu extends Component {
                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.MatchManyReferenceParameter,
                         id: currentNode.id,
-                        value
+                        value: temp
                     });
                 }} />) : null
         ].filter((x) => x).map((x, index) => {

@@ -14,13 +14,17 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import { NodeProperties, NodeTypes, LinkEvents, LinkType, ExecutorUI } from '../constants/nodetypes';
-import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, removeValidator, removeValidatorValidation, uuidv4 } from '../methods/graph_methods';
+import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, removeValidator, removeValidatorValidation } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
+import { uuidv4 } from '../utils/array';
 
 class ExecutorPropertyActivityMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, this.props.nodeType || UIA.NodeTypes.Executor);
+        if (!active) {
+            return <div></div>;
+        }
         var graph = UIA.GetCurrentGraph(state);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var executor;

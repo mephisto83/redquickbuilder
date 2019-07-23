@@ -14,6 +14,7 @@ const EXECUTOR_ENTRY_METHODS = './app/templates/executor/executor_entry_methods.
 const EXECUTOR_ENTRY_METHODS_INTERFACE = './app/templates/executor/executor_entry_methods_interface.tpl';
 const EXECUTOR_METHOD_CASE = './app/templates/executor/entry_method_case.tpl';
 const EXECUTOR_UPDATE = './app/templates/executor/update.tpl';
+const EXECUTOR_GET = './app/templates/executor/get.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const EXECUTOR_METHODS = './app/templates/executor/executor_methods.tpl';
 const EXECUTOR_METHODS_INTERFACE = './app/templates/executor/executor_methods_interface.tpl';
@@ -49,6 +50,7 @@ export default class ExecutorGenerator {
         let _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf-8');
         let _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf-8');
         let _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf-8');
+        let _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf-8');
         let _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf-8');
         let _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf-8');
         let _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf-8');
@@ -108,7 +110,7 @@ export default class ExecutorGenerator {
                 funct: GetNodeProp(functNode, NodeProperties.CodeName)
             })
 
-            let propertyValidationStatements = Object.keys(executorProperties).map(property => {
+            let propertyValidationStatements = Object.keys(executorProperties || {}).map(property => {
                 let propertyNode = GraphMethods.GetNode(graph, property);
                 let validatorPs = executorProperties[property];
 
@@ -173,6 +175,10 @@ export default class ExecutorGenerator {
                     break;
                 case Methods.Update:
                     template = _executor_update;
+                    break;
+                case Methods.Get:
+                case Methods.GetAll:
+                    template = _executor_get;
                     break;
             }
             var templateRes = bindTemplate(template, {

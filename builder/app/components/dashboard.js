@@ -257,7 +257,8 @@ class Dashboard extends Component {
                                         this.props.saveGraphToFile();
                                     }} />
                                     <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-cog'} onClick={() => {
-                                        this.props.scaffoldProject();
+                                        if (confirm("Are you sure you want to scaffold the project"))
+                                            this.props.scaffoldProject();
                                     }} />
                                     <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa fa-cog'} onClick={() => {
                                         this.props.scaffoldProject({ filesOnly: true });

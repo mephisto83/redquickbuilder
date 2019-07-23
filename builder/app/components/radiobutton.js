@@ -12,8 +12,7 @@ import FormControl from './formcontrol';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import { NodeProperties } from '../constants/nodetypes';
-import { uuidv4 } from '../methods/graph_methods';
-
+import { uuidv4 } from '../utils/array';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
 export default class RadioButton extends Component {
     constructor(props) {
