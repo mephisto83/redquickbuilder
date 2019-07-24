@@ -58,7 +58,7 @@ export default class ControllerGenerator {
                             let parameter_route = '';
                             let parameter_values = '';
                             //If the function is a get then, use the get template.
-                            if (GetNodeProp(maestro_function, NodeProperties.MethodType) === Methods.Get) {
+                            if ([Methods.Get, Methods.GetAll].some(v => v === GetNodeProp(maestro_function, NodeProperties.MethodType))) {
                                 tempFunction = _controllerTemplateFunctionGet;
                                 let paramName = 'modelId';
                                 if (ft.parentGet) {

@@ -648,7 +648,7 @@ export default class PermissionGenerator {
 
         return res;
     }
-    static GenerateTestCases(state, permission, agent, model) {
+    static GenerateTestCases(state, permission, agent, model, pindex) {
         var graph = GetCurrentGraph(state);
         let parent = null;
         let manyToMany = null;
@@ -664,27 +664,45 @@ export default class PermissionGenerator {
         }) : null;
         parent = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.Parent);
         manyToMany = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.ManyToManyModel);
-        many_to_many_register = fs.readFileSync('./app/templates/permissions/tests/many_to_many_register.tpl', 'utf-8');
+        if (GetCodeName(parent)) {
+            many_to_many_register = fs.readFileSync('./app/templates/permissions/tests/many_to_many_register.tpl', 'utf-8');
 
-        switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
-            case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-                testCase = fs.readFileSync('./app/templates/permissions/tests/Get_ManyToMany_Agent_Value__IListChild.tpl', 'utf-8');
-                many_to_many_register = bindTemplate(many_to_many_register, {
-                    ref1type: GetCodeName(parent),
-                    ref1: FunctionTemplateKeys.Parent,
-                    ref2type: GetCodeName(model),
-                    ref2: FunctionTemplateKeys.Model,
-                });
-                break;
-            case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
-                testCase = fs.readFileSync('./app/templates/permissions/tests/Get_Parent$Child_Agent_Value__IListChild.tpl', 'utf-8');
-                many_to_many_register = bindTemplate(many_to_many_register, {
-                    ref1type: GetCodeName(parent),
-                    ref1: FunctionTemplateKeys.Parent,
-                    ref2type: GetCodeName(agent),
-                    ref2: FunctionTemplateKeys.Agent,
-                })
-                break;
+            switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
+                case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                    testCase = fs.readFileSync('./app/templates/permissions/tests/Get_ManyToMany_Agent_Value__IListChild.tpl', 'utf-8');
+                    if (model) {
+                        many_to_many_register = bindTemplate(many_to_many_register, {
+                            ref1type: GetCodeName(parent),
+                            ref1: FunctionTemplateKeys.Parent,
+                            ref2type: GetCodeName(model),
+                            ref2: FunctionTemplateKeys.Model,
+                        });
+                    }
+                    else {
+                        many_to_many_register = '';
+                    }
+                    break;
+                case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                    testCase = fs.readFileSync('./app/templates/permissions/tests/Get_Parent$Child_Agent_Value__IListChild.tpl', 'utf-8');
+                    if (agent) {
+                        many_to_many_register = bindTemplate(many_to_many_register, {
+                            ref1type: GetCodeName(parent),
+                            ref1: FunctionTemplateKeys.Parent,
+                            ref2type: GetCodeName(agent),
+                            ref2: FunctionTemplateKeys.Agent,
+                        })
+                    }
+                    else {
+                        many_to_many_register = '';
+                    }
+                    break;
+                default:
+                    many_to_many_register = '';
+                    break;
+            }
+        }
+        if (!manyToMany) {
+            many_to_many_register = '';
         }
         if (methodNode) {
             for (var method in Methods) {
@@ -706,10 +724,12 @@ export default class PermissionGenerator {
                                 agent_type: GetCodeName(agent),
                                 model: GetCodeName(model),
                                 many_to_many: GetCodeName(manyToMany),
-
+                                many_to_many_arbiter_constructor: manyToMany ? bindTemplate(`var manyToManyArbiter = RedStrapper.Resolve<IRedArbiter<{{many_to_many}}>>();`, {
+                                    many_to_many: GetCodeName(manyToMany)
+                                }) : '',
                                 parent: GetCodeName(parent),
                                 method,
-                                test: `_${GetCodeName(agent)}_${GetCodeName(model)}_${method}_${testIndex}`,
+                                test: `_${GetCodeName(agent)}_${GetCodeName(model)}_${method}_${testIndex}_case${pindex}`,
                                 result: resultSuccess ? 'true' : 'false',
                                 function_name: GetCodeName(permission) + method,
                                 ...templates
@@ -780,11 +800,11 @@ export default class PermissionGenerator {
                 }
                 let permissionCases = [];
                 let permissionCodeNames = [];
-                matchingPermissionNodes.map(matchingPermissionNode => {
+                matchingPermissionNodes.map((matchingPermissionNode, pindex) => {
                     if (matchingPermissionNode) {
                         permissionCodeNames.push(GetNodeProp(matchingPermissionNode, NodeProperties.CodeName));
                         let temp = PermissionGenerator.GenerateCases(state, matchingPermissionNode, agent, model);
-                        let testTemp = PermissionGenerator.GenerateTestCases(state, matchingPermissionNode, agent, model);
+                        let testTemp = PermissionGenerator.GenerateTestCases(state, matchingPermissionNode, agent, model, pindex);
                         permissionCases.push(temp);
                         testMethodPermisionCases.push(...testTemp);
                     }

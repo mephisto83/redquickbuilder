@@ -10,7 +10,7 @@
             var agentArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}>>();
             var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
             var parentArbiter = RedStrapper.Resolve<IRedArbiter<{{parent}}>>();
-            var manyToManyArbiter = RedStrapper.Resolve<IRedArbiter<{{many_to_many}}>>();
+            {{many_to_many_arbiter_constructor}}
                 
             var permission = RedStrapper.Resolve<IPermissions{{agent_type}}>();
             var agent = {{agent_type}}.Create();
