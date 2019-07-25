@@ -510,6 +510,52 @@ export function addGroup(graph, group) {
 export function addNewPropertyNode(graph, options) {
     return addNewNodeOfType(graph, options, NodeTypes.Property);
 }
+
+const DEFAULT_PROPERTIES = [
+    { title: 'Owner', type: NodePropertyTypes.STRING },
+    { title: 'Id', type: NodePropertyTypes.STRING },
+    { title: 'Created', type: NodePropertyTypes.STRING },
+    { title: 'Deleted', type: NodePropertyTypes.STRING },
+    { title: 'Version', type: NodePropertyTypes.STRING }
+].map(t => {
+    t.nodeType = NodeTypes.Property;
+    return t;
+});
+
+export function addDefaultProperties(graph, options) {
+    // updateNodeProperty
+    var propertyNodes = GetLinkChainFromGraph(graph, {
+        id: options.parent,
+        links: [{
+            direction: SOURCE,
+            type: LinkType.PropertyLink
+        }]
+    }).map(t => GetNodeProp(t, NodeProperties.UIText));
+    DEFAULT_PROPERTIES.filter(t => {
+        return propertyNodes.indexOf(t.title) === -1;
+    }).map(dp => {
+        graph = addNewNodeOfType(graph, options, dp.nodeType, new_node => {
+            graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.UIText,
+                value: dp.title
+            });
+            graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.IsDefaultProperty,
+                value: true
+            });
+            graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.UIAttributeType,
+                value: dp.type
+            });
+        })
+    });
+
+    return graph;
+}
+
 function updateNode(node, options) {
     if (options.node) {
         Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
@@ -1347,6 +1393,9 @@ export function GetLinkChainItem(state, options) {
 }
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
+    return GetLinkChainFromGraph(graph, options);
+}
+export function GetLinkChainFromGraph(graph, options) {
     var { id, links } = options;
     var ids = [id];
     var result = [];
@@ -1584,7 +1633,7 @@ addEventFunction('OnRemoveModelFilterPropConnection', (graph, link, func) => {
     var { source, target } = link;
     var node = GetNode(graph, source);
     if (node && node.properties)
-        removeValidator(GetNodeProp(node, NodeProperties.ModelItemFilter), { id: target });
+        removeValidator(GetNodeProp(node, NodeProperties.FilterModel), { id: target });
     return graph;
 });
 

@@ -3,7 +3,7 @@ import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetN
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules, FilterUI, FilterRules } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
-import { NodeType } from '../components/titles';
+import { NodeType, Filter } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
 
@@ -51,6 +51,14 @@ export default class ModelItemFilterGenerator {
                                     case FilterRules.EqualsFalse:
                                         validatorValue = 'false';
                                         break;
+                                    case FilterRules.EqualsAgent:
+                                        validatorValue = `agent.${propName}`;
+                                        break;
+                                    case FilterRules.EqualsParent:
+                                        validatorValue = `parent.${propName}`;
+                                        break;
+                                    default:
+                                        throw 'not handled model item filter generation case';
                                 }
                             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf-8');
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {

@@ -229,7 +229,7 @@ export function GetPermissionMethod(permission) {
         }]
     })
 }
-export function GetCurrentGraph(state) { 
+export function GetCurrentGraph(state) {
     var scopedGraph = GetCurrentScopedGraph(state);
     return scopedGraph;
     // if (currentGraph) {
@@ -318,6 +318,7 @@ export const NEW_LINK = 'NEW_LINK';
 export const CHANGE_NODE_TEXT = 'CHANGE_NODE_TEXT';
 export const CURRENT_GRAPH = 'CURRENT_GRAPH';
 export const GRAPH_SCOPE = 'GRAPH_SCOPE';
+export const ADD_DEFAULT_PROPERTIES = 'ADD_DEFAULT_PROPERTIES';
 export const CHANGE_NODE_PROPERTY = 'CHANGE_NODE_PROPERTY';
 export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE';
 export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
@@ -403,6 +404,9 @@ export function graphOperation(operation, options) {
                 case NEW_PROPERTY_NODE:
                     currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case ADD_DEFAULT_PROPERTIES:
+                    currentGraph = GraphMethods.addDefaultProperties(currentGraph, options);
                     break;
                 case NEW_ATTRIBUTE_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);

@@ -245,6 +245,8 @@ export const NodeProperties = {
     UIAttributeType: 'uiAttributeType',
     UseModelAsType: 'useModelAsType',
 
+    IsDefaultProperty: 'isDefaultProperty',
+
     HasLogicalChildren: 'hasLogicalChildren',
     LogicalChildrenTypes: 'logicalChildrenTypes',
     HasLogicalNieces: "hasLogicalNieces",

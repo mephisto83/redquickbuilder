@@ -63,6 +63,9 @@ class ModelFilterItemActivityMenu extends Component {
                         onChange={(value) => {
                             this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
                         }} />
+                     <TextInput
+                        label={Titles.NodeType}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.NODEType)} disabled={true}/>
                     <SelectInput
                         options={propertyNodes}
                         defaultSelectText={Titles.SelectProperty}
