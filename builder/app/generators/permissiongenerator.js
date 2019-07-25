@@ -395,6 +395,7 @@ export default class PermissionGenerator {
                                                         relationship: GetNodeProp(relationship, NodeProperties.CodeName),
                                                         property: GetNodeProp(propNode, NodeProperties.CodeName)
                                                     }),
+                                                    sameInstance: !!(methodProps[mmrp[ConditionTypeParameters.Ref1]] && methodProps[mmrp[ConditionTypeParameters.Ref2]]),
                                                     variable
                                                 });
                                             }
@@ -565,6 +566,7 @@ export default class PermissionGenerator {
                             _case.options[ConditionTypeParameters.Ref2] &&
                             _case.options[ConditionTypeParameters.Ref1] !== _case.options[ConditionTypeParameters.Ref2]) {
                             let ref2Model = _case.options[ConditionTypeParameters.Ref2];
+                            let mmrp = _case.options;
                             switch (_case.options[ConditionTypeParameters.Ref2]) {
                                 case FunctionTemplateKeys.AgentType:
                                     throw 'this should be agent now';
@@ -573,7 +575,8 @@ export default class PermissionGenerator {
                             if (ref2Model) {
                                 let ref1Property = 'Id';
                                 if (!_case.options[ConditionTypeParameters.Ref1UseId]) {
-                                    ref1Property = _case.options[ConditionTypeParameters.Ref1Property]
+                                    ref1Property = _case.options[ConditionTypeParameters.Ref1Property];
+                                    debugger;
                                 }
                                 let template;
                                 let propType = _case.options[ConditionTypeParameters.Ref1];
@@ -588,6 +591,7 @@ export default class PermissionGenerator {
                                         });
                                         props.push({
                                             props: template,
+                                            sameInstance: !!(methodProps[mmrp[ConditionTypeParameters.Ref1]] && methodProps[mmrp[ConditionTypeParameters.Ref2]]),
                                             type: ConditionTypes.MatchReference
                                         });
                                         properties.push({

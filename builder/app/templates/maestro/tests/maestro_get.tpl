@@ -66,7 +66,6 @@
     
                 //Assert
                 Assert.IsNotNull(list);
-                Assert.AreEqual(list.Count, 1);
 
             }
             catch(ValidationException validationException)

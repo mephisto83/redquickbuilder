@@ -229,13 +229,15 @@ class Dashboard extends Component {
                         </Header>
                         <MainSideBar>
                             <SideBarMenu>
-                                <SideBarHeader title={Titles.MainNavigation} />
-                                <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
+                                <SideBarHeader title={Titles.MainNavigation} onClick={() => {
+                                    this.props.toggleVisual('MAIN_NAV');
+                                }} />
+                                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
                                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
-                                }} />
-                                <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
+                                 }} /> : null}
+                                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
                                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
-                                }} />
+                                }} /> : null}
 
                                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                                 <SideBarHeader title={Titles.FileMenu} />

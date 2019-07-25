@@ -1475,6 +1475,8 @@ Object.keys(ExecutorUI).map(t => {
     ExecutorUI[t].type = t;
 })
 export const FilterRules = {
+    EqualsAgent: 'equals-agent',
+    EqualsParent: 'equals-parent',
     EqualsTrue: 'equals-true',
     EqualsFalse: 'equals-false'
 }
@@ -1491,6 +1493,24 @@ export const FilterUI = {
     [FilterRules.EqualsFalse]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsFalse'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            type: NodePropertyTypes.BOOLEAN
+        }
+    },
+    [FilterRules.EqualsParent]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsParent'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            type: NodePropertyTypes.BOOLEAN
+        }
+    },
+    [FilterRules.EqualsAgent]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsAgent'
         },
         arguments: {
             ...COMMON_STRING_ARGS,

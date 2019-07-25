@@ -199,6 +199,8 @@ export default class ModelGenerator {
                 properties.push(bindTemplate(propertyTemplate, propSwapDictionary));
             });
         }
+        
+
         let staticDic = {
             model: GetNodeProp(node, NodeProperties.CodeName)
         };
