@@ -25,7 +25,8 @@ import {
     getValidatorItem,
     isUIExtensionEnumerable,
     GetUIExentionEnumeration,
-    GetUIExentionKeyField
+    GetUIExentionKeyField,
+    GetLinkChainFromGraph
 } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 
@@ -37,9 +38,26 @@ class ExecutorItem extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var validator;
         var validatorItem;
+        var function_variables = [];
         if (currentNode && UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel)) {
             validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor);
             validatorItem = validator.properties[this.props.property].validators[this.props.validator]
+        }
+        else if (currentNode && UIA.GetNodeProp(currentNode, UIA.NodeProperties.ModelItemFilter)) {
+            validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel);
+            validatorItem = validator.properties[this.props.property].validators[this.props.validator];
+            var methods = GetLinkChainFromGraph(graph, {
+                id: currentNode.id,
+                links: [{
+                    direction: TARGET,
+                    type: LinkType.ModelItemFilter
+                }]
+            }, [NodeTypes.Method]);
+            if (methods && methods.length) {
+                var props = UIA.GetMethodProps(methods[0]);
+                if (props)
+                    function_variables = Object.keys(props).map(t => ({ title: t, value: t }));
+            }
         }
         if (validatorItem) {
             if (validatorItem.arguments && validatorItem.arguments.reference) {
@@ -129,6 +147,31 @@ class ExecutorItem extends Component {
                     return formControll
                 }
                 return (<div>reference</div>)
+            }
+            else if (validatorItem.arguments && validatorItem.arguments.functionvariables) {
+                let functionVariableControl = (<FormControl>
+                    <SelectInput
+                        options={function_variables}
+                        defaultSelectText={Titles.FunctionVariables}
+                        label={Titles.Property}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
+                            let old_one = item.node;
+                            item.node = value;
+
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                id,
+                                prop: NodeProperties.FilterModel,
+                                value: validator
+                            })
+
+                        }}
+                        value={validatorItem ? validatorItem.node : ''} />
+                </FormControl>);
+
+                return functionVariableControl
             }
             return (<div>item</div>)
         }

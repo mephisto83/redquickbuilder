@@ -1480,7 +1480,8 @@ export const FilterRules = {
     EqualsAgent: 'equals-agent',
     EqualsParent: 'equals-parent',
     EqualsTrue: 'equals-true',
-    EqualsFalse: 'equals-false'
+    EqualsFalse: 'equals-false',
+    EqualsModelRef: 'equals-model-ref'
 }
 export const FilterUI = {
     [FilterRules.EqualsTrue]: {
@@ -1517,6 +1518,15 @@ export const FilterUI = {
         arguments: {
             ...COMMON_STRING_ARGS,
             type: NodePropertyTypes.BOOLEAN
+        }
+    },
+    [FilterRules.EqualsModelRef]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsModelRef'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            functionvariables: true
         }
     }
 }

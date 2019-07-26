@@ -514,8 +514,9 @@ export function addNewPropertyNode(graph, options) {
 const DEFAULT_PROPERTIES = [
     { title: 'Owner', type: NodePropertyTypes.STRING },
     { title: 'Id', type: NodePropertyTypes.STRING },
-    { title: 'Created', type: NodePropertyTypes.STRING },
-    { title: 'Deleted', type: NodePropertyTypes.STRING },
+    { title: 'Created', type: NodePropertyTypes.DATETIME },
+    { title: 'Updated', type: NodePropertyTypes.DATETIME },
+    { title: 'Deleted', type: NodePropertyTypes.BOOLEAN },
     { title: 'Version', type: NodePropertyTypes.STRING }
 ].map(t => {
     t.nodeType = NodeTypes.Property;
@@ -1395,7 +1396,7 @@ export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
     return GetLinkChainFromGraph(graph, options);
 }
-export function GetLinkChainFromGraph(graph, options) {
+export function GetLinkChainFromGraph(graph, options, nodeType) {
     var { id, links } = options;
     var ids = [id];
     var result = [];
@@ -1416,7 +1417,12 @@ export function GetLinkChainFromGraph(graph, options) {
         newids = newids.unique(x => x);
         ids = newids;
     })
-    return result
+    return result.filter(x => {
+        if (!nodeType) {
+            return true;
+        }
+        return nodeType.indexOf(GetNodeProp(x, NodeProperties.NODEType)) !== -1;
+    })
 }
 export function getNodesByLinkType(graph, options) {
     if (options) {

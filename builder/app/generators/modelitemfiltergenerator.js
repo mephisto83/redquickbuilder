@@ -15,7 +15,7 @@ const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelItemFilterGenerator {
     static predicates(nodes) {
-        return nodes.map(x => `${GetCodeName(x)}.Filter()`)
+        return nodes.map(x => `${GetCodeName(x)}.Filter({{predicate_parameters}})`)
     }
     static Generate(options) {
         var { state, key } = options;
@@ -56,6 +56,8 @@ export default class ModelItemFilterGenerator {
                                         break;
                                     case FilterRules.EqualsParent:
                                         validatorValue = `parent.${propName}`;
+                                        break;
+                                    case FilterRules.EqualsModelRef:
                                         break;
                                     default:
                                         throw 'not handled model item filter generation case';
