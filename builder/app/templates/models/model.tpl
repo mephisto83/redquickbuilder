@@ -1,5 +1,5 @@
 {{attributes}}    
-    [RedAttribute]
+    [Red]
     public class {{model}} : {{base_model}}
     {
 

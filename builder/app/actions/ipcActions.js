@@ -1,5 +1,5 @@
 import { HandlerEvents } from '../ipc/handler-events';
-import { uuidv4, GraphKeys } from '../methods/graph_methods';
+import { GraphKeys } from '../methods/graph_methods';
 import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
@@ -8,6 +8,7 @@ import { GeneratedTypes, NodeTypes } from '../constants/nodetypes';
 import Generator from '../generators/generator';
 import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
+import { uuidv4 } from '../utils/array';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {

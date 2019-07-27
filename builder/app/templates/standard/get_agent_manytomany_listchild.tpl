@@ -5,7 +5,7 @@
             var parent = await arbiter{{parent_type}}.Get<{{parent_type}}>(value);
             if(await {{agent}}Permissions.{{permission_function}}(agent, parent).ConfigureAwait(false)) {
                 var basicConnectionPred = {{connect_type}}Get.Get{{connect_type}}(parent);
-                var predicate = Pred.And(basicConnectionPred{{predicates}});
+                var predicate = Pred.And(basicConnectionPred{{comma}} {{predicates}});
                 var connections = await arbiter{{connect_type}}.GetBy(predicate);
                 var list = await arbiter{{model}}.GetBy({{connect_type}}Get.Get{{model}}(connections));
 

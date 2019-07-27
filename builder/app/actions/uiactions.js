@@ -217,7 +217,7 @@ export function GetFunctionType(methodNode) {
 export function GetMethodNodeProp(methodNode, key) {
     return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {})[key];
 }
-export function GetMethodProps(methodNode, key) {
+export function GetMethodProps(methodNode) {
     return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {});
 }
 export function GetPermissionMethod(permission) {

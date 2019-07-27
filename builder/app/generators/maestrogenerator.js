@@ -105,7 +105,7 @@ export default class MaestroGenerator {
                             });
                             predicates = ModelItemFilterGenerator.predicates(modelItemFilters);
                             if (predicates.length) {
-                                predicates = ',' + predicates.join();
+                                predicates = predicates.join(', ');
                             }
                             else {
                                 predicates = '';
@@ -148,6 +148,7 @@ export default class MaestroGenerator {
                             value,
                             model: model_type,
                             connect_type,
+                            comma: predicates.length ? ',' : '',
                             predicates,
                             maestro_function: functionName,
                             filter_function: modelFilterNode ? GetNodeProp(modelFilterNode, NodeProperties.CodeName) : '{missing filter node}',

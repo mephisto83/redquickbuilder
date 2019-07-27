@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules, FilterUI, FilterRules } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -15,7 +15,24 @@ const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelItemFilterGenerator {
     static predicates(nodes) {
-        return nodes.map(x => `${GetCodeName(x)}.Filter({{predicate_parameters}})`)
+
+        return nodes.map(x => {
+            let validator = GetNodeProp(x, NodeProperties.FilterModel);
+            let params = [];
+            if (validator) {
+                Object.values(validator.properties).map(t => Object.values(t.validators).map(v => {
+                    if (v && v.type === FilterRules.EqualsModelRef) {
+                        params.push(v.node);
+                    }
+                }))
+            }
+            params = params.filter(x => x).unique().sort();
+
+            let text = `${GetCodeName(x)}.Filter({{predicate_parameters}})`;
+            return bindTemplate(text, {
+                predicate_parameters: params.join(', ')
+            });
+        });
     }
     static Generate(options) {
         var { state, key } = options;
@@ -28,11 +45,21 @@ export default class ModelItemFilterGenerator {
         let allfilters = NodesByType(state, NodeTypes.ModelFilter);
         let modelitemfilters = NodesByType(state, NodeTypes.ModelItemFilter);
         modelitemfilters.map(modelitemfilter => {
-
-
+            var method = GraphMethods.GetLinkChain(state, {
+                id: modelitemfilter.id,
+                links: [{
+                    type: LinkType.ModelItemFilter,
+                    direction: GraphMethods.TARGET
+                }]
+            }).find(x => x);
+            var methodProps = null;
+            if (method) {
+                methodProps = GetMethodProps(method);
+            }
             let itemFilter = GetNodeProp(modelitemfilter, NodeProperties.ModelItemFilter);
             let filterModel = GetNodeProp(modelitemfilter, NodeProperties.FilterModel);
             let funcs = [];
+            let parameters = [];
             if (filterModel && filterModel.properties) {
                 let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf-8');
                 let filters = [];
@@ -40,11 +67,12 @@ export default class ModelItemFilterGenerator {
                     let propName = GetCodeName(prop);
                     if (filterModel.properties[prop]) {
                         Object.keys(filterModel.properties[prop].validators).map(validator => {
-                            let validatorName = filterModel.properties[prop].validators[validator];
+                            let _validatorProps = filterModel.properties[prop].validators[validator];
                             let validatorValue = '';
+                            let validatorName = GetCodeName(validator);
                             let _function = '==';
-                            if (validatorName && validatorName.type)
-                                switch (validatorName.type) {
+                            if (_validatorProps && _validatorProps.type)
+                                switch (_validatorProps.type) {
                                     case FilterRules.EqualsTrue:
                                         validatorValue = 'true';
                                         break;
@@ -58,11 +86,19 @@ export default class ModelItemFilterGenerator {
                                         validatorValue = `parent.${propName}`;
                                         break;
                                     case FilterRules.EqualsModelRef:
+                                        if (_validatorProps.node) {
+                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                                            if (mNode) {
+                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                                            }
+                                            validatorValue = `${_validatorProps.node}.Id`;
+                                        }
                                         break;
                                     default:
                                         throw 'not handled model item filter generation case';
                                 }
                             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf-8');
+
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {
                                 property: propName,
                                 value: validatorValue,
@@ -71,9 +107,12 @@ export default class ModelItemFilterGenerator {
                         })
                     }
                 });
+                parameters = parameters.filter(x => x).unique().sort();
+
                 funcs.push(bindTemplate(filterPropFunction, {
                     filter: filters.join(''),
-                    model: GetCodeName(itemFilter)
+                    model: GetCodeName(itemFilter),
+                    parameters: parameters.join(', ')
                 }))
             }
             let templateRes = bindTemplate(_return_get_class, {

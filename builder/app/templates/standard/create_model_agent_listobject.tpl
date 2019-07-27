@@ -14,8 +14,8 @@
                     {{agent_type}}Exceptions.ThrowException(result);
                 }
                 else {
-                
-                    var list = await arbiter{{model}}.GetBy({{agent_type}}Get.Get{{model}}(agent));
+                    var predicate = Pred.And({{predicates}});
+                    var list = await arbiter{{model}}.GetBy(predicate);
 
                     return {{agent_type}}Return.{{filter_function}}(list, agent);
                 }

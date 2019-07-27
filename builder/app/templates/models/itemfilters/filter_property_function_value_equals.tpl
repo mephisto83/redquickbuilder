@@ -1,1 +1,1 @@
-                res = res && model.{{property}} {{function}} {{value}};
+                res = res && item.{{property}} {{function}} {{value}};

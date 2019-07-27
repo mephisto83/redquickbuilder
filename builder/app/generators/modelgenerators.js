@@ -79,7 +79,7 @@ export default class ModelGenerator {
         templateSwapDictionary.attributes = validatorFunctions;
 
         let staticFunctions = [];
-        let properties = connectedProperties.map(propNode => {
+        let properties = connectedProperties.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)).map(propNode => {
             var connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
                 id: propNode.id,
                 type: LinkType.AttributeLink,
@@ -199,7 +199,7 @@ export default class ModelGenerator {
                 properties.push(bindTemplate(propertyTemplate, propSwapDictionary));
             });
         }
-        
+
 
         let staticDic = {
             model: GetNodeProp(node, NodeProperties.CodeName)
