@@ -44,17 +44,17 @@ export default class ExecutorGenerator {
         let result = {};
 
         let nodes = NodesByType(state, NodeTypes.Executor);
-        let _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf-8');
-        let _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf-8');
-        let _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf-8');
-        let _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf-8');
-        let _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf-8');
-        let _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf-8');
-        let _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf-8');
-        let _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf-8');
-        let _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf-8');
-        let _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf-8');
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
+        let _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf8');
+        let _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf8');
+        let _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf8');
+        let _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf8');
+        let _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf8');
+        let _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf8');
+        let _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf8');
+        let _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
+        let _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
+        let _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
         let agentFunctionDic = {};
         let agentFunctionInterfaceDic = {};
         let executor_entry_methods = [];
@@ -154,8 +154,13 @@ export default class ExecutorGenerator {
                         case ExecutorRules.AgentReference:
                             template = `result{{model_property}} = agent.Id;`
                             break;
-                        default:
+                        case ExecutorRules.ParentReference:
+                            template = `result{{model_property}} = data{{model_property}};`
                             break;
+                        case ExecutorRules.Copy:
+                            break;
+                        default:
+                            throw 'not handle [execution generator]';
                     }
                     var templateRes = bindTemplate(template, {
                         attribute_type: validators.code[ProgrammingLanguages.CSHARP],

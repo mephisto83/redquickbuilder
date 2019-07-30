@@ -38,10 +38,10 @@ export default class ModelGetGenerator {
         let graph = GetRootGraph(state);
         let result = {};
 
-        let _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf-8');
-        let _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf-8');
-        let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf-8');
-        let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf-8');
+        let _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf8');
+        let _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf8');
+        let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
+        let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
         let allmodels = NodesByType(state, NodeTypes.Model);
         allmodels.map(agent => {
             var methods = allmodels.filter(x => x.id !== agent.id)
@@ -99,7 +99,7 @@ export default class ModelGetGenerator {
                                             paramName = GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName).toLowerCase();
                                         }
 
-                                        return bindTemplate(`item.{{_type}} == ${paramName}.Id`, {
+                                        return bindTemplate(`item != null && ${paramName} != null && item.{{_type}} == ${paramName}.Id`, {
                                             _type: GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName)
                                         })
                                     }).filter(x => x).join(' && '),// 

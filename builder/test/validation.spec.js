@@ -62,7 +62,7 @@ describe('validation relationship', () => {
     expect(types.length).toBeTruthy();
   });
 
-  var smash_24 = fs.readFileSync(`./test/smash_24.rqb`, 'utf-8');
+  var smash_24 = fs.readFileSync(`./test/smash_24.rqb`, 'utf8');
 
   it('should get nodes by types ', () => {
     var graph = JSON.parse(smash_24);

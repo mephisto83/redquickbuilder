@@ -268,6 +268,10 @@ const COMMON_OUTPUT = {
         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
         [FunctionConstraintKeys.IsList]: true
     },
+    OBJECT: {
+        [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+        [FunctionConstraintKeys.IsList]: false
+    },
     BOOL: {
         [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Bool
     }
@@ -299,8 +303,8 @@ export const FUNCTION_REQUIREMENT_KEYS = {
 const COMMON_FUNCTION_REQUIREMENTS = {
     [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {
         [INTERNAL_TEMPLATE_REQUIREMENTS.PARAMETERSCLASS]: {
-            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf-8'),
-            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_parameter_class.tpl', 'utf8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
@@ -318,8 +322,8 @@ const COMMON_FUNCTION_REQUIREMENTS = {
             }
         },
         [INTERNAL_TEMPLATE_REQUIREMENTS.CHANGECLASS]: {
-            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf-8'),
-            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf-8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.TEMPLATE]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf8'),
+            [INTERNAL_TEMPLATE_REQUIREMENTS.CONSTRUCTORS]: fs.readFileSync('./app/templates/stream_process/stream_process_change_class.tpl', 'utf8'),
             [INTERNAL_TEMPLATE_REQUIREMENTS.MODEL]: FunctionTemplateKeys.Model,
             [INTERNAL_TEMPLATE_REQUIREMENTS.METHODS]: {
                 [INTERNAL_TEMPLATE_REQUIREMENTS.METHOD.CREATE]: {
@@ -385,8 +389,8 @@ export const COMMON_FUNCTION_TEMPLATE_KEYS = {
 export const Functions = {
     [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
         title: Titles.Create_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
@@ -397,8 +401,8 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
         title: Titles.Update_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
@@ -409,8 +413,8 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
@@ -419,10 +423,29 @@ export const Functions = {
         isList: true,
         method: Methods.Delete,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
+    },
+    [FunctionTypes.Get_Object_Agent_Value__Object]: {
+        title: Titles.Get_Object_Agent_Value__Object,
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_model_agent_object_interface.tpl', 'utf8'),
+        constraints: {
+            [FunctionTemplateKeys.ManyToManyModel]: {
+                [NodeProperties.ManyToManyNexus]: true,
+                key: FunctionTemplateKeys.ManyToManyModel,
+                nodeTypes: [NodeTypes.Model]
+            },
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: false,
+        method: Methods.Get,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT
         }, output: {
@@ -433,8 +456,8 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -445,8 +468,8 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -457,8 +480,8 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -469,7 +492,7 @@ export const Functions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
-        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf8'),
         constraints: {
             [FunctionTemplateKeys.AgentType]: {
                 [FunctionConstraintKeys.IsAgent]: true,
@@ -524,8 +547,8 @@ export const Functions = {
 export const MethodFunctions = {
     [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
         title: Titles.Create_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -537,8 +560,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
         title: Titles.Update_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -550,8 +573,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -563,8 +586,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -576,8 +599,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -589,8 +612,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -602,8 +625,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -614,10 +637,24 @@ export const MethodFunctions = {
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
+    
+    [FunctionTypes.Get_Object_Agent_Value__Object]: {
+        title: Titles.Get_Object_Agent_Value__Object,
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_model_agent_object_interface.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: false,
+        method: Methods.Get,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Get_ManyToMany_Agent_Value__IListChild]: {
         title: Titles.Get_ManyToMany_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
         }, output: {
@@ -630,8 +667,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Create_ManyToMany_Agent_Value__IListChild]: {
         title: Titles.Create_ManyToMany_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -643,8 +680,8 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Update_ManyToMany_Agent_Value__IListChild]: {
         title: Titles.Update_ManyToMany_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild.tpl', 'utf-8'),
-        interface: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild_interface.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild_interface.tpl', 'utf8'),
         constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -656,7 +693,7 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
-        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf-8'),
+        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf8'),
         constraints: {
             [FunctionTemplateKeys.AgentType]: {
                 [FunctionConstraintKeys.IsAgent]: true,
@@ -735,7 +772,8 @@ export const ConditionTypeParameters = {
     Ref2: 'ref2',
     Ref1UseId: 'ref1UseId',
     Ref2UseId: 'ref2UseId',
-    Ref1Property: 'ref1Property'
+    Ref1Property: 'ref1Property',
+    Ref2Property: 'ref2Property'
 }
 
 export const ConditionTypeOptions = {

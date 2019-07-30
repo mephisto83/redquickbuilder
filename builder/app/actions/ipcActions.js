@@ -80,10 +80,10 @@ function generateFolderStructure(dir, lib, relative, target_dir) {
             generateFolderStructure(dirPath, lib, relative, target_dir);
         }
         else if (fs.existsSync(dirPath)) {
-            let file = fs.readFileSync(dirPath, 'utf-8');
+            let file = fs.readFileSync(dirPath, 'utf8');
             let reldir = dir.substr(relative.length)
             file = bindTemplate(file, lib);
-            fs.writeFileSync(path.join(target_dir, reldir, item), file, 'utf-8');
+            fs.writeFileSync(path.join(target_dir, reldir, item), file, 'utf8');
         }
     })
 }

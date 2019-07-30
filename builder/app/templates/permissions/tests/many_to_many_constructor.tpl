@@ -1,0 +1,1 @@
+            var manyToManyArbiter = RedStrapper.Resolve<IRedArbiter<{{many_to_many}}>>();

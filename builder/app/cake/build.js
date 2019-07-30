@@ -65,7 +65,7 @@ const appSettingsCopySettings = `
 </ItemGroup>
 `;
 function createWorkSpace() {
-    var build = fs.readFileSync('./workspace.json', 'utf-8');
+    var build = fs.readFileSync('./workspace.json', 'utf8');
     build = JSON.parse(build);
     var solutionPath = path.resolve('./' + build.solutionName + '.sln');
     return Promise.resolve().then(() => {
@@ -209,7 +209,7 @@ function createWorkSpace() {
 
         promise = promise.then(() => {
             console.log('updating the tests project output setting');
-            let tp = fs.readFileSync(testProject, 'utf-8');
+            let tp = fs.readFileSync(testProject, 'utf8');
             const $ = cheerio.load(tp, {
                 xmlMode: true
             });
@@ -218,13 +218,13 @@ function createWorkSpace() {
             if (!settingsEl || settingsEl.length === 0) {
                 $('[Sdk="Microsoft.NET.Sdk"]').append(appSettingsCopySettings);
                 var res = $.xml();
-                fs.writeFileSync(testProject, res, 'utf-8');
+                fs.writeFileSync(testProject, res, 'utf8');
             }
             console.log('completed the tests project output setting');
         })
         promise = promise.then(() => {
             console.log('updating the webProject output setting');
-            let tp = fs.readFileSync(webProject, 'utf-8');
+            let tp = fs.readFileSync(webProject, 'utf8');
             const $ = cheerio.load(tp, {
                 xmlMode: true
             });
@@ -233,7 +233,7 @@ function createWorkSpace() {
             if (!settingsEl || settingsEl.length === 0) {
                 $('[Sdk="Microsoft.NET.Sdk.Web"]').append(appSettingsCopySettings);
                 var res = $.xml();
-                fs.writeFileSync(webProject, res, 'utf-8');
+                fs.writeFileSync(webProject, res, 'utf8');
             }
             console.log('completed the tests project output setting');
         })

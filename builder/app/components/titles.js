@@ -183,6 +183,8 @@ export const Delete_Object_Agent_Value__IListObject = 'Delete Object by Agent =>
 export const Get_Object_Agent_Value__IListObject = 'Get Object by Agent => IList<Object>';
 export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent In Valid List';
 
+export const Get_Object_Agent_Value__Object = 'Get Object by Agent';
+
 export const Functions = 'Functions';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';

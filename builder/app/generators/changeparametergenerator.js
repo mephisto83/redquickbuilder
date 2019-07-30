@@ -27,10 +27,10 @@ export default class ChangeParameterGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
-        let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
-        let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
-        let _streamProcessChangeClassConstrictorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, 'utf-8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
+        let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
+        let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
+        let _streamProcessChangeClassConstrictorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, 'utf8');
         let result = {};
         models.map(agent => {
             let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
@@ -39,7 +39,7 @@ export default class ChangeParameterGenerator {
             let statics = '';
             let constructors = [];
             let tests = [];
-            let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
+            let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
             agents.map(model => {
                 Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 

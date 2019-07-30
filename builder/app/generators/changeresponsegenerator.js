@@ -26,11 +26,11 @@ export default class ChangeResponseGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf-8');
-        let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf-8');
-        let _streamProcessChangeClassConstructorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TEST, 'utf-8');
-        let _streamProcessChangeClassConstructorsFailed = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_FAILED, 'utf-8');
-        let _test = fs.readFileSync(TEST_CLASS, 'utf-8');
+        let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
+        let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
+        let _streamProcessChangeClassConstructorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TEST, 'utf8');
+        let _streamProcessChangeClassConstructorsFailed = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_FAILED, 'utf8');
+        let _test = fs.readFileSync(TEST_CLASS, 'utf8');
         let result = {};
         agents.map(agent => {
             let constructors = [];

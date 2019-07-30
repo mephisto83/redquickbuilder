@@ -36,7 +36,10 @@ class ModelFilterItemActivityMenu extends Component {
             var methodProps = UIA.GetMethodProps(methodNode);
             if (methodProps) {
                 switch (UIA.GetFunctionType(methodNode)) {
+                    case FunctionTypes.Create_Object_Agent_Value__IListObject:
                     case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                    case FunctionTypes.Create_Parent$Child_Agent_Value__IListChild:
+                    case FunctionTypes.Create_Parent_Child_Agent_Value__Child:
                         node = GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
                         break;
                     case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
@@ -63,9 +66,9 @@ class ModelFilterItemActivityMenu extends Component {
                         onChange={(value) => {
                             this.props.graphOperation(UIA.CHANGE_NODE_TEXT, { id: currentNode.id, value })
                         }} />
-                     <TextInput
+                    <TextInput
                         label={Titles.NodeType}
-                        value={UIA.GetNodeProp(currentNode, NodeProperties.NODEType)} disabled={true}/>
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.NODEType)} disabled={true} />
                     <SelectInput
                         options={propertyNodes}
                         defaultSelectText={Titles.SelectProperty}

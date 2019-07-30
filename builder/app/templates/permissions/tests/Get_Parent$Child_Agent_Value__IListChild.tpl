@@ -34,6 +34,8 @@
             //Set Match many reference properties 
 {{set_match_many_reference_properties}}
             
+            {{parent_agent_are_the_same}}
+            
             //Act
             var res = await permission.{{function_name}}(agent, parent);
 

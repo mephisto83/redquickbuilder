@@ -86,24 +86,18 @@ class NodeManagement extends Component {
                     onClick={() => {
                         this.props.toggleVisual(NODE_MANAGEMENT_MENU)
                     }}>
-                    <div className="pull-left">
-                        <div className="btn-group">
-                            <button onClick={() => {
-                                this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
-                                    return {
-                                        operation: UIA.CHANGE_NODE_PROPERTY,
-                                        options: {
-                                            prop: UIA.NodeProperties.Pinned,
-                                            id: node.id,
-                                            value: false
-                                        }
-                                    }
-                                }));
-                            }}
-                                type="button" title={Titles.ClearPinned}
-                                className="btn btn-default btn-flat"><i className="fa fa-times" /></button>
-                        </div>
-                    </div>
+                    <TreeViewMenu hideArrow={true} title={Titles.ClearPinned} icon={'fa fa-times'} onClick={() => {
+                        this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
+                            return {
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Pinned,
+                                    id: node.id,
+                                    value: false
+                                }
+                            }
+                        }));
+                    }} />
                 </TreeViewMenu>
                 <FormControl sidebarform={true}>
                     <TextInput value={this.state.filter} onChange={(value) => {

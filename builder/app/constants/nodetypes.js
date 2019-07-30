@@ -1440,6 +1440,7 @@ export const ExecutorRules = {
     ModelReference: 'model-reference',
     Copy: 'copy',
     AgentReference: 'agent-reference',
+    ParentReference: 'parent-reference'
 }
 export const ExecutorUI = {
     [ExecutorRules.ModelReference]: {
@@ -1457,6 +1458,18 @@ export const ExecutorUI = {
     [ExecutorRules.AgentReference]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'AgentReference'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Model,
+            reference: {
+                types: [NodeTypes.Model]
+            }
+        }
+    },
+    [ExecutorRules.ParentReference]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ParentReference'
         },
         arguments: {
             ...COMMON_STRING_ARGS,

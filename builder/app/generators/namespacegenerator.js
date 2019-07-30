@@ -9,7 +9,7 @@ const NAME_SPACE_TEMPLATE = './app/templates/namespace.tpl';
 export default class NamespaceGenerator {
     static Generate(options) {
         var { template, namespace, space, usings } = options;
-        let namespaceTemplate = fs.readFileSync(NAME_SPACE_TEMPLATE, 'utf-8');
+        let namespaceTemplate = fs.readFileSync(NAME_SPACE_TEMPLATE, 'utf8');
 
         namespaceTemplate = bindTemplate(namespaceTemplate, {
             namespace,

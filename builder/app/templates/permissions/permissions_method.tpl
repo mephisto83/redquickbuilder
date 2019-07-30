@@ -6,7 +6,7 @@
                 return false;
             }
             var result = false;
-
+            {{parent_setup}}
 {{cases}}
 {{case_result}}
             return result;

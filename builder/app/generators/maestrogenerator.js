@@ -34,13 +34,13 @@ export default class MaestroGenerator {
 
         let maestros = NodesByType(state, NodeTypes.Maestro);
 
-        let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf-8');
-        let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf-8');
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
-        let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf-8');
-        let testFunctionGetSameParentTemplate = fs.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf-8');
+        let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf8');
+        let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
+        let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf8');
+        let testFunctionGetSameParentTemplate = fs.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf8');
 
-        let testFunctionGetTemplate = fs.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf-8');
+        let testFunctionGetTemplate = fs.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf8');
         let root = GetRootGraph(state);
         let graph = GetCurrentGraph(state);
         let result = {};
@@ -84,6 +84,7 @@ export default class MaestroGenerator {
                         let permissionNode = null;
                         let modelFilterNode = null;
                         let manyToManyNode = null;
+                        let parent_setup = '';
                         let modelNode = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         let predicates = '';
@@ -95,6 +96,7 @@ export default class MaestroGenerator {
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
+                            parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                             var modelItemFilters = GraphMethods.GetLinkChain(state, {
                                 id: maestro_function.id,
@@ -103,12 +105,16 @@ export default class MaestroGenerator {
                                     direction: GraphMethods.SOURCE
                                 }]
                             });
-                            predicates = ModelItemFilterGenerator.predicates(modelItemFilters);
+                            var out_predicate = {}
+                            predicates = ModelItemFilterGenerator.predicates(modelItemFilters, out_predicate);
                             if (predicates.length) {
                                 predicates = predicates.join(', ');
                             }
                             else {
                                 predicates = '';
+                            }
+                            if (out_predicate.parent) {
+                                parent_setup = `var parent = await arbiter${parent_type}.Get<${parent_type}>(model.${parent_type});`   
                             }
                         }
 
@@ -117,7 +123,6 @@ export default class MaestroGenerator {
                         let agent_type = agentTypeNode ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
                         let methodType = GetNodeProp(maestro_function, NodeProperties.MethodType);
                         let connect_type = manyToManyNode ? GetNodeProp(manyToManyNode, NodeProperties.CodeName) : '{maestro_connection_type_missing}';
-                        parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                         if (parentNode)
                             arbiters.push(parent_type);
                         let manyNodes = GraphMethods.GetManyToManyNodes(graphRoot, [modelNode ? modelNode.id : false, agentTypeNode ? agentTypeNode.id : null].filter(x => x)) || [];
@@ -146,6 +151,7 @@ export default class MaestroGenerator {
                             agent: agent,
                             value_type,
                             value,
+                            parent_setup,
                             model: model_type,
                             connect_type,
                             comma: predicates.length ? ',' : '',
@@ -243,7 +249,7 @@ export default class MaestroGenerator {
                                 }
                                 switch (function_type) {
                                     case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-                                        templ = fs.readFileSync(get_agent_manytomany_listchild_interface, 'utf-8');
+                                        templ = fs.readFileSync(get_agent_manytomany_listchild_interface, 'utf8');
                                         break;
                                 }
                                 return bindTemplate(templ, {

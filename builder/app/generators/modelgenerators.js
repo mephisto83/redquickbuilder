@@ -67,9 +67,9 @@ export default class ModelGenerator {
             type: LinkType.PropertyLink,
             direction: GraphMethods.SOURCE
         });
-        let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf-8');
-        let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf-8');
-        let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf-8');
+        let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
+        let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
+        let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 
         let validatorFunctions = GraphMethods.getNodesByLinkType(graph, {
             id: nodeId,
@@ -223,7 +223,7 @@ export default class ModelGenerator {
         templateSwapDictionary.properties = properties.join('');
         templateSwapDictionary.staticFunctions = staticFunctions.unique(x => x).join('\n');
         console.log(templateSwapDictionary.properties)
-        let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf-8');
+        let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf8');
         modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
         var result = {

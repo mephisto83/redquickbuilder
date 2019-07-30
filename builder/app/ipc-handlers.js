@@ -83,7 +83,7 @@ function copyFile(source, destination) {
 function writeJsonToFile(json, destination) {
     var text = JSON.stringify(json);
     return Promise.resolve().then(() => {
-        fs.writeFileSync(destination, text, 'utf-8');
+        fs.writeFileSync(destination, text, 'utf8');
     });
 }
 function ensureDirectory(dir) {

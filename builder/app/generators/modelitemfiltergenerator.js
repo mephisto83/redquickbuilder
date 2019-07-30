@@ -14,7 +14,7 @@ const FILTER_PROPERTY_FUNCTION_VALUE_EQUALS = './app/templates/models/itemfilter
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelItemFilterGenerator {
-    static predicates(nodes) {
+    static predicates(nodes, out_ = {}) {
 
         return nodes.map(x => {
             let validator = GetNodeProp(x, NodeProperties.FilterModel);
@@ -22,12 +22,12 @@ export default class ModelItemFilterGenerator {
             if (validator) {
                 Object.values(validator.properties).map(t => Object.values(t.validators).map(v => {
                     if (v && v.type === FilterRules.EqualsModelRef) {
+                        out_[v.node] = true;
                         params.push(v.node);
                     }
                 }))
             }
             params = params.filter(x => x).unique().sort();
-
             let text = `${GetCodeName(x)}.Filter({{predicate_parameters}})`;
             return bindTemplate(text, {
                 predicate_parameters: params.join(', ')
@@ -41,7 +41,7 @@ export default class ModelItemFilterGenerator {
         let graph = GetRootGraph(state);
         let result = {};
 
-        let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf-8');
+        let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
         let allfilters = NodesByType(state, NodeTypes.ModelFilter);
         let modelitemfilters = NodesByType(state, NodeTypes.ModelItemFilter);
         modelitemfilters.map(modelitemfilter => {
@@ -61,7 +61,7 @@ export default class ModelItemFilterGenerator {
             let funcs = [];
             let parameters = [];
             if (filterModel && filterModel.properties) {
-                let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf-8');
+                let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
                 let filters = [];
                 Object.keys(filterModel.properties).map(prop => {
                     let propName = GetCodeName(prop);
@@ -97,7 +97,7 @@ export default class ModelItemFilterGenerator {
                                     default:
                                         throw 'not handled model item filter generation case';
                                 }
-                            let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf-8');
+                            let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
 
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {
                                 property: propName,

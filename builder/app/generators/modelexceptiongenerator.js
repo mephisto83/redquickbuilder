@@ -19,7 +19,7 @@ export default class ModelReturnGenerator {
         let graph = GetRootGraph(state);
         let result = {};
 
-        let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf-8');
+        let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
         let allfilters = NodesByType(state, NodeTypes.ModelFilter);
         let allmodels = NodesByType(state, NodeTypes.Model);
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));

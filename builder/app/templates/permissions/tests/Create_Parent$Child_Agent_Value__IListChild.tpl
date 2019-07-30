@@ -10,7 +10,7 @@
             var agentArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}>>();
             var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
             var parentArbiter = RedStrapper.Resolve<IRedArbiter<{{parent}}>>();
-            var manyToManyArbiter = RedStrapper.Resolve<IRedArbiter<{{many_to_many}}>>();
+            {{many_to_many_arbiter_constructor}}
                 
             var permission = RedStrapper.Resolve<IPermissions{{agent_type}}>();
             var agent = {{agent_type}}.Create();
@@ -25,13 +25,23 @@
             //Set Parent Properties
 {{set_parent_properties}}
             parent = await parentArbiter.Create(parent);
+            var model = {{model}}.Create();
+            model.{{parent}} = parent.Id;
 
+{{set_model_properties}}
+
+{{many_to_many_register}}
+
+            //Set Match reference properties 
 {{set_match_reference_properties}}
 
+            //Set Match many reference properties 
+{{set_match_many_reference_properties}}
+            
             {{parent_agent_are_the_same}}
             
             //Act
-            var res = await permission.{{function_name}}(agent, parent);
+            var res = await permission.{{function_name}}(agent, model);
 
             //Assert
             Assert.AreEqual(res, {{result}});

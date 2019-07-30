@@ -20,7 +20,7 @@ export default class ConstantsGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let _constantsClass = fs.readFileSync(CONSTANTS_CLASS, 'utf-8');
+        let _constantsClass = fs.readFileSync(CONSTANTS_CLASS, 'utf8');
         let result = {};
         values.map(value => {
             let { model, name } = value;

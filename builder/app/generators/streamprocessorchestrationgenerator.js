@@ -19,7 +19,7 @@ const TEST_CLASS = './app/templates/tests/tests.tpl';
 export default class StreamProcessOrchestrationGenerator {
     static GenerateStaticMethods(models) {
 
-        let _streamProcessFunctionTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES, 'utf-8');
+        let _streamProcessFunctionTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES, 'utf8');
         let staticMethods = models.map(model => {
             let streamProcessFunctionTemplate = _streamProcessFunctionTemplate;
             let modelCode = GetNodeProp(model, NodeProperties.CodeName);
@@ -37,7 +37,7 @@ export default class StreamProcessOrchestrationGenerator {
     static GenerateAgentMethods(state) {
         let models = NodesByType(state, NodeTypes.Model);
         let agents = models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
-        let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS, 'utf-8');
+        let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS, 'utf8');
 
         let result = [];
         let modelexecution = [];
@@ -65,7 +65,7 @@ ${modelexecution.join('')}
     static GenerateAgentInterfaceMethods(state) {
         let models = NodesByType(state, NodeTypes.Model);
         let agents = models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
-        let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf-8');
+        let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf8');
 
         let result = [];
         agents.map(agent => {
@@ -119,8 +119,8 @@ ${modelexecution.join('')}
         let functions = NodesByType(state, NodeTypes.Method);
         let res = '';
         // STREAM_METHOD_TESTS
-        let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf-8');
-        let _createModelTests = fs.readFileSync(CREATE_MODEL_TESTS, 'utf-8');
+        let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf8');
+        let _createModelTests = fs.readFileSync(CREATE_MODEL_TESTS, 'utf8');
 
         res = functions.map((func, index) => {
             let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
@@ -245,9 +245,9 @@ ${modelexecution.join('')}
         let models = NodesByType(state, NodeTypes.Model);
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
-        let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE, 'utf-8');
-        let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf-8');
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
+        let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE, 'utf8');
+        let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
         let agent_methods = StreamProcessOrchestrationGenerator.GenerateAgentMethods(state);
         let agent_methods_interface = StreamProcessOrchestrationGenerator.GenerateAgentInterfaceMethods(state);
         let statics = StreamProcessOrchestrationGenerator.GenerateStaticMethods(models);

@@ -39,7 +39,7 @@ export default class ExtensionGenerator {
     }
     static CreateListInstanceTemplate(options) {
         let { node, name } = options;
-        let _newTemplateList = fs.readFileSync(EXTENSION_NEW_TEMPLATE_LIST, 'utf-8');
+        let _newTemplateList = fs.readFileSync(EXTENSION_NEW_TEMPLATE_LIST, 'utf8');
         return bindTemplate(_newTemplateList, {
             name,
             model: GetNodeProp(node, NodeProperties.CodeName)
@@ -51,14 +51,14 @@ export default class ExtensionGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let _extensionClassTemplate = fs.readFileSync(EXTENSION_CLASS_TEMPLATE, 'utf-8');
-        let _extensionPropertyTemplate = fs.readFileSync(EXTENSION_PROPERTY_TEMPLATE, 'utf-8');
-        let _extensionNewInstance = fs.readFileSync(EXTENSION_NEW_INSTANCE, 'utf-8');
-        let _extensionNewProperty = fs.readFileSync(EXTENSION_NEW_PROPERTY, 'utf-8');
-        let _extensionNewInstanceList = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST, 'utf-8');
-        let _extensionNewInstanceListAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST_ADD, 'utf-8');
-        let _extensionNewInstanceDictionary = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY, 'utf-8');
-        let _extensionNewInstanceDictionaryAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY_ADD, 'utf-8');
+        let _extensionClassTemplate = fs.readFileSync(EXTENSION_CLASS_TEMPLATE, 'utf8');
+        let _extensionPropertyTemplate = fs.readFileSync(EXTENSION_PROPERTY_TEMPLATE, 'utf8');
+        let _extensionNewInstance = fs.readFileSync(EXTENSION_NEW_INSTANCE, 'utf8');
+        let _extensionNewProperty = fs.readFileSync(EXTENSION_NEW_PROPERTY, 'utf8');
+        let _extensionNewInstanceList = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST, 'utf8');
+        let _extensionNewInstanceListAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_LIST_ADD, 'utf8');
+        let _extensionNewInstanceDictionary = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY, 'utf8');
+        let _extensionNewInstanceDictionaryAdd = fs.readFileSync(EXTENSION_NEW_INSTANCE_DICTIONARY_ADD, 'utf8');
         let result = {};
         extensions.map(extension => {
             let extensionClassTemplate = _extensionClassTemplate;

@@ -153,10 +153,10 @@ export default class ValidationRuleGenerator {
         let result = {};
 
         let nodes = NodesByType(state, NodeTypes.Validator);
-        let _validation_class = fs.readFileSync(VALIDATION_CLASS, 'utf-8');
-        let _validation_property = fs.readFileSync(VALIDATION_PROPERTY, 'utf-8');
-        let _validation_test = fs.readFileSync(VALIDATION_TEST, 'utf-8');
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf-8');
+        let _validation_class = fs.readFileSync(VALIDATION_CLASS, 'utf8');
+        let _validation_property = fs.readFileSync(VALIDATION_PROPERTY, 'utf8');
+        let _validation_test = fs.readFileSync(VALIDATION_TEST, 'utf8');
+        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
         nodes.map(node => {
             var agent = GetNodeProp(node, NodeProperties.ValidatorAgent);
             var model = GetNodeProp(node, NodeProperties.ValidatorModel);

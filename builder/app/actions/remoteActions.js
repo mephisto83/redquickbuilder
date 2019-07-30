@@ -32,7 +32,7 @@ export function openRedQuickBuilderGraph() {
                     fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
                 }
                 console.log(fileName);
-                fs.readFile(fileName, { encoding: 'utf-8' }, (err, res) => {
+                fs.readFile(fileName, { encoding: 'utf8' }, (err, res) => {
                     if (err) {
                         console.error("An error ocurred updating the file" + err.message);
                         console.log(err);
