@@ -571,6 +571,19 @@ export const MethodFunctions = {
         method: Methods.Update,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
+    [FunctionTypes.Update_Object_Agent_Value__Object]: {
+        title: Titles.Update_Object_Agent_Value__Object,
+        template: fs.readFileSync('./app/templates/standard/update_model_agent_object.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_interface.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: false,
+        method: Methods.Update,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
@@ -637,7 +650,7 @@ export const MethodFunctions = {
         ...COMMON_FUNCTION_REQUIREMENTS,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
-    
+
     [FunctionTypes.Get_Object_Agent_Value__Object]: {
         title: Titles.Get_Object_Agent_Value__Object,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),

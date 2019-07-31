@@ -36,14 +36,15 @@ class ModelFilterItemActivityMenu extends Component {
             var methodProps = UIA.GetMethodProps(methodNode);
             if (methodProps) {
                 switch (UIA.GetFunctionType(methodNode)) {
+                    case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                        node = GetNode(graph, methodProps[FunctionTemplateKeys.ManyToManyModel]);
+                        break;
                     case FunctionTypes.Create_Object_Agent_Value__IListObject:
                     case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
                     case FunctionTypes.Create_Parent$Child_Agent_Value__IListChild:
                     case FunctionTypes.Create_Parent_Child_Agent_Value__Child:
+                    default:
                         node = GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
-                        break;
-                    case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-                        node = GetNode(graph, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                         break;
                 }
             }
