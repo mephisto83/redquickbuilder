@@ -28,6 +28,7 @@ export const NodeTypes = {
     ExtensionType: 'extension-type',
     Function: 'function',
     Method: 'method',//NGRX like effect
+    AfterEffect: 'after-effect', // executes after a method finishes successfully.
     Action: 'action', //NGRX like action
     Parameter: 'parameter',
     FunctionOutput: 'function-output',
@@ -262,6 +263,8 @@ export const NodeProperties = {
     UseScopeGraph: 'UseScopeGraph',
     ScopeGraph: 'scopedGraph',
 
+    AfterMethod: 'after-method',
+
     //The name used for code.
     Groups: 'groups',
     GroupParent: 'groupParent',
@@ -366,6 +369,8 @@ export const LinkType = {
 
     Condition: 'condtion',
     ModelItemFilter: 'model-item-filter',
+
+    AfterMethod: 'after-method',
 
     Validation: 'validation',
     ValidationItem: 'validation-item',
@@ -533,6 +538,9 @@ export const LinkProperties = {
     },
     ModelItemFilter: {
         type: LinkType.ModelItemFilter
+    },
+    AfterMethod: {
+        type: LinkType.AfterMethod
     },
     EnumerationReferenceLink: {
         type: LinkType.EnumerationReference

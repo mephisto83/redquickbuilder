@@ -37,48 +37,6 @@ class MethodActivityMenu extends Component {
         })
         return (
             <TabPane active={active}>
-                {/* {currentNode ? (<SelectInput
-                    label={Titles.AgentOperator}
-                    options={agent_nodes}
-                    onChange={(value) => {
-                        var id = currentNode.id;
-                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                            target: currentNode.properties[UIA.NodeProperties.UIExtension],
-                            source: id
-                        })
-                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.UIExtension,
-                            id: currentNode.id,
-                            value
-                        });
-                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                            target: value,
-                            source: id,
-                            properties: { ...UIA.LinkProperties.FunctionOperator }
-                        });
-                    }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
-                {currentNode ? (<SelectInput
-                    label={Titles.PermissionImpl}
-                    options={permission_nodes}
-                    onChange={(value) => {
-                        var id = currentNode.id;
-                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                            target: currentNode.properties[UIA.NodeProperties.PermissionImpl],
-                            source: id
-                        })
-                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.PermissionImpl,
-                            id: currentNode.id,
-                            value
-                        });
-                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                            target: value,
-                            source: id,
-                            properties: { ...UIA.LinkProperties.PermissionLink }
-                        });
-                    }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionImpl] : ''} />) : null} */}
                 {currentNode && !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<SelectInput
                     label={Titles.FunctionTypes}
                     options={function_types}
@@ -136,11 +94,19 @@ class MethodActivityMenu extends Component {
                             }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddModelItemFilter} description={Titles.AddModelItemFilterDescription} />) : null}
-                    {/* {currentNode ? (<ControlSideBarMenuItem onClick={() => {
-                        this.props.graphOperation(UIA.NEW_FUNCTION_OUTPUT_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                    {currentNode ? (<ControlSideBarMenuItem onClick={() => {
+                        this.props.graphOperation(UIA.NEW_AFTER_METHOD, {
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
+                            linkProperties: {
+                                properties: { ...LinkProperties.AfterMethod }
+                            },
+                            properties: {
+                                [NodeProperties.UIText]: `${UIA.GetNodeProp(currentNode, NodeProperties.UIText)} After Effect`
+                            }
                         });
-                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddFunctionOutput} description={Titles.AddFunctionOutputDescription} />) : null} */}
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddAfterMethods} description={Titles.AddAfterMethodsDescription} />) : null}
                 </ControlSideBarMenu>
             </TabPane>
         );

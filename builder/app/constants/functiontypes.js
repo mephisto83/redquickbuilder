@@ -33,6 +33,11 @@ export const FunctionTypes = {
     Get_Object_Agent_Value__Object: 'Get/Object/Agent/Value => Object',
     Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
+    Create_Object__Object: 'Create/Object => Object',
+    Update_Object__Object: 'Update/Object => Object',
+    Delete_Object__Object: 'Delete/Object => Object',
+    Get_Object__Object: 'Get/Object => Object',
+    
     //Function with bool result
     Can_Execute_Agent_Parent_In_Valid_List: 'Can_Execute_Agent_Parent_In_Valid_List'
     // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
@@ -185,6 +190,13 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
     [FunctionTemplateKeys.ModelFilter]: {
         key: FunctionTemplateKeys.ModelFilter,
         nodeTypes: [NodeTypes.ModelFilter]
+    }
+};
+
+const COMMON_CONSTRAINTS_OBJECT_METHOD = {
+    [FunctionTemplateKeys.Model]: {
+        key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
     }
 };
 
@@ -545,6 +557,19 @@ export const Functions = {
 
 
 export const MethodFunctions = {
+    [FunctionTypes.Create_Object__Object]: {
+        title: Titles.Create_Object__Object,
+        template: fs.readFileSync('./app/templates/standard/create_model_object.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_model_object_interface.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: false,
+        method: Methods.Create,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
         title: Titles.Create_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),

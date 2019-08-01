@@ -88,6 +88,8 @@ export const IsOwnedByAgentsDescriptions = 'That would mean any agent/model coul
 export const IsUser = 'User';
 export const ParameterType = 'Parameter Type';
 export const OwnedResources = 'Owned Resources';
+export const AddAfterMethods  ='Add after method';
+export const AddAfterMethodsDescription = 'Adding an after method node, will allow you to append functions to execute after.';
 export const AddModelItemFilter = 'Add model item filter';
 export const AddModelItemFilterDescription = 'Add model item filter for get functions'
 export const PermissionType = 'Permissions';
@@ -167,6 +169,8 @@ export const MatchingValueDescription = 'The value that the associated property 
 
 export const PermissionImpl = 'Permission Implementation';
 export const FunctionTypes = 'Function Types';
+
+export const Create_Object__Object = 'Create Object => Object';
 
 export const Get_ManyToMany_Agent_Value__IListChild = 'Get Many to Many => IList<Child>';
 export const Create_ManyToMany_Agent_Value__IListChild = 'Create Many to Many => IList<Child>';
