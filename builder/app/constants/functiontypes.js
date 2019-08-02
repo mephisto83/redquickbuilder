@@ -197,6 +197,11 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD = {
     [FunctionTemplateKeys.Model]: {
         key: FunctionTemplateKeys.Model,
         nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Agent]: {
+        [NodeProperties.IsAgent]: true,
+        key: FunctionTemplateKeys.Agent,
+        nodeTypes: [NodeTypes.Model]
     }
 };
 
