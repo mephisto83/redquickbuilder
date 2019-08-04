@@ -4,9 +4,9 @@
 
             if(await {{agent}}Permissions.{{permission_function}}(agent, value).ConfigureAwait(false)) {
 
-                var parameters = {{model}}Change.Create(agent, value, FunctionName.{{function_name}});
+                var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, value, FunctionName.{{function_name}});
 
-                var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
+                var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
                 return await arbiter{{model}}.Get<{{model}}>(result.Id);
             }

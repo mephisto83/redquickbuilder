@@ -5,7 +5,7 @@ public async Task<{{agent_type}}> Get{{agent_type}}({{user}} {{user_instance}}, 
 
     if(await {{agent_type}}Permissions.CanGet{{agent_type}}({{agent}} , {{value}}).ConfigureAwait(false))) {
 
-        var parameters = {{agent_type}}Change.Get({{agent}}, {{value}});
+        var parameters = {{agent_type}}ChangeBy{{agent_type}}.Get({{agent}}, {{value}});
 
         var result = await StreamProcess.{{agent_type}}(parameters);
 

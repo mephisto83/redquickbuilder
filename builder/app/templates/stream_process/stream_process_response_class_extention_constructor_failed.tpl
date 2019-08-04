@@ -1,5 +1,5 @@
 
-        public static {{agent_type}}Response {{method}}FailedOnException({{model}}Change change, Exception e) 
+        public static {{agent_type}}Response {{method}}FailedOnException({{model}}ChangeBy{{agent_type}} change, Exception e) 
         {
             return new {{agent_type}}Response {
                 Response = change.Response,
@@ -12,7 +12,7 @@
             };
         }
 
-        public static {{agent_type}}Response {{method}}FailedOnValidation({{model}}Change change) 
+        public static {{agent_type}}Response {{method}}FailedOnValidation({{model}}ChangeBy{{agent_type}} change) 
         {
             return new {{agent_type}}Response {
                 Response = change.Response,

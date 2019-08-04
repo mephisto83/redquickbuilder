@@ -5,13 +5,13 @@
             //Arrange
             var response = Guid.NewGuid().ToString();
             var agent = {{agent_type}}.Create();
-            var change = {{model}}Change.Create(agent, {{model}}.Create(), "func");
+            var change = {{model}}ChangeBy{{agent_type}}.Create(agent, {{model}}.Create(), "func");
             change.Response = response;
 
             RedStrapper.Clear();
             RedStrapper.Add(builder =>
             {
-                var streamProcessOrchestrationMock = new Mock<IStreamProcessOrchestration>();
+                var streamProcessOrchestrationMock = new Mock<I{{agent_type}}StreamProcessOrchestration>();
                 streamProcessOrchestrationMock.Setup(x => x.ProcessStagedChanges(It.IsAny<Distribution>())).Returns(() =>
                 {
                     var stagedResponseArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}Response>>();
@@ -22,7 +22,7 @@
             });
 
             //Act 
-            var res = await StreamProcess.{{model}}<{{agent_type}}>(change);
+            var res = await StreamProcess.{{model}}_{{agent_type}}(change);
 
             //Assert
             Assert.IsNotNull(res);

@@ -1,12 +1,12 @@
             
-        Task<DistributionReport> Process{{model}}Changes (Distribution distribution = null);
+        Task<DistributionReport> Process{{model}}ChangesBy{{agent_type}} (Distribution distribution = null);
 
 
-        Task ProcessSelectedStagedChanges(IList<{{model}}Change> changes);
+        Task ProcessSelectedStagedChangesBy{{agent_type}} (IList<{{model}}ChangeBy{{agent_type}}> changes);
         
         
-        Task Create({{model}}Change change);
+        Task Create({{model}}ChangeBy{{agent_type}} change);
         
-        Task Update({{model}}Change change);
+        Task Update({{model}}ChangeBy{{agent_type}} change);
 
-        Task Delete({{model}}Change change);
+        Task Delete({{model}}ChangeBy{{agent_type}} change);

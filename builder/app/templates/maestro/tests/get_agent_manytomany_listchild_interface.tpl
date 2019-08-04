@@ -10,6 +10,7 @@
             {
                 builder.RegisterType<Permissions{{agent}}>().As<IPermissions{{agent}}>();
                 builder.RegisterType<{{maestro}}>().As<I{{maestro}}>();
+                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IRedStreamProcessOrchestration>();
                 builder.RegisterType<{{agent}}Executor>().As<I{{agent}}Executor>();

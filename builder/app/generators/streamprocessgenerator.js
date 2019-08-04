@@ -60,11 +60,11 @@ export default class StreamProcessGenerator {
         let statics = StreamProcessGenerator.GenerateStaticMethods(models);
         let staticTests = StreamProcessGenerator.GenerateStaticMethodTests(models);
         _streamProcessTemplate = bindTemplate(_streamProcessTemplate, {
-            static_methods: statics.join('')
+            static_methods: statics.unique(x => x).join('')
         });
 
         _streamProcessTemplateTests = bindTemplate(_streamProcessTemplateTests, {
-            tests: staticTests.join(''),
+            tests: staticTests.unique(x => x).join(''),
             name: 'StreamProcess'
         });
 

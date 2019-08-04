@@ -39,6 +39,9 @@ export function Use(node, prop) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+export function IsAgent(node){
+    return GetNodeProp(node, NodeProperties.IsAgent);
+}
 export function GetLinkChainItem(options) {
     return GraphMethods.GetLinkChainItem(GetState(), options);
 }
@@ -288,7 +291,6 @@ export function setAppsettingsAssemblyPrefixes(prefixes) {
 export function GetCurrentScopedGraph(state, dispatch) {
     var currentGraph = Application(state, CURRENT_GRAPH);
     let scope = Application(state, GRAPH_SCOPE) || [];
-    console.log(`current graph ${currentGraph}`)
     if (!currentGraph) {
         if (dispatch) {
             currentGraph = GraphMethods.createGraph();
@@ -298,7 +300,6 @@ export function GetCurrentScopedGraph(state, dispatch) {
     else {
         currentGraph = Graphs(state, currentGraph);
         if (scope.length) {
-            console.log(`scope.length ${scope.length}`)
             currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
         }
     }

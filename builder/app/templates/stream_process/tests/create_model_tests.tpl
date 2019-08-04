@@ -9,6 +9,7 @@
             var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
             RedStrapper.Add(builder =>
             {
+                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterType<{{agent_type}}Executor>().As<I{{agent_type}}Executor>();
             });
@@ -19,8 +20,8 @@
             var model = {{model}}.Create();
 {{set_model_properties}}
 
-            var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
-            var change = {{model}}Change.Create();
+            var orchestration = RedStrapper.Resolve<I{{agent_type}}StreamProcessOrchestration>();
+            var change = {{model}}ChangeBy{{agent_type}}.Create();
             change.Data = model;
             change.AgentId = agent.Id;
             change.FunctionName = FunctionName.{{function_name}};
@@ -56,10 +57,11 @@
             RedStrapper.Clear();
             RedStrapper.Add(builder =>
             {
+                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
             });
-            var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
-            var change = {{model}}Change.Create();
+            var orchestration = RedStrapper.Resolve<I{{agent_type}}StreamProcessOrchestration>();
+            var change = {{model}}ChangeBy{{agent_type}}.Create();
             var responseArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}Response>>();
             change.Response = Guid.NewGuid().ToString();
 

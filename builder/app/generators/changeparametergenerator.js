@@ -32,34 +32,36 @@ export default class ChangeParameterGenerator {
         let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
         let _streamProcessChangeClassConstrictorsTest = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, 'utf8');
         let result = {};
-        models.map(agent => {
-            let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
-            let testClass = _testClass;
-            let properties = '';
-            let statics = '';
-            let constructors = [];
-            let tests = [];
-            let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
-            agents.map(model => {
+        models.map(model => {
+
+            agents.map(agent => {
+                let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
+                let testClass = _testClass;
+                let properties = '';
+                let statics = '';
+                let constructors = [];
+                let tests = [];
+                let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+
                 Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
 
                     streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
-                        model: GetNodeProp(agent, NodeProperties.CodeName),
-                        value: GetNodeProp(agent, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(model, NodeProperties.CodeName),
-                        agent: GetNodeProp(model, NodeProperties.AgentName) || 'agent',
+                        model: GetNodeProp(model, NodeProperties.CodeName),
+                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
                         method
                     });
                     let streamProcessChangeClassConstrictorsTest = _streamProcessChangeClassConstrictorsTest;
 
                     streamProcessChangeClassConstrictorsTest = bindTemplate(streamProcessChangeClassConstrictorsTest, {
-                        model: GetNodeProp(agent, NodeProperties.CodeName),
-                        value: GetNodeProp(agent, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(model, NodeProperties.CodeName),
-                        agent: GetNodeProp(model, NodeProperties.AgentName) || 'agent',
+                        model: GetNodeProp(model, NodeProperties.CodeName),
+                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
                         method
                     });
@@ -67,48 +69,50 @@ export default class ChangeParameterGenerator {
                     tests.push(streamProcessChangeClassConstrictorsTest);
 
                 })
-            }).join(jNL);
 
-            let staticDic = {
-                model: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`
-            };
-            constructors.push(bindTemplate(staticFunctionTemplate, staticDic));
-            streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
-                model: GetNodeProp(agent, NodeProperties.CodeName),
-                constructors: constructors.join(jNL)
-            });
+                let staticDic = {
+                    model: `${GetNodeProp(model, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}`
+                };
+                constructors.push(bindTemplate(staticFunctionTemplate, staticDic));
+                streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
+                    model: GetNodeProp(model, NodeProperties.CodeName),
+                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                    constructors: constructors.join(jNL)
+                });
 
-            testClass = bindTemplate(testClass, {
-                name: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`,
-                tests: tests.unique(x => x).join('')
-            })
-
-
-            result[GetNodeProp(agent, NodeProperties.CodeName)] = {
-                id: GetNodeProp(agent, NodeProperties.CodeName),
-                name: `${GetNodeProp(agent, NodeProperties.CodeName)}Change`,
-                tname: `${GetNodeProp(agent, NodeProperties.CodeName)}ChangeTests`,
-                template: NamespaceGenerator.Generate({
-                    template: streamProcessChangeClassExtension,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Constants}`,
-                        `${namespace}${NameSpace.Model}`],
-                    namespace,
-                    space: NameSpace.Parameters
-                }),
-                test: NamespaceGenerator.Generate({
-                    template: testClass,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        ...STANDARD_TEST_USING,
-                        `${namespace}${NameSpace.Constants}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Model}`],
-                    namespace,
-                    space: NameSpace.Tests
+                testClass = bindTemplate(testClass, {
+                    name: `${GetNodeProp(model, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}`,
+                    tests: tests.unique(x => x).join('')
                 })
-            };
+
+                let change_param_name = `${GetNodeProp(model, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}`;
+                result[change_param_name] = {
+                    id: change_param_name,
+                    name: change_param_name,
+                    tname: `${GetNodeProp(model, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}Tests`,
+                    template: NamespaceGenerator.Generate({
+                        template: streamProcessChangeClassExtension,
+                        usings: [
+                            ...STANDARD_CONTROLLER_USING,
+                            `${namespace}${NameSpace.Constants}`,
+                            `${namespace}${NameSpace.Model}`],
+                        namespace,
+                        space: NameSpace.Parameters
+                    }),
+                    test: NamespaceGenerator.Generate({
+                        template: testClass,
+                        usings: [
+                            ...STANDARD_CONTROLLER_USING,
+                            ...STANDARD_TEST_USING,
+                            `${namespace}${NameSpace.Constants}`,
+                            `${namespace}${NameSpace.Parameters}`,
+                            `${namespace}${NameSpace.Model}`],
+                        namespace,
+                        space: NameSpace.Tests
+                    })
+                };
+
+            });
         })
 
         return result;

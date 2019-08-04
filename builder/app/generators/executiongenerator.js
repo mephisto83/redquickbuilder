@@ -67,9 +67,14 @@ export default class ExecutorGenerator {
             allagents.map(agent => {
                 Object.keys(Methods).map(meth => {
                     let found = false;
-                    allfunctions.filter(x => GetNodeProp(x, NodeProperties.MethodType) === meth).map(fun => {
+                    allfunctions.filter(x => {
+
+                        return GetNodeProp(x, NodeProperties.MethodType) === meth
+                    }).map(fun => {
                         found = true;
+
                         agmCombos.push({
+                            agentId: agent.id,
                             agent: GetNodeProp(agent, NodeProperties.CodeName),
                             model: GetNodeProp(model, NodeProperties.CodeName),
                             function: GetNodeProp(fun, NodeProperties.CodeName),
@@ -79,6 +84,7 @@ export default class ExecutorGenerator {
                     if (!found) {
 
                         agmCombos.push({
+                            agentId: agent.id,
                             agent: GetNodeProp(agent, NodeProperties.CodeName),
                             model: GetNodeProp(model, NodeProperties.CodeName),
                             method: meth
@@ -193,28 +199,31 @@ export default class ExecutorGenerator {
 
             // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
+            let agent_parameter = GetNodeProp(agentNode, NodeProperties.CodeName);
+            agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
+
+            let data_parameter = GetNodeProp(modelNode, NodeProperties.CodeName);
+            data_parameter = data_parameter ? `${data_parameter} data` : false;
+
+            let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
+            change_parameter = change_parameter ? `${change_parameter} change` : false;
+
+            let parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
 
             var templateRes = bindTemplate(_executor_methods, {
                 model: GetNodeProp(modelNode, NodeProperties.CodeName),
                 method_name: GetNodeProp(functionNode, NodeProperties.CodeName),
-                parameters: bindTemplate(`{{data}} data, {{agent}} agent, {{change}} change`, {
-                    data: GetNodeProp(modelNode, NodeProperties.CodeName),
-                    agent: GetNodeProp(agentNode, NodeProperties.CodeName),
-                    change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`
-                }),
+                parameters,
                 data: GetNodeProp(modelNode, NodeProperties.CodeName),
                 agent: GetNodeProp(agentNode, NodeProperties.CodeName),
                 change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`,
                 method_guts: templateRes,
             });
+
             var templateResInterface = bindTemplate(_executor_methods_interface, {
                 model: GetNodeProp(modelNode, NodeProperties.CodeName),
                 method_name: GetNodeProp(functionNode, NodeProperties.CodeName),
-                parameters: bindTemplate(`{{data}} data, {{agent}} agent, {{change}} change`, {
-                    data: GetNodeProp(modelNode, NodeProperties.CodeName),
-                    agent: GetNodeProp(agentNode, NodeProperties.CodeName),
-                    change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`
-                }),
+                parameters,
                 data: GetNodeProp(modelNode, NodeProperties.CodeName),
                 agent: GetNodeProp(agentNode, NodeProperties.CodeName),
                 change: `${GetNodeProp(modelNode, NodeProperties.CodeName)}Change`,
@@ -235,6 +244,7 @@ export default class ExecutorGenerator {
         let static_methods = agmCombos.map(amd => {
             var {
                 agent,
+                agentId,
                 model,
                 method,
             } = amd;
@@ -245,6 +255,8 @@ export default class ExecutorGenerator {
                     functType,
                     funct
                 } = _cases;
+                if (amd.agent !== agent) { ''; }
+
                 let _case = bindTemplate(_exe_case, {
                     agent,
                     model,
@@ -252,26 +264,33 @@ export default class ExecutorGenerator {
                 });
                 return _case + NEW_LINE;
             }).unique(x => x).join('');
-            return bindTemplate(_exe_method, {
-                agent,
-                model,
-                cases,
-                change: `${model}`,
-                method
-            }) + NEW_LINE
+            return {
+                template: bindTemplate(_exe_method, {
+                    agent,
+                    model,
+                    cases,
+                    change: `${model}`,
+                    method
+                }) + NEW_LINE,
+                agent: agentId
+            }
         });
         let static_methods_interface = agmCombos.map(amd => {
             var {
                 agent,
                 model,
                 method,
+                agentId
             } = amd;
-            return bindTemplate(_exe_method_interface, {
-                agent,
-                model,
-                change: `${model}`,
-                method
-            }) + NEW_LINE
+            return {
+                template: bindTemplate(_exe_method_interface, {
+                    agent,
+                    model,
+                    change: `${model}`,
+                    method
+                }) + NEW_LINE,
+                agent: agentId
+            }
         });
         Object.keys(agentFunctionDic).map(agent => {
 
@@ -279,13 +298,13 @@ export default class ExecutorGenerator {
             let templateRes = bindTemplate(_executor_class, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
                 methods: agentFunctionDic[agent].join(''),
-                staticentry: static_methods.unique(x => x).join('')
+                staticentry: static_methods.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
             });
 
             let templateInterfaceRes = bindTemplate(_executor_class_interface, {
                 model: GetNodeProp(node, NodeProperties.CodeName),
                 methods: agentFunctionInterfaceDic[agent].unique(x => x).join(''),
-                staticentry: static_methods_interface.unique(x => x).join('')
+                staticentry: static_methods_interface.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
 
             })
 

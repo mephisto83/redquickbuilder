@@ -48,17 +48,18 @@ export default class ChangeResponseGenerator {
                         let streamProcessChangeClassConstructorsTest = _streamProcessChangeClassConstructorsTest;
                         let parameterTemplate = null;
                         let arrange = '';
+                        let changeParameterName = `${GetNodeProp(model2, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}`
                         if (method === Methods.Delete) {
-                            parameterTemplate = `${GetNodeProp(model2, NodeProperties.CodeName)}Change change, bool res`;
+                            parameterTemplate = `${changeParameterName} change, bool res`;
                             arrange = `
-            var change = ${GetNodeProp(model2, NodeProperties.CodeName)}Change.Create();
+            var change = ${changeParameterName}.Create();
             var res = true;
                             `;
                         }
                         else {
-                            parameterTemplate = `${GetNodeProp(model2, NodeProperties.CodeName)}Change change, ${GetNodeProp(model, NodeProperties.CodeName)} ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}`;
+                            parameterTemplate = `${changeParameterName} change, ${GetNodeProp(model, NodeProperties.CodeName)} ${(GetNodeProp(model, NodeProperties.ValueName) || '').toLowerCase()}`;
                             arrange = `
-            var change = ${GetNodeProp(model2, NodeProperties.CodeName)}Change.Create();
+            var change = ${changeParameterName}.Create();
             var res =  ${GetNodeProp(model, NodeProperties.CodeName)}.Create();
             change.Response = "response";
             change.ChangeType = "changeType";

@@ -7,12 +7,13 @@
             RedStrapper.Add(builder =>
             {
                 var validatorMock = new Mock<IValidator>();
-                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(true));
 
                 var executorMock = new Mock<I{{agent_type}}Executor>();
-                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(newitem));
+{{stream_process_orchestration_mocks}}                    
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterInstance(validatorMock.Object);
                 builder.RegisterInstance(executorMock.Object);
@@ -22,14 +23,14 @@
             agent = await agentArbiter.Create(agent);
 
             var model = {{model}}.Create();
-            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}Change>>();
-            var parameters = {{model}}Change.Create(agent, model, FunctionName.{{function_name}});
+            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}ChangeBy{{agent_type}}>>();
+            var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, model, FunctionName.{{function_name}});
             parameters.Response = Guid.NewGuid().ToString();
             await parameterArbiter.Create(parameters);
 
             var responseArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}Response>>();
 
-            var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
+            var orchestration = RedStrapper.Resolve<I{{agent_type}}StreamProcessOrchestration>();
 
             //Act
             await orchestration.ProcessStagedChanges();
@@ -49,12 +50,13 @@
             RedStrapper.Add(builder =>
             {
                 var validatorMock = new Mock<IValidator>();
-                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(false));
 
                 var executorMock = new Mock<I{{agent_type}}Executor>();
-                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(newitem));
+                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterInstance(validatorMock.Object);
                 builder.RegisterInstance(executorMock.Object);
@@ -64,8 +66,8 @@
             agent = await agentArbiter.Create(agent);
 
             var model = {{model}}.Create();
-            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}Change>>();
-            var parameters = {{model}}Change.Create(agent, model, FunctionName.{{function_name}});
+            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}ChangeBy{{agent_type}}>>();
+            var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, model, FunctionName.{{function_name}});
             parameters.Response = Guid.NewGuid().ToString();
             await parameterArbiter.Create(parameters);
 
@@ -94,12 +96,13 @@
             RedStrapper.Add(builder =>
             {
                 var validatorMock = new Mock<IValidator>();
-                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Throws(new Exception());
 
                 var executorMock = new Mock<I{{agent_type}}Executor>();
-                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}Change>()))
+                executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(newitem));
+                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterInstance(validatorMock.Object);
                 builder.RegisterInstance(executorMock.Object);
@@ -109,8 +112,8 @@
             agent = await agentArbiter.Create(agent);
 
             var model = {{model}}.Create();
-            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}Change>>();
-            var parameters = {{model}}Change.Create(agent, model, FunctionName.{{function_name}});
+            var parameterArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}ChangeBy{{agent_type}}>>();
+            var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, model, FunctionName.{{function_name}});
             parameters.Response = Guid.NewGuid().ToString();
             await parameterArbiter.Create(parameters);
 

@@ -5,9 +5,9 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
     if(await {{agent_type#lower}}Permissions.{{permission_function}}(agent, value).ConfigureAwait(false)) {
 
-        var parameters = {{model#lower}}Change.Update<{{agent_type}}>(agent, value, FunctionName.{{function_name}});
+        var parameters = {{model#lower}}ChangeBy{{agent_type}}.Update<{{agent_type}}>(agent, value, FunctionName.{{function_name}});
 
-        var result = await StreamProcess.{{model}}<{{agent_type}}>(parameters);
+        var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
         return await arbiter{{model}}.Get<{{model}}>(result.Id);
     }

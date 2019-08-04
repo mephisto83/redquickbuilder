@@ -2,15 +2,15 @@
     public async Task<DistributionReport> Process{{model}}Changes (Distribution distribution = null)
     {
         DistributionReport result = null;
-        IList<{{model}}Change> changes = null;
+        IList<{{model}}ChangeBy{{agent_type}}> changes = null;
         if (Distribution.Ok(distribution))
         {
-            Expression<Func<{{model}}Change, bool>> funct = (c) => (c.StreamType == distribution.Stream);
-            changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}Change>().And(funct))).ToList();
+            Expression<Func<{{model}}ChangeBy{{agent_type}}, bool>> funct = (c) => (c.StreamType == distribution.Stream);
+            changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}ChangeBy{{agent_type}}>().And(funct))).ToList();
         }
         else
         {
-            changes = await {{model#lower}}ChangeArbiter.GetAll<{{model}}Change>();
+            changes = await {{model#lower}}ChangeBy{{agent_type}}Arbiter.GetAll<{{model}}ChangeBy{{agent_type}}>();
         }
 
         result = DistributionReport.Create(changes);
@@ -19,13 +19,13 @@
     
     }
 
-    public async Task ProcessSelectedStagedChanges(IList<{{model}}Change> changes)
+    public async Task ProcessSelectedStagedChanges(IList<{{model}}ChangeBy{{agent_type}}> changes)
     {
         foreach (var change in changes)
         {
             try
             {
-                await {{model#lower}}ChangeArbiter.Delete(change.Id);
+                await {{model#lower}}ChangeBy{{agent_type}}Arbiter.Delete(change.Id);
             }
             catch (Exception e) { }
         }

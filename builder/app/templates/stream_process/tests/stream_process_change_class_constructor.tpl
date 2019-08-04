@@ -9,7 +9,7 @@
             var value = {{model}}.Create();
 
             // Act
-            var res = {{model}}Change.{{method}}(agent, value, "func");
+            var res = {{model}}ChangeBy{{agent_type}}.{{method}}(agent, value, "func");
 
             //Assert
             Assert.AreEqual(agent.Id, res.AgentId);

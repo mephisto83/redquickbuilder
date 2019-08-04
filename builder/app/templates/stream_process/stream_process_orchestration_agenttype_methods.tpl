@@ -1,31 +1,31 @@
             
-        public async Task<DistributionReport> Process{{model}}Changes (Distribution distribution = null)
+        public async Task<DistributionReport> Process{{model}}ChangesBy{{agent_type}} (Distribution distribution = null)
         {
             DistributionReport result = null;
-            IList<{{model}}Change> changes = null;
+            IList<{{model}}ChangeBy{{agent_type}}> changes = null;
             if (Distribution.Ok(distribution))
             {
-                Expression<Func<{{model}}Change, bool>> funct = (c) => (c.StreamType == distribution.Stream);
-                changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}Change>().And(funct))).ToList();
+                Expression<Func<{{model}}ChangeBy{{agent_type}}, bool>> funct = (c) => (c.StreamType == distribution.Stream);
+                changes = (await {{model#lower}}ChangeBy{{agent_type}}Arbiter.Query(distribution.RedExpression<{{model}}ChangeBy{{agent_type}}>().And(funct))).ToList();
             }
             else
             {
-                changes = await {{model#lower}}ChangeArbiter.GetAll<{{model}}Change>();
+                changes = await {{model#lower}}ChangeBy{{agent_type}}Arbiter.GetAll<{{model}}ChangeBy{{agent_type}}>();
             }
 
             result = DistributionReport.Create(changes);
-            await ProcessSelectedStagedChanges(changes);
+            await ProcessSelectedStagedChangesBy{{agent_type}}(changes);
             return result;
         
         }
 
-        public async Task ProcessSelectedStagedChanges(IList<{{model}}Change> changes)
+        public async Task ProcessSelectedStagedChangesBy{{agent_type}}(IList<{{model}}ChangeBy{{agent_type}}> changes)
         {
             foreach (var change in changes)
             {
                 try
                 {
-                    await {{model#lower}}ChangeArbiter.Delete(change.Id);
+                    await {{model#lower}}ChangeBy{{agent_type}}Arbiter.Delete(change.Id);
                 }
                 catch (Exception e) { }
             }
@@ -55,13 +55,13 @@
         }
         
         
-        public async Task Create({{model}}Change change) {
+        public async Task Create({{model}}ChangeBy{{agent_type}} change) {
             try 
             {
                 var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
                 var data = change.Data;
             
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
                 {
                     data = await {{agent_type#lower}}Executor.Create(data, agent, change);
                     var result = await {{model#lower}}Arbiter.Create(data);
@@ -77,12 +77,12 @@
             }
         }
 
-        public async Task Update({{model}}Change change) {
+        public async Task Update({{model}}ChangeBy{{agent_type}} change) {
             try 
             {  
                 var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
                 var data = change.Data;
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
                 {
                     data = await {{agent_type#lower}}Executor.Update(data, agent, change);
                     var result = await {{model#lower}}Arbiter.Update(data);
@@ -98,13 +98,13 @@
             }
         }
 
-        public async Task Delete({{model}}Change change) {
+        public async Task Delete({{model}}ChangeBy{{agent_type}} change) {
             try
             {
                 var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
                 var data = change.Data;
             
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}Change>(data, agent, change)) 
+                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
                 {
                     var result = await {{model#lower}}Arbiter.Delete(data);
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));

@@ -5,10 +5,10 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class {{agent_type}}StreamProcessOrchestration : I{{agent_type}}StreamProcessOrchestration
+    public class StreamProcessOrchestration : IStreamProcessOrchestration
     {
 {{arbiter_instances}}
-        public {{agent_type}}StreamProcessOrchestration()
+        public StreamProcessOrchestration()
         {
 {{arbiters_strappers}}
         }
