@@ -39,7 +39,7 @@ export function Use(node, prop) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
-export function IsAgent(node){
+export function IsAgent(node) {
     return GetNodeProp(node, NodeProperties.IsAgent);
 }
 export function GetLinkChainItem(options) {
@@ -61,6 +61,21 @@ export function GetMethodPropNode(graph, node, key) {
     }
     return null;
 }
+
+export function GetMethodOptions(methodProps) {
+    if (!methodProps) {
+        return [];
+    }
+    let state = _getState();
+    return Object.keys(methodProps).map(t => {
+        var n = GraphMethods.GetNode(GetRootGraph(state), methodProps[t]);
+        return {
+            title: `${GetCodeName(n)} (${t})`,
+            value: t
+        }
+    });
+}
+
 export function GetLinkProperty(link, prop) {
     return link && link.properties && link.properties[prop]
 }
@@ -216,6 +231,10 @@ export function setState() {
     return (dispatch, getState) => {
         _getState = getState;
     }
+}
+export function GetGraphNode(id) {
+    let state = _getState();
+    return GraphMethods.GetNode(GetRootGraph(state), id);
 }
 export function GetFunctionType(methodNode) {
     return GetNodeProp(methodNode, NodeProperties.FunctionType);

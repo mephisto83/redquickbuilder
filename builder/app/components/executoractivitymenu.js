@@ -74,6 +74,28 @@ class ExecutorActivityMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ExecutorModel] : ''} />
                     <SelectInput
+                        options={modelNodes}
+                        label={Titles.OutputModel}
+                        onChange={(value) => {
+
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.ExecutorModelOutput],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.ExecutorModelOutput,
+                                id: currentNode.id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.ExecutorModelLink }
+                            });
+                        }}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModelOutput)} />
+                    <SelectInput
                         options={agents}
                         label={Titles.Agents}
                         onChange={(value) => {

@@ -179,6 +179,7 @@ export const NodeProperties = {
     ExecutorAgent: 'ExecutorAgent',
     ExecutorFunction: 'ExecutorFunction',
     ExecutorModel: 'ExecutorModel',
+    ExecutorModelOutput: 'ExecutorModelOutput',
     ExecutorFunctionType: 'ExecutorFunctionType',
     ValidatorFunction: 'ValidatorFunction',
     UseEnumeration: 'UseEnumeration',
@@ -200,6 +201,7 @@ export const NodeProperties = {
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',
     IsAgent: 'isAgent',
+    IsCompositeInput: 'IsCompositeInput',
     IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
     IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
     IsOwnedByAgents: 'IsOwnedByAgents',
@@ -210,6 +212,8 @@ export const NodeProperties = {
     UIName: 'uiName', // The name used in the ui.
 
     UIText: 'text',
+
+    IsReferenceList: 'isReferenceList',
 
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
@@ -244,6 +248,7 @@ export const NodeProperties = {
     ReferenceType: 'referenceType', //Reference nodes will have this type.
 
     UIAttributeType: 'uiAttributeType',
+    PermissionValueType: 'PermissionValueType',
     UseModelAsType: 'useModelAsType',
 
     IsDefaultProperty: 'isDefaultProperty',

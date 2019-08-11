@@ -1,1 +1,1 @@
-        Task<{{model}}> {{method_name}}({{parameters}});
+        Task<{{model_output}}> {{method_name}}({{parameters}});

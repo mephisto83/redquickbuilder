@@ -38,7 +38,6 @@
 
             var userArbiter = RedStrapper.Resolve<IRedArbiter<{{user}}>>();
             var agentArbiter = RedStrapper.Resolve<IRedArbiter<{{agent}}>>();
-            var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
 
             var maestro = RedStrapper.Resolve<I{{maestro}}>();
             var user = {{user}}.Create();

@@ -11,7 +11,7 @@
             RedStrapper.Clear();
             RedStrapper.Add(builder =>
             {
-                var streamProcessOrchestrationMock = new Mock<I{{agent_type}}StreamProcessOrchestration>();
+                var streamProcessOrchestrationMock = new Mock<IStreamProcessOrchestration>();
                 streamProcessOrchestrationMock.Setup(x => x.ProcessStagedChanges(It.IsAny<Distribution>())).Returns(() =>
                 {
                     var stagedResponseArbiter = RedStrapper.Resolve<IRedArbiter<{{agent_type}}Response>>();

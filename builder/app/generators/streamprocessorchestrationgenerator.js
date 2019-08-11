@@ -1,6 +1,6 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes, GetCodeName, GetMethodProps, IsAgent } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, STANDARD_TEST_USING, NEW_LINE } from '../constants/nodetypes';
+import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes, GetCodeName, GetMethodProps, IsAgent, GetGraphNode } from '../actions/uiactions';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, STANDARD_TEST_USING, NEW_LINE, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTemplateKeys, MethodFunctions } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
@@ -12,6 +12,9 @@ const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/st
 const STREAM_PROCESS_ORCHESTRATION_ROOT_TEMPLATE = './app/templates/stream_process/stream_process_orchestration_root.tpl';
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE = './app/templates/stream_process/stream_process_orchestration_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS = './app/templates/stream_process/stream_process_orchestration_agenttype_methods.tpl';
+const STREAM_PROCESS_AGENT_CRUD_UPDATE = './app/templates/stream_process/agent_methods/update.tpl';
+const STREAM_PROCESS_AGENT_CRUD_CREATE = './app/templates/stream_process/agent_methods/create.tpl';
+const STREAM_PROCESS_AGENT_CRUD_DELETE = './app/templates/stream_process/agent_methods/delete.tpl';
 const STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE = './app/templates/stream_process/stream_process_orchestration_agenttype_methods_interface.tpl';
 const STREAM_PROCESS_ORCHESTRATION_STAGED_CHANGES = './app/templates/stream_process/stream_process_orchestration_selected_staged_changes.tpl';
 const STREAM_METHOD_TESTS = './app/templates/stream_process/tests/stream_process_execution_tests.tpl';
@@ -44,13 +47,18 @@ export default class StreamProcessOrchestrationGenerator {
             return methods.find(method => {
                 var props = GetMethodProps(method);
                 return props[FunctionTemplateKeys.Agent] === agent.id &&
-                    (props[FunctionTemplateKeys.Model] === model.id);
+                    (props[FunctionTemplateKeys.Model] === model.id ||
+                        props[FunctionTemplateKeys.CompositeInput] === model.id);
             })
         });
         let result = [];
         let modelexecution = [];
+        let executors = NodesByType(state, NodeTypes.Executor).filter(x => GetNodeProp(x, NodeProperties.ExecutorAgent) === agent.id);
+
         agents.map(agent => {
-            models.map(model => {
+            models.filter(model => {
+                return executors.find(executor => GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id);
+            }).map(model => {
                 modelexecution.push(Tabs(4) + `await Process${GetNodeProp(model, NodeProperties.CodeName)}ChangesBy${GetCodeName(agent)}();` + jNL);
             })
         });
@@ -58,16 +66,81 @@ export default class StreamProcessOrchestrationGenerator {
 ${modelexecution.join('')}
         }
 `)
-        agents.map(agent => {
-            models.map(model => {
-                var res = bindTemplate(_streamAgentMethods, {
-                    model: GetNodeProp(model, NodeProperties.CodeName),
-                    'model#lower': GetNodeProp(model, NodeProperties.CodeName).toLowerCase(),
-                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                    'agent_type#lower': GetNodeProp(agent, NodeProperties.CodeName).toLowerCase()
-                })
-                result.push(res);
-            });
+        // agents.map(agent => {
+        executors.map(_ex => {
+            let agent = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorAgent));
+            let model = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModel));
+            let model_output = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModelOutput));
+
+            let update_method = '';
+            let update_call = '';
+            let delete_method = '';
+            let delete_call = '';
+            let create_method = '';
+            let create_call = '';
+
+            let bind_params = {
+                'model_output#lower': `${GetCodeName(model_output, NodeProperties.CodeName)}`.toLowerCase(),
+                model: GetCodeName(model, NodeProperties.CodeName),
+                'model#lower': GetNodeProp(model, NodeProperties.CodeName).toLowerCase(),
+                agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                'agent_type#lower': GetNodeProp(agent, NodeProperties.CodeName).toLowerCase(),
+                update_method,
+                create_method,
+                delete_method,
+                create_call,
+                update_call,
+                delete_call
+            };
+            if (executors.find(executor => {
+                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Update &&
+                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
+            })) {
+                update_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_UPDATE, 'utf8'), {
+                    ...bind_params
+                });
+                update_call = `case Methods.Update:
+                    await Update(change);
+                    break;`
+            }
+            if (executors.find(executor => {
+                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Create &&
+                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
+            })) {
+                create_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_CREATE, 'utf8'), {
+                    ...bind_params
+                });
+                create_call = `case Methods.Create:
+                    await Create(change);
+                    break;`
+            }
+            if (executors.find(executor => {
+                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Delete &&
+                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
+            })) {
+                delete_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_DELETE, 'utf8'), {
+                    ...bind_params
+                });
+                delete_call = `
+                    case Methods.Delete:
+                        await Delete(change);
+                        break;`;
+            }
+
+            var res = bindTemplate(_streamAgentMethods, {
+                ...bind_params,
+                update_method,
+                update_call,
+                create_method,
+                create_call,
+                delete_method,
+                delete_call
+            })
+            result.push(res);
+            //   });
         });
 
         return result.join('')
@@ -81,23 +154,45 @@ ${modelexecution.join('')}
             return methods.find(method => {
                 var props = GetMethodProps(method);
                 return props[FunctionTemplateKeys.Agent] === agent.id &&
-                    (props[FunctionTemplateKeys.Model] === model.id);
+                    (props[FunctionTemplateKeys.Model] === model.id ||
+                        props[FunctionTemplateKeys.CompositeInput] === model.id);
             })
         });
         let result = [];
-        agents.map(agent => {
-            models.map(model => {
-                var res = bindTemplate(_streamAgentMethods, {
-                    model: GetNodeProp(model, NodeProperties.CodeName),
-                    'model#lower': GetNodeProp(model, NodeProperties.CodeName).toLowerCase(),
-                    agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                    'agent_type#lower': GetNodeProp(agent, NodeProperties.CodeName).toLowerCase()
-                })
-                result.push(res);
-            });
-        });
+        let executors = NodesByType(state, NodeTypes.Executor).filter(x => GetNodeProp(x, NodeProperties.ExecutorAgent) === agent.id);
+        let methods_interface = [];
+        // agents.map(agent => {    
+        executors.map(_ex => {
+            let agent = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorAgent));
+            let model = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModel));
+            let model_output = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModelOutput));
 
-        return result.join('')
+            if (GetNodeProp(_ex, NodeProperties.ExecutorFunctionType)) {
+                methods_interface.push(bindTemplate(`
+                Task {{method}}({{model}}ChangeBy{{agent_type}} change);
+`, {
+                        method: GetNodeProp(_ex, NodeProperties.ExecutorFunctionType),
+                        model: GetCodeName(model),
+                        agent_type: GetCodeName(agent)
+                    }));
+            }
+
+
+            var res = bindTemplate(_streamAgentMethods, {
+                model: GetNodeProp(model, NodeProperties.CodeName),
+                model_output: GetCodeName(model_output),
+                'model#lower': GetNodeProp(model, NodeProperties.CodeName).toLowerCase(),
+                agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                'agent_type#lower': GetNodeProp(agent, NodeProperties.CodeName).toLowerCase(),
+                update_method: 'here interface ok'
+
+            });
+            result.push(...methods_interface);
+            result.push(res);
+        });
+        // });
+
+        return result.unique().join('')
     }
     static GenerateStrappers(models, agent) {
         let result = [];
@@ -164,16 +259,21 @@ ${modelexecution.join('')}
     }
     static GenerateProcessTests(state) {
         let graph = GetRootGraph(state);
-        let functions = NodesByType(state, NodeTypes.Method);
+        let functions = NodesByType(state, NodeTypes.Method).filter(x => ![
+            Methods.Get,
+            Methods.GetAll].some(t => t === GetNodeProp(x, NodeProperties.MethodType)));
         let res = '';
         // STREAM_METHOD_TESTS
         let _stramMethodTests = fs.readFileSync(STREAM_METHOD_TESTS, 'utf8');
         let _createModelTests = fs.readFileSync(CREATE_MODEL_TESTS, 'utf8');
         let agent_process_orchestration_mocks = `           builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
 `;
-        let agent_process_orc_mocks = NodesByType(state, NodeTypes.Method).filter(x => IsAgent(x)).map(t => bindTemplate(agent_process_orchestration_mocks, {
+        let agent_process_orc_mocks = NodesByType(state, NodeTypes.Model).filter(x => {
+            var isAgent = IsAgent(x);
+            return isAgent;
+        }).map(t => bindTemplate(agent_process_orchestration_mocks, {
             agent_type: GetCodeName(t)
-        }));
+        })).join('');
         res = functions.map((func, index) => {
             let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
             let method = GetNodeProp(func, NodeProperties.MethodType);
@@ -309,9 +409,10 @@ ${modelexecution.join('')}
         });
         let strappers = StreamProcessOrchestrationGenerator.GenerateStreamOrchestrations(models);
         let strapperInstances = StreamProcessOrchestrationGenerator.GenerateStreamOrchestrationInstances(models);
+
         _streamProcessTemplate = bindTemplate(_streamProcessTemplate, {
             agent_type_methods: `
-            
+
         public async Task ProcessStagedChanges(Distribution distribution = null) 
         {
 ${agents.map(agent => {

@@ -1,2 +1,2 @@
 
-        Task<{{model}}> {{method}}({{model}} data, {{agent}} agent, {{change}}ChangeBy{{agent}} change);
+        Task<{{model_output}}> {{method}}({{model}} data, {{agent}} agent, {{change}}ChangeBy{{agent}} change);

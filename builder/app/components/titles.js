@@ -14,6 +14,7 @@ export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';
 export const Nodes = 'Nodes';
 export const Models = 'Models';
+export const OutputModel = 'Output Model';
 export const ConditionType = 'Condition Type';
 export const Reference = 'Reference';
 export const Depth = 'Depth';
@@ -67,6 +68,7 @@ export const PropertyValueType = 'Property value type';
 export const PropertyModelType = 'Property model type';
 export const AddReference = 'Add reference node';
 export const FunctionSetup = 'Function Setup';
+export const IsReferenceList = 'Is Reference List';
 export const AgentOperator = 'Agent Operator';
 export const Enumerable = 'Enumerable';
 export const Value = 'Value';
@@ -88,7 +90,7 @@ export const IsOwnedByAgentsDescriptions = 'That would mean any agent/model coul
 export const IsUser = 'User';
 export const ParameterType = 'Parameter Type';
 export const OwnedResources = 'Owned Resources';
-export const AddAfterMethods  ='Add after method';
+export const AddAfterMethods = 'Add after method';
 export const AddAfterMethodsDescription = 'Adding an after method node, will allow you to append functions to execute after.';
 export const AddModelItemFilter = 'Add model item filter';
 export const AddModelItemFilterDescription = 'Add model item filter for get functions'
@@ -96,6 +98,7 @@ export const PermissionType = 'Permissions';
 export const PermissionAttributes = 'Permission Attributes';
 export const OwnedResourcesDescription = 'Check if permissions are for resources owned by source model.'
 export const PermissionActions = 'Permission Actions';
+export const PermissionValueType = 'Permission Value Type';
 export const Permissions = {
     Create: 'Create',
     Get: 'Read',
@@ -170,6 +173,8 @@ export const MatchingValueDescription = 'The value that the associated property 
 export const PermissionImpl = 'Permission Implementation';
 export const FunctionTypes = 'Function Types';
 
+export const Create_Object_Agent_Many_to_Many_CompositeInput__Object = 'Create Object by Agent M2M with Composite Input';
+
 export const Create_Object__Object = 'Create Object => Object';
 
 export const Get_ManyToMany_Agent_Value__IListChild = 'Get Many to Many => IList<Child>';
@@ -211,6 +216,7 @@ export const CodeView = 'Code View';
 
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
+export const IsCompositeInput = 'Is composite input';
 export const UserModel = 'User Model';
 
 export const ManyToManyNexus = 'Many to many';

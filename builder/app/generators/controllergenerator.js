@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCodeName } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
@@ -82,6 +82,7 @@ export default class ControllerGenerator {
                             if (!methodProperties) return;
                             let userNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.UserInstance);
                             let modelNode = GraphMethods.GetNode(root, methodProperties.model);
+                            let compositeInput = GraphMethods.GetNode(graphRoot, methodProperties[FunctionTemplateKeys.CompositeInput])
                             let output_type = '{controller_generator_missing_model}';
                             if (modelNode) {
                                 output_type = GetNodeProp(modelNode, NodeProperties.CodeName) || output_type;
@@ -100,7 +101,7 @@ export default class ControllerGenerator {
                                 user_instance: controller ? GetNodeProp(controller, NodeProperties.CodeUser) : '{controller_generator_code_name}',
                                 output_type: output_type,
                                 maestro_interface: ToInterface(maestroName),
-                                input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{controller_generator_missing_model}'
+                                input_type: (compositeInput || modelNode) ? GetCodeName(compositeInput || modelNode) : '{controller_generator_missing_model}'
                             })
                             // let template = ft.template;
                             // if (ft.template_keys) {

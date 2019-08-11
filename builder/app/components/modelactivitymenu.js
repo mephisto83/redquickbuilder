@@ -101,6 +101,16 @@ class ModelActivityMenu extends Component {
                                 }
                             }]);
                         }} />
+                    <CheckBox
+                        label={Titles.IsCompositeInput}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsCompositeInput)}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.IsCompositeInput,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
                     {many_to_many_enabled ? (<SelectInput
                         options={UIA.NodesByType(state, NodeTypes.Model).map(x => {
                             return {

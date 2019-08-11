@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem, GetPermissionMethod, GetFunctionType, GetMethodNodeProp, GetNodeCode } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem, GetPermissionMethod, GetFunctionType, GetMethodNodeProp, GetNodeCode, GetC } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, ConditionTypes, ConditionTypeParameters, ConditionCases, FunctionTemplateKeys, MethodFunctions, FunctionTypes, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
@@ -38,7 +38,8 @@ export default class PermissionGenerator {
                     return result;
                 default:
                     var result = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent) === agent.id &&
-                        GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model) === model.id;
+                        (GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model) === model.id ||
+                            GetMethodNodeProp(methodNode, FunctionTemplateKeys.CompositeInput) === model.id);
                     return result;
             }
         }
@@ -774,6 +775,18 @@ export default class PermissionGenerator {
             for (var method in Methods) {
                 var permissionsEnabledFor = GetNodeProp(permission, NodeProperties.UIPermissions);
                 if (permission && permissionsEnabledFor && permissionsEnabledFor[method]) {
+
+
+                    let modelCodeName = GetNodeProp(model, NodeProperties.CodeName);
+                    var permissionNode = permission;
+                    let permissionValueType = GetNodeProp(permissionNode, NodeProperties.PermissionValueType)
+
+                    let methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps);
+                    if (permissionValueType && methodProps) {
+                        modelCodeName = GetCodeName(methodProps[permissionValueType]);
+                    }
+
+
                     let res = PermissionGenerator.EnumeratePermissionCases(graph, permission, method, agent, model);
 
                     res = res.map((t, testIndex) => {
@@ -791,7 +804,7 @@ export default class PermissionGenerator {
                                 agent_type: GetCodeName(agent),
                                 parent_setup: '',
                                 many_to_many_constructor,
-                                model: GetCodeName(model),
+                                model: modelCodeName,
                                 many_to_many: GetCodeName(manyToMany),
                                 many_to_many_arbiter_constructor: manyToMany ? bindTemplate(`var manyToManyArbiter = RedStrapper.Resolve<IRedArbiter<{{many_to_many}}>>();`, {
                                     many_to_many: GetCodeName(manyToMany)
@@ -882,11 +895,25 @@ export default class PermissionGenerator {
                         });
 
                         parent_setup = parent_type ? `var parent = data.${parent_type} != null ? (await arbiter${parent_type}.Get<${parent_type}>(data.${parent_type})) : null;` : 'var parent = data;';
+                        let modelCodeName = GetNodeProp(model, NodeProperties.CodeName);
+                        var permissionNode = matchingPermissionNodes[index];
+                        let permissionValueType = GetNodeProp(permissionNode, NodeProperties.PermissionValueType)
+                        var methodNode = permissionNode ? GetLinkChainItem({
+                            id: permissionNode.id,
+                            links: [{
+                                direction: GraphMethods.TARGET,
+                                type: LinkType.FunctionOperator
+                            }]
+                        }) : null;
 
+                        let methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps);
+                        if (permissionValueType && methodProps) {
+                            modelCodeName = GetCodeName(methodProps[permissionValueType]);
+                        }
                         let permissionMethods = _permissionMethods;
                         let permissionInterfaceMethods = _permissionInterfaceMethods;
                         permissionMethods = bindTemplate(permissionMethods, {
-                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            model: modelCodeName,
                             value: `data`,
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                             function_name: permissionCodeNames[index] + permKey,
@@ -897,7 +924,7 @@ export default class PermissionGenerator {
                             case_result: jNL + Tabs(4) + `result = ${cases.map(c => c.variable).join(' && ')};`
                         });
                         permissionInterfaceMethods = bindTemplate(permissionInterfaceMethods, {
-                            model: GetNodeProp(model, NodeProperties.CodeName),
+                            model: modelCodeName,
                             function_name: permissionCodeNames[index] + permKey,
                             value: `data`,
                             agent_type: GetNodeProp(agent, NodeProperties.CodeName),
@@ -918,11 +945,11 @@ export default class PermissionGenerator {
             streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                 arbiters,
-                methods: methodImplementations.join(jNL + jNL)
+                methods: methodImplementations.unique().join(jNL + jNL)
             });
             permissionInterface = bindTemplate(permissionInterface, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                methods: methodInterfaces.join(jNL + jNL)
+                methods: methodInterfaces.unique().join(jNL + jNL)
             });
             result[GetNodeProp(agent, NodeProperties.CodeName)] = {
                 name: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}`,

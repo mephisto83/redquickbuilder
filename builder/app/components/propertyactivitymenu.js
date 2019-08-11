@@ -210,6 +210,16 @@ class PropertyActivityMenu extends Component {
 
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIModelType] : ''} />) : null}
+                    {use_model_as_type ? (<CheckBox
+                        label={Titles.IsReferenceList}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsReferenceList] : ''}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.IsReferenceList,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />) : null}
                 </FormControl>) : null}
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />
                 <ControlSideBarMenu>

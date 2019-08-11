@@ -39,6 +39,7 @@
             var userArbiter = RedStrapper.Resolve<IRedArbiter<{{user}}>>();
             var agentArbiter = RedStrapper.Resolve<IRedArbiter<{{agent}}>>();
             var modelArbiter = RedStrapper.Resolve<IRedArbiter<{{model}}>>();
+            var model_inputArbiter = RedStrapper.Resolve<IRedArbiter<{{model_input}}>>();
 
             var maestro = RedStrapper.Resolve<I{{maestro}}>();
             var user = {{user}}.Create();
@@ -51,7 +52,7 @@
             user.{{agent}} = agent.Id;
             user = await userArbiter.Update(user);
 
-            var model = {{model}}.Create();
+            var model = {{model_input}}.Create();
 {{set_model_properties}}
 
             var workerMinisterArbiter = RedStrapper.Resolve<IWorkMinister>();

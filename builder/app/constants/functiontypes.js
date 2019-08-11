@@ -33,11 +33,13 @@ export const FunctionTypes = {
     Get_Object_Agent_Value__Object: 'Get/Object/Agent/Value => Object',
     Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
+    Create_Object_Agent_Many_to_Many_CompositeInput__Object: 'Create/Object/Agent/Many to Many with Composite Input => Object',
+
     Create_Object__Object: 'Create/Object => Object',
     Update_Object__Object: 'Update/Object => Object',
     Delete_Object__Object: 'Delete/Object => Object',
     Get_Object__Object: 'Get/Object => Object',
-    
+
     //Function with bool result
     Can_Execute_Agent_Parent_In_Valid_List: 'Can_Execute_Agent_Parent_In_Valid_List'
     // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
@@ -60,7 +62,8 @@ export const FunctionTemplateKeys = {
     Permission: 'permission',
     UserInstance: 'user_instance',
     ModelFilter: 'model_filter',
-    Value: 'value'
+    Value: 'value',
+    CompositeInput: 'composite-input'
 }
 
 export const FunctionConstraintKeys = {
@@ -171,6 +174,35 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT = {
 const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
     [FunctionTemplateKeys.Model]: {
         key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Agent]: {
+        [NodeProperties.IsAgent]: true,
+        key: FunctionTemplateKeys.Agent,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.User]: {
+        [NodeProperties.IsUser]: true,
+        key: FunctionTemplateKeys.User,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Permission]: {
+        key: FunctionTemplateKeys.Permission,
+        nodeTypes: [NodeTypes.Permission]
+    },
+    [FunctionTemplateKeys.ModelFilter]: {
+        key: FunctionTemplateKeys.ModelFilter,
+        nodeTypes: [NodeTypes.ModelFilter]
+    }
+};
+
+const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
+    [FunctionTemplateKeys.Model]: {
+        key: FunctionTemplateKeys.Model,
+        nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.CompositeInput]: {
+        key: FunctionTemplateKeys.CompositeInput,
         nodeTypes: [NodeTypes.Model]
     },
     [FunctionTemplateKeys.Agent]: {
@@ -568,6 +600,19 @@ export const MethodFunctions = {
         interface: fs.readFileSync('./app/templates/standard/create_model_object_interface.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: false,
+        method: Methods.Create,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    [FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
+        title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
+        template: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },

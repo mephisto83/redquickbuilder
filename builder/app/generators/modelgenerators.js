@@ -96,7 +96,15 @@ export default class ModelGenerator {
             let propType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
             if (GetNodeProp(propNode, NodeProperties.UIModelType)) {
                 propType = 'string';
+
             }
+            
+            if (GetNodeProp(propNode, NodeProperties.UseModelAsType)) {
+                if (GetNodeProp(propNode, NodeProperties.IsReferenceList)) {
+                    propType = `IList<${propType}>`;
+                }
+            }
+
             let propSwapDictionary = {
                 model: GetNodeProp(node, NodeProperties.CodeName),
                 property_type: propType,

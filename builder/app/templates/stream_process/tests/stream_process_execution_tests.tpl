@@ -56,7 +56,7 @@
                 var executorMock = new Mock<I{{agent_type}}Executor>();
                 executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(newitem));
-                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
+{{stream_process_orchestration_mocks}}                   
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterInstance(validatorMock.Object);
                 builder.RegisterInstance(executorMock.Object);
@@ -102,7 +102,7 @@
                 var executorMock = new Mock<I{{agent_type}}Executor>();
                 executorMock.Setup(x => x.Create(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(newitem));
-                builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
+{{stream_process_orchestration_mocks}}                   
                 builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterInstance(validatorMock.Object);
                 builder.RegisterInstance(executorMock.Object);

@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetCodeName } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
@@ -83,6 +83,7 @@ export default class MaestroGenerator {
                         let parentNode = null;
                         let permissionNode = null;
                         let modelFilterNode = null;
+                        let compositeInput = null;
                         let manyToManyNode = null;
                         let parent_setup = '';
                         let modelNode = null;
@@ -94,6 +95,7 @@ export default class MaestroGenerator {
                             userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
                             permissionNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
+                            compositeInput = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.CompositeInput])
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
                             parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
@@ -114,7 +116,7 @@ export default class MaestroGenerator {
                                 predicates = '';
                             }
                             if (out_predicate.parent) {
-                                parent_setup = `var parent = await arbiter${parent_type}.Get<${parent_type}>(model.${parent_type});`   
+                                parent_setup = `var parent = await arbiter${parent_type}.Get<${parent_type}>(model.${parent_type});`
                             }
                         }
 
@@ -149,6 +151,8 @@ export default class MaestroGenerator {
                             'agent_type#lower': `${agent_type}`.toLowerCase(),
                             parent_type,
                             agent: agent,
+                            'composite-input': GetCodeName(compositeInput) || '',
+                            model_input:  GetCodeName(compositeInput) || model_type,
                             value_type,
                             value,
                             parent_setup,
@@ -162,10 +166,10 @@ export default class MaestroGenerator {
                             http_route: httpRoute || '{maestro_generator_http_method',
                             http_method: httpMethod || '{maestro_generator_http_method',
                             user_instance: userTypeNode ? `${GetNodeProp(userTypeNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_userNode}`,
-                            output_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}',
+                            output_type: modelNode ? GetCodeName(modelNode) : '{maestro_generator_missing_model}',
                             maestro_interface: ToInterface(maestroName),
                             permission_function: permissionNode ? GetNodeProp(permissionNode, NodeProperties.CodeName) + methodType : `{MISSING_PERMISSION_FUNCTION}`,
-                            input_type: modelNode ? GetNodeProp(modelNode, NodeProperties.CodeName) : '{maestro_generator_missing_model}'
+                            input_type: modelNode ? GetCodeName(modelNode) : '{maestro_generator_missing_model}'
                         };
                         tempFunction = bindTemplate(tempFunction, bindOptions);
                         interfaceFunction = bindTemplate(interfaceFunction, bindOptions)
@@ -259,6 +263,7 @@ export default class MaestroGenerator {
                                     set_many_to_many_properties: '//{not set yet}',
                                     value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                                     model: model_type,
+                                    model_input:  GetCodeName(compositeInput) || model_type,
                                     function_name: functionName,
                                     maestro: maestroName,
                                     set_agent_properties: pvc.agent,

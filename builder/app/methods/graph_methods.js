@@ -669,6 +669,9 @@ export function GetNode(graph, id) {
     }
     return null;
 }
+
+
+
 export function GetGroup(graph, id) {
     if (graph && graph.groupLib) {
         return graph.groupLib[id];

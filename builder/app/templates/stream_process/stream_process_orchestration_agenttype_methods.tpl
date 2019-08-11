@@ -35,15 +35,8 @@
                 {
                     switch (change.ChangeType)
                     {
-                        case Methods.Create:
-                            await Create(change);
-                            break;
-                        case Methods.Update:
-                            await Update(change);
-                            break;
-                        case Methods.Delete:
-                            await Delete(change);
-                            break;
+                        {{create_call}}
+                        {{update_call}}
                         default:
                             throw new NotImplementedException();
                     }
@@ -54,68 +47,6 @@
             }
         }
         
-        
-        public async Task Create({{model}}ChangeBy{{agent_type}} change) {
-            try 
-            {
-                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-                var data = change.Data;
-            
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
-                {
-                    data = await {{agent_type#lower}}Executor.Create(data, agent, change);
-                    var result = await {{model#lower}}Arbiter.Create(data);
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Create(change, result));
-                }
-                else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailedOnValidation(change));
-                }
-            }
-            catch(Exception e)
-            {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.CreateFailedOnException(change, e));
-            }
-        }
-
-        public async Task Update({{model}}ChangeBy{{agent_type}} change) {
-            try 
-            {  
-                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-                var data = change.Data;
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
-                {
-                    data = await {{agent_type#lower}}Executor.Update(data, agent, change);
-                    var result = await {{model#lower}}Arbiter.Update(data);
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
-                }
-                else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailedOnValidation(change));
-                }
-            }
-            catch(Exception e)
-            {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.UpdateFailedOnException(change, e));
-            }
-        }
-
-        public async Task Delete({{model}}ChangeBy{{agent_type}} change) {
-            try
-            {
-                var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
-                var data = change.Data;
-            
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
-                {
-                    var result = await {{model#lower}}Arbiter.Delete(data);
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
-                }
-                else {
-                    await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailedOnValidation(change));
-                }
-            }
-            catch(Exception e)
-            {
-                await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.DeleteFailedOnException(change, e));
-            }
-            
-        }
+{{create_method}}
+{{update_method}}
+{{delete_method}}

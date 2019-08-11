@@ -1,5 +1,5 @@
 
-        public  async Task<{{model}}> {{method}}({{model}} data, {{agent}} agent, {{change}}ChangeBy{{agent}} change)
+        public  async Task<{{model_output}}> {{method}}({{model}} data, {{agent}} agent, {{change}}ChangeBy{{agent}} change)
         {
             switch(change.FunctionName)
             {

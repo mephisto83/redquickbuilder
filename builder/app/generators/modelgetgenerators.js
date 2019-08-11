@@ -43,7 +43,7 @@ export default class ModelGetGenerator {
         let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
         let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
         let allmodels = NodesByType(state, NodeTypes.Model);
-        allmodels.map(agent => {
+        allmodels.filter(x => !GetNodeProp(x, NodeProperties.IsCompositeInput)).map(agent => {
             var methods = allmodels.filter(x => x.id !== agent.id)
                 .filter(x => {
                     if (GetNodeProp(agent, NodeProperties.HasLogicalChildren) && (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []).some(v => v === x.id)) {
