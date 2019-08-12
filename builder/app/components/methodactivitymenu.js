@@ -80,6 +80,16 @@ class MethodActivityMenu extends Component {
                             prop: NodeProperties.HttpRoute
                         })
                     }} />) : null}
+                {currentNode ? (<CheckBox
+                    label={Titles.NotIncludeInController}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.NotIncludedInController,
+                            id: currentNode.id,
+                            value
+                        });
+                    }}
+                    value={ UIA.GetNodeProp(currentNode, UIA.NodeProperties.NotIncludedInController)} />) : null}
                 <ControlSideBarMenu>
                     {currentNode && currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])

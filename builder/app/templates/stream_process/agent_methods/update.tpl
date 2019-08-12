@@ -8,6 +8,7 @@
                 {
                     var updateData = await {{agent_type#lower}}Executor.Update(data, agent, change);
                     var result = await {{model_output#lower}}Arbiter.Update(updateData);
+{{ae_calls}}
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Update(change, result));
                 }
                 else {

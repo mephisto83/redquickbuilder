@@ -30,6 +30,7 @@ import MindMap from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
 import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
+import AfterEffectsActivityMenu from './aftereffectsactivitymenu';
 import AttributeFormControl from './attributeformcontrol';
 import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
@@ -427,6 +428,7 @@ class Dashboard extends Component {
                                 <ExtensionDefinitionMenu />
                                 <ModelFilterActivityMenu />
                                 <PermissionDependencyActivityMenu />
+                                <AfterEffectsActivityMenu />
                                 <EnumerationActivityMenu />
                                 <ServiceActivityMenu />
                             </SideBarContent>) : null}

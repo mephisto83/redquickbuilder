@@ -2,7 +2,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes, GetCodeName, GetMethodProps, IsAgent, GetGraphNode } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, STANDARD_TEST_USING, NEW_LINE, Methods } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionTemplateKeys, MethodFunctions } from '../constants/functiontypes';
+import { bindTemplate, FunctionTemplateKeys, MethodFunctions, AFTER_EFFECTS } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import PermissionGenerator from './permissiongenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
@@ -67,11 +67,50 @@ ${modelexecution.join('')}
         }
 `)
         // agents.map(agent => {
-        executors.map(_ex => {
-            let agent = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorAgent));
-            let model = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModel));
-            let model_output = GetGraphNode(GetNodeProp(_ex, NodeProperties.ExecutorModelOutput));
-
+        executors.map(executor => {
+            let agent = GetGraphNode(GetNodeProp(executor, NodeProperties.ExecutorAgent));
+            let model = GetGraphNode(GetNodeProp(executor, NodeProperties.ExecutorModel));
+            let model_output = GetGraphNode(GetNodeProp(executor, NodeProperties.ExecutorModelOutput));
+            let methodNode = GraphMethods.GetMethodNode(state, executor.id, LinkType.ExecutorFunction, GraphMethods.SOURCE);
+            let methodProps = GetMethodProps(methodNode);
+            let afterEffectMethods = GraphMethods.GetLinkChain(state, {
+                id: methodNode.id,
+                links: [{
+                    type: LinkType.AfterMethod,
+                    direction: GraphMethods.SOURCE
+                }]
+            });
+            let ae_calls = [];
+            let ae_functions = [];
+            afterEffectMethods.map(afterEffectMethod => {
+                var ae_type = GetNodeProp(afterEffectMethod, NodeProperties.AfterMethod);
+                var ae_setup = GetNodeProp(afterEffectMethod, NodeProperties.AfterMethodSetup);
+                if (AFTER_EFFECTS[ae_type] && ae_setup && ae_setup[ae_type]) {
+                    let { templateKeys, template_call, template } = AFTER_EFFECTS[ae_type];
+                    let templateString = fs.readFileSync(template, 'utf8');
+                    Object.keys(templateKeys).map(key => {
+                        if (ae_setup[ae_type][key]) {
+                            var name = GetCodeName((methodProps[ae_setup[ae_type][key]] || ae_setup[ae_type][key])) || ae_setup[ae_type][key];
+                            templateString = bindTemplate(templateString, {
+                                [key]: name,
+                                [`${key}#lower`]: `${name}`.toLowerCase()
+                            });
+                            template_call = bindTemplate(template_call, {
+                                [key]: name,
+                                [`${key}#lower`]: `${name}`.toLowerCase()
+                            })
+                        }
+                    })
+                    templateString = bindTemplate(templateString, {
+                        function_name: GetCodeName(afterEffectMethod)
+                    });
+                    template_call = bindTemplate(template_call, {
+                        function_name: GetCodeName(afterEffectMethod)
+                    });
+                    ae_calls.push(template_call);
+                    ae_functions.push(templateString);
+                }
+            });
             let update_method = '';
             let update_call = '';
             let delete_method = '';
@@ -92,37 +131,35 @@ ${modelexecution.join('')}
                 update_call,
                 delete_call
             };
-            if (executors.find(executor => {
-                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Update &&
-                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
-                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
-            })) {
+            ae_calls = ae_calls.unique().join(NEW_LINE)
+            if (GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Update &&
+                GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id) {
                 update_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_UPDATE, 'utf8'), {
-                    ...bind_params
+                    ...bind_params,
+                    ae_calls
                 });
                 update_call = `case Methods.Update:
                     await Update(change);
                     break;`
             }
-            if (executors.find(executor => {
-                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Create &&
-                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
-                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
-            })) {
+            else if (GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Create &&
+                GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id) {
                 create_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_CREATE, 'utf8'), {
-                    ...bind_params
+                    ...bind_params,
+                    ae_calls
                 });
                 create_call = `case Methods.Create:
                     await Create(change);
                     break;`
             }
-            if (executors.find(executor => {
-                return GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Delete &&
-                    GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
-                    GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id;
-            })) {
+            else if (GetNodeProp(executor, NodeProperties.ExecutorFunctionType) === Methods.Delete &&
+                GetNodeProp(executor, NodeProperties.ExecutorAgent) === agent.id &&
+                GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id) {
                 delete_method = bindTemplate(fs.readFileSync(STREAM_PROCESS_AGENT_CRUD_DELETE, 'utf8'), {
-                    ...bind_params
+                    ...bind_params,
+                    ae_calls
                 });
                 delete_call = `
                     case Methods.Delete:
@@ -137,7 +174,8 @@ ${modelexecution.join('')}
                 create_method,
                 create_call,
                 delete_method,
-                delete_call
+                delete_call,
+                ae_functions: ae_functions.unique().join('')
             })
             result.push(res);
             //   });

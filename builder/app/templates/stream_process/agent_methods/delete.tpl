@@ -8,6 +8,7 @@
                 if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
                 {
                     var result = await {{model#lower}}Arbiter.Delete(data);
+{{ae_calls}}
                     await {{agent_type#lower}}ResponseArbiter.Create({{agent_type}}Response.Delete(change, result));
                 }
                 else {

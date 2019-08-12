@@ -269,6 +269,7 @@ export const NodeProperties = {
     ScopeGraph: 'scopedGraph',
 
     AfterMethod: 'after-method',
+    AfterMethodSetup: 'after-method-setup',
 
     //The name used for code.
     Groups: 'groups',
@@ -278,6 +279,7 @@ export const NodeProperties = {
     AgentName: 'agentName',//The name of the instance variable to be used 
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
+    NotIncludedInController: 'not-included-in-controller',
     PermissionImpl: 'permission-implementation',
     ClassConstructionInformation: 'ClassConstructionInformation'
 }
@@ -875,6 +877,13 @@ const COMMON_STRING_ARGS = {
     }
 }
 
+const COMMON_LISTSTRING_ARGS = {
+    value: {
+        type: NodePropertyTypes.LISTOFSTRINGS,
+        nodeType: NodeTypes.Property
+    }
+}
+
 export function GetValidationsFor(type) {
     let result = {};
     Object.keys(ValidationCases).filter(x => {
@@ -1453,7 +1462,8 @@ export const ExecutorRules = {
     ModelReference: 'model-reference',
     Copy: 'copy',
     AgentReference: 'agent-reference',
-    ParentReference: 'parent-reference'
+    ParentReference: 'parent-reference',
+    AddModelReference: 'add-model-reference'
 }
 export const ExecutorUI = {
     [ExecutorRules.ModelReference]: {
@@ -1486,6 +1496,18 @@ export const ExecutorUI = {
         },
         arguments: {
             ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Model,
+            reference: {
+                types: [NodeTypes.Model]
+            }
+        }
+    },
+    [ExecutorRules.AddModelReference]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ParentReference'
+        },
+        arguments: {
+            ...COMMON_LISTSTRING_ARGS,
             nodeType: NodeTypes.Model,
             reference: {
                 types: [NodeTypes.Model]

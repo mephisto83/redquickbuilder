@@ -48,6 +48,8 @@ export const FunctionTypes = {
 
 export const FunctionTemplateKeys = {
     Model: 'model',
+    ModelOutput: 'model_output',
+    ModelProperty: 'model-property',
     Bool: 'bool',
     CanExecute: 'can-execute',
     ModelDeterminingProperty: 'model-determining-property',
@@ -56,14 +58,18 @@ export const FunctionTemplateKeys = {
     Parent: 'parent',
     AgentInstance: 'agent_instance',
     Agent: 'agent',
+    AgentProperty: 'agent-property',
     AgentType: 'agent_type',
     User: 'user',
     ManyToManyModel: 'many_to_many',
+    Method: 'method',
+    MethodType: 'method_type',
     Permission: 'permission',
     UserInstance: 'user_instance',
     ModelFilter: 'model_filter',
     Value: 'value',
-    CompositeInput: 'composite-input'
+    CompositeInput: 'composite-input',
+    CompositeInputProperty: 'composite-input-property'
 }
 
 export const FunctionConstraintKeys = {
@@ -190,6 +196,11 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
         key: FunctionTemplateKeys.Permission,
         nodeTypes: [NodeTypes.Permission]
     },
+    [FunctionTemplateKeys.ManyToManyModel]: {
+        [NodeProperties.ManyToManyNexus]: true,
+        key: FunctionTemplateKeys.ManyToManyModel,
+        nodeTypes: [NodeTypes.Model]
+    },
     [FunctionTemplateKeys.ModelFilter]: {
         key: FunctionTemplateKeys.ModelFilter,
         nodeTypes: [NodeTypes.ModelFilter]
@@ -224,6 +235,74 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
         nodeTypes: [NodeTypes.ModelFilter]
     }
 };
+
+const AfterEffectsTemplate = {
+    GenerateM2M_From_Result_and_Input: 'Generate Many 2 Many from result and input',
+    ExecuteStreamProcess: 'Execute stream process'
+}
+export const AFTER_EFFECTS = {
+    [AfterEffectsTemplate.GenerateM2M_From_Result_and_Input]: {
+        template: './app/templates/aftereffects/generate_m2m_from_result_and_input.tpl',
+        template_call: '                    await {{function_name}}(agent, data, result);',
+        templateKeys: {
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.CompositeInput]: {
+                key: FunctionTemplateKeys.CompositeInput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.CompositeInputProperty]: {
+                key: FunctionTemplateKeys.CompositeInputProperty,
+                nodeTypes: [NodeTypes.Property],
+                parent: FunctionTemplateKeys.CompositeInput
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ManyToManyModel]: {
+                key: FunctionTemplateKeys.ManyToManyModel,
+                nodeTypes: [NodeTypes.Model]
+            }
+        }
+    },
+    [AfterEffectsTemplate.ExecuteStreamProcess]: {
+        template: './app/templates/aftereffects/execute_stream_process.tpl',
+        template_call: '                    await {{function_name}}(agent, result);',
+        templateKeys: {
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ModelOutput]: {
+                key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ManyToManyModel]: {
+                key: FunctionTemplateKeys.ManyToManyModel,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Method]: {
+                key: FunctionTemplateKeys.Method,
+                useNodes: true,
+                nodeTypes: [NodeTypes.Method]
+            },
+            [FunctionTemplateKeys.MethodType]: {
+                key: FunctionTemplateKeys.MethodType,
+                useMethodTypes: true
+            }
+            
+        }
+    }
+}
 
 const COMMON_CONSTRAINTS_OBJECT_METHOD = {
     [FunctionTemplateKeys.Model]: {

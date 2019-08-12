@@ -50,3 +50,4 @@
 {{create_method}}
 {{update_method}}
 {{delete_method}}
+{{ae_functions}}

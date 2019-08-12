@@ -1395,6 +1395,27 @@ export function GetLinkChainItem(state, options) {
     }
     return null;
 }
+export function SetAffterEffectProperty(currentNode, afterMethod, key, value) {
+    let afterEffectSetup = GetNodeProp(currentNode, NodeProperties.AfterMethodSetup) || {};
+    afterEffectSetup[afterMethod] = afterEffectSetup[afterMethod] || {};
+    afterEffectSetup[afterMethod] = { ...afterEffectSetup[afterMethod], ...{ [key]: value } };
+    return afterEffectSetup;
+}
+export function GetAffterEffectProperty(currentNode, afterMethod, key) {
+    let afterEffectSetup = GetNodeProp(currentNode, NodeProperties.AfterMethodSetup);
+    if (afterEffectSetup && afterEffectSetup[afterMethod] && afterEffectSetup[afterMethod][key])
+        return afterEffectSetup[afterMethod][key];
+    return null;
+}
+export function GetMethodNode(state, id, type = LinkType.AfterMethod, direction = TARGET) {
+    return GetLinkChainItem(state, {
+        id,
+        links: [{
+            direction,
+            type
+        }]
+    });
+}
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
     return GetLinkChainFromGraph(graph, options);
@@ -1544,6 +1565,7 @@ export function addLink(graph, options, link) {
             graph.nodeLinks = { ...graph.nodeLinks }
             graph = { ...graph };
         }
+        graph = incrementMinor(graph);
     }
     return graph;
 }
@@ -1759,6 +1781,7 @@ export function removeLink(graph, link, options = {}) {
         if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
             delete graph.nodeConnections[del_link.target];
         }
+        graph = incrementMinor(graph);
 
     }
     return { ...graph };

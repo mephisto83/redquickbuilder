@@ -50,7 +50,7 @@ export default class ControllerGenerator {
                 let maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
                 maestro_functions = tempfunctions;
                 if (maestro_functions.length) {
-                    maestro_functions.map(maestro_function => {
+                    maestro_functions.filter(x => !GetNodeProp(x, NodeProperties.NotIncludedInController)).map(maestro_function => {
                         var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                         if (ft) {
                             let tempFunction = _controllerTemplateFunction;

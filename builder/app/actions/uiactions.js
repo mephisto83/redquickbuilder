@@ -54,6 +54,7 @@ export function GetCodeName(node) {
 export function GetNodeCode(graph, id) {
     return GetCodeName(GraphMethods.GetNode(graph, id));
 }
+
 export function GetMethodPropNode(graph, node, key) {
     var methodProps = GetNodeProp(node, NodeProperties.MethodProps);
     if (methodProps) {

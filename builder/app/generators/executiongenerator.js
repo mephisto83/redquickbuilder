@@ -181,6 +181,8 @@ export default class ExecutorGenerator {
                             break;
                         case ExecutorRules.Copy:
                             break;
+                        case ExecutorRules.AddModelReference:
+                            break;
                         default:
                             throw 'not handle [execution generator]';
                     }
