@@ -51,6 +51,8 @@ export const FunctionTemplateKeys = {
     Model: 'model',
     ModelOutput: 'model_output',
     UpdateModel: 'model_update',
+    ReferenceClass: 'reference_class',
+    Reference: 'reference',
     ModelProperty: 'model-property',
     Bool: 'bool',
     CanExecute: 'can-execute',
@@ -240,7 +242,8 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
 
 const AfterEffectsTemplate = {
     GenerateM2M_From_Result_and_Input: 'Generate Many 2 Many from result and input',
-    ExecuteStreamProcess: 'Execute stream process'
+    ExecuteStreamProcess: 'Execute stream process',
+    ExecuteStreamProcessUpdate: 'Execute stream process update'
 }
 export const AFTER_EFFECTS = {
     [AfterEffectsTemplate.GenerateM2M_From_Result_and_Input]: {
@@ -282,6 +285,50 @@ export const AFTER_EFFECTS = {
             [FunctionTemplateKeys.ModelOutput]: {
                 key: FunctionTemplateKeys.ModelOutput,
                 nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ManyToManyModel]: {
+                key: FunctionTemplateKeys.ManyToManyModel,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Method]: {
+                key: FunctionTemplateKeys.Method,
+                useNodes: true,
+                nodeTypes: [NodeTypes.Method]
+            },
+            [FunctionTemplateKeys.MethodType]: {
+                key: FunctionTemplateKeys.MethodType,
+                useMethodTypes: true
+            }
+
+        }
+    },
+    [AfterEffectsTemplate.ExecuteStreamProcessUpdate]: {
+        template: './app/templates/aftereffects/execute_stream_process_update.tpl',
+        template_call: `
+            var reference = {{reference}};
+            await {{function_name}}(agent, reference, result);`,
+        templateKeys: {
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ModelOutput]: {
+                key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ReferenceClass]: {
+                key: FunctionTemplateKeys.ReferenceClass,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Reference]: {
+                key: FunctionTemplateKeys.Reference,
+                nodeTypes: [NodeTypes.Model],
+                useString: ['agent', 'result', 'newData', 'data'].map(t => `#${t}`)
             },
             [FunctionTemplateKeys.Agent]: {
                 [NodeProperties.IsAgent]: true,

@@ -42,9 +42,9 @@ class AfterEffectsActivityMenu extends Component {
 			let { templateKeys } = AFTER_EFFECTS[afterMethod];
 			if (templateKeys) {
 				Object.values(templateKeys).map(value => {
-					let { key, nodeTypes, parent, useNodes, useMethodTypes } = value;
+					let { key, nodeTypes, parent, useNodes, useMethodTypes, useString } = value;
 					let setup = UIA.GetNodeProp(currentNode, UIA.NodeProperties.AfterMethodSetup);
-					if (!parent && !useNodes && !useMethodTypes) {
+					if (!parent && !useNodes && !useMethodTypes && !useString) {
 						result.push(<SelectInput
 							label={key}
 							options={Object.keys(methodProps).map(val => {
@@ -102,6 +102,14 @@ class AfterEffectsActivityMenu extends Component {
 								return {
 									title: t,
 									value: Methods[t]
+								}
+							})
+						}
+						else if (useString) {
+							options = Object.values(useString).map(t => {
+								return {
+									title: t,
+									value: t
 								}
 							})
 						}

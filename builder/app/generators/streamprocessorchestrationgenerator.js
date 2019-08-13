@@ -90,7 +90,8 @@ ${modelexecution.join('')}
                     let templateString = fs.readFileSync(template, 'utf8');
                     Object.keys(templateKeys).map(key => {
                         if (ae_setup[ae_type][key]) {
-                            var name = GetCodeName((methodProps[ae_setup[ae_type][key]] || ae_setup[ae_type][key])) || ae_setup[ae_type][key];
+                            let key_val = ae_setup[ae_type][key] || '';
+                            var name = key_val.startsWith('#') ? key_val.split('#').join('') : GetCodeName((methodProps[key_val] || key_val)) || key_val;
                             templateString = bindTemplate(templateString, {
                                 [key]: name,
                                 [`${key}#lower`]: `${name}`.toLowerCase()
