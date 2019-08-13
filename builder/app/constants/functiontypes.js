@@ -30,6 +30,7 @@ export const FunctionTypes = {
     //Functions width Object result.
     Create_Object_Agent_Value__Object: 'Create/Object/Agent/Value => Object',
     Update_Object_Agent_Value__Object: 'Update/Object/Agent/Value => Object',
+    Update_Object_Agent_Value__Object_With_Object: 'Update/Object/with/Model/Agent/Value => Object',
     Get_Object_Agent_Value__Object: 'Get/Object/Agent/Value => Object',
     Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
@@ -49,6 +50,7 @@ export const FunctionTypes = {
 export const FunctionTemplateKeys = {
     Model: 'model',
     ModelOutput: 'model_output',
+    UpdateModel: 'model_update',
     ModelProperty: 'model-property',
     Bool: 'bool',
     CanExecute: 'can-execute',
@@ -299,7 +301,7 @@ export const AFTER_EFFECTS = {
                 key: FunctionTemplateKeys.MethodType,
                 useMethodTypes: true
             }
-            
+
         }
     }
 }
@@ -738,6 +740,27 @@ export const MethodFunctions = {
         method: Methods.Update,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
+    [FunctionTypes.Update_Object_Agent_Value__Object_With_Object]: {
+        title: Titles.Update_Object_Agent_Value__Object_With_Object,
+        template: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model_interface.tpl', 'utf8'),
+        templates: {
+            update_with: `./app/templates/standard/update_model_property.tpl`,
+            stream_process_change_parameter: `./app/templates/stream_process/stream_process_change_class_extension_update_by_model.tpl`
+        },
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
+            [FunctionTemplateKeys.UpdateModel]: {
+                key: FunctionTemplateKeys.UpdateModel,
+                nodeTypes: [NodeTypes.Model]
+            }
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: false,
+        method: Methods.Update,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
         title: Titles.Delete_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
@@ -909,6 +932,10 @@ export const MethodFunctions = {
         propreties: {},
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }
+}
+export const MethodTemplateKeys = {
+    stream_process_change_parameter: 'stream_process_change_parameter',
+    update_with: 'update_with'
 }
 export const FunctionMethodTypes = {
     GET: 'GET',

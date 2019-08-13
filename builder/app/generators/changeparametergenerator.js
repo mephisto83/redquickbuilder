@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph } from '../actions/uiactions';
-import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING, STANDARD_TEST_USING } from '../constants/nodetypes';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetMethodNodeProp, GetCodeName } from '../actions/uiactions';
+import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING, STANDARD_TEST_USING, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate } from '../constants/functiontypes';
+import { bindTemplate, FunctionConstraintKeys, FunctionTemplateKeys, FunctionMethodTypes, MethodFunctions, MethodTemplateKeys } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const TEST_CLASS = './app/templates/tests/tests.tpl';
@@ -23,6 +23,7 @@ export default class ChangeParameterGenerator {
     static Generate(options) {
         var { state, key } = options;
         let models = NodesByType(state, NodeTypes.Model);
+        let methods = NodesByType(state, NodeTypes.Method);
         let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
@@ -41,16 +42,46 @@ export default class ChangeParameterGenerator {
                 let statics = '';
                 let constructors = [];
                 let tests = [];
+                let updates_with = [];
                 let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+                methods.filter(x => GetMethodNodeProp(x, FunctionTemplateKeys.Agent) === agent.id &&
+                    GetMethodNodeProp(x, FunctionTemplateKeys.Model) == model.id).filter(method => {
+                        var functionType = GetNodeProp(method, NodeProperties.FunctionType);
+                        if (MethodFunctions[functionType] && MethodFunctions[functionType].templates) {
+                            let { templates } = MethodFunctions[functionType];
+                            if (templates) {
+                                if (templates[MethodTemplateKeys.stream_process_change_parameter]) {
+                                    let spcp_template = fs.readFileSync(templates[MethodTemplateKeys.stream_process_change_parameter], 'utf8');
+                                    spcp_template = bindTemplate(spcp_template, {
+                                        model: GetCodeName(model),
+                                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                                        agent_type: GetCodeName(agent),
+                                        model_update: GetCodeName(GetMethodNodeProp(method, FunctionTemplateKeys.UpdateModel)),
+                                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                                        change_type: `Methods.${MethodFunctions[functionType].method}`,
+                                        method: MethodFunctions[functionType].method
+                                    });
 
-                Object.values(Methods).filter(x => x !== Methods.Get).map(method => {
+                                    constructors.push(spcp_template);
+                                }
+                                if (templates[MethodTemplateKeys.update_with]) {
+                                    let spcp_template = fs.readFileSync(templates[MethodTemplateKeys.update_with], 'utf8');
+                                    spcp_template = bindTemplate(spcp_template, {
+                                        model_update: GetCodeName(GetMethodNodeProp(method, FunctionTemplateKeys.UpdateModel))
+                                    });
+                                    updates_with.push(spcp_template + NEW_LINE);
+                                }
+                            }
+                        }
+                    });
+                Object.values(Methods).filter(x => ![Methods.Get, Methods.GetAll].some(v => v == x)).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
 
                     streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
-                        model: GetNodeProp(model, NodeProperties.CodeName),
+                        model: GetCodeName(model),
                         value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        agent_type: GetCodeName(agent),
                         agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
                         method
@@ -58,9 +89,9 @@ export default class ChangeParameterGenerator {
                     let streamProcessChangeClassConstrictorsTest = _streamProcessChangeClassConstrictorsTest;
 
                     streamProcessChangeClassConstrictorsTest = bindTemplate(streamProcessChangeClassConstrictorsTest, {
-                        model: GetNodeProp(model, NodeProperties.CodeName),
+                        model: GetCodeName(model),
                         value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                        agent_type: GetNodeProp(agent, NodeProperties.CodeName),
+                        agent_type: GetCodeName(agent),
                         agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
                         change_type: `Methods.${method}`,
                         method
@@ -77,7 +108,8 @@ export default class ChangeParameterGenerator {
                 streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
                     model: GetNodeProp(model, NodeProperties.CodeName),
                     agent_type: GetNodeProp(agent, NodeProperties.CodeName),
-                    constructors: constructors.join(jNL)
+                    updates_with: updates_with.unique().join(''),
+                    constructors: constructors.unique().join(jNL)
                 });
 
                 testClass = bindTemplate(testClass, {

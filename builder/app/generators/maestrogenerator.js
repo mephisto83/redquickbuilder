@@ -63,7 +63,7 @@ export default class MaestroGenerator {
             maestro_functions = tempfunctions;
             let permissionValidationCases = [];
             if (maestro_functions.length) {
-                maestro_functions.map(maestro_function => {
+                maestro_functions.filter(x => !GetNodeProp(x, NodeProperties.NotIncludedInController)).map(maestro_function => {
                     let function_type = GetNodeProp(maestro_function, NodeProperties.FunctionType);
                     var ft = MethodFunctions[function_type];
                     if (ft) {

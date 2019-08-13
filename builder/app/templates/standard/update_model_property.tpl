@@ -1,0 +1,1 @@
+        public {{model_update}} {{model_update}} { get; set; }

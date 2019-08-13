@@ -195,6 +195,7 @@ export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent 
 
 export const Get_Object_Agent_Value__Object = 'Get Object by Agent';
 export const Update_Object_Agent_Value__Object = 'Update Object by Agent';
+export const Update_Object_Agent_Value__Object_With_Object = 'Update Object by Agent with object';
 
 export const Functions = 'Functions';
 export const AddFunction = 'Add function';
