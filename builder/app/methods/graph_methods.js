@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 export function createGraph() {
     return {
@@ -1408,13 +1408,10 @@ export function GetAffterEffectProperty(currentNode, afterMethod, key) {
     return null;
 }
 export function GetMethodNode(state, id, type = LinkType.AfterMethod, direction = TARGET) {
-    return GetLinkChainItem(state, {
-        id,
-        links: [{
-            direction,
-            type
-        }]
-    });
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Method);
 }
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
@@ -1508,6 +1505,27 @@ export function getNodeLinked(graph, options) {
     }
     return [];
 }
+
+export function GetNodesLinkedTo(graph, options) {
+    if (options) {
+        var { id } = options;
+        if (graph && graph.nodeConnections && id) {
+            var nodeLinks = graph.nodeConnections[id];
+            if (nodeLinks) {
+                return Object.keys(nodeLinks).map(_id => {
+                    var target = graph.linkLib[_id] ? (graph.linkLib[_id].source !== id ? graph.linkLib[_id].source : graph.linkLib[_id].target) : null;
+                    if (!target) {
+                        console.warn('Missing value in linkLib');
+                        return null;
+                    }
+                    return graph.nodeLib[target];
+                }).filter(x => x);
+            }
+        }
+    }
+    return [];
+}
+
 export const SOURCE = 'SOURCE';
 export const TARGET = 'TARGET';
 export function addLink(graph, options, link) {

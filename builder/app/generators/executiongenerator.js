@@ -68,15 +68,8 @@ export default class ExecutorGenerator {
         let allmodels = NodesByType(state, NodeTypes.Model);
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         let allfunctions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
-        // allmodels.map(model => {
-        //     allagents.map(agent => {
-        // Object.keys(Methods).map(meth => {
-        let found = false;
-        allfunctions.filter(x => {
 
-            return true;//GetNodeProp(x, NodeProperties.MethodType) === meth
-        }).map(fun => {
-            found = true;
+        allfunctions.map(fun => {
             let methodProps = GetMethodProps(fun);
             let model_output;
             if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
@@ -84,7 +77,7 @@ export default class ExecutorGenerator {
             }
             let agent = methodProps[FunctionTemplateKeys.Agent];
             let model = methodProps[FunctionTemplateKeys.Model];
-            
+
             agmCombos.push({
                 agentId: agent,
                 agent: GetCodeName(agent),
@@ -94,18 +87,6 @@ export default class ExecutorGenerator {
                 method: GetNodeProp(fun, NodeProperties.MethodType)
             });
         });
-        if (!found) {
-
-            // agmCombos.push({
-            //     agentId: agent.id,
-            //     agent: GetCodeName(agent),
-            //     model: GetCodeName(model),
-            //     method: meth
-            // });
-        }
-        //  });
-        //     })
-        // })
 
         executor_nodes.map(executor_node => {
             var agent = GetNodeProp(executor_node, NodeProperties.ExecutorAgent);
@@ -172,6 +153,7 @@ export default class ExecutorGenerator {
                         });
                     }
                     let template = `result{{model_property}} = data{{model_property}};`;
+                    let templateBindings = {};
                     switch (validators.type) {
                         case ExecutorRules.AgentReference:
                             template = `result{{model_property}} = agent.Id;`
@@ -182,6 +164,18 @@ export default class ExecutorGenerator {
                         case ExecutorRules.Copy:
                             break;
                         case ExecutorRules.AddModelReference:
+                            template = fs.readFileSync(`app/templates/executor/snippets/add-model-reference.tpl`, 'utf8');
+                            
+                            let { references } = validators;
+                            if (references) {
+                                let methodNode = GraphMethods.GetMethodNode(state, executor_node.id);
+                                if (methodNode) {
+                                    let methodProps = GetMethodProps(methodNode);
+                                    Object.keys(references).map(ref_key => {
+                                        templateBindings[ref_key] = GetCodeName(methodProps[references[ref_key]]);
+                                    })
+                                }
+                            }
                             break;
                         default:
                             throw 'not handle [execution generator]';
@@ -189,7 +183,8 @@ export default class ExecutorGenerator {
                     var templateRes = bindTemplate(template, {
                         attribute_type: validators.code[ProgrammingLanguages.CSHARP],
                         attribute_type_arguments,
-                        model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`
+                        model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`,
+                        ...({ ...templateBindings })
                     });
                     return ExecutorGenerator.Tabs(4) + templateRes + NEW_LINE
                 }).unique(x => x).join('');

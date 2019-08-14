@@ -660,10 +660,10 @@ export const LinkProperties = {
     },
 
     ExecutorLink: {
-        type: LinkType.Validation
+        type: LinkType.Executor
     },
     ExecutorLinkItem: {
-        type: LinkType.ValidationItem
+        type: LinkType.ExecutorItem
     },
     ExecutorAgentLink: {
         type: LinkType.ValidatorAgent
@@ -1504,13 +1504,13 @@ export const ExecutorUI = {
     },
     [ExecutorRules.AddModelReference]: {
         code: {
-            [ProgrammingLanguages.CSHARP]: 'ParentReference'
+            [ProgrammingLanguages.CSHARP]: 'AddModelReference'
         },
         arguments: {
             ...COMMON_LISTSTRING_ARGS,
             nodeType: NodeTypes.Model,
-            reference: {
-                types: [NodeTypes.Model]
+            method_reference: {
+                reference: true
             }
         }
     },

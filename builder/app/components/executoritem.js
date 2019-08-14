@@ -26,7 +26,8 @@ import {
     isUIExtensionEnumerable,
     GetUIExentionEnumeration,
     GetUIExentionKeyField,
-    GetLinkChainFromGraph
+    GetLinkChainFromGraph,
+    GetMethodNode
 } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 
@@ -148,6 +149,9 @@ class ExecutorItem extends Component {
                 }
                 return (<div>reference</div>)
             }
+            else if (validatorItem.arguments && validatorItem.arguments.method_reference) {
+                return this.getMethodReferenceItem(validator, validatorItem);
+            }
             else if (validatorItem.arguments && validatorItem.arguments.functionvariables) {
                 let functionVariableControl = (<FormControl>
                     <SelectInput
@@ -180,6 +184,46 @@ class ExecutorItem extends Component {
         return (
             <div></div>
         );
+    }
+
+    getMethodReferenceItem(validator, validatorItem) {
+        var { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
+        let methodNode = GetMethodNode(state, currentNode.id, LinkType.ExecutorFunction);
+        let methodNodeProperties = UIA.GetMethodProps(methodNode);
+        if (validatorItem.arguments && validatorItem.arguments.method_reference) {
+            return Object.keys(validatorItem.arguments.method_reference).map(ref => {
+                var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                let editlist = [];
+                let options = UIA.GetMethodNodeSelectOptions(methodNodeProperties);
+                let formControll = (<FormControl key={ref}>
+                    <SelectInput
+                        options={options}
+                        defaultSelectText={Titles.NodeType}
+                        label={Titles.Property}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                            let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
+                            item.references = item.references || {};
+                            item.references[ref] = value;
+
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                id,
+                                prop: NodeProperties.Executor,
+                                value: validator
+                            })
+
+                        }}
+                        value={validatorItem && validatorItem.references ? validatorItem.references[ref] : ''} />
+                    {editlist}
+                </FormControl>);
+
+                return formControll
+            });
+        }
+        return (<div>reference</div>)
     }
 }
 

@@ -47,12 +47,7 @@ class AfterEffectsActivityMenu extends Component {
 					if (!parent && !useNodes && !useMethodTypes && !useString) {
 						result.push(<SelectInput
 							label={key}
-							options={Object.keys(methodProps).map(val => {
-								return {
-									value: val,
-									title: `${UIA.GetCodeName(methodProps[val])} (${val})`
-								}
-							})}
+							options={UIA.GetMethodNodeSelectOptions(methodProps)}
 							onChange={(value) => {
 								var afterEffectSetup = SetAffterEffectProperty(currentNode, afterMethod, key, value);
 

@@ -1,20 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
-import TextInput from './textinput';
-import SelectInput from './selectinput';
-import FormControl from './formcontrol';
 import MainSideBar from './mainsidebar';
 import * as UIA from '../actions/uiactions';
-import TabPane from './tabpane';
 import SideBar from './sidebar';
 import TreeViewMenu from './treeviewmenu';
 import ExecutorItem from './executoritem';
 import * as Titles from './titles';
-import CheckBox from './checkbox';
-import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
-import { NodeProperties, NodeTypes, LinkEvents, LinkType, ExecutorUI } from '../constants/nodetypes';
-import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, removeValidator, removeValidatorValidation } from '../methods/graph_methods';
+import { NodeProperties, ExecutorUI } from '../constants/nodetypes';
+import { createValidator, addValidatator, GetNode } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 import { uuidv4 } from '../utils/array';
 

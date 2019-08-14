@@ -1070,6 +1070,11 @@ export function bindTemplate(templateString, data) {
     var singularSymbol = '@';
     var regex = new RegExp('({{)[A-Za-z0-9_.' + singularSymbol + ' ,\'\|]*(}})', 'g');
     var hasTemplate = regex.test(templateString);
+    Object.keys(data).map(t => {
+        if (!data[t + '#lower']) {
+            data[t + '#lower'] = `${data[t]}`.toLowerCase();
+        }
+    });
 
     if (hasTemplate) {
         for (var t in data) {

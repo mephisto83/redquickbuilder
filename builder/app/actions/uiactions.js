@@ -51,6 +51,15 @@ export function GetCodeName(node) {
     }
     return GetNodeProp(node, NodeProperties.CodeName);
 }
+
+export function GetMethodNodeSelectOptions(methodProps) {
+    return Object.keys(methodProps).map(val => {
+        return {
+            value: val,
+            title: `${GetCodeName(methodProps[val])} (${val})`
+        }
+    })
+}
 export function GetNodeCode(graph, id) {
     return GetCodeName(GraphMethods.GetNode(graph, id));
 }
