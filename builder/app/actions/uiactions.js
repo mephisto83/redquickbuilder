@@ -52,6 +52,39 @@ export function GetCodeName(node) {
     return GetNodeProp(node, NodeProperties.CodeName);
 }
 
+export function GetModelPropertyChildren(id) {
+
+    let property_nodes = GetModelPropertyNodes(id);
+    let logicalChildren = GetLogicalChildren(id);
+    return [...property_nodes, ...logicalChildren];
+}
+
+export function GetNodeById(node) {
+    return GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+}
+
+export function GetModelPropertyNodes(refId) {
+    var state = _getState();
+    return GraphMethods.GetLinkChain(state, {
+        id: refId,
+        links: [{
+            type: NodeConstants.LinkType.PropertyLink,
+            direction: GraphMethods.SOURCE
+        }]
+    });
+}
+
+export function GetLogicalChildren(id) {
+    let currentNode = GraphMethods.GetNode(GetCurrentGraph(GetState()), id);
+    var hasLogicalChildren = GetNodeProp(currentNode, NodeProperties.HasLogicalChildren);
+    if (hasLogicalChildren)
+        return (GetNodeProp(currentNode, NodeProperties.LogicalChildrenTypes) || []).map(t => {
+            let node = GraphMethods.GetNode(GetCurrentGraph(_getState()), t);
+            return node;
+        }).filter(x => x);
+    return [];
+}
+
 export function GetMethodNodeSelectOptions(methodProps) {
     return Object.keys(methodProps).map(val => {
         return {

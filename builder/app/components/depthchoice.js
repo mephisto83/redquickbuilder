@@ -8,6 +8,7 @@ import * as UIA from '../actions/uiactions';
 import { NodeProperties } from '../constants/nodetypes';
 import Box from './box';
 import * as Titles from './titles';
+import SelectInput from './selectinput';
 
 class NodeManagement extends Component {
     constructor(props) {
@@ -31,9 +32,13 @@ class NodeManagement extends Component {
         return (
             <Box title={Titles.Depth}>
                 <FormControl>
-                    <RadioButton value={graph.depth} onChange={(val) => {
-                        this.props.graphOperation([{ operation: UIA.SET_DEPTH, options: { depth: val } }]);
-                    }} values={[].interpolate(0, 7, x => ({ title: 'Depth  ' + x, value: x }))} />
+                    <SelectInput
+                        label={Titles.Type}
+                        options={[].interpolate(0, 7, x => ({ title: 'Depth  ' + x, value: x }))}
+                        onChange={(val) => {
+                            this.props.graphOperation([{ operation: UIA.SET_DEPTH, options: { depth: val } }]);
+                        }}
+                        value={graph.depth} />
                 </FormControl>
             </Box>
         );

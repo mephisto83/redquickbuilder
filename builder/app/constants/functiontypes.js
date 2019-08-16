@@ -21,6 +21,9 @@ export const FunctionTypes = {
     Get_Object_Agent_Value__IListObject: 'Get/Object/Agent/Value => IList<Object>',
     Delete_Object_Agent_Value__IListObject: 'Delete/Object/Agent/Value => IList<Object>',
 
+    //Delete
+    Delete_M2M_By_Reference: 'Delete M2M by reference => list',
+
     //Functions with Object result
     Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
     Update_Parent_Child_Agent_Value__Child: 'Update/Parent-Child/Agent/Value => Child',
@@ -186,6 +189,10 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
         key: FunctionTemplateKeys.Model,
         nodeTypes: [NodeTypes.Model]
     },
+    [FunctionTemplateKeys.ModelOutput]: {
+        key: FunctionTemplateKeys.ModelOutput,
+        nodeTypes: [NodeTypes.Model]
+    },
     [FunctionTemplateKeys.Agent]: {
         [NodeProperties.IsAgent]: true,
         key: FunctionTemplateKeys.Agent,
@@ -277,6 +284,8 @@ export const AFTER_EFFECTS = {
     [AfterEffectsTemplate.ExecuteStreamProcess]: {
         template: './app/templates/aftereffects/execute_stream_process.tpl',
         template_call: '                    await {{function_name}}(agent, result);',
+        update_with: `./app/templates/standard/update_model_property.tpl`,
+        stream_process_change_parameter: `./app/templates/stream_process/stream_process_change_class_extension_update_by_model.tpl`,
         templateKeys: {
             [FunctionTemplateKeys.Model]: {
                 key: FunctionTemplateKeys.Model,
@@ -311,7 +320,10 @@ export const AFTER_EFFECTS = {
         template: './app/templates/aftereffects/execute_stream_process_update.tpl',
         template_call: `
             var reference = {{reference}};
-            await {{function_name}}(agent, reference, result);`,
+            var model = result;
+            await {{function_name}}(agent, reference, model);`,
+        stream_process_change_parameter: `./app/templates/stream_process/stream_process_change_class_extension_update_by_model.tpl`,
+        update_with: `./app/templates/standard/update_model_property.tpl`,
         templateKeys: {
             [FunctionTemplateKeys.Model]: {
                 key: FunctionTemplateKeys.Model,
@@ -319,6 +331,10 @@ export const AFTER_EFFECTS = {
             },
             [FunctionTemplateKeys.ModelOutput]: {
                 key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.UpdateModel]: {
+                key: FunctionTemplateKeys.UpdateModel,
                 nodeTypes: [NodeTypes.Model]
             },
             [FunctionTemplateKeys.ReferenceClass]: {
@@ -354,6 +370,11 @@ export const AFTER_EFFECTS = {
 }
 
 const COMMON_CONSTRAINTS_OBJECT_METHOD = {
+    [FunctionTemplateKeys.User]: {
+        [NodeProperties.IsUser]: true,
+        key: FunctionTemplateKeys.User,
+        nodeTypes: [NodeTypes.Model]
+    },
     [FunctionTemplateKeys.Model]: {
         key: FunctionTemplateKeys.Model,
         nodeTypes: [NodeTypes.Model]
@@ -362,6 +383,10 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD = {
         [NodeProperties.IsAgent]: true,
         key: FunctionTemplateKeys.Agent,
         nodeTypes: [NodeTypes.Model]
+    },
+    [FunctionTemplateKeys.Permission]: {
+        key: FunctionTemplateKeys.Permission,
+        nodeTypes: [NodeTypes.Permission]
     }
 };
 
@@ -563,169 +588,171 @@ export const COMMON_FUNCTION_TEMPLATE_KEYS = {
     agent: 'agent',
     agent_type: 'agent_type'
 }
-export const Functions = {
-    [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
-        title: Titles.Create_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
-        constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT
-        }, output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.Create,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
-        title: Titles.Update_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf8'),
-        constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT
-        }, output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.Update,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
-        title: Titles.Delete_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
-        constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT
-        }, output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.Delete,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    },
-    [FunctionTypes.Get_Object_Agent_Value__Object]: {
-        title: Titles.Get_Object_Agent_Value__Object,
-        template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/get_model_agent_object_interface.tpl', 'utf8'),
-        constraints: {
-            [FunctionTemplateKeys.ManyToManyModel]: {
-                [NodeProperties.ManyToManyNexus]: true,
-                key: FunctionTemplateKeys.ManyToManyModel,
-                nodeTypes: [NodeTypes.Model]
-            },
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT
-        }, output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: false,
-        method: Methods.Get,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    },
-    [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
-        title: Titles.Get_Object_Agent_Value__IListObject,
-        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
-        constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT
-        }, output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.GetAll,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
-        title: Titles.Create_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf8'),
-        constraints: { ...COMMON_CONSTRAINTS },
-        output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.Create,
-        ...COMMON_FUNCTION_REQUIREMENTS,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
-        title: Titles.Update_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf8'),
-        constraints: { ...COMMON_CONSTRAINTS },
-        output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.Update,
-        ...COMMON_FUNCTION_REQUIREMENTS,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
-        title: Titles.Get_Parent$Child_Agent_Value__IListChild,
-        template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
-        constraints: { ...COMMON_CONSTRAINTS },
-        output: {
-            ...COMMON_OUTPUT.LIST
-        },
-        isList: true,
-        method: Methods.GetAll,
-        ...COMMON_FUNCTION_REQUIREMENTS,
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
-        title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
-        template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf8'),
-        constraints: {
-            [FunctionTemplateKeys.AgentType]: {
-                [FunctionConstraintKeys.IsAgent]: true,
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                [FunctionConstraintKeys.IsModel]: true,
-                key: FunctionTemplateKeys.AgentType
-            },
-            [FunctionTemplateKeys.AgentDeterminingProperty]: {
-                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.AgentType,
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                [FunctionConstraintKeys.IsProperty]: true,
-                key: FunctionTemplateKeys.AgentDeterminingProperty
-            },
-            [FunctionTemplateKeys.Model]: {
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                [FunctionConstraintKeys.IsModel]: true,
-                key: FunctionTemplateKeys.Model
-            },
-            [FunctionTemplateKeys.ModelDeterminingProperty]: {
-                [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Model,
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                [FunctionConstraintKeys.IsProperty]: true,
-                [FunctionConstraintKeys.IsEnumerable]: true,
-                key: FunctionTemplateKeys.ModelDeterminingProperty
-            },
-            [FunctionTemplateKeys.AgentInstance]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.AgentType,
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                key: FunctionTemplateKeys.AgentInstance,
-                [FunctionConstraintKeys.IsInstanceVariable]: true,
-                [FunctionConstraintKeys.IsInputVariable]: true
-            },
-            [FunctionTemplateKeys.Value]: {
-                [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-                [FunctionConstraintKeys.IsSingleLink]: true,
-                key: FunctionTemplateKeys.Value,
-                [FunctionConstraintKeys.IsInstanceVariable]: true,
-                [FunctionConstraintKeys.IsInputVariable]: true
-            }
-        },
-        output: {
-            ...COMMON_OUTPUT.BOOL
-        },
-        [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {},
-        attachment_methods: {},
-        propreties: {},
-        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-    }
-}
+// export const Functions = {
+//     [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
+//         title: Titles.Create_Object_Agent_Value__IListObject,
+//         template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
+//         constraints: {
+//             ...COMMON_CONSTRAINTS_AGENT_OBJECT
+//         }, output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.Create,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
+//         title: Titles.Update_Object_Agent_Value__IListObject,
+//         template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf8'),
+//         constraints: {
+//             ...COMMON_CONSTRAINTS_AGENT_OBJECT
+//         }, output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.Update,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
+//         title: Titles.Delete_Object_Agent_Value__IListObject,
+//         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
+//         constraints: {
+//             ...COMMON_CONSTRAINTS_AGENT_OBJECT
+//         }, output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.Delete,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     },
+//     [FunctionTypes.Get_Object_Agent_Value__Object]: {
+//         title: Titles.Get_Object_Agent_Value__Object,
+//         template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/standard/get_model_agent_object_interface.tpl', 'utf8'),
+//         constraints: {
+//             [FunctionTemplateKeys.ManyToManyModel]: {
+//                 [NodeProperties.ManyToManyNexus]: true,
+//                 key: FunctionTemplateKeys.ManyToManyModel,
+//                 nodeTypes: [NodeTypes.Model]
+//             },
+//             ...COMMON_CONSTRAINTS_AGENT_OBJECT
+//         }, output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: false,
+//         method: Methods.Get,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     },
+//     [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
+//         title: Titles.Get_Object_Agent_Value__IListObject,
+//         template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
+//         constraints: {
+//             ...COMMON_CONSTRAINTS_AGENT_OBJECT
+//         }, output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.GetAll,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
+//         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
+//         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf8'),
+//         constraints: { ...COMMON_CONSTRAINTS },
+//         output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.Create,
+//         ...COMMON_FUNCTION_REQUIREMENTS,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
+//         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
+//         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf8'),
+//         constraints: { ...COMMON_CONSTRAINTS },
+//         output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.Update,
+//         ...COMMON_FUNCTION_REQUIREMENTS,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
+//         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
+//         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
+//         interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
+//         constraints: { ...COMMON_CONSTRAINTS },
+//         output: {
+//             ...COMMON_OUTPUT.LIST
+//         },
+//         isList: true,
+//         method: Methods.GetAll,
+//         ...COMMON_FUNCTION_REQUIREMENTS,
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }, [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
+//         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
+//         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf8'),
+//         constraints: {
+//             [FunctionTemplateKeys.AgentType]: {
+//                 [FunctionConstraintKeys.IsAgent]: true,
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 [FunctionConstraintKeys.IsModel]: true,
+//                 key: FunctionTemplateKeys.AgentType
+//             },
+//             [FunctionTemplateKeys.AgentDeterminingProperty]: {
+//                 [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.AgentType,
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 [FunctionConstraintKeys.IsProperty]: true,
+//                 key: FunctionTemplateKeys.AgentDeterminingProperty
+//             },
+//             [FunctionTemplateKeys.Model]: {
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 [FunctionConstraintKeys.IsModel]: true,
+//                 key: FunctionTemplateKeys.Model
+//             },
+//             [FunctionTemplateKeys.ModelDeterminingProperty]: {
+//                 [FunctionConstraintKeys.IsChild]: FunctionTemplateKeys.Model,
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 [FunctionConstraintKeys.IsProperty]: true,
+//                 [FunctionConstraintKeys.IsEnumerable]: true,
+//                 key: FunctionTemplateKeys.ModelDeterminingProperty
+//             },
+//             [FunctionTemplateKeys.AgentInstance]: {
+//                 [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.AgentType,
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 key: FunctionTemplateKeys.AgentInstance,
+//                 [FunctionConstraintKeys.IsInstanceVariable]: true,
+//                 [FunctionConstraintKeys.IsInputVariable]: true
+//             },
+//             [FunctionTemplateKeys.Value]: {
+//                 [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
+//                 [FunctionConstraintKeys.IsSingleLink]: true,
+//                 key: FunctionTemplateKeys.Value,
+//                 [FunctionConstraintKeys.IsInstanceVariable]: true,
+//                 [FunctionConstraintKeys.IsInputVariable]: true
+//             }
+//         },
+//         output: {
+//             ...COMMON_OUTPUT.BOOL
+//         },
+//         [FUNCTION_REQUIREMENT_KEYS.CLASSES]: {},
+//         attachment_methods: {},
+//         propreties: {},
+//         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+//     }
+// }
 
 
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
-        template: fs.readFileSync('./app/templates/standard/create_model_object.tpl', 'utf8'),
-        interface: fs.readFileSync('./app/templates/standard/create_model_object_interface.tpl', 'utf8'),
+        template: fs.readFileSync('./app/templates/standard/create_model_agent_object.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/create_model_agent_object_interface.tpl', 'utf8'),
+        templates: {
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
         }, output: {
@@ -792,8 +819,6 @@ export const MethodFunctions = {
         template: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model_interface.tpl', 'utf8'),
         templates: {
-            update_with: `./app/templates/standard/update_model_property.tpl`,
-            stream_process_change_parameter: `./app/templates/stream_process/stream_process_change_class_extension_update_by_model.tpl`
         },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
@@ -812,6 +837,20 @@ export const MethodFunctions = {
         title: Titles.Delete_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.Delete,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    [FunctionTypes.Delete_M2M_By_Reference]: {
+        title: FunctionTypes.Delete_M2M_By_Reference,
+        template: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_interface.tpl', 'utf8'),
+        controller: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_controller.tpl', 'utf8'),
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {

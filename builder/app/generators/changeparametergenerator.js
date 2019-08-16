@@ -2,7 +2,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetMethodNodeProp, GetCodeName } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, STANDARD_CONTROLLER_USING, STANDARD_TEST_USING, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionConstraintKeys, FunctionTemplateKeys, FunctionMethodTypes, MethodFunctions, MethodTemplateKeys } from '../constants/functiontypes';
+import { bindTemplate, FunctionConstraintKeys, FunctionTemplateKeys, FunctionMethodTypes, MethodFunctions, MethodTemplateKeys, AFTER_EFFECTS } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const TEST_CLASS = './app/templates/tests/tests.tpl';
@@ -23,7 +23,7 @@ export default class ChangeParameterGenerator {
     static Generate(options) {
         var { state, key } = options;
         let models = NodesByType(state, NodeTypes.Model);
-        let methods = NodesByType(state, NodeTypes.Method);
+        let afterEffects = NodesByType(state, NodeTypes.AfterEffect);
         let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
@@ -44,36 +44,49 @@ export default class ChangeParameterGenerator {
                 let tests = [];
                 let updates_with = [];
                 let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
-                methods.filter(x => GetMethodNodeProp(x, FunctionTemplateKeys.Agent) === agent.id &&
-                    GetMethodNodeProp(x, FunctionTemplateKeys.Model) == model.id).filter(method => {
-                        var functionType = GetNodeProp(method, NodeProperties.FunctionType);
-                        if (MethodFunctions[functionType] && MethodFunctions[functionType].templates) {
-                            let { templates } = MethodFunctions[functionType];
-                            if (templates) {
-                                if (templates[MethodTemplateKeys.stream_process_change_parameter]) {
-                                    let spcp_template = fs.readFileSync(templates[MethodTemplateKeys.stream_process_change_parameter], 'utf8');
-                                    spcp_template = bindTemplate(spcp_template, {
-                                        model: GetCodeName(model),
-                                        value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
-                                        agent_type: GetCodeName(agent),
-                                        model_update: GetCodeName(GetMethodNodeProp(method, FunctionTemplateKeys.UpdateModel)),
-                                        agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
-                                        change_type: `Methods.${MethodFunctions[functionType].method}`,
-                                        method: MethodFunctions[functionType].method
-                                    });
-
-                                    constructors.push(spcp_template);
-                                }
-                                if (templates[MethodTemplateKeys.update_with]) {
-                                    let spcp_template = fs.readFileSync(templates[MethodTemplateKeys.update_with], 'utf8');
-                                    spcp_template = bindTemplate(spcp_template, {
-                                        model_update: GetCodeName(GetMethodNodeProp(method, FunctionTemplateKeys.UpdateModel))
-                                    });
-                                    updates_with.push(spcp_template + NEW_LINE);
-                                }
-                            }
+                afterEffects.filter(afterEffect => {
+                    let functionType = GetNodeProp(afterEffect, NodeProperties.AfterMethod);
+                    let setup = GetNodeProp(afterEffect, NodeProperties.AfterMethodSetup);
+                    if (setup && functionType && setup[functionType][FunctionTemplateKeys.ModelOutput]) {
+                        var method = GraphMethods.GetMethodNode(state, afterEffect.id);
+                        if (method) {
+                            var valid = GetMethodNodeProp(method, setup[functionType][FunctionTemplateKeys.Agent]) === agent.id &&
+                                GetMethodNodeProp(method, setup[functionType][FunctionTemplateKeys.ModelOutput]) == model.id;
+                            return valid;
                         }
-                    });
+                    }
+                    return false;
+                }).filter(afterEffect => {
+                    let functionType = GetNodeProp(afterEffect, NodeProperties.AfterMethod);
+                    let setup = GetNodeProp(afterEffect, NodeProperties.AfterMethodSetup);
+                    if (AFTER_EFFECTS[functionType] && AFTER_EFFECTS[functionType]) {
+                        let methodNode = GraphMethods.GetMethodNode(state, afterEffect.id);
+                        let stream_process_change_parameter = AFTER_EFFECTS[functionType][MethodTemplateKeys.stream_process_change_parameter];
+                        if (stream_process_change_parameter) {
+                            let spcp_template = fs.readFileSync(stream_process_change_parameter, 'utf8');
+                            spcp_template = bindTemplate(spcp_template, {
+                                model: GetCodeName(model),
+                                value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
+                                agent_type: GetCodeName(agent),
+                                model_update: GetCodeName(GetMethodNodeProp(methodNode, setup[functionType][FunctionTemplateKeys.UpdateModel])),
+                                agent: GetNodeProp(agent, NodeProperties.AgentName) || 'agent',
+                                change_type: `Methods.${setup[functionType][FunctionTemplateKeys.MethodType]}`,
+                                method: setup[functionType][FunctionTemplateKeys.MethodType]
+                            });
+
+                            constructors.push(spcp_template);
+                        }
+
+                        let update_with = AFTER_EFFECTS[functionType][MethodTemplateKeys.update_with];
+                        if (update_with) {
+                            let spcp_template = fs.readFileSync(update_with, 'utf8');
+                            spcp_template = bindTemplate(spcp_template, {
+                                model_update: GetCodeName(GetMethodNodeProp(methodNode, setup[functionType][FunctionTemplateKeys.UpdateModel])),
+                            });
+                            updates_with.push(spcp_template + NEW_LINE);
+                        }
+                    }
+                });
                 Object.values(Methods).filter(x => ![Methods.Get, Methods.GetAll].some(v => v == x)).map(method => {
 
                     let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;

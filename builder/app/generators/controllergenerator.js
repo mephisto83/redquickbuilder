@@ -53,7 +53,7 @@ export default class ControllerGenerator {
                     maestro_functions.filter(x => !GetNodeProp(x, NodeProperties.NotIncludedInController)).map(maestro_function => {
                         var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
                         if (ft) {
-                            let tempFunction = _controllerTemplateFunction;
+                            let tempFunction = ft.controller || _controllerTemplateFunction;
                             let parameters = '';
                             let parameter_route = '';
                             let parameter_values = '';
@@ -80,7 +80,6 @@ export default class ControllerGenerator {
                             let httpRoute = `${GetNodeProp(maestro_function, NodeProperties.HttpRoute)}`;
                             let methodProperties = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                             if (!methodProperties) return;
-                            let userNode = tempfunctions.find(t => GetNodeProp(t, NodeProperties.CodeName) === FunctionTemplateKeys.UserInstance);
                             let modelNode = GraphMethods.GetNode(root, methodProperties.model);
                             let compositeInput = GraphMethods.GetNode(graphRoot, methodProperties[FunctionTemplateKeys.CompositeInput])
                             let output_type = '{controller_generator_missing_model}';

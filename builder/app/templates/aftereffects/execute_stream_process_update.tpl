@@ -1,4 +1,5 @@
 
+        // [AfterEffectsTemplate.ExecuteStreamProcessUpdate]
         private async Task {{function_name}}({{agent}} agent, {{reference_class}} data, {{model}} result)
         {
 

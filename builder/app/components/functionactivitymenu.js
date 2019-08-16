@@ -9,7 +9,7 @@ import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
-import { Functions, HTTP_METHODS } from '../constants/functiontypes';
+import { HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
 import { NodeProperties, Methods } from '../constants/nodetypes';
 
 class FunctionActivityMenu extends Component {
@@ -23,15 +23,15 @@ class FunctionActivityMenu extends Component {
                 title: UIA.GetNodeTitle(node)
             }
         });
-        var function_types = Object.keys(Functions).map(funcKey => {
+        var function_types = Object.keys(MethodFunctions).map(funcKey => {
             return {
-                title: Functions[funcKey].title || funcKey,
+                title: MethodFunctions[funcKey].title || funcKey,
                 value: funcKey
             }
         })
         return (
             <TabPane active={active}>
-                  {currentNode ? (<SelectInput
+                {currentNode ? (<SelectInput
                     label={Titles.AgentOperator}
                     options={agent_nodes}
                     onChange={(value) => {
@@ -52,7 +52,7 @@ class FunctionActivityMenu extends Component {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
-              
+
                 {currentNode ? (<CheckBox
                     label={Titles.CustomFunction}
                     title={Titles.CustomFunctionDescription}

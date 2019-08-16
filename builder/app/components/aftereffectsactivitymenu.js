@@ -1,16 +1,15 @@
 // @flow
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
-import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
-import Box from './box';
 import { AFTER_EFFECTS } from '../constants/functiontypes';
 import SelectInput from './selectinput';
 import FormControl from './formcontrol';
-import { GetLinkChainItem, SetAffterEffectProperty, GetMethodNode, GetNode, TARGET, GetLinkChain, SOURCE } from '../methods/graph_methods';
+import { SetAffterEffectProperty, GetMethodNode, GetNode, TARGET, GetLinkChain, SOURCE } from '../methods/graph_methods';
 import { LinkType, Methods } from '../constants/nodetypes';
+
 class AfterEffectsActivityMenu extends Component {
 	getControls() {
 		var { state } = this.props;

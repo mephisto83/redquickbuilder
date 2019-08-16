@@ -22,8 +22,11 @@ class ModelFilterActivityMenu extends Component {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ModelFilter);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        let nodes = UIA.NodesByType(state, NodeTypes.Model).map(t => ({ title: UIA.GetNodeTitle(t), value: t.id }));
-        let agents = UIA.NodesByType(state, NodeTypes.Model).filter(x => UIA.GetNodeProp(x, NodeProperties.IsAgent)).map(t => ({ title: UIA.GetNodeTitle(t), value: t.id }));
+        let nodes = UIA.NodesByType(state, NodeTypes.Model)
+            .map(t => ({ title: UIA.GetNodeTitle(t), value: t.id }));
+        let agents = UIA.NodesByType(state, NodeTypes.Model)
+            .filter(x => UIA.GetNodeProp(x, NodeProperties.IsAgent))
+            .map(t => ({ title: UIA.GetNodeTitle(t), value: t.id }));
 
         var input = currentNode ? (<SelectInput
             label={Titles.Models}

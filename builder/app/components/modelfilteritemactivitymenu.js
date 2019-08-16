@@ -44,18 +44,13 @@ class ModelFilterItemActivityMenu extends Component {
                     case FunctionTypes.Create_Parent$Child_Agent_Value__IListChild:
                     case FunctionTypes.Create_Parent_Child_Agent_Value__Child:
                     default:
-                        node = GetNode(graph, methodProps[FunctionTemplateKeys.Model]);
+                        node = GetNode(graph, methodProps[FunctionTemplateKeys.ModelOutput] || methodProps[FunctionTemplateKeys.Model]);
                         break;
                 }
             }
             if (node) {
-                propertyNodes = GetLinkChain(state, {
-                    id: node.id,
-                    links: [{
-                        direction: SOURCE,
-                        type: LinkType.PropertyLink
-                    }]
-                }).toNodeSelect();
+                let property_nodes = UIA.GetModelPropertyChildren(node.id);
+                propertyNodes = [...property_nodes.toNodeSelect()];
             }
         }
         return (

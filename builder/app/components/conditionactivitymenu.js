@@ -109,16 +109,13 @@ class ConditionActivityMenu extends Component {
     getProperties(methodProps, temp, state, key = 'ref2') {
         let refId = methodProps[temp[key]];
         let properties = [];
-        let nodeProperties = GetLinkChain(state, {
-            id: refId,
-            links: [{
-                type: LinkType.PropertyLink,
-                direction: SOURCE
-            }]
-        });
+        let nodeProperties = UIA.GetModelPropertyNodes(refId);
+        let currentNode = UIA.GetNodeById(refId);
         if (nodeProperties) {
             properties = nodeProperties.toNodeSelect();
         }
+        let logicalChildren = UIA.GetLogicalChildren(currentNode.id);
+        properties = [...properties, ...logicalChildren.toNodeSelect()];
         return properties;
     }
     getEnumeration(options) {
@@ -554,50 +551,6 @@ class ConditionActivityMenu extends Component {
                 }}
                 value={matchRef.ref2Property} />
         ) : null
-        // matchRef.ref1 && matchRef.ref2 ? (
-        //     <SelectInput
-        //         label={Titles.ManyToManyNexus}
-        //         options={model_options}
-        //         onChange={(value) => {
-        //             var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-        //             temp[ConditionTypeParameters.RefManyToMany] = value;
-        //             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-        //                 prop: propertyType,
-        //                 id: currentNode.id,
-        //                 value: temp
-        //             });
-        //         }}
-        //         value={matchRef[ConditionTypeParameters.RefManyToMany]} />
-        // ) : null,
-        // matchRef.ref1 && matchRef.ref2 ? (
-        //     <SelectInput
-        //         label={Titles.Property}
-        //         options={refManyToMany_properties}
-        //         onChange={(value) => {
-        //             var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-        //             temp.refManyToManyProperty = value;
-        //             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-        //                 prop: propertyType,
-        //                 id: currentNode.id,
-        //                 value: temp
-        //             });
-        //         }}
-        //         value={matchRef.refManyToManyProperty} />
-        // ) : null,
-        // matchRef.refManyToManyProperty && matchRef.ref1 && matchRef.ref2 ? (<SelectInput
-        //     title={Titles.Condition}
-        //     label={Titles.Condition}
-        //     options={[...Object.keys(ConditionTypeOptions)].map(t => ({ title: t, value: t }))}
-        //     value={matchRef.refManyToManyCondition}
-        //     onChange={(value) => {
-        //         var temp = UIA.GetNodeProp(currentNode, NodeProperties.MatchReference) || {};
-        //         temp.refManyToManyCondition = value;
-        //         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-        //             prop: propertyType,
-        //             id: currentNode.id,
-        //             value: temp
-        //         });
-        //    }} />) : null
         ].filter(x => x)
     }
 }

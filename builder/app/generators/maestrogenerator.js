@@ -87,6 +87,7 @@ export default class MaestroGenerator {
                         let manyToManyNode = null;
                         let parent_setup = '';
                         let modelNode = null;
+                        let model_output = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         let predicates = '';
                         if (methodProps) {
@@ -97,6 +98,7 @@ export default class MaestroGenerator {
                             modelFilterNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
                             compositeInput = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.CompositeInput])
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
+                            model_output = GetCodeName(methodProps[FunctionTemplateKeys.ModelOutput])
                             parentNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
                             parent_type = parentNode ? GetNodeProp(parentNode, NodeProperties.CodeName) : '{missing parent name}';
                             manyToManyNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
@@ -152,10 +154,11 @@ export default class MaestroGenerator {
                             parent_type,
                             agent: agent,
                             'composite-input': GetCodeName(compositeInput) || '',
-                            model_input:  GetCodeName(compositeInput) || model_type,
+                            model_input: GetCodeName(compositeInput) || model_type,
                             value_type,
                             value,
                             parent_setup,
+                            model_output,
                             model: model_type,
                             connect_type,
                             comma: predicates.length ? ',' : '',
@@ -263,7 +266,7 @@ export default class MaestroGenerator {
                                     set_many_to_many_properties: '//{not set yet}',
                                     value: modelNode ? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                                     model: model_type,
-                                    model_input:  GetCodeName(compositeInput) || model_type,
+                                    model_input: GetCodeName(compositeInput) || model_type,
                                     function_name: functionName,
                                     maestro: maestroName,
                                     set_agent_properties: pvc.agent,

@@ -1,4 +1,5 @@
 
+        // [AfterEffectsTemplate.GenerateM2M_From_Result_and_Input]
         private async Task {{function_name}}({{agent}} agent, {{composite-input}} data, {{model}} result)
         {
             foreach (var i in data.{{composite-input-property}})

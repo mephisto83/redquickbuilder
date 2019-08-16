@@ -1,4 +1,6 @@
 
+        // [AfterEffectsTemplate.ExecuteStreamProcess]
+        // [AfterEffectsTemplate.ExecuteStreamProcessUpdate]
         // Per {{method}}
         public static {{model}}ChangeBy{{agent_type}} {{method}}({{agent_type}} agent, {{model}} reference, {{model_update}} data, string functionName) 
         {
