@@ -353,12 +353,12 @@ export function getMethodValidationForParameter(methodValidation, methodType, me
     }
     return null;
 }
-export function removeMethodValidationParameter(methodValidation, methodType, methodParam) {
+export function removeMethodValidationParameter(methodValidation, methodType, methodParam, methedParamProperty) {
     if (methodValidation) {
         let temp = getMethodValidationType(methodValidation, methodType);
         if (temp) {
-            if (temp[methodParam]) {
-                delete temp[methodParam];
+            if (temp[methodParam] && temp[methodParam].properties && temp[methodParam].properties[methedParamProperty]) {
+                delete temp[methodParam].properties[methedParamProperty];
             };
         }
     }

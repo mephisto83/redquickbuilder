@@ -139,7 +139,10 @@ class ConditionFilterMenu extends Component {
         };
         let onRemoveValidation = (remove) => {
             if (remove) {
-                methodFunctionValidation = removeMethodValidationParameter(methodFunctionValidation, methodFunctionType, UIA.Visual(state, param_list_key));
+                methodFunctionValidation = removeMethodValidationParameter(
+                    methodFunctionValidation,
+                    methodFunctionType,
+                    UIA.Visual(state, param_list_key), remove);
             }
             updateValidation();
         }

@@ -104,7 +104,7 @@ class GenericPropertyMenu extends Component {
                         <TreeViewMenu hideArrow={true} title={Titles.RemoveExecution} icon={'fa fa-minus'} onClick={() => {
                             let id = currentNode.id;
                             if (this.props.onRemove) {
-                                this.props.onRemove(true);
+                                this.props.onRemove(key);
                             }
                             else {
                                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
