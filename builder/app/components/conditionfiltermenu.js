@@ -4,24 +4,24 @@ import { UIConnect } from '../utils/utils';
 import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
-import NodeList from './nodelist';
 import * as Titles from './titles';
-import FormControl from './formcontrol';
-import CheckBox from './checkbox';
+import { LinkType, NodeProperties, NodeTypes } from '../constants/nodetypes';
 import SelectInput from './selectinput';
-
-class PermissionMenu extends Component {
+import { TARGET, GetLinkChain, SOURCE, GetNode } from '../methods/graph_methods';
+import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters } from '../constants/functiontypes';
+import CheckBox from './checkbox';
+import TextInput from './textinput';
+class ConditionFilterMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var permissionParametesr = UIA.GetMethodPermissionParameters(currentNode.id);
+
         return (
-            <TabPane active={active} >
-                <ControlSideBarMenuHeader title={Titles.ModelActions} />
-            </TabPane >
+            <TabPane active={active}>
+            </TabPane>
         );
     }
 }
 
-export default UIConnect(PermissionMenu)
+export default UIConnect(ConditionFilterMenu)

@@ -591,7 +591,6 @@ export default class PermissionGenerator {
                                 if (!_case.options[ConditionTypeParameters.Ref1UseId]) {
                                     ref1Property = _case.options[ConditionTypeParameters.Ref1Property];
                                     ref1Property = GetCodeName(ref1Property);
-                                    debugger;
                                 }
                                 let ref2Property = 'Id';
                                 if (!_case.options[ConditionTypeParameters.Ref2UseId]) {

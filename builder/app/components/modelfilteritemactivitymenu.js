@@ -13,9 +13,9 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import { NodeProperties, NodeTypes, LinkEvents, LinkType } from '../constants/nodetypes';
-import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLinkChainItem, createExecutor } from '../methods/graph_methods';
+import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLinkChainItem, createExecutor } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
-import { Functions, MethodFunctions, FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
+import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 
 class ModelFilterItemActivityMenu extends Component {
     render() {

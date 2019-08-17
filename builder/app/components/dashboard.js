@@ -235,7 +235,7 @@ class Dashboard extends Component {
                                 }} />
                                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
                                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
-                                 }} /> : null}
+                                }} /> : null}
                                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
                                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                                 }} /> : null}
@@ -443,7 +443,18 @@ class Dashboard extends Component {
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu />) : null}
-                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ExecutorPropertyActivityMenu ui={FilterUI} modelKey={NodeProperties.ModelItemFilter} nodeType={NodeTypes.ModelItemFilter} nodeProp={NodeProperties.FilterModel} />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (
+                                <ExecutorPropertyActivityMenu
+                                    ui={FilterUI}
+                                    modelKey={NodeProperties.ModelItemFilter}
+                                    nodeType={NodeTypes.ModelItemFilter}
+                                    nodeProp={NodeProperties.FilterModel} />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (
+                                <ExecutorPropertyActivityMenu
+                                    ui={FilterUI}
+                                    modelKey={NodeProperties.ModelItemFilter}
+                                    nodeType={NodeTypes.Condition}
+                                    nodeProp={NodeProperties.FilterModel} />) : null}
                         </SideBar>
                     </div>
                 </div >

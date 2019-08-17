@@ -299,28 +299,40 @@ export function GetMethodsProperties(id) {
     let methodProps = GetMethodProps(method);
     return methodProps;
 }
-
-export function GetMethodFilterParameters(filterId) {
+export function GetMethodsProperty(id, prop) {
+    let methodProps = GetMethodsProperties(id);
+    if (methodProps) {
+        return methodProps[prop];
+    }
+    return null;
+}
+export function GetMethodFilterParameters(id) {
+    return GetMethod_Parameters(id, 'filter');
+}
+function GetMethod_Parameters(id, key) {
     let state = _getState();
-    var method = GraphMethods.GetMethodNode(state, filterId);
+    var method = GraphMethods.GetMethodNode(state, id);
     let methodProps = GetMethodProps(method);
     let methodType = GetNodeProp(method, NodeProperties.FunctionType);
     if (methodType) {
         let setup = MethodFunctions[methodType];
-        if (setup && setup.filter && setup.filter.params && methodProps) {
-            return setup.filter.params.map(filter => {
-                let nodeName = GetNodeTitle(methodProps[filter]);
-                let nodeClass = GetCodeName(methodProps[filter]);
+        if (setup && setup[key] && setup[key].params && methodProps) {
+            return setup[key].params.map(_x => {
+                let nodeName = GetNodeTitle(methodProps[_x]);
+                let nodeClass = GetCodeName(methodProps[_x]);
                 return {
                     title: nodeName,
-                    value: filter,
+                    value: _x,
                     paramClass: nodeClass,
-                    paramName: filter
+                    paramName: _x
                 }
             });
         }
     }
     return [];
+}
+export function GetMethodPermissionParameters(id) {
+    return GetMethod_Parameters(id, 'permission');
 }
 export function GetPermissionMethod(permission) {
     return GetLinkChainItem({

@@ -93,6 +93,15 @@ export default class ModelItemFilterGenerator {
                                             validatorValue = `${_validatorProps.node}.Id`;
                                         }
                                         break;
+                                    case FilterRules.EqualsModelProperty:
+                                        if (_validatorProps.node && _validatorProps.nodeProperty) {
+                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                                            if (mNode) {
+                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                                            }
+                                            validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
+                                        }
+                                        break;
                                     default:
                                         throw 'not handled model item filter generation case';
                                 }

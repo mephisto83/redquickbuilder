@@ -876,6 +876,9 @@ export const MethodFunctions = {
         filter: {
             params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
         },
+        permission: {
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {

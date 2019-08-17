@@ -174,6 +174,7 @@ export const NodeProperties = {
     DisallowedExtensionValues: 'DisallowedExtensionValues',
     AllowedEnumValues: 'AllowedEnumerationValue',
     DisallowedEnumValues: 'DisallowedEnumValues',
+    Condition: 'Condition',
     ServiceTypeSettings: 'ServiceTypeSettings',
     ValidatorModel: 'ValidatorModel',
     ExecutorAgent: 'ExecutorAgent',
@@ -1529,7 +1530,8 @@ export const FilterRules = {
     EqualsParent: 'equals-parent',
     EqualsTrue: 'equals-true',
     EqualsFalse: 'equals-false',
-    EqualsModelRef: 'equals-model-ref'
+    EqualsModelRef: 'equals-model-ref',
+    EqualsModelProperty: 'equals-model-property'
 }
 export const FilterUI = {
     [FilterRules.EqualsTrue]: {
@@ -1575,6 +1577,15 @@ export const FilterUI = {
         arguments: {
             ...COMMON_STRING_ARGS,
             functionvariables: true
+        }
+    },
+    [FilterRules.EqualsModelProperty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EqualsModelProperty'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            modelproperty: true
         }
     }
 }
