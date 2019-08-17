@@ -10,7 +10,7 @@ import { LinkType, NodeProperties, NodeTypes, FilterUI } from '../constants/node
 import SelectInput from './selectinput';
 import FormControl from './formcontrol';
 import Box from './box';
-import { TARGET, GetLinkChain, SOURCE, GetNode, createExecutor, addMethodValidationForParamter, getMethodValidationForParameter, createValidator } from '../methods/graph_methods';
+import { TARGET, GetLinkChain, SOURCE, GetNode, createExecutor, addMethodValidationForParamter, getMethodValidationForParameter, createValidator, removeMethodValidationParameter } from '../methods/graph_methods';
 import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import GenericPropertyMenu from './genericpropertymenu';
@@ -137,8 +137,10 @@ class ConditionFilterMenu extends Component {
                 value: methodFunctionValidation
             });
         };
-        let onRemoveValidation = () => {
-            methodFunctionValidation = removeMethodValidationParameter(methodFunctionValidation, methodFunctionType, UIA.Visual(state, param_list_key));
+        let onRemoveValidation = (remove) => {
+            if (remove) {
+                methodFunctionValidation = removeMethodValidationParameter(methodFunctionValidation, methodFunctionType, UIA.Visual(state, param_list_key));
+            }
             updateValidation();
         }
         return (<GenericPropertyContainer title='asdf' subTitle='afaf' nodeType={NodeTypes.Condition} top={top} >
