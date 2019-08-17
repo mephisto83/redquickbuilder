@@ -280,6 +280,7 @@ export const NodeProperties = {
     AgentName: 'agentName',//The name of the instance variable to be used 
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
+    MethodFunctionValidation: 'method-function-validation',
     NotIncludedInController: 'not-included-in-controller',
     PermissionImpl: 'permission-implementation',
     ClassConstructionInformation: 'ClassConstructionInformation'

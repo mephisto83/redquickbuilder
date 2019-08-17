@@ -9,14 +9,11 @@ import DashboardNavBar from './dashboardnavbar';
 import SidebarToggle from './sidebartoggle';
 import * as UIA from '../actions/uiactions';
 import NavBarMenu from './navbarmenu';
-import DropDownMenu from './dropdown';
-import DropDownMenuItem from './dropdownmenuitem';
 import MainSideBar from './mainsidebar';
 import SideBarHeader from './sidebarheader';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
-import TreeViewItem from './treeviewitem';
 import Content from './content';
 import SideBar from './sidebar';
 import SideBarTabs from './sidebartabs';
@@ -24,6 +21,7 @@ import SideBarTab from './sidebartab';
 import ServiceActivityMenu from './serviceactivitymenu';
 import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
+import ConditionFilterMenu from './conditionfiltermenu';
 import CheckBox from './checkbox';
 import * as VC from '../constants/visual';
 import MindMap from './mindmap';
@@ -405,6 +403,8 @@ class Dashboard extends Component {
                                 <ChoiceListItemActivityMenu />
                                 <ConditionActivityMenu />
                             </SideBarContent>) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
+                                <ConditionFilterMenu />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
                                 <ControllerActivityMenu />
                                 <ModelFilterItemActivityMenu />
@@ -452,9 +452,9 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (
                                 <ExecutorPropertyActivityMenu
                                     ui={FilterUI}
-                                    modelKey={NodeProperties.ModelItemFilter}
+                                    modelKey={NodeProperties.Condition}
                                     nodeType={NodeTypes.Condition}
-                                    nodeProp={NodeProperties.FilterModel} />) : null}
+                                    nodeProp={NodeProperties.Condition} />) : null}
                         </SideBar>
                     </div>
                 </div >

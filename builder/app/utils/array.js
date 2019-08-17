@@ -64,6 +64,7 @@ export function uuidv4() {
                 return collection.map(node => {
                     return {
                         value: node.id,
+                        id: node.id,
                         title: GetNodeTitle(node)
                     }
                 })

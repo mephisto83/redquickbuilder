@@ -64,6 +64,25 @@ export function GetNodeById(node) {
     return GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
 }
 
+export function GetMethodDefinition(id) {
+    return MethodFunctions[GetMethodFunctionType(id)];
+}
+export function GetMethodFunctionType(id) {
+    let state = _getState();
+    var method = GraphMethods.GetMethodNode(state, id);
+
+    return GetNodeProp(method, NodeProperties.FunctionType);
+}
+export function GetMethodFunctionValidation(id) {
+
+    let state = _getState();
+    var method = GraphMethods.GetMethodNode(state, id);
+    return GetNodeProp(method, NodeProperties.MethodFunctionValidation);
+}
+export function GetPermissionNode(id) {
+    let state = _getState();
+    return GraphMethods.GetPermissionNode(state, id);
+}
 export function GetModelPropertyNodes(refId) {
     var state = _getState();
     return GraphMethods.GetLinkChain(state, {

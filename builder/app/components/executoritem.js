@@ -65,6 +65,13 @@ class ExecutorItem extends Component {
                 }
             }
         }
+        else {
+            validator = this.props.selectedValidator;
+            if (validator) {
+                validatorItem = validator.properties[this.props.property].validators[this.props.validator]
+            }
+            function_variables = this.props.function_variables;
+        }
         if (validatorItem) {
             if (validatorItem.arguments && validatorItem.arguments.reference) {
                 var { types } = validatorItem.arguments.reference;
@@ -121,30 +128,35 @@ class ExecutorItem extends Component {
                                 let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                                 let old_one = item.node;
                                 item.node = value;
-                                if (old_one) {
-                                    this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                                        target: old_one,
+                                if (this.props.onChange) {
+                                    this.props.onChange();
+                                }
+                                else {
+                                    if (old_one) {
+                                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                            target: old_one,
+                                            source: id,
+                                        });
+                                    }
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        id,
+                                        prop: NodeProperties.Executor,
+                                        value: validator
+                                    })
+                                    this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                        target: value,
                                         source: id,
+                                        properties: {
+                                            ...UIA.LinkProperties.ExecutorModelItemLink,
+                                            ...createEventProp(LinkEvents.Remove, {
+                                                property: this.props.property,
+                                                validator: this.props.validator,
+                                                function: 'OnRemoveExecutorItemPropConnection',
+                                                node: item.node
+                                            })
+                                        }
                                     });
                                 }
-                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                    id,
-                                    prop: NodeProperties.Executor,
-                                    value: validator
-                                })
-                                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                                    target: value,
-                                    source: id,
-                                    properties: {
-                                        ...UIA.LinkProperties.ExecutorModelItemLink,
-                                        ...createEventProp(LinkEvents.Remove, {
-                                            property: this.props.property,
-                                            validator: this.props.validator,
-                                            function: 'OnRemoveExecutorItemPropConnection',
-                                            node: item.node
-                                        })
-                                    }
-                                });
                             }}
                             value={validatorItem ? validatorItem.node : ''} />
                         {editlist}
@@ -164,17 +176,21 @@ class ExecutorItem extends Component {
                         label={Titles.FunctionVariables}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             let old_one = item.node;
                             item.node = value;
-
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                id,
-                                prop: NodeProperties.FilterModel,
-                                value: validator
-                            })
-
+                            debugger;
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.FilterModel,
+                                    value: validator
+                                })
+                            }
                         }}
                         value={validatorItem ? validatorItem.node : ''} />
                 </FormControl>);
@@ -182,12 +198,12 @@ class ExecutorItem extends Component {
                 return functionVariableControl
             }
             else if (validatorItem.arguments && validatorItem.arguments.modelproperty) {
-                let modelParameters = UIA.GetMethodFilterParameters(currentNode.id);
+                let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id);
                 let node_value = validatorItem ? validatorItem.node : '';
                 let nodeProperty = validatorItem ? validatorItem.nodeProperty : '';
                 let properties = [];
                 if (node_value) {
-                    let node_ref = UIA.GetMethodsProperty(currentNode.id, node_value);
+                    let node_ref = UIA.GetMethodsProperty(this.props.adjacentNodeId || currentNode.id, node_value);
                     if (node_ref) {
                         properties = UIA.GetModelPropertyChildren(node_ref).toNodeSelect();
                     }
@@ -198,15 +214,19 @@ class ExecutorItem extends Component {
                         label={Titles.FunctionVariables}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.node = value;
-
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                id,
-                                prop: NodeProperties.FilterModel,
-                                value: validator
-                            })
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.FilterModel,
+                                    value: validator
+                                });
+                            }
 
                         }}
                         value={node_value} />
@@ -215,15 +235,19 @@ class ExecutorItem extends Component {
                         label={Titles.Property}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.nodeProperty = value;
-
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                id,
-                                prop: NodeProperties.FilterModel,
-                                value: validator
-                            })
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.FilterModel,
+                                    value: validator
+                                });
+                            }
 
                         }}
                         value={nodeProperty} />
@@ -262,12 +286,16 @@ class ExecutorItem extends Component {
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.references = item.references || {};
                             item.references[ref] = value;
-
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                id,
-                                prop: NodeProperties.Executor,
-                                value: validator
-                            })
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.Executor,
+                                    value: validator
+                                });
+                            }
 
                         }}
                         value={validatorItem && validatorItem.references ? validatorItem.references[ref] : ''} />

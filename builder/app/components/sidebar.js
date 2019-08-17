@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { RelativeMenuCss } from '../constants/visual';
 
 
 export default class SideBar extends Component {
@@ -9,9 +10,12 @@ export default class SideBar extends Component {
     extraWidth() {
         return this.props.extraWide ? 'extra-wide' : '';
     }
+    relative() {
+        return this.props.relative ? RelativeMenuCss : {};
+    }
     render() {
         return (
-            <aside className={`control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`}>
+            <aside style={this.relative()} className={`control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`}>
                 {this.props.children}
             </aside>
         );

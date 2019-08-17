@@ -299,6 +299,71 @@ export function createValidator() {
         properties: {}
     }
 }
+
+export function createMethodValidation(methodType) {
+    let res = {
+        methods: {
+        }
+    }
+
+    if (res && !res.methods[methodType]) {
+        res.methods[methodType] = createMethodValidationType();
+    }
+
+    return res;
+}
+
+export function createMethodValidationType() {
+    return {};
+}
+export function getMethodValidationType(methodValidation, methodType) {
+    var { methods } = methodValidation;
+    if (methods && methods[methodType]) {
+        return methods[methodType];
+    }
+    return null;
+}
+export function addMethodValidationForParamter(methodValidation, methodType, methodParam, methedParamProperty) {
+    methodValidation = methodValidation || createMethodValidation(methodType);
+    if (getMethodValidationType(methodValidation, methodType)) {
+        let methodValidationType = getMethodValidationType(methodValidation, methodType);
+        if (methodParam) {
+            methodValidationType[methodParam] = methodValidationType[methodParam] || createProperyContainer();
+            if (methedParamProperty && methodValidationType[methodParam]) {
+                methodValidationType[methodParam].properties[methedParamProperty] = methodValidationType[methodParam].properties[methedParamProperty] || createValidatorProperty();
+            }
+        }
+    }
+    return methodValidation;
+}
+export function createProperyContainer() {
+    return {
+        properties: {}
+    }
+}
+export function getMethodValidationForParameter(methodValidation, methodType, methodParam, methodProperty) {
+    methodValidation = methodValidation || addMethodValidationForParamter(methodValidation, methodType, methodParam);
+    if (methodValidation) {
+        let temp = getMethodValidationType(methodValidation, methodType);
+        if (temp) {
+            if (temp[methodParam] && temp[methodParam]) {
+                return temp[methodParam];
+            };
+        }
+    }
+    return null;
+}
+export function removeMethodValidationParameter() {
+    if (methodValidation) {
+        let temp = getMethodValidationType(methodValidation, methodType);
+        if (temp) {
+            if (temp[methodParam]) {
+                delete temp[methodParam];
+            };
+        }
+    }
+    return methodValidation
+}
 export const createExecutor = createValidator;
 
 export function createValidatorProperty() {
@@ -1407,11 +1472,17 @@ export function GetAffterEffectProperty(currentNode, afterMethod, key) {
         return afterEffectSetup[afterMethod][key];
     return null;
 }
-export function GetMethodNode(state, id, type = LinkType.AfterMethod, direction = TARGET) {
+export function GetMethodNode(state, id) {
     let graph = GetRootGraph(state);
     return GetNodesLinkedTo(graph, {
         id
     }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Method);
+}
+export function GetPermissionNode(state, id) {
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Permission);
 }
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);

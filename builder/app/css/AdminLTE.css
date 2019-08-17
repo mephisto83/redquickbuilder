@@ -4977,3 +4977,21 @@ table.text-center th {
     white-space: normal !important;
   }
 }
+
+
+
+
+
+.main-side-bar.relative {
+  position: relative;
+  z-index: auto;
+  width: auto;
+  min-height: auto;
+  top: auto;
+  left: auto;
+  padding-top: 0;
+  display: block;
+}
+.main-side-bar.relative aside {
+  position: relative;
+}
