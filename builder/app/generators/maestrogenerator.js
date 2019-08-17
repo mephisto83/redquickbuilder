@@ -70,6 +70,7 @@ export default class MaestroGenerator {
 
                         let tempFunction = ft.template;
                         let interfaceFunction = ft.interface;
+                        let testFunction = ft.test;
                         let value_type = '';
                         let parent_type = '';
                         if (ft.parentGet) {
@@ -258,6 +259,9 @@ export default class MaestroGenerator {
                                     case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
                                         templ = fs.readFileSync(get_agent_manytomany_listchild_interface, 'utf8');
                                         break;
+                                }
+                                if (ft.test) {
+                                    templ = ft.test;
                                 }
                                 return bindTemplate(templ, {
                                     agent: agent_type,

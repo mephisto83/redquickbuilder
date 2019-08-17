@@ -1,12 +1,12 @@
 
-        [Route("{{http_route}}/{m2m_reference}/{selection_ref_id}")]
+        [Route("{{http_route}}/{model}")]
         [{{http_method}}]
-        public async Task<ActionResult<{{output_type}}>> {{functionName}}(string m2m_reference, string selection_ref_id)
+        public async Task<ActionResult<{{output_type}}>> {{functionName}}(string model)
         {       
             var maestro = RedStrapper.Resolve<{{maestro_interface}}>();
             try
             {
-                var result = await maestro.{{maestro_function}}({{user_instance}}, m2m_reference, selection_ref_id).ConfigureAwait(false);
+                var result = await maestro.{{maestro_function}}({{user_instance}}, model).ConfigureAwait(false);
 
                 return Ok(result);
             }

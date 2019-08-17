@@ -56,8 +56,13 @@ class ExecutorItem extends Component {
             }, [NodeTypes.Method]);
             if (methods && methods.length) {
                 var props = UIA.GetMethodProps(methods[0]);
-                if (props)
+                let filterParameters = UIA.GetMethodFilterParameters(currentNode.id);
+                if (filterParameters && filterParameters.length) {
+                    function_variables = filterParameters; 
+                }
+                else if (props) {
                     function_variables = Object.keys(props).map(t => ({ title: t, value: t }));
+                }
             }
         }
         if (validatorItem) {
@@ -156,8 +161,7 @@ class ExecutorItem extends Component {
                 let functionVariableControl = (<FormControl>
                     <SelectInput
                         options={function_variables}
-                        defaultSelectText={Titles.FunctionVariables}
-                        label={Titles.Property}
+                        label={Titles.FunctionVariables}
                         onChange={(value) => {
                             var id = currentNode.id;
                             var validator = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();

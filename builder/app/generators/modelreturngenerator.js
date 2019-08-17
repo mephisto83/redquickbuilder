@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetMethodsProperties } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate } from '../constants/functiontypes';
+import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
@@ -26,8 +26,14 @@ export default class ModelReturnGenerator {
         let allmodels = NodesByType(state, NodeTypes.Model);
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         allagents.map(agent => {
-            var methods = allfilters.filter(x => GetNodeProp(x, NodeProperties.FilterAgent) === agent.id).map(filterNode => {
-                let model = GraphMethods.GetNode(graphRoot, GetNodeProp(filterNode, NodeProperties.FilterModel));
+            var methods = allfilters.filter(x => {
+                var methodProps = GetMethodsProperties(x.id);
+                if (methodProps) {
+                    return methodProps[FunctionTemplateKeys.Agent] === agent.id;
+                }
+            }).map(filterNode => {
+                var methodProps = GetMethodsProperties(filterNode.id);
+                let model = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelOutput] || methodProps[FunctionTemplateKeys.Model]);
                 let properties = GraphMethods.getNodesByLinkType(graph, {
                     id: model.id,
                     direction: GraphMethods.SOURCE,

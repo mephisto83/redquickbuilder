@@ -2,7 +2,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCurrentGraph, GetLinkProperty, GetCodeName, GetMethodPropNode, GetLinkChainItem, GetPermissionMethod, GetFunctionType, GetMethodNodeProp, GetNodeCode, GetC } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, Methods, MakeConstant, CreateStringList, STANDARD_CONTROLLER_USING, NEW_LINE, STANDARD_TEST_USING } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, ConditionTypes, ConditionTypeParameters, ConditionCases, FunctionTemplateKeys, MethodFunctions, FunctionTypes, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
+import { bindTemplate, ConditionTypes, ConditionTypeParameters, ConditionCases, FunctionTemplateKeys, FunctionTypes, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import ExtensionGenerator from './extensiongenerator';
 import { debug } from 'util';

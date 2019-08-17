@@ -3,6 +3,7 @@ var fs = require('fs');
 import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
+import { MethodFunctions } from '../constants/functiontypes';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -211,6 +212,10 @@ export function toggleDashboardMinMax() {
     return toggleVisual(DASHBOARD_MENU);
 }
 export function GetNodeTitle(node) {
+    if (typeof (node) === 'string') {
+        node = GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+    }
+
     if (!node) { return Titles.Unknown }
     return node.properties ? node.properties.text || node.id : node.id;
 }
@@ -287,6 +292,35 @@ export function GetMethodNodeProp(methodNode, key) {
 }
 export function GetMethodProps(methodNode) {
     return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {});
+}
+export function GetMethodsProperties(id) {
+    let state = _getState();
+    var method = GraphMethods.GetMethodNode(state, id);
+    let methodProps = GetMethodProps(method);
+    return methodProps;
+}
+
+export function GetMethodFilterParameters(filterId) {
+    let state = _getState();
+    var method = GraphMethods.GetMethodNode(state, filterId);
+    let methodProps = GetMethodProps(method);
+    let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+    if (methodType) {
+        let setup = MethodFunctions[methodType];
+        if (setup && setup.filter && setup.filter.params && methodProps) {
+            return setup.filter.params.map(filter => {
+                let nodeName = GetNodeTitle(methodProps[filter]);
+                let nodeClass = GetCodeName(methodProps[filter]);
+                return {
+                    title: nodeName,
+                    value: filter,
+                    paramClass: nodeClass,
+                    paramName: filter
+                }
+            });
+        }
+    }
+    return [];
 }
 export function GetPermissionMethod(permission) {
     return GetLinkChainItem({

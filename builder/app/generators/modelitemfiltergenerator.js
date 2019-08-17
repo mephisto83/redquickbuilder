@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps, GetMethodFilterParameters } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules, FilterUI, FilterRules } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -19,15 +19,19 @@ export default class ModelItemFilterGenerator {
         return nodes.map(x => {
             let validator = GetNodeProp(x, NodeProperties.FilterModel);
             let params = [];
-            if (validator) {
+            let filterModelParams = GetMethodFilterParameters(x.id);
+            if (filterModelParams && filterModelParams.length) {
+                params = filterModelParams.map(x => `${x.paramName}`)
+            }
+            else if (validator) {
                 Object.values(validator.properties).map(t => Object.values(t.validators).map(v => {
                     if (v && v.type === FilterRules.EqualsModelRef) {
                         out_[v.node] = true;
                         params.push(v.node);
                     }
                 }))
+                params = params.filter(x => x).unique().sort();
             }
-            params = params.filter(x => x).unique().sort();
             let text = `${GetCodeName(x)}.Filter({{predicate_parameters}})`;
             return bindTemplate(text, {
                 predicate_parameters: params.join(', ')
@@ -45,19 +49,14 @@ export default class ModelItemFilterGenerator {
         let allfilters = NodesByType(state, NodeTypes.ModelFilter);
         let modelitemfilters = NodesByType(state, NodeTypes.ModelItemFilter);
         modelitemfilters.map(modelitemfilter => {
-            var method = GraphMethods.GetLinkChain(state, {
-                id: modelitemfilter.id,
-                links: [{
-                    type: LinkType.ModelItemFilter,
-                    direction: GraphMethods.TARGET
-                }]
-            }).find(x => x);
+            var method = GraphMethods.GetMethodNode(state, modelitemfilter.id);
             var methodProps = null;
             if (method) {
                 methodProps = GetMethodProps(method);
             }
             let itemFilter = GetNodeProp(modelitemfilter, NodeProperties.ModelItemFilter);
             let filterModel = GetNodeProp(modelitemfilter, NodeProperties.FilterModel);
+            let filterMethodParameters = GetMethodFilterParameters(modelitemfilter.id);
             let funcs = [];
             let parameters = [];
             if (filterModel && filterModel.properties) {
@@ -108,7 +107,11 @@ export default class ModelItemFilterGenerator {
                     }
                 });
                 parameters = parameters.filter(x => x).unique().sort();
-
+                if (filterMethodParameters && filterMethodParameters.length) {
+                    parameters = filterMethodParameters.map(item => {
+                        return `${item.paramClass} ${item.paramName}`
+                    });
+                }
                 funcs.push(bindTemplate(filterPropFunction, {
                     filter: filters.join(''),
                     model: GetCodeName(itemFilter),

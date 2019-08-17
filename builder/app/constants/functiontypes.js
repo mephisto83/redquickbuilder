@@ -38,6 +38,7 @@ export const FunctionTypes = {
     Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
     Create_Object_Agent_Many_to_Many_CompositeInput__Object: 'Create/Object/Agent/Many to Many with Composite Input => Object',
+    Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET: 'Create M2M Object with Agent and Return the updated M2M set',
 
     Create_Object__Object: 'Create/Object => Object',
     Update_Object__Object: 'Update/Object => Object',
@@ -387,6 +388,10 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD = {
     [FunctionTemplateKeys.Permission]: {
         key: FunctionTemplateKeys.Permission,
         nodeTypes: [NodeTypes.Permission]
+    },
+    [FunctionTemplateKeys.ModelFilter]: {
+        key: FunctionTemplateKeys.ModelFilter,
+        nodeTypes: [NodeTypes.ModelFilter]
     }
 };
 
@@ -762,6 +767,22 @@ export const MethodFunctions = {
         method: Methods.Create,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
+    [FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
+        title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,
+        template: fs.readFileSync('./app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set_interface.tpl', 'utf8'),
+        filter: {
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+        },
+        constraints: {
+            ...COMMON_CONSTRAINTS_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.OBJECT
+        },
+        isList: true,
+        method: Methods.Create,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
         title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
         template: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl', 'utf8'),
@@ -850,7 +871,11 @@ export const MethodFunctions = {
         title: FunctionTypes.Delete_M2M_By_Reference,
         template: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_interface.tpl', 'utf8'),
+        test: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_test.tpl', 'utf8'),
         controller: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_controller.tpl', 'utf8'),
+        filter: {
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
