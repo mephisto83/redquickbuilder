@@ -1,0 +1,1 @@
+var {{result}} = {{agent}}.{{agent_property}} == {{model}}.{{model_property}};

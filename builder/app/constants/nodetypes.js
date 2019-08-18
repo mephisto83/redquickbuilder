@@ -1532,7 +1532,8 @@ export const FilterRules = {
     EqualsTrue: 'equals-true',
     EqualsFalse: 'equals-false',
     EqualsModelRef: 'equals-model-ref',
-    EqualsModelProperty: 'equals-model-property'
+    EqualsModelProperty: 'equals-model-property',
+    IsInModelPropertyCollection: 'is-in-model-property-collection'
 }
 export const FilterUI = {
     [FilterRules.EqualsTrue]: {
@@ -1584,9 +1585,20 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsModelProperty'
         },
+        template: './app/templates/equals-model-property.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             modelproperty: true
+        }
+    },
+    [FilterRules.IsInModelPropertyCollection]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'IsInModelPropertyCollection'
+        },
+        template: './app/templates/is_in_model_property_collection.tpl',
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            modelproperty: true,
         }
     }
 }

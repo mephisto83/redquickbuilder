@@ -70,6 +70,7 @@ export default class ModelItemFilterGenerator {
                             let validatorValue = '';
                             let validatorName = GetCodeName(validator);
                             let _function = '==';
+                            let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
                             if (_validatorProps && _validatorProps.type)
                                 switch (_validatorProps.type) {
                                     case FilterRules.EqualsTrue:
@@ -102,10 +103,19 @@ export default class ModelItemFilterGenerator {
                                             validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
                                         }
                                         break;
+                                    case FilterRules.IsInModelPropertyCollection:
+                                        if (_validatorProps.node && _validatorProps.nodeProperty) {
+                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                                            if (mNode) {
+                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                                            }
+                                            validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
+                                            filterPropFunctionValueEquals = FilterUI[_validatorProps.type].template;
+                                        }
+                                        break;
                                     default:
                                         throw 'not handled model item filter generation case';
                                 }
-                            let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
 
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {
                                 property: propName,

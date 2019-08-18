@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes';
 import { UIConnect } from '../utils/utils';
+const { clipboard } = require('electron')
 import DashboardLogo from './dashboardlogo';
 import Header from './header';
 import DashboardNavBar from './dashboardnavbar';
@@ -359,6 +360,11 @@ class Dashboard extends Component {
                                 }} />
                             </SideBarTabs>
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
+                                <SideBarMenu>
+                                    <SideBarHeader onClick={() => {
+                                        clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE))
+                                    }} title={UIA.Visual(state, UIA.SELECTED_NODE)}></SideBarHeader>
+                                </SideBarMenu>
                                 {currentNode && !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (<FormControl>
                                     <TextInput
                                         label={Titles.NodeLabel}

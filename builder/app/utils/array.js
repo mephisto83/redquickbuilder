@@ -1,5 +1,3 @@
-import { GetNodeTitle } from "../actions/uiactions";
-
 export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -54,23 +52,7 @@ export function uuidv4() {
             }
         });
     }
-    if (!array.toNodeSelect) {
-        Object.defineProperty(array, 'toNodeSelect', {
-            enumerable: false,
-            writable: true,
-            configurable: true,
-            value: function () {
-                var collection = this;
-                return collection.map(node => {
-                    return {
-                        value: node.id,
-                        id: node.id,
-                        title: GetNodeTitle(node)
-                    }
-                })
-            }
-        })
-    }
+  
     if (!array.unique) {
         Object.defineProperty(array, 'unique', {
             enumerable: false,

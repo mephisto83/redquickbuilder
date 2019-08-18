@@ -26,9 +26,16 @@ class ConditionFilterMenu extends Component {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var permissionNode = UIA.GetPermissionNode(currentNode.id);
-        var methodDefinition = permissionNode ? UIA.GetMethodDefinition(permissionNode.id) : null;
-        let methodProps = UIA.GetMethodsProperties(permissionNode.id);
+        let methodProps;
+        let methodDefinition;
+        let permissionNode;
+        if (currentNode) {
+            permissionNode = UIA.GetPermissionNode(currentNode.id);
+            if (permissionNode) {
+                methodDefinition = permissionNode ? UIA.GetMethodDefinition(permissionNode.id) : null;
+                methodProps = UIA.GetMethodsProperties(permissionNode.id);
+            }
+        }
         if (methodDefinition && methodDefinition.permission && methodDefinition.permission.params && methodDefinition.permission.params.length) {
 
         }

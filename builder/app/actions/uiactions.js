@@ -3,7 +3,7 @@ var fs = require('fs');
 import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
-import { MethodFunctions } from '../constants/functiontypes';
+import { MethodFunctions, bindTemplate } from '../constants/functiontypes';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -83,6 +83,85 @@ export function GetPermissionNode(id) {
     let state = _getState();
     return GraphMethods.GetPermissionNode(state, id);
 }
+export function GetPermissionsConditions(id) {
+    return _getPermissionsConditions(_getState(), id);
+}
+export function GetConditionSetup(condition) {
+    return GetNodeProp(condition, NodeProperties.Condition);
+}
+export function GetConditionsClauses(adjacentId, clauseSetup, language) {
+    let result = [];
+
+    Object.keys(clauseSetup).map(clauseKey => {
+        let { properties } = clauseSetup[clauseKey];
+        if (properties) {
+            Object.keys(properties).map(modelId => {
+                let propertyName = GetCodeName(modelId);
+                let { validators } = properties[modelId];
+                if (validators) {
+                    Object.keys(validators).map(validatorId => {
+                        let validator = validators[validatorId];
+                        let res = GetConditionClause(adjacentId, clauseKey, propertyName, validator, language);
+                        result.push({
+                            clause: res,
+                            id: validatorId
+                        });
+                    });
+                }
+            });
+        }
+    });
+    return result;
+}
+
+export function GetConditionClause(adjacentId, clauseKey, propertyName, validator, language) {
+    let { type, template, node, nodeProperty } = validator;
+    let conditionTemplate = '';
+    let properties = {};
+    if (template) {
+        conditionTemplate = fs.readFileSync(template, 'utf8');
+    }
+    switch (type) {
+        case NodeConstants.FilterRules.IsInModelPropertyCollection:
+        case NodeConstants.FilterRules.EqualsModelProperty:
+            properties = {
+                agent: clauseKey,
+                agent_property: propertyName,
+                model: node,
+                model_property: GetCodeName(nodeProperty)
+            }
+            break;
+        default:
+            throw 'Unhandled condition clause case';
+    }
+
+    return bindTemplate(conditionTemplate, properties);
+}
+
+export function GetSelectedConditionSetup(permissionId, condition) {
+    var method = GraphMethods.GetMethodNode(_getState(), permissionId);
+    if (method) {
+        let conditionSetup = GetConditionSetup(condition);
+        if (conditionSetup && conditionSetup.methods) {
+            return conditionSetup.methods[GetNodeProp(method, NodeProperties.FunctionType)];
+        }
+        else {
+            console.log(condition);
+            console.warn('condition is improperly formed');
+        }
+    }
+    else {
+        console.warn('no method node found');
+    }
+    return null;
+}
+export function _getPermissionsConditions(state, id) {
+    let graph = GetRootGraph(state);
+    return GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
+}
+
 export function GetModelPropertyNodes(refId) {
     var state = _getState();
     return GraphMethods.GetLinkChain(state, {
@@ -293,6 +372,9 @@ export function NodesConnectedTo(state, nodeId) {
 let _getState;
 export function GetState() {
     return _getState();
+}
+export function setTestGetState(func) {
+    _getState = func;
 }
 export function setState() {
     return (dispatch, getState) => {
@@ -633,3 +715,24 @@ export function graphOperation(operation, options) {
 export const Colors = {
     SelectedNode: '#f39c12'
 };
+
+
+((array) => {
+    if (!array.toNodeSelect) {
+        Object.defineProperty(array, 'toNodeSelect', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function () {
+                var collection = this;
+                return collection.map(node => {
+                    return {
+                        value: node.id,
+                        id: node.id,
+                        title: GetNodeTitle(node)
+                    }
+                })
+            }
+        })
+    }
+})(Array.prototype);
