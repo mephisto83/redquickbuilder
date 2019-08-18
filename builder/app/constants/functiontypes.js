@@ -66,6 +66,7 @@ export const FunctionTemplateKeys = {
     Parent: 'parent',
     AgentInstance: 'agent_instance',
     Agent: 'agent',
+    Item: 'item',
     AgentProperty: 'agent-property',
     AgentType: 'agent_type',
     User: 'user',
@@ -874,9 +875,11 @@ export const MethodFunctions = {
         test: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_test.tpl', 'utf8'),
         controller: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_controller.tpl', 'utf8'),
         filter: {
-            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, FunctionTemplateKeys.ModelOutput]
         },
         permission: {
+            implementation: './app/templates/permissions/permission_method.tpl',
+            interface_: './app/templates/permissions/permission_method_interface.tpl',
             params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
         },
         constraints: {

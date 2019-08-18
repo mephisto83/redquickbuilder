@@ -1,6 +1,6 @@
-        public static Func<{{model}}, bool> Filter({{parameters}})
+        public static Func<{{model_output}}, bool> Filter({{parameters}})
         {
-            Func<{{model}}, bool> result = (item) => {
+            Func<{{model_output}}, bool> result = (item) => {
                 var res = true;
 
 {{filter}}

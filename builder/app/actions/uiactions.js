@@ -3,7 +3,7 @@ var fs = require('fs');
 import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
-import { MethodFunctions, bindTemplate } from '../constants/functiontypes';
+import { MethodFunctions, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -83,11 +83,92 @@ export function GetPermissionNode(id) {
     let state = _getState();
     return GraphMethods.GetPermissionNode(state, id);
 }
+export function GetModelItemFilter(id) {
+    let state = _getState();
+    return GraphMethods.GetModelItemFilter(state, id);
+}
 export function GetPermissionsConditions(id) {
     return _getPermissionsConditions(_getState(), id);
 }
 export function GetConditionSetup(condition) {
     return GetNodeProp(condition, NodeProperties.Condition);
+}
+
+export function GetPermissionsSortedByAgent() {
+    let state = _getState();
+    let permissions = NodesByType(state, NodeTypes.Permission);
+
+    return permissions.filter((permission) => {
+        let methodNode = GraphMethods.GetMethodNode(state, permission.id);
+        return methodNode;
+    }).groupBy(permission => {
+        let methodNode = GraphMethods.GetMethodNode(state, permission.id);
+        return GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
+    })
+}
+
+export function GetArbitersForPermissions() {
+    let state = _getState();
+    let permissions = NodesByType(state, NodeTypes.Permission);
+    let models = [];
+    permissions.map((permission) => {
+        let methodNode = GraphMethods.GetMethodNode(state, permission.id);
+        let methodProps = GetMethodProps(methodNode);
+        Object.values(methodProps).map(id => {
+            let node = GetGraphNode(id);
+            let nodeType = GetNodeProp(node, NodeProperties.NODEType);
+            if ([NodeTypes.Model].some(v => v === nodeType)) {
+                models.push(id);
+            }
+        })
+    })
+    return models.unique();
+}
+
+export function GetArbiterPropertyDefinitions(tabs = 2, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+    let arbiters = GetArbitersForPermissions();
+    let template = `IRedArbiter<{{model}}> arbiter{{model}};`
+    let tab = [].interpolate(0, tabs, () => `   `).join('');
+    let definitions = arbiters.map(arbiter => {
+        return tab + bindTemplate(template, {
+            model: GetCodeName(arbiter)
+        });
+    });
+    return definitions.join(NodeConstants.NEW_LINE);
+}
+
+export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+    let node = GetGraphNode(id);
+    let conditions = [];
+    let final_result = 'res';
+    let tabcount = 0;
+    switch (GetNodeProp(node, NodeProperties.NODEType)) {
+        case NodeTypes.Permission:
+            conditions = GetPermissionsConditions(id);;
+            final_result = 'result';
+            tabcount = 3;
+            break;
+        case NodeTypes.ModelItemFilter:
+            conditions = GetModelItemFilter(id);
+            break;
+    }
+    let tabs = [].interpolate(0, tabcount, () => `    `).join('');
+    let clauses = [];
+    conditions.map(condition => {
+        let selectedConditionSetup = GetSelectedConditionSetup(id, condition);
+        let res = GetConditionsClauses(id, selectedConditionSetup, language);
+        clauses = [...clauses, ...res.map(t => t.clause)];
+    });
+    let finalClause = clauses.map((_, index) => {
+        return `res_` + index;
+    }).join(' && ');
+    clauses.push(`${final_result} = ${finalClause};`)
+    return clauses.map((clause, index) => {
+        return tabs + bindTemplate(clause, {
+            result: `res_${index}`
+        });
+    }).join(NodeConstants.NEW_LINE)
+
 }
 export function GetConditionsClauses(adjacentId, clauseSetup, language) {
     let result = [];
@@ -387,6 +468,9 @@ export function GetGraphNode(id) {
 }
 export function GetFunctionType(methodNode) {
     return GetNodeProp(methodNode, NodeProperties.FunctionType);
+}
+export function GetMethodNode(id) {
+    return GraphMethods.GetMethodNode(_getState(), id);
 }
 export function GetMethodNodeProp(methodNode, key) {
     return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {})[key];

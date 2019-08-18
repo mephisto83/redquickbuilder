@@ -19,6 +19,7 @@ import TextInput from './textinput';
 import ButtonList from './buttonlist';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
+import { PERMISSION, FILTER } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
 class ConditionFilterMenu extends Component {
@@ -28,115 +29,66 @@ class ConditionFilterMenu extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let methodProps;
         let methodDefinition;
-        let permissionNode;
+        let methodDefinitionKey = this.props.methodDefinitionKey;
+        let interestingNode;
         if (currentNode) {
-            permissionNode = UIA.GetPermissionNode(currentNode.id);
-            if (permissionNode) {
-                methodDefinition = permissionNode ? UIA.GetMethodDefinition(permissionNode.id) : null;
-                methodProps = UIA.GetMethodsProperties(permissionNode.id);
+            switch (methodDefinitionKey) {
+                case PERMISSION:
+                    interestingNode = UIA.GetPermissionNode(currentNode.id);
+                    break;
+                case FILTER:
+                    interestingNode = UIA.GetModelItemFilter(currentNode.id);
+                    break;
+
+            }
+            if (interestingNode) {
+                methodDefinition = interestingNode ? UIA.GetMethodDefinition(interestingNode.id) : null;
+                methodProps = UIA.GetMethodsProperties(interestingNode.id);
             }
         }
-        if (methodDefinition && methodDefinition.permission && methodDefinition.permission.params && methodDefinition.permission.params.length) {
+        if (methodDefinition && methodDefinition[methodDefinitionKey] && methodDefinition[methodDefinitionKey].params && methodDefinition[methodDefinitionKey].params.length) {
 
         }
         else {
             active = false;
             return <div></div>
         }
-        let filterParameters = UIA.GetMethodPermissionParameters(permissionNode.id);
+        let filterParameters = UIA.GetMethodPermissionParameters(interestingNode.id);
 
         let id = currentNode.id;
-        // let condition = UIA.GetNodeProp(currentNode, NodeProperties.Condition);
-        // if (!condition)
-        //     return (
-        //         <TabPane active={active}>
-        //             <ControlSideBarMenu>
-        //                 {!condition ? (<ControlSideBarMenuItem onClick={() => {
-        //                     condition = UIA.GetNodeProp(currentNode, NodeProperties.Condition) || createExecutor();
-        //                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-        //                         id,
-        //                         prop: NodeProperties.Condition,
-        //                         value: condition
-        //                     })
-        //                 }} icon={'fa fa-puzzle-piece'} title={Titles.AddCondition} description={Titles.AddCondition} />) : null}
-        //             </ControlSideBarMenu>
-        //         </TabPane>
-        //     );
-        let models = methodDefinition.permission.params.map(t => {
+        let models = methodDefinition[methodDefinitionKey].params.map(t => {
             return {
                 title: `${UIA.GetNodeTitle(methodProps[t])} (${t})`,
                 value: t,
                 id: t
             }
         });
-        let methodFunctionType = UIA.GetMethodFunctionType(permissionNode.id);
+        let methodFunctionType = UIA.GetMethodFunctionType(interestingNode.id);
         let methodFunctionValidation = UIA.GetNodeProp(currentNode, NodeProperties.Condition);// UIA.GetMethodFunctionValidation(permissionNode.id);
         let param_list_key = `${currentNode.id} ${methodFunctionType}`;
         let param = UIA.Visual(state, param_list_key);
         let param_property_list_key = UIA.Visual(state, param_list_key) ? `${param_list_key} ${param}` : null;
         let selectedParameter = UIA.Visual(state, param_list_key);
         let model_properties = UIA.GetModelPropertyChildren(methodProps[param]).toNodeSelect();
-        let top = (<SideBarMenu relative={true}>
-            <TreeViewMenu
-                open={UIA.Visual(state, CONDITION_FILTER_MENU_PARAMETER)}
-                active={UIA.Visual(state, CONDITION_FILTER_MENU_PARAMETER)}
-                title={`${UIA.GetNodeTitle(methodProps[selectedParameter])} (${selectedParameter})` || 'Parameters'}
-                toggle={() => {
-                    this.props.toggleVisual(CONDITION_FILTER_MENU_PARAMETER)
-                }}>
-                <SideBarHeader title={'Parameters'} />
-                <ButtonList
-                    active={true}
-                    isSelected={(item) => {
-                        return item && selectedParameter === item.id;
-                    }}
-                    items={models}
-                    onClick={(item) => {
-                        let methodValidationForParameter = addMethodValidationForParamter(methodFunctionValidation, methodFunctionType, item.id);
-                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.Condition,
-                            id: currentNode.id,
-                            value: methodValidationForParameter
-                        });
-                        this.props.setVisual(param_list_key, item.id);
-                    }}></ButtonList>
-            </TreeViewMenu>
-            <TreeViewMenu
-                open={UIA.Visual(state, CONDITION_FILTER_MENU_PARAMETER_PROPERTIES)}
-                active={UIA.Visual(state, CONDITION_FILTER_MENU_PARAMETER_PROPERTIES)}
-                title={UIA.GetNodeTitle(UIA.Visual(state, param_property_list_key)) || 'Parameter Properties'}
-                toggle={() => {
-                    this.props.toggleVisual(CONDITION_FILTER_MENU_PARAMETER_PROPERTIES)
-                }}>
-                <SideBarHeader title={'Parameter Properties'} />
-                {param_property_list_key ? (<ButtonList
-                    active={true}
-                    isSelected={(item) => {
-                        return item && UIA.Visual(state, param_property_list_key) === item.id;
-                    }}
-                    items={model_properties}
-                    onClick={(item) => {
-                        let methodValidationForParameter = addMethodValidationForParamter(
-                            methodFunctionValidation,
-                            methodFunctionType,
-                            UIA.Visual(state, param_list_key),
-                            item.id);
-                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.Condition,
-                            id: currentNode.id,
-                            value: methodValidationForParameter
-                        });
-                        this.props.setVisual(param_property_list_key, item.id)
-                    }}></ButtonList>) : null}
-            </TreeViewMenu>
-        </SideBarMenu>
-        )
+        let top = this.getTop({
+            model_properties,
+            methodProps,
+            selectedParameter,
+            filterMenuParameter: `${currentNode.id}${CONDITION_FILTER_MENU_PARAMETER}`,
+            filterMenuParameterProperties: `${currentNode.id} ${CONDITION_FILTER_MENU_PARAMETER_PROPERTIES}`,
+            param_list_key,
+            methodFunctionValidation,
+            models,
+            methodFunctionType,
+            param_property_list_key
+        });
 
         let methodParamSetup = getMethodValidationForParameter(
             methodFunctionValidation,
             methodFunctionType,
             UIA.Visual(state, param_list_key),
             UIA.Visual(state, param_property_list_key));
+
         let updateValidation = () => {
             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.Condition,
@@ -160,11 +112,85 @@ class ConditionFilterMenu extends Component {
                 methodParamSetup={methodParamSetup}
                 nodeType={NodeTypes.Condition}
                 onRemove={onRemoveValidation}
-                adjacentNodeId={permissionNode.id}
+                adjacentNodeId={interestingNode.id}
                 onChange={updateValidation}
                 onAdd={updateValidation}
             />
         </GenericPropertyContainer>)
+    }
+    getTop(args = {}) {
+        let {
+            methodProps,
+            model_properties,
+            models,
+            selectedParameter,
+            filterMenuParameter = CONDITION_FILTER_MENU_PARAMETER,
+            filterMenuParameterProperties = CONDITION_FILTER_MENU_PARAMETER_PROPERTIES,
+            param_list_key,
+            methodFunctionValidation,
+            methodFunctionType,
+            param_property_list_key
+        } = args;
+
+        let { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        return (
+            (<SideBarMenu relative={true}>
+                <TreeViewMenu
+                    open={UIA.Visual(state, filterMenuParameter)}
+                    active={UIA.Visual(state, filterMenuParameter)}
+                    title={`${UIA.GetNodeTitle(methodProps[selectedParameter])} (${selectedParameter})` || 'Parameters'}
+                    toggle={() => {
+                        this.props.toggleVisual(filterMenuParameter)
+                    }}>
+                    <SideBarHeader title={'Parameters'} />
+                    <ButtonList
+                        active={true}
+                        isSelected={(item) => {
+                            return item && selectedParameter === item.id;
+                        }}
+                        items={models}
+                        onClick={(item) => {
+                            let methodValidationForParameter = addMethodValidationForParamter(methodFunctionValidation, methodFunctionType, item.id);
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Condition,
+                                id: currentNode.id,
+                                value: methodValidationForParameter
+                            });
+                            this.props.setVisual(param_list_key, item.id);
+                        }}></ButtonList>
+                </TreeViewMenu>
+                <TreeViewMenu
+                    open={UIA.Visual(state, filterMenuParameterProperties)}
+                    active={UIA.Visual(state, filterMenuParameterProperties)}
+                    title={UIA.GetNodeTitle(UIA.Visual(state, param_property_list_key)) || 'Parameter Properties'}
+                    toggle={() => {
+                        this.props.toggleVisual(filterMenuParameterProperties)
+                    }}>
+                    <SideBarHeader title={'Parameter Properties'} />
+                    {param_property_list_key ? (<ButtonList
+                        active={true}
+                        isSelected={(item) => {
+                            return item && UIA.Visual(state, param_property_list_key) === item.id;
+                        }}
+                        items={model_properties}
+                        onClick={(item) => {
+                            let methodValidationForParameter = addMethodValidationForParamter(
+                                methodFunctionValidation,
+                                methodFunctionType,
+                                UIA.Visual(state, param_list_key),
+                                item.id);
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Condition,
+                                id: currentNode.id,
+                                value: methodValidationForParameter
+                            });
+                            this.props.setVisual(param_property_list_key, item.id)
+                        }}></ButtonList>) : null}
+                </TreeViewMenu>
+            </SideBarMenu>
+            )
+        )
     }
 }
 

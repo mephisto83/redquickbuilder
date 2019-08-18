@@ -1484,6 +1484,12 @@ export function GetPermissionNode(state, id) {
         id
     }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Permission);
 }
+export function GetModelItemFilter(state, id) {
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ModelItemFilter);
+}
 export function GetLinkChain(state, options) {
     let graph = GetCurrentGraph(state);
     return GetLinkChainFromGraph(graph, options);

@@ -11,6 +11,7 @@ export default class ButtonList extends Component {
             <TabPane active={this.props.active}>
                 {(this.props.items || []).map((item) => {
                     return <div
+                        title={item.title}
                         key={`allowed-${item.id}`} className={`external-event ${this.props.isSelected(item) ? 'bg-red' : 'bg-green'}`}
                         style={{
                             cursor: 'pointer',
