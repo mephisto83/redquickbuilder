@@ -83,6 +83,10 @@ export function GetPermissionNode(id) {
     let state = _getState();
     return GraphMethods.GetPermissionNode(state, id);
 }
+export function GetValidationNode(id) {
+    let state = _getState();
+    return GraphMethods.GetValidationNode(state, id);
+}
 export function GetModelItemFilter(id) {
     let state = _getState();
     return GraphMethods.GetModelItemFilter(state, id);
@@ -90,13 +94,24 @@ export function GetModelItemFilter(id) {
 export function GetPermissionsConditions(id) {
     return _getPermissionsConditions(_getState(), id);
 }
+export function GetValidationsConditions(id) {
+    return _getValidationConditions(_getState(), id);
+}
 export function GetConditionSetup(condition) {
     return GetNodeProp(condition, NodeProperties.Condition);
 }
 
 export function GetPermissionsSortedByAgent() {
+    return GetNodesSortedByAgent(NodeTypes.Permission);
+}
+
+export function GetValidationsSortedByAgent() {
+    return GetNodesSortedByAgent(NodeTypes.Permission);
+}
+
+export function GetNodesSortedByAgent(type) {
     let state = _getState();
-    let permissions = NodesByType(state, NodeTypes.Permission);
+    let permissions = NodesByType(state, type);
 
     return permissions.filter((permission) => {
         let methodNode = GraphMethods.GetMethodNode(state, permission.id);
@@ -107,9 +122,9 @@ export function GetPermissionsSortedByAgent() {
     })
 }
 
-export function GetArbitersForPermissions() {
+export function GetArbitersForNodeType(type) {
     let state = _getState();
-    let permissions = NodesByType(state, NodeTypes.Permission);
+    let permissions = NodesByType(state, type);
     let models = [];
     permissions.map((permission) => {
         let methodNode = GraphMethods.GetMethodNode(state, permission.id);
@@ -123,6 +138,16 @@ export function GetArbitersForPermissions() {
         })
     })
     return models.unique();
+}
+export function GetAgentNodes() {
+    return NodesByType(_getState(), NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent));
+}
+export function GetArbitersForPermissions() {
+    return GetArbitersForNodeType(NodeTypes.Permission);
+}
+
+export function GetArbitersForValidations() {
+    return GetArbitersForNodeType(NodeTypes.Validator);
 }
 
 export function GetNameSpace() {
@@ -262,6 +287,13 @@ export function GetSelectedConditionSetup(permissionId, condition) {
     return null;
 }
 export function _getPermissionsConditions(state, id) {
+    return _getConditions(state, id);
+}
+
+export function _getValidationConditions(state, id) {
+    return _getConditions(state, id);
+}
+export function _getConditions(state, id) {
     let graph = GetRootGraph(state);
     return GraphMethods.GetNodesLinkedTo(graph, {
         id
@@ -543,6 +575,9 @@ function GetMethod_Parameters(id, key) {
 }
 export function GetMethodPermissionParameters(id) {
     return GetMethod_Parameters(id, 'permission');
+}
+export function GetMethodValidationParameters(id) {
+    return GetMethod_Parameters(id, 'validation');
 }
 export function GetPermissionMethod(permission) {
     return GetLinkChainItem({

@@ -756,6 +756,13 @@ const PERMISSION_DEFAULTS = {
     interface_: './app/templates/permissions/permission_method_interface.tpl',
     params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
 }
+
+const VALIDATION_DEFAULTS = {
+    implementation: './app/templates/validation/validation_method.tpl',
+    interface_: './app/templates/validation/validation_method_interface.tpl',
+    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+};
+
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
@@ -818,9 +825,13 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
+        validation: {
+            ...VALIDATION_DEFAULTS
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
-        }, output: {
+        },
+        output: {
             ...COMMON_OUTPUT.LIST
         },
         isList: true,

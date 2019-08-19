@@ -9,7 +9,7 @@ import TabPane from './tabpane';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
-import { NodeProperties } from '../constants/nodetypes';
+import { NodeProperties, LinkProperties } from '../constants/nodetypes';
 
 class ValidatorActivityMenu extends Component {
     render() {
@@ -108,6 +108,16 @@ class ValidatorActivityMenu extends Component {
                         }}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ValidatorFunction] : ''} />
                 </FormControl>) : null}
+                <button type="submit" className="btn btn-primary" onClick={() => {
+                    this.props.graphOperation(UIA.NEW_CONDITION_NODE, {
+                        parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                        groupProperties: {
+                        },
+                        linkProperties: {
+                            properties: { ...LinkProperties.ConditionLink }
+                        }
+                    });
+                }}>{Titles.AddCondition}</button>
             </TabPane>
         );
     }

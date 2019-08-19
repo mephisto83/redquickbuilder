@@ -19,7 +19,7 @@ import TextInput from './textinput';
 import ButtonList from './buttonlist';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
-import { PERMISSION, FILTER } from '../constants/condition';
+import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
 class ConditionFilterMenu extends Component {
@@ -38,6 +38,9 @@ class ConditionFilterMenu extends Component {
                     break;
                 case FILTER:
                     interestingNode = UIA.GetModelItemFilter(currentNode.id);
+                    break;
+                case VALIDATION:
+                    interestingNode = UIA.GetValidationNode(currentNode.id);
                     break;
 
             }

@@ -410,6 +410,8 @@ class Dashboard extends Component {
                                 {/* <ConditionActivityMenu /> */}
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
+                                <ConditionFilterMenu methodDefinitionKey={'validation'} />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
                                 <ConditionFilterMenu methodDefinitionKey={'permission'} />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
                                 <ConditionFilterMenu methodDefinitionKey={'filter'} />) : null}

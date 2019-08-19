@@ -1,8 +1,17 @@
 import * as NodeTypes from '../app/constants/nodetypes';
 import fs from 'fs';
-import { NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION, GetCurrentGraph, GRAPH_SCOPE, Application } from '../app/actions/uiactions';
+import {
+  NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION, GetCurrentGraph, GRAPH_SCOPE, Application,
+  setTestGetState, GetRootGraph, _getValidationConditions, GetMethodNode,
+  GetMethodValidationParameters, GetValidationsConditions, GetConditionSetup,
+  GetSelectedConditionSetup, GetConditionsClauses, GetCombinedCondition, GetValidationsSortedByAgent,
+  GetArbitersForValidations, GetArbiterPropertyDefinitions, GetArbiterPropertyImplementations
+} from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
+import { GetNode } from '../app/methods/graph_methods';
+import { GetValidationMethodImplementation, GetValidationMethodParameters, GetValidationMethodParametersImplementation, GetValidationMethodInterface, GetAgentValidationInterface, GetAgentValidationImplementation, GenerateAgentValidationInterfacesAndImplementations } from '../app/service/validationservice';
 
+var smash_36 = fs.readFileSync(`./test/smash_36.rqb`, 'utf8');
 
 describe('description', () => {
   it('should have description', () => {
@@ -82,4 +91,130 @@ describe('validation relationship', () => {
     expect(nodes.length).toBeFalsy();
   });
 
+});
+
+
+describe('description', () => {
+  let validationId = '8161fdef-de59-4d44-85c1-ae6f2b45c389';
+  let customerId = 'ba34fc88-4aaa-456a-b1d3-d56cd5a5b3c2';
+  let graph = JSON.parse(smash_36);
+  let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph))
+  state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
+  let nodes = NodesByType({ uiReducer: state }, NodeTypes.NodeTypes.Model);
+  let app_state = { uiReducer: state };
+  let validation = GetNode(graph, validationId);
+  let customer = GetNode(graph, customerId);
+  setTestGetState(() => {
+    return app_state;
+  });
+
+  it('should find a permission', () => {
+    expect(validation).toBeTruthy();
+    expect(validation.id === validationId).toBeTruthy();
+  });
+  it('GetRootGraph', () => {
+    expect(GetRootGraph(app_state)).toBeTruthy();
+  })
+  it('should find the conditions connected to a validation', () => {
+    let conditions = _getValidationConditions(app_state, validation.id);
+    expect(conditions).toBeTruthy();
+    expect(conditions.length).toBe(1);
+  });
+
+  it('should get the validation method', () => {
+    let method = GetMethodNode(validation.id);
+    expect(method).toBeTruthy();
+  });
+
+  it(`it should get the method's validation's parameters`, () => {
+    let permissionParameters = GetMethodValidationParameters(validationId);
+    expect(permissionParameters).toBeTruthy();
+    expect(permissionParameters.length).toBe(2);
+  });
+
+  it('get conditions setup', () => {
+    let conditions = GetValidationsConditions(validationId);
+    let condition = conditions[0];
+    expect(condition).toBeTruthy();
+    let conditionSetup = GetConditionSetup(condition);
+    expect(conditionSetup).toBeTruthy();
+    let selectedConditionSetup = GetSelectedConditionSetup(validationId, condition);
+    expect(selectedConditionSetup).toBeTruthy();
+  });
+
+  it('get conditions clause in c#', () => {
+    let conditions = GetValidationsConditions(validationId);
+    let condition = conditions[0];
+    let selectedConditionSetup = GetSelectedConditionSetup(validationId, condition);
+    let clauses = GetConditionsClauses(validationId, selectedConditionSetup, NodeTypes.ProgrammingLanguages.CSHARP);
+    expect(clauses).toBeTruthy();
+    expect(clauses.length).toBe(1);
+  });
+
+  it('get combined condition result in c#', () => {
+    let combinedCondition = GetCombinedCondition(validationId);
+    expect(combinedCondition).toBeTruthy();
+  });
+
+  it('get validations sorted by agent', () => {
+    let validationSortedByAgent = GetValidationsSortedByAgent();
+    expect(validationSortedByAgent).toBeTruthy();
+  });
+
+  it('get arbiters for validations', () => {
+    let arbiters = GetArbitersForValidations(validationId);
+    expect(arbiters).toBeTruthy();
+    expect(arbiters.length).toBeTruthy();
+  });
+
+  it('get arbiter property definitions', () => {
+    let arbiters = GetArbiterPropertyDefinitions();
+    expect(arbiters).toBeTruthy();
+    expect(arbiters.length).toBeTruthy();
+  });
+
+  it('get arbiter property implementations', () => {
+    let arbiters = GetArbiterPropertyImplementations();
+    expect(arbiters).toBeTruthy();
+    expect(arbiters.length).toBeTruthy();
+  });
+
+  it('get validations method implementation', () => {
+    let implementation = GetValidationMethodImplementation(validationId);
+    expect(implementation).toBeTruthy();
+  });
+
+  it('get validations parameters', () => {
+    let parameters = GetValidationMethodParameters(validationId);
+    expect(parameters).toBeTruthy();
+  });
+
+  it('get validations parameters in C#', () => {
+    let parameters = GetValidationMethodParametersImplementation(validationId, NodeTypes.ProgrammingLanguages.CSHARP);
+    expect(parameters).toBeTruthy();
+  });
+
+  it('get validation method interface', () => {
+    let _interface = GetValidationMethodInterface(validationId);
+    expect(_interface);
+  });
+
+
+  it('get agent validation interface', () => {
+    let agentpermissioninterface = GetAgentValidationInterface(customerId);
+    expect(agentpermissioninterface).toBeTruthy();
+    console.log(agentpermissioninterface);
+  });
+
+  it('get agent validation implentation', () => {
+    let agentpermissioninterface = GetAgentValidationImplementation(customerId);
+    expect(agentpermissioninterface).toBeTruthy();
+    console.log(agentpermissioninterface);
+  });
+  
+  it('generate agents validation interfaces and implementations', () => {
+    let results = GenerateAgentValidationInterfacesAndImplementations();
+    expect(results).toBeTruthy();
+    expect(Object.keys(results).length).toBeTruthy();
+  })
 });
