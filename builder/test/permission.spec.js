@@ -1,9 +1,13 @@
 import * as NodeTypes from '../app/constants/nodetypes';
 import fs from 'fs';
-import { NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION, GetCurrentGraph, GRAPH_SCOPE, Application, setTestGetState, GetRootGraph, _getPermissionsConditions, GetMethodPermissionParameters, GetNodeTitle, GetPermissionsConditions, GetConditionSetup, GetSelectedConditionSetup, GetConditionsClauses, GetCombinedCondition, GetPermissionsSortedByAgent, GetArbitersForPermissions, GetArbiterPropertyDefinitions } from '../app/actions/uiactions';
+import { NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION, GetCurrentGraph, GRAPH_SCOPE, Application, setTestGetState, GetRootGraph, _getPermissionsConditions, GetMethodPermissionParameters, GetNodeTitle, GetPermissionsConditions, GetConditionSetup, GetSelectedConditionSetup, GetConditionsClauses, GetCombinedCondition, GetPermissionsSortedByAgent, GetArbitersForPermissions, GetArbiterPropertyDefinitions, GetArbiterPropertyImplementations } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GetNode, GetMethodNode } from '../app/methods/graph_methods';
-import { GetPermissionMethodImplementation, GetPermissionMethodParameters, GetPermissionMethodParametersImplementation, GetPermissionMethodInterface } from '../app/service/permissionservice';
+import {
+    GetPermissionMethodImplementation, GetPermissionMethodParameters,
+    GetPermissionMethodParametersImplementation, GetPermissionMethodInterface,
+    GetAgentPermissionInterface, GetAgentPermissionImplementation
+} from '../app/service/permissionservice';
 var smash_35 = fs.readFileSync(`./test/smash_35.rqb`, 'utf8');
 
 describe('description', () => {
@@ -83,7 +87,13 @@ describe('description', () => {
         let arbiters = GetArbiterPropertyDefinitions();
         expect(arbiters).toBeTruthy();
         expect(arbiters.length).toBeTruthy();
-    })
+    });
+
+    it('get arbiter property implementations', () => {
+        let arbiters = GetArbiterPropertyImplementations();
+        expect(arbiters).toBeTruthy();
+        expect(arbiters.length).toBeTruthy();
+    });
 
     it('get permissions method implementation', () => {
         let implementation = GetPermissionMethodImplementation(permissionId);
@@ -105,8 +115,16 @@ describe('description', () => {
         expect(_interface);
     });
 
+
     it('get agent permission interface', () => {
         let agentpermissioninterface = GetAgentPermissionInterface(customerId);
         expect(agentpermissioninterface).toBeTruthy();
-    })
+        console.log(agentpermissioninterface);
+    });
+
+    it('get agent permission implentation', () => {
+        let agentpermissioninterface = GetAgentPermissionImplementation(customerId);
+        expect(agentpermissioninterface).toBeTruthy();
+        console.log(agentpermissioninterface);
+    });
 });

@@ -125,7 +125,17 @@ export function GetArbitersForPermissions() {
     return models.unique();
 }
 
-export function GetArbiterPropertyDefinitions(tabs = 2, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+export function GetNameSpace() {
+    let state = _getState();
+
+    let graphRoot = GetRootGraph(state);
+
+    let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+
+    return namespace;
+}
+
+export function GetArbiterPropertyDefinitions(tabs = 3, language = NodeConstants.ProgrammingLanguages.CSHARP) {
     let arbiters = GetArbitersForPermissions();
     let template = `IRedArbiter<{{model}}> arbiter{{model}};`
     let tab = [].interpolate(0, tabs, () => `   `).join('');
@@ -136,6 +146,20 @@ export function GetArbiterPropertyDefinitions(tabs = 2, language = NodeConstants
     });
     return definitions.join(NodeConstants.NEW_LINE);
 }
+
+export function GetArbiterPropertyImplementations(tabs = 4, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+    let arbiters = GetArbitersForPermissions();
+    let template = `arbiter{{model}} = RedStrapper.Resolve<IRedArbiter<{{model}}>>();`
+    let tab = [].interpolate(0, tabs, () => `   `).join('');
+    let definitions = arbiters.map(arbiter => {
+        return tab + bindTemplate(template, {
+            model: GetCodeName(arbiter)
+        });
+    });
+    return definitions.join(NodeConstants.NEW_LINE);
+}
+
+
 
 export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLanguages.CSHARP) {
     let node = GetGraphNode(id);
@@ -161,7 +185,7 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
     });
     let finalClause = clauses.map((_, index) => {
         return `res_` + index;
-    }).join(' && ');
+    }).join(' && ') || 'true';
     clauses.push(`${final_result} = ${finalClause};`)
     return clauses.map((clause, index) => {
         return tabs + bindTemplate(clause, {
@@ -172,26 +196,27 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
 }
 export function GetConditionsClauses(adjacentId, clauseSetup, language) {
     let result = [];
-
-    Object.keys(clauseSetup).map(clauseKey => {
-        let { properties } = clauseSetup[clauseKey];
-        if (properties) {
-            Object.keys(properties).map(modelId => {
-                let propertyName = GetCodeName(modelId);
-                let { validators } = properties[modelId];
-                if (validators) {
-                    Object.keys(validators).map(validatorId => {
-                        let validator = validators[validatorId];
-                        let res = GetConditionClause(adjacentId, clauseKey, propertyName, validator, language);
-                        result.push({
-                            clause: res,
-                            id: validatorId
+    if (clauseSetup) {
+        Object.keys(clauseSetup).map(clauseKey => {
+            let { properties } = clauseSetup[clauseKey];
+            if (properties) {
+                Object.keys(properties).map(modelId => {
+                    let propertyName = GetCodeName(modelId);
+                    let { validators } = properties[modelId];
+                    if (validators) {
+                        Object.keys(validators).map(validatorId => {
+                            let validator = validators[validatorId];
+                            let res = GetConditionClause(adjacentId, clauseKey, propertyName, validator, language);
+                            result.push({
+                                clause: res,
+                                id: validatorId
+                            });
                         });
-                    });
-                }
-            });
-        }
-    });
+                    }
+                });
+            }
+        });
+    }
     return result;
 }
 

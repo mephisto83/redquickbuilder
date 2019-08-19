@@ -751,13 +751,20 @@ export const COMMON_FUNCTION_TEMPLATE_KEYS = {
 //     }
 // }
 
-
+const PERMISSION_DEFAULTS = {
+    implementation: './app/templates/permissions/permission_method.tpl',
+    interface_: './app/templates/permissions/permission_method_interface.tpl',
+    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+}
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
         template: fs.readFileSync('./app/templates/standard/create_model_agent_object.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_model_agent_object_interface.tpl', 'utf8'),
         templates: {
+        },
+        permission: {
+            ...PERMISSION_DEFAULTS,
         },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
@@ -775,6 +782,9 @@ export const MethodFunctions = {
         filter: {
             params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
         },
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
         }, output: {
@@ -788,9 +798,13 @@ export const MethodFunctions = {
         title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
         template: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD
-        }, output: {
+        },
+        output: {
             ...COMMON_OUTPUT.OBJECT
         },
         isList: false,
@@ -801,6 +815,9 @@ export const MethodFunctions = {
         title: Titles.Create_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -814,6 +831,9 @@ export const MethodFunctions = {
         title: Titles.Update_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/update_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/update_model_agent_listobject_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -827,6 +847,9 @@ export const MethodFunctions = {
         title: Titles.Update_Object_Agent_Value__Object,
         template: fs.readFileSync('./app/templates/standard/update_model_agent_object.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -840,6 +863,9 @@ export const MethodFunctions = {
         title: Titles.Update_Object_Agent_Value__Object_With_Object,
         template: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         templates: {
         },
         constraints: {
@@ -859,6 +885,9 @@ export const MethodFunctions = {
         title: Titles.Delete_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/delete_model_agent_listobject_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -878,9 +907,7 @@ export const MethodFunctions = {
             params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, FunctionTemplateKeys.ModelOutput]
         },
         permission: {
-            implementation: './app/templates/permissions/permission_method.tpl',
-            interface_: './app/templates/permissions/permission_method_interface.tpl',
-            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+            ...PERMISSION_DEFAULTS,
         },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
@@ -895,6 +922,9 @@ export const MethodFunctions = {
         title: Titles.Get_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         }, output: {
@@ -908,6 +938,9 @@ export const MethodFunctions = {
         title: Titles.Create_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/create_agent_childparent_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/create_agent_childparent_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -921,6 +954,9 @@ export const MethodFunctions = {
         title: Titles.Update_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/update_agent_childparent_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/update_agent_childparent_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -934,6 +970,9 @@ export const MethodFunctions = {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -949,6 +988,9 @@ export const MethodFunctions = {
         title: Titles.Get_Object_Agent_Value__Object,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/get_model_agent_object_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
         }, output: {
@@ -962,6 +1004,9 @@ export const MethodFunctions = {
         title: Titles.Get_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
         }, output: {
@@ -976,6 +1021,9 @@ export const MethodFunctions = {
         title: Titles.Create_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_agent_manytomany_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -989,6 +1037,9 @@ export const MethodFunctions = {
         title: Titles.Update_ManyToMany_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/update_agent_manytomany_listchild_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -1001,6 +1052,9 @@ export const MethodFunctions = {
     [FunctionTypes.Can_Execute_Agent_Parent_In_Valid_List]: {
         title: Titles.Can_Execute_Agent_Parent_In_Valid_List,
         template: fs.readFileSync('./app/templates/can_execute/can_execute_childparent_valid_list.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+        },
         constraints: {
             [FunctionTemplateKeys.AgentType]: {
                 [FunctionConstraintKeys.IsAgent]: true,

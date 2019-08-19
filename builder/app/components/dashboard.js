@@ -407,7 +407,7 @@ class Dashboard extends Component {
                                         }} />
                                 </FormControl>) : null}
                                 <ChoiceListItemActivityMenu />
-                                <ConditionActivityMenu />
+                                {/* <ConditionActivityMenu /> */}
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
                                 <ConditionFilterMenu methodDefinitionKey={'permission'} />) : null}

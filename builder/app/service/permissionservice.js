@@ -1,13 +1,21 @@
-import { GetMethodNode, GetMethodDefinition, GetMethodNodeProp, GetCodeName, GetCombinedCondition, GetPermissionsSortedByAgent } from "../actions/uiactions";
-import { MethodTemplateKeys, bindTemplate } from "../constants/functiontypes";
+import {
+    GetMethodNode, GetMethodDefinition, GetMethodNodeProp, GetCodeName,
+    GetCombinedCondition, GetPermissionsSortedByAgent, GetNameSpace,
+    GetArbiterPropertyDefinitions,
+    GetNodeCode,
+    GetArbiterPropertyImplementations
+} from "../actions/uiactions";
+import { bindTemplate } from "../constants/functiontypes";
 import fs from 'fs';
-import { ProgrammingLanguages } from "../constants/nodetypes";
+import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from "../constants/nodetypes";
+import NamespaceGenerator from "../generators/namespacegenerator";
 function GetMethodDefinitionPermissionSection(id) {
     let methodDefinition = GetMethodDefinition(id);
-    if (methodDefinition.permission) {
+    if (methodDefinition && methodDefinition.permission) {
         return methodDefinition.permission;
     }
-    throw 'doesnt define a permission for method type ' + methodDefinition.title;
+    console.warn('doesnt define a permission for method type ');
+    return false;
 }
 
 export function GetPermissionMethodImplementation(id, language = ProgrammingLanguages.CSHARP) {
@@ -26,6 +34,9 @@ export function GetPermissionMethodImplementation(id, language = ProgrammingLang
 
 export function GetPermissionMethodInterface(id, language = ProgrammingLanguages.CSHARP) {
     let permissionSection = GetMethodDefinitionPermissionSection(id);
+    if (!permissionSection) {
+        return false;
+    }
     let { interface_ } = permissionSection;
 
     let interface_template = fs.readFileSync(interface_, 'utf8');
@@ -40,11 +51,75 @@ export function GetPermissionMethodInterface(id, language = ProgrammingLanguages
 export function GetAgentPermissionInterface(agentId) {
     let dictionary = GetPermissionsSortedByAgent();
     if (dictionary && dictionary[agentId]) {
-
+        let namespace = GetNameSpace();
+        let interface_ = BuildAgentPermissionInterface(agentId, dictionary[agentId].map(t => t.id));
+        return NamespaceGenerator.Generate({
+            template: interface_,
+            usings: [
+                ...STANDARD_CONTROLLER_USING,
+                `${namespace}${NameSpace.Interface}`,
+                `${namespace}${NameSpace.Model}`
+            ],
+            namespace,
+            space: NameSpace.Interface
+        });
     }
     else {
         throw 'agent doesnt have any permissions';
     }
+}
+
+export function GetAgentPermissionImplementation(agentId) {
+    let dictionary = GetPermissionsSortedByAgent();
+    if (dictionary && dictionary[agentId]) {
+        let namespace = GetNameSpace();
+        let implementation = BuildAgentPermissionImplementation(agentId, dictionary[agentId].map(t => t.id));
+        return NamespaceGenerator.Generate({
+            template: implementation,
+            usings: [
+                ...STANDARD_CONTROLLER_USING,
+                `${namespace}${NameSpace.Extensions}`,
+                `${namespace}${NameSpace.Model}`,
+                `${namespace}${NameSpace.Interface}`,
+                `${namespace}${NameSpace.Controllers}`,
+                `${namespace}${NameSpace.Constants}`].filter(x => x),
+            namespace,
+            space: NameSpace.Permissions
+        });
+    }
+    else {
+        throw 'agent doesnt have any permissions';
+    }
+}
+
+export function BuildAgentPermissionInterface(agentId, permissions, language = ProgrammingLanguages.CSHARP) {
+    let methods = permissions.map(permission => {
+        return GetPermissionMethodInterface(permission, language);
+    }).filter(x => x).join(NEW_LINE);
+    let template = fs.readFileSync('./app/templates/permissions/permissions_interface.tpl', 'utf8');
+
+    return bindTemplate(template, {
+        agent_type: GetCodeName(agentId),
+        methods
+    });
+}
+
+export function BuildAgentPermissionImplementation(agentId, permissions, language = ProgrammingLanguages.CSHARP) {
+    let methods = permissions.map(permission => {
+        return GetPermissionMethodImplementation(permission, language);
+    }).filter(x => x).join(NEW_LINE);
+    let template = fs.readFileSync('./app/templates/permissions/permissions_impl.tpl', 'utf8');
+    let _constructTemplate = fs.readFileSync('./app/templates/permissions/constructor.tpl', 'utf8');
+    let constructor = bindTemplate(_constructTemplate, {
+        agent_type: `${GetCodeName(agentId)}`,
+        arbiters: GetArbiterPropertyImplementations(4, language)
+    });
+    return bindTemplate(template, {
+        agent_type: GetCodeName(agentId),
+        arbiters: GetArbiterPropertyDefinitions(),
+        constructor,
+        methods
+    });
 }
 
 export function GetPermissionMethodParameters(id) {
