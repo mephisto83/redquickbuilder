@@ -40,7 +40,7 @@ export const NodeTypes = {
 }
 export const ExcludeDefaultNode = {
     [NodeTypes.Condition]: true,
-    [NodeTypes.ModelItemFilter]: true
+    [NodeTypes.ModelItemFilter]: false
 };
 export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',

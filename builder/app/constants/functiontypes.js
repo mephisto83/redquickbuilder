@@ -70,6 +70,7 @@ export const FunctionTemplateKeys = {
     AgentProperty: 'agent-property',
     AgentType: 'agent_type',
     User: 'user',
+    ConnectionType: 'connect_type',
     ManyToManyModel: 'many_to_many',
     Method: 'method',
     MethodType: 'method_type',
@@ -184,6 +185,7 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT = {
         [FunctionConstraintKeys.IsInputVariable]: true
     }
 };
+
 
 
 const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
@@ -402,13 +404,9 @@ const COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD = {
         key: FunctionTemplateKeys.Model,
         nodeTypes: [NodeTypes.Model]
     },
-    [FunctionTemplateKeys.Parent]: {
-        key: FunctionTemplateKeys.Parent,
+    [FunctionTemplateKeys.ModelOutput]: {
+        key: FunctionTemplateKeys.ModelOutput,
         nodeTypes: [NodeTypes.Model]
-    },
-    [FunctionTemplateKeys.Property]: {
-        key: FunctionTemplateKeys.Property,
-        nodeTypes: [NodeTypes.Property]
     },
     [FunctionTemplateKeys.Agent]: {
         [NodeProperties.IsAgent]: true,
@@ -441,8 +439,8 @@ const COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD = {
         key: FunctionTemplateKeys.Model,
         nodeTypes: [NodeTypes.Model]
     },
-    [FunctionTemplateKeys.Parent]: {
-        key: FunctionTemplateKeys.Parent,
+    [FunctionTemplateKeys.ModelOutput]: {
+        key: FunctionTemplateKeys.ModelOutput,
         nodeTypes: [NodeTypes.Model]
     },
     [FunctionTemplateKeys.Agent]: {
@@ -455,9 +453,9 @@ const COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD = {
         key: FunctionTemplateKeys.User,
         nodeTypes: [NodeTypes.Model]
     },
-    [FunctionTemplateKeys.ManyToManyModel]: {
+    [FunctionTemplateKeys.ConnectionType]: {
         [NodeProperties.ManyToManyNexus]: true,
-        key: FunctionTemplateKeys.ManyToManyModel,
+        key: FunctionTemplateKeys.ConnectionType,
         nodeTypes: [NodeTypes.Model]
     },
     [FunctionTemplateKeys.Permission]: {
@@ -773,6 +771,9 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
+        validation: {
+            ...VALIDATION_DEFAULTS
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
         }, output: {
@@ -829,7 +830,32 @@ export const MethodFunctions = {
             ...VALIDATION_DEFAULTS
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ModelOutput]: {
+                key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.User]: {
+                [NodeProperties.IsUser]: true,
+                key: FunctionTemplateKeys.User,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Permission]: {
+                key: FunctionTemplateKeys.Permission,
+                nodeTypes: [NodeTypes.Permission]
+            },
+            [FunctionTemplateKeys.ModelFilter]: {
+                key: FunctionTemplateKeys.ModelFilter,
+                nodeTypes: [NodeTypes.ModelFilter]
+            }
         },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -876,6 +902,7 @@ export const MethodFunctions = {
         interface: fs.readFileSync('./app/templates/standard/update_model_agent_object_with_model_interface.tpl', 'utf8'),
         permission: {
             ...PERMISSION_DEFAULTS,
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, FunctionTemplateKeys.UpdateModel]
         },
         templates: {
         },
@@ -984,7 +1011,34 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
-        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        constraints: {
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ModelOutput]: {
+                key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.User]: {
+                [NodeProperties.IsUser]: true,
+                key: FunctionTemplateKeys.User,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Permission]: {
+                key: FunctionTemplateKeys.Permission,
+                nodeTypes: [NodeTypes.Permission]
+            },
+            [FunctionTemplateKeys.ModelFilter]: {
+                key: FunctionTemplateKeys.ModelFilter,
+                nodeTypes: [NodeTypes.ModelFilter]
+            }
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -1003,7 +1057,28 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.User]: {
+                [NodeProperties.IsUser]: true,
+                key: FunctionTemplateKeys.User,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Permission]: {
+                key: FunctionTemplateKeys.Permission,
+                nodeTypes: [NodeTypes.Permission]
+            },
+            [FunctionTemplateKeys.ModelFilter]: {
+                key: FunctionTemplateKeys.ModelFilter,
+                nodeTypes: [NodeTypes.ModelFilter]
+            }
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },
@@ -1017,6 +1092,9 @@ export const MethodFunctions = {
         interface: fs.readFileSync('./app/templates/standard/get_agent_manytomany_listchild_interface.tpl', 'utf8'),
         permission: {
             ...PERMISSION_DEFAULTS,
+        },
+        validation: {
+            ...VALIDATION_DEFAULTS
         },
         constraints: {
             ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD

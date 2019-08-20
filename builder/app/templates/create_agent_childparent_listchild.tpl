@@ -1,8 +1,8 @@
-            public async Task<IList<{{model}}>> {{function_name}}({{user}} user, {{model}} model) 
+            public async Task<IList<{{model_ouput}}>> {{function_name}}({{user}} user, {{model}} model) 
             { 
                 var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 
-                if(await {{agent}}Permissions.{{permission_function}}(agent, model).ConfigureAwait(false)) {
+                if(await {{agent}}Permissions.{{permission_function}}(model, agent).ConfigureAwait(false)) {
                     var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, model, FunctionName.{{function_name}});
                     var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
@@ -15,7 +15,7 @@
                     
                         {{parent_setup}}
                         var predicate = Pred.And({{predicates}});
-                        var list = await arbiter{{model}}.GetBy(predicate);
+                        var list = await arbiter{{model_ouput}}.GetBy(predicate);
                         
                         return {{agent_type}}Return.{{filter_function}}(list, agent);
                     }

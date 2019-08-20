@@ -6,7 +6,7 @@ import { GetNode, GetMethodNode } from '../app/methods/graph_methods';
 import {
     GetPermissionMethodImplementation, GetPermissionMethodParameters,
     GetPermissionMethodParametersImplementation, GetPermissionMethodInterface,
-    GetAgentPermissionInterface, GetAgentPermissionImplementation
+    GetAgentPermissionInterface, GetAgentPermissionImplementation, GenerateAgentPermissionInterfacesAndImplementations
 } from '../app/service/permissionservice';
 var smash_35 = fs.readFileSync(`./test/smash_35.rqb`, 'utf8');
 
@@ -119,12 +119,16 @@ describe('description', () => {
     it('get agent permission interface', () => {
         let agentpermissioninterface = GetAgentPermissionInterface(customerId);
         expect(agentpermissioninterface).toBeTruthy();
-        console.log(agentpermissioninterface);
     });
 
     it('get agent permission implentation', () => {
         let agentpermissioninterface = GetAgentPermissionImplementation(customerId);
         expect(agentpermissioninterface).toBeTruthy();
-        console.log(agentpermissioninterface);
+    });
+
+    it('generate agents validation interfaces and implementations', () => {
+        let results = GenerateAgentPermissionInterfacesAndImplementations();
+        expect(results).toBeTruthy();
+        expect(Object.keys(results).length).toBeTruthy();
     });
 });

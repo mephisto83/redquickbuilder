@@ -6,7 +6,7 @@ import ExtensionGenerator from "./extensiongenerator";
 import MaestroGenerator from "./maestrogenerator";
 import ChangeParameterGenerator from "./changeparametergenerator";
 import ConstantsGenerator from "./constantsgenerator";
-import PermissionGenerator from "./permissiongenerator";
+import PermissionGenerator from "./permission_conditiongenerator";
 import StreamProcessGenerator from "./streamprocessgenerator";
 import { NodesByType, GetNodeProp } from "../actions/uiactions";
 import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgenerator";

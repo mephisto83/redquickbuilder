@@ -1,1 +1,1 @@
-            Task<{{model}}> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}});
+            Task<{{model}}> {{function_name}}({{model}} {{value}}, {{user}} {{user_instance}});

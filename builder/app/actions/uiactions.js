@@ -277,7 +277,6 @@ export function GetSelectedConditionSetup(permissionId, condition) {
             return conditionSetup.methods[GetNodeProp(method, NodeProperties.FunctionType)];
         }
         else {
-            console.log(condition);
             console.warn('condition is improperly formed');
         }
     }

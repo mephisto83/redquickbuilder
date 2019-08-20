@@ -3,7 +3,8 @@ import {
     GetCombinedCondition, GetPermissionsSortedByAgent, GetNameSpace,
     GetArbiterPropertyDefinitions,
     GetNodeCode,
-    GetArbiterPropertyImplementations
+    GetArbiterPropertyImplementations,
+    GetAgentNodes
 } from "../actions/uiactions";
 import { bindTemplate } from "../constants/functiontypes";
 import fs from 'fs';
@@ -69,6 +70,22 @@ export function GetAgentPermissionInterface(agentId) {
     }
 }
 
+export function GenerateAgentPermissionInterfacesAndImplementations() {
+    var agents = GetAgentNodes();
+    let result = {};
+    agents.map(agent => {
+        let agentName = GetCodeName(agent.id);
+        let temp = {
+            name: `Permissions${agentName}`,
+            iname: `IPermissions${agentName}`,
+            template: GetAgentPermissionImplementation(agent.id),
+            interface: GetAgentPermissionInterface(agent.id)
+        };
+        result[agentName] = temp;
+    });
+
+    return result;
+}
 export function GetAgentPermissionImplementation(agentId) {
     let dictionary = GetPermissionsSortedByAgent();
     if (dictionary && dictionary[agentId]) {

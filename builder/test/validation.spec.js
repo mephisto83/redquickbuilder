@@ -211,10 +211,10 @@ describe('description', () => {
     expect(agentpermissioninterface).toBeTruthy();
     console.log(agentpermissioninterface);
   });
-  
+
   it('generate agents validation interfaces and implementations', () => {
     let results = GenerateAgentValidationInterfacesAndImplementations();
     expect(results).toBeTruthy();
     expect(Object.keys(results).length).toBeTruthy();
-  })
+  });
 });

@@ -14,8 +14,6 @@ class PermissionMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var permissionParametesr = UIA.GetMethodPermissionParameters(currentNode.id);
         return (
             <TabPane active={active} >
                 <ControlSideBarMenuHeader title={Titles.ModelActions} />

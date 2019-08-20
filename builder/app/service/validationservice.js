@@ -88,6 +88,7 @@ export function GenerateAgentValidationInterfacesAndImplementations() {
 
     return result;
 }
+
 export function GetAgentValidationImplementation(agentId) {
     let dictionary = GetValidationsSortedByAgent();
     if (dictionary && dictionary[agentId]) {
