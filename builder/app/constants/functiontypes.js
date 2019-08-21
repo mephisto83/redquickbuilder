@@ -2,6 +2,7 @@ import * as Titles from '../components/titles';
 import fs from 'fs';
 import { Methods, NodeTypes, NodeProperties } from './nodetypes';
 
+
 export const FunctionTypes = {
     //Functions with List<Child> result
     Create_ManyToMany_Agent_Value__IListChild: 'Create/ManyToMany/Agent/Value => IList<Child>',
@@ -761,6 +762,12 @@ const VALIDATION_DEFAULTS = {
     params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
 };
 
+const FILTER_DEFAULTS = {
+    implementation: './app/templates/filter/filter_method.tpl',
+    interface_: './app/templates/filter/filter_method_interface.tpl',
+    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+}
+
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
@@ -808,6 +815,7 @@ export const MethodFunctions = {
         interface: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl', 'utf8'),
         permission: {
             ...PERMISSION_DEFAULTS,
+            params: [FunctionTemplateKeys.CompositeInput, FunctionTemplateKeys.Agent]
         },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD
@@ -1011,6 +1019,9 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
+        filter: {
+            ...FILTER_DEFAULTS
+        },
         constraints: {
             [FunctionTemplateKeys.Model]: {
                 key: FunctionTemplateKeys.Model,
@@ -1193,6 +1204,18 @@ export const MethodFunctions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     }
 }
+Object.values(MethodFunctions).map(t => {
+    if (t && !t.permission) {
+        t.permission = PERMISSION_DEFAULTS;
+    }
+    if (t && !t.validation) {
+        t.permission = VALIDATION_DEFAULTS;
+    }
+    if (t && !t.filter) {
+        t.filter = FILTER_DEFAULTS;
+    }
+});
+
 export const MethodTemplateKeys = {
     stream_process_change_parameter: 'stream_process_change_parameter',
     update_with: 'update_with'

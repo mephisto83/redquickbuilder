@@ -180,7 +180,7 @@ class ExecutorItem extends Component {
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             let old_one = item.node;
                             item.node = value;
-                            debugger;
+                            
                             if (this.props.onChange) {
                                 this.props.onChange();
                             }

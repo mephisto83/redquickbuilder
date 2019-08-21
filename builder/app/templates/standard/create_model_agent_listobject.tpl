@@ -3,7 +3,7 @@
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 
-            if(await {{agent}}Permissions.{{permission_function}}(model, agent).ConfigureAwait(false)) {
+            if(await {{agent#lower}}Permissions.{{permission_function}}(model, agent).ConfigureAwait(false)) {
 
                 var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, model, FunctionName.{{function_name}});
 

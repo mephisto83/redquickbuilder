@@ -3,7 +3,7 @@
         { 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
             var model = await arbiter{{model}}.Get<{{model}}>(value);
-            if(await {{agent}}Permissions.{{permission_function}}(model, agent).ConfigureAwait(false)) {
+            if(await {{agent#lower}}Permissions.{{permission_function}}(model, agent).ConfigureAwait(false)) {
                 var predicate = Pred.And({{predicates}});
                 var list = await arbiter{{model_output}}.GetBy(predicate);
                 return {{agent_type}}Return.{{filter_function}}(list, agent);

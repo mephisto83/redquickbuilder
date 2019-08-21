@@ -134,6 +134,7 @@ export default class ModelItemFilterGenerator {
                 funcs.push(bindTemplate(filterPropFunction, {
                     filter: filters.join(''),
                     model: GetCodeName(itemFilter),
+                    model_output: GetCodeName(itemFilter),
                     parameters: parameters.join(', ')
                 }))
             }
