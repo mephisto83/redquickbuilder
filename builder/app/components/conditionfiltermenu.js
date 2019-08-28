@@ -56,10 +56,15 @@ class ConditionFilterMenu extends Component {
             active = false;
             return <div></div>
         }
-        let filterParameters = UIA.GetMethodPermissionParameters(interestingNode.id);
+        let filterParameters = UIA.GetMethodPermissionParameters(interestingNode.id, true);
 
         let id = currentNode.id;
         let models = methodDefinition[methodDefinitionKey].params.map(t => {
+            if (typeof (t) === 'object') {
+                return t.key;
+            }
+            return t;
+        }).map(t => {
             return {
                 title: `${UIA.GetNodeTitle(methodProps[t])} (${t})`,
                 value: t,

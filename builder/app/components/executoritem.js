@@ -56,7 +56,7 @@ class ExecutorItem extends Component {
             }, [NodeTypes.Method]);
             if (methods && methods.length) {
                 var props = UIA.GetMethodProps(methods[0]);
-                let filterParameters = UIA.GetMethodFilterParameters(currentNode.id);
+                let filterParameters = UIA.GetMethodFilterParameters(currentNode.id, true);
                 if (filterParameters && filterParameters.length) {
                     function_variables = filterParameters;
                 }
@@ -180,7 +180,7 @@ class ExecutorItem extends Component {
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             let old_one = item.node;
                             item.node = value;
-                            
+
                             if (this.props.onChange) {
                                 this.props.onChange();
                             }
@@ -198,7 +198,7 @@ class ExecutorItem extends Component {
                 return functionVariableControl
             }
             else if (validatorItem.arguments && validatorItem.arguments.modelproperty) {
-                let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id);
+                let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id, true);
                 let node_value = validatorItem ? validatorItem.node : '';
                 let nodeProperty = validatorItem ? validatorItem.nodeProperty : '';
                 let properties = [];

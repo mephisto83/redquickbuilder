@@ -146,9 +146,9 @@ export function GetPermissionMethodParameters(id) {
     return params.map(param => {
         return {
             paramClass: GetMethodNodeProp(methodNode, param),
-            paramProperty: param
+            paramProperty: param.split('-').join('_')
         };
-    })
+    });
 }
 
 export function GetPermissionMethodParametersImplementation(id, language) {

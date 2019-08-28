@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps, GetMethodFilterParameters } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps, GetMethodFilterParameters, GetMethodFilterMetaParameters, GetConditionNodes, GetCombinedCondition } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules, FilterUI, FilterRules } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -56,9 +56,12 @@ export default class ModelItemFilterGenerator {
             }
             let itemFilter = GetNodeProp(modelitemfilter, NodeProperties.ModelItemFilter);
             let filterModel = GetNodeProp(modelitemfilter, NodeProperties.FilterModel);
+            let conditions = GetConditionNodes(modelitemfilter.id);
             let filterMethodParameters = GetMethodFilterParameters(modelitemfilter.id);
+            let meta_parameters = GetMethodFilterMetaParameters(modelitemfilter.id);
             let funcs = [];
             let parameters = [];
+
             if (filterModel && filterModel.properties) {
                 let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
                 let filters = [];
@@ -70,6 +73,7 @@ export default class ModelItemFilterGenerator {
                             let validatorValue = '';
                             let validatorName = GetCodeName(validator);
                             let _function = '==';
+                            let meta_parameter = 'item';
                             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
                             if (_validatorProps && _validatorProps.type)
                                 switch (_validatorProps.type) {
@@ -120,6 +124,7 @@ export default class ModelItemFilterGenerator {
                             filters.push(bindTemplate(filterPropFunctionValueEquals, {
                                 property: propName,
                                 value: validatorValue,
+                                meta_parameter,
                                 function: _function
                             }));
                         })
@@ -131,10 +136,23 @@ export default class ModelItemFilterGenerator {
                         return `${item.paramClass} ${item.paramName}`
                     });
                 }
+                if (meta_parameters && meta_parameters.length) {
+                    meta_parameters = meta_parameters.map(item => {
+                        return `${item.paramName}`;
+                    })
+                }
+                if (conditions && conditions.length) {
+                    filters = GetCombinedCondition(modelitemfilter.id);
+                }
+                else {
+                    filters = filters.join('');
+                }
+
                 funcs.push(bindTemplate(filterPropFunction, {
-                    filter: filters.join(''),
+                    filter: filters,
                     model: GetCodeName(itemFilter),
                     model_output: GetCodeName(itemFilter),
+                    meta_parameter: meta_parameters.join(', '),
                     parameters: parameters.join(', ')
                 }))
             }

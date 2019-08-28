@@ -1,1 +1,1 @@
-                res = res && item.{{property}} {{function}} {{value}};
+                res = res && {{meta_parameter}}.{{property}} {{function}} {{value}};

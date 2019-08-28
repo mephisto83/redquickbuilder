@@ -40,6 +40,10 @@ export function Use(node, prop) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+export function GetConditionNodes(id) {
+    let state = _getState();
+    return GraphMethods.GetConditionNodes(state, id);
+}
 export function IsAgent(node) {
     return GetNodeProp(node, NodeProperties.IsAgent);
 }
@@ -95,6 +99,9 @@ export function GetPermissionsConditions(id) {
     return _getPermissionsConditions(_getState(), id);
 }
 export function GetValidationsConditions(id) {
+    return _getValidationConditions(_getState(), id);
+}
+export function GetModelItemConditions(id) {
     return _getValidationConditions(_getState(), id);
 }
 export function GetConditionSetup(condition) {
@@ -198,7 +205,7 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
             tabcount = 3;
             break;
         case NodeTypes.ModelItemFilter:
-            conditions = GetModelItemFilter(id);
+            conditions = GetModelItemConditions(id);
             break;
     }
     let tabs = [].interpolate(0, tabcount, () => `    `).join('');
@@ -255,15 +262,16 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
     switch (type) {
         case NodeConstants.FilterRules.IsInModelPropertyCollection:
         case NodeConstants.FilterRules.EqualsModelProperty:
+        case NodeConstants.FilterRules.EqualsFalse:
             properties = {
                 agent: clauseKey,
-                agent_property: propertyName,
+                agent_property: propertyName.split('-').join('_'),
                 model: node,
                 model_property: GetCodeName(nodeProperty)
             }
             break;
         default:
-            throw 'Unhandled condition clause case';
+            throw 'Unhandled condition clause case: ' + type;
     }
 
     return bindTemplate(conditionTemplate, properties);
@@ -547,10 +555,13 @@ export function GetMethodsProperty(id, prop) {
     }
     return null;
 }
-export function GetMethodFilterParameters(id) {
-    return GetMethod_Parameters(id, 'filter');
+export function GetMethodFilterParameters(id, all) {
+    return GetMethod_Parameters(id, 'filter', all);
 }
-function GetMethod_Parameters(id, key) {
+export function GetMethodFilterMetaParameters(id, all) {
+    return GetMethod_MetaParameters(id, 'filter');
+}
+function GetMethod_MetaParameters(id, key) {
     let state = _getState();
     var method = GraphMethods.GetMethodNode(state, id);
     let methodProps = GetMethodProps(method);
@@ -558,7 +569,8 @@ function GetMethod_Parameters(id, key) {
     if (methodType) {
         let setup = MethodFunctions[methodType];
         if (setup && setup[key] && setup[key].params && methodProps) {
-            return setup[key].params.map(_x => {
+            return setup[key].params.filter(x => typeof (x) === 'object' || x.metaparameter).map(x => {
+                let _x = x.key;
                 let nodeName = GetNodeTitle(methodProps[_x]);
                 let nodeClass = GetCodeName(methodProps[_x]);
                 return {
@@ -572,11 +584,35 @@ function GetMethod_Parameters(id, key) {
     }
     return [];
 }
-export function GetMethodPermissionParameters(id) {
-    return GetMethod_Parameters(id, 'permission');
+function GetMethod_Parameters(id, key, all) {
+    let state = _getState();
+    var method = GraphMethods.GetMethodNode(state, id);
+    let methodProps = GetMethodProps(method);
+    let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+    if (methodType) {
+        let setup = MethodFunctions[methodType];
+        if (setup && setup[key] && setup[key].params && methodProps) {
+            return setup[key].params.filter(x => all || typeof (x) === 'string' || !x.metaparameter)
+                .map(x => !x.metaparameter ? x : x.metaparameter)
+                .map(_x => {
+                    let nodeName = GetNodeTitle(methodProps[_x]);
+                    let nodeClass = GetCodeName(methodProps[_x]);
+                    return {
+                        title: nodeName,
+                        value: _x,
+                        paramClass: nodeClass,
+                        paramName: _x
+                    }
+                });
+        }
+    }
+    return [];
 }
-export function GetMethodValidationParameters(id) {
-    return GetMethod_Parameters(id, 'validation');
+export function GetMethodPermissionParameters(id, all) {
+    return GetMethod_Parameters(id, 'permission', all);
+}
+export function GetMethodValidationParameters(id, all) {
+    return GetMethod_Parameters(id, 'validation', all);
 }
 export function GetPermissionMethod(permission) {
     return GetLinkChainItem({

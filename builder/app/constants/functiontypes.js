@@ -765,7 +765,7 @@ const VALIDATION_DEFAULTS = {
 const FILTER_DEFAULTS = {
     implementation: './app/templates/filter/filter_method.tpl',
     interface_: './app/templates/filter/filter_method_interface.tpl',
-    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true }]
 }
 
 export const MethodFunctions = {
@@ -814,7 +814,8 @@ export const MethodFunctions = {
         template: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl', 'utf8'),
         permission: {
-            ...PERMISSION_DEFAULTS,
+            implementation: './app/templates/permissions/permission_method.tpl',
+            interface_: './app/templates/permissions/permission_method_interface.tpl',
             params: [FunctionTemplateKeys.CompositeInput, FunctionTemplateKeys.Agent]
         },
         constraints: {
@@ -823,6 +824,7 @@ export const MethodFunctions = {
         output: {
             ...COMMON_OUTPUT.OBJECT
         },
+        ok: true,
         isList: false,
         method: Methods.Create,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
@@ -950,7 +952,7 @@ export const MethodFunctions = {
         test: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_test.tpl', 'utf8'),
         controller: fs.readFileSync('./app/templates/standard/delete_m2m_by_reference_controller.tpl', 'utf8'),
         filter: {
-            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, FunctionTemplateKeys.ModelOutput]
+            params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true }]
         },
         permission: {
             ...PERMISSION_DEFAULTS,
@@ -1017,7 +1019,7 @@ export const MethodFunctions = {
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
         permission: {
-            ...PERMISSION_DEFAULTS,
+            ...PERMISSION_DEFAULTS
         },
         filter: {
             ...FILTER_DEFAULTS
@@ -1206,13 +1208,14 @@ export const MethodFunctions = {
 }
 Object.values(MethodFunctions).map(t => {
     if (t && !t.permission) {
-        t.permission = PERMISSION_DEFAULTS;
+        t.permission = { ...PERMISSION_DEFAULTS };
+        t.permission.usingDefault = true;
     }
     if (t && !t.validation) {
-        t.permission = VALIDATION_DEFAULTS;
+        t.validation = { ...VALIDATION_DEFAULTS };
     }
     if (t && !t.filter) {
-        t.filter = FILTER_DEFAULTS;
+        t.filter = { ...FILTER_DEFAULTS };
     }
 });
 
