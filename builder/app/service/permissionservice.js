@@ -4,7 +4,8 @@ import {
     GetArbiterPropertyDefinitions,
     GetNodeCode,
     GetArbiterPropertyImplementations,
-    GetAgentNodes
+    GetAgentNodes,
+    safeFormatTemplateProperty
 } from "../actions/uiactions";
 import { bindTemplate } from "../constants/functiontypes";
 import fs from 'fs';
@@ -146,7 +147,7 @@ export function GetPermissionMethodParameters(id) {
     return params.map(param => {
         return {
             paramClass: GetMethodNodeProp(methodNode, param),
-            paramProperty: param.split('-').join('_')
+            paramProperty: safeFormatTemplateProperty(param)
         };
     });
 }

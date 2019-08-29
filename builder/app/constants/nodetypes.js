@@ -1533,13 +1533,16 @@ export const FilterRules = {
     EqualsFalse: 'equals-false',
     EqualsModelRef: 'equals-model-ref',
     EqualsModelProperty: 'equals-model-property',
-    IsInModelPropertyCollection: 'is-in-model-property-collection'
+    IsInModelPropertyCollection: 'is-in-model-property-collection',
+    IsNotInModelPropertyCollection: 'is-not-in-model-property-collection',
+    Many2ManyPropertyIsTrue: 'many-2-many-property-is-true'
 }
 export const FilterUI = {
     [FilterRules.EqualsTrue]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsTrue'
         },
+        template: './app/templates/filter/equals_true.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             type: NodePropertyTypes.BOOLEAN
@@ -1549,6 +1552,7 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsFalse'
         },
+        template: './app/templates/filter/equals_false.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             type: NodePropertyTypes.BOOLEAN
@@ -1585,7 +1589,7 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsModelProperty'
         },
-        template: './app/templates/equals-model-property.tpl',
+        template: './app/templates/filter/equals-model-property.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             modelproperty: true
@@ -1595,10 +1599,30 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'IsInModelPropertyCollection'
         },
-        template: './app/templates/is_in_model_property_collection.tpl',
+        template: './app/templates/filter/is_in_model_property_collection.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             modelproperty: true,
+        }
+    },
+    [FilterRules.IsNotInModelPropertyCollection]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'IsNotInModelPropertyCollection'
+        },
+        template: './app/templates/filter/is_not_in_model_property_collection.tpl',
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            modelproperty: true,
+        }
+    },
+    [FilterRules.Many2ManyPropertyIsTrue]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'Many2ManyPropertyIsTrue'
+        },
+        template: './app/templates/filter/many_2_many_property_is_true.tpl',
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            model2modelproperty: true
         }
     }
 }

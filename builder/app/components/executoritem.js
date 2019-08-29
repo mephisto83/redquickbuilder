@@ -255,6 +255,64 @@ class ExecutorItem extends Component {
 
                 return functionVariableControl
             }
+            else if (validatorItem.arguments && validatorItem.arguments.model2modelproperty) {
+                let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id, true);
+                let node_value = validatorItem ? validatorItem.node : '';
+                let nodeProperty = validatorItem ? validatorItem.nodeProperty : '';
+                let properties = [];
+                if (node_value) {
+                    let node_ref = UIA.GetMethodsProperty(this.props.adjacentNodeId || currentNode.id, node_value);
+                    if (node_ref) {
+                        properties = UIA.GetModelPropertyChildren(node_ref).toNodeSelect();
+                    }
+                }
+                let functionVariableControl = (<FormControl>
+                    <SelectInput
+                        options={modelParameters}
+                        label={Titles.FunctionVariables}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
+                            item.node = value;
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.FilterModel,
+                                    value: validator
+                                });
+                            }
+
+                        }}
+                        value={node_value} />
+                    <SelectInput
+                        options={properties}
+                        label={Titles.Property}
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
+                            item.nodeProperty = value;
+                            if (this.props.onChange) {
+                                this.props.onChange();
+                            }
+                            else {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    id,
+                                    prop: NodeProperties.FilterModel,
+                                    value: validator
+                                });
+                            }
+
+                        }}
+                        value={nodeProperty} />
+                </FormControl>);
+
+                return functionVariableControl
+            }
             return (<div>item</div>)
         }
 

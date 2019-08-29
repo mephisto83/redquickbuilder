@@ -251,7 +251,9 @@ export function GetConditionsClauses(adjacentId, clauseSetup, language) {
     }
     return result;
 }
-
+export function safeFormatTemplateProperty(str) {
+    return str.split('-').join('_');
+}
 export function GetConditionClause(adjacentId, clauseKey, propertyName, validator, language) {
     let { type, template, node, nodeProperty } = validator;
     let conditionTemplate = '';
@@ -263,9 +265,10 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
         case NodeConstants.FilterRules.IsInModelPropertyCollection:
         case NodeConstants.FilterRules.EqualsModelProperty:
         case NodeConstants.FilterRules.EqualsFalse:
+        case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
             properties = {
-                agent: clauseKey,
-                agent_property: propertyName.split('-').join('_'),
+                agent: safeFormatTemplateProperty(clauseKey),
+                agent_property: safeFormatTemplateProperty(propertyName),
                 model: node,
                 model_property: GetCodeName(nodeProperty)
             }
