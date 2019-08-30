@@ -13,7 +13,7 @@ import TreeViewMenu from './treeviewmenu';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
-import { NodeProperties, NodeTypes, LinkEvents, LinkType } from '../constants/nodetypes';
+import { NodeProperties, NodeTypes, LinkEvents, LinkType, FilterRules } from '../constants/nodetypes';
 import {
     getNodesByLinkType,
     SOURCE,
@@ -258,12 +258,109 @@ class ExecutorItem extends Component {
             else if (validatorItem.arguments && validatorItem.arguments.model2modelproperty) {
                 let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id, true);
                 let node_value = validatorItem ? validatorItem.node : '';
+                let many2many = validatorItem ? validatorItem.many2many : '';
                 let nodeProperty = validatorItem ? validatorItem.nodeProperty : '';
+                let many2manyProperty = validatorItem ? validatorItem.many2manyProperty : '';
+                let many2manyMethod = validatorItem ? validatorItem.many2manyMethod : '';
                 let properties = [];
                 if (node_value) {
                     let node_ref = UIA.GetMethodsProperty(this.props.adjacentNodeId || currentNode.id, node_value);
                     if (node_ref) {
                         properties = UIA.GetModelPropertyChildren(node_ref).toNodeSelect();
+                    }
+                }
+                let manyNodeSelector = null;
+                let manyNodePropertySelector = null;
+                let manyNodePropertyMethodSelector = null;
+                if (modelParameters) {
+                    let manyNodes = UIA.GetManyToManyNodes([this.props.property, node_value].filter(x => x)) || [];
+
+                    manyNodeSelector = (
+                        <SelectInput
+                            options={manyNodes.toNodeSelect()}
+                            label={Titles.ManyToMany}
+                            onChange={(value) => {
+                                var id = currentNode.id;
+                                var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                let item = getValidatorItem(validator, {
+                                    property: this.props.property,
+                                    validator: this.props.validator
+                                });
+                                item.many2many = value;
+                                if (this.props.onChange) {
+                                    this.props.onChange();
+                                }
+                                else {
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        id,
+                                        prop: NodeProperties.FilterModel,
+                                        value: validator
+                                    });
+                                }
+
+                            }}
+                            value={many2many} />
+                    );
+                    if (many2many) {
+                        manyNodePropertySelector = (
+                            <SelectInput
+                                options={UIA.GetModelPropertyNodes(many2many).toNodeSelect()}
+                                label={Titles.Many2ManyProperties}
+                                onChange={(value) => {
+                                    var id = currentNode.id;
+                                    var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                    let item = getValidatorItem(validator, {
+                                        property: this.props.property,
+                                        validator: this.props.validator
+                                    });
+                                    item.many2manyProperty = value;
+                                    if (this.props.onChange) {
+                                        this.props.onChange();
+                                    }
+                                    else {
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            id,
+                                            prop: NodeProperties.FilterModel,
+                                            value: validator
+                                        });
+                                    }
+
+                                }}
+                                value={many2manyProperty} />
+                        );
+                        if (many2manyProperty) {
+                            manyNodePropertyMethodSelector = (
+                                <SelectInput
+                                    options={Object.keys(FilterRules).map(t => {
+                                        return {
+                                            title: t,
+                                            value: FilterRules[t]
+                                        }
+                                    })}
+                                    label={Titles.Many2ManyProperties}
+                                    onChange={(value) => {
+                                        var id = currentNode.id;
+                                        var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                        let item = getValidatorItem(validator, {
+                                            property: this.props.property,
+                                            validator: this.props.validator
+                                        });
+                                        item.many2manyMethod = value;
+                                        if (this.props.onChange) {
+                                            this.props.onChange();
+                                        }
+                                        else {
+                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                id,
+                                                prop: NodeProperties.FilterModel,
+                                                value: validator
+                                            });
+                                        }
+
+                                    }}
+                                    value={many2manyMethod} />
+                            )
+                        }
                     }
                 }
                 let functionVariableControl = (<FormControl>
@@ -309,6 +406,9 @@ class ExecutorItem extends Component {
 
                         }}
                         value={nodeProperty} />
+                    {manyNodeSelector}
+                    {manyNodePropertySelector}
+                    {manyNodePropertyMethodSelector}
                 </FormControl>);
 
                 return functionVariableControl

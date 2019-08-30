@@ -37,6 +37,9 @@ export function IsCurrentNodeA(state, type) {
 export function Use(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+export function GetManyToManyNodes(ids) {
+    return GraphMethods.GetManyToManyNodes(GetCurrentGraph(_getState()), ids) || [];
+}
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
@@ -255,11 +258,17 @@ export function safeFormatTemplateProperty(str) {
     return str.split('-').join('_');
 }
 export function GetConditionClause(adjacentId, clauseKey, propertyName, validator, language) {
-    let { type, template, node, nodeProperty } = validator;
+    let method = GetNodesMethod(adjacentId);
+    let clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
+    let { type, template, node, nodeProperty, many2manyProperty, many2many, many2manyMethod } = validator;
+    let nodeNodeId = GetMethodNodeProp(method, node);
     let conditionTemplate = '';
     let properties = {};
     if (template) {
         conditionTemplate = fs.readFileSync(template, 'utf8');
+    }
+    else {
+        throw 'no template found'
     }
     switch (type) {
         case NodeConstants.FilterRules.IsInModelPropertyCollection:
@@ -273,11 +282,47 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
                 model_property: GetCodeName(nodeProperty)
             }
             break;
+        case NodeConstants.FilterRules.Many2ManyPropertyIsTrue:
+            properties = {
+                agent: safeFormatTemplateProperty(clauseKey),
+                agent_property: safeFormatTemplateProperty(propertyName),
+                agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
+                model_type: GetCodeName(nodeNodeId) || 'model_type missing',
+                model: node,
+                model_property: GetCodeName(nodeProperty),
+                connection_type: GetCodeName(many2many),
+                connection_is_true: GetConnectionClause({
+                    many2manyProperty,
+                    many2manyMethod
+                }) //
+            }
+            break;
         default:
             throw 'Unhandled condition clause case: ' + type;
     }
 
     return bindTemplate(conditionTemplate, properties);
+}
+
+export function GetConnectionClause(args) {
+    let {
+        many2manyProperty,
+        many2manyMethod
+    } = args;
+    switch (many2manyMethod) {
+        case NodeConstants.FilterRules.EqualsTrue:
+            return bindTemplate('_x => _x.{{connection_property}} == {{connection_value}}', {
+                connection_property: GetCodeName(many2manyProperty),
+                connection_value: 'true'
+            });
+        case NodeConstants.FilterRules.EqualsFalse:
+            return bindTemplate('_x => _x.{{connection_property}} == {{connection_value}}', {
+                connection_property: GetCodeName(many2manyProperty),
+                connection_value: 'false'
+            });
+        default:
+            throw 'unhandle get connection clause : ' + many2manyMethod
+    }
 }
 
 export function GetSelectedConditionSetup(permissionId, condition) {
@@ -625,6 +670,9 @@ export function GetPermissionMethod(permission) {
             direction: GraphMethods.TARGET
         }]
     })
+}
+export function GetNodesMethod(id) {
+    return GetPermissionMethod(GetNodeById(id));
 }
 export function GetCurrentGraph(state) {
     var scopedGraph = GetCurrentScopedGraph(state);

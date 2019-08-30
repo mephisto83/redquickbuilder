@@ -89,6 +89,7 @@ export default class MaestroGenerator {
                         let connectingNode = null;
                         let parent_setup = '';
                         let modelNode = null;
+                        let parent = null;
                         let model_output = null;
                         let methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);
                         let predicates = '';
@@ -162,6 +163,7 @@ export default class MaestroGenerator {
                             value,
                             parent_setup,
                             model_output,
+                            parent: GetCodeName(parentNode),
                             model: model_type,
                             connect_type,
                             comma: predicates.length ? ',' : '',

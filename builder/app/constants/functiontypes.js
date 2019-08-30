@@ -878,6 +878,10 @@ export const MethodFunctions = {
                 key: FunctionTemplateKeys.ModelOutput,
                 nodeTypes: [NodeTypes.Model]
             },
+            [FunctionTemplateKeys.Parent]: {
+                key: FunctionTemplateKeys.Parent,
+                nodeTypes: [NodeTypes.Model]
+            },
             [FunctionTemplateKeys.ManyToManyModel]: {
                 [NodeProperties.ManyToManyNexus]: true,
                 key: FunctionTemplateKeys.ManyToManyModel,
