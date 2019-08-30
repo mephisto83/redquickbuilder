@@ -4,16 +4,20 @@ import { NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION, GetCurrentGraph, 
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GetNode, GetMethodNode } from '../app/methods/graph_methods';
 import {
-    GetPermissionMethodImplementation, GetPermissionMethodParameters,
-    GetPermissionMethodParametersImplementation, GetPermissionMethodInterface,
-    GetAgentPermissionInterface, GetAgentPermissionImplementation, GenerateAgentPermissionInterfacesAndImplementations
+    GetPermissionMethodImplementation, 
+    GetPermissionMethodParameters,
+    GetPermissionMethodParametersImplementation, 
+    GetPermissionMethodInterface,
+    GetAgentPermissionInterface, 
+    GetAgentPermissionImplementation, 
+    GenerateAgentPermissionInterfacesAndImplementations
 } from '../app/service/permissionservice';
-var smash_35 = fs.readFileSync(`./test/smash_35.rqb`, 'utf8');
+var smash_37 = fs.readFileSync(`./test/smash_37.rqb`, 'utf8');
 
 describe('description', () => {
     let permissionId = '03fa9d11-991e-46ee-841e-fab2ea9a8d6e';
     let customerId = 'ba34fc88-4aaa-456a-b1d3-d56cd5a5b3c2';
-    let graph = JSON.parse(smash_35);
+    let graph = JSON.parse(smash_37);
     let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph))
     state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
     let nodes = NodesByType({ uiReducer: state }, NodeTypes.NodeTypes.Model);

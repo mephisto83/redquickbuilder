@@ -83,19 +83,19 @@ export default class StreamProcessGenerator {
                     namespace,
                     space: NameSpace.StreamProcess
                 }),
-                test: NamespaceGenerator.Generate({
-                    template: _streamProcessTemplateTests,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        ...STANDARD_TEST_USING,
-                        'System.Threading',
-                        `${namespace}${NameSpace.Constants}`,
-                        `${namespace}${NameSpace.StreamProcess}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Model}`],
-                    namespace,
-                    space: NameSpace.Tests
-                })
+                // test: NamespaceGenerator.Generate({
+                //     template: _streamProcessTemplateTests,
+                //     usings: [
+                //         ...STANDARD_CONTROLLER_USING,
+                //         ...STANDARD_TEST_USING,
+                //         'System.Threading',
+                //         `${namespace}${NameSpace.Constants}`,
+                //         `${namespace}${NameSpace.StreamProcess}`,
+                //         `${namespace}${NameSpace.Parameters}`,
+                //         `${namespace}${NameSpace.Model}`],
+                //     namespace,
+                //     space: NameSpace.Tests
+                // })
             }
         };
     }

@@ -1,4 +1,4 @@
-public class Validator : IValidator<{{model}}, {{agent_type}}> {
+public class Validator : I{{agent}}Validations<{{model}}, {{agent_type}}> {
     // validator.Validate<{{model}}, {{agent_type}}>(data, agent);
 
     public async Task<bool> Validate<{{model}}, {{agent_type}}({{model} value, {{agent_type}} {{agent}}, {{string}} methodType) {

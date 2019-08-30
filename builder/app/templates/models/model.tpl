@@ -1,4 +1,4 @@
-{{attributes}}    
+
     [Red]
     public class {{model}} : {{base_model}}
     {

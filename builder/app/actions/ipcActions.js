@@ -156,6 +156,7 @@ const CodeTypeToArea = {
     [GeneratedTypes.ModelExceptions]: '.Controllers',
     [GeneratedTypes.Constants]: '.Models',
     [GeneratedTypes.Permissions]: '.Controllers',
+    [GeneratedTypes.Validators]: '.Controllers',
     [GeneratedTypes.ModelItemFilter]: '.Controllers',
     [GeneratedTypes.StreamProcess]: '.Controllers',
     [GeneratedTypes.StreamProcessOrchestration]: '.Controllers'

@@ -235,7 +235,9 @@ ${modelexecution.join('')}
     }
     static GenerateStrappers(models, agent) {
         let result = [];
-        result.push(Tabs(4) + `validator = RedStrapper.Resolve<IValidator>();` + jNL);
+        result.push(Tabs(4) + bindTemplate(`validator = RedStrapper.Resolve<I{{agent}}Validations>();`, {
+            agent: GetCodeName(agent)
+        }) + jNL);
         var agents = [agent];// models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
@@ -255,7 +257,7 @@ ${modelexecution.join('')}
     static GenerateStrappersInstances(models, agent) {
         let result = [];
 
-        result.push(Tabs(3) + `public IValidator validator;` + jNL);
+        result.push(Tabs(3) + bindTemplate(`public I{{agent}}Validations validator;`, { agent: GetCodeName(agent) }) + jNL);
         var agents = [agent];// models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
@@ -476,7 +478,7 @@ ${agents.map(agent => {
                 id: StreamProcessOrchestration,
                 name: StreamProcessOrchestration,
                 iname: `I${StreamProcessOrchestration}`,
-                tname: `${StreamProcessOrchestration}Tests`,
+                //  tname: `${StreamProcessOrchestration}Tests`,
                 template: NamespaceGenerator.Generate({
                     template: _streamProcessTemplate,
                     usings: [
@@ -501,21 +503,21 @@ ${agents.map(agent => {
                     namespace,
                     space: NameSpace.StreamProcess
                 }),
-                test: NamespaceGenerator.Generate({
-                    template: testTemplate,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        ...STANDARD_TEST_USING,
-                        `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Interface}`,
-                        `${namespace}${NameSpace.StreamProcess}`,
-                        `${namespace}${NameSpace.Executors}`,
-                        `${namespace}${NameSpace.Extensions}`,
-                        `${namespace}${NameSpace.Constants}`],
-                    namespace,
-                    space: NameSpace.Tests
-                })
+                // test: NamespaceGenerator.Generate({
+                //     template: testTemplate,
+                //     usings: [
+                //         ...STANDARD_CONTROLLER_USING,
+                //         ...STANDARD_TEST_USING,
+                //         `${namespace}${NameSpace.Model}`,
+                //         `${namespace}${NameSpace.Parameters}`,
+                //         `${namespace}${NameSpace.Interface}`,
+                //         `${namespace}${NameSpace.StreamProcess}`,
+                //         `${namespace}${NameSpace.Executors}`,
+                //         `${namespace}${NameSpace.Extensions}`,
+                //         `${namespace}${NameSpace.Constants}`],
+                //     namespace,
+                //     space: NameSpace.Tests
+                // })
             }
         };
         result = { ...result, ...streamOrchestration };
@@ -539,6 +541,7 @@ ${agents.map(agent => {
             static_methods: statics.join(''),
             agent_type_methods: agent_methods,
             agent_type: GetCodeName(agent),
+            agent: GetCodeName(agent),
             arbiters_strappers: strappers,
             arbiter_instances: strapperInstances
         });
@@ -557,7 +560,7 @@ ${agents.map(agent => {
                 id: StreamProcessOrchestration,
                 name: `${GetCodeName(agent)}${StreamProcessOrchestration}`,
                 iname: `I${GetCodeName(agent)}${StreamProcessOrchestration}`,
-                tname: `${GetCodeName(agent)}${StreamProcessOrchestration}Tests`,
+                // tname: `${GetCodeName(agent)}${StreamProcessOrchestration}Tests`,
                 template: NamespaceGenerator.Generate({
                     template: _streamProcessTemplate,
                     usings: [
@@ -582,21 +585,21 @@ ${agents.map(agent => {
                     namespace,
                     space: NameSpace.StreamProcess
                 }),
-                test: NamespaceGenerator.Generate({
-                    template: testTemplate,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        ...STANDARD_TEST_USING,
-                        `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Interface}`,
-                        `${namespace}${NameSpace.StreamProcess}`,
-                        `${namespace}${NameSpace.Executors}`,
-                        `${namespace}${NameSpace.Extensions}`,
-                        `${namespace}${NameSpace.Constants}`],
-                    namespace,
-                    space: NameSpace.Tests
-                })
+                // test: NamespaceGenerator.Generate({
+                //     template: testTemplate,
+                //     usings: [
+                //         ...STANDARD_CONTROLLER_USING,
+                //         ...STANDARD_TEST_USING,
+                //         `${namespace}${NameSpace.Model}`,
+                //         `${namespace}${NameSpace.Parameters}`,
+                //         `${namespace}${NameSpace.Interface}`,
+                //         `${namespace}${NameSpace.StreamProcess}`,
+                //         `${namespace}${NameSpace.Executors}`,
+                //         `${namespace}${NameSpace.Extensions}`,
+                //         `${namespace}${NameSpace.Constants}`],
+                //     namespace,
+                //     space: NameSpace.Tests
+                // })
             }
         };
     }

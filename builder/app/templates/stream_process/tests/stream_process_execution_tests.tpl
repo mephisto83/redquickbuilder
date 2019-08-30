@@ -6,7 +6,7 @@
 
             RedStrapper.Add(builder =>
             {
-                var validatorMock = new Mock<IValidator>();
+                var validatorMock = new Mock<I{{agent}}Validations>();
                 validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(true));
 
@@ -49,7 +49,7 @@
 
             RedStrapper.Add(builder =>
             {
-                var validatorMock = new Mock<IValidator>();
+                var validatorMock = new Mock<I{{agent}}Validations>();
                 validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Returns(Task.FromResult(false));
 
@@ -95,7 +95,7 @@
 
             RedStrapper.Add(builder =>
             {
-                var validatorMock = new Mock<IValidator>();
+                var validatorMock = new Mock<I{{agent}}Validations>();
                 validatorMock.Setup(x => x.Validate(It.IsAny<{{model}}>(), It.IsAny<{{agent_type}}>(), It.IsAny<{{model}}ChangeBy{{agent_type}}>()))
                     .Throws(new Exception());
 

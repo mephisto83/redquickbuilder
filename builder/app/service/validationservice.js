@@ -68,7 +68,7 @@ export function GetAgentValidationInterface(agentId) {
         });
     }
     else {
-        throw 'agent doesnt have any validations';
+        return false;
     }
 }
 export function GenerateAgentValidationInterfacesAndImplementations() {
@@ -77,11 +77,16 @@ export function GenerateAgentValidationInterfacesAndImplementations() {
     agents.map(agent => {
         console.warn(`agent : ${agent.id}`)
         let agentName = GetCodeName(agent.id);
+        let template = GetAgentValidationImplementation(agent.id);
+        let _interface = GetAgentValidationInterface(agent.id);
+        if (!template || !_interface) {
+            return;
+        }
         let temp = {
             name: `${agentName}Validations`,
             iname: `I${agentName}Validations`,
-            template: GetAgentValidationImplementation(agent.id),
-            interface: GetAgentValidationInterface(agent.id)
+            template,
+            interface: _interface
         };
         result[agentName] = temp;
     });
@@ -108,7 +113,7 @@ export function GetAgentValidationImplementation(agentId) {
         });
     }
     else {
-        throw 'agent doesnt have any validations';
+        return false;
     }
 }
 
@@ -125,8 +130,8 @@ export function BuildAgentValidationInterface(agentId, validations, language = P
 }
 
 export function BuildAgentValidationImplementation(agentId, validations, language = ProgrammingLanguages.CSHARP) {
-    let methods = validations.map(Validation => {
-        return GetValidationMethodImplementation(Validation, language);
+    let methods = validations.map(validation_ => {
+        return GetValidationMethodImplementation(validation_, language);
     }).filter(x => x).join(NEW_LINE);
     let template = fs.readFileSync('./app/templates/validation/validations_impl.tpl', 'utf8');
     let _constructTemplate = fs.readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
@@ -137,6 +142,7 @@ export function BuildAgentValidationImplementation(agentId, validations, languag
     return bindTemplate(template, {
         agent_type: GetCodeName(agentId),
         arbiters: GetArbiterPropertyDefinitions(),
+        validations: '// validations',
         constructor,
         methods
     });

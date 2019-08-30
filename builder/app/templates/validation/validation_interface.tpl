@@ -1,3 +1,3 @@
-    public interface IPermissions{{agent_type}} {
+    public interface I{{agent_type}}Validations {
 {{methods}}
     }

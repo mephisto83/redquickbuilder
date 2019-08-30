@@ -17,6 +17,7 @@ import ModelReturnGenerator from './modelreturngenerator';
 import ModelExceptionGenerator from './modelexceptiongenerator';
 import ModelItemFilter from './modelitemfiltergenerator';
 import ModelGetGenerator from './modelgetgenerators';
+import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
         var { state, type, key } = options;
@@ -73,6 +74,8 @@ export default class Generator {
                 });
             case GeneratedTypes.Permissions:
                 return PermissionGenerator.Generate({ state, key });
+            case GeneratedTypes.Validators:
+                return ValidatorGenerator.Generate({ state, key });
             case GeneratedTypes.StreamProcess:
                 return StreamProcessGenerator.Generate({ state, key });
             case GeneratedTypes.StreamProcessOrchestration:

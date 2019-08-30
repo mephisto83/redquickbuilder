@@ -46,6 +46,7 @@ export const GeneratedTypes = {
     ChangeParameter: 'change-parameter',
     ChangeResponse: 'change-response',
     Constants: 'constants',
+    Validators: 'validator-generated',
     Permissions: 'permissions-generated',
     Executors: 'executors',
     ModelItemFilter: 'model-item-filter',
@@ -54,7 +55,7 @@ export const GeneratedTypes = {
     ModelExceptions: 'model-exceptions',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
-    ValidationRule: 'validation-rule'
+  //  ValidationRule: 'validation-rule'
 }
 export const IdentityManagement = {
     RedQuickViews: 'RedQuickViews'
@@ -1629,6 +1630,7 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'OneOfAttribute'
         },
+        template: './app/templates/filter/one-of.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
             nodeType: NodeTypes.Enumeration,

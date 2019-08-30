@@ -1,0 +1,1 @@
+var {{result}} = new List<string>{{{list}}}.Any(x => x == {{agent}}.{{agent_property}});

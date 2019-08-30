@@ -241,7 +241,6 @@ export default class ModelGenerator {
                 template: modelTemplate,
                 usings: [...usings,
                     `RedQuickCore.Identity`,
-                `${namespace}${NameSpace.Validations}`,
                 ...STANDARD_CONTROLLER_USING],
                 namespace,
                 space: NameSpace.Model

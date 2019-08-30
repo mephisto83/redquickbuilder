@@ -5,7 +5,7 @@
                 var agent = await {{agent_type#lower}}Arbiter.Get<{{agent_type}}>(change.AgentId);
                 var data = change.Data;
             
-                if(await validator.Validate<{{model}}, {{agent_type}}, {{model}}ChangeBy{{agent_type}}>(data, agent, change)) 
+                if(await validator.Validate(data, agent, change)) 
                 {
                     var newData = await {{agent_type#lower}}Executor.Create(data, agent, change);
                     var result = await {{model_output#lower}}Arbiter.Create(newData);

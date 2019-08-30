@@ -116,18 +116,18 @@ export function GetPermissionsSortedByAgent() {
 }
 
 export function GetValidationsSortedByAgent() {
-    return GetNodesSortedByAgent(NodeTypes.Permission);
+    return GetNodesSortedByAgent(NodeTypes.Validator);
 }
 
 export function GetNodesSortedByAgent(type) {
     let state = _getState();
-    let permissions = NodesByType(state, type);
+    let nodes = NodesByType(state, type);
 
-    return permissions.filter((permission) => {
-        let methodNode = GraphMethods.GetMethodNode(state, permission.id);
+    return nodes.filter((node) => {
+        let methodNode = GraphMethods.GetMethodNode(state, node.id);
         return methodNode;
-    }).groupBy(permission => {
-        let methodNode = GraphMethods.GetMethodNode(state, permission.id);
+    }).groupBy(node => {
+        let methodNode = GraphMethods.GetMethodNode(state, node.id);
         return GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
     })
 }
@@ -210,6 +210,11 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
         case NodeTypes.ModelItemFilter:
             conditions = GetModelItemConditions(id);
             break;
+        case NodeTypes.Validator:
+            conditions = GetValidationsConditions(id);
+            tabcount = 3;
+            final_result = 'result';
+            break;
     }
     let tabs = [].interpolate(0, tabcount, () => `    `).join('');
     let clauses = [];
@@ -268,6 +273,7 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
         conditionTemplate = fs.readFileSync(template, 'utf8');
     }
     else {
+        console.log(validator);
         throw 'no template found'
     }
     switch (type) {
@@ -297,13 +303,37 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
                 }) //
             }
             break;
+        case NodeConstants.ValidationRules.OneOf:
+            let listItems = GenerateConstantList(validator);
+            properties = {
+                agent: safeFormatTemplateProperty(clauseKey),
+                agent_property: safeFormatTemplateProperty(propertyName),
+                agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
+                list: listItems
+            }
+            break;
         default:
             throw 'Unhandled condition clause case: ' + type;
     }
 
     return bindTemplate(conditionTemplate, properties);
 }
+function GenerateConstantList(validator) {
+    let node = GetGraphNode(validator.node);
+    let { enumeration } = validator;
+    switch (GetNodeProp(node, NodeProperties.NODEType)) {
+        case NodeTypes.Enumeration:
+            var enums = GetNodeProp(node, NodeProperties.Enumeration) || [];
 
+            return enums.map(enum_ => {
+                if (enumeration[enum_.id || enum_]) {
+                    return `${GetCodeName(validator.node)}.${NodeConstants.MakeConstant(enum_.value || enum_)}`;
+                }
+            }).filter(x => x).join(', ');
+        default:
+            throw 'not implemented capturing of enums';
+    }
+}
 export function GetConnectionClause(args) {
     let {
         many2manyProperty,

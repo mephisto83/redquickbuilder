@@ -11,7 +11,7 @@ import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GetNode } from '../app/methods/graph_methods';
 import { GetValidationMethodImplementation, GetValidationMethodParameters, GetValidationMethodParametersImplementation, GetValidationMethodInterface, GetAgentValidationInterface, GetAgentValidationImplementation, GenerateAgentValidationInterfacesAndImplementations } from '../app/service/validationservice';
 
-var smash_36 = fs.readFileSync(`./test/smash_36.rqb`, 'utf8');
+var smash_36 = fs.readFileSync(`./test/smash_37.rqb`, 'utf8');
 
 describe('description', () => {
   it('should have description', () => {
