@@ -56,15 +56,15 @@ class ValidatorItem extends Component {
                             case NodeTypes.Enumeration:
                                 var enums = UIA.GetNodeProp(node, NodeProperties.Enumeration) || [];
                                 editlist = enums.map((_enum) => {
-                                    return <div className={`external-event ${item.enumeration && item.enumeration[_enum] ? 'bg-red' : 'bg-black'}`} style={{ cursor: 'pointer' }} onClick={() => {
+                                    return <div className={`external-event ${item.enumeration && item.enumeration[_enum.id] ? 'bg-red' : 'bg-black'}`} style={{ cursor: 'pointer' }} onClick={() => {
                                         item.enumeration = item.enumeration || {};
-                                        item.enumeration[_enum] = !item.enumeration[_enum];
+                                        item.enumeration[_enum.id] = !item.enumeration[_enum.id];
                                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                             id: currentNode.id,
                                             prop: NodeProperties.Validator,
                                             value: validator
                                         })
-                                    }} > {_enum}</div>;
+                                    }} > {_enum.value}</div>;
                                 });
                                 break;
                             case NodeTypes.ExtensionType:

@@ -42,7 +42,7 @@ export default class Generator {
                     var enums = GetNodeProp(node, NodeProperties.Enumeration);
                     var larg = {};
                     enums.map(t => {
-                        larg[MakeConstant(t)] = t;
+                        larg[MakeConstant(t.value || t)] = t.value;
                     })
                     return {
                         name: GetNodeProp(node, NodeProperties.CodeName),

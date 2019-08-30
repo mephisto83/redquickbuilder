@@ -12,6 +12,7 @@ import TextBox from './textinput';
 import TextInput from './textinput';
 import EnumerationEditMenu from './enumerationeditmenu';
 import { NodeProperties } from '../constants/nodetypes';
+import { uuidv4 } from '../utils/array';
 
 class EnumerationActivityMenu extends Component {
     render() {
@@ -29,19 +30,19 @@ class EnumerationActivityMenu extends Component {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.Enumeration,
                             id: currentNode.id,
-                            value: [...enums, val].unique()
+                            value: [...enums, { value: val, id: uuidv4() }].unique(x => x.value)
                         });
                     }
                 }
                 } />
                 {active && enums && enums.length ? enums.map((_enum) => {
-                    return <div className="external-event bg-red" style={{ cursor: 'pointer' }} onClick={() => {
+                    return <div className="external-event bg-red" style={{ cursor: 'pointer' }} key={_enum.id} onClick={() => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                             prop: UIA.NodeProperties.Enumeration,
                             id: currentNode.id,
                             value: [...enums].filter(x => x !== _enum)
                         });
-                    }} > {_enum}</div>;
+                    }} > {_enum && _enum.id ? _enum.value : _enum}</div>;
                 }) : null}
             </TabPane>
         );
