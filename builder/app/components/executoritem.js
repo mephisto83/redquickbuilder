@@ -78,7 +78,7 @@ class ExecutorItem extends Component {
                 if (types) {
                     let _nodes_types = UIA.NodesByType(state, types).filter(x => UIA.GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ExtensionType ? isUIExtensionEnumerable(x) : true);
 
-                    var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                    validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
                     let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                     let editlist = [];
                     if (item && item.node) {
@@ -87,15 +87,15 @@ class ExecutorItem extends Component {
                             case NodeTypes.Enumeration:
                                 var enums = UIA.GetNodeProp(node, NodeProperties.Enumeration) || [];
                                 editlist = enums.map((_enum) => {
-                                    return <div className={`external-event ${item.enumeration && item.enumeration[_enum] ? 'bg-red' : 'bg-black'}`} style={{ cursor: 'pointer' }} onClick={() => {
+                                    return <div className={`external-event ${item.enumeration && item.enumeration[_enum.id || _enum] ? 'bg-red' : 'bg-black'}`} style={{ cursor: 'pointer' }} onClick={() => {
                                         item.enumeration = item.enumeration || {};
-                                        item.enumeration[_enum] = !item.enumeration[_enum];
+                                        item.enumeration[_enum.id || _enum] = !item.enumeration[_enum.id || _enum];
                                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                             id: currentNode.id,
                                             prop: NodeProperties.Executor,
                                             value: validator
                                         })
-                                    }} > {_enum}</div>;
+                                    }} > {_enum.value}</div>;
                                 });
                                 break;
                             case NodeTypes.ExtensionType:
@@ -124,7 +124,7 @@ class ExecutorItem extends Component {
                             label={Titles.Property}
                             onChange={(value) => {
                                 var id = currentNode.id;
-                                var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                                validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
                                 let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                                 let old_one = item.node;
                                 item.node = value;
@@ -176,7 +176,7 @@ class ExecutorItem extends Component {
                         label={Titles.FunctionVariables}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             let old_one = item.node;
                             item.node = value;
@@ -281,7 +281,7 @@ class ExecutorItem extends Component {
                             label={Titles.ManyToMany}
                             onChange={(value) => {
                                 var id = currentNode.id;
-                                var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                                 let item = getValidatorItem(validator, {
                                     property: this.props.property,
                                     validator: this.props.validator
@@ -308,7 +308,7 @@ class ExecutorItem extends Component {
                                 label={Titles.Many2ManyProperties}
                                 onChange={(value) => {
                                     var id = currentNode.id;
-                                    var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                    validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                                     let item = getValidatorItem(validator, {
                                         property: this.props.property,
                                         validator: this.props.validator
@@ -340,7 +340,7 @@ class ExecutorItem extends Component {
                                     label={Titles.Many2ManyProperties}
                                     onChange={(value) => {
                                         var id = currentNode.id;
-                                        var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                                        validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                                         let item = getValidatorItem(validator, {
                                             property: this.props.property,
                                             validator: this.props.validator
@@ -369,7 +369,7 @@ class ExecutorItem extends Component {
                         label={Titles.FunctionVariables}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.node = value;
                             if (this.props.onChange) {
@@ -390,7 +390,7 @@ class ExecutorItem extends Component {
                         label={Titles.Property}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
+                            validator = validator || this.props.selectedValidator || UIA.GetNodeProp(currentNode, NodeProperties.FilterModel) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.nodeProperty = value;
                             if (this.props.onChange) {
@@ -430,7 +430,7 @@ class ExecutorItem extends Component {
         let methodNodeProperties = UIA.GetMethodProps(methodNode);
         if (validatorItem.arguments && validatorItem.arguments.method_reference) {
             return Object.keys(validatorItem.arguments.method_reference).map(ref => {
-                var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
                 let editlist = [];
                 let options = UIA.GetMethodNodeSelectOptions(methodNodeProperties);
                 let formControll = (<FormControl key={ref}>
@@ -440,7 +440,7 @@ class ExecutorItem extends Component {
                         label={Titles.Property}
                         onChange={(value) => {
                             var id = currentNode.id;
-                            var validator = UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                            validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
                             let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
                             item.references = item.references || {};
                             item.references[ref] = value;

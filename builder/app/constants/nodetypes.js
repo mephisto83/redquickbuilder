@@ -1624,6 +1624,96 @@ export const FilterUI = {
             ...COMMON_STRING_ARGS,
             model2modelproperty: true
         }
+    },
+    [ValidationRules.OneOf]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'OneOfAttribute'
+        },
+        arguments: {
+            ...COMMON_STRING_ARGS,
+            nodeType: NodeTypes.Enumeration,
+            reference: {
+                types: [NodeTypes.Enumeration, NodeTypes.ExtensionType]
+            }
+        }
+    },
+    [ValidationRules.SocialSecurity]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'SocialSecurityAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Zip]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ZipAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.ZipEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'ZipEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.PastDate]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'PastDateAttribute'
+        },
+        arguments: { ...COMMON_DATETIME_ARGS }
+    },
+    [ValidationRules.BeforeNow]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'BeforeNowAttribute'
+        },
+        arguments: { ...COMMON_DATETIME_ARGS }
+    },
+    [ValidationRules.Email]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Credit]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'CreditCardAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.EmailEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.Url]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'UrlAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.UrlEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'UrlEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaNumericLike]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'AlphaNumericLikeAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaOnly]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'AlphaOnlyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.AlphaOnlyWithSpaces]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'NotEmptyAttribute'
+        },
+        arguments: { ...COMMON_STRING_ARGS }
     }
 }
 Object.keys(FilterUI).map(t => {
