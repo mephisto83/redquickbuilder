@@ -197,9 +197,9 @@ function createWorkSpace() {
                 return executeSpawnCmd('dotnet', ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'], {});
             });
 
-            
+
         });
-        
+
         let webProjectDeps = [
         ];
 
@@ -250,6 +250,18 @@ function createWorkSpace() {
         console.log(e);
         console.log('SOMETHING WENT WRONG');
     });
+}
+
+function createReactNative(opts) {
+    let { appName } = opts;
+
+    let commands = [
+        `react-native init ${appName}`,
+        `cd ${appName}`,
+        'npm install native-base --save',
+        'react-native link',
+        'npm install --save react-redux'
+    ];
 }
 switch (command) {
     case 'createworkspace':
