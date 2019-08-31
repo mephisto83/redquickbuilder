@@ -12,6 +12,7 @@ using RedQuickCore.Identity;
 using RedQuickCore.Interfaces;
 using {{namespace}}.Models;
 using {{namespace}}.Resources;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Smash.Graph.Web
 {
@@ -29,13 +30,28 @@ namespace Smash.Graph.Web
 
             // DI
             services.AddSingleton<IRedEmailSender,  RedEmailSender>();
-
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+            });
             RedStartUp.ConfigurationServices<{{model}}>(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseStaticFiles();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
             RedStartUp.Configure(app, env);
             // app.Run(async (context) =>
             // {

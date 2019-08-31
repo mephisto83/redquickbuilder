@@ -190,8 +190,16 @@ function createWorkSpace() {
             promise = promise.then(() => {
                 return executeSpawnCmd('dotnet', ['add', project, 'package', 'RedQuick', '-s', source], {});
             });
-        });
+            promise = promise.then(() => {
+                return executeSpawnCmd('dotnet', ['add', project, 'package', 'Swashbuckle.AspNetCore'], {});
+            });
+            promise = promise.then(() => {
+                return executeSpawnCmd('dotnet', ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'], {});
+            });
 
+            
+        });
+        
         let webProjectDeps = [
         ];
 
