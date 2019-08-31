@@ -615,7 +615,17 @@ export function GetMethodNode(id) {
     return GraphMethods.GetMethodNode(_getState(), id);
 }
 export function GetMethodNodeProp(methodNode, key) {
-    return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {})[key];
+    let methodProps = (GetNodeProp(methodNode, NodeProperties.MethodProps) || {});
+    if (typeof (key) === 'string')
+        return methodProps[key];
+    if (!key) return null;
+    let { template } = key;
+    let temp = {};
+    Object.keys(methodProps).map(t => {
+        temp[t] = GetCodeName(methodProps[t]);
+    })
+    return bindTemplate(template, temp);
+
 }
 export function GetMethodProps(methodNode) {
     return (GetNodeProp(methodNode, NodeProperties.MethodProps) || {});

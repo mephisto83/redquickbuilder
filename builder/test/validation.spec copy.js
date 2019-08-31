@@ -9,7 +9,7 @@ import {
 } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GetNode } from '../app/methods/graph_methods';
-import { GetValidationMethodImplementation, GetValidationMethodParameters, GetValidationMethodParametersImplementation, GetValidationMethodInterface, GetAgentValidationInterface, GetAgentValidationImplementation, GenerateAgentValidationInterfacesAndImplementations, GetValidationEntries } from '../app/service/validationservice';
+import { GetValidationMethodImplementation, GetValidationMethodParameters, GetValidationMethodParametersImplementation, GetValidationMethodInterface, GetAgentValidationInterface, GetAgentValidationImplementation, GenerateAgentValidationInterfacesAndImplementations } from '../app/service/validationservice';
 
 var smash_36 = fs.readFileSync(`./test/smash_37.rqb`, 'utf8');
 
@@ -216,12 +216,5 @@ describe('description', () => {
     let results = GenerateAgentValidationInterfacesAndImplementations();
     expect(results).toBeTruthy();
     expect(Object.keys(results).length).toBeTruthy();
-  });
-
-  
-  it('get validation entries', () => {
-    let validatorId = 'e08c41e1-02c1-4aff-aa70-e2398e566c09';
-    let results = GetValidationEntries(customerId, validatorId);
-    console.log(results);
   });
 });

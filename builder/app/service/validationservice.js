@@ -4,9 +4,12 @@ import {
     GetArbiterPropertyDefinitions,
     GetNodeCode,
     GetArbiterPropertyImplementations,
-    GetAgentNodes
+    GetAgentNodes,
+    GetMethodFunctionValidation,
+    GetValidationNode,
+    safeFormatTemplateProperty
 } from "../actions/uiactions";
-import { bindTemplate } from "../constants/functiontypes";
+import { bindTemplate, FunctionTemplateKeys } from "../constants/functiontypes";
 import fs from 'fs';
 import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from "../constants/nodetypes";
 import NamespaceGenerator from "../generators/namespacegenerator";
@@ -17,6 +20,53 @@ function GetMethodDefinitionValidationSection(id) {
     }
     console.warn('doesnt define a validation for method type ');
     return false;
+}
+export function GetValidationEntries(agent, as_interface, language = ProgrammingLanguages.CSHARP) {
+    let dictionary = GetValidationsSortedByAgent();
+    if (dictionary && dictionary[agent]) {
+
+
+        let validation_entry = as_interface ? './app/templates/validation/validation_entry_interface.tpl' : './app/templates/validation/validation_entry.tpl';
+        let validation_entry_template = fs.readFileSync(validation_entry, 'utf8');
+        console.log(validation_entry);
+
+        let validatorNodes = dictionary[agent];
+        console.log(validatorNodes);
+        let methods = validatorNodes.map(valNode => {
+            return GetMethodNode(valNode.id);
+        }).unique().groupBy(x => {
+            var validationNode = GetValidationNode(x.id);
+            let validationSection = GetMethodDefinitionValidationSection(validationNode.id);
+            if (validationSection.asModel) {
+                return GetMethodNodeProp(x, validationSection.asModel)
+            }
+            return GetMethodNodeProp(x, FunctionTemplateKeys.Model)
+        });
+
+        console.log(Object.keys(methods).map(x => GetCodeName(x)));
+        let validation_case_template = fs.readFileSync('./app/templates/validation/validation_case.tpl', 'utf8');
+        return Object.keys(methods).map(modelId => {
+            console.log(`modelId ${GetCodeName(modelId)}`)
+            let parameters = `${GetCodeName(modelId)} model, ${GetCodeName(agent)} agent, ${GetCodeName(modelId)}ChangeBy${GetCodeName(agent)} change_parameter`;
+            let conditions = '';
+            console.log(methods[modelId]);
+            conditions = methods[modelId].map(method => {
+                let validationNode = GetValidationNode(method.id);
+                if (validatorNodes.some(v => v.id === validationNode.id))
+                    return bindTemplate(validation_case_template, {
+                        function_name: `FunctionName.${GetCodeName(method.id)}`,
+                        function: `${GetCodeName(validationNode)}`,
+                        parameters: `model, agent, change_parameter`
+                    })
+
+            }).filter(x => x);
+            return bindTemplate(validation_entry_template, {
+                parameters,
+                switch_parameter: 'change_parameter.FunctionName',
+                conditions: conditions.join(NEW_LINE)
+            })
+        });
+    }
 }
 
 export function GetValidationMethodImplementation(id, language = ProgrammingLanguages.CSHARP) {
@@ -61,7 +111,8 @@ export function GetAgentValidationInterface(agentId) {
             usings: [
                 ...STANDARD_CONTROLLER_USING,
                 `${namespace}${NameSpace.Interface}`,
-                `${namespace}${NameSpace.Model}`
+                `${namespace}${NameSpace.Model}`,
+                `${namespace}${NameSpace.Parameters}`
             ],
             namespace,
             space: NameSpace.Interface
@@ -106,6 +157,7 @@ export function GetAgentValidationImplementation(agentId) {
                 `${namespace}${NameSpace.Extensions}`,
                 `${namespace}${NameSpace.Model}`,
                 `${namespace}${NameSpace.Interface}`,
+                `${namespace}${NameSpace.Parameters}`,
                 `${namespace}${NameSpace.Controllers}`,
                 `${namespace}${NameSpace.Constants}`].filter(x => x),
             namespace,
@@ -122,9 +174,11 @@ export function BuildAgentValidationInterface(agentId, validations, language = P
         return GetValidationMethodInterface(Validation, language);
     }).filter(x => x).join(NEW_LINE);
     let template = fs.readFileSync('./app/templates/validation/validation_interface.tpl', 'utf8');
+    let validation_entries = GetValidationEntries(agentId, true, language);
 
     return bindTemplate(template, {
         agent_type: GetCodeName(agentId),
+        validations: validation_entries.join(NEW_LINE),
         methods
     });
 }
@@ -133,6 +187,7 @@ export function BuildAgentValidationImplementation(agentId, validations, languag
     let methods = validations.map(validation_ => {
         return GetValidationMethodImplementation(validation_, language);
     }).filter(x => x).join(NEW_LINE);
+    let validation_entries = GetValidationEntries(agentId, false, language);
     let template = fs.readFileSync('./app/templates/validation/validations_impl.tpl', 'utf8');
     let _constructTemplate = fs.readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
     let constructor = bindTemplate(_constructTemplate, {
@@ -142,7 +197,7 @@ export function BuildAgentValidationImplementation(agentId, validations, languag
     return bindTemplate(template, {
         agent_type: GetCodeName(agentId),
         arbiters: GetArbiterPropertyDefinitions(),
-        validations: '// validations',
+        validations: validation_entries.join(NEW_LINE),
         constructor,
         methods
     });
@@ -164,7 +219,7 @@ export function GetValidationMethodParametersImplementation(id, language) {
     let parameters = GetValidationMethodParameters(id);
     switch (language) {
         case ProgrammingLanguages.CSHARP:
-            return parameters.map(t => `${GetCodeName(t.paramClass)} ${t.paramProperty}`).join(', ');
+            return parameters.map(t => `${GetCodeName(t.paramClass) || t.paramClass} ${safeFormatTemplateProperty(t.paramProperty && t.paramProperty.key ? t.paramProperty.key : t.paramProperty)}`).join(', ');
 
     }
 }

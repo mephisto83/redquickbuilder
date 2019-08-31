@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes, GetCodeName, GetMethodProps, IsAgent, GetGraphNode } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, GetRootGraph, NodeTypes, GetCodeName, GetMethodProps, IsAgent, GetGraphNode, GetValidationsSortedByAgent } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, STANDARD_TEST_USING, NEW_LINE, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTemplateKeys, MethodFunctions, AFTER_EFFECTS } from '../constants/functiontypes';
@@ -235,9 +235,12 @@ ${modelexecution.join('')}
     }
     static GenerateStrappers(models, agent) {
         let result = [];
-        result.push(Tabs(4) + bindTemplate(`validator = RedStrapper.Resolve<I{{agent}}Validations>();`, {
-            agent: GetCodeName(agent)
-        }) + jNL);
+        var sortedValidations = GetValidationsSortedByAgent();
+        if (sortedValidations && agent && sortedValidations[agent.id]) {
+            result.push(Tabs(4) + bindTemplate(`validator = RedStrapper.Resolve<I{{agent}}Validations>();`, {
+                agent: GetCodeName(agent)
+            }) + jNL);
+        }
         var agents = [agent];// models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);
@@ -257,7 +260,10 @@ ${modelexecution.join('')}
     static GenerateStrappersInstances(models, agent) {
         let result = [];
 
-        result.push(Tabs(3) + bindTemplate(`public I{{agent}}Validations validator;`, { agent: GetCodeName(agent) }) + jNL);
+        var sortedValidations = GetValidationsSortedByAgent();
+        if (sortedValidations && agent && sortedValidations[agent.id]) {
+            result.push(Tabs(3) + bindTemplate(`public I{{agent}}Validations validator;`, { agent: GetCodeName(agent) }) + jNL);
+        }
         var agents = [agent];// models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         models.map(model => {
             let modelName = GetNodeProp(model, NodeProperties.CodeName);

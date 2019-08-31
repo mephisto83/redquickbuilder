@@ -51,7 +51,7 @@ export default class ValidationRuleGenerator {
         var validator = GetNodeProp(validatorNode, NodeProperties.Validator);
         let validatorProperties = GraphMethods.getValidatorProperties(validator);
         var validation_test_vectors = [];
-        Object.keys(validatorProperties).map(property => {
+        Object.keys(validatorProperties || {}).map(property => {
             let propertyNode = GraphMethods.GetNode(graph, property);
             let validatorPs = validatorProperties[property];
 

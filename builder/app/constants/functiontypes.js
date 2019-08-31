@@ -55,6 +55,7 @@ export const FunctionTypes = {
 export const FunctionTemplateKeys = {
     Model: 'model',
     ModelOutput: 'model_output',
+    ChangeParameter: 'change_parameter',
     UpdateModel: 'model_update',
     ReferenceClass: 'reference_class',
     Reference: 'reference',
@@ -602,7 +603,11 @@ const PERMISSION_DEFAULTS = {
 const VALIDATION_DEFAULTS = {
     implementation: './app/templates/validation/validation_method.tpl',
     interface_: './app/templates/validation/validation_method_interface.tpl',
-    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent]
+    params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, {
+        key: FunctionTemplateKeys.ChangeParameter,
+        changeparameter: true,
+        template: `{{${FunctionTemplateKeys.Model}}}ChangeBy{{${FunctionTemplateKeys.Agent}}}`
+    }]
 };
 
 const FILTER_DEFAULTS = {
@@ -620,9 +625,6 @@ export const MethodFunctions = {
         },
         permission: {
             ...PERMISSION_DEFAULTS,
-        },
-        validation: {
-            ...VALIDATION_DEFAULTS
         },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD
@@ -661,6 +663,15 @@ export const MethodFunctions = {
             interface_: './app/templates/permissions/permission_method_interface.tpl',
             params: [FunctionTemplateKeys.CompositeInput, FunctionTemplateKeys.Agent]
         },
+        validation: {
+            ...VALIDATION_DEFAULTS,
+            asModel: FunctionTemplateKeys.CompositeInput, //Used as the model in the validation functions.
+            params: [FunctionTemplateKeys.CompositeInput, FunctionTemplateKeys.Agent, {
+                key: FunctionTemplateKeys.ChangeParameter,
+                changeparameter: true,
+                template: `{{${FunctionTemplateKeys.CompositeInput}}}ChangeBy{{${FunctionTemplateKeys.Agent}}}`
+            }]
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD
         },
@@ -676,12 +687,6 @@ export const MethodFunctions = {
         title: Titles.Create_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/create_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_model_agent_listobject_interface.tpl', 'utf8'),
-        permission: {
-            ...PERMISSION_DEFAULTS,
-        },
-        validation: {
-            ...VALIDATION_DEFAULTS
-        },
         constraints: {
             [FunctionTemplateKeys.Model]: {
                 key: FunctionTemplateKeys.Model,
