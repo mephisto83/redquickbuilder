@@ -24,6 +24,7 @@ export const New = 'New';
 export const Controllers = 'Controllers';
 export const ServiceActivity = 'Service Activity';
 export const CodeTypes = 'Code Types';
+export const ProjectName = 'Project Name';
 export const Project = 'Project';
 export const NameSpace = 'NameSpace';
 export const Pinned = 'Pinned';

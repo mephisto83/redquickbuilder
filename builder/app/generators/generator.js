@@ -80,8 +80,8 @@ export default class Generator {
                 return StreamProcessGenerator.Generate({ state, key });
             case GeneratedTypes.StreamProcessOrchestration:
                 return StreamProcessOrchestrationGenerator.Generate({ state, key });
-            case GeneratedTypes.ValidationRule:
-                return ValidationRuleGenerator.Generate({ state, key });
+            // case GeneratedTypes.ValidationRule:
+            //     return ValidationRuleGenerator.Generate({ state, key });
             case GeneratedTypes.Executors:
                 return ExecutorGenerator.Generate({ state, key });
             case GeneratedTypes.ModelGet:
