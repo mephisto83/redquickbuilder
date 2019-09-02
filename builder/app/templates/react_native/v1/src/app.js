@@ -1,57 +1,109 @@
-import { Scene, Router } from 'react-native-router-flux';
+import * as React from 'react';
+import { Button, Text, View, StyleSheet } from 'react-native';
+import { Provider, connect } from 'react-redux';
+import { createAppContainer, createStackNavigator } from 'react-navigation';
+import { createStore } from 'redux';
+import { buildReducers } from './reducers/index';
+import { redConnect } from './actions/util';
 
-import * as Titles from './titles';
-import Home from './home';
-import SideDrawer from './sidedrawer';
-// app.js
-
-import * as utils from './util';
-
-import React, { Component } from 'react';
-import { connect, Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-const RouterWithRedux = connect()(Router);
-import reducers from './reducers';
-import * as Keys from './screens/keys';
-// other imports...
-import {
-    TabBar,
-    Modal,
-    Schema,
-    Actions,
-    Reducer,
-    ActionConst
-} from 'react-native-router-flux';
-
-import {
-    Dimensions,
-    AppState
-} from 'react-native';
-
-// create store...
-const middleware = [thunk/* ...your middleware (i.e. thunk) */];
-const store = compose(
-    applyMiddleware(...middleware)
-)(createStore)(reducers);
-
-
-class App extends React.Component {
-    componentDidMount() {
-
+// A very simple reducer
+function counter(state, action) {
+    if (typeof state === 'undefined') {
+        return 0;
     }
+
+    switch (action.type) {
+        case 'INCREMENT':
+            return state + 1;
+        case 'DECREMENT':
+            return state - 1;
+        default:
+            return state;
+    }
+}
+
+// A very simple store
+let store = createStore(buildReducers());
+
+// A screen!
+class Counter extends React.Component {
+    static navigationOptions = {
+        title: 'Counter!',
+    };
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.paragraph}>{this.props.count}</Text>
+                <Button
+                    title="Increment"
+                    onPress={() => this.props.dispatch({ type: 'INCREMENT' })}
+                />
+                <Button
+                    title="Decrement"
+                    onPress={() => this.props.dispatch({ type: 'DECREMENT' })}
+                />
+
+                <Button
+                    title="Go to static count screen"
+                    onPress={() => this.props.navigation.navigate('StaticCounter')}
+                />
+            </View>
+        );
+    }
+}
+
+// Another screen!
+class StaticCounter extends React.Component {
+    static navigationOptions = {
+        title: `Same number, wow!`,
+    };
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.paragraph}>{this.props.count}</Text>
+            </View>
+        );
+    }
+}
+
+// Connect the screens to Redux
+let CounterContainer = redConnect(Counter);
+let StaticCounterContainer = redConnect(StaticCounter);
+
+// Create our stack navigator
+let RootStack = createStackNavigator({
+    Counter: CounterContainer,
+    StaticCounter: StaticCounterContainer,
+});
+
+// And the app container
+let Navigation = createAppContainer(RootStack);
+
+// Render the app container component with the provider around it
+export default class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <RouterWithRedux>
-                    <Scene key="root" hideNavBar={true}>
-                        <Scene key={Keys.SideMenu} type={ActionConst.RESET} component={SideDrawer} open={false}>
-                            <Scene key={Keys.Home} component={Home} hideNavBar={true} title="Home" />
-                        </Scene>
-                    </Scene>
-                </RouterWithRedux>
+                <Navigation />
             </Provider>
         );
     }
 }
-export default App; 
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ecf0f1',
+        padding: 8,
+    },
+    paragraph: {
+        margin: 24,
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+});

@@ -72,7 +72,19 @@ export function scaffoldProject(options = {}) {
                 return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
                     model: GetNodeProp(userNode, NodeProperties.CodeName),
                     namespace
-                }, null, path.join(path.join(root.workspace, root.title), solutionName + path.join('.Web')));
+                }, null, path.join(path.join(root.workspace, root.title, 'netcore'), solutionName + path.join('.Web')));
+            }
+        }).then(() => {
+            console.log('Write react-native files')
+            let appName = root[GraphKeys.PROJECTNAME];
+            let version = 'v1';
+            if (appName) {
+                return generateFolderStructure(path.join(`./app/templates/react_native/${version}`), {
+
+                }, null, path.join(root.workspace, root.title, 'reactnative', appName));
+            }
+            else {
+                console.warn('No app name given');
             }
         });
     }
@@ -95,6 +107,7 @@ function generateFolderStructure(dir, lib, relative, target_dir) {
         }
     })
 }
+
 function generateFiles(workspace, solutionName, state) {
 
 

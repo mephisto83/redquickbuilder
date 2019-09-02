@@ -89,11 +89,14 @@ export function incrementBuild(graph) {
 
 export function incrementMinor(graph) {
     graph.version.minor++;
+    graph.version.build = 0;
     return graph;
 }
 
 export function incrementMajor(graph) {
     graph.version.major++;
+    graph.version.minor = 0;
+    graph.version.build = 0;
     return graph;
 }
 

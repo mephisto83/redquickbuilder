@@ -86,6 +86,19 @@ function createReactNative() {
         return executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
             cwd: localDir
         });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-native-gesture-handler', '--save'], {
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('react-native', ['link', 'react-native-gesture-handler'], {
+            shell: true,
+            cwd: localDir
+        });
     }).catch(e => {
         console.log(e);
         console.log('SOMETHING WENT WRONG');

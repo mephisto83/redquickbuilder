@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import * as UIActions from '../actions/uiActions';
+import { connect } from 'react-redux';
 var ReactNative = require('react-native');
 var {
   AsyncStorage
@@ -29,7 +30,10 @@ export const mapStateToProps = (state) => {
     state: state
   };
 };
+export function redConnect(component) {
+  return connect(mapStateToProps, mapDispatchToProps)(component);
 
+}
 export const asyncStorage = store => next => action => {
   var result = next(action);
   if (action.store)
@@ -65,8 +69,8 @@ export function simple(func, param, states, callback, error) {
   }
 }
 export const catchAnd = (then) => {
-    then = then || (() => { });
-    return (e) => _catch(e).then(then).catch(() => { });
+  then = then || (() => { });
+  return (e) => _catch(e).then(then).catch(() => { });
 }
 
 (function (array) {

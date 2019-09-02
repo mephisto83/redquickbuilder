@@ -1,13 +1,11 @@
 // reducers/index.js
 
 import { combineReducers } from 'redux';
-import routes from './routes';
 import uiReducer from './uiReducer';
 // ... other reducers
 
 
-export default combineReducers({
-  routes,
+export default buildReducers = () => combineReducers({
   uiReducer,
   // ... other reducers
 });
