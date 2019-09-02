@@ -1,3 +1,7 @@
+import * as React from 'react';
+import {
+    View
+} from 'native-base';
 import { redConnect, titleService } from '../actions/util';
 
 // {{name}}

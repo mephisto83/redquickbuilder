@@ -1,6 +1,6 @@
 export const UI_UPDATE = 'UI_UPDATE';
 export const RESET_ALL = 'RESET_ALL';
-export const VISUAL = '';
+export const VISUAL = 'VISUAL';
 export function UIV(item, value) {
     return UIC(VISUAL, item, value);
 }
@@ -19,12 +19,7 @@ export function Visual(state, key) {
     }
     return null;
 }
-export function Get(state, key) {
-    if (state)
-        return state.uiReducer[key];
-    return null;
-}
-export function Get(state, key, id) {
+export function GetC(state, key, id) {
     if (state)
         if (state.uiReducer[key])
             return state.uiReducer[key][id];

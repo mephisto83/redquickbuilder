@@ -68,13 +68,15 @@ function createReactNative() {
     var build = fs.readFileSync('./workspace.json', 'utf8');
     build = JSON.parse(build);
     let { appName } = build;
-    let localDir = path.resolve(`./${appName}`)
+    let localDir = path.join(build.workspace, `./${appName}`)
     return Promise.resolve().then(() => {
         return executeSpawnCmd('react-native', ['init', appName], {
+            cwd: build.workspace,
             shell: true
         });
     }).then(() => {
         return executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
+            shell: true,
             cwd: localDir
         });
     }).then(() => {
@@ -83,15 +85,28 @@ function createReactNative() {
             cwd: localDir
         });
     }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'redux', '--save'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
         return executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
+            shell: true,
             cwd: localDir
         });
     }).then(() => {
         return executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-navigation-stack', '--save'], {
+            shell: true,
             cwd: localDir
         });
     }).then(() => {
         return executeSpawnCmd('npm', ['install', 'react-native-gesture-handler', '--save'], {
+            shell: true,
             cwd: localDir
         });
     }).then(() => {
