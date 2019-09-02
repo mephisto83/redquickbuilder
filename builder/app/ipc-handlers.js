@@ -33,6 +33,12 @@ function handle(msg) {
             })
             console.log('handle scaffolding');
             break;
+        case HandlerEvents.reactnative.message:
+            result = Promise.resolve().then(() => {
+                return scaffoldProject(msg.body, 'ReactNative');
+            })
+            console.log('handle scaffolding');
+            break;
         default:
             console.log('did nothing');
             break;
@@ -41,7 +47,7 @@ function handle(msg) {
     return result;
 }
 
-function scaffoldProject(body) {
+function scaffoldProject(body, target) {
     let { workspace, solutionName } = body;
     return ensureDirectory(workspace).then(() => {
         return copyFile(`./app/cake/build.cake`, path.join(workspace, 'build.cake'));
@@ -52,9 +58,9 @@ function scaffoldProject(body) {
     }).then(() => {
         return copyFile(`./app/cake/package.json`, path.join(workspace, 'package.json'));
     }).then(() => {
-        return writeJsonToFile({ workspace, solutionName }, path.join(workspace, 'workspace.json'));
+        return writeJsonToFile(body, path.join(workspace, 'workspace.json'));
     }).then(() => {
-        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', 'CreateWorkSpace'], { cwd: workspace })
+        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', target || 'CreateWorkSpace'], { cwd: workspace })
     }).then(() => {
         console.log('Scaffoled the project successfully');
         return true;

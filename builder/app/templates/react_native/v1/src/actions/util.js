@@ -37,6 +37,37 @@ export const asyncStorage = store => next => action => {
   return result;
 }
 
+///Lots of stuff to add here,
+// better error handling
+export function simple(func, param, states, callback, error) {
+  return (dispatch, getState) => {
+    var state = getState();
+    var loading = states.loading;
+    var objectType = states.objectType;
+    if (!Visual(state, loading)) {
+      dispatch(UIActions.UIV(loading, true));
+      return func(param).then(res => {
+        dispatch(UIActions.UIC(objectType, res));
+        if (callback) {
+          callback(res, dispatch, getState);
+        }
+        return res;
+      }).catch(catchAnd((e) => {
+        if (error) {
+          error(e, dispatch, getState);
+        }
+      })).then((res) => {
+        dispatch(UIActions.UIV(loading, false));
+        return res;
+      });
+    }
+    return Promise.resolve();
+  }
+}
+export const catchAnd = (then) => {
+    then = then || (() => { });
+    return (e) => _catch(e).then(then).catch(() => { });
+}
 
 (function (array) {
   if (!array.subset) {

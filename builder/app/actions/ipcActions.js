@@ -47,13 +47,21 @@ export function scaffoldProject(options = {}) {
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');
 
+        ensureDirectory(path.join(root.workspace));
+        ensureDirectory(path.join(root.workspace, root.title));
         (filesOnly ? Promise.resolve() : send(HandlerEvents.scaffold.message, {
             solutionName,
-            workspace: path.join(root.workspace, root.title)
-        })).then(res => {
+            appName: root[GraphKeys.PROJECTNAME] || '',
+            workspace: path.join(root.workspace, root.title, 'netcore')
+        })).then(() => {
+            return (filesOnly ? Promise.resolve() : send(HandlerEvents.reactnative.message, {
+                solutionName,
+                appName: root[GraphKeys.PROJECTNAME] || '',
+                workspace: path.join(root.workspace, root.title, 'reactnative')
+            }))
+        }).then(res => {
             console.log('Finished Scaffolding.');
-
-            generateFiles(path.join(root.workspace, root.title), solutionName, state);
+            generateFiles(path.join(root.workspace, root.title, 'netcore'), solutionName, state);
         }).then(() => {
 
             let namespace = root ? root[GraphKeys.NAMESPACE] : null;

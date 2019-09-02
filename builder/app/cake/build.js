@@ -13,7 +13,7 @@ function executeSpawnCmd(cmd, args, options) {
     return new Promise(function (resolve, fail) {
         console.log(cmd);
         console.log(args);
-        options = { ... (options || {}), shell: false }
+        options = { shell: false, ... (options || {}) }
         var child;
         if (process.platform === 'win32') {
             child = spawn(cmd, args, options);
@@ -64,6 +64,33 @@ const appSettingsCopySettings = `
 </None>
 </ItemGroup>
 `;
+function createReactNative() {
+    var build = fs.readFileSync('./workspace.json', 'utf8');
+    build = JSON.parse(build);
+    let { appName } = build;
+    let localDir = path.resolve(`./${appName}`)
+    return Promise.resolve().then(() => {
+        return executeSpawnCmd('react-native', ['init', appName], {
+            shell: true
+        });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('react-native', ['link'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
+            cwd: localDir
+        });
+    }).catch(e => {
+        console.log(e);
+        console.log('SOMETHING WENT WRONG');
+    });;
+}
 function createWorkSpace() {
     var build = fs.readFileSync('./workspace.json', 'utf8');
     build = JSON.parse(build);
@@ -252,19 +279,11 @@ function createWorkSpace() {
     });
 }
 
-function createReactNative(opts) {
-    let { appName } = opts;
-
-    let commands = [
-        `react-native init ${appName}`,
-        `cd ${appName}`,
-        'npm install native-base --save',
-        'react-native link',
-        'npm install --save react-redux'
-    ];
-}
 switch (command) {
     case 'createworkspace':
         createWorkSpace();
+        break;
+    case 'createReactNative':
+        createReactNative();
         break;
 }
