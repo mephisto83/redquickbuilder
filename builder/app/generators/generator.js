@@ -1,6 +1,6 @@
 import ControllerGenerator from "./controllergenerator";
 import * as Titles from "../components/titles";
-import { NodeTypes, GeneratedTypes, Methods, GeneratedConstants, NodeProperties, ConstantsDeclaration, MakeConstant } from "../constants/nodetypes";
+import { NodeTypes, GeneratedTypes, Methods, GeneratedConstants, NodeProperties, ConstantsDeclaration, MakeConstant, ReactNativeTypes } from "../constants/nodetypes";
 import ModelGenerator from "./modelgenerators";
 import ExtensionGenerator from "./extensiongenerator";
 import MaestroGenerator from "./maestrogenerator";
@@ -17,6 +17,8 @@ import ModelReturnGenerator from './modelreturngenerator';
 import ModelExceptionGenerator from './modelexceptiongenerator';
 import ModelItemFilter from './modelitemfiltergenerator';
 import ModelGetGenerator from './modelgetgenerators';
+import ReactNativeScreens from './screengenerator';
+import ReactNativeNavigation from './navigationgenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
@@ -92,6 +94,10 @@ export default class Generator {
                 return ModelExceptionGenerator.Generate({ state, key });
             case GeneratedTypes.ModelItemFilter:
                 return ModelItemFilter.Generate({ state, key });
+            case ReactNativeTypes.Screens:
+                return ReactNativeScreens.Generate({ state, key });
+            case ReactNativeTypes.Navigation:
+                return ReactNativeNavigation.Generate({ state, key });
         }
     }
 }

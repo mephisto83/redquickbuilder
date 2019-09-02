@@ -4,7 +4,7 @@ import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties } from './uiacti
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
-import { GeneratedTypes, NodeTypes } from '../constants/nodetypes';
+import { GeneratedTypes, NodeTypes, ReactNativeTypes } from '../constants/nodetypes';
 import Generator from '../generators/generator';
 import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -63,6 +63,9 @@ export function scaffoldProject(options = {}) {
             console.log('Finished Scaffolding.');
             generateFiles(path.join(root.workspace, root.title, 'netcore'), solutionName, state);
         }).then(() => {
+            console.log('generate react-native files');
+            generateReactNative(path.join(root.workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]), state);
+        }).then(() => {
 
             let namespace = root ? root[GraphKeys.NAMESPACE] : null;
             let server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
@@ -107,7 +110,22 @@ function generateFolderStructure(dir, lib, relative, target_dir) {
         }
     })
 }
+function generateReactNative(workspace, state) {
+    let code_types = [...Object.values(ReactNativeTypes)];
+    let root = GetRootGraph(state);
 
+    code_types.map(code_type => {
+        let temp = Generator.generate({
+            type: code_type,
+            state
+        });
+
+        for (var fileName in temp) {
+            ensureDirectory(path.join(workspace, temp[fileName].relative));
+            writeFileSync(path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
+        }
+    })
+}
 function generateFiles(workspace, solutionName, state) {
 
 
@@ -126,7 +144,6 @@ function generateFiles(workspace, solutionName, state) {
             state
         });
         let area = CodeTypeToArea[code_type];
-        path.join();
         for (var fileName in temp) {
             ensureDirectory(path.join(workspace, solutionName + area))
             writeFileSync(path.join(workspace, solutionName + area, `${temp[fileName].name}.cs`), temp[fileName].template)

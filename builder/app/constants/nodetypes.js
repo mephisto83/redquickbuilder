@@ -55,7 +55,11 @@ export const GeneratedTypes = {
     ModelExceptions: 'model-exceptions',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
-  //  ValidationRule: 'validation-rule'
+    //  ValidationRule: 'validation-rule'
+}
+export const ReactNativeTypes = {
+    Screens: 'screens',
+    Navigation: 'navigation'
 }
 export const IdentityManagement = {
     RedQuickViews: 'RedQuickViews'

@@ -169,3 +169,11 @@ export function uuidv4() {
     }
 })(Array.prototype)
 
+
+String.prototype.toJavascriptName = function () {
+    var str = this || '';
+    if (str[0]) {
+        return str[0].toLowerCase() + str.split('').subset(1).join('');
+    }
+    return str;
+}

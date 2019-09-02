@@ -28,10 +28,8 @@ export function GetValidationEntries(agent, as_interface, language = Programming
 
         let validation_entry = as_interface ? './app/templates/validation/validation_entry_interface.tpl' : './app/templates/validation/validation_entry.tpl';
         let validation_entry_template = fs.readFileSync(validation_entry, 'utf8');
-        console.log(validation_entry);
 
         let validatorNodes = dictionary[agent];
-        console.log(validatorNodes);
         let methods = validatorNodes.map(valNode => {
             return GetMethodNode(valNode.id);
         }).unique().groupBy(x => {
@@ -43,13 +41,10 @@ export function GetValidationEntries(agent, as_interface, language = Programming
             return GetMethodNodeProp(x, FunctionTemplateKeys.Model)
         });
 
-        console.log(Object.keys(methods).map(x => GetCodeName(x)));
         let validation_case_template = fs.readFileSync('./app/templates/validation/validation_case.tpl', 'utf8');
         return Object.keys(methods).map(modelId => {
-            console.log(`modelId ${GetCodeName(modelId)}`)
             let parameters = `${GetCodeName(modelId)} model, ${GetCodeName(agent)} agent, ${GetCodeName(modelId)}ChangeBy${GetCodeName(agent)} change_parameter`;
             let conditions = '';
-            console.log(methods[modelId]);
             conditions = methods[modelId].map(method => {
                 let validationNode = GetValidationNode(method.id);
                 if (validatorNodes.some(v => v.id === validationNode.id))
@@ -73,7 +68,6 @@ export function GetValidationMethodImplementation(id, language = ProgrammingLang
     let validationSection = GetMethodDefinitionValidationSection(id);
     if (!validationSection) { return false }
     let { implementation } = validationSection;
-    console.log(validationSection)
     let implementation_template = fs.readFileSync(implementation, 'utf8');
     let parameters = GetValidationMethodParametersImplementation(id, language);
     let conditions = GetCombinedCondition(id, language);
@@ -126,7 +120,6 @@ export function GenerateAgentValidationInterfacesAndImplementations() {
     var agents = GetAgentNodes();
     let result = {};
     agents.map(agent => {
-        console.warn(`agent : ${agent.id}`)
         let agentName = GetCodeName(agent.id);
         let template = GetAgentValidationImplementation(agent.id);
         let _interface = GetAgentValidationInterface(agent.id);
@@ -207,7 +200,7 @@ export function GetValidationMethodParameters(id) {
     let validationSection = GetMethodDefinitionValidationSection(id);
     let { params } = validationSection;
     let methodNode = GetMethodNode(id);
-    return params.map(param => {
+    return (params || []).map(param => {
         return {
             paramClass: GetMethodNodeProp(methodNode, param),
             paramProperty: param
@@ -215,7 +208,7 @@ export function GetValidationMethodParameters(id) {
     })
 }
 
-export function GetValidationMethodParametersImplementation(id, language) {
+export function GetValidationMethodParametersImplementation(id, language = ProgrammingLanguages.CSHARP) {
     let parameters = GetValidationMethodParameters(id);
     switch (language) {
         case ProgrammingLanguages.CSHARP:

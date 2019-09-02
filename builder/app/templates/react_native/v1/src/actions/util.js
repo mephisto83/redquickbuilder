@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import * as UIActions from '../actions/uiActions';
+import { TitleService } from './titles';
 import { connect } from 'react-redux';
 var ReactNative = require('react-native');
 var {
@@ -40,6 +41,8 @@ export const asyncStorage = store => next => action => {
     debouncedStoreAsync(store, action);
   return result;
 }
+
+export const titleService = TitleService;
 
 ///Lots of stuff to add here,
 // better error handling

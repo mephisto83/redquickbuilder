@@ -95,7 +95,7 @@ describe('validation relationship', () => {
 
 
 describe('description', () => {
-  let validationId = '8161fdef-de59-4d44-85c1-ae6f2b45c389';
+  let validationId = 'fe42f950-829c-4eaa-b6c4-2c4c23517f7d';
   let customerId = 'ba34fc88-4aaa-456a-b1d3-d56cd5a5b3c2';
   let graph = JSON.parse(smash_36);
   let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph))
@@ -129,8 +129,9 @@ describe('description', () => {
   it(`it should get the method's validation's parameters`, () => {
     let permissionParameters = GetMethodValidationParameters(validationId);
     expect(permissionParameters).toBeTruthy();
-    expect(permissionParameters.length).toBe(2);
+    expect(permissionParameters.length).toBe(3);
   });
+
 
   it('get conditions setup', () => {
     let conditions = GetValidationsConditions(validationId);
@@ -203,13 +204,11 @@ describe('description', () => {
   it('get agent validation interface', () => {
     let agentpermissioninterface = GetAgentValidationInterface(customerId);
     expect(agentpermissioninterface).toBeTruthy();
-    console.log(agentpermissioninterface);
   });
 
   it('get agent validation implentation', () => {
     let agentpermissioninterface = GetAgentValidationImplementation(customerId);
     expect(agentpermissioninterface).toBeTruthy();
-    console.log(agentpermissioninterface);
   });
 
   it('generate agents validation interfaces and implementations', () => {
@@ -218,10 +217,10 @@ describe('description', () => {
     expect(Object.keys(results).length).toBeTruthy();
   });
 
-  
+
   it('get validation entries', () => {
     let validatorId = 'e08c41e1-02c1-4aff-aa70-e2398e566c09';
     let results = GetValidationEntries(customerId, validatorId);
-    console.log(results);
+    expect(results).toBeTruthy();
   });
 });
