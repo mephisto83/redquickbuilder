@@ -560,6 +560,9 @@ export function GetScreenNodes() {
     var state = _getState();
     return NodesByType(state, NodeTypes.Screen);
 }
+export function GetModelNodes() {
+    return NodesByType(_getState(), NodeTypes.Model);
+}
 export function NodesByType(state, nodeType, options = {}) {
 
     var currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);

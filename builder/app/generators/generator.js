@@ -19,6 +19,7 @@ import ModelItemFilter from './modelitemfiltergenerator';
 import ModelGetGenerator from './modelgetgenerators';
 import ReactNativeScreens from './screengenerator';
 import ReactNativeNavigation from './navigationgenerator';
+import ReactNativeKeys from './keygenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
@@ -98,6 +99,8 @@ export default class Generator {
                 return ReactNativeScreens.Generate({ state, key });
             case ReactNativeTypes.Navigation:
                 return ReactNativeNavigation.Generate({ state, key });
+            case ReactNativeTypes.Keys:
+                return ReactNativeKeys.Generate({ state, key });
         }
     }
 }

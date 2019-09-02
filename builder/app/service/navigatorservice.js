@@ -36,7 +36,7 @@ export function GenerateNavigationRoot() {
 export function BindScreensToTemplate() {
     var screens = GetScreens();
     let template = fs.readFileSync('./app/templates/navigation/navigation.tpl', 'utf8');
-    let import_template = `import {{name}} from '../screens/{{namejs}}';`
+    let import_template = `import {{name}} from './screens/{{namejs}}';`
     let import_property = `     {{name}}: {{name}}`;
     let importStatements = screens.map(screen => {
         return bindTemplate(import_template, {

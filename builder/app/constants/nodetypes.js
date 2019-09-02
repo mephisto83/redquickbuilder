@@ -59,7 +59,8 @@ export const GeneratedTypes = {
 }
 export const ReactNativeTypes = {
     Screens: 'screens',
-    Navigation: 'navigation'
+    Navigation: 'navigation',
+    Keys: 'keys'
 }
 export const IdentityManagement = {
     RedQuickViews: 'RedQuickViews'

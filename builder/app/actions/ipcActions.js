@@ -172,12 +172,15 @@ function ensureDirectory(dir) {
     }
     else {
     }
-
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-    else {
-    }
+    let _dir_parts = dir.split(path.sep);
+    _dir_parts.map((_, i) => {
+        if (i > 1 || _dir_parts.length - 1 === i) {
+            let tempDir = path.join(..._dir_parts.subset(0, i + 1))
+            if (!fs.existsSync(tempDir)) {
+                fs.mkdirSync(tempDir);
+            }
+        }
+    })
 };
 
 const CodeTypeToArea = {

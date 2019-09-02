@@ -62,7 +62,7 @@ function scaffoldProject(body, target) {
     }).then(() => {
         return executeSpawnCmd('powershell', ['./build.ps1', '-Target', target || 'CreateWorkSpace'], { cwd: workspace })
     }).then(() => {
-        console.log('Scaffoled the project successfully');
+        console.log('Scaffoled the project successfully: ' + target);
         return true;
     }).catch((e) => {
         console.log('Failed to scaffold');

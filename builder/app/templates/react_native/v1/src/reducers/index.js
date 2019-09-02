@@ -5,7 +5,9 @@ import uiReducer from './uiReducer';
 // ... other reducers
 
 
-export default buildReducers = () => combineReducers({
-  uiReducer,
-  // ... other reducers
-});
+export function buildReducers() {
+  return combineReducers({
+    uiReducer,
+    // ... other reducers
+  });
+}

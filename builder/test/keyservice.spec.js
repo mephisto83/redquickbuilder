@@ -5,7 +5,7 @@ import {
     setTestGetState, _getPermissionsConditions
 } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
-import { GenerateNavigationRoot } from '../app/service/navigatorservice';
+import { GenerateModelKeys } from '../app/service/keyservice';
 var smash_37 = fs.readFileSync(`./test/smash_37.rqb`, 'utf8');
 
 describe('description', () => {
@@ -18,9 +18,9 @@ describe('description', () => {
     });
 
 
-    it('should generate navigation root', () => {
-        let navigation = GenerateNavigationRoot({});
-        expect(navigation).toBeTruthy();
-        expect(Object.keys(navigation).length).toBeTruthy();
+    it('should generate model keys', () => {
+        let modelKeys = GenerateModelKeys({});
+        expect(modelKeys).toBeTruthy();
+        expect(Object.keys(modelKeys).length).toBeTruthy();
     });
 });

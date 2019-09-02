@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Provider, connect } from 'react-redux';
-import { createAppContainer, createStackNavigator } from 'react-navigation';
+import { Provider } from 'react-redux';
+import { createAppContainer } from 'react-navigation';
 import { createStore } from 'redux';
 import { buildReducers } from './reducers/index';
-import { RootStack } from './src/navigationstack';
+import { RootStack } from './navigationstack';
 
 // A very simple store
 let store = createStore(buildReducers());
