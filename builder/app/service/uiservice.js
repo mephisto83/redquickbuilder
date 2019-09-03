@@ -9,14 +9,14 @@ export function GenerateUi(options) {
         color1: '#3F51B5',
         color2info: '#3F57D3',
         color3success: '#5cb85c',
-        color4danger: '#d9534f',
+        color4: '#d9534f',
         color5warning: '#f0ad4e'
     };
     let alterNate = {
         color1: '#494947',
         color2info: '#35FF69',
         color3success: '#44CCFF',
-        color4danger: '#7494EA',
+        color4: '#7494EA',
         color5warning: '#D138BF'
     };
     let colors = GetRootGraph(state)[GraphKeys.COLORSCHEME] || 'e5e1ee-dffdff-90bede-68edc6-90f3ff';
