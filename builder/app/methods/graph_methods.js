@@ -74,6 +74,7 @@ export function createGraph() {
 export const GraphKeys = {
     NAMESPACE: 'namespace',
     PROJECTNAME: 'project_name',
+    COLORSCHEME: 'color_scheme',
     SERVER_SIDE_SETUP: 'server_side_setup'
 }
 export function updateWorkSpace(graph, options) {

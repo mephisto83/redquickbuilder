@@ -19,7 +19,7 @@ export function GenerateUi(options) {
         color4danger: '#7494EA',
         color5warning: '#D138BF'
     };
-    let colors = 'ffbe0b-fb5607-ff006e-8338ec-3a86ff';
+    let colors = GetRootGraph(state)[GraphKeys.COLORSCHEME] || 'e5e1ee-dffdff-90bede-68edc6-90f3ff';
     Object.keys(alterNate).map((t, _i) => {
 
         alterNate[t] = '#' + (colors.split('-')[_i]);

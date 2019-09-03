@@ -48,6 +48,7 @@ class CodeView extends Component {
         let graphRoot = UIA.GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
         let projectname = graphRoot ? graphRoot[GraphKeys.PROJECTNAME] : null;
+        let colorscheme  = graphRoot ? graphRoot[GraphKeys.COLORSCHEME] : null;
         let server_side_setup = graphRoot ? graphRoot[GraphKeys.SERVER_SIDE_SETUP] : null;
 
 
@@ -108,6 +109,12 @@ class CodeView extends Component {
                                     }}
                                     label={Titles.ProjectName}
                                     value={projectname} />
+                                <TextInput
+                                    onChange={(val) => {
+                                        this.props.setRootGraph(GraphKeys.COLORSCHEME, val);
+                                    }}
+                                    label={Titles.ColorScheme}
+                                    value={colorscheme} />
                                 <SelectInput
                                     label={Titles.ServerSideSetup}
                                     options={Object.keys(IdentityManagement).map(t => {

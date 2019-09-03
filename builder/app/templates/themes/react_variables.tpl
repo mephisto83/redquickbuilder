@@ -142,5 +142,6 @@ export default {
   "deviceWidth": 1920,
   "deviceHeight": 969,
   "isIphoneX": false,
-  "inputGroupRoundedBorderRadius": 30
+  "inputGroupRoundedBorderRadius": 30,
+  "containerBgColor": "{{color2info}}"
 }

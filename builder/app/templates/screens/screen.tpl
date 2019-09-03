@@ -34,8 +34,7 @@ class {{name}} extends React.Component {
     render() {
         return (
             <StyleProvider style={getTheme(material)}>  
-                 <Container style={{backgroundColor:'#f10000'}}>
-                   
+                 <Container>                   
                     <Content>
                         <Text>{{title}}</Text>
                     </Content>
