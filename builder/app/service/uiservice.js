@@ -19,7 +19,7 @@ export function GenerateUi(options) {
         color4danger: '#7494EA',
         color5warning: '#D138BF'
     };
-    let colors = '1ac8ed-aed4e6-af7595-8c2155-5c1a1b';
+    let colors = 'ffbe0b-fb5607-ff006e-8338ec-3a86ff';
     Object.keys(alterNate).map((t, _i) => {
 
         alterNate[t] = '#' + (colors.split('-')[_i]);
