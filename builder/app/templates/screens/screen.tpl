@@ -20,7 +20,7 @@ class {{name}} extends React.Component {
                         <Header>
                             <Left>
                                 <Button transparent>
-                                <Icon name='menu' />
+                                    <Icon name='menu' />
                                 </Button>
                             </Left>
                             <Body>

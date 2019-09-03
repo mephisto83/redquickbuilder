@@ -2,6 +2,8 @@ import color from "color";
 
 import { Platform, Dimensions, PixelRatio } from "react-native";
 
+import { PLATFORM } from './commonColor';
+
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 const platform = Platform.OS;
@@ -12,6 +14,7 @@ const isIphoneX =
 export default {
   "platformStyle": "material",
   "platform": "ios",
+  "toolbarHeight": platform === PLATFORM.IOS ? 64 : 35,
   "androidRipple": true,
   "androidRippleColor": "rgba(256, 256, 256, 0.3)",
   "androidRippleColorDark": "rgba(0, 0, 0, 0.15)",
