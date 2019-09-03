@@ -19,6 +19,12 @@ export function GenerateUi(options) {
         color4danger: '#7494EA',
         color5warning: '#D138BF'
     };
+    let colors = '1ac8ed-aed4e6-af7595-8c2155-5c1a1b';
+    Object.keys(alterNate).map((t, _i) => {
+
+        alterNate[t] = '#' + (colors.split('-')[_i]);
+
+    })
     let template = fs.readFileSync('./app/templates/themes/react_variables.tpl', 'utf8');
 
     let templates = [bindTemplate(template, {

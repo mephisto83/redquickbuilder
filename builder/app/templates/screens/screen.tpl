@@ -16,17 +16,19 @@ class {{name}} extends React.Component {
         headerTitleStyle: {
             fontWeight: 'bold',
         },
-        header: (<Header>
-                        <Left>
-                            <Button transparent>
-                            <Icon name='menu' />
-                            </Button>
-                        </Left>
-                        <Body>
-                            <Title>{ titleService.get({{title}}) }</Title>
-                        </Body>
-                        <Right />
-                    </Header>)
+        header: (<StyleProvider style={getTheme(material)}>  
+                        <Header>
+                            <Left>
+                                <Button transparent>
+                                <Icon name='menu' />
+                                </Button>
+                            </Left>
+                            <Body>
+                                <Title>{ titleService.get({{title}}) }</Title>
+                            </Body>
+                            <Right />
+                        </Header>
+                    </StyleProvider>)
     };
 
     render() {
