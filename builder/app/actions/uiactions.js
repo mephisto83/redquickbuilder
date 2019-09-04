@@ -385,6 +385,13 @@ export function _getConditions(state, id) {
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
 
+export function GetConnectedScreenOptions(id) {
+    let state = _getState();
+    let graph = GetRootGraph(state);
+    return GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption);
+}
 export function GetModelPropertyNodes(refId) {
     var state = _getState();
     return GraphMethods.GetLinkChain(state, {
@@ -831,6 +838,7 @@ export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
 export const NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE = 'NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE';
 export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
 export const NEW_EXTENTION_NODE = 'NEW_EXTENTION_NODE';
+export const NEW_SCREEN_OPTIONS = 'NEW_SCREEN_OPTIONS';
 export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY';
 export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
 export const ADD_NEW_REFERENCE_NODE = 'ADD_NEW_REFERENCE_NODE;'
@@ -945,6 +953,10 @@ export function graphOperation(operation, options) {
                     break;
                 case NEW_CUSTOM_OPTION:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_SCREEN_OPTIONS:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ScreenOption);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
                 case ADD_NEW_REFERENCE_NODE:

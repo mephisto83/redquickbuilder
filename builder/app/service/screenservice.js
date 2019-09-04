@@ -1,4 +1,4 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 
@@ -23,6 +23,7 @@ export function BindScreensToTemplate() {
     let template = fs.readFileSync('./app/templates/screens/screen.tpl', 'utf8');
 
     return screens.map(screen => {
+        let screenOptions = GetConnectedScreenOptions(screen.id);
         return {
             template: bindTemplate(template, {
                 name: GetCodeName(screen),

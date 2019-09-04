@@ -24,6 +24,7 @@ export const NodeTypes = {
     OptionList: 'option-list',
     OptionListItem: 'option-list-item',
     OptionCustom: 'option-custom',
+    ScreenOption: 'screen-option',
     ExtensionTypeList: 'extension-type-list',
     ExtensionType: 'extension-type',
     Function: 'function',
@@ -170,6 +171,8 @@ export const NameSpace = {
 }
 
 export const NodeProperties = {
+    EnabledMenu: 'EnabledMenu',
+    UIType: 'UIType',
     Enumeration: 'Enumeration',
     ConditionType: 'ConditionType',
     MatchReference: 'MatchReference',
@@ -403,6 +406,7 @@ export const LinkType = {
     DependsOn: 'depends-on',
     ExtensionList: 'extension-list',
     Extension: 'extension',
+    ScreenOptions: 'screen-options',
     Enumeration: 'enumeration',
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
@@ -550,6 +554,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ScreenOptionsLink: {
+        type: LinkType.ScreenOptions
     },
     ModelItemFilter: {
         type: LinkType.ModelItemFilter
@@ -743,6 +750,13 @@ export const Methods = {
 }
 export const ValidationVector = {
     Content: 'content'
+}
+export const UITypes = {
+    ReactNative: 'ReactNative',
+    Web: 'Web',
+    VR: 'VR',
+    AR: 'AR',
+    Desktop: 'Desktop'
 }
 export const ValidationRules = {
     CVV: "cvv",

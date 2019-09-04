@@ -16,9 +16,11 @@ import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
 import Content from './content';
+import ScreenActivityMenu from './screenactivitymenu';
 import SideBar from './sidebar';
 import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
+import ScreenOptionsActivityMenu from './screenoptionsactivitymenu';
 import ServiceActivityMenu from './serviceactivitymenu';
 import SideBarContent from './sidebarcontent';
 import NavBarButton from './navbarbutton';
@@ -430,9 +432,11 @@ class Dashboard extends Component {
                                 <ValidationItemFormControl />
                                 <ChoiceActivityMenu />
                                 <MaestroActivityMenu />
+                                <ScreenActivityMenu />
                                 <ValidationActivityMenu />
                                 <OptionActivityMenu />
                                 <ExtensionListActivityMenu />
+                                <ScreenOptionsActivityMenu />
                                 <OptionItemFormControl />
                                 <PermissionActivityMenu />
                                 <ExtensionDefinitionMenu />

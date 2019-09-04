@@ -105,6 +105,16 @@ function createReactNative() {
             cwd: localDir
         });
     }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-navigation-drawer', '--save'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'react-native-reanimated', '--save'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
         return executeSpawnCmd('npm', ['install', 'react-native-gesture-handler', '--save'], {
             shell: true,
             cwd: localDir
