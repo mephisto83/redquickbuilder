@@ -10,8 +10,8 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import ButtonList from './buttonlist';
 import CheckBox from './checkbox';
-import { NodeTypes, LinkProperties, NodeProperties, UITypes } from '../constants/nodetypes';
-import { GetNode } from '../methods/graph_methods';
+import { NodeTypes, LinkProperties, NodeProperties, UITypes, MAIN_CONTENT, MIND_MAP, LAYOUT_VIEW } from '../constants/nodetypes';
+import { GetNode, CreateLayout } from '../methods/graph_methods';
 class ScreenOptionsActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -33,7 +33,7 @@ class ScreenOptionsActivityMenu extends Component {
                             value: value
                         });
                     }}
-                    
+
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)} />
                 <CheckBox
                     label={Titles.EnableMenu}
@@ -45,7 +45,16 @@ class ScreenOptionsActivityMenu extends Component {
                             value
                         });
                     }} />
-
+                <ControlSideBarMenu>
+                    <ControlSideBarMenuItem onClick={() => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.Layout,
+                            id: currentNode.id,
+                            value: UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout()
+                        });
+                        this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.SetupLayout} description={Titles.SetupLayout} />
+                </ControlSideBarMenu>
             </TabPane>
         );
     }

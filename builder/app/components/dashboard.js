@@ -77,16 +77,14 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
+import LayoutView from './layoutview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 const LINK_DISTANCE = 'LINK_DISTANCE';
-const MAIN_CONTENT = 'MAIN_CONTENT';
-const MIND_MAP = 'MIND_MAP';
-const CODE_VIEW = 'CODE_VIEW';
 class Dashboard extends Component {
 
     componentDidMount() {
@@ -301,6 +299,7 @@ class Dashboard extends Component {
                         </MainSideBar>
                         <Content>
                             <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
+                            <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
                             <MindMap
                                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                                 onNodeClick={(nodeId, boundingBox) => {

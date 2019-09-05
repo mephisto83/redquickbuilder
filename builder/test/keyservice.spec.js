@@ -19,7 +19,7 @@ describe('description', () => {
 
 
     it('should generate model keys', () => {
-        let modelKeys = GenerateModelKeys({});
+        let modelKeys = GenerateModelKeys({ state: app_state });
         expect(modelKeys).toBeTruthy();
         expect(Object.keys(modelKeys).length).toBeTruthy();
     });

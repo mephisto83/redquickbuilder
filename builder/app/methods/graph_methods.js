@@ -83,6 +83,112 @@ export function updateWorkSpace(graph, options) {
     return graph;
 }
 
+export function CreateLayout() {
+    return {
+        layout: {},
+        properties: {}
+    }
+}
+export function FindLayoutRoot(id, root) {
+    if (root && root[id]) {
+        return root[id];
+    }
+    else {
+        let res;
+        Object.keys(root).find(t => {
+            if (root[t])
+                res = FindLayoutRoot(id, root[t]);
+            else { return false; }
+            return res;
+        });
+        return res;
+    }
+    return false;
+}
+export function FindLayoutRootParent(id, root, parent) {
+    if (root[id]) {
+        return parent || root;
+    }
+    else {
+        let res;
+        Object.keys(root).find(t => {
+            res = FindLayoutRootParent(id, root[t], root);
+            return res;
+        });
+        return res;
+    }
+    return false;
+}
+export function GetAllChildren(root) {
+    var result = Object.keys(root)
+    Object.keys(root).map(t => {
+        let temp = GetAllChildren(root[t]);
+        result = [...result, ...temp];
+    });
+    return result;
+}
+export const DefaultCellProperties = {
+    style: {
+        display: 'flex',
+        flex: 1,
+        height: '100%',
+        borderStyle: 'solid',
+        borderWidth: 1
+    }
+}
+export function GetCellProperties(setup, id) {
+    var { properties } = setup;
+    return properties[id];
+}
+export function RemoveCellLayout(setup, id) {
+    if (setup && setup.layout) {
+        let parent = FindLayoutRootParent(id, setup.layout);
+        if (parent) {
+            let kids = GetAllChildren(parent[id]);
+            kids.map(t => {
+                delete setup.properties[t];
+            });
+
+            delete parent[id];
+            delete setup.properties[id];
+        }
+    }
+    return setup;
+}
+export function SetCellsLayout(setup, count, id, properties = DefaultCellProperties) {
+    let keys = [];
+    let root = null;
+    count = parseInt(count);
+    if (!id) {
+        keys = Object.keys(setup.layout);
+        root = setup.layout;
+    }
+    else {
+        root = FindLayoutRoot(id, setup.layout);
+        if (!root) {
+            throw 'missing root';
+        }
+        keys = Object.keys(root);
+    }
+    //If there is room add keys
+    if (keys.length - count < 0) {
+        [].interpolate(0, count - keys.length, () => {
+            let newkey = uuidv4();
+            root[newkey] = {};
+            setup.properties[newkey] = { ...JSON.parse(JSON.stringify(properties)) };
+        });
+    }
+    else if (keys.length - count > 0) {
+        [].interpolate(0, keys.length - count, (index) => {
+            delete root[keys[index]];
+            delete setup.properties[keys[index]];
+        })
+    }
+
+    return setup;
+}
+
+
 export function incrementBuild(graph) {
     graph.version.build++;
     return graph;

@@ -15,6 +15,7 @@ export function GenerateModelKeys(options) {
         });
     });
 
+    
     return [{
         template: templates.join(NEW_LINE),
         relative: './src',
