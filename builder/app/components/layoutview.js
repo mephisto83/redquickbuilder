@@ -123,6 +123,18 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Height}
                                     value={cellStyle.height} />) : null}
+                                {cellStyle ? (<TextInput
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellStyle.width = val === '' ? null : parseInt(val);
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={Titles.Width}
+                                    value={cellStyle.width} />) : null}
                             </Box>
 
                         </div>

@@ -19,6 +19,7 @@ export const Models = 'Models';
 export const OutputModel = 'Output Model';
 export const Height = 'Height';
 export const ConditionType = 'Condition Type';
+export const Width = 'Width';
 export const Reference = 'Reference';
 export const Depth = 'Depth';
 export const Label = 'Label';
