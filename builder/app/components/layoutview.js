@@ -17,7 +17,7 @@ import ControllerGenerator from '../generators/controllergenerator';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import TextInput from './textinput';
-import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout } from '../methods/graph_methods';
+import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout } from '../methods/graph_methods';
 
 import Tab from './tab';
 import TabContainer from './tabcontainer';
@@ -41,15 +41,19 @@ class LayoutView extends Component {
         let active = this.active();
 
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let componentNodes = currentNode ? GetConnectedNodesByType(state, currentNode.id, NodeTypes.ComponentNode) : [];
         let namespace = 'namespace';
         let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
         let cellProperties;
         let cellStyle = null;
+        let cellChildren = null;
         let selectedLayoutRoot = null;
         if (nodeLayout && this.state.selectedCell) {
             cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
             if (cellProperties) {
                 cellStyle = cellProperties.style;
+                cellProperties.children = cellProperties.children || {};
+                cellChildren = cellProperties.children;
             }
             selectedLayoutRoot = FindLayoutRoot(this.state.selectedCell, nodeLayout.layout) || nodeLayout.layout;
         }
@@ -95,6 +99,7 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.FlexDirection}
                                     value={cellStyle.flexDirection} />) : null}
+
                                 {cellStyle ? (<SelectInput
                                     options={[].interpolate(0, 12, (t) => ({ title: t, value: t }))}
                                     onChange={(val) => {
@@ -135,6 +140,20 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Width}
                                     value={cellStyle.width} />) : null}
+
+                                {cellChildren ? (<SelectInput
+                                    options={componentNodes.toNodeSelect()}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellChildren[this.state.selectedCell] = val;
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={Titles.Component}
+                                    value={cellChildren[this.state.selectedCell]} />) : null}
                             </Box>
 
                         </div>

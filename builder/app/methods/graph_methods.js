@@ -120,7 +120,7 @@ export function FindLayoutRootParent(id, root, parent) {
     return false;
 }
 export function GetAllChildren(root) {
-    var result = Object.keys(root)
+    var result = Object.keys(root || {})
     Object.keys(root).map(t => {
         let temp = GetAllChildren(root[t]);
         result = [...result, ...temp];
@@ -134,7 +134,8 @@ export const DefaultCellProperties = {
         height: '100%',
         borderStyle: 'solid',
         borderWidth: 1
-    }
+    },
+    children: {}
 }
 export function GetCellProperties(setup, id) {
     var { properties } = setup;
@@ -596,7 +597,9 @@ function clearGroupDeep(graph, options) {
                     success = success && v;
                 }
             })
-            delete graph.childGroups[id][i];
+            if (graph.childGroups[id]) {
+                delete graph.childGroups[id][i];
+            }
         }
     }
     if (success) {
@@ -1601,6 +1604,19 @@ export function GetConditionNodes(state, id) {
         id
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
+export function GetConnectedNodesByType(state, id, type) {
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === type);
+}
+export function GetConnectedNodeByType(state, id, type, direction) {
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id,
+        direction
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === type);
+}
 export function GetValidationNode(state, id) {
     let graph = GetRootGraph(state);
     return GetNodesLinkedTo(graph, {
@@ -1708,12 +1724,22 @@ export function getNodeLinked(graph, options) {
 
 export function GetNodesLinkedTo(graph, options) {
     if (options) {
-        var { id } = options;
+        var { id, direction } = options;
         if (graph && graph.nodeConnections && id) {
             var nodeLinks = graph.nodeConnections[id];
             if (nodeLinks) {
                 return Object.keys(nodeLinks).map(_id => {
-                    var target = graph.linkLib[_id] ? (graph.linkLib[_id].source !== id ? graph.linkLib[_id].source : graph.linkLib[_id].target) : null;
+                    var target = null;
+                    if (graph.linkLib[_id]) {
+                        if (graph.linkLib[_id].source !== id) {
+                            if (!direction || direction === TARGET)
+                                target = graph.linkLib[_id].source;
+                        }
+                        else {
+                            if (!direction || direction === SOURCE)
+                                target = graph.linkLib[_id].target;
+                        }
+                    }
                     if (!target) {
                         console.warn('Missing value in linkLib');
                         return null;

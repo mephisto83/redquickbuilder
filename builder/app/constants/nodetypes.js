@@ -13,6 +13,7 @@ export const NodeTypes = {
     ChoiceList: 'choice-list',
     Permission: 'permission',
     PermissionDependency: 'permission-dependency',
+    ComponentNode: 'component-node',
     Condition: 'condition',
     ModelItemFilter: "model-item-filter",
     Enumeration: 'enumeration', //Basically a list of const string.
@@ -262,6 +263,7 @@ export const NodeProperties = {
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
+    ComponentType: 'component-type',
     ReferenceType: 'referenceType', //Reference nodes will have this type.
 
     UIAttributeType: 'uiAttributeType',
@@ -415,6 +417,7 @@ export const LinkType = {
     Extension: 'extension',
     ScreenOptions: 'screen-options',
     Enumeration: 'enumeration',
+    Component: 'component',
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
     LogicalNieces: 'logical-nieces',
@@ -561,6 +564,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ComponentLink: {
+        type: LinkType.Component
     },
     ScreenOptionsLink: {
         type: LinkType.ScreenOptions

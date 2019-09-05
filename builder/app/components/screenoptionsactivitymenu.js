@@ -12,6 +12,7 @@ import ButtonList from './buttonlist';
 import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties, UITypes, MAIN_CONTENT, MIND_MAP, LAYOUT_VIEW } from '../constants/nodetypes';
 import { GetNode, CreateLayout } from '../methods/graph_methods';
+import { ComponentTypes } from '../constants/componenttypes';
 class ScreenOptionsActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -20,6 +21,8 @@ class ScreenOptionsActivityMenu extends Component {
         if (currentNode) {
 
         }
+        let componentTypes = ComponentTypes[UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)] || {};
+        let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
         return (
             <TabPane active={active}>
                 <ControlSideBarMenuHeader title={Titles.ScreenOptions} />
@@ -54,6 +57,21 @@ class ScreenOptionsActivityMenu extends Component {
                         });
                         this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                     }} icon={'fa fa-puzzle-piece'} title={Titles.SetupLayout} description={Titles.SetupLayout} />
+                    <ControlSideBarMenuItem onClick={() => {
+                        this.props.graphOperation(UIA.NEW_COMPONENT_NODE, {
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
+                            properties: {
+                                [UIA.NodeProperties.UIType]: UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)
+                            },
+                            linkProperties: {
+                                properties: { ...LinkProperties.ComponentLink }
+                            }
+                        });
+
+                        this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddComponentNew} description={Titles.AddComponentNew} />
                 </ControlSideBarMenu>
             </TabPane>
         );

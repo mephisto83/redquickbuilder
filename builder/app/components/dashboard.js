@@ -36,6 +36,7 @@ import AttributeFormControl from './attributeformcontrol';
 import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
+import ComponentActivityMenu from './componentactivitymenu';
 import ModelFilterActivityMenu from './modelfilteractivitymenu';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
@@ -422,6 +423,7 @@ class Dashboard extends Component {
                                 <CommonActivityMenu />
                                 <FunctionActivityMenu />
                                 <MethodActivityMenu />
+                                <ComponentActivityMenu />
                                 <AttributeFormControl />
                                 <ParameterActivityMenu />
                                 <ModelActivityMenu />
