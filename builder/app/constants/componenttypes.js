@@ -25,7 +25,9 @@ export const ComponentTypes = {
         Item: {},
         Label: {},
         Left: {},
-        List: {},
+        List: {
+            layout: true
+        },
         ListItem: {},
         Picker: {},
         Radio: {},

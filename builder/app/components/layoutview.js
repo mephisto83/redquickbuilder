@@ -17,7 +17,7 @@ import ControllerGenerator from '../generators/controllergenerator';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import TextInput from './textinput';
-import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout } from '../methods/graph_methods';
+import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET } from '../methods/graph_methods';
 
 import Tab from './tab';
 import TabContainer from './tabcontainer';
@@ -41,7 +41,7 @@ class LayoutView extends Component {
         let active = this.active();
 
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        let componentNodes = currentNode ? GetConnectedNodesByType(state, currentNode.id, NodeTypes.ComponentNode) : [];
+        let componentNodes = currentNode ? GetConnectedNodesByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : [];
         let namespace = 'namespace';
         let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
         let cellProperties;

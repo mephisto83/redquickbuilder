@@ -1604,10 +1604,11 @@ export function GetConditionNodes(state, id) {
         id
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
-export function GetConnectedNodesByType(state, id, type) {
+export function GetConnectedNodesByType(state, id, type, direction) {
     let graph = GetRootGraph(state);
     return GetNodesLinkedTo(graph, {
-        id
+        id, 
+        direction
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === type);
 }
 export function GetConnectedNodeByType(state, id, type, direction) {
