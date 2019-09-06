@@ -17,11 +17,15 @@ export const ComponentTypes = {
         H3: {},
         Header: {},
         Icon: {},
+        Image: {
+            library: 'react-native'
+        },
         Input: {},
         InputGroup: {},
         Item: {},
         Label: {},
         Left: {},
+        List: {},
         ListItem: {},
         Picker: {},
         Radio: {},
@@ -48,5 +52,6 @@ export const ComponentTypes = {
 }
 
 Object.keys(ComponentTypes.ReactNative).map(key => {
+    ComponentTypes.ReactNative.library = ComponentTypes.ReactNative.library || 'native-base';
     ComponentTypes.ReactNative[key].key = key;
 })
