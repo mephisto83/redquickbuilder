@@ -3,6 +3,9 @@ import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DI
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
 import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
+import { isBuffer } from 'util';
+var os = require('os');
+
 export function createGraph() {
     return {
         id: uuidv4(),
@@ -78,9 +81,17 @@ export const GraphKeys = {
     SERVER_SIDE_SETUP: 'server_side_setup'
 }
 export function updateWorkSpace(graph, options) {
-    let { workspace } = options;
-    graph.workspace = workspace;
+    let {
+        workspace
+    } = options;
+
+    graph.workspaces = graph.workspaces || {};
+    graph.workspaces[os.platform()] = workspace;
+    if (graph.workspaces[os.platform()]) {
+        graph.workspace = workspace;
+    }
     return graph;
+    
 }
 
 export function CreateLayout() {
@@ -1607,7 +1618,7 @@ export function GetConditionNodes(state, id) {
 export function GetConnectedNodesByType(state, id, type, direction) {
     let graph = GetRootGraph(state);
     return GetNodesLinkedTo(graph, {
-        id, 
+        id,
         direction
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === type);
 }

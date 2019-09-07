@@ -9,6 +9,7 @@ import Generator from '../generators/generator';
 import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { uuidv4 } from '../utils/array';
+import { platform } from 'os';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -46,25 +47,25 @@ export function scaffoldProject(options = {}) {
         var state = getState();
         let root = GetRootGraph(state);
         let solutionName = root.title.split(' ').join('.');
-
-        ensureDirectory(path.join(root.workspace));
-        ensureDirectory(path.join(root.workspace, root.title));
+        let workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+        ensureDirectory(path.join(workspace));
+        ensureDirectory(path.join(workspace, root.title));
         (filesOnly ? Promise.resolve() : send(HandlerEvents.scaffold.message, {
             solutionName,
             appName: root[GraphKeys.PROJECTNAME] || '',
-            workspace: path.join(root.workspace, root.title, 'netcore')
+            workspace: path.join(workspace, root.title, 'netcore')
         })).then(() => {
             return (filesOnly ? Promise.resolve() : send(HandlerEvents.reactnative.message, {
                 solutionName,
                 appName: root[GraphKeys.PROJECTNAME] || '',
-                workspace: path.join(root.workspace, root.title, 'reactnative')
+                workspace: path.join(workspace, root.title, 'reactnative')
             }))
         }).then(res => {
             console.log('Finished Scaffolding.');
-            generateFiles(path.join(root.workspace, root.title, 'netcore'), solutionName, state);
+            generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
         }).then(() => {
             console.log('generate react-native files');
-            generateReactNative(path.join(root.workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]), state);
+            generateReactNative(path.join(workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]), state);
         }).then(() => {
 
             let namespace = root ? root[GraphKeys.NAMESPACE] : null;
@@ -75,7 +76,7 @@ export function scaffoldProject(options = {}) {
                 return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
                     model: GetNodeProp(userNode, NodeProperties.CodeName),
                     namespace
-                }, null, path.join(path.join(root.workspace, root.title, 'netcore'), solutionName + path.join('.Web')));
+                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web')));
             }
         }).then(() => {
             console.log('Write react-native files')
@@ -84,7 +85,7 @@ export function scaffoldProject(options = {}) {
             if (appName) {
                 return generateFolderStructure(path.join(`./app/templates/react_native/${version}`), {
 
-                }, null, path.join(root.workspace, root.title, 'reactnative', appName));
+                }, null, path.join(workspace, root.title, 'reactnative', appName));
             }
             else {
                 console.warn('No app name given');
@@ -175,7 +176,10 @@ function ensureDirectory(dir) {
     let _dir_parts = dir.split(path.sep);
     _dir_parts.map((_, i) => {
         if (i > 1 || _dir_parts.length - 1 === i) {
-            let tempDir = path.join(..._dir_parts.subset(0, i + 1))
+            let tempDir = path.join(..._dir_parts.subset(0, i + 1));
+            if (dir.startsWith(path.sep)) {
+                tempDir = `${path.sep}${tempDir}`;
+            }
             if (!fs.existsSync(tempDir)) {
                 fs.mkdirSync(tempDir);
             }

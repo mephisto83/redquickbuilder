@@ -6,7 +6,7 @@ import {
 } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GetNode, GetMethodNode } from '../app/methods/graph_methods';
-import { GetScreens, BindScreensToTemplate, GenerateScreens, GenerateScreenMarkup, GetScreenOption, GenerateMarkupTag, GetScreenImports } from '../app/service/screenservice';
+import { GetScreens, BindScreensToTemplate, GenerateScreens, GenerateScreenMarkup, GetScreenOption, GenerateMarkupTag, GetScreenImports, GenerateScreenOptionSource } from '../app/service/screenservice';
 var smash_41 = fs.readFileSync(`./test/smash_41.rqb`, 'utf8');
 
 describe('description', () => {
@@ -46,6 +46,7 @@ describe('description', () => {
         expect('fasT' === temp.toJavascriptName()).toBeTruthy();
     });
 
+
     it('should generate code for Home Screen', () => {
         let screen = GetNodeById('7ef43f0f-706a-4aa0-9ac6-0f592eacbf9f');
 
@@ -64,9 +65,19 @@ describe('description', () => {
         let screenOption = GetScreenOption(SCREEN, NodeTypes.UITypes.ReactNative);
         let markupTag = GenerateMarkupTag(screenOption, NodeTypes.UITypes.ReactNative);
 
+
         expect(markupTag).toBe('<HomeScreenOptionsReactNative />')
     });
-    
+
+    it('should generate screen options src', () => {
+
+        let screenOption = GetScreenOption(SCREEN, NodeTypes.UITypes.ReactNative);
+        let sourceCode = GenerateScreenOptionSource(screenOption, SCREEN, NodeTypes.UITypes.ReactNative);
+
+        expect(sourceCode).toBeTruthy();
+        console.log(sourceCode);
+    });
+
     it('should generate imports for screen', () => {
         let screen = ('7ef43f0f-706a-4aa0-9ac6-0f592eacbf9f');
         let imports = GetScreenImports(screen, NodeTypes.UITypes.ReactNative);

@@ -82,6 +82,7 @@ import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodePr
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
+import { platform } from 'os';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -177,7 +178,7 @@ class Dashboard extends Component {
         let workspace = null;
         if (rootGraph) {
             version = `${rootGraph.version.major}.${rootGraph.version.minor}.${rootGraph.version.build}`;
-            workspace = rootGraph.workspace;
+            workspace = rootGraph.workspaces ? rootGraph.workspaces[platform()] || rootGraph.workspace : rootGraph.workspace;
         }
         let hoveredLink = null;
         if (UIA.Visual(state, UIA.HOVERED_LINK)) {

@@ -2,6 +2,7 @@ import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, G
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE } from "../constants/nodetypes";
+import { buildLayoutTree } from "./layoutservice";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -29,6 +30,25 @@ export function GenerateScreenMarkup(id, language) {
             elements: elements.join(NEW_LINE)
         })
     }
+}
+
+export function GenerateScreenOptionSource(node, parent, language) {
+    switch (language) {
+        case UITypes.ReactNative:
+            return GenerateRNScreenOptionSource(node, parent, language);
+    }
+}
+export function GenerateRNScreenOptionSource(node, parent, language) {
+    let layoutObj = GetNodeProp(node, NodeProperties.Layout);
+    let layoutSrc = buildLayoutTree(layoutObj, null, language).join(NEW_LINE);
+    let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+    let imports = [];
+    return  bindTemplate(template, {
+        name: GetCodeName(node),
+        title: `"${GetNodeTitle(node)}"`,
+        imports: imports.join(NEW_LINE),
+        elements: layoutSrc
+    })
 }
 export function GenerateMarkupTag(node, language) {
 
@@ -65,7 +85,9 @@ export function GetScreenImports(id, language) {
 export function GenerateImport(node, parentNode, language) {
     switch (language) {
         case UITypes.ReactNative:
-            return `import ${GetCodeName(node)} from '../components/${GetCodeName(parentNode).toJavascriptName()}/${GetCodeName(node).toJavascriptName()}'`;
+            if (node) {
+                return `import ${GetCodeName(node)} from '../components/${(GetCodeName(parentNode) || '').toJavascriptName()}/${(GetCodeName(node) || '').toJavascriptName()}'`;
+            }
     }
 }
 

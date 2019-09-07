@@ -162,49 +162,7 @@ export default class MindMap extends Component {
             redraw();
             return vis;
         }
-        // function gridify(svg, pgLayout, margin, groupMargin) {
-        //     var routes = cola.gridify(pgLayout, 5, margin, groupMargin);
-        //     svg.selectAll('path').remove();
-        //     routes.forEach(route => {
-        //         var cornerradius = 5;
-        //         var arrowwidth = 3;
-        //         var arrowheight = 7;
-        //         var p = cola.GridRouter.getRoutePath(route, cornerradius, arrowwidth, arrowheight);
-        //         if (arrowheight > 0) {
-        //             svg.append('path')
-        //                 .attr('class', 'linkarrowoutline')
-        //                 .attr('d', p.arrowpath);
-        //             svg.append('path')
-        //                 .attr('class', 'linkarrow')
-        //                 .attr('d', p.arrowpath);
-        //         }
-        //         svg.append('path')
-        //             .attr('class', 'linkoutline')
-        //             .attr('d', p.routepath)
-        //             .attr('fill', 'none');
-        //         svg.append('path')
-        //             .attr('class', 'link')
-        //             .attr('d', p.routepath)
-        //             .attr('fill', 'none');
-        //     });
-
-        //     svg.selectAll(".label").transition().attr("x", d => d.routerNode.bounds.cx())
-        //         .attr("y", function (d) {
-        //             var h = this.getBBox().height;
-        //             return d.bounds.cy() + h / 3.5;
-        //         });
-
-        //     svg.selectAll(".node").transition().attr("x", d => d.routerNode.bounds.x)
-        //         .attr("y", d => d.routerNode.bounds.y)
-        //         .attr("width", d => d.routerNode.bounds.width())
-        //         .attr("height", d => d.routerNode.bounds.height());
-
-        //     let groupPadding = margin - groupMargin;
-        //     svg.selectAll(".group").transition().attr('x', d => d.routerNode.bounds.x - groupPadding)
-        //         .attr('y', d => d.routerNode.bounds.y + 2 * groupPadding)
-        //         .attr('width', d => d.routerNode.bounds.width() - groupPadding)
-        //         .attr('height', d => d.routerNode.bounds.height() - groupPadding);
-        // }
+      
         var graph = this.state.graph;
 
         graph.nodes.forEach(function (v) {
@@ -357,12 +315,6 @@ export default class MindMap extends Component {
                     d.innerBounds = d.bounds.inflate(- margin);
                 });
             }
-
-            // link.attr("x1", function (d) { return d.source.x; })
-            //     .attr("y1", function (d) { return d.source.y; })
-            //     .attr("x2", function (d) { return d.target.x; })
-            //     .attr("y2", function (d) { return d.target.y; });
-
 
             if (me.$_nodes) {
                 me.$_nodes
