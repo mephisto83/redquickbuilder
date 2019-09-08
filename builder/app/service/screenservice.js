@@ -40,7 +40,7 @@ export function GenerateScreenOptionSource(node, parent, language) {
 }
 
 export function GetDefaultElement(language) {
-    return '<View></View>';
+    return '<View><Text>DE</Text></View>';
 }
 export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
