@@ -91,7 +91,7 @@ export function updateWorkSpace(graph, options) {
         graph.workspace = workspace;
     }
     return graph;
-    
+
 }
 
 export function CreateLayout() {
@@ -118,7 +118,7 @@ export function FindLayoutRoot(id, root) {
 }
 export function FindLayoutRootParent(id, root, parent) {
     if (root[id]) {
-        return parent || root;
+        return root || parent;
     }
     else {
         let res;
@@ -132,7 +132,7 @@ export function FindLayoutRootParent(id, root, parent) {
 }
 export function GetAllChildren(root) {
     var result = Object.keys(root || {})
-    Object.keys(root).map(t => {
+    result.map(t => {
         let temp = GetAllChildren(root[t]);
         result = [...result, ...temp];
     });
@@ -861,7 +861,57 @@ export function GetNode(graph, id) {
 }
 
 
+export function GetChildComponentAncestors(state, id) {
+    let result = [];
 
+    let graph = GetRootGraph(state);
+    let ancestors = GetNodesLinkedTo(graph, {
+        id,
+        direction: TARGET
+    }).filter(x => {
+        let nodeType = GetNodeProp(x, NodeProperties.NODEType);
+        switch (nodeType) {
+            case NodeTypes.ScreenOption:
+            case NodeTypes.ComponentNode:
+                return true;
+        }
+        return false;
+    }).map(t => t.id);
+
+    result = [...result, ...ancestors].unique();
+    ancestors.map(t => {
+        let temp = GetChildComponentAncestors(state, t);
+        result = [...result, ...temp];
+    });
+    return result.unique();
+
+}
+export function createComponentProperties() {
+    return {
+        properties: {},
+        instanceTypes: {}
+    };
+}
+export function addComponentProperty(props, ops) {
+    let { modelType, modelProp, instanceType } = ops;
+    if (props && props.properties) {
+        props.properties[modelProp] = modelType;
+        props.instanceTypes[modelProp] = instanceType;
+    }
+    return props;
+}
+export function getComponentPropertyList(props) {
+    if (props && props.properties) {
+        return Object.keys(props.properties).map(t => ({ title: t, id: t, value: t }))
+    }
+    return [];
+}
+export function hasComponentProperty(props, prop) {
+    return props && props.properties && props.properties.hasOwnProperty(prop);
+}
+export function getComponentProperty(props, prop, type = 'properties') {
+    return props && props[type] && props[type][(prop)];
+}
 export function GetGroup(graph, id) {
     if (graph && graph.groupLib) {
         return graph.groupLib[id];

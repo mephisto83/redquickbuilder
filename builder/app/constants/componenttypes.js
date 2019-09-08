@@ -1,3 +1,6 @@
+import { NodeTypes } from "./nodetypes";
+
+
 export const ComponentTypes = {
     ReactNative: {
         Badge: {},
@@ -11,7 +14,10 @@ export const ComponentTypes = {
         Fab: {},
         Footer: {},
         FooterTab: {},
-        Form: {},
+        Form: {
+            layout: true,
+            template: './app/templates/components/form.tpl'
+        },
         H1: {},
         H2: {},
         H3: {},
@@ -20,7 +26,13 @@ export const ComponentTypes = {
         Image: {
             library: 'react-native'
         },
-        Input: {},
+        Input: {
+            template: './app/templates/components/input.tpl',
+            properties: {
+                item_attributes: ['fixedLabel', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'regular', 'rounded', 'success', 'error', 'disabled'],
+                label: {}
+            }
+        },
         InputGroup: {},
         Item: {},
         Label: {},
@@ -56,4 +68,11 @@ export const ComponentTypes = {
 Object.keys(ComponentTypes.ReactNative).map(key => {
     ComponentTypes.ReactNative.library = ComponentTypes.ReactNative.library || 'native-base';
     ComponentTypes.ReactNative[key].key = key;
-})
+});
+
+
+export const InstanceTypes = {
+    ScreenInstance: 'ScreenInstance',
+    Instance: 'Instance',
+    AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
+}

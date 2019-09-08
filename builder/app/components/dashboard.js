@@ -37,6 +37,7 @@ import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import ComponentActivityMenu from './componentactivitymenu';
+import ComponentPropertyMenu from './componentpropertymenu';
 import ModelFilterActivityMenu from './modelfilteractivitymenu';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
@@ -455,6 +456,7 @@ class Dashboard extends Component {
                                 <ModelRelationshipMenu />
                                 <MethodPropertyMenu />
                                 <PermissionMenu />
+                                <ComponentPropertyMenu />
                                 <ModelFilterMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<ValidatorPropertyActivityMenu />) : null}

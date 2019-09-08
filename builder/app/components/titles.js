@@ -181,6 +181,7 @@ export const ExtensionDefinitionMenu = 'Define custom extensions';
 export const ExtensionConfig = 'Extension Config';
 export const DependsOn = 'Depends On';
 export const UseId = 'Use Id';
+export const InstanceType = 'Instance Type';
 export const Property = 'Property';
 export const Condition = 'Condition';
 export const DependsOnDescription = 'Defines if a the property associated with this extension is visually dependent on the value of another property on the same object.'

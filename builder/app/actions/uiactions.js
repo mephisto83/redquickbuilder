@@ -71,6 +71,10 @@ export function GetNodeById(node) {
     return GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
 }
 
+export function GetChildComponentAncestors(id) {
+    return GraphMethods.GetChildComponentAncestors(_getState(), id);
+}
+
 export function GetMethodDefinition(id) {
     return MethodFunctions[GetMethodFunctionType(id)];
 }

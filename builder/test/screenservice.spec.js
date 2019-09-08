@@ -75,7 +75,6 @@ describe('description', () => {
         let sourceCode = GenerateScreenOptionSource(screenOption, SCREEN, NodeTypes.UITypes.ReactNative);
 
         expect(sourceCode).toBeTruthy();
-        console.log(sourceCode);
     });
 
     it('should generate imports for screen', () => {

@@ -3,6 +3,7 @@ import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents } from "./layoutservice";
+import { ComponentTypes } from "../constants/componenttypes";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -48,7 +49,6 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let imports = [];
     let layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports).join(NEW_LINE) : GetDefaultElement();
     let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
-    console.log(imports);
 
     let results = [];
     imports.map(t => {
@@ -56,7 +56,6 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         results.push(...GenerateRNComponents(GetNodeById(t), relPath, language))
     });
     imports = imports.unique().map(t => GenerateComponentImport(t, node, language));
-    console.log(imports);
     template = bindTemplate(template, {
         name: GetCodeName(node),
         relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join(''),
@@ -67,11 +66,22 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     return [{
         template: template,
         relative: relativePath ? relativePath : './src/components',
-        relativeFilePath: `./${GetCodeName(node).toJavascriptName()}.js`,
+        relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.js`,
         name: GetCodeName(node)
     }, ...results];
 }
+export function bindComponent(node, componentBindingDefinition) {
+    if (componentBindingDefinition && componentBindingDefinition.template) {
+        let template = fs.readFileSync(componentBindingDefinition.template, 'utf8');
+        let { properties } = componentBindingDefinition;
+        let bindProps = {};
+        Object.keys(properties).map(key => {
+            bindProps[key] = '';
+        });
 
+        return bindTemplate(template, bindProps);
+    }
+}
 export function GenerateRNComponents(node, relative = './src/components', language = UITypes.ReactNative) {
     let result = [];
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
@@ -79,16 +89,21 @@ export function GenerateRNComponents(node, relative = './src/components', langua
         switch (GetNodeProp(node, NodeProperties.NODEType)) {
             case NodeTypes.ComponentNode:
                 let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+                let componentType = GetNodeProp(node, NodeProperties.ComponentType);
+                let elements = null;
+                if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
+                    elements = bindComponent(node, ComponentTypes[language][componentType]);
+                }
                 result.push(
                     {
                         relative: relative ? relative : './src/components',
-                        relativeFilePath: `./${GetCodeName(node).toJavascriptName()}.js`,
+                        relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.js`,
                         name: GetCodeName(node),
                         template: bindTemplate(template, {
                             name: GetCodeName(node),
                             imports: '',
                             relative_depth: [].interpolate(0, relative ? relative.split('/').length - 2 : 1, () => '../').join(''),
-                            elements: GetDefaultElement(),
+                            elements: elements || GetDefaultElement(),
 
                         })
                     });

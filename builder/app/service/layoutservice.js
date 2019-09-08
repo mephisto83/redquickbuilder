@@ -1,6 +1,15 @@
 import { UITypes, NEW_LINE } from "../constants/nodetypes";
-import { GetNodeById } from "../actions/uiactions";
+import { GetNodeById, NodeProperties } from "../actions/uiactions";
 import { GenerateMarkupTag } from "./screenservice";
+
+
+export function GetPropertyConsts(id) {
+    let node = GetNodeById(id);
+    let layout = GetNodeProp(node, NodeProperties.Layout);
+    let components = GetNodeComponents(layout);
+    return components;
+}
+
 
 export function GetNodeComponents(layoutObj, item, currentRoot) {
     let imports = [];

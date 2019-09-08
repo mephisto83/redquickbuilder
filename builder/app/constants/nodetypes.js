@@ -179,6 +179,7 @@ export const LAYOUT_VIEW = 'LAYOUT_VIEW';
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     SelectedLayoutCell: 'SelectedLayoutCell',
+    ComponentProperties: "ComponentProperties",
     Layout: 'Layout',
     UIType: 'UIType',
     Enumeration: 'Enumeration',
@@ -418,6 +419,7 @@ export const LinkType = {
     ScreenOptions: 'screen-options',
     Enumeration: 'enumeration',
     Component: 'component',
+    ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
     LogicalNieces: 'logical-nieces',
@@ -567,6 +569,9 @@ export const LinkProperties = {
     },
     ComponentLink: {
         type: LinkType.Component
+    },
+    ComponentPropertyLink: {
+        type: LinkType.ComponentProperty
     },
     ScreenOptionsLink: {
         type: LinkType.ScreenOptions

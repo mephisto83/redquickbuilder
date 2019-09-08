@@ -17,7 +17,7 @@ import ControllerGenerator from '../generators/controllergenerator';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import TextInput from './textinput';
-import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET, SOURCE } from '../methods/graph_methods';
+import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET, SOURCE, getComponentPropertyList, GetNodesLinkedTo, getComponentProperty } from '../methods/graph_methods';
 
 import Tab from './tab';
 import TabContainer from './tabcontainer';
@@ -47,6 +47,8 @@ class LayoutView extends Component {
         let cellProperties;
         let cellStyle = null;
         let cellChildren = null;
+        let cellModel = null;
+        let cellModelProperty = null;
         let selectedLayoutRoot = null;
         if (nodeLayout && this.state.selectedCell) {
             cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
@@ -54,9 +56,16 @@ class LayoutView extends Component {
                 cellStyle = cellProperties.style;
                 cellProperties.children = cellProperties.children || {};
                 cellChildren = cellProperties.children;
+                cellProperties.cellModel = cellProperties.cellModel || {};
+                cellModel = cellProperties.cellModel;
+
+                cellProperties.cellModelProperty = cellProperties.cellModelProperty || {};
+                cellModelProperty = cellProperties.cellModelProperty;
             }
             selectedLayoutRoot = FindLayoutRoot(this.state.selectedCell, nodeLayout.layout) || nodeLayout.layout;
         }
+        let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
+        let componentPropertiesList = getComponentPropertyList(componentProperties);
         return (
             <TopViewer active={active}>
                 <section className="content">
@@ -154,6 +163,36 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Component}
                                     value={cellChildren[this.state.selectedCell]} />) : null}
+
+                                {cellChildren && cellChildren[this.state.selectedCell] && componentPropertiesList && componentPropertiesList.length ? (<SelectInput
+                                    options={componentPropertiesList}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellModel[this.state.selectedCell] = val;
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={Titles.Models}
+                                    value={cellModel[this.state.selectedCell]} />) : null}
+                                {cellModel && cellModel[this.state.selectedCell] && componentPropertiesList && componentPropertiesList.length ? (<SelectInput
+                                    options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
+                                        id: getComponentProperty(componentProperties, cellModel[this.state.selectedCell]),
+                                        direction: SOURCE
+                                    }).toNodeSelect()}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellModelProperty[this.state.selectedCell] = val;
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={Titles.Models}
+                                    value={cellModelProperty[this.state.selectedCell]} />) : null}
                             </Box>
 
                         </div>
