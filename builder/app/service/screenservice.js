@@ -1,9 +1,10 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
-import { buildLayoutTree, addNewLine, GetNodeComponents } from "./layoutservice";
+import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes } from "../constants/componenttypes";
+import { getComponentProperty } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -47,7 +48,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
 
     let imports = [];
-    let layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports).join(NEW_LINE) : GetDefaultElement();
+    let layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE) : GetDefaultElement();
     let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 
     let results = [];
@@ -56,10 +57,17 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         results.push(...GenerateRNComponents(GetNodeById(t), relPath, language))
     });
     imports = imports.unique().map(t => GenerateComponentImport(t, node, language));
+
+    let _consts = GetRNConsts(node.id ? node.id : node) || [];
+    let modelInstances = GetRNModelInstances(node.id ? node.id : node) || [];
+    let screen_options = addNewLine([..._consts, ...modelInstances].unique().join(NEW_LINE), 4);
+
+
     template = bindTemplate(template, {
         name: GetCodeName(node),
         relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join(''),
         title: `"${GetNodeTitle(node)}"`,
+        screen_options,
         imports: imports.join(NEW_LINE),
         elements: addNewLine(layoutSrc, 4)
     });
@@ -102,6 +110,7 @@ export function GenerateRNComponents(node, relative = './src/components', langua
                         template: bindTemplate(template, {
                             name: GetCodeName(node),
                             imports: '',
+                            screen_options: '',
                             relative_depth: [].interpolate(0, relative ? relative.split('/').length - 2 : 1, () => '../').join(''),
                             elements: elements || GetDefaultElement(),
 
@@ -125,11 +134,26 @@ export function GenerateRNComponents(node, relative = './src/components', langua
     return result;
 }
 
-export function GenerateMarkupTag(node, language) {
-
+export function GenerateMarkupTag(node, language, parent, params) {
+    let {
+        children,
+        cellModel,
+        cellModelProperty,
+        item
+    } = (params || {});
     switch (language) {
         case UITypes.ReactNative:
-            return `<${GetCodeName(node)} />`;
+            // let layout = GetNodeProp(parent, NodeProperties.Layout);
+            let onChange = '';
+            if (parent && children && cellModel && cellModelProperty && cellModel[item] && cellModelProperty[item]) {
+                let componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
+                let instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
+
+                onChange = `onChange={value => {
+    this.props.updateScreenInstance(${instanceType}.${GetCodeName(parent)}, ${GetRNModelConstValue(cellModel[item])}, ${GetRNModelConstValue((GetCodeName(cellModelProperty[item]) || '').toJavascriptName())}, value);
+}}`
+            }
+            return `<${GetCodeName(node)} ${onChange}/>`;
     }
 }
 
@@ -207,5 +231,15 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
             name: GetCodeName(screen)
         }
     });
+
+    moreresults.push({
+        template: bindTemplate(`{{source}}`, {
+            source: NodesByType(GetState(), [NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode]).map(t => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`).join(NEW_LINE)
+        }),
+        relative: './src/actions',
+        relativeFilePath: `./screenInstances.js`,
+        name: ``
+    })
+
     return [...result, ...moreresults];
 }

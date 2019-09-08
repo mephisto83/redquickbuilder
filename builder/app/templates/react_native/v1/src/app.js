@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 import { createAppContainer } from 'react-navigation';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import { buildReducers } from './reducers/index';
 import { RootStack } from './navigationstack';
 
 // A very simple store
-let store = createStore(buildReducers());
+let store = createStore(buildReducers(), applyMiddleware(thunk));
 
 // Create our stack navigator
 // And the app container

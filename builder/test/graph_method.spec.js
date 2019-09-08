@@ -2,11 +2,11 @@ import * as NodeTypes from '../app/constants/nodetypes';
 import fs from 'fs';
 import {
     NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION,
-    setTestGetState, _getPermissionsConditions, GetChildComponentAncestors
+    setTestGetState, _getPermissionsConditions, GetChildComponentAncestors, GetCodeName
 } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GenerateModelKeys } from '../app/service/keyservice';
-import { GetPropertyConsts } from '../app/service/layoutservice';
+import { GetPropertyConsts, GetModelConsts, GetModelPropertyConsts, GetRNConsts, GetRNModelInstances } from '../app/service/layoutservice';
 var smash_42 = fs.readFileSync(`./test/smash_42.rqb`, 'utf8');
 var smash_43 = fs.readFileSync('./test/smash_43.rqb', 'utf8');
 
@@ -26,7 +26,7 @@ describe('smash_42', () => {
         let ancestors = GetChildComponentAncestors(childNode);
         expect(ancestors).toBeTruthy();
         expect(ancestors.length).toBeTruthy();
-        expect(ancestors.length).toBe(4);
+        expect(ancestors.length).toBe(2);
     });
 });
 
@@ -40,11 +40,44 @@ describe('smash_43', () => {
     });
 
 
-    it('should get the ancestors up to the page', () => {
+    it('should get the model costs for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetPropertyConsts(childNode);
+        console.log(propertyConsts.map(x => GetCodeName(x)));
+        expect(propertyConsts).toBeTruthy();
+        expect(propertyConsts.length).toBe(2);
+    })
+
+
+    it('should ge the consts for a component', () => {
+        let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
+        let propertyConsts = GetModelConsts(childNode);
         console.log(propertyConsts);
         expect(propertyConsts).toBeTruthy();
-        expect(propertyConsts.length).toBeTruthy();
+        expect(propertyConsts.length).toBe(1);
+    });
+
+    it('should ge the consts for a component', () => {
+        let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
+        let propertyConsts = GetModelPropertyConsts(childNode);
+        console.log(propertyConsts);
+        expect(propertyConsts).toBeTruthy();
+        expect(propertyConsts.length).toBe(1);
+    });
+
+    it('should get consts for react-native component', () => {
+        let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
+        let rnConsts = GetRNConsts(childNode);
+        expect(rnConsts).toBeTruthy();
+        expect(rnConsts.length).toBeTruthy();
+    });
+
+    it('should get model instances for the react-native component', () => {
+        //let loginModel = GetScreenInstance(state, ScreenInstances.LoginForm, const_loginModel) || CreateDefaultLoginModel();
+        let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
+        let model_instances = GetRNModelInstances(childNode);
+        expect(model_instances).toBeTruthy();
+        expect(model_instances.length).toBeTruthy();
+        console.log(model_instances);
     });
 });

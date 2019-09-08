@@ -1,4 +1,5 @@
 export const UI_UPDATE = 'UI_UPDATE';
+export const UISI_UPDATE = 'UISI_UPDATE';
 export const RESET_ALL = 'RESET_ALL';
 export const SCREEN_INSTANCE = 'SCREEN_INSTANCE';
 export const VISUAL = 'VISUAL';
@@ -11,6 +12,16 @@ export function UIC(section, item, value) {
         item,
         value,
         section
+    }
+}
+export function UISI(form, model, item, value) {
+    return {
+        type: UISI_UPDATE,
+        key: SCREEN_INSTANCE,
+        form,
+        model,
+        item,
+        value
     }
 }
 export function Visual(state, key) {
@@ -35,4 +46,10 @@ export function GetScreenInstance(state, key, id) {
     }
 
     return null;
+}
+
+export function updateScreenInstance(form, model, id, value) {
+    return (dispatch, getState) => {
+        dispatch(UISI(form, model, id, value));
+    }
 }

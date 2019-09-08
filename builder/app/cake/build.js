@@ -95,6 +95,11 @@ function createReactNative() {
             cwd: localDir
         });
     }).then(() => {
+        return executeSpawnCmd('npm', ['install', 'redux-thunk', '--save'], {
+            shell: true,
+            cwd: localDir
+        });
+    }).then(() => {
         return executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
             shell: true,
             cwd: localDir
