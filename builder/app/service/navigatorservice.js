@@ -48,7 +48,9 @@ export function BindScreensToTemplate() {
           navigationOptions: _{{name}}.navigationOptions
         }
       );`
-    let importStatements = screens.map(screen => {
+    let importStatements = screens.sort((b, a) => {
+        return (GetNodeProp(a, NodeProperties.Priority) || 0) - (GetNodeProp(b, NodeProperties.Priority) || 0);
+    }).map(screen => {
         let screenOptions = GetConnectedScreenOptions(screen.id);
         let reactNativeOptions = screenOptions.find(x => GetNodeProp(x, NodeProperties.UIType) === UITypes.ReactNative);
         let temp_template = import_template;

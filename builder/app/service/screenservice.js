@@ -84,7 +84,17 @@ export function bindComponent(node, componentBindingDefinition) {
         let { properties } = componentBindingDefinition;
         let bindProps = {};
         Object.keys(properties).map(key => {
-            bindProps[key] = '';
+            if (properties[key] && properties[key].nodeProperty) {
+                bindProps[key] = GetNodeProp(node, properties[key].nodeProperty);
+                if (properties[key].template) {
+                    let temp = bindProps[key];
+                    bindProps[key] = bindTemplate(properties[key].template, {
+                        value: temp
+                    })
+                }
+            }
+            if (!bindProps[key])
+                bindProps[key] = '';
         });
 
         return bindTemplate(template, bindProps);

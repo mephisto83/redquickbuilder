@@ -125,6 +125,34 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Flex}
                                     value={cellStyle.flex} />) : null}
+                                {cellStyle ? (<SelectInput
+                                    options={['flex-start', 'flex-end', 'center', 'space-between'].map((t) => ({ title: t, value: t }))}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+
+                                        cellStyle.justifyContent = (val);
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={'justify-content'}
+                                    value={cellStyle.justifyContent} />) : null}
+                                {cellStyle ? (<SelectInput
+                                    options={['flex-start', 'flex-end', 'center', 'stretch'].map((t) => ({ title: t, value: t }))}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+
+                                        cellStyle.alignItems = (val);
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    label={'align-items'}
+                                    value={cellStyle.alignItems} />) : null}
                                 {cellStyle ? (<TextInput
                                     onChange={(val) => {
                                         let layout = nodeLayout || CreateLayout();

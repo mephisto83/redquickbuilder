@@ -33,6 +33,17 @@ class ScreenActivityMenu extends Component {
         return (
             <TabPane active={active}>
                 <ControlSideBarMenuHeader title={Titles.ScreenOptions} />
+                <SelectInput
+                    label={Titles.Priority}
+                    options={[].interpolate(0, 10, x => x).map(t => ({ title: t, value: t }))}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Priority)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.Priority,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_SCREEN_OPTIONS, {

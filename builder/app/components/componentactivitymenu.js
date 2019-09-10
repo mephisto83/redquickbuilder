@@ -11,17 +11,51 @@ import SelectInput from './selectinput';
 import { ComponentTypes } from '../constants/componenttypes';
 import { GetConnectedNodeByType, CreateLayout, TARGET } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
+import TextInput from './textinput';
 class ComponentActivityMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var active = UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) === UIA.NodeTypes.ComponentNode;
         let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
-        let componentTypes = ComponentTypes[UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType)] || {};
+        let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
+        let componentTypes = ComponentTypes[_ui_type] || {};
         let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
+        let components = [];
+        if (componentTypes[componentType] && componentTypes[componentType].properties) {
+            Object.keys(componentTypes[componentType].properties).map(key => {
+                let prop_obj = componentTypes[componentType].properties[key];
+                if (prop_obj && prop_obj.ui) {
+                    if (prop_obj.options) {
+                        components.push((<SelectInput
+                            label={key}
+                            key={`${_ui_type} - ${componentType}- ${key}`}
+                            options={prop_obj.options.map(t => ({ title: t, value: t }))}
+                            value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
+                            onChange={(value) => {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    prop: prop_obj.nodeProperty,
+                                    id: currentNode.id,
+                                    value
+                                });
+                            }} />));
+                    }
+                }
+            })
+        }
         return (
             <TabPane active={active}>
                 {currentNode ? (<FormControl>
+                    <TextInput
+                        label={Titles.Label}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Label)}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Label,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
                     <SelectInput
                         label={Titles.ComponentType}
                         options={Object.keys(componentTypes).map(t => ({ title: t, value: t }))}
@@ -33,6 +67,7 @@ class ComponentActivityMenu extends Component {
                                 value
                             });
                         }} />
+                    {components}
                 </FormControl>) : null}
                 {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].layout ? (
 

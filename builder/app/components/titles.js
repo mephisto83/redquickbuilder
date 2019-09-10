@@ -51,6 +51,7 @@ export const OnItemSelection = 'On Item Selection';
 export const OnSuccessLink = 'On Succesful result';
 export const UIType = 'UI Type';
 export const SelectedExecutors = 'Selected Executions';
+export const Priority = 'Priority';
 export const Agents = 'Agents';
 export const SelectProperty = 'Select Property';
 export const DisallowedEnums = 'Disallowed values';

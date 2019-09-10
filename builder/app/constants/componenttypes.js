@@ -1,11 +1,28 @@
 import { NodeTypes } from "./nodetypes";
+import { NodeProperties } from "../actions/uiactions";
 
 
 export const ComponentTypes = {
     ReactNative: {
         Badge: {},
         Body: {},
-        Button: {},
+        Button: {
+            template: './app/templates/components/button.tpl',
+            properties: {
+                full: {
+                    nodeProperty: 'ButtonDefault',
+                    template: '{{value}}',
+                    options: ['transparent', 'bordered', 'rounded', 'block', 'full'],
+                    ui: true
+                },
+                color: {
+                    nodeProperty: 'ButtonColor',
+                    template: '{{value}}',
+                    options: ['primary', 'light', 'dark'],
+                    ui: true
+                }
+            }
+        },
         Card: {},
         CardItem: {},
         CheckBox: {},
@@ -29,8 +46,16 @@ export const ComponentTypes = {
         Input: {
             template: './app/templates/components/input.tpl',
             properties: {
-                item_attributes: ['fixedLabel', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'regular', 'rounded', 'success', 'error', 'disabled'],
-                label: {}
+                item_attributes: {
+                    nodeProperty: NodeProperties.TextType,
+                    template: '{{value}}',
+                    options: ['fixedLabel', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'regular', 'rounded', 'success', 'error', 'disabled'],
+                    ui: true
+                },
+                label: {
+                    nodeProperty: NodeProperties.Label,
+                    template: `{titleService.get('{{value}}')}`
+                }
             }
         },
         InputGroup: {},
@@ -61,13 +86,25 @@ export const ComponentTypes = {
         Toast: {},
         View: {
             layout: true
+        },
+        LoginSelector: {
+            template: './app/templates/components/loginselector.tpl',
+            library: './login-selector'
         }
     }
 }
 
 Object.keys(ComponentTypes.ReactNative).map(key => {
-    ComponentTypes.ReactNative.library = ComponentTypes.ReactNative.library || 'native-base';
-    ComponentTypes.ReactNative[key].key = key;
+    if (ComponentTypes.ReactNative[key]) {
+        ComponentTypes.ReactNative[key].library = ComponentTypes.ReactNative[key].library || 'native-base';
+        ComponentTypes.ReactNative[key].key = key;
+        ComponentTypes.ReactNative[key].properties = ComponentTypes.ReactNative[key].properties || {};
+        ComponentTypes.ReactNative[key].properties.label = ComponentTypes.ReactNative[key].properties.label || {
+            nodeProperty: NodeProperties.Label,
+            template: `{titleService.get('{{value}}')}`,
+            ui: true
+        }
+    }
 });
 
 

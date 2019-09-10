@@ -1,6 +1,7 @@
 
 import fs from 'fs';
 import { CreateLayout, SetCellsLayout, FindLayoutRoot } from '../app/methods/graph_methods';
+import { relativeLuminance, calculateContrast } from '../app/utils/utilservice';
 var smash_37 = fs.readFileSync(`./test/smash_37.rqb`, 'utf8');
 
 describe('description', () => {
@@ -28,5 +29,23 @@ describe('description', () => {
         result = SetCellsLayout(result, 2, id_);
         let subRoot = FindLayoutRoot(id_, result.layout);
         expect(subRoot).toBeTruthy();
+    });
+
+    fit('should calculate luminance', () => {
+        let res = relativeLuminance('#ffffff');
+        expect(res).toBeTruthy();
+        console.log(res);
+    });
+
+    fit('should calculate luminance', () => {
+        let res = relativeLuminance('#000100');
+        expect(res).toBeTruthy();
+        console.log(res);
+    });
+    
+    fit('should calculate contrast', () => {
+        let res = calculateContrast('#000100', '#ffffff');
+        expect(res).toBeTruthy();
+        console.log(res);
     });
 });

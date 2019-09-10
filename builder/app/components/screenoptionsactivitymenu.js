@@ -38,6 +38,7 @@ class ScreenOptionsActivityMenu extends Component {
                     }}
 
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)} />
+              
                 <CheckBox
                     label={Titles.EnableMenu}
                     value={UIA.GetNodeProp(currentNode, NodeProperties.EnabledMenu)}
