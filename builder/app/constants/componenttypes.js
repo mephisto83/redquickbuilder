@@ -88,7 +88,10 @@ export const ComponentTypes = {
             layout: true,
             template: './app/templates/components/list.tpl',
         },
-        ListItem: {},
+        ListItem: {
+            layout: true,
+            ui: true
+        },
         Picker: {},
         Radio: {},
         Right: {},
