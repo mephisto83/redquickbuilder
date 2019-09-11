@@ -8,4 +8,4 @@ console.log(files);
 
 var json = files.map(t => ({ img: path.join('./', t) }));
 
-fs.writeFileSync('./images.json', JSON.stringify(json));
+fs.writeFileSync('../builder/app/data/images.json', JSON.stringify(json));

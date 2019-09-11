@@ -1,0 +1,12 @@
+{
+  "name": "imageservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "image.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server"
+  },
+  "author": "",
+  "license": "ISC"
+}
