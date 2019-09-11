@@ -52,7 +52,7 @@ export function uuidv4() {
             }
         });
     }
-  
+
     if (!array.unique) {
         Object.defineProperty(array, 'unique', {
             enumerable: false,
@@ -176,4 +176,11 @@ String.prototype.toJavascriptName = function () {
         return str[0].toLowerCase() + str.split('').subset(1).join('');
     }
     return str;
+}
+const NEW_LINE = `
+`;
+Array.prototype.tightenPs = function () {
+    var str = this || '';
+
+    return (str.join(NEW_LINE)).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE);
 }

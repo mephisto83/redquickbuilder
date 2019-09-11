@@ -53,6 +53,7 @@ export const UIType = 'UI Type';
 export const SelectedExecutors = 'Selected Executions';
 export const Priority = 'Priority';
 export const Agents = 'Agents';
+export const UseAsRoot = 'Use as top element';
 export const SelectProperty = 'Select Property';
 export const DisallowedEnums = 'Disallowed values';
 export const ManyToMany = 'Many 2 Many';

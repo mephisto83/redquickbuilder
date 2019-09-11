@@ -160,7 +160,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 let instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
 
                 onChange = `onChange={value => {
-    this.props.updateScreenInstance(${instanceType}.${GetCodeName(parent)}, ${GetRNModelConstValue(cellModel[item])}, ${GetRNModelConstValue((GetCodeName(cellModelProperty[item]) || '').toJavascriptName())}, value);
+    this.props.update${instanceType}(${instanceType}.${GetCodeName(parent)}, ${GetRNModelConstValue(cellModel[item])}, ${GetRNModelConstValue((GetCodeName(cellModelProperty[item]) || '').toJavascriptName())}, value);
 }}`
             }
             return `<${GetCodeName(node)} ${onChange}/>`;

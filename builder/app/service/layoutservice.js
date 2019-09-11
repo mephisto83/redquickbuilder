@@ -136,6 +136,7 @@ export function createSection(layoutObj, item, currentRoot, index, language, imp
     let style = properties[item].style || {};
     let children = properties[item].children || {};
     let cellModel = properties[item].cellModel || {};
+    let cellRoot = properties[item].cellRoot = {};
     let cellModelProperty = properties[item].cellModelProperty || {};
     // <UserName value={loginModel.userName} onChange={value => {
     //     this.props.updateScreenInstance(ScreenInstances.LoginForm, const_loginModel, const_userName, value);
@@ -155,13 +156,21 @@ export function createSection(layoutObj, item, currentRoot, index, language, imp
     ["borderStyle", "borderWidth", "borderColor", 'display'].map(t => {
         delete _style[t];
     });
+    Object.keys(_style).map(t => {
+        if (_style[t] === null) {
+            delete _style[t];
+        }
+    })
     // _style.backgroundColor = '#' + ('dd4b39-3a405a-553d36-684a52-857885-94e8b4-72bda3-5e8c61-4e6151-3b322c-cfdbd5-e8eddf-f5cb5c-242423-333533'.split('-')[Math.floor(Math.random() * 5)]);
     switch (language) {
         case UITypes.ReactNative:
+            if (!Object.keys(_style).length || cellRoot[item]) {
+                return tree.tightenPs();
+            }
             return (
                 `
 <View style={${JSON.stringify({ ..._style }, null, 4)}}>
-${addNewLine(tree.join(NEW_LINE))}
+${addNewLine(tree.tightenPs())}
 </View>
             `);
     }
@@ -170,5 +179,5 @@ ${addNewLine(tree.join(NEW_LINE))}
 
 export function addNewLine(str, count) {
     let spaces = [].interpolate(0, count || 1, () => `    `).join('');
-    return ((str ? NEW_LINE : '') + (str || '')).split(NEW_LINE).join(NEW_LINE + spaces)
+    return ((str ? NEW_LINE : '') + (str || '')).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE + spaces)
 }

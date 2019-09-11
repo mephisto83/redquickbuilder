@@ -38,7 +38,29 @@ export const ComponentTypes = {
         H1: {},
         H2: {},
         H3: {},
-        Header: {},
+        Header: {
+            template: './app/templates/components/header.tpl',
+            properties: {
+                left: {
+                    nodeProperty: 'HeaderLeft',
+                    template: '{{value}}',
+                    options: ['true', 'false'],
+                    ui: true
+                },
+                right: {
+                    nodeProperty: 'HeaderRight',
+                    template: '{{value}}',
+                    options: ['true', 'false'],
+                    ui: true
+                },
+                title: {
+                    nodeProperty: 'HeaderTitle',
+                    template: '{{value}}',
+                    options: ['true', 'false'],
+                    ui: true
+                },
+            }
+        },
         Icon: {},
         Image: {
             library: 'react-native'
@@ -63,7 +85,8 @@ export const ComponentTypes = {
         Label: {},
         Left: {},
         List: {
-            layout: true
+            layout: true,
+            template: './app/templates/components/list.tpl',
         },
         ListItem: {},
         Picker: {},
@@ -111,5 +134,6 @@ Object.keys(ComponentTypes.ReactNative).map(key => {
 export const InstanceTypes = {
     ScreenInstance: 'ScreenInstance',
     Instance: 'Instance',
+    AppState: 'AppState',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }

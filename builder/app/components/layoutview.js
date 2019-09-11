@@ -20,6 +20,7 @@ import TextInput from './textinput';
 import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET, SOURCE, getComponentPropertyList, GetNodesLinkedTo, getComponentProperty } from '../methods/graph_methods';
 
 import Tab from './tab';
+import CheckBox from './checkbox';
 import TabContainer from './tabcontainer';
 import TabContent from './tabcontent';
 import Tabs from './tabs';
@@ -49,6 +50,7 @@ class LayoutView extends Component {
         let cellChildren = null;
         let cellModel = null;
         let cellModelProperty = null;
+        let cellRoot = null;
         let selectedLayoutRoot = null;
         if (nodeLayout && this.state.selectedCell) {
             cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
@@ -61,6 +63,9 @@ class LayoutView extends Component {
 
                 cellProperties.cellModelProperty = cellProperties.cellModelProperty || {};
                 cellModelProperty = cellProperties.cellModelProperty;
+
+                cellProperties.cellRoot = cellProperties.cellRoot || {};
+                cellRoot = cellProperties.cellRoot;
             }
             selectedLayoutRoot = FindLayoutRoot(this.state.selectedCell, nodeLayout.layout) || nodeLayout.layout;
         }
@@ -191,6 +196,18 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Component}
                                     value={cellChildren[this.state.selectedCell]} />) : null}
+                                {cellChildren && cellChildren[this.state.selectedCell] ? <CheckBox
+                                    label={Titles.UseAsRoot}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellRoot[this.state.selectedCell] = val;
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    value={cellRoot[this.state.selectedCell]} /> : null}
 
                                 {cellChildren && cellChildren[this.state.selectedCell] && componentPropertiesList && componentPropertiesList.length ? (<SelectInput
                                     options={componentPropertiesList}
