@@ -70,7 +70,6 @@ class ComponentActivityMenu extends Component {
                     {components}
                 </FormControl>) : null}
                 {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].layout ? (
-
                     <ControlSideBarMenu>
                         <ControlSideBarMenuItem onClick={() => {
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -94,8 +93,26 @@ class ComponentActivityMenu extends Component {
                             });
                             this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                         }} icon={'fa fa-puzzle-piece'} title={Titles.AddComponentNew} description={Titles.AddComponentNew} />
+
                     </ControlSideBarMenu>
                 ) : null}
+
+                {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].datasource ? (
+                    <ControlSideBarMenu> <ControlSideBarMenuItem onClick={() => {
+                        this.props.graphOperation(UIA.NEW_DATA_SOURCE, {
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            groupProperties: {
+                            },
+                            properties: {
+                                [UIA.NodeProperties.UIType]: UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType),
+                                [UIA.NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Data Source`
+                            },
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataSourceLink }
+                            }
+                        });
+                    }} icon={'fa fa-puzzle-piece'} title={Titles.AddDataSource} description={Titles.AddDataSource} />  </ControlSideBarMenu>) : null}
+
             </TabPane>
         );
     }

@@ -98,6 +98,10 @@ export function GetValidationNode(id) {
     let state = _getState();
     return GraphMethods.GetValidationNode(state, id);
 }
+export function GetDataSourceNode(id) {
+    let state = _getState();
+    return GraphMethods.GetDataSourceNode(state, id);
+}
 export function GetModelItemFilter(id) {
     let state = _getState();
     return GraphMethods.GetModelItemFilter(state, id);
@@ -839,6 +843,7 @@ export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
 export const NEW_OPTION_ITEM_NODE = 'NEW_OPTION_ITEM_NODE';
 export const NEW_OPTION_NODE = 'NEW_OPTION_NODE';
 export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
+export const NEW_DATA_SOURCE = 'NEW_DATA_SOURCE';
 export const NEW_COMPONENT_NODE = 'NEW_COMPONENT_NODE';
 export const NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE = 'NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE';
 export const NEW_EXTENSION_LIST_NODE = 'NEW_EXTENSION_LIST_NODE';
@@ -930,6 +935,10 @@ export function graphOperation(operation, options) {
                     break;
                 case NEW_COMPONENT_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ComponentNode);
+                    setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case NEW_DATA_SOURCE:
+                    currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.DataSource);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     break;
                 case NEW_VALIDATION_TYPE:

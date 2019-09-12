@@ -3,6 +3,7 @@ import * as _ from '../utils/array';
 export const NodeTypes = {
     Concept: 'concept',
     Model: 'model',
+    DataSource: 'data-source',
     Property: 'model-property',
     ModelFilter: 'model-filter',
     ScreenContainer: 'screen-container',
@@ -421,6 +422,7 @@ export const LinkType = {
     Extension: 'extension',
     ScreenOptions: 'screen-options',
     Enumeration: 'enumeration',
+    DataSource: 'DataSource',
     Component: 'component',
     ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
@@ -569,6 +571,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    DataSourceLink: {
+        type: LinkType.DataSource
     },
     ComponentLink: {
         type: LinkType.Component

@@ -18,6 +18,7 @@ import TreeViewMenu from './treeviewmenu';
 import Content from './content';
 import ScreenActivityMenu from './screenactivitymenu';
 import SideBar from './sidebar';
+import DataSourceActivityMenu from './datasourceactivitymenu';
 import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
 import ScreenOptionsActivityMenu from './screenoptionsactivitymenu';
@@ -112,30 +113,30 @@ class Dashboard extends Component {
                         icon: 'fa fa-download',
                         title: Titles.OnLoad
                     }, {
-                            onClick: () => {
-                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
-                            },
-                            icon: 'fa  fa-trophy',
-                            title: Titles.OnSuccessLink
-                        }, {
-                            onClick: () => {
-                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
-                            },
-                            icon: 'fa  fa-tasks',
-                            title: Titles.OnItemSelection
-                        }, {
-                            onClick: () => {
-                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
-                            },
-                            icon: 'fa  fa-tasks',
-                            title: Titles.OnAction
-                        }, {
-                            onClick: () => {
-                                this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
-                            },
-                            icon: 'fa  fa-frown-o',
-                            title: Titles.OnFailureLink
-                        });
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
+                        },
+                        icon: 'fa  fa-trophy',
+                        title: Titles.OnSuccessLink
+                    }, {
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
+                        },
+                        icon: 'fa  fa-tasks',
+                        title: Titles.OnItemSelection
+                    }, {
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
+                        },
+                        icon: 'fa  fa-tasks',
+                        title: Titles.OnAction
+                    }, {
+                        onClick: () => {
+                            this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
+                        },
+                        icon: 'fa  fa-frown-o',
+                        title: Titles.OnFailureLink
+                    });
                     break;
                 case NodeTypes.ScreenItem:
                 case NodeTypes.ScreenCollection:
@@ -419,10 +420,13 @@ class Dashboard extends Component {
                                 <ConditionFilterMenu methodDefinitionKey={'permission'} />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
                                 <ConditionFilterMenu methodDefinitionKey={'filter'} />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
+                                <ConditionFilterMenu view={'datasource'} />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
                                 <ControllerActivityMenu />
                                 <ModelFilterItemActivityMenu />
                                 <CommonActivityMenu />
+                                <DataSourceActivityMenu />
                                 <FunctionActivityMenu />
                                 <MethodActivityMenu />
                                 <ComponentActivityMenu />

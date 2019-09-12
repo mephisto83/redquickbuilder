@@ -778,6 +778,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
         })
     }
     graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
+    graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.Pinned, value: true });
     if (options.properties) {
         for (var p in options.properties) {
             graph = updateNodeProperty(graph, { id: node.id, prop: p, value: options.properties[p] });
@@ -1684,6 +1685,12 @@ export function GetValidationNode(state, id) {
     return GetNodesLinkedTo(graph, {
         id
     }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Validator);
+}
+export function GetDataSourceNode(state, id) {
+    let graph = GetRootGraph(state);
+    return GetNodesLinkedTo(graph, {
+        id
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataSource);
 }
 export function GetModelItemFilter(state, id) {
     let graph = GetRootGraph(state);

@@ -22,10 +22,10 @@ import TreeViewMenu from './treeviewmenu';
 import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
+const DATA_SOURCE = 'DATA_SOURCE';
 class ConditionFilterMenu extends Component {
     render() {
         var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let methodProps;
         let methodDefinition;
@@ -52,26 +52,39 @@ class ConditionFilterMenu extends Component {
         if (methodDefinition && methodDefinition[methodDefinitionKey] && methodDefinition[methodDefinitionKey].params && methodDefinition[methodDefinitionKey].params.length) {
 
         }
+        else if (this.props.view && currentNode) {
+            interestingNode = UIA.GetDataSourceNode(currentNode.id);
+            if (!interestingNode) {
+                return <div></div>
+            }
+            methodProps = {
+            }
+        }
         else {
-            active = false;
             return <div></div>
         }
         let filterParameters = UIA.GetMethodPermissionParameters(interestingNode.id, true);
 
         let id = currentNode.id;
-        let models = methodDefinition[methodDefinitionKey].params.map(t => {
-            if (typeof (t) === 'object') {
-                return t.key;
-            }
-            return t;
-        }).map(t => {
-            return {
-                title: `${UIA.GetNodeTitle(methodProps[t])} (${t})`,
-                value: t,
-                id: t
-            }
-        });
-        let methodFunctionType = UIA.GetMethodFunctionType(interestingNode.id);
+        let models = [];
+        if (methodDefinition) {
+            models = methodDefinition[methodDefinitionKey].params.map(t => {
+                if (typeof (t) === 'object') {
+                    return t.key;
+                }
+                return t;
+            }).map(t => {
+                return {
+                    title: `${UIA.GetNodeTitle(methodProps[t])} (${t})`,
+                    value: t,
+                    id: t
+                }
+            });
+        }
+        else if (this.props.view) {
+            models = UIA.GetModelNodes().toNodeSelect();
+        }
+        let methodFunctionType = this.props.view ? DATA_SOURCE : UIA.GetMethodFunctionType(interestingNode.id);
         let methodFunctionValidation = UIA.GetNodeProp(currentNode, NodeProperties.Condition);// UIA.GetMethodFunctionValidation(permissionNode.id);
         let param_list_key = `${currentNode.id} ${methodFunctionType}`;
         let param = UIA.Visual(state, param_list_key);

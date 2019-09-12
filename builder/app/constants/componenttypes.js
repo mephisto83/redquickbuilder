@@ -85,8 +85,18 @@ export const ComponentTypes = {
         Label: {},
         Left: {},
         List: {
+            library: 'react-native',
             layout: true,
             template: './app/templates/components/list.tpl',
+            datasource: true,
+            properties: {
+                item_attributes: {
+                    nodeProperty: NodeProperties.TextType,
+                    template: '{{value}}',
+                    component_options: [NodeTypes.ComponentNode],
+                    ui: true
+                },
+            }
         },
         ListItem: {
             layout: true,

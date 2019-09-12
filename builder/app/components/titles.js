@@ -20,6 +20,7 @@ export const OutputModel = 'Output Model';
 export const AddComponentNew = 'Add Component';
 export const Height = 'Height';
 export const Component = 'Component';
+export const AddDataSource = 'Add Data Source';
 export const ComponentType = 'Component Type';
 export const ConditionType = 'Condition Type';
 export const Width = 'Width';
