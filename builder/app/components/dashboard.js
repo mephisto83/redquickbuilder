@@ -45,6 +45,7 @@ import ValidationItemFormControl from './validationitemactivitymenu';
 import ValidatorActivityMenu from './validatoractivitymenu';
 import OptionActivityMenu from './optionactivitymenu';
 import ExecutorPropertyMenu from './executorpropertymenu';
+import ConfigurationActivityMenu from './configurationactivitymenu';
 import ConditionActivityMenu from './conditionactivitymenu';
 import ParameterActivityMenu from './parameteractivitymenu';
 import OptionItemFormControl from './optionitemformcontrol';
@@ -428,6 +429,7 @@ class Dashboard extends Component {
                                 <CommonActivityMenu />
                                 <DataSourceActivityMenu />
                                 <FunctionActivityMenu />
+                                <ConfigurationActivityMenu />
                                 <MethodActivityMenu />
                                 <ComponentActivityMenu />
                                 <AttributeFormControl />

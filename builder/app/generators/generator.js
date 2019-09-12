@@ -20,6 +20,7 @@ import ModelGetGenerator from './modelgetgenerators';
 import ReactNativeScreens from './screengenerator';
 import ReactNativeNavigation from './navigationgenerator';
 import ReactNativeKeys from './keygenerator';
+import ReactNativeConfiguration from './configurationgenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
@@ -101,6 +102,8 @@ export default class Generator {
                 return ReactNativeNavigation.Generate({ state, key });
             case ReactNativeTypes.Keys:
                 return ReactNativeKeys.Generate({ state, key });
+            case ReactNativeTypes.Configuration:
+                return ReactNativeConfiguration.Generate({ state, key });
         }
     }
 }

@@ -11,6 +11,7 @@ export const Type = 'Type';
 export const ServerSideSetup = 'Service Side Setup';
 export const AddCondition = 'Add Condition';
 export const GraphPropertiesMenu = 'Graph Properties';
+export const Domain = 'Domain';
 export const Layout = 'Layout';
 export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';

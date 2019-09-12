@@ -578,6 +578,9 @@ export function GetScreenNodes() {
 export function GetModelNodes() {
     return NodesByType(_getState(), NodeTypes.Model);
 }
+export function GetConfigurationNodes() {
+    return NodesByType(_getState(), NodeTypes.Configuration);
+}
 export function NodesByType(state, nodeType, options = {}) {
 
     var currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);

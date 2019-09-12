@@ -13,6 +13,7 @@ export const NodeTypes = {
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
     Permission: 'permission',
+    Configuration: 'configuration',
     PermissionDependency: 'permission-dependency',
     ComponentNode: 'component-node',
     Condition: 'condition',
@@ -63,7 +64,8 @@ export const GeneratedTypes = {
 export const ReactNativeTypes = {
     Screens: 'screens',
     Navigation: 'navigation',
-    Keys: 'keys'
+    Keys: 'keys',
+    Configuration: 'configuration'
 }
 export const IdentityManagement = {
     RedQuickViews: 'RedQuickViews'
@@ -177,11 +179,15 @@ export const MIND_MAP = 'MIND_MAP';
 export const CODE_VIEW = 'CODE_VIEW';
 export const LAYOUT_VIEW = 'LAYOUT_VIEW';
 
+export const ConfigurationProperties = {
+    Domain: 'Configuration_Domain'
+}
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     SelectedLayoutCell: 'SelectedLayoutCell',
     ComponentProperties: "ComponentProperties",
     Layout: 'Layout',
+    Domain: 'Domain',
     Priority: 'Priority',
     UIType: 'UIType',
     TextType: 'TextType',
@@ -409,7 +415,7 @@ export const LinkType = {
     Validator: 'validator',
     ValidatorProperty: 'validator-property',
     ValidatorModel: 'validator-model',
-
+    Configuration: 'configuration',
     ExecutorFunction: 'executor-function',
     ValidatorFunction: 'validator-function',
     ValidatorModelItem: 'validator-model-item',

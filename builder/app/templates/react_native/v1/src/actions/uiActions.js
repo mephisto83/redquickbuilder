@@ -1,10 +1,19 @@
 export const UI_UPDATE = 'UI_UPDATE';
 export const UISI_UPDATE = 'UISI_UPDATE';
+export const UI_MODELS = 'UI_MODELS';
 export const RESET_ALL = 'RESET_ALL';
 export const SCREEN_INSTANCE = 'SCREEN_INSTANCE';
 export const VISUAL = 'VISUAL';
 let _getState;
+export function GetItems(modelType) {
+    if (_getState) {
+        let state = _getState();
+        let modelDic = GetC(state, UI_MODELS, modelType);
+        return Object.values(modelDic);
+    }
 
+    return [];
+}
 export function setGetState() {
     return (dispatch, getState) => {
         _getState = getState;
