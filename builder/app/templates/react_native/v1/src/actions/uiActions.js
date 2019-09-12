@@ -3,6 +3,13 @@ export const UISI_UPDATE = 'UISI_UPDATE';
 export const RESET_ALL = 'RESET_ALL';
 export const SCREEN_INSTANCE = 'SCREEN_INSTANCE';
 export const VISUAL = 'VISUAL';
+let _getState;
+
+export function setGetState() {
+    return (dispatch, getState) => {
+        _getState = getState;
+    }
+}
 export function UIV(item, value) {
     return UIC(VISUAL, item, value);
 }
@@ -53,3 +60,4 @@ export function updateScreenInstance(form, model, id, value) {
         dispatch(UISI(form, model, id, value));
     }
 }
+

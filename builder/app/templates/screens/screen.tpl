@@ -49,7 +49,11 @@ class {{name}} extends React.Component {
             </Header>
         </StyleProvider>)
     };
-
+    componentDidMount(){
+        if(this.props.setGetState) {
+            this.props.setGetState();
+        }
+    }
     render() {
         navigationInstance = this.props.navigation;
         return (
