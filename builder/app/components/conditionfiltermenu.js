@@ -58,6 +58,7 @@ class ConditionFilterMenu extends Component {
                 return <div></div>
             }
             methodProps = {
+                [DATA_SOURCE]: UIA.GetNodeProp(interestingNode, NodeProperties.UIModelType)
             }
         }
         else {
@@ -90,7 +91,7 @@ class ConditionFilterMenu extends Component {
         let param = UIA.Visual(state, param_list_key);
         let param_property_list_key = UIA.Visual(state, param_list_key) ? `${param_list_key} ${param}` : null;
         let selectedParameter = UIA.Visual(state, param_list_key);
-        let model_properties = UIA.GetModelPropertyChildren(methodProps[param]).toNodeSelect();
+        let model_properties = UIA.GetModelPropertyChildren(this.props.view ? param : methodProps[param]).toNodeSelect();
         let top = this.getTop({
             model_properties,
             methodProps,
