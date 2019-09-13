@@ -38,7 +38,7 @@ class ScreenOptionsActivityMenu extends Component {
                     }}
 
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)} />
-              
+
                 <CheckBox
                     label={Titles.EnableMenu}
                     value={UIA.GetNodeProp(currentNode, NodeProperties.EnabledMenu)}
@@ -49,6 +49,61 @@ class ScreenOptionsActivityMenu extends Component {
                             value
                         });
                     }} />
+
+                <SelectInput label={Titles.AddComponentDidMount}
+                    options={UIA.NodesByType(state, UIA.NodeTypes.Method).toNodeSelect()}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentDidMountEvent)}
+                    onChange={(value) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                            target: currentNode.properties[UIA.NodeProperties.UIChoiceType],
+                            source: id
+                        })
+
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.ComponentDidMountEvent,
+                            id: currentNode.id,
+                            value: [value, ...(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentDidMountEvent) || [])].unique()
+                        });
+                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                            target: value,
+                            source: id,
+                            properties: {}
+                        });
+                    }} />
+                <ButtonList active={true} isSelected={(item) => {
+                    var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentDidMountEvent) || [];
+                    return item && types.some(x => x === item.id);
+                }}
+                    items={(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentDidMountEvent) || []).map(t => {
+                        return GetNode(UIA.GetCurrentGraph(state), t);
+                    }).toNodeSelect()}
+                    onClick={(item) => {
+                        let id = currentNode.id;
+                        var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentDidMountEvent) || [];
+                        var ids = types;
+                        if (types.some(t => item.id === t)) {
+                            ids = [...ids.filter(t => t !== item.id)].unique(x => x)
+                        }
+                        else {
+                            ids = [...ids, item.id].unique(x => x)
+                        }
+                        this.props.graphOperation([{
+                            operation: UIA.CHANGE_NODE_PROPERTY,
+                            options: {
+                                prop: UIA.NodeProperties.ComponentDidMountEvent,
+                                id: currentNode.id,
+                                value: ids
+                            }
+                        }, {
+                            operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                            options: {
+                                target: item.id,
+                                source: id
+                            }
+                        }]);
+                    }} />
+
                 <ControlSideBarMenu>
                     <ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

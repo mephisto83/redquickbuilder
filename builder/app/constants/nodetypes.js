@@ -277,6 +277,8 @@ export const NodeProperties = {
     ComponentType: 'component-type',
     ReferenceType: 'referenceType', //Reference nodes will have this type.
 
+    ComponentDidMountEvent: 'component-did-mount',
+
     UIAttributeType: 'uiAttributeType',
     PermissionValueType: 'PermissionValueType',
     UseModelAsType: 'useModelAsType',
