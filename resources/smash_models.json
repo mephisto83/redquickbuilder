@@ -54,6 +54,11 @@
                 "name": "Email",
                 "jsName": "email"
             },
+            "a3d48264-9c85-4323-bcc2-315c841f84ca": {
+                "name": "ProfileImage",
+                "jsName": "profileImage",
+                "type": "ProfileImage"
+            },
             "0f89967b-1d82-4965-b90d-c937a8d55954": {
                 "name": "Item",
                 "jsName": "item",

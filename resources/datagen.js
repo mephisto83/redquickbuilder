@@ -1,9 +1,42 @@
 var rawdata = require('./rawdata');
 require('./array');
 const loremIpsum = require("lorem-ipsum").loremIpsum;
-var images = require('./images');
+var images = require('./serverimages');
 var smash_data = require('./smash_models');
-
+let relations = {
+    Customer: {
+        Conversations: {
+            multiple: true,
+            type: 'Conversation'
+        },
+        Owner: {
+            type: 'User'
+        },
+        Item: {
+            type: 'Item'
+        },
+        TimelineInfo: {
+            type: 'TimelineInfo'
+        }
+    },
+    Conversation: {
+        Participants: {
+            type: 'Customer',
+            multiple: true
+        },
+        LastMessageSentBy: {
+            type: 'Customer',
+            in: 'Participants'
+        },
+        Owner: {
+            type: 'Customer',
+            in: 'Participants'
+        }
+    },
+    Item: {
+        type: 'Owner'
+    }
+}
 const GeneratedDataTypes = {
     FirstName: 'First Name',
     LastName: 'Last Name',
@@ -66,8 +99,21 @@ function generate(type) {
     throw 'unhandled generation type ' + type;
 }
 
+function generateModels(data) {
+    let result = {};
+
+    data.map(t => {
+        result[t.name] = [].interpolate(0, 10, x => {
+            return generateModel(t);
+        });
+    })
+
+    return result;
+}
 console.log(smash_data.length);
 
 let genmodel = generateModel(smash_data[0]);
 
 console.log(JSON.stringify(genmodel, null, 4));
+
+console.log(JSON.stringify(generateModels(smash_data.subset(0, 3)), null, 4));

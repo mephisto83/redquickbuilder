@@ -8,6 +8,4 @@ console.log(files);
 
 var json = files.map(t => ({ img: 'http://192.168.1.147:8080/images/' + t }));
 
-fs.writeFileSync('../builder/app/data/images.json', JSON.stringify({
-    conversations: json
-}));
+fs.writeFileSync('./serverimages.json', JSON.stringify(json));

@@ -289,7 +289,7 @@ class Dashboard extends Component {
                                         this.props.toggleVisual(VC.GraphPropertiesMenu)
                                     }}>
                                     <TreeViewItemContainer>
-                                        <Slider min={30} max={500}
+                                        <Slider min={30} max={1500}
                                             onChange={(value) => {
                                                 this.props.setVisual(LINK_DISTANCE, value);
                                             }}
