@@ -32,6 +32,7 @@ export const Label = 'Label';
 export const SetupLayout = 'Setup Layout';
 export const New = 'New';
 export const FlexDirection = 'Flex Direction';
+export const SetListItem = 'Set List Item';
 export const ClearLayout = 'Clear Layout';
 export const Flex = 'Flex';
 export const Controllers = 'Controllers';

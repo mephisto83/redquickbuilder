@@ -447,6 +447,7 @@ export const LinkType = {
     ExtensionList: 'extension-list',
     Extension: 'extension',
     ScreenOptions: 'screen-options',
+    ListItem: 'list-item',
     Enumeration: 'enumeration',
     DataSource: 'DataSource',
     Component: 'component',
@@ -600,6 +601,9 @@ export const LinkProperties = {
     },
     DataSourceLink: {
         type: LinkType.DataSource
+    },
+    ListItem: {
+        type: LinkType.ListItem
     },
     ComponentLink: {
         type: LinkType.Component

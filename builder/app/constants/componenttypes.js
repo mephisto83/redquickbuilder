@@ -87,6 +87,7 @@ export const ComponentTypes = {
         List: {
             library: 'react-native',
             layout: true,
+            specialLayout: true,
             template: './app/templates/components/list.tpl',
             datasource: true,
             properties: {

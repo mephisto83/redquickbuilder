@@ -104,11 +104,14 @@ export function bindComponent(node, componentBindingDefinition) {
 export function GenerateRNComponents(node, relative = './src/components', language = UITypes.ReactNative) {
     let result = [];
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
-    if (!layoutObj) {
+    let componentType = GetNodeProp(node, NodeProperties.ComponentType);
+    if (!layoutObj && (
+        !ComponentTypes[language] ||
+        !ComponentTypes[language][componentType] ||
+        !ComponentTypes[language][componentType].specialLayout)) {
         switch (GetNodeProp(node, NodeProperties.NODEType)) {
             case NodeTypes.ComponentNode:
                 let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
-                let componentType = GetNodeProp(node, NodeProperties.ComponentType);
                 let elements = null;
                 if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
                     elements = bindComponent(node, ComponentTypes[language][componentType]);

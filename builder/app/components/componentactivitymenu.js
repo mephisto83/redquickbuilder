@@ -101,7 +101,21 @@ class ComponentActivityMenu extends Component {
                             });
                             this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                         }} icon={'fa fa-puzzle-piece'} title={Titles.AddComponentNew} description={Titles.AddComponentNew} />
-
+                        {UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType) === ComponentTypes.ReactNative.List.key ? (<ControlSideBarMenuItem onClick={() => {
+                            this.props.graphOperation(UIA.NEW_COMPONENT_NODE, {
+                                parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                                groupProperties: {
+                                },
+                                properties: {
+                                    [UIA.NodeProperties.UIType]: UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)
+                                },
+                                linkProperties: {
+                                    properties: { ...LinkProperties.ListItem }
+                                }
+                            });
+                            this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+                        }} icon={'fa fa-puzzle-piece'} title={Titles.SetListItem} description={Titles.SetListItem} />) : null
+                        }
                     </ControlSideBarMenu>
                 ) : null}
 
