@@ -5,7 +5,8 @@
   "main": "image.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server"
+    "serve": "http-server",
+    "jserve": "json-server db.json --routes routes.json --port 3123"
   },
   "author": "",
   "license": "ISC",

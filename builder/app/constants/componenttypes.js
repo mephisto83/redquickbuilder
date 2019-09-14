@@ -96,7 +96,8 @@ export const ComponentTypes = {
                     component_options: [NodeTypes.ComponentNode],
                     ui: true
                 },
-            }
+            },
+            ui: true
         },
         ListItem: {
             layout: true,

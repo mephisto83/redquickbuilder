@@ -80,6 +80,14 @@ class ComponentActivityMenu extends Component {
                             this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                         }} icon={'fa fa-puzzle-piece'} title={Titles.SetupLayout} description={Titles.SetupLayout} />
                         <ControlSideBarMenuItem onClick={() => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: null
+                            });
+                            this.props.setVisual(MAIN_CONTENT, null);
+                        }} icon={'fa fa-puzzle-piece'} title={Titles.ClearLayout} description={Titles.ClearLayout} />
+                        <ControlSideBarMenuItem onClick={() => {
                             this.props.graphOperation(UIA.NEW_COMPONENT_NODE, {
                                 parent: UIA.Visual(state, UIA.SELECTED_NODE),
                                 groupProperties: {

@@ -30,6 +30,13 @@ export function UIC(section, item, value) {
         section
     }
 }
+export function UIModels(model, value) {
+    return {
+        type: UI_MODELS,
+        model,
+        value
+    }
+}
 export function UISI(form, model, item, value) {
     return {
         type: UISI_UPDATE,

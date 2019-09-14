@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import * as UIActions from '../actions/uiActions';
+import * as ControllerActions from '../actions/controllerActions';
 import { TitleService } from './titles';
 import { connect } from 'react-redux';
 var ReactNative = require('react-native');
@@ -19,6 +20,7 @@ export function GUID() {
 export const mapDispatchToProps = (dispatch) => {
   var actionBlob = Object.assign({},
     UIActions,
+    ControllerActions
   );
 
   var result = bindActionCreators(actionBlob, dispatch);
@@ -54,7 +56,7 @@ export function simple(func, param, states, callback, error) {
     if (!Visual(state, loading)) {
       dispatch(UIActions.UIV(loading, true));
       return func(param).then(res => {
-        dispatch(UIActions.UIC(objectType, res));
+        dispatch(UIActions.UIModels(objectType, res));
         if (callback) {
           callback(res, dispatch, getState);
         }

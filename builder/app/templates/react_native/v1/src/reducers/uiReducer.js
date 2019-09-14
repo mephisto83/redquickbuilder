@@ -23,6 +23,22 @@ export function updateUISI(state, action) {
     return newstate;
 }
 
+export function updateModels(state, action) {
+    var { type, model, value } = action;
+    let newstate = { ...state };
+    newstate[type] = newstate[type] || {};
+    newstate[type][model] = newstate[type][model] || {};
+    value.map(val => {
+        if (newstate[type][model][val.id] && newstate[type][model][val.id].hasOwnProperty('version') && newstate[type][model][val.id].version < val.version) {
+            newstate[type][model][val.id] = val;
+        }
+        else if (!newstate[type][model][val.id]) {
+            newstate[type][model][val.id] = val;
+        }
+    });
+    return newstate;
+}
+
 export function makeDefaultState() {
     return {};
 }
@@ -33,6 +49,8 @@ export default function uiReducer(state, action) {
             return updateUI(state, action);
         case UIA.UISI_UPDATE:
             return updateUISI(state, action);
+        case UIA.UI_MODELS:
+            return updateModels(state, action);
         default:
             return state;
     }

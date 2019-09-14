@@ -92,6 +92,14 @@ export function GetCodeName(node) {
     return GetNodeProp(node, NodeProperties.CodeName);
 }
 
+export function GetJSCodeName(node) {
+    var l = GetCodeName(node);
+    if (l) {
+        return l.toJavascriptName();
+    }
+    return l;
+}
+
 export function GetModelPropertyChildren(id) {
 
     let property_nodes = GetModelPropertyNodes(id);
@@ -612,6 +620,28 @@ export function GetModelNodes() {
 }
 export function GetConfigurationNodes() {
     return NodesByType(_getState(), NodeTypes.Configuration);
+}
+export function GetMaestroNode(id) {
+    let state = _getState();
+    let graph = GetRootGraph(state);
+    let nodes = GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Maestro);
+    if (nodes && nodes.length) {
+        return nodes[0];
+    }
+    return null;
+}
+export function GetControllerNode(id) {
+    let state = _getState();
+    let graph = GetRootGraph(state);
+    let nodes = GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Controller);
+    if (nodes && nodes.length) {
+        return nodes[0];
+    }
+    return null;
 }
 export function NodesByType(state, nodeType, options = {}) {
 

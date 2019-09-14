@@ -1,4 +1,5 @@
 var rawdata = require('./rawdata');
+var fs = require('fs');
 require('./array');
 const loremIpsum = require("lorem-ipsum").loremIpsum;
 var images = require('./serverimages');
@@ -7,34 +8,43 @@ let relations = {
     Customer: {
         Conversations: {
             multiple: true,
+            after: 'Conversation',
             type: 'Conversation'
         },
         Owner: {
+            after: 'User',
             type: 'User'
         },
         Item: {
+            after: 'Item',
             type: 'Item'
         },
         TimelineInfo: {
+            after: 'TimelineInfo',
             type: 'TimelineInfo'
         }
     },
     Conversation: {
         Participants: {
+            after: 'Customer',
             type: 'Customer',
             multiple: true
         },
         LastMessageSentBy: {
+            after: 'Customer',
             type: 'Customer',
             in: 'Participants'
         },
         Owner: {
+            after: 'Customer',
             type: 'Customer',
             in: 'Participants'
         }
     },
     Item: {
-        type: 'Owner'
+        Owner: {
+            after: 'Customer'
+        }
     }
 }
 const GeneratedDataTypes = {
@@ -99,7 +109,7 @@ function generate(type) {
     throw 'unhandled generation type ' + type;
 }
 
-function generateModels(data) {
+function generateModels(data, relations, order) {
     let result = {};
 
     data.map(t => {
@@ -107,13 +117,28 @@ function generateModels(data) {
             return generateModel(t);
         });
     })
-
+    result.Customer.map((t, _d) => {
+        t.conversations = (result.Conversation.map(v => v.id));
+        t.owner = result.User[_d].id;
+        t.deleted = false;
+    });
+    result.Conversation.map((t, _d) => {
+        t.participants = result.Customer.filter(x => x.conversations.some(v => v === t.id)).map(c => c.id);
+        t.lastMessageSentBy = result.Customer[Math.floor(Math.random() * result.Customer.length)].id;
+        t.owner = t.lastMessageSentBy;
+        t.banned = false;
+        t.deleted = false;
+    })
     return result;
 }
 console.log(smash_data.length);
 
 let genmodel = generateModel(smash_data[0]);
 
-console.log(JSON.stringify(genmodel, null, 4));
 
-console.log(JSON.stringify(generateModels(smash_data.subset(0, 3)), null, 4));
+let models = [...smash_data];
+let order = ['User', 'Customer',];
+let generatedModels = generateModels(models, relations);
+console.log(JSON.stringify(generatedModels.Customer[0], null, 4));
+
+fs.writeFileSync('./source.json', JSON.stringify(generatedModels, null, 4))

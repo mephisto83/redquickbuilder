@@ -1,3 +1,4 @@
 {
-    "/get/conversations/*": "/conversations"
+    "/api/customer/get/conversations": "/Conversation",
+    "/api/customer/get/conversations/:id": "/Conversation/:id"
 }

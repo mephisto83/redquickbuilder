@@ -179,5 +179,5 @@ ${addNewLine(tree.tightenPs())}
 
 export function addNewLine(str, count) {
     let spaces = [].interpolate(0, count || 1, () => `    `).join('');
-    return ((str ? NEW_LINE : '') + (str || '')).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE + spaces)
+    return ((str ? (NEW_LINE + spaces) : '') + (str || '')).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE + spaces)
 }

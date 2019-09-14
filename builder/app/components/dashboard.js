@@ -233,6 +233,20 @@ class Dashboard extends Component {
                                         this.props.toggleVisual('side-panel-open')
                                     }} />
                                 </NavBarMenu>
+                                <NavBarMenu paddingRight={15}>
+                                    <NavBarButton icon={'fa fa-remove'} title={Titles.ClearPinned} onClick={() => {
+                                        this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
+                                            return {
+                                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                                options: {
+                                                    prop: UIA.NodeProperties.Pinned,
+                                                    id: node.id,
+                                                    value: false
+                                                }
+                                            }
+                                        }));
+                                    }} />
+                                </NavBarMenu>
                             </DashboardNavBar>
                         </Header>
                         <MainSideBar>

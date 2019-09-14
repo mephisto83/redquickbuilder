@@ -1,0 +1,1428 @@
+{
+    "Customer": [
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Διογένης",
+            "owner": "6930cd49-56a7-4c4e-a889-81350de78b94",
+            "id": "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 32,
+            "lastName": "Bernard",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/beth-tate-a6FNJKMreCc-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Adilet",
+            "owner": "d6e7a548-ced2-4969-8f44-7d263ad38bbf",
+            "id": "edde117d-55c7-46ae-b60e-a221bf96f19e",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 44,
+            "lastName": "Βελλεροφόντης",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/gian-cescon-00ByEXKcSkA-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Dudás",
+            "owner": "18cadc49-9846-4ad4-9698-f24eda106b80",
+            "id": "804a1550-f28b-4566-ab70-732af7a7579b",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 4,
+            "lastName": "Boudewijn de",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/harps-joseph-tAvpDE7fXgY-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Ward",
+            "owner": "261803eb-447c-4e58-b609-24c8da466c14",
+            "id": "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 76,
+            "lastName": "Fenyvesi",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/harps-joseph-tAvpDE7fXgY-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Alejandro",
+            "owner": "9f4b39e6-47bf-42da-8528-581d1820df3d",
+            "id": "4048d636-8c75-4657-bda5-0bbe597541f8",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 34,
+            "lastName": "Dora",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Manole",
+            "owner": "3c1d64ad-6f11-40c5-8515-49b758ee653c",
+            "id": "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 20,
+            "lastName": "Flora",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/velizar-ivanov-9bFLTsaP_xo-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "",
+            "owner": "8484098f-f6ce-40cc-82c4-18e58bd27a97",
+            "id": "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 30,
+            "lastName": "Lea",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/ruthie-martin-wVgL7MZrxCk-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Mario",
+            "owner": "897d755c-b4be-47d6-a79e-e5cbb2d14d25",
+            "id": "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 28,
+            "lastName": "Amechie",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/daniel-spase-dLFgkoUuoac-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Crin",
+            "owner": "a518b2c9-a9e1-458a-831b-4e9506b984b0",
+            "id": "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 6,
+            "lastName": "Iridenta",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/lesly-juarez-RukI4qZGlQs-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        },
+        {
+            "state": null,
+            "conversations": [
+                "0f053497-e94c-45c7-9d27-1fd83192c932",
+                "6c566e5f-37e4-4808-998a-a44aeba88999",
+                "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+                "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+                "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+                "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+                "5949817b-fc44-4849-a813-7999c599266f",
+                "0fa656ea-489f-43e0-85d7-ce357af873fc",
+                "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+                "942cd24a-87c1-45ec-b43d-87d33212d86f"
+            ],
+            "firstName": "Ionică",
+            "owner": "6adb862e-8bab-44a7-8cfa-af38c56e5f60",
+            "id": "87e54422-99b4-4b48-8d4a-38dc01deefa5",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": false,
+            "version": 62,
+            "lastName": "Birat",
+            "email": null,
+            "profileImage": "http://192.168.1.147:8080/images/jessica-to-oto-o-EIavdqhlYCA-unsplash.jpg",
+            "item": null,
+            "timelineInfo": null
+        }
+    ],
+    "User": [
+        {
+            "owner": null,
+            "id": "6930cd49-56a7-4c4e-a889-81350de78b94",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "d6e7a548-ced2-4969-8f44-7d263ad38bbf",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "18cadc49-9846-4ad4-9698-f24eda106b80",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "261803eb-447c-4e58-b609-24c8da466c14",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "9f4b39e6-47bf-42da-8528-581d1820df3d",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "3c1d64ad-6f11-40c5-8515-49b758ee653c",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "8484098f-f6ce-40cc-82c4-18e58bd27a97",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "897d755c-b4be-47d6-a79e-e5cbb2d14d25",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "a518b2c9-a9e1-458a-831b-4e9506b984b0",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "owner": null,
+            "id": "6adb862e-8bab-44a7-8cfa-af38c56e5f60",
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        }
+    ],
+    "Item": [
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "6c2d28ba-42e8-42c8-96e8-99d0c833461b",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": null,
+            "version": 71
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "bbebf00c-c38e-408b-8659-fae30fc5faf5",
+            "created": "2019-09-14T19:11:28.350Z",
+            "updated": "2019-09-14T19:11:28.350Z",
+            "deleted": null,
+            "version": 15
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "ab06f5b0-6f86-4a4c-b3a6-bb80b01207dd",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 31
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "6b851345-7a70-42b6-9b31-3a91c1516022",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 13
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "7aa1a12a-3f9e-4d81-a2bd-373c46fdaee5",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 74
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "255a1ed7-7b67-4a46-bed6-be85cf4a34c0",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 79
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "63e66a4b-521b-4c24-854c-069b3feff3fe",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 30
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "2b6450b5-3573-4cef-9974-d69929824486",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 32
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "3ba8c620-5aab-46fa-af21-5aedb2bac19e",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 77
+        },
+        {
+            "name": null,
+            "color": null,
+            "size": null,
+            "customer": null,
+            "owner": null,
+            "id": "9afcfc69-1b3b-42f4-ab6a-fcbba325ab98",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": null,
+            "version": 4
+        }
+    ],
+    "Conversation": [
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Nulla duis magna do cillum eiusmod cupidatat in velit pariatur.",
+            "lastMessageSentBy": "edde117d-55c7-46ae-b60e-a221bf96f19e",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "edde117d-55c7-46ae-b60e-a221bf96f19e",
+            "id": "0f053497-e94c-45c7-9d27-1fd83192c932",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 93,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Et pariatur ipsum duis ex est est.",
+            "lastMessageSentBy": "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+            "id": "6c566e5f-37e4-4808-998a-a44aeba88999",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 0,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Veniam quis dolore consectetur ea aute commodo amet est.",
+            "lastMessageSentBy": "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+            "id": "49cf9c9d-dde2-4859-be45-ccc8b51750b8",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 28,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Pariatur aliqua adipisicing enim cillum eiusmod qui tempor dolore.",
+            "lastMessageSentBy": "4048d636-8c75-4657-bda5-0bbe597541f8",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "4048d636-8c75-4657-bda5-0bbe597541f8",
+            "id": "0c45d6e5-54ae-4f9f-b200-d146d46eb595",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 32,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "In veniam aliqua ad tempor excepteur et esse excepteur culpa nulla sunt proident nisi.",
+            "lastMessageSentBy": "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+            "id": "485d2568-92a0-49b4-8358-fbed4b4ae52c",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 89,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Eiusmod proident aute amet enim reprehenderit cillum occaecat eiusmod culpa amet proident.",
+            "lastMessageSentBy": "edde117d-55c7-46ae-b60e-a221bf96f19e",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "edde117d-55c7-46ae-b60e-a221bf96f19e",
+            "id": "20abf863-74b0-48d2-80a3-44f2ab9238c6",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 60,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Qui in fugiat excepteur est ut cillum ex nostrud quis proident excepteur consectetur.",
+            "lastMessageSentBy": "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+            "id": "5949817b-fc44-4849-a813-7999c599266f",
+            "created": "2019-09-14T19:11:28.351Z",
+            "updated": "2019-09-14T19:11:28.351Z",
+            "deleted": false,
+            "version": 18,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Voluptate fugiat labore fugiat pariatur magna voluptate mollit excepteur sit eu.",
+            "lastMessageSentBy": "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.351Z",
+            "owner": "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+            "id": "0fa656ea-489f-43e0-85d7-ce357af873fc",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "deleted": false,
+            "version": 42,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Officia duis ullamco irure aliquip et ea nostrud id laborum.",
+            "lastMessageSentBy": "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.352Z",
+            "owner": "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+            "id": "51813f5e-8085-4a4b-8c15-82f4d093cf37",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "deleted": false,
+            "version": 23,
+            "conversationMessage": null
+        },
+        {
+            "participants": [
+                "cba1a668-3a02-49e1-887b-9a46ce32bbcd",
+                "edde117d-55c7-46ae-b60e-a221bf96f19e",
+                "804a1550-f28b-4566-ab70-732af7a7579b",
+                "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+                "4048d636-8c75-4657-bda5-0bbe597541f8",
+                "86a4fcab-0b49-4581-9fbd-43e9db0f5888",
+                "a4fe57d8-8c46-47d1-bc8f-e4822afdb6ac",
+                "f0e9ca14-8a19-41ea-9110-6f422fb2c4f3",
+                "4de3ffec-800b-408f-9a73-975da3a2ea7f",
+                "87e54422-99b4-4b48-8d4a-38dc01deefa5"
+            ],
+            "banned": false,
+            "lastMessageText": "Tempor laboris ad quis sunt duis quis.",
+            "lastMessageSentBy": "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+            "lastMessageSentOnDate": "2019-09-14T19:11:28.352Z",
+            "owner": "f3a4fb09-4119-482c-9482-d75f65cae1cb",
+            "id": "942cd24a-87c1-45ec-b43d-87d33212d86f",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "deleted": false,
+            "version": 46,
+            "conversationMessage": null
+        }
+    ],
+    "ConversationMessage": [
+        {
+            "textContent": "Id adipisicing ex quis exercitation non esse velit incididunt commodo culpa cillum.",
+            "mediaContent": "Labore eu nulla anim veniam nisi minim est Lorem consectetur veniam excepteur voluptate sit non.",
+            "mediaContentType": "Ullamco non anim est dolor fugiat enim aliqua irure nisi do aliqua deserunt ut.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "bfd976e3-a146-47d0-b332-c623b9b1df04",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 98
+        },
+        {
+            "textContent": "Sit consequat aliquip nisi est amet mollit ad.",
+            "mediaContent": "Do eu sint Lorem proident.",
+            "mediaContentType": "Minim laborum ea amet ex laboris consequat est duis laborum id pariatur ullamco.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "48d47e11-f7a7-4631-aa82-51a009634a20",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 6
+        },
+        {
+            "textContent": "Reprehenderit ex laborum ullamco excepteur labore id exercitation id magna.",
+            "mediaContent": "Aute sunt commodo incididunt ea tempor eu ut cillum.",
+            "mediaContentType": "Labore voluptate deserunt sunt Lorem velit labore ex duis labore ad irure velit incididunt.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "dcc5e047-3e31-459d-acd1-1d9df723504d",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 77
+        },
+        {
+            "textContent": "Ut est adipisicing cillum id officia enim.",
+            "mediaContent": "Sunt officia ipsum velit commodo exercitation ipsum deserunt.",
+            "mediaContentType": "Ullamco incididunt elit consectetur in sint ad laboris nostrud officia tempor quis cillum mollit.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "e3ce4ee6-5733-4e15-ac9e-016d5c862da1",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 91
+        },
+        {
+            "textContent": "Exercitation aliqua magna dolor pariatur qui officia do est.",
+            "mediaContent": "Anim quis pariatur sit in officia labore fugiat.",
+            "mediaContentType": "Elit tempor do sit eiusmod consectetur qui.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "77751e0b-6614-4ecd-896e-134c63bbf6d5",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 32
+        },
+        {
+            "textContent": "Adipisicing in tempor exercitation eiusmod.",
+            "mediaContent": "In pariatur in cillum ad velit ullamco voluptate minim excepteur proident culpa sit nisi.",
+            "mediaContentType": "Ea consectetur consequat tempor non magna voluptate exercitation anim voluptate adipisicing culpa exercitation labore.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "aef91a7c-3aa9-47cb-8b25-348fa9c3061d",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 67
+        },
+        {
+            "textContent": "Culpa aliquip reprehenderit cupidatat exercitation laboris qui ex sint veniam ut minim.",
+            "mediaContent": "Tempor occaecat adipisicing qui officia officia ut dolor magna minim dolor minim ad reprehenderit.",
+            "mediaContentType": "Lorem sunt sunt nulla officia laborum.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "8e3c6a8d-a917-455d-90cf-d721c9ca8c33",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 69
+        },
+        {
+            "textContent": "Consequat enim eiusmod enim fugiat velit dolor.",
+            "mediaContent": "Aliquip deserunt elit incididunt consequat consequat esse excepteur Lorem ut ad ex.",
+            "mediaContentType": "Anim dolor aute qui veniam mollit est et.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "dcec3776-9a8a-4879-b84f-0b7527eb4545",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 92
+        },
+        {
+            "textContent": "Minim laboris ad incididunt excepteur aliquip anim do consectetur.",
+            "mediaContent": "Proident culpa velit sunt sit amet nulla eiusmod cillum aliquip esse qui pariatur.",
+            "mediaContentType": "Laboris ex aliqua commodo labore ut voluptate elit eiusmod excepteur cillum.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "34967f52-2cb5-4f2f-a3e7-109bf790548b",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 73
+        },
+        {
+            "textContent": "Et veniam officia ex tempor sit aliqua cillum fugiat ex ea.",
+            "mediaContent": "Sit aliquip veniam ex reprehenderit.",
+            "mediaContentType": "Sunt elit adipisicing fugiat nulla non est enim aliquip irure occaecat.",
+            "conversation": null,
+            "deleted": null,
+            "owner": null,
+            "id": "62b98005-31ec-4567-a715-d6a733cb3e53",
+            "created": "2019-09-14T19:11:28.352Z",
+            "updated": "2019-09-14T19:11:28.352Z",
+            "version": 79
+        }
+    ],
+    "CustomertoConversationsRelationship": [
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        },
+        {
+            "isBanned": null,
+            "customer": null,
+            "conversation": null
+        }
+    ],
+    "TimelineInfo": [
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "timelineType": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        }
+    ],
+    "Resume": [
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        },
+        {
+            "title": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "historyItem": null
+        }
+    ],
+    "HistoryItem": [
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        },
+        {
+            "historyItemType": null,
+            "startDate": null,
+            "endDate": null,
+            "description": null,
+            "customer": null,
+            "resume": null,
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null
+        }
+    ],
+    "SystemReport": [
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        },
+        {
+            "owner": null,
+            "id": null,
+            "created": null,
+            "updated": null,
+            "deleted": null,
+            "version": null,
+            "customerCount": null
+        }
+    ],
+    "SystemUser": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+    ],
+    "NewConversationInput": [
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        },
+        {
+            "customers": null,
+            "customer": null
+        }
+    ],
+    "LoginModel": [
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        },
+        {
+            "userName": null,
+            "userPassword": null
+        }
+    ]
+}

@@ -65,6 +65,7 @@ export const ReactNativeTypes = {
     Screens: 'screens',
     Navigation: 'navigation',
     Keys: 'keys',
+    ControllerActions: 'controller-actions',
     Configuration: 'configuration'
 }
 export const IdentityManagement = {

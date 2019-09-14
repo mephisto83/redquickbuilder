@@ -1,4 +1,4 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
@@ -19,17 +19,18 @@ export function GenerateScreens(options) {
 
 export function GenerateScreenMarkup(id, language) {
     let screen = GetNodeById(id);
-    let screenOptions = GetScreenOption(id, language);
-    if (screenOptions) {
+    let screenOption = GetScreenOption(id, language);
+    if (screenOption) {
         let imports = GetScreenImports(id, language);
-        let elements = [GenerateMarkupTag(screenOptions, language)];
+        let elements = [GenerateMarkupTag(screenOption, language)];
         let template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
 
         return bindTemplate(template, {
             name: GetCodeName(screen),
             title: `"${GetNodeTitle(screen)}"`,
             imports: imports.join(NEW_LINE),
-            elements: elements.join(NEW_LINE)
+            elements: elements.join(NEW_LINE),
+            component_did_mount: GetComponentDidMount(screenOption)
         })
     }
 }
@@ -191,7 +192,25 @@ export function GetScreenImports(id, language) {
     return null;
 }
 
-0
+export function GetComponentDidMount(screenOption) {
+    let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
+    if (events && events.length) {
+        let evntHandles = events.map(evt => {
+            let methodNode = GetNodeById(evt);
+            return `this.props.${GetJSCodeName(methodNode)}();`;
+        }).join(NEW_LINE);
+        let componentDidMount = `componentDidMount() {
+{{handles}}
+}
+`;
+        return addNewLine(bindTemplate(componentDidMount, {
+            handles: addNewLine(evntHandles, 1)
+        }), 1)
+    }
+    return '';
+}
+
+
 export function GenerateImport(node, parentNode, language) {
     switch (language) {
         case UITypes.ReactNative:
