@@ -10,7 +10,7 @@ export const GraphOperations = 'Graph Operations';
 export const Type = 'Type';
 export const ServerSideSetup = 'Service Side Setup';
 export const AddCondition = 'Add Condition';
-export const AddComponentDidMount= 'Add Event ComponentDidMount';
+export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const Domain = 'Domain';
 export const Layout = 'Layout';
@@ -68,6 +68,7 @@ export const ModelActions = 'Model Actions';
 export const SetDefaultPropertiesDescription = 'Set default properties, on the node';
 export const SetDefaultProperties = 'Set default props';
 export const AddProperty = 'Add Property';
+export const CreateObjectDataSeed = 'Create Object Data Seed';
 export const UICheckBox = 'UI Checkbox';
 export const PermissionsDependencyAttribute = 'Permission Dependency Attribute';
 export const GeneratedConstants = 'Generated Constants';
@@ -244,6 +245,8 @@ export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const IsCompositeInput = 'Is composite input';
 export const UserModel = 'User Model';
+
+export const PropertyGeneratedType = 'Generated Type';
 
 export const ManyToManyNexus = 'Many to many';
 export const ManyToManyExists = 'Many to many item must exists';

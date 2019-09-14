@@ -27,6 +27,38 @@ export function GetC(state, section, item) {
     }
     return null;
 }
+export function generateDataSeed(node) {
+    let dataSeed = _generateDataSeed(node);
+    return JSON.stringify(dataSeed, null, 4);
+}
+
+function _generateDataSeed(node) {
+    let state = _getState();
+    let properties = {};
+    GraphMethods.getPropertyNodes(GetRootGraph(state), node.id).map(t => {
+        properties[t.id] = {
+            name: GetCodeName(t),
+            jsName: GetCodeName(t).toJavascriptName(),
+            type: GetNodeProp(t, NodeProperties.DataGenerationType)
+        };
+    });
+    GetLogicalChildren(node.id).map(t => {
+        properties[t.id] = {
+            name: GetCodeName(t),
+            jsName: GetCodeName(t).toJavascriptName(),
+            type: 'Id'
+        };
+    });
+    let dataSeed = {
+        name: GetCodeName(node),
+        properties
+    }
+    return dataSeed;
+}
+
+export function generateDataSeeds() {
+    return JSON.stringify(NodesByType(_getState(), NodeTypes.Model).map(t => _generateDataSeed(t)));
+}
 export function Visual(state, key) {
     return GetC(state, VISUAL, key);
 }

@@ -10,7 +10,7 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import ButtonList from './buttonlist';
 import CheckBox from './checkbox';
-import { NodeTypes, LinkProperties, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, LinkProperties, NodeProperties, GeneratedDataTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 class PropertyActivityMenu extends Component {
     render() {
@@ -105,6 +105,20 @@ class PropertyActivityMenu extends Component {
                                 }
                             }].filter(x => x));
                         }} />
+                    <SelectInput
+                        options={Object.keys(GeneratedDataTypes).map(key => ({ title: key, value: key }))}
+                        label={Titles.PropertyGeneratedType}
+                        onChange={(value) => {
+                            this.props.graphOperation([{
+                                operation: UIA.CHANGE_NODE_PROPERTY, options: {
+                                    prop: UIA.NodeProperties.DataGenerationType,
+                                    id: currentNode.id,
+                                    value
+                                }
+                            }]);
+
+                        }}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.DataGenerationType)} />
                     {many_to_many_enabled ? (<SelectInput
                         options={UIA.NodesByType(state, NodeTypes.Model).filter(x => UIA.GetNodeProp(x, NodeProperties.ManyToManyNexus)).map(x => {
                             return {

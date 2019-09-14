@@ -8,5 +8,8 @@
     "serve": "http-server"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "lorem-ipsum": "^2.0.3"
+  }
 }

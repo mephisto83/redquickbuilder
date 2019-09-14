@@ -210,11 +210,14 @@ class Dashboard extends Component {
                             <DashboardNavBar>
                                 <SidebarToggle />
                                 <NavBarMenu>
-                                    {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon={'fa fa-minus-square'} onClick={() => {
+                                    {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon={'fa fa-cube'} onClick={() => {
                                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, UIA.Visual(state, UIA.SELECTED_LINK));
                                         this.props.setVisual(UIA.SELECTED_LINK, null);
                                     }} /> : null}
                                     <GraphMenu />
+                                    <NavBarButton icon={'fa fa-asterisk'} onClick={() => {
+                                        clipboard.writeText(UIA.generateDataSeeds());
+                                    }} />
                                     <NavBarButton icon={'fa fa-plus'} onClick={() => {
                                         this.props.graphOperation(UIA.NEW_NODE);
                                         this.props.setVisual(SIDE_PANEL_OPEN, true);

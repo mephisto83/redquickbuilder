@@ -1,0 +1,474 @@
+[
+    {
+        "name": "Customer",
+        "properties": {
+            "6713bc59-2127-4082-97b6-2b889a69c200": {
+                "name": "State",
+                "jsName": "state"
+            },
+            "eac945b8-41bd-45da-ae6a-ace8ff42a8ce": {
+                "name": "Conversations",
+                "jsName": "conversations",
+                "type": "Ids"
+            },
+            "c857b180-a599-4a0b-a67f-0319d8b5f375": {
+                "name": "FirstName",
+                "jsName": "firstName",
+                "type": "LastName"
+            },
+            "180d9f01-47d6-469b-bf7d-58d90d9b90b5": {
+                "name": "Owner",
+                "jsName": "owner",
+                "type": "Guid"
+            },
+            "188d9216-5538-4aae-b135-2cbbe15a276f": {
+                "name": "Id",
+                "jsName": "id",
+                "type": "Guid"
+            },
+            "79c3d349-a833-4854-b47f-063160da7bcc": {
+                "name": "Created",
+                "jsName": "created",
+                "type": "Date"
+            },
+            "d6c88188-47d4-4121-8f3f-7b2f2668ab9d": {
+                "name": "Updated",
+                "jsName": "updated",
+                "type": "Date"
+            },
+            "d75ca32a-6d34-4bff-8ccf-666bfc3700ed": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "d81d63d5-fa43-45f7-a681-d0738ee20b15": {
+                "name": "Version",
+                "jsName": "version",
+                "type": "Number"
+            },
+            "a1452cb9-ee7f-4caa-87f0-29077db90b43": {
+                "name": "LastName",
+                "jsName": "lastName",
+                "type": "FirstName"
+            },
+            "c9590efd-d975-427a-97a6-24efcb54dca6": {
+                "name": "Email",
+                "jsName": "email"
+            },
+            "0f89967b-1d82-4965-b90d-c937a8d55954": {
+                "name": "Item",
+                "jsName": "item",
+                "type": "Id"
+            },
+            "0ddc4df6-9efc-48ec-862b-e62a53b0dbe9": {
+                "name": "TimelineInfo",
+                "jsName": "timelineInfo",
+                "type": "Id"
+            }
+        }
+    },
+    {
+        "name": "User",
+        "properties": {
+            "4f649dfe-88ce-4f4c-981d-11bd449fc300": {
+                "name": "Owner",
+                "jsName": "owner"
+            },
+            "d2589804-b657-4ddd-ab6a-b4ad3d13bb8e": {
+                "name": "Id",
+                "jsName": "id",
+                "type": "Guid"
+            },
+            "87cd8fcf-34b5-4073-b0a7-99d01f3f6662": {
+                "name": "Created",
+                "jsName": "created"
+            },
+            "ea67e479-798d-414f-9ca5-0edf2e86f0a9": {
+                "name": "Updated",
+                "jsName": "updated"
+            },
+            "9b49b24d-8f88-42e7-8454-ac4cd3b235b6": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "d4b9742d-f55a-4348-a9cb-7a7b3aba5a85": {
+                "name": "Version",
+                "jsName": "version"
+            }
+        }
+    },
+    {
+        "name": "Item",
+        "properties": {
+            "e8617e0b-d471-47cd-9c34-8e3f6c455bc2": {
+                "name": "Name",
+                "jsName": "name"
+            },
+            "82c2f830-f4a3-4bb3-ba35-ef87eed17e29": {
+                "name": "Color",
+                "jsName": "color"
+            },
+            "ef5eff3b-da3d-4bea-b936-d49bb4989018": {
+                "name": "Size",
+                "jsName": "size"
+            },
+            "a1f4b33b-8f67-40b2-bc9c-e8510d1c398b": {
+                "name": "Customer",
+                "jsName": "customer",
+                "type": "Id"
+            },
+            "0e56d8fc-db2d-4e48-8d3c-92cf21501ea7": {
+                "name": "Owner",
+                "jsName": "owner",
+                "type": "Id"
+            },
+            "2c5681d8-7de7-4a71-a9c5-5e64d23c6a87": {
+                "name": "Id",
+                "jsName": "id",
+                "type": "Guid"
+            },
+            "25abfe5a-4f3d-4ced-bb2b-4dffd6fe469d": {
+                "name": "Created",
+                "jsName": "created",
+                "type": "Date"
+            },
+            "2846d385-53c4-41fb-9aa3-728be6fa088c": {
+                "name": "Updated",
+                "jsName": "updated",
+                "type": "Date"
+            },
+            "3add51c3-7f8c-4ea4-b65b-177ffb659130": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "b3a07c73-d31d-4835-a9d2-36b090b5e63e": {
+                "name": "Version",
+                "jsName": "version",
+                "type": "Number"
+            }
+        }
+    },
+    {
+        "name": "Conversation",
+        "properties": {
+            "bc438de7-417a-4c77-8e91-121211c84957": {
+                "name": "Participants",
+                "jsName": "participants",
+                "type": "Ids"
+            },
+            "800f4981-8255-49e1-8a60-d6f009b4320f": {
+                "name": "Banned",
+                "jsName": "banned"
+            },
+            "70ef2b3b-8784-4f96-8316-ef5590096064": {
+                "name": "LastMessageText",
+                "jsName": "lastMessageText",
+                "type": "LoremIpsum"
+            },
+            "39c60579-4943-405d-b8da-a393d726366f": {
+                "name": "LastMessageSentBy",
+                "jsName": "lastMessageSentBy",
+                "type": "Id"
+            },
+            "d84ae313-c004-4bea-8a92-3ebbd8b63043": {
+                "name": "LastMessageSentOnDate",
+                "jsName": "lastMessageSentOnDate",
+                "type": "Date"
+            },
+            "44e3d08f-17c9-4010-b0f8-45564b40bf73": {
+                "name": "Owner",
+                "jsName": "owner",
+                "type": "Id"
+            },
+            "d257ee77-3c14-4dee-89ed-ddf69dbe27a3": {
+                "name": "Id",
+                "jsName": "id",
+                "type": "Guid"
+            },
+            "b2adf9b4-1e81-4d6b-bb7e-dd014f89f28d": {
+                "name": "Created",
+                "jsName": "created",
+                "type": "Date"
+            },
+            "6acf864d-39ba-46d5-ba02-10d510f93b92": {
+                "name": "Updated",
+                "jsName": "updated",
+                "type": "Date"
+            },
+            "1b168c2c-2c2d-4bc4-bd4b-ec83f5226f73": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "56388e39-a8fe-4fcf-8910-c12b223b7ba9": {
+                "name": "Version",
+                "jsName": "version",
+                "type": "Number"
+            },
+            "b4f93f99-3090-4a53-b445-54fd1528f60c": {
+                "name": "ConversationMessage",
+                "jsName": "conversationMessage",
+                "type": "Id"
+            }
+        }
+    },
+    {
+        "name": "ConversationMessage",
+        "properties": {
+            "8d7716b4-0b75-4b70-aad7-988308b8d134": {
+                "name": "TextContent",
+                "jsName": "textContent",
+                "type": "LoremIpsum"
+            },
+            "5fcf4a7f-c5e4-4397-b5b0-5e92d5e6e60d": {
+                "name": "MediaContent",
+                "jsName": "mediaContent",
+                "type": "LoremIpsum"
+            },
+            "05082352-be4b-4687-a59f-7ed5059ba0c5": {
+                "name": "MediaContentType",
+                "jsName": "mediaContentType",
+                "type": "LoremIpsum"
+            },
+            "80769bb3-083c-4a50-8336-e698edec5247": {
+                "name": "Conversation",
+                "jsName": "conversation",
+                "type": "Id"
+            },
+            "1f3c9991-fea4-4028-9e81-7470dd25b984": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "57ebfcc8-7435-4bd8-9fab-9707e8e07799": {
+                "name": "Owner",
+                "jsName": "owner",
+                "type": "Id"
+            },
+            "d73044f3-928c-4c98-bb1e-b2dfb770f0cb": {
+                "name": "Id",
+                "jsName": "id",
+                "type": "Guid"
+            },
+            "d930f745-904f-4ac3-a6da-bb96de419108": {
+                "name": "Created",
+                "jsName": "created",
+                "type": "Date"
+            },
+            "80e6f30a-95f0-4e72-9766-e128c5b53ac1": {
+                "name": "Updated",
+                "jsName": "updated",
+                "type": "Date"
+            },
+            "ace58c22-b837-4625-af7e-22d7a9603bc8": {
+                "name": "Version",
+                "jsName": "version",
+                "type": "Number"
+            }
+        }
+    },
+    {
+        "name": "CustomertoConversationsRelationship",
+        "properties": {
+            "b45f7fc5-ee06-48a6-b945-a770521678a4": {
+                "name": "IsBanned",
+                "jsName": "isBanned"
+            },
+            "ba34fc88-4aaa-456a-b1d3-d56cd5a5b3c2": {
+                "name": "Customer",
+                "jsName": "customer",
+                "type": "Id"
+            },
+            "f082048c-d8a2-41c2-826d-77ef207f44d6": {
+                "name": "Conversation",
+                "jsName": "conversation",
+                "type": "Id"
+            }
+        }
+    },
+    {
+        "name": "TimelineInfo",
+        "properties": {
+            "0c6653a0-d6a2-464e-a659-f7715e4b4f65": {
+                "name": "TimelineType",
+                "jsName": "timelineType"
+            },
+            "a9eb70a9-0e7c-4623-a4fd-909855828016": {
+                "name": "Owner",
+                "jsName": "owner"
+            },
+            "2f85ffa4-142f-4263-b7d5-b527ea6577b5": {
+                "name": "Id",
+                "jsName": "id"
+            },
+            "a4786b1b-9311-4aaf-bac9-de142032eaef": {
+                "name": "Created",
+                "jsName": "created"
+            },
+            "e70acd7a-cf04-445d-a754-460b1ece7819": {
+                "name": "Updated",
+                "jsName": "updated"
+            },
+            "c74e0370-cd41-4aac-8fd5-d037cad9155b": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "ded557f2-0909-448b-b8b9-585d15a5911c": {
+                "name": "Version",
+                "jsName": "version"
+            }
+        }
+    },
+    {
+        "name": "Resume",
+        "properties": {
+            "f0b36f74-ea32-4073-a328-6fceec2a1f82": {
+                "name": "Title",
+                "jsName": "title"
+            },
+            "7e44fe3b-bb84-4a45-bf24-850e3b155481": {
+                "name": "Owner",
+                "jsName": "owner"
+            },
+            "85487221-4cc5-4270-ac19-748afe8c173c": {
+                "name": "Id",
+                "jsName": "id"
+            },
+            "3a619548-21bf-4595-b18a-73854019f4b1": {
+                "name": "Created",
+                "jsName": "created"
+            },
+            "ba5f8f3f-b1d8-4033-8dd6-51714e5b3123": {
+                "name": "Updated",
+                "jsName": "updated"
+            },
+            "4ef2f80b-d109-4ac3-944c-ef792a81b004": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "06300f7b-ba87-42cf-b7df-a036b09a6067": {
+                "name": "Version",
+                "jsName": "version"
+            },
+            "7d4bb49d-92a5-41d1-87fb-56aa453b992c": {
+                "name": "HistoryItem",
+                "jsName": "historyItem",
+                "type": "Id"
+            }
+        }
+    },
+    {
+        "name": "HistoryItem",
+        "properties": {
+            "fb6ffb13-c0e8-417a-a62e-652e354b6dd3": {
+                "name": "HistoryItemType",
+                "jsName": "historyItemType"
+            },
+            "813ae714-8d6c-46ab-9ce2-a93fbf6f8e5d": {
+                "name": "StartDate",
+                "jsName": "startDate"
+            },
+            "8636d76e-7046-4cef-80ff-9938cf7b3068": {
+                "name": "EndDate",
+                "jsName": "endDate"
+            },
+            "d97f9d7c-0fbb-4c6e-95b6-cc78f12448cd": {
+                "name": "Description",
+                "jsName": "description"
+            },
+            "3bdc28b0-f53d-47d9-83a9-253b897a36f4": {
+                "name": "Customer",
+                "jsName": "customer"
+            },
+            "054e4ebf-c7f5-437d-ab85-ad5baeab7d30": {
+                "name": "Resume",
+                "jsName": "resume"
+            },
+            "ee213ded-81c5-42c0-a1e5-9147c384130c": {
+                "name": "Owner",
+                "jsName": "owner"
+            },
+            "f2746953-666c-4abc-855f-0ddf60e456fc": {
+                "name": "Id",
+                "jsName": "id"
+            },
+            "530af21c-f64c-4a09-8bb3-91a73c93bdb8": {
+                "name": "Created",
+                "jsName": "created"
+            },
+            "a8350e8c-b556-479e-803a-87dbc107d0a1": {
+                "name": "Updated",
+                "jsName": "updated"
+            },
+            "446d4e3d-a8ea-4d79-b96b-97a65d46fe32": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "8fbbdcf3-b843-48be-83b4-c68ad94a5147": {
+                "name": "Version",
+                "jsName": "version"
+            }
+        }
+    },
+    {
+        "name": "SystemReport",
+        "properties": {
+            "0ae2e50d-2003-4154-9923-d21ca12be661": {
+                "name": "Owner",
+                "jsName": "owner"
+            },
+            "c969c794-0fd0-48dc-b2ca-b6b129ff2c29": {
+                "name": "Id",
+                "jsName": "id"
+            },
+            "8b7b00a5-1244-46ae-a7e5-19742696ad6c": {
+                "name": "Created",
+                "jsName": "created"
+            },
+            "99f859c5-5b9a-4b55-9249-1f35acdade82": {
+                "name": "Updated",
+                "jsName": "updated"
+            },
+            "fc94a8d7-71a4-455e-8b38-7cb2c4885245": {
+                "name": "Deleted",
+                "jsName": "deleted"
+            },
+            "8bcc3c04-2009-4070-b4de-e67d415280a3": {
+                "name": "Version",
+                "jsName": "version"
+            },
+            "bfeede17-479c-4516-b931-253a002d9948": {
+                "name": "CustomerCount",
+                "jsName": "customerCount"
+            }
+        }
+    },
+    {
+        "name": "SystemUser",
+        "properties": {}
+    },
+    {
+        "name": "NewConversationInput",
+        "properties": {
+            "8cfdd7a7-f064-482f-8d30-6be0db0b3f93": {
+                "name": "Customers",
+                "jsName": "customers"
+            },
+            "ba34fc88-4aaa-456a-b1d3-d56cd5a5b3c2": {
+                "name": "Customer",
+                "jsName": "customer",
+                "type": "Id"
+            }
+        }
+    },
+    {
+        "name": "LoginModel",
+        "properties": {
+            "e2d66c7d-c012-4c77-82f0-e3bcc5c8cc8b": {
+                "name": "UserName",
+                "jsName": "userName"
+            },
+            "0bbc5e9d-cd65-440d-a6ea-4a1b9208285d": {
+                "name": "UserPassword",
+                "jsName": "userPassword"
+            }
+        }
+    }
+]

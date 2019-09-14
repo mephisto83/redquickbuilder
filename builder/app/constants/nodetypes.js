@@ -179,6 +179,21 @@ export const MIND_MAP = 'MIND_MAP';
 export const CODE_VIEW = 'CODE_VIEW';
 export const LAYOUT_VIEW = 'LAYOUT_VIEW';
 
+export const GeneratedDataTypes = {
+    FirstName: 'First Name',
+    LastName: 'Last Name',
+    Name: 'Name',
+    Date: 'Date',
+    Id: 'Id',
+    Ids: 'Ids',
+    ProfileImage: 'Profile Image',
+    LoremIpsum: 'Lorem-Ipsum',
+    Guid: 'Guid',
+    ListOfGuids: 'Guids',
+    Number: 'Number'
+};
+
+
 export const ConfigurationProperties = {
     Domain: 'Configuration_Domain'
 }
@@ -289,6 +304,8 @@ export const NodeProperties = {
     LogicalChildrenTypes: 'logicalChildrenTypes',
     HasLogicalNieces: "hasLogicalNieces",
     LogicalNieceTypes: 'logicalNieceTypes',
+
+    DataGenerationType: 'data-generation-type',
 
     ManyToManyNexus: 'manyToManyNexux',
     ManyToManyNexusType: 'manyToManyNexusType',
