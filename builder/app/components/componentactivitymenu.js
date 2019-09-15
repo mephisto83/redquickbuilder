@@ -40,6 +40,20 @@ class ComponentActivityMenu extends Component {
                                 });
                             }} />));
                     }
+                    else if (prop_obj.nodeTypes) {
+                        components.push((<SelectInput
+                            label={key}
+                            key={`${_ui_type} - ${componentType}- ${key}`}
+                            options={UIA.NodesByType(state, prop_obj.nodeTypes).filter(prop_obj.nodeFilter || (() => true)).toNodeSelect()}
+                            value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
+                            onChange={(value) => {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    prop: prop_obj.nodeProperty,
+                                    id: currentNode.id,
+                                    value
+                                });
+                            }} />));
+                    }
                 }
             })
         }

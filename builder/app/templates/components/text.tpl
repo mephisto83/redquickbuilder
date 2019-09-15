@@ -1,1 +1,1 @@
-<Text>{this.props.data}</Text>
+<Text>{`${this.props.data}`}</Text>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { redConnect, titleService, GetItems } from '{{relative_depth}}actions/util';
+import * as DC from '{{relative_depth}}actions/data-chain';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';
 import getTheme from '{{relative_depth}}../native-base-theme/components'
 import material from '{{relative_depth}}../native-base-theme/variables/variables';

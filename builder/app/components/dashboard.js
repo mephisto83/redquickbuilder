@@ -32,6 +32,7 @@ import MindMap from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
 import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
+import DataChainActvityMenu from './datachainactivitymenu';
 import AfterEffectsActivityMenu from './aftereffectsactivitymenu';
 import AttributeFormControl from './attributeformcontrol';
 import PermissionMenu from './permissionmenu';
@@ -431,6 +432,7 @@ class Dashboard extends Component {
                                 </FormControl>) : null}
                                 <ChoiceListItemActivityMenu />
                                 {/* <ConditionActivityMenu /> */}
+                                <DataChainActvityMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
                                 <ConditionFilterMenu methodDefinitionKey={'validation'} />) : null}

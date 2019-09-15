@@ -40,7 +40,8 @@ export const NodeTypes = {
     Maestro: 'maestro',
     Services: 'services',
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
-    ClassNode: 'class-node'
+    ClassNode: 'class-node',
+    DataChain: 'data-chain'
 }
 export const ExcludeDefaultNode = {
     [NodeTypes.Condition]: true,
@@ -66,7 +67,8 @@ export const ReactNativeTypes = {
     Navigation: 'navigation',
     Keys: 'keys',
     ControllerActions: 'controller-actions',
-    Configuration: 'configuration'
+    Configuration: 'configuration',
+    DataChainFunctions: 'data-chain'
 }
 export const IdentityManagement = {
     RedQuickViews: 'RedQuickViews'
@@ -149,6 +151,10 @@ export const NodeTypeColors = {
     [NodeTypes.ScreenCollection]: '#A9DBB8',
     [NodeTypes.ScreenItem]: '#020887',
     [NodeTypes.ScreenContainer]: '#60B2E5',
+    [NodeTypes.ComponentNode]: '#B7245C',
+    [NodeTypes.DataSource]: '#002500',
+    [NodeTypes.Condition]: '#F90093',
+    [NodeTypes.DataChain]: "#FF6B6B"
 
 }
 
@@ -201,10 +207,13 @@ export const ConfigurationProperties = {
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     SelectedLayoutCell: 'SelectedLayoutCell',
+    EntryPoint: 'EntryPoint',
+    Property: 'Property',
     ComponentProperties: "ComponentProperties",
     Layout: 'Layout',
     Domain: 'Domain',
     Priority: 'Priority',
+    DataChain: 'DataChain',
     UIType: 'UIType',
     TextType: 'TextType',
     Enumeration: 'Enumeration',
@@ -451,6 +460,7 @@ export const LinkType = {
     Enumeration: 'enumeration',
     DataSource: 'DataSource',
     Component: 'component',
+    DataChainLink: 'data-chain-link',
     ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
@@ -601,6 +611,9 @@ export const LinkProperties = {
     },
     DataSourceLink: {
         type: LinkType.DataSource
+    },
+    DataChainLink: {
+        type: LinkType.DataChainLink
     },
     ListItem: {
         type: LinkType.ListItem

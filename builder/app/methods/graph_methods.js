@@ -592,6 +592,9 @@ export function GetManyToManyNodes(state, ids) {
 export function getPropertyNodes(graph, id) {
     return getNodesByLinkType(graph, { id, direction: SOURCE, type: LinkType.PropertyLink });
 }
+export function getDataChainNodes(graph, id) {
+    return getNodesByLinkType(graph, { id, direction: TARGET, type: LinkType.DataChainLink });
+}
 function isEmpty(obj) {
     return obj && Object.keys(obj).length === 0;
 }
@@ -1672,6 +1675,10 @@ export function GetConnectedNodesByType(state, id, type, direction) {
         id,
         direction
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === type);
+}
+export function GetDataChainEntryNodes(state) {
+    let graph = GetRootGraph(state);
+    return NodesByType(graph, NodeTypes.DataChain).filter(x => GetNodeProp(x, NodeProperties.EntryPoint));
 }
 export function GetConnectedNodeByType(state, id, type, direction) {
     let graph = GetRootGraph(state);

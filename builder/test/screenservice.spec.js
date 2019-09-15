@@ -66,7 +66,7 @@ describe('description', () => {
         let markupTag = GenerateMarkupTag(screenOption, NodeTypes.UITypes.ReactNative);
 
 
-        expect(markupTag).toBe('<HomeScreenOptionsReactNative />')
+        expect(markupTag.indexOf('HomeScreenOptionsReactNative') !== -1).toBeTruthy()
     });
 
     it('should generate screen options src', () => {

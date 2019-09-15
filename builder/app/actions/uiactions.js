@@ -158,7 +158,66 @@ export function GetModelItemConditions(id) {
 export function GetConditionSetup(condition) {
     return GetNodeProp(condition, NodeProperties.Condition);
 }
+export function GetDataChainEntryNodes() {
+    return GraphMethods.GetDataChainEntryNodes(_getState());
+}
+export function GenerateChainFunction(id) {
+    let chain = GetDataChainFrom(id);
 
+    let funcs = chain.map(c => {
+        let temp = GenerateDataChainMethod(c);
+        return temp;
+    });
+
+    let method = `export function ${GetCodeName(id)}(_id) {
+    return Chain(_id, [${funcs.join(',' + NodeConstants.NEW_LINE)}])
+}`;
+
+    return method;
+}
+export function GenerateChainFunctions() {
+    let entryNodes = GetDataChainEntryNodes().map(x => x.id);
+    return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
+}
+export function GetDataChainFrom(id) {
+    let result = [id];
+    let current = id;
+    let graph = GetRootGraph(_getState());
+    if (!graph) { throw 'no graph found'; }
+    for (var i = 0; i < 10; i++) {
+        let next = GraphMethods.getNodesByLinkType(graph, {
+            id: current,
+            type: NodeConstants.LinkType.DataChainLink,
+            direction: GraphMethods.SOURCE
+        }).filter(x => x.id !== current).unique(x => x.id)[0];
+        current = null;
+        if (next && next.id) {
+            result.push(next.id);
+            current = next.id;
+        }
+        else {
+            break;
+        }
+    }
+
+    return result;
+}
+export function GenerateDataChainMethod(id) {
+    let node = GetNodeById(id);
+    let model = GetNodeProp(node, NodeProperties.UIModelType);
+    let property = GetNodeProp(node, NodeProperties.Property);
+    let lastpart = 'return item;';
+    if (property) {
+        lastpart = `if(item) {
+        return item.${GetJSCodeName(property) || property};
+    }
+    return null;`
+    }
+    return `(id) => {
+    let item = GetItem(Models.${GetCodeName(model)}, id);
+    ${lastpart}
+}`;
+}
 export function GetPermissionsSortedByAgent() {
     return GetNodesSortedByAgent(NodeTypes.Permission);
 }
@@ -321,7 +380,6 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
         conditionTemplate = fs.readFileSync(template, 'utf8');
     }
     else {
-        console.log(validator);
         throw 'no template found'
     }
     switch (type) {
@@ -895,6 +953,7 @@ export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE';
 export const NEW_ATTRIBUTE_NODE = 'NEW_ATTRIBUTE_NODE';
 export const ADD_LINK_BETWEEN_NODES = 'ADD_LINK_BETWEEN_NODES';
 export const NEW_CONDITION_NODE = 'NEW_CONDITION_NODE';
+export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const REMOVE_LINK_BETWEEN_NODES = 'REMOVE_LINK_BETWEEN_NODES';
 export const REMOVE_LINK = 'REMOVE_LINK';
 export const NEW_CHOICE_ITEM_NODE = 'NEW_CHOICE_ITEM_NODE';
@@ -989,6 +1048,12 @@ export function graphOperation(operation, options) {
                 case NEW_CONDITION_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Condition);
                     setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    break;
+                case ADD_NEW_NODE:
+                    if (options.nodeType) {
+                        currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, options.nodeType);
+                        setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+                    }
                     break;
                 case NEW_MODEL_ITEM_FILTER:
                     currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ModelItemFilter);

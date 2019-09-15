@@ -43,7 +43,6 @@ describe('smash_43', () => {
     it('should get the model costs for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetPropertyConsts(childNode);
-        console.log(propertyConsts.map(x => GetCodeName(x)));
         expect(propertyConsts).toBeTruthy();
         expect(propertyConsts.length).toBe(2);
     })
@@ -52,7 +51,6 @@ describe('smash_43', () => {
     it('should ge the consts for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetModelConsts(childNode);
-        console.log(propertyConsts);
         expect(propertyConsts).toBeTruthy();
         expect(propertyConsts.length).toBe(1);
     });
@@ -60,7 +58,6 @@ describe('smash_43', () => {
     it('should ge the consts for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetModelPropertyConsts(childNode);
-        console.log(propertyConsts);
         expect(propertyConsts).toBeTruthy();
         expect(propertyConsts.length).toBe(1);
     });
@@ -78,6 +75,5 @@ describe('smash_43', () => {
         let model_instances = GetRNModelInstances(childNode);
         expect(model_instances).toBeTruthy();
         expect(model_instances.length).toBeTruthy();
-        console.log(model_instances);
     });
 });

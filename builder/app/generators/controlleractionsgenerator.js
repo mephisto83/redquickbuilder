@@ -49,7 +49,7 @@ export default class ControllerActionGenerator {
 }
         `;
         const controllerActionTemplate = `import * as Models from './models';
-import { service } from '../service/controllerService';
+import service from '../service/controllerService';
 import * as UIA from './uiActions';
 {{body}}
         `;

@@ -105,7 +105,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join(''),
         title: `"${GetNodeTitle(node)}"`,
         screen_options,
-        imports: [...imports, ...extraimports].join(NEW_LINE),
+        imports: [...imports, ...extraimports].unique().join(NEW_LINE),
         elements: addNewLine(layoutSrc, 4)
     });
     return [{
@@ -124,10 +124,15 @@ export function bindComponent(node, componentBindingDefinition) {
             if (properties[key] && properties[key].nodeProperty) {
                 bindProps[key] = GetNodeProp(node, properties[key].nodeProperty);
                 if (properties[key].template) {
-                    let temp = bindProps[key];
-                    bindProps[key] = bindTemplate(properties[key].template, {
-                        value: temp
-                    })
+                    if (typeof (properties[key].template) === 'function') {
+                        bindProps[key] = properties[key].template(node);
+                    }
+                    else {
+                        let temp = bindProps[key];
+                        bindProps[key] = bindTemplate(properties[key].template, {
+                            value: temp
+                        })
+                    }
                 }
             }
             if (!bindProps[key])
@@ -209,21 +214,26 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 modelName = `${cellModel[item]}`.toJavascriptName();
                 propertyName = (GetCodeName(cellModelProperty[item]) || '').toJavascriptName();
                 property = GetRNModelConstValue(propertyName);
+
             };
             switch (instanceType) {
                 case InstanceTypes.PropInstance:
                     if (model && property) {
-                        dataBinding = `data={this.props.${modelName} ? this.props.${modelName}.${propertyName} : null}`
+                        dataBinding = `this.props.${modelName} ? this.props.${modelName}.${propertyName} : null`
                     }
                     else if (model) {
-                        dataBinding = `data={this.props.${modelName}}`
+                        dataBinding = `this.props.${modelName}`
                     }
                     break;
                 default:
-                    onChange = `onChange={value => {
+                    if (model && property && GetCodeName(parent))
+                        onChange = `onChange={value => {
     this.props.update${instanceType}(${instanceType}.${GetCodeName(parent)}, ${model}, ${property}, value);
 }}`;
                     break;
+            }
+            if (dataBinding) {
+                dataBinding = `data={${dataBinding}}`;
             }
             return `<${GetCodeName(node)} ${dataBinding} ${onChange}/>`;
     }

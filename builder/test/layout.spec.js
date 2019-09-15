@@ -31,19 +31,19 @@ describe('description', () => {
         expect(subRoot).toBeTruthy();
     });
 
-    fit('should calculate luminance', () => {
+    it('should calculate luminance', () => {
         let res = relativeLuminance('#ffffff');
         expect(res).toBeTruthy();
         console.log(res);
     });
 
-    fit('should calculate luminance', () => {
+    it('should calculate luminance', () => {
         let res = relativeLuminance('#000100');
         expect(res).toBeTruthy();
         console.log(res);
     });
     
-    fit('should calculate contrast', () => {
+    it('should calculate contrast', () => {
         let res = calculateContrast('#000100', '#ffffff');
         expect(res).toBeTruthy();
         console.log(res);

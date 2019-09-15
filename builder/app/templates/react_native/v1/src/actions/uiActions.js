@@ -14,6 +14,17 @@ export function GetItems(modelType) {
 
     return [];
 }
+export function GetItem(modelType, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelDic = GetC(state, UI_MODELS, modelType);
+        if (modelDic) {
+            return modelDic[id];
+        }
+    }
+
+    return null;
+}
 export function setGetState() {
     return (dispatch, getState) => {
         _getState = getState;
@@ -36,6 +47,15 @@ export function UIModels(model, value) {
         model,
         value
     }
+}
+export function Chain(id, funcs) {
+    let res = id;
+
+    funcs.map(func => {
+        res = func(res);
+    });
+
+    return res;
 }
 export function UISI(form, model, item, value) {
     return {

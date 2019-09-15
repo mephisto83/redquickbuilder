@@ -1,6 +1,7 @@
 import { NodeTypes } from "./nodetypes";
-import { NodeProperties, GetRootGraph, GetNodeProp, GetState } from "../actions/uiactions";
+import { NodeProperties, GetRootGraph, GetNodeProp, GetState, GetCodeName } from "../actions/uiactions";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
+import { bindTemplate } from "./functiontypes";
 
 
 export const ComponentTypes = {
@@ -64,7 +65,27 @@ export const ComponentTypes = {
         },
         Icon: {},
         Image: {
-            library: 'react-native'
+            library: 'react-native',
+            template: './app/templates/components/image.tpl',
+            properties: {
+                data: {
+                    ui: true,
+                    nodeProperty: 'data',
+                    nodeTypes: [NodeTypes.DataChain],
+                    nodeFilter: (item) => {
+                        return GetNodeProp(item, NodeProperties.EntryPoint);
+                    },
+                    template: (node) => {
+                        let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChain));
+                        if (func)
+                            return bindTemplate(`DC.{{function}}({{value}})`, {
+                                function: func,
+                                value: `this.props.data`
+                            });
+                        return `this.props.data`
+                    }
+                }
+            }
         },
         Input: {
             template: './app/templates/components/input.tpl',
@@ -120,6 +141,7 @@ export const ComponentTypes = {
         TabHeader: {},
         Text: {
             template: './app/templates/components/text.tpl',
+            properties: {}
         },
         Textarea: {},
         Thumbnail: {},

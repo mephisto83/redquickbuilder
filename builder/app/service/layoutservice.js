@@ -2,6 +2,7 @@ import { UITypes, NEW_LINE } from "../constants/nodetypes";
 import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName } from "../actions/uiactions";
 import { GenerateMarkupTag } from "./screenservice";
 import { GetCellProperties, getComponentProperty } from "../methods/graph_methods";
+import { InstanceTypes } from "../constants/componenttypes";
 
 
 export function GetPropertyConsts(id, language = UITypes.ReactNative) {
@@ -15,9 +16,7 @@ export function GetModelConsts(id, language = UITypes.ReactNative) {
     let node = GetNodeById(id);
     let layout = GetNodeProp(node, NodeProperties.Layout);
     return GetNodeComponentsKeys(layout).map(cell => {
-        //console.log(cell);
         let cellProperties = GetCellProperties(layout, cell);
-        console.log(cellProperties);
 
         if (cellProperties && cellProperties.cellModel) {
             return cellProperties.cellModel[cell];
@@ -52,7 +51,8 @@ export function GetRNModelInstances(id) {
             cellProperties.cellModel &&
             cellProperties.cellModel[cell]) {
             let instanceType = getComponentProperty(componentProperties, cellProperties.cellModel[cell], 'instanceTypes');
-            return `let ${(cellProperties.cellModel[cell])} = Get${instanceType}(state, ${instanceType}.${GetCodeName(id)}, const_${(cellProperties.cellModel[cell])}) || {};` // CreateDefault${GetCodeName(id)}()
+            if (instanceType != InstanceTypes.PropInstance)
+                return `let ${(cellProperties.cellModel[cell])} = Get${instanceType}(state, ${instanceType}.${GetCodeName(id)}, const_${(cellProperties.cellModel[cell])}) || {};` // CreateDefault${GetCodeName(id)}()
         }
     }).filter(x => x).unique();
 }
@@ -143,7 +143,8 @@ export function createSection(layoutObj, item, currentRoot, index, language, imp
     // }} />
     let tree = Object.keys(currentRoot).length ? buildLayoutTree(layoutObj, currentRoot, language, imports, node) : [];
     if (children && children[item]) {
-        imports.push(children[item]);
+        if (!imports.some(v => v === children[item]))
+            imports.push(children[item]);
         tree = [addNewLine(GenerateMarkupTag(GetNodeById(children[item]), language, node, {
             children,
             cellModel,

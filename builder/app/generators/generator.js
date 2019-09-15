@@ -22,6 +22,7 @@ import ReactNativeNavigation from './navigationgenerator';
 import ReactNativeKeys from './keygenerator';
 import ReactNativeConfiguration from './configurationgenerator';
 import ReactNativeControllerActions from './controlleractionsgenerator';
+import ReactNativeDataChainFunctions from './datachaingenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
@@ -107,6 +108,8 @@ export default class Generator {
                 return ReactNativeConfiguration.Generate({ state, key });
             case ReactNativeTypes.ControllerActions:
                 return ReactNativeControllerActions.Generate({ state, key });
+            case ReactNativeTypes.DataChainFunctions:
+                return ReactNativeDataChainFunctions.Generate({ state, key });
         }
     }
 }
