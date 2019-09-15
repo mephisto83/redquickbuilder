@@ -1,9 +1,9 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode } from "../constants/componenttypes";
 import { getComponentProperty } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
@@ -45,12 +45,45 @@ export function GenerateScreenOptionSource(node, parent, language) {
 export function GetDefaultElement(language) {
     return '<View><Text>DE</Text></View>';
 }
+export function GetItemRender(node, imports, language) {
+    let listItemNode = GetListItemNode(node.id);
+    imports.push(GenerateComponentImport(listItemNode, node, language))
+
+    return `(item)=> <${GetCodeName(listItemNode)} data={item} />`;
+}
+export function GetItemRenderImport(node) {
+    let listItemNode = GetListItemNode(node.id);
+
+    return `(item)=> <${GetCodeName(listItemNode)} data={item} />`;
+}
+
+export function GetItemData(node) {
+    let dataSourceNode = GetDataSourceNode(node.id);
+
+    return `(()=> {
+    return GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))});
+})()`
+}
+
 export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
+    let componentType = GetNodeProp(node, NodeProperties.ComponentType);
+    let { specialLayout, template } = ComponentTypes[language][componentType] ? ComponentTypes[language][componentType] : {};
 
     let imports = [];
-    let layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE) : GetDefaultElement();
-    let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+    let extraimports = [];
+    let layoutSrc;
+    if (!specialLayout) { // if not a List or something like that 
+        layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE) : GetDefaultElement();
+    }
+    else {
+        extraimports.push(`import * as Models from '${relativePath.split('/').map(t => `../`).subset(2).join('')}model_keys.js';`)
+        layoutSrc = bindTemplate(fs.readFileSync(template, 'utf8'), {
+            item_render: GetItemRender(node, extraimports, language),
+            data: GetItemData(node)
+        });
+    }
+    let templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 
     let results = [];
     imports.map(t => {
@@ -64,16 +97,16 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let screen_options = addNewLine([..._consts, ...modelInstances].unique().join(NEW_LINE), 4);
 
 
-    template = bindTemplate(template, {
+    templateStr = bindTemplate(templateStr, {
         name: GetCodeName(node),
         relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join(''),
         title: `"${GetNodeTitle(node)}"`,
         screen_options,
-        imports: imports.join(NEW_LINE),
+        imports: [...imports, ...extraimports].join(NEW_LINE),
         elements: addNewLine(layoutSrc, 4)
     });
     return [{
-        template: template,
+        template: templateStr,
         relative: relativePath ? relativePath : './src/components',
         relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.js`,
         name: GetCodeName(node)

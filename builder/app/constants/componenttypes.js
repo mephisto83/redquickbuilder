@@ -1,5 +1,6 @@
 import { NodeTypes } from "./nodetypes";
-import { NodeProperties } from "../actions/uiactions";
+import { NodeProperties, GetRootGraph, GetNodeProp, GetState } from "../actions/uiactions";
+import { GetNodesLinkedTo } from "../methods/graph_methods";
 
 
 export const ComponentTypes = {
@@ -151,4 +152,16 @@ export const InstanceTypes = {
     Instance: 'Instance',
     AppState: 'AppState',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
+}
+
+export function GetListItemNode(id) {
+    let state = GetState();
+    let graph = GetRootGraph(state);
+    let nodes = GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode && GetNodeProp(x, NodeProperties.ComponentType) === ComponentTypes.ReactNative.ListItem.key);
+    if (nodes && nodes.length) {
+        return nodes[0];
+    }
+    return null;
 }
