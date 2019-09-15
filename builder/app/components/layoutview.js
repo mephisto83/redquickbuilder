@@ -51,6 +51,7 @@ class LayoutView extends Component {
         let cellModel = null;
         let cellModelProperty = null;
         let cellRoot = null;
+        let cellEvents = null;
         let selectedLayoutRoot = null;
         if (nodeLayout && this.state.selectedCell) {
             cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
@@ -66,6 +67,10 @@ class LayoutView extends Component {
 
                 cellProperties.cellRoot = cellProperties.cellRoot || {};
                 cellRoot = cellProperties.cellRoot;
+
+
+                cellProperties.cellEvents = cellProperties.cellEvents || {};
+                cellEvents = cellProperties.cellEvents;
             }
             selectedLayoutRoot = FindLayoutRoot(this.state.selectedCell, nodeLayout.layout) || nodeLayout.layout;
         }
@@ -76,7 +81,7 @@ class LayoutView extends Component {
                 <section className="content">
                     <div className="row">
                         <div className="col-md-2">
-                            <Box primary={true} title={Titles.Layout}>
+                            <Box primary={true} maxheight={350} title={Titles.Layout}>
                                 {this.state.selectedCell ? (<button onClick={() => {
                                     let layout = UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();
                                     layout = RemoveCellLayout(layout, this.state.selectedCell);
@@ -183,6 +188,20 @@ class LayoutView extends Component {
                                     label={Titles.Width}
                                     value={cellStyle.width} />) : null}
 
+                                {cellEvents ? <CheckBox
+                                    label={Titles.OnChange}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellEvents[this.state.selectedCell] = cellEvents[this.state.selectedCell] || {};
+                                        cellEvents[this.state.selectedCell] = { ...cellEvents[this.state.selectedCell], onChange: val };
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    value={cellEvents && cellEvents[this.state.selectedCell] && cellEvents[this.state.selectedCell].onChange} /> : null}
+
                                 {cellChildren ? (<SelectInput
                                     options={componentNodes.toNodeSelect()}
                                     onChange={(val) => {
@@ -236,7 +255,7 @@ class LayoutView extends Component {
                                             value: layout
                                         });
                                     }}
-                                    label={Titles.Models}
+                                    label={Titles.Property}
                                     value={cellModelProperty[this.state.selectedCell]} />) : null}
                             </Box>
 

@@ -3,7 +3,7 @@ import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode, InstanceTypes } from "../constants/componenttypes";
 import { getComponentProperty } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
@@ -78,6 +78,9 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     }
     else {
         extraimports.push(`import * as Models from '${relativePath.split('/').map(t => `../`).subset(2).join('')}model_keys.js';`)
+        if (layoutObj) {
+            buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE)
+        };
         layoutSrc = bindTemplate(fs.readFileSync(template, 'utf8'), {
             item_render: GetItemRender(node, extraimports, language),
             data: GetItemData(node)
@@ -192,15 +195,37 @@ export function GenerateMarkupTag(node, language, parent, params) {
         case UITypes.ReactNative:
             // let layout = GetNodeProp(parent, NodeProperties.Layout);
             let onChange = '';
+            let dataBinding = '';
+            let instanceType = '';
+            let model = '';
+            let property = '';
+            let componentProperties;
+            let modelName = '';
+            let propertyName = '';
             if (parent && children && cellModel && cellModelProperty && cellModel[item] && cellModelProperty[item]) {
-                let componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
-                let instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
-
-                onChange = `onChange={value => {
-    this.props.update${instanceType}(${instanceType}.${GetCodeName(parent)}, ${GetRNModelConstValue(cellModel[item])}, ${GetRNModelConstValue((GetCodeName(cellModelProperty[item]) || '').toJavascriptName())}, value);
-}}`
+                componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
+                instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
+                model = GetRNModelConstValue(cellModel[item]);
+                modelName = `${cellModel[item]}`.toJavascriptName();
+                propertyName = (GetCodeName(cellModelProperty[item]) || '').toJavascriptName();
+                property = GetRNModelConstValue(propertyName);
+            };
+            switch (instanceType) {
+                case InstanceTypes.PropInstance:
+                    if (model && property) {
+                        dataBinding = `data={this.props.${modelName} ? this.props.${modelName}.${propertyName} : null}`
+                    }
+                    else if (model) {
+                        dataBinding = `data={this.props.${modelName}}`
+                    }
+                    break;
+                default:
+                    onChange = `onChange={value => {
+    this.props.update${instanceType}(${instanceType}.${GetCodeName(parent)}, ${model}, ${property}, value);
+}}`;
+                    break;
             }
-            return `<${GetCodeName(node)} ${onChange}/>`;
+            return `<${GetCodeName(node)} ${dataBinding} ${onChange}/>`;
     }
 }
 

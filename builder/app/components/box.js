@@ -21,9 +21,10 @@ export default class Box extends Component {
     render() {
         var style = {};
         var styleAll = {};
+        var maxStyle = {};
         if (this.props.maxheight) {
             style.maxHeight = `${this.props.maxheight}px`;
-            style.overflowY = 'scroll';
+            style.overflowY = 'auto';
 
         }
 
@@ -31,8 +32,9 @@ export default class Box extends Component {
             style.background = this.backgroundColor();
             styleAll.background = this.backgroundColor();
         }
+
         return (
-            <div className={`box ${this.primary()}`} style={{ ...styleAll }}>
+            <div className={`box ${this.primary()}`} style={{ ...styleAll, ...maxStyle }}>
                 <div className="box-header with-border" style={{ ...styleAll }}>
                     <h3 className="box-title" style={{ ...styleAll }}>{this.title()}</h3>
                 </div>

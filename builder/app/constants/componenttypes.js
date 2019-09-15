@@ -118,7 +118,9 @@ export const ComponentTypes = {
         TabBar: {},
         TabContainer: {},
         TabHeader: {},
-        Text: {},
+        Text: {
+            template: './app/templates/components/text.tpl',
+        },
         Textarea: {},
         Thumbnail: {},
         Title: {},
@@ -151,6 +153,7 @@ export const InstanceTypes = {
     ScreenInstance: 'ScreenInstance',
     Instance: 'Instance',
     AppState: 'AppState',
+    PropInstance: 'PropInstance',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }
 
