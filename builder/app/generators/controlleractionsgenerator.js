@@ -1,7 +1,8 @@
-import { GetConfigurationNodes, GetNodeProp, NodesByType, NodeTypes, GetJSCodeName, GetCodeName, NodeProperties, GetMaestroNode, GetControllerNode } from "../actions/uiactions";
+import { GetConfigurationNodes, GetNodeProp, NodesByType, NodeTypes, GetJSCodeName, GetCodeName, NodeProperties, GetMaestroNode, GetControllerNode, GetMethodNodeProp } from "../actions/uiactions";
 import { ConfigurationProperties, NEW_LINE } from "../constants/nodetypes";
 import fs from 'fs';
-import { bindTemplate } from "../constants/functiontypes";
+import * as Titles from '../components/titles';
+import { bindTemplate, MethodTemplateKeys, FunctionTemplateKeys } from "../constants/functiontypes";
 import { addNewLine } from "../service/layoutservice";
 import ControllerGenerator from "./controllergenerator";
 export default class ControllerActionGenerator {
@@ -48,15 +49,15 @@ export default class ControllerActionGenerator {
     {{method_call}}
 }
         `;
-        const controllerActionTemplate = `import * as Models from './models';
-import service from '../service/controllerService';
-import * as UIA from './uiActions';
+        const controllerActionTemplate = `import * as Models from '../model_keys';
+import service from '../util/controllerService';
+import * as Util from './util';
 {{body}}
         `;
         let controllerActions = temp.map(node => {
-            let method_call = `return (dispatch, getState) => UIA.simple(service.${GetJSCodeName(node)}, {}, {
-    loading: Models.${GetCodeName(node)}, 
-    objectType: Models.${GetCodeName(node)} 
+            let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(node)}, {}, {
+    loading: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown}, 
+    objectType: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown} 
 })(dispatch, getState);`;
             return bindTemplate(ControllerMethodTemplate, {
                 methodName: GetJSCodeName(node),

@@ -5,12 +5,15 @@ var {
 
 import {
     https,
-    https_
+    http,
+    http_,
+    https_,
+    wss
 } from '../configuration.js'
 
-export const DEFAULT_URL = https;
+export const DEFAULT_URL = http || https;
 ///export const DEFAULT_URL_ = 'https://herocarcare-v1.azurewebsites.net';
-export const DEFAULT_URL_ = https_;
+export const DEFAULT_URL_ = http_ || https_;
 export const WS_DEFAULT_URL = wss
 export const DEBUG_MODE = false;
 export const setEnvironment = environment => {
@@ -80,22 +83,24 @@ export const getCurrentEnvironment = () => {
 var setDefaultUrlPromise = null;
 export const getDefaultURL = (add) => {
     add = add || ''
-    return new Promise((resolve, fail) => {
-        if (setDefaultUrlPromise) {
-            resolve();
-        }
-        setDefaultUrlPromise = resolve;
-    }).then(() => {
-        return AsyncStorage.getItem('ENVIRONMENT').then(res => {
-            return AsyncStorage.getItem(ENVIRONMENT_URLS).then(environments => {
-                var envs = JSON.parse(environments);
-                if (envs[res]) {
-                    return envs[res];
-                }
-                throw new Error('unknown http(s) endpoint');
-            });
-        });
-    });
+    return Promise.resolve(DEFAULT_URL_);
+    // return new Promise((resolve, fail) => {
+
+    //     if (setDefaultUrlPromise) {
+    //         resolve();
+    //     }
+    //     setDefaultUrlPromise = resolve;
+    // }).then(() => {
+    //     return AsyncStorage.getItem('ENVIRONMENT').then(res => {
+    //         return AsyncStorage.getItem(ENVIRONMENT_URLS).then(environments => {
+    //             var envs = JSON.parse(environments);
+    //             if (envs[res]) {
+    //                 return envs[res];
+    //             }
+    //             throw new Error('unknown http(s) endpoint');
+    //         });
+    //     });
+    // });
 }
 
 export const IceConfiguration = () => {

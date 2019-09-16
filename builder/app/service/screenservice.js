@@ -196,6 +196,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
         cellModelProperty,
         item
     } = (params || {});
+    let listItem = '';
     switch (language) {
         case UITypes.ReactNative:
             // let layout = GetNodeProp(parent, NodeProperties.Layout);
@@ -216,19 +217,22 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 property = GetRNModelConstValue(propertyName);
 
             };
+            if (parent && language === 'ReactNative' && GetNodeProp(parent, NodeProperties.ComponentType) === ComponentTypes[language].ListItem.key) {
+                listItem = '.item';
+            }
             switch (instanceType) {
                 case InstanceTypes.PropInstance:
                     if (model && property) {
-                        dataBinding = `this.props.${modelName} ? this.props.${modelName}.${propertyName} : null`
+                        dataBinding = `this.props.${modelName} && this.props.${modelName}${listItem} ? this.props.${modelName}${listItem}.${propertyName} : null`
                     }
                     else if (model) {
-                        dataBinding = `this.props.${modelName}`
+                        dataBinding = `this.props.${modelName}${listItem}`
                     }
                     break;
                 default:
                     if (model && property && GetCodeName(parent))
                         onChange = `onChange={value => {
-    this.props.update${instanceType}(${instanceType}.${GetCodeName(parent)}, ${model}, ${property}, value);
+    this.props.update${instanceType}(ScreenInstances.${GetCodeName(parent)}, ${model}, ${property}, value);
 }}`;
                     break;
             }
@@ -265,20 +269,23 @@ export function GetScreenImports(id, language) {
 
 export function GetComponentDidMount(screenOption) {
     let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
-    if (events && events.length) {
-        let evntHandles = events.map(evt => {
-            let methodNode = GetNodeById(evt);
-            return `this.props.${GetJSCodeName(methodNode)}();`;
-        }).join(NEW_LINE);
-        let componentDidMount = `componentDidMount() {
+    let componentDidMount = `componentDidMount() {
+        this.props.setGetState();
 {{handles}}
 }
 `;
-        return addNewLine(bindTemplate(componentDidMount, {
-            handles: addNewLine(evntHandles, 1)
-        }), 1)
+    let evntHandles = [];
+    if (events && events.length) {
+        evntHandles = events.map(evt => {
+            let methodNode = GetNodeById(evt);
+            return `this.props.${GetJSCodeName(methodNode)}();`;
+        }).join(NEW_LINE);
+
     }
-    return '';
+
+    return addNewLine(bindTemplate(componentDidMount, {
+        handles: addNewLine(evntHandles, 1)
+    }), 1)
 }
 
 

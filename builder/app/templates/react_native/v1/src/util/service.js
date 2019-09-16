@@ -1,7 +1,6 @@
 'use strict';
 
-import { endPoints, parameters } from './endPoints';
-import { GUID } from './redutil';
+import { endPoints } from './endPoints';
 
 import * as Globals from './globals';
 

@@ -9,7 +9,9 @@ export function GetItems(modelType) {
     if (_getState) {
         let state = _getState();
         let modelDic = GetC(state, UI_MODELS, modelType);
-        return Object.values(modelDic);
+        if (modelDic) {
+            return Object.values(modelDic);
+        }
     }
 
     return [];
@@ -78,6 +80,13 @@ export function GetC(state, key, id) {
     if (state)
         if (state.uiReducer[key])
             return state.uiReducer[key][id];
+    return null;
+}
+
+export function Get(state, key) {
+    if (state)
+        if (state.uiReducer[key])
+            return state.uiReducer[key];
     return null;
 }
 

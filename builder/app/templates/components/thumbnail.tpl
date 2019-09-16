@@ -1,0 +1,1 @@
+ <Thumbnail source={{uri:  {{data}} }} />

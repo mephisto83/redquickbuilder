@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import * as UIActions from '../actions/uiActions';
+import { Visual } from '../actions/uiActions';
 import * as ControllerActions from '../actions/controllerActions';
 import { TitleService } from './titles';
 import { connect } from 'react-redux';
@@ -73,6 +74,19 @@ export function simple(func, param, states, callback, error) {
     return Promise.resolve();
   }
 }
+
+export const _catch = (e) => {
+  return Promise.resolve().then(() => {
+      if (e && e.message && e.message.json) {
+          return e.message.json().then(c => { log(c); return c; });
+      }
+      return Promise.reject(e);
+  }).catch(() => {
+      log(e)
+      return e;
+  })
+}
+
 export const catchAnd = (then) => {
   then = then || (() => { });
   return (e) => _catch(e).then(then).catch(() => { });

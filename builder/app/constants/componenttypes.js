@@ -76,7 +76,7 @@ export const ComponentTypes = {
                         return GetNodeProp(item, NodeProperties.EntryPoint);
                     },
                     template: (node) => {
-                        let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChain));
+                        let func = GetCodeName(GetNodeProp(node, 'data'));
                         if (func)
                             return bindTemplate(`DC.{{function}}({{value}})`, {
                                 function: func,
@@ -141,10 +141,49 @@ export const ComponentTypes = {
         TabHeader: {},
         Text: {
             template: './app/templates/components/text.tpl',
-            properties: {}
+            properties: {
+                data: {
+                    ui: true,
+                    nodeProperty: 'data',
+                    nodeTypes: [NodeTypes.DataChain],
+                    nodeFilter: (item) => {
+                        return GetNodeProp(item, NodeProperties.EntryPoint);
+                    },
+                    template: (node) => {
+                        let func = GetCodeName(GetNodeProp(node, 'data'));
+                        if (func)
+                            return bindTemplate(`DC.{{function}}({{value}})`, {
+                                function: func,
+                                value: `this.props.data`
+                            });
+                        return `this.props.data`
+                    }
+                }
+            }
         },
         Textarea: {},
-        Thumbnail: {},
+        Thumbnail: {
+            template: './app/templates/components/thumbnail.tpl',
+            properties: {
+                data: {
+                    ui: true,
+                    nodeProperty: 'data',
+                    nodeTypes: [NodeTypes.DataChain],
+                    nodeFilter: (item) => {
+                        return GetNodeProp(item, NodeProperties.EntryPoint);
+                    },
+                    template: (node) => {
+                        let func = GetCodeName(GetNodeProp(node, 'data'));
+                        if (func)
+                            return bindTemplate(`DC.{{function}}({{value}})`, {
+                                function: func,
+                                value: `this.props.data`
+                            });
+                        return `this.props.data`
+                    }
+                }
+            }
+        },
         Title: {},
         Toast: {},
         View: {

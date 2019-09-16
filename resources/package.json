@@ -6,11 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "http-server",
-    "jserve": "json-server db.json --routes routes.json --port 3123"
+    "jserve": "json-server db.json --routes routes.json --port 80"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "lorem-ipsum": "^2.0.3"
+  },
+  "dependencies": {
+    "json-server": "^0.15.1",
+    "openssl-nodejs": "^1.0.5"
   }
 }

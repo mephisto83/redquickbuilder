@@ -6,7 +6,7 @@ export default class DataChainGenerator {
         let funcs = GenerateChainFunctions();
         let temps = [{
             template: `import { GetItem, Chain } from './uiActions';
-import * as Models from '../../model_keys.js';
+import * as Models from '../model_keys.js';
 ${funcs}`,
             relative: './src/actions',
             relativeFilePath: `./data-chain.js`,
