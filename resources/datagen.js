@@ -108,12 +108,12 @@ function generate(type) {
     }
     throw 'unhandled generation type ' + type;
 }
-
+let ModelsToBuild = 200;
 function generateModels(data, relations, order) {
     let result = {};
 
     data.map(t => {
-        result[t.name] = [].interpolate(0, 10, x => {
+        result[t.name] = [].interpolate(0, ModelsToBuild, x => {
             return generateModel(t);
         });
     })
