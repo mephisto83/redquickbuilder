@@ -87,3 +87,7 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+net/ImageResizer/.vs/
+net/ImageResizer/bin/
+net/ImageResizer/Properties
+net/ImageResizer/obj/
