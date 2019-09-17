@@ -259,6 +259,7 @@ export default class PermissionGenerator {
         return false;
     }
     static GetTestExtensionNodeValues(graph, permission, method, agent, model) {
+        return [];
         const value_string = 'value';
         var conditionNodes = GraphMethods.getNodesByLinkType(graph, {
             id: permission.id,

@@ -22,6 +22,7 @@ export const Models = 'Models';
 export const OutputModel = 'Output Model';
 export const AddComponentNew = 'Add Component';
 export const Height = 'Height';
+export const Get_Object_Agent_Value__IListObject_By_Specific = 'Get Specific Items';
 export const Component = 'Component';
 export const AddDataSource = 'Add Data Source';
 export const ComponentType = 'Component Type';

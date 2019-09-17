@@ -22,6 +22,7 @@ export const FunctionTypes = {
     Get_Object_Agent_Value__IListObject: 'Get/Object/Agent/Value => IList<Object>',
     Delete_Object_Agent_Value__IListObject: 'Delete/Object/Agent/Value => IList<Object>',
 
+    Get_Object_Agent_Value__IListObject_By_Specific: 'Get/Object/Agent/Value => IList<Object> specific id',
     //Delete
     Delete_M2M_By_Reference: 'Delete M2M by reference => list',
 
@@ -921,6 +922,55 @@ export const MethodFunctions = {
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
     },
 
+    [FunctionTypes.Get_Object_Agent_Value__IListObject_By_Specific]: {
+        title: Titles.Get_Object_Agent_Value__IListObject_By_Specific,
+        template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_specific.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_specific_interface.tpl', 'utf8'),
+        controller: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_specific_controller.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+            params: [FunctionTemplateKeys.Agent]
+        },
+        filter: {
+            ...FILTER_DEFAULTS,
+            params: [FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true }]
+        },
+        constraints: {
+            [FunctionTemplateKeys.Model]: {
+                key: FunctionTemplateKeys.Model,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.ModelOutput]: {
+                key: FunctionTemplateKeys.ModelOutput,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Agent]: {
+                [NodeProperties.IsAgent]: true,
+                key: FunctionTemplateKeys.Agent,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.User]: {
+                [NodeProperties.IsUser]: true,
+                key: FunctionTemplateKeys.User,
+                nodeTypes: [NodeTypes.Model]
+            },
+            [FunctionTemplateKeys.Permission]: {
+                key: FunctionTemplateKeys.Permission,
+                nodeTypes: [NodeTypes.Permission]
+            },
+            [FunctionTemplateKeys.ModelFilter]: {
+                key: FunctionTemplateKeys.ModelFilter,
+                nodeTypes: [NodeTypes.ModelFilter]
+            }
+        },
+        output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.GetAll,
+        ...COMMON_FUNCTION_REQUIREMENTS,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
     [FunctionTypes.Get_Object_Agent_Value__Object]: {
         title: Titles.Get_Object_Agent_Value__Object,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_object.tpl', 'utf8'),

@@ -58,16 +58,17 @@ export default class ControllerGenerator {
                             let parameter_route = '';
                             let parameter_values = '';
                             //If the function is a get then, use the get template.
-                            if ([Methods.Get, Methods.GetAll].some(v => v === GetNodeProp(maestro_function, NodeProperties.MethodType))) {
-                                tempFunction = _controllerTemplateFunctionGet;
-                                let paramName = 'modelId';
-                                if (ft.parentGet) {
-                                    paramName = 'parentId';
+                            if (!ft.controller)
+                                if ([Methods.Get, Methods.GetAll].some(v => v === GetNodeProp(maestro_function, NodeProperties.MethodType))) {
+                                    tempFunction = _controllerTemplateFunctionGet;
+                                    let paramName = 'modelId';
+                                    if (ft.parentGet) {
+                                        paramName = 'parentId';
+                                    }
+                                    parameters = `string ${paramName}`;
+                                    parameter_route = `/{${paramName}}`;
+                                    parameter_values = `${paramName}`;
                                 }
-                                parameters = `string ${paramName}`;
-                                parameter_route = `/{${paramName}}`;
-                                parameter_values = `${paramName}`;
-                            }
                             let codeNode = GetNodeProp(maestro_function, NodeProperties.CodeName);
                             let tempfunctions = GraphMethods.getNodesByLinkType(root, {
                                 id: maestro_function.id,
