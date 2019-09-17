@@ -939,6 +939,19 @@ export function GetSelectedSubgraph(state) {
     }
     return null;
 }
+
+export function BuildPackage(model, package) {
+    let { id } = model;
+    let methodFunctionDefinition = MethodFunctions[package.methodType];
+    if (methodFunctionDefinition) {
+        let { constraints } = methodFunctionDefinition;
+
+        Object.keys(constraints).values(_const => {
+            let { key } = _const;
+        });
+    }
+}
+
 export const UPDATE_GRAPH_TITLE = 'UPDATE_GRAPH_TITLE';
 export const NEW_NODE = 'NEW_NODE';
 export const REMOVE_NODE = 'REMOVE_NODE';

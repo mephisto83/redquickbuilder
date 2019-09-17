@@ -2,11 +2,12 @@ import * as NodeTypes from '../app/constants/nodetypes';
 import fs from 'fs';
 import {
     NodesByType, GRAPHS, UIC, CURRENT_GRAPH, APPLICATION,
-    setTestGetState, _getPermissionsConditions, GetChildComponentAncestors, GetCodeName
+    setTestGetState, _getPermissionsConditions, GetChildComponentAncestors, GetCodeName, GetState, BuildPackage
 } from '../app/actions/uiactions';
 import { updateUI, makeDefaultState } from '../app/reducers/uiReducer';
 import { GenerateModelKeys } from '../app/service/keyservice';
 import { GetPropertyConsts, GetModelConsts, GetModelPropertyConsts, GetRNConsts, GetRNModelInstances } from '../app/service/layoutservice';
+import { GetSpecificModels } from '../app/constants/nodepackages';
 var smash_42 = fs.readFileSync(`./test/smash_42.rqb`, 'utf8');
 var smash_43 = fs.readFileSync('./test/smash_43.rqb', 'utf8');
 
@@ -76,4 +77,12 @@ describe('smash_43', () => {
         expect(model_instances).toBeTruthy();
         expect(model_instances.length).toBeTruthy();
     });
+
+
+    it('should create add a models basic get package', () => {
+        let model = NodesByType(GetState(), NodeTypes.Model);
+        expect(model).toBeTruthy();
+
+        BuildPackage(model, GetSpecificModels)
+    })
 });
