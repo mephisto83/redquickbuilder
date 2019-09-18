@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import { isBuffer } from 'util';
 var os = require('os');
@@ -791,7 +791,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
         graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
     }
     if (callback) {
-        callback(node);
+        callback(GetNodeById(node.id));
     }
 
     return graph;

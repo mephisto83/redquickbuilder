@@ -11,24 +11,14 @@ import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { Functions, HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
 import { NodeProperties, Methods, LinkProperties } from '../constants/nodetypes';
+import { GetSpecificModels } from '../constants/nodepackages';
 
 class MethodActivityMenu extends Component {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Method);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var agent_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).filter(x => UIA.GetNodeProp(x, UIA.NodeProperties.IsAgent)).map(node => {
-            return {
-                value: node.id,
-                title: UIA.GetNodeTitle(node)
-            }
-        });
-        var permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(node => {
-            return {
-                value: node.id,
-                title: UIA.GetNodeTitle(node)
-            }
-        });
+
         var function_types = Object.keys(MethodFunctions).map(funcKey => {
             return {
                 title: MethodFunctions[funcKey].title || funcKey,
@@ -89,7 +79,7 @@ class MethodActivityMenu extends Component {
                             value
                         });
                     }}
-                    value={ UIA.GetNodeProp(currentNode, UIA.NodeProperties.NotIncludedInController)} />) : null}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.NotIncludedInController)} />) : null}
                 <ControlSideBarMenu>
                     {currentNode && currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])
@@ -117,6 +107,7 @@ class MethodActivityMenu extends Component {
                             }
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddAfterMethods} description={Titles.AddAfterMethodsDescription} />) : null}
+
                 </ControlSideBarMenu>
             </TabPane>
         );

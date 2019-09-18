@@ -264,6 +264,8 @@ export const NodeProperties = {
     IsOwned: 'isOwned',
     UIName: 'uiName', // The name used in the ui.
 
+    NodePackage: 'NodePackage',
+    NodePackageType: 'NodePackageType',
     UIText: 'text',
 
     IsReferenceList: 'isReferenceList',

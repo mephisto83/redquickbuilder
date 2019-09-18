@@ -13,6 +13,7 @@ import TextBox from './textinput';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
+import { GetSpecificModels } from '../constants/nodepackages';
 
 class ModelActivityMenu extends Component {
     render() {
@@ -205,9 +206,12 @@ class ModelActivityMenu extends Component {
                         });
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddProperty} description={Titles.AddPropertyDescription} />
                     <ControlSideBarMenuItem onClick={() => {
-                      clipboard.writeText(UIA.generateDataSeed(currentNode))
+                        clipboard.writeText(UIA.generateDataSeed(currentNode))
                     }} icon={'fa fa-puzzle-piece'} title={Titles.CreateObjectDataSeed} description={Titles.CreateObjectDataSeed} />
-                    
+                    {currentNode ? (<ControlSideBarMenuItem onClick={() => {
+                        this.props.executeGraphOperation(currentNode, GetSpecificModels);
+                    }} icon={'fa fa-puzzle-piece'} title={'Setup get specific models'} description={'Setup get specific models'} />) : null}
+
                 </ControlSideBarMenu>
                 {is_agent ? (<SelectInput
                     label={Titles.PermissionType}

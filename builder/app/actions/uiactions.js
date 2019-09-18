@@ -259,6 +259,9 @@ export function GetArbitersForNodeType(type) {
 export function GetAgentNodes() {
     return NodesByType(_getState(), NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent));
 }
+export function GetUsers() {
+    return NodesByType(_getState(), NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsUser));
+}
 export function GetArbitersForPermissions() {
     return GetArbitersForNodeType(NodeTypes.Permission);
 }
@@ -940,9 +943,9 @@ export function GetSelectedSubgraph(state) {
     return null;
 }
 
-export function BuildPackage(model, package) {
+export function BuildPackage(model, _package) {
     let { id } = model;
-    let methodFunctionDefinition = MethodFunctions[package.methodType];
+    let methodFunctionDefinition = MethodFunctions[_package.methodType];
     if (methodFunctionDefinition) {
         let { constraints } = methodFunctionDefinition;
 
@@ -990,7 +993,14 @@ export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY = 'ADD_EXTENSION_DEFINITIO
 export const APPLY_FUNCTION_CONSTRAINTS = 'APPLY_FUNCTION_CONSTRAINTS';
 export const ADD_NEW_REFERENCE_NODE = 'ADD_NEW_REFERENCE_NODE;'
 export const SET_DEPTH = 'SET_DEPTH';
-
+export function PerformGraphOperation(commands) {
+    return graphOperation(commands);
+}
+export function executeGraphOperation(model, op) {
+    return (dispatch, getState) => {
+        op.method({ model, dispatch, getState });
+    }
+}
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
@@ -1064,7 +1074,7 @@ export function graphOperation(operation, options) {
                     break;
                 case ADD_NEW_NODE:
                     if (options.nodeType) {
-                        currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, options.nodeType);
+                        currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, options.nodeType, options.callback);
                         setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                     }
                     break;
