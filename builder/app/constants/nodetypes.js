@@ -1,4 +1,5 @@
 import * as _ from '../utils/array';
+import fs from 'fs';
 
 export const NodeTypes = {
     Concept: 'concept',
@@ -42,6 +43,16 @@ export const NodeTypes = {
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node',
     DataChain: 'data-chain'
+}
+export const NodeTypeIcons = {};
+export function GetNodeTypeIcon(type) {
+    if (!NodeTypeIcons[type]) {
+        let files = fs.readdirSync('./app/css/svg');
+        Object.values(NodeTypes).map((key, index) => {
+            NodeTypeIcons[key] = `./css/svg/${files[index % files.length]}`;
+        })
+    }
+    return NodeTypeIcons[type];
 }
 export const ExcludeDefaultNode = {
     [NodeTypes.Condition]: true,
@@ -266,6 +277,7 @@ export const NodeProperties = {
 
     NodePackage: 'NodePackage',
     NodePackageType: 'NodePackageType',
+    NodePackageAgent: 'NodePackageAgent',
     UIText: 'text',
 
     IsReferenceList: 'isReferenceList',

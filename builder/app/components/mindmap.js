@@ -6,9 +6,10 @@ import * as GraphMethods from '../methods/graph_methods';
 // @flow
 import React, { Component } from 'react';
 import { NodeTypeColors } from '../actions/uiactions';
-import { LinkStyles, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { LinkStyles, LinkType, LinkPropertyKeys, GetNodeTypeIcon } from '../constants/nodetypes';
 
 const MIN_DIMENSIONAL_SIZE = 20;
+let iconSize = 30;
 export default class MindMap extends Component {
     constructor() {
         super();
@@ -162,7 +163,7 @@ export default class MindMap extends Component {
             redraw();
             return vis;
         }
-      
+
         var graph = this.state.graph;
 
         graph.nodes.forEach(function (v) {
@@ -249,7 +250,7 @@ export default class MindMap extends Component {
             if (me.props.onNodeClick && d && d.id) {
                 me.props.onNodeClick(d.id, els[index].getBoundingClientRect());
             }
-        })
+        });
 
         var features = svg.selectAll('.features')
             .data(graph.nodes)
@@ -270,7 +271,27 @@ export default class MindMap extends Component {
                 return color(graph.groups.length)
             })
 
-        var titles = label.append('xhtml:div')
+        var topdiv = label.append('xhtml:div')
+            .style('pointer-events', 'none');
+
+
+        topdiv.append("xhtml:object")
+            .attr("data", (d) => {
+                if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
+                    return GetNodeTypeIcon(d.properties.nodeType);
+                }
+                return "./css/svg/003-cupcake.svg";
+            })
+            .attr("type", (n) => {
+                return "image/svg+xml";
+            })
+            .attr("width", function (d) { return iconSize; })
+            .attr("height", function (d) { return iconSize; })
+            .attr('x', 40)
+            .attr('y', 40)
+            .style('width', 40)
+            .style('height', 40);
+        var titles = topdiv.append('xhtml:div')
             .style('width', x => {
                 return `${x.width - pad / 2}px`
             })
@@ -282,6 +303,7 @@ export default class MindMap extends Component {
             })
             .text(function (d) { return `${getLabelText(d)}` })
             .call(force.drag);
+
 
         this.$force = force;
         this.setState({
@@ -345,15 +367,14 @@ export default class MindMap extends Component {
             })
 
 
-            label
-                .attr("x", function (d) {
-                    return d.x - d.width / 2
-                }).attr("y", function (d) {
-                    var innerbit = this.querySelector('div');
-                    var h = innerbit ? innerbit.getBoundingClientRect().height : 0;
+            label.attr("x", function (d) {
+                return d.x - d.width / 2
+            }).attr("y", function (d) {
+                var innerbit = this.querySelector('div');
+                var h = innerbit ? innerbit.getBoundingClientRect().height : 0;
 
-                    return d.y + h / 2 - d.height + pad / 2;
-                })
+                return d.y + h / 2 - d.height + -pad / 2 - iconSize;
+            })
             titles.text(function (d) {
                 return getLabelText(d);
             })

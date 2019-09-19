@@ -576,6 +576,16 @@ export function Node(state, nodeId) {
     }
     return null;
 }
+export function ModelNotConnectedToFunction(agentId, modelId, packageType, nodeType = NodeTypes.Method) {
+    let connections = NodesByType(_getState(), nodeType).filter(x => {
+        let match = GetNodeProp(x, NodeProperties.NodePackage) === modelId &&
+            GetNodeProp(x, NodeProperties.NodePackageType) === packageType &&
+            GetNodeProp(x, NodeProperties.NodePackageAgent) === agentId
+        return match;
+    }).length;
+
+    return !connections
+}
 export function Application(state, key) {
     return GetC(state, APPLICATION, key);
 }
