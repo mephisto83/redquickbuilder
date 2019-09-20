@@ -19,6 +19,7 @@ export const NodeType = 'Node Type';
 export const EntryPoint = 'Entry Point';
 export const Nodes = 'Nodes';
 export const Models = 'Models';
+export const MethodName = 'Method Name';
 export const OutputModel = 'Output Model';
 export const AddComponentNew = 'Add Component';
 export const Height = 'Height';
@@ -251,7 +252,7 @@ export const CodeView = 'Code View';
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const IsCompositeInput = 'Is composite input';
-export const ExcludeFromController= 'Exclude from controller';
+export const ExcludeFromController = 'Exclude from controller';
 export const UserModel = 'User Model';
 
 export const PropertyGeneratedType = 'Generated Type';

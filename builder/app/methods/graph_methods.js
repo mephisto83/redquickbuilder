@@ -728,22 +728,23 @@ export function addDefaultProperties(graph, options) {
     DEFAULT_PROPERTIES.filter(t => {
         return propertyNodes.indexOf(t.title) === -1;
     }).map(dp => {
-        graph = addNewNodeOfType(graph, options, dp.nodeType, new_node => {
-            graph = updateNodeProperty(graph, {
+        graph = addNewNodeOfType(graph, options, dp.nodeType, (new_node, _graph) => {
+            _graph = updateNodeProperty(_graph, {
                 id: new_node.id,
                 prop: NodeProperties.UIText,
                 value: dp.title
             });
-            graph = updateNodeProperty(graph, {
+            _graph = updateNodeProperty(_graph, {
                 id: new_node.id,
                 prop: NodeProperties.IsDefaultProperty,
                 value: true
             });
-            graph = updateNodeProperty(graph, {
+            _graph = updateNodeProperty(_graph, {
                 id: new_node.id,
                 prop: NodeProperties.UIAttributeType,
                 value: dp.type
             });
+            return _graph;
         })
     });
 
@@ -791,7 +792,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
         graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
     }
     if (callback) {
-        callback(GetNodeById(node.id));
+        graph = callback(GetNodeById(node.id, graph), graph) || graph;
     }
 
     return graph;

@@ -11,6 +11,7 @@ import SidebarToggle from './sidebartoggle';
 import * as UIA from '../actions/uiactions';
 import NavBarMenu from './navbarmenu';
 import MainSideBar from './mainsidebar';
+import BatchMenu from './batchmenu';
 import SideBarHeader from './sidebarheader';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
@@ -382,6 +383,11 @@ class Dashboard extends Component {
                                 <SideBarTab active={UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB)} onClick={() => {
                                     this.props.setVisual(SELECTED_TAB, SCOPE_TAB)
                                 }} />
+                                <SideBarTab
+                                    icon={'fa fa-institution'}
+                                    active={UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU)} onClick={() => {
+                                        this.props.setVisual(SELECTED_TAB, QUICK_MENU)
+                                    }} />
                             </SideBarTabs>
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<SideBarContent>
                                 <SideBarMenu>
@@ -498,6 +504,9 @@ class Dashboard extends Component {
                                     modelKey={NodeProperties.Condition}
                                     nodeType={NodeTypes.Condition}
                                     nodeProp={NodeProperties.Condition} />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
+                                <BatchMenu />
+                            </SideBarContent>) : null}
                         </SideBar>
                     </div>
                 </div >
@@ -509,4 +518,5 @@ const SELECTED_TAB = 'SELECTED_TAB';
 const DEFAULT_TAB = 'DEFAULT_TAB';
 const PARAMETER_TAB = 'PARAMETER_TAB';
 const SCOPE_TAB = 'SCOPE_TAB';
+const QUICK_MENU = 'QUICK_MENU';
 export default UIConnect(Dashboard)

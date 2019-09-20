@@ -107,8 +107,8 @@ export function GetModelPropertyChildren(id) {
     return [...property_nodes, ...logicalChildren];
 }
 
-export function GetNodeById(node) {
-    return GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+export function GetNodeById(node, graph) {
+    return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
 
 export function GetChildComponentAncestors(id) {
@@ -713,6 +713,11 @@ export function GetControllerNode(id) {
         return nodes[0];
     }
     return null;
+}
+export function HasCurrentGraph(options = {}) {
+    let state = _getState();
+    var currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);
+    return !!currentGraph;
 }
 export function NodesByType(state, nodeType, options = {}) {
 
