@@ -352,7 +352,8 @@ export default class MindMap extends Component {
                 .attr("height", function (d) { return d.bounds.height() })
 
             link.each(function (d) {
-                d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
+                //  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
+                d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, 0), 5);
             });
 
             link.attr("x1", function (d) { return d.route.sourceIntersection.x; })

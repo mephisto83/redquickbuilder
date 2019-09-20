@@ -28,6 +28,7 @@ export const AddDataSource = 'Add Data Source';
 export const ComponentType = 'Component Type';
 export const ConditionType = 'Condition Type';
 export const Width = 'Width';
+export const QuickMethods = 'Quick Methods';
 export const Reference = 'Reference';
 export const Depth = 'Depth';
 export const Label = 'Label';
@@ -250,6 +251,7 @@ export const CodeView = 'Code View';
 export const ParentTo = 'Parent to';
 export const IsParent = 'Is parent';
 export const IsCompositeInput = 'Is composite input';
+export const ExcludeFromController= 'Exclude from controller';
 export const UserModel = 'User Model';
 
 export const PropertyGeneratedType = 'Generated Type';

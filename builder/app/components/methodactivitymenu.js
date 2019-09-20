@@ -11,7 +11,6 @@ import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { Functions, HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
 import { NodeProperties, Methods, LinkProperties } from '../constants/nodetypes';
-import { GetSpecificModels } from '../constants/nodepackages';
 
 class MethodActivityMenu extends Component {
     render() {

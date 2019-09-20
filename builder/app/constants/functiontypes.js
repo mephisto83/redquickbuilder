@@ -22,6 +22,7 @@ export const FunctionTypes = {
     Get_Object_Agent_Value__IListObject: 'Get/Object/Agent/Value => IList<Object>',
     Delete_Object_Agent_Value__IListObject: 'Delete/Object/Agent/Value => IList<Object>',
 
+    Get_Agent_Value__IListObject: 'Get/Agent/Value => IList<Object>',
     Get_Object_Agent_Value__IListObject_By_Specific: 'Get/Object/Agent/Value => IList<Object> specific id',
     //Delete
     Delete_M2M_By_Reference: 'Delete M2M by reference => list',
@@ -821,6 +822,23 @@ export const MethodFunctions = {
         interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
         permission: {
             ...PERMISSION_DEFAULTS,
+        },
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+        }, output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        isList: true,
+        method: Methods.GetAll,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    [FunctionTypes.Get_Agent_Value__IListObject]: {
+        title: Titles.Get_Agent_Value__IListObject,
+        template: fs.readFileSync('./app/templates/standard/get_agent_listobject.tpl', 'utf8'),
+        interface: fs.readFileSync('./app/templates/standard/get_agent_listobject_interface.tpl', 'utf8'),
+        permission: {
+            ...PERMISSION_DEFAULTS,
+            params: [FunctionTemplateKeys.Agent]
         },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD

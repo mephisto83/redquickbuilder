@@ -13,7 +13,8 @@ import TextBox from './textinput';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels } from '../constants/nodepackages';
+import TreeViewMenu from './treeviewmenu';
 
 class ModelActivityMenu extends Component {
     render() {
@@ -113,6 +114,16 @@ class ModelActivityMenu extends Component {
                                 value
                             });
                         }} />
+                    <CheckBox
+                        label={Titles.ExcludeFromController}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExcludeFromController)}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.ExcludeFromController,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
                     {many_to_many_enabled ? (<SelectInput
                         options={UIA.NodesByType(state, NodeTypes.Model).map(x => {
                             return {
@@ -208,9 +219,21 @@ class ModelActivityMenu extends Component {
                     <ControlSideBarMenuItem onClick={() => {
                         clipboard.writeText(UIA.generateDataSeed(currentNode))
                     }} icon={'fa fa-puzzle-piece'} title={Titles.CreateObjectDataSeed} description={Titles.CreateObjectDataSeed} />
-                    {currentNode ? (<ControlSideBarMenuItem onClick={() => {
-                        this.props.executeGraphOperation(currentNode, GetSpecificModels);
-                    }} icon={'fa fa-puzzle-piece'} title={'Setup get specific models'} description={'Setup get specific models'} />) : null}
+                    <TreeViewMenu
+                        title={Titles.QuickMethods}
+                        open={UIA.Visual(state, Titles.QuickMethods)}
+                        active={UIA.Visual(state, Titles.QuickMethods)}
+                        toggle={() => {
+                            this.props.toggleVisual(Titles.QuickMethods)
+                        }}
+                        icon={'fa fa-tag'}>
+                        <TreeViewMenu hideArrow={true} title={GetSpecificModels.type} icon={'fa fa-plus'} onClick={(() => {
+                            this.props.executeGraphOperation(currentNode, GetSpecificModels);
+                        })} />
+                        <TreeViewMenu hideArrow={true} title={GetAllModels.type} icon={'fa fa-plus'} onClick={(() => {
+                            this.props.executeGraphOperation(currentNode, GetAllModels);
+                        })} />
+                    </TreeViewMenu>
 
                 </ControlSideBarMenu>
                 {is_agent ? (<SelectInput

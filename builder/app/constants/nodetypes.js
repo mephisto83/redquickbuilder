@@ -264,6 +264,7 @@ export const NodeProperties = {
     CodeUser: 'codeUser',
     HttpRoute: 'HttpRoute',
     HttpMethod: 'HttpMethod',
+    ExcludeFromController: 'ExcludeFromController',
     IsAgent: 'isAgent',
     IsCompositeInput: 'IsCompositeInput',
     IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
