@@ -65,6 +65,7 @@ import FormControl from './formcontrol';
 import ModelFilterMenu from './modelfiltermenu';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
+import DataChainOperator from './datachainoperator';
 import Slider from './slider';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
 import MethodActivityMenu from './methodactivitymenu';
@@ -507,6 +508,7 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
                                 <BatchMenu />
                             </SideBarContent>) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
                         </SideBar>
                     </div>
                 </div >

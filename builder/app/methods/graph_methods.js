@@ -800,7 +800,10 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
 export function updateNodeGroup(graph, options) {
     var { id, groupProperties, parent } = options;
     var group = null;
-    if (!hasGroup(graph, parent)) {
+    if (groupProperties && groupProperties.id) {
+        group = getGroup(graph, groupProperties.id);
+    }
+    else if (!hasGroup(graph, parent)) {
         var group = createGroup();
         graph = addGroup(graph, group);
         graph = updateNodeProperty(graph, {
@@ -852,10 +855,10 @@ function getGroupAncenstors(graph, id) {
     }
     return result;
 }
-function getGroup(graph, id) {
+export function getGroup(graph, id) {
     return graph.groupLib[id];
 }
-function hasGroup(graph, parent) {
+export function hasGroup(graph, parent) {
     return !!(graph.nodeLib[parent] && GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups));
 }
 export function GetNode(graph, id) {

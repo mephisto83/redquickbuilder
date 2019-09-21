@@ -218,8 +218,11 @@ export const ConfigurationProperties = {
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     SelectedLayoutCell: 'SelectedLayoutCell',
+    ChainParent: 'ChainParent',
     EntryPoint: 'EntryPoint',
     Property: 'Property',
+    DataChainEntry: 'DataChainEntry',
+    MergeChain: 'MergeChain',
     ComponentProperties: "ComponentProperties",
     Layout: 'Layout',
     Domain: 'Domain',
@@ -337,10 +340,14 @@ export const NodeProperties = {
     ManyToManyNexusTypes: 'manyToManyNexusTypes',
 
     MethodType: "MethodType",
+    ChainNodeInput2: 'ChainNodeInput2',
+    ChainNodeInput1: 'ChainNodeInput1',
     UIModelType: 'uiModelType',
 
     UseScopeGraph: 'UseScopeGraph',
     ScopeGraph: 'scopedGraph',
+
+    DataChainFunctionType: 'DataChainFunctionType',
 
     AfterMethod: 'after-method',
     AfterMethodSetup: 'after-method-setup',

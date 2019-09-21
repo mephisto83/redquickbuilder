@@ -13,11 +13,13 @@ export default class SideBar extends Component {
     relative() {
         return this.props.relative ? RelativeMenuCss : {};
     }
+
     render() {
         return (
-            <aside style={this.relative()} className={`control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`}>
+            <aside style={{ ...this.relative(), ...(this.props.style || {}) }} className={`control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`
+            }>
                 {this.props.children}
-            </aside>
+            </aside >
         );
     }
 }

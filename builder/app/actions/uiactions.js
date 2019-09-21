@@ -189,7 +189,11 @@ export function GetDataChainFrom(id) {
             id: current,
             type: NodeConstants.LinkType.DataChainLink,
             direction: GraphMethods.SOURCE
-        }).filter(x => x.id !== current).unique(x => x.id)[0];
+        }).filter(x => x.id !== current).sort((a, b) => {
+            var a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
+            var b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
+            return a_ - b_;
+        }).unique(x => x.id)[0];
         current = null;
         if (next && next.id) {
             result.push(next.id);
@@ -201,6 +205,19 @@ export function GetDataChainFrom(id) {
     }
 
     return result;
+}
+export function getGroup(id) {
+    // return graph.groupLib[id];
+    return GraphMethods.getGroup(GetCurrentGraph(_getState()), id);
+}
+export function hasGroup(id) {
+    //    return !!(graph.nodeLib[parent] && GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups));
+    return GraphMethods.hasGroup(GetCurrentGraph(_getState()), id);
+}
+
+
+export function IsEndOfDataChain(id) {
+    return GetDataChainFrom(id).length === 1;
 }
 export function GenerateDataChainMethod(id) {
     let node = GetNodeById(id);
