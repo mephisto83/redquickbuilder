@@ -1,11 +1,12 @@
 
 import fs from 'fs';
-import { GetDataChainEntryNodes, APPLICATION, CURRENT_GRAPH, GRAPHS, UIC, setTestGetState, GetDataChainFrom, GenerateDataChainMethod, GenerateChainFunction, GenerateChainFunctions } from '../app/actions/uiactions';
+import { GetDataChainEntryNodes, APPLICATION, CURRENT_GRAPH, GRAPHS, UIC, setTestGetState, GetDataChainFrom, GenerateDataChainMethod, GenerateChainFunction, GenerateChainFunctions, GetDataChainNextId } from '../app/actions/uiactions';
 import { makeDefaultState, updateUI } from '../app/reducers/uiReducer';
 var smash_47 = fs.readFileSync(`./test/smash_47.rqb`, 'utf8');
+var data_chain_example = fs.readFileSync(`./test/data_chain_example.rqb`, 'utf8');
 
-describe('description', () => {
-    let graph = JSON.parse(smash_47);
+describe('data_chain_example', () => {
+    let graph = JSON.parse(data_chain_example);
     let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph))
     state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
     let app_state = { uiReducer: state };
@@ -31,12 +32,13 @@ describe('description', () => {
         let result = GetDataChainEntryNodes();
         let res = result[0].id;
         let nodes = GetDataChainFrom(res);
-        expect(nodes.length).toBe(2);
+        expect(nodes.length).toBeTruthy();
 
         let code = GenerateDataChainMethod(nodes[0]);
         expect(code).toBeTruthy();
         console.log(code);
     });
+    
     it('should generate a chain function function', () => {
         let result = GetDataChainEntryNodes();
         let res = result[0].id;
@@ -50,5 +52,13 @@ describe('description', () => {
 
         expect(code).toBeTruthy();
         console.log(code);
+    });
+    it('should get the Customer node in the group', () => {
+
+        let dataChainLink = '345cf0b8-ea1f-460d-beee-95af647e47e1';
+        
+        let nextId = GetDataChainNextId(dataChainLink);
+        
+        expect(nextId).toBe('d152894b-71c0-4029-a318-c98d87c77f09');
     })
 });

@@ -842,6 +842,16 @@ export function updateNodeGroup(graph, options) {
             value: group.id,
             prop: NodeProperties.GroupParent
         });
+
+        if (groupProperties) {
+            for (var gp in groupProperties) {
+                graph = updateGroupProperty(graph, {
+                    id: group.id,
+                    prop: gp,
+                    value: groupProperties[gp]
+                })
+            }
+        }
     }
 
     return graph;

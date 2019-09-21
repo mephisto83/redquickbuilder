@@ -28,6 +28,9 @@ class DataChainActvityMenu extends Component {
         let showProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.property : false;
         let showNode1 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_1 : false;
         let showNode2 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_2 : false;
+        let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
+            return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
+        }).toNodeSelect();
         return (
             <TabPane active={active}>
                 <FormControl>
@@ -69,7 +72,7 @@ class DataChainActvityMenu extends Component {
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 target: value,
                                 source: id,
-                                properties: { ...UIA.LinkProperties.DataChainLink }
+                                properties: { ...UIA.LinkProperties.ModelTypeLink }
                             })
                         }}
                         label={Titles.Models}
@@ -118,9 +121,7 @@ class DataChainActvityMenu extends Component {
                         }}
                         label={`${Titles.Input} 1`}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.ChainNodeInput1)}
-                        options={UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
-                            return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent);
-                        }).toNodeSelect()}
+                        options={node_inputs}
                     /> : null}
                     {showNode2 ? <SelectInput
                         onChange={(value) => {
@@ -142,9 +143,7 @@ class DataChainActvityMenu extends Component {
                         }}
                         label={`${Titles.Input} 2`}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.ChainNodeInput2)}
-                        options={UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
-                            return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent);
-                        }).toNodeSelect()}
+                        options={node_inputs}
                     /> : null}
                 </FormControl>
             </TabPane>

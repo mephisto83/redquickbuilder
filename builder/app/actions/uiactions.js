@@ -75,6 +75,14 @@ export function GetManyToManyNodes(ids) {
 export function GetNodeProp(node, prop) {
     return node && node.properties && node.properties[prop];
 }
+export function GetGroupProp(id, prop) {
+    let group = GraphMethods.GetGroup(GetCurrentGraph(_getState()), id);
+    if (group) {
+        return group && group.properties && group.properties[prop];
+    }
+
+    return null;
+}
 export function GetConditionNodes(id) {
     let state = _getState();
     return GraphMethods.GetConditionNodes(state, id);
@@ -179,21 +187,43 @@ export function GenerateChainFunctions() {
     let entryNodes = GetDataChainEntryNodes().map(x => x.id);
     return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
 }
+export function GetDataChainNext(id) {
+    let graph = GetRootGraph(_getState());
+    if (!graph) { throw 'no graph found'; }
+    let current = id;
+
+    let groupId = GetNodeProp(current, NodeProperties.GroupParent);
+    if (groupId) {
+        let group = GraphMethods.GetGroup(graph, groupId);
+        let entryNode = GetGroupProp(group.id, NodeConstants.GroupProperties.GroupEntryNode);
+        if (entryNode === current) {
+            let exitNode = GetGroupProp(group.id, NodeConstants.GroupProperties.ExternalExitNode);
+            return exitNode;
+        }
+    }
+
+    let next = GraphMethods.getNodesByLinkType(graph, {
+        id: current,
+        type: NodeConstants.LinkType.DataChainLink,
+        direction: GraphMethods.SOURCE
+    }).filter(x => x.id !== current).sort((a, b) => {
+        var a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
+        var b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
+        return a_ - b_;
+    }).unique(x => x.id)[0];
+    return next;
+}
+export function GetDataChainNextId(id) {
+    let next = GetDataChainNext(id);
+    return next && next.id;
+}
 export function GetDataChainFrom(id) {
     let result = [id];
     let current = id;
     let graph = GetRootGraph(_getState());
     if (!graph) { throw 'no graph found'; }
     for (var i = 0; i < 10; i++) {
-        let next = GraphMethods.getNodesByLinkType(graph, {
-            id: current,
-            type: NodeConstants.LinkType.DataChainLink,
-            direction: GraphMethods.SOURCE
-        }).filter(x => x.id !== current).sort((a, b) => {
-            var a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
-            var b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
-            return a_ - b_;
-        }).unique(x => x.id)[0];
+        let next = GetDataChainNext(current);
         current = null;
         if (next && next.id) {
             result.push(next.id);
@@ -1015,6 +1045,7 @@ export const NEW_VALIDATION_TYPE = 'NEW_VALIDATION_TYPE';
 export const NEW_OPTION_ITEM_NODE = 'NEW_OPTION_ITEM_NODE';
 export const NEW_OPTION_NODE = 'NEW_OPTION_NODE';
 export const NEW_CUSTOM_OPTION = 'NEW_CUSTOM_OPTION';
+export const UPDATE_GROUP_PROPERTY = 'UPDATE_GROUP_PROPERTY';
 export const NEW_DATA_SOURCE = 'NEW_DATA_SOURCE';
 export const NEW_COMPONENT_NODE = 'NEW_COMPONENT_NODE';
 export const NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE = 'NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE';
@@ -1082,6 +1113,9 @@ export function graphOperation(operation, options) {
                     break;
                 case REMOVE_LINK:
                     currentGraph = GraphMethods.removeLinkById(currentGraph, options);
+                    break;
+                case UPDATE_GROUP_PROPERTY:
+                    currentGraph = GraphMethods.updateGroupProperty(currentGraph, options);
                     break;
                 case CHANGE_NODE_TEXT:
                     currentGraph = GraphMethods.updateNodeProperty(currentGraph, { ...options, prop: 'text' });

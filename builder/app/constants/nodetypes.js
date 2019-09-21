@@ -176,7 +176,11 @@ export const FunctionGroups = {
 }
 export const GroupProperties = {
     IsExternal: 'isExternal',
-    FunctionGroup: 'FunctionGroup'
+    FunctionGroup: 'FunctionGroup',
+    GroupEntryNode: 'GroupEntryNode',
+    GroupExitNode: 'GroupExitNode',
+    ExternalExitNode: 'ExternalExitNode',
+    ExternalEntryNode: 'ExternalEntryNode'
 }
 export const NameSpace = {
     Model: '.Models',
