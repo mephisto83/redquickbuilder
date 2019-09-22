@@ -9,6 +9,7 @@ export default class RedObservable {
         this.observers = [];
         this.id = id;
         this.state = {};
+        this.value = undefined;
         this.process = (x => x);
     }
     setProcess(process) {
@@ -38,12 +39,14 @@ export default class RedObservable {
         if (this.process && this.args && !Object.keys(this.args).some(t => !this.state.hasOwnProperty(t))) {
             let parameters = Object.keys(this.args).sort((a, b) => (this.args[a] - this.args[b])).map(v => this.state[v]);
             let data = this.process(...parameters);
+            this.value = data;
             this.notify(data);
         }
     }
     // update all subscribed objects / DOM elements
     // and pass some data to each of them
     notify(data) {
+        // console.log(`notifies ${this.id}`);
         this.observers.forEach(observer => observer.update(data, this.id));
     }
 }

@@ -34,18 +34,18 @@ describe('description', () => {
     it('should calculate luminance', () => {
         let res = relativeLuminance('#ffffff');
         expect(res).toBeTruthy();
-        console.log(res);
+        // console.log(res);
     });
 
     it('should calculate luminance', () => {
         let res = relativeLuminance('#000100');
         expect(res).toBeTruthy();
-        console.log(res);
+        // console.log(res);
     });
     
     it('should calculate contrast', () => {
         let res = calculateContrast('#000100', '#ffffff');
         expect(res).toBeTruthy();
-        console.log(res);
+        // console.log(res);
     });
 });

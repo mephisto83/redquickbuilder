@@ -36,7 +36,7 @@ describe('data_chain_example', () => {
 
         let code = GenerateDataChainMethod(nodes[0]);
         expect(code).toBeTruthy();
-        console.log(code);
+        // console.log(code);
     });
 
     it('should generate a chain function function', () => {
@@ -51,7 +51,7 @@ describe('data_chain_example', () => {
         let code = GenerateChainFunctions();
 
         expect(code).toBeTruthy();
-        console.log(code);
+        // console.log(code);
     });
     it('should get the Customer node in the group', () => {
 
@@ -60,7 +60,7 @@ describe('data_chain_example', () => {
         let lastChainLink = '627f79ec-fc45-40ad-a13f-f80f4547383a';
 
         let nextId = GetDataChainNextId(dataChainLink);
-        
+
 
         expect(nextId).toBe(middleChainLink);
 

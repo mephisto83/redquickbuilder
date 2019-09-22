@@ -1831,7 +1831,7 @@ export function GetNodesLinkedTo(graph, options) {
                         }
                     }
                     if (!target) {
-                        console.warn('Missing value in linkLib');
+                        // console.warn('Missing value in linkLib');
                         return null;
                     }
                     return graph.nodeLib[target];

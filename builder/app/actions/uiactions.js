@@ -537,11 +537,11 @@ export function GetSelectedConditionSetup(permissionId, condition) {
             return conditionSetup.methods[GetNodeProp(method, NodeProperties.FunctionType)];
         }
         else {
-            console.warn('condition is improperly formed');
+            // console.warn('condition is improperly formed');
         }
     }
     else {
-        console.warn('no method node found');
+        // console.warn('no method node found');
     }
     return null;
 }
