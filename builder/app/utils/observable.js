@@ -1,4 +1,3 @@
-import { uuidv4 } from "./array";
 
 // define a class
 export default class RedObservable {

@@ -44,6 +44,16 @@ class DataChainActvityMenu extends Component {
                                 value: value
                             });
                         }} />
+                    <CheckBox
+                        label={Titles.AsOutput}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsOutput)}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.AsOutput,
+                                id: currentNode.id,
+                                value: value
+                            });
+                        }} />
                     <SelectInput
                         onChange={(value) => {
                             let id = currentNode.id;
@@ -83,8 +93,8 @@ class DataChainActvityMenu extends Component {
                         onChange={(value) => {
                             var id = currentNode.id;
                             this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                                source: UIA.GetNodeProp(currentNode, UIA.NodeProperties.Property),
-                                target: id
+                                target: UIA.GetNodeProp(currentNode, UIA.NodeProperties.Property),
+                                source: id
                             })
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.Property,
@@ -92,8 +102,8 @@ class DataChainActvityMenu extends Component {
                                 value
                             });
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                                source: value,
-                                target: id,
+                                target: value,
+                                source: id,
                                 properties: { ...UIA.LinkProperties.PropertyLink }
                             })
                         }}

@@ -81,6 +81,12 @@ class DataChainOperator extends Component {
                                             source: currentNode.id
                                         }
                                     }, {
+                                        operation: UIA.CHANGE_NODE_PROPERTY, options: {
+                                            id: externalExitNode,
+                                            prop: NodeProperties.ChainParent,
+                                            value: externalExitNode
+                                        }
+                                    },{
                                         operation: UIA.UPDATE_GROUP_PROPERTY, options: {
                                             id: groupProperties.id,
                                             prop: GroupProperties.GroupExitNode,

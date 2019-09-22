@@ -223,6 +223,7 @@ export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     SelectedLayoutCell: 'SelectedLayoutCell',
     ChainParent: 'ChainParent',
+    AsOutput: "AsOutput",
     EntryPoint: 'EntryPoint',
     Property: 'Property',
     DataChainEntry: 'DataChainEntry',

@@ -8,8 +8,8 @@ export const DataChainFunctionKeys = {
 export const DataChainFunctions = {
     [DataChainFunctionKeys.ModelProperty]: {
         ui: {
-            model: true,
-            property: true
+            model: NodeProperties.UIModelType,
+            property: NodeProperties.Property
         },
         filter: {
             [NodeProperties.NODEType]: true
@@ -18,7 +18,7 @@ export const DataChainFunctions = {
     },
     [DataChainFunctionKeys.Model]: {
         ui: {
-            model: true,
+            model: NodeProperties.UIModelType,
             property: false
         },
         filter: {
@@ -36,9 +36,10 @@ export const DataChainFunctions = {
     },
     [DataChainFunctionKeys.StringConcat]: {
         ui: {
-            node_1: true,
-            node_2: true
+            node_1: NodeProperties.ChainNodeInput1,
+            node_2: NodeProperties.ChainNodeInput2
         },
+        merge: true,
         filter: {
             [NodeProperties.MergeNode]: true
         },

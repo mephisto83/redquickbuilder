@@ -4,7 +4,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { MethodFunctions, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
-import { DataChainFunctionKeys } from '../constants/datachain';
+import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -171,18 +171,93 @@ export function GetDataChainEntryNodes() {
     return GraphMethods.GetDataChainEntryNodes(_getState());
 }
 export function GenerateChainFunction(id) {
-    let chain = GetDataChainFrom(id);
-
-    let funcs = chain.map(c => {
+    let chain = GetDataChainParts(id);
+    let args = null;
+    let observables = [];
+    let setArgs = [];
+    let setProcess = [];
+    let funcs = chain.map((c, index) => {
+        if (index === 0) {
+            args = GetDataChainArgs(c);
+        }
         let temp = GenerateDataChainMethod(c);
+        observables.push(GenerateObservable(c, index));
+        setArgs.push(GenerateArgs(c, chain));
+        setProcess.push(GenerateSetProcess(c, chain));
         return temp;
     });
+    let index = chain.indexOf(id);
+    let nodeName = (GetJSCodeName(id) || ('node' + index)).toJavascriptName();
+    let lastLink = GetLastChainLink(chain);
+    let lastLinkindex = chain.indexOf(lastLink);
+    let lastNodeName = (GetJSCodeName(lastLink) || ('node' + lastLinkindex)).toJavascriptName();
+    let method = `export function  ${GetCodeName(id)}(${args.join()}) {
+${observables.join(NodeConstants.NEW_LINE)}
+${setArgs.join(NodeConstants.NEW_LINE)}
+${setProcess.join(NodeConstants.NEW_LINE)}
+${nodeName}.update({ $id });
 
-    let method = `export function ${GetCodeName(id)}(_id) {
-    return Chain(_id, [${funcs.join(',' + NodeConstants.NEW_LINE)}])
+return ${lastNodeName}.value;
 }`;
 
     return method;
+}
+export function GenerateSetProcess(id, parts) {
+    let index = parts.indexOf(id);
+    let nodeName = (GetJSCodeName(id) || ('node' + index)).toJavascriptName();
+    return `${nodeName}.setProcess(${GenerateDataChainMethod(id)})`;
+
+}
+
+export function GenerateArgs(id, parts) {
+    let node = GetNodeById(id);
+    let index = parts.indexOf(id);
+    let nodeName = (GetJSCodeName(id) || ('node' + index)).toJavascriptName();
+    let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+    if (functionType && DataChainFunctions[functionType] && DataChainFunctions[functionType].merge) {
+        // pulls args from other nodes
+        let args = Object.keys(DataChainFunctions[functionType].ui).map((key, kindex) => {
+            let temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
+            console.log(`key : ${key}, ${temp}`)
+            return `['${(GetJSCodeName(temp) || ('node' + parts.indexOf(temp))).toJavascriptName()}']: ${kindex}`
+        });
+
+        return `${nodeName}.setArgs({ ${args} })`;
+    }
+    else {
+        let parent = (GetNodeProp(node, NodeProperties.ChainParent));
+        if (parent) {
+            return `${nodeName}.setArgs({ ['${GetJSCodeName(parent).toJavascriptName()}']: 0 })`;
+        }
+        else {
+            return `${nodeName}.setArgs({ $id: 0 })`;
+        }
+    }
+    return '';
+}
+
+
+export function GetLastChainLink(parts) {
+    let lastLink = parts.find(id => {
+        return GetNodeProp(GetNodeById(id), NodeProperties.AsOutput);
+    })
+    return lastLink;
+}
+export function GenerateObservable(id, index) {
+    let nodeName = (GetCodeName(id) || ('node' + index)).toJavascriptName();
+    return `let ${nodeName} = new RedObservable('${nodeName}');`
+}
+export function GetDataChainArgs(id) {
+    let node = GetNodeById(id);
+    let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+    if (functionType && DataChainFunctions[functionType]) {
+        let { merge, ui } = DataChainFunctions[functionType];
+        if (merge) {
+            return Object.keys(ui);
+        }
+        return ['$id']
+    }
+    return [];
 }
 export function GenerateChainFunctions() {
     let entryNodes = GetDataChainEntryNodes().map(x => x.id);
@@ -218,6 +293,35 @@ export function GetDataChainNext(id) {
 export function GetDataChainNextId(id) {
     let next = GetDataChainNext(id);
     return next && next.id;
+}
+export function GetDataChainParts(id, result) {
+    result = result ? result : [id];
+    result.push(id);
+    result = [...result].unique();
+    let node = GetNodeById(id);
+    let nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
+    let groups = Object.values(nodeGroup);
+    let current = id;
+    let dataChains = NodesByType(_getState(), NodeTypes.DataChain);
+    let oldlength;
+    do {
+        oldlength = result.length;
+        let dc = dataChains.filter(x => result.some(v => v === GetNodeProp(x, NodeProperties.ChainParent)));
+        result.push(...dc.map(v => v.id));
+        dc.map(_dc => {
+            groups = [...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {})];
+        });
+        groups.map(g => {
+            let nodes = GetNodesInGroup(g);
+            result.push(...nodes);
+        });
+        result = result.unique();
+    } while (result.length !== oldlength);
+
+    return result;
+}
+export function GetNodesInGroup(groupId) {
+    return GraphMethods.GetNodesInGroup(GetCurrentGraph(_getState()), groupId);
 }
 export function GetDataChainFrom(id) {
     let result = [id];

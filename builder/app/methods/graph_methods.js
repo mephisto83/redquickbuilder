@@ -286,6 +286,9 @@ export function newGroup(graph, callback) {
     }
     return result;
 }
+export function GetNodesInGroup(graph, group) {
+    return (graph.groupsNodes && graph.groupsNodes[group] && Object.keys(graph.groupsNodes[group]).filter(v => graph.groupsNodes[group][v])) || [];
+}
 export function addLeaf(graph, ops) {
     var { leaf, id } = ops;
     let leaves = graph.groupLib[id].leaves || [];

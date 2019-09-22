@@ -45,20 +45,6 @@ describe('data_chain_example', () => {
         expect(ob4.args).toBeTruthy();
 
         ob1.update(0, 'a');
-        // console.log(ob1.state);
-        // console.log(ob2.state);
-        // console.log(ob3.state);
-        // console.log(ob4.state);
-
-        // console.log(ob1.args);
-        // console.log(ob2.args);
-        // console.log(ob3.args);
-        // console.log(ob4.args);
-
-        // console.log(ob1.value);
-        // console.log(ob2.value);
-        // console.log(ob3.value);
-        // console.log(ob4.value);
 
         expect(result).toBeTruthy();
         expect(ob1.value).toBe(1);

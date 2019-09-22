@@ -1,9 +1,9 @@
 
 import fs from 'fs';
-import { GetDataChainEntryNodes, APPLICATION, CURRENT_GRAPH, GRAPHS, UIC, setTestGetState, GetDataChainFrom, GenerateDataChainMethod, GenerateChainFunction, GenerateChainFunctions, GetDataChainNextId } from '../app/actions/uiactions';
+import { GetDataChainEntryNodes, APPLICATION, CURRENT_GRAPH, GRAPHS, UIC, setTestGetState, GetDataChainFrom, GenerateDataChainMethod, GenerateChainFunction, GenerateChainFunctions, GetDataChainNextId, GetDataChainArgs, GetDataChainParts } from '../app/actions/uiactions';
+import * as asd from '../app/utils/array';
 import { makeDefaultState, updateUI } from '../app/reducers/uiReducer';
-var smash_47 = fs.readFileSync(`./test/smash_47.rqb`, 'utf8');
-var data_chain_example = fs.readFileSync(`./test/data_chain_example.rqb`, 'utf8');
+ var data_chain_example = fs.readFileSync(`./test/data_chain_example.rqb`, 'utf8');
 
 describe('data_chain_example', () => {
     let graph = JSON.parse(data_chain_example);
@@ -45,6 +45,7 @@ describe('data_chain_example', () => {
 
         let code = GenerateChainFunction(res);
         expect(code).toBeTruthy();
+        console.log(code);
     });
 
     it('should generate all the chain functions', () => {
@@ -53,10 +54,11 @@ describe('data_chain_example', () => {
         expect(code).toBeTruthy();
         // console.log(code);
     });
+
+    let dataChainLink = '44bc72d2-0f12-4d80-85de-ac00f3ed2f80';
     it('should get the Customer node in the group', () => {
 
-        let dataChainLink = '345cf0b8-ea1f-460d-beee-95af647e47e1';
-        let middleChainLink = 'd152894b-71c0-4029-a318-c98d87c77f09';
+        let middleChainLink = 'eae4e18e-d645-49bf-ace2-6e0e4621c07a';
         let lastChainLink = '627f79ec-fc45-40ad-a13f-f80f4547383a';
 
         let nextId = GetDataChainNextId(dataChainLink);
@@ -64,8 +66,21 @@ describe('data_chain_example', () => {
 
         expect(nextId).toBe(middleChainLink);
 
-        nextId = GetDataChainNextId(middleChainLink);
-        expect(nextId).toBe(lastChainLink);
 
     })
+
+    it('should get data chain arguments', () => { 
+        let args = GetDataChainArgs(dataChainLink);
+        expect(args).toBeTruthy();
+        expect(args.length).toBeTruthy();
+    })
+    it('should get all the chain parts', () => {
+        let chainParts = GetDataChainParts(dataChainLink, []);
+
+        expect(chainParts).toBeTruthy();
+        expect(chainParts.length > 3).toBeTruthy();
+        console.log(chainParts.length);
+
+    });
+    
 });
