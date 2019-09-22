@@ -4,6 +4,7 @@ import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { MethodFunctions, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
+import { DataChainFunctionKeys } from '../constants/datachain';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -191,17 +192,18 @@ export function GetDataChainNext(id) {
     let graph = GetRootGraph(_getState());
     if (!graph) { throw 'no graph found'; }
     let current = id;
+    let groupDaa = GetNodeProp(GetNodeById(current), NodeProperties.Groups);
 
-    let groupId = GetNodeProp(current, NodeProperties.GroupParent);
-    if (groupId) {
-        let group = GraphMethods.GetGroup(graph, groupId);
-        let entryNode = GetGroupProp(group.id, NodeConstants.GroupProperties.GroupEntryNode);
-        if (entryNode === current) {
-            let exitNode = GetGroupProp(group.id, NodeConstants.GroupProperties.ExternalExitNode);
-            return exitNode;
+    if (groupDaa && groupDaa.group) {
+        let group = GraphMethods.GetGroup(graph, groupDaa.group);
+        if (group) {
+            let entryNode = GetGroupProp(group.id, NodeConstants.GroupProperties.GroupEntryNode);
+            if (entryNode === current) {
+                let exitNode = GetGroupProp(group.id, NodeConstants.GroupProperties.ExternalExitNode);
+                return GetNodeById(exitNode);
+            }
         }
     }
-
     let next = GraphMethods.getNodesByLinkType(graph, {
         id: current,
         type: NodeConstants.LinkType.DataChainLink,
@@ -253,17 +255,33 @@ export function GenerateDataChainMethod(id) {
     let node = GetNodeById(id);
     let model = GetNodeProp(node, NodeProperties.UIModelType);
     let property = GetNodeProp(node, NodeProperties.Property);
+    let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
     let lastpart = 'return item;';
-    if (property) {
-        lastpart = `if(item) {
+    switch (functionType) {
+        case DataChainFunctionKeys.ModelProperty:
+            if (property) {
+                lastpart = `if(item) {
         return item.${GetJSCodeName(property) || property};
     }
     return null;`
-    }
-    return `(id) => {
+            }
+            return `(id) => {
     let item = GetItem(Models.${GetCodeName(model)}, id);
     ${lastpart}
 }`;
+        case DataChainFunctionKeys.Model:
+            return `(id) => {
+    let item = GetItem(Models.${GetCodeName(model)}, id);
+    ${lastpart}
+}`;
+        case DataChainFunctionKeys.Pass:
+            return `(arg) => {
+    return arg;
+}`;
+        case DataChainFunctionKeys.StringConcat:
+            return `(node1, node2) => { return \`\${node1} \${node2}\` }`
+            break;
+    }
 }
 export function GetPermissionsSortedByAgent() {
     return GetNodesSortedByAgent(NodeTypes.Permission);

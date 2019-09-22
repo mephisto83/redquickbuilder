@@ -38,7 +38,7 @@ describe('data_chain_example', () => {
         expect(code).toBeTruthy();
         console.log(code);
     });
-    
+
     it('should generate a chain function function', () => {
         let result = GetDataChainEntryNodes();
         let res = result[0].id;
@@ -56,9 +56,16 @@ describe('data_chain_example', () => {
     it('should get the Customer node in the group', () => {
 
         let dataChainLink = '345cf0b8-ea1f-460d-beee-95af647e47e1';
-        
+        let middleChainLink = 'd152894b-71c0-4029-a318-c98d87c77f09';
+        let lastChainLink = '627f79ec-fc45-40ad-a13f-f80f4547383a';
+
         let nextId = GetDataChainNextId(dataChainLink);
         
-        expect(nextId).toBe('d152894b-71c0-4029-a318-c98d87c77f09');
+
+        expect(nextId).toBe(middleChainLink);
+
+        nextId = GetDataChainNextId(middleChainLink);
+        expect(nextId).toBe(lastChainLink);
+
     })
 });

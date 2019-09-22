@@ -1,7 +1,12 @@
 import { NodeProperties } from "./nodetypes";
-
+export const DataChainFunctionKeys = {
+    ModelProperty: 'Model - Property',
+    Model: 'Model',
+    Pass: 'Pass',
+    StringConcat: 'String Concat {0} {1}'
+};
 export const DataChainFunctions = {
-    'Model - Property': {
+    [DataChainFunctionKeys.ModelProperty]: {
         ui: {
             model: true,
             property: true
@@ -11,7 +16,7 @@ export const DataChainFunctions = {
         },
         value: 'model_property_selection'
     },
-    'Model': {
+    [DataChainFunctionKeys.Model]: {
         ui: {
             model: true,
             property: false
@@ -21,7 +26,7 @@ export const DataChainFunctions = {
         },
         value: 'model_selection'
     },
-    'Pass': {
+    [DataChainFunctionKeys.Pass]: {
         ui: {
         },
         filter: {
@@ -29,7 +34,7 @@ export const DataChainFunctions = {
         },
         value: 'model_selection'
     },
-    'String Concat {0} {1}': {
+    [DataChainFunctionKeys.StringConcat]: {
         ui: {
             node_1: true,
             node_2: true
