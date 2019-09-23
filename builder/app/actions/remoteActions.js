@@ -1,4 +1,4 @@
-import { createGraph, updateWorkSpace } from '../methods/graph_methods';
+import { createGraph, updateWorkSpace, updateGraphTitle, updateGraphProperty } from '../methods/graph_methods';
 import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph } from './uiactions';
 
 var fs = require('fs');
@@ -6,7 +6,9 @@ const { ipcRenderer } = require('electron')
 const remote = require('electron').remote;
 var dialog = remote.dialog;
 
-
+export function openGraph() {
+    openRedQuickBuilderGraph()(_dispatch, _getState);
+}
 
 export function openRedQuickBuilderGraph() {
     return (dispatch, getState) => {
@@ -91,6 +93,7 @@ export function saveGraphToFile() {
                         fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
                     }
                     console.log(fileName);
+                    updateGraphProperty(currentGraph, { prop: 'graphFile', value: fileName });
                     fs.writeFile(fileName, content, (err) => {
                         if (err) {
                             console.error("An error ocurred updating the file" + err.message);
@@ -103,6 +106,29 @@ export function saveGraphToFile() {
                 });
         }
     }
+}
+
+export function saveGraph(graph) {
+    return (dispatch, getState) => {
+        var currentGraph = GetRootGraph(getState());
+        if (currentGraph && currentGraph.graphFile) {
+            if (fs.existsSync(currentGraph.graphFile)) {
+                fs.writeFileSync(currentGraph.graphFile, JSON.stringify(currentGraph));
+            }
+        }
+    }
+}
+let _dispatch = null;
+let _getState = null;
+export function setRemoteState() {
+    return (dispatch, getState) => {
+        _dispatch = dispatch;
+        _getState = getState;
+    }
+}
+export function saveCurrentGraph() {
+    let state = _getState();
+    saveGraph(GetRootGraph(state))(_dispatch, _getState);
 }
 
 export function setWorkingDirectory() {

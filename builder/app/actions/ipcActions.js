@@ -1,6 +1,6 @@
 import { HandlerEvents } from '../ipc/handler-events';
 import { GraphKeys } from '../methods/graph_methods';
-import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties } from './uiactions';
+import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
@@ -10,6 +10,7 @@ import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { uuidv4 } from '../utils/array';
 import { platform } from 'os';
+import { saveCurrentGraph, openGraph } from './remoteActions';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -19,6 +20,25 @@ ipcRenderer.on('message-reply', (event, arg) => {
         hub[reply.id].resolve(reply.msg);
     }
     delete hub[reply.id];
+});
+
+ipcRenderer.on('commands', (event, arg) => {
+    console.log(event);
+    console.log(arg);
+    switch (arg.args) {
+        case 'x':
+            clearPinned();
+            break;
+        case 'p':
+            togglePinned();
+            break;
+        case 's':
+            saveCurrentGraph();
+            break;
+        case 'o':
+            openGraph();
+            break;
+    }
 });
 
 function message(msg, body) {

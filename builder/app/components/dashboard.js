@@ -97,6 +97,7 @@ class Dashboard extends Component {
 
     componentDidMount() {
         this.props.setState();
+        this.props.setRemoteState();
     }
     minified() {
         var { state } = this.props;
@@ -212,6 +213,7 @@ class Dashboard extends Component {
                             <DashboardLogo />
                             <DashboardNavBar>
                                 <SidebarToggle />
+
                                 <NavBarMenu>
                                     {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon={'fa fa-cube'} onClick={() => {
                                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, UIA.Visual(state, UIA.SELECTED_LINK));
@@ -250,6 +252,41 @@ class Dashboard extends Component {
                                         }));
                                     }} />
                                 </NavBarMenu>
+                                <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
+                                    {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
+                                        this.props.setVisual(MAIN_CONTENT, MIND_MAP);
+                                    }} /> : null}
+                                    {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
+                                        this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
+                                    }} /> : null}
+
+                                </NavBarMenu>
+                                <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
+                                    <NavBarButton title={Titles.New} icon={'fa fa-plus'} onClick={() => {
+                                        this.props.newRedQuickBuilderGraph();
+                                    }} />
+                                    <NavBarButton title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
+                                        this.props.openRedQuickBuilderGraph();
+                                    }} />
+                                    {rootGraph ? <NavBarButton title={Titles.SaveAs} icon={'fa fa-cloud-upload'} onClick={() => {
+                                        this.props.saveGraphToFile();
+                                    }} /> : null}
+                                    {rootGraph && rootGraph.fileName ? <NavBarButton title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                                        this.props.saveGraph();
+                                    }} /> : null}
+                                    {rootGraph ? <NavBarButton title={Titles.Scaffold} icon={'fa fa-building'} onClick={() => {
+                                        if (confirm("Are you sure you want to scaffold the project"))
+                                            this.props.scaffoldProject();
+                                    }} /> : null}
+                                    {rootGraph ? <NavBarButton title={Titles.PublishFiles} icon={'fa  fa-building-o'} onClick={() => {
+                                        this.props.scaffoldProject({ filesOnly: true });
+                                    }} /> : null}
+                                    {rootGraph ? <NavBarButton title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                                        this.props.setWorkingDirectory();
+                                    }} /> : null}
+                                    {rootGraph ? <NavBarButton title={version} /> : null}
+                                    {workspace ? <NavBarButton title={workspace} icon={'fa fa-cog'} /> : null}
+                                </NavBarMenu>
                             </DashboardNavBar>
                         </Header>
                         <MainSideBar>
@@ -280,20 +317,23 @@ class Dashboard extends Component {
                                     <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
                                         this.props.openRedQuickBuilderGraph();
                                     }} />
-                                    <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                                    {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.SaveAs} icon={'fa fa-cloud-upload'} onClick={() => {
                                         this.props.saveGraphToFile();
-                                    }} />
-                                    <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-cog'} onClick={() => {
+                                    }} /> : null}
+                                    {rootGraph && rootGraph.fileName ? <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                                        this.props.saveGraph();
+                                    }} /> : null}
+                                    {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa  fa-building'} onClick={() => {
                                         if (confirm("Are you sure you want to scaffold the project"))
                                             this.props.scaffoldProject();
-                                    }} />
-                                    <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa fa-cog'} onClick={() => {
+                                    }} /> : null}
+                                    {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa  fa-building-o'} onClick={() => {
                                         this.props.scaffoldProject({ filesOnly: true });
-                                    }} />
-                                    <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                                    }} /> : null}
+                                    {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
                                         this.props.setWorkingDirectory();
-                                    }} />
-                                    <TreeViewMenu title={version} hideArrow={true} />
+                                    }} /> : null}
+                                    {rootGraph ? <TreeViewMenu title={version} hideArrow={true} /> : null}
                                     {workspace ? <TreeViewMenu hideArrow={true} title={workspace} icon={'fa fa-cog'} /> : null}
                                     <SectionEdit />
                                 </TreeViewMenu>
@@ -428,6 +468,7 @@ class Dashboard extends Component {
                                         }} />
                                     <CheckBox
                                         label={Titles.Pinned}
+                                        title={Titles.PinnedShortCut}
                                         value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
                                         onChange={(value) => {
                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

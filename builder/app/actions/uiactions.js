@@ -218,7 +218,6 @@ export function GenerateArgs(id, parts) {
         // pulls args from other nodes
         let args = Object.keys(DataChainFunctions[functionType].ui).map((key, kindex) => {
             let temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
-            console.log(`key : ${key}, ${temp}`)
             return `['${(GetJSCodeName(temp) || ('node' + parts.indexOf(temp))).toJavascriptName()}']: ${kindex}`
         });
 
@@ -768,6 +767,7 @@ export function SaveApplication(value, key, dispatch) {
 export function Graphs(state, key) {
     return GetC(state, GRAPHS, key);
 }
+
 export function SaveGraph(graph, dispatch) {
     graph = {
         ...graph,
@@ -901,7 +901,6 @@ export function NodesByType(state, nodeType, options = {}) {
                 (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
             .map(x => currentGraph.nodeLib[x]);
     }
-    throw 'no graph found'
     return [];
 }
 
@@ -925,6 +924,7 @@ export function NodesConnectedTo(state, nodeId) {
     return () => false;
 }
 let _getState;
+let _dispatch;
 export function GetState() {
     return _getState();
 }
@@ -934,7 +934,31 @@ export function setTestGetState(func) {
 export function setState() {
     return (dispatch, getState) => {
         _getState = getState;
+        _dispatch = dispatch;
     }
+}
+
+export function clearPinned() {
+    let state = _getState();
+    _dispatch(graphOperation(GetNodes(state).filter(x => GetNodeProp(x, NodeProperties.Pinned)).map(node => {
+        return {
+            operation: CHANGE_NODE_PROPERTY,
+            options: {
+                prop: NodeProperties.Pinned,
+                id: node.id,
+                value: false
+            }
+        }
+    })));
+}
+export function togglePinned() {
+    let state = _getState();
+    let currentNode = Node(state, Visual(state, SELECTED_NODE));
+    _dispatch(graphOperation(CHANGE_NODE_PROPERTY, {
+        prop: NodeProperties.Pinned,
+        id: currentNode.id,
+        value: !GetNodeProp(currentNode, NodeProperties.Pinned)
+    }))
 }
 export function GetGraphNode(id) {
     let state = _getState();

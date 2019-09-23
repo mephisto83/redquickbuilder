@@ -48,6 +48,7 @@ export const Project = 'Project';
 export const NameSpace = 'NameSpace';
 export const AddScreenOptions = 'Add Screen Options';
 export const Pinned = 'Pinned';
+export const PinnedShortCut = 'Ctrl + P'
 export const ColorScheme = 'Color Scheme';
 export const EnableMenu = 'Enable Menu';
 export const ScreenOptions = 'Screen Options';
@@ -242,6 +243,7 @@ export const AddMaestros = 'Add Maestro';
 export const HttpRoute = 'Relative Http Route';
 export const NotIncludeInController = `Don't include in controller`;
 export const Maestros = 'Maestros';
+export const SaveAs = 'Save as ...';
 export const Save = 'Save';
 export const Open = 'Open';
 

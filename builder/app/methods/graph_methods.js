@@ -225,6 +225,13 @@ export function updateGraphTitle(graph, ops) {
     return graph;
 }
 
+
+export function updateGraphProperty(graph, ops) {
+    var { prop, value } = ops;
+    graph[prop] = value;
+    return graph;
+}
+
 export function addNewSubGraph(graph) {
     var newgraph = createGraph();
     newgraph.title = Titles.DefaultSubGraphTitle;

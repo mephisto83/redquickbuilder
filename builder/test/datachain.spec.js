@@ -1,9 +1,23 @@
 
 import fs from 'fs';
-import { GetDataChainEntryNodes, APPLICATION, CURRENT_GRAPH, GRAPHS, UIC, setTestGetState, GetDataChainFrom, GenerateDataChainMethod, GenerateChainFunction, GenerateChainFunctions, GetDataChainNextId, GetDataChainArgs, GetDataChainParts } from '../app/actions/uiactions';
+import {
+    GetDataChainEntryNodes,
+    APPLICATION,
+    CURRENT_GRAPH,
+    GRAPHS,
+    UIC,
+    setTestGetState,
+    GetDataChainFrom,
+    GenerateDataChainMethod,
+    GenerateChainFunction,
+    GenerateChainFunctions,
+    GetDataChainNextId,
+    GetDataChainArgs,
+    GetDataChainParts
+} from '../app/actions/uiactions';
 import * as asd from '../app/utils/array';
 import { makeDefaultState, updateUI } from '../app/reducers/uiReducer';
- var data_chain_example = fs.readFileSync(`./test/data_chain_example.rqb`, 'utf8');
+var data_chain_example = fs.readFileSync(`./test/data_chain_example.rqb`, 'utf8');
 
 describe('data_chain_example', () => {
     let graph = JSON.parse(data_chain_example);
@@ -45,21 +59,19 @@ describe('data_chain_example', () => {
 
         let code = GenerateChainFunction(res);
         expect(code).toBeTruthy();
-        console.log(code);
+        // console.log(code);
     });
 
     it('should generate all the chain functions', () => {
         let code = GenerateChainFunctions();
 
         expect(code).toBeTruthy();
-        // console.log(code);
     });
 
     let dataChainLink = '44bc72d2-0f12-4d80-85de-ac00f3ed2f80';
     it('should get the Customer node in the group', () => {
 
         let middleChainLink = 'eae4e18e-d645-49bf-ace2-6e0e4621c07a';
-        let lastChainLink = '627f79ec-fc45-40ad-a13f-f80f4547383a';
 
         let nextId = GetDataChainNextId(dataChainLink);
 
@@ -69,7 +81,7 @@ describe('data_chain_example', () => {
 
     })
 
-    it('should get data chain arguments', () => { 
+    it('should get data chain arguments', () => {
         let args = GetDataChainArgs(dataChainLink);
         expect(args).toBeTruthy();
         expect(args.length).toBeTruthy();
@@ -79,8 +91,6 @@ describe('data_chain_example', () => {
 
         expect(chainParts).toBeTruthy();
         expect(chainParts.length > 3).toBeTruthy();
-        console.log(chainParts.length);
-
     });
-    
+
 });

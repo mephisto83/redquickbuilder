@@ -62,6 +62,10 @@ app.on('window-all-closed', () => {
 
 
 
+app.on('will-quit', () => {
+  IPCHandlers.tearDown();
+});
+
 app.on('ready', async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -69,7 +73,6 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
-  IPCHandlers.setup();
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
@@ -77,6 +80,7 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
+  IPCHandlers.setup(mainWindow);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event

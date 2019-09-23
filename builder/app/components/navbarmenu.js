@@ -8,6 +8,9 @@ export default class NavBarMenu extends Component {
         if (this.props.paddingRight) {
             style.paddingRight = this.props.paddingRight;
         }
+        if (this.props.style) {
+            style = { ...style, ...this.props.style };
+        }
         return (
             <div className="navbar-custom-menu" style={style}>
                 <ul className="nav navbar-nav">

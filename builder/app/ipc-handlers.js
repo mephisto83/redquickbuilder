@@ -7,9 +7,12 @@ var child_process = require('child_process'),
     exec = child_process.exec,
     spawn = child_process.spawn;
 
+const { app, globalShortcut } = require('electron');
+
+const letters = 'xpso'.split('')
 export default class IPCHandlers {
 
-    static setup() {
+    static setup(mainWindow) {
         ipcMain.on('message', (event, arg) => {
             console.log(arg) // prints "ping"
             let msg = JSON.parse(arg);
@@ -20,6 +23,24 @@ export default class IPCHandlers {
                 }))
             });
         });
+        letters.map(x => {
+            globalShortcut.register('CommandOrControl+' + (x.toUpperCase()), () => {
+                mainWindow.webContents.send('commands', {
+                    args: x
+                })
+            })
+        })
+
+    }
+    static tearDown() {
+
+        // Unregister a shortcut.
+        letters.map(x => {
+            globalShortcut.unregister('CommandOrControl+' + (x.toUpperCase()))
+        })
+
+        // Unregister all shortcuts.
+        globalShortcut.unregisterAll()
     }
 }
 function handle(msg) {
