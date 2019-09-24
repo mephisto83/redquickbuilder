@@ -8,7 +8,9 @@ var fs = require('fs'),
 
 var options = {
     // key: fs.readFileSync('./ssl/key.pem'),
-    // cert: fs.readFileSync('./ssl/cert.pem')
+    // cert: fs.readFileSync('./ssl/cert.pem'),
+    host: '192.168.1.147',
+    noCors: true
 };
 // Add this before server.use(router)
 server.use(jsonServer.rewriter(routes))

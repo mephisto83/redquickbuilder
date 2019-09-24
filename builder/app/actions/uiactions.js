@@ -195,7 +195,7 @@ export function GenerateChainFunction(id) {
 ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
-${nodeName}.update({ $id });
+${nodeName}.update($id , '$id');
 
 return ${lastNodeName}.value;
 }`;

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "http-server",
-    "jserve": "json-server source.json --routes routes.json --port 80"
+    "jserve": "json-server --host 192.168.1.147 source.json --routes routes.json --port 8081"
   },
   "author": "",
   "license": "ISC",

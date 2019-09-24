@@ -75,10 +75,7 @@ describe('data_chain_example', () => {
 
         let nextId = GetDataChainNextId(dataChainLink);
 
-
         expect(nextId).toBe(middleChainLink);
-
-
     })
 
     it('should get data chain arguments', () => {
