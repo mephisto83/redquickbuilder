@@ -1,5 +1,5 @@
 import { createGraph, updateWorkSpace, updateGraphTitle, updateGraphProperty } from '../methods/graph_methods';
-import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph } from './uiactions';
+import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph, Visual, toggleVisual, CONTEXT_MENU_VISIBLE } from './uiactions';
 
 var fs = require('fs');
 const { ipcRenderer } = require('electron')
@@ -8,6 +8,10 @@ var dialog = remote.dialog;
 
 export function openGraph() {
     openRedQuickBuilderGraph()(_dispatch, _getState);
+}
+
+export function toggleContextMenu() {
+    toggleVisual(CONTEXT_MENU_VISIBLE)(_dispatch, _getState);
 }
 
 export function openRedQuickBuilderGraph() {

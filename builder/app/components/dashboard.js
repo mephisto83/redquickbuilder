@@ -77,6 +77,7 @@ import ModelFilterItemActivityMenu from './modelfilteritemactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
 import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
+import ContextMenu from './contextmenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
@@ -552,6 +553,7 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
                         </SideBar>
                     </div>
+                    <ContextMenu />
                 </div >
             </div >
         );

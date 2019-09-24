@@ -140,3 +140,7 @@
 .main-side-bar.relative aside {
     position: relative;
 }
+
+.context-menu .main-sidebar .sidebar .control-sidebar {
+    left: 0px !important;
+}

@@ -10,7 +10,7 @@ import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { uuidv4 } from '../utils/array';
 import { platform } from 'os';
-import { saveCurrentGraph, openGraph } from './remoteActions';
+import { saveCurrentGraph, openGraph, toggleContextMenu } from './remoteActions';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -26,7 +26,7 @@ ipcRenderer.on('commands', (event, arg) => {
     console.log(event);
     console.log(arg);
     switch (arg.args) {
-        case 'x':
+        case 'w':
             clearPinned();
             break;
         case 'p':
@@ -37,6 +37,9 @@ ipcRenderer.on('commands', (event, arg) => {
             break;
         case 'o':
             openGraph();
+            break;
+        case 'm':
+            toggleContextMenu();
             break;
     }
 });

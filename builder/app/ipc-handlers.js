@@ -8,11 +8,31 @@ var child_process = require('child_process'),
     spawn = child_process.spawn;
 
 const { app, globalShortcut } = require('electron');
+const { Menu, MenuItem } = require('electron')
 
-const letters = 'xpso'.split('')
+const letters = 'wpsom'.split('');
+const defaultMenu = 'defaultMenu';
+const MenuItems = {
+    w: {
+        label: 'Clear Pinned',
+    },
+    p: {
+        label: 'Toggle Pinned'
+    },
+    s: {
+        label: 'Save'
+    },
+    o: {
+        label: 'Open'
+    },
+    m: {
+        label: 'Context Menu'
+    }
+}
 export default class IPCHandlers {
 
     static setup(mainWindow) {
+        let submenu = [];
         ipcMain.on('message', (event, arg) => {
             console.log(arg) // prints "ping"
             let msg = JSON.parse(arg);
@@ -23,24 +43,47 @@ export default class IPCHandlers {
                 }))
             });
         });
+        let submenu2 = new Menu();
         letters.map(x => {
-            globalShortcut.register('CommandOrControl+' + (x.toUpperCase()), () => {
-                mainWindow.webContents.send('commands', {
-                    args: x
-                })
-            })
+            // globalShortcut.register('CommandOrControl+' + (x.toUpperCase()), () => {
+            //     mainWindow.webContents.send('commands', {
+            //         args: x
+            //     })
+            // })
+            submenu2.append(new MenuItem({
+                label: MenuItems[x] ? MenuItems[x].label : 'Unknown',
+                accelerator: 'CmdOrCtrl+' + (x.toUpperCase()),
+                click: () => {
+                    mainWindow.webContents.send('commands', {
+                        args: x
+                    })
+                }
+            }))
         })
 
+        const menu2 = new Menu()
+        // submenu2.append(new MenuItem({
+        //     label: 'Print',
+        //     click: () => { console.log('time to print stuff') },
+        // }))
+        menu2.append(new MenuItem({
+            label: 'Red Quick 2',
+            submenu: submenu2
+        }))
+
+
+        // let mainMenu = Menu.buildFromTemplate(template)
+        Menu.setApplicationMenu(menu2);
     }
     static tearDown() {
 
         // Unregister a shortcut.
-        letters.map(x => {
-            globalShortcut.unregister('CommandOrControl+' + (x.toUpperCase()))
-        })
+        // letters.map(x => {
+        //     globalShortcut.unregister('CommandOrControl+' + (x.toUpperCase()))
+        // })
 
         // Unregister all shortcuts.
-        globalShortcut.unregisterAll()
+        // globalShortcut.unregisterAll()
     }
 }
 function handle(msg) {
