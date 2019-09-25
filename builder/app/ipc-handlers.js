@@ -10,7 +10,7 @@ var child_process = require('child_process'),
 const { app, globalShortcut } = require('electron');
 const { Menu, MenuItem } = require('electron')
 
-const letters = 'wpsom'.split('');
+const letters = 'wpsoml1234'.split('');
 const defaultMenu = 'defaultMenu';
 const MenuItems = {
     w: {
@@ -27,7 +27,14 @@ const MenuItems = {
     },
     m: {
         label: 'Context Menu'
-    }
+    },
+    l: {
+        label: 'Layout Menu'
+    },
+    1: { label: 'Menu 1' },
+    2: { label: 'Menu 2' },
+    3: { label: 'Menu 3' },
+    4: { label: 'Menu 4' }
 }
 export default class IPCHandlers {
 

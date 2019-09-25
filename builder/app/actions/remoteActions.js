@@ -1,5 +1,5 @@
 import { createGraph, updateWorkSpace, updateGraphTitle, updateGraphProperty } from '../methods/graph_methods';
-import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph, Visual, toggleVisual, CONTEXT_MENU_VISIBLE } from './uiactions';
+import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph, Visual, toggleVisual, CONTEXT_MENU_VISIBLE, setVisual, CONTEXT_MENU_MODE } from './uiactions';
 
 var fs = require('fs');
 const { ipcRenderer } = require('electron')
@@ -10,10 +10,36 @@ export function openGraph() {
     openRedQuickBuilderGraph()(_dispatch, _getState);
 }
 
-export function toggleContextMenu() {
-    toggleVisual(CONTEXT_MENU_VISIBLE)(_dispatch, _getState);
+export function toggleContextMenu(mode) {
+    if (mode) {
+        setVisual(CONTEXT_MENU_MODE, mode)(_dispatch, _getState);
+        setVisual(CONTEXT_MENU_VISIBLE, true)(_dispatch, _getState);
+    }
+    else {
+        toggleVisual(CONTEXT_MENU_VISIBLE)(_dispatch, _getState);
+    }
 }
-
+const SELECTED_TAB = 'SELECTED_TAB';
+const DEFAULT_TAB = 'DEFAULT_TAB';
+const PARAMETER_TAB = 'PARAMETER_TAB';
+const SCOPE_TAB = 'SCOPE_TAB';
+const QUICK_MENU = 'QUICK_MENU';
+export function setRightMenuTab(num) {
+    switch (num) {
+        case '1':
+            setVisual(SELECTED_TAB, DEFAULT_TAB)(_dispatch, _getState);
+            break;
+        case '2':
+            setVisual(SELECTED_TAB, PARAMETER_TAB)(_dispatch, _getState);
+            break;
+        case '3':
+            setVisual(SELECTED_TAB, SCOPE_TAB)(_dispatch, _getState);
+            break;
+        case '4':
+            setVisual(SELECTED_TAB, QUICK_MENU)(_dispatch, _getState);
+            break;
+    }
+}
 export function openRedQuickBuilderGraph() {
     return (dispatch, getState) => {
         dialog.showOpenDialog(
