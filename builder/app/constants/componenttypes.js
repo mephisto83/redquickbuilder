@@ -3,6 +3,8 @@ import { NodeProperties, GetRootGraph, GetNodeProp, GetState, GetCodeName } from
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 import { bindTemplate } from "./functiontypes";
 
+export const NAVIGATION = '-NAVIGATION';
+export const APP_METHOD = '-APP_METHOD';
 
 export const ComponentTypes = {
     ReactNative: {
@@ -22,8 +24,14 @@ export const ComponentTypes = {
                     template: '{{value}}',
                     options: ['primary', 'light', 'dark'],
                     ui: true
+                },
+                onPress: {
+                    template: '() => { {{value}} }',
+                    method: true,
+                    options: [NAVIGATION, APP_METHOD],
+                    ui: true
                 }
-            }
+            },
         },
         Card: {},
         CardItem: {},
@@ -124,7 +132,18 @@ export const ComponentTypes = {
         },
         ListItem: {
             layout: true,
-            ui: true
+            ui: true,
+            [NAVIGATION]: true,
+            [APP_METHOD]: true,
+            properties: {
+                onPress: {
+                    nodeProperty: 'onPress',
+                    template: '() => { {{value}} }',
+                    method: true,
+                    options: [NAVIGATION, APP_METHOD],
+                    ui: true
+                }
+            }
         },
         Picker: {},
         Radio: {},

@@ -221,8 +221,12 @@ export const ConfigurationProperties = {
 }
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
+    NavigationParameters: 'NavigationParameters',
+    NavigationParametersProperty: 'NavigationParametersProperty',
+    ScreenParameters: 'ScreenParameters',
     SelectedLayoutCell: 'SelectedLayoutCell',
     ChainParent: 'ChainParent',
+    Navigation: 'Navigation',
     AsOutput: "AsOutput",
     EntryPoint: 'EntryPoint',
     Property: 'Property',

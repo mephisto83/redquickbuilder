@@ -4,14 +4,18 @@ import { UIConnect } from '../utils/utils';
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
+import MainSideBar from './mainsidebar';
 import FormControl from './formcontrol';
 import TextBox from './textinput';
 import { ExcludeDefaultNode, NodeTypes, NodeProperties, MAIN_CONTENT, LAYOUT_VIEW, LinkProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
-import { ComponentTypes } from '../constants/componenttypes';
-import { GetConnectedNodeByType, CreateLayout, TARGET } from '../methods/graph_methods';
+import { ComponentTypes, NAVIGATION } from '../constants/componenttypes';
+import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import TextInput from './textinput';
+import TreeViewMenu from './treeviewmenu';
+import SideBarMenu from './sidebarmenu';
+import TreeViewItem from './treeviewitem';
 class ComponentActivityMenu extends Component {
     render() {
         var { state } = this.props;

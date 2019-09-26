@@ -17,6 +17,7 @@ import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
 import Content from './content';
+import NavigationParameterMenu from './navigationparametermenu';
 import ScreenActivityMenu from './screenactivitymenu';
 import SideBar from './sidebar';
 import DataSourceActivityMenu from './datasourceactivitymenu';
@@ -39,6 +40,7 @@ import AttributeFormControl from './attributeformcontrol';
 import PermissionMenu from './permissionmenu';
 import ChoiceActivityMenu from './choiceactivitymenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
+import UIParameters from './uiparameters';
 import ComponentActivityMenu from './componentactivitymenu';
 import ComponentPropertyMenu from './componentpropertymenu';
 import ModelFilterActivityMenu from './modelfilteractivitymenu';
@@ -551,6 +553,8 @@ class Dashboard extends Component {
                                 <BatchMenu />
                             </SideBarContent>) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
                         </SideBar>
                     </div>
                     <ContextMenu />

@@ -225,6 +225,17 @@ export function updateGraphTitle(graph, ops) {
     return graph;
 }
 
+export function createScreenParameter(parameter) {
+    return {
+        title: parameter || '',
+        id: uuidv4()
+    }
+}
+export function GetParameterName(parameter) {
+    if (parameter)
+        return parameter.title || '';
+    return '';
+}
 
 export function updateGraphProperty(graph, ops) {
     var { prop, value } = ops;
@@ -930,7 +941,7 @@ export function addComponentProperty(props, ops) {
 }
 export function getComponentPropertyList(props) {
     if (props && props.properties) {
-        return Object.keys(props.properties).map(t => ({ title: t, id: t, value: t }))
+        return Object.keys(props.properties).map(t => ({ title: t, id: props.properties[t], value: t }))
     }
     return [];
 }
