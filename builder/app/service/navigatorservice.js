@@ -38,7 +38,7 @@ export function BindScreensToTemplate() {
     var screens = GetScreens();
     let template = fs.readFileSync('./app/templates/navigation/navigation.tpl', 'utf8');
     let import_template = `import {{name}} from './screens/{{namejs}}';`
-    let import_property = `     {{name}}: {{name}}`;
+    let import_property = `     {{name}} : { screen: {{name}} }`;
     let add_drawer = `const {{name}} = createDrawerNavigator(
         {
           Home: { screen: _{{name}} }

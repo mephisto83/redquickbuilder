@@ -117,6 +117,7 @@ class NavigationParameterMenu extends Component {
                                 onClick={() => {
                                     this.props.toggleVisual(NAVIGATION_PARAMETERS)
                                 }}>
+                                <br />
                                 {components}
                             </TreeViewMenu>
                         </SideBarMenu>

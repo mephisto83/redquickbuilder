@@ -3,7 +3,7 @@ import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION } from "../constants/componenttypes";
 import { getComponentProperty } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
@@ -86,6 +86,20 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
             data: GetItemData(node)
         });
     }
+
+    if (ComponentTypes) {
+        if (ComponentTypes[language]) {
+            if (ComponentTypes[language][componentType]) {
+                if (ComponentTypes[language][componentType].properties && ComponentTypes[language][componentType].properties) {
+                    let { onPress } = ComponentTypes[language][componentType].properties;
+                    if (onPress) {
+                        layoutSrc = wrapOnPress(layoutSrc, onPress, node);
+                    }
+                }
+            }
+        }
+    }
+
     let templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 
     let results = [];
@@ -142,6 +156,50 @@ export function bindComponent(node, componentBindingDefinition) {
         return bindTemplate(template, bindProps);
     }
 }
+export function wrapOnPress(elements, onPress, node) {
+
+    let onpress = GetNodeProp(node, 'onPress');
+    switch (onpress) {
+        case NAVIGATION:
+            let navigation = GetNodeProp(node, NodeProperties.Navigation);
+            let targetScreen = GetNodeById(navigation);
+            let screenParameters = GetNodeProp(targetScreen, NodeProperties.ScreenParameters);
+            if (screenParameters) {
+                let navigationProperties = GetNodeProp(node, NodeProperties.NavigationParameters);
+                let parameterProperty = GetNodeProp(node, NodeProperties.NavigationParametersProperty) || {};
+                let componentProperties = GetNodeProp(node, NodeProperties.ComponentProperties);
+                let params = [];
+                screenParameters.map(sparam => {
+                    let { title, id } = sparam;
+                    let propName = navigationProperties[id];
+                    if (propName) {
+                        let propPropName = parameterProperty[propName];
+                        if (propPropName) {
+                            let listitem = '';
+                            if (GetNodeProp(node, NodeProperties.NODEType) === ComponentTypes.ReactNative.ListItem) {
+                                listitem = '.item';
+                            }
+                            let propertyNode = GetNodeById(propPropName);
+                            if (propertyNode) {
+                                params.push(`${title}: this.props.${propName}${listitem}.${GetJSCodeName(propertyNode)}`);
+                            }
+                            else {
+                                params.push(`${title}: this.props.${propName}${listitem}`);
+                            }
+                        }
+                    }
+                });
+                let navfunc = `this.props.navigation.navigate('${GetCodeName(navigation)}', {${(params).join(', ')}})`;
+                elements = `
+        <TouchableOpacity onPress={() => { ${navfunc} }}>
+${elements}
+        </TouchableOpacity>`;
+            }
+            break;
+    }
+
+    return elements;
+}
 export function GenerateRNComponents(node, relative = './src/components', language = UITypes.ReactNative) {
     let result = [];
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
@@ -156,6 +214,12 @@ export function GenerateRNComponents(node, relative = './src/components', langua
                 let elements = null;
                 if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
                     elements = bindComponent(node, ComponentTypes[language][componentType]);
+                    if (ComponentTypes[language][componentType].properties && ComponentTypes[language][componentType].properties) {
+                        let { onPress } = ComponentTypes[language][componentType].properties;
+                        if (onPress) {
+                            elements = wrapOnPress(elements, onPress, node);
+                        }
+                    }
                 }
                 result.push(
                     {

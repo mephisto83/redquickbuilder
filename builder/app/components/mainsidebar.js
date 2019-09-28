@@ -8,6 +8,9 @@ export default class Header extends Component {
         return this.props.relative ? RelativeMenuCss : {};
     }
     render() {
+        if (this.props.notactive) {
+            return <div></div>
+        }
         return (
             <aside className={`main-sidebar`} style={this.relative()}>
                 <section className="sidebar" style={{ height: 'auto' }}>
