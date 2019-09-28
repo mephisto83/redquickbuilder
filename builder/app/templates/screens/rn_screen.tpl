@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 import { redConnect, titleService } from '../actions/util';
 import * as DC from '../actions/data-chain';
+import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiActions';
 import getTheme from '../../native-base-theme/components'
 import * as ScreenInstance from '../actions/screenInstances';
 import material from '../../native-base-theme/variables/variables';
@@ -33,6 +34,7 @@ class {{name}} extends React.Component {
 {{component_did_mount}}
     render() {
         navigationInstance = this.props.navigation;
+        setNavigate(navigationInstance);
         return (
             <StyleProvider style={getTheme(material)}>  
                  <Container>                   

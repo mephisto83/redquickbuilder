@@ -9,7 +9,7 @@ import TextBox from './textinput';
 import { ExcludeDefaultNode, NodeTypes, NodeProperties, MAIN_CONTENT, LAYOUT_VIEW, LinkProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
 import { ComponentTypes, InstanceTypes } from '../constants/componenttypes';
-import { GetConnectedNodeByType, CreateLayout, TARGET, createComponentProperties, addComponentProperty, hasComponentProperty, getComponentProperty, getComponentPropertyList } from '../methods/graph_methods';
+import { GetConnectedNodeByType, CreateLayout, TARGET, createComponentProperties, addComponentProperty, hasComponentProperty, getComponentProperty, getComponentPropertyList, removeComponentProperty } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import TextInput from './textinput';
 import SideMenuContainer from './sidemenucontainer';
@@ -23,7 +23,7 @@ class ComponentPropertyMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var active = UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) === UIA.NodeTypes.ComponentNode;
+        var active = [UIA.NodeTypes.ComponentNode, UIA.NodeTypes.ScreenOption].some(v => v === UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType));
         let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
         let componentTypes = ComponentTypes[UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType)] || {};
         let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
@@ -54,7 +54,7 @@ class ComponentPropertyMenu extends Component {
                                 this.setState({ instanceType: value });
                             }} />
                     </FormControl>) : null}
-                    {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].layout ? (
+                    {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType] ? (
                         <ControlSideBarMenu>
                             <ControlSideBarMenuItem onClick={() => {
                                 if (this.state.modelType && this.state.modelProp) {
@@ -82,16 +82,36 @@ class ComponentPropertyMenu extends Component {
                                     })
                                 }
                             }} icon={'fa fa-plus'} title={Titles.Add} description={Titles.Add} />
+                            <ControlSideBarMenuItem onClick={() => {
+                                if (this.state.modelType && this.state.modelProp) {
+
+                                    if (hasComponentProperty(componentProps, this.state.modelProp)) {
+
+                                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                            target: getComponentProperty(componentProps, this.state.modelProp),
+                                            source: currentNode.id
+                                        });
+                                    }
+
+                                    componentProps = removeComponentProperty(componentProps, { instanceType: this.state.instanceType, modelType: this.state.modelType, modelProp: this.state.modelProp })
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        prop: UIA.NodeProperties.ComponentProperties,
+                                        id: currentNode.id,
+                                        value: componentProps
+                                    });
+                                   
+                                }
+                            }} icon={'fa fa-plus'} title={Titles.Remove} description={Titles.Remove} />
                         </ControlSideBarMenu>
                     ) : null}
-                    <ButtonList active={true} isSelected={(item) => { return item.id === this.state.selectedItem; }}
+                    <ButtonList active={true} isSelected={(item) => { return item.value === this.state.selectedItem; }}
                         items={getComponentPropertyList(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties))}
                         onClick={(item) => {
                             this.setState({
-                                modelType: getComponentProperty(componentProps, item.id),
-                                instanceType: getComponentProperty(componentProps, item.id, 'instanceTypes'),
-                                modelProp: item.id,
-                                selectedItem: item.id
+                                modelType: getComponentProperty(componentProps, item.value),
+                                instanceType: getComponentProperty(componentProps, item.value, 'instanceTypes'),
+                                modelProp: item.value,
+                                selectedItem: item.value
                             })
                         }} />
                 </TabPane>

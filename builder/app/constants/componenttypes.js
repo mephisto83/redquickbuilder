@@ -234,6 +234,7 @@ export const InstanceTypes = {
     Instance: 'Instance',
     AppState: 'AppState',
     PropInstance: 'PropInstance',
+    ScreenParam: 'ScreenParam',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }
 

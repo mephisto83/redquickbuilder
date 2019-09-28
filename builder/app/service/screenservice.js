@@ -176,7 +176,7 @@ export function wrapOnPress(elements, onPress, node) {
                         let propPropName = parameterProperty[propName];
                         if (propPropName) {
                             let listitem = '';
-                            if (GetNodeProp(node, NodeProperties.NODEType) === ComponentTypes.ReactNative.ListItem) {
+                            if (GetNodeProp(node, NodeProperties.ComponentType) === ComponentTypes.ReactNative.ListItem.key) {
                                 listitem = '.item';
                             }
                             let propertyNode = GetNodeById(propPropName);
@@ -189,7 +189,7 @@ export function wrapOnPress(elements, onPress, node) {
                         }
                     }
                 });
-                let navfunc = `this.props.navigation.navigate('${GetCodeName(navigation)}', {${(params).join(', ')}})`;
+                let navfunc = `navigate('${GetCodeName(navigation)}', {${(params).join(', ')}})`;
                 elements = `
         <TouchableOpacity onPress={() => { ${navfunc} }}>
 ${elements}
@@ -292,6 +292,9 @@ export function GenerateMarkupTag(node, language, parent, params) {
                     else if (model) {
                         dataBinding = `this.props.${modelName}${listItem}`
                     }
+                    break;
+                case InstanceTypes.ScreenParam:
+                    dataBinding = `GetScreenParam('${modelName}')`;
                     break;
                 default:
                     if (model && property && GetCodeName(parent))

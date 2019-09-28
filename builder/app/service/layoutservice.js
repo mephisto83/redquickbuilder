@@ -51,7 +51,8 @@ export function GetRNModelInstances(id) {
             cellProperties.cellModel &&
             cellProperties.cellModel[cell]) {
             let instanceType = getComponentProperty(componentProperties, cellProperties.cellModel[cell], 'instanceTypes');
-            if (instanceType != InstanceTypes.PropInstance)
+            if (instanceType != InstanceTypes.PropInstance &&
+                instanceType != InstanceTypes.ScreenParam && instanceType)
                 return `let ${(cellProperties.cellModel[cell])} = Get${instanceType}(state, ${instanceType}.${GetCodeName(id)}, const_${(cellProperties.cellModel[cell])}) || {};` // CreateDefault${GetCodeName(id)}()
         }
     }).filter(x => x).unique();

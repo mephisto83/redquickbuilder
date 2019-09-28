@@ -939,6 +939,15 @@ export function addComponentProperty(props, ops) {
     }
     return props;
 }
+export function removeComponentProperty(props, ops) {
+    let { modelProp } = ops;
+    if (props && props.properties) {
+        delete props.properties[modelProp];
+        delete props.instanceTypes[modelProp];
+    }
+    return props;
+
+}
 export function getComponentPropertyList(props) {
     if (props && props.properties) {
         return Object.keys(props.properties).map(t => ({ title: t, id: props.properties[t], value: t }))

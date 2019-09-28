@@ -90,6 +90,19 @@ export function Get(state, key) {
     return null;
 }
 
+let _navigation = null;
+export function setNavigate(navigation) {
+    _navigation = navigation;
+}
+export function navigate(a, b, c) {
+    if (_navigation)
+        return _navigation.navigate(a, b, c);
+}
+export function GetScreenParam(param) {
+    if (_navigation)
+        return _navigation.getParam(param, undefined);
+    return undefined;
+}
 export function GetScreenInstance(state, key, id) {
     let screenInstance = GetC(state, SCREEN_INSTANCE, key);
 

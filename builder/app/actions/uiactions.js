@@ -175,6 +175,7 @@ export function GenerateChainFunction(id) {
     let args = null;
     let observables = [];
     let setArgs = [];
+    let subscribes = [];
     let setProcess = [];
     let funcs = chain.map((c, index) => {
         if (index === 0) {
@@ -184,6 +185,7 @@ export function GenerateChainFunction(id) {
         observables.push(GenerateObservable(c, index));
         setArgs.push(GenerateArgs(c, chain));
         setProcess.push(GenerateSetProcess(c, chain));
+        subscribes.push(GetSubscribes(c, chain));
         return temp;
     });
     let index = chain.indexOf(id);
@@ -195,6 +197,7 @@ export function GenerateChainFunction(id) {
 ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
+${subscribes.join(NodeConstants.NEW_LINE)}
 ${nodeName}.update($id , '$id');
 
 return ${lastNodeName}.value;
@@ -208,6 +211,30 @@ export function GenerateSetProcess(id, parts) {
     return `${nodeName}.setProcess(${GenerateDataChainMethod(id)})`;
 
 }
+
+export function GetSubscribes(id, parts) {
+    let node = GetNodeById(id);
+    let index = parts.indexOf(id);
+    let nodeName = (GetJSCodeName(id) || ('node' + index)).toJavascriptName();
+    let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+    if (functionType && DataChainFunctions[functionType] && DataChainFunctions[functionType].merge) {
+        // pulls args from other nodes
+        let args = Object.keys(DataChainFunctions[functionType].ui).map((key, kindex) => {
+            let temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
+            return `${(GetJSCodeName(temp) || ('node' + parts.indexOf(temp))).toJavascriptName()}`
+        });
+        if (args && args.length)
+            return `${nodeName}${args.map(v => `.subscribe({ ${v} })`).join('')}`;
+    }
+    else {
+        let parent = (GetNodeProp(node, NodeProperties.ChainParent));
+        if (parent) {
+            return `${GetJSCodeName(parent).toJavascriptName()}.subscribe(${nodeName})`;
+        }
+    }
+    return '';
+}
+
 
 export function GenerateArgs(id, parts) {
     let node = GetNodeById(id);
