@@ -201,6 +201,19 @@ class LayoutView extends Component {
                                         });
                                     }}
                                     value={cellEvents && cellEvents[this.state.selectedCell] && cellEvents[this.state.selectedCell].onChange} /> : null}
+                                {cellEvents ? <CheckBox
+                                    label={Titles.OnPress}
+                                    onChange={(val) => {
+                                        let layout = nodeLayout || CreateLayout();
+                                        cellEvents[this.state.selectedCell] = cellEvents[this.state.selectedCell] || {};
+                                        cellEvents[this.state.selectedCell] = { ...cellEvents[this.state.selectedCell], onPress: val };
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+                                    }}
+                                    value={cellEvents && cellEvents[this.state.selectedCell] && cellEvents[this.state.selectedCell].onPress} /> : null}
 
                                 {cellChildren ? (<SelectInput
                                     options={componentNodes.toNodeSelect()}

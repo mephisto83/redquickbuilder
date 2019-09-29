@@ -10,15 +10,15 @@ import SideBar from './sidebar';
 import TextBox from './textinput';
 import { ExcludeDefaultNode, NodeTypes, NodeProperties, MAIN_CONTENT, LAYOUT_VIEW, LinkProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
-import { ComponentTypes, NAVIGATION } from '../constants/componenttypes';
+import { ComponentTypes, APP_METHOD } from '../constants/componenttypes';
 import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList, GetNodesLinkedTo, SOURCE } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
-const NAVIGATION_PARAMETERS = 'NAVIGATION_PARAMETERS';
-class NavigationParameterMenu extends Component {
+const METHOD_PARAMETERS = 'METHOD_PARAMETERS';
+class MethodParameterMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -36,25 +36,25 @@ class NavigationParameterMenu extends Component {
                 if (prop_obj && prop_obj.ui) {
                     if (prop_obj.options) {
                         let nodeproperty = UIA.GetNodeProp(currentNode, prop_obj.nodeProperty);
-                        if (nodeproperty === NAVIGATION) {
+                        if (nodeproperty === APP_METHOD) {
                             components.push((<SelectInput
-                                label={Titles.Navigation}
+                                label={Titles.ClientMethod}
                                 key={`${nodeproperty} - ${_ui_type} - ${componentType} - ${key}`}
-                                options={UIA.NodesByType(state, NodeTypes.Screen).toNodeSelect()}
-                                value={UIA.GetNodeProp(currentNode, NodeProperties.Navigation)}
+                                options={UIA.NodesByType(state, NodeTypes.Method).toNodeSelect()}
+                                value={UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod)}
                                 onChange={(value) => {
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                        prop: NodeProperties.Navigation,
+                                        prop: NodeProperties.ClientMethod,
                                         id: currentNode.id,
                                         value
                                     });
                                 }} />));
 
-                            let screenParameters = UIA.GetNodeProp(UIA.GetNodeById(UIA.GetNodeProp(currentNode, NodeProperties.Navigation)), NodeProperties.ScreenParameters) || [];
+                            let screenParameters = UIA.GetNodeProp(UIA.GetNodeById(UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod)), NodeProperties.ScreenParameters) || [];
                             let treeMenu = (screenParameters.map(v => {
                                 let innertree = `${nodeproperty} - ${_ui_type} - ${componentType} - parameter - ${GetParameterName(v)}`;
-                                let navparameters = UIA.GetNodeProp(currentNode, NodeProperties.NavigationParameters) || {};
-                                let parameterProperty = UIA.GetNodeProp(currentNode, UIA.NodeProperties.NavigationParametersProperty) || {};
+                                let methodparameters = UIA.GetNodeProp(currentNode, NodeProperties.MethodParameters) || {};
+                                let parameterProperty = UIA.GetNodeProp(currentNode, UIA.NodeProperties.MethodParameterProperty) || {};
                                 return (
                                     <TreeViewMenu
                                         title={`${GetParameterName(v)}`}
@@ -69,31 +69,31 @@ class NavigationParameterMenu extends Component {
                                                 label={GetParameterName(v)}
                                                 key={`${innertree}`}
                                                 options={componentPropertiesList}
-                                                value={navparameters[v.id]}
+                                                value={methodparameters[v.id]}
                                                 onChange={(value) => {
-                                                    let parameters = UIA.GetNodeProp(currentNode, NodeProperties.NavigationParameters) || {};
+                                                    let parameters = UIA.GetNodeProp(currentNode, NodeProperties.MethodParameters) || {};
                                                     parameters[v.id] = value;
                                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                                        prop: NodeProperties.NavigationParameters,
+                                                        prop: NodeProperties.MethodParameters,
                                                         id: currentNode.id,
                                                         value: parameters
                                                     });
                                                 }} />
-                                            {componentProperties && navparameters && v && v.id && navparameters[v.id] ? <SelectInput
+                                            {componentProperties && methodparameters && v && v.id && methodparameters[v.id] ? <SelectInput
                                                 options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
-                                                    id: componentProperties.properties[navparameters[v.id]],
+                                                    id: componentProperties.properties[methodparameters[v.id]],
                                                     direction: SOURCE
                                                 }).toNodeSelect()}
                                                 onChange={(val) => {
-                                                    parameterProperty[navparameters[v.id]] = val;
+                                                    parameterProperty[methodparameters[v.id]] = val;
                                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                                        prop: UIA.NodeProperties.NavigationParametersProperty,
+                                                        prop: UIA.NodeProperties.MethodParameterProperty,
                                                         id: currentNode.id,
                                                         value: parameterProperty
                                                     });
                                                 }}
                                                 label={Titles.Property}
-                                                value={parameterProperty[navparameters[v.id]]} /> : null}
+                                                value={parameterProperty[methodparameters[v.id]]} /> : null}
                                         </FormControl>
                                     </TreeViewMenu>)
                             }));
@@ -110,12 +110,12 @@ class NavigationParameterMenu extends Component {
                     <SideBar relative={true} style={{ paddingTop: 0 }}>
                         <SideBarMenu>
                             <TreeViewMenu
-                                title={`${Titles.Navigation}`}
+                                title={`${Titles.ClientMethod}`}
                                 icon={'fa fa-object-group'}
-                                open={UIA.Visual(state, NAVIGATION_PARAMETERS)}
-                                active={UIA.Visual(state, NAVIGATION_PARAMETERS)}
+                                open={UIA.Visual(state, METHOD_PARAMETERS)}
+                                active={UIA.Visual(state, METHOD_PARAMETERS)}
                                 onClick={() => {
-                                    this.props.toggleVisual(NAVIGATION_PARAMETERS)
+                                    this.props.toggleVisual(METHOD_PARAMETERS)
                                 }}>
                                 <br />
                                 {components}
@@ -128,4 +128,4 @@ class NavigationParameterMenu extends Component {
     }
 }
 
-export default UIConnect(NavigationParameterMenu)
+export default UIConnect(MethodParameterMenu)

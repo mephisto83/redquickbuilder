@@ -1,5 +1,5 @@
 import { createGraph, updateWorkSpace, updateGraphTitle, updateGraphProperty } from '../methods/graph_methods';
-import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph, Visual, toggleVisual, CONTEXT_MENU_VISIBLE, setVisual, CONTEXT_MENU_MODE } from './uiactions';
+import { SaveApplication, SaveGraph, CURRENT_GRAPH, GetRootGraph, Visual, toggleVisual, CONTEXT_MENU_VISIBLE, setVisual, CONTEXT_MENU_MODE, GetDispatchFunc, GetStateFunc } from './uiactions';
 
 var fs = require('fs');
 const { ipcRenderer } = require('electron')
@@ -94,6 +94,9 @@ export function newRedQuickBuilderGraph() {
         SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
         SaveGraph(opened_graph, dispatch);
     }
+}
+export function newGraph() {
+    newRedQuickBuilderGraph()(GetDispatchFunc(), GetStateFunc());
 }
 ipcRenderer.on('save-graph-to-file-reply', (event, arg) => {
     console.log(arg) // prints "pong"

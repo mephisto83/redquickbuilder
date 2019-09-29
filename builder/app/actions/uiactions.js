@@ -224,7 +224,8 @@ export function GetSubscribes(id, parts) {
             return `${(GetJSCodeName(temp) || ('node' + parts.indexOf(temp))).toJavascriptName()}`
         });
         if (args && args.length)
-            return `${nodeName}${args.map(v => `.subscribe({ ${v} })`).join('')}`;
+            return `${args.map(v => `${v}.subscribe(${nodeName});
+`).join('')}`;
     }
     else {
         let parent = (GetNodeProp(node, NodeProperties.ChainParent));
@@ -956,6 +957,12 @@ let _getState;
 let _dispatch;
 export function GetState() {
     return _getState();
+}
+export function GetDispatchFunc() {
+    return _dispatch;
+}
+export function GetStateFunc() {
+    return _getState;
 }
 export function setTestGetState(func) {
     _getState = func;

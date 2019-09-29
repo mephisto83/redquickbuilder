@@ -10,8 +10,12 @@ import {
     CHANGE_NODE_PROPERTY,
     ADD_LINK_BETWEEN_NODES,
     GetNodeById,
-    ModelNotConnectedToFunction
+    ModelNotConnectedToFunction,
+    GetCurrentGraph,
+    GetStateFunc,
+    GetDispatchFunc
 } from "../actions/uiactions";
+import { newNode } from "../methods/graph_methods";
 
 
 export const GetSpecificModels = {
@@ -226,7 +230,101 @@ export const GetAllModels = {
     }),
     methodType: FunctionTypes.Get_Agent_Value__IListObject
 }
-
+export const CreateLoginModels = {
+    type: 'create-models',
+    methodType: 'Create Models',
+    method: () => {
+        // let currentGraph = GetCurrentGraph(GetStateFunc()());
+        // currentGraph = newNode(currentGraph);
+        let nodePackageType = 'login-models';
+        let nodePackage = 'login-models';
+        PerformGraphOperation([({
+            operation: ADD_NEW_NODE,
+            options: {
+                nodeType: NodeTypes.Model,
+                // groupProperties: {},
+                properties: {
+                    [NodeProperties.NodePackage]: nodePackage,
+                    [NodeProperties.NodePackageType]: nodePackageType,
+                    [NodeProperties.UIText]: `Red Login Model`
+                },
+                callback: (newNode) => {
+                    // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
+                    // methodProps[constraint.key] = newNode.id;
+                    // perOrModelNode = newNode;
+                    setTimeout(() => {
+                        PerformGraphOperation([
+                            { propName: 'User Name' },
+                            { propName: 'Password' },
+                            { propName: 'Remember Me' }
+                        ].map(v => {
+                            let { propName } = v;
+                            return ({
+                                operation: ADD_NEW_NODE,
+                                options: {
+                                    nodeType: NodeTypes.Property,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.FunctionOperator }
+                                    },
+                                    groupProperties: {
+                                    },
+                                    parent: newNode.id,
+                                    properties: {
+                                        [NodeProperties.NodePackage]: nodePackage,
+                                        [NodeProperties.NodePackageType]: nodePackageType,
+                                        [NodeProperties.UIText]: propName
+                                    }
+                                }
+                            });
+                        }))(GetDispatchFunc(), GetStateFunc());
+                    }, 1000);
+                }
+            }
+        }), ({
+            operation: ADD_NEW_NODE,
+            options: {
+                nodeType: NodeTypes.Model,
+                // groupProperties: {},
+                properties: {
+                    [NodeProperties.NodePackage]: nodePackage,
+                    [NodeProperties.NodePackageType]: nodePackageType,
+                    [NodeProperties.UIText]: `Red Register View Model`
+                },
+                callback: (newNode) => {
+                    // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
+                    // methodProps[constraint.key] = newNode.id;
+                    // perOrModelNode = newNode;
+                    setTimeout(() => {
+                        PerformGraphOperation([
+                            { propName: 'User Name' },
+                            { propName: 'Email' },
+                            { propName: 'Password' },
+                            { propName: 'Confirm Password' }
+                        ].map(v => {
+                            let { propName } = v;
+                            return ({
+                                operation: ADD_NEW_NODE,
+                                options: {
+                                    nodeType: NodeTypes.Property,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.FunctionOperator }
+                                    },
+                                    groupProperties: {},
+                                    parent: newNode.id,
+                                    properties: {
+                                        [NodeProperties.NodePackage]: nodePackage,
+                                        [NodeProperties.NodePackageType]: nodePackageType,
+                                        [NodeProperties.UIText]: propName
+                                    }
+                                }
+                            });
+                        }))(GetDispatchFunc(), GetStateFunc());
+                    }, 1000);
+                }
+            }
+        })])(GetDispatchFunc(), GetStateFunc());
+    }
+}
 function CreateFunction(option) {
     let {
         nodePackageType,

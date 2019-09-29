@@ -14,7 +14,7 @@ import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels, GetAllModels } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels, CreateLoginModels } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import { PARAMETER_TAB } from './dashboard';
 
@@ -235,6 +235,9 @@ class ModelActivityMenu extends Component {
                             })} />
                             <TreeViewMenu hideArrow={true} title={GetAllModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, GetAllModels);
+                            })} />
+                            <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
+                                this.props.executeGraphOperation(currentNode, CreateLoginModels);
                             })} />
                         </TreeViewMenu>
 

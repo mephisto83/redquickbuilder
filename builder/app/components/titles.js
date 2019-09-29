@@ -18,6 +18,7 @@ export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const ComponentPropertyMenu = 'Component Properties';
 export const Domain = 'Domain';
+export const ClientMethod = 'Client Method';
 export const Layout = 'Layout';
 export const NodeLabel = 'Node Label';
 export const NodeType = 'Node Type';
@@ -70,6 +71,8 @@ export const Priority = 'Priority';
 export const Agents = 'Agents';
 export const UseAsRoot = 'Use as top element';
 export const OnChange = ' On Change';
+export const OnClick = 'On Click';
+export const OnPress = 'On Press';
 export const SelectProperty = 'Select Property';
 export const DisallowedEnums = 'Disallowed values';
 export const ManyToMany = 'Many 2 Many';
@@ -234,6 +237,7 @@ export const Create_Object_Agent_Value__IListObject = 'Create Object by Agent =>
 export const Update_Object_Agent_Value__IListObject = 'Update Object by Agent => IList<Object>';
 export const Delete_Object_Agent_Value__IListObject = 'Delete Object by Agent => IList<Object>';
 export const Get_Object_Agent_Value__IListObject = 'Get Object by Agent => IList<Object>';
+export const Get_Agent_Value__IListObject = 'Get Objects for an Agent';
 export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent In Valid List';
 
 export const Get_Object_Agent_Value__Object = 'Get Object by Agent';

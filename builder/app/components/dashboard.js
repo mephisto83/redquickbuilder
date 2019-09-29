@@ -13,6 +13,7 @@ import NavBarMenu from './navbarmenu';
 import MainSideBar from './mainsidebar';
 import BatchMenu from './batchmenu';
 import SideBarHeader from './sidebarheader';
+import QuickMethods from './quickmethods';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
@@ -75,6 +76,7 @@ import MethodActivityMenu from './methodactivitymenu';
 import MethodPropertyMenu from './methodpropertymenu';
 import MaestroDetailsMenu from './maestrodetailsmenu';
 import NodeManagement from './nodemanagement';
+import MethodParameterMenu from './methodparameteremenu';
 import CommonActivityMenu from './commonactivitymenu';
 import ModelFilterItemActivityMenu from './modelfilteritemactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
@@ -559,6 +561,8 @@ class Dashboard extends Component {
                             {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}
+                            {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<QuickMethods />) : null}
                         </SideBar>
                     </div>
                     <ContextMenu />

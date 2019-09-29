@@ -1,6 +1,6 @@
 import { HandlerEvents } from '../ipc/handler-events';
 import { GraphKeys } from '../methods/graph_methods';
-import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned } from './uiactions';
+import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned, GetDispatchFunc, GetStateFunc } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
@@ -10,7 +10,7 @@ import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { uuidv4 } from '../utils/array';
 import { platform } from 'os';
-import { saveCurrentGraph, openGraph, toggleContextMenu, setRightMenuTab } from './remoteActions';
+import { saveCurrentGraph, openGraph, toggleContextMenu, setRightMenuTab, newGraph } from './remoteActions';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -32,11 +32,17 @@ ipcRenderer.on('commands', (event, arg) => {
         case 'p':
             togglePinned();
             break;
+        case 'y':
+            publishFiles();
+            break;
         case 's':
             saveCurrentGraph();
             break;
         case 'o':
             openGraph();
+            break;
+        case 'n':
+            newGraph();
             break;
         case 'm':
             toggleContextMenu();
@@ -71,6 +77,9 @@ function send(mess, body) {
     });
     ipcRenderer.send('message', JSON.stringify(m));
     return result;
+}
+export function publishFiles() {
+    scaffoldProject({ filesOnly: true })(GetDispatchFunc(), GetStateFunc());
 }
 
 export function scaffoldProject(options = {}) {

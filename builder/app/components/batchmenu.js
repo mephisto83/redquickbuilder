@@ -20,7 +20,7 @@ class BatchMenu extends Component {
         return (
             <TabPane active={true}>
                 <FormControl>
-                    <h3>Quick Methods</h3>
+                    <h3>{Titles.QuickMethods}</h3>
                     <SelectInput
                         options={UIA.NodesByType(state, NodeTypes.Model).toNodeSelect()}
                         label={Titles.Models}

@@ -222,7 +222,10 @@ export const ConfigurationProperties = {
 export const NodeProperties = {
     EnabledMenu: 'EnabledMenu',
     NavigationParameters: 'NavigationParameters',
+    ClientMethod: "ClientMethod",
+    MethodParameters: 'MethodParameters',
     NavigationParametersProperty: 'NavigationParametersProperty',
+    MethodParameterProperty: 'MethodParameterProperty',
     ScreenParameters: 'ScreenParameters',
     SelectedLayoutCell: 'SelectedLayoutCell',
     ChainParent: 'ChainParent',

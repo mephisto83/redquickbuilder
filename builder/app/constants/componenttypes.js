@@ -26,6 +26,7 @@ export const ComponentTypes = {
                     ui: true
                 },
                 onPress: {
+                    nodeProperty: 'onPress',
                     template: '() => { {{value}} }',
                     method: true,
                     options: [NAVIGATION, APP_METHOD],

@@ -10,7 +10,7 @@ var child_process = require('child_process'),
 const { app, globalShortcut } = require('electron');
 const { Menu, MenuItem } = require('electron')
 
-const letters = 'wpsoml1234'.split('');
+const letters = 'wpsonmyl1234'.split('');
 const defaultMenu = 'defaultMenu';
 const MenuItems = {
     w: {
@@ -19,11 +19,17 @@ const MenuItems = {
     p: {
         label: 'Toggle Pinned'
     },
+    y: {
+        label: 'Publish'
+    },
     s: {
         label: 'Save'
     },
     o: {
         label: 'Open'
+    },
+    n: {
+        label: 'New'
     },
     m: {
         label: 'Context Menu'
@@ -52,47 +58,46 @@ export default class IPCHandlers {
         });
         let submenu2 = new Menu();
         letters.map(x => {
-            // globalShortcut.register('CommandOrControl+' + (x.toUpperCase()), () => {
-            //     mainWindow.webContents.send('commands', {
-            //         args: x
-            //     })
-            // })
+            let handler = throttle(() => {
+                mainWindow.webContents.send('commands', {
+                    args: x
+                });
+            });
             submenu2.append(new MenuItem({
                 label: MenuItems[x] ? MenuItems[x].label : 'Unknown',
                 accelerator: 'CmdOrCtrl+' + (x.toUpperCase()),
                 click: () => {
-                    mainWindow.webContents.send('commands', {
-                        args: x
-                    })
+                    handler();
                 }
             }))
         })
 
         const menu2 = new Menu()
-        // submenu2.append(new MenuItem({
-        //     label: 'Print',
-        //     click: () => { console.log('time to print stuff') },
-        // }))
         menu2.append(new MenuItem({
             label: 'Red Quick 2',
             submenu: submenu2
-        }))
+        }));
 
-
-        // let mainMenu = Menu.buildFromTemplate(template)
         Menu.setApplicationMenu(menu2);
     }
     static tearDown() {
 
-        // Unregister a shortcut.
-        // letters.map(x => {
-        //     globalShortcut.unregister('CommandOrControl+' + (x.toUpperCase()))
-        // })
-
-        // Unregister all shortcuts.
-        // globalShortcut.unregisterAll()
     }
 }
+
+const throttle = (func, limit) => {
+    let inThrottle
+    return function () {
+        const args = arguments
+        const context = this
+        if (!inThrottle) {
+            func.apply(context, args)
+            inThrottle = true
+            setTimeout(() => inThrottle = false, limit)
+        }
+    }
+}
+
 function handle(msg) {
     let message = msg.msg;
     let result = Promise.resolve();
