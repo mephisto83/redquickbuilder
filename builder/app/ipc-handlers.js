@@ -10,7 +10,7 @@ var child_process = require('child_process'),
 const { app, globalShortcut } = require('electron');
 const { Menu, MenuItem } = require('electron')
 
-const letters = 'wpsonmyl1234'.split('');
+const letters = 'wpsonmyl1234x'.split('');
 const defaultMenu = 'defaultMenu';
 const MenuItems = {
     w: {
@@ -32,10 +32,14 @@ const MenuItems = {
         label: 'New'
     },
     m: {
-        label: 'Context Menu'
+        label: 'New Node'
     },
     l: {
         label: 'Layout Menu'
+    },
+    x: {
+        label: 'Remove Current Node',
+        shift: true
     },
     1: { label: 'Menu 1' },
     2: { label: 'Menu 2' },
@@ -65,7 +69,7 @@ export default class IPCHandlers {
             });
             submenu2.append(new MenuItem({
                 label: MenuItems[x] ? MenuItems[x].label : 'Unknown',
-                accelerator: 'CmdOrCtrl+' + (x.toUpperCase()),
+                accelerator: MenuItems[x] && MenuItems[x].shift ? 'CmdOrCtrl+Shift+' + (x.toUpperCase()) : 'CmdOrCtrl+' + (x.toUpperCase()),
                 click: () => {
                     handler();
                 }

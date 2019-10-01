@@ -231,8 +231,8 @@ export const GetAllModels = {
     methodType: FunctionTypes.Get_Agent_Value__IListObject
 }
 export const CreateLoginModels = {
-    type: 'create-models',
-    methodType: 'Create Models',
+    type: 'login-models',
+    methodType: 'Login Models',
     method: () => {
         // let currentGraph = GetCurrentGraph(GetStateFunc()());
         // currentGraph = newNode(currentGraph);
@@ -246,7 +246,7 @@ export const CreateLoginModels = {
                 properties: {
                     [NodeProperties.NodePackage]: nodePackage,
                     [NodeProperties.NodePackageType]: nodePackageType,
-                    [NodeProperties.UIText]: `Red Login Model`
+                    [NodeProperties.UIText]: `Blue Login Model`
                 },
                 callback: (newNode) => {
                     // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
@@ -264,7 +264,7 @@ export const CreateLoginModels = {
                                 options: {
                                     nodeType: NodeTypes.Property,
                                     linkProperties: {
-                                        properties: { ...LinkProperties.FunctionOperator }
+                                        properties: { ...LinkProperties.PropertyLink }
                                     },
                                     groupProperties: {
                                     },
@@ -288,7 +288,7 @@ export const CreateLoginModels = {
                 properties: {
                     [NodeProperties.NodePackage]: nodePackage,
                     [NodeProperties.NodePackageType]: nodePackageType,
-                    [NodeProperties.UIText]: `Red Register View Model`
+                    [NodeProperties.UIText]: `Blue Register View Model`
                 },
                 callback: (newNode) => {
                     // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
@@ -307,7 +307,7 @@ export const CreateLoginModels = {
                                 options: {
                                     nodeType: NodeTypes.Property,
                                     linkProperties: {
-                                        properties: { ...LinkProperties.FunctionOperator }
+                                        properties: { ...LinkProperties.PropertyLink }
                                     },
                                     groupProperties: {},
                                     parent: newNode.id,

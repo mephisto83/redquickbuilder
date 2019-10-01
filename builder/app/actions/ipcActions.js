@@ -1,6 +1,6 @@
 import { HandlerEvents } from '../ipc/handler-events';
 import { GraphKeys } from '../methods/graph_methods';
-import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned, GetDispatchFunc, GetStateFunc } from './uiactions';
+import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned, GetDispatchFunc, GetStateFunc, removeCurrentNode, newNode } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
@@ -45,10 +45,13 @@ ipcRenderer.on('commands', (event, arg) => {
             newGraph();
             break;
         case 'm':
-            toggleContextMenu();
+            newNode();
             break;
         case 'l':
             toggleContextMenu('layout');
+            break;
+        case 'x':
+            removeCurrentNode();
             break;
         case '1':
         case '2':

@@ -952,9 +952,13 @@ export function NodesByType(state, nodeType, options = {}) {
             nodeType = [nodeType];
         }
         return currentGraph.nodes
-            .filter(x => currentGraph.nodeLib[x].properties &&
+            .filter(x => currentGraph.nodeLib && currentGraph.nodeLib[x] && currentGraph.nodeLib[x].properties &&
                 (nodeType.indexOf(currentGraph.nodeLib[x].properties[NodeProperties.NODEType]) !== -1) ||
-                (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
+                (!options.excludeRefs &&
+                    currentGraph.nodeLib &&
+                    currentGraph.nodeLib[x] &&
+                    currentGraph.nodeLib[x].properties &&
+                    currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
             .map(x => currentGraph.nodeLib[x]);
     }
     return [];
@@ -1012,6 +1016,10 @@ export function clearPinned() {
             }
         }
     })));
+}
+
+export function removeCurrentNode() {
+    graphOperation(REMOVE_NODE, { id: Visual(_getState(), SELECTED_NODE) })(_dispatch, _getState);
 }
 export function togglePinned() {
     let state = _getState();
@@ -1201,6 +1209,18 @@ export function GetCurrentScopedGraph(state, dispatch) {
         }
     }
     return currentGraph
+}
+export const SELECTED_TAB = 'SELECTED_TAB';
+export const DEFAULT_TAB = 'DEFAULT_TAB';
+const SIDE_PANEL_OPEN = 'side-panel-open';
+export const PARAMETER_TAB = 'PARAMETER_TAB';
+export const SCOPE_TAB = 'SCOPE_TAB';
+export const QUICK_MENU = 'QUICK_MENU';
+
+export function newNode() {
+    graphOperation(NEW_NODE)(_dispatch, _getState);
+    setVisual(SIDE_PANEL_OPEN, true)(_dispatch, _getState);
+    setVisual(SELECTED_TAB, DEFAULT_TAB)(_dispatch, _getState);
 }
 export function GetSelectedSubgraph(state) {
     var root = GetRootGraph(state);

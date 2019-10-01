@@ -247,6 +247,7 @@ export const Update_Object_Agent_Value__Object_With_Object = 'Update Object by A
 
 export const Functions = 'Functions';
 export const Login = 'Login';
+export const Register = 'Register';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';
 
@@ -254,8 +255,10 @@ export const HttpMethod = 'Http Methods';
 export const AddMaestros = 'Add Maestro';
 export const HttpRoute = 'Relative Http Route';
 export const NotIncludeInController = `Don't include in controller`;
+export const AsForm = 'As Form';
 export const Maestros = 'Maestros';
 export const SaveAs = 'Save as ...';
+export const NoApiPrefix = 'No api prefix';
 export const Save = 'Save';
 export const Open = 'Open';
 

@@ -50,7 +50,8 @@ export const FunctionTypes = {
 
     //Function with bool result
     Can_Execute_Agent_Parent_In_Valid_List: 'Can_Execute_Agent_Parent_In_Valid_List',
-    Login: 'Login'
+    Login: 'Login',
+    Register: 'Register'
     // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 }
 
@@ -858,6 +859,25 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Login]: {
         title: Titles.Login,
+        // template: fs.readFileSync('./app/templates/standard/get_agent_listobject.tpl', 'utf8'),
+        // interface: fs.readFileSync('./app/templates/standard/get_agent_listobject_interface.tpl', 'utf8'),
+        // controller: fs.readFileSync('./app/templates/standard/get_agent_listobjects_controller.tpl', 'utf8'),
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+        },
+        output: {
+            ...COMMON_OUTPUT.LIST
+        },
+        parameters: {
+            body: {},
+            parameters: false
+        },
+        isList: false,
+        method: Methods.Create,
+        template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+    },
+    [FunctionTypes.Register]: {
+        title: Titles.Register,
         // template: fs.readFileSync('./app/templates/standard/get_agent_listobject.tpl', 'utf8'),
         // interface: fs.readFileSync('./app/templates/standard/get_agent_listobject_interface.tpl', 'utf8'),
         // controller: fs.readFileSync('./app/templates/standard/get_agent_listobjects_controller.tpl', 'utf8'),

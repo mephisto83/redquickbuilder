@@ -59,15 +59,36 @@ export function createRedService(domain, wsdomain, _forceBase) {
         getAccessToken: function () {
             return accessToken;
         },
-        call: function (endpoint, method, body) {
-            console.log(`calling at ${(new Date()).toTimeString()} ${endpoint}`)
-            return fetch(endpoint, {
-                headers: Object.assign({}, headers, {
-                    'Authorization': 'Bearer ' + service.getAccessToken()
-                }),
-                method: method,
-                body: body == undefined ? null : JSON.stringify(body)
-            }).then(function (response) {
+        call: function (endpoint, method, body, options = {}) {
+            console.log(`calling at ${(new Date()).toTimeString()} ${endpoint}`);
+            let fetchPromise = null;
+            if (options && options.asForm) {
+                var formData = new FormData();
+                if (body) {
+                    for (var i in body) {
+                        formData.append(i, body[name]);
+                    }
+                }
+                fetchPromise = fetch(endpoint, {
+                    headers: Object.assign({}, headers, {
+                        'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+                        'Authorization': 'Bearer ' + service.getAccessToken(),
+                        'Content-Type': 'multipart/form-data'
+                    }),
+                    method: method,
+                    body: formData
+                });
+            }
+            else {
+                fetchPromise = fetch(endpoint, {
+                    headers: Object.assign({}, headers, {
+                        'Authorization': 'Bearer ' + service.getAccessToken()
+                    }),
+                    method: method,
+                    body: body == undefined ? null : JSON.stringify(body)
+                });
+            }
+            return fetchPromise.then(function (response) {
 
                 //setTimeout(() => null, 0);  // workaround for issue-6679
                 if (response.status === 401) {
@@ -110,10 +131,10 @@ export function createRedService(domain, wsdomain, _forceBase) {
                 return service.call(endpoint, 'PUT', body);
             });
         },
-        post: function (path, body) {
+        post: function (path, body, options = {}) {
             return Globals.getDefaultURL().then(_baseDomain => {
                 var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
-                return service.call(endpoint, 'POST', body);
+                return service.call(endpoint, 'POST', body, options);
             });
         },
         patch: function (path, body) {

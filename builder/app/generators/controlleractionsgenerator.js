@@ -21,8 +21,12 @@ export default class ControllerActionGenerator {
             if (maestroNode) {
                 let controllerNode = GetControllerNode(maestroNode.id);
                 if (controllerNode) {
-                    endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode)}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
-
+                    if (GetNodeProp(method, NodeProperties.NoApiPrefix)) {
+                        endpoints[GetJSCodeName(method)] = `${GetNodeProp(method, NodeProperties.HttpRoute)}`
+                    }
+                    else {
+                        endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode)}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
+                    }
                     return bindTemplate(methodTemplate, {
                         methodName: GetJSCodeName(method),
                         methodType: `${GetNodeProp(method, NodeProperties.HttpMethod)}`.toLowerCase().split('http').join('')
@@ -55,14 +59,14 @@ import * as Util from './util';
 {{body}}
         `;
         let controllerActions = temp.map(node => {
-            let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(node)}, {}, {
+            let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(node)}, { ...parameters }, {
     loading: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown}, 
     objectType: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown} 
 })(dispatch, getState);`;
             return bindTemplate(ControllerMethodTemplate, {
                 methodName: GetJSCodeName(node),
                 method_call: addNewLine(method_call, 1),
-                arguments: null
+                arguments: 'parameters'
             });
         }).join(NEW_LINE);
 

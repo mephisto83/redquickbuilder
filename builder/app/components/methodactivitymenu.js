@@ -79,6 +79,26 @@ class MethodActivityMenu extends Component {
                         });
                     }}
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.NotIncludedInController)} />) : null}
+                {currentNode ? (<CheckBox
+                    label={Titles.AsForm}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.AsForm,
+                            id: currentNode.id,
+                            value
+                        });
+                    }}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm)} />) : null}
+                {currentNode ? (<CheckBox
+                    label={Titles.NoApiPrefix}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.NoApiPrefix,
+                            id: currentNode.id,
+                            value
+                        });
+                    }}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.NoApiPrefix)} />) : null}
                 <ControlSideBarMenu>
                     {currentNode && currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])

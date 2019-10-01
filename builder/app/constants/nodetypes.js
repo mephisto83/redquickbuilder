@@ -376,6 +376,8 @@ export const NodeProperties = {
     MethodFunctionValidation: 'method-function-validation',
     NotIncludedInController: 'not-included-in-controller',
     PermissionImpl: 'permission-implementation',
+    NoApiPrefix: 'no-api-prefix',
+    AsForm: 'as-form',
     ClassConstructionInformation: 'ClassConstructionInformation'
 }
 
