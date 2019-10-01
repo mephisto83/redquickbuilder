@@ -103,13 +103,15 @@ export function GetScreenParam(param) {
         return _navigation.getParam(param, undefined);
     return undefined;
 }
-export function GetScreenInstance(state, key, id) {
-    let screenInstance = GetC(state, SCREEN_INSTANCE, key);
+export function GetScreenInstance(key, id) {
+    if (_getState) {
+        let state = _getState();
+        let screenInstance = GetC(state, SCREEN_INSTANCE, key);
 
-    if (screenInstance) {
-        return screenInstance[id] || null;
+        if (screenInstance) {
+            return screenInstance[id] || null;
+        }
     }
-
     return null;
 }
 

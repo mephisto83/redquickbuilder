@@ -53,7 +53,7 @@ export function GetRNModelInstances(id) {
             let instanceType = getComponentProperty(componentProperties, cellProperties.cellModel[cell], 'instanceTypes');
             if (instanceType != InstanceTypes.PropInstance &&
                 instanceType != InstanceTypes.ScreenParam && instanceType)
-                return `let ${(cellProperties.cellModel[cell])} = Get${instanceType}(state, ${instanceType}.${GetCodeName(id)}, const_${(cellProperties.cellModel[cell])}) || {};` // CreateDefault${GetCodeName(id)}()
+                return `let ${(cellProperties.cellModel[cell])} = Get${instanceType}(${instanceType}.${GetCodeName(id)}, const_${(cellProperties.cellModel[cell])}) || {};` // CreateDefault${GetCodeName(id)}()
         }
     }).filter(x => x).unique();
 }

@@ -1,10 +1,10 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION } from "../constants/componenttypes";
-import { getComponentProperty } from "../methods/graph_methods";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD } from "../constants/componenttypes";
+import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -160,6 +160,44 @@ export function wrapOnPress(elements, onPress, node) {
 
     let onpress = GetNodeProp(node, 'onPress');
     switch (onpress) {
+        case APP_METHOD:
+            let key = 'onPress';
+            let methodParams = GetNodeProp(node, NodeProperties.ClientMethodParameters) || {};
+            let clientMethod = GetNodeProp(node, NodeProperties.ClientMethod);
+            let bodytext = 'let body = null';
+            let parameterstext = `let parameters = null`
+            if (clientMethod) {
+                let jsClientMethodName = GetJSCodeName(clientMethod);
+                let methodParameters = GetMethodParameters(clientMethod);
+                if (methodParameters) {
+
+                    let { parameters, body } = methodParameters;
+                    if (body) {
+                        let componentNodeProperties = GetComponentNodeProperties();
+                        let instanceType = getClientMethod(methodParams, key, 'body', 'instanceType');
+                        let componentModel = getClientMethod(methodParams, key, 'body', 'componentModel')
+                        let c_props = componentNodeProperties.find(x => x.id === getClientMethod(methodParams, key, 'body', 'component'));
+                        let c_props_options = c_props && c_props.componentPropertiesList ? c_props.componentPropertiesList : []
+                        if (c_props_options.length) {
+                            let c_prop_option = c_props_options.find(v => v.id === componentModel);
+                            if (c_prop_option) {
+                                let componentModelName = c_prop_option.value;
+                                bodytext = `let body = Get${instanceType}('${componentModelName}');`
+                            }
+                        }
+                    }
+                    let pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`
+                    elements = `
+                    <TouchableOpacity onPress={() => {
+${parameterstext}
+${bodytext}
+${pressfunc} }}>
+            ${elements}
+                    </TouchableOpacity>`;
+
+                }
+            }
+            break;
         case NAVIGATION:
             let navigation = GetNodeProp(node, NodeProperties.Navigation);
             let targetScreen = GetNodeById(navigation);
