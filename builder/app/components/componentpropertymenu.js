@@ -67,7 +67,11 @@ class ComponentPropertyMenu extends Component {
                                         });
                                     }
 
-                                    componentProps = addComponentProperty(componentProps, { instanceType: this.state.instanceType, modelType: this.state.modelType, modelProp: this.state.modelProp })
+                                    componentProps = addComponentProperty(componentProps, {
+                                        instanceType: this.state.instanceType,
+                                        modelType: this.state.modelType,
+                                        modelProp: this.state.modelProp
+                                    })
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         prop: UIA.NodeProperties.ComponentProperties,
                                         id: currentNode.id,
@@ -99,7 +103,7 @@ class ComponentPropertyMenu extends Component {
                                         id: currentNode.id,
                                         value: componentProps
                                     });
-                                   
+
                                 }
                             }} icon={'fa fa-plus'} title={Titles.Remove} description={Titles.Remove} />
                         </ControlSideBarMenu>

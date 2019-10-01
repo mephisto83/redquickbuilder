@@ -10,13 +10,14 @@ import SideBar from './sidebar';
 import TextBox from './textinput';
 import { ExcludeDefaultNode, NodeTypes, NodeProperties, MAIN_CONTENT, LAYOUT_VIEW, LinkProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
-import { ComponentTypes, APP_METHOD } from '../constants/componenttypes';
-import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList, GetNodesLinkedTo, SOURCE } from '../methods/graph_methods';
+import { ComponentTypes, APP_METHOD, InstanceTypes } from '../constants/componenttypes';
+import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList, GetNodesLinkedTo, SOURCE, updateClientMethod, getClientMethod } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
+import { MethodFunctions } from '../constants/functiontypes';
 const METHOD_PARAMETERS = 'METHOD_PARAMETERS';
 class MethodParameterMenu extends Component {
     render() {
@@ -30,6 +31,8 @@ class MethodParameterMenu extends Component {
         let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
         let componentPropertiesList = getComponentPropertyList(componentProperties);
         let components = [];
+        let methodParams = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ClientMethodParameters) || {};
+        let componentNodeProperties = UIA.GetComponentNodeProperties();
         if (componentTypes[componentType] && componentTypes[componentType].properties) {
             Object.keys(componentTypes[componentType].properties).map(key => {
                 let prop_obj = componentTypes[componentType].properties[key];
@@ -49,6 +52,73 @@ class MethodParameterMenu extends Component {
                                         value
                                     });
                                 }} />));
+                            let methodId = UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod);
+                            if (methodId) {
+                                let method_parameters = UIA.GetMethodParameters(methodId);
+                                if (method_parameters) {
+                                    let { parameters, body } = method_parameters;
+                                    if (body) {
+                                        let bodyparameters = `${nodeproperty} - ${_ui_type} - ${componentType} - parameter - body`;
+                                        let c_props = componentNodeProperties.find(x => x.id === getClientMethod(methodParams, key, 'body', 'component'));
+                                        let c_props_options = c_props && c_props.componentPropertiesList ? c_props.componentPropertiesList : []
+                                        components.push((
+                                            <TreeViewMenu
+                                                open={UIA.Visual(state, bodyparameters)}
+                                                active={UIA.Visual(state, bodyparameters)}
+                                                onClick={() => {
+                                                    this.props.toggleVisual(bodyparameters)
+                                                }}
+                                                key={'body'}
+                                                title={Titles.Body} icon={'fa fa-tv'}
+                                            >
+                                                <FormControl>
+                                                    <SelectInput
+                                                        label={Titles.InstanceType}
+                                                        value={getClientMethod(methodParams, key, 'body', 'instanceType')}
+                                                        options={Object.keys(InstanceTypes).map(t => ({ title: t, value: InstanceTypes[t] }))}
+                                                        onChange={(value) => {
+                                                            methodParams = updateClientMethod(methodParams, key, 'body', 'instanceType', value);
+                                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                                prop: NodeProperties.ClientMethodParameters,
+                                                                id: currentNode.id,
+                                                                value: methodParams
+                                                            });
+                                                        }} />
+                                                    <SelectInput
+                                                        label={Titles.Models}
+                                                        value={getClientMethod(methodParams, key, 'body', 'component')}
+                                                        options={componentNodeProperties.map(v => {
+                                                            return {
+                                                                title: UIA.GetCodeName(v.id),
+                                                                value: v.id
+                                                            }
+                                                        })}
+                                                        onChange={(value) => {
+                                                            methodParams = updateClientMethod(methodParams, key, 'body', 'component', value);
+                                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                                prop: NodeProperties.ClientMethodParameters,
+                                                                id: currentNode.id,
+                                                                value: methodParams
+                                                            });
+                                                        }} />
+
+                                                    <SelectInput
+                                                        label={Titles.Models}
+                                                        value={getClientMethod(methodParams, key, 'body', 'componentModel')}
+                                                        options={c_props_options}
+                                                        onChange={(value) => {
+                                                            methodParams = updateClientMethod(methodParams, key, 'body', 'componentModel', value);
+                                                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                                                prop: NodeProperties.ClientMethodParameters,
+                                                                id: currentNode.id,
+                                                                value: methodParams
+                                                            });
+                                                        }} />
+                                                </FormControl>
+                                            </TreeViewMenu>))
+                                    }
+                                }
+                            }
 
                             let screenParameters = UIA.GetNodeProp(UIA.GetNodeById(UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod)), NodeProperties.ScreenParameters) || [];
                             let treeMenu = (screenParameters.map(v => {

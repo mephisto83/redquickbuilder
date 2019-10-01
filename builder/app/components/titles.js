@@ -13,6 +13,7 @@ export const Navigation = 'Navigation';
 export const Parameter = 'Parameter';
 export const ServerSideSetup = 'Service Side Setup';
 export const AddCondition = 'Add Condition';
+export const Body = 'Body';
 export const AsOutput = 'As output';
 export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const GraphPropertiesMenu = 'Graph Properties';
@@ -245,6 +246,7 @@ export const Update_Object_Agent_Value__Object = 'Update Object by Agent';
 export const Update_Object_Agent_Value__Object_With_Object = 'Update Object by Agent with object';
 
 export const Functions = 'Functions';
+export const Login = 'Login';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';
 

@@ -230,6 +230,7 @@ export const NodeProperties = {
     SelectedLayoutCell: 'SelectedLayoutCell',
     ChainParent: 'ChainParent',
     Navigation: 'Navigation',
+    ClientMethodParameters: 'ClientMethodParameters',
     AsOutput: "AsOutput",
     EntryPoint: 'EntryPoint',
     Property: 'Property',

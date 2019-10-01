@@ -948,6 +948,27 @@ export function removeComponentProperty(props, ops) {
     return props;
 
 }
+
+export function updateClientMethod(methodParams, key, param, mparam, value) {
+    methodParams[key] = methodParams[key] || {};
+    methodParams[key].parameters = methodParams[key].parameters || {};
+    methodParams[key].parameters[param] = methodParams[key].parameters[param] || {};
+    methodParams[key].parameters[param] = {
+        ...methodParams[key].parameters[param],
+        [mparam]: value
+    }
+
+    return methodParams
+
+}
+
+export function getClientMethod(methodParams, key, param, mparam) {
+    if (methodParams && methodParams[key] && methodParams[key].parameters && methodParams[key].parameters[param] && methodParams[key].parameters[param][mparam])
+        return methodParams[key].parameters[param][mparam];
+
+    return null;
+
+}
 export function getComponentPropertyList(props) {
     if (props && props.properties) {
         return Object.keys(props.properties).map(t => ({ title: t, id: props.properties[t], value: t }))

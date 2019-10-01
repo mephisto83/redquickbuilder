@@ -115,7 +115,20 @@ export function GetModelPropertyChildren(id) {
     let logicalChildren = GetLogicalChildren(id);
     return [...property_nodes, ...logicalChildren];
 }
+export function GetMethodParameters(methodId) {
+    let method = GetNodeById(methodId);
+    if (method) {
+        let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+        if (methodType && MethodFunctions[methodType]) {
 
+            let { parameters } = MethodFunctions[methodType];
+            if (parameters) {
+                return parameters;
+            }
+        }
+    }
+    return null;
+}
 export function GetNodeById(node, graph) {
     return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
@@ -690,6 +703,19 @@ export function _getConditions(state, id) {
     }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
 
+export function GetComponentNodes() {
+    let state = GetState();
+    return NodesByType(state, NodeTypes.ComponentNode);
+}
+export function GetComponentNodeProperties() {
+    return GetComponentNodes().map(node => {
+
+        let componentProperties = GetNodeProp(node, NodeProperties.ComponentProperties);
+        let componentPropertiesList = GraphMethods.getComponentPropertyList(componentProperties);
+
+        return { id: node.id, componentPropertiesList };
+    })
+}
 export function GetConnectedScreenOptions(id) {
     let state = _getState();
     let graph = GetRootGraph(state);
