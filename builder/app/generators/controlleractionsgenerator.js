@@ -2,7 +2,7 @@ import { GetConfigurationNodes, GetNodeProp, NodesByType, NodeTypes, GetJSCodeNa
 import { ConfigurationProperties, NEW_LINE } from "../constants/nodetypes";
 import fs from 'fs';
 import * as Titles from '../components/titles';
-import { bindTemplate, MethodTemplateKeys, FunctionTemplateKeys } from "../constants/functiontypes";
+import { bindTemplate, MethodTemplateKeys, FunctionTemplateKeys, HTTP_METHODS } from "../constants/functiontypes";
 import { addNewLine } from "../service/layoutservice";
 import ControllerGenerator from "./controllergenerator";
 export default class ControllerActionGenerator {
@@ -12,8 +12,14 @@ export default class ControllerActionGenerator {
         let temp = NodesByType(state, NodeTypes.Method);
         let serviceTemplate = fs.readFileSync('./app/templates/screens/service.tpl', 'utf8');
         let methodTemplate = `
-{{methodName}}: async () => {
+{{methodName}}: async (params) => {
+    let { parameters } = params;
     return redservice().{{methodType}}(endpoints.{{methodName}});
+}`;
+        let postMethodTemplate = `
+{{methodName}}: async (params) => {
+    let { body, parameters } = params;
+    return redservice().{{methodType}}(endpoints.{{methodName}}, body, {{options}});
 }`;
         let endpoints = {};
         temp = temp.map(method => {
@@ -27,9 +33,15 @@ export default class ControllerActionGenerator {
                     else {
                         endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode)}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
                     }
-                    return bindTemplate(methodTemplate, {
+                    let methodType = GetNodeProp(method, NodeProperties.HttpMethod);
+                    let asForm = 'null';
+                    if (GetNodeProp(method, NodeProperties.AsForm)) {
+                        asForm = '{ asForm : true }';
+                    }
+                    return bindTemplate(methodType === HTTP_METHODS.POST ? postMethodTemplate : methodTemplate, {
                         methodName: GetJSCodeName(method),
-                        methodType: `${GetNodeProp(method, NodeProperties.HttpMethod)}`.toLowerCase().split('http').join('')
+                        methodType: `${methodType}`.toLowerCase().split('http').join(''),
+                        options: asForm
                     });
                 }
             }

@@ -156,7 +156,7 @@ export function bindComponent(node, componentBindingDefinition) {
         return bindTemplate(template, bindProps);
     }
 }
-export function wrapOnPress(elements, onPress, node) {
+export function wrapOnPress(elements, onPress, node, options) {
 
     let onpress = GetNodeProp(node, 'onPress');
     switch (onpress) {
@@ -186,14 +186,26 @@ export function wrapOnPress(elements, onPress, node) {
                             }
                         }
                     }
-                    let pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`
-                    elements = `
-                    <TouchableOpacity onPress={() => {
+                    let pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`;
+                    if (options && options.onPress && options.onPress.nowrap) {
+                        elements = bindTemplate(elements, {
+                            onPressEvent: `onPress={() => {
 ${parameterstext}
 ${bodytext}
-${pressfunc} }}>
-            ${elements}
-                    </TouchableOpacity>`;
+${pressfunc} }}`
+                        })
+                    }
+                    else {
+                        elements = bindTemplate(elements, { onPressEvent: '' });
+                        elements = `
+                        <TouchableOpacity onPress={() => {
+    ${parameterstext}
+    ${bodytext}
+    ${pressfunc} }}>
+                ${elements}
+                        </TouchableOpacity>`;
+
+                    }
 
                 }
             }
@@ -202,11 +214,11 @@ ${pressfunc} }}>
             let navigation = GetNodeProp(node, NodeProperties.Navigation);
             let targetScreen = GetNodeById(navigation);
             let screenParameters = GetNodeProp(targetScreen, NodeProperties.ScreenParameters);
+            let params = [];
             if (screenParameters) {
                 let navigationProperties = GetNodeProp(node, NodeProperties.NavigationParameters);
                 let parameterProperty = GetNodeProp(node, NodeProperties.NavigationParametersProperty) || {};
                 let componentProperties = GetNodeProp(node, NodeProperties.ComponentProperties);
-                let params = [];
                 screenParameters.map(sparam => {
                     let { title, id } = sparam;
                     let propName = navigationProperties[id];
@@ -227,11 +239,21 @@ ${pressfunc} }}>
                         }
                     }
                 });
+            }
+            if (navigation && params) {
                 let navfunc = `navigate('${GetCodeName(navigation)}', {${(params).join(', ')}})`;
-                elements = `
-        <TouchableOpacity onPress={() => { ${navfunc} }}>
+                if (options && options.onPress && options.onPress.nowrap) {
+                    elements = bindTemplate(elements, {
+                        onPressEvent: `onPress={() => { ${navfunc} }}`
+                    })
+                }
+                else {
+                    elements = bindTemplate(elements, { onPressEvent: '' });
+                    elements = `
+    <TouchableOpacity onPress={() => { ${navfunc} }}>
 ${elements}
-        </TouchableOpacity>`;
+    </TouchableOpacity>`;
+                }
             }
             break;
     }
@@ -253,9 +275,9 @@ export function GenerateRNComponents(node, relative = './src/components', langua
                 if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
                     elements = bindComponent(node, ComponentTypes[language][componentType]);
                     if (ComponentTypes[language][componentType].properties && ComponentTypes[language][componentType].properties) {
-                        let { onPress } = ComponentTypes[language][componentType].properties;
+                        let { onPress, nowrap } = ComponentTypes[language][componentType].properties;
                         if (onPress) {
-                            elements = wrapOnPress(elements, onPress, node);
+                            elements = wrapOnPress(elements, onPress, node, ComponentTypes[language][componentType].properties);
                         }
                     }
                 }

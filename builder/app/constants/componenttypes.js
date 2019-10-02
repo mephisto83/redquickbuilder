@@ -29,6 +29,7 @@ export const ComponentTypes = {
                     nodeProperty: 'onPress',
                     template: '() => { {{value}} }',
                     method: true,
+                    nowrap: true,
                     options: [NAVIGATION, APP_METHOD],
                     ui: true
                 }
@@ -162,6 +163,11 @@ export const ComponentTypes = {
         Text: {
             template: './app/templates/components/text.tpl',
             properties: {
+                label: {
+                    ui: true,
+                    nodeProperty: 'component-as-label',
+                    boolean: true
+                },
                 data: {
                     ui: true,
                     nodeProperty: 'data',
@@ -171,6 +177,9 @@ export const ComponentTypes = {
                     },
                     template: (node) => {
                         let func = GetCodeName(GetNodeProp(node, 'data'));
+                        if (GetNodeProp(node, 'component-as-label')) {
+                            return `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`
+                        }
                         if (func)
                             return bindTemplate(`DC.{{function}}({{value}})`, {
                                 function: func,

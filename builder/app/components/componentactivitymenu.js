@@ -16,6 +16,7 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
+import CheckBox from './checkbox';
 class ComponentActivityMenu extends Component {
     render() {
         var { state } = this.props;
@@ -49,6 +50,19 @@ class ComponentActivityMenu extends Component {
                             label={key}
                             key={`${_ui_type} - ${componentType}- ${key}`}
                             options={UIA.NodesByType(state, prop_obj.nodeTypes).filter(prop_obj.nodeFilter || (() => true)).toNodeSelect()}
+                            value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
+                            onChange={(value) => {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    prop: prop_obj.nodeProperty,
+                                    id: currentNode.id,
+                                    value
+                                });
+                            }} />));
+                    }
+                    else if (prop_obj.boolean) {
+                        components.push((<CheckBox
+                            label={key}
+                            key={`${_ui_type} - ${componentType}- ${key}`}
                             value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
                             onChange={(value) => {
                                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
