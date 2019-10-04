@@ -13,7 +13,8 @@ import {
     ModelNotConnectedToFunction,
     GetCurrentGraph,
     GetStateFunc,
-    GetDispatchFunc
+    GetDispatchFunc,
+    NodePropertyTypes
 } from "../actions/uiactions";
 import { newNode } from "../methods/graph_methods";
 
@@ -271,6 +272,7 @@ export const CreateLoginModels = {
                                     parent: newNode.id,
                                     properties: {
                                         [NodeProperties.NodePackage]: nodePackage,
+                                        [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
                                         [NodeProperties.NodePackageType]: nodePackageType,
                                         [NodeProperties.UIText]: propName
                                     }
@@ -313,6 +315,7 @@ export const CreateLoginModels = {
                                     parent: newNode.id,
                                     properties: {
                                         [NodeProperties.NodePackage]: nodePackage,
+                                        [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
                                         [NodeProperties.NodePackageType]: nodePackageType,
                                         [NodeProperties.UIText]: propName
                                     }
