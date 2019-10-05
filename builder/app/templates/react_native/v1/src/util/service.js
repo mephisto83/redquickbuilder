@@ -72,7 +72,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
                 fetchPromise = fetch(endpoint, {
                     headers: Object.assign({}, headers, {
                         'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
-                        'Authorization': 'Bearer ' + service.getAccessToken(),
+                        // 'Authorization': 'Bearer ' + service.getAccessToken(),
                         'Content-Type': 'multipart/form-data'
                     }),
                     method: method,
