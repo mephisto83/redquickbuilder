@@ -66,7 +66,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
                 var formData = new FormData();
                 if (body) {
                     for (var i in body) {
-                        formData.append(i, body[name]);
+                        formData.append(i, body[i]);
                     }
                 }
                 fetchPromise = fetch(endpoint, {

@@ -164,8 +164,8 @@ export function wrapOnPress(elements, onPress, node, options) {
             let key = 'onPress';
             let methodParams = GetNodeProp(node, NodeProperties.ClientMethodParameters) || {};
             let clientMethod = GetNodeProp(node, NodeProperties.ClientMethod);
-            let bodytext = 'let body = null';
-            let parameterstext = `let parameters = null`
+            let bodytext = 'let body = null;';
+            let parameterstext = `let parameters = null;`
             if (clientMethod) {
                 let jsClientMethodName = GetJSCodeName(clientMethod);
                 let methodParameters = GetMethodParameters(clientMethod);
@@ -179,10 +179,10 @@ export function wrapOnPress(elements, onPress, node, options) {
                         let c_props = componentNodeProperties.find(x => x.id === getClientMethod(methodParams, key, 'body', 'component'));
                         let c_props_options = c_props && c_props.componentPropertiesList ? c_props.componentPropertiesList : []
                         if (c_props_options.length) {
-                            let c_prop_option = c_props_options.find(v => v.id === componentModel);
+                            let c_prop_option = c_props_options.find(v => v.value === componentModel);
                             if (c_prop_option) {
                                 let componentModelName = c_prop_option.value;
-                                bodytext = `let body = Get${instanceType}('${componentModelName}');`
+                                bodytext = `let body = Get${instanceType}('${GetCodeName(c_props.id)}', '${componentModelName}');`
                             }
                         }
                     }
@@ -359,7 +359,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 default:
                     if (model && property && GetCodeName(parent))
                         onChange = `onChange={value => {
-    this.props.update${instanceType}(ScreenInstances.${GetCodeName(parent)}, ${model}, ${property}, value);
+    this.props.update${instanceType}(ScreenInstance.${GetCodeName(parent)}, ${model}, ${property}, value);
 }}`;
                     break;
             }
