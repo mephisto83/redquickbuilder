@@ -19,6 +19,7 @@ export const AsOutput = 'As output';
 export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const ComponentPropertyMenu = 'Component Properties';
+export const ComponentAPIMenu = 'Component API';
 export const Domain = 'Domain';
 export const ClientMethod = 'Client Method';
 export const Layout = 'Layout';

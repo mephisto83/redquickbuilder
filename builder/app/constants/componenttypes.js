@@ -106,6 +106,23 @@ export const ComponentTypes = {
                     options: ['fixedLabel', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'regular', 'rounded', 'success', 'error', 'disabled'],
                     ui: true
                 },
+                value: {
+                    nodeProperty: NodeProperties.Value,
+                    template: (node) => {
+                        let func = GetCodeName(GetNodeProp(node, 'data'));
+                        if (GetNodeProp(node, 'component-as-label')) {
+                            return `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`
+                        }
+                        if (func)
+                            return bindTemplate(`DC.{{function}}({{value}})`, {
+                                function: func,
+                                value: `this.props.data`
+                            });
+                        return `this.props.data`
+                    },
+                    parameterConfig: true,
+                    ui: true
+                },
                 label: {
                     nodeProperty: NodeProperties.Label,
                     template: `{titleService.get('{{value}}')}`
@@ -244,6 +261,7 @@ export const InstanceTypes = {
     Instance: 'Instance',
     AppState: 'AppState',
     PropInstance: 'PropInstance',
+    ApiProperty: 'ApiProperty',
     ScreenParam: 'ScreenParam',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }

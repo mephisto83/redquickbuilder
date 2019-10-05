@@ -9,15 +9,111 @@ import FormControl from './formcontrol';
 import TextBox from './textinput';
 import { ExcludeDefaultNode, NodeTypes, NodeProperties, MAIN_CONTENT, LAYOUT_VIEW, LinkProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
-import { ComponentTypes, NAVIGATION } from '../constants/componenttypes';
-import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList } from '../methods/graph_methods';
+import { ComponentTypes, NAVIGATION, InstanceTypes } from '../constants/componenttypes';
+import { GetConnectedNodeByType, CreateLayout, TARGET, GetParameterName, getComponentPropertyList, GetCellProperties, GetNodesLinkedTo, SOURCE } from '../methods/graph_methods';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
 import CheckBox from './checkbox';
+import { getComponentApiList } from '../methods/component_api_methods';
 class ComponentActivityMenu extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+    getComponentApi(prop_obj, key) {
+        let { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.ComponentParameters);
+
+        let currentProperty = this.state.selectedCell;
+        if (prop_obj && prop_obj.nodeProperty) {
+
+            let componentApi = UIA.GetNodeProp(currentNode, NodeProperties.ComponentApi);
+            if (componentApi) {
+                let selectedComponentApiProperty = key;
+                let componentProperties = UIA.GetNodeProp(currentNode, prop_obj.nodeProperty);
+                componentProperties = componentProperties || {};
+                let {
+                    instanceType,
+                    model,
+                    apiProperty,
+                    modelProperty
+                } = componentProperties[selectedComponentApiProperty] || {};
+
+                return [
+                    selectedComponentApiProperty ? (<SelectInput
+                        label={Titles.InstanceType}
+                        value={instanceType}
+                        options={Object.keys(InstanceTypes).map(t => ({
+                            title: t,
+                            value: InstanceTypes[t]
+                        }))}
+                        onChange={(value) => {
+                            componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                            let temp = componentProperties[selectedComponentApiProperty];
+                            temp.instanceType = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: prop_obj.nodeProperty,
+                                id: currentNode.id,
+                                value: componentProperties
+                            });
+                        }} />) : null,
+
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ApiProperty ? (<SelectInput
+                        label={key}
+                        value={apiProperty}
+                        options={getComponentApiList(componentApi)}
+                        onChange={(value) => {
+                            componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                            let temp = componentProperties[selectedComponentApiProperty];
+                            temp.apiProperty = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: prop_obj.nodeProperty,
+                                id: currentNode.id,
+                                value: componentProperties
+                            });
+                        }} />) : null,
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        label={Titles.Models}
+                        value={model}
+                        options={UIA.NodesByType(this.props.state, NodeTypes.Model).toNodeSelect()}
+                        onChange={(value) => {
+                            componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                            let temp = componentProperties[selectedComponentApiProperty];
+                            temp.model = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: prop_obj.nodeProperty,
+                                id: currentNode.id,
+                                value: componentProperties
+                            });
+                        }} />) : null,
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
+                            id: model,
+                            direction: SOURCE
+                        }).toNodeSelect()}
+                        onChange={(val) => {
+                            componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                            let temp = componentProperties[selectedComponentApiProperty];
+                            temp.modelProperty = val;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: prop_obj.nodeProperty,
+                                id: currentNode.id,
+                                value: componentProperties
+                            });
+                        }}
+                        label={Titles.Property}
+                        value={modelProperty} />) : null
+                ].filter(x => x)
+            }
+        }
+
+        return null;
+    }
+
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -72,9 +168,13 @@ class ComponentActivityMenu extends Component {
                                 });
                             }} />));
                     }
+                    else if (prop_obj.parameterConfig) {
+                        components.push(this.getComponentApi(prop_obj, key));
+                    }
                 }
             })
         }
+        components = components.filter(x => x);
         return (
             <TabPane active={active}>
                 {currentNode ? (<FormControl>

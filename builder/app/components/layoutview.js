@@ -27,6 +27,9 @@ import Tabs from './tabs';
 import Generator from '../generators/generator';
 import ButtonList from './buttonlist';
 import LayoutCreator from './layoutcreator';
+import TreeViewMenu from './treeviewmenu';
+import { getComponentApiList } from '../methods/component_api_methods';
+import { InstanceTypes } from '../constants/componenttypes';
 
 
 class LayoutView extends Component {
@@ -36,6 +39,84 @@ class LayoutView extends Component {
     }
     active() {
         return !!this.props.active;
+    }
+    getComponentApi(cellChildren) {
+        let { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
+
+        let selectedCell = this.state.selectedCell;
+        if (cellChildren && cellChildren[selectedCell]) {
+
+            let childComponent = cellChildren[selectedCell];
+            let componentApi = UIA.GetNodeProp(UIA.GetNodeById(childComponent), NodeProperties.ComponentApi);
+            if (componentApi) {
+                let selectedComponentApiProperty = this.state.componentApi ? this.state.componentApi[selectedCell] : null;
+                let cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
+                cellProperties.componentApi = cellProperties.componentApi || {};
+                let { instanceType, model, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
+                let componentPropertiesList = getComponentPropertyList(componentProperties);
+                return [
+                    (<SelectInput
+                        label={Titles.ComponentAPIMenu}
+                        value={selectedComponentApiProperty}
+                        options={getComponentApiList(componentApi)}
+                        onChange={(value) => {
+                            this.setState({ componentApi: { ...(this.state.componentApi || {}), [selectedCell]: value } });
+                        }} />),
+                    selectedComponentApiProperty ? (<SelectInput
+                        label={Titles.InstanceType}
+                        value={instanceType}
+                        options={Object.keys(InstanceTypes).map(t => ({
+                            title: t, value: InstanceTypes[t]
+                        }))}
+                        onChange={(value) => {
+                            cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let temp = cellProperties.componentApi[selectedComponentApiProperty];
+                            temp.instanceType = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: nodeLayout
+                            });
+                        }} />) : null,
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        label={Titles.Models}
+                        value={model}
+                        options={componentPropertiesList}
+                        onChange={(value) => {
+                            cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            temp.model = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: nodeLayout
+                            });
+                        }} />) : null,
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
+                            id: getComponentProperty(componentProperties, model),
+                            direction: SOURCE
+                        }).toNodeSelect()}
+                        onChange={(val) => {
+                            cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            temp.modelProperty = val;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: nodeLayout
+                            });
+                        }}
+                        label={Titles.Property}
+                        value={modelProperty} />) : null
+                ].filter(x => x)
+            }
+        }
+
+        return null;
     }
     render() {
         var { state } = this.props;
@@ -228,6 +309,7 @@ class LayoutView extends Component {
                                     }}
                                     label={Titles.Component}
                                     value={cellChildren[this.state.selectedCell]} />) : null}
+                                {cellChildren && cellChildren[this.state.selectedCell] ? this.getComponentApi(cellChildren) : null}
                                 {cellChildren && cellChildren[this.state.selectedCell] ? <CheckBox
                                     label={Titles.UseAsRoot}
                                     onChange={(val) => {

@@ -137,7 +137,13 @@ export function bindComponent(node, componentBindingDefinition) {
         Object.keys(properties).map(key => {
             if (properties[key] && properties[key].nodeProperty) {
                 bindProps[key] = GetNodeProp(node, properties[key].nodeProperty);
-                if (properties[key].template) {
+                if (properties[key].parameterConfig) {
+                    let parameterConfig = GetNodeProp(node, properties[key].nodeProperty);
+                    if (parameterConfig && parameterConfig[key]) {
+                        bindProps[key] = writeApiProperties({ [key]: parameterConfig[key] });
+                    }
+                }
+                else if (properties[key].template) {
                     if (typeof (properties[key].template) === 'function') {
                         bindProps[key] = properties[key].template(node);
                     }
@@ -148,6 +154,7 @@ export function bindComponent(node, componentBindingDefinition) {
                         })
                     }
                 }
+
             }
             if (!bindProps[key])
                 bindProps[key] = '';
@@ -331,11 +338,16 @@ export function GenerateMarkupTag(node, language, parent, params) {
             let property = '';
             let componentProperties;
             let modelName = '';
+            let parentLayoutProperties = null;
             let propertyName = '';
+            let parentComponentApiConfig = null;
             if (parent && children && cellModel && cellModelProperty && cellModel[item] && cellModelProperty[item]) {
                 componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
+                parentLayoutProperties = GetNodeProp(parent, NodeProperties.Layout);
                 instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
                 model = GetRNModelConstValue(cellModel[item]);
+                var { componentApi } = getComponentProperty(parentLayoutProperties, item) || {};
+                parentComponentApiConfig = componentApi;
                 modelName = `${cellModel[item]}`.toJavascriptName();
                 propertyName = (GetCodeName(cellModelProperty[item]) || '').toJavascriptName();
                 property = GetRNModelConstValue(propertyName);
@@ -356,20 +368,53 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 case InstanceTypes.ScreenParam:
                     dataBinding = `GetScreenParam('${modelName}')`;
                     break;
+                case InstanceTypes.ApiProperty:
+                    debugger;
+                    break
                 default:
                     if (model && property && GetCodeName(parent))
                         onChange = `onChange={value => {
-    this.props.update${instanceType}(ScreenInstance.${GetCodeName(parent)}, ${model}, ${property}, value);
+    this.props.update${instanceType}(${model}, ${property}, value);
 }}`;
                     break;
+            }
+            let apiProperties = '';
+            if (parentComponentApiConfig) {
+                apiProperties = writeApiProperties(parentComponentApiConfig);
             }
             if (dataBinding) {
                 dataBinding = `data={${dataBinding}}`;
             }
-            return `<${GetCodeName(node)} ${dataBinding} ${onChange}/>`;
+            return `<${GetCodeName(node)} ${dataBinding} ${apiProperties} ${onChange}/>`;
     }
 }
+export function writeApiProperties(apiConfig) {
+    var result = '';
+    var res = [];
 
+    if (apiConfig) {
+        for (var i in apiConfig) {
+            let property = '';
+            let { instanceType, model, modelProperty, apiProperty } = apiConfig[i];
+            switch (instanceType) {
+                case InstanceTypes.ScreenInstance:
+                    property = `GetScreenInstance('${model}', '${GetCodeName(modelProperty)}')`;
+                    break;
+                case InstanceTypes.ApiProperty:
+                    property = `this.props.${apiProperty}`;
+                    break;
+                default:
+                    throw 'write api properties unhandled case ' + instanceType;
+            }
+            //There is an opportunity to wrapp the result in a getter.
+            res.push(`${i}={${property}}`)
+        }
+    }
+
+    result = res.join(' ');
+
+    return result;
+}
 export function GetScreenOption(id, type) {
     let screen = GetNodeById(id);
     let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;

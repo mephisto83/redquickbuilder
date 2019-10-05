@@ -115,9 +115,9 @@ export function GetScreenInstance(key, id) {
     return null;
 }
 
-export function updateScreenInstance(form, model, id, value) {
+export function updateScreenInstance(model, id, value) {
     return (dispatch, getState) => {
-        dispatch(UISI(form, model, id, value));
+        dispatch(UISI(SCREEN_INSTANCE, model, id, value));
     }
 }
 

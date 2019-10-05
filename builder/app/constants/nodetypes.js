@@ -220,7 +220,9 @@ export const ConfigurationProperties = {
     Domain: 'Configuration_Domain'
 }
 export const NodeProperties = {
+    ComponentApi: 'component-api',
     EnabledMenu: 'EnabledMenu',
+    ComponentParameters: 'ComponentParameters',
     NavigationParameters: 'NavigationParameters',
     ClientMethod: "ClientMethod",
     MethodParameters: 'MethodParameters',
@@ -241,6 +243,7 @@ export const NodeProperties = {
     Domain: 'Domain',
     Priority: 'Priority',
     DataChain: 'DataChain',
+    Value: 'Value',
     UIType: 'UIType',
     TextType: 'TextType',
     Enumeration: 'Enumeration',
@@ -299,7 +302,7 @@ export const NodeProperties = {
 
     IsReferenceList: 'isReferenceList',
     UseHttps: 'UseHttps',
-    
+
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',

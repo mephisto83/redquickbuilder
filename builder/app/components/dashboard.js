@@ -45,6 +45,7 @@ import UIParameters from './uiparameters';
 import ComponentActivityMenu from './componentactivitymenu';
 import ComponentPropertyMenu from './componentpropertymenu';
 import ModelFilterActivityMenu from './modelfilteractivitymenu';
+import ComponentAPIMenu from './componentapimenu';
 import ValidationActivityMenu from './validationactivitymenu';
 import ValidationItemFormControl from './validationitemactivitymenu';
 import ValidatorActivityMenu from './validatoractivitymenu';
@@ -532,6 +533,7 @@ class Dashboard extends Component {
                                 <ServiceActivityMenu />
                             </SideBarContent>) : null}
                             <ComponentPropertyMenu />
+                            <ComponentAPIMenu />
                             {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
                                 <ValidatorPropertyMenu />
                                 <ReferenceActivityMenu />

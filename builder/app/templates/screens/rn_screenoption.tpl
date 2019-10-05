@@ -23,7 +23,6 @@ this.state = {};
 }
 render() {
 let { state } = this.props;
-let componentProperties = {};
 {{screen_options}}
 return (
 <StyleProvider style={getTheme(material)}>
