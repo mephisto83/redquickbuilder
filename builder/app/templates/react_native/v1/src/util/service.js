@@ -22,6 +22,7 @@ var getEndpoint = (baseDomain, path) => {
 
     return endpoint;
 }
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 export function createRedService(domain, wsdomain, _forceBase) {
     var forceBase = false;
     forceBase = _forceBase;
@@ -70,6 +71,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
                     }
                 }
                 fetchPromise = fetch(endpoint, {
+                    rejectUnauthorized: false,
                     headers: Object.assign({}, headers, {
                         'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
                         // 'Authorization': 'Bearer ' + service.getAccessToken(),
@@ -81,6 +83,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
             }
             else {
                 fetchPromise = fetch(endpoint, {
+                    rejectUnauthorized: false,
                     headers: Object.assign({}, headers, {
                         'Authorization': 'Bearer ' + service.getAccessToken()
                     }),

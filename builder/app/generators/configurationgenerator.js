@@ -1,4 +1,4 @@
-import { GetConfigurationNodes, GetNodeProp } from "../actions/uiactions";
+import { GetConfigurationNodes, GetNodeProp, NodeProperties } from "../actions/uiactions";
 import { ConfigurationProperties } from "../constants/nodetypes";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
@@ -8,6 +8,7 @@ export default class ConfigurationGenerator {
         let temp = GetConfigurationNodes(options);
         let res = {};
         temp.map(node => {
+            res.https = res.https || (GetNodeProp(node, NodeProperties.UseHttps) ? 'https' : 'http');
             Object.keys(ConfigurationProperties).map(key => {
                 res[key] = res[key] || GetNodeProp(node, key);
             });

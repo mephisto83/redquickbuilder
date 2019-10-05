@@ -19,6 +19,16 @@ class ConfigurationActivityMenu extends Component {
 
         return (
             <TabPane active={active}>
+                <CheckBox
+                    label={Titles.UseHttps}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseHttps)}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.UseHttps,
+                            id: currentNode.id,
+                            value
+                        });
+                    }} />
                 {
                     Object.keys(ConfigurationProperties).map(key => {
                         return (<TextInput

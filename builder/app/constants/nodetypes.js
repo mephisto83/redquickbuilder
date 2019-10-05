@@ -298,7 +298,8 @@ export const NodeProperties = {
     UIText: 'text',
 
     IsReferenceList: 'isReferenceList',
-
+    UseHttps: 'UseHttps',
+    
     UISingular: 'uiSingular',
     UIChoice: 'uiChoice',
     UIChoiceType: 'uiChoiceType',

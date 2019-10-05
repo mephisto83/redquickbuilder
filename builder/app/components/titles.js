@@ -10,6 +10,7 @@ export const GraphOperations = 'Graph Operations';
 export const Type = 'Type';
 export const UIParameters = 'UI Parameters';
 export const Navigation = 'Navigation';
+export const UseHttps = 'Use Https';
 export const Parameter = 'Parameter';
 export const ServerSideSetup = 'Service Side Setup';
 export const AddCondition = 'Add Condition';
