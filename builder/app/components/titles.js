@@ -19,6 +19,7 @@ export const Body = 'Body';
 export const AsOutput = 'As output';
 export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const GraphPropertiesMenu = 'Graph Properties';
+export const DataChain = 'Data Chain';
 export const ComponentPropertyMenu = 'Component Properties';
 export const ComponentAPIMenu = 'Component API';
 export const Domain = 'Domain';
@@ -224,6 +225,7 @@ export const MatchingValue = 'Matching Value';
 export const MatchingValueDescription = 'The value that the associated property will have to equal, to enable the current property';
 
 export const PermissionImpl = 'Permission Implementation';
+export const Number = 'Number';
 export const FunctionTypes = 'Function Types';
 
 export const Create_Object_Agent_Many_to_Many_CompositeInput__Object = 'Create Object by Agent M2M with Composite Input';

@@ -245,6 +245,8 @@ export const NodeProperties = {
     DataChain: 'DataChain',
     OnBlur: 'onBlur',
     Value: 'Value',
+    value: 'value',
+    Number: 'Number',
     OnFocus: 'onFocus',
     OnChange: 'onChangeText',
     UIType: 'UIType',
@@ -361,8 +363,12 @@ export const NodeProperties = {
 
     MethodType: "MethodType",
     ChainNodeInput2: 'ChainNodeInput2',
+    ScreenInstance: 'ScreenInstance',
+    Model: 'Model',
     ChainNodeInput1: 'ChainNodeInput1',
     UIModelType: 'uiModelType',
+    DataChainReference: 'DataChainReference',
+    NumberParameter: 'NumberParameter',
 
     UseScopeGraph: 'UseScopeGraph',
     ScopeGraph: 'scopedGraph',

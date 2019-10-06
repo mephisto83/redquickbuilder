@@ -67,17 +67,22 @@ class ComponentAPIMenu extends Component {
                                 }
                             }} icon={'fa fa-plus'} title={Titles.Remove} description={Titles.Remove} />
                             {componentTypes[componentType] && componentTypes[componentType].defaultApi ? <ControlSideBarMenuItem onClick={() => {
+
+                                let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
+                                let componentTypes = ComponentTypes[_ui_type] || {};
+                                let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
+
                                 componentTypes[componentType].defaultApi.map(x => {
                                     componentProps = addComponentApi(componentProps, {
                                         modelProp: x.property
                                     })
-
                                 })
                                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                     prop: UIA.NodeProperties.ComponentApi,
                                     id: currentNode.id,
                                     value: componentProps
                                 });
+                                this.applyDefaultComponentProperties()
                             }} icon={'fa fa-plus'} title={Titles.AddDefaults} description={Titles.AddDefaults} /> : null}
                         </ControlSideBarMenu>
                     ) : null}
@@ -92,6 +97,36 @@ class ComponentAPIMenu extends Component {
                 </TabPane>
             </SideMenuContainer>
         );
+    }
+    applyDefaultComponentProperties() {
+        var { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
+        let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
+        let componentTypes = ComponentTypes[_ui_type] || {};
+        let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
+
+        Object.keys(componentTypes[componentType].properties).map(key => {
+            let prop_obj = componentTypes[componentType].properties[key];
+            if (prop_obj.parameterConfig) {
+                let selectedComponentApiProperty = key;
+                let componentProperties = UIA.GetNodeProp(currentNode, prop_obj.nodeProperty);
+                componentProperties = componentProperties || {};
+                componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                componentProperties[selectedComponentApiProperty] = {
+                    instanceType: InstanceTypes.ApiProperty,
+                    isHandler: prop_obj.isHandler,
+                    apiProperty: prop_obj.nodeProperty
+                };
+
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: prop_obj.nodeProperty,
+                    id: currentNode.id,
+                    value: componentProperties
+                });
+            }
+        });
+
     }
 }
 

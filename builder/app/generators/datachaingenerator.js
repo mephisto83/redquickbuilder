@@ -7,6 +7,18 @@ export default class DataChainGenerator {
         let funcs = GenerateChainFunctions();
         let temps = [{
             template: `import { GetItem, Chain } from './uiActions';
+import { 
+    validateEmail, 
+    maxLength, 
+    minLength, 
+    greaterThanOrEqualTo, 
+    lessThanOrEqualTo, 
+    minLength, 
+    equalsLength,
+    alphanumericLike,
+    alphanumeric,
+    alpha
+} from './validation';
 import * as Models from '../model_keys.js';
 import RedObservable from './observable.js';
 ${funcs}`,

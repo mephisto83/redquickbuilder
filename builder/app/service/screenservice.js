@@ -395,7 +395,7 @@ export function writeApiProperties(apiConfig) {
     if (apiConfig) {
         for (var i in apiConfig) {
             let property = null;
-            let { instanceType, model, modelProperty, apiProperty, handlerType } = apiConfig[i];
+            let { instanceType, model, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
             switch (instanceType) {
                 case InstanceTypes.ScreenInstance:
                     switch (handlerType) {
@@ -415,12 +415,16 @@ export function writeApiProperties(apiConfig) {
                     }
                     break;
                 case InstanceTypes.ApiProperty:
-                    property = `this.props.${apiProperty}`;
+                    property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
                     break;
                 default:
                     throw 'write api properties unhandled case ' + instanceType;
             }
             if (property) {
+                if (dataChain) {
+                    let codeName = GetCodeName(dataChain);
+                    property = `DC.${codeName}(${property})`;
+                }
                 //There is an opportunity to wrapp the result in a getter.
                 res.push(`${NEW_LINE}${i}={${property}}`);
             }

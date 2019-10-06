@@ -398,6 +398,7 @@ export function IsEndOfDataChain(id) {
 export function GenerateDataChainMethod(id) {
     let node = GetNodeById(id);
     let model = GetNodeProp(node, NodeProperties.UIModelType);
+    let numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
     let property = GetNodeProp(node, NodeProperties.Property);
     let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
     let lastpart = 'return item;';
@@ -423,8 +424,32 @@ export function GenerateDataChainMethod(id) {
     return arg;
 }`;
         case DataChainFunctionKeys.StringConcat:
-            return `(node1, node2) => { return \`\${node1} \${node2}\` }`
-            break;
+            return `(node1, node2) => { return \`\${node1} \${node2}\` }`;
+        case DataChainFunctionKeys.EmailValidation:
+            return `(value) => validateEmail(value)`;
+        case DataChainFunctionKeys.AlphaNumericLike:
+            return `(value) => alphanumericLike(value)`;
+        case DataChainFunctionKeys.AlphaNumeric:
+            return `(value) => alphanumeric(value)`;
+        case DataChainFunctionKeys.AlphaOnly:
+            return `(value) => alpha(value)`;
+        case DataChainFunctionKeys.BooleanAnd:
+            return `(a, b) => a && b`;
+        case DataChainFunctionKeys.BooleanOr:
+            return `(a, b) => a || b`;
+        case DataChainFunctionKeys.GreaterThanOrEqualTo:
+            return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
+        case DataChainFunctionKeys.LessThanOrEqualTo:
+            return `(a) => lessThanOrEqualTo(a, ${numberParameter})`;
+        case DataChainFunctionKeys.MaxLength:
+            return `(a) => maxLength(a, ${numberParameter})`;
+        case DataChainFunctionKeys.MinLength:
+            return `(a) => minLength(a, ${numberParameter})`;
+        case DataChainFunctionKeys.EqualsLength:
+            return `(a) => equalsLength(a, ${numberParameter})`;
+        case DataChainFunctionKeys.GreaterThan:
+            return `(a) => greaterThan(a, ${numberParameter})`;
+            
     }
 }
 export function GetPermissionsSortedByAgent() {

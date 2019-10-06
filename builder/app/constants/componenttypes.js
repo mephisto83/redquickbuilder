@@ -5,12 +5,14 @@ import { bindTemplate } from "./functiontypes";
 
 export const NAVIGATION = '-NAVIGATION';
 export const APP_METHOD = '-APP_METHOD';
-const INPUT_DEFAULT_API = ['onBlur', 'onFocus', 'onChangeText', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
+const ARE_HANDLERS = ['onBlur', 'onFocus', 'onChangeText'];
+const INPUT_DEFAULT_API = ['value', 'onBlur', 'onFocus', 'onChangeText', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
 INPUT_DEFAULT_API.map(x => {
     DEFAULT_INPUT_API_PROPERTIES[x.property] = {
         nodeProperty: x.property,
         parameterConfig: true,
+        isHandler: ARE_HANDLERS.indexOf(x.property) !== -1,
         ui: true
     }
 })
@@ -116,7 +118,7 @@ export const ComponentTypes = {
                     ui: true
                 },
                 value: {
-                    nodeProperty: NodeProperties.Value,
+                    nodeProperty: NodeProperties.value,
                     parameterConfig: true,
                     ui: true
                 },

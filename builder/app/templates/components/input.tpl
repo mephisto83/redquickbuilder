@@ -1,4 +1,4 @@
-<Item {{item_attributes}}>
+<Item {{inlineLabel}} {{floatingLabel}} {{stackedLabel}} {{fixedLabel}} {{success}} {{error}} >
     <Label>{{label}}</Label>
-    <Input {{value}} {{onBlur}} {{onChangeText}} {{onFocus}} />
+    <Input {{value}} {{onBlur}} {{onChangeText}} {{onFocus}}/>
 </Item>

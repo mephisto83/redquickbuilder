@@ -27,9 +27,6 @@ class ComponentActivityMenu extends Component {
     getComponentApi(prop_obj, key) {
         let { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.ComponentParameters);
-
-        let currentProperty = this.state.selectedCell;
         if (prop_obj && prop_obj.nodeProperty) {
 
             let componentApi = UIA.GetNodeProp(currentNode, NodeProperties.ComponentApi);

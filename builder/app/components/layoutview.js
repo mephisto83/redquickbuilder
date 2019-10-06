@@ -54,7 +54,7 @@ class LayoutView extends Component {
                 let selectedComponentApiProperty = this.state.componentApi ? this.state.componentApi[selectedCell] : null;
                 let cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
                 cellProperties.componentApi = cellProperties.componentApi || {};
-                let { instanceType, model, handlerType, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                let { instanceType, model, handlerType, dataChain, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
                 let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
                 let componentPropertiesList = getComponentPropertyList(componentProperties);
                 return [
@@ -112,20 +112,40 @@ class LayoutView extends Component {
                         }}
                         label={Titles.Property}
                         value={modelProperty} />) : null,
-                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
-                        options={Object.keys(HandlerTypes).map(t => ({ title: t, value: HandlerTypes[t] }))}
+                    selectedComponentApiProperty ? (<SelectInput
+                        options={UIA.GetDataChainEntryNodes().toNodeSelect()}
                         onChange={(val) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
-                            temp.handlerType = val;
+                            let id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: temp.dataChain,
+                                source: id,
+                                properties: {
+                                    cell: selectedCell,
+                                    selectedComponentApiProperty
+                                }
+                            });
+                            temp.dataChain = val;
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.Layout,
                                 id: currentNode.id,
                                 value: nodeLayout
                             });
+                            if (val) {
+                                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                    target: val,
+                                    source: id,
+                                    properties: {
+                                        ...UIA.LinkProperties.DataChainLink,
+                                        cell: selectedCell,
+                                        selectedComponentApiProperty
+                                    }
+                                });
+                            }
                         }}
-                        label={Titles.HandlerType}
-                        value={handlerType} />) : null
+                        label={Titles.DataChain}
+                        value={dataChain} />) : null
                 ].filter(x => x)
             }
         }

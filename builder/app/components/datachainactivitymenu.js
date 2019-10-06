@@ -25,9 +25,12 @@ class DataChainActvityMenu extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let dataChainFuncType = UIA.GetNodeProp(currentNode, NodeProperties.DataChainFunctionType);
         let showModel = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.model : false;
+        let showDataChainRef = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.dataref : false;
+        let showNumber = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.number : false;
         let showProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.property : false;
         let showNode1 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_1 : false;
         let showNode2 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_2 : false;
+        let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
         let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
             return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
         }).toNodeSelect();
@@ -67,6 +70,20 @@ class DataChainActvityMenu extends Component {
                         value={dataChainFuncType}
                         options={Object.keys(DataChainFunctions).map(key => ({ title: key, value: key }))}
                     />
+                    {showNumber ? <TextInput
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            if (!isNaN(value)) {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    prop: UIA.NodeProperties.NumberParameter,
+                                    id,
+                                    value
+                                });
+                            }
+                        }}
+                        label={Titles.Number}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.NumberParameter)}
+                    /> : null}
                     {showModel ? <SelectInput
                         onChange={(value) => {
                             var id = currentNode.id;
@@ -110,6 +127,28 @@ class DataChainActvityMenu extends Component {
                         label={Titles.Property}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.Property)}
                         options={UIA.GetModelPropertyChildren(UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIModelType)).toNodeSelect()}
+                    /> : null}
+                    {showDataChainRef ? <SelectInput
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                source: currentNode.properties[UIA.NodeProperties.DataChainReference],
+                                target: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.DataChainReference,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                source: value,
+                                target: id,
+                                properties: { ...UIA.LinkProperties.DataChainLink }
+                            })
+                        }}
+                        label={`${Titles.DataChain}`}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.DataChainReference)}
+                        options={data_chain_entry}
                     /> : null}
                     {showNode1 ? <SelectInput
                         onChange={(value) => {

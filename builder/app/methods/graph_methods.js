@@ -1965,7 +1965,20 @@ export function addLinkBetweenNodes(graph, options) {
     return graph;
 }
 export function findLinkInstance(graph, options) {
-    let { target, source } = options;
+    let { target, source, properties } = options;
+    if (properties) {
+        let link = graph.links.find(x => {
+            if (graph.linkLib[x].source === source && graph.linkLib[x].target == target) {
+                for (var i in properties) {
+                    if (!graph.linkLib[x].properties || graph.linkLib[x].properties[i] !== properties[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+        return link;
+    }
     let link = graph.links.find(x => graph.linkLib[x].source === source && graph.linkLib[x].target == target);
     return link;
 }
