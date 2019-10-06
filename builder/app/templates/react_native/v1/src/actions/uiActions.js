@@ -1,8 +1,12 @@
+export const BATCH = 'BATCH';
 export const UI_UPDATE = 'UI_UPDATE';
 export const UISI_UPDATE = 'UISI_UPDATE';
 export const UI_MODELS = 'UI_MODELS';
 export const RESET_ALL = 'RESET_ALL';
 export const SCREEN_INSTANCE = 'SCREEN_INSTANCE';
+export const SCREEN_INSTANCE_ON_BLUR = 'SCREEN_INSTANCE_ON_BLUR';
+export const SCREEN_INSTANCE_FOCUSED = 'SCREEN_INSTANCE_FOCUSED';
+export const SCREEN_INSTANCE_ON_FOCUS = 'SCREEN_INSTANCE_ON_FOCUS';
 export const VISUAL = 'VISUAL';
 let _getState;
 export function GetItems(modelType) {
@@ -69,6 +73,12 @@ export function UISI(form, model, item, value) {
         value
     }
 }
+export function Batch(a, b, c, d, e, f, g, h, i) {
+    return {
+        type: BATCH,
+        batch: [a, b, c, d, e, f, g, h, i].filter(x => x)
+    }
+}
 export function Visual(state, key) {
     let _state = Get(state, VISUAL);
     if (_state) {
@@ -117,7 +127,27 @@ export function GetScreenInstance(key, id) {
 
 export function updateScreenInstance(model, id, value) {
     return (dispatch, getState) => {
-        dispatch(UISI(SCREEN_INSTANCE, model, id, value));
+        dispatch(Batch(
+            UISI(SCREEN_INSTANCE, model, id, value)
+        ));
+    }
+}
+
+export function updateScreenInstanceBlur(model, id) {
+    return (dispatch, getState) => {
+        dispatch(Batch(
+            UISI(SCREEN_INSTANCE_ON_BLUR, model, id, true),
+            UISI(SCREEN_INSTANCE_FOCUSED, model, id, false)
+        ));
+    }
+}
+
+export function updateScreenInstanceFocus(model, id) {
+    return (dispatch, getState) => {
+        dispatch(Batch(
+            UISI(SCREEN_INSTANCE_ON_FOCUS, model, id, true),
+            UISI(SCREEN_INSTANCE_FOCUSED, model, id, true)
+        ));
     }
 }
 

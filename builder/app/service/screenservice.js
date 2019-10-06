@@ -3,7 +3,7 @@ import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
 
 export function GenerateScreens(options) {
@@ -373,10 +373,10 @@ export function GenerateMarkupTag(node, language, parent, params) {
                     break
                 default:
                     if (model && property && GetCodeName(parent))
-                        onChange = `onChange={value => {
-    this.props.update${instanceType}(${model}, ${property}, value);
-}}`;
-                    break;
+                        //                         onChange = `onChange={value => {
+                        //     this.props.update${instanceType}(${model}, ${property}, value);
+                        // }}`;
+                        break;
             }
             let apiProperties = '';
             if (parentComponentApiConfig) {
@@ -394,11 +394,25 @@ export function writeApiProperties(apiConfig) {
 
     if (apiConfig) {
         for (var i in apiConfig) {
-            let property = '';
-            let { instanceType, model, modelProperty, apiProperty } = apiConfig[i];
+            let property = null;
+            let { instanceType, model, modelProperty, apiProperty, handlerType } = apiConfig[i];
             switch (instanceType) {
                 case InstanceTypes.ScreenInstance:
-                    property = `GetScreenInstance('${model}', '${GetCodeName(modelProperty)}')`;
+                    switch (handlerType) {
+                        case HandlerTypes.Blur:
+                            property = `() => this.props.updateScreenInstanceBlur(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            break;
+                        case HandlerTypes.Focus:
+                            property = `() => this.props.updateScreenInstanceFocus(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            break;
+                        case HandlerTypes.Change:
+                            property = `() => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            break;
+                        case HandlerTypes.Property:
+                        default:
+                            property = `GetScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            break;
+                    }
                     break;
                 case InstanceTypes.ApiProperty:
                     property = `this.props.${apiProperty}`;
@@ -406,8 +420,10 @@ export function writeApiProperties(apiConfig) {
                 default:
                     throw 'write api properties unhandled case ' + instanceType;
             }
-            //There is an opportunity to wrapp the result in a getter.
-            res.push(`${i}={${property}}`)
+            if (property) {
+                //There is an opportunity to wrapp the result in a getter.
+                res.push(`${NEW_LINE}${i}={${property}}`);
+            }
         }
     }
 

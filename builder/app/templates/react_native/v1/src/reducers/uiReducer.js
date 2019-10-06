@@ -44,14 +44,22 @@ export function makeDefaultState() {
 }
 export default function uiReducer(state, action) {
     state = state || makeDefaultState();
-    switch (action.type) {
-        case UIA.UI_UPDATE:
-            return updateUI(state, action);
-        case UIA.UISI_UPDATE:
-            return updateUISI(state, action);
-        case UIA.UI_MODELS:
-            return updateModels(state, action);
-        default:
-            return state;
+    let actions = action.batch;
+    if (action.type !== UIA.BATCH) {
+        actions = [action]
     }
+    actions.map(action => {
+        switch (action.type) {
+            case UIA.UI_UPDATE:
+                state = state || updateUI(state, action);
+                break;
+            case UIA.UISI_UPDATE:
+                state = state || updateUISI(state, action);
+                break;
+            case UIA.UI_MODELS:
+                state = state || updateModels(state, action);
+                break;
+        }
+    })
+    return state;
 }

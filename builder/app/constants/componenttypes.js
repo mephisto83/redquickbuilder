@@ -5,7 +5,15 @@ import { bindTemplate } from "./functiontypes";
 
 export const NAVIGATION = '-NAVIGATION';
 export const APP_METHOD = '-APP_METHOD';
-
+const INPUT_DEFAULT_API = ['onBlur', 'onFocus', 'onChangeText', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
+const DEFAULT_INPUT_API_PROPERTIES = {};
+INPUT_DEFAULT_API.map(x => {
+    DEFAULT_INPUT_API_PROPERTIES[x.property] = {
+        nodeProperty: x.property,
+        parameterConfig: true,
+        ui: true
+    }
+})
 export const ComponentTypes = {
     ReactNative: {
         Badge: {},
@@ -99,6 +107,7 @@ export const ComponentTypes = {
         },
         Input: {
             template: './app/templates/components/input.tpl',
+            defaultApi: INPUT_DEFAULT_API,
             properties: {
                 item_attributes: {
                     nodeProperty: NodeProperties.TextType,
@@ -108,21 +117,10 @@ export const ComponentTypes = {
                 },
                 value: {
                     nodeProperty: NodeProperties.Value,
-                    template: (node) => {
-                        let func = GetCodeName(GetNodeProp(node, 'data'));
-                        if (GetNodeProp(node, 'component-as-label')) {
-                            return `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`
-                        }
-                        if (func)
-                            return bindTemplate(`DC.{{function}}({{value}})`, {
-                                function: func,
-                                value: `this.props.data`
-                            });
-                        return `this.props.data`
-                    },
                     parameterConfig: true,
                     ui: true
                 },
+                ...(DEFAULT_INPUT_API_PROPERTIES),
                 label: {
                     nodeProperty: NodeProperties.Label,
                     template: `{titleService.get('{{value}}')}`
@@ -255,7 +253,12 @@ Object.keys(ComponentTypes.ReactNative).map(key => {
     }
 });
 
-
+export const HandlerTypes = {
+    Blur: 'blur',
+    Change: 'change',
+    Focus: 'focus',
+    Property: 'property'
+}
 export const InstanceTypes = {
     ScreenInstance: 'ScreenInstance',
     Instance: 'Instance',

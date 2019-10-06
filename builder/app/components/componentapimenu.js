@@ -56,7 +56,7 @@ class ComponentAPIMenu extends Component {
                                 }
                             }} icon={'fa fa-plus'} title={Titles.Add} description={Titles.Add} />
                             <ControlSideBarMenuItem onClick={() => {
-                                if (this.state.modelType && this.state.modelProp) {
+                                if (this.state.modelProp) {
                                     componentProps = removeComponentApi(componentProps, { modelProp: this.state.modelProp })
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         prop: UIA.NodeProperties.ComponentApi,
@@ -66,6 +66,19 @@ class ComponentAPIMenu extends Component {
 
                                 }
                             }} icon={'fa fa-plus'} title={Titles.Remove} description={Titles.Remove} />
+                            {componentTypes[componentType] && componentTypes[componentType].defaultApi ? <ControlSideBarMenuItem onClick={() => {
+                                componentTypes[componentType].defaultApi.map(x => {
+                                    componentProps = addComponentApi(componentProps, {
+                                        modelProp: x.property
+                                    })
+
+                                })
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                    prop: UIA.NodeProperties.ComponentApi,
+                                    id: currentNode.id,
+                                    value: componentProps
+                                });
+                            }} icon={'fa fa-plus'} title={Titles.AddDefaults} description={Titles.AddDefaults} /> : null}
                         </ControlSideBarMenu>
                     ) : null}
                     <ButtonList active={true} isSelected={(item) => { return item.value === this.state.selectedItem; }}

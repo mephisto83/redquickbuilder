@@ -29,7 +29,7 @@ import ButtonList from './buttonlist';
 import LayoutCreator from './layoutcreator';
 import TreeViewMenu from './treeviewmenu';
 import { getComponentApiList } from '../methods/component_api_methods';
-import { InstanceTypes } from '../constants/componenttypes';
+import { InstanceTypes, HandlerTypes } from '../constants/componenttypes';
 
 
 class LayoutView extends Component {
@@ -54,7 +54,7 @@ class LayoutView extends Component {
                 let selectedComponentApiProperty = this.state.componentApi ? this.state.componentApi[selectedCell] : null;
                 let cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
                 cellProperties.componentApi = cellProperties.componentApi || {};
-                let { instanceType, model, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                let { instanceType, model, handlerType, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
                 let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
                 let componentPropertiesList = getComponentPropertyList(componentProperties);
                 return [
@@ -111,7 +111,21 @@ class LayoutView extends Component {
                             });
                         }}
                         label={Titles.Property}
-                        value={modelProperty} />) : null
+                        value={modelProperty} />) : null,
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        options={Object.keys(HandlerTypes).map(t => ({ title: t, value: HandlerTypes[t] }))}
+                        onChange={(val) => {
+                            cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            temp.handlerType = val;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: nodeLayout
+                            });
+                        }}
+                        label={Titles.HandlerType}
+                        value={handlerType} />) : null
                 ].filter(x => x)
             }
         }

@@ -16,6 +16,7 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
+import CommandHeader from './commandheader';
 import CheckBox from './checkbox';
 import { getComponentApiList } from '../methods/component_api_methods';
 class ComponentActivityMenu extends Component {
@@ -39,14 +40,19 @@ class ComponentActivityMenu extends Component {
                 let {
                     instanceType,
                     model,
+                    isHandler,
                     apiProperty,
                     modelProperty
                 } = componentProperties[selectedComponentApiProperty] || {};
 
                 return [
+                    <CommandHeader title={apiProperty || Titles.Unknown}
+                        open={UIA.Visual(this.props.state, 'apiProperty-title' + apiProperty)}
+                        visual={'apiProperty-title' + apiProperty} />,
                     selectedComponentApiProperty ? (<SelectInput
                         label={Titles.InstanceType}
                         value={instanceType}
+                        key={`instanceType${apiProperty}`}
                         options={Object.keys(InstanceTypes).map(t => ({
                             title: t,
                             value: InstanceTypes[t]
@@ -61,10 +67,10 @@ class ComponentActivityMenu extends Component {
                                 value: componentProperties
                             });
                         }} />) : null,
-
                     selectedComponentApiProperty && instanceType === InstanceTypes.ApiProperty ? (<SelectInput
                         label={key}
                         value={apiProperty}
+                        key={`apiProperty${apiProperty}`}
                         options={getComponentApiList(componentApi)}
                         onChange={(value) => {
                             componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
@@ -79,6 +85,7 @@ class ComponentActivityMenu extends Component {
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
                         label={Titles.Models}
                         value={model}
+                        key={`model${apiProperty}`}
                         options={UIA.NodesByType(this.props.state, NodeTypes.Model).toNodeSelect()}
                         onChange={(value) => {
                             componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
@@ -91,6 +98,7 @@ class ComponentActivityMenu extends Component {
                             });
                         }} />) : null,
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        key={`modelProperty${apiProperty}`}
                         options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
                             id: model,
                             direction: SOURCE
@@ -106,8 +114,22 @@ class ComponentActivityMenu extends Component {
                             });
                         }}
                         label={Titles.Property}
-                        value={modelProperty} />) : null
-                ].filter(x => x)
+                        value={modelProperty} />) : null,
+                    selectedComponentApiProperty ? (<CheckBox
+                        label={Titles.IsHandler}
+                        key={`isHandler${apiProperty}`}
+                        value={isHandler}
+                        onChange={(value) => {
+                            componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
+                            let temp = componentProperties[selectedComponentApiProperty];
+                            temp.isHandler = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: prop_obj.nodeProperty,
+                                id: currentNode.id,
+                                value: componentProperties
+                            });
+                        }} />) : null
+                ].subset(0, UIA.Visual(this.props.state, 'apiProperty-title' + apiProperty) ? 1000 : 1).filter(x => x)
             }
         }
 
