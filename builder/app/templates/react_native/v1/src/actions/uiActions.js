@@ -125,6 +125,15 @@ export function GetScreenInstance(key, id) {
     return null;
 }
 
+export function GetScreenInstanceObject(key) {
+    if (_getState) {
+        let state = _getState();
+        let screenInstance = GetC(state, SCREEN_INSTANCE, key);
+        return screenInstance;
+    }
+    return null;
+}
+
 export function updateScreenInstance(model, id, value) {
     return (dispatch, getState) => {
         dispatch(Batch(

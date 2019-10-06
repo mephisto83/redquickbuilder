@@ -6,7 +6,7 @@ import * as DC from '{{relative_depth}}actions/data-chain';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';
 import getTheme from '{{relative_depth}}../native-base-theme/components'
 import material from '{{relative_depth}}../native-base-theme/variables/variables';
-import { GetScreenInstance } from '{{relative_depth}}actions/uiActions';
+import { GetScreenInstance, GetScreenInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
 import { Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View, Form, Item,

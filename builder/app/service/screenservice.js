@@ -341,20 +341,23 @@ export function GenerateMarkupTag(node, language, parent, params) {
             let parentLayoutProperties = null;
             let propertyName = '';
             let parentComponentApiConfig = null;
-            if (parent && children && cellModel && cellModelProperty && cellModel[item] && cellModelProperty[item]) {
+            if (parent) {
                 componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
                 parentLayoutProperties = GetNodeProp(parent, NodeProperties.Layout);
-                instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
-                model = GetRNModelConstValue(cellModel[item]);
                 var { componentApi } = getComponentProperty(parentLayoutProperties, item) || {};
                 parentComponentApiConfig = componentApi;
-                modelName = `${cellModel[item]}`.toJavascriptName();
-                propertyName = (GetCodeName(cellModelProperty[item]) || '').toJavascriptName();
-                property = GetRNModelConstValue(propertyName);
 
-            };
-            if (parent && language === 'ReactNative' && GetNodeProp(parent, NodeProperties.ComponentType) === ComponentTypes[language].ListItem.key) {
-                listItem = '.item';
+                if (parent && children && cellModel && cellModelProperty && cellModel[item] && cellModelProperty[item]) {
+                    instanceType = getComponentProperty(componentProperties, cellModel[item], 'instanceTypes');
+                    model = GetRNModelConstValue(cellModel[item]);
+                    modelName = `${cellModel[item]}`.toJavascriptName();
+                    propertyName = (GetCodeName(cellModelProperty[item]) || '').toJavascriptName();
+                    property = GetRNModelConstValue(propertyName);
+
+                };
+                if (parent && language === 'ReactNative' && GetNodeProp(parent, NodeProperties.ComponentType) === ComponentTypes[language].ListItem.key) {
+                    listItem = '.item';
+                }
             }
             switch (instanceType) {
                 case InstanceTypes.PropInstance:
@@ -410,7 +413,12 @@ export function writeApiProperties(apiConfig) {
                             break;
                         case HandlerTypes.Property:
                         default:
-                            property = `GetScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            if (modelProperty) {
+                                property = `GetScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            }
+                            else {
+                                property = `GetScreenInstanceObject(const_${model})`;
+                            }
                             break;
                     }
                     break;

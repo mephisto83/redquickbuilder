@@ -7,7 +7,30 @@ export const NAVIGATION = '-NAVIGATION';
 export const APP_METHOD = '-APP_METHOD';
 const ARE_HANDLERS = ['onBlur', 'onFocus', 'onChangeText'];
 const INPUT_DEFAULT_API = ['value', 'onBlur', 'onFocus', 'onChangeText', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
+const BUTTON_DEFAULT_API = [
+    'block',
+    'primary',
+    'transparent',
+    'success',
+    'danger',
+    'warning',
+    'info',
+    'bordered',
+    'disabled',
+    'rounded',
+    'large',
+    'small',
+    'active'].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
+const DEFAULT_BUTTON_API_PROPERTIES = {};
+BUTTON_DEFAULT_API.map(x => {
+    DEFAULT_BUTTON_API_PROPERTIES[x.property] = {
+        nodeProperty: x.property,
+        parameterConfig: true,
+        isHandler: false,
+        ui: true
+    }
+})
 INPUT_DEFAULT_API.map(x => {
     DEFAULT_INPUT_API_PROPERTIES[x.property] = {
         nodeProperty: x.property,
@@ -22,19 +45,8 @@ export const ComponentTypes = {
         Body: {},
         Button: {
             template: './app/templates/components/button.tpl',
+            defaultApi: BUTTON_DEFAULT_API,
             properties: {
-                full: {
-                    nodeProperty: 'ButtonDefault',
-                    template: '{{value}}',
-                    options: ['transparent', 'bordered', 'rounded', 'block', 'full'],
-                    ui: true
-                },
-                color: {
-                    nodeProperty: 'ButtonColor',
-                    template: '{{value}}',
-                    options: ['primary', 'light', 'dark'],
-                    ui: true
-                },
                 onPress: {
                     nodeProperty: 'onPress',
                     template: '() => { {{value}} }',
@@ -42,7 +54,8 @@ export const ComponentTypes = {
                     nowrap: true,
                     options: [NAVIGATION, APP_METHOD],
                     ui: true
-                }
+                },
+                ...DEFAULT_BUTTON_API_PROPERTIES
             },
         },
         Card: {},
