@@ -401,6 +401,7 @@ export function GenerateDataChainMethod(id) {
     let numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
     let property = GetNodeProp(node, NodeProperties.Property);
     let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+    let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
     let lastpart = 'return item;';
     switch (functionType) {
         case DataChainFunctionKeys.ModelProperty:
@@ -449,7 +450,11 @@ export function GenerateDataChainMethod(id) {
             return `(a) => equalsLength(a, ${numberParameter})`;
         case DataChainFunctionKeys.GreaterThan:
             return `(a) => greaterThan(a, ${numberParameter})`;
-            
+        case DataChainFunctionKeys.Property:
+            return `(a) => {a ? a.${GetJSCodeName(property) || property}} : null`;
+        case DataChainFunctionKeys.ReferenceDataChain:
+            return `(a) => ${func}(a)`;
+
     }
 }
 export function GetPermissionsSortedByAgent() {
