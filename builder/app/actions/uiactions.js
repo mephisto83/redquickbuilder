@@ -451,7 +451,7 @@ export function GenerateDataChainMethod(id) {
         case DataChainFunctionKeys.GreaterThan:
             return `(a) => greaterThan(a, ${numberParameter})`;
         case DataChainFunctionKeys.Property:
-            return `(a) => {a ? a.${GetJSCodeName(property) || property}} : null`;
+            return `(a) => {a ? a.${GetJSCodeName(property) || property} : null }`;
         case DataChainFunctionKeys.ReferenceDataChain:
             return `(a) => ${func}(a)`;
 
@@ -738,13 +738,23 @@ export function GetComponentNodes() {
     return NodesByType(state, NodeTypes.ComponentNode);
 }
 export function GetComponentNodeProperties() {
-    return GetComponentNodes().map(node => {
+    let res = GetComponentNodes().map(node => {
 
         let componentProperties = GetNodeProp(node, NodeProperties.ComponentProperties);
-        let componentPropertiesList = GraphMethods.getComponentPropertyList(componentProperties);
+        let componentPropertiesList = GraphMethods.getComponentPropertyList(componentProperties) || [];
 
         return { id: node.id, componentPropertiesList };
-    })
+    }).filter(x => x.componentPropertiesList.length).groupBy(x => x.id);
+
+    var result = [];
+    Object.keys(res).map(v => {
+        let componentPropertiesList = [];
+        res[v].map(b => componentPropertiesList.push(...b.componentPropertiesList)).unique(x => x.id);
+
+        result.push({ id: v, componentPropertiesList })
+    });
+
+    return result;
 }
 export function GetConnectedScreenOptions(id) {
     let state = _getState();

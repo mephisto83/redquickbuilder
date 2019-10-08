@@ -51,13 +51,13 @@ export default function uiReducer(state, action) {
     actions.map(action => {
         switch (action.type) {
             case UIA.UI_UPDATE:
-                state = state || updateUI(state, action);
+                state = updateUI(state, action) || state;
                 break;
             case UIA.UISI_UPDATE:
-                state = state || updateUISI(state, action);
+                state = updateUISI(state, action) || state;
                 break;
             case UIA.UI_MODELS:
-                state = state || updateModels(state, action);
+                state = updateModels(state, action) || state;
                 break;
         }
     })

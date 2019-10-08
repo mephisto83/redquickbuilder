@@ -189,7 +189,7 @@ export function wrapOnPress(elements, onPress, node, options) {
                             let c_prop_option = c_props_options.find(v => v.value === componentModel);
                             if (c_prop_option) {
                                 let componentModelName = c_prop_option.value;
-                                bodytext = `let body = Get${instanceType}('${GetCodeName(c_props.id)}', '${componentModelName}');`
+                                bodytext = `let body = Get${instanceType}Object('${componentModelName}');`
                             }
                         }
                     }

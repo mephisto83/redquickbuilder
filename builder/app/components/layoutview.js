@@ -65,6 +65,22 @@ class LayoutView extends Component {
                         onChange={(value) => {
                             this.setState({ componentApi: { ...(this.state.componentApi || {}), [selectedCell]: value } });
                         }} />),
+                    selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
+                        label={Titles.HandlerType}
+                        value={handlerType}
+                        options={Object.keys(HandlerTypes).map(t => ({
+                            title: t, value: HandlerTypes[t]
+                        }))}
+                        onChange={(value) => {
+                            cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let temp = cellProperties.componentApi[selectedComponentApiProperty];
+                            temp.handlerType = value;
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Layout,
+                                id: currentNode.id,
+                                value: nodeLayout
+                            });
+                        }} />) : null,
                     selectedComponentApiProperty ? (<SelectInput
                         label={Titles.InstanceType}
                         value={instanceType}

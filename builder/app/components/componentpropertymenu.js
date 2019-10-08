@@ -54,7 +54,7 @@ class ComponentPropertyMenu extends Component {
                                 this.setState({ instanceType: value });
                             }} />
                     </FormControl>) : null}
-                    {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType] ? (
+                    {componentType && componentTypes && componentTypes[componentType] ? (
                         <ControlSideBarMenu>
                             <ControlSideBarMenuItem onClick={() => {
                                 if (this.state.modelType && this.state.modelProp) {

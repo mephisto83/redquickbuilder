@@ -116,20 +116,25 @@ export function GetScreenParam(param) {
 export function GetScreenInstance(key, id) {
     if (_getState) {
         let state = _getState();
-        let screenInstance = GetC(state, SCREEN_INSTANCE, key);
+        let screenInstance = GetScreenInst(state);
 
-        if (screenInstance) {
-            return screenInstance[id] || null;
+        if (screenInstance && screenInstance[key]) {
+            return screenInstance[key][id] || null;
         }
     }
     return null;
+}
+export function GetScreenInst(state) {
+    return GetC(state, SCREEN_INSTANCE, SCREEN_INSTANCE);
 }
 
 export function GetScreenInstanceObject(key) {
     if (_getState) {
         let state = _getState();
-        let screenInstance = GetC(state, SCREEN_INSTANCE, key);
-        return screenInstance;
+        let screenInstance = GetScreenInst(state);
+        if (screenInstance) {
+            return screenInstance[key];
+        }
     }
     return null;
 }

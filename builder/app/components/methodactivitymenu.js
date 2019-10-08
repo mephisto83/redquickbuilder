@@ -89,6 +89,26 @@ class MethodActivityMenu extends Component {
                         });
                     }}
                     value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm)} />) : null}
+                {currentNode && UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm) ? (<CheckBox
+                    label={Titles.CollectCookies}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.CollectCookies,
+                            id: currentNode.id,
+                            value
+                        });
+                    }}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.CollectCookies)} />) : null}
+                {currentNode ? (<CheckBox
+                    label={Titles.AsText}
+                    onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.AsText,
+                            id: currentNode.id,
+                            value
+                        });
+                    }}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsText)} />) : null}
                 {currentNode ? (<CheckBox
                     label={Titles.NoApiPrefix}
                     onChange={(value) => {

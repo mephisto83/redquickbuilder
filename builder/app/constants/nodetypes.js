@@ -391,6 +391,8 @@ export const NodeProperties = {
     PermissionImpl: 'permission-implementation',
     NoApiPrefix: 'no-api-prefix',
     AsForm: 'as-form',
+    CollectCookies: 'collect-cookies',
+    AsText: 'as-text',
     ClassConstructionInformation: 'ClassConstructionInformation'
 }
 

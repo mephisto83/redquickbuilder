@@ -103,7 +103,7 @@ class MethodParameterMenu extends Component {
                                                         }} />
 
                                                     <SelectInput
-                                                        label={Titles.Models}
+                                                        label={Titles.ComponentModel}
                                                         value={getClientMethod(methodParams, key, 'body', 'componentModel')}
                                                         options={c_props_options}
                                                         onChange={(value) => {

@@ -91,6 +91,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
                     body: body == undefined ? null : JSON.stringify(body)
                 });
             }
+            let receivedHeaders = {}
             return fetchPromise.then(function (response) {
 
                 //setTimeout(() => null, 0);  // workaround for issue-6679
@@ -109,11 +110,29 @@ export function createRedService(domain, wsdomain, _forceBase) {
 
                     }
                 }
-
+                if (options && options.collectCookies) {
+                    response.headers.forEach((val, key) => {
+                        receivedHeaders[key] = val;
+                    })
+                }
+                if (options && options.asText) {
+                    return response.text().then(function (txt) {
+                        console.log(`called at ${(new Date()).toTimeString()} ${endpoint}`)
+                        return txt;
+                    });
+                }
                 return response.json().then(function (json) {
                     console.log(`called at ${(new Date()).toTimeString()} ${endpoint}`)
                     return json;
                 })
+            }).then(res => {
+                if (options && options.collectCookies) {
+                    return {
+                        result: res,
+                        headers: receivedHeaders
+                    }
+                }
+                return res;
             }).catch(e => {
                 console.log(e);
                 if (e && e.unauthorized && onUnauthorizedHandler) {

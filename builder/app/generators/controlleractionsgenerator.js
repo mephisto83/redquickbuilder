@@ -34,14 +34,24 @@ export default class ControllerActionGenerator {
                         endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode)}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
                     }
                     let methodType = GetNodeProp(method, NodeProperties.HttpMethod);
-                    let asForm = 'null';
+                    let asForm = '';
+                    let collectCookies = '';
+                    let asText = '';
                     if (GetNodeProp(method, NodeProperties.AsForm)) {
-                        asForm = '{ asForm : true }';
+                        if (GetNodeProp(method, NodeProperties.CollectCookies)) {
+                            collectCookies = ' collectCookies: true';
+                        }
+
+                        asForm = ` asForm: true`;
                     }
+                    if (GetNodeProp(method, NodeProperties.AsText)) {
+                        asText = ` asText: true`;
+                    }
+                    let options = [asForm, collectCookies, asText].filter(x => x).join();
                     return bindTemplate(methodType === HTTP_METHODS.POST ? postMethodTemplate : methodTemplate, {
                         methodName: GetJSCodeName(method),
                         methodType: `${methodType}`.toLowerCase().split('http').join(''),
-                        options: asForm
+                        options: `{${options} }`
                     });
                 }
             }
