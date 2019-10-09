@@ -13,6 +13,9 @@ using RedQuickCore.Interfaces;
 using {{namespace}}.Models;
 using {{namespace}}.Resources;
 using Swashbuckle.AspNetCore.Swagger;
+using RedQuick.Util;
+using Autofac;
+using {{namespace}}.Controllers;
 
 namespace Smash.Graph.Web
 {
@@ -27,6 +30,11 @@ namespace Smash.Graph.Web
             services.AddSingleton<IStringLocalizer, StringLocalizer>();
             services.AddSingleton<IViewLocalizer, ViewLocalizer>();
             services.AddSingleton<IHtmlLocalizerFactory, HtmlLocalizerFactory>();
+
+            RedStrapper.Add(builder =>
+            {
+                builder.RegisterType<ClaimService>().As<IClaimService<{{model}}>>();
+            });
 
             // DI
             services.AddSingleton<IRedEmailSender,  RedEmailSender>();

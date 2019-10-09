@@ -1,6 +1,6 @@
 import { HandlerEvents } from '../ipc/handler-events';
 import { GraphKeys } from '../methods/graph_methods';
-import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned, GetDispatchFunc, GetStateFunc, removeCurrentNode, newNode } from './uiactions';
+import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, togglePinned, GetDispatchFunc, GetStateFunc, removeCurrentNode, newNode, GetLogicalChildren, GetCodeName } from './uiactions';
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
@@ -115,12 +115,24 @@ export function scaffoldProject(options = {}) {
             let namespace = root ? root[GraphKeys.NAMESPACE] : null;
             let server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
             let userNode = NodesByType(state, NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser));
+            let logicalChildren = GetLogicalChildren(userNode.id);
             if (server_side_setup) {
-
+                let children = logicalChildren.map(child => {
+                    return `
+            if (string.IsNullOrEmpty(user.${GetCodeName(child.id)}))
+                result.Add(new Claim("${GetCodeName(child.id)}", user.${GetCodeName(child.id)}));
+            `
+                }).join('');
                 return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
                     model: GetNodeProp(userNode, NodeProperties.CodeName),
                     namespace
-                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web')));
+                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web'))).then(() => {
+                    return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/RedQuickControllers`), {
+                        model: GetNodeProp(userNode, NodeProperties.CodeName),
+                        namespace,
+                        children
+                    }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Controllers')))
+                });
             }
         }).then(() => {
             console.log('Write react-native files')

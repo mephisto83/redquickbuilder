@@ -5,6 +5,7 @@ import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodet
 import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
+import { HandlerType } from "../components/titles";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -408,8 +409,11 @@ export function writeApiProperties(apiConfig) {
                         case HandlerTypes.Focus:
                             property = `() => this.props.updateScreenInstanceFocus(const_${model}, const_${GetJSCodeName(modelProperty)})`;
                             break;
+                        case HandlerTypes.ChangeText:
+                            property = `(v) => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)}, v)`;
+                            break;
                         case HandlerTypes.Change:
-                            property = `() => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            property = `(v) => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)}, v.nativeEvent.text)`;
                             break;
                         case HandlerTypes.Property:
                         default:
@@ -426,7 +430,8 @@ export function writeApiProperties(apiConfig) {
                     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
                     break;
                 default:
-                    throw 'write api properties unhandled case ' + instanceType;
+                    break;
+                //throw 'write api properties unhandled case ' + instanceType;
             }
             if (property) {
                 if (dataChain) {

@@ -271,6 +271,7 @@ Object.keys(ComponentTypes.ReactNative).map(key => {
 export const HandlerTypes = {
     Blur: 'blur',
     Change: 'change',
+    ChangeText: 'changeText',
     Focus: 'focus',
     Property: 'property'
 }
