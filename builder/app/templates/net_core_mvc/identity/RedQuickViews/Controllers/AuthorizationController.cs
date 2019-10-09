@@ -12,7 +12,7 @@ using {{namespace}}.Models;
 
 namespace {{namespace}}.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authorization")]
     [ApiController]
     public class AuthorizationController : RedAuthorizationService<User>
     {
