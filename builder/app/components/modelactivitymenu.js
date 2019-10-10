@@ -21,7 +21,7 @@ import { PARAMETER_TAB } from './dashboard';
 class ModelActivityMenu extends Component {
     render() {
         var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Model);
+        var active = UIA.IsCurrentNodeA(state, [UIA.NodeTypes.Model]);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
         var is_parent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsParent);

@@ -96,7 +96,7 @@ class DataChainOperator extends Component {
                                 }
                             }
                         }} /> : null}
-                        {currentNode && UIA.IsEndOfDataChain(currentNode.id) ? (
+                        {currentNode ? (
                             <TreeViewMenu active={true} hideArrow={true} title={Titles.AddDataChain} icon={'fa fa-plus'} onClick={() => {
                                 let groupProperties = UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) ? {
                                     id: UIA.getGroup(UIA.GetNodeProp(currentNode, NodeProperties.GroupParent)).id

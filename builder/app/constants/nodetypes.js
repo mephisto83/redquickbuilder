@@ -7,6 +7,7 @@ export const NodeTypes = {
     DataSource: 'data-source',
     Property: 'model-property',
     ModelFilter: 'model-filter',
+    Struct: 'struct',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
     ScreenCollection: 'screen-collection',

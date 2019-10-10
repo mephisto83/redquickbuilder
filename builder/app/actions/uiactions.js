@@ -65,7 +65,10 @@ export function Visual(state, key) {
 }
 export function IsCurrentNodeA(state, type) {
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
-    return currentNode && currentNode.properties && currentNode.properties.nodeType === type;
+    if (!Array.isArray(type)) {
+        type = [type]
+    }
+    return currentNode && currentNode.properties && type.some(v => v === currentNode.properties.nodeType);
 }
 export function Use(node, prop) {
     return node && node.properties && node.properties[prop];
@@ -454,6 +457,12 @@ export function GenerateDataChainMethod(id) {
             return `(a) => {a ? a.${GetJSCodeName(property) || property} : null }`;
         case DataChainFunctionKeys.ReferenceDataChain:
             return `(a) => ${func}(a)`;
+        case DataChainFunctionKeys.Equals:
+            return `(a, b) => a === b`;
+        case DataChainFunctionKeys.Required:
+            return `(a) => a !== null && a !==undefined`;
+        case DataChainFunctionKeys.Not:
+            return `(a) => !!!a`;
 
     }
 }

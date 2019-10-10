@@ -1,6 +1,8 @@
 import { NodeProperties } from "./nodetypes";
 export const DataChainFunctionKeys = {
     ModelProperty: 'Model - Property',
+    Required: 'Required',
+    Not: 'Not',
     EmailValidation: 'Email validation',
     GreaterThan: 'Greater Than',
     LessThan: 'Less Than',
@@ -12,15 +14,43 @@ export const DataChainFunctionKeys = {
     AlphaNumeric: 'Alphanumeric',
     AlphaOnly: 'Alpha only',
     LessThanOrEqualTo: 'Less than or equal to',
+    Equals: 'Are Equal',
     BooleanAnd: 'Boolean And',
     BooleanOr: 'Boolean Or',
     Property: 'Property',
+    Validation: 'Validation',
     Model: 'Model',
     Pass: 'Pass',
     ReferenceDataChain: 'Data Chain Ref.',
     StringConcat: 'String Concat {0} {1}'
 };
 export const DataChainFunctions = {
+    [DataChainFunctionKeys.Not]: {
+        ui: {
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'Not'
+    },
+    [DataChainFunctionKeys.Validation]: {
+        ui: {
+            dataref: NodeProperties.DataChainReference,
+            value: NodeProperties.value
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'Validation'
+    },
+    [DataChainFunctionKeys.Required]: {
+        ui: {
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'Required'
+    },
     [DataChainFunctionKeys.Property]: {
         ui: {
             model: NodeProperties.UIModelType,
@@ -41,6 +71,17 @@ export const DataChainFunctions = {
             [NodeProperties.NODEType]: true
         },
         value: 'BooleanAnd'
+    },
+    [DataChainFunctionKeys.Equals]: {
+        ui: {
+            node_1: NodeProperties.ChainNodeInput1,
+            node_2: NodeProperties.ChainNodeInput2
+        },
+        merge: true,
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'AreEquals'
     },
     [DataChainFunctionKeys.BooleanOr]: {
         ui: {
