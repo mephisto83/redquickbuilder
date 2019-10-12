@@ -69,8 +69,7 @@ class MethodParameterMenu extends Component {
                                                     this.props.toggleVisual(bodyparameters)
                                                 }}
                                                 key={'body'}
-                                                title={Titles.Body} icon={'fa fa-tv'}
-                                            >
+                                                title={Titles.Body} icon={'fa fa-tv'}>
                                                 <FormControl>
                                                     <SelectInput
                                                         label={Titles.InstanceType}
@@ -110,7 +109,7 @@ class MethodParameterMenu extends Component {
                                                             methodParams = updateClientMethod(methodParams, key, 'body', 'componentModel', value);
                                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                                                 prop: NodeProperties.ClientMethodParameters,
-                                                                id: currentNode.id,
+                                                            id: currentNode.id,
                                                                 value: methodParams
                                                             });
                                                         }} />

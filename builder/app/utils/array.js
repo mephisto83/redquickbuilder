@@ -184,3 +184,10 @@ Array.prototype.tightenPs = function () {
 
     return (str.join(NEW_LINE)).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE);
 }
+
+
+
+export function addNewLine(str, count) {
+    let spaces = [].interpolate(0, count || 1, () => `    `).join('');
+    return ((str ? (NEW_LINE + spaces) : '') + (str || '')).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE + spaces)
+}

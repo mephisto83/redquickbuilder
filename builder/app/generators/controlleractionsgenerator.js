@@ -3,8 +3,8 @@ import { ConfigurationProperties, NEW_LINE } from "../constants/nodetypes";
 import fs from 'fs';
 import * as Titles from '../components/titles';
 import { bindTemplate, MethodTemplateKeys, FunctionTemplateKeys, HTTP_METHODS } from "../constants/functiontypes";
-import { addNewLine } from "../service/layoutservice";
 import ControllerGenerator from "./controllergenerator";
+import { addNewLine } from "../utils/array";
 export default class ControllerActionGenerator {
 
     static GenerateService(options) {

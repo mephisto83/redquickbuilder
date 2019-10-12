@@ -16,7 +16,7 @@ import { NodeProperties, NodeTypes, LinkEvents, LinkType, LinkProperties } from 
 import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLinkChainItem, createExecutor } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
-import { DataChainFunctions } from '../constants/datachain';
+import { DataChainFunctions, DataChainContextMethods } from '../constants/datachain';
 
 class DataChainActvityMenu extends Component {
     render() {
@@ -29,11 +29,14 @@ class DataChainActvityMenu extends Component {
         let showNumber = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.number : false;
         let showProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.property : false;
         let showNode1 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_1 : false;
+        let showValue = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.value : false;
         let showNode2 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_2 : false;
         let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
         let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
             return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
         }).toNodeSelect();
+        let all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
+        
         return (
             <TabPane active={active}>
                 <FormControl>
@@ -151,23 +154,7 @@ class DataChainActvityMenu extends Component {
                         options={data_chain_entry}
                     /> : null}
                     {showNode1 ? <SelectInput
-                        onChange={(value) => {
-                            var id = currentNode.id;
-                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                                source: currentNode.properties[UIA.NodeProperties.ChainNodeInput1],
-                                target: id
-                            })
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.ChainNodeInput1,
-                                id,
-                                value
-                            });
-                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                                source: value,
-                                target: id,
-                                properties: { ...UIA.LinkProperties.DataChainLink }
-                            })
-                        }}
+                        onChange={DataChainContextMethods.Input1.bind(this, currentNode)}
                         label={`${Titles.Input} 1`}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.ChainNodeInput1)}
                         options={node_inputs}
@@ -193,6 +180,13 @@ class DataChainActvityMenu extends Component {
                         label={`${Titles.Input} 2`}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.ChainNodeInput2)}
                         options={node_inputs}
+                    /> : null}
+                    {showValue ? <SelectInput
+                        onChange={DataChainContextMethods.Value.bind(this, currentNode)}
+                        label={`${Titles.Value}`}
+                        disabled={true}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.Value)}
+                        options={all_inputs}
                     /> : null}
                 </FormControl>
             </TabPane>

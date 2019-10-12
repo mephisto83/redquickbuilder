@@ -10,6 +10,7 @@ export const NodeTypes = {
     Struct: 'struct',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
+    Selector: 'selector',
     ScreenCollection: 'screen-collection',
     ScreenItem: 'screen-item',
     Attribute: 'attribute-property',
@@ -43,7 +44,8 @@ export const NodeTypes = {
     Services: 'services',
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node',
-    DataChain: 'data-chain'
+    DataChain: 'data-chain',
+    ViewModel: 'view-model'
 }
 export const NodeTypeIcons = {};
 export function GetNodeTypeIcon(type) {
@@ -80,6 +82,7 @@ export const ReactNativeTypes = {
     Keys: 'keys',
     ControllerActions: 'controller-actions',
     Configuration: 'configuration',
+    Selectors: 'selectors',
     DataChainFunctions: 'data-chain'
 }
 export const IdentityManagement = {
@@ -142,6 +145,7 @@ export const NodeTypeColors = {
     [NodeTypes.ChoiceList]: '#457B9D',
     [NodeTypes.ValidationList]: '#A8DADC',
     [NodeTypes.ValidationListItem]: '#EA526F',
+    [NodeTypes.Selector]: '#20063B',
     [NodeTypes.OptionList]: '#2EC4B6',
     [NodeTypes.OptionListItem]: '#856A5D',
     [NodeTypes.OptionCustom]: '#403F4C',
@@ -222,7 +226,10 @@ export const ConfigurationProperties = {
 }
 export const NodeProperties = {
     ComponentApi: 'component-api',
+    SelectorType: 'selector-type',
+    UseInstanceType: "UseInstanceType",
     EnabledMenu: 'EnabledMenu',
+    InstanceType: "InstanceType",
     ComponentParameters: 'ComponentParameters',
     NavigationParameters: 'NavigationParameters',
     ClientMethod: "ClientMethod",
@@ -512,8 +519,10 @@ export const LinkType = {
     ListItem: 'list-item',
     Enumeration: 'enumeration',
     DataSource: 'DataSource',
+    ViewModelLink: "view-model-link",
     Component: 'component',
     DataChainLink: 'data-chain-link',
+    SelectorLink: 'selector-link',
     ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
@@ -564,6 +573,15 @@ export const LinkStyles = {
         type: LinkType.OnScreenLink,
         stroke: '#E1CE7A',
         strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.DataChainLink]: {
+        type: LinkType.DataChainLink,
+        stroke: '#33673B',
+        strokeWidth: VIKTIG_LINKS
+    },
+    [LinkType.SelectorLink]: {
+        type: LinkType.SelectorLink,
+        stroke: '#20063B'
     },
     [LinkType.OnSuccessLink]: {
         type: LinkType.OnSuccessLink,
@@ -664,6 +682,12 @@ export const LinkProperties = {
     },
     DataSourceLink: {
         type: LinkType.DataSource
+    },
+    ViewModelLink: {
+        type: LinkType.ViewModelLink
+    },
+    SelectorLink: {
+        type: LinkType.SelectorLink
     },
     DataChainLink: {
         type: LinkType.DataChainLink

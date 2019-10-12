@@ -3,6 +3,7 @@ import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName } from "../action
 import { GenerateMarkupTag } from "./screenservice";
 import { GetCellProperties, getComponentProperty } from "../methods/graph_methods";
 import { InstanceTypes } from "../constants/componenttypes";
+import { addNewLine } from "../utils/array";
 
 
 export function GetPropertyConsts(id, language = UITypes.ReactNative) {
@@ -177,9 +178,4 @@ ${addNewLine(tree.tightenPs())}
             `);
     }
 
-}
-
-export function addNewLine(str, count) {
-    let spaces = [].interpolate(0, count || 1, () => `    `).join('');
-    return ((str ? (NEW_LINE + spaces) : '') + (str || '')).split(NEW_LINE).filter(x => x.trim()).join(NEW_LINE + spaces)
 }

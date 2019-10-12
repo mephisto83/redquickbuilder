@@ -2,10 +2,11 @@ import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, G
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
-import { buildLayoutTree, addNewLine, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
+import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
+import { addNewLine } from "../utils/array";
 
 export function GenerateScreens(options) {
     let temps = BindScreensToTemplate();
@@ -486,6 +487,9 @@ export function GetComponentDidMount(screenOption) {
             return `this.props.${GetJSCodeName(methodNode)}();`;
         }).join(NEW_LINE);
 
+    }
+    else {
+        evntHandles = '';
     }
 
     return addNewLine(bindTemplate(componentDidMount, {

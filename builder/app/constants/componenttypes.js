@@ -277,12 +277,25 @@ export const HandlerTypes = {
 }
 export const InstanceTypes = {
     ScreenInstance: 'ScreenInstance',
+    ScreenInstanceBlur: 'ScreenInstanceBlur',
+    ScreenInstanceFocus: 'ScreenInstanceFocus',
+    ScreenInstanceFocused: 'ScreenInstanceFocused',
+    ScreenInstanceDirty: 'ScreenInstanceDirty',
     Instance: 'Instance',
     AppState: 'AppState',
     PropInstance: 'PropInstance',
     ApiProperty: 'ApiProperty',
     ScreenParam: 'ScreenParam',
+    Selector: 'Selector',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
+}
+
+export const InstanceTypeSelectorFunction = {
+    [InstanceTypes.ScreenInstance]: 'GetScreenInstanceObject',
+    [InstanceTypes.ScreenInstanceBlur]: 'GetScreenInstanceBlurObject',
+    [InstanceTypes.ScreenInstanceFocus]: 'GetScreenInstanceFocusObject',
+    [InstanceTypes.ScreenInstanceFocused]: 'GetScreenInstanceFocusedObject',
+    [InstanceTypes.ScreenInstanceDirty]: 'GetScreenInstanceDirtyObject'
 }
 
 export function GetListItemNode(id) {

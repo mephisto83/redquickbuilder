@@ -16,6 +16,7 @@ import { NodeProperties, NodeTypes, LinkEvents, LinkType, LinkProperties, GroupP
 import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLinkChainItem, createExecutor } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
+import { DataChainContextMethods } from '../constants/datachain';
 
 class DataChainOperator extends Component {
     render() {
@@ -30,23 +31,7 @@ class DataChainOperator extends Component {
                 <SideBar style={{ paddingTop: 0 }}>
                     <SideBarMenu>
                         <TreeViewMenu active={true} hideArrow={true} title={Titles.SplitDataChain} icon={'fa fa-share-alt'} onClick={() => {
-                            let id = currentNode.id;
-                            this.props.graphOperation(UIA.ADD_NEW_NODE, {
-                                parent: UIA.Visual(state, UIA.SELECTED_NODE),
-                                nodeType: NodeTypes.DataChain,
-                                groupProperties: {
-                                    [GroupProperties.ExternalEntryNode]: UIA.GetNodeProp(currentNode, NodeProperties.ChainParent),
-                                    [GroupProperties.GroupEntryNode]: currentNode.id,
-                                    [GroupProperties.GroupExitNode]: currentNode.id,
-                                    [GroupProperties.ExternalExitNode]: UIA.GetDataChainNextId(currentNode.id)
-                                },
-                                properties: {
-                                    [NodeProperties.ChainParent]: currentNode.id
-                                },
-                                linkProperties: {
-                                    properties: { ...LinkProperties.DataChainLink }
-                                }
-                            });
+                            DataChainContextMethods.SplitDataChain.bind(this)(currentNode);
                         }} />
                         {UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) ? <TreeViewMenu active={true} hideArrow={true} title={Titles.MergeChain} icon={'fa fa-code-fork '} onClick={() => {
                             let groupProperties = UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) ? {
@@ -86,7 +71,7 @@ class DataChainOperator extends Component {
                                             prop: NodeProperties.ChainParent,
                                             value: externalExitNode
                                         }
-                                    },{
+                                    }, {
                                         operation: UIA.UPDATE_GROUP_PROPERTY, options: {
                                             id: groupProperties.id,
                                             prop: GroupProperties.GroupExitNode,

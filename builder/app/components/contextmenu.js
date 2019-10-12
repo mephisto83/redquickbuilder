@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
 import * as UIA from '../actions/uiactions';
+import Draggable from 'react-draggable'; // The default
 import TabPane from './tabpane';
 import SideBarHeader from './sidebarheader';
 import * as Titles from './titles';
@@ -22,6 +23,7 @@ import TreeViewMenu from './treeviewmenu';
 import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
+import DataChainContextMenu from './datachaincontextmenu';
 const DATA_SOURCE = 'DATA_SOURCE';
 class ContextMenu extends Component {
     getMenuMode(mode) {
@@ -51,23 +53,58 @@ class ContextMenu extends Component {
                             exit();
                         }} /></TreeViewMenu>))
                 break;
+            default:
+                result.push(this.getContextMenu())
+                break;
         }
 
-        return result;
+        return result.filter(x => x);
+    }
+    getContextMenu() {
+        var { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+        switch (currentNodeType) {
+            case NodeTypes.DataChain:
+                return this.getDataChainContextMenu();
+        }
+    }
+    getDataChainContextMenu() {
+        return <DataChainContextMenu />
     }
     render() {
         var { state } = this.props;
+        let exit = () => {
+            this.props.setVisual(UIA.CONTEXT_MENU_MODE, null);
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let display = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? 'block' : 'none';
         let nodeType = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? UIA.GetNodeProp(currentNode, NodeProperties.NODEType) : null;
         let menuMode = UIA.Visual(state, UIA.CONTEXT_MENU_MODE);
         let menuitems = this.getMenuMode(menuMode);
-        return (<div className="context-menu" style={{ position: 'fixed', width: 250, height: 400, display, top: 250, left: 500 }}>
-            <GenericPropertyContainer active={true} title='asdf' subTitle='afaf' nodeType={nodeType} >
-
-                {menuitems}
-            </GenericPropertyContainer>
-        </div>)
+        return (<Draggable handle=".draggable-header">
+            <div className="context-menu modal-dialog modal-info" style={{ zIndex: 1000, position: 'fixed', width: 250, height: 400, display, top: 250, left: 500 }}>
+                <div className="modal-content">
+                    <div className="modal-header draggable-header">
+                        <button type="button" onClick={() => {
+                            exit();
+                        }} className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                    </div>
+                    <div className="modal-body" style={{ padding: 0 }}>
+                        <GenericPropertyContainer active={true} title='asdf' subTitle='afaf' nodeType={nodeType} >
+                            {menuitems}
+                        </GenericPropertyContainer>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" onClick={() => {
+                            exit();
+                        }} className="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                        {/* <button type="button" className="btn btn-outline">Save changes</button> */}
+                    </div>
+                </div>
+            </div>
+        </Draggable>)
     }
 }
 

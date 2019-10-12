@@ -50,6 +50,9 @@ ipcRenderer.on('commands', (event, arg) => {
         case 'l':
             toggleContextMenu('layout');
             break;
+        case 'k':
+            toggleContextMenu('context');
+            break;
         case 'x':
             removeCurrentNode();
             break;
@@ -123,16 +126,17 @@ export function scaffoldProject(options = {}) {
                 result.Add(new Claim("${GetCodeName(child.id)}", user.${GetCodeName(child.id)}));
             `
                 }).join('');
-                return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
+                generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`), {
                     model: GetNodeProp(userNode, NodeProperties.CodeName),
                     namespace
-                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web'))).then(() => {
-                    return generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/RedQuickControllers`), {
-                        model: GetNodeProp(userNode, NodeProperties.CodeName),
-                        namespace,
-                        children
-                    }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Controllers')))
-                });
+                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web')))
+
+                generateFolderStructure(path.join(`./app/templates/net_core_mvc/identity/RedQuickControllers`), {
+                    model: GetNodeProp(userNode, NodeProperties.CodeName),
+                    namespace,
+                    children
+                }, null, path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Controllers')))
+
             }
         }).then(() => {
             console.log('Write react-native files')

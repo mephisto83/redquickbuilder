@@ -103,6 +103,7 @@ export default class MindMap extends Component {
         force
             .linkDistance(this.props.linkDistance || 280)
             .avoidOverlaps(true)
+            .convergenceThreshold(0.1)
             .handleDisconnected(false)
             .size([width, height]);
 
@@ -555,4 +556,16 @@ function duplicateGroup(nn, nodes, groups) {
     delete temp.leaves;
     delete temp.groups;
     return temp;
+}
+const throttle = (func, limit) => {
+    let inThrottle
+    return function () {
+        const args = arguments
+        const context = this
+        if (!inThrottle) {
+            func.apply(context, args)
+            inThrottle = true
+            setTimeout(() => inThrottle = false, limit)
+        }
+    }
 }

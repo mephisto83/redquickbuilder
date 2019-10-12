@@ -21,6 +21,8 @@ export const NodePropertyTypes = NodeConstants.NodePropertyTypes;
 export const ValidationRules = NodeConstants.ValidationRules;
 export const OptionsTypes = NodeConstants.OptionsTypes;
 
+
+
 export const UI_UPDATE = 'UI_UPDATE';
 export function GetC(state, section, item) {
     if (state && state.uiReducer && state.uiReducer[section]) {
@@ -302,6 +304,17 @@ export function GetDataChainArgs(id) {
     }
     return [];
 }
+
+
+export function GetSelectorsNodes(id) {
+    let state = _getState();
+    let graph = GetRootGraph(state);
+    return GraphMethods.GetNodesLinkedTo(graph, {
+        id,
+        direction: GraphMethods.SOURCE
+    }).filter(x => [NodeTypes.Selector, NodeTypes.ViewModel].some(v => v === GetNodeProp(x, NodeProperties.NODEType)));
+}
+
 export function GenerateChainFunctions() {
     let entryNodes = GetDataChainEntryNodes().map(x => x.id);
     return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);

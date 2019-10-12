@@ -1,8 +1,11 @@
-import { NodeProperties } from "./nodetypes";
+import { NodeProperties, LinkProperties, GroupProperties, NodeTypes } from "./nodetypes";
+import { ADD_LINK_BETWEEN_NODES, CHANGE_NODE_PROPERTY, REMOVE_LINK_BETWEEN_NODES, ADD_NEW_NODE, SELECTED_NODE, GetNodeProp, GetDataChainNextId, Visual } from "../actions/uiactions";
 export const DataChainFunctionKeys = {
     ModelProperty: 'Model - Property',
     Required: 'Required',
     Not: 'Not',
+    CollectResults: 'Collect values',
+    Selector: 'Selector',
     EmailValidation: 'Email validation',
     GreaterThan: 'Greater Than',
     LessThan: 'Less Than',
@@ -18,7 +21,9 @@ export const DataChainFunctionKeys = {
     BooleanAnd: 'Boolean And',
     BooleanOr: 'Boolean Or',
     Property: 'Property',
-    Validation: 'Validation',
+    IfTrue: 'IfTrue',
+    Title: 'Title',
+    IfFalse: 'IfFalse',
     Model: 'Model',
     Pass: 'Pass',
     ReferenceDataChain: 'Data Chain Ref.',
@@ -33,15 +38,42 @@ export const DataChainFunctions = {
         },
         value: 'Not'
     },
-    [DataChainFunctionKeys.Validation]: {
+    [DataChainFunctionKeys.Title]: {
         ui: {
-            dataref: NodeProperties.DataChainReference,
-            value: NodeProperties.value
+            value: NodeProperties.Value,
         },
         filter: {
             [NodeProperties.NODEType]: true
         },
-        value: 'Validation'
+        value: 'Title'
+    },
+    [DataChainFunctionKeys.Selector]: {
+        ui: {
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'Selector'
+    },
+    [DataChainFunctionKeys.IfTrue]: {
+        ui: {
+            node_1: NodeProperties.ChainNodeInput1,
+            value: NodeProperties.Value,
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'IfTrue'
+    },
+    [DataChainFunctionKeys.IfFalse]: {
+        ui: {
+            node_1: NodeProperties.ChainNodeInput1,
+            value: NodeProperties.Value,
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'IfFalse'
     },
     [DataChainFunctionKeys.Required]: {
         ui: {
@@ -250,3 +282,46 @@ export const DataChainFunctions = {
         value: 'string_concat_2_values'
     }
 };
+export function connectNodeChain(prop) {
+    return function (currentNode, value) {
+        var id = currentNode.id;
+        this.props.graphOperation(REMOVE_LINK_BETWEEN_NODES, {
+            source: currentNode.properties[prop],
+            target: id
+        })
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+            prop,
+            id,
+            value
+        });
+        this.props.graphOperation(ADD_LINK_BETWEEN_NODES, {
+            source: value,
+            target: id,
+            properties: { ...LinkProperties.DataChainLink }
+        })
+    }
+}
+export const DataChainContextMethods = {
+    Input1: connectNodeChain(NodeProperties.ChainNodeInput1),
+    Value: connectNodeChain(NodeProperties.Value),
+    SplitDataChain: function (currentNode) {
+        let id = currentNode.id;
+        let { state } = this.props;
+        this.props.graphOperation(ADD_NEW_NODE, {
+            parent: Visual(state, SELECTED_NODE),
+            nodeType: NodeTypes.DataChain,
+            groupProperties: {
+                [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent),
+                [GroupProperties.GroupEntryNode]: currentNode.id,
+                [GroupProperties.GroupExitNode]: currentNode.id,
+                [GroupProperties.ExternalExitNode]: GetDataChainNextId(currentNode.id)
+            },
+            properties: {
+                [NodeProperties.ChainParent]: currentNode.id
+            },
+            linkProperties: {
+                properties: { ...LinkProperties.DataChainLink }
+            }
+        });
+    }
+}
