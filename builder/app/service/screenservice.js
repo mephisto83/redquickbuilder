@@ -3,7 +3,7 @@ import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, InstanceTypeSelectorFunction } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
@@ -400,7 +400,7 @@ export function writeApiProperties(apiConfig) {
     if (apiConfig) {
         for (var i in apiConfig) {
             let property = null;
-            let { instanceType, model, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
+            let { instanceType, model, selector, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
             switch (instanceType) {
                 case InstanceTypes.ScreenInstance:
                     switch (handlerType) {
@@ -430,6 +430,8 @@ export function writeApiProperties(apiConfig) {
                 case InstanceTypes.ApiProperty:
                     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
                     break;
+                case InstanceTypes.Selector:
+                    property = `S.${GetJSCodeName(selector)}()`
                 default:
                     break;
                 //throw 'write api properties unhandled case ' + instanceType;

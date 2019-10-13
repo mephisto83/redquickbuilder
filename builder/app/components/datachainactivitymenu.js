@@ -30,13 +30,17 @@ class DataChainActvityMenu extends Component {
         let showProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.property : false;
         let showNode1 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_1 : false;
         let showValue = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.value : false;
+        let showSelector = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selector : false;
+        let showSelectorProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selectorProperty : false;
         let showNode2 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_2 : false;
         let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
+        let selector_nodes = UIA.NodesByType(state, NodeTypes.Selector).toNodeSelect();
+        let selector_node_properties = UIA.GetSelectorsNodes(UIA.GetNodeProp(currentNode, NodeProperties.Selector)).toNodeSelect();
         let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
             return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
         }).toNodeSelect();
         let all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
-        
+
         return (
             <TabPane active={active}>
                 <FormControl>
@@ -152,6 +156,18 @@ class DataChainActvityMenu extends Component {
                         label={`${Titles.DataChain}`}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.DataChainReference)}
                         options={data_chain_entry}
+                    /> : null}
+                    {showSelector ? <SelectInput
+                        onChange={DataChainContextMethods.Selector.bind(this, currentNode)}
+                        label={`${Titles.Selector}`}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.Selector)}
+                        options={selector_nodes}
+                    /> : null}
+                    {showSelectorProperty ? <SelectInput
+                        onChange={DataChainContextMethods.SelectorProperty.bind(this, currentNode)}
+                        label={`${Titles.SelectorProperty}`}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.SelectorProperty)}
+                        options={selector_node_properties}
                     /> : null}
                     {showNode1 ? <SelectInput
                         onChange={DataChainContextMethods.Input1.bind(this, currentNode)}

@@ -418,6 +418,7 @@ export function GenerateDataChainMethod(id) {
     let property = GetNodeProp(node, NodeProperties.Property);
     let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
     let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
+    let selectorProp = GetJSCodeName(GetNodeProp(node, NodeProperties.SelectorProperty));
     let lastpart = 'return item;';
     switch (functionType) {
         case DataChainFunctionKeys.ModelProperty:
@@ -476,6 +477,8 @@ export function GenerateDataChainMethod(id) {
             return `(a) => a !== null && a !==undefined`;
         case DataChainFunctionKeys.Not:
             return `(a) => !!!a`;
+        case DataChainFunctionKeys.Selector:
+            return `(a) => a.${selectorProp}`
 
     }
 }
@@ -1274,7 +1277,7 @@ export function GetCurrentScopedGraph(state, dispatch) {
 }
 export const SELECTED_TAB = 'SELECTED_TAB';
 export const DEFAULT_TAB = 'DEFAULT_TAB';
-const SIDE_PANEL_OPEN = 'side-panel-open';
+export const SIDE_PANEL_OPEN = 'side-panel-open';
 export const PARAMETER_TAB = 'PARAMETER_TAB';
 export const SCOPE_TAB = 'SCOPE_TAB';
 export const QUICK_MENU = 'QUICK_MENU';

@@ -44,14 +44,11 @@ class DataChainContextMenu extends Component {
                     DataChainContextMethods.SplitDataChain.bind(this)(currentNode);
                     exit();
                 }} />
-                <TreeViewMenu title={Titles.MindMap} hideArrow={true} icon={'fa fa-taxi'} key={'mindmap'} onClick={() => {
-                    this.props.setVisual(MAIN_CONTENT, MIND_MAP);
+                <TreeViewMenu title={Titles.Snip} hideArrow={true} icon={'fa fa-taxi'} key={'mindmap'} onClick={() => {
+                    DataChainContextMethods.SnipDataChain.bind(this)(currentNode);
                     exit();
                 }} />
-                <TreeViewMenu title={Titles.CodeView} hideArrow={true} icon={'fa fa-taxi'} key={'codeview'} onClick={() => {
-                    this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
-                    exit();
-                }} /></TreeViewMenu>)
+            </TreeViewMenu>)
     }
 }
 

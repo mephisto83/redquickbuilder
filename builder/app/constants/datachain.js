@@ -1,5 +1,6 @@
 import { NodeProperties, LinkProperties, GroupProperties, NodeTypes } from "./nodetypes";
-import { ADD_LINK_BETWEEN_NODES, CHANGE_NODE_PROPERTY, REMOVE_LINK_BETWEEN_NODES, ADD_NEW_NODE, SELECTED_NODE, GetNodeProp, GetDataChainNextId, Visual } from "../actions/uiactions";
+import { ADD_LINK_BETWEEN_NODES, CHANGE_NODE_PROPERTY, REMOVE_LINK_BETWEEN_NODES, ADD_NEW_NODE, SELECTED_NODE, GetNodeProp, GetDataChainNextId, Visual, GetCurrentGraph, GetState, GetNodeById, getGroup, GetNodesInGroup, REMOVE_NODE, SELECTED_TAB, DEFAULT_TAB, SIDE_PANEL_OPEN } from "../actions/uiactions";
+import { GetLinkBetween, getNodesGroups, getNodeLinks } from "../methods/graph_methods";
 export const DataChainFunctionKeys = {
     ModelProperty: 'Model - Property',
     Required: 'Required',
@@ -49,6 +50,8 @@ export const DataChainFunctions = {
     },
     [DataChainFunctionKeys.Selector]: {
         ui: {
+            selectorProperty: NodeProperties.SelectorProperty,
+            selector: NodeProperties.Selector
         },
         filter: {
             [NodeProperties.NODEType]: true
@@ -301,9 +304,126 @@ export function connectNodeChain(prop) {
         })
     }
 }
+export function snipNodeFromInbetween() {
+    return function (currentNode) {
+        let graph = GetCurrentGraph(GetState());
+        let links = getNodeLinks(graph, currentNode.id);
+        if (links.length === 2) {
+            let sourceNode = links.filter(v => v.target === currentNode.id).map(t => GetNodeById(t.source)).find(x => x);
+            let targetNode = links.filter(v => v.source === currentNode.id).map(t => GetNodeById(t.target)).find(x => x);
+
+            if (sourceNode && targetNode) {
+
+                this.props.graphOperation([{
+                    operation: REMOVE_NODE,
+                    options: {
+                        id: currentNode.id,
+                    }
+                }, {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: {
+                        source: sourceNode.id,
+                        target: targetNode.id,
+                        properties: { ...LinkProperties.DataChainLink }
+                    }
+                }, {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: {
+                        prop: NodeProperties.ChainParent,
+                        id: targetNode.id,
+                        value: sourceNode.id
+                    }
+                }]);
+                this.props.setVisual(SIDE_PANEL_OPEN, false);
+                this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
+
+            }
+        }
+    }
+}
+export function insertNodeInbetween() {
+    return function (currentNode, value) {
+        let graph = GetCurrentGraph(GetState());
+        let me = this;
+        let link = GetLinkBetween(currentNode.id, value, graph);
+        if (link) {
+            var source = GetNodeById(link.source);
+            var target = GetNodeById(link.target);
+
+            this.props.graphOperation(REMOVE_LINK_BETWEEN_NODES, {
+                ...link
+            });
+
+            let groupParent = GetNodeProp(source, NodeProperties.GroupParent);
+
+            this.props.graphOperation(ADD_NEW_NODE, {
+                nodeType: NodeTypes.DataChain,
+                parent: source.id,
+                groupProperties: groupParent ? {
+                    id: groupParent
+                } : {},
+                linkProperties: { properties: { ...LinkProperties.DataChainLink } },
+                properties: {
+                    [NodeProperties.ChainParent]: source.id
+                },
+                links: [{
+                    target: link.target,
+                    linkProperties: { properties: { ...LinkProperties.DataChainLink } }
+                }],
+                callback: (node) => {
+                    setTimeout(() => {
+
+                        me.props.graphOperation([{
+                            operation: ADD_LINK_BETWEEN_NODES,
+                            options:
+                            {
+                                source: link.source,
+                                target: node.id,
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }, {
+                            operation: CHANGE_NODE_PROPERTY,
+                            options:
+                            {
+                                id: link.target,
+                                value: node.id,
+                                prop: NodeProperties.ChainParent
+                            }
+                        }])
+                    }, 100)
+                }
+            })
+        }
+    }
+}
+export function connectChain() {
+    return function (currentNode, value) {
+        var id = currentNode.id;
+        this.props.graphOperation([{
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: {
+                source: id,
+                target: value,
+                properties: { ...LinkProperties.DataChainLink }
+            }
+        }, {
+            operation: CHANGE_NODE_PROPERTY,
+            options: {
+                id: value,
+                prop: NodeProperties.ChainParent,
+                value: id,
+            }
+        }])
+    }
+}
 export const DataChainContextMethods = {
     Input1: connectNodeChain(NodeProperties.ChainNodeInput1),
+    Selector: connectNodeChain(NodeProperties.Selector),
+    SelectorProperty: connectNodeChain(NodeProperties.SelectorProperty),
     Value: connectNodeChain(NodeProperties.Value),
+    StandardLink: connectChain(),
+    InsertDataChain: insertNodeInbetween(),
+    SnipDataChain: snipNodeFromInbetween(),
     SplitDataChain: function (currentNode) {
         let id = currentNode.id;
         let { state } = this.props;
@@ -321,6 +441,14 @@ export const DataChainContextMethods = {
             },
             linkProperties: {
                 properties: { ...LinkProperties.DataChainLink }
+            },
+            callback: (node, graph) => {
+                let groups = getNodesGroups(graph, node.id)
+                this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+                    prop,
+                    id,
+                    value
+                });
             }
         });
     }

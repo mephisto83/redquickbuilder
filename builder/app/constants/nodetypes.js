@@ -252,6 +252,8 @@ export const NodeProperties = {
     Priority: 'Priority',
     DataChain: 'DataChain',
     OnBlur: 'onBlur',
+    Selector: 'Selector',
+    SelectorProperty: 'SelectorProperty',
     Value: 'Value',
     value: 'value',
     Number: 'Number',

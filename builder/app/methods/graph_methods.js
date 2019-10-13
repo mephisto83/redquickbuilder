@@ -413,6 +413,10 @@ export function removeGroupFromGroup(graph, ops) {
 
     return graph;
 }
+
+export function getNodesGroups(graph, id) {
+    return graph && graph.nodesGroups ? graph.nodesGroups[id] : null;
+}
 export function clearGroup(graph, ops) {
     var { id } = ops
     for (let i in graph.groupsNodes[id]) {
@@ -1834,6 +1838,10 @@ export function getNodesByLinkType(graph, options) {
     }
 
     return [];
+}
+
+export function GetLinkBetween(a, b, graph) {
+    return getNodeLinks(graph, a, SOURCE).find(v => v.target === b);
 }
 export function getNodeLinked(graph, options) {
     if (options) {

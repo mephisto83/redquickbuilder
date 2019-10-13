@@ -216,6 +216,24 @@ class Dashboard extends Component {
 			},
 			icon: 'fa fa-money',
 			title: `${Titles.Value}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainLink,
+					context: 'StandardLink',
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `${Titles.Value}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainLink,
+					context: 'InsertDataChain',
+				});
+			},
+			icon: 'fa fa-yc',
+			title: `${Titles.Insert}`
 		});
 
 		return result;
