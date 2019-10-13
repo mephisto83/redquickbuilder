@@ -9,6 +9,7 @@ export default class LayoutCreator extends Component {
         if (!currentRoot) {
             currentRoot = layout;
         }
+
         Object.keys(currentRoot).map((item, index) => {
             result.push(this.createSection(layoutObj, item, currentRoot[item], index + 1));
         })

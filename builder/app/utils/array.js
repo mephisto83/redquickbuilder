@@ -112,6 +112,32 @@ export function uuidv4() {
             }
         });
     }
+    if (!array.flatten) {
+        //non recursive flatten deep using a stack
+
+        Object.defineProperty(array, 'flatten', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function () {
+                let input = this;
+                const stack = [...input];
+                const res = [];
+                while (stack.length) {
+                    // pop value from stack
+                    const next = stack.pop();
+                    if (Array.isArray(next)) {
+                        // push back array items, won't modify the original input
+                        stack.push(...next);
+                    } else {
+                        res.push(next);
+                    }
+                }
+                //reverse to restore input order
+                return res.reverse();
+            }
+        });
+    }
     if (!array.orderBy) {
         Object.defineProperty(array, 'orderBy', {
             enumerable: false,

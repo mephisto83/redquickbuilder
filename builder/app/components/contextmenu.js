@@ -69,6 +69,7 @@ class ContextMenu extends Component {
                 return this.getDataChainContextMenu();
         }
     }
+    
     getDataChainContextMenu() {
         return <DataChainContextMenu />
     }

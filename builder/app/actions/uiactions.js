@@ -282,6 +282,7 @@ export function GenerateArgs(id, parts) {
 }
 
 
+
 export function GetLastChainLink(parts) {
     let lastLink = parts.find(id => {
         return GetNodeProp(GetNodeById(id), NodeProperties.AsOutput);
@@ -1381,6 +1382,9 @@ export function graphOperation(operation, options) {
         }
         operations.filter(x => x).map(op => {
             let { operation, options } = op;
+            if (typeof options === 'function') {
+                options = options(currentGraph);
+            }
             switch (operation) {
                 case SET_DEPTH:
                     currentGraph = GraphMethods.setDepth(currentGraph, options);

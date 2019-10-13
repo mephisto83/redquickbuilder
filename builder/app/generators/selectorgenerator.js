@@ -8,7 +8,7 @@ export default class SelectorGenerator {
     static Generate(options) {
         let funcs = GenerateSelectorFunctions();
         let temps = [{
-            template: `import { GetScreenInstanceFocus, GetScreenInstanceBlur, GetScreenInstanceFocused, GetScreenInstanceDirty, GetScreenInstanceObject } from './uiActions';
+            template: `import * as UIA from './uiActions';
 ${funcs}`,
             relative: './src/actions',
             relativeFilePath: `./selector.js`,
@@ -42,7 +42,7 @@ export function GenerateSelectorFunction(node) {
             case NodeTypes.ViewModel:
                 let instanceType = GetNodeProp(part, NodeProperties.InstanceType)
                 let method = InstanceTypeSelectorFunction[instanceType];
-                return `${GetJSCodeName(part)}: ${method}('${GetJSCodeName(part)}')`
+                return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}')`
             case NodeTypes.Selector:
                 return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}()`;
             default:

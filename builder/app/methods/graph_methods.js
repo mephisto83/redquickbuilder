@@ -167,6 +167,52 @@ export function RemoveCellLayout(setup, id) {
     }
     return setup;
 }
+export function ReorderCellLayout(setup, id, dir = -1) {
+    if (setup && setup.layout) {
+        let parent = FindLayoutRootParent(id, setup.layout);
+        if (parent) {
+            //     let kids = GetAllChildren(parent[id]);
+            //     // kids.map(t => {
+            //     //     delete setup.properties[t];
+            //     // });
+
+            //     delete parent[id];
+            //     delete setup.properties[id];
+            // }
+            let layout = parent;
+            let keys = Object.keys(layout);
+            if (keys.some(v => v === id)) {
+                let id_index = keys.indexOf(id);
+                if (id_index === 0 && dir === -1) {
+
+                }
+                else if (id_index === (keys.length - 1) && dir === 1) {
+
+                }
+                else {
+                    let temp = keys[id_index];
+                    keys[id_index] = keys[id_index + dir];
+                    keys[id_index + dir] = temp;
+                }
+
+                let temp_layout = { ...layout };
+                keys.map(k => delete layout[k]);
+                keys.map(k => layout[k] = temp_layout[k]);
+            }
+        }
+    }
+    return setup;
+}
+export function GetChildren(setup, parentId) {
+    let parent = FindLayoutRootParent(parentId, setup.layout);
+
+    return Object.keys(parent[parentId]);
+}
+export function GetFirstCell(setup) {
+    var keys = setup ? Object.keys(setup.layout) : [];
+
+    return keys[0] || null;
+}
 export function SetCellsLayout(setup, count, id, properties = DefaultCellProperties) {
     let keys = [];
     let root = null;
@@ -783,6 +829,9 @@ function updateNode(node, options) {
 }
 export function addNewNodeOfType(graph, options, nodeType, callback) {
     let { parent, linkProperties, groupProperties } = options;
+    if (!callback) {
+        callback = options.callback;
+    }
     let node = createNode(nodeType);
     if (options.node) {
         updateNode(node, options);

@@ -21,6 +21,7 @@ export const AsOutput = 'As output';
 export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const SelectorType = 'Selector Type';
 export const GraphPropertiesMenu = 'Graph Properties';
+export const Execute = 'Execute';
 export const DataChain = 'Data Chain';
 export const ComponentPropertyMenu = 'Component Properties';
 export const ComponentAPIMenu = 'Component API';

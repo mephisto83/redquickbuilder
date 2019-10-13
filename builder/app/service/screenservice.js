@@ -401,28 +401,29 @@ export function writeApiProperties(apiConfig) {
         for (var i in apiConfig) {
             let property = null;
             let { instanceType, model, selector, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
+            let modelJsName = GetJSCodeName(model) || model;
             switch (instanceType) {
                 case InstanceTypes.ScreenInstance:
                     switch (handlerType) {
                         case HandlerTypes.Blur:
-                            property = `() => this.props.updateScreenInstanceBlur(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            property = `() => this.props.updateScreenInstanceBlur(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
                             break;
                         case HandlerTypes.Focus:
-                            property = `() => this.props.updateScreenInstanceFocus(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                            property = `() => this.props.updateScreenInstanceFocus(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
                             break;
                         case HandlerTypes.ChangeText:
-                            property = `(v) => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)}, v)`;
+                            property = `(v) => this.props.updateScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)}, v)`;
                             break;
                         case HandlerTypes.Change:
-                            property = `(v) => this.props.updateScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)}, v.nativeEvent.text)`;
+                            property = `(v) => this.props.updateScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)}, v.nativeEvent.text)`;
                             break;
                         case HandlerTypes.Property:
                         default:
                             if (modelProperty) {
-                                property = `GetScreenInstance(const_${model}, const_${GetJSCodeName(modelProperty)})`;
+                                property = `GetScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
                             }
                             else {
-                                property = `GetScreenInstanceObject(const_${model})`;
+                                property = `GetScreenInstanceObject(const_${modelJsName})`;
                             }
                             break;
                     }
@@ -431,7 +432,11 @@ export function writeApiProperties(apiConfig) {
                     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
                     break;
                 case InstanceTypes.Selector:
-                    property = `S.${GetJSCodeName(selector)}()`
+                    property = `S.${GetJSCodeName(selector)}()`;
+                    break;
+                case InstanceTypes.Boolean:
+                    property = `true`;
+                    break;
                 default:
                     break;
                 //throw 'write api properties unhandled case ' + instanceType;

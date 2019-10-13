@@ -1628,6 +1628,7 @@ export const ValidationCases = {
 Object.keys(ValidationCases).map(t => {
     ValidationCases[t].id = t;
 })
+
 export const ExecutorRules = {
     ModelReference: 'model-reference',
     Copy: 'copy',

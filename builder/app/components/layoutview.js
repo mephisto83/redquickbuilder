@@ -17,7 +17,7 @@ import ControllerGenerator from '../generators/controllergenerator';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import TextInput from './textinput';
-import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET, SOURCE, getComponentPropertyList, GetNodesLinkedTo, getComponentProperty } from '../methods/graph_methods';
+import { GraphKeys, SetCellsLayout, GetCellProperties, FindLayoutRoot, RemoveCellLayout, GetConnectedNodesByType, CreateLayout, TARGET, SOURCE, getComponentPropertyList, GetNodesLinkedTo, getComponentProperty, ReorderCellLayout } from '../methods/graph_methods';
 
 import Tab from './tab';
 import CheckBox from './checkbox';
@@ -55,15 +55,24 @@ class LayoutView extends Component {
                 let cellProperties = GetCellProperties(nodeLayout, this.state.selectedCell);
                 cellProperties.componentApi = cellProperties.componentApi || {};
                 let { instanceType, model, selector, handlerType, dataChain, modelProperty } = cellProperties.componentApi[selectedComponentApiProperty] || {};
-                let componentProperties = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentProperties);
-                let componentPropertiesList = getComponentPropertyList(componentProperties);
+                let model_obj = UIA.GetNodeById(model);
+                let temp_model = UIA.GetNodeProp(model_obj, UIA.NodeProperties.Model);
+                let properties = GetNodesLinkedTo(UIA.GetRootGraph(state), {
+                    id: temp_model,
+                    direction: SOURCE
+                }).toNodeSelect();
                 return [
                     (<SelectInput
                         label={Titles.ComponentAPIMenu}
                         value={selectedComponentApiProperty}
                         options={getComponentApiList(componentApi)}
                         onChange={(value) => {
-                            this.setState({ componentApi: { ...(this.state.componentApi || {}), [selectedCell]: value } });
+                            this.setState({
+                                componentApi: {
+                                    ...(this.state.componentApi || {}), 
+                                    [selectedCell]: value
+                                }
+                            });
                         }} />),
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
                         label={Titles.HandlerType}
@@ -126,10 +135,7 @@ class LayoutView extends Component {
                             });
                         }} />) : null,
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
-                        options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
-                            id: getComponentProperty(componentProperties, UIA.GetNodeProp(UIA.GetNodeById(model), UIA.NodeProperties.Model)),
-                            direction: SOURCE
-                        }).toNodeSelect()}
+                        options={properties}
                         onChange={(val) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
@@ -226,6 +232,30 @@ class LayoutView extends Component {
                 <section className="content">
                     <div className="row">
                         <div className="col-md-2">
+                            <div className="btn-group">
+                                <button type="button" onClick={() => {
+                                    let layout = UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();
+                                    layout = ReorderCellLayout(layout, this.state.selectedCell);
+                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                        prop: UIA.NodeProperties.Layout,
+                                        id: currentNode.id,
+                                        value: layout
+                                    });
+
+                                }} className="btn btn-default btn-flat"><i className="fa  fa-angle-left"></i></button>
+                                <button type="button"
+                                    onClick={() => {
+                                        let layout = UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();
+                                        layout = ReorderCellLayout(layout, this.state.selectedCell, 1);
+                                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                            prop: UIA.NodeProperties.Layout,
+                                            id: currentNode.id,
+                                            value: layout
+                                        });
+
+                                    }}
+                                    className="btn btn-default btn-flat"><i className="fa fa-angle-right"></i></button>
+                            </div>
                             <Box primary={true} maxheight={350} title={Titles.Layout}>
                                 {this.state.selectedCell ? (<button onClick={() => {
                                     let layout = UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();

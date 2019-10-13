@@ -287,6 +287,7 @@ export const InstanceTypes = {
     ApiProperty: 'ApiProperty',
     ScreenParam: 'ScreenParam',
     Selector: 'Selector',
+    Boolean: 'Boolean',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }
 

@@ -14,7 +14,7 @@ import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels, GetAllModels, CreateLoginModels } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import { PARAMETER_TAB } from './dashboard';
 import SideBar from './sidebar';
@@ -46,6 +46,9 @@ class QuickMethods extends Component {
                             })} />
                             <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, CreateLoginModels);
+                            })} />
+                            <TreeViewMenu hideArrow={true} title={CreateDefaultView.type} icon={'fa fa-plus'} onClick={(() => {
+                                this.props.executeGraphOperation(currentNode, CreateDefaultView);
                             })} />
                         </TreeViewMenu>
                     </SideBarMenu>
