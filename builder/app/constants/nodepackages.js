@@ -24,11 +24,12 @@ import {
     GetModelPropertyChildren,
     GetDataChainNextId
 } from "../actions/uiactions";
-import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren } from "../methods/graph_methods";
+import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi } from "../methods/component_api_methods";
+import { DataChainFunctionKeys } from "./datachain";
 
 
 export const GetSpecificModels = {
@@ -507,7 +508,8 @@ export const CreateDefaultView = {
                             [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} React Native Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.View.key,
-                            [NodeProperties.Layout]: layout
+                            [NodeProperties.Layout]: layout,
+                            [NodeProperties.Pinned]: false
                         },
                         groupProperties: {
                         },
@@ -664,9 +666,9 @@ export const CreateDefaultView = {
                     }
                 }
             })])(GetDispatchFunc(), GetStateFunc());
-            modelProperties.map(property => {
+            modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
-                debugger;
+
                 PerformGraphOperation([{
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
@@ -674,8 +676,23 @@ export const CreateDefaultView = {
                             nodeType: NodeTypes.DataChain,
                             properties: {
                                 [NodeProperties.UIText]: `Get ${GetNodeTitle(currentNode)} Object => ${GetNodeTitle(property)}`,
-                                [NodeProperties.EntryPoint]: true
+                                [NodeProperties.EntryPoint]: true,
+                                [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                                [NodeProperties.Selector]: modelComponentSelectors[0],
+                                [NodeProperties.SelectorProperty]: viewModelNodeId,
+                                [NodeProperties.Pinned]: false
                             },
+                            links: [{
+                                target: modelComponentSelectors[0],
+                                linkProperties: {
+                                    properties: { ...LinkProperties.DataChainLink }
+                                }
+                            }, {
+                                target: viewModelNodeId,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.DataChainLink }
+                                }
+                            }],
                             callback: (propNode) => {
                                 propNodeId = propNode.id;
                             }
@@ -688,13 +705,16 @@ export const CreateDefaultView = {
                             parent: propNodeId,
                             nodeType: NodeTypes.DataChain,
                             groupProperties: {
-                                [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent),
+                                [GroupProperties.ExternalEntryNode]: GetNodeProp(GetNodeById(propNodeId), NodeProperties.ChainParent),
                                 [GroupProperties.GroupEntryNode]: propNodeId,
                                 [GroupProperties.GroupExitNode]: propNodeId,
                                 [GroupProperties.ExternalExitNode]: GetDataChainNextId(propNodeId)
                             },
                             properties: {
-                                [NodeProperties.ChainParent]: propNodeId
+                                [NodeProperties.UIText]: `Get ${GetNodeTitle(property)}`,
+                                [NodeProperties.ChainParent]: propNodeId,
+                                [NodeProperties.AsOutput]: true,
+                                [NodeProperties.Pinned]: false
                             },
                             linkProperties: {
                                 properties: { ...LinkProperties.DataChainLink }
@@ -706,6 +726,7 @@ export const CreateDefaultView = {
                                 //     id,
                                 //     value
                                 // });
+                                // DataChainContextMethods.SplitDataChain.bind(this)(currentNode);
                             }
                         }
                     }

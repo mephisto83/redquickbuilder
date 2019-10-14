@@ -469,12 +469,11 @@ export const DataChainContextMethods = {
                 properties: { ...LinkProperties.DataChainLink }
             },
             callback: (node, graph) => {
-                // let groups = getNodesGroups(graph, node.id)
-                // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-                //     prop,
-                //     id,
-                //     value
-                // });
+                this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+                    prop,
+                    id,
+                    value
+                });
             }
         });
     }
