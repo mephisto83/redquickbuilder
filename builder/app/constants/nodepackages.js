@@ -303,7 +303,7 @@ export const CreateLoginModels = {
                 properties: {
                     [NodeProperties.NodePackage]: nodePackage,
                     [NodeProperties.NodePackageType]: nodePackageType,
-                    [NodeProperties.UIText]: `Blue Register VM`
+                    [NodeProperties.UIText]: `Blue Register View Model`
                 },
                 callback: (newNode) => {
                     // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
@@ -312,11 +312,11 @@ export const CreateLoginModels = {
                     setTimeout(() => {
                         PerformGraphOperation([
                             { propName: 'User Name' },
-                            { propName: 'Email' },
+                            { propName: 'Email', propType: NodePropertyTypes.EMAIL },
                             { propName: 'Password' },
                             { propName: 'Confirm Password' }
                         ].map(v => {
-                            let { propName } = v;
+                            let { propName, propType } = v;
                             return ({
                                 operation: ADD_NEW_NODE,
                                 options: {
@@ -328,7 +328,7 @@ export const CreateLoginModels = {
                                     parent: newNode.id,
                                     properties: {
                                         [NodeProperties.NodePackage]: nodePackage,
-                                        [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
+                                        [NodeProperties.UIAttributeType]: propType || NodePropertyTypes.STRING,
                                         [NodeProperties.NodePackageType]: nodePackageType,
                                         [NodeProperties.UIText]: propName
                                     }
