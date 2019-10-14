@@ -5,8 +5,15 @@ import { bindTemplate } from "./functiontypes";
 
 export const NAVIGATION = '-NAVIGATION';
 export const APP_METHOD = '-APP_METHOD';
-const ARE_HANDLERS = ['onBlur', 'onFocus', 'onChangeText'];
-const INPUT_DEFAULT_API = ['value', 'onBlur', 'onFocus', 'onChangeText', 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
+export const ON_BLUR = 'onBlur';
+export const ON_FOCUS = 'onFocus';
+export const ON_CHANGE = 'onChange';
+export const ON_CHANGE_TEXT = 'onChangeText';
+export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE];
+export const ARE_BOOLEANS = ['inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel'];
+export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
+export const VALUE = 'value';
+const INPUT_DEFAULT_API = [VALUE, ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
     'block',
     'primary',

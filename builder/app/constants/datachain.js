@@ -442,19 +442,11 @@ export function connectChain() {
         }])
     }
 }
-export const DataChainContextMethods = {
-    Input1: connectNodeChain(NodeProperties.ChainNodeInput1),
-    Selector: connectNodeChain(NodeProperties.Selector),
-    SelectorProperty: connectNodeChain(NodeProperties.SelectorProperty),
-    Value: connectNodeChain(NodeProperties.Value),
-    StandardLink: connectChain(),
-    InsertDataChain: insertNodeInbetween(),
-    SnipDataChain: snipNodeFromInbetween(),
-    SplitDataChain: function (currentNode) {
-        let id = currentNode.id;
-        let { state } = this.props;
-        this.props.graphOperation(ADD_NEW_NODE, {
-            parent: Visual(state, SELECTED_NODE),
+export function SplitDataCommand(currentNode, callback) {
+    return {
+        operation: ADD_NEW_NODE,
+        options: {
+            parent: currentNode.id,
             nodeType: NodeTypes.DataChain,
             groupProperties: {
                 [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent),
@@ -468,13 +460,21 @@ export const DataChainContextMethods = {
             linkProperties: {
                 properties: { ...LinkProperties.DataChainLink }
             },
-            callback: (node, graph) => {
-                this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-                    prop,
-                    id,
-                    value
-                });
-            }
-        });
+            callback
+        }
+    }
+}
+export const DataChainContextMethods = {
+    Input1: connectNodeChain(NodeProperties.ChainNodeInput1),
+    Selector: connectNodeChain(NodeProperties.Selector),
+    SelectorProperty: connectNodeChain(NodeProperties.SelectorProperty),
+    Value: connectNodeChain(NodeProperties.Value),
+    StandardLink: connectChain(),
+    InsertDataChain: insertNodeInbetween(),
+    SnipDataChain: snipNodeFromInbetween(),
+    SplitDataChain: function (currentNode) {
+        let id = currentNode.id;
+        let { state } = this.props;
+        this.props.graphOperation([SplitDataCommand(currentNode)]);
     }
 }

@@ -25,11 +25,11 @@ import {
     GetDataChainNextId
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode } from "../methods/graph_methods";
-import { ComponentTypes, InstanceTypes } from "./componenttypes";
+import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
-import { createComponentApi, addComponentApi } from "../methods/component_api_methods";
-import { DataChainFunctionKeys } from "./datachain";
+import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
+import { DataChainFunctionKeys, DataChainFunctions } from "./datachain";
 
 
 export const GetSpecificModels = {
@@ -666,6 +666,7 @@ export const CreateDefaultView = {
                     }
                 }
             })])(GetDispatchFunc(), GetStateFunc());
+            let propertyDataChainAccesors = [];
             modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
 
@@ -695,6 +696,7 @@ export const CreateDefaultView = {
                             }],
                             callback: (propNode) => {
                                 propNodeId = propNode.id;
+                                propertyDataChainAccesors.push(propNodeId);
                             }
                         }
                     }
@@ -714,11 +716,25 @@ export const CreateDefaultView = {
                                 [NodeProperties.UIText]: `Get ${GetNodeTitle(property)}`,
                                 [NodeProperties.ChainParent]: propNodeId,
                                 [NodeProperties.AsOutput]: true,
-                                [NodeProperties.Pinned]: false
+                                [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Property,
+                                [NodeProperties.Pinned]: false,
+                                [NodeProperties.UIModelType]: currentNode.id,
+                                [NodeProperties.Property]: property.id
                             },
                             linkProperties: {
                                 properties: { ...LinkProperties.DataChainLink }
                             },
+                            links: [{
+                                target: currentNode.id,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.ModelTypeLink }
+                                }
+                            }, {
+                                target: property.id,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.PropertyLink }
+                                }
+                            }],
                             callback: (node, graph) => {
                                 // let groups = getNodesGroups(graph, node.id)
                                 // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
@@ -731,6 +747,117 @@ export const CreateDefaultView = {
                         }
                     }
                 }])(GetDispatchFunc(), GetStateFunc());;
+
+                let compNodeId = childComponents[propertyIndex];
+
+                let compNode = GetNodeById(compNodeId)
+                let componentType = GetNodeProp(compNode, NodeProperties.ComponentType);
+                let componentApi = GetNodeProp(compNode, NodeProperties.ComponentApi);
+                // componentTypes[componentType].defaultApi.map(x => {
+                //     componentProps = addComponentApi(componentProps, {
+                //         modelProp: x.property
+                //     });
+                // });
+
+                let rootCellId = GetFirstCell(layout);
+                let children = GetChildren(layout, rootCellId);
+                let childId = children[propertyIndex];
+                let apiList = getComponentApiList(componentApi);
+
+                PerformGraphOperation([...apiList.map(api => {
+                    let apiProperty = api.value;
+                    if (ARE_BOOLEANS.some(v => v === apiProperty) || ARE_HANDLERS.some(v => v === apiProperty)) {
+                        return false;
+                    }
+                    return {
+                        operation: ADD_NEW_NODE,
+                        options: function (graph) {
+                            return {
+                                nodeType: NodeTypes.DataChain,
+                                properties: {
+                                    [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}`
+                                },
+                                links: [...vmsIds().map(t => ({
+                                    target: t,
+                                    linkProperties: {
+                                        properties: {
+                                            ...LinkProperties.SelectorLink
+                                        }
+                                    }
+                                }))],
+                                callback: (selector) => {
+                                    modelComponentSelectors.push(selector.id);
+                                }
+                            }
+                        }
+                    }
+                }).filter(x => x)]);//(GetDispatchFunc(), GetStateFunc());
+
+                PerformGraphOperation([...apiList.map(api => {
+                    return {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+
+                            let apiProperty = api.value;
+                            let cellProperties = GetCellProperties(layout, childId);
+                            cellProperties.componentApi = cellProperties.componentApi || {};
+                            // let { instanceType, model, selector, handlerType, dataChain, modelProperty } = cellProperties.componentApi[apiProperty] || {};
+                            if (ARE_BOOLEANS.some(v => v === apiProperty)) {
+                                cellProperties.componentApi[apiProperty] = {
+                                    instanceType: InstanceTypes.Boolean,
+                                    handlerType: HandlerTypes.Property,
+                                }
+                            }
+                            else if (ARE_HANDLERS.some(v => v === apiProperty)) {
+                                if ([ARE_TEXT_CHANGE].some(v => v === apiProperty)) {
+                                    cellProperties.componentApi[apiProperty] = {
+                                        instanceType: InstanceTypes.ScreenInstance,
+                                        handlerType: HandlerTypes.ChangeText
+                                    };
+                                }
+                                else {
+                                    cellProperties.componentApi[apiProperty] = {
+                                        instanceType: InstanceTypes.ScreenInstance,
+                                        handlerType: HandlerTypes.Change,
+                                    }
+                                }
+                            }
+                            else {
+                                cellProperties.componentApi[apiProperty] = {
+                                    instanceType: InstanceTypes.Selector,
+                                    selector: modelComponentSelectors[0],
+                                    handlerType: HandlerTypes.Property,
+                                }
+                            }
+
+                            if (apiProperty === VALUE) {
+                                cellProperties.componentApi[apiProperty].dataChain = propertyDataChainAccesors[propertyIndex]
+                            }
+
+                            switch (apiProperty) {
+                                case ON_BLUR:
+                                    cellProperties.componentApi[apiProperty].model = viewModelNodeBlurId;
+                                    cellProperties.componentApi[apiProperty].modelProperty = modelProperties[propertyIndex].id;
+                                    break;
+                                case ON_CHANGE_TEXT:
+                                case ON_CHANGE:
+                                    cellProperties.componentApi[apiProperty].model = viewModelNodeId;
+                                    cellProperties.componentApi[apiProperty].modelProperty = modelProperties[propertyIndex].id;
+                                    break;
+                                case ON_FOCUS:
+                                    cellProperties.componentApi[apiProperty].model = viewModelNodeFocusId;
+                                    cellProperties.componentApi[apiProperty].modelProperty = modelProperties[propertyIndex].id;
+                                    break;
+                            }
+
+                            return {
+                                prop: NodeProperties.Layout,
+                                id: compNodeId,
+                                value: layout
+                            }
+                        }
+                    }
+                })])(GetDispatchFunc(), GetStateFunc());
             });
 
             PerformGraphOperation([
