@@ -288,22 +288,48 @@ export const DataChainFunctions = {
 export function connectNodeChain(prop) {
     return function (currentNode, value) {
         var id = currentNode.id;
-        this.props.graphOperation(REMOVE_LINK_BETWEEN_NODES, {
-            source: currentNode.properties[prop],
+        // this.props.graphOperation(REMOVE_LINK_BETWEEN_NODES, {
+        //     source: currentNode.properties[prop],
+        //     target: id
+        // })
+        // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+        //     prop,
+        //     id,
+        //     value
+        // });
+        // this.props.graphOperation(ADD_LINK_BETWEEN_NODES, {
+        //     source: value,
+        //     target: id,
+        //     properties: { ...LinkProperties.DataChainLink }
+        // })
+        this.props.graphOperation(connectNodeChainCommands(prop, id, value, currentNode.properties[prop]));
+    }
+}
+
+export function connectNodeChainCommands(prop, id, value, source) {
+    return [{
+        operation: REMOVE_LINK_BETWEEN_NODES,
+        options: {
+            source: source,
             target: id
-        })
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: {
             prop,
             id,
             value
-        });
-        this.props.graphOperation(ADD_LINK_BETWEEN_NODES, {
+        }
+    }, {
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: {
             source: value,
             target: id,
             properties: { ...LinkProperties.DataChainLink }
-        })
-    }
+        }
+    }]
 }
+
 export function snipNodeFromInbetween() {
     return function (currentNode) {
         let graph = GetCurrentGraph(GetState());
@@ -443,12 +469,12 @@ export const DataChainContextMethods = {
                 properties: { ...LinkProperties.DataChainLink }
             },
             callback: (node, graph) => {
-                let groups = getNodesGroups(graph, node.id)
-                this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-                    prop,
-                    id,
-                    value
-                });
+                // let groups = getNodesGroups(graph, node.id)
+                // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+                //     prop,
+                //     id,
+                //     value
+                // });
             }
         });
     }

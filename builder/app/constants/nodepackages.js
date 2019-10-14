@@ -1,5 +1,5 @@
 import { MethodFunctions, FunctionTypes, FunctionTemplateKeys, FunctionMethodTypes, HTTP_METHODS } from "./functiontypes";
-import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes } from "./nodetypes";
+import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties } from "./nodetypes";
 import {
     ADD_NEW_NODE,
     GetAgentNodes,
@@ -21,7 +21,8 @@ import {
     GetState,
     NEW_SCREEN_OPTIONS,
     NEW_COMPONENT_NODE,
-    GetModelPropertyChildren
+    GetModelPropertyChildren,
+    GetDataChainNextId
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes } from "./componenttypes";
@@ -663,6 +664,53 @@ export const CreateDefaultView = {
                     }
                 }
             })])(GetDispatchFunc(), GetStateFunc());
+            modelProperties.map(property => {
+                let propNodeId = null;
+                debugger;
+                PerformGraphOperation([{
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        return {
+                            nodeType: NodeTypes.DataChain,
+                            properties: {
+                                [NodeProperties.UIText]: `Get ${GetNodeTitle(currentNode)} Object => ${GetNodeTitle(property)}`,
+                                [NodeProperties.EntryPoint]: true
+                            },
+                            callback: (propNode) => {
+                                propNodeId = propNode.id;
+                            }
+                        }
+                    }
+                }, {
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        return {
+                            parent: propNodeId,
+                            nodeType: NodeTypes.DataChain,
+                            groupProperties: {
+                                [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent),
+                                [GroupProperties.GroupEntryNode]: propNodeId,
+                                [GroupProperties.GroupExitNode]: propNodeId,
+                                [GroupProperties.ExternalExitNode]: GetDataChainNextId(propNodeId)
+                            },
+                            properties: {
+                                [NodeProperties.ChainParent]: propNodeId
+                            },
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataChainLink }
+                            },
+                            callback: (node, graph) => {
+                                // let groups = getNodesGroups(graph, node.id)
+                                // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+                                //     prop,
+                                //     id,
+                                //     value
+                                // });
+                            }
+                        }
+                    }
+                }])(GetDispatchFunc(), GetStateFunc());;
+            });
 
             PerformGraphOperation([
                 ...([].interpolate(0, modelProperties.length + 1, modelIndex => {
