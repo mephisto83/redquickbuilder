@@ -301,7 +301,7 @@ export const CreateLoginModels = {
                 properties: {
                     [NodeProperties.NodePackage]: nodePackage,
                     [NodeProperties.NodePackageType]: nodePackageType,
-                    [NodeProperties.UIText]: `Blue Register View Model`
+                    [NodeProperties.UIText]: `Blue Register VM`
                 },
                 callback: (newNode) => {
                     // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
@@ -350,8 +350,15 @@ export const CreateDefaultView = {
         let screenComponentId = null;
         let screenNodeOptionId = null;
         let childComponents = [];
+        let modelComponentSelectors = [];
+        let modelComponentDataChains = [];
         let layout = null;
+        let viewModelNodeDirtyId = null;
+        let viewModelNodeFocusId = null;
+        let viewModelNodeBlurId = null;
+        let viewModelNodeFocusedId = null;
         let viewModelNodeId = null;
+        let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
             let modelProperties = GetModelPropertyChildren(currentNode.id);
             PerformGraphOperation([{
@@ -373,9 +380,85 @@ export const CreateDefaultView = {
                         viewModelNodeId = viewModelNode.id;
                     },
                     properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} View Model`,
+                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM`,
                         [NodeProperties.Model]: currentNode.id,
                         [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance
+                    },
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: { ...LinkProperties.ViewModelLink }
+                        }
+                    }]
+                }
+            }, {
+                operation: ADD_NEW_NODE,
+                options: {
+                    nodeType: NodeTypes.ViewModel,
+                    callback: (viewModelNodeDirty) => {
+                        viewModelNodeDirtyId = viewModelNodeDirty.id;
+                    },
+                    properties: {
+                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Dirty`,
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty
+                    },
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: { ...LinkProperties.ViewModelLink }
+                        }
+                    }]
+                }
+            }, {
+                operation: ADD_NEW_NODE,
+                options: {
+                    nodeType: NodeTypes.ViewModel,
+                    callback: (viewModelNodeFocus) => {
+                        viewModelNodeFocusId = viewModelNodeFocus.id;
+                    },
+                    properties: {
+                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Focus`,
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus
+                    },
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: { ...LinkProperties.ViewModelLink }
+                        }
+                    }]
+                }
+            }, {
+                operation: ADD_NEW_NODE,
+                options: {
+                    nodeType: NodeTypes.ViewModel,
+                    callback: (viewModelNodeFocused) => {
+                        viewModelNodeFocusedId = viewModelNodeFocused.id;
+                    },
+                    properties: {
+                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Focused`,
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused
+                    },
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: { ...LinkProperties.ViewModelLink }
+                        }
+                    }]
+                }
+            }, {
+                operation: ADD_NEW_NODE,
+                options: {
+                    nodeType: NodeTypes.ViewModel,
+                    callback: (viewModelNodeBlur) => {
+                        viewModelNodeBlurId = viewModelNodeBlur.id;
+                    },
+                    properties: {
+                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Blur`,
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur
                     },
                     links: [{
                         target: currentNode.id,
@@ -558,12 +641,57 @@ export const CreateDefaultView = {
                 }
             }])(GetDispatchFunc(), GetStateFunc());
 
+            PerformGraphOperation([({
+                operation: ADD_NEW_NODE,
+                options: function (graph) {
+                    return {
+                        nodeType: NodeTypes.Selector,
+                        properties: {
+                            [NodeProperties.UIText]: GetNodeTitle(currentNode)
+                        },
+                        links: [...vmsIds().map(t => ({
+                            target: t,
+                            linkProperties: {
+                                properties: {
+                                    ...LinkProperties.SelectorLink
+                                }
+                            }
+                        }))],
+                        callback: (selector) => {
+                            modelComponentSelectors.push(selector.id);
+                        }
+                    }
+                }
+            })])(GetDispatchFunc(), GetStateFunc());
+
             PerformGraphOperation([
                 ...([].interpolate(0, modelProperties.length + 1, modelIndex => {
                     return applyDefaultComponentProperties(GetNodeById(childComponents[modelIndex]), UITypes.ReactNative)
-                })).flatten()
-            ])(GetDispatchFunc(), GetStateFunc());;
+                })).flatten(),
+            ])(GetDispatchFunc(), GetStateFunc());
 
+            // PerformGraphOperation([...([].interpolate(0, modelProperties.length + 1, modelIndex => {
+            //     // return applyDefaultComponentProperties(GetNodeById(childComponents[modelIndex]), UITypes.ReactNative)
+            //     return {
+            //         operation: CHANGE_NODE_PROPERTY,
+            //         options: function (graph) {
+            //             let childComponentId = childComponents[modelIndex]
+            //             let rootCellId = GetFirstCell(layout);
+            //             let children = GetChildren(layout, rootCellId);
+            //             let childId = children[modelIndex];
+            //             let cellProperties = GetCellProperties(layout, childId);
+            //             cellProperties.componentApi = cellProperties.componentApi || {};
+            //             cellProperties.componentApi.instanceType = InstanceTypes.Selector;
+            //             cellProperties.componentApi.selector = modelComponentSelectors[0]
+            //             cellProperties.componentApi.dataChain = modelComponentDataChains[modelIndex];
+            //             return {
+            //                 prop: NodeProperties.ComponentApi,
+            //                 id: compNodeId,
+            //                 value: componentProps
+            //             };
+            //         }
+            //     }
+            // }))])(GetDispatchFunc(), GetStateFunc());
         }
     }
 };
