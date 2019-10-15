@@ -399,13 +399,13 @@ export function GetDataChainFrom(id) {
 
     return result;
 }
-export function getGroup(id) {
+export function getGroup(id, graph) {
     // return graph.groupLib[id];
-    return GraphMethods.getGroup(GetCurrentGraph(_getState()), id);
+    return GraphMethods.getGroup(graph || GetCurrentGraph(_getState()), id);
 }
-export function hasGroup(id) {
+export function hasGroup(id, graph) {
     //    return !!(graph.nodeLib[parent] && GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups));
-    return GraphMethods.hasGroup(GetCurrentGraph(_getState()), id);
+    return GraphMethods.hasGroup(graph || GetCurrentGraph(_getState()), id);
 }
 
 

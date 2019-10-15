@@ -445,9 +445,9 @@ export function ConnectChainCommand(source, target) {
     }]
 }
 
-export function AddChainCommand(currentNode, callback) {
+export function AddChainCommand(currentNode, callback, graph) {
     let groupProperties = GetNodeProp(currentNode, NodeProperties.GroupParent) ? {
-        id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent)).id
+        id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent), graph).id
     } : null;
     return {
         operation: ADD_NEW_NODE,

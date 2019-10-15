@@ -799,9 +799,10 @@ export const CreateDefaultView = {
                     }, {
                         operation: ADD_NEW_NODE,
                         options: function (graph) {
+                            
                             let temp = AddChainCommand(GetNodeById(splitId, graph), complete => {
                                 completeId = complete.id;
-                            });
+                            }, graph);
                             return temp.options;
                         }
                     }, {
