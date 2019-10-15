@@ -342,6 +342,39 @@ export const CreateLoginModels = {
     }
 }
 
+export const AddAgentUser = {
+    type: 'add-agent-user',
+    methodType: 'Add User Agent',
+    method: () => {
+        let userId = null;
+        PerformGraphOperation([{
+            operation: ADD_NEW_NODE,
+            options: {
+                nodeType: NodeTypes.Model,
+                callback: (node) => {
+                    userId = node.id;
+                },
+                properties: {
+                    [NodeProperties.UIText]: `User`,
+                    [NodeProperties.IsUser]: true
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function () {
+                return {
+                    nodeType: NodeTypes.Model,
+                    properties: {
+                        [NodeProperties.UIText]: `Agent`,
+                        [NodeProperties.IsAgent]: true,
+                        [NodeProperties.UIUser]: userId
+                    }
+                }
+            }
+        }])(GetDispatchFunc(), GetStateFunc());
+    }
+}
+
 export const CreateDefaultView = {
     type: 'react-native-views',
     methodType: 'React Native Views',
@@ -507,7 +540,7 @@ export const CreateDefaultView = {
                         properties: {
                             [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} React Native Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
-                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.View.key,
+                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Form.key,
                             [NodeProperties.Layout]: layout,
                             [NodeProperties.Pinned]: false
                         },
@@ -516,6 +549,22 @@ export const CreateDefaultView = {
                         linkProperties: {
                             properties: { ...LinkProperties.ComponentLink }
                         }
+                    }
+                }
+            }, {
+                operation: CHANGE_NODE_PROPERTY,
+                options: function () {
+                    let formLayout = CreateLayout();
+                    formLayout = SetCellsLayout(formLayout, 1);
+                    let rootCellId = GetFirstCell(formLayout);
+                    let cellProperties = GetCellProperties(formLayout, rootCellId);
+                    cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
+
+                    cellProperties.children[rootCellId] = screenComponentId;
+                    return {
+                        prop: NodeProperties.Layout,
+                        value: formLayout,
+                        id: screenNodeOptionId
                     }
                 }
             }, ...modelProperties.map((modelProperty, modelIndex) => {
@@ -799,7 +848,7 @@ export const CreateDefaultView = {
                     }, {
                         operation: ADD_NEW_NODE,
                         options: function (graph) {
-                            
+
                             let temp = AddChainCommand(GetNodeById(splitId, graph), complete => {
                                 completeId = complete.id;
                             }, graph);
@@ -930,7 +979,7 @@ export const CreateDefaultView = {
 
                             return {
                                 prop: NodeProperties.Layout,
-                                id: compNodeId,
+                                id: screenComponentId,
                                 value: layout
                             }
                         }
