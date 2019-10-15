@@ -266,7 +266,6 @@ export const DataChainFunctions = {
     },
     [DataChainFunctionKeys.Pass]: {
         ui: {
-            value: NodeProperties.value
         },
         filter: {
             [NodeProperties.NODEType]: true
@@ -425,22 +424,46 @@ export function insertNodeInbetween() {
 export function connectChain() {
     return function (currentNode, value) {
         var id = currentNode.id;
-        this.props.graphOperation([{
-            operation: ADD_LINK_BETWEEN_NODES,
-            options: {
-                source: id,
-                target: value,
-                properties: { ...LinkProperties.DataChainLink }
-            }
-        }, {
-            operation: CHANGE_NODE_PROPERTY,
-            options: {
-                id: value,
-                prop: NodeProperties.ChainParent,
-                value: id,
-            }
-        }])
+        this.props.graphOperation(ConnectChainCommand(id, value))
     }
+}
+export function ConnectChainCommand(source, target) {
+    return [{
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: {
+            source,
+            target,
+            properties: { ...LinkProperties.DataChainLink }
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: {
+            id: target,
+            prop: NodeProperties.ChainParent,
+            value: source,
+        }
+    }]
+}
+
+export function AddChainCommand(currentNode, callback) {
+    let groupProperties = GetNodeProp(currentNode, NodeProperties.GroupParent) ? {
+        id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent)).id
+    } : null;
+    return {
+        operation: ADD_NEW_NODE,
+        options: {
+            parent: currentNode.id,
+            nodeType: NodeTypes.DataChain,
+            groupProperties,
+            properties: {
+                [NodeProperties.ChainParent]: currentNode.id
+            },
+            linkProperties: {
+                properties: { ...LinkProperties.DataChainLink }
+            },
+            callback
+        }
+    };
 }
 export function SplitDataCommand(currentNode, callback) {
     return {

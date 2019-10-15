@@ -29,7 +29,7 @@ import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
-import { DataChainFunctionKeys, DataChainFunctions } from "./datachain";
+import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand } from "./datachain";
 
 
 export const GetSpecificModels = {
@@ -669,7 +669,6 @@ export const CreateDefaultView = {
             let propertyDataChainAccesors = [];
             modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
-
                 PerformGraphOperation([{
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
@@ -763,35 +762,113 @@ export const CreateDefaultView = {
                 let children = GetChildren(layout, rootCellId);
                 let childId = children[propertyIndex];
                 let apiList = getComponentApiList(componentApi);
-
+                let apiDataChainLists = []
                 PerformGraphOperation([...apiList.map(api => {
                     let apiProperty = api.value;
                     if (ARE_BOOLEANS.some(v => v === apiProperty) || ARE_HANDLERS.some(v => v === apiProperty)) {
                         return false;
                     }
-                    return {
+                    let dca = null;
+                    let completeId = null;
+                    let splitId = null;
+                    return [{
                         operation: ADD_NEW_NODE,
                         options: function (graph) {
                             return {
                                 nodeType: NodeTypes.DataChain,
                                 properties: {
-                                    [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}`
+                                    [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} ${GetNodeTitle(property)} ${apiProperty}`,
+                                    [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                                    [NodeProperties.EntryPoint]: true
                                 },
-                                links: [...vmsIds().map(t => ({
-                                    target: t,
-                                    linkProperties: {
-                                        properties: {
-                                            ...LinkProperties.SelectorLink
-                                        }
-                                    }
-                                }))],
-                                callback: (selector) => {
-                                    modelComponentSelectors.push(selector.id);
+                                links: [],
+                                callback: (dataChainApis) => {
+                                    dca = dataChainApis.id;
+                                    apiDataChainLists.push(dataChainApis.id);
                                 }
                             }
                         }
-                    }
-                }).filter(x => x)]);//(GetDispatchFunc(), GetStateFunc());
+                    }, {
+                        operation: ADD_NEW_NODE,
+                        options: function (graph) {
+                            let temp = SplitDataCommand(GetNodeById(dca, graph), split => {
+                                splitId = split.id;
+                            });
+                            return temp.options;
+                        }
+                    }, {
+                        operation: ADD_NEW_NODE,
+                        options: function (graph) {
+                            let temp = AddChainCommand(GetNodeById(splitId, graph), complete => {
+                                completeId = complete.id;
+                            });
+                            return temp.options;
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.DataChainFunctionType,
+                                id: completeId,
+                                value: DataChainFunctionKeys.Pass
+                            }
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.UIText,
+                                id: completeId,
+                                value: `${apiProperty} Complete`
+                            }
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.AsOutput,
+                                id: completeId,
+                                value: true
+                            }
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.DataChainFunctionType,
+                                id: splitId,
+                                value: DataChainFunctionKeys.ReferenceDataChain
+                            }
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.UIText,
+                                id: splitId,
+                                value: `${GetNodeTitle(property)} ${apiProperty}`
+                            }
+                        }
+                    }, {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options: function (graph) {
+                            return {
+                                prop: NodeProperties.DataChainReference,
+                                id: splitId,
+                                value: propNodeId
+                            }
+                        }
+                    }, {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options: function (graph) {
+                            return {
+                                source: splitId,
+                                target: propNodeId,
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }
+                    }]
+                }).flatten().filter(x => x)])(GetDispatchFunc(), GetStateFunc());
 
                 PerformGraphOperation([...apiList.map(api => {
                     return {
