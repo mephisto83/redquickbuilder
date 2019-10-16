@@ -14,17 +14,21 @@ import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import { PARAMETER_TAB } from './dashboard';
 import SideBar from './sidebar';
 import SideBarMenu from './sidebarmenu';
 import MainSideBar from './mainsidebar';
+import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../constants/functiontypes';
+const BATCH_MODEL = 'BATCH_MODEL';
+const BATCH_AGENT = 'BATCH_AGENT';
+const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
+const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
 
 class QuickMethods extends Component {
     render() {
         var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Model);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         return (
             <MainSideBar relative={true}>
@@ -33,7 +37,7 @@ class QuickMethods extends Component {
                         <TreeViewMenu
                             title={Titles.QuickMethods}
                             open={UIA.Visual(state, Titles.QuickMethods)}
-                            active={UIA.Visual(state, Titles.QuickMethods)}
+                            active={true}
                             toggle={() => {
                                 this.props.toggleVisual(Titles.QuickMethods)
                             }}
@@ -44,6 +48,7 @@ class QuickMethods extends Component {
                             <TreeViewMenu hideArrow={true} title={GetAllModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, GetAllModels);
                             })} />
+
                             <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, CreateLoginModels);
                             })} />
@@ -53,7 +58,23 @@ class QuickMethods extends Component {
                             <TreeViewMenu hideArrow={true} title={AddAgentUser.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, AddAgentUser);
                             })} />
-                            
+
+                            <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
+                                this.props.executeGraphOperation(currentNode, {
+                                    type: UIA.Visual(state, BATCH_FUNCTION_NAME),
+                                    method: CreateAgentFunction({
+                                        nodePackageType: UIA.Visual(state, BATCH_FUNCTION_NAME),
+                                        methodType: MethodFunctions[UIA.Visual(state, BATCH_FUNCTION_TYPE)].method,
+                                        model: UIA.GetNodeById(UIA.Visual(state, BATCH_MODEL)),
+                                        agent: UIA.GetNodeById(UIA.Visual(state, BATCH_AGENT)),
+                                        httpMethod: HTTP_METHODS.POST,
+                                        functionType: UIA.Visual(state, BATCH_FUNCTION_TYPE),
+                                        functionName: UIA.Visual(state, BATCH_FUNCTION_NAME)
+                                    }),
+                                    methodType: UIA.Visual(state, BATCH_FUNCTION_TYPE)
+                                });
+                            })} />
+
                         </TreeViewMenu>
                     </SideBarMenu>
                 </SideBar>

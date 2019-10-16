@@ -108,6 +108,8 @@ class Dashboard extends Component {
 	componentDidMount() {
 		this.props.setState();
 		this.props.setRemoteState();
+		this.props.setVisual(UIA.NODE_COST, 50);
+		this.props.setVisual(UIA.NODE_CONNECTION_COST, 13);
 	}
 	minified() {
 		var { state } = this.props;
@@ -238,8 +240,22 @@ class Dashboard extends Component {
 
 		return result;
 	}
+	getCost() {
+		var { state } = this.props;
+		let cost = 0;
+		let graph = UIA.GetCurrentGraph(state);
+		let node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
+		let node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
+		
+
+		if (graph) {
+			cost = Object.keys(graph.linkLib || {}).length * node_cost + Object.keys(graph.nodeLib || {}).length * node_connection_cost;
+		}
+		return cost;
+	}
 	render() {
 		var { state } = this.props;
+		let cost = this.getCost()
 		var selected_node_bb = UIA.Visual(state, UIA.SELECTED_NODE_BB);
 		var menu_left = 0;
 		var menu_top = 0;
@@ -429,7 +445,8 @@ class Dashboard extends Component {
 								</TreeViewMenu>
 								<SectionList />
 								<NodeManagement />
-								<MaestroDetailsMenu />
+								<SideBarHeader title={`$ ${cost}`} onClick={() => { }} />
+								{/* <MaestroDetailsMenu /> */}
 								<ControllerDetailsMenu />
 							</SideBarMenu>
 						</MainSideBar>

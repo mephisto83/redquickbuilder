@@ -20,6 +20,8 @@ export const NodeAttributePropertyTypes = NodeConstants.NodeAttributePropertyTyp
 export const NodePropertyTypes = NodeConstants.NodePropertyTypes;
 export const ValidationRules = NodeConstants.ValidationRules;
 export const OptionsTypes = NodeConstants.OptionsTypes;
+export const NODE_COST = 'NODE_COST';
+export const NODE_CONNECTION_COST = 'NODE_CONNECTION_COST';
 
 
 

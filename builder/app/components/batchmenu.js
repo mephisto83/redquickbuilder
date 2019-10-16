@@ -9,10 +9,12 @@ import FormControl from './formcontrol';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
+import { MethodFunctions } from '../constants/functiontypes';
 
 const BATCH_MODEL = 'BATCH_MODEL';
 const BATCH_AGENT = 'BATCH_AGENT';
 const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
+const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
 class BatchMenu extends Component {
     render() {
         var { state } = this.props;
@@ -30,11 +32,23 @@ class BatchMenu extends Component {
                         value={UIA.Visual(state, BATCH_MODEL)} />
                     <SelectInput
                         options={UIA.NodesByType(state, NodeTypes.Model).filter(t => UIA.GetNodeProp(t, NodeProperties.IsAgent)).toNodeSelect()}
-                        label={Titles.Models}
+                        label={Titles.Agents}
                         onChange={(value) => {
                             this.props.setVisual(BATCH_AGENT, value);
                         }}
                         value={UIA.Visual(state, BATCH_AGENT)} />
+                    <SelectInput
+                        options={Object.keys(MethodFunctions).map(t => {
+                            return {
+                                title: MethodFunctions[t] && MethodFunctions[t].title ? MethodFunctions[t].title : t,
+                                value: t
+                            }
+                        })}
+                        label={Titles.FunctionTypes}
+                        onChange={(value) => {
+                            this.props.setVisual(BATCH_FUNCTION_TYPE, value);
+                        }}
+                        value={UIA.Visual(state, BATCH_FUNCTION_TYPE)} />
                     <TextInput
                         label={Titles.MethodName}
                         value={UIA.Visual(state, BATCH_FUNCTION_NAME)}
