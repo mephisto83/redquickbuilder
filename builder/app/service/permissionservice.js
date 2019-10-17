@@ -52,23 +52,23 @@ export function GetPermissionMethodInterface(id, language = ProgrammingLanguages
 
 export function GetAgentPermissionInterface(agentId) {
     let dictionary = GetPermissionsSortedByAgent();
-    if (dictionary && dictionary[agentId]) {
-        let namespace = GetNameSpace();
-        let interface_ = BuildAgentPermissionInterface(agentId, dictionary[agentId].map(t => t.id));
-        return NamespaceGenerator.Generate({
-            template: interface_,
-            usings: [
-                ...STANDARD_CONTROLLER_USING,
-                `${namespace}${NameSpace.Interface}`,
-                `${namespace}${NameSpace.Model}`
-            ],
-            namespace,
-            space: NameSpace.Interface
-        });
-    }
-    else {
-        throw 'agent doesnt have any permissions';
-    }
+    //    if (dictionary && dictionary[agentId]) {
+    let namespace = GetNameSpace();
+    let interface_ = BuildAgentPermissionInterface(agentId, (dictionary[agentId] || []).map(t => t.id));
+    return NamespaceGenerator.Generate({
+        template: interface_,
+        usings: [
+            ...STANDARD_CONTROLLER_USING,
+            `${namespace}${NameSpace.Interface}`,
+            `${namespace}${NameSpace.Model}`
+        ],
+        namespace,
+        space: NameSpace.Interface
+    });
+    // }
+    // else {
+    //     throw 'agent doesnt have any permissions';
+    // }
 }
 
 export function GenerateAgentPermissionInterfacesAndImplementations() {
@@ -89,25 +89,25 @@ export function GenerateAgentPermissionInterfacesAndImplementations() {
 }
 export function GetAgentPermissionImplementation(agentId) {
     let dictionary = GetPermissionsSortedByAgent();
-    if (dictionary && dictionary[agentId]) {
-        let namespace = GetNameSpace();
-        let implementation = BuildAgentPermissionImplementation(agentId, dictionary[agentId].map(t => t.id));
-        return NamespaceGenerator.Generate({
-            template: implementation,
-            usings: [
-                ...STANDARD_CONTROLLER_USING,
-                `${namespace}${NameSpace.Extensions}`,
-                `${namespace}${NameSpace.Model}`,
-                `${namespace}${NameSpace.Interface}`,
-                `${namespace}${NameSpace.Controllers}`,
-                `${namespace}${NameSpace.Constants}`].filter(x => x),
-            namespace,
-            space: NameSpace.Permissions
-        });
-    }
-    else {
-        throw 'agent doesnt have any permissions';
-    }
+    //if (dictionary && dictionary[agentId]) {
+    let namespace = GetNameSpace();
+    let implementation = BuildAgentPermissionImplementation(agentId, (dictionary[agentId] || []).map(t => t.id));
+    return NamespaceGenerator.Generate({
+        template: implementation,
+        usings: [
+            ...STANDARD_CONTROLLER_USING,
+            `${namespace}${NameSpace.Extensions}`,
+            `${namespace}${NameSpace.Model}`,
+            `${namespace}${NameSpace.Interface}`,
+            `${namespace}${NameSpace.Controllers}`,
+            `${namespace}${NameSpace.Constants}`].filter(x => x),
+        namespace,
+        space: NameSpace.Permissions
+    });
+    // }
+    // else {
+    //     throw 'agent doesnt have any permissions';
+    // }
 }
 
 export function BuildAgentPermissionInterface(agentId, permissions, language = ProgrammingLanguages.CSHARP) {

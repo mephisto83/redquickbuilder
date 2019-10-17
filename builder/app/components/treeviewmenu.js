@@ -34,7 +34,7 @@ export default class TreeViewMenu extends Component {
                         {this.props.right ? this.props.right : null}
                     </span>)}
                 </a>
-                <ul className="treeview-menu" style={{ display: this.display() }}>
+                <ul className="treeview-menu" style={{ display: this.display(), ...(this.props.innerStyle || {}) }}>
                     {this.props.children}
                 </ul>
             </li>

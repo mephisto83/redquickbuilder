@@ -124,6 +124,7 @@ class GenericPropertyMenu extends Component {
                         </TreeViewMenu>
                         <TreeViewMenu title={Titles.SelectExecution}
                             icon={'fa fa-plus-circle'}
+                            innerStyle={{ maxHeight: 200, overflowY: 'auto' }}
                             open={UIA.Visual(state, `${visualKey}-selectexecution`)}
                             active={UIA.Visual(state, `${visualKey}-selectexecution`)}
                             toggle={() => {

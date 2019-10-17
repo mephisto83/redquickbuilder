@@ -62,74 +62,74 @@ export default class ModelItemFilterGenerator {
             let funcs = [];
             let parameters = [];
 
-            if (filterModel && filterModel.properties) {
+            if (true || filterModel && filterModel.properties) {
                 let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
                 let filters = [];
-                Object.keys(filterModel.properties).map(prop => {
-                    let propName = GetCodeName(prop);
-                    if (filterModel.properties[prop]) {
-                        Object.keys(filterModel.properties[prop].validators).map(validator => {
-                            let _validatorProps = filterModel.properties[prop].validators[validator];
-                            let validatorValue = '';
-                            let validatorName = GetCodeName(validator);
-                            let _function = '==';
-                            let meta_parameter = 'item';
-                            let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
-                            if (_validatorProps && _validatorProps.type)
-                                switch (_validatorProps.type) {
-                                    case FilterRules.EqualsTrue:
-                                        validatorValue = 'true';
-                                        break;
-                                    case FilterRules.EqualsFalse:
-                                        validatorValue = 'false';
-                                        break;
-                                    case FilterRules.EqualsAgent:
-                                        validatorValue = `agent.${propName}`;
-                                        break;
-                                    case FilterRules.EqualsParent:
-                                        validatorValue = `parent.${propName}`;
-                                        break;
-                                    case FilterRules.EqualsModelRef:
-                                        if (_validatorProps.node) {
-                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                                            if (mNode) {
-                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                                            }
-                                            validatorValue = `${_validatorProps.node}.Id`;
-                                        }
-                                        break;
-                                    case FilterRules.EqualsModelProperty:
-                                        if (_validatorProps.node && _validatorProps.nodeProperty) {
-                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                                            if (mNode) {
-                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                                            }
-                                            validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
-                                        }
-                                        break;
-                                    case FilterRules.IsInModelPropertyCollection:
-                                        if (_validatorProps.node && _validatorProps.nodeProperty) {
-                                            let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                                            if (mNode) {
-                                                parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                                            }
-                                            validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
-                                            filterPropFunctionValueEquals = FilterUI[_validatorProps.type].template;
-                                        }
-                                        break;
-                                    default:
-                                        throw 'not handled model item filter generation case';
-                                }
+                // Object.keys(filterModel.properties).map(prop => {
+                //     let propName = GetCodeName(prop);
+                //     if (filterModel.properties[prop]) {
+                //         Object.keys(filterModel.properties[prop].validators).map(validator => {
+                //             let _validatorProps = filterModel.properties[prop].validators[validator];
+                //             let validatorValue = '';
+                //             let validatorName = GetCodeName(validator);
+                //             let _function = '==';
+                //             let meta_parameter = 'item';
+                //             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
+                //             if (_validatorProps && _validatorProps.type)
+                //                 switch (_validatorProps.type) {
+                //                     case FilterRules.EqualsTrue:
+                //                         validatorValue = 'true';
+                //                         break;
+                //                     case FilterRules.EqualsFalse:
+                //                         validatorValue = 'false';
+                //                         break;
+                //                     case FilterRules.EqualsAgent:
+                //                         validatorValue = `agent.${propName}`;
+                //                         break;
+                //                     case FilterRules.EqualsParent:
+                //                         validatorValue = `parent.${propName}`;
+                //                         break;
+                //                     case FilterRules.EqualsModelRef:
+                //                         if (_validatorProps.node) {
+                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                //                             if (mNode) {
+                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                //                             }
+                //                             validatorValue = `${_validatorProps.node}.Id`;
+                //                         }
+                //                         break;
+                //                     case FilterRules.EqualsModelProperty:
+                //                         if (_validatorProps.node && _validatorProps.nodeProperty) {
+                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                //                             if (mNode) {
+                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                //                             }
+                //                             validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
+                //                         }
+                //                         break;
+                //                     case FilterRules.IsInModelPropertyCollection:
+                //                         if (_validatorProps.node && _validatorProps.nodeProperty) {
+                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
+                //                             if (mNode) {
+                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
+                //                             }
+                //                             validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
+                //                             filterPropFunctionValueEquals = FilterUI[_validatorProps.type].template;
+                //                         }
+                //                         break;
+                //                     default:
+                //                         throw 'not handled model item filter generation case';
+                //                 }
 
-                            filters.push(bindTemplate(filterPropFunctionValueEquals, {
-                                property: propName,
-                                value: validatorValue,
-                                meta_parameter,
-                                function: _function
-                            }));
-                        })
-                    }
-                });
+                //             filters.push(bindTemplate(filterPropFunctionValueEquals, {
+                //                 property: propName,
+                //                 value: validatorValue,
+                //                 meta_parameter,
+                //                 function: _function
+                //             }));
+                //         })
+                //     }
+                // });
                 parameters = parameters.filter(x => x).unique().sort();
                 if (filterMethodParameters && filterMethodParameters.length) {
                     parameters = filterMethodParameters.map(item => {

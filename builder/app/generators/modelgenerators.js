@@ -79,7 +79,7 @@ export default class ModelGenerator {
         templateSwapDictionary.attributes = validatorFunctions;
 
         let staticFunctions = [];
-        let properties = connectedProperties.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)).map(propNode => {
+        let properties = connectedProperties.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)).filter(x => x.id !== nodeId).map(propNode => {
             var connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
                 id: propNode.id,
                 type: LinkType.AttributeLink,
@@ -98,7 +98,7 @@ export default class ModelGenerator {
                 propType = 'string';
 
             }
-            
+
             if (GetNodeProp(propNode, NodeProperties.UseModelAsType)) {
                 if (GetNodeProp(propNode, NodeProperties.IsReferenceList)) {
                     propType = `IList<${propType}>`;

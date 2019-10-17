@@ -246,13 +246,28 @@ class Dashboard extends Component {
 		let graph = UIA.GetCurrentGraph(state);
 		let node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
 		let node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
-		
+
 
 		if (graph) {
 			cost = Object.keys(graph.linkLib || {}).length * node_cost + Object.keys(graph.nodeLib || {}).length * node_connection_cost;
 		}
-		return cost;
+		return this.formatMoney(cost, 2, '.', ',');
 	}
+	formatMoney(number, decPlaces, decSep, thouSep) {
+		decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+			decSep = typeof decSep === "undefined" ? "." : decSep;
+		thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+		var sign = number < 0 ? "-" : "";
+		var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+		var j = (j = i.length) > 3 ? j % 3 : 0;
+
+		return sign +
+			(j ? i.substr(0, j) + thouSep : "") +
+			i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+			(decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+	}
+
+
 	render() {
 		var { state } = this.props;
 		let cost = this.getCost()
@@ -308,8 +323,14 @@ class Dashboard extends Component {
 										this.props.setVisual(UIA.SELECTED_LINK, null);
 									}} /> : null}
 									<GraphMenu />
-									<NavBarButton icon={'fa fa-asterisk'} onClick={() => {
+									{/* <NavBarButton icon={'fa fa-asterisk'} onClick={() => {
 										clipboard.writeText(UIA.generateDataSeeds());
+									}} /> */}
+									<NavBarButton icon={'fa fa-asterisk'} onClick={() => {
+										  this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+											source: currentNode.id,
+											target: currentNode.id
+										})
 									}} />
 									<NavBarButton icon={'fa fa-plus'} onClick={() => {
 										this.props.graphOperation(UIA.NEW_NODE);

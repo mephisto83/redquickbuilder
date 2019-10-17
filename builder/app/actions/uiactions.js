@@ -23,6 +23,12 @@ export const OptionsTypes = NodeConstants.OptionsTypes;
 export const NODE_COST = 'NODE_COST';
 export const NODE_CONNECTION_COST = 'NODE_CONNECTION_COST';
 
+export const BATCH_MODEL = 'BATCH_MODEL';
+export const BATCH_AGENT = 'BATCH_AGENT';
+export const BATCH_PARENT = 'BATCH_PARENT';
+export const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
+export const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
+
 
 
 export const UI_UPDATE = 'UI_UPDATE';

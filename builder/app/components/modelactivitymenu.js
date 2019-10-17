@@ -12,7 +12,7 @@ import ButtonList from './buttonlist';
 import TextBox from './textinput';
 import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
-import { GetNode } from '../methods/graph_methods';
+import { GetNode, getNodeLinks } from '../methods/graph_methods';
 import { clipboard } from 'electron';
 import { GetSpecificModels, GetAllModels, CreateLoginModels } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
@@ -155,45 +155,45 @@ class ModelActivityMenu extends Component {
                                 }]);
                             }}
                             value={''} />) : null}
-                        <ButtonList active={true} isSelected={(item) => {
-                            var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
-                            return item && types.some(x => x === item.id);
-                        }}
-                            items={(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || []).map(t => {
-                                let node = GetNode(UIA.GetCurrentGraph(state), t);
-                                if (node) {
-                                    return {
-                                        title: UIA.GetNodeTitle(node),
-                                        id: node.id
-                                    }
+                        {/* ok
+                        <ButtonList active={true} tabPaneStyle={{ maxHeight: 200, overflowY: 'scroll' }}
+                            items={(getNodeLinks(UIA.GetCurrentGraph(state), currentNode.id) || []).map(t => {
+                                let id_ = t.source;
+                                if (t.source === currentNode.id) {
+                                    id_ = t.target;
+                                }
+                                return {
+                                    title: UIA.GetNodeTitle(id_),
+                                    id: t.id
                                 }
                             })}
+                            isSelected={() => false}
                             onClick={(item) => {
-                                let id = currentNode.id;
-                                var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
-                                var ids = types;
-                                if (types.some(t => item.id === t)) {
-                                    ids = [...ids.filter(t => t !== item.id)].unique(x => x)
-                                }
-                                else {
-                                    ids = [...ids, item.id].unique(x => x)
-                                }
-                                this.props.graphOperation([{
-                                    operation: UIA.CHANGE_NODE_PROPERTY,
-                                    options: {
-                                        prop: UIA.NodeProperties.ManyToManyNexusTypes,
-                                        id: currentNode.id,
-                                        value: ids
-                                    }
-                                }, {
-                                    operation: UIA.REMOVE_LINK_BETWEEN_NODES,
-                                    options: {
-                                        target: item.id,
-                                        source: id,
-                                        linkType: UIA.LinkProperties.ManyToManyLink.type
-                                    }
-                                }]);
-                            }} />
+                                // let id = currentNode.id;
+                                // var types = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusTypes) || [];
+                                // var ids = types;
+                                // if (types.some(t => item.id === t)) {
+                                //     ids = [...ids.filter(t => t !== item.id)].unique(x => x)
+                                // }
+                                // else {
+                                //     ids = [...ids, item.id].unique(x => x)
+                                // }
+                                // this.props.graphOperation([{
+                                //     operation: UIA.CHANGE_NODE_PROPERTY,
+                                //     options: {
+                                //         prop: UIA.NodeProperties.ManyToManyNexusTypes,
+                                //         id: currentNode.id,
+                                //         value: ids
+                                //     }
+                                // }, {
+                                //     operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                                //     options: {
+                                //         target: item.id,
+                                //         source: id,
+                                //         linkType: UIA.LinkProperties.ManyToManyLink.type
+                                //     }
+                                // }]);
+                            }} /> */}
                     </FormControl>) : null}
 
                     <ControlSideBarMenuHeader title={Titles.ModelActions} />

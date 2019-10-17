@@ -79,6 +79,7 @@ export const UIType = 'UI Type';
 export const SelectedExecutors = 'Selected Executions';
 export const Priority = 'Priority';
 export const Agents = 'Agents';
+export const Parents = 'Parents';
 export const UseAsRoot = 'Use as top element';
 export const OnChange = ' On Change';
 export const OnClick = 'On Click';

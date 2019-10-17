@@ -7,8 +7,9 @@ import TabPane from './tabpane';
 
 export default class ButtonList extends Component {
     render() {
+        let tabPaneStyle = this.props.tabPaneStyle || {};
         return (
-            <TabPane active={this.props.active}>
+            <TabPane active={this.props.active} style={{ ...tabPaneStyle }}>
                 {(this.props.items || []).map((item) => {
                     return <div
                         title={item.title}

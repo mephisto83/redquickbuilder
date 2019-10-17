@@ -1281,17 +1281,17 @@ export function CreateAgentFunction(option) {
     let {
         nodePackageType,
         methodType,
+        maestroNodeId,
+        parentId: parent,
         httpMethod,
         functionType,
         functionName,
         model,
         agent
     } = option;
+
     if (!nodePackageType) {
         throw 'missing node package type';
-    }
-    if (!agent) {
-        throw 'missing agent';
     }
     if (!methodType) {
         throw 'missing method type';
@@ -1315,200 +1315,140 @@ export function CreateAgentFunction(option) {
         let methodProps;
 
         if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType)) {
-            let methodNodeId = null;
             let outer_commands = [{
                 operation: ADD_NEW_NODE,
-                options: function () {
-                    return {
-                        nodeType: NodeTypes.Method,
-                        parent: model.id,
-                        groupProperties: {
-                        },
-                        properties: {
-                            [NodeProperties.NodePackage]: model.id,
-                            [NodeProperties.NodePackageType]: nodePackageType,
-                            [NodeProperties.NodePackageAgent]: agent.id,
-                            [NodeProperties.FunctionType]: functionType,
-                            [NodeProperties.MethodType]: methodType,
-                            [NodeProperties.HttpMethod]: httpMethod,
-                            [NodeProperties.UIText]: `${GetNodeTitle(model)} ${functionName}`
-                        },
-                        linkProperties: {
-                            properties: { ...LinkProperties.FunctionOperator }
-                        },
-                        callback: (methodNode) => {
-                            methodNodeId = methodNode.id;
+                options: {
+                    nodeType: NodeTypes.Method,
+                    parent: model.id,
+                    groupProperties: {
+                    },
+                    properties: {
+                        [NodeProperties.NodePackage]: model.id,
+                        [NodeProperties.NodePackageType]: nodePackageType,
+                        [NodeProperties.NodePackageAgent]: agent.id,
+                        [NodeProperties.FunctionType]: functionType,
+                        [NodeProperties.MethodType]: methodType,
+                        [NodeProperties.HttpMethod]: httpMethod,
+                        [NodeProperties.UIText]: `${GetNodeTitle(model)} ${functionName}`
+                    },
+                    linkProperties: {
+                        properties: { ...LinkProperties.FunctionOperator }
+                    },
+                    callback: (methodNode) => {
+                        setTimeout(() => {
+                            new Promise((resolve) => {
 
-                        }
-                    }
-                }
-            }, {
-                operation: something,
-                options: function () {
-                    setTimeout(() => {
-                        new Promise((resolve) => {
-
-                            let { constraints } = MethodFunctions[functionType];
-                            let commands = [];
-                            let permissionNode = null;
-                            Object.values(constraints).map(constraint => {
-                                switch (constraint.key) {
-                                    case FunctionTemplateKeys.Model:
-                                    case FunctionTemplateKeys.Agent:
-                                    case FunctionTemplateKeys.User:
-                                    case FunctionTemplateKeys.ModelOutput:
-                                        methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
-                                        if (constraint[NodeProperties.IsAgent]) {
-                                            methodProps[constraint.key] = agent.id;
-                                        }
-                                        else if (constraint.key === FunctionTemplateKeys.User) {
-                                            methodProps[constraint.key] = GetNodeProp(GetNodeById(agent.id), NodeProperties.UIUser) || GetUsers()[0].id;
-                                        }
-                                        else {
-                                            methodProps[constraint.key] = model.id;
-                                        }
-                                        break;
-                                    case FunctionTemplateKeys.Permission:
-                                    case FunctionTemplateKeys.ModelFilter:
-                                        let perOrModelNode = null;
-                                        PerformGraphOperation([({
-                                            operation: ADD_NEW_NODE,
-                                            options: {
-                                                parent: methodNode.id,
-                                                nodeType: constraint.key === FunctionTemplateKeys.Permission ? NodeTypes.Permission : NodeTypes.ModelFilter,
-                                                groupProperties: {
-                                                },
-                                                properties: {
-                                                    [NodeProperties.NodePackage]: model.id,
-                                                    [NodeProperties.NodePackageType]: nodePackageType,
-                                                    [NodeProperties.UIText]: `${GetNodeTitle(methodNode)} ${constraint.key === FunctionTemplateKeys.Permission ? NodeTypes.Permission : NodeTypes.ModelFilter}`
-                                                },
-                                                linkProperties: {
-                                                    properties: { ...LinkProperties.FunctionOperator }
-                                                },
-                                                callback: (newNode) => {
-                                                    methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
-                                                    methodProps[constraint.key] = newNode.id;
-                                                    perOrModelNode = newNode;
-                                                }
+                                let { constraints } = MethodFunctions[functionType];
+                                let commands = [];
+                                let permissionNode = null;
+                                Object.values(constraints).map(constraint => {
+                                    switch (constraint.key) {
+                                        case FunctionTemplateKeys.Model:
+                                        case FunctionTemplateKeys.ModelOutput:
+                                        case FunctionTemplateKeys.Agent:
+                                        case FunctionTemplateKeys.Parent:
+                                        case FunctionTemplateKeys.User:
+                                        case FunctionTemplateKeys.ModelOutput:
+                                            methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
+                                            if (constraint[NodeProperties.IsAgent]) {
+                                                methodProps[constraint.key] = agent.id;
                                             }
-                                        })])(dispatch, getState);
-                                        if (constraint.key === FunctionTemplateKeys.ModelFilter) {
-                                            commands = [...commands, {
-                                                operation: CHANGE_NODE_PROPERTY,
-                                                options: {
-                                                    prop: NodeProperties.FilterAgent,
-                                                    id: perOrModelNode.id,
-                                                    value: agent.id
+                                            else if (constraint.key === FunctionTemplateKeys.User) {
+                                                methodProps[constraint.key] = GetNodeProp(GetNodeById(agent.id), NodeProperties.UIUser) || GetUsers()[0].id;
+                                            }
+                                            else if (constraint.key === FunctionTemplateKeys.Parent) {
+                                                methodProps[constraint.key] = parent.id;
+                                            }
+                                            else {
+                                                methodProps[constraint.key] = model.id;
+                                            }
+                                            break;
+                                        case FunctionTemplateKeys.Permission:
+                                        case FunctionTemplateKeys.ModelFilter:
+                                            let perOrModelNode = null;
+                                            PerformGraphOperation([({
+                                                operation: ADD_NEW_NODE,
+                                                options: function () {
+                                                    return {
+                                                        parent: methodNode.id,
+                                                        nodeType: constraint.key === FunctionTemplateKeys.Permission ? NodeTypes.Permission : NodeTypes.ModelFilter,
+                                                        groupProperties: {
+                                                        },
+                                                        properties: {
+                                                            [NodeProperties.NodePackage]: model.id,
+                                                            [NodeProperties.NodePackageType]: nodePackageType,
+                                                            [NodeProperties.UIText]: `${GetNodeTitle(methodNode)} ${constraint.key === FunctionTemplateKeys.Permission ? NodeTypes.Permission : NodeTypes.ModelFilter}`
+                                                        },
+                                                        linkProperties: {
+                                                            properties: { ...LinkProperties.FunctionOperator }
+                                                        },
+                                                        callback: (newNode) => {
+                                                            methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
+                                                            methodProps[constraint.key] = newNode.id;
+                                                            perOrModelNode = newNode;
+                                                        }
+                                                    }
                                                 }
-                                            }, {
-                                                operation: CHANGE_NODE_PROPERTY,
-                                                options: {
-                                                    prop: NodeProperties.FilterModel,
-                                                    id: perOrModelNode.id,
-                                                    value: model.id
-                                                }
-                                            }, {
-                                                operation: ADD_LINK_BETWEEN_NODES,
-                                                options: {
-                                                    target: model.id,
-                                                    source: perOrModelNode.id,
-                                                    properties: { ...LinkProperties.ModelTypeLink }
-                                                }
-                                            }, {
-                                                operation: ADD_LINK_BETWEEN_NODES,
-                                                options: {
-                                                    target: agent.id,
-                                                    source: perOrModelNode.id,
-                                                    properties: { ...LinkProperties.AgentTypeLink }
-                                                }
-                                            }]
+                                            })])(GetDispatchFunc(), GetStateFunc());
+                                            if (constraint.key === FunctionTemplateKeys.ModelFilter) {
+                                                commands = [...commands, {
+                                                    operation: CHANGE_NODE_PROPERTY,
+                                                    options: {
+                                                        prop: NodeProperties.FilterAgent,
+                                                        id: perOrModelNode.id,
+                                                        value: agent.id
+                                                    }
+                                                }, {
+                                                    operation: CHANGE_NODE_PROPERTY,
+                                                    options: {
+                                                        prop: NodeProperties.FilterModel,
+                                                        id: perOrModelNode.id,
+                                                        value: model.id
+                                                    }
+                                                }, {
+                                                    operation: ADD_LINK_BETWEEN_NODES,
+                                                    options: {
+                                                        target: model.id,
+                                                        source: perOrModelNode.id,
+                                                        properties: { ...LinkProperties.ModelTypeLink }
+                                                    }
+                                                }, {
+                                                    operation: ADD_LINK_BETWEEN_NODES,
+                                                    options: {
+                                                        target: agent.id,
+                                                        source: perOrModelNode.id,
+                                                        properties: { ...LinkProperties.AgentTypeLink }
+                                                    }
+                                                }]
+                                            }
+                                            break;
+                                    }
+                                    commands = [...commands, ...[{
+                                        operation: CHANGE_NODE_PROPERTY,
+                                        options: {
+                                            prop: NodeProperties.MethodProps,
+                                            id: methodNode.id,
+                                            value: methodProps
                                         }
-                                        break;
-                                }
-                                commands = [...commands, ...[{
-                                    operation: CHANGE_NODE_PROPERTY,
-                                    options: {
-                                        prop: NodeProperties.MethodProps,
-                                        id: methodNode.id,
-                                        value: methodProps
-                                    }
-                                }, {
-                                    operation: ADD_LINK_BETWEEN_NODES,
-                                    options: {
-                                        target: methodProps[constraint.key],
-                                        source: methodNode.id,
-                                        properties: { ...LinkProperties.FunctionOperator }
-                                    }
-                                }]];
-                            })
-                            if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType, NodeTypes.Controller)) {
-                                let controllerNodeId = null;
-                                commands.push({
-                                    operation: ADD_NEW_NODE,
-                                    options: {
-                                        nodeType: NodeTypes.Controller,
-                                        properties: {
-                                            [NodeProperties.NodePackage]: model.id,
-                                            [NodeProperties.NodePackageType]: nodePackageType,
-                                            [NodeProperties.NodePackageAgent]: agent.id,
-                                            [NodeProperties.UIText]: `${GetNodeTitle(model)} ${GetNodeTitle(agent)} Controller`
-                                        },
-                                        linkProperties: {
+                                    }, {
+                                        operation: ADD_LINK_BETWEEN_NODES,
+                                        options: {
+                                            target: methodProps[constraint.key],
+                                            source: methodNode.id,
                                             properties: { ...LinkProperties.FunctionOperator }
-                                        },
-                                        callback: (controllerNode) => {
-                                            controllerNodeId = controllerNode.id;
-                                            // setTimeout(() => {
-                                            //     if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType, NodeTypes.Maestro)) {
-                                            //         let maestroNodeId = null;
-                                            //         PerformGraphOperation()(dispatch, getState)
-                                            //     }
+                                        }
+                                    }]];
+                                })
 
-                                            // }, 1500)
-                                        }
-                                    }
-                                }, ...[{
-                                    operation: ADD_NEW_NODE,
-                                    options: function () {
-                                        return {
-                                            nodeType: NodeTypes.Maestro,
-                                            parent: controllerNode.id,
-
-                                            properties: {
-                                                [NodeProperties.NodePackage]: model.id,
-                                                [NodeProperties.NodePackageType]: nodePackageType,
-                                                [NodeProperties.NodePackageAgent]: agent.id,
-                                                [NodeProperties.UIText]: `${GetNodeTitle(model)} ${GetNodeTitle(agent)} Maestro`
-                                            },
-                                            linkProperties: {
-                                                properties: { ...LinkProperties.MaestroLink }
-                                            },
-                                            callback: (maestroNode) => {
-                                                maestroNodeId = maestroNode.id;
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    operation: ADD_LINK_BETWEEN_NODES,
-                                    options: function () {
-                                        return {
-                                            target: methodNodeId,
-                                            source: maestroNodeId,
-                                            properties: {
-                                                ...LinkProperties.FunctionLink
-                                            }
-                                        }
-                                    }
-                                }]);
-                            }
-                            PerformGraphOperation(commands)(dispatch, getState)
-                            resolve();
-                        })
-                    }, 1500)
+                                PerformGraphOperation(commands)(dispatch, getState)
+                                resolve();
+                            })
+                        }, 1500)
+                    }
                 }
             }]
             PerformGraphOperation(outer_commands)(dispatch, getState);
         }
+
     }
 }

@@ -21,10 +21,6 @@ import SideBar from './sidebar';
 import SideBarMenu from './sidebarmenu';
 import MainSideBar from './mainsidebar';
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../constants/functiontypes';
-const BATCH_MODEL = 'BATCH_MODEL';
-const BATCH_AGENT = 'BATCH_AGENT';
-const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
-const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
 
 class QuickMethods extends Component {
     render() {
@@ -61,17 +57,18 @@ class QuickMethods extends Component {
 
                             <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, {
-                                    type: UIA.Visual(state, BATCH_FUNCTION_NAME),
+                                    type: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
                                     method: CreateAgentFunction({
-                                        nodePackageType: UIA.Visual(state, BATCH_FUNCTION_NAME),
-                                        methodType: MethodFunctions[UIA.Visual(state, BATCH_FUNCTION_TYPE)].method,
-                                        model: UIA.GetNodeById(UIA.Visual(state, BATCH_MODEL)),
-                                        agent: UIA.GetNodeById(UIA.Visual(state, BATCH_AGENT)),
+                                        nodePackageType: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
+                                        methodType: MethodFunctions[UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)].method,
+                                        model: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_MODEL)),
+                                        parentId: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_PARENT)),
+                                        agent: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_AGENT)),
                                         httpMethod: HTTP_METHODS.POST,
-                                        functionType: UIA.Visual(state, BATCH_FUNCTION_TYPE),
-                                        functionName: UIA.Visual(state, BATCH_FUNCTION_NAME)
+                                        functionType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE),
+                                        functionName: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME)
                                     }),
-                                    methodType: UIA.Visual(state, BATCH_FUNCTION_TYPE)
+                                    methodType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)
                                 });
                             })} />
 
