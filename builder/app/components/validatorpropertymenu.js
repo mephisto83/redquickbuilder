@@ -28,7 +28,7 @@ class ValidatorPropertyMenu extends Component {
                 id: UIA.GetNodeProp(currentNode, UIA.NodeProperties.ValidatorModel),
                 direction: SOURCE,
                 type: LinkType.PropertyLink
-            }).map(t => {
+            }).filter(x => UIA.GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.Model).map(t => {
                 return {
                     title: UIA.GetNodeTitle(t),
                     value: t.id

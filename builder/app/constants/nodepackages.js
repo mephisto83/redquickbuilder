@@ -1363,6 +1363,113 @@ export function CreateAgentFunction(option) {
                                                 methodProps[constraint.key] = model.id;
                                             }
                                             break;
+                                        case FunctionTemplateKeys.Validator:
+                                            let validator = null;
+                                            PerformGraphOperation([{
+                                                operation: ADD_NEW_NODE,
+                                                options: function () {
+                                                    return {
+                                                        parent: methodNode.id,
+                                                        nodeType: NodeTypes.Validator,
+                                                        groupProperties: {},
+                                                        properties: {
+                                                            [NodeProperties.NodePackage]: model.id,
+                                                            [NodeProperties.Collapsed]: true,
+                                                            [NodeProperties.NodePackageType]: nodePackageType,
+                                                            [NodeProperties.UIText]: `${GetNodeTitle(methodNode)} Validator`,
+                                                            [NodeProperties.ValidatorModel]: model.id,
+                                                            [NodeProperties.ValidatorAgent]: agent.id,
+                                                            [NodeProperties.ValidatorFunction]: methodNode.id
+                                                        },
+                                                        callback: (_node) => {
+                                                            methodProps[constraint.key] = _node.id;
+                                                            validator = _node;
+                                                        }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: model.id,
+                                                        source: validator.id,
+                                                        properties: { ...LinkProperties.ValidatorModelLink }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: agent.id,
+                                                        source: validator.id,
+                                                        properties: { ...LinkProperties.ValidatorAgentLink }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: methodNode.id,
+                                                        source: validator.id,
+                                                        properties: { ...LinkProperties.ValidatorFunctionLink }
+                                                    }
+                                                }
+                                            }])(GetDispatchFunc(), GetStateFunc());
+                                            break;
+                                        case FunctionTemplateKeys.Executor:
+                                            let executor = null;
+                                            PerformGraphOperation([{
+                                                operation: ADD_NEW_NODE,
+                                                options: function () {
+                                                    return {
+                                                        parent: methodNode.id,
+                                                        nodeType: NodeTypes.Executor,
+                                                        groupProperties: {},
+                                                        properties: {
+                                                            [NodeProperties.NodePackage]: model.id,
+                                                            [NodeProperties.NodePackageType]: nodePackageType,
+                                                            [NodeProperties.ExecutorFunctionType]: methodType,
+                                                            [NodeProperties.UIText]: `${GetNodeTitle(methodNode)} Executor`,
+                                                            [NodeProperties.ExecutorModel]: model.id,
+                                                            [NodeProperties.ExecutorModelOutput]: model.id,
+                                                            [NodeProperties.ExecutorFunction]: methodNode.id,
+                                                            [NodeProperties.ExecutorAgent]: agent.id,
+                                                        },
+                                                        callback: (_node) => {
+                                                            methodProps[constraint.key] = _node.id;
+                                                            executor = _node;
+                                                        }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: model.id,
+                                                        source: executor.id,
+                                                        properties: { ...LinkProperties.ExecutorModelLink }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: agent.id,
+                                                        source: executor.id,
+                                                        properties: { ...LinkProperties.ExecutorAgentLink }
+                                                    }
+                                                }
+                                            }, {
+                                                operation: ADD_LINK_BETWEEN_NODES,
+                                                options: function () {
+                                                    return {
+                                                        target: methodNode.id,
+                                                        source: executor.id,
+                                                        properties: { ...LinkProperties.ExecutorFunctionLink }
+                                                    }
+                                                }
+                                            }])(GetDispatchFunc(), GetStateFunc());
+                                            break;
                                         case FunctionTemplateKeys.Permission:
                                         case FunctionTemplateKeys.ModelFilter:
                                             let perOrModelNode = null;

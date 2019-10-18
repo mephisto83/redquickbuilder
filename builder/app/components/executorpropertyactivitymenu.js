@@ -134,7 +134,7 @@ class ExecutorPropertyActivityMenu extends Component {
             propertyExecutors = (
                 <div style={{ position: 'relative' }}>
                     <MainSideBar>
-                        <SideBar>
+                        <SideBar style={{ maxHeight: 600, overflowY: 'auto' }}>
                             <SideBarMenu>
                                 {propertyExecutors}
                             </SideBarMenu>

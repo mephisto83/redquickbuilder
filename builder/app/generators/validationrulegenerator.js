@@ -281,7 +281,7 @@ export default class ValidationRuleGenerator {
                 type: GetNodeProp(GraphMethods.GetNode(graph, model), NodeProperties.CodeName),
             });
 
-
+            let hasExtensions = NodesByType(state, NodeTypes.ExtensionType).length;
 
             result[GetNodeProp(node, NodeProperties.CodeName)] = {
                 id: GetNodeProp(node, NodeProperties.CodeName),
@@ -292,8 +292,8 @@ export default class ValidationRuleGenerator {
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
                         `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Extensions}`,
-                        `${namespace}${NameSpace.Constants}`],
+                        hasExtensions ? `${namespace}${NameSpace.Extensions}` : false,
+                        `${namespace}${NameSpace.Constants}`].filter(x => x),
                     namespace,
                     space: NameSpace.Validations
                 }),
@@ -304,8 +304,8 @@ export default class ValidationRuleGenerator {
                         ...STANDARD_TEST_USING,
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Validations}`,
-                        `${namespace}${NameSpace.Extensions}`,
-                        `${namespace}${NameSpace.Constants}`],
+                        hasExtensions ? `${namespace}${NameSpace.Extensions}` : false,
+                        `${namespace}${NameSpace.Constants}`].filter(x => x),
                     namespace,
                     space: NameSpace.Tests
                 }),

@@ -652,6 +652,9 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
     let nodeNodeId = GetMethodNodeProp(method, node);
     let conditionTemplate = '';
     let properties = {};
+    if (NodeConstants.FilterUI && NodeConstants.FilterUI[type] && NodeConstants.FilterUI[type].template && !template) {
+        template = NodeConstants.FilterUI[type].template;
+    }
     if (template) {
         conditionTemplate = fs.readFileSync(template, 'utf8');
     }
@@ -692,6 +695,27 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
                 agent_property: safeFormatTemplateProperty(propertyName),
                 agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
                 list: listItems
+            }
+            break;
+        case NodeConstants.ValidationRules.AlphaOnlyWithSpaces:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'AlphaOnlyWithSpacesAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.AlphaNumericLike:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'AlphaNumericLikeAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.AlphaOnly:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'AlphaOnlyAttribute'
             }
             break;
         default:

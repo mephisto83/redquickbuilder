@@ -240,6 +240,8 @@ export const FunctionTypes = 'Function Types';
 export const Create_Object_Agent_Many_to_Many_CompositeInput__Object = 'Create Object by Agent M2M with Composite Input';
 
 export const Create_Object__Object = 'Create Object => Object';
+export const AddAllProperties = 'Add all properties';
+export const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
 
 export const Get_ManyToMany_Agent_Value__IListChild = 'Get Many to Many => IList<Child>';
 export const Create_ManyToMany_Agent_Value__IListChild = 'Create Many to Many => IList<Child>';

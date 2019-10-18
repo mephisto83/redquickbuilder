@@ -79,6 +79,8 @@ export const FunctionTemplateKeys = {
     ConnectionType: 'connect_type',
     ManyToManyModel: 'many_to_many',
     Method: 'method',
+    Executor: 'executor',
+    Validator: 'Validator',
     MethodType: 'method_type',
     Permission: 'permission',
     UserInstance: 'user_instance',
@@ -227,6 +229,17 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD = {
         nodeTypes: [NodeTypes.ModelFilter]
     }
 };
+
+const COMMON_CREATE_UPDATE_CONSTRAINTS = {
+    [FunctionTemplateKeys.Validator]: {
+        key: FunctionTemplateKeys.Validator,
+        nodeTypes: [NodeTypes.Validator]
+    },
+    [FunctionTemplateKeys.Executor]: {
+        key: FunctionTemplateKeys.Executor,
+        nodeTypes: [NodeTypes.Executor]
+    }
+}
 
 const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
     [FunctionTemplateKeys.Model]: {
@@ -631,7 +644,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },
@@ -650,7 +664,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },
@@ -677,7 +692,8 @@ export const MethodFunctions = {
             }]
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         },
         output: {
             ...COMMON_OUTPUT.OBJECT
@@ -717,7 +733,8 @@ export const MethodFunctions = {
             [FunctionTemplateKeys.ModelFilter]: {
                 key: FunctionTemplateKeys.ModelFilter,
                 nodeTypes: [NodeTypes.ModelFilter]
-            }
+            },
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         },
         output: {
             ...COMMON_OUTPUT.LIST
@@ -734,7 +751,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -750,7 +768,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },
@@ -773,7 +792,8 @@ export const MethodFunctions = {
             [FunctionTemplateKeys.UpdateModel]: {
                 key: FunctionTemplateKeys.UpdateModel,
                 nodeTypes: [NodeTypes.Model]
-            }
+            },
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.OBJECT
         },
@@ -789,7 +809,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -810,7 +831,8 @@ export const MethodFunctions = {
             ...PERMISSION_DEFAULTS,
         },
         constraints: {
-            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
+            ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -902,7 +924,10 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
-        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -918,7 +943,10 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
-        constraints: { ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD },
+        constraints: {
+            ...COMMON_CONSTRAINTS_AGENT_PARENT_CHILD_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -1097,7 +1125,10 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
-        constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
+        constraints: {
+            ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },
@@ -1113,7 +1144,10 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
-        constraints: { ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD },
+        constraints: {
+            ...COMMON_CONSTRAINTS_MANYTOMANY_CHILD_METHOD,
+            ...COMMON_CREATE_UPDATE_CONSTRAINTS
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },

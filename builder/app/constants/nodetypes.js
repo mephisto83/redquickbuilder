@@ -1811,78 +1811,91 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'SocialSecurityAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.Zip]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'ZipAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.ZipEmpty]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'ZipEmptyAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.PastDate]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'PastDateAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_DATETIME_ARGS }
     },
     [ValidationRules.BeforeNow]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'BeforeNowAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_DATETIME_ARGS }
     },
     [ValidationRules.Email]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EmailAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.Credit]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'CreditCardAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.EmailEmpty]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EmailEmptyAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.Url]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'UrlAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.UrlEmpty]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'UrlEmptyAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.AlphaNumericLike]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'AlphaNumericLikeAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.AlphaOnly]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'AlphaOnlyAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     },
     [ValidationRules.AlphaOnlyWithSpaces]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'NotEmptyAttribute'
         },
+        template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
     }
 }
