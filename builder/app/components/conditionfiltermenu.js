@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import FormControl from './formcontrol';
 import Box from './box';
 import { TARGET, GetLinkChain, SOURCE, GetNode, createExecutor, addMethodValidationForParamter, getMethodValidationForParameter, createValidator, removeMethodValidationParameter } from '../methods/graph_methods';
-import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters } from '../constants/functiontypes';
+import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import GenericPropertyMenu from './genericpropertymenu';
 import GenericPropertyContainer from './genericpropertycontainer';
@@ -20,6 +20,9 @@ import ButtonList from './buttonlist';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
 import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
+import { debug } from 'util';
+import { uuidv4 } from '../utils/array';
+import { combineReducers } from 'redux';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
 const DATA_SOURCE = 'DATA_SOURCE';
@@ -69,12 +72,24 @@ class ConditionFilterMenu extends Component {
         let id = currentNode.id;
         let models = [];
         if (methodDefinition) {
-            models = methodDefinition[methodDefinitionKey].params.map(t => {
+            let mdparams = methodDefinition[methodDefinitionKey].params;
+            models = mdparams.map(t => {
                 if (typeof (t) === 'object') {
                     return t.key;
                 }
                 return t;
-            }).map(t => {
+            }).map((t, t_index) => {
+                if (mdparams[t_index] && mdparams[t_index].changeparameter) {
+                    let mdprops = {};
+                    mdparams.filter(x => typeof x === 'string').map(x => {
+                        mdprops[x] = UIA.GetNodeTitle(methodProps[x])
+                    });
+                    return {
+                        title: bindTemplate(mdparams[t_index].template, mdprops),
+                        value: t,
+                        id: t
+                    }
+                }
                 return {
                     title: `${UIA.GetNodeTitle(methodProps[t])} (${t})`,
                     value: t,
@@ -91,7 +106,18 @@ class ConditionFilterMenu extends Component {
         let param = UIA.Visual(state, param_list_key);
         let param_property_list_key = UIA.Visual(state, param_list_key) ? `${param_list_key} ${param}` : null;
         let selectedParameter = UIA.Visual(state, param_list_key);
-        let model_properties = UIA.GetModelPropertyChildren(this.props.view ? param : methodProps[param]).toNodeSelect();
+
+        let model_properties = [];
+        if (FunctionTemplateKeys.ChangeParameter === param) {
+            let cp_params = methodDefinition[methodDefinitionKey].params;
+            let cp = cp_params.find(x => x && x.key === FunctionTemplateKeys.ChangeParameter);
+            if (cp) {
+                model_properties = UIA.GetModelPropertyChildren(this.props.view ? param : methodProps[cp_params[0]]).toNodeSelect();
+            }
+        }
+        else {
+            model_properties = UIA.GetModelPropertyChildren(this.props.view ? param : methodProps[param]).toNodeSelect();
+        }
         let top = this.getTop({
             model_properties,
             methodProps,
@@ -118,6 +144,67 @@ class ConditionFilterMenu extends Component {
                 value: methodFunctionValidation
             });
         };
+        let onCopy = (prop, key) => {
+            let copyValue = null;
+            if (methodFunctionValidation &&
+                methodFunctionValidation.methods &&
+                methodFunctionValidation.methods[methodFunctionType] &&
+                methodFunctionValidation.methods[methodFunctionType][selectedParameter] &&
+                methodFunctionValidation.methods[methodFunctionType][selectedParameter].properties) {
+                copyValue = methodFunctionValidation.methods[methodFunctionType][selectedParameter].properties[prop];
+                if (copyValue &&
+                    copyValue.validators &&
+                    copyValue.validators[key]) {
+                    copyValue = copyValue.validators[key];
+
+                    copyValue = {
+                        value: JSON.parse(JSON.stringify(copyValue)),
+                        isAll: false,
+                        isPart: true
+                    }
+                }
+                else {
+                    copyValue = {
+                        value: JSON.parse(JSON.stringify(copyValue)),
+                        isAll: true,
+                        isPart: false
+                    }
+                }
+            }
+
+            if (copyValue) {
+                this.props.setVisual(UIA.CopyKey(methodDefinitionKey), (copyValue));
+            }
+        }
+        let copyKey = UIA.Visual(state, UIA.CopyKey(methodDefinitionKey));
+        let onPaste = (prop, key) => {
+            if (copyKey) {
+                if (copyKey.value && copyKey.isAll && prop) {
+                    if (methodFunctionValidation &&
+                        methodFunctionValidation.methods &&
+                        methodFunctionValidation.methods[methodFunctionType] &&
+                        methodFunctionValidation.methods[methodFunctionType][selectedParameter] &&
+                        methodFunctionValidation.methods[methodFunctionType][selectedParameter].properties &&
+                        methodFunctionValidation.methods[methodFunctionType][selectedParameter].properties[prop]) {
+                        if (copyKey.value && copyKey.value.validators) {
+                            let updatableObject = methodFunctionValidation.methods[methodFunctionType][selectedParameter].properties[prop].validators;
+                            Object.values(copyKey.value.validators).map(copyValue => {
+                                updatableObject[uuidv4()] = copyValue;
+                            })
+                        }
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.Condition,
+                            id: currentNode.id,
+                            value: methodFunctionValidation
+                        });
+                    }
+
+                }
+                else if (copyKey.isPart && prop && key) {
+                    debugger;
+                }
+            }
+        }
         let onRemoveValidation = (remove) => {
             if (remove) {
                 methodFunctionValidation = removeMethodValidationParameter(
@@ -134,6 +221,10 @@ class ConditionFilterMenu extends Component {
                 methodParamSetup={methodParamSetup}
                 nodeType={NodeTypes.Condition}
                 onRemove={onRemoveValidation}
+                onCopy={onCopy}
+                onPaste={onPaste}
+                pasteAll={copyKey && copyKey.isAll}
+                pastePart={copyKey && copyKey.isPart}
                 adjacentNodeId={interestingNode.id}
                 onChange={updateValidation}
                 onAdd={updateValidation}

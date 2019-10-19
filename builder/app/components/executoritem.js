@@ -13,7 +13,7 @@ import TreeViewMenu from './treeviewmenu';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
-import { NodeProperties, NodeTypes, LinkEvents, LinkType, FilterRules } from '../constants/nodetypes';
+import { NodeProperties, NodeTypes, LinkEvents, LinkType, FilterRules, NodePropertyTypes } from '../constants/nodetypes';
 import {
     getNodesByLinkType,
     SOURCE,
@@ -413,6 +413,9 @@ class ExecutorItem extends Component {
 
                 return functionVariableControl
             }
+            else if (validatorItem.arguments && validatorItem.arguments.condition) {
+                return this.getValidatorArgumentCondition(validator, validatorItem);
+            }
             return (<div>item</div>)
         }
 
@@ -421,7 +424,39 @@ class ExecutorItem extends Component {
             <div></div>
         );
     }
+    getValidatorArgumentCondition(validator, validatorItem) {
+        var { state } = this.props;
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        if (validatorItem.arguments.condition) {
+            
+            let formControll = (<FormControl>
+                <TextInput value={validatorItem && validatorItem.condition ? validatorItem.condition : ''} label={Titles.Condition} onChange={(value) => {
+                    if (validatorItem.arguments.condition.type === NodePropertyTypes.INT && isNaN(value)) {
+                        return;
+                    }
 
+                    var id = currentNode.id;
+
+                    validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
+                    let item = getValidatorItem(validator, { property: this.props.property, validator: this.props.validator });
+                    item.condition = value;
+                    if (this.props.onChange) {
+                        this.props.onChange();
+                    }
+                    else {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            id,
+                            prop: NodeProperties.Executor,
+                            value: validator
+                        });
+                    }
+                }} />
+            </FormControl>);
+
+            return formControll;
+        }
+        return <div></div>
+    }
     getMethodReferenceItem(validator, validatorItem) {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

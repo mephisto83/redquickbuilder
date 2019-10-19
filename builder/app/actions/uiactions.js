@@ -73,6 +73,9 @@ export function generateDataSeeds() {
 export function Visual(state, key) {
     return GetC(state, VISUAL, key);
 }
+export function CopyKey(key) {
+    return `Copy ${key}`;
+}
 export function IsCurrentNodeA(state, type) {
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     if (!Array.isArray(type)) {
@@ -649,8 +652,10 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
     let method = GetNodesMethod(adjacentId);
     let clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
     let { type, template, node, nodeProperty, many2manyProperty, many2many, many2manyMethod } = validator;
+    let dataAccessor = '';
     let nodeNodeId = GetMethodNodeProp(method, node);
     let conditionTemplate = '';
+    let condition = '';
     let properties = {};
     if (NodeConstants.FilterUI && NodeConstants.FilterUI[type] && NodeConstants.FilterUI[type].template && !template) {
         template = NodeConstants.FilterUI[type].template;
@@ -660,6 +665,9 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
     }
     else {
         throw 'no template found'
+    }
+    if (clauseKey === 'change_parameter') {
+        clauseKey = clauseKey + '.Data';
     }
     switch (type) {
         case NodeConstants.FilterRules.IsInModelPropertyCollection:
@@ -718,11 +726,79 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
                 validation_Func_name: 'AlphaOnlyAttribute'
             }
             break;
+        case NodeConstants.ValidationRules.MaxLength:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}`,
+                validation_Func_name: 'MaxLengthAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MaxLengthEqual:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}, true`,
+                validation_Func_name: 'MaxLengthAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MinLength:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: validator ? validator.condition : null,
+                validation_Func_name: 'MinLengthAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MinLengthEqual:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}, true`,
+                validation_Func_name: 'MinLengthAttribute'
+            }
+            break;
+
+        case NodeConstants.ValidationRules.MaxValue:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}`,
+                validation_Func_name: 'MaxAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MaxValueEqual:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}, true`,
+                validation_Func_name: 'MaxAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MinValue:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: validator ? validator.condition : null,
+                validation_Func_name: 'MinAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.MinValueEqual:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                parameters: `${validator ? validator.condition : null}, true`,
+                validation_Func_name: 'MinAttribute'
+            }
+            break;
         default:
             throw 'Unhandled condition clause case: ' + type;
     }
 
-    return bindTemplate(conditionTemplate, properties);
+    return bindTemplate(conditionTemplate, {
+        parameters: '',
+        ...properties
+    });
 }
 function GenerateConstantList(validator) {
     let node = GetGraphNode(validator.node);
@@ -829,7 +905,7 @@ export function GetModelPropertyNodes(refId) {
             type: NodeConstants.LinkType.PropertyLink,
             direction: GraphMethods.SOURCE
         }]
-    });
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Property);
 }
 
 export function GetLogicalChildren(id) {
@@ -1115,7 +1191,15 @@ export function clearPinned() {
         }
     })));
 }
-
+export function toggleNodeMark() {
+    let state = _getState();
+    let currentNode = Node(state, Visual(state, SELECTED_NODE));
+    _dispatch(graphOperation(CHANGE_NODE_PROPERTY, {
+        prop: NodeProperties.Selected,
+        id: currentNode.id,
+        value: !GetNodeProp(currentNode, NodeProperties.Selected)
+    }))
+}
 export function removeCurrentNode() {
     graphOperation(REMOVE_NODE, { id: Visual(_getState(), SELECTED_NODE) })(_dispatch, _getState);
 }

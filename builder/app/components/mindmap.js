@@ -443,7 +443,7 @@ export default class MindMap extends Component {
                     }
                 })
 
-                draw = true;
+                draw = draw || newNodes.length || removedNodes.length;
             }
             if (graph.links && this.state && this.state.graph && this.state.graph.links) {
                 let removedLinks = this.state.graph.links.relativeCompliment(graph.links, (x, y) => x.id === y).map(t => {
@@ -467,7 +467,7 @@ export default class MindMap extends Component {
                         nn.properties = { ...nl.properties };
                     }
                 });
-                draw = true;
+                draw = draw || newLinks.length || removedLinks.length;
             }
 
             if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {

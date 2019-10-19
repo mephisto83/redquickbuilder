@@ -327,7 +327,7 @@ class Dashboard extends Component {
 										clipboard.writeText(UIA.generateDataSeeds());
 									}} /> */}
 									<NavBarButton icon={'fa fa-asterisk'} onClick={() => {
-										  this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+										this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
 											source: currentNode.id,
 											target: currentNode.id
 										})
@@ -594,6 +594,17 @@ class Dashboard extends Component {
 											onChange={(value) => {
 												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
 													prop: UIA.NodeProperties.Pinned,
+													id: currentNode.id,
+													value
+												});
+											}} />
+										<CheckBox
+											label={Titles.Selected}
+											title={Titles.SelectedShortCut}
+											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+											onChange={(value) => {
+												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+													prop: UIA.NodeProperties.Selected,
 													id: currentNode.id,
 													value
 												});

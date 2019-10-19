@@ -19,6 +19,7 @@ import GenericPropertyContainer from './genericpropertycontainer';
 import TextInput from './textinput';
 import ButtonList from './buttonlist';
 import SideBarMenu from './sidebarmenu';
+import ConditionContextMenu from './conditioncontextmenu';
 import TreeViewMenu from './treeviewmenu';
 import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
@@ -67,9 +68,13 @@ class ContextMenu extends Component {
         switch (currentNodeType) {
             case NodeTypes.DataChain:
                 return this.getDataChainContextMenu();
+            case NodeTypes.Condition:
+                return this.getConditionMenu();
         }
     }
-    
+    getConditionMenu(){
+        return <ConditionContextMenu />
+    }
     getDataChainContextMenu() {
         return <DataChainContextMenu />
     }

@@ -1,4 +1,4 @@
-//Templated version.
+//Update model by agent
 public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) { 
 
     var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
@@ -9,7 +9,9 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
         var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
-        return await arbiter{{model}}.Get<{{model}}>(result.Id);
+        var updatedItem = await arbiter{{model}}.Get<{{model}}>(result.Id);
+
+        return {{agent_type}}Return.{{filter_function}}(updatedItem, agent);
     }
     throw new PermissionException();
 }

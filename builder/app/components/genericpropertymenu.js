@@ -12,6 +12,8 @@ import { createValidator, addValidatator, GetNode } from '../methods/graph_metho
 import SideBarMenu from './sidebarmenu';
 import { uuidv4 } from '../utils/array';
 import SideBarHeader from './sidebarheader';
+import TreeViewButtonGroup from './treeviewbuttongroup';
+import TreeViewGroupButton from './treeviewgroupbutton';
 class GenericPropertyMenu extends Component {
     render() {
         var { state } = this.props;
@@ -28,7 +30,10 @@ class GenericPropertyMenu extends Component {
             propertyExecutors = Object.keys(genericProperty.properties).map(key => {
                 let _validates = genericProperty.properties[key];
                 let visualKey = `GenericPropertyMenu${key}-${currentNode.id}`;
-                let selectedValidations = Object.keys(_validates && _validates.validators ? _validates.validators : {}).map(v => {
+
+                let temp = Object.keys(_validates && _validates.validators ? _validates.validators : {});
+                let selectedValidationsCount = temp.length;
+                let selectedValidations = temp.map(v => {
                     let selK = `${visualKey}-selected-validation`;
                     let selKInner = `${selK}-inne-${v}-r`;
                     return (
@@ -41,11 +46,9 @@ class GenericPropertyMenu extends Component {
                                 this.props.toggleVisual(selKInner)
                             }}
                             icon={'fa fa-tag'}>
-                            <TreeViewMenu
-                                hideArrow={true}
-                                title={Titles.Remove}
-                                icon={'fa fa-minus'}
-                                onClick={(() => {
+
+                            <TreeViewButtonGroup>
+                                <TreeViewGroupButton title={Titles.RemoveExecution} onClick={() => {
                                     let id = currentNode.id;
                                     let validator = genericProperty;
 
@@ -56,7 +59,19 @@ class GenericPropertyMenu extends Component {
                                     if (this.props.onRemove) {
                                         this.props.onRemove();
                                     }
-                                })} />
+                                }} icon={'fa fa-minus'} />
+                                <TreeViewGroupButton title={Titles.CopyExecution} onClick={() => {
+                                    if (this.props.onCopy) {
+                                        this.props.onCopy(key, v);
+                                    }
+                                }} icon={'fa fa-copy'} />
+                                {this.props.pastePart ? <TreeViewGroupButton title={Titles.Paste} icon={'fa fa-paste'} onClick={() => {
+                                    if (this.props.onPaste) {
+                                        this.props.onPaste(key, v);
+                                    }
+                                }} /> : null}
+
+                            </TreeViewButtonGroup>
                             <ExecutorItem
                                 adjacentNodeId={this.props.adjacentNodeId}
                                 onChange={this.props.onChange}
@@ -101,7 +116,7 @@ class GenericPropertyMenu extends Component {
                         toggle={() => {
                             this.props.toggleVisual(visualKey)
                         }}>
-                        <TreeViewMenu hideArrow={true} title={Titles.RemoveExecution} icon={'fa fa-minus'} onClick={() => {
+                        {/* <TreeViewMenu hideArrow={true} title={Titles.RemoveExecution} icon={'fa fa-minus'} onClick={() => {
                             let id = currentNode.id;
                             if (this.props.onRemove) {
                                 this.props.onRemove(key);
@@ -113,7 +128,43 @@ class GenericPropertyMenu extends Component {
                                 });
                             }
                         }} />
-                        <TreeViewMenu title={Titles.SelectedExecutors}
+
+                        <TreeViewMenu hideArrow={true} title={Titles.CopyExecution} icon={'fa fa-copy'} onClick={() => {
+                            if (this.props.onCopy) {
+                                this.props.onCopy(key);
+                            }
+                        }} /> */}
+                        <TreeViewButtonGroup>
+                            <TreeViewGroupButton title={Titles.RemoveExecution} onClick={() => {
+                                let id = currentNode.id;
+                                if (this.props.onRemove) {
+                                    this.props.onRemove(key);
+                                }
+                                else {
+                                    this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                        target: key,
+                                        source: id,
+                                    });
+                                }
+                            }} icon={'fa fa-minus'} />
+                            <TreeViewGroupButton title={Titles.CopyExecution} onClick={() => {
+                                if (this.props.onCopy) {
+                                    this.props.onCopy(key);
+                                }
+                            }} icon={'fa fa-copy'} />
+                            {this.props.pasteAll ? <TreeViewGroupButton title={Titles.Paste} icon={'fa fa-paste'} onClick={() => {
+                                if (this.props.onPaste) {
+                                    this.props.onPaste(key);
+                                }
+                            }} /> : null}
+
+                        </TreeViewButtonGroup>
+                        {/* {this.props.pasteAll ? <TreeViewMenu hideArrow={true} title={Titles.Paste} icon={'fa fa-copy'} onClick={() => {
+                            if (this.props.onPaste) {
+                                this.props.onPaste(key);
+                            }
+                        }} /> : null} */}
+                        <TreeViewMenu title={`${Titles.SelectedExecutors}(${selectedValidationsCount}) `}
                             icon={'fa  fa-list-ul'}
                             open={UIA.Visual(state, `${visualKey}-selected-executions`)}
                             active={UIA.Visual(state, `${visualKey}-selected-executions`)}

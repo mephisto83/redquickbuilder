@@ -951,6 +951,7 @@ export default class PermissionGenerator {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                 methods: methodInterfaces.unique().join(jNL + jNL)
             });
+            let hasExtensions = NodesByType(state, NodeTypes.ExtensionType).length;
             result[GetNodeProp(agent, NodeProperties.CodeName)] = {
                 name: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}`,
                 tname: `Permissions${GetNodeProp(agent, NodeProperties.CodeName)}Tests`,
@@ -959,7 +960,7 @@ export default class PermissionGenerator {
                     template: streamProcessChangeClassExtension,
                     usings: [
                         ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Extensions}`,
+                        hasExtensions ? `${namespace}${NameSpace.Extensions}` : false,
                         `${namespace}${NameSpace.Model}`,
                         `${namespace}${NameSpace.Interface}`,
                         arbiters && arbiters.length ? `${namespace}${NameSpace.Controllers}` : null,
@@ -987,7 +988,7 @@ export default class PermissionGenerator {
                         ...STANDARD_TEST_USING,
                         `${namespace}${NameSpace.Interface}`,
                         `${namespace}${NameSpace.Permissions}`,
-                        `${namespace}${NameSpace.Extensions}`,
+                        hasExtensions ? `${namespace}${NameSpace.Extensions}` : false,
                         `${namespace}${NameSpace.Constants}`,
                         `${namespace}${NameSpace.Model}`
                     ],

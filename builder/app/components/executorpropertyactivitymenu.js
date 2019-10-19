@@ -32,7 +32,9 @@ class ExecutorPropertyActivityMenu extends Component {
             propertyExecutors = Object.keys(executor.properties).map(key => {
                 let _validates = executor.properties[key];
                 let visualKey = `ExecutorPropertyActivityMenu${key}-${currentNode.id}`;
-                let selectedValidations = Object.keys(_validates && _validates.validators ? _validates.validators : {}).map(v => {
+                let temp = Object.keys(_validates && _validates.validators ? _validates.validators : {});
+                let selectedValidationsCount = temp.length;
+                let selectedValidations = temp.map(v => {
                     let selK = `${visualKey}-selected-validation`;
                     let selKInner = `${selK}-inne-${v}-r`;
                     return (
@@ -110,7 +112,7 @@ class ExecutorPropertyActivityMenu extends Component {
                                 source: id,
                             });
                         }} />
-                        <TreeViewMenu title={Titles.SelectedExecutors}
+                        <TreeViewMenu title={`${Titles.SelectedExecutors}(${selectedValidationsCount})`}
                             icon={'fa  fa-list-ul'}
                             open={UIA.Visual(state, `${visualKey}-selected-executions`)}
                             active={UIA.Visual(state, `${visualKey}-selected-executions`)}

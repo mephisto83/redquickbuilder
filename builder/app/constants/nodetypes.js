@@ -292,6 +292,7 @@ export const NodeProperties = {
     UseExtension: 'usextension',
     IncludedInList: 'includedInList',
     Pinned: 'Pinned',
+    Selected: 'Selected',
     ExcludedFromList: 'excludedInList',
     UseEqual: "UseEqual",
     IsEqualTo: 'IsEqualTo',
@@ -916,6 +917,14 @@ export const ValidationRules = {
     Empty: 'empty',
     AlphaOnlyWithSpaces: "alphaonlywithspaces",
     NotEmpty: "notempty",
+    MaxLength: 'maxlength',
+    MinLength: 'minLength',
+    MaxLengthEqual: 'maxlengthEqual',
+    MinLengthEqual: 'minLengthEqual',
+    MaxValue: 'maxValue',
+    MinValue: 'minValue',
+    MaxValueEqual: 'maxValueEqual',
+    MinValueEqual: 'minValueEqual',
     UrlEmpty: "url_empty",
     IsTrue: 'is_true',
     IsFalse: 'is_false',
@@ -1045,6 +1054,27 @@ const COMMON_STRING_ARGS = {
         type: NodePropertyTypes.STRING,
         nodeType: NodeTypes.Property
     }
+}
+const COMMON_NUMBER_ARGS = {
+    value: {
+        type: NodePropertyTypes.INT,
+        nodeType: NodeTypes.Property
+    },
+    condition: {
+        type: NodePropertyTypes.INT,
+        nodeType: null,
+        defaultValue: 0
+    }
+}
+const COMMON_NUMBER__EQ_ARGS = {
+    ...COMMON_NUMBER_ARGS,
+    condition: {
+        type: NodePropertyTypes.INT,
+        nodeType: null,
+        equals: true,
+        defaultValue: 0
+    }
+
 }
 
 const COMMON_LISTSTRING_ARGS = {
@@ -1897,7 +1927,66 @@ export const FilterUI = {
         },
         template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_STRING_ARGS }
-    }
+    },
+    [ValidationRules.MaxLength]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MaximumLengthAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER_ARGS }
+    },
+    [ValidationRules.MinLength]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MinimumLengthAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER_ARGS }
+    },
+    [ValidationRules.MaxLengthEqual]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MaximumLengthAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER__EQ_ARGS }
+    },
+    [ValidationRules.MinLengthEqual]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MinAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER__EQ_ARGS }
+    },
+
+    
+    [ValidationRules.MaxValue]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MaxAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER_ARGS }
+    },
+    [ValidationRules.MinValue]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MinAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER_ARGS }
+    },
+    [ValidationRules.MaxValueEqual]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MaxAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER__EQ_ARGS }
+    },
+    [ValidationRules.MinValueEqual]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'MinAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_NUMBER__EQ_ARGS }
+    },
+
 }
 Object.keys(FilterUI).map(t => {
     FilterUI[t].type = t;
