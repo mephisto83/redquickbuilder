@@ -719,9 +719,21 @@ export const CreateDefaultView = {
             let propertyDataChainAccesors = [];
             modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
+                let skip = false;
                 PerformGraphOperation([{
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
+                        let node = GetNodesByProperties({
+                            [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                            [NodeProperties.Selector]: modelComponentSelectors[0],
+                            [NodeProperties.SelectorProperty]: viewModelNodeId,
+                        }).find(x => x);
+                        if (node) {
+                            propNodeId = node.id;
+                            skip = true;
+                            propertyDataChainAccesors.push(propNodeId);
+                            return {};
+                        }
                         return {
                             nodeType: NodeTypes.DataChain,
                             properties: {
@@ -752,6 +764,9 @@ export const CreateDefaultView = {
                 }, {
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
+                        if (skip) {
+                            return {};
+                        }
                         return {
                             parent: propNodeId,
                             nodeType: NodeTypes.DataChain,
@@ -785,13 +800,7 @@ export const CreateDefaultView = {
                                 }
                             }],
                             callback: (node, graph) => {
-                                // let groups = getNodesGroups(graph, node.id)
-                                // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-                                //     prop,
-                                //     id,
-                                //     value
-                                // });
-                                // DataChainContextMethods.SplitDataChain.bind(this)(currentNode);
+
                             }
                         }
                     }
@@ -966,6 +975,7 @@ export const CreateDefaultView = {
                                 case ON_BLUR:
                                     cellProperties.componentApi[apiProperty].model = viewModelNodeBlurId;
                                     cellProperties.componentApi[apiProperty].modelProperty = modelProperties[propertyIndex].id;
+                                    cellProperties.componentApi[apiProperty].handlerType = HandlerTypes.Blur;
                                     break;
                                 case ON_CHANGE_TEXT:
                                 case ON_CHANGE:
@@ -975,6 +985,7 @@ export const CreateDefaultView = {
                                 case ON_FOCUS:
                                     cellProperties.componentApi[apiProperty].model = viewModelNodeFocusId;
                                     cellProperties.componentApi[apiProperty].modelProperty = modelProperties[propertyIndex].id;
+                                    cellProperties.componentApi[apiProperty].handlerType = HandlerTypes.Focus;
                                     break;
                             }
 

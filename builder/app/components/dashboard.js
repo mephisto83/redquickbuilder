@@ -524,8 +524,10 @@ class Dashboard extends Component {
 								}}
 
 								selectedColor={UIA.Colors.SelectedNode}
+								markedColor = {UIA.Colors.MarkedNode}
 								selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}
 								selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
+								markedNodes={graph ? graph.markedSelectedNodeIds : []}
 								graph={vgraph || graph}></MindMap>
 						</Content>
 						<SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>

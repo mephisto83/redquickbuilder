@@ -271,7 +271,18 @@ export default class MindMap extends Component {
                 }
                 return color(graph.groups.length)
             })
-
+        features.append("rect")
+            .attr("width", function (d) { return d.marked ? 15 : 0; })
+            .attr("height", function (d) { return 15; })
+            .attr('x', function (d) { return d.width - 5 })
+            .attr('y', 5)
+            .attr("rx", 5).attr("ry", 5)
+            .style("fill", function (d) {
+                if (d.marked && me.props.markedColor) {
+                    return me.props.markedColor;
+                }
+                return color(graph.groups.length)
+            })
         var topdiv = label.append('xhtml:div')
             .style('pointer-events', 'none');
 
@@ -430,7 +441,11 @@ export default class MindMap extends Component {
                         this.applyNodeVisualData(GraphMethods.duplicateNode(graph.nodeLib[nn]))
                     );
                 });
-
+                if (props.markedNodes) {
+                    this.state.graph.nodes.map(nn => {
+                        nn.marked = !!props.markedNodes.find(t => t == nn.id);
+                    })
+                }
                 if (props.selectedNodes) {
                     this.state.graph.nodes.map(nn => {
                         nn.selected = !!props.selectedNodes.find(t => t == nn.id);

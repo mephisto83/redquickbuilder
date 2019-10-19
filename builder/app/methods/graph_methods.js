@@ -1,7 +1,7 @@
 import * as Titles from '../components/titles'
 import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
 import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById } from '../actions/uiactions';
+import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById, GetNodes } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import { isBuffer } from 'util';
 var os = require('os');
@@ -2286,6 +2286,15 @@ export function updateNodeProperty(graph, options) {
                     [prop]: value,
                     ...additionalChange,
                 }
+            }
+        }
+        if (prop === NodeProperties.Selected) {
+            graph.selected = graph.selected ? (graph.selected + (value ? 1 : -1)) : 0;
+            if (value) {
+                graph.markedSelectedNodeIds = [...(graph.markedSelectedNodeIds || []), id].unique();
+            }
+            else {
+                graph.markedSelectedNodeIds = [...(graph.markedSelectedNodeIds || [])].filter(x => x !== id);
             }
         }
         if (prop === NodeProperties.NODEType && value === NodeTypes.Function) {

@@ -270,6 +270,8 @@ export const Update_Object_Agent_Value__Object_With_Object = 'Update Object by A
 
 export const Functions = 'Functions';
 export const Login = 'Login';
+export const SelectAllConnected = 'Selected All Connected';
+export const ClearMarked = 'Clear Marked';
 export const Register = 'Register';
 export const AddFunction = 'Add function';
 export const MaestroDetails = 'Maestro Details';

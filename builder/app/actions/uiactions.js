@@ -148,7 +148,20 @@ export function GetMethodParameters(methodId) {
 export function GetNodeById(node, graph) {
     return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
-
+export function GetNodesByProperties(props, graph) {
+    var currentGraph = graph || GetCurrentGraph(GetState());
+    if (currentGraph) {
+        return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])].filter(x => {
+            for (var i in props) {
+                if (props[i] !== GetNodeProp(x, i)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+    return [];
+}
 export function GetChildComponentAncestors(id) {
     return GraphMethods.GetChildComponentAncestors(_getState(), id);
 }
@@ -1191,6 +1204,20 @@ export function clearPinned() {
         }
     })));
 }
+export function clearMarked() {
+    let state = _getState();
+    _dispatch(graphOperation(GetNodes(state).filter(x => GetNodeProp(x, NodeProperties.Selected)).map(node => {
+        return {
+            operation: CHANGE_NODE_PROPERTY,
+            options: {
+                prop: NodeProperties.Selected,
+                id: node.id,
+                value: false
+            }
+        }
+    })));
+}
+
 export function toggleNodeMark() {
     let state = _getState();
     let currentNode = Node(state, Visual(state, SELECTED_NODE));
@@ -1474,6 +1501,25 @@ export function executeGraphOperation(model, op) {
         op.method({ model, dispatch, getState });
     }
 }
+export function selectAllConnected(id) {
+    return (dispatch, getState) => {
+        let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {
+            id
+        });
+        graphOperation([...[...nodes, GetNodeById(id)].map(t => {
+            return {
+                operation: CHANGE_NODE_PROPERTY,
+                options: function () {
+                    return {
+                        prop: NodeProperties.Selected,
+                        value: true,
+                        id: t.id
+                    }
+                }
+            }
+        })])(dispatch, getState)
+    }
+}
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();
@@ -1652,7 +1698,8 @@ export function graphOperation(operation, options) {
 }
 
 export const Colors = {
-    SelectedNode: '#f39c12'
+    SelectedNode: '#f39c12',
+    MarkedNode: '#af10fe'
 };
 
 

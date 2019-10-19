@@ -25,6 +25,8 @@ import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
 import DataChainContextMenu from './datachaincontextmenu';
+import TreeViewGroupButton from './treeviewgroupbutton';
+import TreeViewButtonGroup from './treeviewbuttongroup';
 const DATA_SOURCE = 'DATA_SOURCE';
 class ContextMenu extends Component {
     getMenuMode(mode) {
@@ -72,11 +74,24 @@ class ContextMenu extends Component {
                 return this.getConditionMenu();
         }
     }
-    getConditionMenu(){
+    getConditionMenu() {
         return <ConditionContextMenu />
     }
     getDataChainContextMenu() {
         return <DataChainContextMenu />
+    }
+    getDefaultMenu() {
+        var { state } = this.props;
+        return (<TreeViewButtonGroup>
+            <TreeViewGroupButton title={Titles.ClearMarked} onClick={() => {
+                UIA.clearMarked();
+            }} icon={'fa  fa-stop'} />
+            <TreeViewGroupButton
+                title={Titles.SelectAllConnected}
+                onClick={() => {
+                    this.props.selectAllConnected(UIA.Visual(state, UIA.SELECTED_NODE))
+                }} icon={'fa fa-arrows-alt'} />
+        </TreeViewButtonGroup>)
     }
     render() {
         var { state } = this.props;
@@ -88,6 +103,7 @@ class ContextMenu extends Component {
         let nodeType = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? UIA.GetNodeProp(currentNode, NodeProperties.NODEType) : null;
         let menuMode = UIA.Visual(state, UIA.CONTEXT_MENU_MODE);
         let menuitems = this.getMenuMode(menuMode);
+        let defaultMenus = this.getDefaultMenu();
         return (<Draggable handle=".draggable-header">
             <div className="context-menu modal-dialog modal-info" style={{ zIndex: 1000, position: 'fixed', width: 250, height: 400, display, top: 250, left: 500 }}>
                 <div className="modal-content">
@@ -99,6 +115,7 @@ class ContextMenu extends Component {
                     </div>
                     <div className="modal-body" style={{ padding: 0 }}>
                         <GenericPropertyContainer active={true} title='asdf' subTitle='afaf' nodeType={nodeType} >
+                            {defaultMenus}
                             {menuitems}
                         </GenericPropertyContainer>
                     </div>
