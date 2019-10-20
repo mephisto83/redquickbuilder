@@ -445,7 +445,7 @@ export function ConnectChainCommand(source, target) {
     }]
 }
 
-export function AddChainCommand(currentNode, callback, graph) {
+export function AddChainCommand(currentNode, callback, graph, viewPackage = {}) {
     let groupProperties = GetNodeProp(currentNode, NodeProperties.GroupParent) ? {
         id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent), graph).id
     } : null;
@@ -456,6 +456,7 @@ export function AddChainCommand(currentNode, callback, graph) {
             nodeType: NodeTypes.DataChain,
             groupProperties,
             properties: {
+                ...viewPackage,
                 [NodeProperties.ChainParent]: currentNode.id
             },
             linkProperties: {
@@ -465,7 +466,7 @@ export function AddChainCommand(currentNode, callback, graph) {
         }
     };
 }
-export function SplitDataCommand(currentNode, callback) {
+export function SplitDataCommand(currentNode, callback, viewPackage = {}) {
     return {
         operation: ADD_NEW_NODE,
         options: {
@@ -478,6 +479,7 @@ export function SplitDataCommand(currentNode, callback) {
                 [GroupProperties.ExternalExitNode]: GetDataChainNextId(currentNode.id)
             },
             properties: {
+                ...viewPackage,
                 [NodeProperties.ChainParent]: currentNode.id
             },
             linkProperties: {

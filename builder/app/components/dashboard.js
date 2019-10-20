@@ -333,7 +333,7 @@ class Dashboard extends Component {
 										})
 									}} />
 									<NavBarButton icon={'fa fa-plus'} onClick={() => {
-										this.props.graphOperation(UIA.NEW_NODE);
+										this.props.graphOperation(UIA.NEW_NODE, {});
 										this.props.setVisual(SIDE_PANEL_OPEN, true);
 										this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
 									}} />

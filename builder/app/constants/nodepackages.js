@@ -31,6 +31,7 @@ import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
 import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand } from "./datachain";
+import { uuidv4 } from "../utils/array";
 
 
 export const GetSpecificModels = {
@@ -388,7 +389,8 @@ export const AddAgentUser = {
 export const CreateDefaultView = {
     type: 'react-native-views',
     methodType: 'React Native Views',
-    method: () => {
+    method: (args = {}) => {
+        let { viewName } = args;
         let state = GetState();
         var currentNode = Node(state, Visual(state, SELECTED_NODE));
         let screenNodeId = null;
@@ -403,9 +405,15 @@ export const CreateDefaultView = {
         let viewModelNodeBlurId = null;
         let viewModelNodeFocusedId = null;
         let viewModelNodeId = null;
+        viewName = viewName || GetNodeTitle(currentNode);
+        let viewPackage = {
+            [NodeProperties.ViewPackage]: uuidv4(),
+            [NodeProperties.ViewPackageTitle]: viewName
+        };
+
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
-            let modelProperties = GetModelPropertyChildren(currentNode.id);
+            let modelProperties = GetModelPropertyChildren(currentNode.id).filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
 
             let apiListLinkOperations = [];
             PerformGraphOperation([{
@@ -416,103 +424,168 @@ export const CreateDefaultView = {
                         screenNodeId = screenNode.id;
                     },
                     properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Form`
+                        ...viewPackage,
+                        [NodeProperties.UIText]: `${viewName} Form`
                     }
                 }
             }, {
                 operation: ADD_NEW_NODE,
-                options: {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: (viewModelNode) => {
-                        viewModelNodeId = viewModelNode.id;
-                    },
-                    properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM`,
+                options: function (graph) {
+                    let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance
-                    },
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                        }
-                    }]
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    }, graph);
+                    if (res && res.length) {
+                        viewModelNodeId = res[0].id;
+                        return false;
+                    }
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        callback: (viewModelNode) => {
+                            viewModelNodeId = viewModelNode.id;
+                        },
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} VM`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }]
+                    }
                 }
             }, {
                 operation: ADD_NEW_NODE,
-                options: {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: (viewModelNodeDirty) => {
-                        viewModelNodeDirtyId = viewModelNodeDirty.id;
-                    },
-                    properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Dirty`,
+                options: function (graph) {
+                    let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty
-                    },
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                        }
-                    }]
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    }, graph);
+                    if (res && res.length) {
+                        viewModelNodeDirtyId = res[0].id;
+                        return false;
+                    }
+
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        callback: (viewModelNodeDirty) => {
+                            viewModelNodeDirtyId = viewModelNodeDirty.id;
+                        },
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} VM Dirty`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }]
+                    };
                 }
             }, {
                 operation: ADD_NEW_NODE,
-                options: {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: (viewModelNodeFocus) => {
-                        viewModelNodeFocusId = viewModelNodeFocus.id;
-                    },
-                    properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Focus`,
+                options: function (graph) {
+                    let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus
-                    },
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                        }
-                    }]
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    }, graph);
+                    if (res && res.length) {
+                        viewModelNodeFocusId = res[0].id;
+                        return false;
+                    }
+
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        callback: (viewModelNodeFocus) => {
+                            viewModelNodeFocusId = viewModelNodeFocus.id;
+                        },
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} VM Focus`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }]
+                    }
                 }
             }, {
                 operation: ADD_NEW_NODE,
-                options: {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: (viewModelNodeFocused) => {
-                        viewModelNodeFocusedId = viewModelNodeFocused.id;
-                    },
-                    properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Focused`,
+                options: function (graph) {
+                    let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused
-                    },
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                        }
-                    }]
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    }, graph);
+                    if (res && res.length) {
+                        viewModelNodeFocusedId = res[0].id;
+                        return false;
+                    }
+
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        callback: (viewModelNodeFocused) => {
+                            viewModelNodeFocusedId = viewModelNodeFocused.id;
+                        },
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} VM Focused`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }]
+                    }
                 }
             }, {
                 operation: ADD_NEW_NODE,
-                options: {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: (viewModelNodeBlur) => {
-                        viewModelNodeBlurId = viewModelNodeBlur.id;
-                    },
-                    properties: {
-                        [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} VM Blur`,
+                options: function (graph) {
+                    let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur
-                    },
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                        }
-                    }]
+                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    }, graph);
+                    if (res && res.length) {
+                        viewModelNodeBlurId = res[0].id;
+                        return false;
+                    }
+
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        callback: (viewModelNodeBlur) => {
+                            viewModelNodeBlurId = viewModelNodeBlur.id;
+                        },
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} VM Blur`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }]
+                    }
                 }
             }, {
                 operation: NEW_SCREEN_OPTIONS,
@@ -523,7 +596,8 @@ export const CreateDefaultView = {
                         },
                         parent: screenNodeId,
                         properties: {
-                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} React Native Form`,
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} React Native Form`,
                             [NodeProperties.UIType]: UITypes.ReactNative
                         },
                         groupProperties: {
@@ -550,7 +624,8 @@ export const CreateDefaultView = {
                         },
                         parent: screenNodeOptionId,
                         properties: {
-                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} React Native Component`,
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} React Native Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Form.key,
                             [NodeProperties.Layout]: layout,
@@ -588,6 +663,7 @@ export const CreateDefaultView = {
                             groupProperties: {
                             },
                             properties: {
+                                ...viewPackage,
                                 [NodeProperties.UIText]: `${GetNodeTitle(modelProperty)} React Native Component`,
                                 [NodeProperties.UIType]: UITypes.ReactNative,
                                 [NodeProperties.Label]: GetNodeTitle(modelProperty),
@@ -611,9 +687,10 @@ export const CreateDefaultView = {
                         groupProperties: {
                         },
                         properties: {
-                            [NodeProperties.UIText]: ` ${Titles.Execute} Button ${GetNodeTitle(currentNode)} Component`,
+                            ...viewPackage,
+                            [NodeProperties.UIText]: ` ${Titles.Execute} Button ${viewName} Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
-                            [NodeProperties.Label]: `${GetNodeTitle(currentNode)} ${Titles.Execute}`,
+                            [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Button.key
                         },
                         linkProperties: {
@@ -708,10 +785,20 @@ export const CreateDefaultView = {
             PerformGraphOperation([({
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
+                    let selectorNode = GetNodesByProperties({
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.NODEType]: NodeTypes.Selector
+                    }).find(x => x);
+                    if (selectorNode) {
+                        modelComponentSelectors.push(selectorNode.id);
+                        return false;
+                    }
                     return {
                         nodeType: NodeTypes.Selector,
                         properties: {
-                            [NodeProperties.UIText]: GetNodeTitle(currentNode)
+                            ...viewPackage,
+                            [NodeProperties.UIText]: GetNodeTitle(currentNode),
+                            [NodeProperties.Model]: currentNode.id
                         },
                         links: [...vmsIds().map(t => ({
                             target: t,
@@ -729,9 +816,9 @@ export const CreateDefaultView = {
             })])(GetDispatchFunc(), GetStateFunc());
 
             let propertyDataChainAccesors = [];
-            
+
             let datachainLink = [];
-            
+
             modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
                 let skip = false;
@@ -748,12 +835,13 @@ export const CreateDefaultView = {
                             propNodeId = node.id;
                             skip = true;
                             propertyDataChainAccesors.push(propNodeId);
-                            return {};
+                            return null;
                         }
                         return {
                             nodeType: NodeTypes.DataChain,
                             properties: {
-                                [NodeProperties.UIText]: `Get ${GetNodeTitle(currentNode)} Object => ${GetNodeTitle(property)}`,
+                                ...viewPackage,
+                                [NodeProperties.UIText]: `Get ${viewName} Object => ${GetNodeTitle(property)}`,
                                 [NodeProperties.EntryPoint]: true,
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                                 [NodeProperties.Selector]: modelComponentSelectors[0],
@@ -794,6 +882,7 @@ export const CreateDefaultView = {
                                 [GroupProperties.ExternalExitNode]: GetDataChainNextId(propNodeId)
                             },
                             properties: {
+                                ...viewPackage,
                                 [NodeProperties.UIText]: `Get ${GetNodeTitle(property)}`,
                                 [NodeProperties.ChainParent]: propNodeId,
                                 [NodeProperties.AsOutput]: true,
@@ -853,7 +942,8 @@ export const CreateDefaultView = {
                             return {
                                 nodeType: NodeTypes.DataChain,
                                 properties: {
-                                    [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} ${GetNodeTitle(property)} ${apiProperty}`,
+                                    ...viewPackage,
+                                    [NodeProperties.UIText]: `${viewName} ${GetNodeTitle(property)} ${apiProperty}`,
                                     [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
                                     [NodeProperties.EntryPoint]: true
                                 },
@@ -869,7 +959,7 @@ export const CreateDefaultView = {
                         options: function (graph) {
                             let temp = SplitDataCommand(GetNodeById(dca, graph), split => {
                                 splitId = split.id;
-                            });
+                            }, viewPackage);
                             return temp.options;
                         }
                     }, {
@@ -878,7 +968,7 @@ export const CreateDefaultView = {
 
                             let temp = AddChainCommand(GetNodeById(splitId, graph), complete => {
                                 completeId = complete.id;
-                            }, graph);
+                            }, graph, viewPackage);
                             return temp.options;
                         }
                     }, {

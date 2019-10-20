@@ -59,6 +59,7 @@ class NodeManagement extends Component {
                 <TreeViewMenu title={group} key={`node-${group}-${gi}`}
                     icon="fa fa-dot-circle-o"
                     open={UIA.Visual(state, groupKey)}
+                    innerStyle={{ maxHeight: 400, overflowY: 'auto' }}
                     active={UIA.Visual(state, groupKey)}
                     right={<span className="label label-primary ">{groups[group].length}</span>}
                     toggle={() => {

@@ -225,6 +225,8 @@ export const ConfigurationProperties = {
     Domain: 'Configuration_Domain'
 }
 export const NodeProperties = {
+    ViewPackage: "view-package",
+    ViewPackageTitle: 'view-package-title',
     ComponentApi: 'component-api',
     SelectorType: 'selector-type',
     UseInstanceType: "UseInstanceType",

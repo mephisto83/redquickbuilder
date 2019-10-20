@@ -25,13 +25,15 @@ class ModelFilterMenu extends Component {
         let nodes = UIA.NodesByType(state, NodeTypes.Model).map(t => ({ title: UIA.GetNodeTitle(t), value: t.id }));
         var graph = UIA.GetCurrentGraph(state);
         let properties = [];
+        let propnodes = [];
         if (currentNode) {
             let model = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel);
-            properties = (getNodesByLinkType(graph, {
+            propnodes = (getNodesByLinkType(graph, {
                 id: model,
                 direction: SOURCE,
                 type: LinkType.PropertyLink
-            }) || []).map(t => {
+            }) || []);
+            properties = propnodes.map(t => {
                 return (<CheckBox
                     key={`checkbox-${t.id}`}
                     label={UIA.GetNodeTitle(t)}
@@ -49,6 +51,30 @@ class ModelFilterMenu extends Component {
         }
         return (
             <TabPane active={active}>
+                <div class="btn-group">
+                    <button title={Titles.SelectAll} onClick={() => {
+                        let fprops = UIA.GetNodeProp(currentNode, UIA.NodeProperties.FilterPropreties) || {};
+                        propnodes.map(node => {
+                            fprops[node.id] = true;
+                        })
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.FilterPropreties,
+                            id: currentNode.id,
+                            value: fprops
+                        });
+                    }} className={`btn btn-success`}><i className={`fa  fa-flag-checkered`} /></button>
+                    <button title={Titles.Clear} onClick={() => {
+                        let fprops = UIA.GetNodeProp(currentNode, UIA.NodeProperties.FilterPropreties) || {};
+                        propnodes.map(node => {
+                            fprops[node.id] = false;
+                        })
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.FilterPropreties,
+                            id: currentNode.id,
+                            value: fprops
+                        });
+                    }} className={`btn btn-default`}><i className={`fa  fa-flag-o`} /></button>
+                </div>
                 {currentNode ? (<FormControl>
                     {properties}
                 </FormControl>) : null}

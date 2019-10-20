@@ -93,10 +93,21 @@ class ContextMenu extends Component {
                     this.props.selectAllConnected(UIA.Visual(state, UIA.SELECTED_NODE))
                 }} icon={'fa fa-arrows-alt'} />
             <TreeViewGroupButton
+                title={Titles.SelectViewPackage}
+                onClick={() => {
+                    this.props.selectAllInViewPackage(UIA.Visual(state, UIA.SELECTED_NODE))
+                }} icon={'fa fa-shopping-cart'} />
+            <TreeViewGroupButton
+                title={Titles.PinSelected}
+                onClick={() => {
+                    this.props.pinSelected()
+                }} icon={'fa fa-map-pin'} />
+            <TreeViewGroupButton
                 title={`${Titles.DeleteAllSelected}(${graph ? graph.selected : '0'})`}
                 onClick={() => {
                     this.props.deleteAllSelected();
                 }} icon={'fa fa-minus'} />
+
         </TreeViewButtonGroup>)
     }
     render() {

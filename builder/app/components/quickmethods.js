@@ -48,13 +48,32 @@ class QuickMethods extends Component {
                             <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, CreateLoginModels);
                             })} />
-                            <TreeViewMenu hideArrow={true} title={CreateDefaultView.type} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, CreateDefaultView);
-                            })} />
                             <TreeViewMenu hideArrow={true} title={AddAgentUser.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, AddAgentUser);
                             })} />
-
+                            <TreeViewMenu
+                                title={CreateDefaultView.type}
+                                open={UIA.Visual(state, CreateDefaultView.type)}
+                                active={true}
+                                toggle={() => {
+                                    this.props.toggleVisual(CreateDefaultView.type)
+                                }}
+                                icon={'fa fa-tag'}>
+                                {/* <TextBox label={'View Package'} value={this.props.Visual(state, 'View Package Title')} onChange={(val) => {
+                                    this.props.setVisual('View Package Title', val);
+                                }} />*/}
+                                <TextBox
+                                    label={Titles.ViewPackage}
+                                    value={UIA.Visual(state, 'View Package Title')}
+                                    onChange={(value) => {
+                                        this.props.setVisual('View Package Title', value);
+                                    }} />
+                                <TreeViewMenu hideArrow={true} title={CreateDefaultView.type} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, CreateDefaultView, {
+                                        viewName: UIA.Visual(state, 'View Package Title')
+                                    });
+                                })} />
+                            </TreeViewMenu>
                             <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, {
                                     type: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
