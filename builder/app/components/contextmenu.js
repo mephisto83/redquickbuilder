@@ -82,6 +82,7 @@ class ContextMenu extends Component {
     }
     getDefaultMenu() {
         var { state } = this.props;
+        var graph = UIA.GetCurrentGraph(state);
         return (<TreeViewButtonGroup>
             <TreeViewGroupButton title={Titles.ClearMarked} onClick={() => {
                 UIA.clearMarked();
@@ -91,6 +92,11 @@ class ContextMenu extends Component {
                 onClick={() => {
                     this.props.selectAllConnected(UIA.Visual(state, UIA.SELECTED_NODE))
                 }} icon={'fa fa-arrows-alt'} />
+            <TreeViewGroupButton
+                title={`${Titles.DeleteAllSelected}(${graph ? graph.selected : '0'})`}
+                onClick={() => {
+                    this.props.deleteAllSelected();
+                }} icon={'fa fa-minus'} />
         </TreeViewButtonGroup>)
     }
     render() {

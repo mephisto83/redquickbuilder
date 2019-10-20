@@ -1520,6 +1520,16 @@ export function selectAllConnected(id) {
         })])(dispatch, getState)
     }
 }
+export function deleteAllSelected() {
+    return (dispatch, getState) => {
+        graphOperation(GetNodesByProperties({
+            [NodeProperties.Selected]: true
+        }).map(t => ({
+            operation: REMOVE_NODE,
+            options: { id: t.id }
+        })))(dispatch, getState);
+    }
+}
 export function graphOperation(operation, options) {
     return (dispatch, getState) => {
         var state = getState();

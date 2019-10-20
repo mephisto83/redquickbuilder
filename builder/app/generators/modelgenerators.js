@@ -67,6 +67,12 @@ export default class ModelGenerator {
             type: LinkType.PropertyLink,
             direction: GraphMethods.SOURCE
         });
+        let logicalParents = GraphMethods.getNodesByLinkType(graph, {
+            id: node.id,
+            type: LinkType.LogicalChildren,
+            direction: GraphMethods.TARGET
+        }).filter(x => x.id !== node.id);
+        connectedProperties = [...connectedProperties, ...logicalParents];
         let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
         let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
         let staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
@@ -98,7 +104,10 @@ export default class ModelGenerator {
                 propType = 'string';
 
             }
-
+            else if (GetNodeProp(propNode, NodeProperties.NODEType) === NodeTypes.Model) {
+                propType = 'string';
+            }
+            
             if (GetNodeProp(propNode, NodeProperties.UseModelAsType)) {
                 if (GetNodeProp(propNode, NodeProperties.IsReferenceList)) {
                     propType = `IList<${propType}>`;

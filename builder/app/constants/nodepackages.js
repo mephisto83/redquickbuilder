@@ -22,7 +22,8 @@ import {
     NEW_SCREEN_OPTIONS,
     NEW_COMPONENT_NODE,
     GetModelPropertyChildren,
-    GetDataChainNextId
+    GetDataChainNextId,
+    GetNodesByProperties
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE } from "./componenttypes";
@@ -350,14 +351,16 @@ export const AddAgentUser = {
         let userId = null;
         PerformGraphOperation([{
             operation: ADD_NEW_NODE,
-            options: {
-                nodeType: NodeTypes.Model,
-                callback: (node) => {
-                    userId = node.id;
-                },
-                properties: {
-                    [NodeProperties.UIText]: `User`,
-                    [NodeProperties.IsUser]: true
+            options: function () {
+                return {
+                    nodeType: NodeTypes.Model,
+                    callback: (node) => {
+                        userId = node.id;
+                    },
+                    properties: {
+                        [NodeProperties.UIText]: `User`,
+                        [NodeProperties.IsUser]: true
+                    }
                 }
             }
         }, {
@@ -369,7 +372,13 @@ export const AddAgentUser = {
                         [NodeProperties.UIText]: `Agent`,
                         [NodeProperties.IsAgent]: true,
                         [NodeProperties.UIUser]: userId
-                    }
+                    },
+                    links: [{
+                        target: userId,
+                        linkProperties: {
+                            properties: { ...LinkProperties.UserLink }
+                        }
+                    }]
                 }
             }
         }])(GetDispatchFunc(), GetStateFunc());
@@ -397,6 +406,8 @@ export const CreateDefaultView = {
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
             let modelProperties = GetModelPropertyChildren(currentNode.id);
+
+            let apiListLinkOperations = [];
             PerformGraphOperation([{
                 operation: ADD_NEW_NODE,
                 options: {
@@ -716,7 +727,11 @@ export const CreateDefaultView = {
                     }
                 }
             })])(GetDispatchFunc(), GetStateFunc());
+
             let propertyDataChainAccesors = [];
+            
+            let datachainLink = [];
+            
             modelProperties.map((property, propertyIndex) => {
                 let propNodeId = null;
                 let skip = false;
@@ -727,6 +742,7 @@ export const CreateDefaultView = {
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                             [NodeProperties.Selector]: modelComponentSelectors[0],
                             [NodeProperties.SelectorProperty]: viewModelNodeId,
+                            [NodeProperties.Property]: property.id
                         }).find(x => x);
                         if (node) {
                             propNodeId = node.id;
@@ -742,7 +758,8 @@ export const CreateDefaultView = {
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                                 [NodeProperties.Selector]: modelComponentSelectors[0],
                                 [NodeProperties.SelectorProperty]: viewModelNodeId,
-                                [NodeProperties.Pinned]: false
+                                [NodeProperties.Pinned]: false,
+                                [NodeProperties.Property]: property.id
                             },
                             links: [{
                                 target: modelComponentSelectors[0],
@@ -821,7 +838,7 @@ export const CreateDefaultView = {
                 let children = GetChildren(layout, rootCellId);
                 let childId = children[propertyIndex];
                 let apiList = getComponentApiList(componentApi);
-                let apiDataChainLists = []
+                let apiDataChainLists = {};
                 PerformGraphOperation([...apiList.map(api => {
                     let apiProperty = api.value;
                     if (ARE_BOOLEANS.some(v => v === apiProperty) || ARE_HANDLERS.some(v => v === apiProperty)) {
@@ -843,7 +860,7 @@ export const CreateDefaultView = {
                                 links: [],
                                 callback: (dataChainApis) => {
                                     dca = dataChainApis.id;
-                                    apiDataChainLists.push(dataChainApis.id);
+                                    apiDataChainLists[apiProperty] = (dataChainApis.id);
                                 }
                             }
                         }
@@ -929,12 +946,10 @@ export const CreateDefaultView = {
                         }
                     }]
                 }).flatten().filter(x => x)])(GetDispatchFunc(), GetStateFunc());
-
                 PerformGraphOperation([...apiList.map(api => {
                     return {
                         operation: CHANGE_NODE_PROPERTY,
                         options: function (graph) {
-
                             let apiProperty = api.value;
                             let cellProperties = GetCellProperties(layout, childId);
                             cellProperties.componentApi = cellProperties.componentApi || {};
@@ -965,10 +980,39 @@ export const CreateDefaultView = {
                                     selector: modelComponentSelectors[0],
                                     handlerType: HandlerTypes.Property,
                                 }
+                                if (apiDataChainLists[apiProperty]) {
+                                    datachainLink.push({
+                                        operation: ADD_LINK_BETWEEN_NODES,
+                                        options: function () {
+                                            return {
+                                                target: modelComponentSelectors[0],
+                                                source: compNodeId,
+                                                linkProperties: {
+                                                    ...LinkProperties.SelectorLink
+                                                }
+                                            }
+                                        }
+                                    })
+                                }
                             }
 
                             if (apiProperty === VALUE) {
-                                cellProperties.componentApi[apiProperty].dataChain = propertyDataChainAccesors[propertyIndex]
+                                cellProperties.componentApi[apiProperty].dataChain = propertyDataChainAccesors[propertyIndex];
+                                datachainLink.push({
+                                    operation: ADD_LINK_BETWEEN_NODES,
+                                    options: function () {
+                                        return {
+                                            target: propertyDataChainAccesors[propertyIndex],
+                                            source: compNodeId,
+                                            linkProperties: {
+                                                ...LinkProperties.DataChainLink,
+                                                cell: childId,
+                                                selectedComponentApiProperty: apiProperty
+                                            }
+                                        }
+                                    }
+                                })
+
                             }
 
                             switch (apiProperty) {
@@ -988,6 +1032,37 @@ export const CreateDefaultView = {
                                     cellProperties.componentApi[apiProperty].handlerType = HandlerTypes.Focus;
                                     break;
                             }
+                            if (cellProperties.componentApi[apiProperty].modelProperty) {
+                                datachainLink.push({
+                                    operation: ADD_LINK_BETWEEN_NODES,
+                                    options: function () {
+                                        return {
+                                            target: cellProperties.componentApi[apiProperty].modelProperty,
+                                            source: compNodeId,
+                                            linkProperties: {
+                                                ...LinkProperties.ComponentApi,
+                                                modelProperty: true
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+
+                            if (cellProperties.componentApi[apiProperty].model) {
+                                datachainLink.push({
+                                    operation: ADD_LINK_BETWEEN_NODES,
+                                    options: function () {
+                                        return {
+                                            target: cellProperties.componentApi[apiProperty].model,
+                                            source: compNodeId,
+                                            linkProperties: {
+                                                ...LinkProperties.ComponentApi,
+                                                model: true
+                                            }
+                                        }
+                                    }
+                                })
+                            }
 
                             return {
                                 prop: NodeProperties.Layout,
@@ -998,6 +1073,8 @@ export const CreateDefaultView = {
                     }
                 })])(GetDispatchFunc(), GetStateFunc());
             });
+
+            PerformGraphOperation(datachainLink)(GetDispatchFunc(), GetStateFunc());
 
             PerformGraphOperation([
                 ...([].interpolate(0, modelProperties.length + 1, modelIndex => {

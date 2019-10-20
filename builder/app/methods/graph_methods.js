@@ -439,7 +439,9 @@ export function removeGroupFromGroup(graph, ops) {
     let { groupId, id } = ops;
     let group = graph.groupLib[id];
 
-    group.groups = [...group.groups.filter(x => x !== groupId)];
+    if (group && group.groups) {
+        group.groups = [...group.groups.filter(x => x !== groupId)];
+    }
     graph.groupLib[id] = { ...group };
     if (graph.childGroups) {
         if (graph.childGroups[id]) {

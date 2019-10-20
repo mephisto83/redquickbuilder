@@ -69,7 +69,7 @@ class LayoutView extends Component {
                         onChange={(value) => {
                             this.setState({
                                 componentApi: {
-                                    ...(this.state.componentApi || {}), 
+                                    ...(this.state.componentApi || {}),
                                     [selectedCell]: value
                                 }
                             });
@@ -83,13 +83,19 @@ class LayoutView extends Component {
                         onChange={(value) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty];
+                            let old = temp.handlerType;
                             temp.handlerType = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.Layout,
-                                id: currentNode.id,
-                                value: nodeLayout
-                            });
-                        }} />) : null,
+
+                            this.props.graphOperation([{
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Layout,
+                                    id: currentNode.id,
+                                    value: nodeLayout
+                                }
+                            }]);
+                        }
+                        } />) : null,
                     selectedComponentApiProperty ? (<SelectInput
                         label={Titles.InstanceType}
                         value={instanceType}
@@ -113,12 +119,33 @@ class LayoutView extends Component {
                         onChange={(value) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let old = temp.selector;
                             temp.selector = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.Layout,
-                                id: currentNode.id,
-                                value: nodeLayout
-                            });
+
+                            this.props.graphOperation([{
+                                operation: REMOVE_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: old,
+                                    source: currentNode.id
+                                }
+                            }, {
+                                operation: ADD_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: value,
+                                    source: currentNode.id,
+                                    properties: {
+                                        ...UIA.LinkProperties.ComponentApi,
+                                        selector: true
+                                    }
+                                }
+                            }, {
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Layout,
+                                    id: currentNode.id,
+                                    value: nodeLayout
+                                }
+                            }]);
                         }} />) : null,
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
                         label={Titles.Models}
@@ -127,24 +154,66 @@ class LayoutView extends Component {
                         onChange={(value) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let old = temp.model;
                             temp.model = value;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.Layout,
-                                id: currentNode.id,
-                                value: nodeLayout
-                            });
+                            
+                            this.props.graphOperation([{
+                                operation: REMOVE_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: old,
+                                    source: currentNode.id
+                                }
+                            }, {
+                                operation: ADD_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: value,
+                                    source: currentNode.id,
+                                    properties: {
+                                        ...UIA.LinkProperties.ComponentApi,
+                                        model: true
+                                    }
+                                }
+                            }, {
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Layout,
+                                    id: currentNode.id,
+                                    value: nodeLayout
+                                }
+                            }]);
                         }} />) : null,
                     selectedComponentApiProperty && instanceType === InstanceTypes.ScreenInstance ? (<SelectInput
                         options={properties}
                         onChange={(val) => {
                             cellProperties.componentApi[selectedComponentApiProperty] = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
+                            let old = temp.modelProperty;
                             temp.modelProperty = val;
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                prop: UIA.NodeProperties.Layout,
-                                id: currentNode.id,
-                                value: nodeLayout
-                            });
+
+                            this.props.graphOperation([{
+                                operation: REMOVE_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: old,
+                                    source: currentNode.id
+                                }
+                            }, {
+                                operation: ADD_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: value,
+                                    source: currentNode.id,
+                                    properties: {
+                                        ...UIA.LinkProperties.ComponentApi,
+                                        modelProperty: true
+                                    }
+                                }
+                            }, {
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Layout,
+                                    id: currentNode.id,
+                                    value: nodeLayout
+                                }
+                            }]);
                         }}
                         label={Titles.Property}
                         value={modelProperty} />) : null,

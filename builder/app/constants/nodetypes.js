@@ -522,6 +522,7 @@ export const LinkType = {
     ListItem: 'list-item',
     Enumeration: 'enumeration',
     DataSource: 'DataSource',
+    ComponentApi: 'ComponentApi',
     ViewModelLink: "view-model-link",
     Component: 'component',
     DataChainLink: 'data-chain-link',
@@ -682,6 +683,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ComponentApi: {
+        type: LinkType.ComponentApi
     },
     DataSourceLink: {
         type: LinkType.DataSource
@@ -1957,7 +1961,7 @@ export const FilterUI = {
         arguments: { ...COMMON_NUMBER__EQ_ARGS }
     },
 
-    
+
     [ValidationRules.MaxValue]: {
         code: {
             [ProgrammingLanguages.CSHARP]: 'MaxAttribute'
