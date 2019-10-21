@@ -1767,9 +1767,10 @@ export const FilterUI = {
         code: {
             [ProgrammingLanguages.CSHARP]: 'EqualsParent'
         },
+        template: './app/templates/filter/equals_parent.tpl',
         arguments: {
             ...COMMON_STRING_ARGS,
-            type: NodePropertyTypes.BOOLEAN
+            modelproperty: true
         }
     },
     [FilterRules.EqualsAgent]: {
@@ -1991,6 +1992,20 @@ export const FilterUI = {
         },
         template: './app/templates/validation/validation_generic.tpl',
         arguments: { ...COMMON_NUMBER__EQ_ARGS }
+    },
+    [ValidationRules.Email]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_STRING_ARGS }
+    },
+    [ValidationRules.EmailEmpty]: {
+        code: {
+            [ProgrammingLanguages.CSHARP]: 'EmailEmptyAttribute'
+        },
+        template: './app/templates/validation/validation_generic.tpl',
+        arguments: { ...COMMON_STRING_ARGS }
     },
 
 }

@@ -541,6 +541,10 @@ export function getMethodValidationForParameter(methodValidation, methodType, me
     methodValidation = methodValidation || addMethodValidationForParamter(methodValidation, methodType, methodParam);
     if (methodValidation) {
         let temp = getMethodValidationType(methodValidation, methodType);
+        if (!temp) {
+            debugger;
+            methodValidation.methods[methodType] = createMethodValidation(methodType).methods[methodType];
+        }
         if (temp) {
             if (temp[methodParam] && temp[methodParam]) {
                 return temp[methodParam];

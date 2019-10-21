@@ -686,6 +686,7 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
         case NodeConstants.FilterRules.IsInModelPropertyCollection:
         case NodeConstants.FilterRules.EqualsModelProperty:
         case NodeConstants.FilterRules.EqualsFalse:
+        case NodeConstants.FilterRules.EqualsParent:
         case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
             properties = {
                 agent: safeFormatTemplateProperty(clauseKey),
@@ -802,6 +803,34 @@ export function GetConditionClause(adjacentId, clauseKey, propertyName, validato
                 model_property: propertyName,
                 parameters: `${validator ? validator.condition : null}, true`,
                 validation_Func_name: 'MinAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.Email:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'EmailAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.EmailEmpty:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'EmailEmptyAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.Zip:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'ZipAttribute'
+            }
+            break;
+        case NodeConstants.ValidationRules.ZipEmpty:
+            properties = {
+                model: clauseKey,
+                model_property: propertyName,
+                validation_Func_name: 'ZipEmptyAttribute'
             }
             break;
         default:

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace {{namespace}}.Controllers
 {
-    public class ClaimService : IClaimService<{{{model}}}>
+    public class ClaimService : IClaimService<{{model}}>
     {
         public async Task<IList<Claim>> CreateClaims({{model}} user)
         {

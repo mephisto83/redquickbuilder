@@ -38,7 +38,7 @@ export default class ModelReturnGenerator {
                     id: model.id,
                     direction: GraphMethods.SOURCE,
                     type: LinkType.PropertyLink
-                }).filter(t => GetNodeProp(filterNode, NodeProperties.FilterPropreties) ? GetNodeProp(filterNode, NodeProperties.FilterPropreties)[t.id] : '')
+                }).filter(x => x.id !== model.id).filter(t => GetNodeProp(filterNode, NodeProperties.FilterPropreties) ? GetNodeProp(filterNode, NodeProperties.FilterPropreties)[t.id] : '')
                     .map(t => {
                         return `           result.${GetNodeProp(t, NodeProperties.CodeName)} = model.${GetNodeProp(t, NodeProperties.CodeName)};`
                     }).join(NEW_LINE);

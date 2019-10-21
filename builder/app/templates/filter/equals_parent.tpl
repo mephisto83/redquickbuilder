@@ -1,0 +1,1 @@
+var {{result}} = {{parent}}.{{parent_property}} == {{model}}.{{model_property}};

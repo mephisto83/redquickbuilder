@@ -17,7 +17,7 @@ using RedQuick.Util;
 using Autofac;
 using {{namespace}}.Controllers;
 
-namespace Smash.Graph.Web
+namespace {{namespace}}.Web
 {
     public class Startup
     {
