@@ -844,8 +844,14 @@ export const MethodFunctions = {
         title: Titles.Get_Object_Agent_Value__IListObject,
         template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
+        controller_parameters: {
+            params: [FunctionTemplateKeys.Model]
+        },
         permission: {
             ...PERMISSION_DEFAULTS,
+        },
+        filter: {
+            ...FILTER_DEFAULTS
         },
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD

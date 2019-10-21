@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCodeName } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodeTypes, NodesByType, GetRootGraph, GetCodeName, GetMethodProps } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace, STANDARD_CONTROLLER_USING, Methods } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate, FunctionTypes, Functions, TEMPLATE_KEY_MODIFIERS, FunctionTemplateKeys, ToInterface, MethodFunctions } from '../constants/functiontypes';
@@ -69,6 +69,16 @@ export default class ControllerGenerator {
                                     parameter_route = `/{${paramName}}`;
                                     parameter_values = `${paramName}`;
                                 }
+                            if (ft.controller_parameters) {
+                                let methodprops = GetMethodProps(maestro_function);
+                                parameters = ft.controller_parameters.params.map(cp => {
+                                    return `${GetCodeName(methodprops[cp])} ${cp}`;
+                                }).join();
+                                parameter_route = '';
+                                parameter_values = ft.controller_parameters.params.map(cp => {
+                                    return `${cp}`;
+                                }).join();
+                            }
                             let codeNode = GetNodeProp(maestro_function, NodeProperties.CodeName);
                             let tempfunctions = GraphMethods.getNodesByLinkType(root, {
                                 id: maestro_function.id,

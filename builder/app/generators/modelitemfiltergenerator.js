@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps, GetMethodFilterParameters, GetMethodFilterMetaParameters, GetConditionNodes, GetCombinedCondition } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle, GetCodeName, GetMethodProps, GetMethodFilterParameters, GetMethodFilterMetaParameters, GetConditionNodes, GetCombinedCondition, GetFunctionType } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules, FilterUI, FilterRules } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate } from '../constants/functiontypes';
+import { bindTemplate, FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 import { NodeType, Filter } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
@@ -38,6 +38,25 @@ export default class ModelItemFilterGenerator {
             });
         });
     }
+    static GetFilterModel(graph, methodNode) {
+        var node = null;
+        var methodProps = GetMethodProps(methodNode);
+        if (methodProps) {
+            switch (GetFunctionType(methodNode)) {
+                case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
+                    node = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.ManyToManyModel]);
+                    break;
+                case FunctionTypes.Create_Object_Agent_Value__IListObject:
+                case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
+                case FunctionTypes.Create_Parent$Child_Agent_Value__IListChild:
+                case FunctionTypes.Create_Parent_Child_Agent_Value__Child:
+                default:
+                    node = GraphMethods.GetNode(graph, methodProps[FunctionTemplateKeys.ModelOutput] || methodProps[FunctionTemplateKeys.Model]);
+                    break;
+            }
+        }
+        return node
+    }
     static Generate(options) {
         var { state, key } = options;
         let graphRoot = GetRootGraph(state);
@@ -51,10 +70,12 @@ export default class ModelItemFilterGenerator {
         modelitemfilters.map(modelitemfilter => {
             var method = GraphMethods.GetMethodNode(state, modelitemfilter.id);
             var methodProps = null;
+            let filterModelNode = null;
             if (method) {
                 methodProps = GetMethodProps(method);
+                filterModelNode = ModelItemFilterGenerator.GetFilterModel(graphRoot, method);
             }
-            let itemFilter = GetNodeProp(modelitemfilter, NodeProperties.ModelItemFilter);
+            let itemFilter = GetNodeProp(modelitemfilter, NodeProperties.ModelItemFilter) || (filterModelNode ? filterModelNode.id : null);
             let filterModel = GetNodeProp(modelitemfilter, NodeProperties.FilterModel);
             let conditions = GetConditionNodes(modelitemfilter.id);
             let filterMethodParameters = GetMethodFilterParameters(modelitemfilter.id);
@@ -65,71 +86,6 @@ export default class ModelItemFilterGenerator {
             if (true || filterModel && filterModel.properties) {
                 let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
                 let filters = [];
-                // Object.keys(filterModel.properties).map(prop => {
-                //     let propName = GetCodeName(prop);
-                //     if (filterModel.properties[prop]) {
-                //         Object.keys(filterModel.properties[prop].validators).map(validator => {
-                //             let _validatorProps = filterModel.properties[prop].validators[validator];
-                //             let validatorValue = '';
-                //             let validatorName = GetCodeName(validator);
-                //             let _function = '==';
-                //             let meta_parameter = 'item';
-                //             let filterPropFunctionValueEquals = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE_EQUALS, 'utf8');
-                //             if (_validatorProps && _validatorProps.type)
-                //                 switch (_validatorProps.type) {
-                //                     case FilterRules.EqualsTrue:
-                //                         validatorValue = 'true';
-                //                         break;
-                //                     case FilterRules.EqualsFalse:
-                //                         validatorValue = 'false';
-                //                         break;
-                //                     case FilterRules.EqualsAgent:
-                //                         validatorValue = `agent.${propName}`;
-                //                         break;
-                //                     case FilterRules.EqualsParent:
-                //                         validatorValue = `parent.${propName}`;
-                //                         break;
-                //                     case FilterRules.EqualsModelRef:
-                //                         if (_validatorProps.node) {
-                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                //                             if (mNode) {
-                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                //                             }
-                //                             validatorValue = `${_validatorProps.node}.Id`;
-                //                         }
-                //                         break;
-                //                     case FilterRules.EqualsModelProperty:
-                //                         if (_validatorProps.node && _validatorProps.nodeProperty) {
-                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                //                             if (mNode) {
-                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                //                             }
-                //                             validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
-                //                         }
-                //                         break;
-                //                     case FilterRules.IsInModelPropertyCollection:
-                //                         if (_validatorProps.node && _validatorProps.nodeProperty) {
-                //                             let mNode = GraphMethods.GetNode(graph, methodProps[_validatorProps.node]);
-                //                             if (mNode) {
-                //                                 parameters.push(`${GetCodeName(mNode)} ${_validatorProps.node}`);
-                //                             }
-                //                             validatorValue = `${_validatorProps.node}.${GetCodeName(_validatorProps.nodeProperty)}`;
-                //                             filterPropFunctionValueEquals = FilterUI[_validatorProps.type].template;
-                //                         }
-                //                         break;
-                //                     default:
-                //                         throw 'not handled model item filter generation case';
-                //                 }
-
-                //             filters.push(bindTemplate(filterPropFunctionValueEquals, {
-                //                 property: propName,
-                //                 value: validatorValue,
-                //                 meta_parameter,
-                //                 function: _function
-                //             }));
-                //         })
-                //     }
-                // });
                 parameters = parameters.filter(x => x).unique().sort();
                 if (filterMethodParameters && filterMethodParameters.length) {
                     parameters = filterMethodParameters.map(item => {
