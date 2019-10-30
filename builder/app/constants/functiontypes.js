@@ -1318,22 +1318,31 @@ export function hasTemplate(templateString) {
 
 export function bindTemplate(templateString, data) {
     var singularSymbol = '@';
-    var regex = new RegExp('({{)[A-Za-z0-9_.' + singularSymbol + ' ,\'\|]*(}})', 'g');
-    var hasTemplate = regex.test(templateString);
-    Object.keys(data).map(t => {
-        if (!data[t + '#lower']) {
-            data[t + '#lower'] = `${data[t]}`.toLowerCase();
-        }
-    });
+    try {
+        var regex = new RegExp('({{)[A-Za-z0-9_.' + singularSymbol + ' ,\'\|]*(}})', 'g');
+        var hasTemplate;
+        try { hasTemplate = regex.test(templateString); } catch (e) { }
+        Object.keys(data).map(t => {
+            if (!data[t + '#lower']) {
+                data[t + '#lower'] = `${data[t]}`.toLowerCase();
+            }
+        });
 
-    if (hasTemplate) {
-        for (var t in data) {
-            var subregex = new RegExp('({{)' + t + '(}})', 'g');
-            var val = data[t];
-            templateString = templateString.replace(subregex, val === null || val === undefined ? '' : val);
+        if (hasTemplate) {
+            for (var t in data) {
+                var subregex = new RegExp('({{)' + t + '(}})', 'g');
+                var val = data[t];
+                templateString = templateString.replace(subregex, val === null || val === undefined ? '' : val);
+            }
         }
+    } catch (e) {
+        console.log('-------------');
+        console.log(t);
+        console.log(`"${singularSymbol}"`);
+        console.log(`"${templateString}"`)
+        throw e;
+
     }
-
     return templateString;
 
 }

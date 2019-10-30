@@ -66,7 +66,9 @@ export function GetItemData(node) {
     return GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))});
 })()`
 }
-
+export function getRelativePathPrefix(relativePath) {
+    return relativePath ? relativePath.split('/').map(t => `../`).subset(2).join('') : relativePath;
+}
 export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let layoutObj = GetNodeProp(node, NodeProperties.Layout);
     let componentType = GetNodeProp(node, NodeProperties.ComponentType);
@@ -79,7 +81,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         layoutSrc = layoutObj ? buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE) : GetDefaultElement();
     }
     else {
-        extraimports.push(`import * as Models from '${relativePath.split('/').map(t => `../`).subset(2).join('')}model_keys.js';`)
+        extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`)
         if (layoutObj) {
             buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE)
         };
@@ -105,7 +107,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     let templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 
     let results = [];
-    imports.map(t => {
+    imports.filter(x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent)).map(t => {
         let relPath = relativePath ? `${relativePath}/${(GetCodeName(node) || '').toJavascriptName()}` : `./src/components/${(GetCodeName(node) || '').toJavascriptName()}`;
         results.push(...GenerateRNComponents(GetNodeById(t), relPath, language))
     });
@@ -118,12 +120,14 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
 
     templateStr = bindTemplate(templateStr, {
         name: GetCodeName(node),
-        relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join(''),
         title: `"${GetNodeTitle(node)}"`,
         screen_options,
         imports: [...imports, ...extraimports].unique().join(NEW_LINE),
         elements: addNewLine(layoutSrc, 4)
     });
+    templateStr = bindTemplate(templateStr, {
+        relative_depth: [].interpolate(0, relativePath ? relativePath.split('/').length - 2 : 1, () => '../').join('')
+    })
     return [{
         template: templateStr,
         relative: relativePath ? relativePath : './src/components',
@@ -290,19 +294,22 @@ export function GenerateRNComponents(node, relative = './src/components', langua
                         }
                     }
                 }
+                template = bindTemplate(template, {
+                    name: GetCodeName(node),
+                    imports: '',
+                    screen_options: '',
+                    elements: elements || GetDefaultElement(),
+
+                });
+                template = bindTemplate(template, {
+                    relative_depth: [].interpolate(0, relative ? relative.split('/').length - 2 : 1, () => '../').join('')
+                });
                 result.push(
                     {
                         relative: relative ? relative : './src/components',
                         relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.js`,
                         name: GetCodeName(node),
-                        template: bindTemplate(template, {
-                            name: GetCodeName(node),
-                            imports: '',
-                            screen_options: '',
-                            relative_depth: [].interpolate(0, relative ? relative.split('/').length - 2 : 1, () => '../').join(''),
-                            elements: elements || GetDefaultElement(),
-
-                        })
+                        template
                     });
                 break;
         }
@@ -313,7 +320,8 @@ export function GenerateRNComponents(node, relative = './src/components', langua
         if (src)
             result.push(...src);
     }
-    let components = GetNodeComponents(layoutObj);
+
+    let components = GetNodeComponents(layoutObj).filter(x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent));
     components.map(component => {
         let relPath = relative ? `${relative}/${(GetCodeName(node) || '').toJavascriptName()}` : `./src/components/${(GetCodeName(node) || '').toJavascriptName()}`;
         let temp = GenerateRNComponents(component, relPath, language);
@@ -509,6 +517,9 @@ export function GenerateImport(node, parentNode, language) {
     switch (language) {
         case UITypes.ReactNative:
             if (node) {
+                if (GetNodeProp(node, NodeProperties.SharedComponent)) {
+                    return `import ${GetCodeName(node)} from '../shared/${(GetCodeName(node) || '').toJavascriptName()}'`;
+                }
                 return `import ${GetCodeName(node)} from '../components/${(GetCodeName(node) || '').toJavascriptName()}'`;
             }
     }
@@ -518,6 +529,9 @@ export function GenerateComponentImport(node, parentNode, language) {
     switch (language) {
         case UITypes.ReactNative:
             if (node) {
+                if (GetNodeProp(node, NodeProperties.SharedComponent)) {
+                    return `import ${GetCodeName(node)} from '{{relative_depth}}shared/${(GetCodeName(node) || '').toJavascriptName()}'`;
+                }
                 return `import ${GetCodeName(node)} from './${(GetCodeName(parentNode) || '').toJavascriptName()}/${(GetCodeName(node) || '').toJavascriptName()}'`;
             }
     }
@@ -525,7 +539,7 @@ export function GenerateComponentImport(node, parentNode, language) {
 
 export function GetScreens() {
     var screens = GetScreenNodes();
-    return screens
+    return screens;
 }
 
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
@@ -553,6 +567,12 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
             relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}.js`,
             name: GetCodeName(screen)
         }
+    });
+    let all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);
+    let sharedComponents = all_nodes.filter(x => GetNodeProp(x, NodeProperties.SharedComponent));
+    let relPath = './src/shared'
+    sharedComponents.map(sharedComponent => {
+        moreresults.push(...GenerateRNComponents(sharedComponent, relPath, language))
     });
 
     moreresults.push({

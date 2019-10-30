@@ -239,7 +239,7 @@ export default class ModelGenerator {
         }
         templateSwapDictionary.properties = properties.join('');
         templateSwapDictionary.staticFunctions = staticFunctions.unique(x => x).join('\n');
-        console.log(templateSwapDictionary.properties)
+        
         let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf8');
         modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 

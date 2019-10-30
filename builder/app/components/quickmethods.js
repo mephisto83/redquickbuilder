@@ -14,7 +14,7 @@ import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction, ViewTypes } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import { PARAMETER_TAB } from './dashboard';
 import SideBar from './sidebar';
@@ -25,6 +25,7 @@ import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../constants/funct
 class QuickMethods extends Component {
     render() {
         var { state } = this.props;
+        let sharedcontrolkey = 'View Package Shared Control';
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         return (
             <MainSideBar relative={true}>
@@ -68,9 +69,24 @@ class QuickMethods extends Component {
                                     onChange={(value) => {
                                         this.props.setVisual('View Package Title', value);
                                     }} />
-                                <TreeViewMenu hideArrow={true} title={CreateDefaultView.type} icon={'fa fa-plus'} onClick={(() => {
+                                <CheckBox
+                                    label={Titles.SharedControl}
+                                    value={UIA.Visual(state, sharedcontrolkey)}
+                                    onChange={(value) => {
+                                        this.props.setVisual(sharedcontrolkey, value);
+                                    }} />
+                                <TreeViewMenu hideArrow={true} title={`Create View`} icon={'fa fa-plus'} onClick={(() => {
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
-                                        viewName: UIA.Visual(state, 'View Package Title')
+                                        viewName: UIA.Visual(state, 'View Package Title'),
+                                        sharedComponent: UIA.Visual(state, sharedcontrolkey),
+                                        viewType: ViewTypes.Create
+                                    });
+                                })} />
+                                <TreeViewMenu hideArrow={true} title={`Get View`} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, CreateDefaultView, {
+                                        viewName: UIA.Visual(state, 'View Package Title'),
+                                        sharedComponent: UIA.Visual(state, sharedcontrolkey),
+                                        viewType: ViewTypes.Get
                                     });
                                 })} />
                             </TreeViewMenu>

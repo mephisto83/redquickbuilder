@@ -230,6 +230,7 @@ export const NodeProperties = {
     ComponentApi: 'component-api',
     SelectorType: 'selector-type',
     UseInstanceType: "UseInstanceType",
+    SharedComponent: 'SharedComponent',
     EnabledMenu: 'EnabledMenu',
     InstanceType: "InstanceType",
     ComponentParameters: 'ComponentParameters',
@@ -294,6 +295,7 @@ export const NodeProperties = {
     UseExtension: 'usextension',
     IncludedInList: 'includedInList',
     Pinned: 'Pinned',
+    UseInView: 'UseInView',
     Selected: 'Selected',
     ExcludedFromList: 'excludedInList',
     UseEqual: "UseEqual",
@@ -352,6 +354,11 @@ export const NodeProperties = {
     UIValidationType: 'uiValidationType',
     UseUIValidations: 'UseuiValidations',
     NODEType: 'nodeType',
+    DefaultViewTypeGet: 'DefaultViewTypeGet',
+    DefaultViewTypeGetAll: 'DefaultViewTypeGetAll',
+    DefaultViewTypeUpdate: 'DefaultViewTypeUpdate',
+    DefaultViewTypeDelete: 'DefaultViewTypeDelete',
+    DefaultViewTypeCreate: 'DefaultViewTypeCreate',
     ComponentType: 'component-type',
     ReferenceType: 'referenceType', //Reference nodes will have this type.
 
@@ -494,6 +501,8 @@ export const LinkEvents = {
 export const LinkType = {
     Choice: 'choice',
 
+    DefaultViewType: 'DefaultViewType',
+
     Executor: 'executor',
     ExecutorItem: 'executor-item',
     ExecutorProperty: 'executor-property',
@@ -523,6 +532,7 @@ export const LinkType = {
     ScreenOptions: 'screen-options',
     ListItem: 'list-item',
     Enumeration: 'enumeration',
+    ClientMethod: 'ClientMethod',
     DataSource: 'DataSource',
     ComponentApi: 'ComponentApi',
     ViewModelLink: "view-model-link",
@@ -570,6 +580,9 @@ export const LinkStyles = {
     [LinkType.FunctionLink]: {
         type: LinkType.FunctionLink,
         stroke: NodeTypeColors[NodeTypes.Function]
+    },
+    [LinkType.DefaultViewType]: {
+        type: LinkType.DefaultViewType
     },
     [LinkType.ErrorLink]: {
         type: LinkType.ErrorLink,
@@ -683,8 +696,14 @@ export const LinkPropertyKeys = {
 }
 
 export const LinkProperties = {
+    DefaultViewType: {
+        type: LinkType.DefaultViewType
+    },
     EnumerationLink: {
         type: LinkType.Enumeration
+    },
+    ClientMethodLink: {
+        type: LinkType.ClientMethod
     },
     ComponentApi: {
         type: LinkType.ComponentApi

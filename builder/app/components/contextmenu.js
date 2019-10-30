@@ -18,6 +18,7 @@ import GenericPropertyMenu from './genericpropertymenu';
 import GenericPropertyContainer from './genericpropertycontainer';
 import TextInput from './textinput';
 import ButtonList from './buttonlist';
+import ModelContextMenu from './modelcontextmenu';
 import SideBarMenu from './sidebarmenu';
 import ConditionContextMenu from './conditioncontextmenu';
 import TreeViewMenu from './treeviewmenu';
@@ -72,7 +73,12 @@ class ContextMenu extends Component {
                 return this.getDataChainContextMenu();
             case NodeTypes.Condition:
                 return this.getConditionMenu();
+            case NodeTypes.Model:
+                return this.getModelMenu();
         }
+    }
+    getModelMenu() {
+        return <ModelContextMenu />;
     }
     getConditionMenu() {
         return <ConditionContextMenu />

@@ -199,7 +199,13 @@ export function uuidv4() {
 String.prototype.toJavascriptName = function () {
     var str = this || '';
     if (str[0]) {
-        return str[0].toLowerCase() + str.split('').subset(1).join('');
+        try {
+            return str[0].toLowerCase() + str.split('').subset(1).join('');
+        } catch (e) {
+            console.log(str);
+            console.log(str.length);
+            
+        }
     }
     return str;
 }

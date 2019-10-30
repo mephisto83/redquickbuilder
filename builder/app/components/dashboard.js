@@ -99,6 +99,7 @@ import LayoutView from './layoutview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
+import { ViewTypes } from '../constants/nodepackages';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -126,6 +127,9 @@ class Dashboard extends Component {
 					return result;
 				case NodeTypes.Selector:
 					result.push(...this.getSelectorContext())
+					return result;
+				case NodeTypes.Model:
+					result.push(...this.getModelContext())
 					return result;
 				case NodeTypes.Method:
 				case NodeTypes.Action:
@@ -196,6 +200,58 @@ class Dashboard extends Component {
 			icon: 'fa fa-font',
 			title: `${Titles.Selector}`
 		})
+		return result;
+	}
+	getModelContext() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: ViewTypes.Get
+				});
+			},
+			icon: 'fa fa-get-pocket',
+			title: `${ViewTypes.Get}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: ViewTypes.GetAll
+				});
+			},
+			icon: 'fa fa-reply-all',
+			title: `${ViewTypes.GetAll}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: ViewTypes.Create
+				});
+			},
+			icon: 'fa  fa-calendar-plus-o',
+			title: `${ViewTypes.Create}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: ViewTypes.Update
+				});
+			},
+			icon: 'fa  fa-fire',
+			title: `${ViewTypes.Update}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: ViewTypes.Delete
+				});
+			},
+			icon: 'fa  fa-remove',
+			title: `${ViewTypes.Update}`
+		})
+
 		return result;
 	}
 	getDataChainContext() {
@@ -524,7 +580,7 @@ class Dashboard extends Component {
 								}}
 
 								selectedColor={UIA.Colors.SelectedNode}
-								markedColor = {UIA.Colors.MarkedNode}
+								markedColor={UIA.Colors.MarkedNode}
 								selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}
 								selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
 								markedNodes={graph ? graph.markedSelectedNodeIds : []}

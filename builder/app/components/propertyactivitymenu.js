@@ -80,6 +80,18 @@ class PropertyActivityMenu extends Component {
 
                 </FormControl>) : null}
                 {currentNode ? (<FormControl>
+
+                    <CheckBox
+                        label={Titles.UseInView}
+                        title={Titles.UseInView}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseInView)}
+                        onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.UseInView,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} />
                     <CheckBox
                         label={Titles.ManyToManyNexus}
                         title={Titles.ManyToManyNexusDescription}

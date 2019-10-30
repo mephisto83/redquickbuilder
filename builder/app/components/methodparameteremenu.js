@@ -46,12 +46,30 @@ class MethodParameterMenu extends Component {
                                 options={UIA.NodesByType(state, NodeTypes.Method).toNodeSelect()}
                                 value={UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod)}
                                 onChange={(value) => {
-                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                        prop: NodeProperties.ClientMethod,
-                                        id: currentNode.id,
-                                        value
-                                    });
-                                }} />));
+                                    let id = currentNode.id;
+                                    this.props.graphOperation([{
+                                        operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                                        options: {
+                                            target: currentNode.properties[NodeProperties.ClientMethod],
+                                            source: id
+                                        }
+                                    }, {
+                                        operation: UIA.CHANGE_NODE_PROPERTY,
+                                        options: {
+                                            prop: NodeProperties.ClientMethod,
+                                            id: currentNode.id,
+                                            value
+                                        }
+                                    }, {
+                                        operation: UIA.ADD_LINK_BETWEEN_NODES,
+                                        options: {
+                                            target: value,
+                                            source: id,
+                                            properties: { ...UIA.LinkProperties.ClientMethodLink }
+                                        }
+                                    }])
+                                }
+                                } />));
                             let methodId = UIA.GetNodeProp(currentNode, NodeProperties.ClientMethod);
                             if (methodId) {
                                 let method_parameters = UIA.GetMethodParameters(methodId);
@@ -109,7 +127,7 @@ class MethodParameterMenu extends Component {
                                                             methodParams = updateClientMethod(methodParams, key, 'body', 'componentModel', value);
                                                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                                                 prop: NodeProperties.ClientMethodParameters,
-                                                            id: currentNode.id,
+                                                                id: currentNode.id,
                                                                 value: methodParams
                                                             });
                                                         }} />

@@ -90,6 +90,9 @@ export function GetManyToManyNodes(ids) {
     return GraphMethods.GetManyToManyNodes(GetCurrentGraph(_getState()), ids) || [];
 }
 export function GetNodeProp(node, prop) {
+    if (typeof node === 'string') {
+        node = GetNodeById(node) || node;
+    }
     return node && node.properties && node.properties[prop];
 }
 export function GetGroupProp(id, prop) {
@@ -99,6 +102,11 @@ export function GetGroupProp(id, prop) {
     }
 
     return null;
+}
+
+export function setupDefaultViewType(args) {
+    let { properties, target, source } = args;
+    
 }
 export function GetConditionNodes(id) {
     let state = _getState();
@@ -129,7 +137,7 @@ export function GetModelPropertyChildren(id) {
 
     let property_nodes = GetModelPropertyNodes(id);
     let logicalChildren = GetLogicalChildren(id);
-    return [...property_nodes, ...logicalChildren];
+    return [...property_nodes, ...logicalChildren].filter(x => x.id !== id);
 }
 export function GetMethodParameters(methodId) {
     let method = GetNodeById(methodId);
@@ -148,8 +156,8 @@ export function GetMethodParameters(methodId) {
 export function GetNodeById(node, graph) {
     return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
-export function GetNodesByProperties(props, graph) {
-    var currentGraph = graph || GetCurrentGraph(GetState());
+export function GetNodesByProperties(props, graph, state) {
+    var currentGraph = graph || GetCurrentGraph(state || GetState());
     if (currentGraph) {
         return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])].filter(x => {
             for (var i in props) {
@@ -1247,6 +1255,21 @@ export function clearMarked() {
     })));
 }
 
+export function selectProperties(model) {
+    return (dispatch, getState) => {
+        let state = getState();
+        (graphOperation(GraphMethods.getPropertyNodes(GetRootGraph(state), model).map(t => {
+            return {
+                operation: CHANGE_NODE_PROPERTY,
+                options: {
+                    prop: NodeProperties.Pinned,
+                    id: t.id,
+                    value: true
+                }
+            }
+        })))(dispatch, getState);
+    }
+}
 export function toggleNodeMark() {
     let state = _getState();
     let currentNode = Node(state, Visual(state, SELECTED_NODE));

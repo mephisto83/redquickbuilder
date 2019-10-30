@@ -13,6 +13,7 @@ export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE];
 export const ARE_BOOLEANS = ['inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel'];
 export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = 'value';
+export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 const INPUT_DEFAULT_API = [VALUE, ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
     'block',
@@ -28,6 +29,7 @@ const BUTTON_DEFAULT_API = [
     'large',
     'small',
     'active'].map(x => ({ property: x }));
+const LABEL_DEFAULT_API = ['title'].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
 const DEFAULT_BUTTON_API_PROPERTIES = {};
 BUTTON_DEFAULT_API.map(x => {
@@ -199,6 +201,7 @@ export const ComponentTypes = {
         TabHeader: {},
         Text: {
             template: './app/templates/components/text.tpl',
+            defaultApi: LABEL_DEFAULT_API,
             properties: {
                 label: {
                     ui: true,

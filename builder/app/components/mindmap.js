@@ -301,6 +301,12 @@ export default class MindMap extends Component {
             .attr("height", function (d) { return iconSize; })
             .attr('x', 40)
             .attr('y', 40)
+            .attr('title', (d) => {
+                if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
+                    return (d.properties.nodeType);
+                }
+                return '';
+            })
             .style('width', 40)
             .style('height', 40);
         var titles = topdiv.append('xhtml:div')

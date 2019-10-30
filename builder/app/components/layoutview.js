@@ -156,7 +156,7 @@ class LayoutView extends Component {
                             let temp = cellProperties.componentApi[selectedComponentApiProperty] || {};
                             let old = temp.model;
                             temp.model = value;
-                            
+
                             this.props.graphOperation([{
                                 operation: REMOVE_LINK_BETWEEN_NODES,
                                 options: {
@@ -263,6 +263,10 @@ class LayoutView extends Component {
 
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         let componentNodes = currentNode ? GetConnectedNodesByType(state, currentNode.id, NodeTypes.ComponentNode, SOURCE) : [];
+        componentNodes = [...componentNodes, ...UIA.GetNodesByProperties({
+            [NodeProperties.NODEType]: NodeTypes.ComponentNode,
+            [NodeProperties.SharedComponent]: true
+        }, null, state)];
         let namespace = 'namespace';
         let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
         let cellProperties;
