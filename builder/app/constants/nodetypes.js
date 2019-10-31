@@ -25,6 +25,7 @@ export const NodeTypes = {
     // ChoiceListItem: 'choice-list-item',
     ValidationList: 'validation-list',
     ValidationListItem: 'validation-list-item',
+    ViewType: 'view-type',
     Validator: 'validator',
     Executor: 'executor', // performs the final acts or data manipulation.
     OptionList: 'option-list',
@@ -138,6 +139,7 @@ export const NodeTypeColors = {
     [ColorStates.Error]: '#FF0000',
     [NodeTypes.Concept]: '#DD4B39',
     [NodeTypes.ModelItemFilter]: '#4ECDC4',
+    [NodeTypes.ViewType]: '#412451',
     [NodeTypes.Model]: '#713E5A',
     [NodeTypes.Property]: '#484349',
     [NodeTypes.Screen]: '#3A405A',
@@ -502,7 +504,7 @@ export const LinkType = {
     Choice: 'choice',
 
     DefaultViewType: 'DefaultViewType',
-
+    SharedComponent: 'SharedComponent',
     Executor: 'executor',
     ExecutorItem: 'executor-item',
     ExecutorProperty: 'executor-property',
@@ -696,6 +698,9 @@ export const LinkPropertyKeys = {
 }
 
 export const LinkProperties = {
+    SharedComponent: {
+        type: LinkType.SharedComponent
+    },
     DefaultViewType: {
         type: LinkType.DefaultViewType
     },

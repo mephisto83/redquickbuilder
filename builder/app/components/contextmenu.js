@@ -109,6 +109,11 @@ class ContextMenu extends Component {
                     this.props.pinSelected()
                 }} icon={'fa fa-map-pin'} />
             <TreeViewGroupButton
+                title={Titles.UnPinSelected}
+                onClick={() => {
+                    this.props.unPinSelected()
+                }} icon={'fa fa-houzz'} />
+            <TreeViewGroupButton
                 title={`${Titles.DeleteAllSelected}(${graph ? graph.selected : '0'})`}
                 onClick={() => {
                     this.props.deleteAllSelected();

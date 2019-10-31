@@ -5,6 +5,7 @@ import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { MethodFunctions, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
+import { uuidv4 } from '../utils/array';
 export const VISUAL = 'VISUAL';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -104,9 +105,67 @@ export function GetGroupProp(id, prop) {
     return null;
 }
 
+export function setSharedComponent(args) {
+    let { properties, target, source } = args;
+    return (dispatch, getState) => {
+        let state = getState();
+        let graph = GetCurrentGraph(getState());
+        if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.SharedComponent }) &&
+            GetNodeProp(target, NodeProperties.SharedComponent) &&
+            GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode) {
+            let connections = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentNode).map(x => {
+                return {
+                    operation: REMOVE_LINK_BETWEEN_NODES,
+                    options: {
+                        source,
+                        target: x.id
+                    }
+                }
+            })
+
+            PerformGraphOperation([...connections, {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: {
+                    source,
+                    target,
+                    properties: { ...properties }
+                }
+            }])(dispatch, getState);
+        }
+    };
+}
+
 export function setupDefaultViewType(args) {
     let { properties, target, source } = args;
-    
+    return (dispatch, getState) => {
+        let graph = GetCurrentGraph(getState());
+        if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.LogicalChildren })) {
+            let sibling = uuidv4();
+            PerformGraphOperation([{
+                operation: ADD_NEW_NODE,
+                options: function () {
+                    return {
+                        nodeType: NodeTypes.ViewType,
+                        properties: {
+                            [NodeProperties.UIText]: `[${properties.viewType}] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
+                        },
+                        links: [{
+                            target: target,
+                            linkProperties: {
+                                properties: { ...properties, sibling }
+                            }
+                        }, {
+                            target: source,
+                            linkProperties: {
+                                properties: { ...properties, sibling }
+                            }
+                        }]
+                    }
+                }
+
+            }])(dispatch, getState);
+        }
+    }
 }
 export function GetConditionNodes(id) {
     let state = _getState();
@@ -1605,6 +1664,25 @@ export function pinSelected() {
                     return {
                         prop: NodeProperties.Pinned,
                         value: true,
+                        id: t.id
+                    }
+                }
+            }
+        }))(dispatch, getState)
+    }
+}
+export function unPinSelected() {
+    return (dispatch, getState) => {
+        let nodes = GetNodesByProperties({
+            [NodeProperties.Selected]: true
+        });
+        graphOperation(nodes.map(t => {
+            return {
+                operation: CHANGE_NODE_PROPERTY,
+                options: function () {
+                    return {
+                        prop: NodeProperties.Pinned,
+                        value: false,
                         id: t.id
                     }
                 }

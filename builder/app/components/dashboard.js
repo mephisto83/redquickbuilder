@@ -131,6 +131,9 @@ class Dashboard extends Component {
 				case NodeTypes.Model:
 					result.push(...this.getModelContext())
 					return result;
+				case NodeTypes.ViewType:
+					result.push(...this.getViewTypeContext());
+					return result;
 				case NodeTypes.Method:
 				case NodeTypes.Action:
 					result.push({
@@ -202,6 +205,21 @@ class Dashboard extends Component {
 		})
 		return result;
 	}
+	getViewTypeContext() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.SharedComponent
+				});
+			},
+			icon: 'fa fa-coffee',
+			title: `${Titles.SharedControl}`
+		});
+
+		return result;
+	}
 	getModelContext() {
 		let result = [];
 
@@ -249,7 +267,7 @@ class Dashboard extends Component {
 				});
 			},
 			icon: 'fa  fa-remove',
-			title: `${ViewTypes.Update}`
+			title: `${ViewTypes.Delete}`
 		})
 
 		return result;
@@ -539,6 +557,20 @@ class Dashboard extends Component {
 										let properties = UIA.Visual(state, CONNECTING_NODE);
 										if (properties === true) {
 											this.props.graphOperation(UIA.NEW_LINK, {
+												target: nodeId,
+												source: selectedId
+											});
+										}
+										else if (properties && properties.type === LinkType.SharedComponent) {
+											this.props.setSharedComponent({
+												properties,
+												target: nodeId,
+												source: selectedId
+											})
+										}
+										else if (properties && properties.viewType) {
+											this.props.setupDefaultViewType({
+												properties,
 												target: nodeId,
 												source: selectedId
 											});
