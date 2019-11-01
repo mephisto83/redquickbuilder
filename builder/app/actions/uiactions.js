@@ -30,6 +30,13 @@ export const BATCH_PARENT = 'BATCH_PARENT';
 export const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
 export const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
 
+export const ViewTypes = {
+    Update: 'Update',
+    Delete: 'Delete',
+    Create: 'Create',
+    Get: 'Get',
+    GetAll: 'GetAll'
+}
 
 
 export const UI_UPDATE = 'UI_UPDATE';
@@ -139,31 +146,75 @@ export function setupDefaultViewType(args) {
     let { properties, target, source } = args;
     return (dispatch, getState) => {
         let graph = GetCurrentGraph(getState());
-        if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.LogicalChildren })) {
-            let sibling = uuidv4();
-            PerformGraphOperation([{
-                operation: ADD_NEW_NODE,
-                options: function () {
-                    return {
-                        nodeType: NodeTypes.ViewType,
-                        properties: {
-                            [NodeProperties.UIText]: `[${properties.viewType}] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
-                        },
-                        links: [{
-                            target: target,
-                            linkProperties: {
-                                properties: { ...properties, sibling }
-                            }
-                        }, {
-                            target: source,
-                            linkProperties: {
-                                properties: { ...properties, sibling }
-                            }
-                        }]
-                    }
-                }
+        let right_link = (
+            GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink }) &&
+            GetNodeProp(target, NodeProperties.UseModelAsType)) ||
+            GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.LogicalChildren });
+        if (right_link) {
 
-            }])(dispatch, getState);
+            let useModelAsType = GetNodeProp(target, NodeProperties.UseModelAsType);
+            let illegalViewType = useModelAsType ? ViewTypes.GetAll : ViewTypes.Get;
+            if (properties.all) {
+                PerformGraphOperation(Object.keys(ViewTypes).filter(x => x !== illegalViewType).map(viewType => {
+                    let sibling = uuidv4();
+                    return {
+                        operation: ADD_NEW_NODE,
+                        options: function () {
+                            return {
+                                nodeType: NodeTypes.ViewType,
+                                properties: {
+                                    [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
+                                },
+                                ...(useModelAsType ? { parent: target, groupProperties: {} } : {}),
+                                links: [{
+                                    target: target,
+                                    linkProperties: {
+                                        properties: { ...properties, viewType, sibling }
+                                    }
+                                }, {
+                                    target: source,
+                                    linkProperties: {
+                                        properties: { ...properties, viewType, sibling }
+                                    }
+                                }]
+                            }
+                        }
+
+                    }
+                }))(dispatch, getState);
+            }
+            else {
+                if (illegalViewType !== properties.viewType) {
+                    PerformGraphOperation([{
+                        operation: ADD_NEW_NODE,
+                        options: function () {
+                            return {
+                                nodeType: NodeTypes.ViewType,
+                                properties: {
+                                    [NodeProperties.UIText]: `[${properties.viewType}] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
+                                },
+                                links: [{
+                                    target: target,
+                                    linkProperties: {
+                                        properties: { ...properties, sibling }
+                                    }
+                                }, {
+                                    target: source,
+                                    linkProperties: {
+                                        properties: { ...properties, sibling }
+                                    }
+                                }]
+                            }
+                        }
+
+                    }])(dispatch, getState);
+                }
+            }
+        }
+        else if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink })) {
+            if (GetNodeProp(target, NodeProperties.UseModelAsType)) {
+                debugger;
+            }
         }
     }
 }

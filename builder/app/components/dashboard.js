@@ -93,13 +93,13 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
+import { ViewTypes } from '../actions/uiactions';
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
-import { ViewTypes } from '../constants/nodepackages';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -268,6 +268,16 @@ class Dashboard extends Component {
 			},
 			icon: 'fa  fa-remove',
 			title: `${ViewTypes.Delete}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DefaultViewType,
+					viewType: true,
+					all: true
+				});
+			},
+			icon: 'fa  fa-soccer-ball-o',
+			title: `${Titles.All}`
 		})
 
 		return result;

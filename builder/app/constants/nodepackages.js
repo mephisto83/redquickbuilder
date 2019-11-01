@@ -23,7 +23,8 @@ import {
     NEW_COMPONENT_NODE,
     GetModelPropertyChildren,
     GetDataChainNextId,
-    GetNodesByProperties
+    GetNodesByProperties,
+    ViewTypes
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API } from "./componenttypes";
@@ -386,13 +387,6 @@ export const AddAgentUser = {
     }
 }
 
-export const ViewTypes = {
-    Update: 'Update',
-    Delete: 'Delete',
-    Create: 'Create',
-    Get: 'Get',
-    GetAll: 'GetAll'
-}
 export const CreateDefaultView = {
     type: 'Create View - Form',
     methodType: 'React Native Views',

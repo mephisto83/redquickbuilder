@@ -14,7 +14,7 @@ import SideMenuContainer from './sidemenucontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 import { clipboard } from 'electron';
-import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction, ViewTypes } from '../constants/nodepackages';
+import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import { PARAMETER_TAB } from './dashboard';
 import SideBar from './sidebar';
@@ -79,14 +79,14 @@ class QuickMethods extends Component {
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
                                         viewName: UIA.Visual(state, 'View Package Title'),
                                         sharedComponent: UIA.Visual(state, sharedcontrolkey),
-                                        viewType: ViewTypes.Create
+                                        viewType: UIA.ViewTypes.Create
                                     });
                                 })} />
                                 <TreeViewMenu hideArrow={true} title={`Get View`} icon={'fa fa-plus'} onClick={(() => {
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
                                         viewName: UIA.Visual(state, 'View Package Title'),
                                         sharedComponent: UIA.Visual(state, sharedcontrolkey),
-                                        viewType: ViewTypes.Get
+                                        viewType: UIA.ViewTypes.Get
                                     });
                                 })} />
                             </TreeViewMenu>
