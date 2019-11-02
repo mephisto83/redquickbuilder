@@ -5,8 +5,8 @@ import * as Cola from 'webcola'
 import * as GraphMethods from '../methods/graph_methods';
 // @flow
 import React, { Component } from 'react';
-import { NodeTypeColors } from '../actions/uiactions';
-import { LinkStyles, LinkType, LinkPropertyKeys, GetNodeTypeIcon } from '../constants/nodetypes';
+import { NodeTypeColors, GetNodeProp } from '../actions/uiactions';
+import { LinkStyles, LinkType, LinkPropertyKeys, GetNodeTypeIcon, NodeProperties } from '../constants/nodetypes';
 
 const MIN_DIMENSIONAL_SIZE = 20;
 let iconSize = 30;
@@ -168,6 +168,14 @@ export default class MindMap extends Component {
         var graph = this.state.graph;
 
         graph.nodes.forEach(function (v) {
+            if (me.props && me.props.minimizeTypes) {
+                let propType = GetNodeProp(v, NodeProperties.NODEType);
+                if (me.props.minimizeTypes[propType]) {
+                    v.width = MIN_DIMENSIONAL_SIZE;
+                    v.height = MIN_DIMENSIONAL_SIZE;
+                    return;
+                }
+            }
             var bb = me.calculateNodeTextSize(getLabelText(v), pad);
             v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
             v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
@@ -302,8 +310,13 @@ export default class MindMap extends Component {
             .attr('x', 40)
             .attr('y', 40)
             .attr('title', (d) => {
-                if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
-                    return (d.properties.nodeType);
+                if (d && d.properties && d.properties.nodeType) {
+                    if (this.props.minimizeTypes && this.props.minimizeTypes[d.properties.nodeType]) {
+                        return '';
+                    }
+                    if (NodeTypeColors[d.properties.nodeType]) {
+                        return (d.properties.nodeType);
+                    }
                 }
                 return '';
             })
@@ -350,18 +363,44 @@ export default class MindMap extends Component {
             if (me.$_nodes) {
                 me.$_nodes.each(function (d) {
                     var bb = me.calculateNodeTextSize(getLabelText(d), pad);
-                    d.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
-                    d.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height)
+                    if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                        d.width = MIN_DIMENSIONAL_SIZE;
+                        d.height = MIN_DIMENSIONAL_SIZE;
+                    }
+                    else {
+                        d.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
+                        d.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height)
+                    }
                     d.innerBounds = d.bounds.inflate(- margin);
                 });
             }
 
             if (me.$_nodes) {
                 me.$_nodes
-                    .attr("width", function (d) { return d.width; })
-                    .attr("height", function (d) { return d.height; })
-                    .attr("x", function (d) { return d.x - d.width / 2 })
-                    .attr("y", function (d) { return d.y - d.height / 2 })
+                    .attr("width", function (d) {
+                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                            return MIN_DIMENSIONAL_SIZE;
+                        }
+                        return d.width;
+                    })
+                    .attr("height", function (d) {
+                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                            return MIN_DIMENSIONAL_SIZE;
+                        }
+                        return d.height;
+                    })
+                    .attr("x", function (d) {
+                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                            return d.x - MIN_DIMENSIONAL_SIZE / 2;
+                        }
+                        return d.x - d.width / 2
+                    })
+                    .attr("y", function (d) {
+                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                            return d.y - MIN_DIMENSIONAL_SIZE / 2;
+                        }
+                        return d.y - d.height / 2
+                    });
             }
 
             group.attr("x", function (d) { return d.bounds.x })
@@ -395,6 +434,13 @@ export default class MindMap extends Component {
                 return d.y + h / 2 - d.height + -pad / 2 - iconSize;
             })
             titles.text(function (d) {
+                if (d &&
+                    d.properties &&
+                    d.properties.nodeType &&
+                    me.props.minimizeTypes &&
+                    me.props.minimizeTypes[d.properties.nodeType]) {
+                    return '';
+                }
                 return getLabelText(d);
             })
         }

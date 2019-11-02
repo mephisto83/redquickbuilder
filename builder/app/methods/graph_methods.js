@@ -1689,7 +1689,7 @@ export function getNodeLinks(graph, id, direction) {
     }
     return [];
 }
-function findLink(graph, options) {
+export function findLink(graph, options) {
     let { target, source } = options;
     let res = graph.links.find(link => {
         return graph.linkLib && graph.linkLib[link] && graph.linkLib[link].target === target && graph.linkLib[link].source === source;

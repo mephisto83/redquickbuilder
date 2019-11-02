@@ -620,7 +620,7 @@ class Dashboard extends Component {
 
 									this.props.setVisual(UIA.HOVERED_LINK, linkId);
 								}}
-
+								minimizeTypes={UIA.Minimized(state)}
 								selectedColor={UIA.Colors.SelectedNode}
 								markedColor={UIA.Colors.MarkedNode}
 								selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}

@@ -3,10 +3,12 @@ var fs = require('fs');
 import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
-import { MethodFunctions, bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
+import { MethodFunctions, bindTemplate, FunctionTemplateKeys, ReturnTypes } from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4 } from '../utils/array';
 export const VISUAL = 'VISUAL';
+export const MINIMIZED = 'MINIMIZED';
+export const HIDDEN = 'HIDDEN';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
 export const VISUAL_GRAPH = 'VISUAL_GRAPH';
@@ -46,6 +48,12 @@ export function GetC(state, section, item) {
     }
     return null;
 }
+export function Get(state, section) {
+    if (state && state.uiReducer) {
+        return state.uiReducer[section];
+    }
+    return null;
+}
 export function generateDataSeed(node) {
     let dataSeed = _generateDataSeed(node);
     return JSON.stringify(dataSeed, null, 4);
@@ -80,6 +88,18 @@ export function generateDataSeeds() {
 }
 export function Visual(state, key) {
     return GetC(state, VISUAL, key);
+}
+export function Minimized(state, key) {
+    if (!key) {
+        return Get(state, MINIMIZED);
+    }
+    return GetC(state, MINIMIZED, key);
+}
+export function Hidden(state, key) {
+    if (!key) {
+        return Get(state, HIDDEN);
+    }
+    return GetC(state, HIDDEN, key);
 }
 export function CopyKey(key) {
     return `Copy ${key}`;
@@ -163,7 +183,7 @@ export function setupDefaultViewType(args) {
                             return {
                                 nodeType: NodeTypes.ViewType,
                                 properties: {
-                                    [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
+                                    [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)} => ${GetNodeTitle(source)}`
                                 },
                                 ...(useModelAsType ? { parent: target, groupProperties: {} } : {}),
                                 links: [{
@@ -1181,7 +1201,32 @@ export function toggleVisual(key) {
         var state = getState();
         dispatch(UIC(VISUAL, key, !!!GetC(state, VISUAL, key)))
     }
+}
 
+export function toggleMinimized(key) {
+    return (dispatch, getState) => {
+        var state = getState();
+        dispatch(UIC(MINIMIZED, key, !!!GetC(state, MINIMIZED, key)))
+    }
+}
+
+export function toggleHideByTypes(key) {
+    return (dispatch, getState) => {
+        var state = getState();
+        let newvalue = !!!GetC(state, HIDDEN, key);
+        dispatch(UIC(HIDDEN, key, newvalue));
+        PerformGraphOperation(NodesByType(state, key).map(node => {
+            return {
+                operation: CHANGE_NODE_PROPERTY,
+                options: {
+                    prop: NodeProperties.Pinned,
+                    id: node.id,
+                    value: newvalue
+
+                }
+            }
+        }))(dispatch, getState);
+    }
 }
 
 export function GUID() {

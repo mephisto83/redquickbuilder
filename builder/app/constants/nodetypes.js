@@ -694,9 +694,9 @@ export const LinkPropertyKeys = {
     TYPE: 'type',
     CONSTRAINTS: 'constraints',
     VALID_CONSTRAINTS: 'valid-constraints',
-    FUNCTION_ID: 'function-id'
+    FUNCTION_ID: 'function-id',
+    ViewType: 'viewType'
 }
-
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent

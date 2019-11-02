@@ -300,6 +300,8 @@ export const NoApiPrefix = 'No api prefix';
 export const Save = 'Save';
 export const Open = 'Open';
 
+export const MinimizeTypeMenu = 'Minimize Types';
+export const HideTypeMenu = 'Hide Types';
 export const Validator = 'Validator';
 export const PublishFiles = 'Publish Files';
 export const Scaffold = 'Scaffold';

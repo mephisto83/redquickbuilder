@@ -61,8 +61,59 @@ class ContextMenu extends Component {
                 result.push(this.getContextMenu())
                 break;
         }
-
+        result.push(this.minimizeMenu());
+        result.push(this.hideTypeMenu());
         return result.filter(x => x);
+    }
+    hideTypeMenu() {
+        let HIDE_TYPE_MENU = 'HIDE_TYPE_MENU';
+        let { state } = this.props;
+        return (
+            <TreeViewMenu open={UIA.Visual(state, HIDE_TYPE_MENU)}
+                active={true}
+                title={Titles.HideTypeMenu}
+                innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+                toggle={() => {
+                    this.props.toggleVisual(HIDE_TYPE_MENU);
+                }}>
+                {Object.keys(NodeTypes).sort().map(type => {
+                    return (
+                        <TreeViewMenu key={`node-${type}`}
+                            hideArrow={true}
+                            title={type}
+                            icon={UIA.Hidden(state, NodeTypes[type]) ? "fa fa-circle-o" : 'fa fa-check-circle-o'}
+                            toggle={() => {
+                                this.props.toggleHideByTypes(NodeTypes[type]);
+                            }}>
+                        </TreeViewMenu>)
+                })}
+            </TreeViewMenu>
+        )
+    }
+    minimizeMenu() {
+        let MINIMIZE_MENU = 'MINIMIZE_MENU';
+        let { state } = this.props;
+        return (
+            <TreeViewMenu open={UIA.Visual(state, MINIMIZE_MENU)}
+                active={true}
+                title={Titles.MinimizeTypeMenu}
+                innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+                toggle={() => {
+                    this.props.toggleVisual(MINIMIZE_MENU);
+                }}>
+                {Object.keys(NodeTypes).sort().map(type => {
+                    return (
+                        <TreeViewMenu key={`node-${type}`}
+                            hideArrow={true}
+                            title={type}
+                            icon={!UIA.Minimized(state, NodeTypes[type]) ? "fa fa-circle-o" : 'fa fa-check-circle-o'}
+                            toggle={() => {
+                                this.props.toggleMinimized(NodeTypes[type]);
+                            }}>
+                        </TreeViewMenu>)
+                })}
+            </TreeViewMenu>
+        )
     }
     getContextMenu() {
         var { state } = this.props;

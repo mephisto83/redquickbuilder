@@ -1,5 +1,5 @@
 import { MethodFunctions, FunctionTypes, FunctionTemplateKeys, FunctionMethodTypes, HTTP_METHODS } from "./functiontypes";
-import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties } from "./nodetypes";
+import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties, LinkType, LinkPropertyKeys } from "./nodetypes";
 import {
     ADD_NEW_NODE,
     GetAgentNodes,
@@ -24,9 +24,10 @@ import {
     GetModelPropertyChildren,
     GetDataChainNextId,
     GetNodesByProperties,
-    ViewTypes
+    ViewTypes,
+    GetLinkProperty
 } from "../actions/uiactions";
-import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode } from "../methods/graph_methods";
+import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
@@ -423,7 +424,8 @@ export const CreateDefaultView = {
 
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
-            let modelProperties = GetModelPropertyChildren(currentNode.id).filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
+            let modelChildren = GetModelPropertyChildren(currentNode.id);
+            let modelProperties = modelChildren.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
             childComponents = modelProperties.map(v => null);
             let apiListLinkOperations = [];
             PerformGraphOperation([!sharedComponent ? {
@@ -684,7 +686,7 @@ export const CreateDefaultView = {
 
                         //Check if the property has a default view to use for different types of situations
 
-                        let sharedComponent = GetSharedComponentFor(viewType, modelProperty);
+                        let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
 
                         return {
                             parent: screenComponentId,
@@ -695,7 +697,8 @@ export const CreateDefaultView = {
                                 [NodeProperties.UIText]: `${GetNodeTitle(modelProperty)} RNC`,
                                 [NodeProperties.UIType]: UITypes.ReactNative,
                                 [NodeProperties.Label]: GetNodeTitle(modelProperty),
-                                [NodeProperties.ComponentType]: sharedComponent || componentTypeToUse
+                                [NodeProperties.ComponentType]: sharedComponent || componentTypeToUse,
+                                [NodeProperties.UsingSharedComponent]: !!sharedComponent
                             },
                             linkProperties: {
                                 properties: { ...LinkProperties.ComponentLink }
@@ -778,7 +781,7 @@ export const CreateDefaultView = {
                 }
             }),
             ...modelProperties.map((modelProperty, modelIndex) => {
-                let sharedComponent = GetSharedComponentFor(viewType, modelProperty);
+                let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
                 if (!sharedComponent) {
                     switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
                         case NodeTypes.Model:
@@ -1790,7 +1793,28 @@ export function CreateAgentFunction(option) {
     }
 }
 
-function GetSharedComponentFor(viewType, modelProperty) {
+function GetSharedComponentFor(viewType, modelProperty, currentNodeId) {
+    let graph = GetCurrentGraph(GetState());
+    let viewTypeNodes = GetNodesLinkedTo(graph, {
+        id: modelProperty.id
+    });
+    viewTypeNodes = viewTypeNodes.filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType);
+    viewTypeNodes = viewTypeNodes.find(x => {
+        if (existsLinkBetween(graph, {
+            source: x.id,
+            target: currentNodeId,
+            type: LinkType.DefaultViewType
+        })) {
+            let link = findLink(graph, { source: x.id, target: currentNodeId });
+            if (GetLinkProperty(link, LinkPropertyKeys.ViewType) === viewType) {
+                return true;
+            }
+        }
+        return false;
+    });
+    if (viewTypeNodes) {
+        return viewTypeNodes.id;
+    }
     switch (viewType) {
         case ViewTypes.Get:
             return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGet);
