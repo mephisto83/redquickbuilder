@@ -22,6 +22,24 @@ export function updateUISI(state, action) {
 
     return newstate;
 }
+export function updateUIMI(state, action) {
+    var newstate = { ...state };
+    let { key,
+        form,
+        model,
+        instance,
+        item,
+        value } = action;
+
+    newstate[key] = newstate[key] || {};
+    newstate[key][form] = newstate[key][form] || {};
+    newstate[key][form][model] = newstate[key][form][model] || {};
+    newstate[key][form][model][instance] = newstate[key][form][model][instance] || {};
+    newstate[key][form][model][instance][item] = newstate[key][form][model][instance][item] || {};
+    newstate[key][form][model][instance][item] = value;
+
+    return newstate;
+}
 
 export function updateModels(state, action) {
     var { type, model, value } = action;
@@ -55,6 +73,9 @@ export default function uiReducer(state, action) {
                 break;
             case UIA.UISI_UPDATE:
                 state = updateUISI(state, action) || state;
+                break;
+            case UIA.UIMI_UPDATE:
+                state = updateUIMI(state, action) || state;
                 break;
             case UIA.UI_MODELS:
                 state = updateModels(state, action) || state;
