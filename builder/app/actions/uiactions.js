@@ -89,6 +89,9 @@ export function generateDataSeeds() {
 export function Visual(state, key) {
     return GetC(state, VISUAL, key);
 }
+export function ChoseModel(id) {
+    return `choson model ${id}`;
+}
 export function Minimized(state, key) {
     if (!key) {
         return Get(state, MINIMIZED);
@@ -173,7 +176,7 @@ export function setupDefaultViewType(args) {
         if (right_link) {
 
             let useModelAsType = GetNodeProp(target, NodeProperties.UseModelAsType);
-            let illegalViewType = useModelAsType ? ViewTypes.GetAll : ViewTypes.Get;
+            let illegalViewType = false;//useModelAsType ? ViewTypes.GetAll : ViewTypes.Get;
             if (properties.all) {
                 PerformGraphOperation(Object.keys(ViewTypes).filter(x => x !== illegalViewType).map(viewType => {
                     let sibling = uuidv4();
@@ -1432,7 +1435,12 @@ export function toggleNodeMark() {
         prop: NodeProperties.Selected,
         id: currentNode.id,
         value: !GetNodeProp(currentNode, NodeProperties.Selected)
-    }))
+    }));
+}
+export function setInComponentMode() {
+    _dispatch(UIC(MINIMIZED, NodeTypes.Selector, true));
+    _dispatch(UIC(MINIMIZED, NodeTypes.ViewModel, true));
+    _dispatch(UIC(MINIMIZED, NodeTypes.ViewType, true));
 }
 export function removeCurrentNode() {
     graphOperation(REMOVE_NODE, { id: Visual(_getState(), SELECTED_NODE) })(_dispatch, _getState);

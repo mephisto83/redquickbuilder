@@ -11,8 +11,8 @@ import SelectInput from './selectinput';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
 import SideMenuContainer from './sidemenucontainer';
-import { NodeTypes } from '../constants/nodetypes';
-import { GetNode } from '../methods/graph_methods';
+import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { GetNode, GetAllChildren } from '../methods/graph_methods';
 import { clipboard } from 'electron';
 import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
@@ -21,12 +21,19 @@ import SideBar from './sidebar';
 import SideBarMenu from './sidebarmenu';
 import MainSideBar from './mainsidebar';
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../constants/functiontypes';
+import BatchMenu from './batchmenu';
 
 class QuickMethods extends Component {
     render() {
         var { state } = this.props;
         let sharedcontrolkey = 'View Package Shared Control';
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        function getChosenChildren() {
+            let chosenChildren = UIA.GetModelPropertyChildren(currentNode.id).filter(child => {
+                return UIA.Visual(state, UIA.ChoseModel(child.id));
+            }).map(x => x.id);
+            return chosenChildren;
+        }
         return (
             <MainSideBar relative={true}>
                 <SideBar relative={true} style={{ paddingTop: 0 }}>
@@ -39,6 +46,16 @@ class QuickMethods extends Component {
                                 this.props.toggleVisual(Titles.QuickMethods)
                             }}
                             icon={'fa fa-tag'}>
+                            <TreeViewMenu
+                                title={Titles.UIParameters}
+                                open={UIA.Visual(state, Titles.UIParameters)}
+                                active={true}
+                                toggle={() => {
+                                    this.props.toggleVisual(Titles.UIParameters)
+                                }}
+                                icon={'fa fa-tag'}>
+                                <BatchMenu />
+                            </TreeViewMenu>
                             <TreeViewMenu hideArrow={true} title={GetSpecificModels.type} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, GetSpecificModels);
                             })} />
@@ -75,18 +92,41 @@ class QuickMethods extends Component {
                                     onChange={(value) => {
                                         this.props.setVisual(sharedcontrolkey, value);
                                     }} />
+                                <TreeViewMenu
+                                    title={Titles.NodeProperties}
+                                    open={UIA.Visual(state, `${Titles.NodeProperties} quick method`)}
+                                    active={true}
+                                    toggle={() => {
+                                        this.props.toggleVisual(`${Titles.NodeProperties} quick method`)
+                                    }}
+                                    icon={'fa fa-tag'}>
+                                    {UIA.GetModelPropertyChildren(currentNode ? currentNode.id : null).map(child => {
+                                        //Could use something besides a VISUAL for this.
+                                        return (<CheckBox
+                                            label={UIA.GetNodeTitle(child)}
+                                            key={child.id}
+                                            value={UIA.Visual(state, UIA.ChoseModel(child.id))}
+                                            onChange={(value) => {
+                                                this.props.setVisual(UIA.ChoseModel(child.id), value);
+                                            }} />)
+                                    })}
+                                </TreeViewMenu>
                                 <TreeViewMenu hideArrow={true} title={`Create View`} icon={'fa fa-plus'} onClick={(() => {
+
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
                                         viewName: UIA.Visual(state, 'View Package Title'),
-                                        sharedComponent: UIA.Visual(state, sharedcontrolkey),
-                                        viewType: UIA.ViewTypes.Create
+                                        isSharedComponent: UIA.Visual(state, sharedcontrolkey),
+                                        viewType: UIA.ViewTypes.Create,
+                                        chosenChildren: getChosenChildren()
                                     });
                                 })} />
                                 <TreeViewMenu hideArrow={true} title={`Get View`} icon={'fa fa-plus'} onClick={(() => {
+
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
                                         viewName: UIA.Visual(state, 'View Package Title'),
-                                        sharedComponent: UIA.Visual(state, sharedcontrolkey),
-                                        viewType: UIA.ViewTypes.Get
+                                        isSharedComponent: UIA.Visual(state, sharedcontrolkey),
+                                        viewType: UIA.ViewTypes.Get,
+                                        chosenChildren: getChosenChildren()
                                     });
                                 })} />
                             </TreeViewMenu>

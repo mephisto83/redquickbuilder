@@ -781,7 +781,6 @@ class Dashboard extends Component {
 									nodeType={NodeTypes.Condition}
 									nodeProp={NodeProperties.Condition} />) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
-								<BatchMenu />
 							</SideBarContent>) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}

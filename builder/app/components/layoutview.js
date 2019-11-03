@@ -266,6 +266,8 @@ class LayoutView extends Component {
         componentNodes = [...componentNodes, ...UIA.GetNodesByProperties({
             [NodeProperties.NODEType]: NodeTypes.ComponentNode,
             [NodeProperties.SharedComponent]: true
+        }, null, state), ...UIA.GetNodesByProperties({
+            [NodeProperties.NODEType]: NodeTypes.ViewType
         }, null, state)];
         let namespace = 'namespace';
         let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);

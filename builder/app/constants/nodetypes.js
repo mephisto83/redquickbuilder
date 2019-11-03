@@ -505,6 +505,7 @@ export const LinkType = {
 
     DefaultViewType: 'DefaultViewType',
     SharedComponent: 'SharedComponent',
+    SharedComponentInstance: 'SharedComponentInstance',
     Executor: 'executor',
     ExecutorItem: 'executor-item',
     ExecutorProperty: 'executor-property',
@@ -700,6 +701,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
+    },
+    SharedComponentInstance: {
+        type: LinkType.SharedComponentInstance
     },
     DefaultViewType: {
         type: LinkType.DefaultViewType

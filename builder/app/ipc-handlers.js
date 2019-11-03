@@ -10,7 +10,7 @@ var child_process = require('child_process'),
 const { app, globalShortcut } = require('electron');
 const { Menu, MenuItem } = require('electron')
 
-const letters = 'wpsonmqyl1k234x'.split('');
+const letters = 'wpsonmqeyl1k234x'.split('');
 const defaultMenu = 'defaultMenu';
 const MenuItems = {
     w: {
@@ -46,6 +46,9 @@ const MenuItems = {
     },
     q: {
         label: 'Mark Node'
+    },
+    e: {
+        label: 'Component Mode'
     },
     1: { label: 'Menu 1' },
     2: { label: 'Menu 2' },

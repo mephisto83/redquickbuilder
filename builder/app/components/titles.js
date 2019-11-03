@@ -25,6 +25,7 @@ export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const SelectorType = 'Selector Type';
 export const GraphPropertiesMenu = 'Graph Properties';
 export const Execute = 'Execute';
+export const ViewTypes = 'View Types';
 export const All = 'All';
 export const DataChain = 'Data Chain';
 export const ComponentPropertyMenu = 'Component Properties';

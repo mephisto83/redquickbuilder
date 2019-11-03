@@ -1,10 +1,10 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem } from "../actions/uiactions";
 import fs from 'fs';
 import { bindTemplate } from "../constants/functiontypes";
-import { NodeProperties, UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
+import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, InstanceTypeSelectorFunction } from "../constants/componenttypes";
-import { getComponentProperty, getClientMethod } from "../methods/graph_methods";
+import { getComponentProperty, getClientMethod, TARGET, SOURCE } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
 
@@ -329,7 +329,28 @@ export function GenerateRNComponents(node, relative = './src/components', langua
     })
     return result;
 }
-
+function ConvertViewTypeToComponentNode(node) {
+    let wasstring = false;
+    if (typeof node === 'string') {
+        node = GetNodeById(node);
+        wasstring = true;
+    }
+    switch (GetNodeProp(node, NodeProperties.NODEType)) {
+        case NodeTypes.ViewType:
+            node = GetLinkChainItem({
+                id: node.id,
+                links: [{
+                    type: LinkType.SharedComponent,
+                    direction: SOURCE
+                }]
+            }) || node;
+            break;
+    }
+    if (wasstring) {
+        return node.id;
+    }
+    return node;
+}
 export function GenerateMarkupTag(node, language, parent, params) {
     let {
         children,
@@ -338,6 +359,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
         item
     } = (params || {});
     let listItem = '';
+    node = ConvertViewTypeToComponentNode(node);
     switch (language) {
         case UITypes.ReactNative:
             // let layout = GetNodeProp(parent, NodeProperties.Layout);
@@ -514,6 +536,9 @@ export function GetComponentDidMount(screenOption) {
 
 
 export function GenerateImport(node, parentNode, language) {
+
+    node = ConvertViewTypeToComponentNode(node);
+
     switch (language) {
         case UITypes.ReactNative:
             if (node) {
@@ -526,6 +551,8 @@ export function GenerateImport(node, parentNode, language) {
 }
 
 export function GenerateComponentImport(node, parentNode, language) {
+    node = ConvertViewTypeToComponentNode(node);
+
     switch (language) {
         case UITypes.ReactNative:
             if (node) {

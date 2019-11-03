@@ -392,7 +392,7 @@ export const CreateDefaultView = {
     type: 'Create View - Form',
     methodType: 'React Native Views',
     method: (args = {}) => {
-        let { viewName, viewType, sharedComponent } = args;
+        let { viewName, viewType, isSharedComponent, chosenChildren = [] } = args;
         let state = GetState();
         var currentNode = Node(state, Visual(state, SELECTED_NODE));
         let screenNodeId = null;
@@ -425,10 +425,13 @@ export const CreateDefaultView = {
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
             let modelChildren = GetModelPropertyChildren(currentNode.id);
+            if (chosenChildren && chosenChildren.length) {
+                modelChildren = modelChildren.filter(x => chosenChildren.some(v => v === x.id));
+            }
             let modelProperties = modelChildren.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
             childComponents = modelProperties.map(v => null);
             let apiListLinkOperations = [];
-            PerformGraphOperation([!sharedComponent ? {
+            PerformGraphOperation([!isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: {
                     nodeType: NodeTypes.Screen,
@@ -440,7 +443,7 @@ export const CreateDefaultView = {
                         [NodeProperties.UIText]: `${viewName} Form`
                     }
                 }
-            } : false, !sharedComponent ? {
+            } : false, !isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
                     let res = GetNodesByProperties({
@@ -599,7 +602,7 @@ export const CreateDefaultView = {
                         }]
                     }
                 }
-            }, !sharedComponent ? {
+            }, !isSharedComponent ? {
                 operation: NEW_SCREEN_OPTIONS,
                 options: function () {
                     return {
@@ -639,7 +642,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} RNC`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
-                            [NodeProperties.SharedComponent]: sharedComponent,
+                            [NodeProperties.SharedComponent]: isSharedComponent,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Form.key,
                             [NodeProperties.Layout]: layout,
                             [NodeProperties.Pinned]: false
@@ -668,15 +671,22 @@ export const CreateDefaultView = {
                     }
                 }
             }, ...modelProperties.map((modelProperty, modelIndex) => {
-                switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
-                    case NodeTypes.Model:
-                        return {};
-                    case NodeTypes.Property:
-                        if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-                            //if the property is a model reference, it should be a shared component or something.
+                let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
+                if (!sharedComponent) {
+                    switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
+                        case NodeTypes.Model:
                             return {};
-                        }
-                        break;
+                        case NodeTypes.Property:
+                            if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
+                                //if the property is a model reference, it should be a shared component or something.
+                                return {};
+                            }
+                            break;
+                    }
+                }
+                else {
+                    childComponents[modelIndex] = sharedComponent;
+                    return {};
                 }
 
                 return {
@@ -685,8 +695,6 @@ export const CreateDefaultView = {
                         let componentTypeToUse = viewComponentType;
 
                         //Check if the property has a default view to use for different types of situations
-
-                        let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
 
                         return {
                             parent: screenComponentId,
@@ -707,6 +715,30 @@ export const CreateDefaultView = {
                                 childComponents[modelIndex] = component.id;
                             }
 
+                        }
+                    }
+                }
+            }),
+            ...modelProperties.map((modelProperty, modelIndex) => {
+                return {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
+                        if (screenComponentId &&
+                            sharedComponent &&
+                            !existsLinkBetween(GetCurrentGraph(GetState()), {
+                                source: screenComponentId,
+                                target: sharedComponent,
+                                type: LinkType.SharedComponentInstance
+                            })) {
+
+                            return {
+                                source: screenComponentId,
+                                target: sharedComponent,
+                                properties: {
+                                    ...LinkProperties.SharedComponentInstance
+                                }
+                            }
                         }
                     }
                 }
@@ -751,25 +783,30 @@ export const CreateDefaultView = {
                 }
             },
             ...modelProperties.map((modelProperty, modelIndex) => {
-                switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
-                    case NodeTypes.Model:
 
-                        return {};
-                    case NodeTypes.Property:
-                        if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-                            //if the property is a model reference, it should be a shared component or something.
-                            return {};
-                        }
-                        break;
-                }
                 return {
                     operation: CHANGE_NODE_PROPERTY,
                     options: function () {
+                        let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
+                        if (!sharedComponent) {
+                            switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
+                                case NodeTypes.Model:
+
+                                    return {};
+                                case NodeTypes.Property:
+                                    if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
+                                        //if the property is a model reference, it should be a shared component or something.
+                                        return {};
+                                    }
+                                    break;
+                            }
+                        }
+
                         let rootCellId = GetFirstCell(layout);
                         let children = GetChildren(layout, rootCellId);
                         let childId = children[modelIndex];
                         let cellProperties = GetCellProperties(layout, childId);
-                        cellProperties.children[childId] = childComponents[modelIndex];
+                        cellProperties.children[childId] = sharedComponent || childComponents[modelIndex];
                         cellProperties.style.flex = null;
                         cellProperties.style.height = null;
                         return {
@@ -1260,7 +1297,7 @@ export function applyDefaultComponentProperties(currentNode, _ui_type) {
     if (currentNode) {
         let componentTypes = ComponentTypes[_ui_type] || {};
         let componentType = GetNodeProp(currentNode, NodeProperties.ComponentType);
-        Object.keys(componentTypes[componentType].properties).map(key => {
+        Object.keys(componentTypes[componentType] ? componentTypes[componentType].properties : {}).map(key => {
             let prop_obj = componentTypes[componentType].properties[key];
             if (prop_obj.parameterConfig) {
                 let selectedComponentApiProperty = key;
