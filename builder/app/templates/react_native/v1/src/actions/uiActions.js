@@ -156,6 +156,18 @@ export function GetScreenInstance(key, id) {
     return null;
 }
 
+export function GetModelInstance(key, instance, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInst(state);
+
+        if (modelInstance && modelInstance[key] && modelInstance[key][instance]) {
+            return modelInstance[key][instance][id] || null;
+        }
+    }
+    return null;
+}
+
 export function GetScreenInst(state) {
     return GetC(state, SCREEN_INSTANCE, SCREEN_INSTANCE);
 }
@@ -174,6 +186,17 @@ export function GetScreenInstanceBlur(key, id) {
     }
     return null;
 }
+export function GetModelInstanceBlur(key, instance, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstBlur(state, instance);
+
+        if (modelInstance && modelInstance[key]) {
+            return modelInstance[key][id] || null;
+        }
+    }
+    return null;
+}
 
 export function GetScreenInstanceBlurObject(key) {
     if (_getState) {
@@ -182,6 +205,18 @@ export function GetScreenInstanceBlurObject(key) {
 
         if (screenInstance) {
             return screenInstance[key] || null;
+        }
+    }
+    return null;
+}
+
+export function GetModelInstanceBlurObject(key, instance) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstBlur(state, instance);
+
+        if (modelInstance) {
+            return modelInstance[key] || null;
         }
     }
     return null;
@@ -205,6 +240,17 @@ export function GetScreenInstanceFocus(key, id) {
     }
     return null;
 }
+export function GetModelInstanceFocus(key, instance, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstFocus(state, instance);
+
+        if (modelInstance && modelInstance[key]) {
+            return modelInstance[key][id] || null;
+        }
+    }
+    return null;
+}
 
 export function GetScreenInstanceFocusObject(key) {
     if (_getState) {
@@ -213,6 +259,17 @@ export function GetScreenInstanceFocusObject(key) {
 
         if (screenInstance) {
             return screenInstance[key] || null;
+        }
+    }
+    return null;
+}
+export function GetModelInstanceFocusObject(key, instance) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstFocus(state, instance);
+
+        if (modelInstance) {
+            return modelInstance[key] || null;
         }
     }
     return null;
@@ -238,6 +295,21 @@ export function GetScreenInstanceDirty(key, id) {
     }
     return null;
 }
+
+
+export function GetModelInstanceDirty(key, instance, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstDirty(state, instance);
+
+        if (modelInstance && modelInstance[key]) {
+            return modelInstance[key][id] || null;
+        }
+    }
+    return null;
+}
+
+
 export function GetScreenInstanceDirtyObject(key) {
     if (_getState) {
         let state = _getState();
@@ -245,6 +317,19 @@ export function GetScreenInstanceDirtyObject(key) {
 
         if (screenInstance) {
             return screenInstance[key] || null;
+        }
+    }
+    return null;
+}
+
+
+export function GetModelInstanceDirtyObject(key, instance) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstDirty(state, instance);
+
+        if (modelInstance) {
+            return modelInstance[key] || null;
         }
     }
     return null;
@@ -273,6 +358,19 @@ export function GetScreenInstanceFocused(key, id) {
 }
 
 
+export function GetModelInstanceFocused(key, instance, id) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstFocused(state, instance);
+
+        if (modelInstance && modelInstance[key]) {
+            return modelInstance[key][id] || null;
+        }
+    }
+    return null;
+}
+
+
 export function GetScreenInstanceFocusedObject(key) {
     if (_getState) {
         let state = _getState();
@@ -280,6 +378,18 @@ export function GetScreenInstanceFocusedObject(key) {
 
         if (screenInstance) {
             return screenInstance[key] || null;
+        }
+    }
+    return null;
+}
+
+export function GetModelInstanceFocusedObject(key, instance) {
+    if (_getState) {
+        let state = _getState();
+        let modelInstance = GetModelInstFocused(state, instance);
+
+        if (modelInstance) {
+            return modelInstance[key] || null;
         }
     }
     return null;

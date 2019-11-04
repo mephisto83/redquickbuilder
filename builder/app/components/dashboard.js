@@ -584,6 +584,7 @@ class Dashboard extends Component {
 												target: nodeId,
 												source: selectedId
 											});
+											this.props.SelectedNode(null);
 										}
 										else if (properties && properties.context) {
 											switch (properties.type) {

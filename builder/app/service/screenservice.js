@@ -24,7 +24,7 @@ export function GenerateScreenMarkup(id, language) {
     let screenOption = GetScreenOption(id, language);
     if (screenOption) {
         let imports = GetScreenImports(id, language);
-        let elements = [GenerateMarkupTag(screenOption, language)];
+        let elements = [GenerateMarkupTag(screenOption, language, screen)];
         let template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
 
         return bindTemplate(template, {
@@ -329,7 +329,7 @@ export function GenerateRNComponents(node, relative = './src/components', langua
     })
     return result;
 }
-function ConvertViewTypeToComponentNode(node) {
+export function ConvertViewTypeToComponentNode(node) {
     let wasstring = false;
     if (typeof node === 'string') {
         node = GetNodeById(node);
@@ -359,10 +359,13 @@ export function GenerateMarkupTag(node, language, parent, params) {
         item
     } = (params || {});
     let listItem = '';
+    let viewTypeNode = null;
+    if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
+        viewTypeNode = node;
+    }
     node = ConvertViewTypeToComponentNode(node);
     switch (language) {
         case UITypes.ReactNative:
-            // let layout = GetNodeProp(parent, NodeProperties.Layout);
             let onChange = '';
             let dataBinding = '';
             let instanceType = '';
@@ -373,6 +376,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
             let parentLayoutProperties = null;
             let propertyName = '';
             let parentComponentApiConfig = null;
+            let valueBinding = '';
             if (parent) {
                 componentProperties = GetNodeProp(parent, NodeProperties.ComponentProperties);
                 parentLayoutProperties = GetNodeProp(parent, NodeProperties.Layout);
@@ -391,6 +395,9 @@ export function GenerateMarkupTag(node, language, parent, params) {
                     listItem = '.item';
                 }
             }
+            if (!componentApi) {
+                componentApi = GetNodeProp(viewTypeNode, NodeProperties.ComponentApi);
+            }
             switch (instanceType) {
                 case InstanceTypes.PropInstance:
                     if (model && property) {
@@ -406,21 +413,43 @@ export function GenerateMarkupTag(node, language, parent, params) {
                 case InstanceTypes.ApiProperty:
                     debugger;
                     break
+                case InstanceTypes.ModelInstance:
+                    debugger;
+                    break;
                 default:
-                    if (model && property && GetCodeName(parent))
-                        //                         onChange = `onChange={value => {
-                        //     this.props.update${instanceType}(${model}, ${property}, value);
-                        // }}`;
-                        break;
+                    switch (GetNodeProp(node, NodeProperties.NODEType)) {
+                        // case NodeTypes.ComponentNode:
+                        //     switch (GetNodeProp(node, NodeProperties.InstanceType)) {
+                        //         case InstanceTypes.ModelInstance:
+                        //             valueBinding = 'this.props.value';
+                        //             break;
+                        //     }
+                        //     break;
+                        case NodeTypes.ScreenOption:
+                        case NodeTypes.Screen:
+                            switch (GetNodeProp(node, NodeProperties.InstanceType)) {
+                                case InstanceTypes.ModelInstance:
+                                    valueBinding = `GetScreenParam('id')`;
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
             }
             let apiProperties = '';
             if (parentComponentApiConfig) {
                 apiProperties = writeApiProperties(parentComponentApiConfig);
             }
+            else if (componentApi) {
+                apiProperties = writeApiProperties(componentApi);
+            }
             if (dataBinding) {
                 dataBinding = `data={${dataBinding}}`;
             }
-            return `<${GetCodeName(node)} ${dataBinding} ${apiProperties} ${onChange}/>`;
+            if (valueBinding) {
+                valueBinding = `value={${valueBinding}}`
+            }
+            return `<${GetCodeName(node)} ${valueBinding} ${dataBinding} ${apiProperties} ${onChange}/>`;
     }
 }
 export function writeApiProperties(apiConfig) {
@@ -458,11 +487,39 @@ export function writeApiProperties(apiConfig) {
                             break;
                     }
                     break;
+                case InstanceTypes.ModelInstance:
+                    switch (handlerType) {
+                        case HandlerTypes.Blur:
+                            property = `() => this.props.updateModelInstanceBlur('${modelJsName}', this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                            break;
+                        case HandlerTypes.Focus:
+                            property = `() => this.props.updateModelInstanceFocus('${modelJsName}', this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                            break;
+                        case HandlerTypes.ChangeText:
+                            property = `(v) => this.props.updateModelInstance('${modelJsName}', this.props.value, '${GetJSCodeName(modelProperty)}', v)`;
+                            break;
+                        case HandlerTypes.Change:
+                            property = `(v) => this.props.updateModelInstance('${modelJsName}', this.props.value, '${GetJSCodeName(modelProperty)}', v.nativeEvent.text)`;
+                            break;
+                        case HandlerTypes.Property:
+                        default:
+                            if (modelProperty) {
+                                property = `GetModelInstance('${modelJsName}', this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                            }
+                            else {
+                                property = `GetModelInstanceObject('${modelJsName}', this.props.value)`;
+                            }
+                            break;
+                    }
+                    break;
                 case InstanceTypes.ApiProperty:
                     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
                     break;
                 case InstanceTypes.Selector:
                     property = `S.${GetJSCodeName(selector)}()`;
+                    break;
+                case InstanceTypes.SelectorInstance:
+                    property = `S.${GetJSCodeName(selector)}(this.props.value)`;
                     break;
                 case InstanceTypes.Boolean:
                     property = `true`;

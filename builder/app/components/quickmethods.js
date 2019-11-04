@@ -120,6 +120,15 @@ class QuickMethods extends Component {
                                         chosenChildren: getChosenChildren()
                                     });
                                 })} />
+                                <TreeViewMenu hideArrow={true} title={`Update View`} icon={'fa fa-plus'} onClick={(() => {
+
+                                    this.props.executeGraphOperation(currentNode, CreateDefaultView, {
+                                        viewName: UIA.Visual(state, 'View Package Title'),
+                                        isSharedComponent: UIA.Visual(state, sharedcontrolkey),
+                                        viewType: UIA.ViewTypes.Update,
+                                        chosenChildren: getChosenChildren()
+                                    });
+                                })} />
                                 <TreeViewMenu hideArrow={true} title={`Get View`} icon={'fa fa-plus'} onClick={(() => {
 
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {

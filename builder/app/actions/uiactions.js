@@ -120,9 +120,9 @@ export function Use(node, prop) {
 export function GetManyToManyNodes(ids) {
     return GraphMethods.GetManyToManyNodes(GetCurrentGraph(_getState()), ids) || [];
 }
-export function GetNodeProp(node, prop) {
+export function GetNodeProp(node, prop, currentGraph) {
     if (typeof node === 'string') {
-        node = GetNodeById(node) || node;
+        node = GetNodeById(node, currentGraph) || node;
     }
     return node && node.properties && node.properties[prop];
 }

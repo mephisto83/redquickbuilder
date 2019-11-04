@@ -1,6 +1,6 @@
 import { UITypes, NEW_LINE } from "../constants/nodetypes";
 import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName } from "../actions/uiactions";
-import { GenerateMarkupTag } from "./screenservice";
+import { GenerateMarkupTag, ConvertViewTypeToComponentNode } from "./screenservice";
 import { GetCellProperties, getComponentProperty } from "../methods/graph_methods";
 import { InstanceTypes } from "../constants/componenttypes";
 import { addNewLine } from "../utils/array";
@@ -10,7 +10,7 @@ export function GetPropertyConsts(id, language = UITypes.ReactNative) {
     let node = GetNodeById(id);
     let layout = GetNodeProp(node, NodeProperties.Layout);
     let components = GetNodeComponents(layout);
-    return components;
+    return components.map(ConvertViewTypeToComponentNode).unique();
 }
 
 export function GetModelConsts(id, language = UITypes.ReactNative) {
@@ -22,7 +22,7 @@ export function GetModelConsts(id, language = UITypes.ReactNative) {
         if (cellProperties && cellProperties.cellModel) {
             return cellProperties.cellModel[cell];
         }
-    }).filter(x => x).unique();
+    }).filter(x => x).map(ConvertViewTypeToComponentNode).unique();
 }
 
 export function GetModelPropertyConsts(id, language = UITypes.ReactNative) {
@@ -36,7 +36,7 @@ export function GetModelPropertyConsts(id, language = UITypes.ReactNative) {
         if (cellProperties && cellProperties.cellModelProperty) {
             return cellProperties.cellModelProperty[cell];
         }
-    }).filter(x => x).unique();
+    }).filter(x => x).map(ConvertViewTypeToComponentNode).unique();
 }
 
 export function GetRNModelInstances(id) {

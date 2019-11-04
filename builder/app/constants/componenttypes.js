@@ -14,6 +14,7 @@ export const ARE_BOOLEANS = ['inlineLabel', 'floatingLabel', 'stackedLabel', 'fi
 export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = 'value';
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
+export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 const INPUT_DEFAULT_API = [VALUE, ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
     'block',
@@ -77,7 +78,14 @@ export const ComponentTypes = {
         FooterTab: {},
         Form: {
             layout: true,
-            template: './app/templates/components/form.tpl'
+            template: './app/templates/components/form.tpl',
+            properties: {
+                value: {
+                    nodeProperty: NodeProperties.value,
+                    parameterConfig: true,
+                    ui: true
+                }
+            }
         },
         H1: {},
         H2: {},
@@ -148,6 +156,15 @@ export const ComponentTypes = {
                 label: {
                     nodeProperty: NodeProperties.Label,
                     template: `{titleService.get('{{value}}')}`
+                }
+            }
+        },
+        Generic: {
+            properties: {
+                value: {
+                    nodeProperty: NodeProperties.value,
+                    parameterConfig: true,
+                    ui: true
                 }
             }
         },
@@ -291,12 +308,21 @@ export const InstanceTypes = {
     ScreenInstanceFocus: 'ScreenInstanceFocus',
     ScreenInstanceFocused: 'ScreenInstanceFocused',
     ScreenInstanceDirty: 'ScreenInstanceDirty',
+
+    ModelInstance: 'ModelInstance',
+    ModelInstanceBlur: 'ModelInstanceBlur',
+    ModelInstanceFocus: 'ModelInstanceFocus',
+    ModelInstanceFocused: 'ModelInstanceFocused',
+    ModelInstanceDirty: 'ModelInstanceDirty',
+
+
     Instance: 'Instance',
     AppState: 'AppState',
     PropInstance: 'PropInstance',
     ApiProperty: 'ApiProperty',
     ScreenParam: 'ScreenParam',
     Selector: 'Selector',
+    SelectorInstance: 'SelectorInstance',
     Boolean: 'Boolean',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }
@@ -306,7 +332,13 @@ export const InstanceTypeSelectorFunction = {
     [InstanceTypes.ScreenInstanceBlur]: 'GetScreenInstanceBlurObject',
     [InstanceTypes.ScreenInstanceFocus]: 'GetScreenInstanceFocusObject',
     [InstanceTypes.ScreenInstanceFocused]: 'GetScreenInstanceFocusedObject',
-    [InstanceTypes.ScreenInstanceDirty]: 'GetScreenInstanceDirtyObject'
+    [InstanceTypes.ScreenInstanceDirty]: 'GetScreenInstanceDirtyObject',
+
+    [InstanceTypes.ModelInstance]: 'GetModelInstanceObject',
+    [InstanceTypes.ModelInstanceBlur]: 'GetModelInstanceBlurObject',
+    [InstanceTypes.ModelInstanceFocus]: 'GetModelInstanceFocusObject',
+    [InstanceTypes.ModelInstanceFocused]: 'GetModelInstanceFocusedObject',
+    [InstanceTypes.ModelInstanceDirty]: 'GetModelInstanceDirtyObject'
 }
 
 export function GetListItemNode(id) {

@@ -28,7 +28,7 @@ import {
     GetLinkProperty
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink } from "../methods/graph_methods";
-import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API } from "./componenttypes";
+import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
@@ -408,6 +408,7 @@ export const CreateDefaultView = {
         let viewModelNodeFocusedId = null;
         let viewModelNodeId = null;
         viewName = viewName || GetNodeTitle(currentNode);
+        let useModelInstance = viewType === ViewTypes.Update || viewType === ViewTypes.Get || viewType === ViewTypes.GetAll;
         let viewPackage = {
             [NodeProperties.ViewPackage]: uuidv4(),
             [NodeProperties.ViewPackageTitle]: viewName
@@ -440,6 +441,7 @@ export const CreateDefaultView = {
                     },
                     properties: {
                         ...viewPackage,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                         [NodeProperties.UIText]: `${viewName} Form`
                     }
                 }
@@ -448,7 +450,7 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                         [NodeProperties.NODEType]: NodeTypes.ViewModel
                     }, graph);
                     if (res && res.length) {
@@ -464,7 +466,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} VM`,
                             [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstance
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                         },
                         links: [{
                             target: currentNode.id,
@@ -479,7 +481,7 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty,
                         [NodeProperties.NODEType]: NodeTypes.ViewModel
                     }, graph);
                     if (res && res.length) {
@@ -496,7 +498,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} VM Dirty`,
                             [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceDirty
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
                         },
                         links: [{
                             target: currentNode.id,
@@ -511,7 +513,7 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus,
                         [NodeProperties.NODEType]: NodeTypes.ViewModel
                     }, graph);
                     if (res && res.length) {
@@ -528,7 +530,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} VM Focus`,
                             [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocus
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
                         },
                         links: [{
                             target: currentNode.id,
@@ -543,7 +545,7 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused,
                         [NodeProperties.NODEType]: NodeTypes.ViewModel
                     }, graph);
                     if (res && res.length) {
@@ -560,7 +562,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} VM Focused`,
                             [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceFocused
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
                         },
                         links: [{
                             target: currentNode.id,
@@ -575,7 +577,7 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let res = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur,
                         [NodeProperties.NODEType]: NodeTypes.ViewModel
                     }, graph);
                     if (res && res.length) {
@@ -592,7 +594,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} VM Blur`,
                             [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: InstanceTypes.ScreenInstanceBlur
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
                         },
                         links: [{
                             target: currentNode.id,
@@ -605,6 +607,34 @@ export const CreateDefaultView = {
             }, !isSharedComponent ? {
                 operation: NEW_SCREEN_OPTIONS,
                 options: function () {
+                    let formLayout = CreateLayout();
+                    formLayout = SetCellsLayout(formLayout, 1);
+                    let rootCellId = GetFirstCell(formLayout);
+                    let cellProperties = GetCellProperties(formLayout, rootCellId);
+                    cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
+
+                    let componentProps = null;
+
+                    if (useModelInstance) {
+                        componentProps = createComponentApi();
+                        GENERAL_COMPONENT_API.map(x => {
+                            componentProps = addComponentApi(componentProps, {
+                                modelProp: x.property
+                            });
+                        });
+                        GENERAL_COMPONENT_API.map(t => {
+                            let apiProperty = t.property;
+                            (function () {
+                                let rootCellId = GetFirstCell(formLayout);
+                                let cellProperties = GetCellProperties(formLayout, rootCellId);
+                                cellProperties.componentApi = cellProperties.componentApi || {};
+                                cellProperties.componentApi[apiProperty] = {
+                                    instanceType: InstanceTypes.ApiProperty,
+                                    apiProperty
+                                }
+                            })();
+                        });
+                    }
                     return {
                         callback: (screenOptionNode) => {
                             screenNodeOptionId = screenOptionNode.id;
@@ -613,7 +643,11 @@ export const CreateDefaultView = {
                         properties: {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} React Native Form`,
-                            [NodeProperties.UIType]: UITypes.ReactNative
+                            [NodeProperties.UIType]: UITypes.ReactNative,
+                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Generic.key,
+                            [NodeProperties.ComponentApi]: componentProps,
+                            [NodeProperties.Layout]: formLayout,
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                         },
                         groupProperties: {
                         },
@@ -631,6 +665,28 @@ export const CreateDefaultView = {
                     let cellProperties = GetCellProperties(layout, rootCellId);
                     cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
                     let propertyCount = modelProperties.length + 1;
+                    let componentProps = null;
+                    // if (useModelInstance) {
+                    //     componentProps = createComponentApi();
+                    //     GENERAL_COMPONENT_API.map(x => {
+                    //         componentProps = addComponentApi(componentProps, {
+                    //             modelProp: x.property
+                    //         });
+                    //     });
+                    //     GENERAL_COMPONENT_API.map(t => {
+                    //         let apiProperty = t.property;
+                    //         (function () {
+                    //             let rootCellId = GetFirstCell(layout);
+                    //             let cellProperties = GetCellProperties(layout, rootCellId);
+                    //             cellProperties.componentApi = cellProperties.componentApi || {};
+                    //             cellProperties.componentApi[apiProperty] = {
+                    //                 instanceType: InstanceTypes.ApiProperty,
+                    //                 apiProperty
+                    //             }
+                    //         })();
+                    //     });
+                    // }
+
                     layout = SetCellsLayout(layout, propertyCount, rootCellId);
 
                     return {
@@ -644,7 +700,9 @@ export const CreateDefaultView = {
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.SharedComponent]: isSharedComponent,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Form.key,
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                             [NodeProperties.Layout]: layout,
+                            [NodeProperties.ComponentApi]: componentProps,
                             [NodeProperties.Pinned]: false
                         },
                         groupProperties: {
@@ -654,23 +712,24 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            }, {
+            },
+
+            !isSharedComponent ? {
                 operation: CHANGE_NODE_PROPERTY,
-                options: function () {
-                    let formLayout = CreateLayout();
-                    formLayout = SetCellsLayout(formLayout, 1);
+                options: function (currentGraph) {
+                    let formLayout = GetNodeProp(screenNodeOptionId, NodeProperties.Layout, currentGraph);
                     let rootCellId = GetFirstCell(formLayout);
                     let cellProperties = GetCellProperties(formLayout, rootCellId);
-                    cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
-
                     cellProperties.children[rootCellId] = screenComponentId;
+
                     return {
                         prop: NodeProperties.Layout,
                         value: formLayout,
                         id: screenNodeOptionId
                     }
                 }
-            }, ...modelProperties.map((modelProperty, modelIndex) => {
+            } : false,
+            ...modelProperties.map((modelProperty, modelIndex) => {
                 let sharedComponent = GetSharedComponentFor(viewType, modelProperty, currentNode.id);
                 if (!sharedComponent) {
                     switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -706,7 +765,8 @@ export const CreateDefaultView = {
                                 [NodeProperties.UIType]: UITypes.ReactNative,
                                 [NodeProperties.Label]: GetNodeTitle(modelProperty),
                                 [NodeProperties.ComponentType]: sharedComponent || componentTypeToUse,
-                                [NodeProperties.UsingSharedComponent]: !!sharedComponent
+                                [NodeProperties.UsingSharedComponent]: !!sharedComponent,
+                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                             },
                             linkProperties: {
                                 properties: { ...LinkProperties.ComponentLink }
@@ -754,7 +814,8 @@ export const CreateDefaultView = {
                             [NodeProperties.UIText]: ` ${Titles.Execute} Button ${viewName} Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
-                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Button.key
+                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Button.key,
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                         },
                         linkProperties: {
                             properties: { ...LinkProperties.ComponentLink }
@@ -847,10 +908,16 @@ export const CreateDefaultView = {
                             });
                         }
                         else if (sharedComponent) {
+                            componentProps = {};
+                            //     let { instanceType, model, selector, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
                             SHARED_COMPONENT_API.map(x => {
-                                componentProps = addComponentApi(componentProps, {
-                                    modelProp: x.property
-                                });
+                                componentProps[x.property] = {
+                                    instanceType: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                                    model: currentNode.id,
+                                    modelProperty: modelProperty.id,
+                                    handlerType: HandlerTypes.Property
+                                }
+
                             });
                         }
                         else {
@@ -891,7 +958,8 @@ export const CreateDefaultView = {
                 options: function (graph) {
                     let selectorNode = GetNodesByProperties({
                         [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.NODEType]: NodeTypes.Selector
+                        [NodeProperties.NODEType]: NodeTypes.Selector,
+                        [NodeProperties.InstanceType]: useModelInstance
                     }).find(x => x);
                     if (selectorNode) {
                         modelComponentSelectors.push(selectorNode.id);
@@ -901,8 +969,9 @@ export const CreateDefaultView = {
                         nodeType: NodeTypes.Selector,
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: GetNodeTitle(currentNode),
-                            [NodeProperties.Model]: currentNode.id
+                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}${useModelInstance ? ' Instance' : ''}`,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.InstanceType]: useModelInstance
                         },
                         links: [...vmsIds().map(t => ({
                             target: t,
@@ -1163,20 +1232,20 @@ export const CreateDefaultView = {
                             else if (ARE_HANDLERS.some(v => v === apiProperty)) {
                                 if ([ARE_TEXT_CHANGE].some(v => v === apiProperty)) {
                                     cellProperties.componentApi[apiProperty] = {
-                                        instanceType: InstanceTypes.ScreenInstance,
+                                        instanceType: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                                         handlerType: HandlerTypes.ChangeText
                                     };
                                 }
                                 else {
                                     cellProperties.componentApi[apiProperty] = {
-                                        instanceType: InstanceTypes.ScreenInstance,
+                                        instanceType: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                                         handlerType: HandlerTypes.Change,
                                     }
                                 }
                             }
                             else {
                                 cellProperties.componentApi[apiProperty] = {
-                                    instanceType: InstanceTypes.Selector,
+                                    instanceType: useModelInstance ? InstanceTypes.SelectorInstance : InstanceTypes.Selector,
                                     selector: modelComponentSelectors[0],
                                     handlerType: HandlerTypes.Property,
                                 }
@@ -1281,6 +1350,9 @@ export const CreateDefaultView = {
                     return applyDefaultComponentProperties(GetNodeById(childComponents[modelIndex]), UITypes.ReactNative)
 
                 })).flatten(),
+
+                applyDefaultComponentProperties(GetNodeById(screenComponentId), UITypes.ReactNative),
+                applyDefaultComponentProperties(GetNodeById(screenNodeOptionId), UITypes.ReactNative)
             ])(GetDispatchFunc(), GetStateFunc());
 
         }

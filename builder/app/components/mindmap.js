@@ -170,7 +170,7 @@ export default class MindMap extends Component {
         graph.nodes.forEach(function (v) {
             if (me.props && me.props.minimizeTypes) {
                 let propType = GetNodeProp(v, NodeProperties.NODEType);
-                if (me.props.minimizeTypes[propType]) {
+                if (!v.selected && me.props.minimizeTypes[propType]) {
                     v.width = MIN_DIMENSIONAL_SIZE;
                     v.height = MIN_DIMENSIONAL_SIZE;
                     return;
@@ -309,17 +309,6 @@ export default class MindMap extends Component {
             .attr("height", function (d) { return iconSize; })
             .attr('x', 40)
             .attr('y', 40)
-            .attr('title', (d) => {
-                if (d && d.properties && d.properties.nodeType) {
-                    if (this.props.minimizeTypes && this.props.minimizeTypes[d.properties.nodeType]) {
-                        return '';
-                    }
-                    if (NodeTypeColors[d.properties.nodeType]) {
-                        return (d.properties.nodeType);
-                    }
-                }
-                return '';
-            })
             .style('width', 40)
             .style('height', 40);
         var titles = topdiv.append('xhtml:div')
@@ -363,7 +352,7 @@ export default class MindMap extends Component {
             if (me.$_nodes) {
                 me.$_nodes.each(function (d) {
                     var bb = me.calculateNodeTextSize(getLabelText(d), pad);
-                    if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                    if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
                         d.width = MIN_DIMENSIONAL_SIZE;
                         d.height = MIN_DIMENSIONAL_SIZE;
                     }
@@ -378,25 +367,25 @@ export default class MindMap extends Component {
             if (me.$_nodes) {
                 me.$_nodes
                     .attr("width", function (d) {
-                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                        if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
                             return MIN_DIMENSIONAL_SIZE;
                         }
                         return d.width;
                     })
                     .attr("height", function (d) {
-                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                        if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
                             return MIN_DIMENSIONAL_SIZE;
                         }
                         return d.height;
                     })
                     .attr("x", function (d) {
-                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                        if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
                             return d.x - MIN_DIMENSIONAL_SIZE / 2;
                         }
                         return d.x - d.width / 2
                     })
                     .attr("y", function (d) {
-                        if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                        if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
                             return d.y - MIN_DIMENSIONAL_SIZE / 2;
                         }
                         return d.y - d.height / 2
@@ -435,6 +424,7 @@ export default class MindMap extends Component {
             })
             titles.text(function (d) {
                 if (d &&
+                    !d.selected &&
                     d.properties &&
                     d.properties.nodeType &&
                     me.props.minimizeTypes &&
