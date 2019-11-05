@@ -457,6 +457,7 @@ export function AddChainCommand(currentNode, callback, graph, viewPackage = {}) 
             groupProperties,
             properties: {
                 ...viewPackage,
+                [NodeProperties.Pinned]: false,
                 [NodeProperties.ChainParent]: currentNode.id
             },
             linkProperties: {
@@ -480,6 +481,7 @@ export function SplitDataCommand(currentNode, callback, viewPackage = {}) {
             },
             properties: {
                 ...viewPackage,
+                [NodeProperties.Pinned]: false,
                 [NodeProperties.ChainParent]: currentNode.id
             },
             linkProperties: {

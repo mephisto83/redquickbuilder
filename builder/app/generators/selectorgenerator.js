@@ -42,15 +42,15 @@ export function GenerateSelectorFunction(node) {
             case NodeTypes.ViewModel:
                 let instanceType = GetNodeProp(part, NodeProperties.InstanceType)
                 let method = InstanceTypeSelectorFunction[instanceType];
-                return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}')`
+                return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}'${GetNodeProp(node, NodeProperties.InstanceType) ? ', value' : null})`
             case NodeTypes.Selector:
-                return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}()`;
+                return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}(${GetNodeProp(part, NodeProperties.InstanceType) ? 'value' : null})`;
             default:
                 throw 'unhandled generate selector function type ' + GetNodeProp(part, NodeProperties.NODEType);
         }
     })
     let result = `
-export function ${GetJSCodeName(node)}() {
+export function ${GetJSCodeName(node)}(${GetNodeProp(node, NodeProperties.InstanceType) ? 'value' : null}) {
     return {
 ${addNewLine(parts.join(',' + NEW_LINE), 2)}
     }

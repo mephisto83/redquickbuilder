@@ -321,6 +321,7 @@ export const NodeProperties = {
     NodePackageType: 'NodePackageType',
     NodePackageAgent: 'NodePackageAgent',
     UIText: 'text',
+    ViewType: 'view-type',
 
     IsReferenceList: 'isReferenceList',
     UseHttps: 'UseHttps',

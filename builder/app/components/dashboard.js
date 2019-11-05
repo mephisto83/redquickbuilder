@@ -131,6 +131,9 @@ class Dashboard extends Component {
 				case NodeTypes.Model:
 					result.push(...this.getModelContext())
 					return result;
+				case NodeTypes.ComponentNode:
+					result.push(...this.getComponentContext());
+					break;
 				case NodeTypes.ViewType:
 					result.push(...this.getViewTypeContext());
 					return result;
@@ -217,6 +220,24 @@ class Dashboard extends Component {
 			icon: 'fa fa-coffee',
 			title: `${Titles.SharedControl}`
 		});
+
+		return result;
+	}
+	getComponentContext() {
+		let result = [];
+		let { state } = this.props;
+		var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+		let me = this;
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					autoConnectViewType: currentNode.id
+				});
+
+			},
+			icon: 'fa  fa-soccer-ball-o',
+			title: `${Titles.All}`
+		})
 
 		return result;
 	}
@@ -585,6 +606,25 @@ class Dashboard extends Component {
 												source: selectedId
 											});
 											this.props.SelectedNode(null);
+										}
+										else if (properties && properties.autoConnectViewType) {
+											let connectto = [];
+											Object.values(ViewTypes).map(viewType => {
+							
+												connectto = UIA.getViewTypeEndpointsForDefaults(viewType, null, nodeId);
+												connectto.map(ct => {
+							
+													this.props.setSharedComponent({
+														properties: {
+															...LinkProperties.DefaultViewType,
+															viewType
+														},
+														source: ct.id,
+														target: properties.autoConnectViewType
+													})
+												});
+											});
+
 										}
 										else if (properties && properties.context) {
 											switch (properties.type) {

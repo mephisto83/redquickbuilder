@@ -135,6 +135,31 @@ export function GetGroupProp(id, prop) {
     return null;
 }
 
+export function getViewTypeEndpointsForDefaults(viewType, currentGraph, id) {
+    currentGraph = currentGraph || GetCurrentGraph(_getState());
+
+    let currentNode = GetNodeById(id, currentGraph)
+    var connectto = GetNodesByProperties({
+        [NodeProperties.NODEType]: NodeTypes.ViewType,
+        [NodeProperties.ViewType]: viewType,
+    }, currentGraph).filter(_x => {
+        let res = GraphMethods.existsLinkBetween(currentGraph, {
+            source: _x.id,
+            type: NodeConstants.LinkType.DefaultViewType,
+            target: currentNode.id
+        });
+        if (res) {
+            let link = GraphMethods.GetLinkBetween(_x.id, currentNode.id, currentGraph);
+            if (link && link.properties && link.properties.target === currentNode.id) {
+                return true;
+            }
+        }
+        return false;
+    });
+
+    return connectto;
+}
+
 export function setSharedComponent(args) {
     let { properties, target, source } = args;
     return (dispatch, getState) => {
@@ -186,18 +211,27 @@ export function setupDefaultViewType(args) {
                             return {
                                 nodeType: NodeTypes.ViewType,
                                 properties: {
+                                    [NodeProperties.ViewType]: viewType,
                                     [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)} => ${GetNodeTitle(source)}`
                                 },
                                 ...(useModelAsType ? { parent: target, groupProperties: {} } : {}),
                                 links: [{
                                     target: target,
                                     linkProperties: {
-                                        properties: { ...properties, viewType, sibling }
+                                        properties: {
+                                            ...properties, viewType, sibling,
+                                            target: target
+                                        }
                                     }
                                 }, {
                                     target: source,
                                     linkProperties: {
-                                        properties: { ...properties, viewType, sibling }
+                                        properties: {
+                                            ...properties,
+                                            viewType,
+                                            sibling,
+                                            source: source
+                                        }
                                     }
                                 }]
                             }

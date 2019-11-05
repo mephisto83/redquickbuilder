@@ -101,7 +101,7 @@ class NodeManagement extends Component {
                     }} />
                 </TreeViewMenu>
                 <FormControl sidebarform={true}>
-                    <TextInput value={this.state.filter} onChange={(value) => {
+                    <TextInput value={this.state.filter} immediate={true} onChange={(value) => {
                         this.setState({ filter: value });
                     }} inputgroup={true} placeholder={Titles.Filter} />
                 </FormControl>

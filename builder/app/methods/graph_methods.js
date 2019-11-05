@@ -1105,8 +1105,9 @@ function NodesByType(graph, nodeType, options = {}) {
     return [];
 }
 export function existsLinkBetween(graph, options) {
-    var { source, target, type } = options;
+    var { source, target, type, direction } = options;
     var link = findLink(graph, { source, target })
+    
     if (link) {
         return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type;
     }

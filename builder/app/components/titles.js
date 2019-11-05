@@ -113,6 +113,7 @@ export const TargetModel = 'Target Model';
 export const UseEnumeration = 'Use Enumeration';
 export const Enumeration = 'Enumeration';
 export const SharedControl = 'Shared Component';
+export const UseAsDefault = 'Use as default';
 export const PermissionDependsOnProperties = 'Properties permissions depend on.';
 export const ViewPackage = 'View Package';
 export const CodeUser = 'Code User';
