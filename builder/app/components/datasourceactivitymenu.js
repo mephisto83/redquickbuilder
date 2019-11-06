@@ -48,6 +48,29 @@ class DataSourceActivityMenu extends Component {
                         value={UIA.GetNodeProp(currentNode, NodeProperties.UIModelType)}
                         options={UIA.GetModelNodes().toNodeSelect()}
                     />
+                    <SelectInput
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.DataChain],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.DataChain,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.DataChain }
+                            })
+                        }}
+                        label={Titles.DataChain}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.DataChain)}
+                        options={UIA.GetDataChainEntryNodes().toNodeSelect()}
+                    />
+                    
                 </FormControl>
                 <button type="submit" className="btn btn-primary" onClick={() => {
                     this.props.graphOperation(UIA.NEW_CONDITION_NODE, {

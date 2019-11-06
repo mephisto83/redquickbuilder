@@ -4,7 +4,7 @@ import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, InstanceTypeSelectorFunction } from "../constants/componenttypes";
-import { getComponentProperty, getClientMethod, TARGET, SOURCE } from "../methods/graph_methods";
+import { getComponentProperty, getClientMethod, TARGET, SOURCE, GetConnectedNodeByType } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
 
@@ -61,7 +61,13 @@ export function GetItemRenderImport(node) {
 
 export function GetItemData(node) {
     let dataSourceNode = GetDataSourceNode(node.id);
-
+    let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
+    if (connectedNode) {
+        // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
+    return `(()=> {
+    return D.${GetCodeName(connectedNode)}(GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}));
+})()`
+    }
     return `(()=> {
     return GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))});
 })()`
@@ -85,9 +91,12 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         if (layoutObj) {
             buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE)
         };
+        let data = GetItemData(node);
+        let item_render = GetItemRender(node, extraimports, language);
+        
         layoutSrc = bindTemplate(fs.readFileSync(template, 'utf8'), {
-            item_render: GetItemRender(node, extraimports, language),
-            data: GetItemData(node)
+            item_render: item_render,
+            data: data
         });
     }
 

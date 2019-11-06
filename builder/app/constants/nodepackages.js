@@ -417,7 +417,7 @@ export const CreateDefaultView = {
         let viewModelNodeId = null;
         let createConnections = [];
         viewName = viewName || GetNodeTitle(currentNode);
-        let useModelInstance = viewType === ViewTypes.Update || viewType === ViewTypes.Get || viewType === ViewTypes.GetAll;
+        let useModelInstance = viewType === ViewTypes.Update || viewType === ViewTypes.Get || viewType === ViewTypes.GetAll || viewType === ViewTypes.Delete;
         let viewPackage = {
             [NodeProperties.ViewPackage]: uuidv4(),
             [NodeProperties.ViewPackageTitle]: viewName
@@ -425,6 +425,7 @@ export const CreateDefaultView = {
         let viewComponentType = null;
         switch (viewType) {
             case ViewTypes.Get:
+            case ViewTypes.GetAll:
                 viewComponentType = ComponentTypes.ReactNative.Text.key;
                 break;
             default:
@@ -684,23 +685,6 @@ export const CreateDefaultView = {
                     layout = SetCellsLayout(layout, propertyCount, rootCellId);
                     let connectto = [];
                     if (isDefaultComponent) {
-                        // connectto = GetNodesByProperties({
-                        //     [NodeProperties.NODEType]: NodeTypes.ViewType,
-                        //     [NodeProperties.ViewType]: viewType,
-                        // }, currentGraph).filter(_x => {
-                        //     let res = existsLinkBetween(currentGraph, {
-                        //         source: _x.id,
-                        //         type: LinkType.DefaultViewType,
-                        //         target: currentNode.id
-                        //     });
-                        //     if (res) {
-                        //         let link = GetLinkBetween(_x.id, currentNode.id, currentGraph);
-                        //         if (link && link.properties && link.properties.target === currentNode.id) {
-                        //             return true;
-                        //         }
-                        //     }
-                        //     return false;
-                        // });
                         connectto = getViewTypeEndpointsForDefaults(viewType, currentGraph, currentNode.id);
                     }
                     return {
