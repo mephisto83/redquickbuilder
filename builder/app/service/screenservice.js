@@ -65,7 +65,7 @@ export function GetItemData(node) {
     if (connectedNode) {
         // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
     return `(()=> {
-    return D.${GetCodeName(connectedNode)}(GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}));
+    return DC.${GetCodeName(connectedNode)}(GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}));
 })()`
     }
     return `(()=> {

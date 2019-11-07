@@ -157,7 +157,8 @@ class QuickMethods extends Component {
 
                                     this.props.executeGraphOperation(currentNode, CreateDefaultView, {
                                         ...(defaultParameters()),
-                                        viewType: UIA.ViewTypes.GetAll
+                                        viewType: UIA.ViewTypes.GetAll,
+                                        isList: true
                                     });
                                 })} />
                             </TreeViewMenu>

@@ -63,7 +63,7 @@ class DataSourceActivityMenu extends Component {
                             this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                                 target: value,
                                 source: id,
-                                properties: { ...UIA.LinkProperties.DataChain }
+                                properties: { ...UIA.LinkProperties.DataChainLink }
                             })
                         }}
                         label={Titles.DataChain}

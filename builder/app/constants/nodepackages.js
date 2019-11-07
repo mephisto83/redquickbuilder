@@ -27,7 +27,8 @@ import {
     ViewTypes,
     GetLinkProperty,
     setSharedComponent,
-    getViewTypeEndpointsForDefaults
+    getViewTypeEndpointsForDefaults,
+    NEW_DATA_SOURCE
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API } from "./componenttypes";
@@ -399,23 +400,27 @@ export const CreateDefaultView = {
             viewType,
             isDefaultComponent,
             isSharedComponent,
+            isList,
             chosenChildren = []
         } = args;
         let state = GetState();
         var currentNode = Node(state, Visual(state, SELECTED_NODE));
         let screenNodeId = null;
         let screenComponentId = null;
+        let listComponentId = null;
         let screenNodeOptionId = null;
         let childComponents = [];
         let modelComponentSelectors = [];
         let modelComponentDataChains = [];
         let layout = null;
+        let listLayout = null;
         let viewModelNodeDirtyId = null;
         let viewModelNodeFocusId = null;
         let viewModelNodeBlurId = null;
         let viewModelNodeFocusedId = null;
         let viewModelNodeId = null;
         let createConnections = [];
+        let createListConnections = [];
         viewName = viewName || GetNodeTitle(currentNode);
         let useModelInstance = viewType === ViewTypes.Update || viewType === ViewTypes.Get || viewType === ViewTypes.GetAll || viewType === ViewTypes.Delete;
         let viewPackage = {
@@ -432,7 +437,7 @@ export const CreateDefaultView = {
                 viewComponentType = ComponentTypes.ReactNative.Input.key;
                 break;
         }
-
+        let dataSourceId;
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
             let modelChildren = GetModelPropertyChildren(currentNode.id);
@@ -474,7 +479,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'}`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
@@ -507,7 +512,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM Dirty`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Dirty`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
@@ -540,7 +545,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM Focus`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Focus`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
@@ -573,7 +578,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM Focused`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Focused`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
@@ -606,7 +611,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM Blur`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Blur`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
@@ -671,7 +676,78 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            } : false, {
+            } : false, isList ? {
+                operation: NEW_COMPONENT_NODE,
+                options: function (currentGraph) {
+                    listLayout = CreateLayout();
+                    listLayout = SetCellsLayout(listLayout, 1);
+                    let rootCellId = GetFirstCell(listLayout);
+                    let cellProperties = GetCellProperties(listLayout, rootCellId);
+                    cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
+                    let componentProps = null;
+
+                    let connectto = [];
+                    if (isDefaultComponent) {
+                        connectto = getViewTypeEndpointsForDefaults(viewType, currentGraph, currentNode.id);
+                    }
+                    return {
+                        callback: (listComponent) => {
+                            listComponentId = listComponent.id;
+                            connectto.map(ct => {
+
+                                createListConnections.push(function () {
+                                    return setSharedComponent({
+                                        properties: {
+                                            ...LinkProperties.DefaultViewType,
+                                            viewType
+                                        },
+                                        source: ct.id,
+                                        target: listComponentId
+                                    })(GetDispatchFunc(), GetStateFunc());
+                                })
+                            });
+                        },
+                        parent: screenNodeOptionId,
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `${viewName} List RNC`,
+                            [NodeProperties.UIType]: UITypes.ReactNative,
+                            [NodeProperties.SharedComponent]: isSharedComponent,
+                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.List.key,
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                            [NodeProperties.Layout]: listLayout,
+                            [NodeProperties.ComponentApi]: componentProps
+                        },
+                        groupProperties: {
+                        },
+                        linkProperties: {
+                            properties: { ...LinkProperties.ComponentLink }
+                        }
+                    }
+                }
+            } : false,
+            isList ? ({
+                operation: NEW_DATA_SOURCE,
+                options: function (currentGraph) {
+                    return {
+                        parent: listComponentId,
+                        callback: (dataSource) => {
+                            dataSourceId = dataSource.id;
+                        },
+                        groupProperties: {
+                        },
+                        properties: {
+                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                            [NodeProperties.UIType]: GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph),
+                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source`
+                        },
+                        linkProperties: {
+                            properties: { ...LinkProperties.DataSourceLink }
+                        }
+                    }
+                }
+            }) : false,
+            {
                 operation: NEW_COMPONENT_NODE,
                 options: function (currentGraph) {
                     layout = CreateLayout();
@@ -704,13 +780,13 @@ export const CreateDefaultView = {
                                 })
                             });
                         },
-                        parent: screenNodeOptionId,
+                        parent: isList ? listComponentId : screenNodeOptionId,
                         properties: {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} RNC`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.SharedComponent]: isSharedComponent,
-                            [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Form.key,
+                            [NodeProperties.ComponentType]: isList ? ComponentTypes.ReactNative.ListItem.key : ComponentTypes.ReactNative.Form.key,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                             [NodeProperties.Layout]: layout,
                             [NodeProperties.ComponentApi]: componentProps
@@ -718,7 +794,7 @@ export const CreateDefaultView = {
                         groupProperties: {
                         },
                         linkProperties: {
-                            properties: { ...LinkProperties.ComponentLink }
+                            properties: isList ? { ...LinkProperties.ListItem } : { ...LinkProperties.ComponentLink }
                         }
                     }
                 }
@@ -730,12 +806,28 @@ export const CreateDefaultView = {
                     let formLayout = GetNodeProp(screenNodeOptionId, NodeProperties.Layout, currentGraph);
                     let rootCellId = GetFirstCell(formLayout);
                     let cellProperties = GetCellProperties(formLayout, rootCellId);
-                    cellProperties.children[rootCellId] = screenComponentId;
+                    cellProperties.children[rootCellId] = isList ? listComponentId : screenComponentId;
 
                     return {
                         prop: NodeProperties.Layout,
                         value: formLayout,
                         id: screenNodeOptionId
+                    }
+                }
+            } : false,
+
+            isList ? {
+                operation: CHANGE_NODE_PROPERTY,
+                options: function (currentGraph) {
+                    let formLayout = GetNodeProp(listComponentId, NodeProperties.Layout, currentGraph);
+                    let rootCellId = GetFirstCell(formLayout);
+                    let cellProperties = GetCellProperties(formLayout, rootCellId);
+                    cellProperties.children[rootCellId] = screenComponentId;
+
+                    return {
+                        prop: NodeProperties.Layout,
+                        value: formLayout,
+                        id: listComponentId
                     }
                 }
             } : false,
@@ -1001,6 +1093,141 @@ export const CreateDefaultView = {
             let propertyDataChainAccesors = [];
 
             let datachainLink = [];
+            let skipModelDataChainListParts = false;
+            let listDataChainId = null;
+            let listDataChainExitId = null;
+            PerformGraphOperation([
+                isList ? {
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        let node = GetNodesByProperties({
+                            [NodeProperties.EntryPoint]: true,
+                            [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Models,
+                            [NodeProperties.UIModelType]: currentNode.id,
+                        }).find(x => x);
+                        if (node) {
+                            listDataChainId = node.id;
+                            skipModelDataChainListParts = true;
+                            return null;
+                        }
+
+                        return {
+                            callback: (dataChain) => {
+                                listDataChainId = dataChain.id;
+                            },
+                            nodeType: NodeTypes.DataChain,
+                            properties: {
+                                ...viewPackage,
+                                [NodeProperties.UIText]: `Get ${viewName} Objects`,
+                                [NodeProperties.EntryPoint]: true,
+                                [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Models,
+                                [NodeProperties.UIModelType]: currentNode.id,
+                                [NodeProperties.Pinned]: false
+                            },
+                            links: [{
+                                target: currentNode.id,
+                                linkProperties: {
+                                    properties: {
+                                        ...LinkProperties.ModelTypeLink
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        if (skipModelDataChainListParts) {
+                            return null;
+                        }
+                        let temp = SplitDataCommand(GetNodeById(listDataChainId, graph), split => {
+                            listDataChainExitId = split.id;
+                        }, viewPackage);
+                        return temp.options;
+                    }
+                } : false,
+                isList ? {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: function (graph) {
+                        if (skipModelDataChainListParts) {
+                            return null;
+                        }
+                        return {
+                            prop: NodeProperties.DataChainFunctionType,
+                            id: listDataChainExitId,
+                            value: DataChainFunctionKeys.Pass
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: function (graph) {
+                        if (skipModelDataChainListParts) {
+                            return null;
+                        }
+                        return {
+                            prop: NodeProperties.UIText,
+                            id: listDataChainExitId,
+                            value: `${GetNodeTitle(currentNode)}s DC Complete`
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: function (graph) {
+                        if (skipModelDataChainListParts) {
+                            return null;
+                        }
+                        return {
+                            prop: NodeProperties.AsOutput,
+                            id: listDataChainExitId,
+                            value: true
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: function (graph) {
+                        return {
+                            prop: NodeProperties.DataChain,
+                            id: dataSourceId,
+                            value: listDataChainId
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function (graph) {
+                        return {
+                            target: listDataChainId,
+                            source: dataSourceId,
+                            properties: { ...LinkProperties.DataChainLink }
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: CHANGE_NODE_PROPERTY,
+                    options: function (graph) {
+                        debugger;
+                        return {
+                            prop: NodeProperties.UIModelType,
+                            id: dataSourceId,
+                            value: currentNode.id
+                        }
+                    }
+                } : false,
+                isList ? {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function (graph) {
+                        return {
+                            target: currentNode.id,
+                            source: dataSourceId,
+                            properties: { ...LinkProperties.ModelTypeLink }
+                        }
+                    }
+                } : false,
+            ].filter(x => x))(GetDispatchFunc(), GetStateFunc());
 
             modelProperties.map((modelProperty, propertyIndex) => {
                 let propNodeId = null;
@@ -1104,7 +1331,7 @@ export const CreateDefaultView = {
                             }
                         }
                     }
-                }])(GetDispatchFunc(), GetStateFunc());;
+                }].filter(x => x))(GetDispatchFunc(), GetStateFunc());;
 
                 let compNodeId = childComponents[propertyIndex];
 
@@ -1366,6 +1593,7 @@ export const CreateDefaultView = {
                 applyDefaultComponentProperties(GetNodeById(screenNodeOptionId), UITypes.ReactNative)
             ])(GetDispatchFunc(), GetStateFunc());
             createConnections.map(t => t());
+            createListConnections.map(t => t());
         }
     }
 };

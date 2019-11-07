@@ -26,6 +26,10 @@ export const DataChainFunctionKeys = {
     Title: 'Title',
     IfFalse: 'IfFalse',
     Model: 'Model',
+    Models: 'Models',// Gets an array of models of a type
+    Subset: 'Subset', //Gets a subset of an array
+    Sort: 'Sort', //Sorts an array,
+    Filter: 'Filter', //Filters an array.
     Pass: 'Pass',
     ReferenceDataChain: 'Data Chain Ref.',
     StringConcat: 'String Concat {0} {1}'
@@ -271,6 +275,44 @@ export const DataChainFunctions = {
             [NodeProperties.NODEType]: true
         },
         value: 'pass_selection'
+    },
+    [DataChainFunctionKeys.Models]: {
+        ui: {
+            model: NodeProperties.UIModelType,
+            property: false
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'models_selection'
+    },
+    [DataChainFunctionKeys.Filter]: {
+        ui: {
+            dataref: NodeProperties.DataChainReference
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'array_filter'
+    },
+    [DataChainFunctionKeys.Sort]: {
+        ui: {
+            dataref: NodeProperties.DataChainReference,
+            compareref: NodeProperties.DataChainReference
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'array_sort'
+    },
+    [DataChainFunctionKeys.Subset]: {
+        ui: {
+            dataref: NodeProperties.DataChainReference
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'array_subset'
     },
     [DataChainFunctionKeys.StringConcat]: {
         ui: {
