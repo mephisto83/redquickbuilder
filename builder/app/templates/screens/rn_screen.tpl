@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity } from "react-native";
-import { redConnect, titleService } from '../actions/util';
+import { redConnect, titleService, fetchModelInstance, fetchModelInstanceChildren } from '../actions/util';
 import * as DC from '../actions/data-chain';
 import * as S from '../actions/selector';
 import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiActions';

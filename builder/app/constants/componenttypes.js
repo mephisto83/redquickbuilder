@@ -30,7 +30,7 @@ const BUTTON_DEFAULT_API = [
     'large',
     'small',
     'active'].map(x => ({ property: x }));
-const LABEL_DEFAULT_API = ['title'].map(x => ({ property: x }));
+const LABEL_DEFAULT_API = ['data'].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
 const DEFAULT_BUTTON_API_PROPERTIES = {};
 BUTTON_DEFAULT_API.map(x => {

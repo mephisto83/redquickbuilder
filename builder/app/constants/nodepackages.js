@@ -458,7 +458,8 @@ export const CreateDefaultView = {
                     properties: {
                         ...viewPackage,
                         [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
-                        [NodeProperties.UIText]: `${viewName} Form`
+                        [NodeProperties.UIText]: `${viewName} Form`,
+                        [NodeProperties.Model]: currentNode.id
                     }
                 }
             } : false, !isSharedComponent ? {
@@ -667,7 +668,10 @@ export const CreateDefaultView = {
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Generic.key,
                             [NodeProperties.ComponentApi]: componentProps,
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.Layout]: formLayout,
+                            [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.ViewType]: viewType,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                         },
                         groupProperties: {
@@ -713,6 +717,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${viewName} List RNC`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.SharedComponent]: isSharedComponent,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.List.key,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
@@ -740,6 +745,7 @@ export const CreateDefaultView = {
                         properties: {
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                             [NodeProperties.UIType]: GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph),
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source`
                         },
                         linkProperties: {
@@ -787,6 +793,7 @@ export const CreateDefaultView = {
                             [NodeProperties.UIText]: `${viewName} RNC`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
                             [NodeProperties.SharedComponent]: isSharedComponent,
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.ComponentType]: isList ? ComponentTypes.ReactNative.ListItem.key : ComponentTypes.ReactNative.Form.key,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                             [NodeProperties.Layout]: layout,
@@ -869,6 +876,7 @@ export const CreateDefaultView = {
                                 [NodeProperties.Label]: GetNodeTitle(modelProperty),
                                 [NodeProperties.ComponentType]: sharedComponent || componentTypeToUse,
                                 [NodeProperties.UsingSharedComponent]: !!sharedComponent,
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                             },
                             linkProperties: {
@@ -916,6 +924,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: ` ${Titles.Execute} Button ${viewName} Component`,
                             [NodeProperties.UIType]: UITypes.ReactNative,
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
                             [NodeProperties.ComponentType]: ComponentTypes.ReactNative.Button.key,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
@@ -1074,6 +1083,7 @@ export const CreateDefaultView = {
                             ...viewPackage,
                             [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}${useModelInstance ? ' Instance' : ''}`,
                             [NodeProperties.Model]: currentNode.id,
+                            [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance
                         },
                         links: [...vmsIds().map(t => ({
@@ -1248,7 +1258,9 @@ export const CreateDefaultView = {
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
                         let node = GetNodesByProperties({
+                            [NodeProperties.UIText]: `Get ${viewName} Object => ${GetNodeTitle(modelProperty)}`,
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                            [NodeProperties.EntryPoint]: true,
                             [NodeProperties.Selector]: modelComponentSelectors[0],
                             [NodeProperties.SelectorProperty]: viewModelNodeId,
                             [NodeProperties.Property]: modelProperty.id
@@ -1487,6 +1499,7 @@ export const CreateDefaultView = {
                                     instanceType: useModelInstance ? InstanceTypes.SelectorInstance : InstanceTypes.Selector,
                                     selector: modelComponentSelectors[0],
                                     handlerType: HandlerTypes.Property,
+                                    dataChain: propertyDataChainAccesors[propertyIndex]
                                 }
                                 if (apiDataChainLists[apiProperty]) {
                                     datachainLink.push({

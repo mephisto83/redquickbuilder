@@ -28,8 +28,12 @@ export default class TextInput extends Component {
         }
     }
     componentDidUpdate(prevProps) {
-        // if (this.state.value !== prevProps.value)
-        //     this.setState({ value: this.props.value });
+        if (!this.immediate()) {
+            if (!this.state.focused)
+                if (this.state.value !== prevProps.value) {
+                    this.setState({ value: this.props.value });
+                }
+        }
     }
 
     render() {
@@ -52,7 +56,11 @@ export default class TextInput extends Component {
                                 this.props.onChange(this.state.value || '');
                             }
                         }
+                        this.setState({ focused: false });
                     }}
+                    onFocus={(() => {
+                        this.setState({ focused: true });
+                    })}
                     value={this.value()}
                     onKeyPress={handleKeyPress}
                     onChange={(v) => {

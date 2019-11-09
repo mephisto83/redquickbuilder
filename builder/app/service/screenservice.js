@@ -1,4 +1,4 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes } from "../actions/uiactions";
 import fs from 'fs';
 import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
@@ -587,7 +587,17 @@ export function GetScreenImports(id, language) {
 
 export function GetComponentDidMount(screenOption) {
     let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
+    let outOfBandCall = '';
+    if (GetNodeProp(screenOption, NodeProperties.InstanceType) === InstanceTypes.ModelInstance) {
+        if (GetNodeProp(screenOption, NodeProperties.ViewType) === ViewTypes.GetAll) {
+            outOfBandCall = `fetchModelInstanceChildren(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
+        }
+        else {
+            outOfBandCall = `fetchModelInstance(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
+        }
+    }
     let componentDidMount = `componentDidMount() {
+        ${outOfBandCall}
         this.props.setGetState();
 {{handles}}
 }
