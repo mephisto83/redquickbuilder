@@ -498,6 +498,13 @@ export default class MindMap extends Component {
                     if (nl && nl.properties) {
                         nn.properties = { ...nl.properties };
                     }
+                    if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
+                        if (graph.visibleNodes[nn.id] === 2)
+                            nn.fixed = true;
+                        else {
+                            nn.fixed = false;
+                        }
+                    }
                 })
 
                 draw = draw || newNodes.length || removedNodes.length;

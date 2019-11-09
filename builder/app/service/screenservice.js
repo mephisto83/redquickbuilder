@@ -1,5 +1,6 @@
 import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem } from "../actions/uiactions";
 import fs from 'fs';
+import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
@@ -13,7 +14,7 @@ export function GenerateScreens(options) {
     let result = {};
 
     temps.map(t => {
-        result[t.name] = t;
+        result[path.join(t.relative, t.name)] = t;
     });
 
     return result;
@@ -62,10 +63,11 @@ export function GetItemRenderImport(node) {
 export function GetItemData(node) {
     let dataSourceNode = GetDataSourceNode(node.id);
     let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
+    let instanceType = GetNodeProp(dataSourceNode, NodeProperties.InstanceType);
     if (connectedNode) {
         // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
-    return `(()=> {
-    return DC.${GetCodeName(connectedNode)}(GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}));
+        return `(()=> {
+    return DC.${GetCodeName(connectedNode)}(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}${instanceType ? ', this.props.value' : ''});
 })()`
     }
     return `(()=> {
@@ -93,7 +95,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         };
         let data = GetItemData(node);
         let item_render = GetItemRender(node, extraimports, language);
-        
+
         layoutSrc = bindTemplate(fs.readFileSync(template, 'utf8'), {
             item_render: item_render,
             data: data
@@ -351,6 +353,13 @@ export function ConvertViewTypeToComponentNode(node) {
                 links: [{
                     type: LinkType.SharedComponent,
                     direction: SOURCE
+                }]
+            }) || node;
+            node = GetLinkChainItem({
+                id: node.id,
+                links: [{
+                    type: LinkType.SharedComponentInstance,
+                    direction: TARGET
                 }]
             }) || node;
             break;

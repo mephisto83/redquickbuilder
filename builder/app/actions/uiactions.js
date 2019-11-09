@@ -1750,6 +1750,14 @@ export function executeGraphOperation(model, op, args = {}) {
         op.method({ model, dispatch, getState, ...args });
     }
 }
+export function executeGraphOperations(operations) {
+    return (dispatch, getState) => {
+        operations.map(t => {
+            var { node, method, options } = t;
+            method.method({ model: node, dispatch, getState, ...options });
+        })
+    }
+}
 export function selectAllConnected(id) {
     return (dispatch, getState) => {
         let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {

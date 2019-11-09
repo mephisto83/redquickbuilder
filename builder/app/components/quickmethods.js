@@ -35,7 +35,7 @@ class QuickMethods extends Component {
             }).map(x => x.id);
             return chosenChildren;
         }
-        let defaultParameters = function () {
+        let defaultParameters = function (title) {
             return {
                 viewName: UIA.Visual(state, 'View Package Title'),
                 isSharedComponent: UIA.Visual(state, sharedcontrolkey),
@@ -161,6 +161,34 @@ class QuickMethods extends Component {
                                         isList: true
                                     });
                                 })} />
+                                <TreeViewMenu hideArrow={true} title={`Deluxe`} icon={'fa fa-plus'} onClick={(() => {
+                                    var operations = [];
+                                    [UIA.ViewTypes.Create, UIA.ViewTypes.Update, UIA.ViewTypes.Delete, UIA.ViewTypes.Get].map(t => {
+                                        operations.push({
+                                            node: currentNode,
+                                            method: CreateDefaultView,
+                                            options: {
+                                                ...(defaultParameters()),
+                                                viewName: `${UIA.Visual(state, 'View Package Title')} ${t}`,
+                                                viewType: t
+                                            }
+                                        });
+                                    });
+                                    operations.push({
+                                        node: currentNode,
+                                        method: CreateDefaultView,
+                                        options: {
+                                            ...(defaultParameters()),
+                                            viewName: `${UIA.Visual(state, 'View Package Title')} ${UIA.ViewTypes.GetAll}`,
+                                            viewType: UIA.ViewTypes.GetAll,
+                                            isList: true
+                                        }
+                                    })
+
+                                    this.props.executeGraphOperations(operations);
+                                })
+                                } />
+
                             </TreeViewMenu>
                             <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
                                 this.props.executeGraphOperation(currentNode, {

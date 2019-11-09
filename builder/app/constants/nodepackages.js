@@ -401,10 +401,11 @@ export const CreateDefaultView = {
             isDefaultComponent,
             isSharedComponent,
             isList,
+            model,
             chosenChildren = []
         } = args;
         let state = GetState();
-        var currentNode = Node(state, Visual(state, SELECTED_NODE));
+        var currentNode = model || Node(state, Visual(state, SELECTED_NODE));
         let screenNodeId = null;
         let screenComponentId = null;
         let listComponentId = null;
@@ -1122,7 +1123,8 @@ export const CreateDefaultView = {
                                 [NodeProperties.EntryPoint]: true,
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Models,
                                 [NodeProperties.UIModelType]: currentNode.id,
-                                [NodeProperties.Pinned]: false
+                                [NodeProperties.Pinned]: false,
+                                [NodeProperties.InstanceType]: useModelInstance
                             },
                             links: [{
                                 target: currentNode.id,
@@ -1209,7 +1211,6 @@ export const CreateDefaultView = {
                 isList ? {
                     operation: CHANGE_NODE_PROPERTY,
                     options: function (graph) {
-                        debugger;
                         return {
                             prop: NodeProperties.UIModelType,
                             id: dataSourceId,

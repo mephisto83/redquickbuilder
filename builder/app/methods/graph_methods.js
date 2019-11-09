@@ -1107,7 +1107,7 @@ function NodesByType(graph, nodeType, options = {}) {
 export function existsLinkBetween(graph, options) {
     var { source, target, type, direction } = options;
     var link = findLink(graph, { source, target })
-    
+
     if (link) {
         return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type;
     }
@@ -2449,7 +2449,12 @@ export function SetVisible(graph) {
         [].interpolate(0, graph.depth, x => {
             Object.keys(graph.visibleNodes).map(t => {
                 for (let h in graph.nodeLinks[t]) {
-                    graph.visibleNodes[h] = true;
+                    if (x > 1 && !graph.visibleNodes[h] ) {
+                        graph.visibleNodes[h] = 2;
+                    }
+                    else {
+                        graph.visibleNodes[h] = true;
+                    }
                 }
             })
         })
@@ -2560,6 +2565,7 @@ export function VisualProcess(graph) {
     let vgraph = createGraph();
     vgraph.id = graph.id;
     graph = SetVisible(graph);
+    vgraph.visibleNodes = { ...graph.visibleNodes };
     graph = FilterGraph(graph)
     let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
     let collapsingGroups = {};
