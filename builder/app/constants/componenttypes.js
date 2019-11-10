@@ -10,7 +10,7 @@ export const ON_FOCUS = 'onFocus';
 export const ON_CHANGE = 'onChange';
 export const ON_CHANGE_TEXT = 'onChangeText';
 export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE];
-export const ARE_BOOLEANS = ['inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel'];
+export const ARE_BOOLEANS = [];
 export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = 'value';
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));

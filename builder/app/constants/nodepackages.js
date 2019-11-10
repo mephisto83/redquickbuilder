@@ -1499,7 +1499,7 @@ export const CreateDefaultView = {
                                     instanceType: useModelInstance ? InstanceTypes.SelectorInstance : InstanceTypes.Selector,
                                     selector: modelComponentSelectors[0],
                                     handlerType: HandlerTypes.Property,
-                                    dataChain: propertyDataChainAccesors[propertyIndex]
+                                    dataChain: apiDataChainLists[apiProperty]// propertyDataChainAccesors[propertyIndex]
                                 }
                                 if (apiDataChainLists[apiProperty]) {
                                     datachainLink.push({
@@ -1518,7 +1518,7 @@ export const CreateDefaultView = {
                             }
 
                             if (apiProperty === VALUE) {
-                                cellProperties.componentApi[apiProperty].dataChain = propertyDataChainAccesors[propertyIndex];
+                                cellProperties.componentApi[apiProperty].dataChain = apiDataChainLists[apiProperty];//propertyDataChainAccesors[propertyIndex];
                                 datachainLink.push({
                                     operation: ADD_LINK_BETWEEN_NODES,
                                     options: function () {
