@@ -5,7 +5,10 @@ import {
     GetNodeCode,
     GetArbiterPropertyImplementations,
     GetAgentNodes,
-    safeFormatTemplateProperty
+    safeFormatTemplateProperty,
+    GetCustomServiceImplementations,
+    NodeTypes,
+    GetCustomServiceDefinitions
 } from "../actions/uiactions";
 import { bindTemplate } from "../constants/functiontypes";
 import fs from 'fs';
@@ -128,13 +131,15 @@ export function BuildAgentPermissionImplementation(agentId, permissions, languag
     }).filter(x => x).join(NEW_LINE);
     let template = fs.readFileSync('./app/templates/permissions/permissions_impl.tpl', 'utf8');
     let _constructTemplate = fs.readFileSync('./app/templates/permissions/constructor.tpl', 'utf8');
+    let customService = GetCustomServiceImplementations(NodeTypes.Permission) || '';
     let constructor = bindTemplate(_constructTemplate, {
         agent_type: `${GetCodeName(agentId)}`,
-        arbiters: GetArbiterPropertyImplementations(4, language)
+        arbiters: [GetArbiterPropertyImplementations(4, language), customService].join(NEW_LINE)
     });
+
     return bindTemplate(template, {
         agent_type: GetCodeName(agentId),
-        arbiters: GetArbiterPropertyDefinitions(),
+        arbiters: [GetArbiterPropertyDefinitions(), GetCustomServiceDefinitions(NodeTypes.Permission)].join(NEW_LINE),
         constructor,
         methods
     });
@@ -152,7 +157,7 @@ export function GetPermissionMethodParameters(id) {
     });
 }
 
-export function GetPermissionMethodParametersImplementation(id, language) {
+export function GetPermissionMethodParametersImplementation(id, language = ProgrammingLanguages.CSHARP) {
     let parameters = GetPermissionMethodParameters(id);
     switch (language) {
         case ProgrammingLanguages.CSHARP:

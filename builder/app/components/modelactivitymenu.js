@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
 import SideMenuContainer from './sidemenucontainer';
-import { NodeTypes } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NodePropertyTypes } from '../constants/nodetypes';
 import { GetNode, getNodeLinks } from '../methods/graph_methods';
 import { clipboard } from 'electron';
 import { GetSpecificModels, GetAllModels, CreateLoginModels } from '../constants/nodepackages';
@@ -212,6 +212,9 @@ class ModelActivityMenu extends Component {
                         <ControlSideBarMenuItem onClick={() => {
                             this.props.graphOperation(UIA.NEW_PROPERTY_NODE, {
                                 parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                                properties: {
+                                    [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING
+                                },
                                 groupProperties: {
                                 },
                                 linkProperties: {

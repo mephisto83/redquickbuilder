@@ -92,7 +92,7 @@ export default class ModelGenerator {
                 direction: GraphMethods.SOURCE
             });
             let property_instance_template = propertyTemplate;
-            let np = GetNodeProp(propNode, NodeProperties.UIAttributeType);
+            let np = GetNodeProp(propNode, NodeProperties.UIAttributeType) || NodePropertyTypes.STRING;
             if (Usings[ProgrammingLanguages.CSHARP][np]) {
                 usings.push(
                     ...Usings[ProgrammingLanguages.CSHARP][np],

@@ -16,6 +16,7 @@ import ExecutorGenerator from "./executiongenerator";
 import ModelReturnGenerator from './modelreturngenerator';
 import ModelExceptionGenerator from './modelexceptiongenerator';
 import ModelItemFilter from './modelitemfiltergenerator';
+import CustomService from './customservicegenerator';
 import ModelGetGenerator from './modelgetgenerators';
 import ReactNativeScreens from './screengenerator';
 import ReactNativeNavigation from './navigationgenerator';
@@ -99,6 +100,8 @@ export default class Generator {
                 return ModelExceptionGenerator.Generate({ state, key });
             case GeneratedTypes.ModelItemFilter:
                 return ModelItemFilter.Generate({ state, key });
+            case GeneratedTypes.CustomService:
+                return CustomService.Generate({ state, key });
             case ReactNativeTypes.Screens:
                 return ReactNativeScreens.Generate({ state, key });
             case ReactNativeTypes.Navigation:

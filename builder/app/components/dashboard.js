@@ -16,6 +16,7 @@ import SelectorActivityMenu from './selectoractivitymenu';
 import SideBarHeader from './sidebarheader';
 import ViewModelActivityMenu from './viewmodelactivitymenu';
 import QuickMethods from './quickmethods';
+import ServiceIntefaceMenu from './serviceinterfacemenu';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
 import TreeViewMenu from './treeviewmenu';
@@ -137,6 +138,15 @@ class Dashboard extends Component {
 				case NodeTypes.ViewType:
 					result.push(...this.getViewTypeContext());
 					return result;
+				case NodeTypes.Permission:
+					result.push(...this.getPermissionContext());
+					return result;
+				case NodeTypes.Executor:
+					result.push(...this.getExecutorContext());
+					return result;
+				case NodeTypes.Validator:
+					result.push(...this.getValidatorContext());
+					return result;
 				case NodeTypes.Method:
 				case NodeTypes.Action:
 					result.push({
@@ -219,6 +229,51 @@ class Dashboard extends Component {
 			},
 			icon: 'fa fa-coffee',
 			title: `${Titles.SharedControl}`
+		});
+
+		return result;
+	}
+	getPermissionContext() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.PermissionServiceMethod
+				});
+			},
+			icon: 'fa fa-unlock-alt',
+			title: `${Titles.PermissionServiceMethod}`
+		});
+
+		return result;
+	}
+	getExecutorContext() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.ExecutorServiceMethod
+				});
+			},
+			icon: 'fa fa-rocket',
+			title: `${Titles.ExecutorServiceMethod}`
+		});
+
+		return result;
+	}
+	getValidatorContext() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.ValidatorServiceMethod
+				});
+			},
+			icon: 'fa fa-rocket',
+			title: `${Titles.ValidatorServiceMethod}`
 		});
 
 		return result;
@@ -610,10 +665,10 @@ class Dashboard extends Component {
 										else if (properties && properties.autoConnectViewType) {
 											let connectto = [];
 											Object.values(ViewTypes).map(viewType => {
-							
+
 												connectto = UIA.getViewTypeEndpointsForDefaults(viewType, null, nodeId);
 												connectto.map(ct => {
-							
+
 													this.props.setSharedComponent({
 														properties: {
 															...LinkProperties.DefaultViewType,
@@ -635,11 +690,17 @@ class Dashboard extends Component {
 											}
 										}
 										else {
-											this.props.graphOperation(UIA.NEW_LINK, {
-												target: nodeId,
-												source: selectedId,
-												properties
-											});
+											let targetNodeType = UIA.GetNodeProp(nodeId, NodeProperties.NODEType);
+											if (properties.nodeTypes && properties.nodeTypes.length && !properties.nodeTypes.some(t => targetNodeType === t)) {
+
+											}
+											else {
+												this.props.graphOperation(UIA.NEW_LINK, {
+													target: nodeId,
+													source: selectedId,
+													properties
+												});
+											}
 										}
 										this.props.setVisual(CONNECTING_NODE, false);
 										this.props.setVisual(UIA.SELECTED_NODE, null);
@@ -824,6 +885,7 @@ class Dashboard extends Component {
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
 							</SideBarContent>) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
+							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ServiceIntefaceMenu />) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}

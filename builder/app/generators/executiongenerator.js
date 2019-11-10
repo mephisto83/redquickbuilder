@@ -1,8 +1,8 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetMethodProps, GetCodeName, GetNodeCode } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetMethodProps, GetCodeName, GetNodeCode, GetMethodNode, GetMethodNodeProp, GetCurrentGraph, GetState } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
+import { bindTemplate, FunctionTemplateKeys, MethodTemplateKeys } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
@@ -28,6 +28,34 @@ export default class ExecutorGenerator {
 
         var enumeration = ExecutorGenerator.EnumerateCases(vects);
         return enumeration;
+    }
+    static GetParameters(executor_node) {
+        let graph = GetCurrentGraph(GetState());
+        let methodNode = GetMethodNode(executor_node.id);
+        var agent = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
+        var model = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model);
+        var modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
+        var modelNode = GraphMethods.GetNode(graph, model);
+        var agentNode = GraphMethods.GetNode(graph, agent);
+
+        // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
+
+        let agent_parameter = GetCodeName(agentNode);
+        agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
+
+        let data_parameter = GetCodeName(modelNode);
+        data_parameter = data_parameter ? `${data_parameter} data` : false;
+
+        let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
+        change_parameter = change_parameter ? `${change_parameter} change` : false;
+
+        let parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
+        return parameters;
+    }
+    static GetOutput(executor_node) {
+        let methodNode = GetMethodNode(executor_node.id);
+        var modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
+        return modelOutput
     }
     static EnumerateCases(vects, j = 0) {
         return enumerate(vects, j);
@@ -165,7 +193,7 @@ export default class ExecutorGenerator {
                             break;
                         case ExecutorRules.AddModelReference:
                             template = fs.readFileSync(`app/templates/executor/snippets/add-model-reference.tpl`, 'utf8');
-                            
+
                             let { references } = validators;
                             if (references) {
                                 let methodNode = GraphMethods.GetMethodNode(state, executor_node.id);

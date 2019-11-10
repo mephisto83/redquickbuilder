@@ -46,6 +46,8 @@ export const NodeTypes = {
     ReferenceNode: 'referenceNode', //Is a standing for a node that is at a higher level,
     ClassNode: 'class-node',
     DataChain: 'data-chain',
+    ServiceInterface: 'service-interface',
+    ServiceInterfaceMethod: 'service-interface-method',
     ViewModel: 'view-model'
 }
 export const NodeTypeIcons = {};
@@ -75,6 +77,7 @@ export const GeneratedTypes = {
     ModelExceptions: 'model-exceptions',
     StreamProcess: 'stream-process',
     StreamProcessOrchestration: 'stream-process-orchestration',
+    CustomService: 'custom-service'
     //  ValidationRule: 'validation-rule'
 }
 export const ReactNativeTypes = {
@@ -172,7 +175,8 @@ export const NodeTypeColors = {
     [NodeTypes.ComponentNode]: '#B7245C',
     [NodeTypes.DataSource]: '#002500',
     [NodeTypes.Condition]: '#F90093',
-    [NodeTypes.DataChain]: "#FF6B6B"
+    [NodeTypes.DataChain]: "#FF6B6B",
+    [NodeTypes.ServiceInterface]: '#4A6D7C'
 
 }
 
@@ -506,10 +510,14 @@ export const LinkType = {
 
     DefaultViewType: 'DefaultViewType',
     SharedComponent: 'SharedComponent',
+    ExecutorServiceMethod: 'ExecutorServiceMethod',
+    ValidatorServiceMethod: 'ValidatorServiceMethod',
+    PermissionServiceMethod: 'PermissionServiceMethod',
     SharedComponentInstance: 'SharedComponentInstance',
     Executor: 'executor',
     ExecutorItem: 'executor-item',
     ExecutorProperty: 'executor-property',
+    ServiceInterfaceMethod: 'service-interface-method',
     ExecutorModel: 'executor-model',
 
     Condition: 'condtion',
@@ -702,6 +710,21 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
+    },
+    PermissionServiceMethod: {
+        type: LinkType.PermissionServiceMethod,
+        nodeTypes: [NodeTypes.ServiceInterfaceMethod]
+    },
+    ExecutorServiceMethod: {
+        type: LinkType.ExecutorServiceMethod,
+        nodeTypes: [NodeTypes.ServiceInterfaceMethod]
+    },
+    ValidatorServiceMethod: {
+        type: LinkType.ValidatorServiceMethod,
+        nodeTypes: [NodeTypes.ServiceInterfaceMethod]
+    },
+    ServiceInterfaceMethod: {
+        type: LinkType.ServiceInterfaceMethod
     },
     SharedComponentInstance: {
         type: LinkType.SharedComponentInstance

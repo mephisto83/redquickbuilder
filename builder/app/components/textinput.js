@@ -53,7 +53,8 @@ export default class TextInput extends Component {
                     onBlur={() => {
                         if (!this.immediate()) {
                             if (this.props.onChange) {
-                                this.props.onChange(this.state.value || '');
+                                if (this.state.value !== this.props.value)
+                                    this.props.onChange(this.state.value || '');
                             }
                         }
                         this.setState({ focused: false });

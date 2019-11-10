@@ -320,6 +320,23 @@ export function GetMethodParameters(methodId) {
     }
     return null;
 }
+export function GetMethodParametersFor(methodId, type) {
+    let method = GetNodeById(methodId);
+    if (method) {
+        let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+        if (methodType && MethodFunctions[methodType]) {
+
+            let { permission, validation } = MethodFunctions[methodType];
+            switch (type) {
+                case NodeTypes.Permission:
+                    return permission ? permission.params : null;
+                case NodeTypes.Validator:
+                    return validation ? validation.params : null;
+            }
+        }
+    }
+    return null;
+}
 export function GetNodeById(node, graph) {
     return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
@@ -374,6 +391,20 @@ export function GetModelItemFilter(id) {
 }
 export function GetPermissionsConditions(id) {
     return _getPermissionsConditions(_getState(), id);
+}
+export function GetServiceInterfaceMethodCalls(id) {
+    let state = GetState();
+    let graph = GetRootGraph(state);
+    return GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterfaceMethod);
+}
+export function GetServiceInterfaceCalls(id) {
+    let state = GetState();
+    let graph = GetRootGraph(state);
+    return GraphMethods.GetNodesLinkedTo(graph, {
+        id
+    }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterface);
 }
 export function GetValidationsConditions(id) {
     return _getValidationConditions(_getState(), id);
@@ -720,6 +751,21 @@ export function GetArbitersForNodeType(type) {
     })
     return models.unique();
 }
+
+export function GetCustomServicesForNodeType(type) {
+    let state = _getState();
+    let permissions = NodesByType(state, type);
+    let models = [];
+    permissions.map((permission) => {
+        let methods = GetServiceInterfaceMethodCalls(permission.id);
+        methods.map(method => {
+            let services = GetServiceInterfaceCalls(method.id);
+            models.push(...services.map(v => v.id));
+        })
+    });
+    return models.unique();
+}
+
 export function GetAgentNodes() {
     return NodesByType(_getState(), NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent));
 }
@@ -755,6 +801,19 @@ export function GetArbiterPropertyDefinitions(tabs = 3, language = NodeConstants
     });
     return definitions.join(NodeConstants.NEW_LINE);
 }
+export function GetCustomServiceDefinitions(type, tabs = 3, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+    let services = GetCustomServicesForNodeType(type);
+    let template = `I{{model}} {{model_js}};`
+    let tab = [].interpolate(0, tabs, () => `   `).join('');
+    let definitions = services.map(service => {
+        return tab + bindTemplate(template, {
+            model: GetCodeName(service),
+            model_js: GetJSCodeName(service)
+        });
+    });
+    return definitions.join(NodeConstants.NEW_LINE);
+}
+
 
 export function GetArbiterPropertyImplementations(tabs = 4, language = NodeConstants.ProgrammingLanguages.CSHARP) {
     let arbiters = GetArbitersForPermissions();
@@ -768,16 +827,37 @@ export function GetArbiterPropertyImplementations(tabs = 4, language = NodeConst
     return definitions.join(NodeConstants.NEW_LINE);
 }
 
-
+export function GetCustomServiceImplementations(type, tabs = 4, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+    let services = GetCustomServicesForNodeType(type);
+    let template = `{{model_js}} = RedStrapper.Resolve<I{{model}}>();`
+    let tab = [].interpolate(0, tabs, () => `   `).join('');
+    let definitions = services.map(service => {
+        return tab + bindTemplate(template, {
+            model: GetCodeName(service),
+            model_js: GetJSCodeName(service)
+        });
+    });
+    return definitions.join(NodeConstants.NEW_LINE);
+}
 
 export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLanguages.CSHARP) {
     let node = GetGraphNode(id);
     let conditions = [];
+    let customMethods = [];
     let final_result = 'res';
     let tabcount = 0;
+    let methodNodeParameters = null;
+    let ft = null;
+    let methodNode = null;
     switch (GetNodeProp(node, NodeProperties.NODEType)) {
         case NodeTypes.Permission:
-            conditions = GetPermissionsConditions(id);;
+            conditions = GetPermissionsConditions(id);
+            customMethods = GetServiceInterfaceMethodCalls(id);
+            methodNode = GetPermissionMethod(node);
+            ft = MethodFunctions[GetNodeProp(methodNode, NodeProperties.FunctionType)];
+            if (ft && ft.permission && ft.permission.params) {
+                methodNodeParameters = ft.permission.params.map(t => typeof (t) === 'string' ? t : t.key);
+            }
             final_result = 'result';
             tabcount = 3;
             break;
@@ -786,6 +866,11 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
             break;
         case NodeTypes.Validator:
             conditions = GetValidationsConditions(id);
+            methodNode = GetNodesMethod(id);
+            ft = MethodFunctions[GetNodeProp(methodNode, NodeProperties.FunctionType)];
+            if (ft && ft.validation && ft.validation.params) {
+                methodNodeParameters = ft.validation.params.map(t => typeof (t) === 'string' ? t : t.key);
+            }
             tabcount = 3;
             final_result = 'result';
             break;
@@ -797,6 +882,10 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
         let res = GetConditionsClauses(id, selectedConditionSetup, language);
         clauses = [...clauses, ...res.map(t => t.clause)];
     });
+    customMethods.map(customMethod => {
+        let res = GetCustomMethodClauses(node, customMethod, methodNodeParameters, language);
+        clauses = [...clauses, ...res.map(t => t.clause)]
+    });
     let finalClause = clauses.map((_, index) => {
         return `res_` + index;
     }).join(' && ') || 'true';
@@ -807,6 +896,22 @@ export function GetCombinedCondition(id, language = NodeConstants.ProgrammingLan
         });
     }).join(NodeConstants.NEW_LINE)
 
+}
+
+export function GetCustomMethodClauses(node, customMethod, methodNodeParameters, language) {
+    let result = [];
+
+    if (methodNodeParameters) {
+        let serviceInterface = GetServiceInterfaceCalls(customMethod.id).find(x => x);
+
+        if (serviceInterface) {
+            result.push({
+                clause: `var {{result}} = await ${GetJSCodeName(serviceInterface)}.${GetCodeName(customMethod)}(${methodNodeParameters.join()});`
+            })
+        }
+
+    }
+    return result;
 }
 export function GetConditionsClauses(adjacentId, clauseSetup, language) {
     let result = [];
