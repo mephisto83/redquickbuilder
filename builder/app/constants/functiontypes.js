@@ -633,6 +633,13 @@ const FILTER_DEFAULTS = {
     params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true }]
 }
 
+const QUERY_PARAMETERS = {
+    skip: true,
+    take: true,
+    filter: true,
+    sort: true
+}
+
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
@@ -965,6 +972,7 @@ export const MethodFunctions = {
         title: Titles.Get_Parent$Child_Agent_Value__IListChild,
         template: fs.readFileSync('./app/templates/get_agent_childparent_listchild.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/get_agent_childparent_listchild_interface.tpl', 'utf8'),
+        controller: fs.readFileSync('./app/templates/controller/controller_get_all_by_parent.tpl', 'utf8'),
         permission: {
             ...PERMISSION_DEFAULTS,
             params: [FunctionTemplateKeys.Parent, FunctionTemplateKeys.Agent]
@@ -1008,6 +1016,13 @@ export const MethodFunctions = {
             [FunctionTemplateKeys.ModelFilter]: {
                 key: FunctionTemplateKeys.ModelFilter,
                 nodeTypes: [NodeTypes.ModelFilter]
+            }
+        },
+        parameters: {
+            body: false,
+            parameters: {
+                path: [FunctionTemplateKeys.Parent],
+                query: { ...QUERY_PARAMETERS }
             }
         },
         output: {

@@ -1,5 +1,5 @@
 
-        public async Task<IList<{{model_output}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} value) 
+        public async Task<IList<{{model_output}}>> {{function_name}}({{user}} {{user_instance}}, {{value_type}} value, QueryParameters queryParameter = null) 
         { 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
             var parent = await arbiter{{parent}}.Get<{{parent}}>(value);

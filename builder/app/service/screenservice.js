@@ -210,6 +210,9 @@ export function wrapOnPress(elements, onPress, node, options) {
                             }
                         }
                     }
+                    if (parameters) {
+                        //TODO: Handle parameters;
+                    }
                     let pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`;
                     if (options && options.onPress && options.onPress.nowrap) {
                         elements = bindTemplate(elements, {
