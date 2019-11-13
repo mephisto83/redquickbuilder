@@ -95,10 +95,10 @@ import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
 import { ViewTypes } from '../actions/uiactions';
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
-import { findLinkInstance, getLinkInstance } from '../methods/graph_methods';
+import { findLinkInstance, getLinkInstance, createEventProp } from '../methods/graph_methods';
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -151,35 +151,44 @@ class Dashboard extends Component {
 				case NodeTypes.Action:
 					result.push({
 						onClick: () => {
-							this.props.setVisual(CONNECTING_NODE, LinkProperties.OnScreenLink);
+							this.props.setVisual(CONNECTING_NODE, LinkProperties.ModelItemFilter);
 						},
-						icon: 'fa fa-download',
-						title: Titles.OnLoad
-					}, {
-						onClick: () => {
-							this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
-						},
-						icon: 'fa  fa-trophy',
-						title: Titles.OnSuccessLink
-					}, {
-						onClick: () => {
-							this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
-						},
-						icon: 'fa  fa-tasks',
-						title: Titles.OnItemSelection
-					}, {
-						onClick: () => {
-							this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
-						},
-						icon: 'fa  fa-tasks',
-						title: Titles.OnAction
-					}, {
-						onClick: () => {
-							this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
-						},
-						icon: 'fa  fa-frown-o',
-						title: Titles.OnFailureLink
-					});
+						icon: 'fa  fa-filter',
+						title: Titles.ConnectModelItemFilter
+					}
+						// 	{
+						// 	onClick: () => {
+						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnScreenLink);
+						// 	},
+						// 	icon: 'fa fa-download',
+						// 	title: Titles.OnLoad
+						// }
+						// , {
+						// 	onClick: () => {
+						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
+						// 	},
+						// 	icon: 'fa  fa-trophy',
+						// 	title: Titles.OnSuccessLink
+						// }, {
+						// 	onClick: () => {
+						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
+						// 	},
+						// 	icon: 'fa  fa-tasks',
+						// 	title: Titles.OnItemSelection
+						// }, {
+						// 	onClick: () => {
+						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
+						// 	},
+						// 	icon: 'fa  fa-tasks',
+						// 	title: Titles.OnAction
+						// }, {
+						// 	onClick: () => {
+						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
+						// 	},
+						// 	icon: 'fa  fa-frown-o',
+						// 	title: Titles.OnFailureLink
+						// }
+					);
 					break;
 				case NodeTypes.ScreenItem:
 				case NodeTypes.ScreenCollection:
@@ -653,6 +662,34 @@ class Dashboard extends Component {
 												target: nodeId,
 												source: selectedId
 											})
+										}
+										else if (properties && properties.type === LinkType.ModelItemFilter) {
+											this.props.graphOperation([{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													id: selectedId,
+													prop: NodeProperties.FilterModel,
+													value: nodeId
+												}
+											}, {
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													id: selectedId,
+													prop: NodeProperties.ModelItemFilter,
+													value: nodeId
+												}
+											}])
+
+											this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+												target: nodeId,
+												source: selectedId,
+												properties: {
+													...UIA.LinkProperties.ModelItemFilter,
+													...createEventProp(LinkEvents.Remove, {
+														function: 'OnRemoveModelFilterPropConnection'
+													})
+												}
+											});
 										}
 										else if (properties && properties.viewType) {
 											this.props.setupDefaultViewType({

@@ -5,7 +5,7 @@
             var parent = await arbiter{{parent}}.Get<{{parent}}>(value);
             if(await {{agent#lower}}Permissions.{{permission_function}}(parent, agent).ConfigureAwait(false)) {
                 var predicate = Pred.And({{predicates}});
-                var list = await arbiter{{model_output}}.GetBy(predicate);
+                var list = await arbiter{{model_output}}.GetBy(predicate, RedQueryFunctions.Take(queryParameter), RedQueryFunctions.Skip(queryParameter));
                 return {{agent_type}}Return.{{filter_function}}(list, agent);
             }
             

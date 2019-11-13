@@ -6,6 +6,7 @@ import * as Titles from '../components/titles';
 import { MethodFunctions, bindTemplate, FunctionTemplateKeys, ReturnTypes } from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4 } from '../utils/array';
+import { currentId } from 'async_hooks';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const HIDDEN = 'HIDDEN';
@@ -319,6 +320,110 @@ export function GetMethodParameters(methodId) {
         }
     }
     return null;
+}
+export function updateMethodParameters(current, methodType) {
+    return (dispatch, getState) => {
+
+        let state = getState();
+        let graph = GetRootGraph(state);
+        let toRemove = [];
+        let parameters = GraphMethods.getNodesByLinkType(graph, {
+            id: current,
+            type: NodeConstants.LinkType.MethodApiParameters,
+            direction: GraphMethods.SOURCE
+        }).map(t => {
+            if (GetNodeProp(t, NodeProperties.NODEType) === NodeConstants.NodeTypes.MethodApiParameters)
+                toRemove.push(t.id);
+            GraphMethods.getNodesByLinkType(graph, {
+                id: current,
+                type: NodeConstants.LinkType.MethodApiParameters,
+                direction: GraphMethods.SOURCE
+            }).map(v => {
+                if (GetNodeProp(v, NodeProperties.NODEType) === NodeConstants.NodeTypes.MethodApiParameters)
+                    toRemove.push(v.id);
+            });
+        });
+
+        toRemove.map(v => {
+            graphOperation(REMOVE_NODE, { id: v })(dispatch, getState);
+        });
+        if (MethodFunctions[methodType]) {
+            let { parameters } = MethodFunctions[methodType];
+            if (parameters) {
+                let { body } = parameters;
+                let params = parameters.parameters;
+                let operations = [body ? {
+                    operation: ADD_NEW_NODE,
+                    options: function () {
+                        return {
+                            nodeType: NodeTypes.MethodApiParameters,
+                            groupProperties: {},
+                            parent: current,
+                            links: [{
+                                target: current,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.MethodApiParameters, body: !!body }
+                                }
+                            }]
+                        }
+                    }
+                } : false].filter(x => x);
+                if (params) {
+                    let { query } = params;
+                    if (query) {
+                        let queryNodeId = null;
+                        operations.push({
+                            operation: ADD_NEW_NODE,
+                            options: function () {
+                                return {
+                                    nodeType: NodeTypes.MethodApiParameters,
+                                    groupProperties: {},
+                                    parent: current,
+                                    properties: {
+                                        [NodeProperties.UIText]: 'Query'
+                                    },
+                                    callback: function (queryNode) {
+                                        queryNodeId = queryNode.id;
+                                    },
+                                    links: [{
+                                        target: current,
+                                        linkProperties: {
+                                            properties: {
+                                                ...LinkProperties.MethodApiParameters,
+                                                params: true,
+                                                query: true
+                                            }
+                                        }
+                                    }]
+                                };
+                            }
+                        }, ...Object.keys(query).map(q => {
+                            return {
+                                operation: ADD_NEW_NODE,
+                                options: function () {
+                                    return {
+                                        nodeType: NodeTypes.MethodApiParameters,
+                                        groupProperties: {},
+                                        parent: queryNodeId,
+                                        properties: {
+                                            [NodeProperties.UIText]: q
+                                        },
+                                        links: [{
+                                            target: queryNodeId,
+                                            linkProperties: {
+                                                properties: { ...LinkProperties.MethodApiParameters, parameter: q }
+                                            }
+                                        }]
+                                    };
+                                }
+                            }
+                        }))
+                    }
+                }
+                PerformGraphOperation([...operations])(dispatch, getState);
+            }
+        }
+    }
 }
 export function GetMethodParametersFor(methodId, type) {
     let method = GetNodeById(methodId);

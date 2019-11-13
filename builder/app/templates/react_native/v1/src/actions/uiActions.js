@@ -1,10 +1,12 @@
 export const BATCH = 'BATCH';
 export const UI_UPDATE = 'UI_UPDATE';
 export const UISI_UPDATE = 'UISI_UPDATE';
+export const UISP_UPDATE = 'UISP_UPDATE';
 export const UIMI_UPDATE = 'UIMI_UPDATE';
 export const UI_MODELS = 'UI_MODELS';
 export const RESET_ALL = 'RESET_ALL';
 
+export const SCREEN_PROPERTIES = 'SCREEN_PROPERTIES';
 
 export const MODEL_INSTANCE = 'MODEL_INSTANCE';
 export const MODEL_INSTANCE_DIRTY = 'MODEL_INSTANCE_DIRTY';
@@ -32,6 +34,28 @@ export function GetItems(modelType) {
 
     return [];
 }
+
+export function GetScreenProperties(screen) {
+    if (_getState) {
+        let state = _getState();
+        let modelDic = GetC(state, SCREEN_PROPERTIES, screen);
+        if (modelDic) {
+            return modelDic;
+        }
+    }
+    return null;
+}
+
+export function UISP(screen, property, value) {
+    return {
+        type: UISP_UPDATE,
+        key: SCREEN_PROPERTIES,
+        screen,
+        property,
+        value
+    }
+}
+
 export function GetItem(modelType, id) {
     if (_getState) {
         let state = _getState();

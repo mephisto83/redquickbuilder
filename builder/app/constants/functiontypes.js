@@ -885,6 +885,12 @@ export const MethodFunctions = {
         constraints: {
             ...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
         },
+        parameters: {
+            body: false,
+            parameters: {
+                query: { ...QUERY_PARAMETERS }
+            }
+        },
         output: {
             ...COMMON_OUTPUT.LIST
         },

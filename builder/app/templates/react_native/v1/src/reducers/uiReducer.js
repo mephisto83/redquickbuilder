@@ -57,6 +57,20 @@ export function updateModels(state, action) {
     return newstate;
 }
 
+export function updateScreenProperties(state, action) {
+    let { key,
+        screen,
+        property,
+        value } = action;
+
+    newstate[key] = newstate[key] || {};
+    newstate[key] = newstate[key] || {};
+    newstate[key][screen] = newstate[key][screen] || {};
+    newstate[key][screen][property] = value;
+    
+    return newstate;
+}
+
 export function makeDefaultState() {
     return {};
 }
@@ -79,6 +93,9 @@ export default function uiReducer(state, action) {
                 break;
             case UIA.UI_MODELS:
                 state = updateModels(state, action) || state;
+                break;
+            case UIA.UISP_UPDATE:
+                state = updateScreenProperties(state, action) || state;
                 break;
         }
     })

@@ -35,6 +35,7 @@ class MethodActivityMenu extends Component {
                             id: currentNode.id,
                             value
                         });
+                        this.props.updateMethodParameters(currentNode.id, value);
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.FunctionType] : ''} />) : null}
                 {currentNode ? (<SelectInput

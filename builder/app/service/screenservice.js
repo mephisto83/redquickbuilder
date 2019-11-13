@@ -593,10 +593,10 @@ export function GetComponentDidMount(screenOption) {
     let outOfBandCall = '';
     if (GetNodeProp(screenOption, NodeProperties.InstanceType) === InstanceTypes.ModelInstance) {
         if (GetNodeProp(screenOption, NodeProperties.ViewType) === ViewTypes.GetAll) {
-            outOfBandCall = `fetchModelInstanceChildren(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
+            outOfBandCall = `// fetchModelInstanceChildren(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
         }
         else {
-            outOfBandCall = `fetchModelInstance(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
+            outOfBandCall = `//  fetchModelInstance(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
         }
     }
     let componentDidMount = `componentDidMount() {

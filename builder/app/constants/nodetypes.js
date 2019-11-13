@@ -8,6 +8,7 @@ export const NodeTypes = {
     Property: 'model-property',
     ModelFilter: 'model-filter',
     Struct: 'struct',
+    MethodApiParameters: 'method-api-parameters',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
     Selector: 'selector',
@@ -507,7 +508,7 @@ export const LinkEvents = {
 }
 export const LinkType = {
     Choice: 'choice',
-
+    MethodApiParameters: 'MethodApiParameters',
     DefaultViewType: 'DefaultViewType',
     SharedComponent: 'SharedComponent',
     ExecutorServiceMethod: 'ExecutorServiceMethod',
@@ -710,6 +711,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
+    },
+    MethodApiParameters: {
+        type: LinkType.MethodApiParameters
     },
     PermissionServiceMethod: {
         type: LinkType.PermissionServiceMethod,

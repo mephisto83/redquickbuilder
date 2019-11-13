@@ -1,12 +1,19 @@
 
         [Route("{{http_route}}")]
         [{{http_method}}]
-        public async Task<ActionResult<{{output_type}}>> {{functionName}}()
+        public async Task<ActionResult<{{output_type}}>> {{functionName}}(int? skip = null, int? take = null, string sort = null, string filter = null)
         {       
             var maestro = RedStrapper.Resolve<{{maestro_interface}}>();
             try
             {
-                var result = await maestro.{{maestro_function}}({{user_instance}}).ConfigureAwait(false);
+                var queryParameters = new QueryParameters {
+                    Skip = skip,
+                    Take = take,
+                    Sort = sort,
+                    Filter = filter
+                };
+
+                var result = await maestro.{{maestro_function}}({{user_instance}}, queryParameters).ConfigureAwait(false);
 
                 return Ok(result);
             }
