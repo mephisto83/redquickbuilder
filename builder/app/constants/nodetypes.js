@@ -9,6 +9,7 @@ export const NodeTypes = {
     ModelFilter: 'model-filter',
     Struct: 'struct',
     MethodApiParameters: 'method-api-parameters',
+    ComponentApiConnector: 'component-api-connector',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
     Selector: 'selector',
@@ -514,6 +515,7 @@ export const LinkType = {
     ExecutorServiceMethod: 'ExecutorServiceMethod',
     ValidatorServiceMethod: 'ValidatorServiceMethod',
     PermissionServiceMethod: 'PermissionServiceMethod',
+    ComponentApiConnection: "ComponentApiConnection",
     SharedComponentInstance: 'SharedComponentInstance',
     Executor: 'executor',
     ExecutorItem: 'executor-item',
@@ -718,6 +720,9 @@ export const LinkProperties = {
     PermissionServiceMethod: {
         type: LinkType.PermissionServiceMethod,
         nodeTypes: [NodeTypes.ServiceInterfaceMethod]
+    },
+    ComponentApiConnection: {
+        type: LinkType.ComponentApiConnection
     },
     ExecutorServiceMethod: {
         type: LinkType.ExecutorServiceMethod,

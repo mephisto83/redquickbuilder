@@ -190,7 +190,33 @@ export function setSharedComponent(args) {
         }
     };
 }
-
+export function setComponentApiConnection(args) {
+    let { properties, target, source } = args;
+    return (dispatch, getState) => {
+        let state = getState();
+        let graph = GetCurrentGraph(state);
+        if ([NodeTypes.ComponentNode, NodeTypes.MethodApiParameters, NodeTypes.DataChain].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
+            if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.ComponentApiConnection })) {
+                let connections = GraphMethods.GetConnectedNodesByType(state, source, GetNodeProp(target, NodeProperties.NODEType)).map(x => {
+                    return {
+                        operation: REMOVE_LINK_BETWEEN_NODES,
+                        options: {
+                            source,
+                            target: x.id
+                        }
+                    }
+                });
+                PerformGraphOperation([...connections, {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: {
+                        source,
+                        target,
+                        properties: { ...properties }
+                    }
+                }])(dispatch, getState);
+            }
+    }
+}
 export function setupDefaultViewType(args) {
     let { properties, target, source } = args;
     return (dispatch, getState) => {
@@ -327,20 +353,18 @@ export function updateMethodParameters(current, methodType) {
         let state = getState();
         let graph = GetRootGraph(state);
         let toRemove = [];
-        let parameters = GraphMethods.getNodesByLinkType(graph, {
-            id: current,
-            type: NodeConstants.LinkType.MethodApiParameters,
-            direction: GraphMethods.SOURCE
+        GraphMethods.GetNodesLinkedTo(graph, {
+            id: current
+        }).filter(t => {
+            return GetNodeProp(t, NodeProperties.NODEType) === NodeTypes.MethodApiParameters;
         }).map(t => {
-            if (GetNodeProp(t, NodeProperties.NODEType) === NodeConstants.NodeTypes.MethodApiParameters)
-                toRemove.push(t.id);
-            GraphMethods.getNodesByLinkType(graph, {
-                id: current,
-                type: NodeConstants.LinkType.MethodApiParameters,
-                direction: GraphMethods.SOURCE
+            toRemove.push(t.id);
+            GraphMethods.GetNodesLinkedTo(graph, {
+                id: t.id,
+            }).filter(w => {
+                return GetNodeProp(w, NodeProperties.NODEType) === NodeTypes.MethodApiParameters;
             }).map(v => {
-                if (GetNodeProp(v, NodeProperties.NODEType) === NodeConstants.NodeTypes.MethodApiParameters)
-                    toRemove.push(v.id);
+                toRemove.push(v.id);
             });
         });
 
@@ -349,6 +373,7 @@ export function updateMethodParameters(current, methodType) {
         });
         if (MethodFunctions[methodType]) {
             let { parameters } = MethodFunctions[methodType];
+            let newGroupId = uuidv4();
             if (parameters) {
                 let { body } = parameters;
                 let params = parameters.parameters;
@@ -357,8 +382,9 @@ export function updateMethodParameters(current, methodType) {
                     options: function () {
                         return {
                             nodeType: NodeTypes.MethodApiParameters,
-                            groupProperties: {},
-                            parent: current,
+                            properties: {
+                                [NodeProperties.UIText]: Titles.Body
+                            },
                             links: [{
                                 target: current,
                                 linkProperties: {
@@ -377,8 +403,6 @@ export function updateMethodParameters(current, methodType) {
                             options: function () {
                                 return {
                                     nodeType: NodeTypes.MethodApiParameters,
-                                    groupProperties: {},
-                                    parent: current,
                                     properties: {
                                         [NodeProperties.UIText]: 'Query'
                                     },
@@ -408,12 +432,9 @@ export function updateMethodParameters(current, methodType) {
                                         properties: {
                                             [NodeProperties.UIText]: q
                                         },
-                                        links: [{
-                                            target: queryNodeId,
-                                            linkProperties: {
-                                                properties: { ...LinkProperties.MethodApiParameters, parameter: q }
-                                            }
-                                        }]
+                                        linkProperties: {
+                                            properties: { ...LinkProperties.MethodApiParameters, parameter: q }
+                                        }
                                     };
                                 }
                             }

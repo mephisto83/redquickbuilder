@@ -1,4 +1,4 @@
-            public async Task<IList<{{model_output}}>> {{function_name}}({{user}} user, {{model}} model) 
+            public async Task<IList<{{model_output}}>> {{function_name}}({{user}} user, {{model}} model, QueryParameters queryParameter = null) 
             { 
                 var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 

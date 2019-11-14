@@ -28,7 +28,8 @@ import {
     GetLinkProperty,
     setSharedComponent,
     getViewTypeEndpointsForDefaults,
-    NEW_DATA_SOURCE
+    NEW_DATA_SOURCE,
+    updateMethodParameters
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API } from "./componenttypes";
@@ -1240,6 +1241,45 @@ export const CreateDefaultView = {
                 } : false,
             ].filter(x => x))(GetDispatchFunc(), GetStateFunc());
 
+            PerformGraphOperation([{
+                operation: ADD_NEW_NODE,
+                options: function (graph) {
+                    let node = GetNodesByProperties({
+                        [NodeProperties.UIText]: `Get ${viewName}`,
+                        [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                        [NodeProperties.EntryPoint]: true,
+                        [NodeProperties.Selector]: modelComponentSelectors[0],
+                        [NodeProperties.SelectorProperty]: viewModelNodeId
+                    }).find(x => x);
+                    if (node) {
+                        return null;
+                    }
+                    return {
+                        nodeType: NodeTypes.DataChain,
+                        properties: {
+                            ...viewPackage,
+                            [NodeProperties.UIText]: `Get ${viewName}`,
+                            [NodeProperties.EntryPoint]: true,
+                            [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                            [NodeProperties.Selector]: modelComponentSelectors[0],
+                            [NodeProperties.SelectorProperty]: viewModelNodeId,
+                            [NodeProperties.Pinned]: true
+                        },
+                        links: [{
+                            target: modelComponentSelectors[0],
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }, {
+                            target: viewModelNodeId,
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }]
+                    }
+                }
+            }])(GetDispatchFunc(), GetStateFunc());;
+            
             modelProperties.map((modelProperty, propertyIndex) => {
                 let propNodeId = null;
                 let skip = false;
@@ -1253,7 +1293,6 @@ export const CreateDefaultView = {
                         }
                         break;
                 }
-
                 PerformGraphOperation([{
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
@@ -1914,7 +1953,6 @@ export function CreateAgentFunction(option) {
                 operation: ADD_NEW_NODE,
                 options: {
                     nodeType: NodeTypes.Method,
-                    parent: model.id,
                     groupProperties: {
                     },
                     properties: {
@@ -2142,7 +2180,11 @@ export function CreateAgentFunction(option) {
                                     }]];
                                 })
 
-                                PerformGraphOperation(commands)(dispatch, getState)
+                                PerformGraphOperation(commands)(dispatch, getState);
+                                setTimeout(() => {
+
+                                    updateMethodParameters(methodNode.id, functionType)(dispatch, getState);
+                                }, 1000);
                                 resolve();
                             })
                         }, 1500)

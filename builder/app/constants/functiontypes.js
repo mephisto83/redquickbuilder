@@ -650,6 +650,10 @@ export const MethodFunctions = {
         permission: {
             ...PERMISSION_DEFAULTS,
         },
+        parameters: {
+            body: true,
+            parameters: false
+        },
         constraints: {
             ...COMMON_CONSTRAINTS_OBJECT_METHOD,
             ...COMMON_CREATE_UPDATE_CONSTRAINTS
@@ -949,6 +953,12 @@ export const MethodFunctions = {
         },
         output: {
             ...COMMON_OUTPUT.LIST
+        },
+        parameters: {
+            body: true,
+            parameters: {
+                query: { ...QUERY_PARAMETERS }
+            }
         },
         isList: true,
         method: Methods.Create,

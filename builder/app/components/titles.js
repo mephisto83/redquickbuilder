@@ -117,6 +117,7 @@ export const SharedControl = 'Shared Component';
 export const UseAsDefault = 'Use as default';
 export const PermissionServiceMethod = 'Permission Service Method';
 export const ExecutorServiceMethod = 'Executor Service Method';
+export const ComponentApiConnection = 'Connect Component Api';
 export const ValidatorServiceMethod = 'Validator Service Method';
 export const PermissionDependsOnProperties = 'Properties permissions depend on.';
 export const ViewPackage = 'View Package';

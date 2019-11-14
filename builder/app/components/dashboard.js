@@ -147,6 +147,9 @@ class Dashboard extends Component {
 				case NodeTypes.Validator:
 					result.push(...this.getValidatorContext());
 					return result;
+				case NodeTypes.ComponentApiConnector:
+					result.push(...this.getComponentApiContextMenu());
+					break;
 				case NodeTypes.Method:
 				case NodeTypes.Action:
 					result.push({
@@ -269,6 +272,21 @@ class Dashboard extends Component {
 			icon: 'fa fa-rocket',
 			title: `${Titles.ExecutorServiceMethod}`
 		});
+
+		return result;
+	}
+	getComponentApiContextMenu() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.ComponentApiConnection
+				});
+			},
+			icon: 'fa fa-rocket',
+			title: `${Titles.ComponentApiConnection}`
+		})
 
 		return result;
 	}
@@ -658,6 +676,13 @@ class Dashboard extends Component {
 										}
 										else if (properties && properties.type === LinkType.SharedComponent) {
 											this.props.setSharedComponent({
+												properties,
+												target: nodeId,
+												source: selectedId
+											})
+										}
+										else if (properties && properties.type === LinkType.ComponentApiConnection) {
+											this.props.setComponentApiConnection({
 												properties,
 												target: nodeId,
 												source: selectedId
