@@ -259,19 +259,21 @@ export function connectLifeCycleMethod(args) {
                 PerformGraphOperation([...apiConnectors, ...apiEndpoints.map(ae => {
                     return {
                         operation: ADD_NEW_NODE,
-                        options: {
-                            nodeType: NodeTypes.ComponentApiConnector,
-                            groupProperties: {},
-                            parent: source,
-                            properties: {
-                                [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
-                            },
-                            links: [{
-                                target: ae.id,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.ComponentApiConnection }
-                                }
-                            }]
+                        options: function () {
+                            return {
+                                nodeType: NodeTypes.ComponentApiConnector,
+                                groupProperties: {},
+                                parent: source,
+                                properties: {
+                                    [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
+                                },
+                                links: [{
+                                    target: ae.id,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.ComponentApiConnection }
+                                    }
+                                }]
+                            }
                         }
                     }
                 })])(dispatch, getState);

@@ -148,7 +148,9 @@ class Dashboard extends Component {
 					result.push(...this.getValidatorContext());
 					return result;
 				case NodeTypes.LifeCylceMethod:
-					result.push(...this.getLifeCylcleMethods());
+					return this.getLifeCylcleMethods();
+				case NodeTypes.LifeCylceMethodInstance:
+					result.push(...this.getLifeCylcleInstanceMethods());
 					return result;
 				case NodeTypes.ComponentApiConnector:
 					result.push(...this.getComponentApiContextMenu());
@@ -294,6 +296,40 @@ class Dashboard extends Component {
 		return result;
 	}
 	getLifeCylcleMethods() {
+		let result = [];
+		let { state } = this.props;
+		result.push({
+			onClick: () => {
+
+				var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
+				this.props.graphOperation([{
+					operation: UIA.ADD_NEW_NODE,
+					options: function () {
+						return {
+							nodeType: NodeTypes.LifeCylceMethodInstance,
+							parent: currentNode.id,
+							groupProperties: {},
+							properties: {
+								[NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Instance`,
+								[NodeProperties.AutoDelete]: {
+									properties: {
+										[NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+									}
+								}
+							}
+						}
+					}
+				}
+				])
+			},
+			icon: 'fa  fa-plus',
+			title: `${Titles.AddInstance}`
+		});
+
+		return result;
+	}
+	getLifeCylcleInstanceMethods() {
 		let result = [];
 
 		result.push({

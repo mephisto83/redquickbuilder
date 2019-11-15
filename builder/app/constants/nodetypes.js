@@ -14,6 +14,7 @@ export const NodeTypes = {
     ScreenContainer: 'screen-container',
     Screen: 'screen',
     LifeCylceMethod: 'LifeCylceMethod',
+    LifeCylceMethodInstance: 'LifeCylceMethodInstance',
     Selector: 'selector',
     ScreenCollection: 'screen-collection',
     ScreenItem: 'screen-item',
@@ -327,6 +328,7 @@ export const NodeProperties = {
     UIName: 'uiName', // The name used in the ui.
     QueryParameterObject: 'QueryParameterObject',
     QueryParameterParam: 'QueryParameterParam',
+    AutoDelete: 'AutoDelete', // Anything matching the properties etc, will auto delete along with the current node.
     UriBody: 'UriBody',
     UriParameter: 'UriParameter',
     NodePackage: 'NodePackage',
