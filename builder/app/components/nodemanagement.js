@@ -30,9 +30,10 @@ class NodeManagement extends Component {
         var graph = UIA.GetCurrentGraph(state);
         let filter = (this.state.filter || '').toLowerCase();
         let groups = UIA.GetNodes(state).filter(x => {
-            if (!filter) {
+            if (!filter || !x) {
                 return false;
             }
+            
             var str = this.toFilterString(x);
             return str.indexOf(filter) !== -1;
         }).groupBy(x => UIA.GetNodeProp(x, NodeProperties.NODEType));

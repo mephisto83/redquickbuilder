@@ -15,6 +15,9 @@ export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = 'value';
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
+
+export const SCREEN_COMPONENT_EVENTS = ['componentDidMount', 'componentWillUnmount'];
+
 const INPUT_DEFAULT_API = [VALUE, ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
     'block',
@@ -33,6 +36,7 @@ const BUTTON_DEFAULT_API = [
 const LABEL_DEFAULT_API = ['data'].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
 const DEFAULT_BUTTON_API_PROPERTIES = {};
+
 BUTTON_DEFAULT_API.map(x => {
     DEFAULT_BUTTON_API_PROPERTIES[x.property] = {
         nodeProperty: x.property,
@@ -56,6 +60,7 @@ export const ComponentTypes = {
         Button: {
             template: './app/templates/components/button.tpl',
             defaultApi: BUTTON_DEFAULT_API,
+            eventApi: ['onPress'],
             properties: {
                 onPress: {
                     nodeProperty: 'onPress',
@@ -176,6 +181,7 @@ export const ComponentTypes = {
             library: 'react-native',
             layout: true,
             specialLayout: true,
+            eventApi: ['onEndReachedThreshold', 'onEndReached'],
             template: './app/templates/components/list.tpl',
             datasource: true,
             properties: {
@@ -273,6 +279,7 @@ export const ComponentTypes = {
         Title: {},
         Toast: {},
         View: {
+            eventApi: ['componentDidMount'],
             layout: true
         },
         LoginSelector: {

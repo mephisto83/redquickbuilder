@@ -147,6 +147,9 @@ class Dashboard extends Component {
 				case NodeTypes.Validator:
 					result.push(...this.getValidatorContext());
 					return result;
+				case NodeTypes.LifeCylceMethod:
+					result.push(...this.getLifeCylcleMethods());
+					return result;
 				case NodeTypes.ComponentApiConnector:
 					result.push(...this.getComponentApiContextMenu());
 					break;
@@ -287,6 +290,21 @@ class Dashboard extends Component {
 			icon: 'fa fa-rocket',
 			title: `${Titles.ComponentApiConnection}`
 		})
+
+		return result;
+	}
+	getLifeCylcleMethods() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.LifeCylceMethod
+				});
+			},
+			icon: 'fa fa-list-ol',
+			title: `${Titles.ConnectLifeCylceMethods}`
+		});
 
 		return result;
 	}
@@ -683,6 +701,13 @@ class Dashboard extends Component {
 										}
 										else if (properties && properties.type === LinkType.ComponentApiConnection) {
 											this.props.setComponentApiConnection({
+												properties,
+												target: nodeId,
+												source: selectedId
+											})
+										}
+										else if (properties && properties.type === LinkType.LifeCylceMethod) {
+											this.props.connectLifeCycleMethod({
 												properties,
 												target: nodeId,
 												source: selectedId

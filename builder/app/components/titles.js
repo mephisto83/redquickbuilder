@@ -115,6 +115,7 @@ export const UseEnumeration = 'Use Enumeration';
 export const Enumeration = 'Enumeration';
 export const SharedControl = 'Shared Component';
 export const UseAsDefault = 'Use as default';
+export const ConnectLifeCylceMethods = 'Connect Lifecylce Method To Api Method';
 export const PermissionServiceMethod = 'Permission Service Method';
 export const ExecutorServiceMethod = 'Executor Service Method';
 export const ComponentApiConnection = 'Connect Component Api';

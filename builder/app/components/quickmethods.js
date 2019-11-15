@@ -65,19 +65,28 @@ class QuickMethods extends Component {
                                 icon={'fa fa-tag'}>
                                 <BatchMenu />
                             </TreeViewMenu>
-                            <TreeViewMenu hideArrow={true} title={GetSpecificModels.type} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, GetSpecificModels);
-                            })} />
-                            <TreeViewMenu hideArrow={true} title={GetAllModels.type} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, GetAllModels);
-                            })} />
+                            <TreeViewMenu
+                                title={'More Commands'}
+                                open={UIA.Visual(state, 'More Commands')}
+                                active={true}
+                                toggle={() => {
+                                    this.props.toggleVisual('More Commands')
+                                }}
+                                icon={'fa fa-tag'}>
+                                <TreeViewMenu hideArrow={true} title={GetSpecificModels.type} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, GetSpecificModels);
+                                })} />
+                                <TreeViewMenu hideArrow={true} title={GetAllModels.type} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, GetAllModels);
+                                })} />
 
-                            <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, CreateLoginModels);
-                            })} />
-                            <TreeViewMenu hideArrow={true} title={AddAgentUser.type} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, AddAgentUser);
-                            })} />
+                                <TreeViewMenu hideArrow={true} title={CreateLoginModels.type} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, CreateLoginModels);
+                                })} />
+                                <TreeViewMenu hideArrow={true} title={AddAgentUser.type} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, AddAgentUser);
+                                })} />
+                            </TreeViewMenu>
                             <TreeViewMenu
                                 title={CreateDefaultView.type}
                                 open={UIA.Visual(state, CreateDefaultView.type)}

@@ -32,7 +32,7 @@ import {
     updateMethodParameters
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
-import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API } from "./componenttypes";
+import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
@@ -449,6 +449,7 @@ export const CreateDefaultView = {
             let modelProperties = modelChildren.filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
             childComponents = modelProperties.map(v => null);
             let apiListLinkOperations = [];
+            let screenComponentEvents = [];
             PerformGraphOperation([!isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: {
@@ -463,7 +464,30 @@ export const CreateDefaultView = {
                         [NodeProperties.Model]: currentNode.id
                     }
                 }
-            } : false, !isSharedComponent ? {
+            } : false, ...(!isSharedComponent ? (SCREEN_COMPONENT_EVENTS.map(t => {
+                return {
+                    operation: ADD_NEW_NODE,
+                    options: function () {
+                        return {
+                            nodeType: NodeTypes.LifeCylceMethod,
+                            properties: {
+                                ...viewPackage,
+                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                                [NodeProperties.UIText]: `${t}`,
+                            },
+                            links: [{
+                                target: screenNodeId,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.LifeCylceMethod }
+                                }
+                            }],
+                            callback: (screenNode) => {
+                                screenComponentEvents.push(screenNode.id);
+                            },
+                        }
+                    }
+                }
+            })) : []),  !isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
                     let res = GetNodesByProperties({
@@ -1279,7 +1303,7 @@ export const CreateDefaultView = {
                     }
                 }
             }])(GetDispatchFunc(), GetStateFunc());;
-            
+
             modelProperties.map((modelProperty, propertyIndex) => {
                 let propNodeId = null;
                 let skip = false;

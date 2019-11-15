@@ -1097,9 +1097,9 @@ function NodesByType(graph, nodeType, options = {}) {
             nodeType = [nodeType];
         }
         return currentGraph.nodes
-            .filter(x => currentGraph.nodeLib[x].properties &&
+            .filter(x => currentGraph.nodeLib && currentGraph.nodeLib[x] && currentGraph.nodeLib[x].properties &&
                 (nodeType.indexOf(currentGraph.nodeLib[x].properties[NodeProperties.NODEType]) !== -1) ||
-                (!options.excludeRefs && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
+                (!options.excludeRefs && currentGraph.nodeLib[x] && currentGraph.nodeLib[x].properties && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
             .map(x => currentGraph.nodeLib[x]);
     }
     return [];
@@ -2449,7 +2449,7 @@ export function SetVisible(graph) {
         [].interpolate(0, graph.depth, x => {
             Object.keys(graph.visibleNodes).map(t => {
                 for (let h in graph.nodeLinks[t]) {
-                    if (x > 1 && !graph.visibleNodes[h] ) {
+                    if (x > 1 && !graph.visibleNodes[h]) {
                         graph.visibleNodes[h] = 2;
                     }
                     else {

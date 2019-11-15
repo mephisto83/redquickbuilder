@@ -195,7 +195,7 @@ export function setComponentApiConnection(args) {
     return (dispatch, getState) => {
         let state = getState();
         let graph = GetCurrentGraph(state);
-        if ([NodeTypes.ComponentNode, NodeTypes.MethodApiParameters, NodeTypes.DataChain].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
+        if ([NodeTypes.EventHandler, NodeTypes.LifeCylceMethod, NodeTypes.MethodApiParameters, NodeTypes.DataChain].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
             if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.ComponentApiConnection })) {
                 let connections = GraphMethods.GetConnectedNodesByType(state, source, GetNodeProp(target, NodeProperties.NODEType)).map(x => {
                     return {
@@ -215,6 +215,70 @@ export function setComponentApiConnection(args) {
                     }
                 }])(dispatch, getState);
             }
+    }
+}
+
+export function connectLifeCycleMethod(args) {
+
+    let { properties, target, source } = args;
+    return (dispatch, getState) => {
+        setTimeout(() => {
+
+            let state = getState();
+            let graph = GetCurrentGraph(state);
+            if ([NodeTypes.Method].some(t => t === GetNodeProp(target, NodeProperties.NODEType))) {
+                let apiConnectors = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentApiConnector).map(x => {
+                    return {
+                        operation: REMOVE_NODE,
+                        options: {
+                            id: x.id
+                        }
+                    }
+                });
+
+                state = getState();
+                graph = GetCurrentGraph(state);
+                let apiEndpoints = [];
+                GraphMethods.GetConnectedNodesByType(state, target, NodeTypes.MethodApiParameters).filter(x => {
+                    if (GetNodeProp(x, NodeProperties.QueryParameterObject)) {
+                        return true;
+                    }
+                    if (GetNodeProp(x, NodeProperties.UriBody)) {
+                        apiEndpoints.push(x);
+                        return false;
+                    }
+                    return true;
+                }).map(queryObj => {
+                    GraphMethods.GetConnectedNodesByType(state, queryObj.id, NodeTypes.MethodApiParameters).map(queryParam => {
+                        if (GetNodeProp(queryParam, NodeProperties.QueryParameterParam)) {
+                            apiEndpoints.push(queryParam);
+                        }
+                    })
+                });
+
+                PerformGraphOperation([...apiConnectors, ...apiEndpoints.map(ae => {
+                    return {
+                        operation: ADD_NEW_NODE,
+                        options: {
+                            nodeType: NodeTypes.ComponentApiConnector,
+                            groupProperties: {},
+                            parent: source,
+                            properties: {
+                                [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
+                            },
+                            links: [{
+                                target: ae.id,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.ComponentApiConnection }
+                                }
+                            }]
+                        }
+                    }
+                })])(dispatch, getState);
+
+            }
+
+        }, 100);
     }
 }
 export function setupDefaultViewType(args) {
@@ -383,7 +447,8 @@ export function updateMethodParameters(current, methodType) {
                         return {
                             nodeType: NodeTypes.MethodApiParameters,
                             properties: {
-                                [NodeProperties.UIText]: Titles.Body
+                                [NodeProperties.UIText]: Titles.Body,
+                                [NodeProperties.UriBody]: true
                             },
                             links: [{
                                 target: current,
@@ -404,7 +469,8 @@ export function updateMethodParameters(current, methodType) {
                                 return {
                                     nodeType: NodeTypes.MethodApiParameters,
                                     properties: {
-                                        [NodeProperties.UIText]: 'Query'
+                                        [NodeProperties.UIText]: 'Query',
+                                        [NodeProperties.QueryParameterObject]: true
                                     },
                                     callback: function (queryNode) {
                                         queryNodeId = queryNode.id;
@@ -430,7 +496,8 @@ export function updateMethodParameters(current, methodType) {
                                         groupProperties: {},
                                         parent: queryNodeId,
                                         properties: {
-                                            [NodeProperties.UIText]: q
+                                            [NodeProperties.UIText]: q,
+                                            [NodeProperties.QueryParameterParam]: true
                                         },
                                         linkProperties: {
                                             properties: { ...LinkProperties.MethodApiParameters, parameter: q }

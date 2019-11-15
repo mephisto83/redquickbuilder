@@ -9,9 +9,11 @@ export const NodeTypes = {
     ModelFilter: 'model-filter',
     Struct: 'struct',
     MethodApiParameters: 'method-api-parameters',
+    EventHandler: 'EventHandler',
     ComponentApiConnector: 'component-api-connector',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
+    LifeCylceMethod: 'LifeCylceMethod',
     Selector: 'selector',
     ScreenCollection: 'screen-collection',
     ScreenItem: 'screen-item',
@@ -178,7 +180,8 @@ export const NodeTypeColors = {
     [NodeTypes.DataSource]: '#002500',
     [NodeTypes.Condition]: '#F90093',
     [NodeTypes.DataChain]: "#FF6B6B",
-    [NodeTypes.ServiceInterface]: '#4A6D7C'
+    [NodeTypes.ServiceInterface]: '#4A6D7C',
+    [NodeTypes.MethodApiParameters]: '#ff0001'
 
 }
 
@@ -322,7 +325,10 @@ export const NodeProperties = {
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
     UIName: 'uiName', // The name used in the ui.
-
+    QueryParameterObject: 'QueryParameterObject',
+    QueryParameterParam: 'QueryParameterParam',
+    UriBody: 'UriBody',
+    UriParameter: 'UriParameter',
     NodePackage: 'NodePackage',
     NodePackageType: 'NodePackageType',
     NodePackageAgent: 'NodePackageAgent',
@@ -513,9 +519,11 @@ export const LinkType = {
     DefaultViewType: 'DefaultViewType',
     SharedComponent: 'SharedComponent',
     ExecutorServiceMethod: 'ExecutorServiceMethod',
+    LifeCylceMethod: 'LifeCylceMethod',
     ValidatorServiceMethod: 'ValidatorServiceMethod',
     PermissionServiceMethod: 'PermissionServiceMethod',
     ComponentApiConnection: "ComponentApiConnection",
+    EventHandler: 'EventHandler',
     SharedComponentInstance: 'SharedComponentInstance',
     Executor: 'executor',
     ExecutorItem: 'executor-item',
@@ -714,6 +722,9 @@ export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
     },
+    LifeCylceMethod: {
+        type: LinkType.LifeCylceMethod
+    },
     MethodApiParameters: {
         type: LinkType.MethodApiParameters
     },
@@ -723,6 +734,9 @@ export const LinkProperties = {
     },
     ComponentApiConnection: {
         type: LinkType.ComponentApiConnection
+    },
+    EventHandler: {
+        type: LinkType.EventHandler
     },
     ExecutorServiceMethod: {
         type: LinkType.ExecutorServiceMethod,
