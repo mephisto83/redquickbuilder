@@ -37,7 +37,7 @@ import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
-import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand, insertNodeInbetween } from "./datachain";
+import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand, insertNodeInbetween, InsertNodeInbetween } from "./datachain";
 import { uuidv4 } from "../utils/array";
 
 
@@ -396,6 +396,8 @@ export const AddAgentUser = {
 export function CreatePagingDataChains() {
     var result = {};
     var skipResult = false;
+    let arrayLengthNode = null;
+    let defaultPagingValue = null;
     PerformGraphOperation([{
         operation: ADD_NEW_NODE,
         options: function (graph) {
@@ -438,15 +440,65 @@ export function CreatePagingDataChains() {
 
             return temp.options;
         }
+    }, function (graph) {
+        if (skipResult) {
+            return false;
+        }
+        return InsertNodeInbetween(GetNodeById(result.pagingSkip, graph), result.pagingSkipOuput, graph, insertedNode => {
+            arrayLengthNode = insertedNode.id;
+        });
     }, {
-        operation: ADD_NEW_NODE,
+        operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
-            if (skipResult) {
-                return false;
+            return {
+                prop: NodeProperties.DataChainFunctionType,
+                value: DataChainFunctionKeys.ArrayLength,
+                id: arrayLengthNode
             }
-            insertNodeInbetween(insertedNode => {
-
-            }, graph)(GetNodeById(result.pagingSkip, graph), result.pagingSkipOuput)
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            return {
+                prop: NodeProperties.UIText,
+                value: `Paging ${DataChainFunctionKeys.ArrayLength}`,
+                id: arrayLengthNode
+            }
+        }
+    }, function (graph) {
+        if (skipResult) {
+            return false;
+        }
+        debugger;
+        return InsertNodeInbetween(GetNodeById(arrayLengthNode, graph), result.pagingSkipOuput, graph, insertedNode => {
+            defaultPagingValue = insertedNode.id;
+        });
+    },{
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            return {
+                prop: NodeProperties.DataChainFunctionType,
+                value: DataChainFunctionKeys.NumericalDefault,
+                id: defaultPagingValue
+            }
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            return {
+                prop: NodeProperties.UIText,
+                value: `Paging ${DataChainFunctionKeys.NumericalDefault}`,
+                id: defaultPagingValue
+            }
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            return {
+                prop: NodeProperties.value,
+                value: '0',
+                id: defaultPagingValue
+            }
         }
     }])(GetDispatchFunc(), GetStateFunc());
     return result;

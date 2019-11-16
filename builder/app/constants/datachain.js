@@ -487,14 +487,14 @@ export function insertNodeInbetween(_callback, graph) {
         }
     }
 }
-export function InsertNodeInbetween(currentNode, value, graph) {
+export function InsertNodeInbetween(currentNode, value, graph, onCallback) {
     graph = graph || GetCurrentGraph(GetState());
     let me = this;
     let link = GetLinkBetween(currentNode.id, value, graph);
     let result = [];
     if (link) {
-        var source = GetNodeById(link.source);
-        var target = GetNodeById(link.target);
+        var source = GetNodeById(link.source, graph);
+        var target = GetNodeById(link.target, graph);
 
         result.push({
             operation: REMOVE_LINK_BETWEEN_NODES,
@@ -524,6 +524,9 @@ export function InsertNodeInbetween(currentNode, value, graph) {
                     }],
                     callback: (node) => {
                         targetNode = node;
+                        if (onCallback) {
+                            onCallback(targetNode);
+                        }
                     }
                 }
             }
