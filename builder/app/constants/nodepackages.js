@@ -30,7 +30,8 @@ import {
     getViewTypeEndpointsForDefaults,
     NEW_DATA_SOURCE,
     updateMethodParameters,
-    GetNodeByProperties
+    GetNodeByProperties,
+    getGroup
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS } from "./componenttypes";
@@ -393,7 +394,7 @@ export const AddAgentUser = {
     }
 }
 
-export function CreatePagingDataChains() {
+export function CreatePagingSkipDataChains() {
     var result = {};
     var skipResult = false;
     let arrayLengthNode = null;
@@ -450,6 +451,9 @@ export function CreatePagingDataChains() {
     }, {
         operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
             return {
                 prop: NodeProperties.DataChainFunctionType,
                 value: DataChainFunctionKeys.ArrayLength,
@@ -459,6 +463,9 @@ export function CreatePagingDataChains() {
     }, {
         operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
             return {
                 prop: NodeProperties.UIText,
                 value: `Paging ${DataChainFunctionKeys.ArrayLength}`,
@@ -469,13 +476,16 @@ export function CreatePagingDataChains() {
         if (skipResult) {
             return false;
         }
-        debugger;
+
         return InsertNodeInbetween(GetNodeById(arrayLengthNode, graph), result.pagingSkipOuput, graph, insertedNode => {
             defaultPagingValue = insertedNode.id;
         });
-    },{
+    }, {
         operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
             return {
                 prop: NodeProperties.DataChainFunctionType,
                 value: DataChainFunctionKeys.NumericalDefault,
@@ -485,6 +495,9 @@ export function CreatePagingDataChains() {
     }, {
         operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
             return {
                 prop: NodeProperties.UIText,
                 value: `Paging ${DataChainFunctionKeys.NumericalDefault}`,
@@ -494,14 +507,266 @@ export function CreatePagingDataChains() {
     }, {
         operation: CHANGE_NODE_PROPERTY,
         options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
             return {
-                prop: NodeProperties.value,
+                prop: NodeProperties.NumberParameter,
                 value: '0',
                 id: defaultPagingValue
             }
         }
     }])(GetDispatchFunc(), GetStateFunc());
     return result;
+}
+export function CreatePagingTakeDataChains() {
+    var result = {};
+    var skipTake = false;
+    let defaultPagingValue = null;
+    PerformGraphOperation([{
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.IsDataChainPagingTake]: true,
+                [NodeProperties.EntryPoint]: true
+            }, graph);
+            if (model) {
+                result.pagingTake = model.id;
+                skipTake = true;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.DataChain,
+                callback: (node) => {
+                    result.pagingTake = node.id;
+                },
+
+                properties: {
+                    [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                    [NodeProperties.UIText]: 'Paging Take',
+                    [NodeProperties.IsDataChainPagingTake]: true,
+                    [NodeProperties.EntryPoint]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            if (skipTake) {
+                return false;
+            }
+            let temp = SplitDataCommand(GetNodeById(result.pagingTake, graph), split => {
+                result.pagingTakeOuput = split.id;
+            }, {
+                [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                [NodeProperties.UIText]: 'Paging Take Ouput',
+                [NodeProperties.AsOutput]: true
+            });
+
+            return temp.options;
+        }
+    }, function (graph) {
+        if (skipTake) {
+            return false;
+        }
+
+        return InsertNodeInbetween(GetNodeById(result.pagingTake, graph), result.pagingTakeOuput, graph, insertedNode => {
+            defaultPagingValue = insertedNode.id;
+        });
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            if (skipTake) {
+                return false;
+            }
+            return {
+                prop: NodeProperties.DataChainFunctionType,
+                value: DataChainFunctionKeys.NumericalDefault,
+                id: defaultPagingValue
+            }
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            if (skipTake) {
+                return false;
+            }
+            return {
+                prop: NodeProperties.UIText,
+                value: `Paging ${DataChainFunctionKeys.NumericalDefault}`,
+                id: defaultPagingValue
+            }
+        }
+    }, {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+            if (skipTake) {
+                return false;
+            }
+            return {
+                prop: NodeProperties.NumberParameter,
+                value: '50',
+                id: defaultPagingValue
+            }
+        }
+    }])(GetDispatchFunc(), GetStateFunc());
+    return result;
+}
+export function CreateScreenModel(viewModel, options = { isList: true }) {
+    var result = {};
+    let pageModelId = null;
+
+    PerformGraphOperation([{
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            return {
+                nodeType: NodeTypes.Model,
+                callback: (pageModel) => {
+                    pageModelId = pageModel.id;
+                    result.model = pageModelId;
+                },
+
+                properties: {
+                    [NodeProperties.ExcludeFromController]: true,
+                    [NodeProperties.UIText]: viewModel + ' Model'
+                }
+            }
+        }
+    }, (options && options.isList ? {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            return {
+                nodeType: NodeTypes.Property,
+                callback: (skipModel) => {
+                    result.list = skipModel.id;
+                },
+                parent: pageModelId,
+                groupProperties: {},
+                linkProperties: {
+                    properties: { ...LinkProperties.PropertyLink }
+                },
+                properties: {
+                    [NodeProperties.UIText]: Titles.List
+                }
+            }
+        }
+    } : false)])(GetDispatchFunc(), GetStateFunc());
+
+
+    return result;
+}
+
+export function createViewPagingDataChain(newItems, viewName, viewPackage, skipChain = true) {
+    return function () {
+        return [{
+            // The data chain for a list screen
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                return {
+                    nodeType: NodeTypes.DataChain,
+                    properties: {
+                        [NodeProperties.UIText]: skipChain ? `Get ${viewName} Skip` : `Get ${viewName} Take`,
+                        [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                        [NodeProperties.Model]: newItems.currentNode,
+                        [NodeProperties.PagingSkip]: skipChain,
+                        [NodeProperties.PagingTake]: !skipChain,
+                        [NodeProperties.EntryPoint]: true,
+                        ...viewPackage
+                    },
+                    callback: (res) => {
+                        newItems.pagingEntry = res.id;
+                    }
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                let temp = SplitDataCommand(GetNodeById(newItems.pagingEntry, graph), split => {
+                    newItems.viewModelListRefNode = split.id;
+                }, {
+                    [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
+                    [NodeProperties.UIText]: `${viewName} VM Ref`,
+                    [NodeProperties.DataChainReference]: newItems.screenListDataChain,
+                    [NodeProperties.Pinned]: true,
+                    ...viewPackage
+                }, graph);
+                return temp.options;
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                return {
+                    target: newItems.viewModelListRefNode,
+                    source: newItems.screenListDataChain,
+                    properties: { ...LinkProperties.DataChainLink }
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                let groupProperties = GetNodeProp(newItems.viewModelListRefNode, NodeProperties.GroupParent, graph) ? {
+                    id: getGroup(GetNodeProp(newItems.viewModelListRefNode, NodeProperties.GroupParent, graph), graph).id
+                } : null;
+                let model = GetNodeByProperties({
+                    [skipChain ? NodeProperties.IsDataChainPagingSkip : NodeProperties.IsDataChainPagingTake]: true,
+                    [NodeProperties.EntryPoint]: true
+                }, graph);
+
+
+                return {
+                    parent: newItems.viewModelListRefNode,
+                    nodeType: NodeTypes.DataChain,
+                    groupProperties,
+                    properties: {
+                        [NodeProperties.UIText]: `${viewName} Paging Ref`,
+                        [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
+                        [NodeProperties.DataChainReference]: model ? model.id : null,
+                        [NodeProperties.ChainParent]: newItems.viewModelListRefNode
+                    },
+                    linkProperties: {
+                        properties: { ...LinkProperties.DataChainLink }
+                    },
+                    callback: (v) => {
+                        newItems.pagingRefNode = v.id;
+                    }
+                };
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                let model = GetNodeByProperties({
+                    [skipChain ? NodeProperties.IsDataChainPagingSkip : NodeProperties.IsDataChainPagingTake]: true,
+                    [NodeProperties.EntryPoint]: true
+                }, graph);
+
+                return {
+                    target: newItems.pagingRefNode,
+                    source: model ? model.id : null,
+                    properties: { ...LinkProperties.DataChainLink }
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                let groupProperties = GetNodeProp(newItems.pagingRefNode, NodeProperties.GroupParent, graph) ? {
+                    id: getGroup(GetNodeProp(newItems.pagingRefNode, NodeProperties.GroupParent, graph), graph).id
+                } : null;
+                return {
+                    parent: newItems.pagingRefNode,
+                    nodeType: NodeTypes.DataChain,
+                    groupProperties,
+                    properties: {
+                        [NodeProperties.ChainParent]: newItems.pagingRefNode,
+                        [NodeProperties.UIText]: `${viewName} Output`,
+                        [NodeProperties.AsOutput]: true
+                    },
+                    linkProperties: {
+                        properties: { ...LinkProperties.DataChainLink }
+                    }
+                };
+            }
+        }]
+    }
 }
 export function CreatePagingModel() {
     var result = null;
@@ -514,7 +779,8 @@ export function CreatePagingModel() {
         operation: ADD_NEW_NODE,
         options: function (graph) {
             let model = GetNodeByProperties({
-                [NodeProperties.IsPagingModel]: true
+                [NodeProperties.IsPagingModel]: true,
+                [NodeProperties.NODEType]: NodeTypes.Model
             }, graph);
             if (model) {
                 pageModelId = model.id;
@@ -537,7 +803,8 @@ export function CreatePagingModel() {
         operation: ADD_NEW_NODE,
         options: function (graph) {
             let model = GetNodeByProperties({
-                [NodeProperties.PagingSkip]: true
+                [NodeProperties.PagingSkip]: true,
+                [NodeProperties.NODEType]: NodeTypes.Property
             }, graph);
             if (model) {
                 skipModelId = model.id;
@@ -550,6 +817,9 @@ export function CreatePagingModel() {
                 },
                 parent: pageModelId,
                 groupProperties: {},
+                linkProperties: {
+                    properties: { ...LinkProperties.PropertyLink }
+                },
                 properties: {
                     [NodeProperties.UIText]: 'Skip',
                     [NodeProperties.PagingSkip]: true
@@ -560,7 +830,8 @@ export function CreatePagingModel() {
         operation: ADD_NEW_NODE,
         options: function (graph) {
             let model = GetNodeByProperties({
-                [NodeProperties.PagingTake]: true
+                [NodeProperties.PagingTake]: true,
+                [NodeProperties.NODEType]: NodeTypes.Property
             }, graph);
             if (model) {
                 takeModelId = model.id;
@@ -583,7 +854,8 @@ export function CreatePagingModel() {
         operation: ADD_NEW_NODE,
         options: function (graph) {
             let model = GetNodeByProperties({
-                [NodeProperties.PagingFilter]: true
+                [NodeProperties.PagingFilter]: true,
+                [NodeProperties.NODEType]: NodeTypes.Property
             }, graph);
             if (model) {
                 filterModelId = model.id;
@@ -606,7 +878,8 @@ export function CreatePagingModel() {
         operation: ADD_NEW_NODE,
         options: function (graph) {
             let model = GetNodeByProperties({
-                [NodeProperties.PagingSort]: true
+                [NodeProperties.PagingSort]: true,
+                [NodeProperties.NODEType]: NodeTypes.Property
             }, graph);
             if (model) {
                 sortModelId = model.id;
@@ -674,6 +947,7 @@ export const CreateDefaultView = {
             [NodeProperties.ViewPackage]: uuidv4(),
             [NodeProperties.ViewPackageTitle]: viewName
         };
+        let newItems = {};
         let viewComponentType = null;
         switch (viewType) {
             case ViewTypes.Get:
@@ -688,6 +962,7 @@ export const CreateDefaultView = {
         let vmsIds = () => ([viewModelNodeDirtyId, viewModelNodeFocusId, viewModelNodeBlurId, viewModelNodeFocusedId, viewModelNodeId]);
         if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model) {
             let modelChildren = GetModelPropertyChildren(currentNode.id);
+            newItems.currentNode = currentNode.id;
             if (chosenChildren && chosenChildren.length) {
                 modelChildren = modelChildren.filter(x => chosenChildren.some(v => v === x.id));
             }
@@ -696,10 +971,16 @@ export const CreateDefaultView = {
             let apiListLinkOperations = [];
             let screenComponentEvents = [];
             let pagingModelAndProperties = null;
-            let pagingDataChains = null;
+            let pagingSkipChains = null;
+            let pagingTakeChains = null;
             if (isList) {
                 pagingModelAndProperties = CreatePagingModel();
-                pagingDataChains = CreatePagingDataChains();
+                pagingSkipChains = CreatePagingSkipDataChains();
+                pagingTakeChains = CreatePagingTakeDataChains();
+            }
+            let pageViewModel = null;
+            if (!isSharedComponent) {
+                pageViewModel = CreateScreenModel(viewName);
             }
             PerformGraphOperation([!isSharedComponent ? {
                 operation: ADD_NEW_NODE,
@@ -738,7 +1019,86 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            })) : []), !isSharedComponent ? {
+            })) : []),
+            !isSharedComponent && isList ? {
+                // The selector for a list screen
+                operation: ADD_NEW_NODE,
+                options: function (graph) {
+                    return {
+                        nodeType: NodeTypes.ViewModel,
+                        properties: {
+                            [NodeProperties.UIText]: `${viewName} Screen View Model`,
+                            [NodeProperties.InstanceType]: InstanceTypes.AppState,
+                            [NodeProperties.Model]: pageViewModel.model
+                        },
+                        links: [{
+                            target: pageViewModel.model,
+                            linkProperties: {
+                                properties: { ...LinkProperties.ViewModelLink }
+                            }
+                        }],
+                        callback: (res) => {
+                            newItems.screenViewModel = res.id;
+                        }
+                    }
+                }
+            } : false,
+            !isSharedComponent && isList ? {
+                // The selector for a list screen
+                operation: ADD_NEW_NODE,
+                options: function (graph) {
+                    return {
+                        nodeType: NodeTypes.Selector,
+                        properties: {
+                            [NodeProperties.UIText]: `${viewName} Screen Selector`
+                        },
+                        links: [{
+                            target: newItems.screenViewModel,
+                            linkProperties: {
+                                properties: { ...LinkProperties.SelectorLink }
+                            }
+                        }],
+                        callback: (res) => {
+                            newItems.screenSelector = res.id;
+                        }
+                    }
+                }
+            } : false,
+            !isSharedComponent && isList ? {
+                // The data chain for a list screen
+                operation: ADD_NEW_NODE,
+                options: function (graph) {
+                    return {
+                        nodeType: NodeTypes.DataChain,
+                        properties: {
+                            [NodeProperties.UIText]: `${viewName} Screen DC`,
+                            [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
+                            [NodeProperties.Selector]: newItems.screenSelector,
+                            [NodeProperties.EntryPoint]: true,
+                            [NodeProperties.SelectorProperty]: newItems.screenViewModel
+                        },
+                        links: [{
+                            target: newItems.screenSelector,
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }, {
+                            target: newItems.screenViewModel,
+                            linkProperties: {
+                                properties: { ...LinkProperties.DataChainLink }
+                            }
+                        }],
+                        callback: (res) => {
+                            newItems.screenListDataChain = res.id;
+                        }
+                    }
+                }
+            } : false,
+
+            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, true) : false,
+            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, false) : false,
+
+            !isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
                     let res = GetNodesByProperties({
@@ -757,7 +1117,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'}`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance}`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
@@ -790,7 +1150,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Dirty`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty} `,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
@@ -823,7 +1183,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Focus`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus}`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
@@ -856,7 +1216,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Focused`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused}`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
@@ -889,7 +1249,7 @@ export const CreateDefaultView = {
                         },
                         properties: {
                             ...viewPackage,
-                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : 'Instance'} Blur`,
+                            [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur}`,
                             [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Pinned]: false,
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
@@ -1519,16 +1879,22 @@ export const CreateDefaultView = {
             PerformGraphOperation([{
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
+                    let viewModelInstanceNode = GetNodeByProperties({
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                        [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    });
                     let node = GetNodesByProperties({
                         [NodeProperties.UIText]: `Get ${viewName}`,
                         [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                         [NodeProperties.EntryPoint]: true,
                         [NodeProperties.Selector]: modelComponentSelectors[0],
-                        [NodeProperties.SelectorProperty]: viewModelNodeId
+                        [NodeProperties.SelectorProperty]: viewModelInstanceNode.id
                     }).find(x => x);
                     if (node) {
                         return null;
                     }
+
                     return {
                         nodeType: NodeTypes.DataChain,
                         properties: {
@@ -1537,7 +1903,7 @@ export const CreateDefaultView = {
                             [NodeProperties.EntryPoint]: true,
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                             [NodeProperties.Selector]: modelComponentSelectors[0],
-                            [NodeProperties.SelectorProperty]: viewModelNodeId,
+                            [NodeProperties.SelectorProperty]: viewModelInstanceNode.id,
                             [NodeProperties.Pinned]: true
                         },
                         links: [{

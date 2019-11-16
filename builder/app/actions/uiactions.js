@@ -195,7 +195,7 @@ export function setComponentApiConnection(args) {
     return (dispatch, getState) => {
         let state = getState();
         let graph = GetCurrentGraph(state);
-        if ([NodeTypes.EventHandler, NodeTypes.LifeCylceMethod, NodeTypes.MethodApiParameters, NodeTypes.DataChain].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
+        if ([NodeTypes.EventHandler, NodeTypes.LifeCylceMethod, NodeTypes.MethodApiParameters, NodeTypes.DataChain, NodeTypes.Selector].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
             if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.ComponentApiConnection })) {
                 let connections = GraphMethods.GetConnectedNodesByType(state, source, GetNodeProp(target, NodeProperties.NODEType)).map(x => {
                     return {
@@ -903,7 +903,7 @@ export function GenerateDataChainMethod(id) {
         case DataChainFunctionKeys.GreaterThan:
             return `(a) => greaterThan(a, ${numberParameter})`;
         case DataChainFunctionKeys.Property:
-            return `(a) => {a ? a.${GetJSCodeName(property) || property} : null }`;
+            return `(a) => a ? a.${GetJSCodeName(property) || property} : null`;
         case DataChainFunctionKeys.ReferenceDataChain:
             return `(a) => ${func}(a)`;
         case DataChainFunctionKeys.Equals:

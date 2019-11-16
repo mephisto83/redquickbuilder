@@ -598,7 +598,7 @@ export function AddChainCommand(currentNode, callback, graph, viewPackage = {}) 
         }
     };
 }
-export function SplitDataCommand(currentNode, callback, viewPackage = {}, graph) {
+export function SplitDataCommand(currentNode, callback, viewPackage = {}, graph, links = []) {
     return {
         operation: ADD_NEW_NODE,
         options: {
@@ -611,13 +611,14 @@ export function SplitDataCommand(currentNode, callback, viewPackage = {}, graph)
                 [GroupProperties.ExternalExitNode]: GetDataChainNextId(currentNode.id, graph)
             },
             properties: {
-                ...viewPackage,
                 [NodeProperties.Pinned]: false,
+                ...viewPackage,
                 [NodeProperties.ChainParent]: currentNode.id
             },
             linkProperties: {
                 properties: { ...LinkProperties.DataChainLink }
             },
+            links,
             callback
         }
     }
