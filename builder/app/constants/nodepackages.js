@@ -29,14 +29,15 @@ import {
     setSharedComponent,
     getViewTypeEndpointsForDefaults,
     NEW_DATA_SOURCE,
-    updateMethodParameters
+    updateMethodParameters,
+    GetNodeByProperties
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
-import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand } from "./datachain";
+import { DataChainFunctionKeys, DataChainFunctions, SplitDataCommand, ConnectChainCommand, AddChainCommand, insertNodeInbetween } from "./datachain";
 import { uuidv4 } from "../utils/array";
 
 
@@ -392,6 +393,198 @@ export const AddAgentUser = {
     }
 }
 
+export function CreatePagingDataChains() {
+    var result = {};
+    var skipResult = false;
+    PerformGraphOperation([{
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.IsDataChainPagingSkip]: true,
+                [NodeProperties.EntryPoint]: true
+            }, graph);
+            if (model) {
+                result.pagingSkip = model.id;
+                skipResult = true;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.DataChain,
+                callback: (node) => {
+                    result.pagingSkip = node.id;
+                },
+
+                properties: {
+                    [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                    [NodeProperties.UIText]: 'Paging Skip',
+                    [NodeProperties.IsDataChainPagingSkip]: true,
+                    [NodeProperties.EntryPoint]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
+            let temp = SplitDataCommand(GetNodeById(result.pagingSkip, graph), split => {
+                result.pagingSkipOuput = split.id;
+            }, {
+                [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                [NodeProperties.UIText]: 'Paging Skip Ouput',
+                [NodeProperties.AsOutput]: true
+            });
+
+            return temp.options;
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            if (skipResult) {
+                return false;
+            }
+            insertNodeInbetween(insertedNode => {
+
+            }, graph)(GetNodeById(result.pagingSkip, graph), result.pagingSkipOuput)
+        }
+    }])(GetDispatchFunc(), GetStateFunc());
+    return result;
+}
+export function CreatePagingModel() {
+    var result = null;
+    let pageModelId = null;
+    let skipModelId = null;
+    let takeModelId = null;
+    let filterModelId = null;
+    let sortModelId = null;
+    PerformGraphOperation([{
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.IsPagingModel]: true
+            }, graph);
+            if (model) {
+                pageModelId = model.id;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.Model,
+                callback: (pageModel) => {
+                    pageModelId = pageModel.id;
+                },
+
+                properties: {
+                    [NodeProperties.ExcludeFromController]: true,
+                    [NodeProperties.UIText]: 'Paging Model',
+                    [NodeProperties.IsPagingModel]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.PagingSkip]: true
+            }, graph);
+            if (model) {
+                skipModelId = model.id;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.Property,
+                callback: (skipModel) => {
+                    skipModelId = skipModel.id;
+                },
+                parent: pageModelId,
+                groupProperties: {},
+                properties: {
+                    [NodeProperties.UIText]: 'Skip',
+                    [NodeProperties.PagingSkip]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.PagingTake]: true
+            }, graph);
+            if (model) {
+                takeModelId = model.id;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.Property,
+                callback: (takeModel) => {
+                    takeModelId = takeModel.id;
+                },
+                parent: pageModelId,
+                groupProperties: {},
+                properties: {
+                    [NodeProperties.UIText]: 'Take',
+                    [NodeProperties.PagingTake]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.PagingFilter]: true
+            }, graph);
+            if (model) {
+                filterModelId = model.id;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.Property,
+                callback: (filterModel) => {
+                    filterModelId = filterModel.id;
+                },
+                parent: pageModelId,
+                groupProperties: {},
+                properties: {
+                    [NodeProperties.UIText]: 'Filter',
+                    [NodeProperties.PagingFilter]: true
+                }
+            }
+        }
+    }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+            let model = GetNodeByProperties({
+                [NodeProperties.PagingSort]: true
+            }, graph);
+            if (model) {
+                sortModelId = model.id;
+                return false;
+            }
+            return {
+                nodeType: NodeTypes.Property,
+                callback: (sortModel) => {
+                    sortModelId = sortModel.id;
+                },
+                parent: pageModelId,
+                groupProperties: {},
+                properties: {
+                    [NodeProperties.ExcludeFromController]: true,
+                    [NodeProperties.UIText]: 'Sort',
+                    [NodeProperties.PagingSort]: true
+                }
+            }
+        }
+    },])(GetDispatchFunc(), GetStateFunc());
+    result = {
+        pageModelId,
+        skipModelId,
+        takeModelId,
+        filterModelId,
+        sortModelId
+    };
+
+    return result;
+}
 export const CreateDefaultView = {
     type: 'Create View - Form',
     methodType: 'React Native Views',
@@ -450,6 +643,12 @@ export const CreateDefaultView = {
             childComponents = modelProperties.map(v => null);
             let apiListLinkOperations = [];
             let screenComponentEvents = [];
+            let pagingModelAndProperties = null;
+            let pagingDataChains = null;
+            if (isList) {
+                pagingModelAndProperties = CreatePagingModel();
+                pagingDataChains = CreatePagingDataChains();
+            }
             PerformGraphOperation([!isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: {

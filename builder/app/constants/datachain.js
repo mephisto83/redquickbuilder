@@ -24,6 +24,7 @@ export const DataChainFunctionKeys = {
     Property: 'Property',
     IfTrue: 'IfTrue',
     Title: 'Title',
+    NumericalDefault: 'Default (number)',
     IfFalse: 'IfFalse',
     Model: 'Model',
     Models: 'Models',// Gets an array of models of a type
@@ -32,6 +33,7 @@ export const DataChainFunctionKeys = {
     Filter: 'Filter', //Filters an array.
     Pass: 'Pass',
     ReferenceDataChain: 'Data Chain Ref.',
+    ArrayLength: 'Array Length',
     StringConcat: 'String Concat {0} {1}'
 };
 export const DataChainFunctions = {
@@ -178,6 +180,25 @@ export const DataChainFunctions = {
             [NodeProperties.NODEType]: true
         },
         value: 'LessThanOrEqualTo'
+    },
+    [DataChainFunctionKeys.ArrayLength]: {
+        ui: {
+            value: NodeProperties.value
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'ArrayLength'
+    },
+    [DataChainFunctionKeys.NumericalDefault]: {
+        ui: {
+            value: NodeProperties.value,
+            number: NodeProperties.Number
+        },
+        filter: {
+            [NodeProperties.NODEType]: true
+        },
+        value: 'NumericalDefault'
     },
     [DataChainFunctionKeys.GreaterThanOrEqualTo]: {
         ui: {
@@ -408,9 +429,9 @@ export function snipNodeFromInbetween() {
         }
     }
 }
-export function insertNodeInbetween() {
+export function insertNodeInbetween(_callback, graph) {
     return function (currentNode, value) {
-        let graph = GetCurrentGraph(GetState());
+        graph = graph || GetCurrentGraph(GetState());
         let me = this;
         let link = GetLinkBetween(currentNode.id, value, graph);
         if (link) {
@@ -456,12 +477,77 @@ export function insertNodeInbetween() {
                                 value: node.id,
                                 prop: NodeProperties.ChainParent
                             }
-                        }])
+                        }]);
+                        if (_callback) {
+                            _callback(node.id);
+                        }
                     }, 100)
                 }
             })
         }
     }
+}
+export function InsertNodeInbetween(currentNode, value, graph) {
+    graph = graph || GetCurrentGraph(GetState());
+    let me = this;
+    let link = GetLinkBetween(currentNode.id, value, graph);
+    let result = [];
+    if (link) {
+        var source = GetNodeById(link.source);
+        var target = GetNodeById(link.target);
+
+        result.push({
+            operation: REMOVE_LINK_BETWEEN_NODES,
+            options: {
+                ...link
+            }
+        });
+
+        let groupParent = GetNodeProp(source, NodeProperties.GroupParent);
+        let targetNode;
+        result.push({
+            operation: ADD_NEW_NODE,
+            options: function () {
+                return {
+                    nodeType: NodeTypes.DataChain,
+                    parent: source.id,
+                    groupProperties: groupParent ? {
+                        id: groupParent
+                    } : {},
+                    linkProperties: { properties: { ...LinkProperties.DataChainLink } },
+                    properties: {
+                        [NodeProperties.ChainParent]: source.id
+                    },
+                    links: [{
+                        target: link.target,
+                        linkProperties: { properties: { ...LinkProperties.DataChainLink } }
+                    }],
+                    callback: (node) => {
+                        targetNode = node;
+                    }
+                }
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function () {
+                return {
+                    source: link.source,
+                    target: targetNode.id,
+                    properties: { ...LinkProperties.DataChainLink }
+                }
+            }
+        }, {
+            operation: CHANGE_NODE_PROPERTY,
+            options: function () {
+                return {
+                    id: link.target,
+                    value: targetNode.id,
+                    prop: NodeProperties.ChainParent
+                }
+            }
+        });
+    }
+    return result;
 }
 export function connectChain() {
     return function (currentNode, value) {
@@ -509,17 +595,17 @@ export function AddChainCommand(currentNode, callback, graph, viewPackage = {}) 
         }
     };
 }
-export function SplitDataCommand(currentNode, callback, viewPackage = {}) {
+export function SplitDataCommand(currentNode, callback, viewPackage = {}, graph) {
     return {
         operation: ADD_NEW_NODE,
         options: {
             parent: currentNode.id,
             nodeType: NodeTypes.DataChain,
             groupProperties: {
-                [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent),
+                [GroupProperties.ExternalEntryNode]: GetNodeProp(currentNode, NodeProperties.ChainParent, graph),
                 [GroupProperties.GroupEntryNode]: currentNode.id,
                 [GroupProperties.GroupExitNode]: currentNode.id,
-                [GroupProperties.ExternalExitNode]: GetDataChainNextId(currentNode.id)
+                [GroupProperties.ExternalExitNode]: GetDataChainNextId(currentNode.id, graph)
             },
             properties: {
                 ...viewPackage,

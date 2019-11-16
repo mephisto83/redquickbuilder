@@ -869,6 +869,12 @@ export const MethodFunctions = {
         }, output: {
             ...COMMON_OUTPUT.LIST
         },
+        parameters: {
+            body: false,
+            parameters: {
+                query: { ...QUERY_PARAMETERS }
+            }
+        },
         isList: true,
         method: Methods.GetAll,
         template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }

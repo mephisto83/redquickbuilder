@@ -1,3 +1,4 @@
+import { Value } from "../../../../../components/titles";
 
 export function validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -16,6 +17,12 @@ export function greaterThanOrEqualTo(val, length) {
         return `${val}`.length <= length;
 
     return val <= length;
+}
+export function numericalDefault(val, defaultValue) {
+    if (val === undefined || val === null || typeof val !== 'number') {
+        return defaultValue;
+    }
+    return val;
 }
 export function lessThanOrEqualTo(val, length) {
     if (typeof (val) === 'string')
@@ -45,4 +52,13 @@ export function alpha(val) {
         t = t.toLowerCase();
         return 'abcdefghijklmnopqrstuvwxyz'.indexOf(t) === -1;
     })
+}
+export function arrayLength(val) {
+    if (Array.isArray(val)) {
+        return val.length;
+    }
+    if (val && val.length) {
+        return val.length;
+    }
+    return 0;
 }

@@ -328,12 +328,19 @@ export const NodeProperties = {
     UIName: 'uiName', // The name used in the ui.
     QueryParameterObject: 'QueryParameterObject',
     QueryParameterParam: 'QueryParameterParam',
+    QueryParameterParamType: 'QueryParameterParamType',
     AutoDelete: 'AutoDelete', // Anything matching the properties etc, will auto delete along with the current node.
     UriBody: 'UriBody',
     UriParameter: 'UriParameter',
     NodePackage: 'NodePackage',
     NodePackageType: 'NodePackageType',
     NodePackageAgent: 'NodePackageAgent',
+    IsPagingModel: 'IsPagingModel',
+    PagingSkip: 'Skip',
+    PagingTake: 'Take',
+    PagingFilter: 'Filter',
+    PagingSort: "PagingSort",
+    IsDataChainPagingSkip: 'IsDataChainPagingSkip',
     UIText: 'text',
     ViewType: 'view-type',
 

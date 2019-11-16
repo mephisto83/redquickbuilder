@@ -499,7 +499,8 @@ export function updateMethodParameters(current, methodType) {
                                         parent: queryNodeId,
                                         properties: {
                                             [NodeProperties.UIText]: q,
-                                            [NodeProperties.QueryParameterParam]: true
+                                            [NodeProperties.QueryParameterParam]: true,
+                                            [NodeProperties.QueryParameterParamType]: q
                                         },
                                         linkProperties: {
                                             properties: { ...LinkProperties.MethodApiParameters, parameter: q }
@@ -549,6 +550,10 @@ export function GetNodesByProperties(props, graph, state) {
     }
     return [];
 }
+export function GetNodeByProperties(props, graph, state) {
+    return GetNodesByProperties(props, graph, state).find(x => x);
+}
+
 export function GetChildComponentAncestors(id) {
     return GraphMethods.GetChildComponentAncestors(_getState(), id);
 }
@@ -745,8 +750,8 @@ export function GenerateChainFunctions() {
     let entryNodes = GetDataChainEntryNodes().map(x => x.id);
     return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
 }
-export function GetDataChainNext(id) {
-    let graph = GetRootGraph(_getState());
+export function GetDataChainNext(id, graph) {
+    graph = graph || GetRootGraph(_getState());
     if (!graph) { throw 'no graph found'; }
     let current = id;
     let groupDaa = GetNodeProp(GetNodeById(current), NodeProperties.Groups);
@@ -772,8 +777,8 @@ export function GetDataChainNext(id) {
     }).unique(x => x.id)[0];
     return next;
 }
-export function GetDataChainNextId(id) {
-    let next = GetDataChainNext(id);
+export function GetDataChainNextId(id, graph) {
+    let next = GetDataChainNext(id, graph);
     return next && next.id;
 }
 export function GetDataChainParts(id, result) {
@@ -883,6 +888,10 @@ export function GenerateDataChainMethod(id) {
             return `(a, b) => a || b`;
         case DataChainFunctionKeys.GreaterThanOrEqualTo:
             return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
+        case DataChainFunctionKeys.NumericalDefault:
+            return `(a) => numericalDefault(a, ${numberParameter})`;
+        case DataChainFunctionKeys.ArrayLength:
+            return `(a) => arrayLength(a)`;
         case DataChainFunctionKeys.LessThanOrEqualTo:
             return `(a) => lessThanOrEqualTo(a, ${numberParameter})`;
         case DataChainFunctionKeys.MaxLength:
@@ -2226,7 +2235,7 @@ export function graphOperation(operation, options) {
                         setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                         break;
                     case ADD_NEW_NODE:
-                        if (options.nodeType) {
+                        if (options && options.nodeType) {
                             currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, options.nodeType, options.callback);
                             setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
                         }

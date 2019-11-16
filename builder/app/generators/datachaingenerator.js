@@ -13,6 +13,8 @@ import {
     minLength, 
     greaterThanOrEqualTo, 
     lessThanOrEqualTo, 
+    arrayLength,
+    numericalDefault,
     equalsLength,
     alphanumericLike,
     alphanumeric,
