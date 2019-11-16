@@ -14,6 +14,7 @@ export const MODEL_INSTANCE_ON_BLUR = 'MODEL_INSTANCE_ON_BLUR';
 export const MODEL_INSTANCE_FOCUSED = 'MODEL_INSTANCE_FOCUSED';
 export const MODEL_INSTANCE_ON_FOCUS = 'MODEL_INSTANCE_ON_FOCUS';
 
+export const APP_STATE = 'APP_STATE';
 
 export const SCREEN_INSTANCE = 'SCREEN_INSTANCE';
 export const SCREEN_INSTANCE_DIRTY = 'SCREEN_INSTANCE_DIRTY';
@@ -194,6 +195,9 @@ export function GetModelInstance(key, instance, id) {
 
 export function GetScreenInst(state) {
     return GetC(state, SCREEN_INSTANCE, SCREEN_INSTANCE);
+}
+export function GetAppState(state) {
+    return GetC(state, APP_STATE, APP_STATE)
 }
 export function GetModelInst(state, instance) {
     return GetK(state, MODEL_INSTANCE, MODEL_INSTANCE, instance);
@@ -436,6 +440,16 @@ export function GetScreenInstanceObject(key) {
         }
     }
     return null;
+}
+
+export function GetAppStateObject(key) {
+    if (_getState) {
+        let state = _getState();
+        let appState = GetAppState(state);
+        if (appState) {
+            return appState[key];
+        }
+    }
 }
 
 export function GetModelInstanceObject(key, instance) {

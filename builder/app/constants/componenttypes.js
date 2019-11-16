@@ -341,6 +341,8 @@ export const InstanceTypeSelectorFunction = {
     [InstanceTypes.ScreenInstanceFocused]: 'GetScreenInstanceFocusedObject',
     [InstanceTypes.ScreenInstanceDirty]: 'GetScreenInstanceDirtyObject',
 
+    [InstanceTypes.AppState]: 'GetAppStateObject',
+
     [InstanceTypes.ModelInstance]: 'GetModelInstanceObject',
     [InstanceTypes.ModelInstanceBlur]: 'GetModelInstanceBlurObject',
     [InstanceTypes.ModelInstanceFocus]: 'GetModelInstanceFocusObject',

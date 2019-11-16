@@ -625,33 +625,54 @@ export function createExtensionDefinition() {
 export function defaultExtensionDefinitionType() {
     return 'string';
 }
+export function MatchesProperties(properties, node) {
+    if (properties && node) {
+        let res = !Object.keys(properties).some(key => {
+            return properties[key] !== GetNodeProp(node, key);
+        });
+
+        return res;
+    }
+    return false;
+}
 export function removeNode(graph, options = {}) {
     let { id } = options;
-    let existNodes = getNodesByLinkType(graph, { exist: true, id, direction: TARGET, type: LinkType.Exist });
-
-    graph = incrementBuild(graph);
-    //links
-    graph = clearLinks(graph, options);
-
-    //groups 
-    graph = removeNodeFromGroups(graph, options);
-
-    if (graph.functionNodes && graph.functionNodes[id]) {
-        delete graph.functionNodes[id];
-        graph.functionNodes = { ...graph.functionNodes };
+    let idsToDelete = [id];
+    let autoDelete = GetNodeProp(id, NodeProperties.AutoDelete, graph);
+    if (autoDelete) {
+        GetNodesLinkedTo(graph, { id }).filter(x => MatchesProperties(autoDelete.properties, x)).map(t => {
+            idsToDelete.push(t.id);
+        });
     }
-    if (graph.classNodes && graph.classNodes[id]) {
-        delete graph.classNodes[id];
-        graph.classNodes = { ...graph.classNodes };
-    }
-    delete graph.nodeLib[id];
-    graph.nodeLib = { ...graph.nodeLib };
-    graph.nodes = [...graph.nodes.filter(x => x !== id)];
-    if (existNodes) {
-        existNodes.map(en => {
-            graph = removeNode(graph, { id: en.id });
-        })
-    }
+
+    idsToDelete.map(id => {
+        let existNodes = getNodesByLinkType(graph, { exist: true, id, direction: TARGET, type: LinkType.Exist });
+
+        graph = incrementBuild(graph);
+        //links
+        graph = clearLinks(graph, options);
+
+        //groups 
+        graph = removeNodeFromGroups(graph, options);
+
+        if (graph.functionNodes && graph.functionNodes[id]) {
+            delete graph.functionNodes[id];
+            graph.functionNodes = { ...graph.functionNodes };
+        }
+        if (graph.classNodes && graph.classNodes[id]) {
+            delete graph.classNodes[id];
+            graph.classNodes = { ...graph.classNodes };
+        }
+        delete graph.nodeLib[id];
+        graph.nodeLib = { ...graph.nodeLib };
+        graph.nodes = [...graph.nodes.filter(x => x !== id)];
+        if (existNodes) {
+            existNodes.map(en => {
+                graph = removeNode(graph, { id: en.id });
+            })
+        }
+
+    })
     return graph;
 }
 

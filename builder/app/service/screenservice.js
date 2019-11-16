@@ -4,7 +4,7 @@ import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
 import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, InstanceTypeSelectorFunction } from "../constants/componenttypes";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod, TARGET, SOURCE, GetConnectedNodeByType } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";

@@ -487,7 +487,7 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            })) : []),  !isSharedComponent ? {
+            })) : []), !isSharedComponent ? {
                 operation: ADD_NEW_NODE,
                 options: function (graph) {
                     let res = GetNodesByProperties({
