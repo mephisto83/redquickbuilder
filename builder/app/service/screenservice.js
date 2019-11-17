@@ -1,11 +1,11 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes, GetCurrentGraph } from "../actions/uiactions";
 import fs from 'fs';
 import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
-import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType } from "../constants/nodetypes";
+import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType, ProgrammingLanguages } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
-import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes } from "../constants/componenttypes";
-import { getComponentProperty, getClientMethod, TARGET, SOURCE, GetConnectedNodeByType } from "../methods/graph_methods";
+import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, ComponentEvents } from "../constants/componenttypes";
+import { getComponentProperty, getClientMethod, TARGET, SOURCE, GetConnectedNodeByType, GetNodesLinkedTo, GetConnectedNodesByType, GetLinkByNodes, getNodesByLinkType, getNodesLinkedTo, getNodesLinkedFrom } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
 
@@ -588,6 +588,55 @@ export function GetScreenImports(id, language) {
     return null;
 }
 
+export function getMethodInstancesForEvntType(node, evtType) {
+    let graph = GetCurrentGraph(GetState());
+    let methods = getNodesByLinkType(graph, {
+        id: node.id,
+        type: LinkType.LifeCylceMethod,
+        direction: TARGET,
+        exist: true
+    }).filter(x => GetNodeProp(x, NodeProperties.EventType) === evtType);
+    let methodInstances = [];
+    methods.map(method => {
+        methodInstances.push(...getNodesLinkedTo(graph, {
+            id: method.id,
+            exist: true
+        }).filter(x => [NodeTypes.LifeCylceMethodInstance].some(v => v === GetNodeProp(x, NodeProperties.NODEType))));
+    });
+
+    return methodInstances;
+
+}
+export function getMethodInvocation(methodInstanceCall, component) {
+    let graph = GetCurrentGraph(GetState());
+    let method = getNodesByLinkType(graph, {
+        id: methodInstanceCall.id,
+        type: LinkType.MethodCall,
+        direction: SOURCE
+    }).find(x => x);
+    if (method) {
+        let body = getNodesByLinkType(graph, {
+            id: method.id,
+            type: LinkType.MethodApiParameters,
+            direction: SOURCE
+        }).find(x => GetNodeProp(x, NodeProperties.UriBody));
+        let queryObject = getNodesByLinkType(graph, {
+            id: method.id,
+            type: LinkType.MethodApiParameters,
+            direction: TARGET
+        }).find(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
+
+        if (queryObject) {
+            let queryParameters = getNodesByLinkType(graph, {
+                id: queryObject.id,
+                type: LinkType.MethodApiParameters,
+                direction: TARGET
+            });
+            queryParameters.filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
+            debugger;
+        }
+    }
+}
 export function GetComponentDidMount(screenOption) {
     let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
     let outOfBandCall = '';
@@ -599,6 +648,13 @@ export function GetComponentDidMount(screenOption) {
             outOfBandCall = `//  fetchModelInstance(this.props.value, Models.${GetCodeName(GetNodeProp(screenOption, NodeProperties.Model))});`;
         }
     }
+    let methodInstances = getMethodInstancesForEvntType(screenOption, ComponentEvents.ComponentDidMount);
+
+    methodInstances.map(methodInstanceCall => {
+        return getMethodInvocation(methodInstanceCall, screenOption);
+    })
+
+
     let componentDidMount = `componentDidMount() {
         ${outOfBandCall}
         this.props.setGetState();

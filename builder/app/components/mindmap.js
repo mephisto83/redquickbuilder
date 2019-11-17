@@ -98,12 +98,12 @@ export default class MindMap extends Component {
         var width = bb.width - 10;// 960;
         var height = bb.height - 10;// 800;
         var color = d3.scaleOrdinal(d3.schemeCategory10)
-
+        me.avoidOverlaps = true;
         var margin = 6, pad = 12;;
         force
             .linkDistance(this.props.linkDistance || 280)
-            .avoidOverlaps(true)
-            .convergenceThreshold(0.1)
+            .avoidOverlaps(me.avoidOverlaps)
+            .convergenceThreshold(.01)
             .handleDisconnected(false)
             .size([width, height]);
 
@@ -334,9 +334,26 @@ export default class MindMap extends Component {
         function getLabelText(d) {
             return d && d.properties ? d.properties.text || d.name : d.name;
         }
+        function createRectangle(source) {
+            var temp = {
+                x: source.x - source.width / 2,
+                y: source.y - source.height / 2,
+                X: source.x + source.width / 2,
+                Y: source.y + source.height / 2
+            }
 
+            return new Cola.Rectangle(temp.x, temp.X, temp.y, temp.Y);
+        }
         function rotate(source, degree = Math.PI / 2) {
             var { innerBounds, x, y } = source;
+            if (!innerBounds) {
+                innerBounds = {
+                    x: source.x - source.width / 2,
+                    y: source.y - source.height / 2,
+                    X: source.x + source.width / 2,
+                    Y: source.y + source.height / 2
+                }
+            }
             var rise = innerBounds.y - innerBounds.Y;
             var run = innerBounds.x - innerBounds.X;
 
@@ -360,7 +377,8 @@ export default class MindMap extends Component {
                         d.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
                         d.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height)
                     }
-                    d.innerBounds = d.bounds.inflate(- margin);
+                    if (me.avoidOverlaps)
+                        d.innerBounds = d.bounds.inflate(- margin);
                 });
             }
 
@@ -391,15 +409,50 @@ export default class MindMap extends Component {
                         return d.y - d.height / 2
                     });
             }
-
-            group.attr("x", function (d) { return d.bounds.x })
-                .attr("y", function (d) { return d.bounds.y })
-                .attr("width", function (d) { return d.bounds.width() })
-                .attr("height", function (d) { return d.bounds.height() })
+            // if (me.avoidOverlapss)
+            group.attr("x", function (d) {
+                if (!d.bounds) {
+                    let min = d.leaves.minimum(x => (x.x - x.width / 2));
+                    let max = d.leaves.maximum(x => x.x + x.width / 2);
+                    let width = max - min;
+                    return (d.leaves.summation(x => x.x) / d.leaves.length) - (width / 2);
+                }
+                return d.bounds.x
+            })
+                .attr("y", function (d) {
+                    if (!d.bounds) {
+                        let min = d.leaves.minimum(x => (x.y - x.height / 2));
+                        let max = d.leaves.maximum(x => (x.y + x.height / 2));
+                        let height = max - min;
+                        return d.leaves.summation(x => x.y) / d.leaves.length - (height / 2);
+                    }
+                    return d.bounds.y
+                })
+                .attr("width", function (d) {
+                    if (!d.bounds) {
+                        let min = d.leaves.minimum(x => (x.x - x.width / 2));
+                        let max = d.leaves.maximum(x => x.x + x.width / 2);
+                        return max - min;
+                    }
+                    return d.bounds.width()
+                })
+                .attr("height", function (d) {
+                    if (!d.bounds) {
+                        let min = d.leaves.minimum(x => (x.y - x.height / 2));
+                        let max = d.leaves.maximum(x => (x.y + x.height / 2));
+                        return max - min;
+                    }
+                    return d.bounds.height()
+                })
 
             link.each(function (d) {
                 //  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
-                d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, 0), 5);
+                if (!me.avoidOverlaps) {
+                    d.route = Cola.makeEdgeBetween(createRectangle(d.source), createRectangle(d.target), 5);
+                }
+                else {
+                    d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, 0), 5);
+                }
             });
 
             link.attr("x1", function (d) { return d.route.sourceIntersection.x; })

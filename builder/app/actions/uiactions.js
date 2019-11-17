@@ -236,6 +236,9 @@ export function connectLifeCycleMethod(args) {
                     }
                 });
 
+                let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(state, source, NodeTypes.LifeCylceMethod);
+                let componentNode = GraphMethods.GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption]);
+
                 state = getState();
                 graph = GetCurrentGraph(state);
                 let apiEndpoints = [];
@@ -256,10 +259,27 @@ export function connectLifeCycleMethod(args) {
                     })
                 });
 
-                PerformGraphOperation([...apiConnectors, ...apiEndpoints.map(ae => {
+                PerformGraphOperation([...apiConnectors, {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        return {
+                            target,
+                            source,
+                            properties: {
+                                ...LinkProperties.MethodCall
+                            }
+                        }
+                    }
+                }, ...apiEndpoints.map(ae => {
                     return {
                         operation: ADD_NEW_NODE,
                         options: function () {
+                            let skipOrTake = GetNodeByProperties({
+                                [NodeProperties.QueryParameterType]: GetNodeProp(ae, NodeProperties.QueryParameterParamType),
+                                [NodeProperties.NODEType]: NodeTypes.DataChain,
+                                [NodeProperties.Component]: componentNode.id,
+                                [NodeProperties.IsPaging]: true
+                            })
                             return {
                                 nodeType: NodeTypes.ComponentApiConnector,
                                 groupProperties: {},
@@ -272,11 +292,17 @@ export function connectLifeCycleMethod(args) {
                                     linkProperties: {
                                         properties: { ...LinkProperties.ComponentApiConnection }
                                     }
-                                }]
+                                }, skipOrTake ? ({
+                                    target: skipOrTake.id,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.ComponentApiConnection }
+                                    }
+                                }) : null].filter(x => x)
                             }
                         }
                     }
                 })])(dispatch, getState);
+
 
             }
 

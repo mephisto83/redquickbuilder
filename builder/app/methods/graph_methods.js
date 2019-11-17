@@ -1829,11 +1829,17 @@ export function GetDataChainEntryNodes(state) {
     return NodesByType(graph, NodeTypes.DataChain).filter(x => GetNodeProp(x, NodeProperties.EntryPoint));
 }
 export function GetConnectedNodeByType(state, id, type, direction) {
+    if (!Array.isArray(type)) {
+        type = [type];
+    }
     let graph = GetRootGraph(state);
     return GetNodesLinkedTo(graph, {
         id,
         direction
-    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === type);
+    }).find(x => {
+        let ntype = GetNodeProp(x, NodeProperties.NODEType);
+        return type.some(v => v === ntype);
+    });
 }
 export function GetValidationNode(state, id) {
     let graph = GetRootGraph(state);

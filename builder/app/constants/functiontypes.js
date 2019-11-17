@@ -632,12 +632,17 @@ const FILTER_DEFAULTS = {
     interface_: './app/templates/filter/filter_method_interface.tpl',
     params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true }]
 }
-
-const QUERY_PARAMETERS = {
-    skip: true,
-    take: true,
-    filter: true,
-    sort: true
+export const QUERY_PARAMETER_KEYS = {
+    Skip: 'skip',
+    Take: 'take',
+    Filter: 'filter',
+    Sort: 'sort'
+}
+export const QUERY_PARAMETERS = {
+    [QUERY_PARAMETER_KEYS.Skip]: true,
+    [QUERY_PARAMETER_KEYS.Take]: true,
+    [QUERY_PARAMETER_KEYS.Filter]: true,
+    [QUERY_PARAMETER_KEYS.Sort]: true
 }
 
 export const MethodFunctions = {

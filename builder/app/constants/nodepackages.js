@@ -1,4 +1,4 @@
-import { MethodFunctions, FunctionTypes, FunctionTemplateKeys, FunctionMethodTypes, HTTP_METHODS } from "./functiontypes";
+import { MethodFunctions, FunctionTypes, FunctionTemplateKeys, FunctionMethodTypes, HTTP_METHODS, QUERY_PARAMETERS, QUERY_PARAMETER_KEYS } from "./functiontypes";
 import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties, LinkType, LinkPropertyKeys } from "./nodetypes";
 import {
     ADD_NEW_NODE,
@@ -667,9 +667,11 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                     properties: {
                         [NodeProperties.UIText]: skipChain ? `Get ${viewName} Skip` : `Get ${viewName} Take`,
                         [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                        [NodeProperties.QueryParameterType]: skipChain ? QUERY_PARAMETER_KEYS.Skip : QUERY_PARAMETER_KEYS.Take,
                         [NodeProperties.Model]: newItems.currentNode,
-                        [NodeProperties.Screen]: newItems.screenNodeId,
+                        [NodeProperties.Component]: newItems.screenNodeOptionId,
                         [NodeProperties.PagingSkip]: skipChain,
+                        [NodeProperties.IsPaging]: true,
                         [NodeProperties.PagingTake]: !skipChain,
                         [NodeProperties.EntryPoint]: true,
                         ...viewPackage
@@ -998,30 +1000,7 @@ export const CreateDefaultView = {
                         [NodeProperties.Model]: currentNode.id
                     }
                 }
-            } : false, ...(!isSharedComponent ? (SCREEN_COMPONENT_EVENTS.map(t => {
-                return {
-                    operation: ADD_NEW_NODE,
-                    options: function () {
-                        return {
-                            nodeType: NodeTypes.LifeCylceMethod,
-                            properties: {
-                                ...viewPackage,
-                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
-                                [NodeProperties.UIText]: `${t}`,
-                            },
-                            links: [{
-                                target: screenNodeId,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.LifeCylceMethod }
-                                }
-                            }],
-                            callback: (screenNode) => {
-                                screenComponentEvents.push(screenNode.id);
-                            },
-                        }
-                    }
-                }
-            })) : []),
+            } : false,
             !isSharedComponent && isList ? {
                 // The selector for a list screen
                 operation: ADD_NEW_NODE,
@@ -1097,8 +1076,6 @@ export const CreateDefaultView = {
                 }
             } : false,
 
-            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, true) : false,
-            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, false) : false,
 
             !isSharedComponent ? {
                 operation: ADD_NEW_NODE,
@@ -1298,6 +1275,7 @@ export const CreateDefaultView = {
                     return {
                         callback: (screenOptionNode) => {
                             screenNodeOptionId = screenOptionNode.id;
+                            newItems.screenNodeOptionId = screenNodeOptionId;
                         },
                         parent: screenNodeId,
                         properties: {
@@ -1319,7 +1297,37 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            } : false, isList ? {
+            } : false,
+            ...(!isSharedComponent ? (SCREEN_COMPONENT_EVENTS.map(t => {
+                return {
+                    operation: ADD_NEW_NODE,
+                    options: function () {
+                        return {
+                            nodeType: NodeTypes.LifeCylceMethod,
+                            properties: {
+                                ...viewPackage,
+                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                                [NodeProperties.EventType]: t,
+                                [NodeProperties.UIText]: `${t}`,
+                            },
+                            links: [{
+                                target: newItems.screenNodeOptionId,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.LifeCylceMethod }
+                                }
+                            }],
+                            callback: (screenNode) => {
+                                screenComponentEvents.push(screenNode.id);
+                            },
+                        }
+                    }
+                }
+            })) : []),
+
+            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, true) : false,
+            !isSharedComponent && isList ? createViewPagingDataChain(newItems, viewName, viewPackage, false) : false,
+
+            isList ? {
                 operation: NEW_COMPONENT_NODE,
                 options: function (currentGraph) {
                     listLayout = CreateLayout();

@@ -193,6 +193,87 @@ export function uuidv4() {
             }
         });
     }
+    if (!array.maxSelection) {
+        Object.defineProperty(array, 'maxSelection', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var result = null;
+                var _result = null;
+                var collection = this;
+                for (var i = 0; i < collection.length; i++) {
+                    let temp = func(collection[i]);
+                    if (result == null || temp > result) {
+                        result = temp;
+                        _result = collection[i];
+                    }
+                }
+                return _result;
+            }
+        });
+    }
+    if (!array.maximum) {
+        Object.defineProperty(array, 'maximum', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var result = null;
+                var _result = null;
+                var collection = this;
+                func = func || function (x) { return x; };
+                for (var i = 0; i < collection.length; i++) {
+                    let temp = func(collection[i], i);
+                    if (result == null || temp > result) {
+                        result = temp;
+                        _result = collection[i];
+                    }
+                }
+                return result;
+            }
+        });
+    }
+
+
+    if (!array.minimum) {
+        Object.defineProperty(array, 'minimum', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var result = null;
+                var _result = null;
+                var collection = this;
+                var val;
+                func = func || function (x) { return x; };
+                for (var i = 0; i < collection.length; i++) {
+                    val = func(collection[i], i);
+                    if (result == null || val < result) {
+                        result = val;
+                        _result = collection[i];
+                    }
+                }
+                return result;
+            }
+        });
+    }
+
+    if (!array.summation) {
+        Object.defineProperty(array, 'summation', {
+            enumerable: false,
+            writable: true,
+            configurable: true,
+            value: function (func) {
+                var result = 0;
+                var collection = this;
+                for (var i = 0; i < collection.length; i++) {
+                    result = func(collection[i], result, i, collection.length);
+                }
+                return result;
+            }
+        });
+    }
 })(Array.prototype)
 
 
@@ -204,7 +285,7 @@ String.prototype.toJavascriptName = function () {
         } catch (e) {
             console.log(str);
             console.log(str.length);
-            
+
         }
     }
     return str;

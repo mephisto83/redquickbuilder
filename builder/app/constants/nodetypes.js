@@ -243,6 +243,7 @@ export const NodeProperties = {
     SelectorType: 'selector-type',
     UseInstanceType: "UseInstanceType",
     SharedComponent: 'SharedComponent',
+    EventType: 'EventType',
     EnabledMenu: 'EnabledMenu',
     InstanceType: "InstanceType",
     ComponentParameters: 'ComponentParameters',
@@ -337,6 +338,7 @@ export const NodeProperties = {
     NodePackageAgent: 'NodePackageAgent',
     IsPagingModel: 'IsPagingModel',
     PagingSkip: 'Skip',
+    IsPaging: 'IsPaging',
     PagingTake: 'Take',
     PagingFilter: 'Filter',
     PagingSort: "PagingSort",
@@ -420,6 +422,8 @@ export const NodeProperties = {
     ScopeGraph: 'scopedGraph',
 
     DataChainFunctionType: 'DataChainFunctionType',
+    QueryParameterType: 'QueryParameterType',
+    Component: 'Component',
 
     AfterMethod: 'after-method',
     AfterMethodSetup: 'after-method-setup',
@@ -531,6 +535,7 @@ export const LinkType = {
     SharedComponent: 'SharedComponent',
     ExecutorServiceMethod: 'ExecutorServiceMethod',
     LifeCylceMethod: 'LifeCylceMethod',
+    MethodCall: 'MethodCall',
     ValidatorServiceMethod: 'ValidatorServiceMethod',
     PermissionServiceMethod: 'PermissionServiceMethod',
     ComponentApiConnection: "ComponentApiConnection",
@@ -732,6 +737,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
+    },
+    MethodCall: {
+        type: LinkType.MethodCall
     },
     LifeCylceMethod: {
         type: LinkType.LifeCylceMethod
