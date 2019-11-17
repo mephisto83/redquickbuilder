@@ -668,6 +668,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                         [NodeProperties.UIText]: skipChain ? `Get ${viewName} Skip` : `Get ${viewName} Take`,
                         [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
                         [NodeProperties.Model]: newItems.currentNode,
+                        [NodeProperties.Screen]: newItems.screenNodeId,
                         [NodeProperties.PagingSkip]: skipChain,
                         [NodeProperties.PagingTake]: !skipChain,
                         [NodeProperties.EntryPoint]: true,
@@ -988,6 +989,7 @@ export const CreateDefaultView = {
                     nodeType: NodeTypes.Screen,
                     callback: (screenNode) => {
                         screenNodeId = screenNode.id;
+                        newItems.screenNodeId = screenNode.id;
                     },
                     properties: {
                         ...viewPackage,

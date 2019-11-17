@@ -410,6 +410,7 @@ export const NodeProperties = {
     ChainNodeInput2: 'ChainNodeInput2',
     ScreenInstance: 'ScreenInstance',
     Model: 'Model',
+    Screen: 'Screen',
     ChainNodeInput1: 'ChainNodeInput1',
     UIModelType: 'uiModelType',
     DataChainReference: 'DataChainReference',
