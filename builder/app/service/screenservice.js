@@ -615,26 +615,66 @@ export function getMethodInvocation(methodInstanceCall, component) {
         direction: SOURCE
     }).find(x => x);
     if (method) {
+        let parts = [];
         let body = getNodesByLinkType(graph, {
             id: method.id,
             type: LinkType.MethodApiParameters,
-            direction: SOURCE
+            direction: TARGET
         }).find(x => GetNodeProp(x, NodeProperties.UriBody));
         let queryObject = getNodesByLinkType(graph, {
             id: method.id,
             type: LinkType.MethodApiParameters,
             direction: TARGET
         }).find(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
-
+        let body_input = null;
+        if (body) {
+            let body_param = getNodesByLinkType(graph, {
+                id: body.id,
+                type: LinkType.ComponentApiConnection,
+                direction: TARGET
+            }).find(x => x);
+            if (body_param) {
+                let body_value = getNodesByLinkType(graph, {
+                    id: body_param.id,
+                    type: LinkType.ComponentApiConnection,
+                    direction: SOURCE
+                }).find(x_temp => GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.DataChain);
+                if (body_value)
+                    body_input = `body: DC.${GetJSCodeName(body_value)}(this.props.state)`;
+            }
+            if (body_input) {
+                parts.push(`${body_input}`);
+            }
+        }
         if (queryObject) {
             let queryParameters = getNodesByLinkType(graph, {
                 id: queryObject.id,
                 type: LinkType.MethodApiParameters,
-                direction: TARGET
+                direction: SOURCE
             });
-            queryParameters.filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
-            debugger;
+            queryParameters = queryParameters.filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
+
+            let queryParameterValues = queryParameters.map(queryParameter => {
+                let param = getNodesByLinkType(graph, {
+                    id: queryParameter.id,
+                    type: LinkType.ComponentApiConnection,
+                    direction: TARGET
+                }).find(x_temp => x_temp);
+                if (param) {
+                    let value = getNodesByLinkType(graph, {
+                        id: param.id,
+                        type: LinkType.ComponentApiConnection,
+                        direction: SOURCE
+                    }).find(x_temp => GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.DataChain);
+                    if (value) {
+                        return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value)}(this.props.state)`;
+                    }
+                }
+            }).filter(temp => temp);
+            parts.push(`query: {${addNewLine(queryParameterValues.join(', ' + NEW_LINE))}}`);
         }
+        let query = parts.join();
+        return `this.props.${GetJSCodeName(method)}({${query}});`;
     }
 }
 export function GetComponentDidMount(screenOption) {
@@ -650,13 +690,14 @@ export function GetComponentDidMount(screenOption) {
     }
     let methodInstances = getMethodInstancesForEvntType(screenOption, ComponentEvents.ComponentDidMount);
 
-    methodInstances.map(methodInstanceCall => {
+    let invocations = methodInstances.map(methodInstanceCall => {
         return getMethodInvocation(methodInstanceCall, screenOption);
-    })
+    }).join(NEW_LINE)
 
 
     let componentDidMount = `componentDidMount() {
         ${outOfBandCall}
+        ${invocations}
         this.props.setGetState();
 {{handles}}
 }
