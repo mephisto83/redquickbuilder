@@ -1580,10 +1580,32 @@ export const CreateDefaultView = {
                         },
                         callback: (component) => {
                             childComponents.push(component.id);
+                            newItems.button = component.id;
                         }
                     }
                 }
-            }, {
+            }, ...((ComponentTypes.ReactNative.Button.eventApi.map(t => {
+                return {
+                    operation: ADD_NEW_NODE,
+                    options: function () {
+                        return {
+                            nodeType: NodeTypes.EventMethod,
+                            properties: {
+                                ...viewPackage,
+                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                                [NodeProperties.EventType]: t,
+                                [NodeProperties.UIText]: `${t}`,
+                            },
+                            links: [{
+                                target: newItems.button,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.EventMethod }
+                                }
+                            }]
+                        }
+                    }
+                }
+            }))), {
                 operation: CHANGE_NODE_PROPERTY,
                 options: function () {
                     let lastComponent = childComponents.length - 1;

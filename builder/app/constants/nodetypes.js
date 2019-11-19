@@ -13,6 +13,8 @@ export const NodeTypes = {
     ComponentApiConnector: 'component-api-connector',
     ScreenContainer: 'screen-container',
     Screen: 'screen',
+    EventMethod: 'EventMethod',
+    EventMethodInstance: 'EventMethodInstance',
     LifeCylceMethod: 'LifeCylceMethod',
     LifeCylceMethodInstance: 'LifeCylceMethodInstance',
     Selector: 'selector',
@@ -535,6 +537,8 @@ export const LinkType = {
     SharedComponent: 'SharedComponent',
     ExecutorServiceMethod: 'ExecutorServiceMethod',
     LifeCylceMethod: 'LifeCylceMethod',
+    EventMethod: 'EventMethod',
+    NavigationMethod: 'NavigationMethod',
     MethodCall: 'MethodCall',
     ValidatorServiceMethod: 'ValidatorServiceMethod',
     PermissionServiceMethod: 'PermissionServiceMethod',
@@ -743,6 +747,12 @@ export const LinkProperties = {
     },
     LifeCylceMethod: {
         type: LinkType.LifeCylceMethod
+    },
+    EventMethod: {
+        type: LinkType.EventMethod
+    },
+    NavigationMethod: {
+        type: LinkType.NavigationMethod
     },
     MethodApiParameters: {
         type: LinkType.MethodApiParameters

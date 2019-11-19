@@ -195,7 +195,7 @@ export function setComponentApiConnection(args) {
     return (dispatch, getState) => {
         let state = getState();
         let graph = GetCurrentGraph(state);
-        if ([NodeTypes.EventHandler, NodeTypes.LifeCylceMethod, NodeTypes.MethodApiParameters, NodeTypes.DataChain, NodeTypes.Selector].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
+        if ([NodeTypes.EventMethod, NodeTypes.LifeCylceMethod, NodeTypes.MethodApiParameters, NodeTypes.DataChain, NodeTypes.Selector].some(t => t === GetNodeProp(target, NodeProperties.NODEType)))
             if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.ComponentApiConnection })) {
                 let connections = GraphMethods.GetConnectedNodesByType(state, source, GetNodeProp(target, NodeProperties.NODEType)).map(x => {
                     return {
@@ -226,7 +226,7 @@ export function connectLifeCycleMethod(args) {
 
             let state = getState();
             let graph = GetCurrentGraph(state);
-            if ([NodeTypes.Method].some(t => t === GetNodeProp(target, NodeProperties.NODEType))) {
+            if ([NodeTypes.Method, NodeTypes.ScreenOption].some(t => t === GetNodeProp(target, NodeProperties.NODEType))) {
                 let apiConnectors = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentApiConnector).map(x => {
                     return {
                         operation: REMOVE_NODE,
@@ -236,7 +236,7 @@ export function connectLifeCycleMethod(args) {
                     }
                 });
 
-                let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(state, source, NodeTypes.LifeCylceMethod);
+                let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(state, source, [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod]);
                 let componentNode = GraphMethods.GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption]);
 
                 state = getState();

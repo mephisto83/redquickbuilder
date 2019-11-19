@@ -149,6 +149,11 @@ class Dashboard extends Component {
 					return result;
 				case NodeTypes.LifeCylceMethod:
 					return this.getLifeCylcleMethods();
+				case NodeTypes.EventMethod:
+					return this.getEventMethods();
+				case NodeTypes.EventMethodInstance:
+					result.push(...this.getEventInstanceMethods());
+					return result;
 				case NodeTypes.LifeCylceMethodInstance:
 					result.push(...this.getLifeCylcleInstanceMethods());
 					return result;
@@ -295,6 +300,40 @@ class Dashboard extends Component {
 
 		return result;
 	}
+	getEventMethods() {
+		let result = [];
+		let { state } = this.props;
+		result.push({
+			onClick: () => {
+
+				var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
+				this.props.graphOperation([{
+					operation: UIA.ADD_NEW_NODE,
+					options: function () {
+						return {
+							nodeType: NodeTypes.EventMethodInstance,
+							parent: currentNode.id,
+							groupProperties: {},
+							properties: {
+								[NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Instance`,
+								[NodeProperties.AutoDelete]: {
+									properties: {
+										[NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+									}
+								}
+							}
+						}
+					}
+				}
+				])
+			},
+			icon: 'fa  fa-plus',
+			title: `${Titles.AddInstance}`
+		});
+
+		return result;
+	}
 	getLifeCylcleMethods() {
 		let result = [];
 		let { state } = this.props;
@@ -340,6 +379,30 @@ class Dashboard extends Component {
 			},
 			icon: 'fa fa-list-ol',
 			title: `${Titles.ConnectLifeCylceMethods}`
+		});
+
+		return result;
+	}
+	getEventInstanceMethods() {
+		let result = [];
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.EventMethod
+				});
+			},
+			icon: 'fa fa-list-ol',
+			title: `${Titles.ConnectEventMethods}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.NavigationMethod
+				});
+			},
+			icon: 'fa fa-plus',
+			title: `${Titles.NavigateTo}`
+
 		});
 
 		return result;
@@ -742,7 +805,7 @@ class Dashboard extends Component {
 												source: selectedId
 											})
 										}
-										else if (properties && properties.type === LinkType.LifeCylceMethod) {
+										else if (properties && [LinkType.LifeCylceMethod, LinkType.EventMethod, LinkType.NavigationMethod].some(v => v === properties.type)) {
 											this.props.connectLifeCycleMethod({
 												properties,
 												target: nodeId,
