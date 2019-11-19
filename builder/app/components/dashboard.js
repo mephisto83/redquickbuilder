@@ -203,6 +203,26 @@ class Dashboard extends Component {
 						// }
 					);
 					break;
+				case NodeTypes.ScreenOption:
+					result.push({
+						onClick: () => {
+							this.props.addQueryMethodApi();
+						},
+						icon: 'fa  fa-plus',
+						title: Titles.AddQueryMethodApi
+					})
+					break;
+				case NodeTypes.MethodApiParameters:
+					if (UIA.GetNodeProp(currentNode, NodeProperties.QueryParameterObjectExtendible)) {
+						result.push({
+							onClick: () => {
+								this.props.addQueryMethodParameter();
+							},
+							icon: 'fa  fa-plus',
+							title: Titles.AddQueryMethodApi
+						})
+					}
+					break;
 				case NodeTypes.ScreenItem:
 				case NodeTypes.ScreenCollection:
 				case NodeTypes.ScreenContainer:

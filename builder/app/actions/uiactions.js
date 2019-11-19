@@ -218,6 +218,75 @@ export function setComponentApiConnection(args) {
     }
 }
 
+export function addQueryMethodParameter() {
+    return (dispatch, getState) => {
+        let state = getState();
+        let graph = GetCurrentGraph(state);
+        var currentNode = Node(state, Visual(state, SELECTED_NODE));
+        let operations = [];
+        operations.push({
+            operation: ADD_NEW_NODE,
+            options: function () {
+                return {
+                    nodeType: NodeTypes.MethodApiParameters,
+                    properties: {
+                        [NodeProperties.UIText]: 'Query Parameter',
+                        [NodeProperties.QueryParameterParam]: true,
+                    },
+                    parent: currentNode.id,
+                    groupProperties: {},
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: {
+                                ...LinkProperties.MethodApiParameters,
+                                params: true,
+                                query: true
+                            }
+                        }
+                    }]
+                };
+            }
+        });
+        PerformGraphOperation(operations)(dispatch, getState);
+    }
+}
+export function addQueryMethodApi() {
+    return (dispatch, getState) => {
+        let state = getState();
+        let graph = GetCurrentGraph(state);
+        var currentNode = Node(state, Visual(state, SELECTED_NODE));
+        let queryObjects = GraphMethods.GetConnectedNodesByType(state, currentNode.id, NodeTypes.MethodApiParameters).filter(x => GetNodeProp(x, NodeProperties.QueryParameterObject))
+        if (queryObjects.length === 0) {
+            let operations = [];
+            operations.push({
+                operation: ADD_NEW_NODE,
+                options: function () {
+                    return {
+                        nodeType: NodeTypes.MethodApiParameters,
+                        properties: {
+                            [NodeProperties.UIText]: 'Query',
+                            [NodeProperties.QueryParameterObject]: true,
+                            [NodeProperties.QueryParameterObjectExtendible]: true
+                        },
+                        links: [{
+                            target: currentNode.id,
+                            linkProperties: {
+                                properties: {
+                                    ...LinkProperties.MethodApiParameters,
+                                    params: true,
+                                    query: true
+                                }
+                            }
+                        }]
+                    };
+                }
+            });
+            PerformGraphOperation(operations)(dispatch, getState);
+        }
+    }
+}
+
 export function connectLifeCycleMethod(args) {
 
     let { properties, target, source } = args;

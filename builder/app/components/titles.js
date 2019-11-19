@@ -80,6 +80,7 @@ export const Selector = 'Selector';
 export const Collapsed = 'Collapsed';
 export const GenericLink = 'General Link';
 export const OnLoad = 'On Load';
+export const AddQueryMethodApi = 'Add Query Api'
 export const ChildLink = 'Child link';
 export const OnFailureLink = 'On failure result';
 export const OnAction = 'On Action';

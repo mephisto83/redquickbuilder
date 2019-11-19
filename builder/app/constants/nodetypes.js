@@ -329,6 +329,7 @@ export const NodeProperties = {
     UIPermissions: 'uiPermissions',
     IsOwned: 'isOwned',
     UIName: 'uiName', // The name used in the ui.
+    QueryParameterObjectExtendible: 'QueryParameterObjectExtendible',
     QueryParameterObject: 'QueryParameterObject',
     QueryParameterParam: 'QueryParameterParam',
     QueryParameterParamType: 'QueryParameterParamType',
