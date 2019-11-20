@@ -98,7 +98,7 @@ import { ViewTypes } from '../actions/uiactions';
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
-import { findLinkInstance, getLinkInstance, createEventProp } from '../methods/graph_methods';
+import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET } from '../methods/graph_methods';
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -210,6 +210,15 @@ class Dashboard extends Component {
 						},
 						icon: 'fa  fa-plus',
 						title: Titles.AddQueryMethodApi
+					}, {
+						onClick: () => {
+							// this.props.setVisual(CONNECTING_NODE, {
+							// 	autoConnectViewType: currentNode.id
+							// });
+
+						},
+						icon: 'fa fa-plus',
+						title: `${Titles.AddComponentApi}`
 					})
 					break;
 				case NodeTypes.MethodApiParameters:
@@ -223,6 +232,19 @@ class Dashboard extends Component {
 						})
 					}
 					break;
+				case NodeTypes.ComponentExternalApi:
+					result.push({
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.DataChainLink,
+								singleLink: true,
+								nodeTypes: [NodeTypes.DataChain]
+							});
+						},
+						icon: 'fa  fa-share-alt',
+						title: Titles.DataChain
+					})
+					break;
 				case NodeTypes.ScreenItem:
 				case NodeTypes.ScreenCollection:
 				case NodeTypes.ScreenContainer:
@@ -233,6 +255,29 @@ class Dashboard extends Component {
 						},
 						icon: 'fa  fa-share-alt',
 						title: Titles.ChildLink
+					}, {
+						onClick: () => {
+							// this.props.setVisual(CONNECTING_NODE, {
+							// 	autoConnectViewType: currentNode.id
+							// });
+							this.props.graphOperation([{
+								operation: UIA.ADD_NEW_NODE,
+								options: function () {
+									return {
+										nodeType: NodeTypes.ComponentApi,
+										parent: currentNode.id,
+										groupProperties: {},
+										properties: {
+											[NodeProperties.UIText]: `value`
+										}
+									}
+								}
+							}
+							])
+
+						},
+						icon: 'fa fa-plus',
+						title: `${Titles.AddComponentApi}`
 					});
 					break;
 			}
@@ -420,7 +465,7 @@ class Dashboard extends Component {
 					...LinkProperties.NavigationMethod
 				});
 			},
-			icon: 'fa fa-plus',
+			icon: 'fa fa-map-signs',
 			title: `${Titles.NavigateTo}`
 
 		});
@@ -456,6 +501,46 @@ class Dashboard extends Component {
 			},
 			icon: 'fa  fa-soccer-ball-o',
 			title: `${Titles.All}`
+		}, {
+			onClick: () => {
+				this.props.graphOperation([{
+					operation: UIA.ADD_NEW_NODE,
+					options: function () {
+						return {
+							nodeType: NodeTypes.ComponentApi,
+							parent: currentNode.id,
+							groupProperties: {},
+							properties: {
+								[NodeProperties.UIText]: `value`
+							}
+						}
+					}
+				}
+				])
+
+			},
+			icon: 'fa fa-plus',
+			title: `${Titles.AddComponentApi}`
+		}, {
+			onClick: () => {
+				this.props.graphOperation([{
+					operation: UIA.ADD_NEW_NODE,
+					options: function () {
+						return {
+							nodeType: NodeTypes.ComponentExternalApi,
+							parent: currentNode.id,
+							groupProperties: {},
+							properties: {
+								[NodeProperties.UIText]: `value`
+							}
+						}
+					}
+				}
+				])
+
+			},
+			icon: 'fa fa-plus-circle',
+			title: `${Titles.AddComponentExtApi}`
 		})
 
 		return result;
@@ -901,11 +986,36 @@ class Dashboard extends Component {
 
 											}
 											else {
-												this.props.graphOperation(UIA.NEW_LINK, {
-													target: nodeId,
-													source: selectedId,
-													properties
-												});
+												if (properties.singleLink) {
+
+													this.props.graphOperation([...getNodesByLinkType(graph, {
+														type: properties.type,
+														direction: SOURCE,
+														id: selectedId
+													}).map(rm => {
+														return {
+															operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+															options: {
+																target: rm.id,
+																source: selectedId
+															}
+														}
+													}), {
+														operation: UIA.NEW_LINK,
+														options: {
+															target: nodeId,
+															source: selectedId,
+															properties
+														}
+													}])
+												}
+												else {
+													this.props.graphOperation(UIA.NEW_LINK, {
+														target: nodeId,
+														source: selectedId,
+														properties
+													});
+												}
 											}
 										}
 										this.props.setVisual(CONNECTING_NODE, false);

@@ -18,6 +18,8 @@ export const NodeTypes = {
     LifeCylceMethod: 'LifeCylceMethod',
     LifeCylceMethodInstance: 'LifeCylceMethodInstance',
     Selector: 'selector',
+    ComponentApi: 'ComponentApi',
+    ComponentExternalApi: 'ComponentExternalApi',
     ScreenCollection: 'screen-collection',
     ScreenItem: 'screen-item',
     Attribute: 'attribute-property',
@@ -184,7 +186,9 @@ export const NodeTypeColors = {
     [NodeTypes.Condition]: '#F90093',
     [NodeTypes.DataChain]: "#FF6B6B",
     [NodeTypes.ServiceInterface]: '#4A6D7C',
-    [NodeTypes.MethodApiParameters]: '#ff0001'
+    [NodeTypes.MethodApiParameters]: '#ff0001',
+    [NodeTypes.ComponentApi]: '#E2C044',
+    [NodeTypes.ComponentExternalApi]: '#2E5266'
 
 }
 

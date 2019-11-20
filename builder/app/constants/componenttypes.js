@@ -16,11 +16,14 @@ export const VALUE = 'value';
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 
-export const ComponentEvents = {
+export const ComponentLifeCycleEvents = {
     ComponentDidMount: 'componentDidMount',
     ComponentWillUnmount: 'componentWillUnmount'
 }
-export const SCREEN_COMPONENT_EVENTS = [ComponentEvents.ComponentDidMount, ComponentEvents.ComponentWillUnmount];
+export const ComponentEvents = {
+    onPress: 'onPress'
+}
+export const SCREEN_COMPONENT_EVENTS = [ComponentLifeCycleEvents.ComponentDidMount, ComponentLifeCycleEvents.ComponentWillUnmount];
 
 const INPUT_DEFAULT_API = [VALUE, ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, 'inlineLabel', 'floatingLabel', 'stackedLabel', 'fixedLabel', 'success', 'error'].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
