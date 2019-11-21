@@ -22,6 +22,7 @@ super(props);
 
 this.state = {};
 }
+{{component_did_update}}
 render() {
 let { state } = this.props;
 {{screen_options}}

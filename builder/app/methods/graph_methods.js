@@ -1958,12 +1958,17 @@ export function getNodeLinked(graph, options) {
 
 export function GetNodesLinkedTo(graph, options) {
     if (options) {
-        var { id, direction } = options;
+        var { id, direction, link } = options;
         if (graph && graph.nodeConnections && id) {
             var nodeLinks = graph.nodeConnections[id];
             if (nodeLinks) {
                 return Object.keys(nodeLinks).map(_id => {
                     var target = null;
+                    if (link) {
+                        if (GetLinkProperty(graph.linkLib[_id], LinkPropertyKeys.TYPE) !== link) {
+                            return null;
+                        }
+                    }
                     if (graph.linkLib[_id]) {
                         if (graph.linkLib[_id].source !== id) {
                             if (!direction || direction === TARGET)
@@ -1974,6 +1979,7 @@ export function GetNodesLinkedTo(graph, options) {
                                 target = graph.linkLib[_id].target;
                         }
                     }
+
                     if (!target) {
                         // console.warn('Missing value in linkLib');
                         return null;

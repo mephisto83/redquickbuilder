@@ -337,6 +337,7 @@ export const NodeProperties = {
     QueryParameterObject: 'QueryParameterObject',
     QueryParameterParam: 'QueryParameterParam',
     QueryParameterParamType: 'QueryParameterParamType',
+    IsQuery: 'query',
     AutoDelete: 'AutoDelete', // Anything matching the properties etc, will auto delete along with the current node.
     UriBody: 'UriBody',
     UriParameter: 'UriParameter',
@@ -349,6 +350,7 @@ export const NodeProperties = {
     PagingTake: 'Take',
     PagingFilter: 'Filter',
     PagingSort: "PagingSort",
+    ComponentApiKey: 'ComponentApiKey',
     IsDataChainPagingSkip: 'IsDataChainPagingSkip',
     IsDataChainPagingTake: 'IsDataChainPagingTake',
     UIText: 'text',
@@ -586,9 +588,12 @@ export const LinkType = {
     ComponentApi: 'ComponentApi',
     ComponentInternalConnection: 'component-internal-connection',
     ComponentExternalConnection: 'component-external-connection',
+    ComponentExternalApi: "component-external-api",
+    ComponentInternalApi: "component-internal-api",
     ViewModelLink: "view-model-link",
     Component: 'component',
     DataChainLink: 'data-chain-link',
+    QueryLink: 'query-link',
     SelectorLink: 'selector-link',
     ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
@@ -631,6 +636,10 @@ export const LinkStyles = {
     [LinkType.FunctionLink]: {
         type: LinkType.FunctionLink,
         stroke: NodeTypeColors[NodeTypes.Function]
+    },
+    [LinkType.ComponentInternalConnection]: {
+        stroke: NodeTypeColors[NodeTypes.ComponentApi],
+        type: LinkType.ComponentInternalConnection
     },
     [LinkType.DefaultViewType]: {
         type: LinkType.DefaultViewType
@@ -813,8 +822,17 @@ export const LinkProperties = {
     ComponentExternalConnection: {
         type: LinkType.ComponentExternalConnection
     },
+    ComponentExternalApi: {
+        type: LinkType.ComponentExternalApi
+    },
+    ComponentInternalApi: {
+        type: LinkType.ComponentInternalApi
+    },
     SelectorLink: {
         type: LinkType.SelectorLink
+    },
+    QueryLink: {
+        type: LinkType.QueryLink
     },
     DataChainLink: {
         type: LinkType.DataChainLink

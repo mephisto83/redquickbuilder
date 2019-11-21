@@ -128,7 +128,7 @@ export default class MindMap extends Component {
                     if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
                         return LinkStyles[d.properties.type].stroke;
                     }
-                    return '#555';
+                    return '#ff0000';
                 });
 
 
@@ -588,24 +588,34 @@ export default class MindMap extends Component {
             }
 
             if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
+
                 let graph_groups = graph.groups.filter(x => graph.groupLib[x].leaves || graph.groupLib[x].groups);
-                let removedGroups = this.state.graph.groups.relativeCompliment(graph_groups, (x, y) => x.id === y).map(t => {
-                    return this.state.graph.groups.indexOf(t);
-                });
+                let removedGroups = null;
+                if (this.props.groupsDisabled) {
+                    removedGroups = [].interpolate(0, this.state.graph.groups.length, x => x);
+                }
+                else {
+                    removedGroups = this.state.graph.groups.relativeCompliment(graph_groups, (x, y) => x.id === y).map(t => {
+                        return this.state.graph.groups.indexOf(t);
+                    });
+                }
                 this.state.graph.groups.removeIndices(removedGroups);
-                let newGroups = graph_groups
-                    .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
-                    .filter(x => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
-                newGroups.map(nn => {
-                    this.state.graph.groups.push(
-                        (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
-                    )
-                })
-                graph_groups.forEach(group => {
-                    let g = this.state.graph.groups.find(x => x.id === group);
-                    applyGroup(g, graph.groupLib[group], this.state.graph.groups, this.state.graph.nodes);
-                    // (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
-                })
+                if (!this.props.groupsDisabled) {
+                    let newGroups = graph_groups
+                        .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
+                        .filter(x => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
+                    newGroups.map(nn => {
+                        this.state.graph.groups.push(
+                            (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
+                        )
+                    })
+
+                    graph_groups.forEach(group => {
+                        let g = this.state.graph.groups.find(x => x.id === group);
+                        applyGroup(g, graph.groupLib[group], this.state.graph.groups, this.state.graph.nodes, this.props.groupsDisabled);
+                        // (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
+                    })
+                }
 
                 // this.state.graph.groups.map(group => {
                 //     var _group = graph.groupLib[group.id];

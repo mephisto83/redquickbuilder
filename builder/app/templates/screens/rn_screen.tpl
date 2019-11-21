@@ -32,6 +32,7 @@ class {{name}} extends React.Component {
         title: titleService.get({{title}}),
         header: null
     };
+{{component_did_update}}
 {{component_did_mount}}
     render() {
         navigationInstance = this.props.navigation;

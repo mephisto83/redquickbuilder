@@ -1,8 +1,8 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes, GetCurrentGraph, GetNodeByProperties } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes, GetCurrentGraph, GetNodeByProperties, GetNodes } from "../actions/uiactions";
 import fs from 'fs';
 import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
-import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType, ProgrammingLanguages } from "../constants/nodetypes";
+import { NodeProperties, UITypes, NEW_LINE, NodeTypes, LinkType, ProgrammingLanguages, NodePropertiesDirtyChain } from "../constants/nodetypes";
 import { buildLayoutTree, GetNodeComponents, GetRNConsts, GetRNModelInstances, GetRNModelConst, GetRNModelConstValue } from "./layoutservice";
 import { ComponentTypes, GetListItemNode, InstanceTypes, NAVIGATION, APP_METHOD, HandlerTypes, ComponentLifeCycleEvents, ComponentEvents } from "../constants/componenttypes";
 import { getComponentProperty, getClientMethod, TARGET, SOURCE, GetConnectedNodeByType, GetNodesLinkedTo, GetConnectedNodesByType, GetLinkByNodes, getNodesByLinkType, getNodesLinkedTo, getNodesLinkedFrom } from "../methods/graph_methods";
@@ -33,6 +33,7 @@ export function GenerateScreenMarkup(id, language) {
             title: `"${GetNodeTitle(screen)}"`,
             imports: imports.join(NEW_LINE),
             elements: elements.join(NEW_LINE),
+            component_did_update: GetComponentDidUpdate(screen),
             component_did_mount: GetComponentDidMount(screenOption)
         })
     }
@@ -51,27 +52,29 @@ export function GetDefaultElement(language) {
 export function GetItemRender(node, imports, language) {
     let listItemNode = GetListItemNode(node.id);
     imports.push(GenerateComponentImport(listItemNode, node, language))
-
-    return `(item)=> <${GetCodeName(listItemNode)} data={item} />`;
+    let properties = WriteDescribedApiProperties(listItemNode, { listItem: true });
+    return `({item, index, separators})=> <${GetCodeName(listItemNode)} ${properties} />`;
 }
 export function GetItemRenderImport(node) {
     let listItemNode = GetListItemNode(node.id);
+    let properties = WriteDescribedApiProperties(listItemNode, { listItem: true });
 
-    return `(item)=> <${GetCodeName(listItemNode)} data={item} />`;
+    return `({item, index, separators})=> <${GetCodeName(listItemNode)} ${properties} />`;
 }
 
 export function GetItemData(node) {
     let dataSourceNode = GetDataSourceNode(node.id);
     let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
     let instanceType = GetNodeProp(dataSourceNode, NodeProperties.InstanceType);
+    let defaultValue = GetDefaultComponentValue(node);
     if (connectedNode) {
         // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
         return `(()=> {
-    return DC.${GetCodeName(connectedNode)}(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))}${instanceType ? ', this.props.value' : ''});
+    return DC.${GetCodeName(connectedNode)}(${defaultValue});
 })()`
     }
     return `(()=> {
-    return GetItems(Models.${GetCodeName(GetNodeProp(dataSourceNode, NodeProperties.UIModelType))});
+    return ${defaultValue};
 })()`
 }
 export function getRelativePathPrefix(relativePath) {
@@ -133,6 +136,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         name: GetCodeName(node),
         title: `"${GetNodeTitle(node)}"`,
         screen_options,
+        component_did_update: GetComponentDidUpdate(node),
         imports: [...imports, ...extraimports].unique().join(NEW_LINE),
         elements: addNewLine(layoutSrc, 4)
     });
@@ -143,7 +147,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         template: templateStr,
         relative: relativePath ? relativePath : './src/components',
         relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.js`,
-        name: GetCodeName(node)
+        name: (relativePath ? relativePath : './src/components/') + `${(GetCodeName(node) || '').toJavascriptName()}.js`
     }, ...results];
 }
 export function bindComponent(node, componentBindingDefinition) {
@@ -161,15 +165,19 @@ export function bindComponent(node, componentBindingDefinition) {
                     }
                 }
                 else if (properties[key].template) {
-                    if (typeof (properties[key].template) === 'function') {
-                        bindProps[key] = properties[key].template(node);
-                    }
-                    else {
-                        let temp = bindProps[key];
-                        bindProps[key] = bindTemplate(properties[key].template, {
-                            value: temp
-                        })
-                    }
+                    bindProps[key] = GetDefaultComponentValue(node);
+
+                    // if (typeof (properties[key].template) === 'function') {
+                    //     //TODO 
+                    //     bindProps[key] = GetDefaultComponentValue(node) || properties[key].template(node);
+                    // }
+                    // else {
+
+                    //     //    let temp = bindProps[key];
+                    //     // bindProps[key] = bindTemplate(properties[key].template, {
+                    //     //     value: temp
+                    //     // })
+                    // }
                 }
 
             }
@@ -321,9 +329,12 @@ export function GenerateRNComponents(node, relative = './src/components', langua
                         }
                     }
                 }
+                let component_did_update = GetComponentDidUpdate(node);
+
                 template = bindTemplate(template, {
                     name: GetCodeName(node),
                     imports: '',
+                    component_did_update,
                     screen_options: '',
                     elements: elements || GetDefaultElement(),
 
@@ -483,8 +494,174 @@ export function GenerateMarkupTag(node, language, parent, params) {
             if (valueBinding) {
                 valueBinding = `value={${valueBinding}}`
             }
-            return `<${GetCodeName(node)} ${valueBinding} ${dataBinding} ${apiProperties} ${onChange}/>`;
+            let describedApi = '';
+            if (node && parent) {
+                describedApi = WriteDescribedApiProperties(node).trim();
+            }
+            // ${valueBinding} ${dataBinding} 
+            return `<${GetCodeName(node)} ${apiProperties} ${describedApi} ${onChange}/>`;
     }
+}
+function WriteDescribedStateUpdates(parent) {
+    let result = ``;
+    let graph = GetCurrentGraph(GetState());
+    if (typeof parent === 'string') {
+        parent = GetNodeById(parent, graph);
+    }
+    let componentInternalApis = GetNodesLinkedTo(graph, {
+        id: parent.id,
+        link: LinkType.ComponentInternalApi
+    });
+    result = componentInternalApis.unique(x => GetJSCodeName(x)).map(componentInternalApi => {
+        let externalApiNode = GetNodesLinkedTo(graph, {
+            id: componentInternalApi.id,
+            link: LinkType.ComponentInternalConnection
+        }).find(x => x);
+
+        let dataChain = GetNodesLinkedTo(graph, {
+            id: componentInternalApi.id,
+            link: LinkType.DataChainLink
+        }).find(x => x);
+
+        let selector = GetNodesLinkedTo(graph, {
+            id: componentInternalApi.id,
+            link: LinkType.SelectorLink
+        }).find(x => x);
+
+        let innerValue = null;
+        let externalKey = GetJSCodeName(externalApiNode);
+        innerValue = externalKey;
+        if (innerValue) {
+            if (selector) {
+                innerValue = `S.${GetJSCodeName(selector)}({{temp}})`;
+            }
+            else {
+                innerValue = '{{temp}}';
+            }
+            if (dataChain) {
+                innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+            }
+
+            result = ` 
+            var new_${externalKey} = ${bindTemplate(innerValue, { temp: `this.props.${externalKey}` })};
+            if ( new_${externalKey} !== this.state.${GetJSCodeName(componentInternalApi)}) {
+           
+            {{step}}
+        }`;
+
+
+
+            return bindTemplate(result, {
+                temp: innerValue,
+                step: `this.setState((state, props) => {
+                return { ${GetJSCodeName(componentInternalApi)}:  new_${externalKey} };
+              });`
+            });
+        }
+    }).filter(x => x).join(NEW_LINE);
+    return result;
+}
+function GetDefaultComponentValue(node) {
+    let result = ``;
+    let graph = GetCurrentGraph(GetState());
+    if (typeof node === 'string') {
+        node = GetNodeById(node, graph);
+    }
+    let componentInternalApis = [GetNodesLinkedTo(graph, {
+        id: node.id,
+        link: LinkType.ComponentInternalApi
+    }).filter(x => GetNodeProp(x, NodeProperties.UseAsValue)).find(x => x)].filter(x => x);
+
+    result = componentInternalApis.unique(x => GetJSCodeName(x)).map(componentInternalApi => {
+        let dataChain = GetNodesLinkedTo(graph, {
+            id: componentInternalApi.id,
+            link: LinkType.DataChainLink
+        }).find(x => x);
+
+        let selector = GetNodesLinkedTo(graph, {
+            id: componentInternalApi.id,
+            link: LinkType.SelectorLink
+        }).find(x => x);
+
+        let innerValue = null;
+        let externalKey = GetJSCodeName(componentInternalApi);
+        innerValue = externalKey;
+        if (innerValue) {
+            if (selector) {
+                innerValue = `S.${GetJSCodeName(selector)}({{temp}})`;
+            }
+            else {
+                innerValue = '{{temp}}';
+            }
+            if (dataChain) {
+                innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+            }
+
+            result = `${bindTemplate(innerValue, { temp: `this.state.${externalKey}` })}`;
+            return result;
+        }
+    }).filter(x => x).join(NEW_LINE);
+    return result;
+}
+function WriteDescribedApiProperties(node, options = { listItem: false }) {
+    let result = '';
+    if (typeof node === 'string') {
+        node = GetNodeById(node, graph);
+    }
+    let graph = GetCurrentGraph(GetState());
+    let componentExternalApis = GetNodesLinkedTo(graph, {
+        id: node.id,
+        link: LinkType.ComponentExternalApi
+    });
+
+    result = componentExternalApis.unique(x => GetJSCodeName(x)).map(componentExternalApi => {
+        let externalConnection = GetNodesLinkedTo(graph, {
+            id: componentExternalApi.id,
+            link: LinkType.ComponentExternalConnection
+        }).find(x => x);
+
+        let dataChain = GetNodesLinkedTo(graph, {
+            id: componentExternalApi.id,
+            link: LinkType.DataChainLink
+        }).find(x => x);
+
+        let selector = GetNodesLinkedTo(graph, {
+            id: componentExternalApi.id,
+            link: LinkType.SelectorLink
+        }).find(x => x);
+
+        let innerValue = null;
+        if (externalConnection) {
+            let query = GetNodesLinkedTo(graph, {
+                id: externalConnection.id,
+                link: LinkType.MethodApiParameters
+            }).find(x => x);
+            if (query && GetNodeProp(query, NodeProperties.IsQuery)) {
+                innerValue = `GetScreenParam('query')`;
+            }
+            else {
+                if (options.listItem) {
+                    innerValue = GetJSCodeName(externalConnection);
+                }
+                else {
+                    innerValue = `this.state.${GetJSCodeName(externalConnection)}`;
+                }
+            }
+        }
+
+        if (innerValue) {
+            if (selector) {
+                innerValue = `S.${GetJSCodeName(selector)}(${innerValue})`;
+            }
+            if (dataChain) {
+                innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+            }
+
+            return `${GetJSCodeName(externalConnection)}={${innerValue}}`;
+        }
+    }).filter(x => x);
+
+    return result.join(' ');
 }
 export function writeApiProperties(apiConfig) {
     var result = '';
@@ -546,18 +723,18 @@ export function writeApiProperties(apiConfig) {
                             break;
                     }
                     break;
-                case InstanceTypes.ApiProperty:
-                    property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
-                    break;
-                case InstanceTypes.Selector:
-                    property = `S.${GetJSCodeName(selector)}()`;
-                    break;
-                case InstanceTypes.SelectorInstance:
-                    property = `S.${GetJSCodeName(selector)}(this.props.value)`;
-                    break;
-                case InstanceTypes.Boolean:
-                    property = `true`;
-                    break;
+                // case InstanceTypes.ApiProperty:
+                //     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
+                //     break;
+                // case InstanceTypes.Selector:
+                //     property = `S.${GetJSCodeName(selector)}()`;
+                //     break;
+                // case InstanceTypes.SelectorInstance:
+                //     property = `S.${GetJSCodeName(selector)}(this.props.value)`;
+                //     break;
+                // case InstanceTypes.Boolean:
+                //     property = `true`;
+                //     break;
                 default:
                     break;
                 //throw 'write api properties unhandled case ' + instanceType;
@@ -715,6 +892,18 @@ export function getMethodInvocation(methodInstanceCall, component) {
         let query = parts.join();
         return `this.props.${GetJSCodeName(method)}({${query}});`;
     }
+}
+export function GetComponentDidUpdate(parent) {
+    let describedApi = '';
+    if (parent) {
+        describedApi = WriteDescribedStateUpdates(parent).trim();
+    }
+
+    let componentDidUpdate = `componentDidUpdate(prevProps) {
+${describedApi}
+      }`;
+
+    return componentDidUpdate;
 }
 export function GetComponentDidMount(screenOption) {
     let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);

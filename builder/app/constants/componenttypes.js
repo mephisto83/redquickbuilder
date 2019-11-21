@@ -1,5 +1,5 @@
 import { NodeTypes } from "./nodetypes";
-import { NodeProperties, GetRootGraph, GetNodeProp, GetState, GetCodeName } from "../actions/uiactions";
+import { NodeProperties, GetRootGraph, GetNodeProp, GetState, GetCodeName, ComponentApiKeys } from "../actions/uiactions";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 import { bindTemplate } from "./functiontypes";
 
@@ -232,30 +232,27 @@ export const ComponentTypes = {
         Text: {
             template: './app/templates/components/text.tpl',
             defaultApi: LABEL_DEFAULT_API,
+            internalApiNode: ComponentApiKeys.DATA,
+            externalApiNode: ComponentApiKeys.DATA,
             properties: {
-                label: {
-                    ui: true,
-                    nodeProperty: 'component-as-label',
-                    boolean: true
-                },
                 data: {
                     ui: true,
-                    nodeProperty: 'data',
+                    nodeProperty: ComponentApiKeys.DATA,
                     nodeTypes: [NodeTypes.DataChain],
                     nodeFilter: (item) => {
                         return GetNodeProp(item, NodeProperties.EntryPoint);
                     },
                     template: (node) => {
-                        let func = GetCodeName(GetNodeProp(node, 'data'));
+                        let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA));
                         if (GetNodeProp(node, 'component-as-label')) {
                             return `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`
                         }
                         if (func)
                             return bindTemplate(`DC.{{function}}({{value}})`, {
                                 function: func,
-                                value: `this.props.data`
+                                value: `this.props.` + ComponentApiKeys.DATA
                             });
-                        return `this.props.data`
+                        return `this.props.` + ComponentApiKeys.DATA
                     }
                 }
             }

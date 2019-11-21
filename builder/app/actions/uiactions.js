@@ -15,6 +15,7 @@ export const GRAPHS = 'GRAPHS';
 export const VISUAL_GRAPH = 'VISUAL_GRAPH';
 export const DASHBOARD_MENU = 'DASHBOARD_MENU';
 export const SELECTED_NODE_BB = 'SELECTED_NODE_BB';
+export const GROUPS_ENABLED = 'GROUPS_ENABLED';
 export const SIDE_PANEL_EXTRA_WIDTH = 'SIDE_PANEL_EXTRA_WIDTH';
 export const NodeTypes = NodeConstants.NodeTypes;
 export const NodeTypeColors = NodeConstants.NodeTypeColors;
@@ -235,16 +236,13 @@ export function addQueryMethodParameter() {
                     },
                     parent: currentNode.id,
                     groupProperties: {},
-                    links: [{
-                        target: currentNode.id,
-                        linkProperties: {
-                            properties: {
-                                ...LinkProperties.MethodApiParameters,
-                                params: true,
-                                query: true
-                            }
+                    linkProperties: {
+                        properties: {
+                            ...LinkProperties.MethodApiParameters,
+                            params: true,
+                            query: true
                         }
-                    }]
+                    }
                 };
             }
         });
@@ -2106,7 +2104,9 @@ export function BuildPackage(model, _package) {
         });
     }
 }
-
+export const ComponentApiKeys = {
+    DATA: 'data'
+};
 export const UPDATE_GRAPH_TITLE = 'UPDATE_GRAPH_TITLE';
 export const NEW_NODE = 'NEW_NODE';
 export const REMOVE_NODE = 'REMOVE_NODE';

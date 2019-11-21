@@ -19,6 +19,10 @@ export function toggleContextMenu(mode) {
         toggleVisual(CONTEXT_MENU_VISIBLE)(_dispatch, _getState);
     }
 }
+export function toggleVisualKey(key) {
+    
+    toggleVisual(key)(_dispatch, _getState);
+}
 const SELECTED_TAB = 'SELECTED_TAB';
 const DEFAULT_TAB = 'DEFAULT_TAB';
 const PARAMETER_TAB = 'PARAMETER_TAB';

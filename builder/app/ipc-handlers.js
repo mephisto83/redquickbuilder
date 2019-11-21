@@ -10,7 +10,7 @@ var child_process = require('child_process'),
 const { app, globalShortcut } = require('electron');
 const { Menu, MenuItem } = require('electron')
 
-const letters = 'wpsonmqeyl1k234x'.split('');
+const letters = 'wpsonmgqeyl1k234x'.split('');
 const defaultMenu = 'defaultMenu';
 const MenuItems = {
     w: {
@@ -42,6 +42,10 @@ const MenuItems = {
     },
     x: {
         label: 'Remove Current Node',
+        shift: true
+    },
+    g: {
+        label: 'Toggle Groups',
         shift: true
     },
     q: {

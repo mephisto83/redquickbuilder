@@ -98,7 +98,7 @@ import { ViewTypes } from '../actions/uiactions';
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
-import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET } from '../methods/graph_methods';
+import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
 const SIDE_PANEL_OPEN = 'side-panel-open';
@@ -264,6 +264,23 @@ class Dashboard extends Component {
 						icon: 'fa fa-reply',
 						title: Titles.Selector
 					});
+					let graph = UIA.GetCurrentGraph(UIA.GetState())
+					if (GetNodesLinkedTo(graph, {
+						id: currentNode.id,
+						link: LinkType.ComponentExternalApi
+					}).some(v => UIA.GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.ScreenOption)) {
+						result.push({
+							onClick: () => {
+								this.props.setVisual(CONNECTING_NODE, {
+									...LinkProperties.QueryLink,
+									singleLink: true,
+									nodeTypes: [NodeTypes.MethodApiParameters]
+								});
+							},
+							icon: 'fa fa-question',
+							title: Titles.AddQueryMethodApi
+						})
+					}
 					return result;
 				case NodeTypes.ComponentApi:
 					result.push({

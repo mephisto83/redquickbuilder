@@ -10,7 +10,7 @@ import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { uuidv4 } from '../utils/array';
 import { platform } from 'os';
-import { saveCurrentGraph, openGraph, toggleContextMenu, setRightMenuTab, newGraph } from './remoteActions';
+import { saveCurrentGraph, openGraph, toggleContextMenu, setRightMenuTab, newGraph, toggleVisualKey } from './remoteActions';
 
 const hub = {};
 ipcRenderer.on('message-reply', (event, arg) => {
@@ -52,6 +52,9 @@ ipcRenderer.on('commands', (event, arg) => {
             break;
         case 'l':
             toggleContextMenu('layout');
+            break;
+        case 'g':
+            toggleVisualKey('GROUPS_ENABLED');
             break;
         case 'k':
             toggleContextMenu('context');
