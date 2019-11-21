@@ -1344,8 +1344,8 @@ export const CreateDefaultView = {
                     return {
                         callback: (listComponent) => {
                             listComponentId = listComponent.id;
+                            newItems.listComponentId = listComponentId;
                             connectto.map(ct => {
-
                                 createListConnections.push(function () {
                                     return setSharedComponent({
                                         properties: {
@@ -1378,6 +1378,52 @@ export const CreateDefaultView = {
                     }
                 }
             } : false,
+            isList ? ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentApi,
+                        callback: (nn) => {
+                            newItems.listComponentInternalApi = nn.id;
+                        },
+                        parent: newItems.listComponentId,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `item`,
+                            [NodeProperties.UseAsValue]: true
+                        },
+
+                    }
+                }
+            }) : null,
+            isList ? ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentExternalApi,
+                        callback: (nn) => {
+                            newItems.listComponentExternalApi = nn.id;
+                        },
+                        parent: newItems.listComponentId,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `value`
+                        }
+                    }
+                }
+            }) : null,
+            isList ? ({
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function () {
+                    return {
+                        source: newItems.listComponentInternalApi,
+                        target: newItems.listComponentExternalApi,
+                        properties: {
+                            ...LinkProperties.ComponentInternalConnection
+                        }
+                    }
+                }
+            }) : null,
             isList ? ({
                 operation: NEW_DATA_SOURCE,
                 options: function (currentGraph) {
@@ -1419,6 +1465,7 @@ export const CreateDefaultView = {
                     return {
                         callback: (screenComponent) => {
                             screenComponentId = screenComponent.id;
+                            newItems.screenComponentId = screenComponentId;
                             connectto.map(ct => {
 
                                 createConnections.push(function () {
@@ -1453,7 +1500,52 @@ export const CreateDefaultView = {
                     }
                 }
             },
+            ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentApi,
+                        callback: (nn) => {
+                            newItems.screenComponentIdInternalApi = nn.id;
+                        },
+                        parent: newItems.screenComponentId,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `value`,
+                            [NodeProperties.UseAsValue]: true
+                        },
 
+                    }
+                }
+            }),
+            ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentExternalApi,
+                        callback: (nn) => {
+                            newItems.screenComponentIdExternalApi = nn.id;
+                        },
+                        parent: newItems.screenComponentId,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `value`
+                        }
+                    }
+                }
+            }),
+            ({
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function () {
+                    return {
+                        source: newItems.screenComponentIdInternalApi,
+                        target: newItems.screenComponentIdExternalApi,
+                        properties: {
+                            ...LinkProperties.ComponentInternalConnection
+                        }
+                    }
+                }
+            }),
             !isSharedComponent ? {
                 operation: CHANGE_NODE_PROPERTY,
                 options: function (currentGraph) {
@@ -1504,7 +1596,7 @@ export const CreateDefaultView = {
                     return {};
                 }
 
-                return {
+                return [{
                     operation: NEW_COMPONENT_NODE,
                     options: function () {
                         let componentTypeToUse = viewComponentType;
@@ -1534,8 +1626,72 @@ export const CreateDefaultView = {
 
                         }
                     }
-                }
-            }),
+                },
+                ({
+                    operation: ADD_NEW_NODE,
+                    options: function (currentGraph) {
+                        return {
+                            nodeType: NodeTypes.ComponentApi,
+                            callback: (nn) => {
+                                newItems[childComponents[modelIndex]] = {
+                                    componentInternalValue: nn.id
+                                }
+                            },
+                            parent: childComponents[modelIndex],
+                            groupProperties: {},
+                            properties: {
+                                [NodeProperties.UIText]: `value`,
+                                [NodeProperties.UseAsValue]: true
+                            },
+
+                        }
+                    }
+                }),
+                ({
+                    operation: ADD_NEW_NODE,
+                    options: function (currentGraph) {
+                        return {
+                            nodeType: NodeTypes.ComponentExternalApi,
+                            callback: (nn) => {
+                                newItems[childComponents[modelIndex]] = {
+                                    ...newItems[childComponents[modelIndex]],
+                                    componentExternalValue: nn.id
+                                }
+                            },
+                            parent: childComponents[modelIndex],
+                            groupProperties: {},
+                            properties: {
+                                [NodeProperties.UIText]: `value`
+                            }
+                        }
+                    }
+                }),
+                ({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        return {
+                            source: newItems[childComponents[modelIndex]].componentInternalValue,
+                            target: newItems[childComponents[modelIndex]].componentExternalValue,
+                            properties: {
+                                ...LinkProperties.ComponentInternalConnection
+                            }
+                        }
+                    }
+                }),
+                ({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        return {
+                            target: newItems.screenComponentIdInternalApi,
+                            source: newItems[childComponents[modelIndex]].componentExternalValue,
+                            properties: {
+                                ...LinkProperties.ComponentExternalConnection
+                            }
+                        }
+                    }
+                })]
+
+            }).flatten(),
             ...modelProperties.map((modelProperty, modelIndex) => {
                 return {
                     operation: ADD_LINK_BETWEEN_NODES,
@@ -1584,7 +1740,65 @@ export const CreateDefaultView = {
                         }
                     }
                 }
-            }, ...((ComponentTypes.ReactNative.Button.eventApi.map(t => {
+            },
+            ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentApi,
+                        callback: (nn) => {
+                            newItems.buttonInternalApi = nn.id;
+                        },
+                        parent: newItems.button,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `value`,
+                            [NodeProperties.UseAsValue]: true
+                        },
+
+                    }
+                }
+            }),
+            ({
+                operation: ADD_NEW_NODE,
+                options: function (currentGraph) {
+                    return {
+                        nodeType: NodeTypes.ComponentExternalApi,
+                        callback: (nn) => {
+                            newItems.buttonExternalApi = nn.id;
+                        },
+                        parent: newItems.button,
+                        groupProperties: {},
+                        properties: {
+                            [NodeProperties.UIText]: `value`
+                        }
+                    }
+                }
+            }),
+            ({
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function () {
+                    return {
+                        source: newItems.buttonInternalApi,
+                        target: newItems.buttonExternalApi,
+                        properties: {
+                            ...LinkProperties.ComponentInternalConnection
+                        }
+                    }
+                }
+            }),
+            ({
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function () {
+                    return {
+                        target: newItems.screenComponentIdInternalApi,
+                        source: newItems.buttonExternalApi,
+                        properties: {
+                            ...LinkProperties.ComponentExternalConnection
+                        }
+                    }
+                }
+            }), ...((ComponentTypes.ReactNative.Button.eventApi.map(t => {
                 return {
                     operation: ADD_NEW_NODE,
                     options: function () {
@@ -2056,7 +2270,31 @@ export const CreateDefaultView = {
                             }
                         }
                     }
-                }].filter(x => x))(GetDispatchFunc(), GetStateFunc());;
+                },
+                ({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        return {
+                            target: propNodeId,
+                            source: newItems[childComponents[propertyIndex]].componentExternalValue,
+                            properties: {
+                                ...LinkProperties.DataChainLink
+                            }
+                        }
+                    }
+                }),
+                ({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+                        return {
+                            target: modelComponentSelectors[0],
+                            source: newItems[childComponents[propertyIndex]].componentExternalValue,
+                            properties: {
+                                ...LinkProperties.SelectorLink
+                            }
+                        }
+                    }
+                })].filter(x => x))(GetDispatchFunc(), GetStateFunc());;
 
                 let compNodeId = childComponents[propertyIndex];
 

@@ -166,7 +166,7 @@ class Dashboard extends Component {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, LinkProperties.ModelItemFilter);
 						},
-						icon: 'fa  fa-filter',
+						icon: 'fa fa-filter',
 						title: Titles.ConnectModelItemFilter
 					}
 						// 	{
@@ -180,25 +180,25 @@ class Dashboard extends Component {
 						// 	onClick: () => {
 						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
 						// 	},
-						// 	icon: 'fa  fa-trophy',
+						// 	icon: 'fa fa-trophy',
 						// 	title: Titles.OnSuccessLink
 						// }, {
 						// 	onClick: () => {
 						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
 						// 	},
-						// 	icon: 'fa  fa-tasks',
+						// 	icon: 'fa fa-tasks',
 						// 	title: Titles.OnItemSelection
 						// }, {
 						// 	onClick: () => {
 						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
 						// 	},
-						// 	icon: 'fa  fa-tasks',
+						// 	icon: 'fa fa-tasks',
 						// 	title: Titles.OnAction
 						// }, {
 						// 	onClick: () => {
 						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
 						// 	},
-						// 	icon: 'fa  fa-frown-o',
+						// 	icon: 'fa fa-frown-o',
 						// 	title: Titles.OnFailureLink
 						// }
 					);
@@ -208,7 +208,7 @@ class Dashboard extends Component {
 						onClick: () => {
 							this.props.addQueryMethodApi();
 						},
-						icon: 'fa  fa-plus',
+						icon: 'fa fa-plus',
 						title: Titles.AddQueryMethodApi
 					}, {
 						onClick: () => {
@@ -227,7 +227,7 @@ class Dashboard extends Component {
 							onClick: () => {
 								this.props.addQueryMethodParameter();
 							},
-							icon: 'fa  fa-plus',
+							icon: 'fa fa-plus',
 							title: Titles.AddQueryMethodApi
 						})
 					}
@@ -241,10 +241,63 @@ class Dashboard extends Component {
 								nodeTypes: [NodeTypes.DataChain]
 							});
 						},
-						icon: 'fa  fa-share-alt',
+						icon: 'fa fa-share-alt',
 						title: Titles.DataChain
-					})
-					break;
+					}, {
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.ComponentInternalConnection,
+								singleLink: true,
+								nodeTypes: [NodeTypes.ComponentApi]
+							});
+						},
+						icon: 'fa fa-search-plus',
+						title: Titles.InternalApiConnection
+					}, {
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.SelectorLink,
+								singleLink: true,
+								nodeTypes: [NodeTypes.Selector]
+							});
+						},
+						icon: 'fa fa-reply',
+						title: Titles.Selector
+					});
+					return result;
+				case NodeTypes.ComponentApi:
+					result.push({
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.DataChainLink,
+								singleLink: true,
+								nodeTypes: [NodeTypes.DataChain]
+							});
+						},
+						icon: 'fa fa-share-alt',
+						title: Titles.DataChain
+					}, {
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.ComponentInternalConnection,
+								singleLink: true,
+								nodeTypes: [NodeTypes.ComponentExternalApi]
+							});
+						},
+						icon: 'fa fa-search-plus',
+						title: Titles.ExternalApiConnection
+					}, {
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.SelectorLink,
+								singleLink: true,
+								nodeTypes: [NodeTypes.Selector]
+							});
+						},
+						icon: 'fa fa-reply',
+						title: Titles.Selector
+					});
+					return result;
 				case NodeTypes.ScreenItem:
 				case NodeTypes.ScreenCollection:
 				case NodeTypes.ScreenContainer:
@@ -253,7 +306,7 @@ class Dashboard extends Component {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, LinkProperties.ChildLink);
 						},
-						icon: 'fa  fa-share-alt',
+						icon: 'fa fa-share-alt',
 						title: Titles.ChildLink
 					}, {
 						onClick: () => {
@@ -393,7 +446,7 @@ class Dashboard extends Component {
 				}
 				])
 			},
-			icon: 'fa  fa-plus',
+			icon: 'fa fa-plus',
 			title: `${Titles.AddInstance}`
 		});
 
@@ -427,7 +480,7 @@ class Dashboard extends Component {
 				}
 				])
 			},
-			icon: 'fa  fa-plus',
+			icon: 'fa fa-plus',
 			title: `${Titles.AddInstance}`
 		});
 
@@ -499,7 +552,7 @@ class Dashboard extends Component {
 				});
 
 			},
-			icon: 'fa  fa-soccer-ball-o',
+			icon: 'fa fa-soccer-ball-o',
 			title: `${Titles.All}`
 		}, {
 			onClick: () => {
@@ -573,7 +626,7 @@ class Dashboard extends Component {
 					viewType: ViewTypes.Create
 				});
 			},
-			icon: 'fa  fa-calendar-plus-o',
+			icon: 'fa fa-calendar-plus-o',
 			title: `${ViewTypes.Create}`
 		}, {
 			onClick: () => {
@@ -582,7 +635,7 @@ class Dashboard extends Component {
 					viewType: ViewTypes.Update
 				});
 			},
-			icon: 'fa  fa-fire',
+			icon: 'fa fa-fire',
 			title: `${ViewTypes.Update}`
 		}, {
 			onClick: () => {
@@ -591,7 +644,7 @@ class Dashboard extends Component {
 					viewType: ViewTypes.Delete
 				});
 			},
-			icon: 'fa  fa-remove',
+			icon: 'fa fa-remove',
 			title: `${ViewTypes.Delete}`
 		}, {
 			onClick: () => {
@@ -601,7 +654,7 @@ class Dashboard extends Component {
 					all: true
 				});
 			},
-			icon: 'fa  fa-soccer-ball-o',
+			icon: 'fa fa-soccer-ball-o',
 			title: `${Titles.All}`
 		})
 
@@ -796,7 +849,7 @@ class Dashboard extends Component {
 										if (confirm("Are you sure you want to scaffold the project"))
 											this.props.scaffoldProject();
 									}} /> : null}
-									{rootGraph ? <NavBarButton title={Titles.PublishFiles} icon={'fa  fa-building-o'} onClick={() => {
+									{rootGraph ? <NavBarButton title={Titles.PublishFiles} icon={'fa fa-building-o'} onClick={() => {
 										this.props.scaffoldProject({ filesOnly: true });
 									}} /> : null}
 									{rootGraph ? <NavBarButton title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
@@ -841,11 +894,11 @@ class Dashboard extends Component {
 									{rootGraph && rootGraph.fileName ? <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
 										this.props.saveGraph();
 									}} /> : null}
-									{rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa  fa-building'} onClick={() => {
+									{rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-building'} onClick={() => {
 										if (confirm("Are you sure you want to scaffold the project"))
 											this.props.scaffoldProject();
 									}} /> : null}
-									{rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa  fa-building-o'} onClick={() => {
+									{rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa fa-building-o'} onClick={() => {
 										this.props.scaffoldProject({ filesOnly: true });
 									}} /> : null}
 									{rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {

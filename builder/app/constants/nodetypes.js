@@ -352,6 +352,7 @@ export const NodeProperties = {
     IsDataChainPagingSkip: 'IsDataChainPagingSkip',
     IsDataChainPagingTake: 'IsDataChainPagingTake',
     UIText: 'text',
+    UseAsValue: 'UseAsValue',
     ViewType: 'view-type',
 
     IsReferenceList: 'isReferenceList',
@@ -583,6 +584,8 @@ export const LinkType = {
     ClientMethod: 'ClientMethod',
     DataSource: 'DataSource',
     ComponentApi: 'ComponentApi',
+    ComponentInternalConnection: 'component-internal-connection',
+    ComponentExternalConnection: 'component-external-connection',
     ViewModelLink: "view-model-link",
     Component: 'component',
     DataChainLink: 'data-chain-link',
@@ -803,6 +806,12 @@ export const LinkProperties = {
     },
     ViewModelLink: {
         type: LinkType.ViewModelLink
+    },
+    ComponentInternalConnection: {
+        type: LinkType.ComponentInternalConnection
+    },
+    ComponentExternalConnection: {
+        type: LinkType.ComponentExternalConnection
     },
     SelectorLink: {
         type: LinkType.SelectorLink

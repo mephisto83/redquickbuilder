@@ -97,7 +97,7 @@ export default class MindMap extends Component {
         var force = Cola.d3adaptor(d3);
         var width = bb.width - 10;// 960;
         var height = bb.height - 10;// 800;
-        var color = d3.scaleOrdinal(d3.schemeCategory10)
+        var color = d3.scaleOrdinal(Object.values(NodeTypeColors) || d3.schemeCategory10)
         me.avoidOverlaps = true;
         var margin = 6, pad = 12;;
         force
@@ -192,7 +192,7 @@ export default class MindMap extends Component {
             .enter().append("rect")
             .attr("rx", 8).attr("ry", 8)
             .attr("class", "group")
-            .style("fill", function (d, i) { return color(i) })
+            .style("fill", function (d, i) { return Object.values(NodeTypeColors)[i] || color(i) })
             .call(force.drag)
 
         var node = svg.selectAll(".node");
@@ -212,7 +212,7 @@ export default class MindMap extends Component {
                 else if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
                     return LinkStyles[d.properties.type].stroke;
                 }
-                return '#555';
+                return '#000';
             })
             .style("stroke-dasharray", function (d) {
                 if (d && d.properties && d.properties.type === LinkType.FunctionConstraintLink && !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]) {
@@ -475,17 +475,17 @@ export default class MindMap extends Component {
 
                 return d.y + h / 2 - d.height + -pad / 2 - iconSize;
             })
-            titles.text(function (d) {
-                if (d &&
-                    !d.selected &&
-                    d.properties &&
-                    d.properties.nodeType &&
-                    me.props.minimizeTypes &&
-                    me.props.minimizeTypes[d.properties.nodeType]) {
-                    return '';
-                }
-                return getLabelText(d);
-            })
+            // titles.text(function (d) {
+            //     if (d &&
+            //         !d.selected &&
+            //         d.properties &&
+            //         d.properties.nodeType &&
+            //         me.props.minimizeTypes &&
+            //         me.props.minimizeTypes[d.properties.nodeType]) {
+            //         return '';
+            //     }
+            //     return getLabelText(d);
+            // })
         }
         force.start();
     }
