@@ -823,10 +823,12 @@ export const LinkProperties = {
         type: LinkType.ListItem
     },
     ComponentLink: {
-        type: LinkType.Component
+        type: LinkType.Component,
+        stroke: NodeTypeColors[NodeTypes.ComponentNode]
     },
     ComponentPropertyLink: {
-        type: LinkType.ComponentProperty
+        type: LinkType.ComponentProperty,
+        stroke: NodeTypeColors[NodeTypes.Property]
     },
     ScreenOptionsLink: {
         type: LinkType.ScreenOptions
