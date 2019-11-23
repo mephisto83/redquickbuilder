@@ -35,7 +35,9 @@ export const DataChainFunctionKeys = {
     ReferenceDataChain: 'Data Chain Ref.',
     ArrayLength: 'Array Length',
     StringConcat: 'String Concat {0} {1}',
-    SaveModelArrayToState: 'Save Model Array To State'
+    SaveModelArrayToState: 'Save Model Array To State',
+    GetModelIds: 'Get Model Ids', // Get an array of model ids from an array
+    SaveModelIdsToState: 'Save Model Array Ids to State Under Key'
 };
 export const DataChainFunctions = {
     [DataChainFunctionKeys.Not]: {
@@ -342,6 +344,20 @@ export const DataChainFunctions = {
         },
         filter: {},
         value: DataChainFunctionKeys.SaveModelArrayToState
+    },
+    [DataChainFunctionKeys.GetModelIds]: {
+        ui: {
+        },
+        filter: {},
+        value: DataChainFunctionKeys.GetModelIds
+    },
+    //GetModelIds
+    [DataChainFunctionKeys.SaveModelIdsToState]: {
+        ui: {
+            stateKey: NodeProperties.StateKey
+        },
+        filter: {},
+        value: DataChainFunctionKeys.SaveModelIdsToState
     },
     [DataChainFunctionKeys.StringConcat]: {
         ui: {

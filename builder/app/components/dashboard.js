@@ -514,6 +514,16 @@ class Dashboard extends Component {
 			},
 			icon: 'fa fa-list-ol',
 			title: `${Titles.ConnectLifeCylceMethods}`
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainLink,
+					singleLink: true,
+					nodeTypes: [NodeTypes.DataChain]
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `${Titles.ConnectToDataChainResponseHandler}`
 		});
 
 		return result;

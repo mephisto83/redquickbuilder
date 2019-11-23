@@ -842,6 +842,12 @@ export function getMethodInvocation(methodInstanceCall, component) {
             type: LinkType.MethodApiParameters,
             direction: TARGET
         }).find(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
+
+        let dataChain = getNodesByLinkType(graph, {
+            id: methodInstanceCall.id,
+            type: LinkType.DataChainLink,
+            direction: SOURCE
+        }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChain);
         let body_input = null;
         if (body) {
             let body_param = getNodesByLinkType(graph, {
@@ -889,8 +895,12 @@ export function getMethodInvocation(methodInstanceCall, component) {
             }).filter(temp => temp);
             parts.push(`query: {${addNewLine(queryParameterValues.join(', ' + NEW_LINE))}}`);
         }
+        let dataChainInput = '';
+        if (dataChain) {
+            dataChainInput = ((parts.length) ? ',' : '') + `dataChain: DC.${GetCodeName(dataChain)}`;
+        }
         let query = parts.join();
-        return `this.props.${GetJSCodeName(method)}({${query}});`;
+        return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}});`;
     }
 }
 export function GetComponentDidUpdate(parent) {

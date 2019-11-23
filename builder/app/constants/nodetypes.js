@@ -6,6 +6,7 @@ export const NodeTypes = {
     Model: 'model',
     DataSource: 'data-source',
     Property: 'model-property',
+    StateKey: 'StateKey',
     ModelFilter: 'model-filter',
     Struct: 'struct',
     MethodApiParameters: 'method-api-parameters',
@@ -425,6 +426,7 @@ export const NodeProperties = {
     Screen: 'Screen',
     ChainNodeInput1: 'ChainNodeInput1',
     UIModelType: 'uiModelType',
+    StateKey: 'StateKey',
     DataChainReference: 'DataChainReference',
     NumberParameter: 'NumberParameter',
 
@@ -544,6 +546,7 @@ export const LinkType = {
     DefaultViewType: 'DefaultViewType',
     SharedComponent: 'SharedComponent',
     ExecutorServiceMethod: 'ExecutorServiceMethod',
+    StateKey: 'StateKey',
     LifeCylceMethod: 'LifeCylceMethod',
     EventMethod: 'EventMethod',
     NavigationMethod: 'NavigationMethod',
@@ -758,6 +761,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
     SharedComponent: {
         type: LinkType.SharedComponent
+    },
+    StateKey: {
+        type: LinkType.StateKey
     },
     MethodCall: {
         type: LinkType.MethodCall

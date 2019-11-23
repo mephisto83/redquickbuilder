@@ -33,6 +33,7 @@ class DataChainActvityMenu extends Component {
         let showSelector = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selector : false;
         let showSelectorProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selectorProperty : false;
         let showNode2 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_2 : false;
+        let stateKey = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.stateKey : false;
         let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
         let selector_nodes = UIA.NodesByType(state, NodeTypes.Selector).toNodeSelect();
         let selector_node_properties = UIA.GetSelectorsNodes(UIA.GetNodeProp(currentNode, NodeProperties.Selector)).toNodeSelect();
@@ -135,6 +136,28 @@ class DataChainActvityMenu extends Component {
                         value={UIA.GetNodeProp(currentNode, NodeProperties.Property)}
                         options={UIA.GetModelPropertyChildren(UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIModelType)).toNodeSelect()}
                     /> : null}
+                    {stateKey ? (<SelectInput
+                        onChange={(value) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: UIA.GetNodeProp(currentNode, UIA.NodeProperties.StateKey),
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.StateKey,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.StateKey }
+                            })
+                        }}
+                        label={Titles.StateKey}
+                        value={UIA.GetNodeProp(currentNode, NodeProperties.StateKey)}
+                        options={UIA.NodesByType(state, [NodeTypes.StateKey]) .toNodeSelect()}
+                    />) : null}
                     {showDataChainRef ? <SelectInput
                         onChange={(value) => {
                             var id = currentNode.id;

@@ -938,6 +938,7 @@ export function IsEndOfDataChain(id) {
 export function GenerateDataChainMethod(id) {
     let node = GetNodeById(id);
     let model = GetNodeProp(node, NodeProperties.UIModelType);
+    let stateKey = GetNodeProp(node, NodeProperties.StateKey);
     let numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
     let property = GetNodeProp(node, NodeProperties.Property);
     let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
@@ -1005,8 +1006,12 @@ export function GenerateDataChainMethod(id) {
             return `(a) => a !== null && a !== undefined`;
         case DataChainFunctionKeys.Not:
             return `(a) => !!!a`;
+        case DataChainFunctionKeys.GetModelIds:
+                return `(a) => { return a.map(item => item.id); }`;
         case DataChainFunctionKeys.SaveModelArrayToState:
-            return `(a) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(model)}, a)); return a; }`
+            return `(a) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(model)}, a)); return a; }`;
+        case DataChainFunctionKeys.SaveModelIdsToState:
+            return `(a) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(stateKey)}, a)); return a; }`
         case DataChainFunctionKeys.Selector:
             return `(a) => a.${selectorProp}`
 
