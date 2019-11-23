@@ -208,18 +208,21 @@ function generateReactNative(workspace, state) {
 function generateElectronIO(workspace, state) {
     let code_types = [...Object.values(ReactNativeTypes)];
 
-    code_types.map(code_type => {
-        let temp = Generator.generate({
-            type: code_type,
-            language: 'electronio',
-            state
-        });
+    // code_types.map(code_type => {
+    //     let temp = Generator.generate({
+    //         type: code_type,
+    //         language: 'electronio',
+    //         state
+    //     });
 
-        for (var fileName in temp) {
-            ensureDirectory(path.join(workspace, temp[fileName].relative));
-            writeFileSync(path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
-        }
-    });
+    //     for (var fileName in temp) {
+    //         var relative = temp[fileName].relative;
+    //         relative = relative.replace('src', 'app');
+    //         ensureDirectory(path.join(workspace, relative));
+    //         console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+    //         writeFileSync(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
+    //     }
+    // });
 }
 function generateFiles(workspace, solutionName, state) {
 

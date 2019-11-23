@@ -68,22 +68,34 @@ function createElectronIo() {
     var build = fs.readFileSync('./workspace.json', 'utf8');
     build = JSON.parse(build);
     let { appName } = build;
-    let localDir = path.join(build.workspace, `./${appName}`)
+    let localDir = path.join(build.workspace)
+    console.log(localDir);
     return Promise.resolve()
         .then(() => {
-            return executeSpawnCmd('rimraf', ['-f', './'], {
-                shell: true,
-                cwd: localDir
-            })
+            if (fs.existsSync(`./${appName}`))
+                return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
+                    shell: true,
+                    cwd: localDir
+                })
         })
         .then(() => {
-            return executeSpawnCmd('git', ['clone', '--depth', '1', '--single-branch', '--branch', 'master', 'https://github.com/electron-react-boilerplate/electron-react-boilerplate.git', appName], {
+            console.log('cloding electron-react-boilerplate');
+            return executeSpawnCmd('powershell', ['git', 'clone', '--depth', '1', '--single-branch', '--branch', 'master', 'https://github.com/electron-react-boilerplate/electron-react-boilerplate.git', appName], {
                 shell: true,
                 cwd: localDir
             });
+        })
+        .then(() => {
+            console.log('installing yarn');
+            console.log(path.join(localDir, appName));
+            return executeSpawnCmd('yarn', ['install'], {
+                shell: true,
+                cwd: path.join(localDir, appName)
+            })
         }).catch(e => {
             console.log(e);
             console.log('SOMETHING WENT WRONG');
+            throw e;
         });;
 }
 function createReactNative() {

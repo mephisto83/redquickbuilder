@@ -158,7 +158,7 @@ function scaffoldProject(body, target) {
     }).then(() => {
         return writeJsonToFile(body, path.join(workspace, 'workspace.json'));
     }).then(() => {
-        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', target || 'CreateWorkSpace'], { cwd: workspace })
+        return executeSpawnCmd('powershell', ['./build.ps1', '-Target', target || 'CreateWorkSpace', '-verbosity=verbose'], { cwd: workspace })
     }).then(() => {
         console.log('Scaffoled the project successfully: ' + target);
         return true;
