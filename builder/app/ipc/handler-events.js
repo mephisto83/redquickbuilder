@@ -6,5 +6,9 @@ export const HandlerEvents = {
     reactnative: {
         message: 'react-project',
         reply: 'react-project-reply'
+    },
+    electron: {
+        message: 'electron-project',
+        reply: 'electron-project-reply'
     }
 }

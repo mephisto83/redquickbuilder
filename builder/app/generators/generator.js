@@ -28,21 +28,21 @@ import ReactNativeSelectorFunctions from './selectorgenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
     static generate(options) {
-        var { state, type, key } = options;
+        var { state, type, key, language } = options;
         switch (type) {
             case NodeTypes.Controller:
-                let temp = ControllerGenerator.Generate({ state, key });
+                let temp = ControllerGenerator.Generate({ state, key, language });
                 return temp;
             case NodeTypes.Model:
-                return ModelGenerator.Generate({ state, key });
+                return ModelGenerator.Generate({ state, key, language });
             case NodeTypes.ExtensionType:
-                return ExtensionGenerator.Generate({ state, key });
+                return ExtensionGenerator.Generate({ state, key, language });
             case NodeTypes.Maestro:
-                return MaestroGenerator.Generate({ state, key });
+                return MaestroGenerator.Generate({ state, key, language });
             case GeneratedTypes.ChangeParameter:
-                return ChangeParameterGenerator.Generate({ state, key });
+                return ChangeParameterGenerator.Generate({ state, key, language });
             case GeneratedTypes.ChangeResponse:
-                return ChangeResponseGenerator.Generate({ state, key });
+                return ChangeResponseGenerator.Generate({ state, key, language });
             case GeneratedTypes.Constants:
                 //Add enumerations here.
                 let models = NodesByType(state, NodeTypes.Model);
@@ -81,41 +81,41 @@ export default class Generator {
                     key
                 });
             case GeneratedTypes.Permissions:
-                return PermissionGenerator.Generate({ state, key });
+                return PermissionGenerator.Generate({ state, key, language });
             case GeneratedTypes.Validators:
-                return ValidatorGenerator.Generate({ state, key });
+                return ValidatorGenerator.Generate({ state, key, language });
             case GeneratedTypes.StreamProcess:
-                return StreamProcessGenerator.Generate({ state, key });
+                return StreamProcessGenerator.Generate({ state, key, language });
             case GeneratedTypes.StreamProcessOrchestration:
-                return StreamProcessOrchestrationGenerator.Generate({ state, key });
+                return StreamProcessOrchestrationGenerator.Generate({ state, key, language });
             // case GeneratedTypes.ValidationRule:
-            //     return ValidationRuleGenerator.Generate({ state, key });
+            //     return ValidationRuleGenerator.Generate({ state, key, language });
             case GeneratedTypes.Executors:
-                return ExecutorGenerator.Generate({ state, key });
+                return ExecutorGenerator.Generate({ state, key, language });
             case GeneratedTypes.ModelGet:
-                return ModelGetGenerator.Generate({ state, key });
+                return ModelGetGenerator.Generate({ state, key, language });
             case GeneratedTypes.ModelReturn:
-                return ModelReturnGenerator.Generate({ state, key });
+                return ModelReturnGenerator.Generate({ state, key, language });
             case GeneratedTypes.ModelExceptions:
-                return ModelExceptionGenerator.Generate({ state, key });
+                return ModelExceptionGenerator.Generate({ state, key, language });
             case GeneratedTypes.ModelItemFilter:
-                return ModelItemFilter.Generate({ state, key });
+                return ModelItemFilter.Generate({ state, key, language });
             case GeneratedTypes.CustomService:
-                return CustomService.Generate({ state, key });
+                return CustomService.Generate({ state, key, language });
             case ReactNativeTypes.Screens:
-                return ReactNativeScreens.Generate({ state, key });
+                return ReactNativeScreens.Generate({ state, key, language });
             case ReactNativeTypes.Navigation:
-                return ReactNativeNavigation.Generate({ state, key });
+                return ReactNativeNavigation.Generate({ state, key, language });
             case ReactNativeTypes.Keys:
-                return ReactNativeKeys.Generate({ state, key });
+                return ReactNativeKeys.Generate({ state, key, language });
             case ReactNativeTypes.Configuration:
-                return ReactNativeConfiguration.Generate({ state, key });
+                return ReactNativeConfiguration.Generate({ state, key, language });
             case ReactNativeTypes.ControllerActions:
-                return ReactNativeControllerActions.Generate({ state, key });
+                return ReactNativeControllerActions.Generate({ state, key, language });
             case ReactNativeTypes.DataChainFunctions:
-                return ReactNativeDataChainFunctions.Generate({ state, key });
+                return ReactNativeDataChainFunctions.Generate({ state, key, language });
             case ReactNativeTypes.Selectors:
-                return ReactNativeSelectorFunctions.Generate({ state, key });
+                return ReactNativeSelectorFunctions.Generate({ state, key, language });
         }
     }
 }

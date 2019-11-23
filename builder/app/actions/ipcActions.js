@@ -116,12 +116,22 @@ export function scaffoldProject(options = {}) {
                 appName: root[GraphKeys.PROJECTNAME] || '',
                 workspace: path.join(workspace, root.title, 'reactnative')
             }))
+        }).then(() => {
+            return (filesOnly ? Promise.resolve() : send(HandlerEvents.electron.message, {
+                solutionName,
+                appName: root[GraphKeys.PROJECTNAME] || '',
+                workspace: path.join(workspace, root.title, 'electronio')
+            }))
         }).then(res => {
             console.log('Finished Scaffolding.');
             generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
         }).then(() => {
             console.log('generate react-native files');
             generateReactNative(path.join(workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]), state);
+        }).then(() => {
+            console.log('generate electron io files');
+            generateElectronIO(path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]), state);
+
         }).then(() => {
 
             let namespace = root ? root[GraphKeys.NAMESPACE] : null;
@@ -182,7 +192,6 @@ function generateFolderStructure(dir, lib, relative, target_dir) {
 }
 function generateReactNative(workspace, state) {
     let code_types = [...Object.values(ReactNativeTypes)];
-    let root = GetRootGraph(state);
 
     code_types.map(code_type => {
         let temp = Generator.generate({
@@ -194,7 +203,23 @@ function generateReactNative(workspace, state) {
             ensureDirectory(path.join(workspace, temp[fileName].relative));
             writeFileSync(path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
         }
-    })
+    });
+}
+function generateElectronIO(workspace, state) {
+    let code_types = [...Object.values(ReactNativeTypes)];
+
+    code_types.map(code_type => {
+        let temp = Generator.generate({
+            type: code_type,
+            language: 'electronio',
+            state
+        });
+
+        for (var fileName in temp) {
+            ensureDirectory(path.join(workspace, temp[fileName].relative));
+            writeFileSync(path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
+        }
+    });
 }
 function generateFiles(workspace, solutionName, state) {
 

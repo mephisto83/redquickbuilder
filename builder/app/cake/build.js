@@ -64,6 +64,28 @@ const appSettingsCopySettings = `
 </None>
 </ItemGroup>
 `;
+function createElectronIo() {
+    var build = fs.readFileSync('./workspace.json', 'utf8');
+    build = JSON.parse(build);
+    let { appName } = build;
+    let localDir = path.join(build.workspace, `./${appName}`)
+    return Promise.resolve()
+        .then(() => {
+            return executeSpawnCmd('rimraf', ['-f', './'], {
+                shell: true,
+                cwd: localDir
+            })
+        })
+        .then(() => {
+            return executeSpawnCmd('git', ['clone', '--depth', '1', '--single-branch', '--branch', 'master', 'https://github.com/electron-react-boilerplate/electron-react-boilerplate.git', appName], {
+                shell: true,
+                cwd: localDir
+            });
+        }).catch(e => {
+            console.log(e);
+            console.log('SOMETHING WENT WRONG');
+        });;
+}
 function createReactNative() {
     var build = fs.readFileSync('./workspace.json', 'utf8');
     build = JSON.parse(build);
@@ -328,5 +350,8 @@ switch (command) {
         break;
     case 'createReactNative':
         createReactNative();
+        break;
+    case 'createElectronIo':
+        createElectronIo();
         break;
 }

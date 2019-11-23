@@ -132,6 +132,11 @@ function handle(msg) {
             })
             console.log('handle scaffolding');
             break;
+        case HandlerEvents.electron.message:
+            result = Promise.resolve().then(() => {
+                return scaffoldProject(msg.body, 'ElectronIO');
+            })
+            console.log('handle scaffolding');
         default:
             console.log('did nothing');
             break;
