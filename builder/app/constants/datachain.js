@@ -34,7 +34,8 @@ export const DataChainFunctionKeys = {
     Pass: 'Pass',
     ReferenceDataChain: 'Data Chain Ref.',
     ArrayLength: 'Array Length',
-    StringConcat: 'String Concat {0} {1}'
+    StringConcat: 'String Concat {0} {1}',
+    SaveModelArrayToState: 'Save Model Array To State'
 };
 export const DataChainFunctions = {
     [DataChainFunctionKeys.Not]: {
@@ -334,6 +335,13 @@ export const DataChainFunctions = {
             [NodeProperties.NODEType]: true
         },
         value: 'array_subset'
+    },
+    [DataChainFunctionKeys.SaveModelArrayToState]: {
+        ui: {
+            model: NodeProperties.UIModelType
+        },
+        filter: {},
+        value: DataChainFunctionKeys.SaveModelArrayToState
     },
     [DataChainFunctionKeys.StringConcat]: {
         ui: {

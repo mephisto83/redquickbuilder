@@ -6,7 +6,7 @@ export default class DataChainGenerator {
     static Generate(options) {
         let funcs = GenerateChainFunctions();
         let temps = [{
-            template: `import { GetItem, Chain } from './uiActions';
+            template: `import { GetItem, Chain, UIModels, GetDispatch, GetState } from './uiActions';
 import { 
     validateEmail, 
     maxLength, 

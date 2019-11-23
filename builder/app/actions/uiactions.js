@@ -1002,9 +1002,11 @@ export function GenerateDataChainMethod(id) {
         case DataChainFunctionKeys.Equals:
             return `(a, b) => a === b`;
         case DataChainFunctionKeys.Required:
-            return `(a) => a !== null && a !==undefined`;
+            return `(a) => a !== null && a !== undefined`;
         case DataChainFunctionKeys.Not:
             return `(a) => !!!a`;
+        case DataChainFunctionKeys.SaveModelArrayToState:
+            return `(a) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(model)}, a)); return a; }`
         case DataChainFunctionKeys.Selector:
             return `(a) => a.${selectorProp}`
 

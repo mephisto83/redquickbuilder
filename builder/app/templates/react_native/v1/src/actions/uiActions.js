@@ -24,6 +24,7 @@ export const SCREEN_INSTANCE_ON_FOCUS = 'SCREEN_INSTANCE_ON_FOCUS';
 
 export const VISUAL = 'VISUAL';
 let _getState;
+let _dispatch;
 export function GetItems(modelType) {
     if (_getState) {
         let state = _getState();
@@ -71,8 +72,21 @@ export function GetItem(modelType, id) {
 export function setGetState() {
     return (dispatch, getState) => {
         _getState = getState;
+        _dispatch = dispatch;
     }
 }
+
+export function GetDispatch() {
+    if (_dispatch) {
+        return _dispatch;
+    }
+}
+export function GetState() {
+    if (_getState) {
+        return _getState;
+    }
+}
+
 export function UIV(item, value) {
     return UIC(VISUAL, item, value);
 }

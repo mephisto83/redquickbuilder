@@ -33,7 +33,7 @@ export function GenerateScreenMarkup(id, language) {
             title: `"${GetNodeTitle(screen)}"`,
             imports: imports.join(NEW_LINE),
             elements: elements.join(NEW_LINE),
-            component_did_update: GetComponentDidUpdate(screen),
+            component_did_update: GetComponentDidUpdate(screenOption),
             component_did_mount: GetComponentDidMount(screenOption)
         })
     }
@@ -619,6 +619,10 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             id: componentExternalApi.id,
             link: LinkType.ComponentExternalConnection
         }).find(x => x);
+        let query = GetNodesLinkedTo(graph, {
+            id: componentExternalApi.id,
+            link: LinkType.QueryLink
+        }).find(x => x);
 
         let dataChain = GetNodesLinkedTo(graph, {
             id: componentExternalApi.id,
@@ -630,13 +634,10 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             link: LinkType.SelectorLink
         }).find(x => x);
 
-        let innerValue = null;
-        if (externalConnection) {
-            let query = GetNodesLinkedTo(graph, {
-                id: externalConnection.id,
-                link: LinkType.MethodApiParameters
-            }).find(x => x);
-            if (query && GetNodeProp(query, NodeProperties.IsQuery)) {
+        let innerValue = '';
+        if (externalConnection || query) {
+
+            if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {
                 innerValue = `GetScreenParam('query')`;
             }
             else {
@@ -649,16 +650,15 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             }
         }
 
-        if (innerValue) {
-            if (selector) {
-                innerValue = `S.${GetJSCodeName(selector)}(${innerValue})`;
-            }
-            if (dataChain) {
-                innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
-            }
-
-            return `${GetJSCodeName(externalConnection)}={${innerValue}}`;
+        if (selector) {
+            innerValue = `S.${GetJSCodeName(selector)}(${innerValue})`;
         }
+        if (dataChain) {
+            innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+        }
+        if (innerValue)
+            return `${GetJSCodeName(externalConnection) || GetJSCodeName(componentExternalApi)}={${innerValue}}`;
+
     }).filter(x => x);
 
     return result.join(' ');

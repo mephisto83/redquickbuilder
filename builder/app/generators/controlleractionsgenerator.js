@@ -84,6 +84,14 @@ import * as Util from './util';
             let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(node)}, { ...parameters }, {
     loading: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown}, 
     objectType: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown} 
+}, (result) => {
+    var { dataChain } = (parameters || {});
+    if (dataChain) { 
+        return dataChain(result);
+    }
+    else {
+        console.low('missing data chain');
+    }
 })(dispatch, getState);`;
             return bindTemplate(ControllerMethodTemplate, {
                 methodName: GetJSCodeName(node),

@@ -57,7 +57,6 @@ export function simple(func, param, states, callback, error) {
     if (!Visual(state, loading)) {
       dispatch(UIActions.UIV(loading, true));
       return func(param).then(res => {
-        dispatch(UIActions.UIModels(objectType, res));
         if (callback) {
           callback(res, dispatch, getState);
         }
