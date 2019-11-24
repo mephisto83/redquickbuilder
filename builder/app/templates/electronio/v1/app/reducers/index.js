@@ -1,13 +1,12 @@
-// reducers/index.js
-
+// @flow
 import { combineReducers } from 'redux';
+import { connectRouter } from 'connected-react-router';
+import counter from './counter';
 import uiReducer from './uiReducer';
-// ... other reducers
-
-
-export function buildReducers() {
+export default function createRootReducer(history) {
   return combineReducers({
-    uiReducer,
-    // ... other reducers
+    router: connectRouter(history),
+    counter,
+    uiReducer
   });
 }

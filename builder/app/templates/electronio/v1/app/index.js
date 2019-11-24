@@ -1,21 +1,11 @@
-/**
- * @format
- */
-
-import React, { Fragment } from 'react';
+import React from 'react';
 import { render } from 'react-dom';
-import { AppContainer as ReactHotAppContainer } from 'react-hot-loader';
+import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
-import {  history } from './store/configureStore';
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import { buildReducers } from './reducers/index';
+import { configureStore, history } from './store/configureStore';
 import './app.global.css';
 
-// const store = configureStore();
-let store = createStore(buildReducers(), applyMiddleware(thunk));
-
-const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
+const store = configureStore();
 
 render(
   <AppContainer>
@@ -23,3 +13,16 @@ render(
   </AppContainer>,
   document.getElementById('root')
 );
+
+if (module.hot) {
+  module.hot.accept('./containers/Root', () => {
+    // eslint-disable-next-line global-require
+    const NextRoot = require('./containers/Root').default;
+    render(
+      <AppContainer>
+        <NextRoot store={store} history={history} />
+      </AppContainer>,
+      document.getElementById('root')
+    );
+  });
+}
