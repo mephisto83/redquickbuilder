@@ -4,10 +4,7 @@ import { Visual } from '../actions/uiActions';
 import * as ControllerActions from '../actions/controllerActions';
 import { TitleService } from './titles';
 import { connect } from 'react-redux';
-var ReactNative = require('react-native');
-var {
-  AsyncStorage
-} = ReactNative;
+
 
 export function GUID() {
   var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

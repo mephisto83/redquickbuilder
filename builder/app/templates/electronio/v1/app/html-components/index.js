@@ -1,0 +1,20 @@
+export default {
+  Container: {},
+  ListItem: {},
+  Header: {},
+  Title: {},
+  Footer: {},
+  FooterTab: {},
+  Button: {},
+  Left: {},
+  Right: {},
+  Body: {},
+  Icon: {},
+  Text: {},
+  View: {},
+  Platform: {},
+  StyleSheet: {},
+  TouchableOpacity: {},
+  FlatList: {},
+  Image: {}
+}

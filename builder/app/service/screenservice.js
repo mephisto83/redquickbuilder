@@ -27,8 +27,17 @@ export function GenerateScreenMarkup(id, language) {
     if (screenOption) {
         let imports = GetScreenImports(id, language);
         let elements = [GenerateMarkupTag(screenOption, language, screen)];
-        let template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
+        let template = null;
+        switch (language) {
+            case UITypes.ElectronIO:
+                template = fs.readFileSync('./app/templates/screens/el_screen.tpl', 'utf8');
+                break;
+            case UITypes.ReactNative:
+            default:
+                template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
+                break;
 
+        }
         return bindTemplate(template, {
             name: GetCodeName(screen),
             title: `"${GetNodeTitle(screen)}"`,
@@ -119,8 +128,16 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         }
     }
 
-    let templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
-
+    let templateStr = null;
+    switch (language) {
+        case UITypes.ElectronIO:
+            templateStr = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
+            break;
+        case UITypes.ReactNative:
+        default:
+            templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+            break;
+    }
     let results = [];
     imports.filter(x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent)).map(t => {
         let relPath = relativePath ? `${relativePath}/${(GetCodeName(node) || '').toJavascriptName()}` : `./src/components/${(GetCodeName(node) || '').toJavascriptName()}`;
@@ -319,7 +336,18 @@ export function GenerateRNComponents(node, relative = './src/components', langua
         !ComponentTypes[language][componentType].specialLayout)) {
         switch (GetNodeProp(node, NodeProperties.NODEType)) {
             case NodeTypes.ComponentNode:
-                let template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+                let template = null;
+                switch (language) {
+                    case UITypes.ElectronIO:
+                        template = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
+                        break;
+                    case UITypes.ReactNative:
+                    default:
+                        template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+                        break;
+                }
+
+
                 let elements = null;
                 if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
                     elements = bindComponent(node, ComponentTypes[language][componentType]);
@@ -1001,7 +1029,7 @@ function GenerateElectronIORoutes(screens) {
     let _screens = [];
     screens.map(screen => {
         routes.push(bindTemplate(template, {
-            route_name: `'${GetJSCodeName(screen)}'`, 
+            route_name: `'${GetJSCodeName(screen)}'`,
             component: GetCodeName(screen)
         }));
         _screens.push(bindTemplate(import_, {
