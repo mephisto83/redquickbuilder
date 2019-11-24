@@ -169,6 +169,18 @@ export function scaffoldProject(options = {}) {
             else {
                 console.warn('No app name given');
             }
+        }).then(() => {
+            // console.log('Write electron files')
+            // let appName = root[GraphKeys.PROJECTNAME];
+            // let version = 'v1';
+            // if (appName) {
+            //     return generateFolderStructure(path.join(`./app/templates/electronio/${version}`), {
+
+            //     }, null, path.join(workspace, root.title, 'electronio', appName));
+            // }
+            // else {
+            //     console.warn('No app name given');
+            // }
         });
     }
 }
@@ -208,21 +220,21 @@ function generateReactNative(workspace, state) {
 function generateElectronIO(workspace, state) {
     let code_types = [...Object.values(ReactNativeTypes)];
 
-    // code_types.map(code_type => {
-    //     let temp = Generator.generate({
-    //         type: code_type,
-    //         language: 'electronio',
-    //         state
-    //     });
+    code_types.map(code_type => {
+        let temp = Generator.generate({
+            type: code_type,
+            language: 'electronio',
+            state
+        });
 
-    //     for (var fileName in temp) {
-    //         var relative = temp[fileName].relative;
-    //         relative = relative.replace('src', 'app');
-    //         ensureDirectory(path.join(workspace, relative));
-    //         console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
-    //         writeFileSync(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
-    //     }
-    // });
+        for (var fileName in temp) {
+            var relative = temp[fileName].relative;
+            relative = relative.replace('src', 'app');
+            ensureDirectory(path.join(workspace, relative));
+            console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+            writeFileSync(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`), temp[fileName].template)
+        }
+    });
 }
 function generateFiles(workspace, solutionName, state) {
 

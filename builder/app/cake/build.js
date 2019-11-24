@@ -92,6 +92,13 @@ function createElectronIo() {
                 shell: true,
                 cwd: path.join(localDir, appName)
             })
+        }).then(() => {
+            let packagejsonfilepath = path.join(localDir, appName, 'package.json');
+            let packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath));
+            let devScript = packageJson.scripts.dev;
+            let port = Math.floor(Math.random() * 30000) + 1000;
+            packageJson.scripts.dev = devScript.replace(/START_HOT=1/g, 'START_HOT=1 PORT=' + 1231);
+            fs.writeFileSync(packagejsonfilepath, JSON.stringify(packageJson), 'utf8');
         }).catch(e => {
             console.log(e);
             console.log('SOMETHING WENT WRONG');
