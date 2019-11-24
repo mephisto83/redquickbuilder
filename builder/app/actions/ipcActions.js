@@ -4,7 +4,7 @@ import { GetRootGraph, NodesByType, GetNodeProp, NodeProperties, clearPinned, to
 import fs from 'fs';
 const { ipcRenderer } = require('electron');
 import path from 'path';
-import { GeneratedTypes, NodeTypes, ReactNativeTypes } from '../constants/nodetypes';
+import { GeneratedTypes, NodeTypes, ReactNativeTypes, UITypes } from '../constants/nodetypes';
 import Generator from '../generators/generator';
 import { fstat, writeFileSync } from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
@@ -170,17 +170,17 @@ export function scaffoldProject(options = {}) {
                 console.warn('No app name given');
             }
         }).then(() => {
-            // console.log('Write electron files')
-            // let appName = root[GraphKeys.PROJECTNAME];
-            // let version = 'v1';
-            // if (appName) {
-            //     return generateFolderStructure(path.join(`./app/templates/electronio/${version}`), {
+            console.log('Write electron files')
+            let appName = root[GraphKeys.PROJECTNAME];
+            let version = 'v1';
+            if (appName) {
+                return generateFolderStructure(path.join(`./app/templates/electronio/${version}`), {
 
-            //     }, null, path.join(workspace, root.title, 'electronio', appName));
-            // }
-            // else {
-            //     console.warn('No app name given');
-            // }
+                }, null, path.join(workspace, root.title, 'electronio', appName));
+            }
+            else {
+                console.warn('No app name given');
+            }
         });
     }
 }
@@ -223,7 +223,7 @@ function generateElectronIO(workspace, state) {
     code_types.map(code_type => {
         let temp = Generator.generate({
             type: code_type,
-            language: 'electronio',
+            language: UITypes.ElectronIO,
             state
         });
 

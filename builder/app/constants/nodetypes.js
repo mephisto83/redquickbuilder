@@ -1055,7 +1055,7 @@ export const UITypes = {
     Web: 'Web',
     VR: 'VR',
     AR: 'AR',
-    Desktop: 'Desktop'
+    ElectronIO: 'ElectronIO'
 }
 export const ValidationRules = {
     CVV: "cvv",

@@ -10,7 +10,8 @@ import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
 
 export function GenerateScreens(options) {
-    let temps = BindScreensToTemplate();
+    let { language } = options;
+    let temps = BindScreensToTemplate(language || UITypes.ReactNative);
     let result = {};
 
     temps.map(t => {
@@ -774,6 +775,7 @@ export function GetScreenImports(id, language) {
         if (reactScreenOption) {
             return [GenerateImport(reactScreenOption, screen, language)];
         }
+        return [];
     }
     return null;
 }
@@ -991,7 +993,33 @@ export function GetScreens() {
     var screens = GetScreenNodes();
     return screens;
 }
-
+function GenerateElectronIORoutes(screens) {
+    let template = `<Route path={{{route_name}}} component={{{component}}} />`;
+    let routefile = fs.readFileSync('./app/templates/electronio/routes.tpl', 'utf8');
+    let import_ = `import {{name}} from './screens/{{jsname}}';`
+    let routes = [];
+    let _screens = [];
+    screens.map(screen => {
+        routes.push(bindTemplate(template, {
+            route_name: `'${GetJSCodeName(screen)}'`, 
+            component: GetCodeName(screen)
+        }));
+        _screens.push(bindTemplate(import_, {
+            name: GetCodeName(screen),
+            jsname: GetJSCodeName(screen)
+        }))
+    });
+    let routeFile = bindTemplate(routefile, {
+        routes: routes.join(NEW_LINE),
+        route_imports: _screens.join(NEW_LINE)
+    });
+    return {
+        template: routeFile,
+        relative: './src',
+        relativeFilePath: `./Routes.js`,
+        name: `Routes.js`
+    }
+}
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
     var screens = GetScreens();
     let template = fs.readFileSync('./app/templates/screens/screen.tpl', 'utf8');
@@ -1018,6 +1046,11 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
             name: GetCodeName(screen)
         }
     });
+    switch (language) {
+        case UITypes.ElectronIO:
+            moreresults.push(GenerateElectronIORoutes(screens))
+            break;
+    }
     let all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);
     let sharedComponents = all_nodes.filter(x => GetNodeProp(x, NodeProperties.SharedComponent));
     let relPath = './src/shared'
