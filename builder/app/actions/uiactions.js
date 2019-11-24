@@ -843,6 +843,40 @@ export function GenerateChainFunctions() {
     let entryNodes = GetDataChainEntryNodes().map(x => x.id);
     return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
 }
+export function GenerateChainFunctionSpecs() {
+    let result = [];
+    let entryNodes = GetDataChainEntryNodes().map(x => x.id);
+
+    let basicentryvalues = [undefined, null, 0, {}, "a string", 1.1, [], [1], ['1'], ['1', 1]];
+
+    entryNodes.map(entryNode => {
+        basicentryvalues.map(val => {
+            result.push(GenerateSimpleTest(entryNode, val))
+        })
+    });
+    return result;
+}
+export function GenerateSimpleTest(node, val) {
+    let _value = ['object', 'string'].some(v => typeof val === v && val !== undefined && val !== null) ? JSON.stringify(val) : val;
+    if (val === undefined) {
+        _value = 'undefined';
+    }
+    else if (val === null) {
+        _value = 'null';
+    }
+    let template = `it('${GetCodeName(node)} - should be able to handle a "${typeof val === 'object' ? JSON.stringify(val) : val}"', () => {
+    let error = undefined;
+    try {
+        DC.${GetCodeName(node)}(${_value});
+    }
+    catch(e) {
+        error = e;
+        console.error(e);
+    }
+    expect(error === undefined).toBeTruthy(error);
+})`;
+    return template;
+}
 export function GetDataChainNext(id, graph) {
     graph = graph || GetRootGraph(_getState());
     if (!graph) { throw 'no graph found'; }
@@ -1007,13 +1041,20 @@ export function GenerateDataChainMethod(id) {
         case DataChainFunctionKeys.Not:
             return `(a) => !!!a`;
         case DataChainFunctionKeys.GetModelIds:
-                return `(a) => { return a.map(item => item.id); }`;
+            return `(a) => { 
+    if(a && a.map) {
+        return a.map(item => item.id);
+    }
+    else { 
+        console.warn('"a" parameter was not an array');
+    }
+}`;
         case DataChainFunctionKeys.SaveModelArrayToState:
             return `(a) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(model)}, a)); return a; }`;
         case DataChainFunctionKeys.SaveModelIdsToState:
             return `(a) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(stateKey)}, a)); return a; }`
         case DataChainFunctionKeys.Selector:
-            return `(a) => a.${selectorProp}`
+            return `(a) => a ? a.${selectorProp} : undefined`
 
     }
 }

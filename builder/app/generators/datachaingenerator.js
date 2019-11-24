@@ -1,12 +1,19 @@
-import { GenerateChainFunctions } from "../actions/uiactions";
-import { readFileSync } from "fs";
+import {
+  GenerateChainFunctions,
+  GenerateChainFunctionSpecs
+} from '../actions/uiactions'
+import { readFileSync } from 'fs'
+import { UITypes, NEW_LINE } from '../constants/nodetypes'
+import { bindTemplate } from '../constants/functiontypes'
 
 export default class DataChainGenerator {
+  static Generate (options) {
+    let { language } = options
+    let funcs = GenerateChainFunctions()
 
-    static Generate(options) {
-        let funcs = GenerateChainFunctions();
-        let temps = [{
-            template: `import { GetItem, Chain, UIModels, GetDispatch, GetState } from './uiActions';
+    let temps = [
+      {
+        template: `import { GetItem, Chain, UIModels, GetDispatch, GetState, UIC } from './uiActions';
 import { 
     validateEmail, 
     maxLength, 
@@ -25,22 +32,39 @@ import * as StateKeys from '../state_keys';
 import * as Models from '../model_keys.js';
 import RedObservable from './observable.js';
 ${funcs}`,
-            relative: './src/actions',
-            relativeFilePath: `./data-chain.js`,
-            name: 'data-chain'
-        }, {
-            template: readFileSync('./app/utils/observable.js', 'utf8'),
-            relative: './src/actions',
-            relativeFilePath: './observable.js',
-            name: 'observable'
-        }];
-
-        let result = {};
-
-        temps.map(t => {
-            result[t.name] = t;
-        });
-
-        return result;
+        relative: './src/actions',
+        relativeFilePath: `./data-chain.js`,
+        name: 'data-chain'
+      },
+      {
+        template: readFileSync('./app/utils/observable.js', 'utf8'),
+        relative: './src/actions',
+        relativeFilePath: './observable.js',
+        name: 'observable'
+      }
+    ]
+    switch (language) {
+      case UITypes.ElectronIO:
+        let tests = GenerateChainFunctionSpecs(options)
+        temps.push({
+          relative: './test',
+          relativeFilePath: './data-chain.spec.js',
+          name: 'data-chain.spec.js',
+          template: bindTemplate(
+            readFileSync('./app/templates/electronio/spec.tpl', 'utf8'),
+            {
+              tests: tests.join(NEW_LINE)
+            }
+          )
+        })
+        break
     }
+    let result = {}
+
+    temps.map(t => {
+      result[t.name] = t
+    })
+
+    return result
+  }
 }
