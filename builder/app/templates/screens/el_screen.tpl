@@ -11,6 +11,11 @@ import MenuItem from '../components/menuitem';
 // {{name}}
 let navigationInstance;
 class {{name}} extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {};
+    }
 {{component_did_update}}
 {{component_did_mount}}
     render() {

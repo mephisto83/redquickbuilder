@@ -52,6 +52,7 @@ export function GenerateScreenMarkup(id, language) {
 export function GenerateScreenOptionSource(node, parent, language) {
     switch (language) {
         case UITypes.ReactNative:
+        case UITypes.ElectronIO:
             return GenerateRNScreenOptionSource(node, null, language);
     }
 }
@@ -1022,14 +1023,14 @@ export function GetScreens() {
     return screens;
 }
 function GenerateElectronIORoutes(screens) {
-    let template = `<Route path={{{route_name}}} component={{{component}}} />`;
+    let template = `<Route path={routes.{{route_name}}} component={{{component}}} />`;
     let routefile = fs.readFileSync('./app/templates/electronio/routes.tpl', 'utf8');
     let import_ = `import {{name}} from './screens/{{jsname}}';`
     let routes = [];
     let _screens = [];
     screens.map(screen => {
         routes.push(bindTemplate(template, {
-            route_name: `'${GetJSCodeName(screen)}'`,
+            route_name: `${GetCodeName(screen)}`,
             component: GetCodeName(screen)
         }));
         _screens.push(bindTemplate(import_, {

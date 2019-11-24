@@ -9,9 +9,9 @@ import CounterPage from './containers/CounterPage';
 export default () => (
   <App>
     <Switch>
+{{routes}}
       <Route path={routes.COUNTER} component={CounterPage} />
       <Route path={routes.HOME} component={HomePage} />
-{{routes}}
     </Switch>
   </App>
 );
