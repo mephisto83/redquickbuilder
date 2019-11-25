@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, FlatList, Image } from '../html-components';;
+import { Platform, StyleSheet, TouchableOpacity, FlatList, Image } from '{{relative_depth}}html-components';;
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
 import { GetItems, navigate, GetScreenParam, fetchModelInstance, fetchModelInstanceChildren  } from '{{relative_depth}}actions/uiActions';
 import * as DC from '{{relative_depth}}actions/data-chain';
