@@ -19,7 +19,6 @@ class {{name}} extends React.Component {
 {{component_did_update}}
 {{component_did_mount}}
     render() {
-        navigationInstance = this.props.navigation;
         setNavigate(navigationInstance);
         return (
             <StyleProvider>  

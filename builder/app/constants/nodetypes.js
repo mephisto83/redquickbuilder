@@ -434,6 +434,7 @@ export const NodeProperties = {
     ScopeGraph: 'scopedGraph',
 
     DataChainFunctionType: 'DataChainFunctionType',
+    DataChainProperty: 'DataChainProperty',
     QueryParameterType: 'QueryParameterType',
     Component: 'Component',
 

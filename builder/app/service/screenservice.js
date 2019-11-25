@@ -441,6 +441,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
     node = ConvertViewTypeToComponentNode(node);
     switch (language) {
         case UITypes.ReactNative:
+        case UITypes.ElectronIO:
             let onChange = '';
             let dataBinding = '';
             let instanceType = '';
@@ -466,7 +467,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
                     property = GetRNModelConstValue(propertyName);
 
                 };
-                if (parent && language === 'ReactNative' && GetNodeProp(parent, NodeProperties.ComponentType) === ComponentTypes[language].ListItem.key) {
+                if (parent && GetNodeProp(parent, NodeProperties.ComponentType) === ComponentTypes[language].ListItem.key) {
                     listItem = '.item';
                 }
             }
@@ -784,11 +785,11 @@ export function writeApiProperties(apiConfig) {
 
     return result;
 }
-export function GetScreenOption(id, type) {
+export function GetScreenOption(id, language) {
     let screen = GetNodeById(id);
     let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;
     if (screenOptions && screenOptions.length) {
-        let reactScreenOption = screenOptions.find(x => GetNodeProp(x, NodeProperties.UIType) === UITypes.ReactNative);
+        let reactScreenOption = screenOptions.find(x => GetNodeProp(x, NodeProperties.UIType) === language);
         if (reactScreenOption) {
             return reactScreenOption;
         }
@@ -995,6 +996,7 @@ export function GenerateImport(node, parentNode, language) {
 
     switch (language) {
         case UITypes.ReactNative:
+        case UITypes.ElectronIO:
             if (node) {
                 if (GetNodeProp(node, NodeProperties.SharedComponent)) {
                     return `import ${GetCodeName(node)} from '../shared/${(GetCodeName(node) || '').toJavascriptName()}'`;
@@ -1008,6 +1010,7 @@ export function GenerateComponentImport(node, parentNode, language) {
     node = ConvertViewTypeToComponentNode(node);
 
     switch (language) {
+        case UITypes.ElectronIO:
         case UITypes.ReactNative:
             if (node) {
                 if (GetNodeProp(node, NodeProperties.SharedComponent)) {
@@ -1056,7 +1059,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
     let result = screens.map(screen => {
         let screenOptions = GetConnectedScreenOptions(screen.id);
         if (screenOptions && screenOptions.length) {
-            let reactScreenOption = screenOptions.find(x => GetNodeProp(x, NodeProperties.UIType) === UITypes.ReactNative);
+            let reactScreenOption = screenOptions.find(x => GetNodeProp(x, NodeProperties.UIType) === language);
             if (reactScreenOption) {
                 template = GenerateScreenMarkup(screen.id, language);
                 let screenOptionSrc = GenerateScreenOptionSource(reactScreenOption, screen, language);
@@ -1064,6 +1067,9 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
                     moreresults.push(...screenOptionSrc.filter(x => x));
                 }
             }
+        }
+        else {
+            return false;
         }
         return {
             template: bindTemplate(template, {
@@ -1074,7 +1080,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
             relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}.js`,
             name: GetCodeName(screen)
         }
-    });
+    }).filter(x => x);
     switch (language) {
         case UITypes.ElectronIO:
             moreresults.push(GenerateElectronIORoutes(screens))

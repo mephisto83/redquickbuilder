@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
 import SideMenuContainer from './sidemenucontainer';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, UITypes } from '../constants/nodetypes';
 import { GetNode, GetAllChildren } from '../methods/graph_methods';
 import { clipboard } from 'electron';
 import { GetSpecificModels, GetAllModels, CreateLoginModels, CreateDefaultView, AddAgentUser, CreateAgentFunction } from '../constants/nodepackages';
@@ -40,6 +40,12 @@ class QuickMethods extends Component {
                 viewName: UIA.Visual(state, 'View Package Title'),
                 isSharedComponent: UIA.Visual(state, sharedcontrolkey),
                 isDefaultComponent: UIA.Visual(state, use_as_default),
+                uiTypes: {
+                    [UITypes.ReactNative]: UIA.Visual(state, UITypes.ReactNative),
+                    [UITypes.ElectronIO]: UIA.Visual(state, UITypes.ElectronIO),
+                    [UITypes.VR]: UIA.Visual(state, UITypes.VR),
+                    [UITypes.Web]: UIA.Visual(state, UITypes.Web)
+                },
                 chosenChildren: getChosenChildren()
             }
         };
@@ -109,6 +115,18 @@ class QuickMethods extends Component {
                                     value={UIA.Visual(state, sharedcontrolkey)}
                                     onChange={(value) => {
                                         this.props.setVisual(sharedcontrolkey, value);
+                                    }} />
+                                <CheckBox
+                                    label={UITypes.ElectronIO}
+                                    value={UIA.Visual(state, UITypes.ElectronIO)}
+                                    onChange={(value) => {
+                                        this.props.setVisual(UITypes.ElectronIO, value);
+                                    }} />
+                                <CheckBox
+                                    label={UITypes.ReactNative}
+                                    value={UIA.Visual(state, UITypes.ReactNative)}
+                                    onChange={(value) => {
+                                        this.props.setVisual(UITypes.ReactNative, value);
                                     }} />
                                 {UIA.Visual(state, sharedcontrolkey) ? <CheckBox
                                     label={Titles.UseAsDefault}
