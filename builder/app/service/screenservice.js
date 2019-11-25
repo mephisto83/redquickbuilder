@@ -1095,7 +1095,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 
     moreresults.push({
         template: bindTemplate(`{{source}}`, {
-            source: NodesByType(GetState(), [NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode]).map(t => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`).join(NEW_LINE)
+            source: NodesByType(GetState(), [NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode]).map(t => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`).unique().join(NEW_LINE)
         }),
         relative: './src/actions',
         relativeFilePath: `./screenInstances.js`,
