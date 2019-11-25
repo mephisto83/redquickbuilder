@@ -616,10 +616,21 @@ export function CreatePagingTakeDataChains() {
 export function CreateScreenModel(viewModel, options = { isList: true }) {
     var result = {};
     let pageModelId = null;
-
+    let skip = false;
     PerformGraphOperation([{
         operation: ADD_NEW_NODE,
         options: function (graph) {
+            let $node = GetNodeByProperties({
+                [NodeProperties.ExcludeFromController]: true,
+                [NodeProperties.UIText]: viewModel + ' Model',
+                [NodeProperties.IsViewModel]: true
+            }, graph);
+            if ($node) {
+                pageModelId = $node.id;
+                result.model = pageModelId;
+                skip = true;
+                return false;
+            }
             return {
                 nodeType: NodeTypes.Model,
                 callback: (pageModel) => {
@@ -629,13 +640,17 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
 
                 properties: {
                     [NodeProperties.ExcludeFromController]: true,
-                    [NodeProperties.UIText]: viewModel + ' Model'
+                    [NodeProperties.UIText]: viewModel + ' Model',
+                    [NodeProperties.IsViewModel]: true
                 }
             }
         }
     }, (options && options.isList ? {
         operation: ADD_NEW_NODE,
         options: function (graph) {
+            if (skip) {
+                return false;
+            }
             return {
                 nodeType: NodeTypes.Property,
                 callback: (skipModel) => {
@@ -1489,17 +1504,17 @@ export const CreateDefaultView = {
                         cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
 
 
-                        let $node = GetNodeByProperties({
-                            [NodeProperties.UIText]: `${viewName} List`,
-                            [NodeProperties.SharedComponent]: isSharedComponent,
-                            [NodeProperties.ComponentType]: ComponentTypes[uiType].List.key,
-                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
-                        }, currentGraph);
-                        if ($node) {
-                            listComponentId = $node.id;
-                            newItems.listComponentId = $node;
-                            return false;
-                        }
+                        // let $node = GetNodeByProperties({
+                        //     [NodeProperties.UIText]: `${viewName} List`,
+                        //     [NodeProperties.SharedComponent]: isSharedComponent,
+                        //     [NodeProperties.ComponentType]: ComponentTypes[uiType].List.key,
+                        //     [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                        // }, currentGraph);
+                        // if ($node) {
+                        //     listComponentId = $node.id;
+                        //     newItems.listComponentId = $node;
+                        //     return false;
+                        // }
 
                         let componentProps = null;
 
@@ -1622,7 +1637,7 @@ export const CreateDefaultView = {
                             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                             [NodeProperties.UIType]: GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph),
                             [NodeProperties.Pinned]: false,
-                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source`
+                            [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source ${GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph)}`
                         }, currentGraph);
                         if (res && res.length) {
                             dataSourceId = res[0].id;
@@ -1640,7 +1655,7 @@ export const CreateDefaultView = {
                                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                                 [NodeProperties.UIType]: GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph),
                                 [NodeProperties.Pinned]: false,
-                                [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source`
+                                [NodeProperties.UIText]: `${GetNodeTitle(currentNode)} Data Source ${GetNodeProp(listComponentId, NodeProperties.UIType, currentGraph)}`
                             },
                             linkProperties: {
                                 properties: { ...LinkProperties.DataSourceLink }
