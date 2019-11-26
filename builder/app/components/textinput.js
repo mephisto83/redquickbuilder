@@ -75,7 +75,7 @@ export default class TextInput extends Component {
                         }
                     }} placeholder={this.placeholder()} />
                 {this.props.inputgroup ? (<span className="input-group-btn">
-                    <button type="submit" onClick={() => {
+                    <button onClick={() => {
                         if (this.props.onClick) {
                             this.props.onClick();
                         }
