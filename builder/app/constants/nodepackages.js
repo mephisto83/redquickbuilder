@@ -1432,6 +1432,7 @@ export const CreateDefaultView = {
                             groupProperties: {},
                             properties: {
                                 [NodeProperties.UIText]: `value`,
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UseAsValue]: true
                             },
 
@@ -1450,6 +1451,7 @@ export const CreateDefaultView = {
                             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                             groupProperties: {},
                             properties: {
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UIText]: `value`
                             }
                         }
@@ -1585,6 +1587,7 @@ export const CreateDefaultView = {
                             groupProperties: {},
                             properties: {
                                 [NodeProperties.UIText]: `item`,
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UseAsValue]: true
                             },
 
@@ -1603,6 +1606,7 @@ export const CreateDefaultView = {
                             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                             groupProperties: {},
                             properties: {
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UIText]: `value`
                             }
                         }
@@ -1762,6 +1766,7 @@ export const CreateDefaultView = {
                             groupProperties: {},
                             properties: {
                                 [NodeProperties.UIText]: `value`,
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UseAsValue]: true
                             },
 
@@ -1780,6 +1785,7 @@ export const CreateDefaultView = {
                             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                             groupProperties: {},
                             properties: {
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UIText]: `value`
                             }
                         }
@@ -2025,6 +2031,7 @@ export const CreateDefaultView = {
                             groupProperties: {},
                             properties: {
                                 [NodeProperties.UIText]: `value`,
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UseAsValue]: true
                             },
 
@@ -2043,6 +2050,7 @@ export const CreateDefaultView = {
                             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                             groupProperties: {},
                             properties: {
+                                [NodeProperties.Pinned]: false,
                                 [NodeProperties.UIText]: `value`
                             }
                         }
@@ -2412,6 +2420,7 @@ export const CreateDefaultView = {
                         }, graph).find(x => x);
                         if (node) {
                             skipAddingComplete = true;
+                            newItems.getObjectDataChain = node.id;
                             return null;
                         }
 
@@ -3513,6 +3522,7 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                     groupProperties: {},
                     properties: {
                         [NodeProperties.UIText]: text,
+                        [NodeProperties.Pinned]: false,
                         [NodeProperties.UseAsValue]: options.useAsValue
                     },
 
@@ -3532,6 +3542,7 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                     linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                     groupProperties: {},
                     properties: {
+                        [NodeProperties.Pinned]: false,
                         [NodeProperties.UIText]: text
                     }
                 }
@@ -3576,6 +3587,7 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
                     groupProperties: {},
                     properties: {
                         [NodeProperties.UIText]: `value`,
+                        [NodeProperties.Pinned]: false,
                         [NodeProperties.UseAsValue]: true,
                         [NodeProperties.ComponentApiKey]: viewComponentType.internalApiNode || null
                     }
@@ -3598,6 +3610,7 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
                     groupProperties: {},
                     properties: {
                         [NodeProperties.UIText]: `value`,
+                        [NodeProperties.Pinned]: false,
                         [NodeProperties.ComponentApiKey]: viewComponentType.externalApiNode || null
                     }
                 }
