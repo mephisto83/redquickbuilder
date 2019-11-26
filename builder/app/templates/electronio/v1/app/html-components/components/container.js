@@ -15,7 +15,9 @@ export default class Container extends React.Component {
         delete props.children
         return (
             <StyleProvider>
-                <div {...props}>{this.props.children}</div>
+                <div className="container"  {...props}>
+                    {this.props.children}
+                </div>
             </StyleProvider>
         );
     }

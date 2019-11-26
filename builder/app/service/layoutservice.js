@@ -167,6 +167,7 @@ export function createSection(layoutObj, item, currentRoot, index, language, imp
     // _style.backgroundColor = '#' + ('dd4b39-3a405a-553d36-684a52-857885-94e8b4-72bda3-5e8c61-4e6151-3b322c-cfdbd5-e8eddf-f5cb5c-242423-333533'.split('-')[Math.floor(Math.random() * 5)]);
     switch (language) {
         case UITypes.ReactNative:
+        case UITypes.ElectronIO:
             if (!Object.keys(_style).length || cellRoot[item]) {
                 return tree.tightenPs();
             }

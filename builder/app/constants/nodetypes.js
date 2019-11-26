@@ -351,6 +351,7 @@ export const NodeProperties = {
     PagingTake: 'Take',
     PagingFilter: 'Filter',
     PagingSort: "PagingSort",
+    IsViewModel: 'IsViewModel',
     ComponentApiKey: 'ComponentApiKey',
     IsDataChainPagingSkip: 'IsDataChainPagingSkip',
     IsDataChainPagingTake: 'IsDataChainPagingTake',

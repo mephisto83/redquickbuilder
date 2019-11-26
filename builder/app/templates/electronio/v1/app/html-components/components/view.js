@@ -17,7 +17,7 @@ export default class ListItem extends React.Component {
         delete props.children
         return (
             <StyleProvider>
-                <li {...props}>{this.props.children}</li>
+                <div {...props}>{this.props.children}</div>
             </StyleProvider>
         );
     }

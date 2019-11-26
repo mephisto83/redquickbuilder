@@ -674,6 +674,7 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
 
 export function createViewPagingDataChain(newItems, viewName, viewPackage, skipChain = true) {
     let skip = false;
+    let skipOrTake = skipChain ? 'Skip' : 'Take';
     return function () {
         return [{
             // The data chain for a list screen
@@ -721,7 +722,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                 }
                 let $node = GetNodeByProperties({
                     [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
-                    [NodeProperties.UIText]: `${viewName} VM Ref`,
+                    [NodeProperties.UIText]: `${viewName} ${skipOrTake} VM Ref`,
                     [NodeProperties.DataChainReference]: newItems.screenListDataChain
                 }, graph);
                 if ($node) {
@@ -732,7 +733,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                     newItems.viewModelListRefNode = split.id;
                 }, {
                     [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
-                    [NodeProperties.UIText]: `${viewName} VM Ref`,
+                    [NodeProperties.UIText]: `${viewName} ${skipOrTake} VM Ref`,
                     [NodeProperties.DataChainReference]: newItems.screenListDataChain,
                     [NodeProperties.Pinned]: true,
                     ...viewPackage
@@ -770,7 +771,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                 }, graph);
 
                 let $node = GetNodeByProperties({
-                    [NodeProperties.UIText]: `${viewName} Paging Ref`,
+                    [NodeProperties.UIText]: `${viewName} ${skipOrTake} Paging Ref`,
                     [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
                     [NodeProperties.DataChainReference]: model ? model.id : null,
                     [NodeProperties.ChainParent]: newItems.viewModelListRefNode
@@ -785,7 +786,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                     nodeType: NodeTypes.DataChain,
                     groupProperties,
                     properties: {
-                        [NodeProperties.UIText]: `${viewName} Paging Ref`,
+                        [NodeProperties.UIText]: `${viewName} ${skipOrTake} Paging Ref`,
                         [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.ReferenceDataChain,
                         [NodeProperties.DataChainReference]: model ? model.id : null,
                         [NodeProperties.ChainParent]: newItems.viewModelListRefNode
@@ -830,7 +831,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                     groupProperties,
                     properties: {
                         [NodeProperties.ChainParent]: newItems.pagingRefNode,
-                        [NodeProperties.UIText]: `${viewName} Output`,
+                        [NodeProperties.UIText]: `${viewName} ${skipOrTake} Output`,
                         [NodeProperties.AsOutput]: true
                     },
                     linkProperties: {
@@ -1175,6 +1176,7 @@ export const CreateDefaultView = {
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                                 [NodeProperties.Selector]: newItems.screenSelector,
                                 [NodeProperties.EntryPoint]: true,
+                                [NodeProperties.AsOutput]: true,
                                 [NodeProperties.SelectorProperty]: newItems.screenViewModel
                             },
                             links: [{
@@ -2392,7 +2394,7 @@ export const CreateDefaultView = {
                         }
                     } : false,
                 ].filter(x => x))(GetDispatchFunc(), GetStateFunc());
-
+                let skipAddingComplete = false;
                 PerformGraphOperation([{
                     operation: ADD_NEW_NODE,
                     options: function (graph) {
@@ -2409,11 +2411,15 @@ export const CreateDefaultView = {
                             [NodeProperties.SelectorProperty]: viewModelInstanceNode.id
                         }, graph).find(x => x);
                         if (node) {
+                            skipAddingComplete = true;
                             return null;
                         }
 
                         return {
                             nodeType: NodeTypes.DataChain,
+                            callback: (node) => {
+                                newItems.getObjectDataChain = node.id;
+                            },
                             properties: {
                                 ...viewPackage,
                                 [NodeProperties.UIText]: `Get ${viewName}`,
@@ -2435,6 +2441,21 @@ export const CreateDefaultView = {
                                 }
                             }]
                         }
+                    }
+                }, {
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        if (skipAddingComplete) {
+                            return false;
+                        }
+                        let temp = AddChainCommand(GetNodeById(newItems.getObjectDataChain, graph), complete => {
+                        }, graph, {
+                            ...viewPackage,
+                            [NodeProperties.AsOutput]: true,
+                            [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
+                            [NodeProperties.UIText]: `Get ${viewName} Complete`
+                        });
+                        return temp.options;
                     }
                 }])(GetDispatchFunc(), GetStateFunc());;
 

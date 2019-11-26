@@ -11,6 +11,7 @@ import Right from './components/right';
 import Body from './components/body';
 import Icon from './components/icon';
 import Text from './components/text';
+import Input from './components/input';
 import View from './components/view';
 import StyleSheet from './components/stylesheet';
 import StyleProvider from './components/styleprovider';
@@ -32,6 +33,7 @@ export {
   Text,
   View,
   StyleProvider,
+  Input,
   StyleSheet,
   FlatList,
   Image

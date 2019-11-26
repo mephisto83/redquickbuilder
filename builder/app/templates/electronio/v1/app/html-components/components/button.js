@@ -17,7 +17,7 @@ export default class Button extends React.Component {
         delete props.children
         return (
             <StyleProvider>
-                <button {...props}>{this.props.children}</button>
+                <button  {...props} type="button" className={"btn btn-primary"}>{this.props.children}</button>
             </StyleProvider>
         );
     }
