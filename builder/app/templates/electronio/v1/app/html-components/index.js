@@ -16,7 +16,9 @@ import View from './components/view';
 import StyleSheet from './components/stylesheet';
 import StyleProvider from './components/styleprovider';
 import FlatList from './components/flatlist';
+import Label from './components/label';
 import Image from './components/image';
+import Item from './components/item';
 export {
   Content,
   Container,
@@ -24,6 +26,8 @@ export {
   Header,
   Title,
   Footer,
+  Label,
+  Item,
   FooterTab,
   Button,
   Left,

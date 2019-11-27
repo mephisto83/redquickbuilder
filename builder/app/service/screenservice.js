@@ -184,7 +184,7 @@ export function bindComponent(node, componentBindingDefinition) {
                     }
                 }
                 else if (properties[key].template) {
-                    bindProps[key] = GetDefaultComponentValue(node);
+                    bindProps[key] = GetDefaultComponentValue(node, key);
 
                     // if (typeof (properties[key].template) === 'function') {
                     //     //TODO 
@@ -203,8 +203,7 @@ export function bindComponent(node, componentBindingDefinition) {
             if (!bindProps[key])
                 bindProps[key] = '';
         });
-
-        var cevents = Object.keys(ComponentEvents);
+        var cevents = componentBindingDefinition.eventApi || Object.keys(ComponentEvents);
         let eventHandlers = cevents.map(t => getMethodInstancesForEvntType(node, ComponentEvents[t])).map((methodInstances, i) => {
             let invocations = methodInstances.map(methodInstanceCall => {
                 return getMethodInvocation(methodInstanceCall, node);
@@ -592,7 +591,7 @@ function WriteDescribedStateUpdates(parent) {
     }).filter(x => x).join(NEW_LINE);
     return result;
 }
-function GetDefaultComponentValue(node) {
+function GetDefaultComponentValue(node, key) {
     let result = ``;
     let graph = GetCurrentGraph(GetState());
     if (typeof node === 'string') {
@@ -601,7 +600,7 @@ function GetDefaultComponentValue(node) {
     let componentInternalApis = [GetNodesLinkedTo(graph, {
         id: node.id,
         link: LinkType.ComponentInternalApi
-    }).filter(x => GetNodeProp(x, NodeProperties.UseAsValue)).find(x => x)].filter(x => x);
+    }).filter(x => GetNodeProp(x, NodeProperties.UIText) === key).find(x => x)].filter(x => x);
 
     result = componentInternalApis.unique(x => GetJSCodeName(x)).map(componentInternalApi => {
         let dataChain = GetNodesLinkedTo(graph, {
@@ -650,6 +649,12 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             id: componentExternalApi.id,
             link: LinkType.ComponentExternalConnection
         }).find(x => x);
+
+        let titleService = GetNodesLinkedTo(graph, {
+            id: componentExternalApi.id,
+            link: LinkType.TitleServiceLink,
+        }).find(x => x);
+
         let query = GetNodesLinkedTo(graph, {
             id: componentExternalApi.id,
             link: LinkType.QueryLink
@@ -666,6 +671,9 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         }).find(x => x);
 
         let innerValue = '';
+        if (titleService) {
+            innerValue = `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`;
+        }
         if (externalConnection || query) {
 
             if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {

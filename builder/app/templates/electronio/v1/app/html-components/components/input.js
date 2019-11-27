@@ -67,7 +67,11 @@ export default class Input extends Component {
                     onChange={(v) => {
                         if (this.immediate()) {
                             if (this.props.onChange) {
-                                this.props.onChange(v.target.value);
+                                this.props.onChange(v);
+                            }
+                            
+                            if (this.props.onChangeText) {
+                                this.props.onChangeText(v.target.value);
                             }
                         }
                         else {

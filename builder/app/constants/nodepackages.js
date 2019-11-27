@@ -1123,6 +1123,29 @@ export const CreateDefaultView = {
                         }
                     }
                 } : false,
+                {
+                    operation: ADD_NEW_NODE,
+                    options: function (graph) {
+                        let $node = GetNodeByProperties({
+                            [NodeProperties.UIText]: `Title Service`,
+                            [NodeProperties.NODEType]: NodeTypes.TitleService
+                        }, graph);
+                        if ($node) {
+                            newItems.titleService = $node.id;
+                            return false;
+                        }
+                        return {
+                            nodeType: NodeTypes.TitleService,
+                            properties: {
+                                [NodeProperties.UIText]: `Title Service`
+                            },
+
+                            callback: (res) => {
+                                newItems.titleService = res.id;
+                            }
+                        }
+                    }
+                },
                 !isSharedComponent && isList ? {
                     // The selector for a list screen
                     operation: ADD_NEW_NODE,
@@ -1900,73 +1923,9 @@ export const CreateDefaultView = {
                     (function () {
                         return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent);
                     }),
-                        // ({
-                        //     operation: ADD_NEW_NODE,
-                        //     options: function (currentGraph) {
-                        //         return {
-                        //             nodeType: NodeTypes.ComponentApi,
-                        //             callback: (nn) => {
-                        //                 newItems[childComponents[modelIndex]] = {
-                        //                     componentInternalValue: nn.id
-                        //                 }
-                        //             },
-                        //             linkProperties: { properties: { ...LinkProperties.ComponentInternalApi } },
-                        //             parent: childComponents[modelIndex],
-                        //             groupProperties: {},
-                        //             properties: {
-                        //                 [NodeProperties.UIText]: `value`,
-                        //                 [NodeProperties.UseAsValue]: true,
-                        //                 [NodeProperties.ComponentApiKey]: ComponentTypes[uiType].Text.key === viewComponentType ? ComponentTypes[uiType].Text. 
-                        //             },
-
-                        //         }
-                        //     }
-                        // }),
-                        // ({
-                        //     operation: ADD_NEW_NODE,
-                        //     options: function (currentGraph) {
-                        //         return {
-                        //             nodeType: NodeTypes.ComponentExternalApi,
-                        //             callback: (nn) => {
-                        //                 newItems[childComponents[modelIndex]] = {
-                        //                     ...newItems[childComponents[modelIndex]],
-                        //                     componentExternalValue: nn.id
-                        //                 }
-                        //             },
-                        //             parent: childComponents[modelIndex],
-                        //             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
-                        //             groupProperties: {},
-                        //             properties: {
-                        //                 [NodeProperties.UIText]: `value`
-                        //             }
-                        //         }
-                        //     }
-                        // }),
-                        // ({
-                        //     operation: ADD_LINK_BETWEEN_NODES,
-                        //     options: function () {
-                        //         return {
-                        //             source: newItems[childComponents[modelIndex]].componentInternalValue,
-                        //             target: newItems[childComponents[modelIndex]].componentExternalValue,
-                        //             properties: {
-                        //                 ...LinkProperties.ComponentInternalConnection
-                        //             }
-                        //         }
-                        //     }
-                        // }),
-                        // ({
-                        //     operation: ADD_LINK_BETWEEN_NODES,
-                        //     options: function () {
-                        //         return {
-                        //             target: newItems.screenComponentIdInternalApi,
-                        //             source: newItems[childComponents[modelIndex]].componentExternalValue,
-                        //             properties: {
-                        //                 ...LinkProperties.ComponentExternalConnection
-                        //             }
-                        //         }
-                        //     }
-                        // })
-                    ]
+                    (function () {
+                        return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'label');
+                    })]
 
                 }).flatten(),
                 ...modelProperties.map((modelProperty, modelIndex) => {
@@ -2577,7 +2536,7 @@ export const CreateDefaultView = {
                         options: function () {
                             return {
                                 target: propNodeId,
-                                source: newItems[childComponents[propertyIndex]].componentExternalValue,
+                                source: newItems[childComponents[propertyIndex]].value.componentExternalValue,
                                 properties: {
                                     ...LinkProperties.DataChainLink
                                 }
@@ -2589,9 +2548,21 @@ export const CreateDefaultView = {
                         options: function () {
                             return {
                                 target: modelComponentSelectors[0],
-                                source: newItems[childComponents[propertyIndex]].componentExternalValue,
+                                source: newItems[childComponents[propertyIndex]].value.componentExternalValue,
                                 properties: {
                                     ...LinkProperties.SelectorLink
+                                }
+                            }
+                        }
+                    }),
+                    ({
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options: function () {
+                            return {
+                                target: newItems.titleService,
+                                source: newItems[childComponents[propertyIndex]].label.componentExternalValue,
+                                properties: {
+                                    ...LinkProperties.TitleServiceLink
                                 }
                             }
                         }
@@ -3568,9 +3539,10 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
             }
         })].filter(x => x)
 }
-function addComponentApiNodes(newItems, childComponents, modelIndex, viewComponentType) {
+function addComponentApiNodes(newItems, childComponents, modelIndex, viewComponentType, apiName = 'value') {
     let parent = childComponents[modelIndex];
-
+    let componentInternalValue = null;
+    let componentExternalValue = null;
     return [
         ({
             operation: ADD_NEW_NODE,
@@ -3578,15 +3550,23 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
                 return {
                     nodeType: NodeTypes.ComponentApi,
                     callback: (nn) => {
+                        componentInternalValue = nn.id;
                         newItems[childComponents[modelIndex]] = {
-                            componentInternalValue: nn.id
+                            ...(newItems[childComponents[modelIndex]] || {}),
+                            [apiName]: {
+                                componentInternalValue: nn.id
+                            }
                         }
                     },
-                    linkProperties: { properties: { ...LinkProperties.ComponentInternalApi } },
+                    linkProperties: {
+                        properties: {
+                            ...LinkProperties.ComponentInternalApi
+                        }
+                    },
                     parent,
                     groupProperties: {},
                     properties: {
-                        [NodeProperties.UIText]: `value`,
+                        [NodeProperties.UIText]: apiName,
                         [NodeProperties.Pinned]: false,
                         [NodeProperties.UseAsValue]: true,
                         [NodeProperties.ComponentApiKey]: viewComponentType.internalApiNode || null
@@ -3600,16 +3580,20 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
                 return {
                     nodeType: NodeTypes.ComponentExternalApi,
                     callback: (nn) => {
+                        componentExternalValue = nn.id;
                         newItems[childComponents[modelIndex]] = {
                             ...newItems[childComponents[modelIndex]],
-                            componentExternalValue: nn.id
+                            [apiName]: {
+                                ...newItems[childComponents[modelIndex]][apiName],
+                                componentExternalValue: nn.id
+                            }
                         }
                     },
                     parent,
                     linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
                     groupProperties: {},
                     properties: {
-                        [NodeProperties.UIText]: `value`,
+                        [NodeProperties.UIText]: apiName,
                         [NodeProperties.Pinned]: false,
                         [NodeProperties.ComponentApiKey]: viewComponentType.externalApiNode || null
                     }
@@ -3620,24 +3604,24 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
             operation: ADD_LINK_BETWEEN_NODES,
             options: function () {
                 return {
-                    source: newItems[childComponents[modelIndex]].componentInternalValue,
-                    target: newItems[childComponents[modelIndex]].componentExternalValue,
+                    source: componentInternalValue,
+                    target: componentExternalValue,
                     properties: {
                         ...LinkProperties.ComponentInternalConnection
                     }
                 }
             }
         }),
-        ({
+        apiName === 'value' ? ({
             operation: ADD_LINK_BETWEEN_NODES,
             options: function () {
                 return {
                     target: newItems.screenComponentIdInternalApi,
-                    source: newItems[childComponents[modelIndex]].componentExternalValue,
+                    source: componentExternalValue,
                     properties: {
                         ...LinkProperties.ComponentExternalConnection
                     }
                 }
             }
-        })];
+        }) : false].filter(x => x);
 }

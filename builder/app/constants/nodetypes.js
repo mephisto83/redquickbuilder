@@ -22,6 +22,7 @@ export const NodeTypes = {
     ComponentApi: 'ComponentApi',
     ComponentExternalApi: 'ComponentExternalApi',
     ScreenCollection: 'screen-collection',
+    TitleService: 'titleService',
     ScreenItem: 'screen-item',
     Attribute: 'attribute-property',
     ChoiceList: 'choice-list',
@@ -600,6 +601,7 @@ export const LinkType = {
     DataChainLink: 'data-chain-link',
     QueryLink: 'query-link',
     SelectorLink: 'selector-link',
+    TitleServiceLink: 'title-service-link',
     ComponentProperty: "component-link",
     EnumerationReference: 'enumeration-reference',
     LogicalChildren: 'logical-children',
@@ -838,6 +840,9 @@ export const LinkProperties = {
     },
     SelectorLink: {
         type: LinkType.SelectorLink
+    },
+    TitleServiceLink: {
+        type: LinkType.TitleServiceLink
     },
     QueryLink: {
         type: LinkType.QueryLink
