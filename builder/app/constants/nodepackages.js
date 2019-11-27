@@ -35,7 +35,7 @@ import {
     SelectedNode
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
-import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS } from "./componenttypes";
+import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
 import { createComponentApi, addComponentApi, getComponentApiList } from "../methods/component_api_methods";
@@ -1925,7 +1925,19 @@ export const CreateDefaultView = {
                     }),
                     (function () {
                         return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'label');
-                    })]
+                    }),
+                    function () {
+                        return addComponentEventApiNodes({
+                            newItems,
+                            childComponents,
+                            modelIndex,
+                            viewComponent,
+                            viewPackage,
+                            modelProperty,
+                            currentNode,
+                            useModelInstance
+                        });
+                    }]
 
                 }).flatten(),
                 ...modelProperties.map((modelProperty, modelIndex) => {
@@ -3538,6 +3550,136 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                 }
             }
         })].filter(x => x)
+}
+function addComponentEventApiNodes(args) {
+    let { newItems, childComponents, modelIndex, modelProperty, currentNode, viewComponent, viewPackage, useModelInstance } = args;
+    let parent = childComponents[modelIndex];
+    newItems.eventApis = newItems.eventApis || {};
+    return viewComponent.eventApi.map(apiName => {
+        let apiNameInstance = `${apiName} Instance`;
+        let apiNameEventHandler = `${apiName} Event Handler`;
+
+        return [{
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                return {
+                    nodeType: NodeTypes.EventMethod,
+                    callback: (nn) => {
+                        newItems.eventApis[childComponents[modelIndex]] = {
+                            ...(newItems.eventApis[childComponents[modelIndex]] || {}),
+                            [apiName]: nn.id
+                        }
+                    },
+                    linkProperties: {
+                        properties: {
+                            ...LinkProperties.EventMethod
+                        }
+                    },
+                    parent,
+                    groupProperties: {},
+                    properties: {
+                        ...viewPackage,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                        [NodeProperties.EventType]: apiName,
+                        [NodeProperties.UIText]: `${apiName}`,
+                    }
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                return {
+                    nodeType: NodeTypes.EventMethodInstance,
+                    callback: (nn) => {
+                        newItems.eventApis[childComponents[modelIndex]] = {
+                            ...(newItems.eventApis[childComponents[modelIndex]] || {}),
+                            [apiNameInstance]: nn.id
+                        }
+                    },
+                    parent: newItems.eventApis[childComponents[modelIndex]][apiName],
+                    groupProperties: {},
+                    properties: {
+                        [NodeProperties.UIText]: `${apiName} Instance`,
+                        [NodeProperties.AutoDelete]: {
+                            properties: {
+                                [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+                            }
+                        }
+                    }
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                return {
+                    nodeType: NodeTypes.EventHandler,
+                    callback: (nn) => {
+                        newItems.eventApis[childComponents[modelIndex]] = {
+                            ...(newItems.eventApis[childComponents[modelIndex]] || {}),
+                            [apiNameEventHandler]: nn.id
+                        }
+                    },
+                    parent: newItems.eventApis[childComponents[modelIndex]][apiName],
+                    linkProperties: {
+                        properties: {
+                            ...LinkProperties.EventHandler,
+                        }
+                    },
+                    groupProperties: {},
+                    properties: {
+                        [NodeProperties.EventType]: apiName,
+                        [NodeProperties.UIText]: `${apiName} EventHandler`,
+                    }
+                }
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                let viewModelNode = null;
+                let instanceType = null;
+                switch (apiName) {
+                    case ComponentEvents.onFocus:
+                        instanceType = useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus;
+                        break;
+                    case ComponentEvents.onBlur:
+                        instanceType = useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur;
+                        break;
+                    case ComponentEvents.onChange:
+                        instanceType = useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance;
+                        break;
+                    case ComponentEvents.onChangeText:
+                        instanceType = useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance;
+                        break;
+                }
+                let res = GetNodesByProperties({
+                    [NodeProperties.Model]: currentNode.id,
+                    [NodeProperties.InstanceType]: instanceType,
+                    [NodeProperties.NODEType]: NodeTypes.ViewModel
+                }, graph);
+                if (res && res.length) {
+                    viewModelNode = res[0].id;
+                }
+                return {
+                    source: newItems.eventApis[childComponents[modelIndex]][apiNameEventHandler],
+                    target: viewModelNode,
+                    properties: {
+                        ...LinkProperties.ViewModelLink
+                    }
+                }
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                return {
+                    source: newItems.eventApis[childComponents[modelIndex]][apiNameEventHandler],
+                    target: modelProperty.id,
+                    properties: {
+                        ...LinkProperties.PropertyLink
+                    }
+                }
+            }
+        }];
+    }).flatten();
 }
 function addComponentApiNodes(newItems, childComponents, modelIndex, viewComponentType, apiName = 'value') {
     let parent = childComponents[modelIndex];

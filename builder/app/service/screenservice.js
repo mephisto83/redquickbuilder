@@ -526,7 +526,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
             }
             let describedApi = '';
             if (node && parent) {
-                describedApi = WriteDescribedApiProperties(node).trim();
+                describedApi = WriteDescribedApiProperties(node);
             }
             // ${valueBinding} ${dataBinding} 
             return `<${GetCodeName(node)} ${apiProperties} ${describedApi} ${onChange}/>`;
@@ -631,7 +631,7 @@ function GetDefaultComponentValue(node, key) {
             return result;
         }
     }).filter(x => x).join(NEW_LINE);
-    return result;
+    return NEW_LINE + result;
 }
 function WriteDescribedApiProperties(node, options = { listItem: false }) {
     let result = '';
@@ -700,7 +700,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
 
     }).filter(x => x);
 
-    return result.join(' ');
+    return NEW_LINE + result.join(NEW_LINE);
 }
 export function writeApiProperties(apiConfig) {
     var result = '';

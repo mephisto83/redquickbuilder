@@ -35,6 +35,24 @@ export const ComponentEvents = {
     onChangeText: 'onChangeText'
 
 }
+export const ComponentEventArgs = {
+    [ComponentEvents.onBlur]: {
+        [NodeTypes.Property]: true,
+        [NodeTypes.ViewModel]: true
+    },
+    [ComponentEvents.onFocus]: {
+        [NodeTypes.Property]: true,
+        [NodeTypes.ViewModel]: true
+    },
+    [ComponentEvents.onChange]: {
+        [NodeTypes.Property]: true,
+        [NodeTypes.ViewModel]: true
+    },
+    [ComponentEvents.onChangeText]: {
+        [NodeTypes.Property]: true,
+        [NodeTypes.ViewModel]: true
+    }
+}
 export const SCREEN_COMPONENT_EVENTS = [
     ComponentLifeCycleEvents.ComponentDidMount,
     ComponentLifeCycleEvents.ComponentWillUnmount
@@ -180,6 +198,7 @@ export const ComponentTypes = {
         Input: {
             template: './app/templates/components/input.tpl',
             defaultApi: INPUT_DEFAULT_API,
+            eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
             properties: {
                 item_attributes: {
                     nodeProperty: NodeProperties.TextType,

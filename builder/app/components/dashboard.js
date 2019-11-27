@@ -19,6 +19,7 @@ import QuickMethods from './quickmethods';
 import ServiceIntefaceMenu from './serviceinterfacemenu';
 import * as Titles from './titles';
 import SideBarMenu from './sidebarmenu';
+import EventHandlerActivityMenu from './eventhandleractivitymenu';
 import TreeViewMenu from './treeviewmenu';
 import Content from './content';
 import NavigationParameterMenu from './navigationparametermenu';
@@ -547,6 +548,17 @@ class Dashboard extends Component {
 			},
 			icon: 'fa fa-map-signs',
 			title: `${Titles.NavigateTo}`
+
+		}, {
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.EventHandler,
+					singleLink: true,
+					nodeTypes: [NodeTypes.EventHandler]
+				});
+			},
+			icon: 'fa fa-vimeo',
+			title: `${Titles.ConnectEventHandler}`
 
 		});
 
@@ -1255,6 +1267,7 @@ class Dashboard extends Component {
 							</SideBarContent>) : null}
 							<ComponentPropertyMenu />
 							<ComponentAPIMenu />
+							<EventHandlerActivityMenu />
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<SideBarContent>
 								<ValidatorPropertyMenu />
 								<ReferenceActivityMenu />
