@@ -219,13 +219,19 @@ export const ComponentTypes = {
                 ...DEFAULT_INPUT_API_PROPERTIES,
                 value: {
                     nodeProperty: NodeProperties.value,
-                    template: `{titleService.get('{{value}}')}`,
-                    // parameterConfig: true,
-                    // ui: true
+                    template: true
                 },
                 label: {
                     nodeProperty: NodeProperties.Label,
-                    template: `{titleService.get('{{value}}')}`
+                    template: true
+                },
+                error: {
+                    nodeProperty: NodeProperties.Error,
+                    template: true
+                },
+                success: {
+                    nodeProperty: NodeProperties.Success,
+                    template: true
                 }
             }
         },

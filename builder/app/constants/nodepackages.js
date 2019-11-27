@@ -1926,6 +1926,12 @@ export const CreateDefaultView = {
                     (function () {
                         return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'label');
                     }),
+                    (function () {
+                        return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'error');
+                    }),
+                    (function () {
+                        return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'success');
+                    }),
                     function () {
                         return addComponentEventApiNodes({
                             newItems,
@@ -3596,10 +3602,20 @@ function addComponentEventApiNodes(args) {
                             [apiNameInstance]: nn.id
                         }
                     },
+
+                    linkProperties: {
+                        properties: {
+                            ...LinkProperties.EventMethodInstance
+                        }
+                    },
                     parent: newItems.eventApis[childComponents[modelIndex]][apiName],
                     groupProperties: {},
                     properties: {
                         [NodeProperties.UIText]: `${apiName} Instance`,
+                        [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
+                        [NodeProperties.EventType]: apiName,
+                        [NodeProperties.Model]: currentNode.id,
+                        [NodeProperties.Property]: modelProperty.id,
                         [NodeProperties.AutoDelete]: {
                             properties: {
                                 [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
@@ -3619,7 +3635,7 @@ function addComponentEventApiNodes(args) {
                             [apiNameEventHandler]: nn.id
                         }
                     },
-                    parent: newItems.eventApis[childComponents[modelIndex]][apiName],
+                    parent: newItems.eventApis[childComponents[modelIndex]][apiNameInstance],
                     linkProperties: {
                         properties: {
                             ...LinkProperties.EventHandler,

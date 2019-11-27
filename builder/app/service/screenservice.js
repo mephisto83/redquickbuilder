@@ -528,8 +528,8 @@ export function GenerateMarkupTag(node, language, parent, params) {
             if (node && parent) {
                 describedApi = WriteDescribedApiProperties(node);
             }
-            // ${valueBinding} ${dataBinding} 
-            return `<${GetCodeName(node)} ${apiProperties} ${describedApi} ${onChange}/>`;
+            // ${apiProperties} ${valueBinding} ${dataBinding} ${onChange}
+            return `<${GetCodeName(node)} ${describedApi} />`;
     }
 }
 function WriteDescribedStateUpdates(parent) {
@@ -644,6 +644,11 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         link: LinkType.ComponentExternalApi
     });
 
+    let componentEventHandlers = GetNodesLinkedTo(graph, {
+        id: node.id,
+        link: LinkType.EventMethod
+    })
+
     result = componentExternalApis.unique(x => GetJSCodeName(x)).map(componentExternalApi => {
         let externalConnection = GetNodesLinkedTo(graph, {
             id: componentExternalApi.id,
@@ -700,6 +705,54 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
 
     }).filter(x => x);
 
+    let res = componentEventHandlers.unique(x => GetJSCodeName(x)).map(componentEventHandler => {
+        let eventInstances = GetNodesLinkedTo(graph, {
+            id: componentEventHandler.id,
+            link: LinkType.EventMethodInstance
+        });
+        return eventInstances.map(eventInstance => {
+            let eventMethodHandlers = GetNodesLinkedTo(graph, {
+                id: eventInstance.id,
+                link: LinkType.EventHandler
+            });
+            let method_calls = eventMethodHandlers.map(eventMethodHandler => {
+                let property = GetNodesLinkedTo(graph, {
+                    id: eventMethodHandler.id,
+                    link: LinkType.PropertyLink,
+                }).find(x => x);
+                let viewModel = GetNodesLinkedTo(graph, {
+                    id: eventMethodHandler.id,
+                    link: LinkType.ViewModelLink,
+                }).find(x => x);
+                let eventType = GetNodeProp(eventMethodHandler, NodeProperties.EventType);
+                let method_call = null;
+                let modelJsName = GetJSCodeName(viewModel);
+                let modelProperty = GetJSCodeName(property);
+                let screenOrModel = GetNodeProp(eventMethodHandler, NodeProperties.InstanceType) ? 'Model' : 'Screen';
+                switch (eventType) {
+                    case ComponentEvents.onBlur:
+                        method_call = `this.props.update${screenOrModel}InstanceBlur('${modelJsName}', '${(modelProperty)}')`;
+                        break;
+                    case ComponentEvents.onFocus:
+                        method_call = `this.props.update${screenOrModel}InstanceFocus('${modelJsName}', '${(modelProperty)}')`;
+                        break;
+                    case ComponentEvents.onChangeText:
+                        method_call = `this.props.update${screenOrModel}Instance('${modelJsName}', '${(modelProperty)}', arg)`;
+                        break;
+                    case ComponentEvents.onChange:
+                        method_call = `this.props.update${screenOrModel}Instance('${modelJsName}', '${(modelProperty)}', arg.nativeEvent.text)`;
+                        break;
+                }
+                return method_call;
+            });
+            if (method_calls && method_calls.length) {
+                return `${GetNodeProp(eventInstance, NodeProperties.EventType)}={arg => {
+                    ${method_calls.join(NEW_LINE)}
+                }}`
+            }
+        }).filter(x => x).join(NEW_LINE);
+    });
+    result.push(...res);
     return NEW_LINE + result.join(NEW_LINE);
 }
 export function writeApiProperties(apiConfig) {

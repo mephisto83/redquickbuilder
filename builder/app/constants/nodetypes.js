@@ -389,6 +389,8 @@ export const NodeProperties = {
     UIExtension: 'uiExtension',
     UIExtensionDefinition: 'uiExtensionDefinition',
     Label: 'Label',
+    Error: 'Error',
+    Success: 'Success',
     MethodProps: 'methodProperties',
     FilterPropreties: 'filterproperties',
     UIValidationType: 'uiValidationType',
@@ -552,6 +554,7 @@ export const LinkType = {
     StateKey: 'StateKey',
     LifeCylceMethod: 'LifeCylceMethod',
     EventMethod: 'EventMethod',
+    EventMethodInstance: 'EventMethodInstance',
     NavigationMethod: 'NavigationMethod',
     MethodCall: 'MethodCall',
     ValidatorServiceMethod: 'ValidatorServiceMethod',
@@ -777,6 +780,9 @@ export const LinkProperties = {
     },
     EventMethod: {
         type: LinkType.EventMethod
+    },
+    EventMethodInstance: {
+        type: LinkType.EventMethodInstance
     },
     NavigationMethod: {
         type: LinkType.NavigationMethod
