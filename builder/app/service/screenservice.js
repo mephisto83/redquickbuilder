@@ -631,7 +631,7 @@ function GetDefaultComponentValue(node, key) {
             return result;
         }
     }).filter(x => x).join(NEW_LINE);
-    return NEW_LINE + result;
+    return result;
 }
 function WriteDescribedApiProperties(node, options = { listItem: false }) {
     let result = '';
@@ -679,7 +679,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         if (titleService) {
             innerValue = `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`;
         }
-        if (externalConnection || query) {
+        else if (externalConnection || query) {
 
             if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {
                 innerValue = `GetScreenParam('query')`;
@@ -701,7 +701,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
         }
         if (innerValue)
-            return `${GetJSCodeName(externalConnection) || GetJSCodeName(componentExternalApi)}={${innerValue}}`;
+            return `${GetJSCodeName(componentExternalApi)}={${innerValue}}`;
 
     }).filter(x => x);
 

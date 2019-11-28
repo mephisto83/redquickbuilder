@@ -1,4 +1,4 @@
-<Item {{inlineLabel}} {{floatingLabel}} {{stackedLabel}} {{fixedLabel}} {{success}} {{error}} >
+<Item {{inlineLabel}} {{floatingLabel}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
     <Label>{{{label}}}</Label>
     <Input value={{{value}}} 
         onBlur={()=>{
