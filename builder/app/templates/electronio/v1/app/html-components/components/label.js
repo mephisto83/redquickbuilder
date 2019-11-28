@@ -8,7 +8,7 @@ export default class Input extends Component {
     render() {
         return (
             <div>
-                {this.props.value}
+                {this.props.children}
             </div>
         );
     }

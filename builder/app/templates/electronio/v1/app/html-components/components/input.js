@@ -8,7 +8,7 @@ export default class Input extends Component {
         return this.props.label || '{label}';
     }
     immediate() {
-        return this.props.immediate || false;
+        return this.props.immediate || true;
     }
     value() {
         if (this.immediate()) {
@@ -47,46 +47,41 @@ export default class Input extends Component {
             }
         }
         return (
-            <div className={this.props.inputgroup ? 'input-group' : "form-group"}>
-                {this.props.inputgroup ? null : <label>{this.label()}</label>}
-                <input type="text" disabled={this.disabled()} className={"form-control"}
-                    onBlur={() => {
-                        if (!this.immediate()) {
-                            if (this.props.onChange) {
-                                if (this.state.value !== this.props.value)
-                                    this.props.onChange(this.state.value || '');
-                            }
+            <input type="text" disabled={this.disabled()} className={"form-control"}
+                onBlur={() => {
+                    if (!this.immediate()) {
+                        if (this.props.onChange) {
+                            if (this.state.value !== this.props.value)
+                                this.props.onChange(this.state.value || '');
                         }
-                        this.setState({ focused: false });
-                    }}
-                    onFocus={(() => {
-                        this.setState({ focused: true });
-                    })}
-                    value={this.value()}
-                    onKeyPress={handleKeyPress}
-                    onChange={(v) => {
-                        if (this.immediate()) {
-                            if (this.props.onChange) {
-                                this.props.onChange(v);
-                            }
-                            
-                            if (this.props.onChangeText) {
-                                this.props.onChangeText(v.target.value);
-                            }
+                    }
+                    this.setState({ focused: false });
+                    if (this.props.onBlur) {
+                        this.props.onBlur();
+                    }
+                }}
+                onFocus={(() => {
+                    this.setState({ focused: true });
+                    if (this.props.onFocus) {
+                        this.props.onFocus();
+                    }
+                })}
+                value={this.value()}
+                onKeyPress={handleKeyPress}
+                onChange={(v) => {
+                    if (this.immediate()) {
+                        if (this.props.onChange) {
+                            this.props.onChange(v);
                         }
-                        else {
-                            this.setState({ value: v.target.value });
+
+                        if (this.props.onChangeText) {
+                            this.props.onChangeText(v.target.value);
                         }
-                    }} placeholder={this.placeholder()} />
-                {this.props.inputgroup ? (<span className="input-group-btn">
-                    <button type="submit" onClick={() => {
-                        if (this.props.onClick) {
-                            this.props.onClick();
-                        }
-                    }} name="search" id="search-btn" className="btn btn-flat"><i className="fa fa-edit"></i>
-                    </button>
-                </span>) : null}
-            </div>
+                    }
+                    else {
+                        this.setState({ value: v.target.value });
+                    }
+                }} placeholder={this.placeholder()} />
         );
     }
 }
