@@ -1003,7 +1003,13 @@ export function GetComponentDidUpdate(parent) {
     }
 
     let componentDidUpdate = `componentDidUpdate(prevProps) {
-${describedApi}
+        this.captureValues();
+      }
+      componentDidMount(prevProps) {
+        this.captureValues();
+      }
+      captureValues(){
+        ${describedApi}
       }`;
 
     return componentDidUpdate;

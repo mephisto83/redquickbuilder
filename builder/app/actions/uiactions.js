@@ -1054,8 +1054,11 @@ export function GenerateDataChainMethod(id) {
         case DataChainFunctionKeys.SaveModelIdsToState:
             return `(a) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(stateKey)}, a)); return a; }`
         case DataChainFunctionKeys.Selector:
-            return `(a) => a ? a.${selectorProp} : undefined`
-
+            return `(a) => a ? a.${selectorProp} : undefined`;
+        case DataChainFunctionKeys.Models:
+            return `a => GetItems(Models.${GetCodeName(model)})`;
+        default:
+            throw `${functionType} is not a defined function type.`;
     }
 }
 export function GetPermissionsSortedByAgent() {

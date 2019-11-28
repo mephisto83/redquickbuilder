@@ -556,6 +556,7 @@ export function CreatePagingTakeDataChains() {
             if (skipTake) {
                 return false;
             }
+            
             let temp = SplitDataCommand(GetNodeById(result.pagingTake, graph), split => {
                 result.pagingTakeOuput = split.id;
             }, {
@@ -831,6 +832,7 @@ export function createViewPagingDataChain(newItems, viewName, viewPackage, skipC
                     groupProperties,
                     properties: {
                         [NodeProperties.ChainParent]: newItems.pagingRefNode,
+                        [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
                         [NodeProperties.UIText]: `${viewName} ${skipOrTake} Output`,
                         [NodeProperties.AsOutput]: true
                     },
@@ -2758,10 +2760,15 @@ export const CreateDefaultView = {
                                         [apiNameInstance]: nn.id
                                     }
                                  */
-                                return {
-                                    source: newItems.eventApis[childComponents[propertyIndex]][apiNameEventHandler],
-                                    target: apiDataChainLists[apiProperty],
-                                    properties: { ...LinkProperties.DataChainLink }
+                                if (newItems.eventApis &&
+                                    newItems.eventApis[childComponents[propertyIndex]] &&
+                                    newItems.eventApis[childComponents[propertyIndex]][apiNameEventHandler] &&
+                                    apiDataChainLists[apiProperty]) {
+                                    return {
+                                        source: newItems.eventApis[childComponents[propertyIndex]][apiNameEventHandler],
+                                        target: apiDataChainLists[apiProperty],
+                                        properties: { ...LinkProperties.DataChainLink }
+                                    }
                                 }
                             }
                         }]
@@ -3621,7 +3628,7 @@ function addComponentEventApiNodes(args) {
     let { newItems, childComponents, modelIndex, modelProperty, currentNode, viewComponent, viewPackage, useModelInstance } = args;
     let parent = childComponents[modelIndex];
     newItems.eventApis = newItems.eventApis || {};
-    return viewComponent.eventApi.map(apiName => {
+    return (viewComponent.eventApi || []).map(apiName => {
         let apiNameInstance = `${apiName} Instance`;
         let apiNameEventHandler = `${apiName} Event Handler`;
 
