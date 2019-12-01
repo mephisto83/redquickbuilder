@@ -1,5 +1,5 @@
 import { MethodFunctions, FunctionTypes, FunctionTemplateKeys, FunctionMethodTypes, HTTP_METHODS, QUERY_PARAMETERS, QUERY_PARAMETER_KEYS } from "./functiontypes";
-import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties, LinkType, LinkPropertyKeys } from "./nodetypes";
+import { NodeTypes, LinkProperties, NodeProperties, Methods, UITypes, GroupProperties, LinkType, LinkPropertyKeys, SelectorPropertyKeys } from "./nodetypes";
 import {
     ADD_NEW_NODE,
     GetAgentNodes,
@@ -1242,7 +1242,7 @@ export const CreateDefaultView = {
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                             [NodeProperties.Selector]: newItems.screenSelector,
                             [NodeProperties.EntryPoint]: true,
-                            [NodeProperties.SelectorProperty]: newItems.screenViewModel
+                            [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object
                         }, graph);
                         if ($node) {
                             newItems.screenListDataChain = $node.id;
@@ -1259,7 +1259,7 @@ export const CreateDefaultView = {
                                 [NodeProperties.EntryPoint]: true,
                                 [NodeProperties.Pinned]: false,
                                 [NodeProperties.AsOutput]: true,
-                                [NodeProperties.SelectorProperty]: newItems.screenViewModel
+                                [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object
                             },
                             links: [{
                                 target: newItems.screenSelector,
@@ -1312,139 +1312,144 @@ export const CreateDefaultView = {
                             }]
                         }
                     }
-                } : false, !isSharedComponent ? {
-                    operation: ADD_NEW_NODE,
-                    options: function (graph) {
-                        let res = GetNodesByProperties({
-                            [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty,
-                            [NodeProperties.NODEType]: NodeTypes.ViewModel
-                        }, graph);
-                        if (res && res.length) {
-                            viewModelNodeDirtyId = res[0].id;
-                            return false;
-                        }
+                } : false,
+                //  !isSharedComponent ? {
+                //     operation: ADD_NEW_NODE,
+                //     options: function (graph) {
+                //         let res = GetNodesByProperties({
+                //             [NodeProperties.Model]: currentNode.id,
+                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty,
+                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
+                //         }, graph);
+                //         if (res && res.length) {
+                //             viewModelNodeDirtyId = res[0].id;
+                //             return false;
+                //         }
 
-                        return {
-                            nodeType: NodeTypes.ViewModel,
-                            callback: (viewModelNodeDirty) => {
-                                viewModelNodeDirtyId = viewModelNodeDirty.id;
-                            },
-                            properties: {
-                                ...viewPackage,
-                                [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty} `,
-                                [NodeProperties.Model]: currentNode.id,
-                                [NodeProperties.Pinned]: false,
-                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
-                            },
-                            links: [{
-                                target: currentNode.id,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.ViewModelLink }
-                                }
-                            }]
-                        };
-                    }
-                } : null, !isSharedComponent ? {
-                    operation: ADD_NEW_NODE,
-                    options: function (graph) {
-                        let res = GetNodesByProperties({
-                            [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus,
-                            [NodeProperties.NODEType]: NodeTypes.ViewModel
-                        }, graph);
-                        if (res && res.length) {
-                            viewModelNodeFocusId = res[0].id;
-                            return false;
-                        }
+                //         return {
+                //             nodeType: NodeTypes.ViewModel,
+                //             callback: (viewModelNodeDirty) => {
+                //                 viewModelNodeDirtyId = viewModelNodeDirty.id;
+                //             },
+                //             properties: {
+                //                 ...viewPackage,
+                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty} `,
+                //                 [NodeProperties.Model]: currentNode.id,
+                //                 [NodeProperties.Pinned]: false,
+                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
+                //             },
+                //             links: [{
+                //                 target: currentNode.id,
+                //                 linkProperties: {
+                //                     properties: { ...LinkProperties.ViewModelLink }
+                //                 }
+                //             }]
+                //         };
+                //     }
+                // } : null,
+                //  !isSharedComponent ? {
+                //     operation: ADD_NEW_NODE,
+                //     options: function (graph) {
+                //         let res = GetNodesByProperties({
+                //             [NodeProperties.Model]: currentNode.id,
+                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus,
+                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
+                //         }, graph);
+                //         if (res && res.length) {
+                //             viewModelNodeFocusId = res[0].id;
+                //             return false;
+                //         }
 
-                        return {
-                            nodeType: NodeTypes.ViewModel,
-                            callback: (viewModelNodeFocus) => {
-                                viewModelNodeFocusId = viewModelNodeFocus.id;
-                            },
-                            properties: {
-                                ...viewPackage,
-                                [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus}`,
-                                [NodeProperties.Model]: currentNode.id,
-                                [NodeProperties.Pinned]: false,
-                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
-                            },
-                            links: [{
-                                target: currentNode.id,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.ViewModelLink }
-                                }
-                            }]
-                        }
-                    }
-                } : null, !isSharedComponent ? {
-                    operation: ADD_NEW_NODE,
-                    options: function (graph) {
-                        let res = GetNodesByProperties({
-                            [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused,
-                            [NodeProperties.NODEType]: NodeTypes.ViewModel
-                        }, graph);
-                        if (res && res.length) {
-                            viewModelNodeFocusedId = res[0].id;
-                            return false;
-                        }
+                //         return {
+                //             nodeType: NodeTypes.ViewModel,
+                //             callback: (viewModelNodeFocus) => {
+                //                 viewModelNodeFocusId = viewModelNodeFocus.id;
+                //             },
+                //             properties: {
+                //                 ...viewPackage,
+                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus}`,
+                //                 [NodeProperties.Model]: currentNode.id,
+                //                 [NodeProperties.Pinned]: false,
+                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
+                //             },
+                //             links: [{
+                //                 target: currentNode.id,
+                //                 linkProperties: {
+                //                     properties: { ...LinkProperties.ViewModelLink }
+                //                 }
+                //             }]
+                //         }
+                //     }
+                // } : null,
+                //  !isSharedComponent ? {
+                //     operation: ADD_NEW_NODE,
+                //     options: function (graph) {
+                //         let res = GetNodesByProperties({
+                //             [NodeProperties.Model]: currentNode.id,
+                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused,
+                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
+                //         }, graph);
+                //         if (res && res.length) {
+                //             viewModelNodeFocusedId = res[0].id;
+                //             return false;
+                //         }
 
-                        return {
-                            nodeType: NodeTypes.ViewModel,
-                            callback: (viewModelNodeFocused) => {
-                                viewModelNodeFocusedId = viewModelNodeFocused.id;
-                            },
-                            properties: {
-                                ...viewPackage,
-                                [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused}`,
-                                [NodeProperties.Model]: currentNode.id,
-                                [NodeProperties.Pinned]: false,
-                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
-                            },
-                            links: [{
-                                target: currentNode.id,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.ViewModelLink }
-                                }
-                            }]
-                        }
-                    }
-                } : false, !isSharedComponent ? {
-                    operation: ADD_NEW_NODE,
-                    options: function (graph) {
-                        let res = GetNodesByProperties({
-                            [NodeProperties.Model]: currentNode.id,
-                            [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur,
-                            [NodeProperties.NODEType]: NodeTypes.ViewModel
-                        }, graph);
-                        if (res && res.length) {
-                            viewModelNodeBlurId = res[0].id;
-                            return false;
-                        }
+                //         return {
+                //             nodeType: NodeTypes.ViewModel,
+                //             callback: (viewModelNodeFocused) => {
+                //                 viewModelNodeFocusedId = viewModelNodeFocused.id;
+                //             },
+                //             properties: {
+                //                 ...viewPackage,
+                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused}`,
+                //                 [NodeProperties.Model]: currentNode.id,
+                //                 [NodeProperties.Pinned]: false,
+                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
+                //             },
+                //             links: [{
+                //                 target: currentNode.id,
+                //                 linkProperties: {
+                //                     properties: { ...LinkProperties.ViewModelLink }
+                //                 }
+                //             }]
+                //         }
+                //     }
+                // } : false, 
+                // !isSharedComponent ? {
+                //     operation: ADD_NEW_NODE,
+                //     options: function (graph) {
+                //         let res = GetNodesByProperties({
+                //             [NodeProperties.Model]: currentNode.id,
+                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur,
+                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
+                //         }, graph);
+                //         if (res && res.length) {
+                //             viewModelNodeBlurId = res[0].id;
+                //             return false;
+                //         }
 
-                        return {
-                            nodeType: NodeTypes.ViewModel,
-                            callback: (viewModelNodeBlur) => {
-                                viewModelNodeBlurId = viewModelNodeBlur.id;
-                            },
-                            properties: {
-                                ...viewPackage,
-                                [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur}`,
-                                [NodeProperties.Model]: currentNode.id,
-                                [NodeProperties.Pinned]: false,
-                                [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
-                            },
-                            links: [{
-                                target: currentNode.id,
-                                linkProperties: {
-                                    properties: { ...LinkProperties.ViewModelLink }
-                                }
-                            }]
-                        }
-                    }
-                } : null, !isSharedComponent ? {
+                //         return {
+                //             nodeType: NodeTypes.ViewModel,
+                //             callback: (viewModelNodeBlur) => {
+                //                 viewModelNodeBlurId = viewModelNodeBlur.id;
+                //             },
+                //             properties: {
+                //                 ...viewPackage,
+                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur}`,
+                //                 [NodeProperties.Model]: currentNode.id,
+                //                 [NodeProperties.Pinned]: false,
+                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
+                //             },
+                //             links: [{
+                //                 target: currentNode.id,
+                //                 linkProperties: {
+                //                     properties: { ...LinkProperties.ViewModelLink }
+                //                 }
+                //             }]
+                //         }
+                //     }
+                // } : null, 
+                !isSharedComponent ? {
                     operation: NEW_SCREEN_OPTIONS,
                     options: function () {
                         let formLayout = CreateLayout();
@@ -2496,7 +2501,7 @@ export const CreateDefaultView = {
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                             [NodeProperties.EntryPoint]: true,
                             [NodeProperties.Selector]: modelComponentSelectors[0],
-                            [NodeProperties.SelectorProperty]: viewModelInstanceNode.id
+                            [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object
                         }, graph).find(x => x);
                         if (node) {
                             skipAddingComplete = true;
@@ -2517,7 +2522,7 @@ export const CreateDefaultView = {
                                 [NodeProperties.EntryPoint]: true,
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                                 [NodeProperties.Selector]: modelComponentSelectors[0],
-                                [NodeProperties.SelectorProperty]: viewModelInstanceNode.id,
+                                [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object,
                                 [NodeProperties.Pinned]: true
                             },
                             links: [{
@@ -3841,7 +3846,7 @@ function BuildPropertyDataChainAccessor(args) {
                 [NodeProperties.EntryPoint]: true,
                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                 [NodeProperties.Selector]: modelComponentSelectors[0],
-                [NodeProperties.SelectorProperty]: viewModelNodeId,
+                [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object,
                 [NodeProperties.Pinned]: false,
                 [NodeProperties.Property]: modelProperty.id
             };

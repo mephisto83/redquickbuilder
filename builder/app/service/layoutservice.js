@@ -60,9 +60,9 @@ export function GetRNModelInstances(id) {
 }
 
 export function GetRNConsts(id) {
-    let prop_consts = GetPropertyConsts(id);
-    let model_consts = GetModelConsts(id);
-    let model_propconsts = GetModelPropertyConsts(id);
+    let prop_consts = [];// GetPropertyConsts(id);
+    let model_consts = [];// GetModelConsts(id);
+    let model_propconsts = [];//GetModelPropertyConsts(id);
 
     return [...prop_consts.map(x => {
         return `const const_${(GetCodeName(x) || '').toJavascriptName()} = '${(GetCodeName(x) || '').toJavascriptName()}';`

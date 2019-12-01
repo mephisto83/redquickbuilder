@@ -12,7 +12,7 @@ import TreeViewMenu from './treeviewmenu';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
-import { NodeProperties, NodeTypes, LinkEvents, LinkType, LinkProperties } from '../constants/nodetypes';
+import { NodeProperties, NodeTypes, LinkEvents, LinkType, LinkProperties, SelectorPropertyKeys } from '../constants/nodetypes';
 import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLinkChainItem, createExecutor } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
@@ -36,7 +36,7 @@ class DataChainActvityMenu extends Component {
         let stateKey = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.stateKey : false;
         let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
         let selector_nodes = UIA.NodesByType(state, NodeTypes.Selector).toNodeSelect();
-        let selector_node_properties = UIA.GetSelectorsNodes(UIA.GetNodeProp(currentNode, NodeProperties.Selector)).toNodeSelect();
+        let selector_node_properties = Object.keys(SelectorPropertyKeys).map(v => ({ title: v, value: v }))
         let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
             return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
         }).toNodeSelect();
@@ -156,7 +156,7 @@ class DataChainActvityMenu extends Component {
                         }}
                         label={Titles.StateKey}
                         value={UIA.GetNodeProp(currentNode, NodeProperties.StateKey)}
-                        options={UIA.NodesByType(state, [NodeTypes.StateKey]) .toNodeSelect()}
+                        options={UIA.NodesByType(state, [NodeTypes.StateKey]).toNodeSelect()}
                     />) : null}
                     {showDataChainRef ? <SelectInput
                         onChange={(value) => {

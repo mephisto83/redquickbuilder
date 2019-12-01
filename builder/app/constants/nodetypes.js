@@ -244,6 +244,13 @@ export const GeneratedDataTypes = {
 export const ConfigurationProperties = {
     Domain: 'Configuration_Domain'
 }
+export const SelectorPropertyKeys = {
+    Dirty: 'dirty',
+    Focused: 'focused',
+    Focus: 'focus',
+    Object: 'object',
+    Blur: 'blur'
+}
 export const NodeProperties = {
     ViewPackage: "view-package",
     DefaultComponentApiValue: 'DefaultComponentApiValue',

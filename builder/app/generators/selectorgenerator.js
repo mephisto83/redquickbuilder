@@ -52,9 +52,23 @@ export function GenerateSelectorFunction(node) {
     let result = null;
 
     result = `
-export function ${GetJSCodeName(node)}(${GetNodeProp(node, NodeProperties.InstanceType) ? 'value' : ''}) {
+export function ${GetJSCodeName(node)}(value, viewModel) {
     return {
-${addNewLine(parts.join(',' + NEW_LINE), 2)}
+        dirty: value
+            ? UIA.GetModelInstanceDirtyObject(value, viewModel)
+            : UIA.GetScreenInstanceDirtyObject(viewModel),
+        focus: value
+            ? UIA.GetModelInstanceFocusObject(value, viewModel)
+            : UIA.GetScreenInstanceFocusObject(viewModel),
+        blur: value
+            ? UIA.GetModelInstanceBlurObject(value, viewModel)
+            : UIA.GetScreenInstanceBlurObject(viewModel),
+        focused: value
+            ? UIA.GetModelInstanceFocusedObject(value, viewModel)
+            : UIA.GetScreenInstanceFocusedObject(viewModel),
+        object: value
+            ? UIA.GetModelInstanceObject(value, viewModel)
+            : UIA.GetScreenInstanceObject(viewModel)
     }
 }
 `;

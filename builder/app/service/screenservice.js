@@ -563,7 +563,7 @@ function WriteDescribedStateUpdates(parent) {
         innerValue = externalKey;
         if (innerValue) {
             if (selector) {
-                innerValue = `S.${GetJSCodeName(selector)}({{temp}})`;
+                innerValue = `S.${GetJSCodeName(selector)}({{temp}}, this.state.viewModel)`;
             }
             else {
                 innerValue = '{{temp}}';
@@ -618,7 +618,7 @@ function GetDefaultComponentValue(node, key) {
         innerValue = externalKey;
         if (innerValue) {
             if (selector) {
-                innerValue = `S.${GetJSCodeName(selector)}({{temp}})`;
+                innerValue = `S.${GetJSCodeName(selector)}({{temp}}, this.state.viewModel)`;
             }
             else {
                 innerValue = '{{temp}}';
@@ -704,7 +704,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             }
         }
         if (selector) {
-            innerValue = `S.${GetJSCodeName(selector)}(${innerValue})`;
+            innerValue = `S.${GetJSCodeName(selector)}(${innerValue}, this.state.viewModel)`;
         }
         if (dataChain) {
             innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
@@ -743,16 +743,16 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 let screenOrModel = GetNodeProp(eventMethodHandler, NodeProperties.InstanceType) ? 'Model' : 'Screen';
                 switch (eventType) {
                     case ComponentEvents.onBlur:
-                        method_call = `this.props.update${screenOrModel}InstanceBlur(${modelJsName}, '${(modelProperty)}')`;
+                        method_call = `this.props.update${screenOrModel}InstanceBlur(this.statel.viewModel, '${(modelProperty)}')`;
                         break;
                     case ComponentEvents.onFocus:
-                        method_call = `this.props.update${screenOrModel}InstanceFocus(${modelJsName}, '${(modelProperty)}')`;
+                        method_call = `this.props.update${screenOrModel}InstanceFocus(this.statel.viewModel, '${(modelProperty)}')`;
                         break;
                     case ComponentEvents.onChangeText:
-                        method_call = `this.props.update${screenOrModel}Instance(${modelJsName}, '${(modelProperty)}', arg)`;
+                        method_call = `this.props.update${screenOrModel}Instance(this.statel.viewModel, '${(modelProperty)}', arg)`;
                         break;
                     case ComponentEvents.onChange:
-                        method_call = `this.props.update${screenOrModel}Instance(${modelJsName}, '${(modelProperty)}', arg.nativeEvent.text)`;
+                        method_call = `this.props.update${screenOrModel}Instance(this.statel.viewModel, '${(modelProperty)}', arg.nativeEvent.text)`;
                         break;
                 }
                 return method_call;
@@ -780,24 +780,24 @@ export function writeApiProperties(apiConfig) {
                 case InstanceTypes.ScreenInstance:
                     switch (handlerType) {
                         case HandlerTypes.Blur:
-                            property = `() => this.props.updateScreenInstanceBlur(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
+                            property = `() => this.props.updateScreenInstanceBlur(this.state.viewModel, const_${GetJSCodeName(modelProperty)})`;
                             break;
                         case HandlerTypes.Focus:
-                            property = `() => this.props.updateScreenInstanceFocus(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
+                            property = `() => this.props.updateScreenInstanceFocus(this.state.viewModel, const_${GetJSCodeName(modelProperty)})`;
                             break;
                         case HandlerTypes.ChangeText:
-                            property = `(v) => this.props.updateScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)}, v)`;
+                            property = `(v) => this.props.updateScreenInstance(this.state.viewModel, const_${GetJSCodeName(modelProperty)}, v)`;
                             break;
                         case HandlerTypes.Change:
-                            property = `(v) => this.props.updateScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)}, v.nativeEvent.text)`;
+                            property = `(v) => this.props.updateScreenInstance(this.state.viewModel, const_${GetJSCodeName(modelProperty)}, v.nativeEvent.text)`;
                             break;
                         case HandlerTypes.Property:
                         default:
                             if (modelProperty) {
-                                property = `GetScreenInstance(const_${modelJsName}, const_${GetJSCodeName(modelProperty)})`;
+                                property = `GetScreenInstance(this.state.viewModel, const_${GetJSCodeName(modelProperty)})`;
                             }
                             else {
-                                property = `GetScreenInstanceObject(const_${modelJsName})`;
+                                property = `GetScreenInstanceObject(this.state.viewModel)`;
                             }
                             break;
                     }
@@ -805,40 +805,28 @@ export function writeApiProperties(apiConfig) {
                 case InstanceTypes.ModelInstance:
                     switch (handlerType) {
                         case HandlerTypes.Blur:
-                            property = `() => this.props.updateModelInstanceBlur(${modelJsName}, this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                            property = `() => this.props.updateModelInstanceBlur(this.state.viewModel, this.props.value, '${GetJSCodeName(modelProperty)}')`;
                             break;
                         case HandlerTypes.Focus:
-                            property = `() => this.props.updateModelInstanceFocus(${modelJsName}, this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                            property = `() => this.props.updateModelInstanceFocus(this.state.viewModel, this.props.value, '${GetJSCodeName(modelProperty)}')`;
                             break;
                         case HandlerTypes.ChangeText:
-                            property = `(v) => this.props.updateModelInstance(${modelJsName}, this.props.value, '${GetJSCodeName(modelProperty)}', v)`;
+                            property = `(v) => this.props.updateModelInstance(this.state.viewModel, this.props.value, '${GetJSCodeName(modelProperty)}', v)`;
                             break;
                         case HandlerTypes.Change:
-                            property = `(v) => this.props.updateModelInstance(${modelJsName}, this.props.value, '${GetJSCodeName(modelProperty)}', v.nativeEvent.text)`;
+                            property = `(v) => this.props.updateModelInstance(this.state.viewModel, this.props.value, '${GetJSCodeName(modelProperty)}', v.nativeEvent.text)`;
                             break;
                         case HandlerTypes.Property:
                         default:
                             if (modelProperty) {
-                                property = `GetModelInstance(${modelJsName}, this.props.value, '${GetJSCodeName(modelProperty)}')`;
+                                property = `GetModelInstance(this.state.viewModel, this.props.value, '${GetJSCodeName(modelProperty)}')`;
                             }
                             else {
-                                property = `GetModelInstanceObject(${modelJsName}, this.props.value)`;
+                                property = `GetModelInstanceObject(this.state.viewModel, this.props.value)`;
                             }
                             break;
                     }
                     break;
-                // case InstanceTypes.ApiProperty:
-                //     property = `this.props.${apiProperty}${isHandler ? ' || (() => {})' : ''}`;
-                //     break;
-                // case InstanceTypes.Selector:
-                //     property = `S.${GetJSCodeName(selector)}()`;
-                //     break;
-                // case InstanceTypes.SelectorInstance:
-                //     property = `S.${GetJSCodeName(selector)}(this.props.value)`;
-                //     break;
-                // case InstanceTypes.Boolean:
-                //     property = `true`;
-                //     break;
                 default:
                     break;
                 //throw 'write api properties unhandled case ' + instanceType;

@@ -980,7 +980,7 @@ export function GenerateDataChainMethod(id) {
     let property = GetNodeProp(node, NodeProperties.Property);
     let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
     let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
-    let selectorProp = GetJSCodeName(GetNodeProp(node, NodeProperties.SelectorProperty));
+    let selectorProp = (GetNodeProp(node, NodeProperties.SelectorProperty));
     let lastpart = 'return item;';
     switch (functionType) {
         case DataChainFunctionKeys.ModelProperty:
