@@ -2157,7 +2157,22 @@ export const CreateDefaultView = {
                             }
                         }
                     }
-                }), ...((ComponentTypes[uiType].Button.eventApi.map(t => {
+                }),
+                (function () {
+                    return addComponentApiToForm({
+                        newItems, text: 'viewModel', parent: newItems.button
+                    });
+                }),
+                (function () {
+                    return connectComponentToExternalApi({
+                        newItems,
+                        parent: newItems.screenComponentId,
+                        key: 'viewModel',
+                        properties: LinkProperties.ComponentExternalConnection,
+                        child: newItems.button
+                    })
+                }),
+                ...((ComponentTypes[uiType].Button.eventApi.map(t => {
                     return {
                         operation: ADD_NEW_NODE,
                         options: function () {

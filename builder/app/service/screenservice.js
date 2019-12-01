@@ -743,16 +743,16 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 let screenOrModel = GetNodeProp(eventMethodHandler, NodeProperties.InstanceType) ? 'Model' : 'Screen';
                 switch (eventType) {
                     case ComponentEvents.onBlur:
-                        method_call = `this.props.update${screenOrModel}InstanceBlur(this.statel.viewModel, '${(modelProperty)}')`;
+                        method_call = `this.props.update${screenOrModel}InstanceBlur(this.state.viewModel, '${(modelProperty)}')`;
                         break;
                     case ComponentEvents.onFocus:
-                        method_call = `this.props.update${screenOrModel}InstanceFocus(this.statel.viewModel, '${(modelProperty)}')`;
+                        method_call = `this.props.update${screenOrModel}InstanceFocus(this.state.viewModel, '${(modelProperty)}')`;
                         break;
                     case ComponentEvents.onChangeText:
-                        method_call = `this.props.update${screenOrModel}Instance(this.statel.viewModel, '${(modelProperty)}', arg)`;
+                        method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${(modelProperty)}', arg)`;
                         break;
                     case ComponentEvents.onChange:
-                        method_call = `this.props.update${screenOrModel}Instance(this.statel.viewModel, '${(modelProperty)}', arg.nativeEvent.text)`;
+                        method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${(modelProperty)}', arg.nativeEvent.text)`;
                         break;
                 }
                 return method_call;
