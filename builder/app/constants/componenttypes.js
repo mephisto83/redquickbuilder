@@ -57,7 +57,7 @@ export const SCREEN_COMPONENT_EVENTS = [
     ComponentLifeCycleEvents.ComponentDidMount,
     ComponentLifeCycleEvents.ComponentWillUnmount
 ]
-
+export const PropertyApiList = ['error', 'success', VALUE].map(v => ({ value: v }));
 const INPUT_DEFAULT_API = [
     VALUE,
     ON_BLUR,

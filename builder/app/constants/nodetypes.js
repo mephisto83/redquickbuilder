@@ -315,6 +315,7 @@ export const NodeProperties = {
     Collapsed: 'collapsed',
     UseExtension: 'usextension',
     IncludedInList: 'includedInList',
+    IsShared: 'IsShared',
     Pinned: 'Pinned',
     UseInView: 'UseInView',
     Selected: 'Selected',

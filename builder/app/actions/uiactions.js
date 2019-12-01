@@ -163,22 +163,25 @@ export function getViewTypeEndpointsForDefaults(viewType, currentGraph, id) {
 }
 
 export function setSharedComponent(args) {
-    let { properties, target, source } = args;
+    let { properties, target, source, viewType, uiType } = args;
     return (dispatch, getState) => {
         let state = getState();
         let graph = GetCurrentGraph(getState());
-        if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.SharedComponent }) &&
+        if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.SharedComponent, properties: { viewType } }) &&
             GetNodeProp(target, NodeProperties.SharedComponent) &&
             GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode) {
-            let connections = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentNode).map(x => {
-                return {
-                    operation: REMOVE_LINK_BETWEEN_NODES,
-                    options: {
-                        source,
-                        target: x.id
+            let connections = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentNode)
+                .filter(x => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+                .filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType)
+                .map(x => {
+                    return {
+                        operation: REMOVE_LINK_BETWEEN_NODES,
+                        options: {
+                            source,
+                            target: x.id
+                        }
                     }
-                }
-            })
+                })
 
             PerformGraphOperation([...connections, {
                 operation: ADD_LINK_BETWEEN_NODES,

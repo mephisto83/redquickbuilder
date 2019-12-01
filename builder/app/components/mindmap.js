@@ -332,6 +332,11 @@ export default class MindMap extends Component {
         })
 
         function getLabelText(d) {
+            if (!d.selected) {
+                if (d.properties && me.props.minimizeTypes && me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]) {
+                    return '';
+                }
+            }
             return d && d.properties ? d.properties.text || d.name : d.name;
         }
         function createRectangle(source) {

@@ -33,14 +33,14 @@ class NodeManagement extends Component {
             if (!filter || !x) {
                 return false;
             }
-            
+
             var str = this.toFilterString(x);
             return str.indexOf(filter) !== -1;
         }).groupBy(x => UIA.GetNodeProp(x, NodeProperties.NODEType));
         let body = [];
         body = Object.keys(groups).filter(group => groups[group].length).map((group, gi) => {
             let groupKey = `NodeManagement-${group}`;
-            let groupNodes = groups[group].map((gn, gni) => {
+            let groupNodes = groups[group].subset(0, 100).map((gn, gni) => {
                 return (
                     <TreeViewMenu key={`node-${group}-${gi}-${gni}`}
                         hideArrow={true}
@@ -89,7 +89,7 @@ class NodeManagement extends Component {
                         this.props.toggleVisual(NODE_MANAGEMENT_MENU)
                     }}>
                     <TreeViewMenu hideArrow={true} title={Titles.ClearPinned} icon={'fa fa-times'} onClick={() => {
-                        this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
+                        this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).subset(0, 100).map(node => {
                             return {
                                 operation: UIA.CHANGE_NODE_PROPERTY,
                                 options: {

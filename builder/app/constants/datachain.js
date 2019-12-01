@@ -511,7 +511,7 @@ export function insertNodeInbetween(_callback, graph) {
         }
     }
 }
-export function InsertNodeInbetween(currentNode, value, graph, onCallback) {
+export function InsertNodeInbetween(currentNode, value, graph, onCallback, properties = {}) {
     graph = graph || GetCurrentGraph(GetState());
     let me = this;
     let link = GetLinkBetween(currentNode.id, value, graph);
@@ -540,6 +540,7 @@ export function InsertNodeInbetween(currentNode, value, graph, onCallback) {
                     } : {},
                     linkProperties: { properties: { ...LinkProperties.DataChainLink } },
                     properties: {
+                        ...properties,
                         [NodeProperties.ChainParent]: source.id
                     },
                     links: [{

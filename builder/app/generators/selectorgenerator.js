@@ -48,8 +48,10 @@ export function GenerateSelectorFunction(node) {
             default:
                 throw 'unhandled generate selector function type ' + GetNodeProp(part, NodeProperties.NODEType);
         }
-    })
-    let result = `
+    });
+    let result = null;
+
+    result = `
 export function ${GetJSCodeName(node)}(${GetNodeProp(node, NodeProperties.InstanceType) ? 'value' : ''}) {
     return {
 ${addNewLine(parts.join(',' + NEW_LINE), 2)}

@@ -1126,10 +1126,15 @@ function NodesByType(graph, nodeType, options = {}) {
     return [];
 }
 export function existsLinkBetween(graph, options) {
-    var { source, target, type, direction } = options;
+    var { source, target, type, direction, properties } = options;
     var link = findLink(graph, { source, target })
 
     if (link) {
+        if (properties && Object.key(properties).some(prop => {
+            return GetLinkProperty(link, prop) !== properties[prop];
+        })) {
+            return false;
+        }
         return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type;
     }
     return false;
@@ -2055,7 +2060,7 @@ export function addLink(graph, options, link) {
 }
 export function addLinkBetweenNodes(graph, options) {
     let { target, source, properties } = options;
-    if (target !== source) {
+    if (target !== source && target) {
         let link = createLink(target, source, properties);
         return addLink(graph, options, link);
     }
