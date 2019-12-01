@@ -685,15 +685,24 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 innerValue = `GetScreenParam('query')`;
             }
             else {
+
                 if (options.listItem) {
                     innerValue = GetJSCodeName(externalConnection);
                 }
                 else {
-                    innerValue = `this.state.${GetJSCodeName(externalConnection)}`;
+
+                    let defaulComponentValue = GetNodeProp(externalConnection, NodeProperties.DefaultComponentApiValue) || '';
+                    if (defaulComponentValue) {
+                        //Create/Update case
+                        innerValue = `ViewModelKeys.${defaulComponentValue}`;
+                    }
+                    else {
+                        //Get/GetAll/Delete
+                        innerValue = `this.state.${GetJSCodeName(externalConnection)}`;
+                    }
                 }
             }
         }
-
         if (selector) {
             innerValue = `S.${GetJSCodeName(selector)}(${innerValue})`;
         }

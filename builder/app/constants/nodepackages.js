@@ -32,7 +32,9 @@ import {
     updateMethodParameters,
     GetNodeByProperties,
     getGroup,
-    SelectedNode
+    SelectedNode,
+    GetJSCodeName,
+    GetCodeName
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents, PropertyApiList } from "./componenttypes";
@@ -1051,7 +1053,7 @@ export const CreateDefaultView = {
             let createConnections = [];
             let createListConnections = [];
             viewName = viewName || GetNodeTitle(currentNode);
-            let useModelInstance = viewType === ViewTypes.Update || viewType === ViewTypes.Get || viewType === ViewTypes.GetAll || viewType === ViewTypes.Delete;
+            let useModelInstance = [ViewTypes.Get, ViewTypes.GetAll, ViewTypes.Delete].some(v => viewType === v);
             let viewPackage = {
                 [NodeProperties.ViewPackage]: uuidv4(),
                 [NodeProperties.ViewPackageTitle]: viewName
@@ -1122,6 +1124,26 @@ export const CreateDefaultView = {
                         }
                     }
                 } : false,
+                !isSharedComponent ? (function (graph) {
+                    return addComponentApiToForm({
+                        newItems,
+                        text: 'value',
+                        parent: newItems.screenNodeId,
+                        graph,
+                        isSingular: true
+                    });
+                }) : null,
+                !isSharedComponent ? (function (graph) {
+                    return addComponentApiToForm({
+                        newItems, text: 'viewModel',
+                        parent: newItems.screenNodeId,
+                        graph,
+                        isSingular: true,
+                        internalProperties: {
+                            [NodeProperties.DefaultComponentApiValue]: useModelInstance ? false : GetCodeName(newItems.screenNodeId)
+                        }
+                    });
+                }) : null,
                 !isSharedComponent && isList ? {
                     // The selector for a list screen
                     operation: ADD_NEW_NODE,
@@ -1479,62 +1501,34 @@ export const CreateDefaultView = {
                         }
                     }
                 } : false,
-                ({
-                    operation: ADD_NEW_NODE,
-                    options: function (currentGraph) {
-                        if (newItems.screenNodeOptionId) {
-                            return {
-                                nodeType: NodeTypes.ComponentApi,
-                                callback: (nn) => {
-                                    newItems.screenNodeOptionInternalApi = nn.id;
-                                },
-                                parent: newItems.screenNodeOptionId,
-                                linkProperties: { properties: { ...LinkProperties.ComponentInternalApi } },
-                                groupProperties: {},
-                                properties: {
-                                    [NodeProperties.UIText]: `value`,
-                                    [NodeProperties.Pinned]: false,
-                                    [NodeProperties.UseAsValue]: true
-                                },
-
-                            }
-                        }
-                    }
-                }),
-                ({
-                    operation: ADD_NEW_NODE,
-                    options: function (currentGraph) {
-                        if (newItems.screenNodeOptionId) {
-                            return {
-                                nodeType: NodeTypes.ComponentExternalApi,
-                                callback: (nn) => {
-                                    newItems.screenNodeOptionExternalApi = nn.id;
-                                },
-                                parent: newItems.screenNodeOptionId,
-                                linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
-                                groupProperties: {},
-                                properties: {
-                                    [NodeProperties.Pinned]: false,
-                                    [NodeProperties.UIText]: `value`
-                                }
-                            }
-                        }
-                    }
-                }),
-                ({
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options: function () {
-                        if (newItems.screenNodeOptionId) {
-                            return {
-                                source: newItems.screenNodeOptionInternalApi,
-                                target: newItems.screenNodeOptionExternalApi,
-                                properties: {
-                                    ...LinkProperties.ComponentInternalConnection
-                                }
-                            }
-                        }
-                    }
-                }),
+                !isSharedComponent ? (function () {
+                    return addComponentApiToForm({
+                        newItems, text: 'value', parent: newItems.screenNodeOptionId
+                    });
+                }) : null,
+                !isSharedComponent ? (function () {
+                    return addComponentApiToForm({
+                        newItems, text: 'viewModel', parent: newItems.screenNodeOptionId
+                    });
+                }) : null,
+                !isSharedComponent ? (function () {
+                    return connectComponentToExternalApi({
+                        newItems,
+                        parent: newItems.screenNodeId,
+                        key: 'value',
+                        properties: LinkProperties.ComponentExternalConnection,
+                        child: newItems.screenNodeOptionId
+                    })
+                }) : null,
+                !isSharedComponent ? (function () {
+                    return connectComponentToExternalApi({
+                        newItems,
+                        parent: newItems.screenNodeId,
+                        properties: LinkProperties.ComponentExternalConnection,
+                        key: 'viewModel',
+                        child: newItems.screenNodeOptionId
+                    })
+                }) : null,
                 ...(!isSharedComponent ? (SCREEN_COMPONENT_EVENTS.map(t => {
                     return {
                         operation: ADD_NEW_NODE,
@@ -1633,9 +1627,9 @@ export const CreateDefaultView = {
                         }
                     }
                 } : false,
-                isSharedComponent && isList ? (function () {
+                isList ? (function () {
                     return addListItemComponentApi(newItems, 'viewModel', false, (v, _i) => {
-                        newItems.sharedItemListViewModel = _i;
+                        newItems.componentItemListViewModel = _i;
                     }, newItems.listComponentId, { useAsValue: false })
                 }) : null,
                 ...(['index', 'separators'].map(text => {
@@ -1703,7 +1697,7 @@ export const CreateDefaultView = {
                     options: function () {
                         return {
                             source: newItems.listComponentExternalApi,
-                            target: newItems.screenNodeOptionInternalApi,
+                            target: getApiConnectors(newItems, newItems.screenNodeOptionId, 'value').internalId,
                             properties: {
                                 ...LinkProperties.ComponentExternalConnection
                             }
@@ -1802,13 +1796,13 @@ export const CreateDefaultView = {
                     }
                 },
 
-                isSharedComponent ? (function () {
+                (function () {
                     return addListItemComponentApi(newItems, 'viewModel', false, (v, _i) => {
-                        newItems.sharedItemViewModel = _i;
+                        newItems.componentViewModelApiIds = _i;
                     }, newItems.screenComponentId, { useAsValue: false })
-                }) : null,
+                }),
 
-                isSharedComponent && isList ? ((function () {
+                isList ? ((function () {
                     if (!isList) {
                         return []
                     }
@@ -1816,8 +1810,8 @@ export const CreateDefaultView = {
                         operation: ADD_LINK_BETWEEN_NODES,
                         options: function () {
                             return {
-                                target: newItems.sharedItemListViewModel.internalId,
-                                source: newItems.sharedItemViewModel.externalId,
+                                target: newItems.componentItemListViewModel.internalId,
+                                source: newItems.componentViewModelApiIds.externalId,
                                 properties: {
                                     ...LinkProperties.ComponentExternalConnection
                                 }
@@ -1883,6 +1877,10 @@ export const CreateDefaultView = {
                             nodeType: NodeTypes.ComponentExternalApi,
                             callback: (nn) => {
                                 newItems.screenComponentIdExternalApi = nn.id;
+                                setApiConnectors(newItems, newItems.screenComponentId, {
+                                    externalId: nn.id,
+                                    internalId: newItems.screenComponentIdInternalApi
+                                }, 'value');
                             },
                             parent: newItems.screenComponentId,
                             linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
@@ -1898,8 +1896,8 @@ export const CreateDefaultView = {
                     operation: ADD_LINK_BETWEEN_NODES,
                     options: function () {
                         return {
-                            source: newItems.screenComponentIdInternalApi,
-                            target: newItems.screenComponentIdExternalApi,
+                            source: getApiConnectors(newItems, newItems.screenComponentId, 'value').internalId,
+                            target: getApiConnectors(newItems, newItems.screenComponentId, 'value').externalId,
                             properties: {
                                 ...LinkProperties.ComponentInternalConnection
                             }
@@ -1909,9 +1907,23 @@ export const CreateDefaultView = {
                 ({
                     operation: ADD_LINK_BETWEEN_NODES,
                     options: function () {
+
                         return {
-                            source: newItems.screenComponentIdExternalApi,
-                            target: isList ? newItems.listComponentInternalApi : screenNodeOptionId,
+                            source: getApiConnectors(newItems, newItems.screenComponentId, 'value').externalId,
+                            target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'value').internalId,
+                            properties: {
+                                ...LinkProperties.ComponentExternalConnection
+                            }
+                        }
+                    }
+                }),
+                ({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function () {
+
+                        return {
+                            source: getApiConnectors(newItems, newItems.screenComponentId, 'viewModel').externalId,
+                            target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'viewModel').internalId,
                             properties: {
                                 ...LinkProperties.ComponentExternalConnection
                             }
@@ -2011,6 +2023,9 @@ export const CreateDefaultView = {
                     }),
                     (function () {
                         return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'success');
+                    }),
+                    (function () {
+                        return addComponentApiNodes(newItems, childComponents, modelIndex, viewComponent, 'viewModel', newItems.componentViewModelApiIds.internalId);
                     }),
                     function () {
                         return addComponentEventApiNodes({
@@ -3387,6 +3402,10 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                                 internalId,
                                 externalId
                             });
+                            setApiConnectors(newItems, parent, {
+                                internalId,
+                                externalId
+                            }, text);
                         }
                     },
                     parent,
@@ -3408,7 +3427,6 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                     nodeType: NodeTypes.ComponentExternalApi,
                     callback: (nn) => {
                         externalId = nn.id;
-
                     },
                     parent,
                     linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
@@ -3429,7 +3447,10 @@ function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, op
                         externalId
                     });
                 }
-
+                setApiConnectors(newItems, parent, {
+                    internalId,
+                    externalId
+                }, text);
                 return {
                     source: internalId,
                     target: externalId,
@@ -3583,7 +3604,7 @@ function addComponentEventApiNodes(args) {
         }];
     }).flatten();
 }
-function addComponentApiNodes(newItems, childComponents, modelIndex, viewComponentType, apiName = 'value') {
+function addComponentApiNodes(newItems, childComponents, modelIndex, viewComponentType, apiName = 'value', externalApiId) {
     let parent = childComponents[modelIndex];
     let componentInternalValue = null;
     let componentExternalValue = null;
@@ -3660,7 +3681,7 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
             operation: ADD_LINK_BETWEEN_NODES,
             options: function () {
                 return {
-                    target: newItems.screenComponentIdInternalApi,
+                    target: externalApiId || newItems.screenComponentIdInternalApi,
                     source: componentExternalValue,
                     properties: {
                         ...LinkProperties.ComponentExternalConnection
@@ -4189,4 +4210,126 @@ function setupPropertyApi(args) {
             }
         })
     })])(GetDispatchFunc(), GetStateFunc());
+}
+function connectComponentToExternalApi(args) {
+    let { newItems, child, key, parent, properties } = args;
+    let { externalId } = getApiConnectors(newItems, child, key);
+    let { internalId } = getApiConnectors(newItems, parent, key);
+    return [({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: function () {
+
+            return {
+                source: externalId,
+                target: internalId,
+                properties: {
+                    ...properties
+                }
+            }
+        }
+    })]
+}
+
+function addComponentApiToForm(args) {
+    let { newItems, text, parent, isSingular, graph, internalProperties = {}, externalProperties = {} } = args;
+    let externalId;
+    let internalId;
+    let skip = false;
+    return ([
+        ({
+            operation: ADD_NEW_NODE,
+            options: function (currentGraph) {
+                if (parent) {
+                    if (isSingular && graph) {
+                        let temp = GetNodesLinkedTo(graph, {
+                            id: parent,
+                            link: LinkType.ComponentInternalApi
+                        }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi && GetNodeProp(x, NodeProperties.UIText) === text);
+                        if (temp) {
+                            internalId = temp.id;
+                            skip = true;
+                            return false;
+                        }
+                    }
+                    return {
+                        nodeType: NodeTypes.ComponentApi,
+                        callback: (nn) => {
+                            internalId = nn.id;
+                        },
+                        parent: parent,
+                        linkProperties: { properties: { ...LinkProperties.ComponentInternalApi } },
+                        groupProperties: {},
+                        properties: {
+                            ...internalProperties,
+                            [NodeProperties.UIText]: text,
+                            [NodeProperties.Pinned]: false,
+                            [NodeProperties.UseAsValue]: true
+                        },
+
+                    }
+                }
+            }
+        }),
+        ({
+            operation: ADD_NEW_NODE,
+            options: function (currentGraph) {
+                if (isSingular && graph) {
+                    let temp = GetNodesLinkedTo(graph, {
+                        id: parent,
+                        link: LinkType.ComponentExternalApi
+                    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi && GetNodeProp(x, NodeProperties.UIText) === text);
+                    if (temp) {
+                        externalId = temp.id;
+                        skip = true;
+                        return false;
+                    }
+                }
+                if (parent && !skip) {
+                    return {
+                        nodeType: NodeTypes.ComponentExternalApi,
+                        callback: (nn) => {
+                            externalId = nn.id;
+                        },
+                        parent: parent,
+                        linkProperties: { properties: { ...LinkProperties.ComponentExternalApi } },
+                        groupProperties: {},
+                        properties: {
+                            ...externalProperties,
+                            [NodeProperties.Pinned]: false,
+                            [NodeProperties.UIText]: text
+                        }
+                    }
+                }
+            }
+        }),
+        ({
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function () {
+                if (parent) {
+                    setApiConnectors(newItems, parent, { internalId, externalId }, text);
+                }
+                if (parent && !skip) {
+                    return {
+                        source: internalId,
+                        target: externalId,
+                        properties: {
+                            ...LinkProperties.ComponentInternalConnection
+                        }
+                    }
+                }
+            }
+        })]);
+}
+
+function setApiConnectors(newItems, parent, api, key) {
+    newItems.apiConnectors = newItems.apiConnectors || {};
+    newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};
+    newItems.apiConnectors[parent][key] = api;
+
+}
+function getApiConnectors(newItems, parent, key) {
+
+    newItems.apiConnectors = newItems.apiConnectors || {};
+    newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};
+    return newItems.apiConnectors[parent][key];
 }

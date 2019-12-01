@@ -246,6 +246,7 @@ export const ConfigurationProperties = {
 }
 export const NodeProperties = {
     ViewPackage: "view-package",
+    DefaultComponentApiValue: 'DefaultComponentApiValue',
     ViewPackageTitle: 'view-package-title',
     ComponentApi: 'component-api',
     SelectorType: 'selector-type',

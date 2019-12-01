@@ -9,6 +9,7 @@ import * as ScreenInstance from '../actions/screenInstances';
 import material from '../../native-base-theme/variables/variables';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
+import * as ViewModelKeys from '../viewmodel_keys';
 import { Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from 'native-base';
 import { NavigationActions } from 'react-navigation';
 import MenuItem from '../components/menuitem';

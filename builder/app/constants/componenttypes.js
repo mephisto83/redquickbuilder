@@ -410,6 +410,22 @@ export const InstanceTypes = {
     Boolean: 'Boolean',
     AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
 }
+export const SelectorKeys = {
+    screen: {
+        object: InstanceTypes.ScreenInstance,
+        blur: InstanceTypes.ScreenInstanceBlur,
+        focus: InstanceTypes.ScreenInstanceFocus,
+        focused: InstanceTypes.ScreenInstanceFocused,
+        dirty: InstanceTypes.ScreenInstanceDirty
+    },
+    model: {
+        object: InstanceTypes.ModelInstance,
+        blur: InstanceTypes.ModelInstanceBlur,
+        focus: InstanceTypes.ModelInstanceFocus,
+        focused: InstanceTypes.ModelInstanceFocused,
+        dirty: InstanceTypes.ModelInstanceDirty
+    }
+};
 
 export const InstanceTypeSelectorFunction = {
     [InstanceTypes.ScreenInstance]: 'GetScreenInstanceObject',
