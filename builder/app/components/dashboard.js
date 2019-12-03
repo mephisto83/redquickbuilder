@@ -232,6 +232,17 @@ class Dashboard extends Component {
 							title: Titles.AddQueryMethodApi
 						})
 					}
+					result.push({
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.ComponentApiConnection,
+								singleLink: true,
+								nodeTypes: [NodeTypes.DataChain]
+							});
+						},
+						icon: 'fa  fa-contao',
+						title: Titles.Body
+					})
 					break;
 				case NodeTypes.ComponentExternalApi:
 					result.push({

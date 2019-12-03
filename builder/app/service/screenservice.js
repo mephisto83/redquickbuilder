@@ -949,13 +949,22 @@ export function getMethodInvocation(methodInstanceCall, component) {
                 direction: TARGET
             }).find(x => x);
             if (body_param) {
+                let body_selector = getNodesByLinkType(graph, {
+                    id: body_param.id,
+                    type: LinkType.ComponentApiConnection,
+                    direction: SOURCE
+                }).find(x_temp => GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.Selector);
+                let innervalue = '';
+                if (body_selector) {
+                    innervalue = `S.${GetJSCodeName(body_selector)}(this.state.value, this.state.viewModel)`
+                }
                 let body_value = getNodesByLinkType(graph, {
                     id: body_param.id,
                     type: LinkType.ComponentApiConnection,
                     direction: SOURCE
                 }).find(x_temp => GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.DataChain);
                 if (body_value)
-                    body_input = `body: DC.${GetJSCodeName(body_value)}(this.props.state)`;
+                    body_input = `body: DC.${GetCodeName(body_value)}(${innervalue})`;
             }
             if (body_input) {
                 parts.push(`${body_input}`);

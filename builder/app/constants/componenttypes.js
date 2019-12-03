@@ -29,6 +29,7 @@ export const ComponentLifeCycleEvents = {
 }
 export const ComponentEvents = {
     onPress: 'onPress',
+    onClick: 'onClick',
     onFocus: 'onFocus',
     onBlur: 'onBlur',
     onChange: 'onChange',
@@ -363,7 +364,6 @@ export const ComponentTypes = {
 }
 
 ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative }
-
 Object.keys(ComponentTypes.ReactNative).map(key => {
     if (ComponentTypes.ReactNative[key]) {
         ComponentTypes.ReactNative[key].library =
@@ -380,6 +380,21 @@ Object.keys(ComponentTypes.ReactNative).map(key => {
     }
 })
 
+ComponentTypes[UITypes.ElectronIO].Button = {
+    ...ComponentTypes[UITypes.ElectronIO].Button,
+    eventApi: [ComponentEvents.onClick],
+    properties: {
+        ...ComponentTypes[UITypes.ElectronIO].Button.properties,
+        onClick: {
+            nodeProperty: 'onClick',
+            template: '() => { {{value}} }',
+            method: true,
+            nowrap: true,
+            options: [NAVIGATION, APP_METHOD],
+            ui: true
+        }
+    }
+}
 export const HandlerTypes = {
     Blur: 'blur',
     Change: 'change',

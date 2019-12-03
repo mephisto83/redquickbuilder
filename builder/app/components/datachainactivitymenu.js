@@ -36,7 +36,7 @@ class DataChainActvityMenu extends Component {
         let stateKey = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.stateKey : false;
         let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
         let selector_nodes = UIA.NodesByType(state, NodeTypes.Selector).toNodeSelect();
-        let selector_node_properties = Object.keys(SelectorPropertyKeys).map(v => ({ title: v, value: v }))
+        let selector_node_properties = Object.keys(SelectorPropertyKeys).map(v => ({ title: v, value: SelectorPropertyKeys[v] }))
         let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain).filter(x => {
             return UIA.GetNodeProp(x, NodeProperties.GroupParent) === UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) && x !== currentNode;
         }).toNodeSelect();
