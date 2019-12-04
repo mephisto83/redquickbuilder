@@ -2186,6 +2186,11 @@ export const CreateDefaultView = {
                                     [NodeProperties.Pinned]: false
                                 },
                                 links: [{
+                                    target: currentNode.id,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.ModelTypeLink }
+                                    }
+                                }, {
                                     target: newItems.button,
                                     linkProperties: {
                                         properties: { ...LinkProperties.EventMethod }
@@ -2345,14 +2350,19 @@ export const CreateDefaultView = {
                                 [NodeProperties.IsShared]: isSharedComponent,
                                 [NodeProperties.InstanceType]: useModelInstance
                             },
-                            links: [...vmsIds().map(t => ({
+                            links: [...vmsIds().filter(x => x).map(t => ({
                                 target: t,
                                 linkProperties: {
                                     properties: {
                                         ...LinkProperties.SelectorLink
                                     }
                                 }
-                            }))],
+                            })), {
+                                target: currentNode.id,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.ModelTypeLink }
+                                }
+                            }],
                             callback: (selector) => {
                                 modelComponentSelectors.push(selector.id);
                             }
@@ -2515,6 +2525,7 @@ export const CreateDefaultView = {
                             [NodeProperties.UIText]: `Get ${viewName}`,
                             [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                             [NodeProperties.EntryPoint]: true,
+                            [NodeProperties.Model]: currentNode.id,
                             [NodeProperties.Selector]: modelComponentSelectors[0],
                             [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object
                         }, graph).find(x => x);
@@ -2535,6 +2546,7 @@ export const CreateDefaultView = {
                                 ...viewPackage,
                                 [NodeProperties.UIText]: `Get ${viewName}`,
                                 [NodeProperties.EntryPoint]: true,
+                                [NodeProperties.Model]: currentNode.id,
                                 [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Selector,
                                 [NodeProperties.Selector]: modelComponentSelectors[0],
                                 [NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object,
@@ -2549,6 +2561,11 @@ export const CreateDefaultView = {
                                 target: viewModelNodeId,
                                 linkProperties: {
                                     properties: { ...LinkProperties.DataChainLink }
+                                }
+                            }, {
+                                target: currentNode.id,
+                                linkProperties: {
+                                    properties: { ...LinkProperties.ModelTypeLink }
                                 }
                             }]
                         }
@@ -3513,7 +3530,13 @@ function addComponentEventApiNodes(args) {
                         [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
                         [NodeProperties.EventType]: apiName,
                         [NodeProperties.UIText]: `${apiName}`,
-                    }
+                    },
+                    links: [{
+                        target: currentNode.id,
+                        linkProperties: {
+                            properties: { ...LinkProperties.ModelTypeLink }
+                        }
+                    }]
                 }
             }
         }, {

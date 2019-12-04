@@ -307,6 +307,9 @@ export function connectLifeCycleMethod(args) {
                 });
 
                 let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(state, source, [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod]);
+                let model = GraphMethods.GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.Model]);
+                let dataChain = model ? GraphMethods.GetConnectedNodeByType(state, model.id, [NodeTypes.DataChain]) : null;
+                let selectorNode = model ? GraphMethods.GetConnectedNodeByType(state, model.id, [NodeTypes.Selector]) : null;
                 let componentNode = GraphMethods.GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption]);
 
                 state = getState();
@@ -349,7 +352,13 @@ export function connectLifeCycleMethod(args) {
                                 [NodeProperties.NODEType]: NodeTypes.DataChain,
                                 [NodeProperties.Component]: componentNode.id,
                                 [NodeProperties.IsPaging]: true
-                            })
+                            });
+                            if (model) {
+                                debugger;
+                            }
+                            if (dataChain) {
+                                debugger;
+                            }
                             return {
                                 nodeType: NodeTypes.ComponentApiConnector,
                                 groupProperties: {},
@@ -364,6 +373,17 @@ export function connectLifeCycleMethod(args) {
                                     }
                                 }, skipOrTake ? ({
                                     target: skipOrTake.id,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.ComponentApiConnection }
+                                    }
+                                }) : null, dataChain ? ({
+                                    target: dataChain.id,
+                                    linkProperties: {
+                                        properties: { ...LinkProperties.ComponentApiConnection }
+                                    }
+                                }) : null,
+                                selectorNode ? ({
+                                    target: selectorNode.id,
                                     linkProperties: {
                                         properties: { ...LinkProperties.ComponentApiConnection }
                                     }
