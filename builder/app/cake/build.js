@@ -542,7 +542,7 @@ function createWorkSpace () {
         promise = promise.then(() => {
           return executeSpawnCmd(
             'dotnet',
-            ['add', project, 'package', 'RedQuick', '-s', source],
+            ['add', project, 'package', 'RedQuick'],//, '-s', source
             {}
           )
         })
