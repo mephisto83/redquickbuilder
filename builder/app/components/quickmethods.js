@@ -70,6 +70,22 @@ class QuickMethods extends Component {
                                 }}
                                 icon={'fa fa-tag'}>
                                 <BatchMenu />
+                                <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
+                                    this.props.executeGraphOperation(currentNode, {
+                                        type: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
+                                        method: CreateAgentFunction({
+                                            nodePackageType: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
+                                            methodType: MethodFunctions[UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)].method,
+                                            model: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_MODEL)),
+                                            parentId: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_PARENT)),
+                                            agent: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_AGENT)),
+                                            httpMethod: HTTP_METHODS.POST,
+                                            functionType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE),
+                                            functionName: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME)
+                                        }),
+                                        methodType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)
+                                    });
+                                })} />
                             </TreeViewMenu>
                             <TreeViewMenu
                                 title={'More Commands'}
@@ -217,22 +233,7 @@ class QuickMethods extends Component {
                                 } />
 
                             </TreeViewMenu>
-                            <TreeViewMenu hideArrow={true} title={'Create Model by Agent'} icon={'fa fa-plus'} onClick={(() => {
-                                this.props.executeGraphOperation(currentNode, {
-                                    type: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
-                                    method: CreateAgentFunction({
-                                        nodePackageType: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
-                                        methodType: MethodFunctions[UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)].method,
-                                        model: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_MODEL)),
-                                        parentId: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_PARENT)),
-                                        agent: UIA.GetNodeById(UIA.Visual(state, UIA.BATCH_AGENT)),
-                                        httpMethod: HTTP_METHODS.POST,
-                                        functionType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE),
-                                        functionName: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME)
-                                    }),
-                                    methodType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)
-                                });
-                            })} />
+
 
                         </TreeViewMenu>
                     </SideBarMenu>

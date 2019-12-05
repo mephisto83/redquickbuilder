@@ -34,7 +34,8 @@ import {
     getGroup,
     SelectedNode,
     GetJSCodeName,
-    GetCodeName
+    GetCodeName,
+    attachMethodToMaestro
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents, PropertyApiList } from "./componenttypes";
@@ -3375,6 +3376,7 @@ export function CreateAgentFunction(option) {
                                 setTimeout(() => {
 
                                     updateMethodParameters(methodNode.id, functionType)(dispatch, getState);
+                                    attachMethodToMaestro(methodNode.id, model.id)(dispatch, getState);
                                 }, 1000);
                                 resolve();
                             })

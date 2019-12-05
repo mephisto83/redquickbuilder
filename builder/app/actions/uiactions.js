@@ -354,10 +354,10 @@ export function connectLifeCycleMethod(args) {
                                 [NodeProperties.IsPaging]: true
                             });
                             if (model) {
-                                debugger;
+                                
                             }
                             if (dataChain) {
-                                debugger;
+                                
                             }
                             return {
                                 nodeType: NodeTypes.ComponentApiConnector,
@@ -479,7 +479,7 @@ export function setupDefaultViewType(args) {
         }
         else if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink })) {
             if (GetNodeProp(target, NodeProperties.UseModelAsType)) {
-                debugger;
+                
             }
         }
     }
@@ -630,6 +630,116 @@ export function updateMethodParameters(current, methodType) {
                 PerformGraphOperation([...operations])(dispatch, getState);
             }
         }
+    }
+}
+
+export function attachMethodToMaestro(methodNodeId, modelId) {
+    return (dispatch, getState) => {
+        let controller = false;
+        let maestro = false;
+        PerformGraphOperation([{
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                
+                let state = getState();
+                let _controller = NodesByType(state, NodeTypes.Controller).find(x => {
+                    return GraphMethods.GetNodesLinkedTo(graph, {
+                        id: modelId,
+                        link: NodeConstants.LinkType.ModelTypeLink
+                    }).length;
+                });
+
+                if (!_controller) {
+                    return {
+                        nodeType: NodeTypes.Controller,
+                        properties: {
+                            [NodeProperties.UIText]: `${GetNodeTitle(modelId)} Controller`
+                        },
+                        links: [{
+                            target: modelId,
+                            properties: {
+                                ...LinkProperties.ModelTypeLink
+                            }
+                        }],
+                        callback: (_controller) => {
+                            controller = _controller;
+                        }
+                    }
+                }
+                else {
+                    controller = _controller;
+                }
+            }
+        }, {
+            operation: CHANGE_NODE_PROPERTY,
+            options: function (graph) {
+                return {
+                    id: controller.id,
+                    value: 'systemUser',
+                    prop: NodeProperties.CodeUser
+                }
+            }
+        }, {
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+                
+                let state = getState();
+
+                let _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
+                    return GraphMethods.GetNodesLinkedTo(graph, {
+                        id: modelId,
+                        link: NodeConstants.LinkType.ModelTypeLink
+                    }).length;
+                });
+
+                if (!_maestro) {
+                    return {
+                        nodeType: NodeTypes.Maestro,
+                        properties: {
+                            [NodeProperties.UIText]: `${GetNodeTitle(modelId)} Maestro`
+                        },
+                        links: [{
+                            target: modelId,
+                            properties: {
+                                ...LinkProperties.ModelTypeLink
+                            }
+                        }],
+                        callback: (_maestro) => {
+                            maestro = _maestro;
+                        }
+                    }
+                }
+                else {
+                    maestro = _maestro;
+                }
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                
+
+                return {
+                    source: controller.id,
+                    target: maestro.id,
+                    properties: {
+                        ...LinkProperties.MaestroLink
+                    }
+                }
+            }
+        }, {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function (graph) {
+                
+
+                return {
+                    source: maestro.id,
+                    target: methodNodeId,
+                    properties: {
+                        ...LinkProperties.FunctionLink
+                    }
+                }
+            }
+        }])(dispatch, getState);
     }
 }
 export function GetMethodParametersFor(methodId, type) {
