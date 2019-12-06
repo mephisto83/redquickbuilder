@@ -367,6 +367,7 @@ export const NodeProperties = {
     IsDataChainPagingTake: 'IsDataChainPagingTake',
     UIText: 'text',
     UseAsValue: 'UseAsValue',
+    AgentBasedMethod: 'AgentBasedMethod',
     ViewType: 'view-type',
 
     IsReferenceList: 'isReferenceList',

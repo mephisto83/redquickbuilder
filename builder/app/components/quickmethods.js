@@ -22,6 +22,7 @@ import SideBarMenu from './sidebarmenu';
 import MainSideBar from './mainsidebar';
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../constants/functiontypes';
 import BatchMenu from './batchmenu';
+import AgentBasedMethods from './agentbasedmethods';
 
 class QuickMethods extends Component {
     render() {
@@ -86,6 +87,16 @@ class QuickMethods extends Component {
                                         methodType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)
                                     });
                                 })} />
+                            </TreeViewMenu>
+                            <TreeViewMenu
+                                title={Titles.AgentBaseMethods}
+                                open={UIA.Visual(state, Titles.AgentBaseMethods)}
+                                active={true}
+                                toggle={() => {
+                                    this.props.toggleVisual(Titles.AgentBaseMethods)
+                                }}
+                                icon={'fa fa-tag'}>
+                                <AgentBasedMethods />
                             </TreeViewMenu>
                             <TreeViewMenu
                                 title={'More Commands'}

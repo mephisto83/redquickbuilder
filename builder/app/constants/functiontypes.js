@@ -648,6 +648,9 @@ export const QUERY_PARAMETERS = {
 export const MethodFunctions = {
     [FunctionTypes.Create_Object__Object]: {
         title: Titles.Create_Object__Object,
+        titleTemplate: function (t, a) {
+            return `Create ${t} by ${a}`
+        },
         template: fs.readFileSync('./app/templates/standard/create_model_agent_object.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/create_model_agent_object_interface.tpl', 'utf8'),
         templates: {
@@ -858,6 +861,9 @@ export const MethodFunctions = {
     },
     [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
         title: Titles.Get_Object_Agent_Value__IListObject,
+        titleTemplate: function (t, a) {
+            return `Get ${t}s by ${a}`
+        },
         template: fs.readFileSync('./app/templates/standard/get_model_agent_listobject.tpl', 'utf8'),
         interface: fs.readFileSync('./app/templates/standard/get_model_agent_listobject_interface.tpl', 'utf8'),
         controller_parameters: {

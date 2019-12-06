@@ -354,10 +354,10 @@ export function connectLifeCycleMethod(args) {
                                 [NodeProperties.IsPaging]: true
                             });
                             if (model) {
-                                
+
                             }
                             if (dataChain) {
-                                
+
                             }
                             return {
                                 nodeType: NodeTypes.ComponentApiConnector,
@@ -479,7 +479,7 @@ export function setupDefaultViewType(args) {
         }
         else if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink })) {
             if (GetNodeProp(target, NodeProperties.UseModelAsType)) {
-                
+
             }
         }
     }
@@ -640,13 +640,14 @@ export function attachMethodToMaestro(methodNodeId, modelId) {
         PerformGraphOperation([{
             operation: ADD_NEW_NODE,
             options: function (graph) {
-                
+
                 let state = getState();
                 let _controller = NodesByType(state, NodeTypes.Controller).find(x => {
-                    return GraphMethods.GetNodesLinkedTo(graph, {
-                        id: modelId,
+                    return GraphMethods.existsLinkBetween(graph, {
+                        target: modelId,
+                        source: x.id,
                         link: NodeConstants.LinkType.ModelTypeLink
-                    }).length;
+                    });
                 });
 
                 if (!_controller) {
@@ -682,14 +683,15 @@ export function attachMethodToMaestro(methodNodeId, modelId) {
         }, {
             operation: ADD_NEW_NODE,
             options: function (graph) {
-                
+
                 let state = getState();
 
                 let _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
-                    return GraphMethods.GetNodesLinkedTo(graph, {
-                        id: modelId,
+                    return GraphMethods.existsLinkBetween(graph, {
+                        target: modelId,
+                        source: x.id,
                         link: NodeConstants.LinkType.ModelTypeLink
-                    }).length;
+                    });
                 });
 
                 if (!_maestro) {
@@ -716,7 +718,7 @@ export function attachMethodToMaestro(methodNodeId, modelId) {
         }, {
             operation: ADD_LINK_BETWEEN_NODES,
             options: function (graph) {
-                
+
 
                 return {
                     source: controller.id,
@@ -729,7 +731,7 @@ export function attachMethodToMaestro(methodNodeId, modelId) {
         }, {
             operation: ADD_LINK_BETWEEN_NODES,
             options: function (graph) {
-                
+
 
                 return {
                     source: maestro.id,
@@ -2338,6 +2340,16 @@ export function executeGraphOperation(model, op, args = {}) {
         op.method({ model, dispatch, getState, ...args });
     }
 }
+// export function executeGraphOperations(model, ops, args = {}) {
+//     return (dispatch, getState) => {
+//         var promise = Promise.resolve();
+//         ops.map(op => {
+//             promise = promise.then(() => {
+//                 return op.method({ model, dispatch, getState, ...args });
+//             })
+//         });
+//     }
+// }
 export function executeGraphOperations(operations) {
     return (dispatch, getState) => {
         operations.map(t => {
