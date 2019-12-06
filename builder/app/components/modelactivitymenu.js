@@ -208,7 +208,10 @@ class ModelActivityMenu extends Component {
                                     properties: { ...UIA.LinkProperties.PropertyLink }
                                 }
                             });
-                        }} icon={'fa fa-puzzle-piece'} title={Titles.SetDefaultProperties} description={Titles.SetDefaultPropertiesDescription} />
+                        }}
+                            icon={'fa fa-puzzle-piece'}
+                            title={Titles.SetDefaultProperties}
+                            description={Titles.SetDefaultPropertiesDescription} />
                         <ControlSideBarMenuItem onClick={() => {
                             this.props.graphOperation(UIA.NEW_PROPERTY_NODE, {
                                 parent: UIA.Visual(state, UIA.SELECTED_NODE),

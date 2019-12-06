@@ -35,7 +35,8 @@ import {
     SelectedNode,
     GetJSCodeName,
     GetCodeName,
-    attachMethodToMaestro
+    attachMethodToMaestro,
+    ADD_DEFAULT_PROPERTIES
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents, PropertyApiList } from "./componenttypes";
@@ -3168,7 +3169,17 @@ export function CreateAgentFunction(option) {
             }, function () {
                 let { methodNode } = new_nodes;
                 let { constraints } = MethodFunctions[functionType];
-                let commands = [];
+                let commands = [{
+                    operation: ADD_DEFAULT_PROPERTIES,
+                    options: {
+                        parent: model.id,
+                        groupProperties: {
+                        },
+                        linkProperties: {
+                            properties: { ...LinkProperties.PropertyLink }
+                        }
+                    }
+                }];
                 Object.values(constraints).map(constraint => {
                     switch (constraint.key) {
                         case FunctionTemplateKeys.Model:
@@ -3246,7 +3257,7 @@ export function CreateAgentFunction(option) {
                             break;
                         case FunctionTemplateKeys.Executor:
                             let executor = null;
-                            debugger;
+
                             commands.push(...[{
                                 operation: ADD_NEW_NODE,
                                 options: function () {
