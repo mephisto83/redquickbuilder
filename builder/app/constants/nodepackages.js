@@ -38,7 +38,7 @@ import {
     attachMethodToMaestro,
     ADD_DEFAULT_PROPERTIES
 } from "../actions/uiactions";
-import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween } from "../methods/graph_methods";
+import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween, getNodesLinkedTo } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents, PropertyApiList } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from '../components/titles';
@@ -1438,19 +1438,6 @@ export const CreateDefaultView = {
                         let rootCellId = GetFirstCell(listLayout);
                         let cellProperties = GetCellProperties(listLayout, rootCellId);
                         cellProperties.style = { ...cellProperties.style, flexDirection: 'column' };
-
-                        // let $node = GetNodeByProperties({
-                        //     [NodeProperties.UIText]: `${viewName} List`,
-                        //     [NodeProperties.SharedComponent]: isSharedComponent,
-                        //     [NodeProperties.ComponentType]: ComponentTypes[uiType].List.key,
-                        //     [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance,
-                        // }, currentGraph);
-                        // if ($node) {
-                        //     listComponentId = $node.id;
-                        //     newItems.listComponentId = $node;
-                        //     return false;
-                        // }
-
                         let componentProps = null;
 
                         let connectto = [];
@@ -1474,6 +1461,13 @@ export const CreateDefaultView = {
                                             source: ct.id,
                                             target: listComponentId
                                         })(GetDispatchFunc(), GetStateFunc());
+                                    }, function () {
+                                        PerformGraphOperation([...['value', 'viewModel', 'label', 'error', 'success'].map(v => (function () {
+                                            let graph = GetCurrentGraph(GetStateFunc()());
+                                            return addComponentApiToForm({
+                                                newItems, text: v, parent: ct.id, isSingular: true, graph
+                                            });
+                                        }))])(GetDispatchFunc(), GetStateFunc())
                                     })
                                 });
                             },
@@ -1918,7 +1912,54 @@ export const CreateDefaultView = {
                             currentNode,
                             useModelInstance
                         });
-                    }]
+                    },
+
+
+                    ...((['value', 'viewModel', 'label', 'error', 'success'].map(v => {
+                        return function (graph) {
+                            let connectto = [];
+                            if (isDefaultComponent) {
+                                connectto = getViewTypeEndpointsForDefaults(viewType, graph, currentNode.id);
+                            }
+                            
+                            let shared_to_component_commands = [];
+                            connectto.map(ct => {
+                                shared_to_component_commands.push(...addComponentApiToForm({
+                                    newItems, text: v, parent: ct.id, isSingular: true, graph
+                                }));
+                            });
+                            return shared_to_component_commands.flatten();
+                        }
+                    }).filter(x => x && isSharedComponent && isDefaultComponent))),
+
+
+
+
+                    isSharedComponent && isDefaultComponent ? function (graph) {
+                        let connectto = [];
+                        if (isDefaultComponent) {
+                            connectto = getViewTypeEndpointsForDefaults(viewType, graph, currentNode.id);
+                        }
+                        
+                        let shared_to_component_commands = [];
+                        connectto.map(ct => {
+                            let temp = GetNodesLinkedTo(graph, {
+                                id: ct.id,
+                                link: LinkType.ComponentInternalApi
+                            }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi);
+                            //&& GetNodeProp(x, NodeProperties.UIText) === text
+                            temp.map(t => {
+                                shared_to_component_commands.push(...connectComponentToExternalApi({
+                                    newItems,
+                                    parent: ct.id,
+                                    key: GetNodeProp(t, NodeProperties.UIText),
+                                    properties: LinkProperties.ComponentExternalConnection,
+                                    child: childComponents[modelIndex]
+                                }));
+                            });
+                        });
+                        return shared_to_component_commands;
+                    } : null].filter(x => x);
 
                 }).flatten(),
                 ...modelProperties.map((modelProperty, modelIndex) => {
@@ -3607,6 +3648,12 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
         ({
             operation: ADD_LINK_BETWEEN_NODES,
             options: function () {
+                if (parent) {
+                    setApiConnectors(newItems, parent, {
+                        internalId: componentInternalValue,
+                        externalId: componentExternalValue
+                    }, apiName);
+                }
                 return {
                     source: componentInternalValue,
                     target: componentExternalValue,
@@ -3616,6 +3663,7 @@ function addComponentApiNodes(newItems, childComponents, modelIndex, viewCompone
                 }
             }
         }),
+
         ({
             operation: ADD_LINK_BETWEEN_NODES,
             options: function () {
