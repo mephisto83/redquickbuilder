@@ -19,15 +19,14 @@ import GenericPropertyContainer from './genericpropertycontainer';
 import TextInput from './textinput';
 import ButtonList from './buttonlist';
 import ModelContextMenu from './modelcontextmenu';
+import ComponentNodeMenu from './componentnodemenu';
 import SideBarMenu from './sidebarmenu';
 import ConditionContextMenu from './conditioncontextmenu';
 import TreeViewMenu from './treeviewmenu';
-import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
-const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
-const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
 import DataChainContextMenu from './datachaincontextmenu';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewButtonGroup from './treeviewbuttongroup';
+import ViewTypeMenu from './viewtypecontextmenu';
 const DATA_SOURCE = 'DATA_SOURCE';
 class ContextMenu extends Component {
     getMenuMode(mode) {
@@ -126,10 +125,43 @@ class ContextMenu extends Component {
                 return this.getConditionMenu();
             case NodeTypes.Model:
                 return this.getModelMenu();
+            case NodeTypes.ComponentNode:
+            case NodeTypes.Screen:
+            case NodeTypes.ScreenOption:
+                return this.getComponentNodeMenu();
+            case NodeTypes.ViewType:
+                return this.getViewTypes();
+            case NodeTypes.ComponentExternalApi:
+                return this.getComponentExternalMenu(currentNode);
         }
+    }
+    getViewTypes() {
+        return <ViewTypeMenu />
+    }
+    getComponentExternalMenu(currentNode) {
+        return (
+            <TreeViewMenu
+                open={true}
+                active={true}
+                title={Titles.Select}
+                toggle={() => {
+                }}>
+                <TreeViewMenu title={LinkType.ComponentExternalConnection} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentExternalConnection);
+                }} />
+                <TreeViewMenu title={LinkType.SelectorLink} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.SelectorLink);
+                }} />
+                <TreeViewMenu title={LinkType.DataChainLink} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.DataChainLink);
+                }} />
+            </TreeViewMenu>);
     }
     getModelMenu() {
         return <ModelContextMenu />;
+    }
+    getComponentNodeMenu() {
+        return <ComponentNodeMenu />;
     }
     getConditionMenu() {
         return <ConditionContextMenu />

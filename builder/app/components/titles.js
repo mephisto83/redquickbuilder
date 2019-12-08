@@ -112,6 +112,7 @@ export const SetDefaultPropertiesDescription = 'Set default properties, on the n
 export const SetDefaultProperties = 'Set default props';
 export const AddProperty = 'Add Property';
 export const CreateObjectDataSeed = 'Create Object Data Seed';
+export const ComponentApi = 'ComponentApi';
 export const UICheckBox = 'UI Checkbox';
 export const PermissionsDependencyAttribute = 'Permission Dependency Attribute';
 export const GeneratedConstants = 'Generated Constants';

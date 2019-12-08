@@ -1,4 +1,4 @@
-import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes, GetCurrentGraph, GetNodeByProperties, GetNodes } from "../actions/uiactions";
+import { GetScreenNodes, GetCodeName, GetNodeTitle, GetConnectedScreenOptions, GetNodeProp, GetNodeById, NodesByType, GetState, GetJSCodeName, GetDataSourceNode, GetMethodParameters, GetComponentNodeProperties, GetLinkChainItem, ViewTypes, GetCurrentGraph, GetNodeByProperties, GetNodes, GetSharedComponentFor } from "../actions/uiactions";
 import fs from 'fs';
 import path from 'path';
 import { bindTemplate } from "../constants/functiontypes";
@@ -520,7 +520,22 @@ export function GenerateMarkupTag(node, language, parent, params) {
             }
             let describedApi = '';
             if (node && parent) {
-                describedApi = WriteDescribedApiProperties(node);
+                if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.Model) {
+                    let temps = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
+                        id: viewTypeNode.id,
+                        link: LinkType.DefaultViewType
+                    }).filter(x => [NodeTypes.ComponentNode].some(v => v === GetNodeProp(x, NodeProperties.NODEType)))
+                        .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
+                        .find(x => x);
+                    if (temps) {
+                        console.warn('more than one option for a shared component so thats weird')
+                        debugger;
+                        describedApi = WriteDescribedApiProperties(viewTypeNode);
+                    }
+                }
+                if (!describedApi) {
+                    describedApi = WriteDescribedApiProperties(node);
+                }
             }
             // ${apiProperties} ${valueBinding} ${dataBinding} ${onChange}
             return `<${GetCodeName(node)} ${describedApi} />`;

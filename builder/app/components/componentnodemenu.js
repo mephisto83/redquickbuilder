@@ -24,28 +24,38 @@ import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 import { DataChainContextMethods } from '../constants/datachain';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const DATA_SOURCE = 'DATA_SOURCE';
-class ModelContextMenu extends Component {
+class ComponentNodeMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        let display = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? 'block' : 'none';
-        let nodeType = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? UIA.GetNodeProp(currentNode, NodeProperties.NODEType) : null;
-        let menuMode = UIA.Visual(state, UIA.CONTEXT_MENU_MODE);
         let exit = () => {
             this.props.setVisual(UIA.CONTEXT_MENU_MODE, null);
         }
+
         return (
             <TreeViewMenu
                 open={true}
                 active={true}
-                title={Titles.Condition}
+                title={Titles.Select}
                 toggle={() => {
                 }}>
-                <TreeViewMenu title={Titles.SelectProperties} hideArrow={true} onClick={() => {
-                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.PropertyLink);
+                <TreeViewMenu title={LinkType.ComponentInternalApi} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentInternalApi);
+                }} />
+                <TreeViewMenu title={LinkType.ComponentExternalApi} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentExternalApi);
+                }} />
+                <TreeViewMenu title={LinkType.ComponentExternalConnection} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentExternalConnection);
+                }} />
+                <TreeViewMenu title={LinkType.Component} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.Component);
+                }} />
+                <TreeViewMenu title={LinkType.ScreenOptions} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ScreenOptions);
                 }} />
             </TreeViewMenu>)
     }
 }
 
-export default UIConnect(ModelContextMenu)
+export default UIConnect(ComponentNodeMenu)

@@ -137,6 +137,42 @@ export function GetGroupProp(id, prop) {
     return null;
 }
 
+export function GetSharedComponentFor(viewType, modelProperty, currentNodeId) {
+    let graph = GetCurrentGraph(GetState());
+    let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
+        id: modelProperty.id
+    });
+    viewTypeNodes = viewTypeNodes.filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType);
+    viewTypeNodes = viewTypeNodes.find(x => {
+        if (GraphMethods.existsLinkBetween(graph, {
+            source: x.id,
+            target: currentNodeId,
+            type: NodeConstants.LinkType.DefaultViewType
+        })) {
+            let link = GraphMethods.findLink(graph, { source: x.id, target: currentNodeId });
+            if (GetLinkProperty(link, NodeConstants.LinkPropertyKeys.ViewType) === viewType) {
+                return true;
+            }
+        }
+        return false;
+    });
+    if (viewTypeNodes) {
+        return viewTypeNodes.id;
+    }
+    switch (viewType) {
+        case ViewTypes.Get:
+            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGet);
+        case ViewTypes.Create:
+            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeCreate);
+        case ViewTypes.Delete:
+            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeDelete);
+        case ViewTypes.GetAll:
+            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGetAll);
+        case ViewTypes.Update:
+            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeUpdate);
+    }
+}
+
 export function getViewTypeEndpointsForDefaults(viewType, currentGraph, id) {
     currentGraph = currentGraph || GetCurrentGraph(_getState());
 
@@ -167,7 +203,12 @@ export function setSharedComponent(args) {
     return (dispatch, getState) => {
         let state = getState();
         let graph = GetCurrentGraph(getState());
-        if (!GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.SharedComponent, properties: { viewType } }) &&
+        if (!GraphMethods.existsLinkBetween(graph, {
+            target,
+            source,
+            type: NodeConstants.LinkType.SharedComponent,
+            properties: { viewType }
+        }) &&
             GetNodeProp(target, NodeProperties.SharedComponent) &&
             GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode) {
             let connections = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentNode)
@@ -2045,6 +2086,24 @@ export function selectProperties(model) {
                     prop: NodeProperties.Pinned,
                     id: t.id,
                     value: true
+                }
+            }
+        })))(dispatch, getState);
+    }
+}
+export function togglePinnedConnectedNodesByLinkType(model, linkType) {
+    return (dispatch, getState) => {
+        let state = getState();
+        let graph = GetRootGraph(state);
+        let nodes = GraphMethods.getNodesByLinkType(graph, { id: model, direction: GraphMethods.SOURCE, type: linkType });
+        let pinned = nodes.some(v => GetNodeProp(v, NodeProperties.Pinned));
+        (graphOperation(nodes.map(t => {
+            return {
+                operation: CHANGE_NODE_PROPERTY,
+                options: {
+                    prop: NodeProperties.Pinned,
+                    id: t.id,
+                    value: !pinned
                 }
             }
         })))(dispatch, getState);

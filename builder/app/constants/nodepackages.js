@@ -36,7 +36,8 @@ import {
     GetJSCodeName,
     GetCodeName,
     attachMethodToMaestro,
-    ADD_DEFAULT_PROPERTIES
+    ADD_DEFAULT_PROPERTIES,
+    GetSharedComponentFor
 } from "../actions/uiactions";
 import { newNode, CreateLayout, SetCellsLayout, GetCellProperties, GetFirstCell, GetAllChildren, FindLayoutRootParent, GetChildren, GetNode, existsLinkBetween, getNodesByLinkType, TARGET, SOURCE, GetNodesLinkedTo, findLink, GetLinkBetween, getNodesLinkedTo } from "../methods/graph_methods";
 import { ComponentTypes, InstanceTypes, ARE_BOOLEANS, ARE_HANDLERS, HandlerTypes, ARE_TEXT_CHANGE, ON_BLUR, ON_CHANGE, ON_CHANGE_TEXT, ON_FOCUS, VALUE, SHARED_COMPONENT_API, GENERAL_COMPONENT_API, SCREEN_COMPONENT_EVENTS, ComponentEvents, PropertyApiList } from "./componenttypes";
@@ -1921,7 +1922,7 @@ export const CreateDefaultView = {
                             if (isDefaultComponent) {
                                 connectto = getViewTypeEndpointsForDefaults(viewType, graph, currentNode.id);
                             }
-                            
+
                             let shared_to_component_commands = [];
                             connectto.map(ct => {
                                 shared_to_component_commands.push(...addComponentApiToForm({
@@ -1940,7 +1941,7 @@ export const CreateDefaultView = {
                         if (isDefaultComponent) {
                             connectto = getViewTypeEndpointsForDefaults(viewType, graph, currentNode.id);
                         }
-                        
+
                         let shared_to_component_commands = [];
                         connectto.map(ct => {
                             let temp = GetNodesLinkedTo(graph, {
@@ -2506,13 +2507,23 @@ export const CreateDefaultView = {
                 modelProperties.map((modelProperty, propertyIndex) => {
                     let propDataChainNodeId = null;
                     let skip = false;
+                    let referenceproperty = false;
+                    // Needs an accessor even if it is a shared or reference property
                     switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
                         case NodeTypes.Model:
                             return {};
                         case NodeTypes.Property:
                             if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
                                 //if the property is a model reference, it should be a shared component or something.
-                                return {};
+                                // The ViewType will be need the data chain accessor to get the property value 
+                                // on the object. 
+                                /*
+                                    current.[property] 
+                                    we need to get the property to pass to the shared component.
+                                */
+                                // If the thing being referenced is a n => many that means it will need,
+                                // the 'current' id to be able to query for the children objects.
+                                referenceproperty = true;
                             }
                             break;
                     }
@@ -2533,23 +2544,16 @@ export const CreateDefaultView = {
                         childComponents,
                         propertyIndex
                     });
-
+                    if (referenceproperty) {
+                        return {};
+                    }
                     skip = buildPropertyResult.skip;
                     propDataChainNodeId = buildPropertyResult.propDataChainNodeId;
 
                     ConnectExternalApisToSelectors({
-                        viewName,
-                        modelProperty,
-                        currentNode,
                         modelComponentSelectors,
-                        skip,
-                        isSharedComponent,
-                        viewModelNodeId,
-                        viewPackage,
-                        propertyDataChainAccesors,
-                        uiType,
-                        viewType,
                         newItems,
+                        viewType,
                         childComponents,
                         propertyIndex
                     });
@@ -2638,33 +2642,6 @@ export const CreateDefaultView = {
                                             }
                                         })
                                     }
-                                }
-
-                                if ([VALUE].some(vv => vv === apiProperty)) {
-                                    //cellProperties.componentApi[apiProperty].dataChain = apiDataChainLists[apiProperty];//propertyDataChainAccesors[propertyIndex];
-                                    // datachainLink.push({
-                                    //     operation: ADD_LINK_BETWEEN_NODES,
-                                    //     options: function () {
-                                    //         return {
-                                    //             target: propertyDataChainAccesors[propertyIndex],
-                                    //             source: newItems[childComponents[propertyIndex]][apiProperty].componentExternalValue,
-                                    //             linkProperties: {
-                                    //                 ...LinkProperties.DataChainLink
-                                    //             }
-                                    //         }
-                                    //     }
-                                    // })
-
-                                    /**
-                                     * newItems[childComponents[modelIndex]] = {
-                            ...newItems[childComponents[modelIndex]],
-                            [apiName]: {
-                                ...newItems[childComponents[modelIndex]][apiName],
-                                componentExternalValue: nn.id
-                            }
-                        }
-                                     */
-
                                 }
 
                                 switch (apiProperty) {
@@ -3325,41 +3302,7 @@ export function CreateAgentFunction(option) {
     }
 }
 
-function GetSharedComponentFor(viewType, modelProperty, currentNodeId) {
-    let graph = GetCurrentGraph(GetState());
-    let viewTypeNodes = GetNodesLinkedTo(graph, {
-        id: modelProperty.id
-    });
-    viewTypeNodes = viewTypeNodes.filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType);
-    viewTypeNodes = viewTypeNodes.find(x => {
-        if (existsLinkBetween(graph, {
-            source: x.id,
-            target: currentNodeId,
-            type: LinkType.DefaultViewType
-        })) {
-            let link = findLink(graph, { source: x.id, target: currentNodeId });
-            if (GetLinkProperty(link, LinkPropertyKeys.ViewType) === viewType) {
-                return true;
-            }
-        }
-        return false;
-    });
-    if (viewTypeNodes) {
-        return viewTypeNodes.id;
-    }
-    switch (viewType) {
-        case ViewTypes.Get:
-            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGet);
-        case ViewTypes.Create:
-            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeCreate);
-        case ViewTypes.Delete:
-            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeDelete);
-        case ViewTypes.GetAll:
-            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGetAll);
-        case ViewTypes.Update:
-            return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeUpdate);
-    }
-}
+
 function addListItemComponentApi(newItems, text, noExternal, keyfunc, parent, options = { useAsValue: true }) {
     let internalId;
     let externalId;
@@ -3748,18 +3691,10 @@ function addButtonApiNodes(newItems) {
 
 function ConnectExternalApisToSelectors(args) {
     var {
-        viewName,
-        modelProperty,
-        viewPackage,
-        currentNode,
         modelComponentSelectors,
-        viewModelNodeId,
-        propertyDataChainAccesors,
         newItems,
-        uiType,
         viewType,
         childComponents,
-        isSharedComponent,
         propertyIndex
     } = args;
     let steps = [];
