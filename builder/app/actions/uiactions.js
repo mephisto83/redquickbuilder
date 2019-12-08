@@ -444,10 +444,20 @@ export function setupDefaultViewType(args) {
     let { properties, target, source } = args;
     return (dispatch, getState) => {
         let graph = GetCurrentGraph(getState());
+        let is_property_link = false;
+        if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.ModelTypeLink })) {
+            let isUsedAsModelType = GetNodeProp(source, NodeProperties.UseModelAsType)
+            if (isUsedAsModelType) {
+                let targetedTypeNode = GetNodeProp(source, NodeProperties.UIModelType);
+                if (targetedTypeNode === target) {
+                    is_property_link = true;
+                }
+            }
+        }
+
         let right_link = (
-            GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink }) &&
-            GetNodeProp(target, NodeProperties.UseModelAsType)) ||
-            GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.LogicalChildren });
+            is_property_link
+        ) || GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.LogicalChildren });
         if (right_link) {
 
             let useModelAsType = GetNodeProp(target, NodeProperties.UseModelAsType);
@@ -518,11 +528,7 @@ export function setupDefaultViewType(args) {
                 }
             }
         }
-        else if (GraphMethods.existsLinkBetween(graph, { target, source, type: NodeConstants.LinkType.PropertyLink })) {
-            if (GetNodeProp(target, NodeProperties.UseModelAsType)) {
 
-            }
-        }
     }
 }
 export function GetConditionNodes(id) {

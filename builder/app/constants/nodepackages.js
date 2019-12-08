@@ -2147,8 +2147,14 @@ export const CreateDefaultView = {
                                         return {};
                                     case NodeTypes.Property:
                                         if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-                                            //if the property is a model reference, it should be a shared component or something.
-                                            return {};
+                                            let _ui_model_type = GetNodeProp(modelProperty, NodeProperties.UIModelType);
+                                            if (_ui_model_type) {
+                                                sharedComponent = GetSharedComponentFor(viewType, modelProperty, _ui_model_type);
+                                            }
+                                            if (!sharedComponent) {
+                                                //if the property is a model reference, it should be a shared component or something.
+                                                return {};
+                                            }
                                         }
                                         break;
                                 }
@@ -2523,7 +2529,14 @@ export const CreateDefaultView = {
                                 */
                                 // If the thing being referenced is a n => many that means it will need,
                                 // the 'current' id to be able to query for the children objects.
-                                referenceproperty = true;
+                                 
+                                if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
+                                    let _ui_model_type = GetNodeProp(modelProperty, NodeProperties.UIModelType);
+                                    if (_ui_model_type) {
+                                        referenceproperty = GetSharedComponentFor(viewType, modelProperty, _ui_model_type);
+                                    }
+                                }
+
                             }
                             break;
                     }
@@ -2545,6 +2558,9 @@ export const CreateDefaultView = {
                         propertyIndex
                     });
                     if (referenceproperty) {
+                        //add data-chain accessor to view-type external connections
+                        AttachDataChainAccessorTo(referenceproperty,buildPropertyResult.propDataChainNodeId);
+                        AttachSelectorAccessorTo(referenceproperty,modelComponentSelectors[0])
                         return {};
                     }
                     skip = buildPropertyResult.skip;
@@ -4255,3 +4271,47 @@ function getApiConnectors(newItems, parent, key) {
     newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};
     return newItems.apiConnectors[parent][key];
 }
+
+function AttachDataChainAccessorTo(nodeId, accessorId){
+   let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()),{
+        id:nodeId,
+        link:LinkType.ComponentExternalApi
+    });
+
+    PerformGraphOperation([...externalApis.map(externalApi=>{
+        return {
+            operation:ADD_LINK_BETWEEN_NODES,
+            options:function(graph){
+                return {
+                    target:accessorId,
+                    source:externalApi.id,
+                    properties:{
+                        ...LinkProperties.DataChainLink
+                    }
+                }
+            }
+        }
+    })])(GetDispatchFunc(), GetStateFunc())
+}
+
+function AttachSelectorAccessorTo(nodeId, accessorId){
+    let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()),{
+         id:nodeId,
+         link:LinkType.ComponentExternalApi
+     });
+ 
+     PerformGraphOperation([...externalApis.map(externalApi=>{
+         return {
+             operation:ADD_LINK_BETWEEN_NODES,
+             options:function(graph){
+                 return {
+                     target:accessorId,
+                     source:externalApi.id,
+                     properties:{
+                         ...LinkProperties.SelectorLink
+                     }
+                 }
+             }
+         }
+     })])(GetDispatchFunc(), GetStateFunc())
+ }

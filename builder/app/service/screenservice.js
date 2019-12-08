@@ -396,21 +396,21 @@ export function GenerateRNComponents(node, relative = './src/components', langua
     })
     return result;
 }
-export function ConvertViewTypeToComponentNode(node) {
+export function ConvertViewTypeToComponentNode(node, language) {
     let wasstring = false;
     if (typeof node === 'string') {
         node = GetNodeById(node);
         wasstring = true;
     }
+
     switch (GetNodeProp(node, NodeProperties.NODEType)) {
         case NodeTypes.ViewType:
-            let temp = GetLinkChainItem({
+            let temp = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
                 id: node.id,
-                links: [{
-                    type: LinkType.DefaultViewType,
-                    direction: SOURCE
-                }]
-            });
+                link: LinkType.DefaultViewType
+            }).filter(x => [NodeTypes.ComponentNode].some(v => v === GetNodeProp(x, NodeProperties.NODEType)))
+                .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
+                .find(x => x);;
             node = temp || node;
             break;
     }
@@ -431,7 +431,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
     if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
         viewTypeNode = node;
     }
-    node = ConvertViewTypeToComponentNode(node);
+    node = ConvertViewTypeToComponentNode(node, language);
     switch (language) {
         case UITypes.ReactNative:
         case UITypes.ElectronIO:
@@ -505,39 +505,28 @@ export function GenerateMarkupTag(node, language, parent, params) {
                     }
                     break;
             }
-            let apiProperties = '';
-            if (parentComponentApiConfig) {
-                apiProperties = writeApiProperties(parentComponentApiConfig);
-            }
-            else if (componentApi) {
-                apiProperties = writeApiProperties(componentApi);
-            }
-            if (dataBinding) {
-                dataBinding = `data={${dataBinding}}`;
-            }
-            if (valueBinding) {
-                valueBinding = `value={${valueBinding}}`
-            }
+            // let apiProperties = '';
+            // if (parentComponentApiConfig) {
+            //     apiProperties = writeApiProperties(parentComponentApiConfig);
+            // }
+            // else if (componentApi) {
+            //     apiProperties = writeApiProperties(componentApi);
+            // }
+            // if (dataBinding) {
+            //     dataBinding = `data={${dataBinding}}`;
+            // }
+            // if (valueBinding) {
+            //     valueBinding = `value={${valueBinding}}`
+            // }
             let describedApi = '';
             if (node && parent) {
-                if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.Model) {
-                    let temps = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
-                        id: viewTypeNode.id,
-                        link: LinkType.DefaultViewType
-                    }).filter(x => [NodeTypes.ComponentNode].some(v => v === GetNodeProp(x, NodeProperties.NODEType)))
-                        .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
-                        .find(x => x);
-                    if (temps) {
-                        console.warn('more than one option for a shared component so thats weird')
-                        debugger;
-                        describedApi = WriteDescribedApiProperties(viewTypeNode);
-                    }
+                if (viewTypeNode) {
+                    describedApi = WriteDescribedApiProperties(viewTypeNode, { listitem:false, parent });
                 }
                 if (!describedApi) {
                     describedApi = WriteDescribedApiProperties(node);
                 }
             }
-            // ${apiProperties} ${valueBinding} ${dataBinding} ${onChange}
             return `<${GetCodeName(node)} ${describedApi} />`;
     }
 }
@@ -656,13 +645,21 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
     let componentEventHandlers = GetNodesLinkedTo(graph, {
         id: node.id,
         link: LinkType.EventMethod
-    })
+    });
+
+    let isViewType = GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType;
 
     result = componentExternalApis.unique(x => GetJSCodeName(x)).map(componentExternalApi => {
         let externalConnection = GetNodesLinkedTo(graph, {
             id: componentExternalApi.id,
             link: LinkType.ComponentExternalConnection
         }).find(x => x);
+
+        if (isViewType && !externalConnection) {
+            // If the view-type node doesn't have an external connection
+            // Then conventions will be assumed.
+            externalConnection = componentExternalApi;
+        }
 
         let titleService = GetNodesLinkedTo(graph, {
             id: componentExternalApi.id,
@@ -1077,7 +1074,7 @@ export function GetComponentDidMount(screenOption) {
 
 export function GenerateImport(node, parentNode, language) {
 
-    node = ConvertViewTypeToComponentNode(node);
+    node = ConvertViewTypeToComponentNode(node, language);
 
     switch (language) {
         case UITypes.ReactNative:
@@ -1092,7 +1089,7 @@ export function GenerateImport(node, parentNode, language) {
 }
 
 export function GenerateComponentImport(node, parentNode, language) {
-    node = ConvertViewTypeToComponentNode(node);
+    node = ConvertViewTypeToComponentNode(node, language);
 
     switch (language) {
         case UITypes.ElectronIO:

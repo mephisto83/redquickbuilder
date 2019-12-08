@@ -131,6 +131,7 @@ class Dashboard extends Component {
 					result.push(...this.getSelectorContext())
 					return result;
 				case NodeTypes.Model:
+				case NodeTypes.Property:
 					result.push(...this.getModelContext())
 					return result;
 				case NodeTypes.ComponentNode:
@@ -170,38 +171,6 @@ class Dashboard extends Component {
 						icon: 'fa fa-filter',
 						title: Titles.ConnectModelItemFilter
 					}
-						// 	{
-						// 	onClick: () => {
-						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnScreenLink);
-						// 	},
-						// 	icon: 'fa fa-download',
-						// 	title: Titles.OnLoad
-						// }
-						// , {
-						// 	onClick: () => {
-						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnSuccessLink);
-						// 	},
-						// 	icon: 'fa fa-trophy',
-						// 	title: Titles.OnSuccessLink
-						// }, {
-						// 	onClick: () => {
-						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnItemSelection);
-						// 	},
-						// 	icon: 'fa fa-tasks',
-						// 	title: Titles.OnItemSelection
-						// }, {
-						// 	onClick: () => {
-						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnAction);
-						// 	},
-						// 	icon: 'fa fa-tasks',
-						// 	title: Titles.OnAction
-						// }, {
-						// 	onClick: () => {
-						// 		this.props.setVisual(CONNECTING_NODE, LinkProperties.OnFailureLink);
-						// 	},
-						// 	icon: 'fa fa-frown-o',
-						// 	title: Titles.OnFailureLink
-						// }
 					);
 					break;
 				case NodeTypes.ScreenOption:
@@ -255,6 +224,15 @@ class Dashboard extends Component {
 						},
 						icon: 'fa fa-share-alt',
 						title: Titles.DataChain
+					},{
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.ComponentExternalConnection,
+								nodeTypes: [NodeTypes.ComponentApi]
+							});
+						},
+						icon: 'fa fa-external-link-square',
+						title: Titles.ExternalApiConnection
 					}, {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, {
