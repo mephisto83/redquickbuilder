@@ -404,20 +404,14 @@ export function ConvertViewTypeToComponentNode(node) {
     }
     switch (GetNodeProp(node, NodeProperties.NODEType)) {
         case NodeTypes.ViewType:
-            node = GetLinkChainItem({
+            let temp = GetLinkChainItem({
                 id: node.id,
                 links: [{
-                    type: LinkType.SharedComponent,
+                    type: LinkType.DefaultViewType,
                     direction: SOURCE
                 }]
-            }) || node;
-            node = GetLinkChainItem({
-                id: node.id,
-                links: [{
-                    type: LinkType.SharedComponentInstance,
-                    direction: TARGET
-                }]
-            }) || node;
+            });
+            node = temp || node;
             break;
     }
     if (wasstring) {

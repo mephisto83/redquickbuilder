@@ -1,1 +1,1 @@
-<Text>{`${ {{data}} }`}</Text>
+<Text>{`${this.state.value}`}</Text>

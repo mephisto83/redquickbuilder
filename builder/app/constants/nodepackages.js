@@ -1315,142 +1315,6 @@ export const CreateDefaultView = {
                         }
                     }
                 } : false,
-                //  !isSharedComponent ? {
-                //     operation: ADD_NEW_NODE,
-                //     options: function (graph) {
-                //         let res = GetNodesByProperties({
-                //             [NodeProperties.Model]: currentNode.id,
-                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty,
-                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
-                //         }, graph);
-                //         if (res && res.length) {
-                //             viewModelNodeDirtyId = res[0].id;
-                //             return false;
-                //         }
-
-                //         return {
-                //             nodeType: NodeTypes.ViewModel,
-                //             callback: (viewModelNodeDirty) => {
-                //                 viewModelNodeDirtyId = viewModelNodeDirty.id;
-                //             },
-                //             properties: {
-                //                 ...viewPackage,
-                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty} `,
-                //                 [NodeProperties.Model]: currentNode.id,
-                //                 [NodeProperties.Pinned]: false,
-                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceDirty : InstanceTypes.ScreenInstanceDirty
-                //             },
-                //             links: [{
-                //                 target: currentNode.id,
-                //                 linkProperties: {
-                //                     properties: { ...LinkProperties.ViewModelLink }
-                //                 }
-                //             }]
-                //         };
-                //     }
-                // } : null,
-                //  !isSharedComponent ? {
-                //     operation: ADD_NEW_NODE,
-                //     options: function (graph) {
-                //         let res = GetNodesByProperties({
-                //             [NodeProperties.Model]: currentNode.id,
-                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus,
-                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
-                //         }, graph);
-                //         if (res && res.length) {
-                //             viewModelNodeFocusId = res[0].id;
-                //             return false;
-                //         }
-
-                //         return {
-                //             nodeType: NodeTypes.ViewModel,
-                //             callback: (viewModelNodeFocus) => {
-                //                 viewModelNodeFocusId = viewModelNodeFocus.id;
-                //             },
-                //             properties: {
-                //                 ...viewPackage,
-                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus}`,
-                //                 [NodeProperties.Model]: currentNode.id,
-                //                 [NodeProperties.Pinned]: false,
-                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocus : InstanceTypes.ScreenInstanceFocus
-                //             },
-                //             links: [{
-                //                 target: currentNode.id,
-                //                 linkProperties: {
-                //                     properties: { ...LinkProperties.ViewModelLink }
-                //                 }
-                //             }]
-                //         }
-                //     }
-                // } : null,
-                //  !isSharedComponent ? {
-                //     operation: ADD_NEW_NODE,
-                //     options: function (graph) {
-                //         let res = GetNodesByProperties({
-                //             [NodeProperties.Model]: currentNode.id,
-                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused,
-                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
-                //         }, graph);
-                //         if (res && res.length) {
-                //             viewModelNodeFocusedId = res[0].id;
-                //             return false;
-                //         }
-
-                //         return {
-                //             nodeType: NodeTypes.ViewModel,
-                //             callback: (viewModelNodeFocused) => {
-                //                 viewModelNodeFocusedId = viewModelNodeFocused.id;
-                //             },
-                //             properties: {
-                //                 ...viewPackage,
-                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused}`,
-                //                 [NodeProperties.Model]: currentNode.id,
-                //                 [NodeProperties.Pinned]: false,
-                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceFocused : InstanceTypes.ScreenInstanceFocused
-                //             },
-                //             links: [{
-                //                 target: currentNode.id,
-                //                 linkProperties: {
-                //                     properties: { ...LinkProperties.ViewModelLink }
-                //                 }
-                //             }]
-                //         }
-                //     }
-                // } : false, 
-                // !isSharedComponent ? {
-                //     operation: ADD_NEW_NODE,
-                //     options: function (graph) {
-                //         let res = GetNodesByProperties({
-                //             [NodeProperties.Model]: currentNode.id,
-                //             [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur,
-                //             [NodeProperties.NODEType]: NodeTypes.ViewModel
-                //         }, graph);
-                //         if (res && res.length) {
-                //             viewModelNodeBlurId = res[0].id;
-                //             return false;
-                //         }
-
-                //         return {
-                //             nodeType: NodeTypes.ViewModel,
-                //             callback: (viewModelNodeBlur) => {
-                //                 viewModelNodeBlurId = viewModelNodeBlur.id;
-                //             },
-                //             properties: {
-                //                 ...viewPackage,
-                //                 [NodeProperties.UIText]: `${viewName} VM ${useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur}`,
-                //                 [NodeProperties.Model]: currentNode.id,
-                //                 [NodeProperties.Pinned]: false,
-                //                 [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstanceBlur : InstanceTypes.ScreenInstanceBlur
-                //             },
-                //             links: [{
-                //                 target: currentNode.id,
-                //                 linkProperties: {
-                //                     properties: { ...LinkProperties.ViewModelLink }
-                //                 }
-                //             }]
-                //         }
-                //     }
-                // } : null, 
                 !isSharedComponent ? {
                     operation: NEW_SCREEN_OPTIONS,
                     options: function () {
@@ -1639,7 +1503,7 @@ export const CreateDefaultView = {
                         newItems.componentItemListViewModel = _i;
                     }, newItems.listComponentId, { useAsValue: false })
                 }) : null,
-                ...(['index', 'separators'].map(text => {
+                ...(['index', 'separators', 'value'].map(text => {
                     return (function () {
                         if (!isList) {
                             return []
@@ -1699,7 +1563,7 @@ export const CreateDefaultView = {
                         }
                     }
                 }) : null,
-                isList ? ({
+                isList && !isSharedComponent ? ({
                     operation: ADD_LINK_BETWEEN_NODES,
                     options: function () {
                         return {
@@ -1911,32 +1775,35 @@ export const CreateDefaultView = {
                         }
                     }
                 }),
-                ({
+                !isSharedComponent ? ({
                     operation: ADD_LINK_BETWEEN_NODES,
                     options: function () {
-
-                        return {
-                            source: getApiConnectors(newItems, newItems.screenComponentId, 'value').externalId,
-                            target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'value').internalId,
-                            properties: {
-                                ...LinkProperties.ComponentExternalConnection
+                        if (screenNodeOptionId || listComponentId) {
+                            return {
+                                source: getApiConnectors(newItems, newItems.screenComponentId, 'value').externalId,
+                                target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'value').internalId,
+                                properties: {
+                                    ...LinkProperties.ComponentExternalConnection
+                                }
                             }
                         }
                     }
-                }),
-                ({
+                }) : false,
+                !isSharedComponent ? ({
                     operation: ADD_LINK_BETWEEN_NODES,
                     options: function () {
 
-                        return {
-                            source: getApiConnectors(newItems, newItems.screenComponentId, 'viewModel').externalId,
-                            target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'viewModel').internalId,
-                            properties: {
-                                ...LinkProperties.ComponentExternalConnection
+                        if (screenNodeOptionId || listComponentId) {
+                            return {
+                                source: getApiConnectors(newItems, newItems.screenComponentId, 'viewModel').externalId,
+                                target: getApiConnectors(newItems, isList ? listComponentId : screenNodeOptionId, 'viewModel').internalId,
+                                properties: {
+                                    ...LinkProperties.ComponentExternalConnection
+                                }
                             }
                         }
                     }
-                }),
+                }) : null,
                 !isSharedComponent ? {
                     operation: CHANGE_NODE_PROPERTY,
                     options: function (currentGraph) {
@@ -1984,6 +1851,12 @@ export const CreateDefaultView = {
                     }
                     else {
                         childComponents[modelIndex] = sharedComponent;
+                        return [...['value', 'viewModel', 'label', 'error', 'success'].map(v => (function () {
+                            let graph = GetCurrentGraph(GetStateFunc()());
+                            return addComponentApiToForm({
+                                newItems, text: v, parent: sharedComponent, isSingular: true, graph
+                            });
+                        }))];
                         return {};
                     }
 
