@@ -16,6 +16,7 @@ import View from './components/view';
 import StyleSheet from './components/stylesheet';
 import StyleProvider from './components/styleprovider';
 import FlatList from './components/flatlist';
+import MultiSelectList from './components/multiselectlist';
 import Label from './components/label';
 import Image from './components/image';
 import Item from './components/item';
@@ -40,5 +41,6 @@ export {
   Input,
   StyleSheet,
   FlatList,
+  MultiSelectList,
   Image
 };

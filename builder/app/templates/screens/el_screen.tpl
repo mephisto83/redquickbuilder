@@ -6,7 +6,7 @@ import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiA
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
 import * as ViewModelKeys from '../viewmodel_keys';
-import { Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from '../html-components';
+import { MultiSelectList, Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from '../html-components';
 import MenuItem from '../components/menuitem';
 {{imports}}
 // {{name}}
@@ -22,11 +22,11 @@ class {{name}} extends React.Component {
     render() {
         setNavigate(navigationInstance);
         return (
-            <StyleProvider>  
-                 <Container>                   
+            <StyleProvider>
+                 <Container>
                      {{elements}}
-                </Container> 
-            </StyleProvider> 
+                </Container>
+            </StyleProvider>
         );
     }
 }

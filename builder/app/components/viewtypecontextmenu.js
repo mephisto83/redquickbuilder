@@ -10,7 +10,7 @@ class ViewTypeMenu extends Component {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        
+
         return (
             <TreeViewMenu
                 open={true}
@@ -23,6 +23,9 @@ class ViewTypeMenu extends Component {
                 }} />
                 <TreeViewMenu title={LinkType.ComponentExternalApi} hideArrow={true} onClick={() => {
                     this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentExternalApi);
+                }} />
+                <TreeViewMenu title={LinkType.DefaultViewType} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.DefaultViewType);
                 }} />
             </TreeViewMenu>)
     }

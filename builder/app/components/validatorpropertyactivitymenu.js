@@ -53,10 +53,10 @@ class ValidatorPropertyActivityMenu extends Component {
                                 onClick={() => {
                                     let id = currentNode.id;
                                     let validator = UIA.GetNodeProp(currentNode, NodeProperties.Validator) || createValidator();
- 
+
 
                                     let _validates = validator.properties[key];
-                                    delete _validates.validators[v] 
+                                    delete _validates.validators[v]
 
                                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                         id,

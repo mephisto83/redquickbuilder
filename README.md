@@ -708,3 +708,24 @@ IAgent, IHasAllowedCollection
             return false;
         }
 
+
+
+## View Components Matrix
+
+
+            	References to other objects
+
+
+        Get   	    SingularView		List	
+
+                    
+        GetAll	    SingularView		List
+
+
+        Create      SingularSelection	MultiSelection
+
+
+        Update	    SingularSelection	MultiSelection
+
+
+        Delete	    SingularView		List
