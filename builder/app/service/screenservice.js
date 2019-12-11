@@ -15,8 +15,7 @@ import {
   ViewTypes,
   GetCurrentGraph,
   GetNodeByProperties,
-  GetNodes,
-  GetSharedComponentFor
+  GetNodes
 } from '../actions/uiactions'
 import fs from 'fs'
 import path from 'path'
@@ -64,7 +63,7 @@ import {
 import { HandlerType } from '../components/titles'
 import { addNewLine } from '../utils/array'
 
-export function GenerateScreens (options) {
+export function GenerateScreens(options) {
   let { language } = options
   let temps = BindScreensToTemplate(language || UITypes.ReactNative)
   let result = {}
@@ -76,7 +75,7 @@ export function GenerateScreens (options) {
   return result
 }
 
-export function GenerateScreenMarkup (id, language) {
+export function GenerateScreenMarkup(id, language) {
   let screen = GetNodeById(id)
   let screenOption = GetScreenOption(id, language)
   if (screenOption) {
@@ -109,7 +108,7 @@ export function GenerateScreenMarkup (id, language) {
   }
 }
 
-export function GenerateScreenOptionSource (node, parent, language) {
+export function GenerateScreenOptionSource(node, parent, language) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
@@ -117,10 +116,10 @@ export function GenerateScreenOptionSource (node, parent, language) {
   }
 }
 
-export function GetDefaultElement (language) {
+export function GetDefaultElement(language) {
   return '<View><Text>DE</Text></View>'
 }
-export function GetItemRender (node, imports, language) {
+export function GetItemRender(node, imports, language) {
   let listItemNode = GetListItemNode(node.id)
   imports.push(GenerateComponentImport(listItemNode, node, language))
   let properties = WriteDescribedApiProperties(listItemNode, { listItem: true })
@@ -128,7 +127,7 @@ export function GetItemRender (node, imports, language) {
     listItemNode
   )} ${properties} />`
 }
-export function GetItemRenderImport (node) {
+export function GetItemRenderImport(node) {
   let listItemNode = GetListItemNode(node.id)
   let properties = WriteDescribedApiProperties(listItemNode, { listItem: true })
 
@@ -137,7 +136,7 @@ export function GetItemRenderImport (node) {
   )} ${properties} />`
 }
 
-export function GetItemData (node) {
+export function GetItemData(node) {
   let dataSourceNode = GetDataSourceNode(node.id)
   let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain)
   let instanceType = GetNodeProp(dataSourceNode, NodeProperties.InstanceType)
@@ -152,7 +151,7 @@ export function GetItemData (node) {
     return ${defaultValue};
 })()`
 }
-export function getRelativePathPrefix (relativePath) {
+export function getRelativePathPrefix(relativePath) {
   return relativePath
     ? relativePath
       .split('/')
@@ -161,7 +160,7 @@ export function getRelativePathPrefix (relativePath) {
       .join('')
     : relativePath
 }
-export function GenerateRNScreenOptionSource (node, relativePath, language) {
+export function GenerateRNScreenOptionSource(node, relativePath, language) {
   let layoutObj = GetNodeProp(node, NodeProperties.Layout)
   let componentType = GetNodeProp(node, NodeProperties.ComponentType)
   let { specialLayout, template } = ComponentTypes[language][componentType]
@@ -275,7 +274,7 @@ export function GenerateRNScreenOptionSource (node, relativePath, language) {
     ...results
   ]
 }
-export function bindComponent (node, componentBindingDefinition) {
+export function bindComponent(node, componentBindingDefinition) {
   if (componentBindingDefinition && componentBindingDefinition.template) {
     let template = fs.readFileSync(componentBindingDefinition.template, 'utf8')
     let { properties } = componentBindingDefinition
@@ -327,7 +326,7 @@ ${invocations}
     return bindTemplate(template, bindProps)
   }
 }
-export function wrapOnPress (elements, onPress, node, options) {
+export function wrapOnPress(elements, onPress, node, options) {
   let onpress = GetNodeProp(node, 'onPress')
   switch (onpress) {
     case APP_METHOD:
@@ -465,7 +464,7 @@ ${elements}
 
   return elements
 }
-export function GenerateRNComponents (
+export function GenerateRNComponents(
   node,
   relative = './src/components',
   language = UITypes.ReactNative
@@ -576,7 +575,7 @@ export function GenerateRNComponents (
   })
   return result
 }
-export function ConvertViewTypeToComponentNode (node, language) {
+export function ConvertViewTypeToComponentNode(node, language, isPluralComponent) {
   let wasstring = false
   if (typeof node === 'string') {
     node = GetNodeById(node)
@@ -589,14 +588,11 @@ export function ConvertViewTypeToComponentNode (node, language) {
         id: node.id,
         link: LinkType.DefaultViewType
       })
-        .filter(x =>
-          [NodeTypes.ComponentNode].some(
-            v => v === GetNodeProp(x, NodeProperties.NODEType)
-          )
-        )
+        .filter(x => [NodeTypes.ComponentNode].some(v => v === GetNodeProp(x, NodeProperties.NODEType)))
         .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
-        .find(x => x)
-      node = temp || node
+        .filter(x => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
+        .find(x => x);
+      node = temp || node;
       break
   }
   if (wasstring) {
@@ -604,7 +600,7 @@ export function ConvertViewTypeToComponentNode (node, language) {
   }
   return node
 }
-export function GenerateMarkupTag (node, language, parent, params) {
+export function GenerateMarkupTag(node, language, parent, params) {
   let { children, cellModel, cellModelProperty, item } = params || {}
   let listItem = ''
   let viewTypeNode = null
@@ -659,7 +655,7 @@ export function GenerateMarkupTag (node, language, parent, params) {
         if (
           parent &&
           GetNodeProp(parent, NodeProperties.ComponentType) ===
-            ComponentTypes[language].ListItem.key
+          ComponentTypes[language].ListItem.key
         ) {
           listItem = '.item'
         }
@@ -732,7 +728,7 @@ export function GenerateMarkupTag (node, language, parent, params) {
       return `<${GetCodeName(node)} ${describedApi} />`
   }
 }
-function WriteDescribedStateUpdates (parent) {
+function WriteDescribedStateUpdates(parent) {
   let result = ``
   let graph = GetCurrentGraph(GetState())
   if (typeof parent === 'string') {
@@ -777,11 +773,11 @@ function WriteDescribedStateUpdates (parent) {
 
         result = `
             var new_${externalKey} = ${bindTemplate(innerValue, {
-  temp: `this.props.${externalKey}`
-})};
+          temp: `this.props.${externalKey}`
+        })};
             if ( new_${externalKey} !== this.state.${GetJSCodeName(
-  componentInternalApi
-)}) {
+          componentInternalApi
+        )}) {
 
             {{step}}
         }`
@@ -790,8 +786,8 @@ function WriteDescribedStateUpdates (parent) {
           temp: innerValue,
           step: `this.setState((state, props) => {
                 return { ${GetJSCodeName(
-    componentInternalApi
-  )}:  new_${externalKey} };
+            componentInternalApi
+          )}:  new_${externalKey} };
               });`
         })
       }
@@ -800,7 +796,7 @@ function WriteDescribedStateUpdates (parent) {
     .join(NEW_LINE)
   return result
 }
-function GetDefaultComponentValue (node, key) {
+function GetDefaultComponentValue(node, key) {
   let result = ``
   let graph = GetCurrentGraph(GetState())
   if (typeof node === 'string') {
@@ -853,7 +849,7 @@ function GetDefaultComponentValue (node, key) {
     .join(NEW_LINE)
   return result
 }
-function WriteDescribedApiProperties (node, options = { listItem: false }) {
+function WriteDescribedApiProperties(node, options = { listItem: false }) {
   let result = ''
   if (typeof node === 'string') {
     node = GetNodeById(node, graph)
@@ -1015,7 +1011,7 @@ function WriteDescribedApiProperties (node, options = { listItem: false }) {
   result.push(...res)
   return NEW_LINE + result.join(NEW_LINE)
 }
-export function writeApiProperties (apiConfig) {
+export function writeApiProperties(apiConfig) {
   var result = ''
   var res = []
 
@@ -1121,7 +1117,7 @@ export function writeApiProperties (apiConfig) {
 
   return result
 }
-export function GetScreenOption (id, language) {
+export function GetScreenOption(id, language) {
   let screen = GetNodeById(id)
   let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null
   if (screenOptions && screenOptions.length) {
@@ -1135,7 +1131,7 @@ export function GetScreenOption (id, language) {
   return null
 }
 
-export function GetScreenImports (id, language) {
+export function GetScreenImports(id, language) {
   let screen = GetNodeById(id)
   let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null
   if (screenOptions && screenOptions.length) {
@@ -1150,7 +1146,7 @@ export function GetScreenImports (id, language) {
   return null
 }
 
-export function getMethodInstancesForLifeCylcEvntType (node, evtType) {
+export function getMethodInstancesForLifeCylcEvntType(node, evtType) {
   if (typeof node === 'string') {
     node = GetNodeById(node)
   }
@@ -1178,7 +1174,7 @@ export function getMethodInstancesForLifeCylcEvntType (node, evtType) {
   return methodInstances
 }
 
-export function getMethodInstancesForEvntType (node, evtType) {
+export function getMethodInstancesForEvntType(node, evtType) {
   if (typeof node === 'string') {
     node = GetNodeById(node)
   }
@@ -1205,7 +1201,7 @@ export function getMethodInstancesForEvntType (node, evtType) {
 
   return methodInstances
 }
-export function getMethodInvocation (methodInstanceCall, component) {
+export function getMethodInvocation(methodInstanceCall, component) {
   let graph = GetCurrentGraph(GetState())
   let method = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
@@ -1316,7 +1312,7 @@ export function getMethodInvocation (methodInstanceCall, component) {
     return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}});`
   }
 }
-export function GetComponentDidUpdate (parent) {
+export function GetComponentDidUpdate(parent) {
   let describedApi = ''
   if (parent) {
     describedApi = WriteDescribedStateUpdates(parent).trim()
@@ -1334,7 +1330,7 @@ export function GetComponentDidUpdate (parent) {
 
   return componentDidUpdate
 }
-export function GetComponentDidMount (screenOption) {
+export function GetComponentDidMount(screenOption) {
   let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent)
   let outOfBandCall = ''
   if (
@@ -1391,7 +1387,7 @@ export function GetComponentDidMount (screenOption) {
   )
 }
 
-export function GenerateImport (node, parentNode, language) {
+export function GenerateImport(node, parentNode, language) {
   node = ConvertViewTypeToComponentNode(node, language)
 
   switch (language) {
@@ -1410,7 +1406,7 @@ export function GenerateImport (node, parentNode, language) {
   }
 }
 
-export function GenerateComponentImport (node, parentNode, language) {
+export function GenerateComponentImport(node, parentNode, language) {
   node = ConvertViewTypeToComponentNode(node, language)
 
   switch (language) {
@@ -1429,11 +1425,11 @@ export function GenerateComponentImport (node, parentNode, language) {
   }
 }
 
-export function GetScreens () {
+export function GetScreens() {
   var screens = GetScreenNodes()
   return screens
 }
-function GenerateElectronIORoutes (screens) {
+function GenerateElectronIORoutes(screens) {
   let template = `<Route path={routes.{{route_name}}} component={{{component}}} />`
   let routefile = fs.readFileSync(
     './app/templates/electronio/routes.tpl',
@@ -1467,7 +1463,7 @@ function GenerateElectronIORoutes (screens) {
     name: `Routes.js`
   }
 }
-export function BindScreensToTemplate (language = UITypes.ReactNative) {
+export function BindScreensToTemplate(language = UITypes.ReactNative) {
   var screens = GetScreens()
   let template = fs.readFileSync('./app/templates/screens/screen.tpl', 'utf8')
   let moreresults = []

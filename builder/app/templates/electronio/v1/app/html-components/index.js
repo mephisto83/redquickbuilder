@@ -20,6 +20,7 @@ import MultiSelectList from './components/multiselectlist';
 import Label from './components/label';
 import Image from './components/image';
 import Item from './components/item';
+import MultiViewList from './components/multiviewlist';
 export {
   Content,
   Container,
@@ -42,5 +43,6 @@ export {
   StyleSheet,
   FlatList,
   MultiSelectList,
+  MultiViewList,
   Image
 };

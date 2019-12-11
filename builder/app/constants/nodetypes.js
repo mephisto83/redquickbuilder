@@ -427,6 +427,7 @@ export const NodeProperties = {
     HasLogicalNieces: "hasLogicalNieces",
     LogicalNieceTypes: 'logicalNieceTypes',
 
+    IsPluralComponent:'IsPluralComponent',
     DataGenerationType: 'data-generation-type',
 
     ManyToManyNexus: 'manyToManyNexux',
@@ -459,8 +460,8 @@ export const NodeProperties = {
     Groups: 'groups',
     GroupParent: 'groupParent',
     CodeName: 'codeName',
-    ValueName: 'valueName',//The name of the instance variable to be used 
-    AgentName: 'agentName',//The name of the instance variable to be used 
+    ValueName: 'valueName',//The name of the instance variable to be used
+    AgentName: 'agentName',//The name of the instance variable to be used
     CodePropertyType: 'codeProperty',
     FunctionType: 'functionType',
     MethodFunctionValidation: 'method-function-validation',
@@ -622,7 +623,7 @@ export const LinkType = {
     ManyToManyLink: "ManyToManyLink",
     Permission: 'permission',
     AppliedPermissionLink: 'applied-permission',
-    RequestorPermissionLink: 'request-permission-link',//the agent/node that is requesting permissions 
+    RequestorPermissionLink: 'request-permission-link',//the agent/node that is requesting permissions
     ManyToManyPermissionLink: 'many-to-many-permission-link',
     ExtensionDependencyLink: 'extension-dependency-link',
     FunctionOperator: 'function-operator',

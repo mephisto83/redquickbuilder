@@ -195,7 +195,7 @@ export const GetSpecificModels = {
                                 parent: methodNode.id,
                                 nodeType:
                                   constraint.key ===
-                                  FunctionTemplateKeys.Permission
+                                    FunctionTemplateKeys.Permission
                                     ? NodeTypes.Permission
                                     : NodeTypes.ModelFilter,
                                 groupProperties: {},
@@ -207,10 +207,10 @@ export const GetSpecificModels = {
                                     methodNode
                                   )} ${
                                     constraint.key ===
-                                    FunctionTemplateKeys.Permission
+                                      FunctionTemplateKeys.Permission
                                       ? NodeTypes.Permission
                                       : NodeTypes.ModelFilter
-                                  }`
+                                    }`
                                 },
                                 linkProperties: {
                                   properties: {
@@ -560,7 +560,7 @@ export const AddAgentUser = {
   }
 }
 
-export function CreatePagingSkipDataChains () {
+export function CreatePagingSkipDataChains() {
   var result = {}
   var skipResult = false
   let arrayLengthNode = null
@@ -720,7 +720,7 @@ export function CreatePagingSkipDataChains () {
   ])(GetDispatchFunc(), GetStateFunc())
   return result
 }
-export function CreatePagingTakeDataChains () {
+export function CreatePagingTakeDataChains() {
   var result = {}
   var skipTake = false
   let defaultPagingValue = null
@@ -848,7 +848,7 @@ export function CreatePagingTakeDataChains () {
   ])(GetDispatchFunc(), GetStateFunc())
   return result
 }
-export function CreateScreenModel (viewModel, options = { isList: true }) {
+export function CreateScreenModel(viewModel, options = { isList: true }) {
   var result = {}
   let pageModelId = null
   let skip = false
@@ -916,7 +916,7 @@ export function CreateScreenModel (viewModel, options = { isList: true }) {
   return result
 }
 
-export function createViewPagingDataChain (
+export function createViewPagingDataChain(
   newItems,
   viewName,
   viewPackage,
@@ -1167,7 +1167,7 @@ export function createViewPagingDataChain (
     ]
   }
 }
-export function CreatePagingModel () {
+export function CreatePagingModel() {
   var result = null
   let pageModelId = null
   let skipModelId = null
@@ -1391,6 +1391,7 @@ export const CreateDefaultView = {
           viewComponent = ComponentTypes[uiType].Text
           if (isPluralComponent && isSharedComponent) {
             isList = true
+            multi_item_component = ComponentTypes[uiType].MultiViewList.key
           } else if (isSharedComponent) {
             isList = false
           }
@@ -1414,9 +1415,10 @@ export const CreateDefaultView = {
         viewModelNodeFocusedId,
         viewModelNodeId
       ]
-      if (
-        GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Model
-      ) {
+      let modelType = GetNodeProp(currentNode, NodeProperties.NODEType)
+      let isModel = modelType === NodeTypes.Model
+
+      if (isModel) {
         let modelChildren = GetModelPropertyChildren(currentNode.id)
         newItems.currentNode = currentNode.id
         if (chosenChildren && chosenChildren.length) {
@@ -1428,15 +1430,11 @@ export const CreateDefaultView = {
           x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
         )
         childComponents = modelProperties.map(v => null)
-        let apiListLinkOperations = []
         let screenComponentEvents = []
-        let pagingModelAndProperties = null
-        let pagingSkipChains = null
-        let pagingTakeChains = null
         if (isList) {
-          pagingModelAndProperties = CreatePagingModel()
-          pagingSkipChains = CreatePagingSkipDataChains()
-          pagingTakeChains = CreatePagingTakeDataChains()
+          CreatePagingModel();
+          CreatePagingSkipDataChains();
+          CreatePagingTakeDataChains();
         }
         let pageViewModel = null
         if (!isSharedComponent) {
@@ -1623,11 +1621,11 @@ export const CreateDefaultView = {
                     {
                       [NodeProperties.UIText]: `${viewName} Screen DC`,
                       [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Selector,
+                        DataChainFunctionKeys.Selector,
                       [NodeProperties.Selector]: newItems.screenSelector,
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.SelectorProperty]:
-                          SelectorPropertyKeys.Object
+                        SelectorPropertyKeys.Object
                     },
                     graph
                   )
@@ -1642,13 +1640,13 @@ export const CreateDefaultView = {
                     properties: {
                       [NodeProperties.UIText]: `${viewName} Screen DC`,
                       [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Selector,
+                        DataChainFunctionKeys.Selector,
                       [NodeProperties.Selector]: newItems.screenSelector,
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.Pinned]: false,
                       [NodeProperties.AsOutput]: true,
                       [NodeProperties.SelectorProperty]:
-                          SelectorPropertyKeys.Object
+                        SelectorPropertyKeys.Object
                     },
                     links: [
                       {
@@ -1701,7 +1699,7 @@ export const CreateDefaultView = {
                         useModelInstance
                           ? InstanceTypes.ModelInstance
                           : InstanceTypes.ScreenInstance
-                      }`,
+                        }`,
                       [NodeProperties.Model]: currentNode.id,
                       [NodeProperties.Pinned]: false,
                       [NodeProperties.InstanceType]: useModelInstance
@@ -1747,19 +1745,19 @@ export const CreateDefaultView = {
                     })
                     GENERAL_COMPONENT_API.map(t => {
                       let apiProperty = t.property
-                        ;(function () {
-                        let rootCellId = GetFirstCell(formLayout)
-                        let cellProperties = GetCellProperties(
-                          formLayout,
-                          rootCellId
-                        )
-                        cellProperties.componentApi =
+                        ; (function () {
+                          let rootCellId = GetFirstCell(formLayout)
+                          let cellProperties = GetCellProperties(
+                            formLayout,
+                            rootCellId
+                          )
+                          cellProperties.componentApi =
                             cellProperties.componentApi || {}
-                        cellProperties.componentApi[apiProperty] = {
-                          instanceType: InstanceTypes.ApiProperty,
-                          apiProperty
-                        }
-                      })()
+                          cellProperties.componentApi[apiProperty] = {
+                            instanceType: InstanceTypes.ApiProperty,
+                            apiProperty
+                          }
+                        })()
                     })
                   }
                   return {
@@ -1773,7 +1771,7 @@ export const CreateDefaultView = {
                       [NodeProperties.UIText]: `${viewName} ${uiType} Form`,
                       [NodeProperties.UIType]: uiType,
                       [NodeProperties.ComponentType]:
-                          ComponentTypes[uiType].Generic.key,
+                        ComponentTypes[uiType].Generic.key,
                       [NodeProperties.ComponentApi]: componentProps,
                       [NodeProperties.Pinned]: false,
                       [NodeProperties.Layout]: formLayout,
@@ -1912,10 +1910,12 @@ export const CreateDefaultView = {
                               properties: {
                                 ...LinkProperties.DefaultViewType,
                                 viewType,
-                                uiType
+                                uiType,
+                                isPluralComponent
                               },
                               viewType,
                               uiType,
+                              isPluralComponent,
                               source: ct.id,
                               target: listComponentId
                             })(GetDispatchFunc(), GetStateFunc())
@@ -1954,6 +1954,7 @@ export const CreateDefaultView = {
                       [NodeProperties.UIText]: `${viewName} ${multi_item_component}`,
                       [NodeProperties.UIType]: uiType,
                       [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.IsPluralComponent]: isPluralComponent,
                       [NodeProperties.Pinned]: false,
                       [NodeProperties.SharedComponent]: isSharedComponent,
                       [NodeProperties.ComponentType]: multi_item_component,
@@ -2173,9 +2174,11 @@ export const CreateDefaultView = {
                           properties: {
                             ...LinkProperties.DefaultViewType,
                             viewType,
-                            uiType
+                            uiType,
+                            isPluralComponent
                           },
                           source: ct.id,
+                          isPluralComponent,
                           target: screenComponentId,
                           viewType,
                           uiType
@@ -2454,7 +2457,8 @@ export const CreateDefaultView = {
                 let sharedComponent = GetSharedComponentFor(
                   viewType,
                   modelProperty,
-                  currentNode.id
+                  currentNode.id,
+                  isPluralComponent
                 )
                 if (!sharedComponent) {
                   switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -2634,7 +2638,7 @@ export const CreateDefaultView = {
                         }).filter(
                           x =>
                             GetNodeProp(x, NodeProperties.NODEType) ===
-                              NodeTypes.ComponentApi
+                            NodeTypes.ComponentApi
                         )
                         // && GetNodeProp(x, NodeProperties.UIText) === text
                         temp.map(t => {
@@ -2644,7 +2648,7 @@ export const CreateDefaultView = {
                               parent: ct.id,
                               key: GetNodeProp(t, NodeProperties.UIText),
                               properties:
-                                  LinkProperties.ComponentExternalConnection,
+                                LinkProperties.ComponentExternalConnection,
                               child: childComponents[modelIndex]
                             })
                           )
@@ -2663,7 +2667,8 @@ export const CreateDefaultView = {
                   let sharedComponent = GetSharedComponentFor(
                     viewType,
                     modelProperty,
-                    currentNode.id
+                    currentNode.id,
+                    isPluralComponent
                   )
                   if (
                     screenComponentId &&
@@ -2695,7 +2700,7 @@ export const CreateDefaultView = {
                     ...viewPackage,
                     [NodeProperties.UIText]: ` ${
                       Titles.Execute
-                    } Button ${viewName} Component`,
+                      } Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
@@ -2856,11 +2861,12 @@ export const CreateDefaultView = {
                   let sharedComponent = GetSharedComponentFor(
                     viewType,
                     modelProperty,
-                    currentNode.id
+                    currentNode.id,
+                    isPluralComponent
                   )
                   if (!sharedComponent) {
                     switch (
-                      GetNodeProp(modelProperty, NodeProperties.NODEType)
+                    GetNodeProp(modelProperty, NodeProperties.NODEType)
                     ) {
                       case NodeTypes.Model:
                         return {}
@@ -2879,7 +2885,8 @@ export const CreateDefaultView = {
                             sharedComponent = GetSharedComponentFor(
                               viewType,
                               modelProperty,
-                              _ui_model_type
+                              _ui_model_type,
+                              isPluralComponent
                             )
                           }
                           if (!sharedComponent) {
@@ -2911,7 +2918,8 @@ export const CreateDefaultView = {
               let sharedComponent = GetSharedComponentFor(
                 viewType,
                 modelProperty,
-                currentNode.id
+                currentNode.id,
+                isPluralComponent
               )
               if (!sharedComponent) {
                 switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -3016,7 +3024,7 @@ export const CreateDefaultView = {
                   ...viewPackage,
                   [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}${
                     useModelInstance ? ' Instance' : ''
-                  }`,
+                    }`,
                   [NodeProperties.Model]: currentNode.id,
                   [NodeProperties.Pinned]: false,
                   [NodeProperties.IsShared]: isSharedComponent,
@@ -3063,7 +3071,7 @@ export const CreateDefaultView = {
                   let node = GetNodesByProperties({
                     [NodeProperties.EntryPoint]: true,
                     [NodeProperties.DataChainFunctionType]:
-                        DataChainFunctionKeys.Models,
+                      DataChainFunctionKeys.Models,
                     [NodeProperties.UIModelType]: currentNode.id
                   }).find(x => x)
                   if (node) {
@@ -3082,7 +3090,7 @@ export const CreateDefaultView = {
                       [NodeProperties.UIText]: `Get ${viewName} Objects`,
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Models,
+                        DataChainFunctionKeys.Models,
                       [NodeProperties.UIModelType]: currentNode.id,
                       [NodeProperties.Pinned]: false,
                       [NodeProperties.InstanceType]: useModelInstance
@@ -3302,7 +3310,7 @@ export const CreateDefaultView = {
               }
               let temp = AddChainCommand(
                 GetNodeById(newItems.getObjectDataChain, graph),
-                complete => {},
+                complete => { },
                 graph,
                 {
                   ...viewPackage,
@@ -3346,7 +3354,8 @@ export const CreateDefaultView = {
                     referenceproperty = GetSharedComponentFor(
                       viewType,
                       modelProperty,
-                      _ui_model_type
+                      _ui_model_type,
+                      isPluralComponent
                     )
                   }
                 }
@@ -3599,7 +3608,7 @@ export const CreateDefaultView = {
   }
 }
 
-export function applyDefaultComponentProperties (currentNode, _ui_type) {
+export function applyDefaultComponentProperties(currentNode, _ui_type) {
   // var { state } = this.props;
   // var currentNode = Node(state, Visual(state, SELECTED_NODE));
   // let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
@@ -3644,7 +3653,7 @@ export function applyDefaultComponentProperties (currentNode, _ui_type) {
   return result
 }
 
-function CreateFunction (option) {
+function CreateFunction(option) {
   let {
     nodePackageType,
     methodType,
@@ -3745,7 +3754,7 @@ function CreateFunction (option) {
                                   parent: methodNode.id,
                                   nodeType:
                                     constraint.key ===
-                                    FunctionTemplateKeys.Permission
+                                      FunctionTemplateKeys.Permission
                                       ? NodeTypes.Permission
                                       : NodeTypes.ModelFilter,
                                   groupProperties: {},
@@ -3756,10 +3765,10 @@ function CreateFunction (option) {
                                       methodNode
                                     )} ${
                                       constraint.key ===
-                                      FunctionTemplateKeys.Permission
+                                        FunctionTemplateKeys.Permission
                                         ? NodeTypes.Permission
                                         : NodeTypes.ModelFilter
-                                    }`
+                                      }`
                                   },
                                   linkProperties: {
                                     properties: {
@@ -3946,7 +3955,7 @@ function CreateFunction (option) {
   }
 }
 
-export function CreateAgentFunction (option) {
+export function CreateAgentFunction(option) {
   let {
     nodePackageType,
     methodType,
@@ -4205,7 +4214,7 @@ export function CreateAgentFunction (option) {
                               constraint.key === FunctionTemplateKeys.Permission
                                 ? NodeTypes.Permission
                                 : NodeTypes.ModelFilter
-                            }`
+                              }`
                           },
                           linkProperties: {
                             properties: { ...LinkProperties.FunctionOperator }
@@ -4316,7 +4325,7 @@ export function CreateAgentFunction (option) {
   }
 }
 
-function addListItemComponentApi (
+function addListItemComponentApi(
   newItems,
   text,
   noExternal,
@@ -4416,7 +4425,7 @@ function addListItemComponentApi (
       }
   ].filter(x => x)
 }
-function addComponentEventApiNodes (args) {
+function addComponentEventApiNodes(args) {
   let {
     newItems,
     childComponents,
@@ -4523,7 +4532,7 @@ function addComponentEventApiNodes (args) {
               },
               parent:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameInstance
+                apiNameInstance
                 ],
               linkProperties: {
                 properties: {
@@ -4580,7 +4589,7 @@ function addComponentEventApiNodes (args) {
             return {
               source:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameEventHandler
+                apiNameEventHandler
                 ],
               target: viewModelNode,
               properties: {
@@ -4595,7 +4604,7 @@ function addComponentEventApiNodes (args) {
             return {
               source:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameEventHandler
+                apiNameEventHandler
                 ],
               target: modelProperty.id,
               properties: {
@@ -4608,7 +4617,7 @@ function addComponentEventApiNodes (args) {
     })
     .flatten()
 }
-function addComponentApiNodes (
+function addComponentApiNodes(
   newItems,
   childComponents,
   modelIndex,
@@ -4718,7 +4727,7 @@ function addComponentApiNodes (
   ].filter(x => x)
 }
 
-function addButtonApiNodes (newItems) {
+function addButtonApiNodes(newItems) {
   let buttonInternalApi = null
   let buttonExternalApi = null
   return [
@@ -4790,7 +4799,7 @@ function addButtonApiNodes (newItems) {
   ]
 }
 
-function ConnectExternalApisToSelectors (args) {
+function ConnectExternalApisToSelectors(args) {
   var {
     modelComponentSelectors,
     newItems,
@@ -4840,7 +4849,7 @@ function ConnectExternalApisToSelectors (args) {
   ])(GetDispatchFunc(), GetStateFunc())
 }
 
-function BuildPropertyDataChainAccessor (args) {
+function BuildPropertyDataChainAccessor(args) {
   var {
     viewName,
     modelProperty,
@@ -4989,7 +4998,7 @@ function BuildPropertyDataChainAccessor (args) {
                 [NodeProperties.ChainParent]: propDataChainNodeId,
                 [NodeProperties.AsOutput]: true,
                 [NodeProperties.DataChainFunctionType]:
-                    DataChainFunctionKeys.Property,
+                  DataChainFunctionKeys.Property,
                 [NodeProperties.Pinned]: false,
                 [NodeProperties.UIModelType]: currentNode.id,
                 [NodeProperties.Property]: modelProperty.id
@@ -5011,7 +5020,7 @@ function BuildPropertyDataChainAccessor (args) {
                   }
                 }
               ],
-              callback: (node, graph) => {}
+              callback: (node, graph) => { }
             }
           }
         },
@@ -5046,7 +5055,7 @@ function BuildPropertyDataChainAccessor (args) {
                 [NodeProperties.Pinned]: false,
                 [NodeProperties.ChainParent]: propDataChainNodeId,
                 [NodeProperties.DataChainFunctionType]:
-                    DataChainFunctionKeys.Pass,
+                  DataChainFunctionKeys.Pass,
                 [NodeProperties.UIText]: `Get ${viewName} ${viewType} Object => ${GetNodeTitle(
                   modelProperty
                 )} Output`,
@@ -5064,7 +5073,7 @@ function BuildPropertyDataChainAccessor (args) {
   return { skip, propDataChainNodeId }
 }
 
-function setModelPropertyViewTypePropNode (
+function setModelPropertyViewTypePropNode(
   newItems,
   modelProperty,
   viewType,
@@ -5079,7 +5088,7 @@ function setModelPropertyViewTypePropNode (
   newItems.PropertyDataChainGetter[modelProperty.id][viewType] = propNode.id
 }
 
-function setupPropertyApi (args) {
+function setupPropertyApi(args) {
   var {
     newItems,
     childId,
@@ -5289,14 +5298,14 @@ function setupPropertyApi (args) {
                 newItems.eventApis &&
                 newItems.eventApis[childComponents[propertyIndex]] &&
                 newItems.eventApis[childComponents[propertyIndex]][
-                  apiNameEventHandler
+                apiNameEventHandler
                 ] &&
                 apiDataChainLists[apiProperty]
               ) {
                 return {
                   source:
                     newItems.eventApis[childComponents[propertyIndex]][
-                      apiNameEventHandler
+                    apiNameEventHandler
                     ],
                   target: apiDataChainLists[apiProperty],
                   properties: { ...LinkProperties.DataChainLink }
@@ -5350,7 +5359,7 @@ function setupPropertyApi (args) {
       })
   ])(GetDispatchFunc(), GetStateFunc())
 }
-function connectComponentToExternalApi (args) {
+function connectComponentToExternalApi(args) {
   let { newItems, child, key, parent, properties } = args
   let { externalId } = getApiConnectors(newItems, child, key)
   let { internalId } = getApiConnectors(newItems, parent, key)
@@ -5370,7 +5379,7 @@ function connectComponentToExternalApi (args) {
   ]
 }
 
-function addComponentApiToForm (args) {
+function addComponentApiToForm(args) {
   let {
     newItems,
     text,
@@ -5395,7 +5404,7 @@ function addComponentApiToForm (args) {
             }).find(
               x =>
                 GetNodeProp(x, NodeProperties.NODEType) ===
-                  NodeTypes.ComponentApi &&
+                NodeTypes.ComponentApi &&
                 GetNodeProp(x, NodeProperties.UIText) === text
             )
             if (temp) {
@@ -5434,7 +5443,7 @@ function addComponentApiToForm (args) {
           }).find(
             x =>
               GetNodeProp(x, NodeProperties.NODEType) ===
-                NodeTypes.ComponentApi &&
+              NodeTypes.ComponentApi &&
               GetNodeProp(x, NodeProperties.UIText) === text
           )
           if (temp) {
@@ -5483,18 +5492,18 @@ function addComponentApiToForm (args) {
   ]
 }
 
-function setApiConnectors (newItems, parent, api, key) {
+function setApiConnectors(newItems, parent, api, key) {
   newItems.apiConnectors = newItems.apiConnectors || {}
   newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {}
   newItems.apiConnectors[parent][key] = api
 }
-function getApiConnectors (newItems, parent, key) {
+function getApiConnectors(newItems, parent, key) {
   newItems.apiConnectors = newItems.apiConnectors || {}
   newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {}
   return newItems.apiConnectors[parent][key]
 }
 
-function AttachDataChainAccessorTo (nodeId, accessorId) {
+function AttachDataChainAccessorTo(nodeId, accessorId) {
   let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
     id: nodeId,
     link: LinkType.ComponentExternalApi
@@ -5518,7 +5527,7 @@ function AttachDataChainAccessorTo (nodeId, accessorId) {
   ])(GetDispatchFunc(), GetStateFunc())
 }
 
-function AttachSelectorAccessorTo (nodeId, accessorId) {
+function AttachSelectorAccessorTo(nodeId, accessorId) {
   let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
     id: nodeId,
     link: LinkType.ComponentExternalApi
