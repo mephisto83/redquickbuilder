@@ -162,7 +162,7 @@ export function GetSharedComponentFor(viewType, modelProperty, currentNodeId, is
   viewTypeNodes = viewTypeNodes.filter(x => {
     let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 
-    result = result && GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent;
+    result = result && (!!GetNodeProp(x, NodeProperties.IsPluralComponent) === !!isPluralComponent);
     return result;
   })
   viewTypeNodes = viewTypeNodes.find(x => {

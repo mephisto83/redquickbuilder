@@ -2465,12 +2465,8 @@ export const CreateDefaultView = {
                     case NodeTypes.Model:
                       return {}
                     case NodeTypes.Property:
-                      if (
-                        GetNodeProp(
-                          modelProperty,
-                          NodeProperties.UseModelAsType
-                        )
-                      ) {
+
+                      if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
                         // if the property is a model reference, it should be a shared component or something.
                         return {}
                       }
@@ -2871,16 +2867,11 @@ export const CreateDefaultView = {
                       case NodeTypes.Model:
                         return {}
                       case NodeTypes.Property:
-                        if (
-                          GetNodeProp(
-                            modelProperty,
-                            NodeProperties.UseModelAsType
-                          )
-                        ) {
+                        if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
                           let _ui_model_type = GetNodeProp(
                             modelProperty,
                             NodeProperties.UIModelType
-                          )
+                          );
                           if (_ui_model_type) {
                             sharedComponent = GetSharedComponentFor(
                               viewType,
@@ -3326,9 +3317,10 @@ export const CreateDefaultView = {
         ])(GetDispatchFunc(), GetStateFunc())
 
         modelProperties.map((modelProperty, propertyIndex) => {
-          let propDataChainNodeId = null
-          let skip = false
-          let referenceproperty = false
+          let propDataChainNodeId = null;
+          let skip = false;
+          let _ui_model_type = false;
+          let referenceproperty = false;
           // Needs an accessor even if it is a shared or reference property
           switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
             case NodeTypes.Model:
@@ -3346,10 +3338,8 @@ export const CreateDefaultView = {
                 // the 'current' id to be able to query for the children objects.
 
                 if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-                  let _ui_model_type = GetNodeProp(
-                    modelProperty,
-                    NodeProperties.UIModelType
-                  )
+                  debugger;
+                  _ui_model_type = GetNodeProp(modelProperty, NodeProperties.UIModelType);
                   if (_ui_model_type) {
                     referenceproperty = GetSharedComponentFor(
                       viewType,
@@ -3384,32 +3374,34 @@ export const CreateDefaultView = {
             AttachDataChainAccessorTo(
               referenceproperty,
               buildPropertyResult.propDataChainNodeId
-            )
+            );
             AttachSelectorAccessorTo(
               referenceproperty,
               modelComponentSelectors[0]
-            )
-            return {}
+            );
+            return {};
           }
-          skip = buildPropertyResult.skip
-          propDataChainNodeId = buildPropertyResult.propDataChainNodeId
-
+          skip = buildPropertyResult.skip;
+          propDataChainNodeId = buildPropertyResult.propDataChainNodeId;
+          if (_ui_model_type) {
+            return {};
+          }
           ConnectExternalApisToSelectors({
             modelComponentSelectors,
             newItems,
             viewType,
             childComponents,
             propertyIndex
-          })
+          });
 
-          let compNodeId = childComponents[propertyIndex]
+          let compNodeId = childComponents[propertyIndex];
 
-          let compNode = GetNodeById(compNodeId)
+          let compNode = GetNodeById(compNodeId);
           let componentType = GetNodeProp(
             compNode,
             NodeProperties.ComponentType
-          )
-          let componentApi = GetNodeProp(compNode, NodeProperties.ComponentApi)
+          );
+          let componentApi = GetNodeProp(compNode, NodeProperties.ComponentApi);
 
           let rootCellId = GetFirstCell(layout)
           let children = GetChildren(layout, rootCellId)

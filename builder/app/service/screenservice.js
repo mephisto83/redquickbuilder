@@ -852,25 +852,28 @@ function GetDefaultComponentValue(node, key) {
 function WriteDescribedApiProperties(node, options = { listItem: false }) {
   let result = ''
   if (typeof node === 'string') {
-    node = GetNodeById(node, graph)
+    node = GetNodeById(node, graph);
   }
+
   let graph = GetCurrentGraph(GetState())
   let componentExternalApis = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.ComponentExternalApi
-  })
+  });
 
   let componentEventHandlers = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.EventMethod
-  })
+  });
 
-  let isViewType =
-    GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType
+  let isViewType = GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType
 
   result = componentExternalApis
     .unique(x => GetJSCodeName(x))
     .map(componentExternalApi => {
+      let stateKey = false;
+      let noSelector = false;
+      let noDataChain = false;
       let externalConnection = GetNodesLinkedTo(graph, {
         id: componentExternalApi.id,
         link: LinkType.ComponentExternalConnection
@@ -880,6 +883,18 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         // If the view-type node doesn't have an external connection
         // Then conventions will be assumed.
         externalConnection = componentExternalApi
+        switch (GetNodeTitle(externalConnection)) {
+          case 'label':
+          case 'error':
+          case 'success':
+            return;
+          case 'viewModel':
+            noSelector = true;
+            noDataChain = true;
+          default:
+            stateKey = 'value';
+            break;
+        }
       }
 
       let titleService = GetNodesLinkedTo(graph, {
@@ -925,17 +940,17 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               innerValue = `ViewModelKeys.${defaulComponentValue}`
             } else {
               // Get/GetAll/Delete
-              innerValue = `this.state.${GetJSCodeName(externalConnection)}`
+              innerValue = `this.state.${stateKey || GetJSCodeName(externalConnection)}`
             }
           }
         }
       }
-      if (selector) {
+      if (!noSelector && selector) {
         innerValue = `S.${GetJSCodeName(
           selector
         )}(${innerValue}, this.state.viewModel)`
       }
-      if (dataChain) {
+      if (!noDataChain && dataChain) {
         innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`
       }
       if (innerValue) { return `${GetJSCodeName(componentExternalApi)}={${innerValue}}` }
