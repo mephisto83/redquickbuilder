@@ -19,8 +19,8 @@ using {{namespace}}.Models;
 namespace {{namespace}}.Controllers
 {
     //[Route("auth")]
-    public class AccountController : RedAuthorizationController<{{model}}> 
-    {   
+    public class AccountController : RedAuthorizationController<{{model}}>
+    {
         public AccountController(
             UserManager<{{model}}> _userManager,
             SignInManager<{{model}}> _signInManager,
@@ -43,7 +43,7 @@ namespace {{namespace}}.Controllers
         [ValidateAntiForgeryToken]
         public override  Task<IActionResult> Login(RedLoginModel model, string returnUrl = null)
         {
-            return base.Login(model, returnUrl); 
+            return base.Login(model, returnUrl);
         }
 
         [HttpGet]
@@ -121,7 +121,7 @@ namespace {{namespace}}.Controllers
             return base.ExternalLoginCallback(returnUrl, remoteError);
         }
 
-       
+
 
         public override {{model}} CreateUser(RedExternalLoginViewModel model)
         {

@@ -1899,7 +1899,7 @@ export function GetLinkChainFromGraph(graph, options, nodeType) {
 export function getNodesLinkTypes(graph, options) {
   if (options) {
     var { id } = options;
-    var links = graph.nodeConnections[id];
+    var links = graph.nodeConnections[id] || {};
     var groups = Object.keys(links)
       .groupBy(x => GetLinkProperty(graph.linkLib[x], LinkPropertyKeys.TYPE));
     return Object.keys(groups);

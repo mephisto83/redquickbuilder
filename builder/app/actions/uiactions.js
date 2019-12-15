@@ -570,6 +570,16 @@ export function connectLifeCycleMethod(args) {
     }, 100)
   }
 }
+
+export function AgentHasExecutor(model) {
+  var state = GetState();
+  var graphRoot = GetCurrentGraph();
+  return NodesByType(state, NodeTypes.Executor).find(x => GraphMethods.existsLinkBetween(graphRoot, {
+    source: x.id,
+    target: model.id,
+    type: LinkProperties.ExecutorModelLink
+  }))
+}
 export function setupDefaultViewType(args) {
   let { properties, target, source } = args
   return (dispatch, getState) => {
