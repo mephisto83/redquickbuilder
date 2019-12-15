@@ -67,8 +67,11 @@ export function createGraph() {
         "ResetPasswordAction": "ResetPassword",
         "ResetPasswordController": "Account",
         "SecurityKey": "ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf",
+        "AppSecret": "YQBiAGMAZABlAGYAZwBoAGkAagBrAGwAbQBuAG8AcABxAHIAcwB0AHUAdgB3AHgAeQB6ADAAMQAyADMANAA1AA==",
         "Domain": "https://localhost:13424",
         "TokenExpirationInMinutes": "250",
+        "Issuer": "http://localhost:13424",
+        "Audience": "http://localhost:13424",
         "DomainPort": "13424"
       }
     }

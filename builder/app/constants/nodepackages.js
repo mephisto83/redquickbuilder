@@ -518,7 +518,7 @@ export const CreateLoginModels = {
             properties: {
               ...viewPackage,
               [NodeProperties.ExcludeFromGeneration]: true,
-              [NodeProperties.UIText]: 'Authorization Controller'
+              [NodeProperties.UIText]: 'Authorization'
             },
             callback: (node) => {
               newStuff.controller = node.id;
@@ -577,9 +577,9 @@ export const CreateLoginModels = {
       user: NodesByType(GetState(), NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser)),
       httpMethod: HTTP_METHODS.POST,
       functionType: FunctionTypes.Login,
-      functionName: `Login`
+      functionName: `Authenticate`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
-    let viewName = 'Login';
+    let viewName = 'Authenticate';
     args = args || {};
     let chosenChildren = GetModelPropertyChildren(newStuff.loginModel).map(x => x.id);
 
