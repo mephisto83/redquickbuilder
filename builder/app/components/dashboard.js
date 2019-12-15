@@ -435,21 +435,7 @@ class Dashboard extends Component {
 
 				this.props.graphOperation([{
 					operation: UIA.ADD_NEW_NODE,
-					options: function () {
-						return {
-							nodeType: NodeTypes.EventMethodInstance,
-							parent: currentNode.id,
-							groupProperties: {},
-							properties: {
-								[NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Instance`,
-								[NodeProperties.AutoDelete]: {
-									properties: {
-										[NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
-									}
-								}
-							}
-						}
-					}
+					options: UIA.addInstanceFunc(currentNode)
 				}
 				])
 			},

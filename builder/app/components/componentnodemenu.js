@@ -48,6 +48,9 @@ class ComponentNodeMenu extends Component {
                 <TreeViewMenu title={LinkType.ComponentExternalConnection} hideArrow={true} onClick={() => {
                     this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentExternalConnection);
                 }} />
+                <TreeViewMenu title={LinkType.ComponentApiConnection} hideArrow={true} onClick={() => {
+                    this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.ComponentApiConnection);
+                }} />
                 <TreeViewMenu title={LinkType.Component} hideArrow={true} onClick={() => {
                     this.props.togglePinnedConnectedNodesByLinkType(currentNode.id, LinkType.Component);
                 }} />

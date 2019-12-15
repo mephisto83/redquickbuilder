@@ -55,7 +55,10 @@ import {
   GetCodeName,
   attachMethodToMaestro,
   ADD_DEFAULT_PROPERTIES,
-  GetSharedComponentFor
+  GetSharedComponentFor,
+  NodesByType,
+  addInstanceFunc,
+  connectLifeCycleMethod
 } from '../actions/uiactions'
 import {
   newNode,
@@ -409,13 +412,19 @@ export const GetAllModels = {
 }
 
 export const CreateLoginModels = {
-  type: 'login-models',
+  type: 'Build Login',
   methodType: 'Login Models',
-  method: () => {
+  method: (args) => {
+
     // let currentGraph = GetCurrentGraph(GetStateFunc()());
     // currentGraph = newNode(currentGraph);
-    let nodePackageType = 'login-models'
-    let nodePackage = 'login-models'
+    let nodePackageType = 'login-models';
+    let nodePackage = 'login-models';
+    let viewPackage = {
+      [NodeProperties.NodePackage]: nodePackage,
+      [NodeProperties.NodePackageType]: nodePackageType
+    };
+    let newStuff = {};
     PerformGraphOperation([
       {
         operation: ADD_NEW_NODE,
@@ -423,45 +432,39 @@ export const CreateLoginModels = {
           nodeType: NodeTypes.Model,
           // groupProperties: {},
           properties: {
-            [NodeProperties.NodePackage]: nodePackage,
-            [NodeProperties.NodePackageType]: nodePackageType,
-            [NodeProperties.UIText]: `Blue Login Model`
+            ...viewPackage,
+            [NodeProperties.ExcludeFromController]: true,
+            [NodeProperties.UIText]: `Red Login Model`
           },
           callback: newNode => {
-            // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
-            // methodProps[constraint.key] = newNode.id;
-            // perOrModelNode = newNode;
-            setTimeout(() => {
-              PerformGraphOperation(
-                [
-                  { propName: 'User Name' },
-                  { propName: 'Password' },
-                  { propName: 'Remember Me' }
-                ].map(v => {
-                  let { propName } = v
-                  return {
-                    operation: ADD_NEW_NODE,
-                    options: {
-                      nodeType: NodeTypes.Property,
-                      linkProperties: {
-                        properties: { ...LinkProperties.PropertyLink }
-                      },
-                      groupProperties: {},
-                      parent: newNode.id,
-                      properties: {
-                        [NodeProperties.NodePackage]: nodePackage,
-                        [NodeProperties.UIAttributeType]:
-                          NodePropertyTypes.STRING,
-                        [NodeProperties.NodePackageType]: nodePackageType,
-                        [NodeProperties.UIText]: propName
-                      }
-                    }
-                  }
-                })
-              )(GetDispatchFunc(), GetStateFunc())
-            }, 1000)
+            newStuff.loginModel = newNode.id;
           }
         }
+      },
+      function () {
+        return [
+          { propName: 'User Name' },
+          { propName: 'Password' },
+          { propName: 'Remember Me' }
+        ].map(v => {
+          let { propName } = v
+          return {
+            operation: ADD_NEW_NODE,
+            options: {
+              nodeType: NodeTypes.Property,
+              linkProperties: {
+                properties: { ...LinkProperties.PropertyLink }
+              },
+              groupProperties: {},
+              parent: newStuff.loginModel,
+              properties: {
+                ...viewPackage,
+                [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
+                [NodeProperties.UIText]: propName
+              }
+            }
+          }
+        })
       },
       {
         operation: ADD_NEW_NODE,
@@ -469,51 +472,193 @@ export const CreateLoginModels = {
           nodeType: NodeTypes.Model,
           // groupProperties: {},
           properties: {
-            [NodeProperties.NodePackage]: nodePackage,
-            [NodeProperties.NodePackageType]: nodePackageType,
-            [NodeProperties.UIText]: `Blue Register View Model`
+            ...viewPackage,
+            [NodeProperties.ExcludeFromController]: true,
+            [NodeProperties.UIText]: `Red Register View Model`
           },
           callback: newNode => {
             // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
             // methodProps[constraint.key] = newNode.id;
             // perOrModelNode = newNode;
-            setTimeout(() => {
-              PerformGraphOperation(
-                [
-                  { propName: 'User Name' },
-                  { propName: 'Email', propType: NodePropertyTypes.EMAIL },
-                  { propName: 'Password' },
-                  { propName: 'Confirm Password' }
-                ].map(v => {
-                  let { propName, propType } = v
-                  return {
-                    operation: ADD_NEW_NODE,
-                    options: {
-                      nodeType: NodeTypes.Property,
-                      linkProperties: {
-                        properties: { ...LinkProperties.PropertyLink }
-                      },
-                      groupProperties: {},
-                      parent: newNode.id,
-                      properties: {
-                        [NodeProperties.NodePackage]: nodePackage,
-                        [NodeProperties.UIAttributeType]:
-                          propType || NodePropertyTypes.STRING,
-                        [NodeProperties.NodePackageType]: nodePackageType,
-                        [NodeProperties.UIText]: propName
-                      }
-                    }
-                  }
-                })
-              )(GetDispatchFunc(), GetStateFunc())
-            }, 1000)
+            newStuff.registerModel = newNode.id;
+          }
+        }
+      }, function () {
+        return [
+          { propName: 'User Name' },
+          { propName: 'Email', propType: NodePropertyTypes.EMAIL },
+          { propName: 'Password' },
+          { propName: 'Confirm Password' }
+        ].map(v => {
+          let { propName, propType } = v
+          return {
+            operation: ADD_NEW_NODE,
+            options: {
+              nodeType: NodeTypes.Property,
+              linkProperties: {
+                properties: { ...LinkProperties.PropertyLink }
+              },
+              groupProperties: {},
+              parent: newStuff.registerModel,
+              properties: {
+                [NodeProperties.NodePackage]: nodePackage,
+                [NodeProperties.UIAttributeType]:
+                  propType || NodePropertyTypes.STRING,
+                [NodeProperties.NodePackageType]: nodePackageType,
+                [NodeProperties.UIText]: propName
+              }
+            }
+          }
+        })
+      }, {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+          return {
+            nodeType: NodeTypes.Controller,
+            properties: {
+              ...viewPackage,
+              [NodeProperties.ExcludeFromGeneration]: true,
+              [NodeProperties.UIText]: 'Authorization Controller'
+            },
+            callback: (node) => {
+              newStuff.controller = node.id;
+            }
+          }
+        }
+      },
+      {
+        operation: ADD_NEW_NODE,
+        options: function (graph) {
+          return {
+            nodeType: NodeTypes.Maestro,
+            parent: newStuff.controller,
+            linkProperties: {
+              properties: {
+                ...LinkProperties.MaestroLink
+              }
+            },
+            properties: {
+              ...viewPackage,
+              [NodeProperties.ExcludeFromGeneration]: true,
+              [NodeProperties.UIText]: 'Authorization Maestro'
+            },
+            callback: (node) => {
+              newStuff.maestro = node.id;
+            }
+          }
+        }
+      },
+      function (graph) {
+        newStuff.graph = graph;
+        return [];
+      }
+    ])(GetDispatchFunc(), GetStateFunc())
+    var regsterResult = CreateAgentFunction({
+      viewPackage,
+      nodePackageType,
+      model: GetNodeById(newStuff.registerModel, newStuff.graph),
+      agent: {},
+      maestro: newStuff.maestro,
+      nodePackageType: 'register-user',
+      methodType: Methods.Create,
+      user: NodesByType(GetState(), NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser)),
+      httpMethod: HTTP_METHODS.POST,
+      functionType: FunctionTypes.Register,
+      functionName: `Register`
+    })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+    var loginResult = CreateAgentFunction({
+      viewPackage,
+      nodePackageType,
+      model: GetNodeById(newStuff.loginModel, newStuff.graph),
+      agent: {},
+      maestro: newStuff.maestro,
+      nodePackageType: 'login-user',
+      methodType: Methods.Create,
+      user: NodesByType(GetState(), NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsUser)),
+      httpMethod: HTTP_METHODS.POST,
+      functionType: FunctionTypes.Login,
+      functionName: `Login`
+    })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+    let viewName = 'Login';
+    args = args || {};
+    let chosenChildren = GetModelPropertyChildren(newStuff.loginModel).map(x => x.id);
+
+    let method_results = CreateDefaultView.method({
+      viewName,
+      dispatch: GetDispatchFunc(),
+      getState: GetStateFunc(),
+      model: GetNodeById(newStuff.loginModel, newStuff.graph),
+      isSharedComponent: false,
+      isDefaultComponent: false,
+      isPluralComponent: false,
+      uiTypes: {
+        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
+        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
+        [UITypes.VR]: args[UITypes.VR] || false,
+        [UITypes.Web]: args[UITypes.Web] || false
+      },
+      chosenChildren,
+      viewName: `${viewName}`,
+      viewType: ViewTypes.Create
+    });
+    addInstanceEventsToForms({ method_results, targetMethod: loginResult.methodNode.id })
+
+    viewName = 'Register';
+    chosenChildren = GetModelPropertyChildren(newStuff.registerModel).map(x => x.id);
+    method_results = CreateDefaultView.method({
+      viewName,
+      dispatch: GetDispatchFunc(),
+      getState: GetStateFunc(),
+      model: GetNodeById(newStuff.registerModel, newStuff.graph),
+      isSharedComponent: false,
+      isDefaultComponent: false,
+      isPluralComponent: false,
+      uiTypes: {
+        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
+        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
+        [UITypes.VR]: args[UITypes.VR] || false,
+        [UITypes.Web]: args[UITypes.Web] || false
+      },
+      chosenChildren,
+      viewName: `${viewName}`,
+      viewType: ViewTypes.Create
+    })
+    addInstanceEventsToForms({ method_results, targetMethod: regsterResult.methodNode.id })
+  }
+}
+function addInstanceEventsToForms(args) {
+  var { method_results, targetMethod } = args;
+  if (method_results && method_results.formButton) {
+    PerformGraphOperation([
+      {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function (graph) {
+          return {
+            prop: NodeProperties.Pinned,
+            value: true,
+            id: method_results.formButton
           }
         }
       }
-    ])(GetDispatchFunc(), GetStateFunc())
+    ])(GetDispatchFunc(), GetStateFunc());
+    if (method_results.formButtonApi) {
+      PerformGraphOperation(Object.keys(method_results.formButtonApi).map(evt => {
+        return {
+          operation: ADD_NEW_NODE,
+          options: function (graph) {
+            let currentNode = GetNodeById(method_results.formButtonApi[evt], graph);
+            return addInstanceFunc(currentNode, (instanceFuncNode) => {
+              connectLifeCycleMethod({
+                source: instanceFuncNode.id,
+                target: targetMethod
+              })(GetDispatchFunc(), GetStateFunc())
+            })();
+          },
+        }
+      }))(GetDispatchFunc(), GetStateFunc());
+    }
   }
 }
-
 export const AddAgentUser = {
   type: 'add-agent-user',
   methodType: 'Add User Agent',
@@ -1339,6 +1484,7 @@ export const CreateDefaultView = {
   type: 'Create View - Form',
   methodType: 'React Native Views',
   method: function (_args) {
+    var method_result = {};
     let default_View_method = (args = {}) => {
       let {
         viewName,
@@ -2710,8 +2856,9 @@ export const CreateDefaultView = {
                     properties: { ...LinkProperties.ComponentLink }
                   },
                   callback: component => {
-                    childComponents.push(component.id)
-                    newItems.button = component.id
+                    childComponents.push(component.id);
+                    newItems.button = component.id;
+                    method_result.formButton = component.id;
                   }
                 }
               }
@@ -2812,6 +2959,10 @@ export const CreateDefaultView = {
                       [NodeProperties.EventType]: t,
                       [NodeProperties.UIText]: `${t}`,
                       [NodeProperties.Pinned]: false
+                    },
+                    callback: function (component) {
+                      method_result.formButtonApi = method_result.formButtonApi || {};
+                      method_result.formButtonApi[t] = component.id;
                     },
                     links: [
                       {
@@ -3597,6 +3748,7 @@ export const CreateDefaultView = {
     } else {
       default_View_method({ ..._args })
     }
+    return method_result;
   }
 }
 
@@ -3951,7 +4103,6 @@ export function CreateAgentFunction(option) {
   let {
     nodePackageType,
     methodType,
-    maestroNodeId,
     parentId: parent,
     httpMethod,
     functionType,
@@ -4043,13 +4194,25 @@ export function CreateAgentFunction(option) {
                 if (constraint[NodeProperties.IsAgent]) {
                   methodProps[constraint.key] = agent.id
                 } else if (constraint.key === FunctionTemplateKeys.User) {
-                  methodProps[constraint.key] =
+                  methodProps[constraint.key] = option.user ? option.user.id : (
                     GetNodeProp(GetNodeById(agent.id), NodeProperties.UIUser) ||
-                    GetUsers()[0].id
+                    GetUsers()[0].id);
+                  commands.push({
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function (graph) {
+                      return {
+                        source: methodNode.id,
+                        target: methodProps[constraint.key],
+                        properties: {
+                          ...LinkProperties.FunctionOperator
+                        }
+                      }
+                    }
+                  })
                 } else if (constraint.key === FunctionTemplateKeys.Parent) {
-                  methodProps[constraint.key] = parent.id
+                  methodProps[constraint.key] = parent.id;
                 } else {
-                  methodProps[constraint.key] = model.id
+                  methodProps[constraint.key] = model.id;
                 }
                 break
               case FunctionTemplateKeys.Validator:
@@ -4309,11 +4472,13 @@ export function CreateAgentFunction(option) {
         dispatch,
         getState
       )
-      attachMethodToMaestro(new_nodes.methodNode.id, model.id)(
+      attachMethodToMaestro(new_nodes.methodNode.id, model.id, option)(
         dispatch,
         getState
       )
     }
+
+    return new_nodes;
   }
 }
 

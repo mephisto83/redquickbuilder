@@ -749,10 +749,7 @@ export function updateMethodParameters(current, methodType) {
           id: t.id
         })
           .filter(w => {
-            return (
-              GetNodeProp(w, NodeProperties.NODEType) ===
-              NodeTypes.MethodApiParameters
-            )
+            return (GetNodeProp(w, NodeProperties.NODEType) === NodeTypes.MethodApiParameters)
           })
           .map(v => {
             toRemove.push(v.id)
@@ -859,10 +856,25 @@ export function updateMethodParameters(current, methodType) {
   }
 }
 
-export function attachMethodToMaestro(methodNodeId, modelId) {
+export function attachMethodToMaestro(methodNodeId, modelId, options) {
   return (dispatch, getState) => {
-    let controller = false
-    let maestro = false
+    let controller = false;
+    let maestro = false;
+    if (options && options.maestro) {
+      PerformGraphOperation([{
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: function (graph) {
+          return {
+            source: options.maestro,
+            target: methodNodeId,
+            properties: {
+              ...LinkProperties.FunctionLink
+            }
+          }
+        }
+      }])(dispatch, getState);
+      return;
+    }
     PerformGraphOperation([
       {
         operation: ADD_NEW_NODE,
@@ -1815,7 +1827,7 @@ export function GetConditionClause(
   if (template) {
     conditionTemplate = fs.readFileSync(template, 'utf8')
   } else {
-    throw 'no template found'
+    throw 'no template found: ' + type
   }
   if (clauseKey === 'change_parameter') {
     clauseKey = clauseKey + '.Data'
@@ -2491,12 +2503,11 @@ export function togglePinnedConnectedNodesByLinkType(model, linkType) {
   return (dispatch, getState) => {
     let state = getState()
     let graph = GetRootGraph(state)
-    let nodes = GraphMethods.getNodesByLinkType(graph, {
+    let nodes = GraphMethods.GetNodesLinkedTo(graph, {
       id: model,
-      direction: GraphMethods.SOURCE,
-      type: linkType
-    })
-    let pinned = nodes.some(v => GetNodeProp(v, NodeProperties.Pinned))
+      link: linkType
+    });
+    let pinned = nodes.filter(x => x.id !== model).some(v => GetNodeProp(v, NodeProperties.Pinned))
     graphOperation(
       nodes.map(t => {
         return {
@@ -2824,6 +2835,30 @@ export function executeGraphOperation(model, op, args = {}) {
 //         });
 //     }
 // }
+export function GetNodesLinkTypes(id) {
+  return GraphMethods.getNodesLinkTypes(GetCurrentGraph(GetState()), { id })
+}
+export function addInstanceFunc(node, callback) {
+  return function () {
+    return {
+      nodeType: NodeTypes.EventMethodInstance,
+      parent: node.id,
+      groupProperties: {},
+      linkProperties: {
+        properties: { ...LinkProperties.EventMethodInstance }
+      },
+      properties: {
+        [NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
+        [NodeProperties.AutoDelete]: {
+          properties: {
+            [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+          }
+        }
+      },
+      callback
+    }
+  }
+}
 export function executeGraphOperations(operations) {
   return (dispatch, getState) => {
     operations.map(t => {

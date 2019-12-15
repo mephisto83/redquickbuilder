@@ -39,20 +39,20 @@ import BatchMenu from './batchmenu'
 import AgentBasedMethods from './agentbasedmethods'
 
 class QuickMethods extends Component<any, any, any> {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       selectedMethods: {}
     }
   }
-  render () {
+  render() {
     var { state } = this.props
     let sharedcontrolkey = 'View Package Shared Control'
     let use_as_default = 'Use As Default Shared Component'
     let use_as_plural = 'Create Components for 1 to Many Relationships'
 
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE))
-    function getChosenChildren () {
+    function getChosenChildren() {
       let chosenChildren = UIA.GetModelPropertyChildren(currentNode.id)
         .filter(child => {
           return UIA.Visual(state, UIA.ChoseModel(child.id))
@@ -189,8 +189,10 @@ class QuickMethods extends Component<any, any, any> {
                   onClick={() => {
                     this.props.executeGraphOperation(
                       currentNode,
-                      CreateLoginModels
-                    )
+                      CreateLoginModels, {
+                      [UITypes.ElectronIO]: true,
+                      [UITypes.ReactNative]: true
+                    })
                   }}
                 />
                 <TreeViewMenu

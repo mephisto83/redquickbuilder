@@ -36,6 +36,7 @@ namespace {{namespace}}.Web.Controllers
             return {{namespace}}.Models.User.Create(model);
         }
 
+        [AllowAnonymous]
         [Route("register")]
         [HttpPost]
         public override Task<bool> Register(RedRegisterViewModel model, string returnUrl = null)
@@ -43,11 +44,20 @@ namespace {{namespace}}.Web.Controllers
             return base.Register(model, returnUrl);
         }
 
+        [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
         public override async Task<string> Authenticate([FromBody] RedLoginModel obj, string returnUrl = null)
         {
             return await base.Authenticate(obj);
+        }
+
+        [AllowAnonymous]
+        [Route("registerandauthenticate")]
+        [HttpPost]
+        public override Task<string> RegisterAndAuthenticate([FromBody] RedRegisterViewModel model, string returnUrl = null)
+        {
+            return base.RegisterAndAuthenticate(model, returnUrl);
         }
     }
 }
