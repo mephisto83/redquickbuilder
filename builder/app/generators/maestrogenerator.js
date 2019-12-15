@@ -32,7 +32,7 @@ export default class MaestroGenerator {
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-        let maestros = NodesByType(state, NodeTypes.Maestro);
+        let maestros = NodesByType(state, NodeTypes.Maestro).filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 
         let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf8');
         let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf8');
