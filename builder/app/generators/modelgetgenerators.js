@@ -42,7 +42,8 @@ export default class ModelGetGenerator {
         let _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf8');
         let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
         let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
-        let allmodels = NodesByType(state, NodeTypes.Model);
+        let allmodels = NodesByType(state, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
+        .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
         allmodels.filter(x => !GetNodeProp(x, NodeProperties.IsCompositeInput)).map(agent => {
             var methods = allmodels.filter(x => x.id !== agent.id)
                 .filter(x => {
@@ -102,7 +103,7 @@ export default class ModelGetGenerator {
                                         return bindTemplate(`item != null && ${paramName} != null && item.{{_type}} == ${paramName}.Id`, {
                                             _type: GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName)
                                         })
-                                    }).filter(x => x).join(' && '),// 
+                                    }).filter(x => x).join(' && '),//
                                     model: GetNodeProp(agent, NodeProperties.CodeName),
                                 }));
                             }

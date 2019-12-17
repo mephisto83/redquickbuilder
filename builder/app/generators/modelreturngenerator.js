@@ -23,7 +23,8 @@ export default class ModelReturnGenerator {
         let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
         let _return_get_methods = fs.readFileSync(RETURN_GET_FUNCTION, 'utf8');
         let allfilters = NodesByType(state, NodeTypes.ModelFilter);
-        let allmodels = NodesByType(state, NodeTypes.Model);
+        let allmodels = NodesByType(state, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
+        .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
         let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
         allagents.map(agent => {
             var methods = allfilters.filter(x => {

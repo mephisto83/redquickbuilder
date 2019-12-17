@@ -52,7 +52,9 @@ export default class StreamProcessGenerator {
     }
     static Generate(options) {
         var { state, key } = options;
-        let models = NodesByType(state, NodeTypes.Model);
+        let models = NodesByType(state, NodeTypes.Model)
+          .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+          .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
         let graphRoot = GetRootGraph(state);
         let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
         let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_TEMPLATE, 'utf8');

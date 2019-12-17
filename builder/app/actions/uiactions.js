@@ -576,8 +576,7 @@ export function AgentHasExecutor(model) {
   var graphRoot = GetCurrentGraph();
   return NodesByType(state, NodeTypes.Executor).find(x => GraphMethods.existsLinkBetween(graphRoot, {
     source: x.id,
-    target: model.id,
-    type: LinkProperties.ExecutorModelLink
+    target: model.id
   }))
 }
 export function setupDefaultViewType(args) {
@@ -2678,6 +2677,14 @@ export function GetPermissionMethod(permission) {
 export function GetNodesMethod(id) {
   return GetPermissionMethod(GetNodeById(id))
 }
+export function GetAppSettings(graph) {
+  if (graph) {
+    if (graph.appConfig) {
+      return graph.appConfig.AppSettings;
+    }
+  }
+  return null;
+}
 export function GetCurrentGraph(state) {
   var scopedGraph = GetCurrentScopedGraph(state)
   return scopedGraph
@@ -2734,6 +2741,7 @@ export function setAppsettingsAssemblyPrefixes(prefixes) {
   }
 }
 export function GetCurrentScopedGraph(state, dispatch) {
+  state = state || GetState();
   var currentGraph = Application(state, CURRENT_GRAPH)
   let scope = Application(state, GRAPH_SCOPE) || []
   if (!currentGraph) {
@@ -2794,6 +2802,7 @@ export const CHANGE_NODE_TEXT = 'CHANGE_NODE_TEXT'
 export const CURRENT_GRAPH = 'CURRENT_GRAPH'
 export const GRAPH_SCOPE = 'GRAPH_SCOPE'
 export const ADD_DEFAULT_PROPERTIES = 'ADD_DEFAULT_PROPERTIES'
+export const CHANGE_APP_SETTINGS = 'CHANGE_APP_SETTINGS';
 export const CHANGE_NODE_PROPERTY = 'CHANGE_NODE_PROPERTY'
 export const NEW_PROPERTY_NODE = 'NEW_PROPERTY_NODE'
 export const NEW_PERMISSION_NODE = 'NEW_PERMISSION_NODE'
@@ -3074,6 +3083,12 @@ export function graphOperation(operation, options) {
                   options
                 )
                 break
+              case CHANGE_APP_SETTINGS:
+                currentGraph = GraphMethods.updateAppSettings(
+                  currentGraph,
+                  options
+                )
+                break;
               case NEW_PROPERTY_NODE:
                 currentGraph = GraphMethods.addNewPropertyNode(
                   currentGraph,

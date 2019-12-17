@@ -1138,7 +1138,7 @@ export function existsLinkBetween(graph, options) {
     })) {
       return false;
     }
-    return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type;
+    return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type || !type;
   }
   return false;
 }
@@ -2320,6 +2320,16 @@ export function updateNodeText(graph, options) {
       }
     }
   }
+}
+export function updateAppSettings(graph, options) {
+  let { prop, value } = options;
+  if (prop && value) {
+    debugger;
+    graph.appConfig = graph.appConfig || {};
+    graph.appConfig.AppSettings = graph.appConfig.AppSettings || {};
+    graph.appConfig.AppSettings[prop] = value;
+  }
+  return graph;
 }
 export function updateNodeProperty(graph, options) {
   let { id, value, prop } = options;

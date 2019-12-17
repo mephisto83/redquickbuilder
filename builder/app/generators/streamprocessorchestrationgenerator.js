@@ -262,7 +262,7 @@ ${modelexecution.join('')}
       if (GetNodeProp(model, NodeProperties.IsAgent)) {
         result.push(Tabs(4) + `${modelName.toLowerCase()}ResponseArbiter = RedStrapper.Resolve<IRedArbiter<${modelName}Response>>();` + jNL);
 
-        if (AgentHasExecutor(model)) {
+        if (AgentHasExecutor(agent)) {
           result.push(Tabs(4) + `${modelName.toLowerCase()}Executor = RedStrapper.Resolve<I${modelName}Executor>();` + jNL);
         }
       }
@@ -291,7 +291,7 @@ ${modelexecution.join('')}
         let state = GetState();
         let graphRoot = GetCurrentGraph();
 
-        if (AgentHasExecutor(model)) {
+        if (AgentHasExecutor(agent)) {
           result.push(Tabs(3) + `public I${modelName}Executor ${modelName.toLowerCase()}Executor;` + jNL);
         }
       }
@@ -465,7 +465,9 @@ ${modelexecution.join('')}
     let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
     let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf8');
     const StreamProcessOrchestration = 'StreamProcessOrchestration';
-    let models = NodesByType(state, NodeTypes.Model);
+    let models = NodesByType(state, NodeTypes.Model)
+      .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+      .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
     let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
     let result = {};
     agents.map(agent => {
@@ -498,11 +500,10 @@ ${agents.map(agent => {
       agent_type: ''
     });
     let usings = [...STANDARD_CONTROLLER_USING];
-    if (NodesByType(state, NodeTypes.Executor).find(x => GraphMethods.existsLinkBetween(graphRoot, {
+    if (agents.find(agent => NodesByType(state, NodeTypes.Executor).find(x => GraphMethods.existsLinkBetween(graphRoot, {
       source: x.id,
-      target: agent.id,
-      type: LinkProperties.ExecutorModelLink
-    }))) {
+      target: agent.id
+    })))) {
       usings = [...usings, `${namespace}${NameSpace.Executors}`];
     }
     let streamOrchestration = {
@@ -557,7 +558,9 @@ ${agents.map(agent => {
   static GenerateAgent(options) {
     var { state, key, agent } = options;
     const StreamProcessOrchestration = 'StreamProcessOrchestration';
-    let models = NodesByType(state, NodeTypes.Model);
+    let models = NodesByType(state, NodeTypes.Model)
+      .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+      .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
     let graphRoot = GetRootGraph(state);
     let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
     let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE, 'utf8');
@@ -587,10 +590,10 @@ ${agents.map(agent => {
       agent_type_methods: agent_methods_interface
     });
     let usings = [...STANDARD_CONTROLLER_USING];
+
     if (NodesByType(state, NodeTypes.Executor).find(x => GraphMethods.existsLinkBetween(graphRoot, {
       source: x.id,
-      target: agent.id,
-      type: LinkProperties.ExecutorModelLink
+      target: agent.id
     }))) {
       usings = [...usings, `${namespace}${NameSpace.Executors}`];
     }
@@ -615,7 +618,7 @@ ${agents.map(agent => {
         interface: NamespaceGenerator.Generate({
           template: _streamProcessInterfaceTemplate,
           usings: [
-            ...usings,
+            ...STANDARD_CONTROLLER_USING,
             `${namespace}${NameSpace.Model}`,
             `${namespace}${NameSpace.Parameters}`,
             `${namespace}${NameSpace.Interface}`,
