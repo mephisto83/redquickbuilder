@@ -222,7 +222,8 @@ export const AddValidationList = 'Add validation type'
 export const AddValidationListDescription =
   'Create a new shared validation list'
 export const ValidationItemActions = 'Validation Item Actions'
-export const Add = 'Add'
+export const Add = 'Add';
+export const Events = 'Events';
 export const ValidationTypes = 'Validation Types'
 export const ValidationType = 'Validation Type'
 export const OptionListActions = 'Option Actions'

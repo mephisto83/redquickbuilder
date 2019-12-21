@@ -288,37 +288,21 @@ export function bindComponent(node, componentBindingDefinition) {
             bindProps[key] = writeApiProperties({ [key]: parameterConfig[key] })
           }
         } else if (properties[key].template) {
-          bindProps[key] = GetDefaultComponentValue(node, key)
-
-          // if (typeof (properties[key].template) === 'function') {
-          //     //TODO
-          //     bindProps[key] = GetDefaultComponentValue(node) || properties[key].template(node);
-          // }
-          // else {
-
-          //     //    let temp = bindProps[key];
-          //     // bindProps[key] = bindTemplate(properties[key].template, {
-          //     //     value: temp
-          //     // })
-          // }
+          bindProps[key] = GetDefaultComponentValue(node, key);
         }
       }
       if (!bindProps[key]) bindProps[key] = ''
     })
-    var cevents =
-      componentBindingDefinition.eventApi || Object.keys(ComponentEvents)
-    let eventHandlers = cevents
-      .map(t => getMethodInstancesForEvntType(node, ComponentEvents[t]))
+    var cevents = componentBindingDefinition.eventApi || Object.keys(ComponentEvents)
+    let eventHandlers = cevents.map(t => getMethodInstancesForEvntType(node, ComponentEvents[t]))
       .map((methodInstances, i) => {
-        let invocations = methodInstances
-          .map(methodInstanceCall => {
-            return getMethodInvocation(methodInstanceCall, node)
-          })
-          .join(NEW_LINE)
+        let invocations = methodInstances.map(methodInstanceCall => {
+          return getMethodInvocation(methodInstanceCall, node)
+        }).join(NEW_LINE)
         return `${ComponentEvents[cevents[i]]}={()=> {
 ${invocations}
     }}`
-      })
+      });
 
     if (eventHandlers && eventHandlers.length) {
       bindProps['events'] = eventHandlers.join(NEW_LINE)
@@ -1369,11 +1353,9 @@ export function GetComponentDidMount(screenOption) {
     ComponentLifeCycleEvents.ComponentDidMount
   )
 
-  let invocations = methodInstances
-    .map(methodInstanceCall => {
-      return getMethodInvocation(methodInstanceCall, screenOption)
-    })
-    .join(NEW_LINE)
+  let invocations = methodInstances.map(methodInstanceCall => {
+    return getMethodInvocation(methodInstanceCall, screenOption)
+  }).join(NEW_LINE)
 
   let componentDidMount = `componentDidMount() {
         ${outOfBandCall}

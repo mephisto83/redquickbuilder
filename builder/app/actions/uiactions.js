@@ -409,11 +409,7 @@ export function connectLifeCycleMethod(args) {
     setTimeout(() => {
       let state = getState()
       let graph = GetCurrentGraph(state)
-      if (
-        [NodeTypes.Method, NodeTypes.ScreenOption].some(
-          t => t === GetNodeProp(target, NodeProperties.NODEType)
-        )
-      ) {
+      if ([NodeTypes.Method, NodeTypes.ScreenOption].some(t => t === GetNodeProp(target, NodeProperties.NODEType))) {
         let apiConnectors = GraphMethods.GetConnectedNodesByType(
           state,
           source,
@@ -568,6 +564,30 @@ export function connectLifeCycleMethod(args) {
         ])(dispatch, getState)
       }
     }, 100)
+  }
+}
+export function addComponentEventTo(node, apiName) {
+  return (dispatch, getState) => {
+    graphOperation([{
+      operation: ADD_NEW_NODE,
+      options: function (graph) {
+        return {
+          nodeType: NodeTypes.EventMethod,
+          properties: {
+            [NodeProperties.EventType]: apiName,
+            [NodeProperties.UIText]: `${apiName}`
+          },
+          links: [
+            {
+              target: node,
+              linkProperties: {
+                properties: { ...LinkProperties.EventMethod }
+              }
+            }
+          ]
+        }
+      }
+    }])(dispatch, getState);
   }
 }
 

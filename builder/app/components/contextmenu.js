@@ -7,7 +7,7 @@ import Draggable from 'react-draggable'; // The default
 import TabPane from './tabpane';
 import SideBarHeader from './sidebarheader';
 import * as Titles from './titles';
-import { LinkType, NodeProperties, NodeTypes, FilterUI, LAYOUT_VIEW, MAIN_CONTENT, MIND_MAP, CODE_VIEW } from '../constants/nodetypes';
+import { LinkType, NodeProperties, NodeTypes, FilterUI, LAYOUT_VIEW, MAIN_CONTENT, MIND_MAP, CODE_VIEW, UITypes } from '../constants/nodetypes';
 import SelectInput from './selectinput';
 import FormControl from './formcontrol';
 import Box from './box';
@@ -27,6 +27,7 @@ import DataChainContextMenu from './datachaincontextmenu';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import ViewTypeMenu from './viewtypecontextmenu';
+import { ComponentTypes } from '../constants/componenttypes';
 const DATA_SOURCE = 'DATA_SOURCE';
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -60,6 +61,7 @@ class ContextMenu extends Component {
         result.push(this.getContextMenu())
         break;
     }
+    result.push(...this.eventMenu());
     result.push(this.minimizeMenu());
     result.push(this.hideTypeMenu());
     return result.filter(x => x);
@@ -114,6 +116,21 @@ class ContextMenu extends Component {
       </TreeViewMenu>
     )
   }
+  eventMenu() {
+    var { state } = this.props;
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+    switch (currentNodeType) {
+      case NodeTypes.ComponentNode:
+        let componentType = UIA.GetNodeProp(currentNode, NodeProperties.ComponentType);
+        switch (componentType) {
+          case 'Button':
+            return [this.getButtonEventMenu(currentNode)];
+        }
+        break;
+    }
+    return [];
+  }
   getContextMenu() {
     var { state } = this.props;
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -140,6 +157,36 @@ class ContextMenu extends Component {
   }
   getViewTypes() {
     return <ViewTypeMenu />
+  }
+  getButtonEventMenu(currentNode) {
+    switch (UIA.GetNodeProp(currentNode, NodeProperties.UIType)) {
+      case UITypes.ReactNative:
+        return (
+          <TreeViewMenu
+            open={true}
+            active={true}
+            title={Titles.Events}
+            toggle={() => {
+            }}>
+            <TreeViewMenu title={`${Titles.Add} onPress`} hideArrow={true} onClick={() => {
+              this.props.addComponentEventTo(currentNode.id, 'onPress');
+            }} />
+          </TreeViewMenu>);
+        break;
+      case UITypes.ElectronIO:
+        return (
+          <TreeViewMenu
+            open={true}
+            active={true}
+            title={Titles.Events}
+            toggle={() => {
+            }}>
+            <TreeViewMenu title={`${Titles.Add} onClick`} hideArrow={true} onClick={() => {
+              this.props.addComponentEventTo(currentNode.id, 'onClick');
+            }} />
+          </TreeViewMenu>);
+        break;
+    }
   }
   getComponentExternalMenu(currentNode) {
     return (
