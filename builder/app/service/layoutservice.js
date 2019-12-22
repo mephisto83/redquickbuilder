@@ -156,7 +156,7 @@ export function createSection(layoutObj, item, currentRoot, index, language, imp
     }
 
     let _style = { ...style };
-    ["borderStyle", "borderWidth", "borderColor", 'display'].map(t => {
+    ["borderStyle", "borderWidth", "borderColor"].map(t => {
         delete _style[t];
     });
     Object.keys(_style).map(t => {

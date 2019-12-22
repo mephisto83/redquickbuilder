@@ -4,18 +4,22 @@ import * as React from 'react';
 let navigationInstance;
 
 export default class StyleProvider extends React.Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.state = {};
-    }
-    render() {
-        var props = {
-            ...this.props
-        };
-        delete props.children
-        return (
-            <div style-provider={"style-provider"} {...props}>{this.props.children}</div>
-        );
-    }
+    this.state = {};
+  }
+  render() {
+    var props = {
+      style: {
+        display: 'flex',
+        flex: '1 1 auto',
+      },
+      ...this.props
+    };
+    delete props.children
+    return (
+      <div style-provider={"style-provider"} {...props}>{this.props.children}</div>
+    );
+  }
 }

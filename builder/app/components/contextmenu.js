@@ -62,6 +62,7 @@ class ContextMenu extends Component {
         break;
     }
     result.push(...this.eventMenu());
+    result.push(...this.apiMenu())
     result.push(this.minimizeMenu());
     result.push(this.hideTypeMenu());
     return result.filter(x => x);
@@ -116,6 +117,21 @@ class ContextMenu extends Component {
       </TreeViewMenu>
     )
   }
+  apiMenu() {
+    var { state } = this.props;
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+    switch (currentNodeType) {
+      case NodeTypes.ComponentNode:
+        let componentType = UIA.GetNodeProp(currentNode, NodeProperties.ComponentType);
+        switch (componentType) {
+          case 'Button':
+            return [this.getButtonApiMenu(currentNode)];
+        }
+        break;
+    }
+    return [];
+  }
   eventMenu() {
     var { state } = this.props;
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -157,6 +173,22 @@ class ContextMenu extends Component {
   }
   getViewTypes() {
     return <ViewTypeMenu />
+  }
+  getButtonApiMenu(currentNode) {
+    return (
+      <TreeViewMenu
+        open={true}
+        active={true}
+        title={Titles.ComponentAPIMenu}
+        toggle={() => {
+        }}>
+        <TreeViewMenu title={`${Titles.Add} Label`} hideArrow={true} onClick={() => {
+          this.props.addComponentApiNodes(currentNode.id, 'label');
+        }} />
+        <TreeViewMenu title={`${Titles.Add} Value`} hideArrow={true} onClick={() => {
+          this.props.addComponentApiNodes(currentNode.id, 'value');
+        }} />
+      </TreeViewMenu>);
   }
   getButtonEventMenu(currentNode) {
     switch (UIA.GetNodeProp(currentNode, NodeProperties.UIType)) {

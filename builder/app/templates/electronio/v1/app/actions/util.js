@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import * as UIActions from '../actions/uiActions';
+import * as NavigationActions from '../actions/navigationActions';
 import { Visual } from '../actions/uiActions';
 import * as ControllerActions from '../actions/controllerActions';
 import { TitleService } from './titles';
@@ -18,6 +19,7 @@ export function GUID() {
 export const mapDispatchToProps = (dispatch) => {
   var actionBlob = Object.assign({},
     UIActions,
+    NavigationActions,
     ControllerActions
   );
 

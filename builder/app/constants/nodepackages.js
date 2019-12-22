@@ -2298,7 +2298,7 @@ export const CreateDefaultView = {
                   ...cellProperties.style,
                   flexDirection: 'column'
                 }
-                let propertyCount = modelProperties.length + 1
+                let propertyCount = modelProperties.length + 2;
                 let componentProps = null
 
                 layout = SetCellsLayout(layout, propertyCount, rootCellId)
@@ -2840,17 +2840,12 @@ export const CreateDefaultView = {
                   groupProperties: {},
                   properties: {
                     ...viewPackage,
-                    [NodeProperties.UIText]: ` ${
-                      Titles.Execute
-                      } Button ${viewName} Component`,
+                    [NodeProperties.UIText]: `${Titles.Execute} Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
-                    [NodeProperties.ComponentType]:
-                      ComponentTypes[uiType].Button.key,
-                    [NodeProperties.InstanceType]: useModelInstance
-                      ? InstanceTypes.ModelInstance
-                      : InstanceTypes.ScreenInstance
+                    [NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
+                    [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
                   },
                   linkProperties: {
                     properties: { ...LinkProperties.ComponentLink }
@@ -2863,7 +2858,34 @@ export const CreateDefaultView = {
                 }
               }
             },
+            {
+              operation: NEW_COMPONENT_NODE,
+              options: function () {
+                return {
+                  parent: screenComponentId,
+                  groupProperties: {},
+                  properties: {
+                    ...viewPackage,
+                    [NodeProperties.UIText]: `${Titles.Cancel} Button ${viewName} Component`,
+                    [NodeProperties.UIType]: uiType,
+                    [NodeProperties.Pinned]: false,
+                    [NodeProperties.Label]: `${viewName} ${Titles.Cancel}`,
+                    [NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
+                    [NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
+                  },
+                  linkProperties: {
+                    properties: { ...LinkProperties.ComponentLink }
+                  },
+                  callback: component => {
+                    childComponents.push(component.id);
+                    newItems.cancelbutton = component.id;
+                    method_result.cancelButton = component.id;
+                  }
+                }
+              }
+            },
             ...addButtonApiNodes(newItems),
+            ...addButtonApiNodes(newItems, newItems.cancelbutton),
             {
               operation: ADD_NEW_NODE,
               options: function (currentGraph) {
@@ -2985,13 +3007,13 @@ export const CreateDefaultView = {
             {
               operation: CHANGE_NODE_PROPERTY,
               options: function () {
-                let lastComponent = childComponents.length - 1
+                let executeButtonComponent = childComponents.length - 2
                 let rootCellId = GetFirstCell(layout)
                 let children = GetChildren(layout, rootCellId)
-                let childId = children[lastComponent]
+                let childId = children[executeButtonComponent]
                 let cellProperties = GetCellProperties(layout, childId)
                 cellProperties.children[childId] =
-                  childComponents[lastComponent]
+                  childComponents[executeButtonComponent]
                 cellProperties.style.flex = null
                 cellProperties.style.height = null
                 return {
@@ -3125,6 +3147,30 @@ export const CreateDefaultView = {
                 let componentProps = createComponentApi()
                 let componentTypes = ComponentTypes[uiType]
                 let compNodeId = childComponents[childComponents.length - 1]
+                let compNode = GetNodeById(compNodeId, graph)
+                let componentType = GetNodeProp(
+                  compNode,
+                  NodeProperties.ComponentType
+                )
+                componentTypes[componentType].defaultApi.map(x => {
+                  componentProps = addComponentApi(componentProps, {
+                    modelProp: x.property
+                  })
+                })
+
+                return {
+                  prop: NodeProperties.ComponentApi,
+                  id: compNodeId,
+                  value: componentProps
+                }
+              }
+            },
+            {
+              operation: CHANGE_NODE_PROPERTY,
+              options: function (graph) {
+                let componentProps = createComponentApi()
+                let componentTypes = ComponentTypes[uiType]
+                let compNodeId = childComponents[childComponents.length - 2]
                 let compNode = GetNodeById(compNodeId, graph)
                 let componentType = GetNodeProp(
                   compNode,
@@ -4811,8 +4857,7 @@ function addComponentApiNodes(
             [NodeProperties.UIText]: apiName,
             [NodeProperties.Pinned]: false,
             [NodeProperties.UseAsValue]: true,
-            [NodeProperties.ComponentApiKey]:
-              viewComponentType.internalApiNode || null
+            // [NodeProperties.ComponentApiKey]: viewComponentType.internalApiNode || null
           }
         }
       }
@@ -4840,8 +4885,7 @@ function addComponentApiNodes(
           properties: {
             [NodeProperties.UIText]: apiName,
             [NodeProperties.Pinned]: false,
-            [NodeProperties.ComponentApiKey]:
-              viewComponentType.externalApiNode || null
+            // [NodeProperties.ComponentApiKey]:  viewComponentType.externalApiNode || null
           }
         }
       }
@@ -4884,7 +4928,7 @@ function addComponentApiNodes(
   ].filter(x => x)
 }
 
-function addButtonApiNodes(newItems) {
+function addButtonApiNodes(newItems, btn) {
   let buttonInternalApi = null
   let buttonExternalApi = null
   return [
@@ -4899,7 +4943,7 @@ function addButtonApiNodes(newItems) {
           linkProperties: {
             properties: { ...LinkProperties.ComponentInternalApi }
           },
-          parent: newItems.button,
+          parent: btn || newItems.button,
           groupProperties: {},
           properties: {
             [NodeProperties.UIText]: `label`,
@@ -4917,7 +4961,7 @@ function addButtonApiNodes(newItems) {
           callback: nn => {
             buttonExternalApi = nn.id
           },
-          parent: newItems.button,
+          parent: btn || newItems.button,
           linkProperties: {
             properties: { ...LinkProperties.ComponentExternalApi }
           },

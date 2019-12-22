@@ -2138,6 +2138,42 @@ export function GetConnectedScreenOptions(id) {
     x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption
   )
 }
+export function attachToNavigateNode(currentId, action) {
+  return (dispatch, getState) => {
+    graphOperation(_attachToNavigateNode(currentId, action))(dispatch, getState);
+  }
+}
+
+export function _attachToNavigateNode(currentId, action) {
+  return [
+    {
+      operation: ADD_NEW_NODE,
+      options: function (currentGraph) {
+        return {
+          nodeType: NodeTypes.NavigationAction,
+          linkProperties: {
+            properties: {
+              ...LinkProperties.NavigationMethod
+            }
+          },
+          parent: currentId,
+          properties: {
+            [NodeProperties.UIText]: action,
+            [NodeProperties.NavigationAction]: action
+          }
+        }
+      }
+    }];
+}
+export function GetConnectedScreen(id) {
+  let state = _getState()
+  let graph = GetRootGraph(state)
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id
+  }).find(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen
+  )
+}
 export function GetModelPropertyNodes(refId) {
   var state = _getState()
   return GraphMethods.GetLinkChain(state, {
@@ -2365,6 +2401,95 @@ export function CanChangeType(node) {
 export function GetScreenNodes() {
   var state = _getState()
   return NodesByType(state, NodeTypes.Screen)
+}
+
+export function addComponentApiNodes(id, apiName) {
+  return (dispatch, getState) => {
+    graphOperation($addComponentApiNodes(id, apiName))(dispatch, getState);
+  }
+}
+export function $addComponentApiNodes(
+  parent,
+  apiName = 'value',
+  externalApiId
+) {
+  let componentInternalValue = null
+  let componentExternalValue = null
+  return [
+    {
+      operation: ADD_NEW_NODE,
+      options: function (currentGraph) {
+        return {
+          nodeType: NodeTypes.ComponentApi,
+          callback: nn => {
+            componentInternalValue = nn.id
+          },
+          linkProperties: {
+            properties: {
+              ...LinkProperties.ComponentInternalApi
+            }
+          },
+          parent,
+          groupProperties: {},
+          properties: {
+            [NodeProperties.UIText]: apiName,
+            [NodeProperties.Pinned]: false,
+            [NodeProperties.UseAsValue]: true,
+            // [NodeProperties.ComponentApiKey]: viewComponentType.internalApiNode || null
+          }
+        }
+      }
+    },
+    {
+      operation: ADD_NEW_NODE,
+      options: function (currentGraph) {
+        return {
+          nodeType: NodeTypes.ComponentExternalApi,
+          callback: nn => {
+            componentExternalValue = nn.id
+          },
+          parent,
+          linkProperties: {
+            properties: { ...LinkProperties.ComponentExternalApi }
+          },
+          groupProperties: {},
+          properties: {
+            [NodeProperties.UIText]: apiName,
+            [NodeProperties.Pinned]: false,
+            // [NodeProperties.ComponentApiKey]: viewComponentType.externalApiNode || null
+          }
+        }
+      }
+    },
+    {
+      operation: ADD_LINK_BETWEEN_NODES,
+      options: function () {
+        return {
+          source: componentInternalValue,
+          target: componentExternalValue,
+          properties: {
+            ...LinkProperties.ComponentInternalConnection
+          }
+        }
+      }
+    },
+    externalApiId ? {
+      operation: ADD_LINK_BETWEEN_NODES,
+      options: function () {
+        return {
+          target: externalApiId,
+          source: componentExternalValue,
+          properties: {
+            ...LinkProperties.ComponentExternalConnection
+          }
+        }
+      }
+    } : null
+  ].filter(x => x)
+}
+export function GetScreenOptions() {
+  var state = _getState()
+  return NodesByType(state, NodeTypes.ScreenOption)
 }
 export function GetModelNodes() {
   return NodesByType(_getState(), NodeTypes.Model)

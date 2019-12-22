@@ -15,6 +15,7 @@ export const NodeTypes = {
   ScreenContainer: 'screen-container',
   Screen: 'screen',
   EventMethod: 'EventMethod',
+  NavigationAction: 'NavigationAction',
   EventMethodInstance: 'EventMethodInstance',
   LifeCylceMethod: 'LifeCylceMethod',
   LifeCylceMethodInstance: 'LifeCylceMethodInstance',
@@ -191,9 +192,14 @@ export const NodeTypeColors = {
   [NodeTypes.ServiceInterface]: '#4A6D7C',
   [NodeTypes.MethodApiParameters]: '#ff0001',
   [NodeTypes.ComponentApi]: '#E2C044',
-  [NodeTypes.ComponentExternalApi]: '#2E5266'
-
+  [NodeTypes.ComponentExternalApi]: '#2E5266',
+  [NodeTypes.NavigationAction]: '#1282A2'
 }
+
+export const NavigateTypes = {
+  Back: 'GoBack',
+  Forward: 'GoForward'
+};
 
 export const FunctionGroups = {
   External: 'external',
@@ -364,11 +370,12 @@ export const NodeProperties = {
   PagingFilter: 'Filter',
   PagingSort: "PagingSort",
   IsViewModel: 'IsViewModel',
-  ComponentApiKey: 'ComponentApiKey',
+  // ComponentApiKey: 'ComponentApiKey',
   IsDataChainPagingSkip: 'IsDataChainPagingSkip',
   IsDataChainPagingTake: 'IsDataChainPagingTake',
   UIText: 'text',
   UseAsValue: 'UseAsValue',
+  NavigationAction: 'NavigationAction',
   AgentBasedMethod: 'AgentBasedMethod',
   ViewType: 'view-type',
 
@@ -520,6 +527,11 @@ export const NodePropertiesDirtyChain = {
     }
   }, {
     chainProp: NodeProperties.UIName,
+    chainFunc: (x) => {
+      return x;
+    }
+  }, {
+    chainProp: NodeProperties.Label,
     chainFunc: (x) => {
       return x;
     }
