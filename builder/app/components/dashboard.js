@@ -550,6 +550,16 @@ class Dashboard extends Component {
       title: `${Titles.ConnectEventHandler}`
     }, {
       onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.DataChainLink,
+          singleLink: true,
+          nodeTypes: [NodeTypes.DataChain]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${Titles.DataChain}`
+    }, {
+      onClick: () => {
         if (currentNode)
           this.props.attachToNavigateNode(currentNode.id, NavigateTypes.Back)
       },

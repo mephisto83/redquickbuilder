@@ -22,6 +22,11 @@ var getEndpoint = (baseDomain, path) => {
 
     return endpoint;
 }
+
+export function setBearerAccessToken(access_token) {
+  accessToken = access_token;
+}
+
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 export function createRedService(domain, wsdomain, _forceBase) {
     var forceBase = false;

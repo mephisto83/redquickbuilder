@@ -14,12 +14,12 @@ export default class DataChainGenerator {
     let temps = [
       {
         template: `import { GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems } from './uiActions';
-import { 
-    validateEmail, 
-    maxLength, 
-    minLength, 
-    greaterThanOrEqualTo, 
-    lessThanOrEqualTo, 
+import {
+    validateEmail,
+    maxLength,
+    minLength,
+    greaterThanOrEqualTo,
+    lessThanOrEqualTo,
     arrayLength,
     numericalDefault,
     equalsLength,
@@ -27,6 +27,11 @@ import {
     alphanumeric,
     alpha
 } from './validation';
+
+import * as navigate from './navigationActions';
+import * as $service from '../util/service';
+import * as routes from '../constants/routes';
+
 
 import * as StateKeys from '../state_keys';
 import * as ViewModelKeys from '../viewmodel_keys';

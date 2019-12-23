@@ -40,7 +40,7 @@ export function GenerateNavigationActions(language) {
     let navigationFunctions = options.map(op => {
         let screen = GetConnectedScreen(op.id);
         let template = `
-  export function ${GetJSCodeName(op)}(params = {}) {
+  export function ${GetJSCodeName(screen)}(params = {}) {
     return (dispatch, getState) => {
       dispatch(push(routes.${GetCodeName(screen)}));
     }
@@ -60,7 +60,17 @@ export function GoForward(params = {}) {
     dispatch(goForward());
   }
 }
-${navigationFunctions.join(NEW_LINE)}
+export function Replace(params = {}) {
+  return (dispatch, getState) => {
+    if(params.route) {
+      dispatch(replace(params.route));
+    }
+    else {
+      console.warn('missing route');
+    }
+  }
+}
+${navigationFunctions.unique().join(NEW_LINE)}
   `;
     return [{
         template,
