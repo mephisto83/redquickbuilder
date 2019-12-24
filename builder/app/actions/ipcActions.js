@@ -273,6 +273,18 @@ export function scaffoldProject(options = {}) {
         } else {
           console.warn("No app name given");
         }
+      })
+      .then(() => {
+        console.log("Write electron theme");
+        return generateElectronIOTheme(
+          path.join(
+            workspace,
+            root.title,
+            "electronio",
+            root[GraphKeys.PROJECTNAME]
+          ),
+          state
+        );
       });
   };
 }
@@ -338,11 +350,13 @@ function generateElectronIO(workspace, state) {
       );
     }
   });
+}
+function generateElectronIOTheme(workspace, state) {
   let result = ThemeServiceGenerator.Generate({
     state,
     language: UITypes.ElectronIO
   });
-  debugger;
+
   if (result.location) {
     generateFolderStructure(
       path.join(`${result.location}`),

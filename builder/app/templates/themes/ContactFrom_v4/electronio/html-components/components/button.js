@@ -22,7 +22,7 @@ export default class Button extends React.Component {
           <button {...props} type="button" className="contact100-form-btn">
             <span>
               {this.props.children}
-              <i className="fa fa-long-arrow-right m-l-7" aria-hidden="true" />
+              <i className="fas fa-angle-right m-l-7" aria-hidden="true" />
             </span>
           </button>
         </div>
