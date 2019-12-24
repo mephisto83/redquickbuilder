@@ -10,7 +10,7 @@ export default class Container extends React.Component {
     var props = {
       ...this.props
     };
-
+    delete props.style;
     delete props.children;
     return (
       <div className="container-contact100" {...props}>
