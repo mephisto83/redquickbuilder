@@ -89,7 +89,7 @@ export function processRecording(str) {
     }
     if (unaccountedGuids.some(v => v === command.callback)) {
       unaccountedGuids = [
-        ...unaccountedGuids.filter(x => x === command.callback)
+        ...unaccountedGuids.filter(x => x !== command.callback)
       ];
     }
     delete command.callback;
@@ -101,6 +101,8 @@ export function processRecording(str) {
       subregex,
       `"callback": function(node) { context.node${index} = node.id; }`
     );
+    subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.node${index}]:`);
     subregex = new RegExp(`"${guid}"`, "g");
     str = str.replace(subregex, `context.node${index}`);
   });

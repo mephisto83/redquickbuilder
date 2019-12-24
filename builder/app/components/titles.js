@@ -349,7 +349,7 @@ export const Register = "Register";
 export const AsPlural = "As Plural";
 export const AddFunction = "Add function";
 export const MaestroDetails = "Maestro Details";
-
+export const Operations = 'Operations';
 export const HttpMethod = "Http Methods";
 export const AddMaestros = "Add Maestro";
 export const HttpRoute = "Relative Http Route";

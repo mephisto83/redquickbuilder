@@ -1,0 +1,2335 @@
+export default function(args = {}) {
+    // node0
+    let context = {
+      ...args
+    };
+
+    return [
+      function(graph) {
+      return [{
+
+        "operation": "NEW_NODE",
+        "options": {
+            "callback": function(node) { context.node0 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node0,
+            "value": "Home View"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "nodeType",
+            "id": context.node0,
+            "value": "screen"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Pinned",
+            "id": context.node0,
+            "value": true
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_SCREEN_OPTIONS",
+        "options": {
+            "parent": context.node0,
+            "groupProperties": {},
+            "linkProperties": {
+                "properties": {
+                    "type": "screen-options",
+                    "screen-options": {}
+                }
+            },
+            "callback": function(node) { context.node1 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "UIType",
+            "id": context.node1,
+            "value": "ElectronIO"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node1,
+            "value": "Home View Container"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node1,
+            "value": {
+                "layout": {
+                    [context.node2]: {}
+                },
+                "properties": {
+                    [context.node2]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {
+                            [context.node2]: context.node3
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node1,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node3 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node3,
+            "value": "Home View Component"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node3,
+            "value": "View"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node1,
+            "value": {
+                "layout": {
+                    [context.node2]: {}
+                },
+                "properties": {
+                    [context.node2]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {
+                            [context.node2]: context.node3
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node1,
+            "value": {
+                "layout": {
+                    [context.node2]: {}
+                },
+                "properties": {
+                    [context.node2]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {
+                            [context.node2]: context.node3
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node3,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node8 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node8,
+            "value": "Register Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node8,
+            "value": "Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node3,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node7 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Label",
+            "id": context.node7,
+            "value": "Authenticate Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node7,
+            "value": "Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node7,
+            "value": "Authenticate Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node3,
+            "value": {
+                "layout": {
+                    [context.node4]: {
+                        [context.node5]: {},
+                        [context.node6]: {}
+                    }
+                },
+                "properties": {
+                    [context.node4]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node5]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node5]: context.node7
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node6]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                        },
+                        "children": {
+                            [context.node6]: context.node8
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_NODE",
+        "options": {
+            "callback": function(node) { context.node13 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node13,
+            "value": "Home View Screen"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "nodeType",
+            "id": context.node13,
+            "value": "screen"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Pinned",
+            "id": context.node13,
+            "value": true
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_SCREEN_OPTIONS",
+        "options": {
+            "parent": context.node13,
+            "groupProperties": {},
+            "linkProperties": {
+                "properties": {
+                    "type": "screen-options",
+                    "screen-options": {}
+                }
+            },
+            "callback": function(node) { context.node14 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "UIType",
+            "id": context.node14,
+            "value": "ElectronIO"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node14,
+            "value": "Home View Container"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node14,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node15 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node15,
+            "value": "Home View Component"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node15,
+            "value": "View"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node14,
+            "value": {
+                "layout": {
+                    [context.node16]: {}
+                },
+                "properties": {
+                    [context.node16]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {
+                            [context.node16]: context.node15
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node14,
+            "value": {
+                "layout": {
+                    [context.node16]: {}
+                },
+                "properties": {
+                    [context.node16]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {
+                            [context.node16]: context.node15
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node15,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node21 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node21,
+            "value": "Register Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node21,
+            "value": "Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_COMPONENT_NODE",
+        "options": {
+            "parent": context.node15,
+            "groupProperties": {},
+            "properties": {
+                "UIType": "ElectronIO"
+            },
+            "linkProperties": {
+                "properties": {
+                    "type": "component",
+                    "stroke": "#B7245C",
+                    "component": {}
+                }
+            },
+            "callback": function(node) { context.node20 = node.id; }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_TEXT",
+        "options": {
+            "id": context.node20,
+            "value": "Authenticate Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "component-type",
+            "id": context.node20,
+            "value": "Button"
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Layout",
+            "id": context.node15,
+            "value": {
+                "layout": {
+                    [context.node17]: {
+                        [context.node18]: {},
+                        [context.node19]: {}
+                    }
+                },
+                "properties": {
+                    [context.node17]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1
+                        },
+                        "children": {},
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node18]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node18]: context.node20
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    },
+                    [context.node19]: {
+                        "style": {
+                            "display": "flex",
+                            "flex": 1,
+                            "height": "100%",
+                            "borderStyle": "solid",
+                            "borderWidth": 1,
+                            "justifyContent": "center",
+                            "alignItems": "center"
+                        },
+                        "children": {
+                            [context.node19]: context.node21
+                        },
+                        "cellModel": {},
+                        "cellModelProperty": {},
+                        "cellRoot": {},
+                        "cellEvents": {}
+                    }
+                }
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Pinned",
+            "id": context.node27,
+            "value": true
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_LINK",
+        "options": {
+            "target": context.node28,
+            "source": context.node27,
+            "properties": {
+                "type": "title-service-link",
+                "title-service-link": {},
+                "singleLink": true,
+                "nodeTypes": [
+                    "titleService"
+                ]
+            }
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_NEW_NODE"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "ADD_LINK_BETWEEN_NODES"
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "CHANGE_NODE_PROPERTY",
+        "options": {
+            "prop": "Pinned",
+            "id": context.node30,
+            "value": true
+        }
+    }]
+    },
+
+    function(graph) {
+      return [{
+
+        "operation": "NEW_LINK",
+        "options": {
+            "target": context.node28,
+            "source": context.node30,
+            "properties": {
+                "type": "title-service-link",
+                "title-service-link": {},
+                "singleLink": true,
+                "nodeTypes": [
+                    "titleService"
+                ]
+            }
+        }
+    }]
+  }]
+
+  }

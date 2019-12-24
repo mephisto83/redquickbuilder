@@ -3570,7 +3570,8 @@ export function graphOperation(operation, options) {
 
             if (recording && Visual(state, RECORDING)) {
               recording.push({
-                ...op,
+                operation,
+                options,
                 callback:
                   currentLastNode !==
                   currentGraph.nodes[currentGraph.nodes.length - 1]

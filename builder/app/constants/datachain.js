@@ -448,8 +448,8 @@ export function connectNodeChainCommands(prop, id, value, source, reverse) {
     {
       operation: REMOVE_LINK_BETWEEN_NODES,
       options: {
-        source: source,
-        target: id
+        source: reverse ? id : source,
+        target: reverse ? source : id
       }
     },
     {
