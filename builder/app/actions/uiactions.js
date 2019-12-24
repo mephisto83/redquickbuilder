@@ -42,6 +42,7 @@ export const BATCH_MODEL = "BATCH_MODEL";
 export const BATCH_AGENT = "BATCH_AGENT";
 export const BATCH_PARENT = "BATCH_PARENT";
 export const BATCH_FUNCTION_NAME = "BATCH_FUNCTION_NAME";
+export const RECORDING = "RECORDING";
 export const BATCH_FUNCTION_TYPE = "BATCH_FUNCTION_TYPE";
 
 export const ViewTypes = {
@@ -3200,6 +3201,7 @@ export function deleteAllSelected() {
     )(dispatch, getState);
   };
 }
+
 export function graphOperation(operation, options) {
   return (dispatch, getState) => {
     var state = getState();
@@ -3236,12 +3238,16 @@ export function graphOperation(operation, options) {
             options = options(currentGraph);
           }
           if (options) {
+            let currentLastNode =
+              currentGraph.nodes && currentGraph.nodes.length
+                ? currentGraph.nodes[currentGraph.nodes.length - 1]
+                : null;
             switch (operation) {
               case SET_DEPTH:
                 currentGraph = GraphMethods.setDepth(currentGraph, options);
                 break;
               case NEW_NODE:
-                currentGraph = GraphMethods.newNode(currentGraph);
+                currentGraph = GraphMethods.newNode(currentGraph, options);
                 setVisual(
                   SELECTED_NODE,
                   currentGraph.nodes[currentGraph.nodes.length - 1]
@@ -3561,6 +3567,17 @@ export function graphOperation(operation, options) {
               case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                 break;
             }
+
+            if (recording && Visual(state, RECORDING)) {
+              recording.push({
+                ...op,
+                callback:
+                  currentLastNode !==
+                  currentGraph.nodes[currentGraph.nodes.length - 1]
+                    ? currentGraph.nodes[currentGraph.nodes.length - 1]
+                    : null
+              });
+            }
           }
 
           currentGraph = GraphMethods.applyConstraints(currentGraph);
@@ -3581,6 +3598,15 @@ export function graphOperation(operation, options) {
   };
 }
 
+let recording = [];
+export function GetRecording() {
+  return recording;
+}
+export function clearRecording() {
+  return (dispatch, getState) => {
+    recording = [];
+  };
+}
 export const Colors = {
   SelectedNode: "#f39c12",
   MarkedNode: "#af10fe"

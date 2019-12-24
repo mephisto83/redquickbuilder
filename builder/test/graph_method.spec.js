@@ -49,21 +49,21 @@ describe('smash_43', () => {
     })
 
 
-    it('should ge the consts for a component', () => {
+    xit('should ge the consts for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetModelConsts(childNode);
         expect(propertyConsts).toBeTruthy();
         expect(propertyConsts.length).toBe(1);
     });
 
-    it('should ge the consts for a component', () => {
+    xit('should ge the consts for a component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let propertyConsts = GetModelPropertyConsts(childNode);
         expect(propertyConsts).toBeTruthy();
         expect(propertyConsts.length).toBe(1);
     });
 
-    it('should get consts for react-native component', () => {
+    xit('should get consts for react-native component', () => {
         let childNode = '8d376dce-7faa-4635-9a99-02c72f15e277';
         let rnConsts = GetRNConsts(childNode);
         expect(rnConsts).toBeTruthy();

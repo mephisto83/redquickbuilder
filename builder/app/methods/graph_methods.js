@@ -607,9 +607,9 @@ export function setDepth(graph, options) {
 
   return graph;
 }
-export function newNode(graph) {
+export function newNode(graph, options) {
   let node = createNode();
-  return addNode(graph, node);
+  return addNode(graph, node, options);
 }
 export function createExtensionDefinition() {
   return {
@@ -785,12 +785,15 @@ export function clearLinks(graph, options) {
 
 }
 
-export function addNode(graph, node) {
+export function addNode(graph, node, options) {
   graph.nodeLib[node.id] = node;
   graph.nodeLib = { ...graph.nodeLib };
   graph.nodes = [...graph.nodes, node.id];
   graph = { ...graph };
   graph = incrementBuild(graph);
+  if(options&&options.callback){
+    options.callback(node);
+  }
   return graph;
 }
 export function addGroup(graph, group) {
@@ -892,6 +895,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
       graph = updateNodeProperty(graph, { id: node.id, prop: p, value: options.properties[p] });
     }
   }
+
   if (groupProperties) {
     graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
   }

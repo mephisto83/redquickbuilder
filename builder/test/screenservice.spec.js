@@ -29,13 +29,13 @@ describe('description', () => {
         expect(screens.length).toBeTruthy();
     });
 
-    it('should bind screen node to template', () => {
+    xit('should bind screen node to template', () => {
         let screens = BindScreensToTemplate();
         expect(screens).toBeTruthy();
         expect(screens.length).toBeTruthy();
     });
 
-    it('should generate screens', () => {
+    xit('should generate screens', () => {
         let screens = GenerateScreens({});
         expect(screens).toBeTruthy();
         expect(Object.keys(screens).length).toBeTruthy();
@@ -69,7 +69,7 @@ describe('description', () => {
         expect(markupTag.indexOf('HomeScreenOptionsReactNative') !== -1).toBeTruthy()
     });
 
-    it('should generate screen options src', () => {
+    xit('should generate screen options src', () => {
 
         let screenOption = GetScreenOption(SCREEN, NodeTypes.UITypes.ReactNative);
         let sourceCode = GenerateScreenOptionSource(screenOption, SCREEN, NodeTypes.UITypes.ReactNative);
