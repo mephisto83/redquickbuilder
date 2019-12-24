@@ -1,6 +1,15 @@
 import ControllerGenerator from "./controllergenerator";
 import * as Titles from "../components/titles";
-import { NodeTypes, GeneratedTypes, Methods, GeneratedConstants, NodeProperties, ConstantsDeclaration, MakeConstant, ReactNativeTypes } from "../constants/nodetypes";
+import {
+  NodeTypes,
+  GeneratedTypes,
+  Methods,
+  GeneratedConstants,
+  NodeProperties,
+  ConstantsDeclaration,
+  MakeConstant,
+  ReactNativeTypes
+} from "../constants/nodetypes";
 import ModelGenerator from "./modelgenerators";
 import ExtensionGenerator from "./extensiongenerator";
 import MaestroGenerator from "./maestrogenerator";
@@ -13,18 +22,19 @@ import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgen
 import ChangeResponseGenerator from "./changeresponsegenerator";
 import ValidationRuleGenerator from "./validationrulegenerator";
 import ExecutorGenerator from "./executiongenerator";
-import ModelReturnGenerator from './modelreturngenerator';
-import ModelExceptionGenerator from './modelexceptiongenerator';
-import ModelItemFilter from './modelitemfiltergenerator';
-import CustomService from './customservicegenerator';
-import ModelGetGenerator from './modelgetgenerators';
-import ReactNativeScreens from './screengenerator';
-import ReactNativeNavigation from './navigationgenerator';
-import ReactNativeKeys from './keygenerator';
-import ReactNativeConfiguration from './configurationgenerator';
-import ReactNativeControllerActions from './controlleractionsgenerator';
-import ReactNativeDataChainFunctions from './datachaingenerator';
-import ReactNativeSelectorFunctions from './selectorgenerator';
+import ModelReturnGenerator from "./modelreturngenerator";
+import ModelExceptionGenerator from "./modelexceptiongenerator";
+import ModelItemFilter from "./modelitemfiltergenerator";
+import ThemeService from './themeservicegenerator';
+import CustomService from "./customservicegenerator";
+import ModelGetGenerator from "./modelgetgenerators";
+import ReactNativeScreens from "./screengenerator";
+import ReactNativeNavigation from "./navigationgenerator";
+import ReactNativeKeys from "./keygenerator";
+import ReactNativeConfiguration from "./configurationgenerator";
+import ReactNativeControllerActions from "./controlleractionsgenerator";
+import ReactNativeDataChainFunctions from "./datachaingenerator";
+import ReactNativeSelectorFunctions from "./selectorgenerator";
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
   static generate(options) {
@@ -48,37 +58,52 @@ export default class Generator {
         let models = NodesByType(state, NodeTypes.Model)
           .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
           .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
-        let functions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
-        let enumerations = NodesByType(state, NodeTypes.Enumeration).map(node => {
-          var enums = GetNodeProp(node, NodeProperties.Enumeration);
-          var larg = {};
-          enums.map(t => {
-            larg[MakeConstant(t.value || t)] = t.value;
-          })
-          return {
-            name: GetNodeProp(node, NodeProperties.CodeName),
-            model: larg
+        let functions = NodesByType(state, [
+          NodeTypes.Function,
+          NodeTypes.Method
+        ]);
+        let enumerations = NodesByType(state, NodeTypes.Enumeration).map(
+          node => {
+            var enums = GetNodeProp(node, NodeProperties.Enumeration);
+            var larg = {};
+            enums.map(t => {
+              larg[MakeConstant(t.value || t)] = t.value;
+            });
+            return {
+              name: GetNodeProp(node, NodeProperties.CodeName),
+              model: larg
+            };
           }
-        });
+        );
         let streamTypes = {};
         models.map(t => {
-          streamTypes[GetNodeProp(t, NodeProperties.CodeName).toUpperCase()] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
-        })
+          streamTypes[
+            GetNodeProp(t, NodeProperties.CodeName).toUpperCase()
+          ] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
+        });
         let functionsTypes = {};
         functions.map(t => {
-          functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
-        })
+          functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(
+            t,
+            NodeProperties.CodeName
+          ).toUpperCase();
+        });
         return ConstantsGenerator.Generate({
-          values: [{
-            name: GeneratedConstants.Methods,
-            model: Methods
-          }, {
-            name: GeneratedConstants.StreamTypes,
-            model: streamTypes
-          }, {
-            name: GeneratedConstants.FunctionName,
-            model: functionsTypes
-          }, ...enumerations],
+          values: [
+            {
+              name: GeneratedConstants.Methods,
+              model: Methods
+            },
+            {
+              name: GeneratedConstants.StreamTypes,
+              model: streamTypes
+            },
+            {
+              name: GeneratedConstants.FunctionName,
+              model: functionsTypes
+            },
+            ...enumerations
+          ],
           state,
           key
         });
@@ -89,7 +114,11 @@ export default class Generator {
       case GeneratedTypes.StreamProcess:
         return StreamProcessGenerator.Generate({ state, key, language });
       case GeneratedTypes.StreamProcessOrchestration:
-        return StreamProcessOrchestrationGenerator.Generate({ state, key, language });
+        return StreamProcessOrchestrationGenerator.Generate({
+          state,
+          key,
+          language
+        });
       // case GeneratedTypes.ValidationRule:
       //     return ValidationRuleGenerator.Generate({ state, key, language });
       case GeneratedTypes.Executors:
