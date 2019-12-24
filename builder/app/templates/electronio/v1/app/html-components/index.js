@@ -21,6 +21,7 @@ import Label from './components/label';
 import Image from './components/image';
 import Item from './components/item';
 import MultiViewList from './components/multiviewlist';
+import Form from './components/form';
 export {
   Content,
   Container,
@@ -32,6 +33,7 @@ export {
   Item,
   FooterTab,
   Button,
+  Form,
   Left,
   Right,
   Body,

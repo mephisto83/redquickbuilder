@@ -19,6 +19,7 @@ export const Navigation = "Navigation";
 export const UseHttps = "Use Https";
 export const Parameter = "Parameter";
 export const ServerSideSetup = "Service Side Setup";
+export const Theme = 'Theme';
 export const EventHandlerActivityMenu = "Event Handlers";
 export const AddCondition = "Add Condition";
 export const Body = "Body";

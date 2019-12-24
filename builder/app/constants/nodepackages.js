@@ -116,6 +116,8 @@ import {
 } from "./datachain";
 import { uuidv4 } from "../utils/array";
 import PostAuthenticate from "../nodepacks/PostAuthenticate";
+import HomeView from "../nodepacks/HomeView";
+import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -650,6 +652,7 @@ export const CreateLoginModels = {
       method_results,
       targetMethod: regsterResult.methodNode.id
     });
+    let registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
       PerformGraphOperation(
         PostRegister({
@@ -659,6 +662,16 @@ export const CreateLoginModels = {
         })
       )(GetDispatchFunc(), GetStateFunc());
     }
+    let titleService = GetNodeByProperties({
+      [NodeProperties.NODEType]: NodeTypes.TitleService
+    });
+    PerformGraphOperation(
+      HomeView({
+        titleService: titleService.id,
+        registerForm: registerScreen,
+        authenticateForm: authenticateScreen
+      })
+    )(GetDispatchFunc(), GetStateFunc());
   }
 };
 function addInstanceEventsToForms(args) {
@@ -2941,6 +2954,7 @@ export const CreateDefaultView = {
                 };
               }
             },
+
             ...addButtonApiNodes(newItems),
             ...addButtonApiNodes(newItems, newItems.cancelbutton),
             {
@@ -3066,6 +3080,25 @@ export const CreateDefaultView = {
               operation: CHANGE_NODE_PROPERTY,
               options: function() {
                 let executeButtonComponent = childComponents.length - 2;
+                let rootCellId = GetFirstCell(layout);
+                let children = GetChildren(layout, rootCellId);
+                let childId = children[executeButtonComponent];
+                let cellProperties = GetCellProperties(layout, childId);
+                cellProperties.children[childId] =
+                  childComponents[executeButtonComponent];
+                cellProperties.style.flex = null;
+                cellProperties.style.height = null;
+                return {
+                  prop: NodeProperties.Layout,
+                  id: screenComponentId,
+                  value: layout
+                };
+              }
+            },
+            {
+              operation: CHANGE_NODE_PROPERTY,
+              options: function() {
+                let executeButtonComponent = childComponents.length - 1;
                 let rootCellId = GetFirstCell(layout);
                 let children = GetChildren(layout, rootCellId);
                 let childId = children[executeButtonComponent];
@@ -3255,6 +3288,12 @@ export const CreateDefaultView = {
           ].filter(x => x)
         )(GetDispatchFunc(), GetStateFunc());
 
+        PerformGraphOperation(
+          AddNavigateBackHandler({
+            button: newItems.cancelbutton,
+            evt: uiType === UITypes.ReactNative ? "onPress" : "onClick"
+          })
+        )(GetDispatchFunc(), GetStateFunc());
         PerformGraphOperation([
           {
             operation: ADD_NEW_NODE,

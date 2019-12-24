@@ -22,11 +22,9 @@ class {{name}} extends React.Component {
     render() {
         setNavigate(navigationInstance);
         return (
-            <StyleProvider>
-                 <Container>
-                     {{elements}}
-                </Container>
-            </StyleProvider>
+            <Container>
+                {{elements}}
+          </Container>
         );
     }
 }

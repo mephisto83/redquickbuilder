@@ -1,10 +1,38 @@
-import * as Titles from '../components/titles'
-import { NodeTypes, NodeTypeColors, NodeProperties, NodePropertiesDirtyChain, DIRTY_PROP_EXT, LinkProperties, LinkType, LinkPropertyKeys, NodePropertyTypes, GroupProperties, FunctionGroups, LinkEvents } from '../constants/nodetypes';
-import { Functions, FunctionTemplateKeys, FunctionConstraintKeys, FUNCTION_REQUIREMENT_KEYS, INTERNAL_TEMPLATE_REQUIREMENTS } from '../constants/functiontypes';
-import { GetNodeProp, GetLinkProperty, GetNodeTitle, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById, GetNodes } from '../actions/uiactions';
-import { uuidv4 } from '../utils/array';
-import { isBuffer } from 'util';
-var os = require('os');
+import * as Titles from "../components/titles";
+import {
+  NodeTypes,
+  NodeTypeColors,
+  NodeProperties,
+  NodePropertiesDirtyChain,
+  DIRTY_PROP_EXT,
+  LinkProperties,
+  LinkType,
+  LinkPropertyKeys,
+  NodePropertyTypes,
+  GroupProperties,
+  FunctionGroups,
+  LinkEvents
+} from "../constants/nodetypes";
+import {
+  Functions,
+  FunctionTemplateKeys,
+  FunctionConstraintKeys,
+  FUNCTION_REQUIREMENT_KEYS,
+  INTERNAL_TEMPLATE_REQUIREMENTS
+} from "../constants/functiontypes";
+import {
+  GetNodeProp,
+  GetLinkProperty,
+  GetNodeTitle,
+  GetGroupProperty,
+  GetCurrentGraph,
+  GetRootGraph,
+  GetNodeById,
+  GetNodes
+} from "../actions/uiactions";
+import { uuidv4 } from "../utils/array";
+import { isBuffer } from "util";
+var os = require("os");
 
 export function createGraph() {
   return {
@@ -14,10 +42,10 @@ export function createGraph() {
       minor: 0,
       build: 0
     },
-    workspace: '',
+    workspace: "",
     title: Titles.DefaultGraphTitle,
     path: [],
-    namespace: '',
+    namespace: "",
     //Groups
     groups: [],
     groupLib: {},
@@ -41,52 +69,54 @@ export function createGraph() {
     updated: null,
     visibleNodes: {}, //Nodes that are visible now, and used to calculate the visibility of other nodes.
     appConfig: {
-      "Logging": {
-        "IncludeScopes": false,
-        "LogLevel": {
-          "Default": "Debug",
-          "System": "Information",
-          "Microsoft": "Information"
+      Logging: {
+        IncludeScopes: false,
+        LogLevel: {
+          Default: "Debug",
+          System: "Information",
+          Microsoft: "Information"
         }
       },
-      "AppSettings": {
-        "Local-AuthorizationKey": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+      AppSettings: {
+        "Local-AuthorizationKey":
+          "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
         "Local-EndPointUrl": "https://localhost:8081",
-        "use_local": "true",
-        "EndPointUrl": "",
-        "AuthorizationKey": "",
-        "DatabaseId": "red-db-001",
-        "AssemblyPrefixes": "Smash;RedQuick",
+        use_local: "true",
+        EndPointUrl: "",
+        AuthorizationKey: "",
+        DatabaseId: "red-db-001",
+        AssemblyPrefixes: "Smash;RedQuick",
         "Use-SingleCollection": "true",
         "storage-key": "UseDevelopmentStorage=true",
         "single-thread": true,
-        "ConfirmEmailController": "Account",
-        "ConfirmEmailAction": "ConfirmEmail",
-        "HomeAction": "Index",
-        "HomeController": "Home",
-        "ResetPasswordAction": "ResetPassword",
-        "ResetPasswordController": "Account",
-        "SecurityKey": "ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf",
-        "AppSecret": "YQBiAGMAZABlAGYAZwBoAGkAagBrAGwAbQBuAG8AcABxAHIAcwB0AHUAdgB3AHgAeQB6ADAAMQAyADMANAA1AA==",
-        "Domain": "https://localhost:13424",
-        "TokenExpirationInMinutes": "250",
-        "Issuer": "http://localhost:13424",
-        "Audience": "http://localhost:13424",
-        "DomainPort": "13424"
+        ConfirmEmailController: "Account",
+        ConfirmEmailAction: "ConfirmEmail",
+        HomeAction: "Index",
+        HomeController: "Home",
+        ResetPasswordAction: "ResetPassword",
+        ResetPasswordController: "Account",
+        Domain: "localhost:44338",
+        SecurityKey: "ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf",
+        AppSecret:
+          "YQBiAGMAZABlAGYAZwBoAGkAagBrAGwAbQBuAG8AcABxAHIAcwB0AHUAdgB3AHgAeQB6ADAAMQAyADMANAA1AA==",
+        Domain: "https://localhost:44338",
+        TokenExpirationInMinutes: "250",
+        Issuer: "https://localhost:44338",
+        Audience: "https://localhost:44338",
+        DomainPort: "44338"
       }
     }
-  }
+  };
 }
 export const GraphKeys = {
-  NAMESPACE: 'namespace',
-  PROJECTNAME: 'project_name',
-  COLORSCHEME: 'color_scheme',
-  SERVER_SIDE_SETUP: 'server_side_setup'
-}
+  NAMESPACE: "namespace",
+  PROJECTNAME: "project_name",
+  COLORSCHEME: "color_scheme",
+  SERVER_SIDE_SETUP: "server_side_setup",
+  THEME: "theme"
+};
 export function updateWorkSpace(graph, options) {
-  let {
-    workspace
-  } = options;
+  let { workspace } = options;
 
   graph.workspaces = graph.workspaces || {};
   graph.workspaces[os.platform()] = workspace;
@@ -94,25 +124,24 @@ export function updateWorkSpace(graph, options) {
     graph.workspace = workspace;
   }
   return graph;
-
 }
 
 export function CreateLayout() {
   return {
     layout: {},
     properties: {}
-  }
+  };
 }
 export function FindLayoutRoot(id, root) {
   if (root && root[id]) {
     return root[id];
-  }
-  else {
+  } else {
     let res;
     Object.keys(root).find(t => {
-      if (root[t])
-        res = FindLayoutRoot(id, root[t]);
-      else { return false; }
+      if (root[t]) res = FindLayoutRoot(id, root[t]);
+      else {
+        return false;
+      }
       return res;
     });
     return res;
@@ -122,8 +151,7 @@ export function FindLayoutRoot(id, root) {
 export function FindLayoutRootParent(id, root, parent) {
   if (root[id]) {
     return root || parent;
-  }
-  else {
+  } else {
     let res;
     Object.keys(root).find(t => {
       res = FindLayoutRootParent(id, root[t], root);
@@ -134,7 +162,7 @@ export function FindLayoutRootParent(id, root, parent) {
   return false;
 }
 export function GetAllChildren(root) {
-  var result = Object.keys(root || {})
+  var result = Object.keys(root || {});
   result.map(t => {
     let temp = GetAllChildren(root[t]);
     result = [...result, ...temp];
@@ -143,14 +171,14 @@ export function GetAllChildren(root) {
 }
 export const DefaultCellProperties = {
   style: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    height: '100%',
-    borderStyle: 'solid',
+    height: "100%",
+    borderStyle: "solid",
     borderWidth: 1
   },
   children: {}
-}
+};
 export function GetCellProperties(setup, id) {
   var { properties } = setup;
   return properties[id];
@@ -187,12 +215,8 @@ export function ReorderCellLayout(setup, id, dir = -1) {
       if (keys.some(v => v === id)) {
         let id_index = keys.indexOf(id);
         if (id_index === 0 && dir === -1) {
-
-        }
-        else if (id_index === (keys.length - 1) && dir === 1) {
-
-        }
-        else {
+        } else if (id_index === keys.length - 1 && dir === 1) {
+        } else {
           let temp = keys[id_index];
           keys[id_index] = keys[id_index + dir];
           keys[id_index + dir] = temp;
@@ -200,7 +224,7 @@ export function ReorderCellLayout(setup, id, dir = -1) {
 
         let temp_layout = { ...layout };
         keys.map(k => delete layout[k]);
-        keys.map(k => layout[k] = temp_layout[k]);
+        keys.map(k => (layout[k] = temp_layout[k]));
       }
     }
   }
@@ -216,18 +240,22 @@ export function GetFirstCell(setup) {
 
   return keys[0] || null;
 }
-export function SetCellsLayout(setup, count, id, properties = DefaultCellProperties) {
+export function SetCellsLayout(
+  setup,
+  count,
+  id,
+  properties = DefaultCellProperties
+) {
   let keys = [];
   let root = null;
   count = parseInt(count);
   if (!id) {
     keys = Object.keys(setup.layout);
     root = setup.layout;
-  }
-  else {
+  } else {
     root = FindLayoutRoot(id, setup.layout);
     if (!root) {
-      throw 'missing root';
+      throw "missing root";
     }
     keys = Object.keys(root);
   }
@@ -238,17 +266,15 @@ export function SetCellsLayout(setup, count, id, properties = DefaultCellPropert
       root[newkey] = {};
       setup.properties[newkey] = { ...JSON.parse(JSON.stringify(properties)) };
     });
-  }
-  else if (keys.length - count > 0) {
-    [].interpolate(0, keys.length - count, (index) => {
+  } else if (keys.length - count > 0) {
+    [].interpolate(0, keys.length - count, index => {
       delete root[keys[index]];
       delete setup.properties[keys[index]];
-    })
+    });
   }
 
   return setup;
 }
-
 
 export function incrementBuild(graph) {
   graph.version.build++;
@@ -276,14 +302,13 @@ export function updateGraphTitle(graph, ops) {
 
 export function createScreenParameter(parameter) {
   return {
-    title: parameter || '',
+    title: parameter || "",
     id: uuidv4()
-  }
+  };
 }
 export function GetParameterName(parameter) {
-  if (parameter)
-    return parameter.title || '';
-  return '';
+  if (parameter) return parameter.title || "";
+  return "";
 }
 
 export function updateGraphProperty(graph, ops) {
@@ -300,11 +325,13 @@ export function addNewSubGraph(graph) {
 }
 export function removeSubGraph(graph, id) {
   delete graph.graphs[id];
-  return graph
+  return graph;
 }
 
 export function getSubGraphs(graph) {
-  return graph && graph.graphs ? Object.keys(graph.graphs || {}).map(t => graph.graphs[t]) : [];
+  return graph && graph.graphs
+    ? Object.keys(graph.graphs || {}).map(t => graph.graphs[t])
+    : [];
 }
 
 export function getSubGraph(graph, scopes) {
@@ -338,8 +365,7 @@ export function setScopedGraph(root, options) {
         currentGraph = currentGraph.graphs[s];
       }
     });
-  }
-  else {
+  } else {
     root = graph;
   }
   return root;
@@ -354,7 +380,14 @@ export function newGroup(graph, callback) {
   return result;
 }
 export function GetNodesInGroup(graph, group) {
-  return (graph.groupsNodes && graph.groupsNodes[group] && Object.keys(graph.groupsNodes[group]).filter(v => graph.groupsNodes[group][v])) || [];
+  return (
+    (graph.groupsNodes &&
+      graph.groupsNodes[group] &&
+      Object.keys(graph.groupsNodes[group]).filter(
+        v => graph.groupsNodes[group][v]
+      )) ||
+    []
+  );
 }
 export function addLeaf(graph, ops) {
   var { leaf, id } = ops;
@@ -362,20 +395,18 @@ export function addLeaf(graph, ops) {
   leaves = [...leaves, leaf].unique(x => x);
 
   //Groups => nodes
-  graph.groupsNodes[id] = graph.groupsNodes[id] || {}
+  graph.groupsNodes[id] = graph.groupsNodes[id] || {};
   graph.groupsNodes[id][leaf] = true;
   graph.groupsNodes = {
     ...graph.groupsNodes
-  }
+  };
 
   //Nodes => groups
-  graph.nodesGroups[leaf] = graph.nodesGroups[leaf] || {}
+  graph.nodesGroups[leaf] = graph.nodesGroups[leaf] || {};
   graph.nodesGroups[leaf][id] = true;
   graph.nodesGroups = {
     ...graph.nodesGroups
-  }
-
-
+  };
 
   graph.groupLib[id].leaves = leaves;
   return graph;
@@ -399,7 +430,7 @@ export function removeLeaf(graph, ops) {
     }
     graph.groupsNodes = {
       ...graph.groupsNodes
-    }
+    };
   }
 
   if (graph.nodesGroups[leaf]) {
@@ -411,13 +442,11 @@ export function removeLeaf(graph, ops) {
     }
     graph.nodesGroups = {
       ...graph.nodesGroups
-    }
+    };
   }
-
 
   return graph;
 }
-
 
 export function addGroupToGroup(graph, ops) {
   let { groupId, id } = ops;
@@ -434,7 +463,6 @@ export function addGroupToGroup(graph, ops) {
   // and also the containers to know about the groups
   graph.parentGroup[groupId] = graph.parentGroup[groupId] || {};
   graph.parentGroup[groupId][id] = true;
-
 
   return graph;
 }
@@ -469,7 +497,7 @@ export function getNodesGroups(graph, id) {
   return graph && graph.nodesGroups ? graph.nodesGroups[id] : null;
 }
 export function clearGroup(graph, ops) {
-  var { id } = ops
+  var { id } = ops;
   for (let i in graph.groupsNodes[id]) {
     if (graph.nodesGroups[i]) {
       delete graph.nodesGroups[i][id];
@@ -480,14 +508,14 @@ export function clearGroup(graph, ops) {
   }
   for (let i in graph.childGroups[id]) {
     if (graph.parentGroup[i]) {
-      delete graph.parentGroup[i][id]
+      delete graph.parentGroup[i][id];
       if (Object.keys(graph.parentGroup[i]).length === 0) {
         delete graph.parentGroup[i];
       }
     }
   }
   graph.groups = [...graph.groups.filter(x => x !== id)];
-  delete graph.groupLib[id]
+  delete graph.groupLib[id];
   delete graph.childGroups[id];
   delete graph.groupsNodes[id];
 
@@ -496,14 +524,13 @@ export function clearGroup(graph, ops) {
 export function createValidator() {
   return {
     properties: {}
-  }
+  };
 }
 
 export function createMethodValidation(methodType) {
   let res = {
-    methods: {
-    }
-  }
+    methods: {}
+  };
 
   if (res && !res.methods[methodType]) {
     res.methods[methodType] = createMethodValidationType();
@@ -522,14 +549,25 @@ export function getMethodValidationType(methodValidation, methodType) {
   }
   return null;
 }
-export function addMethodValidationForParamter(methodValidation, methodType, methodParam, methedParamProperty) {
+export function addMethodValidationForParamter(
+  methodValidation,
+  methodType,
+  methodParam,
+  methedParamProperty
+) {
   methodValidation = methodValidation || createMethodValidation(methodType);
   if (getMethodValidationType(methodValidation, methodType)) {
-    let methodValidationType = getMethodValidationType(methodValidation, methodType);
+    let methodValidationType = getMethodValidationType(
+      methodValidation,
+      methodType
+    );
     if (methodParam) {
-      methodValidationType[methodParam] = methodValidationType[methodParam] || createProperyContainer();
+      methodValidationType[methodParam] =
+        methodValidationType[methodParam] || createProperyContainer();
       if (methedParamProperty && methodValidationType[methodParam]) {
-        methodValidationType[methodParam].properties[methedParamProperty] = methodValidationType[methodParam].properties[methedParamProperty] || createValidatorProperty();
+        methodValidationType[methodParam].properties[methedParamProperty] =
+          methodValidationType[methodParam].properties[methedParamProperty] ||
+          createValidatorProperty();
       }
     }
   }
@@ -538,47 +576,66 @@ export function addMethodValidationForParamter(methodValidation, methodType, met
 export function createProperyContainer() {
   return {
     properties: {}
-  }
+  };
 }
-export function getMethodValidationForParameter(methodValidation, methodType, methodParam, methodProperty) {
-  methodValidation = methodValidation || addMethodValidationForParamter(methodValidation, methodType, methodParam);
+export function getMethodValidationForParameter(
+  methodValidation,
+  methodType,
+  methodParam,
+  methodProperty
+) {
+  methodValidation =
+    methodValidation ||
+    addMethodValidationForParamter(methodValidation, methodType, methodParam);
   if (methodValidation) {
     let temp = getMethodValidationType(methodValidation, methodType);
     if (!temp) {
       debugger;
-      methodValidation.methods[methodType] = createMethodValidation(methodType).methods[methodType];
+      methodValidation.methods[methodType] = createMethodValidation(
+        methodType
+      ).methods[methodType];
     }
     if (temp) {
       if (temp[methodParam] && temp[methodParam]) {
         return temp[methodParam];
-      };
+      }
     }
   }
   return null;
 }
-export function removeMethodValidationParameter(methodValidation, methodType, methodParam, methedParamProperty) {
+export function removeMethodValidationParameter(
+  methodValidation,
+  methodType,
+  methodParam,
+  methedParamProperty
+) {
   if (methodValidation) {
     let temp = getMethodValidationType(methodValidation, methodType);
     if (temp) {
-      if (temp[methodParam] && temp[methodParam].properties && temp[methodParam].properties[methedParamProperty]) {
+      if (
+        temp[methodParam] &&
+        temp[methodParam].properties &&
+        temp[methodParam].properties[methedParamProperty]
+      ) {
         delete temp[methodParam].properties[methedParamProperty];
-      };
+      }
     }
   }
-  return methodValidation
+  return methodValidation;
 }
 export const createExecutor = createValidator;
 
 export function createValidatorProperty() {
   return {
-    validators: {
-    }
-  }
+    validators: {}
+  };
 }
 export function addValidatator(validator, options) {
-  validator.properties[options.id] = validator.properties[options.id] || createValidatorProperty();
+  validator.properties[options.id] =
+    validator.properties[options.id] || createValidatorProperty();
   if (options.validator)
-    validator.properties[options.id].validators[options.validator] = options.validatorArgs;
+    validator.properties[options.id].validators[options.validator] =
+      options.validatorArgs;
 
   return validator;
 }
@@ -623,10 +680,10 @@ export function createExtensionDefinition() {
       list: []
     },
     definition: {}
-  }
+  };
 }
 export function defaultExtensionDefinitionType() {
-  return 'string';
+  return "string";
 }
 export function MatchesProperties(properties, node) {
   if (properties && node) {
@@ -643,13 +700,20 @@ export function removeNode(graph, options = {}) {
   let idsToDelete = [id];
   let autoDelete = GetNodeProp(id, NodeProperties.AutoDelete, graph);
   if (autoDelete) {
-    GetNodesLinkedTo(graph, { id }).filter(x => MatchesProperties(autoDelete.properties, x)).map(t => {
-      idsToDelete.push(t.id);
-    });
+    GetNodesLinkedTo(graph, { id })
+      .filter(x => MatchesProperties(autoDelete.properties, x))
+      .map(t => {
+        idsToDelete.push(t.id);
+      });
   }
 
   idsToDelete.map(id => {
-    let existNodes = getNodesByLinkType(graph, { exist: true, id, direction: TARGET, type: LinkType.Exist });
+    let existNodes = getNodesByLinkType(graph, {
+      exist: true,
+      id,
+      direction: TARGET,
+      type: LinkType.Exist
+    });
 
     graph = incrementBuild(graph);
     //links
@@ -672,29 +736,41 @@ export function removeNode(graph, options = {}) {
     if (existNodes) {
       existNodes.map(en => {
         graph = removeNode(graph, { id: en.id });
-      })
+      });
     }
-
-  })
+  });
   return graph;
 }
 
 export function GetManyToManyNodes(state, ids) {
   if (state && ids && ids.length) {
-
-    return NodesByType(state, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.ManyToManyNexus)).filter(x => {
-      return !(ids || []).some(t => {
-        return (GetNodeProp(x, NodeProperties.ManyToManyNexusTypes) || []).indexOf(t) !== -1;
+    return NodesByType(state, NodeTypes.Model)
+      .filter(x => GetNodeProp(x, NodeProperties.ManyToManyNexus))
+      .filter(x => {
+        return !(ids || []).some(t => {
+          return (
+            (GetNodeProp(x, NodeProperties.ManyToManyNexusTypes) || []).indexOf(
+              t
+            ) !== -1
+          );
+        });
       });
-    });
   }
   return [];
 }
 export function getPropertyNodes(graph, id) {
-  return getNodesByLinkType(graph, { id, direction: SOURCE, type: LinkType.PropertyLink });
+  return getNodesByLinkType(graph, {
+    id,
+    direction: SOURCE,
+    type: LinkType.PropertyLink
+  });
 }
 export function getDataChainNodes(graph, id) {
-  return getNodesByLinkType(graph, { id, direction: TARGET, type: LinkType.DataChainLink });
+  return getNodesByLinkType(graph, {
+    id,
+    direction: TARGET,
+    type: LinkType.DataChainLink
+  });
 }
 function isEmpty(obj) {
   return obj && Object.keys(obj).length === 0;
@@ -707,11 +783,11 @@ function clearGroupDeep(graph, options) {
       var ok = false;
       graph = clearGroupDeep(graph, {
         id: i,
-        callback: (v) => {
+        callback: v => {
           ok = v;
           success = success && v;
         }
-      })
+      });
       if (graph.childGroups[id]) {
         delete graph.childGroups[id][i];
       }
@@ -719,8 +795,16 @@ function clearGroupDeep(graph, options) {
   }
   if (success) {
     //If the children were empty this can be cleared out
-    if (!graph.groupLib[id] || !graph.groupLib[id].leaves || !graph.groupLib[id].leaves.length) {
-      if (!graph.groupLib[id] || !graph.groupLib[id].groups || !graph.groupLib[id].groups.length) {
+    if (
+      !graph.groupLib[id] ||
+      !graph.groupLib[id].leaves ||
+      !graph.groupLib[id].leaves.length
+    ) {
+      if (
+        !graph.groupLib[id] ||
+        !graph.groupLib[id].groups ||
+        !graph.groupLib[id].groups.length
+      ) {
         //if these conditions are met.
         delete graph.groupLib[id];
         graph.groups = [...graph.groups.filter(x => x !== id)];
@@ -729,15 +813,13 @@ function clearGroupDeep(graph, options) {
           for (var i in graph.parentGroup[id]) {
             graph = removeGroupFromGroup(graph, { groupId: id, id: i });
             graph = clearGroupDeep(graph, { id: i });
-            if (graph.childGroups[i])
-              delete graph.childGroups[i][id]
+            if (graph.childGroups[i]) delete graph.childGroups[i][id];
           }
           delete graph.parentGroup[id];
         }
       }
     }
-  }
-  else {
+  } else {
     if (callback) {
       callback(false);
     }
@@ -751,8 +833,8 @@ export function removeNodeFromGroups(graph, options) {
   if (graph.nodesGroups[id]) {
     groupsContainingNode = Object.keys(graph.nodesGroups[id]);
     groupsContainingNode.map(group => {
-      graph = removeLeaf(graph, { leaf: id, id: group })
-    })
+      graph = removeLeaf(graph, { leaf: id, id: group });
+    });
   }
 
   //groupsNodes
@@ -760,7 +842,7 @@ export function removeNodeFromGroups(graph, options) {
     groupsContainingNode.map(group => {
       if (graph.groupsNodes[group]) {
         if (graph.groupsNodes[group][id]) {
-          delete graph.groupsNodes[group][id]
+          delete graph.groupsNodes[group][id];
         }
 
         if (Object.keys(graph.groupsNodes[group]).length === 0) {
@@ -768,9 +850,8 @@ export function removeNodeFromGroups(graph, options) {
         }
       }
       graph = clearGroupDeep(graph, { id: group });
-    })
+    });
   }
-
 
   return graph;
 }
@@ -782,7 +863,6 @@ export function clearLinks(graph, options) {
     graph = removeLink(graph, link);
   }
   return graph;
-
 }
 
 export function addNode(graph, node, options) {
@@ -791,7 +871,7 @@ export function addNode(graph, node, options) {
   graph.nodes = [...graph.nodes, node.id];
   graph = { ...graph };
   graph = incrementBuild(graph);
-  if(options&&options.callback){
+  if (options && options.callback) {
     options.callback(node);
   }
   return graph;
@@ -809,12 +889,12 @@ export function addNewPropertyNode(graph, options) {
 }
 
 const DEFAULT_PROPERTIES = [
-  { title: 'Owner', type: NodePropertyTypes.STRING },
-  { title: 'Id', type: NodePropertyTypes.STRING },
-  { title: 'Created', type: NodePropertyTypes.DATETIME },
-  { title: 'Updated', type: NodePropertyTypes.DATETIME },
-  { title: 'Deleted', type: NodePropertyTypes.BOOLEAN },
-  { title: 'Version', type: NodePropertyTypes.STRING }
+  { title: "Owner", type: NodePropertyTypes.STRING },
+  { title: "Id", type: NodePropertyTypes.STRING },
+  { title: "Created", type: NodePropertyTypes.DATETIME },
+  { title: "Updated", type: NodePropertyTypes.DATETIME },
+  { title: "Deleted", type: NodePropertyTypes.BOOLEAN },
+  { title: "Version", type: NodePropertyTypes.STRING }
 ].map(t => {
   t.nodeType = NodeTypes.Property;
   return t;
@@ -824,32 +904,39 @@ export function addDefaultProperties(graph, options) {
   // updateNodeProperty
   var propertyNodes = GetLinkChainFromGraph(graph, {
     id: options.parent,
-    links: [{
-      direction: SOURCE,
-      type: LinkType.PropertyLink
-    }]
+    links: [
+      {
+        direction: SOURCE,
+        type: LinkType.PropertyLink
+      }
+    ]
   }).map(t => GetNodeProp(t, NodeProperties.UIText));
   DEFAULT_PROPERTIES.filter(t => {
     return propertyNodes.indexOf(t.title) === -1;
   }).map(dp => {
-    graph = addNewNodeOfType(graph, options, dp.nodeType, (new_node, _graph) => {
-      _graph = updateNodeProperty(_graph, {
-        id: new_node.id,
-        prop: NodeProperties.UIText,
-        value: dp.title
-      });
-      _graph = updateNodeProperty(_graph, {
-        id: new_node.id,
-        prop: NodeProperties.IsDefaultProperty,
-        value: true
-      });
-      _graph = updateNodeProperty(_graph, {
-        id: new_node.id,
-        prop: NodeProperties.UIAttributeType,
-        value: dp.type
-      });
-      return _graph;
-    })
+    graph = addNewNodeOfType(
+      graph,
+      options,
+      dp.nodeType,
+      (new_node, _graph) => {
+        _graph = updateNodeProperty(_graph, {
+          id: new_node.id,
+          prop: NodeProperties.UIText,
+          value: dp.title
+        });
+        _graph = updateNodeProperty(_graph, {
+          id: new_node.id,
+          prop: NodeProperties.IsDefaultProperty,
+          value: true
+        });
+        _graph = updateNodeProperty(_graph, {
+          id: new_node.id,
+          prop: NodeProperties.UIAttributeType,
+          value: dp.type
+        });
+        return _graph;
+      }
+    );
   });
 
   return graph;
@@ -857,7 +944,10 @@ export function addDefaultProperties(graph, options) {
 
 function updateNode(node, options) {
   if (options.node) {
-    Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
+    Object.apply(
+      node.properties,
+      JSON.parse(JSON.stringify(options.node.properties))
+    );
   }
 }
 export function addNewNodeOfType(graph, options, nodeType, callback) {
@@ -872,32 +962,56 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
       if (options.rootNode) {
         options.rootNode.referenceNodes[graph.id] = {
           ...(options.rootNode.referenceNodes[graph.id] || {}),
-          ...({
+          ...{
             [node.id]: options.node.id
-          })
-        }
+          }
+        };
       }
     }
   }
   graph = addNode(graph, node);
   if (parent) {
-    graph = newLink(graph, { source: parent, target: node.id, properties: linkProperties ? linkProperties.properties : null });
+    graph = newLink(graph, {
+      source: parent,
+      target: node.id,
+      properties: linkProperties ? linkProperties.properties : null
+    });
   }
   if (options.links) {
     options.links.map(link => {
-      graph = newLink(graph, { source: node.id, target: link.target, properties: link.linkProperties ? link.linkProperties.properties : null });
-    })
+      if (typeof link === "function") {
+        link = link(graph);
+        link = link.find(x => x);
+      }
+      graph = newLink(graph, {
+        source: node.id,
+        target: link.target,
+        properties: link.linkProperties ? link.linkProperties.properties : null
+      });
+    });
   }
-  graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.NODEType, value: nodeType });
-  graph = updateNodeProperty(graph, { id: node.id, prop: NodeProperties.Pinned, value: true });
+  graph = updateNodeProperty(graph, {
+    id: node.id,
+    prop: NodeProperties.NODEType,
+    value: nodeType
+  });
+  graph = updateNodeProperty(graph, {
+    id: node.id,
+    prop: NodeProperties.Pinned,
+    value: true
+  });
   if (options.properties) {
     for (var p in options.properties) {
-      graph = updateNodeProperty(graph, { id: node.id, prop: p, value: options.properties[p] });
+      graph = updateNodeProperty(graph, {
+        id: node.id,
+        prop: p,
+        value: options.properties[p]
+      });
     }
   }
 
   if (groupProperties) {
-    graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent })
+    graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent });
   }
   if (callback) {
     graph = callback(GetNodeById(node.id, graph), graph) || graph;
@@ -910,8 +1024,7 @@ export function updateNodeGroup(graph, options) {
   var group = null;
   if (groupProperties && groupProperties.id) {
     group = getGroup(graph, groupProperties.id);
-  }
-  else if (!hasGroup(graph, parent)) {
+  } else if (!hasGroup(graph, parent)) {
     var group = createGroup();
     graph = addGroup(graph, group);
     graph = updateNodeProperty(graph, {
@@ -920,7 +1033,10 @@ export function updateNodeGroup(graph, options) {
       prop: NodeProperties.Groups
     });
     graph = addLeaf(graph, { leaf: parent, id: group.id });
-    var grandParent = GetNodeProp(graph.nodeLib[parent], NodeProperties.GroupParent);
+    var grandParent = GetNodeProp(
+      graph.nodeLib[parent],
+      NodeProperties.GroupParent
+    );
     if (grandParent && graph.groupLib[grandParent]) {
       var gparentGroup = graph.groupLib[grandParent];
       if (gparentGroup) {
@@ -934,12 +1050,14 @@ export function updateNodeGroup(graph, options) {
             id: anc,
             groupId: group.id
           });
-        })
+        });
       }
     }
-  }
-  else {
-    let nodeGroupProp = GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups);
+  } else {
+    let nodeGroupProp = GetNodeProp(
+      graph.nodeLib[parent],
+      NodeProperties.Groups
+    );
     group = getGroup(graph, nodeGroupProp.group);
   }
 
@@ -957,7 +1075,7 @@ export function updateNodeGroup(graph, options) {
           id: group.id,
           prop: gp,
           value: groupProperties[gp]
-        })
+        });
       }
     }
   }
@@ -977,7 +1095,10 @@ export function getGroup(graph, id) {
   return graph.groupLib[id];
 }
 export function hasGroup(graph, parent) {
-  return !!(graph.nodeLib[parent] && GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups));
+  return !!(
+    graph.nodeLib[parent] &&
+    GetNodeProp(graph.nodeLib[parent], NodeProperties.Groups)
+  );
 }
 export function GetNode(graph, id) {
   if (graph && graph.nodeLib) {
@@ -986,7 +1107,6 @@ export function GetNode(graph, id) {
   return null;
 }
 
-
 export function GetChildComponentAncestors(state, id) {
   let result = [];
 
@@ -994,15 +1114,17 @@ export function GetChildComponentAncestors(state, id) {
   let ancestors = GetNodesLinkedTo(graph, {
     id,
     direction: TARGET
-  }).filter(x => {
-    let nodeType = GetNodeProp(x, NodeProperties.NODEType);
-    switch (nodeType) {
-      case NodeTypes.ScreenOption:
-      case NodeTypes.ComponentNode:
-        return true;
-    }
-    return false;
-  }).map(t => t.id);
+  })
+    .filter(x => {
+      let nodeType = GetNodeProp(x, NodeProperties.NODEType);
+      switch (nodeType) {
+        case NodeTypes.ScreenOption:
+        case NodeTypes.ComponentNode:
+          return true;
+      }
+      return false;
+    })
+    .map(t => t.id);
 
   result = [...result, ...ancestors].unique();
   ancestors.map(t => {
@@ -1010,7 +1132,6 @@ export function GetChildComponentAncestors(state, id) {
     result = [...result, ...temp];
   });
   return result.unique();
-
 }
 export function createComponentProperties() {
   return {
@@ -1033,42 +1154,48 @@ export function removeComponentProperty(props, ops) {
     delete props.instanceTypes[modelProp];
   }
   return props;
-
 }
-
-
 
 export function updateClientMethod(methodParams, key, param, mparam, value) {
   methodParams[key] = methodParams[key] || {};
   methodParams[key].parameters = methodParams[key].parameters || {};
-  methodParams[key].parameters[param] = methodParams[key].parameters[param] || {};
+  methodParams[key].parameters[param] =
+    methodParams[key].parameters[param] || {};
   methodParams[key].parameters[param] = {
     ...methodParams[key].parameters[param],
     [mparam]: value
-  }
+  };
 
-  return methodParams
-
+  return methodParams;
 }
 
 export function getClientMethod(methodParams, key, param, mparam) {
-  if (methodParams && methodParams[key] && methodParams[key].parameters && methodParams[key].parameters[param] && methodParams[key].parameters[param][mparam])
+  if (
+    methodParams &&
+    methodParams[key] &&
+    methodParams[key].parameters &&
+    methodParams[key].parameters[param] &&
+    methodParams[key].parameters[param][mparam]
+  )
     return methodParams[key].parameters[param][mparam];
 
   return null;
-
 }
 export function getComponentPropertyList(props) {
   if (props && props.properties) {
-    return Object.keys(props.properties).map(t => ({ title: t, id: props.properties[t], value: t }))
+    return Object.keys(props.properties).map(t => ({
+      title: t,
+      id: props.properties[t],
+      value: t
+    }));
   }
   return [];
 }
 export function hasComponentProperty(props, prop) {
   return props && props.properties && props.properties.hasOwnProperty(prop);
 }
-export function getComponentProperty(props, prop, type = 'properties') {
-  return props && props[type] && props[type][(prop)];
+export function getComponentProperty(props, prop, type = "properties") {
+  return props && props[type] && props[type][prop];
 }
 export function GetGroup(graph, id) {
   if (graph && graph.groupLib) {
@@ -1086,7 +1213,10 @@ export function applyConstraints(graph) {
         if (functionType) {
           var functionConstraintObject = Functions[functionType];
           if (functionConstraintObject) {
-            graph = checkConstraints(graph, { id: i, functionConstraints: functionConstraintObject });
+            graph = checkConstraints(graph, {
+              id: i,
+              functionConstraints: functionConstraintObject
+            });
           }
         }
       }
@@ -1095,12 +1225,11 @@ export function applyConstraints(graph) {
   let validationNodes = NodesByType(graph, NodeTypes.Validator);
   validationNodes.map(x => {
     graph = applyValidationNodeRules(graph, x);
-  })
+  });
   return graph;
 }
 
 function applyValidationNodeRules(graph, node) {
-
   let validator = GetNodeProp(node, NodeProperties.Validator);
   if (validator) {
     var nodesLinks = getNodesLinkedTo(graph, { id: node.id });
@@ -1108,8 +1237,7 @@ function applyValidationNodeRules(graph, node) {
     Object.keys(validatorProperties).map(property => {
       if (graph.nodeLinks[property] && graph.nodeLinks[property][node.id]) {
         //link between nodes exists.
-      }
-      else {
+      } else {
         //link between nodes exists.
       }
     });
@@ -1118,28 +1246,41 @@ function applyValidationNodeRules(graph, node) {
 }
 
 function NodesByType(graph, nodeType, options = {}) {
-
   var currentGraph = graph;
   if (currentGraph) {
     if (!Array.isArray(nodeType)) {
       nodeType = [nodeType];
     }
     return currentGraph.nodes
-      .filter(x => currentGraph.nodeLib && currentGraph.nodeLib[x] && currentGraph.nodeLib[x].properties &&
-        (nodeType.indexOf(currentGraph.nodeLib[x].properties[NodeProperties.NODEType]) !== -1) ||
-        (!options.excludeRefs && currentGraph.nodeLib[x] && currentGraph.nodeLib[x].properties && currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType))
+      .filter(
+        x =>
+          (currentGraph.nodeLib &&
+            currentGraph.nodeLib[x] &&
+            currentGraph.nodeLib[x].properties &&
+            nodeType.indexOf(
+              currentGraph.nodeLib[x].properties[NodeProperties.NODEType]
+            ) !== -1) ||
+          (!options.excludeRefs &&
+            currentGraph.nodeLib[x] &&
+            currentGraph.nodeLib[x].properties &&
+            currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
+              nodeType)
+      )
       .map(x => currentGraph.nodeLib[x]);
   }
   return [];
 }
 export function existsLinkBetween(graph, options) {
   var { source, target, type, direction, properties } = options;
-  var link = findLink(graph, { source, target })
+  var link = findLink(graph, { source, target });
 
   if (link) {
-    if (properties && Object.key(properties).some(prop => {
-      return GetLinkProperty(link, prop) !== properties[prop];
-    })) {
+    if (
+      properties &&
+      Object.key(properties).some(prop => {
+        return GetLinkProperty(link, prop) !== properties[prop];
+      })
+    ) {
       return false;
     }
     return GetLinkProperty(link, LinkPropertyKeys.TYPE) === type || !type;
@@ -1176,18 +1317,31 @@ export function constraintSideEffects(graph) {
     for (let i in functionNodes) {
       var function_node = GetNode(graph, i);
       if (function_node) {
-        var functionType = GetNodeProp(function_node, NodeProperties.FunctionType);
+        var functionType = GetNodeProp(
+          function_node,
+          NodeProperties.FunctionType
+        );
         if (functionType) {
           var functionConstraintObject = Functions[functionType];
-          if (functionConstraintObject && functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES]) {
-            let functionConstraintRequiredClasses = functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES];
+          if (
+            functionConstraintObject &&
+            functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES]
+          ) {
+            let functionConstraintRequiredClasses =
+              functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES];
             if (functionConstraintRequiredClasses) {
               for (let j in functionConstraintRequiredClasses) {
                 //Get the model constraint key.
                 //Should be able to find the singular model that is connected to the functionNode and children, if it exists.
-                let constraintModelKey = functionConstraintRequiredClasses[j][INTERNAL_TEMPLATE_REQUIREMENTS.MODEL];
+                let constraintModelKey =
+                  functionConstraintRequiredClasses[j][
+                    INTERNAL_TEMPLATE_REQUIREMENTS.MODEL
+                  ];
                 if (constraintModelKey) {
-                  var constraint_nodes = getNodesFunctionsConnected(graph, { id: i, constraintKey: constraintModelKey });
+                  var constraint_nodes = getNodesFunctionsConnected(graph, {
+                    id: i,
+                    constraintKey: constraintModelKey
+                  });
                   var nodes_one_step_down_the_line = [];
                   constraint_nodes.map(cn => {
                     var nextNodes = getNodesLinkedTo(graph, { id: cn.id });
@@ -1199,79 +1353,94 @@ export function constraintSideEffects(graph) {
                       functionNode: function_node.id,
                       key: constraintModelKey,
                       class: j
-                    })
-                  })
+                    });
+                  });
                 }
               }
             }
           }
         }
       }
-      classes_that_must_exist = [...classes_that_must_exist.unique(x => {
-        return JSON.stringify(x);
-      })]
+      classes_that_must_exist = [
+        ...classes_that_must_exist.unique(x => {
+          return JSON.stringify(x);
+        })
+      ];
       //Remove class nodes that are no longer cool.
       Object.keys(graph.classNodes).map(i => {
-        if (!classes_that_must_exist.find(cls => {
-          let _cnode = graph.nodeLib[i];
-          var res = GetNodeProp(_cnode, NodeProperties.ClassConstructionInformation);
-          return matchObject(res, cls);
-        })) {
-          graph = removeNode(graph, { id: i })
-        }
-        else {
-
+        if (
+          !classes_that_must_exist.find(cls => {
+            let _cnode = graph.nodeLib[i];
+            var res = GetNodeProp(
+              _cnode,
+              NodeProperties.ClassConstructionInformation
+            );
+            return matchObject(res, cls);
+          })
+        ) {
+          graph = removeNode(graph, { id: i });
+        } else {
         }
       });
       //Could make this faster by using a dictionary
       classes_that_must_exist.map(cls => {
         var matching_nodes = Object.keys(graph.classNodes).filter(i => {
-
           let _cnode = graph.nodeLib[i];
-          var res = GetNodeProp(_cnode, NodeProperties.ClassConstructionInformation);
+          var res = GetNodeProp(
+            _cnode,
+            NodeProperties.ClassConstructionInformation
+          );
           if (matchObject(res, cls)) {
             return true;
-          }
-          else {
+          } else {
             return false;
           }
         });
         if (matching_nodes.length === 0) {
           //Create new classNodes
-          graph = addNewNodeOfType(graph, {
-            parent: cls.functionNode,
-            linkProperties: {
-              properties: { ...LinkProperties.RequiredClassLink }
+          graph = addNewNodeOfType(
+            graph,
+            {
+              parent: cls.functionNode,
+              linkProperties: {
+                properties: { ...LinkProperties.RequiredClassLink }
+              }
+            },
+            NodeTypes.ClassNode,
+            new_node => {
+              graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.UIText,
+                value: RequiredClassName(
+                  cls.class,
+                  GetNodeProp(
+                    GetNode(graph, cls.nodeId),
+                    NodeProperties.CodeName
+                  )
+                )
+              });
+              graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.ClassConstructionInformation,
+                value: cls
+              });
             }
-          }, NodeTypes.ClassNode, (new_node) => {
-            graph = updateNodeProperty(graph, {
-              id: new_node.id,
-              prop: NodeProperties.UIText,
-              value: RequiredClassName(
-                cls.class,
-                GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName)
-              )
-            });
-            graph = updateNodeProperty(graph, {
-              id: new_node.id,
-              prop: NodeProperties.ClassConstructionInformation,
-              value: cls
-            });
-          })
-        }
-        else if (matching_nodes.length === 1) {
+          );
+        } else if (matching_nodes.length === 1) {
           var _cnode = graph.nodeLib[matching_nodes[0]];
           //The existing classNodes can be updated with any new dependent values. e.g. Text/title
           graph = updateNodeProperty(graph, {
             id: _cnode.id,
             prop: NodeProperties.UIText,
-            value: RequiredClassName(cls.class, GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName))
+            value: RequiredClassName(
+              cls.class,
+              GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName)
+            )
           });
+        } else {
+          console.error("There should never be more than one");
         }
-        else {
-          console.error('There should never be more than one');
-        }
-      })
+      });
     }
   }
 
@@ -1290,9 +1459,8 @@ export function getNodesFunctionsConnected(graph, options) {
 
   return links.map(link => {
     return graph.nodeLib[link.target];
-  })
+  });
 }
-
 
 export function checkConstraints(graph, options) {
   var { id, functionConstraints } = options;
@@ -1306,16 +1474,29 @@ export function checkConstraints(graph, options) {
         let { constraints } = properties;
         if (constraints) {
           Object.keys(FunctionTemplateKeys).map(ftk => {
-            let functionTemplateKey = FunctionTemplateKeys[ftk]
-            let constraintObj = functionConstraints.constraints[functionTemplateKey];
-            if (constraintObj && _link && _link.properties && _link.properties.constraints && _link.properties.constraints.key) {
+            let functionTemplateKey = FunctionTemplateKeys[ftk];
+            let constraintObj =
+              functionConstraints.constraints[functionTemplateKey];
+            if (
+              constraintObj &&
+              _link &&
+              _link.properties &&
+              _link.properties.constraints &&
+              _link.properties.constraints.key
+            ) {
               if (_link.properties.constraints.key === constraintObj.key) {
-                let valid = FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph);
+                let valid = FunctionMeetsConstraint.meets(
+                  constraintObj,
+                  constraints,
+                  _link,
+                  node,
+                  graph
+                );
                 graph = updateLinkProperty(graph, {
                   id: _link.id,
                   prop: LinkPropertyKeys.VALID_CONSTRAINTS,
                   value: !!valid
-                })
+                });
               }
             }
           });
@@ -1332,17 +1513,23 @@ export function applyFunctionConstraints(graph, options) {
   let functionConstraints = Functions[value];
   if (functionConstraints) {
     if (functionConstraints.constraints) {
-
       if (graph.nodeConnections[id]) {
         getNodeFunctionConstraintLinks(graph, { id }).map(link => {
-          let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
-          if (!hasMatchingConstraints(link_constraints, functionConstraints.constraints)) {
+          let link_constraints = GetLinkProperty(
+            link,
+            LinkPropertyKeys.CONSTRAINTS
+          );
+          if (
+            !hasMatchingConstraints(
+              link_constraints,
+              functionConstraints.constraints
+            )
+          ) {
             let nodeToRemove = GetTargetNode(graph, link.id);
 
             if (nodeToRemove) {
-              graph = removeNode(graph, { id: nodeToRemove.id })
-            }
-            else {
+              graph = removeNode(graph, { id: nodeToRemove.id });
+            } else {
               console.warn("No nodes were removed as exepected");
             }
           }
@@ -1363,7 +1550,9 @@ export function applyFunctionConstraints(graph, options) {
 
       if (graph.nodesGroups[id]) {
         for (let i in graph.nodesGroups[id]) {
-          switch (GetGroupProperty(graph.groupLib[i], GroupProperties.FunctionGroup)) {
+          switch (
+            GetGroupProperty(graph.groupLib[i], GroupProperties.FunctionGroup)
+          ) {
             case FunctionGroups.Core:
               core_group = graph.groupLib[i];
               break;
@@ -1371,8 +1560,8 @@ export function applyFunctionConstraints(graph, options) {
         }
       }
       if (!core_group) {
-        graph = newGroup(graph, (_group) => {
-          core_group = _group
+        graph = newGroup(graph, _group => {
+          core_group = _group;
           graph = updateGroupProperty(graph, {
             id: _group.id,
             prop: GroupProperties.FunctionGroup,
@@ -1382,8 +1571,8 @@ export function applyFunctionConstraints(graph, options) {
       }
 
       if (!internal_group) {
-        graph = newGroup(graph, (_group) => {
-          internal_group = _group
+        graph = newGroup(graph, _group => {
+          internal_group = _group;
           graph = updateGroupProperty(graph, {
             id: _group.id,
             prop: GroupProperties.FunctionGroup,
@@ -1393,8 +1582,8 @@ export function applyFunctionConstraints(graph, options) {
       }
 
       if (!external_group) {
-        graph = newGroup(graph, (_group) => {
-          external_group = _group
+        graph = newGroup(graph, _group => {
+          external_group = _group;
           graph = updateGroupProperty(graph, {
             id: _group.id,
             prop: GroupProperties.FunctionGroup,
@@ -1403,56 +1592,91 @@ export function applyFunctionConstraints(graph, options) {
         });
       }
 
-      if (!graph.groupsNodes[external_group.id] || !graph.groupsNodes[external_group.id][id]) {
-        graph = addLeaf(graph, { leaf: id, id: external_group.id })
+      if (
+        !graph.groupsNodes[external_group.id] ||
+        !graph.groupsNodes[external_group.id][id]
+      ) {
+        graph = addLeaf(graph, { leaf: id, id: external_group.id });
       }
 
-      if (!graph.childGroups[internal_group.id] || !graph.childGroups[internal_group.id][external_group.id]) {
-        graph = addGroupToGroup(graph, { groupId: internal_group.id, id: external_group.id });
+      if (
+        !graph.childGroups[internal_group.id] ||
+        !graph.childGroups[internal_group.id][external_group.id]
+      ) {
+        graph = addGroupToGroup(graph, {
+          groupId: internal_group.id,
+          id: external_group.id
+        });
       }
 
-      if (!graph.childGroups[core_group.id] || !graph.childGroups[core_group.id][internal_group.id]) {
-        graph = addGroupToGroup(graph, { groupId: core_group.id, id: internal_group.id });
+      if (
+        !graph.childGroups[core_group.id] ||
+        !graph.childGroups[core_group.id][internal_group.id]
+      ) {
+        graph = addGroupToGroup(graph, {
+          groupId: core_group.id,
+          id: internal_group.id
+        });
       }
-
 
       var existMatchinLinks = getNodeFunctionConstraintLinks(graph, { id });
       var constraintKeys = existMatchinLinks.map(link => {
-        let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
-        return findMatchingConstraints(link_constraints, functionConstraints.constraints);
-      })
+        let link_constraints = GetLinkProperty(
+          link,
+          LinkPropertyKeys.CONSTRAINTS
+        );
+        return findMatchingConstraints(
+          link_constraints,
+          functionConstraints.constraints
+        );
+      });
 
       Object.keys(functionConstraints.constraints).map(constraint => {
         //Create links to new nodes representing those constraints.
         if (constraintKeys.indexOf(constraint) === -1) {
-          graph = addNewNodeOfType(graph, {
-            parent: node.id,
-            linkProperties: {
-              properties: {
-                type: LinkType.FunctionConstraintLink,
-                constraints: {
-                  ...functionConstraints.constraints[constraint]
+          graph = addNewNodeOfType(
+            graph,
+            {
+              parent: node.id,
+              linkProperties: {
+                properties: {
+                  type: LinkType.FunctionConstraintLink,
+                  constraints: {
+                    ...functionConstraints.constraints[constraint]
+                  }
                 }
               }
+            },
+            NodeTypes.Parameter,
+            new_node => {
+              graph = updateNodeProperty(graph, {
+                id: new_node.id,
+                prop: NodeProperties.UIText,
+                value: constraint
+              });
             }
-          }, NodeTypes.Parameter, (new_node) => {
-            graph = updateNodeProperty(graph, { id: new_node.id, prop: NodeProperties.UIText, value: constraint });
-
-          });
+          );
         }
       });
 
-      var nodes_with_link = getNodeFunctionConstraintLinks(graph, { id: node.id });
+      var nodes_with_link = getNodeFunctionConstraintLinks(graph, {
+        id: node.id
+      });
 
-      nodes_with_link.map((link) => {
+      nodes_with_link.map(link => {
         let new_node = graph.nodeLib[link.target];
         var constraint = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
-        if (constraint && constraint.key && functionConstraints.constraints[constraint.key] &&
-          functionConstraints.constraints[constraint.key][FunctionConstraintKeys.IsInputVariable]) {
+        if (
+          constraint &&
+          constraint.key &&
+          functionConstraints.constraints[constraint.key] &&
+          functionConstraints.constraints[constraint.key][
+            FunctionConstraintKeys.IsInputVariable
+          ]
+        ) {
           graph = addLeaf(graph, { leaf: new_node.id, id: internal_group.id });
-        }
-        else {
-          graph = addLeaf(graph, { leaf: new_node.id, id: core_group.id })
+        } else {
+          graph = addLeaf(graph, { leaf: new_node.id, id: core_group.id });
         }
       });
 
@@ -1465,16 +1689,29 @@ export function applyFunctionConstraints(graph, options) {
             let { constraints } = properties;
             if (constraints) {
               Object.keys(FunctionTemplateKeys).map(ftk => {
-                let functionTemplateKey = FunctionTemplateKeys[ftk]
-                let constraintObj = functionConstraints.constraints[functionTemplateKey];
-                if (constraintObj && _link && _link.properties && _link.properties.constraints && _link.properties.constraints.key) {
+                let functionTemplateKey = FunctionTemplateKeys[ftk];
+                let constraintObj =
+                  functionConstraints.constraints[functionTemplateKey];
+                if (
+                  constraintObj &&
+                  _link &&
+                  _link.properties &&
+                  _link.properties.constraints &&
+                  _link.properties.constraints.key
+                ) {
                   if (_link.properties.constraints.key === constraintObj.key) {
-                    let valid = FunctionMeetsConstraint.meets(constraintObj, constraints, _link, node, graph);
+                    let valid = FunctionMeetsConstraint.meets(
+                      constraintObj,
+                      constraints,
+                      _link,
+                      node,
+                      graph
+                    );
                     graph = updateLinkProperty(graph, {
                       id: _link.id,
                       prop: LinkPropertyKeys.VALID_CONSTRAINTS,
                       value: !!valid
-                    })
+                    });
                   }
                 }
               });
@@ -1490,7 +1727,7 @@ export function applyFunctionConstraints(graph, options) {
           internal: internal_group.id,
           external: external_group.id
         }
-      })
+      });
     }
   }
 
@@ -1501,12 +1738,20 @@ function getNodeLinksWithKey(graph, options) {
   var { id, key } = options;
   var result = [];
   if (graph.nodeConnections[id]) {
-    return Object.keys(graph.nodeConnections[id]).map(link => {
-      let _link = graph.linkLib[link];
-      return _link;
-    }).filter(_link => {
-      return _link && _link.source === id && _link.properties && _link.properties.constraints && _link.properties.constraints.key === key;
-    })
+    return Object.keys(graph.nodeConnections[id])
+      .map(link => {
+        let _link = graph.linkLib[link];
+        return _link;
+      })
+      .filter(_link => {
+        return (
+          _link &&
+          _link.source === id &&
+          _link.properties &&
+          _link.properties.constraints &&
+          _link.properties.constraints.key === key
+        );
+      });
   }
 
   return result;
@@ -1517,15 +1762,22 @@ function hasMatchingConstraints(linkConstraint, functionConstraints) {
 }
 function findMatchingConstraints(linkConstraint, functionConstraints) {
   let lcj = JSON.stringify(linkConstraint);
-  return Object.keys(functionConstraints).find(f => JSON.stringify(functionConstraints[f]) === lcj)
+  return Object.keys(functionConstraints).find(
+    f => JSON.stringify(functionConstraints[f]) === lcj
+  );
 }
 
 function getNodeFunctionConstraintLinks(graph, options) {
   let { id } = options;
   if (graph && graph.nodeConnections && graph.nodeConnections[id]) {
-    return Object.keys(graph.nodeConnections[id]).filter(link => {
-      return GetLinkProperty(graph.linkLib[link], LinkPropertyKeys.TYPE) === LinkType.FunctionConstraintLink;
-    }).map(link => graph.linkLib[link]);
+    return Object.keys(graph.nodeConnections[id])
+      .filter(link => {
+        return (
+          GetLinkProperty(graph.linkLib[link], LinkPropertyKeys.TYPE) ===
+          LinkType.FunctionConstraintLink
+        );
+      })
+      .map(link => graph.linkLib[link]);
   }
 
   return [];
@@ -1552,8 +1804,7 @@ export const FunctionMeetsConstraint = {
                 if (!GetNodeProp(targetNode, NodeProperties.IsAgent)) {
                   result = false;
                 }
-              }
-              else {
+              } else {
                 result = false;
               }
               break;
@@ -1562,8 +1813,7 @@ export const FunctionMeetsConstraint = {
                 if (!GetNodeProp(targetNode, NodeProperties.IsUser)) {
                   result = false;
                 }
-              }
-              else {
+              } else {
                 result = false;
               }
               break;
@@ -1571,26 +1821,36 @@ export const FunctionMeetsConstraint = {
               //If it is an input variable, then we will all anything.
               if (!constraintObj[FunctionConstraintKeys.IsInputVariable]) {
                 if (targetNode) {
-                  let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                  let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                  let targetNodeType = GetNodeProp(
+                    targetNode,
+                    NodeProperties.NODEType
+                  );
+                  let targetConstraint = constraintObj[constraint]; //FunctionConstraintKeys.Model
                   // The targetNodeType should match the other node.
-                  let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                  let linkWithConstraints = findLinkWithConstraint(
+                    node.id,
+                    graph,
+                    targetConstraint
+                  );
                   if (linkWithConstraints.length) {
-                    let links = linkWithConstraints.filter(linkWithConstraint => {
-
-                      let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
-                      let nodeToMatchWithType = GetNodeProp(nodeToMatchWith, NodeProperties.NODEType);
-                      return (nodeToMatchWithType !== targetNodeType);
-                    });
+                    let links = linkWithConstraints.filter(
+                      linkWithConstraint => {
+                        let nodeToMatchWith =
+                          graph.nodeLib[linkWithConstraint.target];
+                        let nodeToMatchWithType = GetNodeProp(
+                          nodeToMatchWith,
+                          NodeProperties.NODEType
+                        );
+                        return nodeToMatchWithType !== targetNodeType;
+                      }
+                    );
                     if (links.length === 0) {
                       result = false;
                     }
-                  }
-                  else {
+                  } else {
                     result = false;
                   }
-                }
-                else {
+                } else {
                   result = false;
                 }
               }
@@ -1598,16 +1858,32 @@ export const FunctionMeetsConstraint = {
             case FunctionConstraintKeys.IsChild:
               if (targetNode) {
                 // let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                let targetConstraint = constraintObj[constraint]; //FunctionConstraintKeys.Model
                 // The targetNodeType should match the other node.
-                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                let linkWithConstraints = findLinkWithConstraint(
+                  node.id,
+                  graph,
+                  targetConstraint
+                );
                 if (linkWithConstraints) {
                   let links = linkWithConstraints.filter(linkWithConstraint => {
-                    let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
-                    let linkToParentParameter = getNodeLinkedTo(graph, { id: nodeToMatchWith.id });
+                    let nodeToMatchWith =
+                      graph.nodeLib[linkWithConstraint.target];
+                    let linkToParentParameter = getNodeLinkedTo(graph, {
+                      id: nodeToMatchWith.id
+                    });
                     if (linkToParentParameter && linkToParentParameter.length) {
-                      let relationshipLink = findLink(graph, { target: targetNode.id, source: linkToParentParameter[0].id })
-                      if (!relationshipLink || GetLinkProperty(relationshipLink, LinkPropertyKeys.TYPE) !== LinkProperties.ParentLink.type) {
+                      let relationshipLink = findLink(graph, {
+                        target: targetNode.id,
+                        source: linkToParentParameter[0].id
+                      });
+                      if (
+                        !relationshipLink ||
+                        GetLinkProperty(
+                          relationshipLink,
+                          LinkPropertyKeys.TYPE
+                        ) !== LinkProperties.ParentLink.type
+                      ) {
                         return false;
                       }
                     } else {
@@ -1619,28 +1895,42 @@ export const FunctionMeetsConstraint = {
                   if (links.length === 0) {
                     result = false;
                   }
-                }
-                else {
+                } else {
                   result = false;
                 }
-              }
-              else {
+              } else {
                 result = false;
               }
               break;
             case FunctionConstraintKeys.IsParent:
               if (targetNode) {
                 // let targetNodeType = GetNodeProp(targetNode, NodeProperties.NODEType);
-                let targetConstraint = constraintObj[constraint] //FunctionConstraintKeys.Model
+                let targetConstraint = constraintObj[constraint]; //FunctionConstraintKeys.Model
                 // The targetNodeType should match the other node.
-                let linkWithConstraints = findLinkWithConstraint(node.id, graph, targetConstraint);
+                let linkWithConstraints = findLinkWithConstraint(
+                  node.id,
+                  graph,
+                  targetConstraint
+                );
                 if (linkWithConstraints) {
                   let links = linkWithConstraints.filter(linkWithConstraint => {
-                    let nodeToMatchWith = graph.nodeLib[linkWithConstraint.target];;
-                    let linkToParentParameter = getNodeLinkedTo(graph, { id: nodeToMatchWith.id });
+                    let nodeToMatchWith =
+                      graph.nodeLib[linkWithConstraint.target];
+                    let linkToParentParameter = getNodeLinkedTo(graph, {
+                      id: nodeToMatchWith.id
+                    });
                     if (linkToParentParameter && linkToParentParameter.length) {
-                      let relationshipLink = findLink(graph, { target: targetNode.id, source: linkToParentParameter[0].id })
-                      if (!relationshipLink || GetLinkProperty(relationshipLink, LinkPropertyKeys.TYPE) !== LinkProperties.ParentLink.type) {
+                      let relationshipLink = findLink(graph, {
+                        target: targetNode.id,
+                        source: linkToParentParameter[0].id
+                      });
+                      if (
+                        !relationshipLink ||
+                        GetLinkProperty(
+                          relationshipLink,
+                          LinkPropertyKeys.TYPE
+                        ) !== LinkProperties.ParentLink.type
+                      ) {
                         return false;
                       }
                     } else {
@@ -1652,12 +1942,10 @@ export const FunctionMeetsConstraint = {
                   if (links.length === 0) {
                     result = false;
                   }
-                }
-                else {
+                } else {
                   result = false;
                 }
-              }
-              else {
+              } else {
                 result = false;
               }
               break;
@@ -1697,36 +1985,52 @@ export const FunctionMeetsConstraint = {
 
           return result;
         });
-      })
+      });
     }
 
     return false;
   }
-}
+};
 function findLinkWithConstraint(nodeId, graph, targetConstraint) {
-  return Object.keys(graph.nodeConnections[nodeId]).filter(t => graph.nodeConnections[nodeId][t] === SOURCE).filter(link => {
-    if (link && graph.linkLib && graph.linkLib[link] && graph.linkLib[link].properties && graph.linkLib[link].properties.constraints
-      && graph.linkLib[link].properties.constraints.key === targetConstraint) {
-      return graph.linkLib[link];
-    }
-    return false;
-  }).map(link => graph.linkLib[link]);
+  return Object.keys(graph.nodeConnections[nodeId])
+    .filter(t => graph.nodeConnections[nodeId][t] === SOURCE)
+    .filter(link => {
+      if (
+        link &&
+        graph.linkLib &&
+        graph.linkLib[link] &&
+        graph.linkLib[link].properties &&
+        graph.linkLib[link].properties.constraints &&
+        graph.linkLib[link].properties.constraints.key === targetConstraint
+      ) {
+        return graph.linkLib[link];
+      }
+      return false;
+    })
+    .map(link => graph.linkLib[link]);
 }
 export function getNodeLinks(graph, id, direction) {
   if (graph && graph.nodeConnections) {
-    return Object.keys(graph.nodeConnections[id]).filter(x => {
-      if (direction) {
-        return graph.nodeConnections[id][x] === direction;
-      }
-      return true;
-    }).map(link => graph.linkLib[link]);
+    return Object.keys(graph.nodeConnections[id])
+      .filter(x => {
+        if (direction) {
+          return graph.nodeConnections[id][x] === direction;
+        }
+        return true;
+      })
+      .map(link => graph.linkLib[link]);
   }
   return [];
 }
 export function findLink(graph, options) {
   let { target, source } = options;
   let res = graph.links.find(link => {
-    return graph.linkLib && graph.linkLib[link] && graph.linkLib[link].target === target && graph.linkLib[link].source === source;
+    return (
+      graph.linkLib &&
+      graph.linkLib[link] &&
+      graph.linkLib[link].target === target &&
+      graph.linkLib[link].source === source
+    );
   });
   if (res) {
     return graph.linkLib[res];
@@ -1789,7 +2093,7 @@ export function GetLinkByNodes(graph, options) {
   var { source, target } = options;
   return Object.values(graph.linkLib).find(t => {
     return t.source === source && t.target === target;
-  })
+  });
 }
 export function GetLinkChainItem(state, options) {
   var chains = GetLinkChain(state, options);
@@ -1800,14 +2104,25 @@ export function GetLinkChainItem(state, options) {
   return null;
 }
 export function SetAffterEffectProperty(currentNode, afterMethod, key, value) {
-  let afterEffectSetup = GetNodeProp(currentNode, NodeProperties.AfterMethodSetup) || {};
+  let afterEffectSetup =
+    GetNodeProp(currentNode, NodeProperties.AfterMethodSetup) || {};
   afterEffectSetup[afterMethod] = afterEffectSetup[afterMethod] || {};
-  afterEffectSetup[afterMethod] = { ...afterEffectSetup[afterMethod], ...{ [key]: value } };
+  afterEffectSetup[afterMethod] = {
+    ...afterEffectSetup[afterMethod],
+    ...{ [key]: value }
+  };
   return afterEffectSetup;
 }
 export function GetAffterEffectProperty(currentNode, afterMethod, key) {
-  let afterEffectSetup = GetNodeProp(currentNode, NodeProperties.AfterMethodSetup);
-  if (afterEffectSetup && afterEffectSetup[afterMethod] && afterEffectSetup[afterMethod][key])
+  let afterEffectSetup = GetNodeProp(
+    currentNode,
+    NodeProperties.AfterMethodSetup
+  );
+  if (
+    afterEffectSetup &&
+    afterEffectSetup[afterMethod] &&
+    afterEffectSetup[afterMethod][key]
+  )
     return afterEffectSetup[afterMethod][key];
   return null;
 }
@@ -1821,13 +2136,17 @@ export function GetPermissionNode(state, id) {
   let graph = GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id
-  }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Permission);
+  }).find(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Permission
+  );
 }
 export function GetConditionNodes(state, id) {
   let graph = GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id
-  }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
+  }).filter(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition
+  );
 }
 export function GetConnectedNodesByType(state, id, type, direction) {
   let graph = GetRootGraph(state);
@@ -1838,7 +2157,9 @@ export function GetConnectedNodesByType(state, id, type, direction) {
 }
 export function GetDataChainEntryNodes(state) {
   let graph = GetRootGraph(state);
-  return NodesByType(graph, NodeTypes.DataChain).filter(x => GetNodeProp(x, NodeProperties.EntryPoint));
+  return NodesByType(graph, NodeTypes.DataChain).filter(x =>
+    GetNodeProp(x, NodeProperties.EntryPoint)
+  );
 }
 export function GetConnectedNodeByType(state, id, type, direction) {
   if (!Array.isArray(type)) {
@@ -1863,13 +2184,17 @@ export function GetDataSourceNode(state, id) {
   let graph = GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id
-  }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataSource);
+  }).find(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataSource
+  );
 }
 export function GetModelItemFilter(state, id) {
   let graph = GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id
-  }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ModelItemFilter);
+  }).find(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ModelItemFilter
+  );
 }
 export function GetLinkChain(state, options) {
   let graph = GetCurrentGraph(state);
@@ -1888,27 +2213,27 @@ export function GetLinkChainFromGraph(graph, options, nodeType) {
       });
       if (il === links.length - 1) {
         result = newnodes;
-      }
-      else {
+      } else {
         newids = [...newids, ...newnodes.map(t => t.id)];
       }
-    })
+    });
     newids = newids.unique(x => x);
     ids = newids;
-  })
+  });
   return result.filter(x => {
     if (!nodeType) {
       return true;
     }
     return nodeType.indexOf(GetNodeProp(x, NodeProperties.NODEType)) !== -1;
-  })
+  });
 }
 export function getNodesLinkTypes(graph, options) {
   if (options) {
     var { id } = options;
     var links = graph.nodeConnections[id] || {};
-    var groups = Object.keys(links)
-      .groupBy(x => GetLinkProperty(graph.linkLib[x], LinkPropertyKeys.TYPE));
+    var groups = Object.keys(links).groupBy(x =>
+      GetLinkProperty(graph.linkLib[x], LinkPropertyKeys.TYPE)
+    );
     return Object.keys(groups);
   }
   return [];
@@ -1922,22 +2247,34 @@ export function getNodesByLinkType(graph, options) {
         return Object.keys(nodeLinks)
           .filter(x => nodeLinks[x])
           .map(_id => {
-            var target = graph.linkLib[_id] ? (direction === TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target) : null;
+            var target = graph.linkLib[_id]
+              ? direction === TARGET
+                ? graph.linkLib[_id].source
+                : graph.linkLib[_id].target
+              : null;
 
             if (!target) {
-              console.warn('Missing value in linkLib');
+              console.warn("Missing value in linkLib");
               return null;
             }
-            if (exist && graph.linkLib[_id].properties && graph.linkLib[_id].properties.exist) {
+            if (
+              exist &&
+              graph.linkLib[_id].properties &&
+              graph.linkLib[_id].properties.exist
+            ) {
               return graph.nodeLib[target];
             }
-            if (!type || graph.linkLib[_id].properties &&
-              (graph.linkLib[_id].properties.type === type ||
-                graph.linkLib[_id].properties[type])) {
+            if (
+              !type ||
+              (graph.linkLib[_id].properties &&
+                (graph.linkLib[_id].properties.type === type ||
+                  graph.linkLib[_id].properties[type]))
+            ) {
               return graph.nodeLib[target];
             }
             return null;
-          }).filter(x => x);
+          })
+          .filter(x => x);
       }
     }
   }
@@ -1954,24 +2291,33 @@ export function getNodeLinked(graph, options) {
     if (graph && graph.nodeConnections && id) {
       var nodeLinks = graph.nodeConnections[id];
       if (nodeLinks) {
-        return Object.keys(nodeLinks).filter(x => nodeLinks[x] === direction).map(_id => {
-          var target = graph.linkLib[_id] ? (direction === TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target) : null;
-          if (!target) {
-            console.warn('Missing value in linkLib');
-            return null;
-          }
-          if (constraints) {
-            let link = graph.linkLib[_id];
-            let link_constraints = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
-            if (matchOneWay(constraints, link_constraints)) {
-              return graph.nodeLib[target];
-            }
-            else {
+        return Object.keys(nodeLinks)
+          .filter(x => nodeLinks[x] === direction)
+          .map(_id => {
+            var target = graph.linkLib[_id]
+              ? direction === TARGET
+                ? graph.linkLib[_id].source
+                : graph.linkLib[_id].target
+              : null;
+            if (!target) {
+              console.warn("Missing value in linkLib");
               return null;
             }
-          }
-          return graph.nodeLib[target];
-        }).filter(x => x);
+            if (constraints) {
+              let link = graph.linkLib[_id];
+              let link_constraints = GetLinkProperty(
+                link,
+                LinkPropertyKeys.CONSTRAINTS
+              );
+              if (matchOneWay(constraints, link_constraints)) {
+                return graph.nodeLib[target];
+              } else {
+                return null;
+              }
+            }
+            return graph.nodeLib[target];
+          })
+          .filter(x => x);
       }
     }
   }
@@ -1984,38 +2330,42 @@ export function GetNodesLinkedTo(graph, options) {
     if (graph && graph.nodeConnections && id) {
       var nodeLinks = graph.nodeConnections[id];
       if (nodeLinks) {
-        return Object.keys(nodeLinks).map(_id => {
-          var target = null;
-          if (link) {
-            if (GetLinkProperty(graph.linkLib[_id], LinkPropertyKeys.TYPE) !== link) {
+        return Object.keys(nodeLinks)
+          .map(_id => {
+            var target = null;
+            if (link) {
+              if (
+                GetLinkProperty(graph.linkLib[_id], LinkPropertyKeys.TYPE) !==
+                link
+              ) {
+                return null;
+              }
+            }
+            if (graph.linkLib[_id]) {
+              if (graph.linkLib[_id].source !== id) {
+                if (!direction || direction === TARGET)
+                  target = graph.linkLib[_id].source;
+              } else {
+                if (!direction || direction === SOURCE)
+                  target = graph.linkLib[_id].target;
+              }
+            }
+
+            if (!target) {
+              // console.warn('Missing value in linkLib');
               return null;
             }
-          }
-          if (graph.linkLib[_id]) {
-            if (graph.linkLib[_id].source !== id) {
-              if (!direction || direction === TARGET)
-                target = graph.linkLib[_id].source;
-            }
-            else {
-              if (!direction || direction === SOURCE)
-                target = graph.linkLib[_id].target;
-            }
-          }
-
-          if (!target) {
-            // console.warn('Missing value in linkLib');
-            return null;
-          }
-          return graph.nodeLib[target];
-        }).filter(x => x);
+            return graph.nodeLib[target];
+          })
+          .filter(x => x);
       }
     }
   }
   return [];
 }
 
-export const SOURCE = 'SOURCE';
-export const TARGET = 'TARGET';
+export const SOURCE = "SOURCE";
+export const TARGET = "TARGET";
 export function addLink(graph, options, link) {
   let { target, source } = options;
   if (target && source && target !== source) {
@@ -2031,7 +2381,7 @@ export function addLink(graph, options, link) {
           ...{
             [link.id]: SOURCE
           }
-        }
+        };
 
         //Keeps track of the links for each node.
         graph.nodeConnections[link.target] = {
@@ -2039,24 +2389,27 @@ export function addLink(graph, options, link) {
           ...{
             [link.id]: TARGET
           }
-        }
+        };
 
         //Keeps track of the number of links between nodes.
         graph.nodeLinks[link.source] = {
           ...(graph.nodeLinks[link.source] || {}),
           ...{
-            [link.target]: graph.nodeLinks[link.source] ? (graph.nodeLinks[link.source][link.target] || 0) + 1 : 1
+            [link.target]: graph.nodeLinks[link.source]
+              ? (graph.nodeLinks[link.source][link.target] || 0) + 1
+              : 1
           }
         };
         //Keeps track of the number of links between nodes.
         graph.nodeLinks[link.target] = {
           ...graph.nodeLinks[link.target],
           ...{
-            [link.source]: graph.nodeLinks[link.target] ? (graph.nodeLinks[link.target][link.source] || 0) + 1 : 1
+            [link.source]: graph.nodeLinks[link.target]
+              ? (graph.nodeLinks[link.target][link.source] || 0) + 1
+              : 1
           }
         };
-      }
-      else {
+      } else {
         var oldLink = findLink(graph, { target, source });
         if (oldLink) {
           //  the type won't change onces its set
@@ -2064,11 +2417,11 @@ export function addLink(graph, options, link) {
           oldLink.properties = {
             ...oldLink.properties,
             ...link.properties,
-            ...({ type: oldLink.properties.type })
+            ...{ type: oldLink.properties.type }
           };
         }
       }
-      graph.nodeLinks = { ...graph.nodeLinks }
+      graph.nodeLinks = { ...graph.nodeLinks };
       graph = { ...graph };
     }
     graph = incrementMinor(graph);
@@ -2087,9 +2440,15 @@ export function findLinkInstance(graph, options) {
   let { target, source, properties } = options;
   if (properties) {
     let link = graph.links.find(x => {
-      if (graph.linkLib[x].source === source && graph.linkLib[x].target == target) {
+      if (
+        graph.linkLib[x].source === source &&
+        graph.linkLib[x].target == target
+      ) {
         for (var i in properties) {
-          if (!graph.linkLib[x].properties || graph.linkLib[x].properties[i] !== properties[i]) {
+          if (
+            !graph.linkLib[x].properties ||
+            graph.linkLib[x].properties[i] !== properties[i]
+          ) {
             return false;
           }
         }
@@ -2098,7 +2457,9 @@ export function findLinkInstance(graph, options) {
     });
     return link;
   }
-  let link = graph.links.find(x => graph.linkLib[x].source === source && graph.linkLib[x].target == target);
+  let link = graph.links.find(
+    x => graph.linkLib[x].source === source && graph.linkLib[x].target == target
+  );
   return link;
 }
 export function getLinkInstance(graph, options) {
@@ -2109,7 +2470,9 @@ export function getLinkInstance(graph, options) {
   return null;
 }
 export function getAllLinksWithNode(graph, id) {
-  return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === id);
+  return graph.links.filter(
+    x => graph.linkLib[x].source === id || graph.linkLib[x].target === id
+  );
 }
 export function removeLinkBetweenNodes(graph, options) {
   let link = findLinkInstance(graph, options);
@@ -2135,10 +2498,15 @@ export function removeEventFunction(key) {
   delete EventFunctions[key];
 }
 export function executeRemoveEvents(graph, link) {
-  if (link && link.properties && link.properties.on && link.properties.on[LinkEvents.Remove]) {
+  if (
+    link &&
+    link.properties &&
+    link.properties.on &&
+    link.properties.on[LinkEvents.Remove]
+  ) {
     link.properties.on[LinkEvents.Remove].map(args => {
       if (args.function && EventFunctions[args.function]) {
-        graph = EventFunctions[args.function](graph, link, args.function, args)
+        graph = EventFunctions[args.function](graph, link, args.function, args);
       }
     });
   }
@@ -2147,7 +2515,7 @@ export function executeRemoveEvents(graph, link) {
 export function isUIExtensionEnumerable(node) {
   let _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
   if (_node && _node.config) {
-    return _node.config.isEnumeration
+    return _node.config.isEnumeration;
   }
 }
 export function GetUIExentionEnumeration(node) {
@@ -2164,14 +2532,16 @@ export function GetUIExentionKeyField(node) {
   }
   return null;
 }
-addEventFunction('OnRemoveValidationPropConnection', (graph, link, func) => {
+addEventFunction("OnRemoveValidationPropConnection", (graph, link, func) => {
   var { source, target } = link;
   var node = GetNode(graph, source);
   if (node && node.properties)
-    removeValidator(GetNodeProp(node, NodeProperties.Validator), { id: target });
+    removeValidator(GetNodeProp(node, NodeProperties.Validator), {
+      id: target
+    });
   return graph;
 });
-addEventFunction('OnRemoveExecutorPropConnection', (graph, link, func) => {
+addEventFunction("OnRemoveExecutorPropConnection", (graph, link, func) => {
   var { source, target } = link;
   var node = GetNode(graph, source);
   if (node && node.properties)
@@ -2179,60 +2549,75 @@ addEventFunction('OnRemoveExecutorPropConnection', (graph, link, func) => {
   return graph;
 });
 
-addEventFunction('OnRemoveModelFilterPropConnection', (graph, link, func) => {
+addEventFunction("OnRemoveModelFilterPropConnection", (graph, link, func) => {
   var { source, target } = link;
   var node = GetNode(graph, source);
   if (node && node.properties)
-    removeValidator(GetNodeProp(node, NodeProperties.FilterModel), { id: target });
+    removeValidator(GetNodeProp(node, NodeProperties.FilterModel), {
+      id: target
+    });
   return graph;
 });
 
-addEventFunction('OnRemoveValidationItemPropConnection', (graph, link, func, args) => {
-  var { source, target } = link;
-  var node = GetNode(graph, source);
-  var { property, validator } = (args || {});
+addEventFunction(
+  "OnRemoveValidationItemPropConnection",
+  (graph, link, func, args) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    var { property, validator } = args || {};
 
-  let _validator = GetNodeProp(node, NodeProperties.Validator);
-  if (node && node.properties &&
-    _validator.properties &&
-    _validator.properties[property] &&
-    _validator.properties[property].validators &&
-    _validator.properties[property].validators[validator] &&
-    _validator.properties[property].validators[validator].node === target) {
-    removeValidatorItem(_validator, { ...args, id: target, });
+    let _validator = GetNodeProp(node, NodeProperties.Validator);
+    if (
+      node &&
+      node.properties &&
+      _validator.properties &&
+      _validator.properties[property] &&
+      _validator.properties[property].validators &&
+      _validator.properties[property].validators[validator] &&
+      _validator.properties[property].validators[validator].node === target
+    ) {
+      removeValidatorItem(_validator, { ...args, id: target });
+    }
+    return graph;
   }
-  return graph;
-});
+);
 
-addEventFunction('OnRemoveExecutorItemPropConnection', (graph, link, func, args) => {
-  var { source, target } = link;
-  var node = GetNode(graph, source);
-  var { property, validator } = (args || {});
+addEventFunction(
+  "OnRemoveExecutorItemPropConnection",
+  (graph, link, func, args) => {
+    var { source, target } = link;
+    var node = GetNode(graph, source);
+    var { property, validator } = args || {};
 
-  let _validator = GetNodeProp(node, NodeProperties.Executor);
-  if (node && node.properties &&
-    _validator.properties &&
-    _validator.properties[property] &&
-    _validator.properties[property].validators &&
-    _validator.properties[property].validators[validator] &&
-    _validator.properties[property].validators[validator].node === target) {
-    removeValidatorItem(_validator, { ...args, id: target, });
+    let _validator = GetNodeProp(node, NodeProperties.Executor);
+    if (
+      node &&
+      node.properties &&
+      _validator.properties &&
+      _validator.properties[property] &&
+      _validator.properties[property].validators &&
+      _validator.properties[property].validators[validator] &&
+      _validator.properties[property].validators[validator].node === target
+    ) {
+      removeValidatorItem(_validator, { ...args, id: target });
+    }
+    return graph;
   }
-  return graph;
-});
-
+);
 
 export function removeValidatorItem(_validator, options) {
   var { property, validator } = options;
-  delete _validator.properties[property].validators[validator]
+  delete _validator.properties[property].validators[validator];
 }
 export function createEventProp(type, options = {}) {
   var res = { on: {} };
   switch (type) {
     case LinkEvents.Remove:
-      res.on[type] = [{
-        ...options
-      }];
+      res.on[type] = [
+        {
+          ...options
+        }
+      ];
       break;
   }
 
@@ -2241,7 +2626,11 @@ export function createEventProp(type, options = {}) {
 export function removeLink(graph, link, options = {}) {
   if (link && options.linkType) {
     let update_link = graph.linkLib[link];
-    if (update_link && update_link.properties && update_link.properties[options.linkType]) {
+    if (
+      update_link &&
+      update_link.properties &&
+      update_link.properties[options.linkType]
+    ) {
       delete update_link.properties[options.linkType];
 
       //If only the type is on the property
@@ -2258,15 +2647,20 @@ export function removeLink(graph, link, options = {}) {
         graph = executeEvents(graph, del_link, LinkEvents.Remove);
       }
     }
-    delete graph.linkLib[link]
+    delete graph.linkLib[link];
     graph.linkLib = { ...graph.linkLib };
     graph.nodeLinks[del_link.source] = {
       ...graph.nodeLinks[del_link.source],
       ...{
-        [del_link.target]: graph.nodeLinks[del_link.source] ? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1 : 0
+        [del_link.target]: graph.nodeLinks[del_link.source]
+          ? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
+          : 0
       }
     };
-    if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
+    if (
+      graph.nodeLinks[del_link.source] &&
+      !graph.nodeLinks[del_link.source][del_link.target]
+    ) {
       delete graph.nodeLinks[del_link.source][del_link.target];
       if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
         delete graph.nodeLinks[del_link.source];
@@ -2275,10 +2669,15 @@ export function removeLink(graph, link, options = {}) {
     graph.nodeLinks[del_link.target] = {
       ...graph.nodeLinks[del_link.target],
       ...{
-        [del_link.source]: graph.nodeLinks[del_link.target] ? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1 : 0
+        [del_link.source]: graph.nodeLinks[del_link.target]
+          ? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
+          : 0
       }
     };
-    if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
+    if (
+      graph.nodeLinks[del_link.target] &&
+      !graph.nodeLinks[del_link.target][del_link.source]
+    ) {
       delete graph.nodeLinks[del_link.target][del_link.source];
       if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
         delete graph.nodeLinks[del_link.target];
@@ -2286,7 +2685,10 @@ export function removeLink(graph, link, options = {}) {
     }
 
     //Keeps track of the links for each node.
-    if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
+    if (
+      graph.nodeConnections[del_link.source] &&
+      graph.nodeConnections[del_link.source][del_link.id]
+    ) {
       delete graph.nodeConnections[del_link.source][del_link.id];
     }
     if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
@@ -2294,23 +2696,25 @@ export function removeLink(graph, link, options = {}) {
     }
 
     //Keeps track of the links for each node.
-    if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
+    if (
+      graph.nodeConnections[del_link.target] &&
+      graph.nodeConnections[del_link.target][del_link.id]
+    ) {
       delete graph.nodeConnections[del_link.target][del_link.id];
     }
     if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
       delete graph.nodeConnections[del_link.target];
     }
     graph = incrementMinor(graph);
-
   }
   return { ...graph };
-
 }
 export function updateNodeText(graph, options) {
   let { id, value } = options;
   if (id && graph.nodeLib && graph.nodeLib[id]) {
     graph.nodeLib[id] = {
-      ...graph.nodeLib[id], ...{
+      ...graph.nodeLib[id],
+      ...{
         _properties: {
           ...(graph.nodeLib[id].properties || {}),
           i: value
@@ -2320,15 +2724,14 @@ export function updateNodeText(graph, options) {
         },
         set properties(value) {
           this._properties = value;
-        },
+        }
       }
-    }
+    };
   }
 }
 export function updateAppSettings(graph, options) {
   let { prop, value } = options;
   if (prop && value) {
-    debugger;
     graph.appConfig = graph.appConfig || {};
     graph.appConfig.AppSettings = graph.appConfig.AppSettings || {};
     graph.appConfig.AppSettings[prop] = value;
@@ -2348,7 +2751,8 @@ export function updateNodeProperty(graph, options) {
       });
     }
     graph.nodeLib[id] = {
-      ...graph.nodeLib[id], ...{
+      ...graph.nodeLib[id],
+      ...{
         dirty: {
           [prop]: true,
           ...(graph.nodeLib[id].dirty || {})
@@ -2356,23 +2760,26 @@ export function updateNodeProperty(graph, options) {
         properties: {
           ...(graph.nodeLib[id].properties || {}),
           [prop]: value,
-          ...additionalChange,
+          ...additionalChange
         }
       }
-    }
+    };
     if (prop === NodeProperties.Selected) {
-      graph.selected = graph.selected ? (graph.selected + (value ? 1 : -1)) : 0;
+      graph.selected = graph.selected ? graph.selected + (value ? 1 : -1) : 0;
       if (value) {
-        graph.markedSelectedNodeIds = [...(graph.markedSelectedNodeIds || []), id].unique();
-      }
-      else {
-        graph.markedSelectedNodeIds = [...(graph.markedSelectedNodeIds || [])].filter(x => x !== id);
+        graph.markedSelectedNodeIds = [
+          ...(graph.markedSelectedNodeIds || []),
+          id
+        ].unique();
+      } else {
+        graph.markedSelectedNodeIds = [
+          ...(graph.markedSelectedNodeIds || [])
+        ].filter(x => x !== id);
       }
     }
     if (prop === NodeProperties.NODEType && value === NodeTypes.Function) {
       graph.functionNodes = { ...graph.functionNodes, ...{ [id]: true } };
-    }
-    else {
+    } else {
       if (graph.functionNodes[id] && prop === NodeProperties.NODEType) {
         delete graph.functionNodes[id];
         graph.functionNodes = { ...graph.functionNodes };
@@ -2381,8 +2788,7 @@ export function updateNodeProperty(graph, options) {
 
     if (prop === NodeProperties.NODEType && value === NodeTypes.ClassNode) {
       graph.classNodes = { ...graph.classNodes, ...{ [id]: true } };
-    }
-    else {
+    } else {
       if (graph.classNodes[id] && prop === NodeProperties.NODEType) {
         delete graph.classNodes[id];
         graph.classNodes = { ...graph.classNodes };
@@ -2396,13 +2802,14 @@ export function updateLinkProperty(graph, options) {
   let { id, value, prop } = options;
   if (id && prop && graph.linkLib && graph.linkLib[id]) {
     graph.linkLib[id] = {
-      ...graph.linkLib[id], ...{
+      ...graph.linkLib[id],
+      ...{
         properties: {
           ...(graph.linkLib[id].properties || {}),
           [prop]: value
         }
       }
-    }
+    };
   }
   return graph;
 }
@@ -2411,13 +2818,14 @@ export function updateGroupProperty(graph, options) {
   let { id, value, prop } = options;
   if (id && prop && graph.groupLib && graph.groupLib[id]) {
     graph.groupLib[id] = {
-      ...graph.groupLib[id], ...{
+      ...graph.groupLib[id],
+      ...{
         properties: {
           ...(graph.groupLib[id].properties || {}),
           [prop]: value
         }
       }
-    }
+    };
   }
   return graph;
 }
@@ -2426,7 +2834,7 @@ function noSameLink(graph, ops) {
   return !graph.links.some(x => {
     let temp = graph.linkLib[x];
     return temp.source === ops.source && temp.target === ops.target;
-  })
+  });
 }
 function createGroup() {
   return {
@@ -2434,18 +2842,16 @@ function createGroup() {
     leaves: [],
     groups: [],
     properties: {}
-  }
+  };
 }
 function createNode(nodeType) {
   return {
     id: uuidv4(),
-    dirty: {
-
-    },
+    dirty: {},
     properties: {
       text: nodeType || Titles.Unknown
     }
-  }
+  };
 }
 function createLink(target, source, properties) {
   properties = properties || {};
@@ -2454,12 +2860,12 @@ function createLink(target, source, properties) {
     source,
     target,
     properties
-  }
+  };
 }
 function copyLink(link) {
   return {
-    ...(JSON.parse(JSON.stringify(link)))
-  }
+    ...JSON.parse(JSON.stringify(link))
+  };
 }
 export function duplicateNode(nn) {
   return {
@@ -2482,7 +2888,7 @@ function GetNodesInsideGroup(graph, t, seenGroups = {}) {
         ...seenGroups,
         [i]: true
       };
-      res = [...res, ...GetNodesInsideGroup(graph, i, seenGroups)]
+      res = [...res, ...GetNodesInsideGroup(graph, i, seenGroups)];
     }
   }
 
@@ -2501,10 +2907,10 @@ export const GroupImportanceOrder = {
   [NodeTypes.ValidationList]: 10,
   [NodeTypes.ValidationListItem]: 12,
   [NodeTypes.ModelItemFilter]: 13
-}
+};
 
 export function SetVisible(graph) {
-  graph.visibleNodes = {}
+  graph.visibleNodes = {};
   graph.nodes.map(t => {
     if (GetNodeProp(GetNode(graph, t), NodeProperties.Pinned)) {
       graph.visibleNodes[t] = true;
@@ -2516,13 +2922,12 @@ export function SetVisible(graph) {
         for (let h in graph.nodeLinks[t]) {
           if (x > 1 && !graph.visibleNodes[h]) {
             graph.visibleNodes[h] = 2;
-          }
-          else {
+          } else {
             graph.visibleNodes[h] = true;
           }
         }
-      })
-    })
+      });
+    });
   }
   return graph;
 }
@@ -2549,63 +2954,82 @@ export function FilterGraph(graph) {
   filteredGraph.groupLib = { ...graph.groupLib };
   filteredGraph.childGroups = { ...graph.childGroups };
   filteredGraph.parentGroup = { ...graph.parentGroup };
-  filteredGraph.links = [...graph.links.filter(linkId => {
-    var { target, source } = graph.linkLib[linkId];
-    if (graph.visibleNodes[target] && graph.visibleNodes[source]) {
-      return true;
-    } else {
-      delete filteredGraph.linkLib[linkId];
-    }
-    return false;
-  })];
+  filteredGraph.links = [
+    ...graph.links.filter(linkId => {
+      var { target, source } = graph.linkLib[linkId];
+      if (graph.visibleNodes[target] && graph.visibleNodes[source]) {
+        return true;
+      } else {
+        delete filteredGraph.linkLib[linkId];
+      }
+      return false;
+    })
+  ];
   Object.keys(graph.nodesGroups).map(nodeId => {
     if (!graph.visibleNodes[nodeId]) {
       let temp = graph.nodesGroups[nodeId];
       for (let i in temp) {
         filteredGraph.groupsNodes[i] = { ...filteredGraph.groupsNodes[i] };
-        delete filteredGraph.groupsNodes[i][nodeId]
+        delete filteredGraph.groupsNodes[i][nodeId];
         if (Object.keys(filteredGraph.groupsNodes[i]).length === 0) {
-          delete filteredGraph.groupsNodes[i]
+          delete filteredGraph.groupsNodes[i];
         }
       }
-      delete filteredGraph.nodesGroups[nodeId]
+      delete filteredGraph.nodesGroups[nodeId];
     }
   });
-  Object.keys(filteredGraph.groupLib).sort((b, a) => {
-    return getDepth(a, graph) - getDepth(b, graph);
-  }).map(group => {
-    if (filteredGraph.groupLib[group].leaves) {
-      filteredGraph.groupLib[group] = { ...filteredGraph.groupLib[group] };
-      filteredGraph.groupLib[group].leaves = [...filteredGraph.groupLib[group].leaves.filter(x => graph.visibleNodes[x])];
-      filteredGraph.groupLib[group].groups = [...filteredGraph.groupLib[group].groups.filter(x => filteredGraph.groupLib[x])];
-      if (!filteredGraph.groupLib[group].leaves.length && !filteredGraph.groupLib[group].groups.length) {
-        filteredGraph.groups = [...filteredGraph.groups.filter(x => x !== group)];
-        delete filteredGraph.groupLib[group]
+  Object.keys(filteredGraph.groupLib)
+    .sort((b, a) => {
+      return getDepth(a, graph) - getDepth(b, graph);
+    })
+    .map(group => {
+      if (filteredGraph.groupLib[group].leaves) {
+        filteredGraph.groupLib[group] = { ...filteredGraph.groupLib[group] };
+        filteredGraph.groupLib[group].leaves = [
+          ...filteredGraph.groupLib[group].leaves.filter(
+            x => graph.visibleNodes[x]
+          )
+        ];
+        filteredGraph.groupLib[group].groups = [
+          ...filteredGraph.groupLib[group].groups.filter(
+            x => filteredGraph.groupLib[x]
+          )
+        ];
+        if (
+          !filteredGraph.groupLib[group].leaves.length &&
+          !filteredGraph.groupLib[group].groups.length
+        ) {
+          filteredGraph.groups = [
+            ...filteredGraph.groups.filter(x => x !== group)
+          ];
+          delete filteredGraph.groupLib[group];
+        }
       }
-    }
-  })
+    });
   Object.keys(graph.childGroups).map(group => {
     if (!filteredGraph.groupsNodes[group]) {
       delete filteredGraph.childGroups[group];
-    }
-    else {
+    } else {
       for (let t in filteredGraph.childGroups[group]) {
         if (!filteredGraph.groupsNodes[t]) {
-          filteredGraph.childGroups[group] = { ...filteredGraph.childGroups[group] }
-          delete filteredGraph.childGroups[group][t]
+          filteredGraph.childGroups[group] = {
+            ...filteredGraph.childGroups[group]
+          };
+          delete filteredGraph.childGroups[group][t];
         }
       }
     }
-  })
+  });
   Object.keys(graph.parentGroup).map(group => {
     if (!filteredGraph.groupsNodes[group]) {
       delete filteredGraph.parentGroup[group];
-    }
-    else {
+    } else {
       for (let t in filteredGraph.parentGroup[group]) {
         if (!filteredGraph.groupsNodes[t]) {
-          filteredGraph.parentGroup[group] = { ...filteredGraph.parentGroup[group] }
-          delete filteredGraph.parentGroup[group][t]
+          filteredGraph.parentGroup[group] = {
+            ...filteredGraph.parentGroup[group]
+          };
+          delete filteredGraph.parentGroup[group][t];
         }
       }
     }
@@ -2613,16 +3037,20 @@ export function FilterGraph(graph) {
   Object.keys(graph.visibleNodes).map(nodeId => {
     filteredGraph.nodeLib[nodeId] = graph.nodeLib[nodeId];
     filteredGraph.nodes.push(nodeId);
-    filteredGraph.nodeConnections[nodeId] = { ...graph.nodeConnections[nodeId] };
+    filteredGraph.nodeConnections[nodeId] = {
+      ...graph.nodeConnections[nodeId]
+    };
     filteredGraph.nodeLinks[nodeId] = { ...graph.nodeLinks[nodeId] };
 
     Object.keys(graph.nodeLinks[nodeId] || {}).map(t => {
       if (!filteredGraph.linkLib[t]) {
-        filteredGraph.nodeLinks[nodeId] = { ...filteredGraph.nodeLinks[nodeId] }
+        filteredGraph.nodeLinks[nodeId] = {
+          ...filteredGraph.nodeLinks[nodeId]
+        };
         delete filteredGraph.nodeLinks[nodeId][t];
       }
-    })
-  })
+    });
+  });
 
   return filteredGraph;
 }
@@ -2631,34 +3059,43 @@ export function VisualProcess(graph) {
   vgraph.id = graph.id;
   graph = SetVisible(graph);
   vgraph.visibleNodes = { ...graph.visibleNodes };
-  graph = FilterGraph(graph)
-  let collapsedNodes = graph.nodes.filter(node => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
+  graph = FilterGraph(graph);
+  let collapsedNodes = graph.nodes.filter(node =>
+    GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed)
+  );
   let collapsingGroups = {};
   collapsedNodes.map(t => {
     if (graph.nodesGroups[t]) {
-      let t_importance = GroupImportanceOrder[GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)] || 1000;
-      var sortedGroups = Object.keys(graph.nodesGroups[t]).filter(nodeGroupKey => {
+      let t_importance =
+        GroupImportanceOrder[
+          GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)
+        ] || 1000;
+      var sortedGroups = Object.keys(graph.nodesGroups[t])
+        .filter(nodeGroupKey => {
+          let nodesInGroup = GetNodesInsideGroup(graph, nodeGroupKey);
+          var moreImportantNode = nodesInGroup.find(n => {
+            if (n === t) {
+              return false;
+            }
+            var _type = GetNodeProp(graph.nodeLib[n], NodeProperties.NODEType);
+            let n_importance = GroupImportanceOrder[_type] || 1000;
 
-        let nodesInGroup = GetNodesInsideGroup(graph, nodeGroupKey);
-        var moreImportantNode = nodesInGroup.find(n => {
-          if (n === t) {
-            return false;
-          }
-          var _type = GetNodeProp(graph.nodeLib[n], NodeProperties.NODEType);
-          let n_importance = GroupImportanceOrder[_type] || 1000;
-
-          if (n_importance > t_importance) {
+            if (n_importance > t_importance) {
+              return false;
+            }
+            return true;
+          });
+          if (moreImportantNode) {
             return false;
           }
           return true;
+        })
+        .sort((b, a) => {
+          return (
+            Object.keys(graph.groupsNodes[a]).length -
+            Object.keys(graph.groupsNodes[b]).length
+          );
         });
-        if (moreImportantNode) {
-          return false;
-        }
-        return true;
-      }).sort((b, a) => {
-        return Object.keys(graph.groupsNodes[a]).length - Object.keys(graph.groupsNodes[b]).length;
-      });
       if (sortedGroups.length) {
         collapsingGroups[sortedGroups[0]] = true;
       }
@@ -2693,66 +3130,71 @@ export function VisualProcess(graph) {
     disappearingNodes = { ...disappearingNodes, ...dt };
   });
 
-  vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])]
+  vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])];
   vgraph.nodeLib = {};
-  vgraph.nodes.map(t => { vgraph.nodeLib[t] = graph.nodeLib[t] });
-  vgraph.links = graph.links.map(x => {
-    //Find any link that should be disappearing, and make it go away
-    var { source, target } = graph.linkLib[x];
-    var dupLink;
-    if (disappearingNodes[source] && disappearingNodes[target]) {
-      // the link is going totally away;
-      return false;
-    }
-    else if (disappearingNodes[source]) {
-      dupLink = copyLink(graph.linkLib[x]);
-      dupLink.source = disappearingNodes[source];
-      dupLink.id = `${dupLink.source}${dupLink.target}`;
-      vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-    }
-    else if (disappearingNodes[target]) {
-      dupLink = copyLink(graph.linkLib[x]);
-      dupLink.target = disappearingNodes[target];
-      dupLink.id = `${dupLink.source}${dupLink.target}`;
-      vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-    }
-    else {
-      dupLink = copyLink(graph.linkLib[x]);
-      dupLink.id = `${dupLink.source}${dupLink.target}`;
-      vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
-    }
-    if (dupLink.source === dupLink.target) {
-      return false;
-    }
-    return dupLink.id;
-  }).filter(x => x);
-
-  var vgroups = graph.groups.map((group, groupIndex) => {
-    let oldgroup = graph.groupLib[group];
-    let newgroup = createGroup();
-    newgroup.id = `${oldgroup.id}`;
-    if (oldgroup && oldgroup.leaves) {
-      oldgroup.leaves.map(leaf => {
-        if (vgraph.nodeLib[leaf]) {
-          newgroup.leaves.push(leaf);
-        }
-      })
-    }
-    if (newgroup.leaves.length) {
-      vgraph.groupLib[newgroup.id] = newgroup;
-
-      return newgroup.id
-    }
-    return null;
-  }).filter(x => x);
-  vgroups.map((group) => {
-    vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(og => {
-      if (vgraph.groupLib[og]) {
-        return true;
+  vgraph.nodes.map(t => {
+    vgraph.nodeLib[t] = graph.nodeLib[t];
+  });
+  vgraph.links = graph.links
+    .map(x => {
+      //Find any link that should be disappearing, and make it go away
+      var { source, target } = graph.linkLib[x];
+      var dupLink;
+      if (disappearingNodes[source] && disappearingNodes[target]) {
+        // the link is going totally away;
+        return false;
+      } else if (disappearingNodes[source]) {
+        dupLink = copyLink(graph.linkLib[x]);
+        dupLink.source = disappearingNodes[source];
+        dupLink.id = `${dupLink.source}${dupLink.target}`;
+        vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+      } else if (disappearingNodes[target]) {
+        dupLink = copyLink(graph.linkLib[x]);
+        dupLink.target = disappearingNodes[target];
+        dupLink.id = `${dupLink.source}${dupLink.target}`;
+        vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
+      } else {
+        dupLink = copyLink(graph.linkLib[x]);
+        dupLink.id = `${dupLink.source}${dupLink.target}`;
+        vgraph.linkLib[`${dupLink.source}${dupLink.target}`] = dupLink;
       }
-      return false;
+      if (dupLink.source === dupLink.target) {
+        return false;
+      }
+      return dupLink.id;
     })
-  })
+    .filter(x => x);
+
+  var vgroups = graph.groups
+    .map((group, groupIndex) => {
+      let oldgroup = graph.groupLib[group];
+      let newgroup = createGroup();
+      newgroup.id = `${oldgroup.id}`;
+      if (oldgroup && oldgroup.leaves) {
+        oldgroup.leaves.map(leaf => {
+          if (vgraph.nodeLib[leaf]) {
+            newgroup.leaves.push(leaf);
+          }
+        });
+      }
+      if (newgroup.leaves.length) {
+        vgraph.groupLib[newgroup.id] = newgroup;
+
+        return newgroup.id;
+      }
+      return null;
+    })
+    .filter(x => x);
+  vgroups.map(group => {
+    vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(
+      og => {
+        if (vgraph.groupLib[og]) {
+          return true;
+        }
+        return false;
+      }
+    );
+  });
   vgraph.groups = vgroups;
   return vgraph;
 }

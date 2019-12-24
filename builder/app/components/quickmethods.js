@@ -203,21 +203,6 @@ class QuickMethods extends Component<any, any, any> {
                     this.props.executeGraphOperation(currentNode, AddAgentUser);
                   }}
                 />
-                <TreeViewMenu
-                  hideArrow
-                  title={"Home View"}
-                  icon={"fa fa-plus"}
-                  onClick={() => {
-                    this.props.graphOperation(
-                      HomeView({
-                        titleService: GetTitleService(),
-                        registerForm: GetRegisterForm(),
-                        authenticateForm: GetAuthenticateForm()
-                      }),
-                      AddAgentUser
-                    );
-                  }}
-                />
               </TreeViewMenu>
               <TreeViewMenu
                 title={CreateDefaultView.type}

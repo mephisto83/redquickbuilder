@@ -38,6 +38,18 @@ export default function(args = {}) {
         }
       ];
     },
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            id: context.node0,
+            value: "/",
+            prop: "HttpRoute"
+          }
+        }
+      ];
+    },
 
     function(graph) {
       return [
@@ -106,6 +118,19 @@ export default function(args = {}) {
           options: {
             id: context.node1,
             value: "Home View Container"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            id: context.node1,
+            value: "/",
+            prop: "HttpRoute"
           }
         }
       ];

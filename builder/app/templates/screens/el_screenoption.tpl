@@ -24,9 +24,7 @@ class {{name}} extends React.Component {
         let { state } = this.props;
         {{screen_options}}
         return (
-            <StyleProvider>
-                {{elements}}
-            </StyleProvider>
+          {{elements}}
         );
     }
 }

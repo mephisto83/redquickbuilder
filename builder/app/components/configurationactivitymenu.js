@@ -40,7 +40,6 @@ class ConfigurationActivityMenu extends Component {
           key={key}
           value={appSettings[key]}
           onChange={(value) => {
-            debugger;
             this.props.graphOperation(UIA.CHANGE_APP_SETTINGS, {
               prop: key,
               value: value
