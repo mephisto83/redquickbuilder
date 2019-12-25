@@ -6,7 +6,7 @@ import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiA
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
 import * as ViewModelKeys from '../viewmodel_keys';
-import { MultiSelectList, MultiViewList, Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from '../html-components';
+import { MultiSelectList, MultiViewList, Container, ListItem, H3, H1, H2, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from '../html-components';
 import MenuItem from '../components/menuitem';
 {{imports}}
 // {{name}}

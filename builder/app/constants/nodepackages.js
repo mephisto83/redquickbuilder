@@ -118,6 +118,7 @@ import { uuidv4 } from "../utils/array";
 import PostAuthenticate from "../nodepacks/PostAuthenticate";
 import HomeView from "../nodepacks/HomeView";
 import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
+import AddCancelLabel from "../nodepacks/AddCancelLabel";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -2128,6 +2129,7 @@ export const CreateDefaultView = {
                                   "value",
                                   "viewModel",
                                   "label",
+                                  "placeholder",
                                   "error",
                                   "success"
                                 ].map(
@@ -2681,7 +2683,14 @@ export const CreateDefaultView = {
                 } else {
                   childComponents[modelIndex] = sharedComponent;
                   return [
-                    ...["value", "viewModel", "label", "error", "success"].map(
+                    ...[
+                      "value",
+                      "viewModel",
+                      "label",
+                      "placeholder",
+                      "error",
+                      "success"
+                    ].map(
                       v =>
                         function() {
                           let graph = GetCurrentGraph(GetStateFunc()());
@@ -2757,6 +2766,15 @@ export const CreateDefaultView = {
                       childComponents,
                       modelIndex,
                       viewComponent,
+                      "placeholder"
+                    );
+                  },
+                  function() {
+                    return addComponentApiNodes(
+                      newItems,
+                      childComponents,
+                      modelIndex,
+                      viewComponent,
                       "error"
                     );
                   },
@@ -2792,7 +2810,14 @@ export const CreateDefaultView = {
                     });
                   },
 
-                  ...["value", "viewModel", "label", "error", "success"]
+                  ...[
+                    "value",
+                    "viewModel",
+                    "label",
+                    "placeholder",
+                    "error",
+                    "success"
+                  ]
                     .map(v => {
                       return function(graph) {
                         let connectto = [];
@@ -3294,6 +3319,12 @@ export const CreateDefaultView = {
             evt: uiType === UITypes.ReactNative ? "onPress" : "onClick"
           })
         )(GetDispatchFunc(), GetStateFunc());
+        PerformGraphOperation(
+          AddCancelLabel({
+            button: newItems.cancelbutton
+          })
+        )(GetDispatchFunc(), GetStateFunc());
+
         PerformGraphOperation([
           {
             operation: ADD_NEW_NODE,
@@ -5155,6 +5186,25 @@ function ConnectExternalApisToSelectors(args) {
       }
     }
   ])(GetDispatchFunc(), GetStateFunc());
+  if (newItems[childComponents[propertyIndex]].placeholder) {
+    PerformGraphOperation([
+      ...steps,
+      {
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: function() {
+          return {
+            target: newItems.titleService,
+            source:
+              newItems[childComponents[propertyIndex]].placeholder
+                .componentExternalValue,
+            properties: {
+              ...LinkProperties.TitleServiceLink
+            }
+          };
+        }
+      }
+    ])(GetDispatchFunc(), GetStateFunc());
+  }
 }
 
 function BuildPropertyDataChainAccessor(args) {

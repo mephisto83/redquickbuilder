@@ -7,7 +7,7 @@ import * as S from '{{relative_depth}}actions/selector';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';
 import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { Content, StyleProvider } from '{{relative_depth}}html-components';
-import { MultiSelectList, MultiViewList, Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View, Form, Item,
+import { MultiSelectList, MultiViewList, Container, ListItem, Header, Title, H3, H1, H2, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View, Form, Item,
 Input, Label, List, Thumbnail }  from '{{relative_depth}}html-components';
 
 {{imports}}

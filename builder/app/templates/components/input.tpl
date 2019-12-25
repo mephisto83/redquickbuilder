@@ -1,11 +1,11 @@
 <Item {{inlineLabel}} {{floatingLabel}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
     <Label>{{{label}}}</Label>
-    <Input value={{{value}}} 
+    <Input value={{{value}}} placeholder={{{placeholder}}}
         onBlur={()=>{
             if(this.props.onBlur) {
                 this.props.onBlur();
             }
-        }} 
+        }}
         onChangeText={(_text)=>{
             if(this.props.onChangeText) {
                 this.props.onChangeText(_text);

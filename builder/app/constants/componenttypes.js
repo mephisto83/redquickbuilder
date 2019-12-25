@@ -1,4 +1,4 @@
-import { NodeTypes, UITypes } from './nodetypes'
+import { NodeTypes, UITypes } from "./nodetypes";
 import {
   NodeProperties,
   GetRootGraph,
@@ -6,35 +6,35 @@ import {
   GetState,
   GetCodeName,
   ComponentApiKeys
-} from '../actions/uiactions'
-import { GetNodesLinkedTo } from '../methods/graph_methods'
-import { bindTemplate } from './functiontypes'
+} from "../actions/uiactions";
+import { GetNodesLinkedTo } from "../methods/graph_methods";
+import { bindTemplate } from "./functiontypes";
 
-export const NAVIGATION = '-NAVIGATION'
-export const APP_METHOD = '-APP_METHOD'
-export const ON_BLUR = 'onBlur'
-export const ON_FOCUS = 'onFocus'
-export const ON_CHANGE = 'onChange'
-export const ON_CHANGE_TEXT = 'onChangeText'
-export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE]
-export const ARE_BOOLEANS = []
-export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT]
-export const VALUE = 'value'
-export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }))
-export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }))
+export const NAVIGATION = "-NAVIGATION";
+export const APP_METHOD = "-APP_METHOD";
+export const ON_BLUR = "onBlur";
+export const ON_FOCUS = "onFocus";
+export const ON_CHANGE = "onChange";
+export const ON_CHANGE_TEXT = "onChangeText";
+export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE];
+export const ARE_BOOLEANS = [];
+export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
+export const VALUE = "value";
+export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
+export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 
 export const ComponentLifeCycleEvents = {
-  ComponentDidMount: 'componentDidMount',
-  ComponentWillUnmount: 'componentWillUnmount'
-}
+  ComponentDidMount: "componentDidMount",
+  ComponentWillUnmount: "componentWillUnmount"
+};
 export const ComponentEvents = {
-  onPress: 'onPress',
-  onClick: 'onClick',
-  onFocus: 'onFocus',
-  onBlur: 'onBlur',
-  onChange: 'onChange',
-  onChangeText: 'onChangeText'
-}
+  onPress: "onPress",
+  onClick: "onClick",
+  onFocus: "onFocus",
+  onBlur: "onBlur",
+  onChange: "onChange",
+  onChangeText: "onChangeText"
+};
 export const ComponentEventArgs = {
   [ComponentEvents.onBlur]: {
     [NodeTypes.Property]: true,
@@ -52,44 +52,44 @@ export const ComponentEventArgs = {
     [NodeTypes.Property]: true,
     [NodeTypes.ViewModel]: true
   }
-}
+};
 export const SCREEN_COMPONENT_EVENTS = [
   ComponentLifeCycleEvents.ComponentDidMount,
   ComponentLifeCycleEvents.ComponentWillUnmount
-]
-export const PropertyApiList = ['error', 'success', VALUE].map(v => ({
+];
+export const PropertyApiList = ["error", "success", VALUE].map(v => ({
   value: v
-}))
+}));
 const INPUT_DEFAULT_API = [
   VALUE,
   ON_BLUR,
   ON_FOCUS,
   ON_CHANGE_TEXT,
-  'inlineLabel',
-  'floatingLabel',
-  'stackedLabel',
-  'fixedLabel',
-  'success',
-  'error'
-].map(x => ({ property: x }))
+  "inlineLabel",
+  "floatingLabel",
+  "stackedLabel",
+  "fixedLabel",
+  "success",
+  "error"
+].map(x => ({ property: x }));
 const BUTTON_DEFAULT_API = [
-  'block',
-  'primary',
-  'transparent',
-  'success',
-  'danger',
-  'warning',
-  'info',
-  'bordered',
-  'disabled',
-  'rounded',
-  'large',
-  'small',
-  'active'
-].map(x => ({ property: x }))
-const LABEL_DEFAULT_API = ['data'].map(x => ({ property: x }))
-const DEFAULT_INPUT_API_PROPERTIES = {}
-const DEFAULT_BUTTON_API_PROPERTIES = {}
+  "block",
+  "primary",
+  "transparent",
+  "success",
+  "danger",
+  "warning",
+  "info",
+  "bordered",
+  "disabled",
+  "rounded",
+  "large",
+  "small",
+  "active"
+].map(x => ({ property: x }));
+const LABEL_DEFAULT_API = ["data"].map(x => ({ property: x }));
+const DEFAULT_INPUT_API_PROPERTIES = {};
+const DEFAULT_BUTTON_API_PROPERTIES = {};
 
 BUTTON_DEFAULT_API.map(x => {
   DEFAULT_BUTTON_API_PROPERTIES[x.property] = {
@@ -97,28 +97,28 @@ BUTTON_DEFAULT_API.map(x => {
     parameterConfig: true,
     isHandler: false,
     ui: true
-  }
-})
+  };
+});
 INPUT_DEFAULT_API.map(x => {
   DEFAULT_INPUT_API_PROPERTIES[x.property] = {
     nodeProperty: x.property,
     parameterConfig: true,
     isHandler: ARE_HANDLERS.indexOf(x.property) !== -1,
     ui: true
-  }
-})
+  };
+});
 export const ComponentTypes = {
   ReactNative: {
     Badge: {},
     Body: {},
     Button: {
-      template: './app/templates/components/button.tpl',
+      template: "./app/templates/components/button.tpl",
       defaultApi: BUTTON_DEFAULT_API,
       eventApi: [ComponentEvents.onPress],
       properties: {
         onPress: {
-          nodeProperty: 'onPress',
-          template: '() => { {{value}} }',
+          nodeProperty: "onPress",
+          template: "() => { {{value}} }",
           method: true,
           nowrap: true,
           options: [NAVIGATION, APP_METHOD],
@@ -137,7 +137,7 @@ export const ComponentTypes = {
     FooterTab: {},
     Form: {
       layout: true,
-      template: './app/templates/components/form.tpl',
+      template: "./app/templates/components/form.tpl",
       properties: {
         value: {
           nodeProperty: NodeProperties.value,
@@ -148,57 +148,69 @@ export const ComponentTypes = {
     },
     H1: {},
     H2: {},
-    H3: {},
+    H3: {
+      template: "./app/templates/components/h3.tpl",
+      properties: {
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
+        label: {
+          nodeProperty: NodeProperties.Label,
+          template: true
+        },
+      }
+    },
     Header: {
-      template: './app/templates/components/header.tpl',
+      template: "./app/templates/components/header.tpl",
       properties: {
         left: {
-          nodeProperty: 'HeaderLeft',
-          template: '{{value}}',
-          options: ['true', 'false'],
+          nodeProperty: "HeaderLeft",
+          template: "{{value}}",
+          options: ["true", "false"],
           ui: true
         },
         right: {
-          nodeProperty: 'HeaderRight',
-          template: '{{value}}',
-          options: ['true', 'false'],
+          nodeProperty: "HeaderRight",
+          template: "{{value}}",
+          options: ["true", "false"],
           ui: true
         },
         title: {
-          nodeProperty: 'HeaderTitle',
-          template: '{{value}}',
-          options: ['true', 'false'],
+          nodeProperty: "HeaderTitle",
+          template: "{{value}}",
+          options: ["true", "false"],
           ui: true
         }
       }
     },
     Icon: {},
     Image: {
-      library: 'react-native',
-      template: './app/templates/components/image.tpl',
+      library: "react-native",
+      template: "./app/templates/components/image.tpl",
       properties: {
         data: {
           ui: true,
-          nodeProperty: 'data',
+          nodeProperty: "data",
           nodeTypes: [NodeTypes.DataChain],
           nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint)
+            return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, 'data'))
+            let func = GetCodeName(GetNodeProp(node, "data"));
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,
                 value: `this.props.data`
-              })
+              });
             }
-            return `this.props.data`
+            return `this.props.data`;
           }
         }
       }
     },
     Input: {
-      template: './app/templates/components/input.tpl',
+      template: "./app/templates/components/input.tpl",
       defaultApi: INPUT_DEFAULT_API,
       eventApi: [
         ComponentEvents.onBlur,
@@ -208,17 +220,17 @@ export const ComponentTypes = {
       properties: {
         item_attributes: {
           nodeProperty: NodeProperties.TextType,
-          template: '{{value}}',
+          template: "{{value}}",
           options: [
-            'fixedLabel',
-            'inlineLabel',
-            'floatingLabel',
-            'stackedLabel',
-            'regular',
-            'rounded',
-            'success',
-            'error',
-            'disabled'
+            "fixedLabel",
+            "inlineLabel",
+            "floatingLabel",
+            "stackedLabel",
+            "regular",
+            "rounded",
+            "success",
+            "error",
+            "disabled"
           ],
           ui: true
         },
@@ -229,6 +241,10 @@ export const ComponentTypes = {
         },
         label: {
           nodeProperty: NodeProperties.Label,
+          template: true
+        },
+        placeholder: {
+          nodeProperty: NodeProperties.Placeholder,
           template: true
         },
         error: {
@@ -255,16 +271,16 @@ export const ComponentTypes = {
     Label: {},
     Left: {},
     List: {
-      library: 'react-native',
+      library: "react-native",
       layout: true,
       specialLayout: true,
-      eventApi: ['onEndReachedThreshold', 'onEndReached'],
-      template: './app/templates/components/list.tpl',
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/list.tpl",
       datasource: true,
       properties: {
         item_attributes: {
           nodeProperty: NodeProperties.TextType,
-          template: '{{value}}',
+          template: "{{value}}",
           component_options: [NodeTypes.ComponentNode],
           ui: true
         }
@@ -274,13 +290,13 @@ export const ComponentTypes = {
     MultiViewList: {
       layout: true,
       specialLayout: true,
-      eventApi: ['onEndReachedThreshold', 'onEndReached'],
-      template: './app/templates/components/multiviewlist.tpl',
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/multiviewlist.tpl",
       datasource: true,
       properties: {
         item_attributes: {
           nodeProperty: NodeProperties.TextType,
-          template: '{{value}}',
+          template: "{{value}}",
           component_options: [NodeTypes.ComponentNode],
           ui: true
         }
@@ -290,13 +306,13 @@ export const ComponentTypes = {
     MultiSelectList: {
       layout: true,
       specialLayout: true,
-      eventApi: ['onEndReachedThreshold', 'onEndReached'],
-      template: './app/templates/components/multiselectlist.tpl',
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/multiselectlist.tpl",
       datasource: true,
       properties: {
         item_attributes: {
           nodeProperty: NodeProperties.TextType,
-          template: '{{value}}',
+          template: "{{value}}",
           component_options: [NodeTypes.ComponentNode],
           ui: true
         }
@@ -310,8 +326,8 @@ export const ComponentTypes = {
       [APP_METHOD]: true,
       properties: {
         onPress: {
-          nodeProperty: 'onPress',
-          template: '() => { {{value}} }',
+          nodeProperty: "onPress",
+          template: "() => { {{value}} }",
           method: true,
           options: [NAVIGATION, APP_METHOD],
           ui: true
@@ -332,7 +348,7 @@ export const ComponentTypes = {
     TabContainer: {},
     TabHeader: {},
     Text: {
-      template: './app/templates/components/text.tpl',
+      template: "./app/templates/components/text.tpl",
       defaultApi: LABEL_DEFAULT_API,
       internalApiNode: ComponentApiKeys.DATA,
       externalApiNode: ComponentApiKeys.DATA,
@@ -342,47 +358,47 @@ export const ComponentTypes = {
           nodeProperty: ComponentApiKeys.DATA,
           nodeTypes: [NodeTypes.DataChain],
           nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint)
+            return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA))
-            if (GetNodeProp(node, 'component-as-label')) {
+            let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA));
+            if (GetNodeProp(node, "component-as-label")) {
               return `titleService.get('${GetNodeProp(
                 node,
                 NodeProperties.Label
-              )}')`
+              )}')`;
             }
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,
                 value: `this.props.` + ComponentApiKeys.DATA
-              })
+              });
             }
-            return `this.props.` + ComponentApiKeys.DATA
+            return `this.props.` + ComponentApiKeys.DATA;
           }
         }
       }
     },
     Textarea: {},
     Thumbnail: {
-      template: './app/templates/components/thumbnail.tpl',
+      template: "./app/templates/components/thumbnail.tpl",
       properties: {
         data: {
           ui: true,
-          nodeProperty: 'data',
+          nodeProperty: "data",
           nodeTypes: [NodeTypes.DataChain],
           nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint)
+            return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, 'data'))
+            let func = GetCodeName(GetNodeProp(node, "data"));
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,
                 value: `this.props.data`
-              })
+              });
             }
-            return `this.props.data`
+            return `this.props.data`;
           }
         }
       }
@@ -390,32 +406,32 @@ export const ComponentTypes = {
     Title: {},
     Toast: {},
     View: {
-      eventApi: ['componentDidMount'],
+      eventApi: ["componentDidMount"],
       layout: true
     },
     LoginSelector: {
-      template: './app/templates/components/loginselector.tpl',
-      library: './login-selector'
+      template: "./app/templates/components/loginselector.tpl",
+      library: "./login-selector"
     }
   }
-}
+};
 
-ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative }
+ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
 Object.keys(ComponentTypes.ReactNative).map(key => {
   if (ComponentTypes.ReactNative[key]) {
     ComponentTypes.ReactNative[key].library =
-      ComponentTypes.ReactNative[key].library || 'native-base'
-    ComponentTypes.ReactNative[key].key = key
+      ComponentTypes.ReactNative[key].library || "native-base";
+    ComponentTypes.ReactNative[key].key = key;
     ComponentTypes.ReactNative[key].properties =
-      ComponentTypes.ReactNative[key].properties || {}
+      ComponentTypes.ReactNative[key].properties || {};
     ComponentTypes.ReactNative[key].properties.label = ComponentTypes
       .ReactNative[key].properties.label || {
       nodeProperty: NodeProperties.Label,
       template: `{titleService.get('{{value}}')}`,
       ui: true
-    }
+    };
   }
-})
+});
 
 ComponentTypes[UITypes.ElectronIO].Button = {
   ...ComponentTypes[UITypes.ElectronIO].Button,
@@ -423,45 +439,45 @@ ComponentTypes[UITypes.ElectronIO].Button = {
   properties: {
     ...ComponentTypes[UITypes.ElectronIO].Button.properties,
     onClick: {
-      nodeProperty: 'onClick',
-      template: '() => { {{value}} }',
+      nodeProperty: "onClick",
+      template: "() => { {{value}} }",
       method: true,
       nowrap: true,
       options: [NAVIGATION, APP_METHOD],
       ui: true
     }
   }
-}
+};
 export const HandlerTypes = {
-  Blur: 'blur',
-  Change: 'change',
-  ChangeText: 'changeText',
-  Focus: 'focus',
-  Property: 'property'
-}
+  Blur: "blur",
+  Change: "change",
+  ChangeText: "changeText",
+  Focus: "focus",
+  Property: "property"
+};
 export const InstanceTypes = {
-  ScreenInstance: 'ScreenInstance',
-  ScreenInstanceBlur: 'ScreenInstanceBlur',
-  ScreenInstanceFocus: 'ScreenInstanceFocus',
-  ScreenInstanceFocused: 'ScreenInstanceFocused',
-  ScreenInstanceDirty: 'ScreenInstanceDirty',
+  ScreenInstance: "ScreenInstance",
+  ScreenInstanceBlur: "ScreenInstanceBlur",
+  ScreenInstanceFocus: "ScreenInstanceFocus",
+  ScreenInstanceFocused: "ScreenInstanceFocused",
+  ScreenInstanceDirty: "ScreenInstanceDirty",
 
-  ModelInstance: 'ModelInstance',
-  ModelInstanceBlur: 'ModelInstanceBlur',
-  ModelInstanceFocus: 'ModelInstanceFocus',
-  ModelInstanceFocused: 'ModelInstanceFocused',
-  ModelInstanceDirty: 'ModelInstanceDirty',
+  ModelInstance: "ModelInstance",
+  ModelInstanceBlur: "ModelInstanceBlur",
+  ModelInstanceFocus: "ModelInstanceFocus",
+  ModelInstanceFocused: "ModelInstanceFocused",
+  ModelInstanceDirty: "ModelInstanceDirty",
 
-  Instance: 'Instance',
-  AppState: 'AppState',
-  PropInstance: 'PropInstance',
-  ApiProperty: 'ApiProperty',
-  ScreenParam: 'ScreenParam',
-  Selector: 'Selector',
-  SelectorInstance: 'SelectorInstance',
-  Boolean: 'Boolean',
-  AddAnotherIfTheseDontMakeSense: 'add another if these dont make sense'
-}
+  Instance: "Instance",
+  AppState: "AppState",
+  PropInstance: "PropInstance",
+  ApiProperty: "ApiProperty",
+  ScreenParam: "ScreenParam",
+  Selector: "Selector",
+  SelectorInstance: "SelectorInstance",
+  Boolean: "Boolean",
+  AddAnotherIfTheseDontMakeSense: "add another if these dont make sense"
+};
 export const SelectorKeys = {
   screen: {
     object: InstanceTypes.ScreenInstance,
@@ -477,27 +493,27 @@ export const SelectorKeys = {
     focused: InstanceTypes.ModelInstanceFocused,
     dirty: InstanceTypes.ModelInstanceDirty
   }
-}
+};
 
 export const InstanceTypeSelectorFunction = {
-  [InstanceTypes.ScreenInstance]: 'GetScreenInstanceObject',
-  [InstanceTypes.ScreenInstanceBlur]: 'GetScreenInstanceBlurObject',
-  [InstanceTypes.ScreenInstanceFocus]: 'GetScreenInstanceFocusObject',
-  [InstanceTypes.ScreenInstanceFocused]: 'GetScreenInstanceFocusedObject',
-  [InstanceTypes.ScreenInstanceDirty]: 'GetScreenInstanceDirtyObject',
+  [InstanceTypes.ScreenInstance]: "GetScreenInstanceObject",
+  [InstanceTypes.ScreenInstanceBlur]: "GetScreenInstanceBlurObject",
+  [InstanceTypes.ScreenInstanceFocus]: "GetScreenInstanceFocusObject",
+  [InstanceTypes.ScreenInstanceFocused]: "GetScreenInstanceFocusedObject",
+  [InstanceTypes.ScreenInstanceDirty]: "GetScreenInstanceDirtyObject",
 
-  [InstanceTypes.AppState]: 'GetAppStateObject',
+  [InstanceTypes.AppState]: "GetAppStateObject",
 
-  [InstanceTypes.ModelInstance]: 'GetModelInstanceObject',
-  [InstanceTypes.ModelInstanceBlur]: 'GetModelInstanceBlurObject',
-  [InstanceTypes.ModelInstanceFocus]: 'GetModelInstanceFocusObject',
-  [InstanceTypes.ModelInstanceFocused]: 'GetModelInstanceFocusedObject',
-  [InstanceTypes.ModelInstanceDirty]: 'GetModelInstanceDirtyObject'
-}
+  [InstanceTypes.ModelInstance]: "GetModelInstanceObject",
+  [InstanceTypes.ModelInstanceBlur]: "GetModelInstanceBlurObject",
+  [InstanceTypes.ModelInstanceFocus]: "GetModelInstanceFocusObject",
+  [InstanceTypes.ModelInstanceFocused]: "GetModelInstanceFocusedObject",
+  [InstanceTypes.ModelInstanceDirty]: "GetModelInstanceDirtyObject"
+};
 
-export function GetListItemNode (id) {
-  let state = GetState()
-  let graph = GetRootGraph(state)
+export function GetListItemNode(id) {
+  let state = GetState();
+  let graph = GetRootGraph(state);
   let nodes = GetNodesLinkedTo(graph, {
     id
   }).filter(
@@ -505,9 +521,9 @@ export function GetListItemNode (id) {
       GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode &&
       GetNodeProp(x, NodeProperties.ComponentType) ===
         ComponentTypes.ReactNative.ListItem.key
-  )
+  );
   if (nodes && nodes.length) {
-    return nodes[0]
+    return nodes[0];
   }
-  return null
+  return null;
 }

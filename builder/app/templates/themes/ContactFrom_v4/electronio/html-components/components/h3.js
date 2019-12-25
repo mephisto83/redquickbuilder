@@ -1,7 +1,9 @@
 import * as React from "react";
 import StyleProvider from "./styleprovider";
 
-export default class Content extends React.Component {
+let navigationInstance;
+
+export default class H3 extends React.Component {
   constructor(props) {
     super(props);
 
@@ -11,13 +13,7 @@ export default class Content extends React.Component {
     var props = {
       ...this.props
     };
-
-    delete props.style;
     delete props.children;
-    return (
-      <div {...props} className="wrap-contact100">
-        {this.props.children}
-      </div>
-    );
+    return <span {...props} className={'contact100-form-title'}>{this.props.children}</span>;
   }
 }

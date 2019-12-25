@@ -10,7 +10,7 @@ import material from '../../native-base-theme/variables/variables';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
 import * as ViewModelKeys from '../viewmodel_keys';
-import { Container, ListItem, Header, Title, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, View } from 'native-base';
+import { Container, ListItem, Header, Title, Footer, FooterTab,H3, Button, Left, Right, Body, Icon, Text, View } from 'native-base';
 import { NavigationActions } from 'react-navigation';
 import MenuItem from '../components/menuitem';
 {{imports}}
@@ -20,15 +20,15 @@ class {{name}} extends React.Component {
     static drawerContent = props => (
         <StyleProvider style={getTheme(material)}>
             <Container>
-                <MenuItem icon={'arrow-back'} 
+                <MenuItem icon={'arrow-back'}
                     onPress={() => {
                         const backAction = NavigationActions.back({});
                         props.navigation.dispatch(backAction);
-                    }} 
+                    }}
                     title={titleService.get("Back")}/>
             </Container>
         </StyleProvider>)
-    
+
     static navigationOptions = {
         title: titleService.get({{title}}),
         header: null
@@ -39,11 +39,11 @@ class {{name}} extends React.Component {
         navigationInstance = this.props.navigation;
         setNavigate(navigationInstance);
         return (
-            <StyleProvider style={getTheme(material)}>  
-                 <Container>                   
+            <StyleProvider style={getTheme(material)}>
+                 <Container>
                      {{elements}}
-                </Container> 
-            </StyleProvider> 
+                </Container>
+            </StyleProvider>
         );
     }
 }

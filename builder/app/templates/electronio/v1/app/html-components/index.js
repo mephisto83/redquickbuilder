@@ -20,6 +20,9 @@ import MultiSelectList from './components/multiselectlist';
 import Label from './components/label';
 import Image from './components/image';
 import Item from './components/item';
+import H3 from './components/h3';
+import H2 from './components/h2';
+import H1 from './components/h1';
 import MultiViewList from './components/multiviewlist';
 import Form from './components/form';
 export {
@@ -34,6 +37,9 @@ export {
   FooterTab,
   Button,
   Form,
+  H3,
+  H2,
+  H1,
   Left,
   Right,
   Body,

@@ -202,6 +202,8 @@ class ContextMenu extends Component {
         switch (componentType) {
           case "Button":
             return [this.getButtonApiMenu(currentNode)];
+          default:
+            return [this.getGenericComponentApiMenu(currentNode)];
         }
         break;
     }
@@ -250,6 +252,31 @@ class ContextMenu extends Component {
     return <ViewTypeMenu />;
   }
   getButtonApiMenu(currentNode) {
+    return (
+      <TreeViewMenu
+        open={true}
+        active={true}
+        title={Titles.ComponentAPIMenu}
+        toggle={() => {}}
+      >
+        <TreeViewMenu
+          title={`${Titles.Add} Label`}
+          hideArrow={true}
+          onClick={() => {
+            this.props.addComponentApiNodes(currentNode.id, "label");
+          }}
+        />
+        <TreeViewMenu
+          title={`${Titles.Add} Value`}
+          hideArrow={true}
+          onClick={() => {
+            this.props.addComponentApiNodes(currentNode.id, "value");
+          }}
+        />
+      </TreeViewMenu>
+    );
+  }
+  getGenericComponentApiMenu(currentNode) {
     return (
       <TreeViewMenu
         open={true}

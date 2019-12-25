@@ -706,19 +706,7 @@ export function GenerateMarkupTag(node, language, parent, params) {
           }
           break;
       }
-      // let apiProperties = '';
-      // if (parentComponentApiConfig) {
-      //     apiProperties = writeApiProperties(parentComponentApiConfig);
-      // }
-      // else if (componentApi) {
-      //     apiProperties = writeApiProperties(componentApi);
-      // }
-      // if (dataBinding) {
-      //     dataBinding = `data={${dataBinding}}`;
-      // }
-      // if (valueBinding) {
-      //     valueBinding = `value={${valueBinding}}`
-      // }
+
       let describedApi = "";
       if (node && parent) {
         if (viewTypeNode) {
@@ -894,6 +882,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
           case "label":
           case "error":
           case "success":
+          case "placeholder":
             return;
           case "viewModel":
             noSelector = true;

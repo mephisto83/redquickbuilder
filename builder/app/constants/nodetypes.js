@@ -410,6 +410,7 @@ export const NodeProperties = {
   UIExtensionDefinition: "uiExtensionDefinition",
   Label: "Label",
   Error: "Error",
+  Placeholder: "Placeholder",
   Success: "Success",
   MethodProps: "methodProperties",
   FilterPropreties: "filterproperties",

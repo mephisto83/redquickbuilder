@@ -217,9 +217,6 @@ export function createSection(
   let cellModel = properties[item].cellModel || {};
   let cellRoot = (properties[item].cellRoot = {});
   let cellModelProperty = properties[item].cellModelProperty || {};
-  // <UserName value={loginModel.userName} onChange={value => {
-  //     this.props.updateScreenInstance(ScreenInstances.LoginForm, const_loginModel, const_userName, value);
-  // }} />
   let tree = Object.keys(currentRoot).length
     ? buildLayoutTree(layoutObj, currentRoot, language, imports, node)
     : [];
