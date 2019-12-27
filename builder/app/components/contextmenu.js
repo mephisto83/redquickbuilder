@@ -15,6 +15,9 @@ import {
   UITypes
 } from "../constants/nodetypes";
 import AddNameDescription from "../nodepacks/AddNameDescription";
+import TinyTweaks from "../nodepacks/TinyTweaks";
+import BasicApplicationLayout from '../nodepacks/BasicApplicationLayout';
+import BasicDoubleSideColumn from '../nodepacks/BasicDoubleSideColumn';
 import GenericPropertyContainer from "./genericpropertycontainer";
 import ModelContextMenu from "./modelcontextmenu";
 import ComponentNodeMenu from "./componentnodemenu";
@@ -24,6 +27,8 @@ import DataChainContextMenu from "./datachaincontextmenu";
 import TreeViewGroupButton from "./treeviewgroupbutton";
 import TreeViewButtonGroup from "./treeviewbuttongroup";
 import ViewTypeMenu from "./viewtypecontextmenu";
+import FourColumn from "../nodepacks/FourColumn";
+import ThreeColumn from "../nodepacks/ThreeColumn";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -183,7 +188,64 @@ class ContextMenu extends Component {
             />
           </TreeViewMenu>
         ];
-        break;
+      case NodeTypes.ScreenOption:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "ScreenOptionOperations")}
+            active={true}
+            title={Titles.Layout}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("ScreenOptionOperations");
+            }}
+          >
+            <TreeViewMenu
+              title={`Set Tiny Tweaks Layout`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  TinyTweaks({ component: currentNode.id })
+                );
+              }}
+            />
+            <TreeViewMenu
+              title={`Basic Application Layout`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  BasicApplicationLayout({ component: currentNode.id })
+                );
+              }}
+            />
+            <TreeViewMenu
+              title={`Basic Double Side Column`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  BasicDoubleSideColumn({ component: currentNode.id })
+                );
+              }}
+            />
+            <TreeViewMenu
+              title={`Four Column`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  FourColumn({ component: currentNode.id })
+                );
+              }}
+            />
+            <TreeViewMenu
+              title={`Three Column`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  ThreeColumn({ component: currentNode.id })
+                );
+              }}
+            />
+          </TreeViewMenu>
+        ];
     }
     return [];
   }

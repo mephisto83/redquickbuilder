@@ -123,8 +123,8 @@ ipcRenderer.on("save-graph-to-file-reply", (event, arg) => {
 });
 export const RED_QUICK_FILE_EXT = ".rqb";
 export const RED_QUICK_FILE_EXT$ = "rqb";
-export const RED_QUICK_FILE_RECORDING_EXT = ".rqbr";
-export const RED_QUICK_FILE_RECORDING_EXT$ = "rqbr";
+export const RED_QUICK_FILE_RECORDING_EXT = ".js";
+export const RED_QUICK_FILE_RECORDING_EXT$ = "js";
 export function saveGraphToFile() {
   return (dispatch, getState) => {
     var currentGraph = GetRootGraph(getState());

@@ -9,6 +9,16 @@ import {
 } from "../actions/uiactions";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 import { bindTemplate } from "./functiontypes";
+export const ComponentTags = {
+  MainMenu: "MainMenu",
+  Main: "Main",
+  SideContainer: "SideContainer",
+  Header: "Header",
+  TopMenu: "TopMenu",
+  LeftContainer: "LeftContainer",
+  RightContainer: "RightContainer",
+  SecondaryMain: "SecondaryMain"
+};
 
 export const NAVIGATION = "-NAVIGATION";
 export const APP_METHOD = "-APP_METHOD";
@@ -158,7 +168,7 @@ export const ComponentTypes = {
         label: {
           nodeProperty: NodeProperties.Label,
           template: true
-        },
+        }
       }
     },
     Header: {
