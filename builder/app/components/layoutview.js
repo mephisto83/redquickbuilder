@@ -704,6 +704,27 @@ class LayoutView extends Component {
               </Box>
               <Box maxheight={350} title={Titles.Properties}>
                 {cellProperties && cellProperties.properties ? (
+                  <SelectInput
+                    options={[
+                      "Content",
+                      "Container",
+                      "View"
+                    ].map(t => ({ title: t, value: t }))}
+                    onChange={val => {
+                      let layout = nodeLayout || CreateLayout();
+
+                      cellProperties.properties.componentType = val;
+                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: layout
+                      });
+                    }}
+                    label={Titles.ComponentType}
+                    value={cellProperties.properties.componentType}
+                  />
+                ) : null}
+                {cellProperties && cellProperties.properties ? (
                   <ButtonList
                     active
                     isSelected={item => {

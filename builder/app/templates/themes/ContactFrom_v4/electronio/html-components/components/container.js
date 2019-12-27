@@ -12,7 +12,10 @@ export default class Container extends React.Component {
     };
     delete props.children;
     return (
-      <div className="container-contact100" {...props}>
+      <div
+        className={`${this.props.className || ""} container-contact100 `}
+        {...props}
+      >
         {this.props.children}
       </div>
     );

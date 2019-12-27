@@ -140,6 +140,39 @@ export function GetItemRenderImport(node) {
   )} ${properties} />`;
 }
 
+function getCssClassName(css, id) {
+  var res = id;
+  if (css[id] && css[id].parent) {
+    res = `${getCssClassName(css, css[id].parent)} .${res}`;
+  } else {
+    res = `.${res}`;
+  }
+  return res;
+}
+export function constructCssFile(css, clsName) {
+  let rules = Object.keys(css)
+    .map(v => {
+      let style = css[v].style;
+
+      let props = Object.keys(style)
+        .map(key => {
+          let temp = key.replace(/([a-z])([A-Z])/g, "$1-$2");
+          let value = style[key];
+          if(!isNaN(value)){
+            value = `${value}px`
+          }
+          return `${temp.toLowerCase()}: ${value};`;
+        })
+        .join(NEW_LINE);
+      return `${getCssClassName(css, v)} {
+      ${props}
+    }`;
+    })
+    .join(NEW_LINE);
+
+  return rules;
+}
+
 export function GetItemData(node) {
   let dataSourceNode = GetDataSourceNode(node.id);
   let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
@@ -173,11 +206,19 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
 
   let imports = [];
   let extraimports = [];
+  let css = {};
   let layoutSrc;
   if (!specialLayout) {
     // if not a List or something like that
     layoutSrc = layoutObj
-      ? buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE)
+      ? buildLayoutTree({
+          layoutObj,
+          currentRoot: null,
+          language,
+          imports,
+          node,
+          css
+        }).join(NEW_LINE)
       : GetDefaultElement();
   } else {
     extraimports.push(
@@ -186,7 +227,14 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
       )}model_keys.js';`
     );
     if (layoutObj) {
-      buildLayoutTree(layoutObj, null, language, imports, node).join(NEW_LINE);
+      buildLayoutTree({
+        layoutObj,
+        currentRoot: null,
+        language,
+        imports,
+        node,
+        css
+      }).join(NEW_LINE);
     }
     let data = GetItemData(node);
     let item_render = GetItemRender(node, extraimports, language);
@@ -213,6 +261,8 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     }
   }
 
+  let cssFile = null;
+  let cssImport = null;
   let templateStr = null;
   switch (language) {
     case UITypes.ElectronIO:
@@ -220,6 +270,13 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
       );
+      cssFile = constructCssFile(
+        css,
+        `.${(GetCodeName(node) || "").toJavascriptName()}`
+      );
+      cssImport = `import styles from './${(
+        GetCodeName(node) || ""
+      ).toJavascriptName()}.css'`;
       break;
     case UITypes.ReactNative:
     default:
@@ -254,7 +311,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     title: `"${GetNodeTitle(node)}"`,
     screen_options,
     component_did_update: GetComponentDidUpdate(node),
-    imports: [...imports, ...extraimports].unique().join(NEW_LINE),
+    imports: [...imports, cssImport, ...extraimports].unique().join(NEW_LINE),
     elements: addNewLine(layoutSrc, 4)
   });
   templateStr = bindTemplate(templateStr, {
@@ -275,8 +332,20 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         (relativePath || "./src/components/") +
         `${(GetCodeName(node) || "").toJavascriptName()}.js`
     },
+    cssFile
+      ? {
+          template: cssFile,
+          relative: relativePath || "./src/components",
+          relativeFilePath: `./${(
+            GetCodeName(node) || ""
+          ).toJavascriptName()}.css`,
+          name:
+            (relativePath || "./src/components/") +
+            `${(GetCodeName(node) || "").toJavascriptName()}.css`
+        }
+      : null,
     ...results
-  ];
+  ].filter(x => x);
 }
 export function bindComponent(node, componentBindingDefinition) {
   if (componentBindingDefinition && componentBindingDefinition.template) {
@@ -569,6 +638,38 @@ export function GenerateRNComponents(
   });
   return result;
 }
+export function GenerateCss(id, language) {
+  let screen = GetNodeById(id);
+  let screenOption = GetScreenOption(id, language);
+  if (screenOption) {
+    let imports = GetScreenImports(id, language);
+    let elements = [GenerateMarkupTag(screenOption, language, screen)];
+    let template = null;
+    switch (language) {
+      case UITypes.ElectronIO:
+        template = fs.readFileSync(
+          "./app/templates/screens/el_screen.tpl",
+          "utf8"
+        );
+        break;
+      case UITypes.ReactNative:
+      default:
+        template = fs.readFileSync(
+          "./app/templates/screens/rn_screen.tpl",
+          "utf8"
+        );
+        break;
+    }
+    return bindTemplate(template, {
+      name: GetCodeName(screen),
+      title: `"${GetNodeTitle(screen)}"`,
+      imports: imports.join(NEW_LINE),
+      elements: elements.join(NEW_LINE),
+      component_did_update: GetComponentDidUpdate(screenOption),
+      component_did_mount: GetComponentDidMount(screenOption)
+    });
+  }
+}
 export function ConvertViewTypeToComponentNode(
   node,
   language,
@@ -606,9 +707,7 @@ export function ConvertViewTypeToComponentNode(
   }
   return node;
 }
-export function GenerateMarkupTag(node, language, parent, params) {
-  let { children, cellModel, cellModelProperty, item } = params || {};
-  let listItem = "";
+export function GenerateMarkupTag(node, language, parent) {
   let viewTypeNode = null;
   if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
     viewTypeNode = node;
@@ -617,96 +716,6 @@ export function GenerateMarkupTag(node, language, parent, params) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
-      let onChange = "";
-      let dataBinding = "";
-      let instanceType = "";
-      let model = "";
-      let property = "";
-      let componentProperties;
-      let modelName = "";
-      let parentLayoutProperties = null;
-      let propertyName = "";
-      let parentComponentApiConfig = null;
-      let valueBinding = "";
-      if (parent) {
-        componentProperties = GetNodeProp(
-          parent,
-          NodeProperties.ComponentProperties
-        );
-        parentLayoutProperties = GetNodeProp(parent, NodeProperties.Layout);
-        var { componentApi } =
-          getComponentProperty(parentLayoutProperties, item) || {};
-        parentComponentApiConfig = componentApi;
-
-        if (
-          parent &&
-          children &&
-          cellModel &&
-          cellModelProperty &&
-          cellModel[item] &&
-          cellModelProperty[item]
-        ) {
-          instanceType = getComponentProperty(
-            componentProperties,
-            cellModel[item],
-            "instanceTypes"
-          );
-          model = GetRNModelConstValue(cellModel[item]);
-          modelName = `${cellModel[item]}`.toJavascriptName();
-          propertyName = (
-            GetCodeName(cellModelProperty[item]) || ""
-          ).toJavascriptName();
-          property = GetRNModelConstValue(propertyName);
-        }
-        if (
-          parent &&
-          GetNodeProp(parent, NodeProperties.ComponentType) ===
-            ComponentTypes[language].ListItem.key
-        ) {
-          listItem = ".item";
-        }
-      }
-      if (!componentApi) {
-        componentApi = GetNodeProp(viewTypeNode, NodeProperties.ComponentApi);
-      }
-      switch (instanceType) {
-        case InstanceTypes.PropInstance:
-          if (model && property) {
-            dataBinding = `this.props.${modelName} && this.props.${modelName}${listItem} ? this.props.${modelName}${listItem}.${propertyName} : null`;
-          } else if (model) {
-            dataBinding = `this.props.${modelName}${listItem}`;
-          }
-          break;
-        case InstanceTypes.ScreenParam:
-          dataBinding = `GetScreenParam('${modelName}')`;
-          break;
-        case InstanceTypes.ApiProperty:
-          debugger;
-          break;
-        case InstanceTypes.ModelInstance:
-          debugger;
-          break;
-        default:
-          switch (GetNodeProp(node, NodeProperties.NODEType)) {
-            // case NodeTypes.ComponentNode:
-            //     switch (GetNodeProp(node, NodeProperties.InstanceType)) {
-            //         case InstanceTypes.ModelInstance:
-            //             valueBinding = 'this.props.value';
-            //             break;
-            //     }
-            //     break;
-            case NodeTypes.ScreenOption:
-            case NodeTypes.Screen:
-              switch (GetNodeProp(node, NodeProperties.InstanceType)) {
-                case InstanceTypes.ModelInstance:
-                  valueBinding = `GetScreenParam('id')`;
-                  break;
-              }
-              break;
-          }
-          break;
-      }
-
       let describedApi = "";
       if (node && parent) {
         if (viewTypeNode) {

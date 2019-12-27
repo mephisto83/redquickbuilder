@@ -175,13 +175,16 @@ export function GetNodeComponentsKeys(layoutObj, item, currentRoot) {
   return imports;
 }
 
-export function buildLayoutTree(
-  layoutObj,
-  currentRoot,
-  language,
-  imports = [],
-  node = null
-) {
+export function buildLayoutTree(args) {
+  let {
+    layoutObj,
+    currentRoot,
+    language,
+    imports = [],
+    node = null,
+    css,
+    section = "section"
+  } = args;
   let result = [];
   let { layout, properties } = layoutObj;
   if (!currentRoot) {
@@ -189,36 +192,58 @@ export function buildLayoutTree(
   }
   Object.keys(currentRoot).map((item, index) => {
     result.push(
-      createSection(
+      createSection({
         layoutObj,
         item,
-        currentRoot[item],
-        index + 1,
+        currentRoot: currentRoot[item],
+        index: index + 1,
+        css,
         language,
         imports,
-        node
-      )
+        node,
+        section: `${section}_${index}`
+      })
     );
+    if (section !== "section") {
+      css[`${section}_${index}`].parent = section;
+    }
   });
+  if (css[`${section}`]) {
+    css[`${section}`].children = Object.keys(currentRoot).map(
+      (_, index) => `${section}_${index}`
+    );
+  }
   return result;
 }
-export function createSection(
-  layoutObj,
-  item,
-  currentRoot,
-  index,
-  language,
-  imports,
-  node
-) {
+export function createSection(args) {
+  let {
+    layoutObj,
+    item,
+    currentRoot,
+    index,
+    language,
+    imports,
+    node,
+    section,
+    css
+  } = args;
   let { properties } = layoutObj;
   let style = properties[item].style || {};
   let children = properties[item].children || {};
   let cellModel = properties[item].cellModel || {};
   let cellRoot = (properties[item].cellRoot = {});
+  let layoutProperties = properties[item].properties || {};
   let cellModelProperty = properties[item].cellModelProperty || {};
   let tree = Object.keys(currentRoot).length
-    ? buildLayoutTree(layoutObj, currentRoot, language, imports, node)
+    ? buildLayoutTree({
+        layoutObj,
+        currentRoot,
+        language,
+        imports,
+        node,
+        section,
+        css
+      })
     : [];
   if (children && children[item]) {
     if (!imports.some(v => v === children[item])) imports.push(children[item]);
@@ -244,7 +269,7 @@ export function createSection(
       delete _style[t];
     }
   });
-  // _style.backgroundColor = '#' + ('dd4b39-3a405a-553d36-684a52-857885-94e8b4-72bda3-5e8c61-4e6151-3b322c-cfdbd5-e8eddf-f5cb5c-242423-333533'.split('-')[Math.floor(Math.random() * 5)]);
+  css[section] = { style: { ..._style } };
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
@@ -264,8 +289,17 @@ export function createSection(
           }
           break;
       }
+      if (layoutProperties && layoutProperties.componentType) {
+        control = layoutProperties.componentType;
+      }
+      let className = "";
+      if (UITypes.ReactNative !== language) {
+        className = `className={styles.${section}}`;
+      } else {
+        className = `style={${JSON.stringify({ ..._style }, null, 4)}}`;
+      }
       return `
-<${control} style={${JSON.stringify({ ..._style }, null, 4)}}>
+<${control} ${className} >
 ${addNewLine(tree.tightenPs())}
 </${control}>
             `;
