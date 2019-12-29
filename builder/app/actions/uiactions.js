@@ -1487,6 +1487,8 @@ export function GenerateDataChainMethod(id) {
   let selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
+  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+  let listReference = GetNodeProp(node, NodeProperties.List);
   let lastpart = "return item;";
   switch (functionType) {
     case DataChainFunctionKeys.ModelProperty:
@@ -1509,6 +1511,24 @@ export function GenerateDataChainMethod(id) {
       return `(arg) => {
     return arg;
 }`;
+    case DataChainFunctionKeys.NewRedGraph:
+      return `() => {
+        let menuData = new RedGraph();
+        // for (var i = 0; i < 12; i++) {
+        //   RedGraph.addNode(menuData, { title: "Menu Node " + i, id: i + 1 }, i + 1);
+        //   if (i > 2) RedGraph.addLink(menuData, 2, i + 1);
+        //   else RedGraph.addLink(menuData, null, i + 1);
+        // }
+        return menuData;
+      }`;
+    case DataChainFunctionKeys.AddUrlsToGraph:
+      return `graph => {
+        Object.keys(routes).map(route=>{
+          RedGraph.addNode(graph, { title: route, id: route } , route);
+          RedGraph.addLink(graph, null, route);
+        });
+        return graph;
+      }`;
     case DataChainFunctionKeys.StringConcat:
       return `(node1, node2) => { return \`\${node1} \${node2}\` }`;
     case DataChainFunctionKeys.EmailValidation:
@@ -1525,6 +1545,10 @@ export function GenerateDataChainMethod(id) {
       return `(a, b) => a || b`;
     case DataChainFunctionKeys.GreaterThanOrEqualTo:
       return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
+    case DataChainFunctionKeys.Map:
+      return `${lambda}`;
+    case DataChainFunctionKeys.ListReference:
+      return `(a) => RedList.${GetCodeName(listReference)}`;
     case DataChainFunctionKeys.NumericalDefault:
       return `(a) => numericalDefault(a, ${numberParameter})`;
     case DataChainFunctionKeys.ArrayLength:
@@ -3161,6 +3185,27 @@ export function pinSelected() {
               value: true,
               id: t.id
             };
+          }
+        };
+      })
+    )(dispatch, getState);
+  };
+}
+export function addAllOfType(args) {
+  return (dispatch, getState) => {
+    let { properties, target, source } = args;
+    let nodes = NodesByType(
+      getState(),
+      GetNodeProp(target, NodeProperties.NODEType)
+    );
+    graphOperation(
+      nodes.map(v => {
+        return {
+          operation: ADD_LINK_BETWEEN_NODES,
+          options: {
+            target: v.id,
+            source,
+            properties
           }
         };
       })

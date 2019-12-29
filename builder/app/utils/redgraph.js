@@ -1,19 +1,37 @@
 // define a class
 export default class RedGraph {
-
   constructor() {
     this.nodes = {};
     this.links = {};
     this.nodeParents = {};
   }
 
-  static addNode(graph, proprerties, id) {
+  static addNode(graph, properties, id) {
     graph.nodes[id] = {
-      proprerties
+      properties,
+      id: id
     };
     return graph;
   }
-
+  static getTitle(graph, id) {
+    let node = RedGraph.getNode(graph, id);
+    if (node) {
+      return node.properties["title"];
+    }
+    return false;
+  }
+  static getId(node) {
+    if (node) {
+      return node.properties["id"];
+    }
+    return false;
+  }
+  static getNode(graph, id) {
+    if (graph && graph.nodes) {
+      return graph.nodes[id];
+    }
+    return null;
+  }
   static addLink(graph, parent, child) {
     graph.links[parent] = graph.links[parent] || {};
     graph.links[parent] = { ...graph.links[parent], [child]: {} };
@@ -40,11 +58,11 @@ export default class RedGraph {
 
   static getChildren(graph, parent) {
     let result = {};
-
-    Object.keys(graph.links[parent]).map(key => {
-      result[key] = graph.nodes[key] || null;
-    });
-
-    return result;
+    if (graph && graph.links && graph.links[parent]) {
+      Object.keys(graph.links[parent]).map(key => {
+        result[key] = graph.nodes[key] || null;
+      });
+    }
+    return Object.values(result);
   }
 }

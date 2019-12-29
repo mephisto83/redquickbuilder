@@ -30,13 +30,14 @@ import {
 
 import * as navigate from './navigationActions';
 import * as $service from '../util/service';
-import * as routes from '../constants/routes';
+import routes from '../constants/routes';
 
-
+import * as RedLists from './lists.js';
 import * as StateKeys from '../state_keys';
 import * as ViewModelKeys from '../viewmodel_keys';
 import * as Models from '../model_keys.js';
 import RedObservable from './observable.js';
+import RedGraph from './redgraph.js';
 ${funcs}`,
         relative: './src/actions',
         relativeFilePath: `./data-chain.js`,
@@ -47,6 +48,12 @@ ${funcs}`,
         relative: './src/actions',
         relativeFilePath: './observable.js',
         name: 'observable'
+      },
+      {
+        template: readFileSync('./app/utils/redgraph.js', 'utf8'),
+        relative: './src/actions',
+        relativeFilePath: './redgraph.js',
+        name: 'redgraph.js'
       }
     ]
     switch (language) {

@@ -61,12 +61,16 @@ export const DataChainFunctionKeys = {
   Pass: "Pass",
   SetBearerAccessToken: "SetBearerAccessToken",
   ReferenceDataChain: "Data Chain Ref.",
+  Map: "Map",
   ArrayLength: "Array Length",
+  ListReference: "List Reference",
   StringConcat: "String Concat {0} {1}",
   SaveModelArrayToState: "Save Model Array To State",
   Navigate: "Navigate",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
-  SaveModelIdsToState: "Save Model Array Ids to State Under Key"
+  SaveModelIdsToState: "Save Model Array Ids to State Under Key",
+  NewRedGraph: "New Red Graph",
+  AddUrlsToGraph: "Add Urls to Graph"
 };
 export const DataChainFunctions = {
   [DataChainFunctionKeys.Not]: {
@@ -104,6 +108,20 @@ export const DataChainFunctions = {
       [NodeProperties.NODEType]: true
     },
     value: "Navigate"
+  },
+  [DataChainFunctionKeys.ListReference]: {
+    ui: {
+      list: NodeProperties.List
+    },
+    filter: {},
+    value: DataChainFunctionKeys.ListReference
+  },
+  [DataChainFunctionKeys.Map]: {
+    ui: {
+      lambda: NodeProperties.Lambda
+    },
+    filter: {},
+    value: DataChainFunctionKeys.Map
   },
   [DataChainFunctionKeys.IfTrue]: {
     ui: {
@@ -301,8 +319,7 @@ export const DataChainFunctions = {
     value: "greater_than_validation"
   },
   [DataChainFunctionKeys.SetBearerAccessToken]: {
-    ui: {
-    },
+    ui: {},
     filter: {
       [NodeProperties.NODEType]: true
     },
@@ -343,6 +360,16 @@ export const DataChainFunctions = {
       [NodeProperties.NODEType]: true
     },
     value: "pass_selection"
+  },
+  [DataChainFunctionKeys.NewRedGraph]: {
+    ui: {},
+    filter: {},
+    value: DataChainFunctionKeys.NewRedGraph
+  },
+  [DataChainFunctionKeys.AddUrlsToGraph]: {
+    ui: {},
+    filter: {},
+    value: DataChainFunctionKeys.AddUrlsToGraph
   },
   [DataChainFunctionKeys.Models]: {
     ui: {
@@ -417,20 +444,6 @@ export const DataChainFunctions = {
 export function connectNodeChain(prop, reverse) {
   return function(currentNode, value) {
     var id = currentNode.id;
-    // this.props.graphOperation(REMOVE_LINK_BETWEEN_NODES, {
-    //     source: currentNode.properties[prop],
-    //     target: id
-    // })
-    // this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-    //     prop,
-    //     id,
-    //     value
-    // });
-    // this.props.graphOperation(ADD_LINK_BETWEEN_NODES, {
-    //     source: value,
-    //     target: id,
-    //     properties: { ...LinkProperties.DataChainLink }
-    // })
     this.props.graphOperation(
       connectNodeChainCommands(
         prop,
@@ -759,6 +772,7 @@ export function SplitDataCommand(
 }
 export const DataChainContextMethods = {
   Input1: connectNodeChain(NodeProperties.ChainNodeInput1),
+  List: connectNodeChain(NodeProperties.List),
   Selector: connectNodeChain(NodeProperties.Selector),
   Screen: connectNodeChain(NodeProperties.Screen, true),
   SelectorProperty: connectNodeChain(NodeProperties.SelectorProperty),

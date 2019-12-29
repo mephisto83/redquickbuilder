@@ -214,6 +214,27 @@ class Dashboard extends Component {
             title: Titles.Body
           })
           break;
+        case NodeTypes.Lists:
+          return [{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.Lists,
+                nodeTypes: [NodeTypes.Screen]
+              });
+            },
+            icon: 'fa  fa-list',
+            title: 'Add to list'
+          },{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.Lists,
+                allOfType: true,
+                nodeTypes: [NodeTypes.Screen]
+              });
+            },
+            icon: 'fa fa-list',
+            title: 'Add All of [Type] list'
+          }];
         case NodeTypes.ComponentExternalApi:
           result.push({
             onClick: () => {
@@ -1065,6 +1086,13 @@ class Dashboard extends Component {
                         source: selectedId
                       });
                       this.props.SelectedNode(null);
+                    }
+                    else if(properties && properties.allOfType){
+                        this.props.addAllOfType({
+                          properties,
+                          target: nodeId,
+                          source: selectedId
+                        })
                     }
                     else if (properties && properties.autoConnectViewType) {
                       let connectto = [];

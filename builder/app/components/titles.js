@@ -92,6 +92,7 @@ export const OnLoad = "On Load";
 export const AddQueryMethodApi = "Add Query Api";
 export const ChildLink = "Child link";
 export const OnFailureLink = "On failure result";
+export const Lambda = "Lambda";
 export const ExternalApiConnection = "External Api Connection";
 export const OnAction = "On Action";
 export const OnItemSelection = "On Item Selection";

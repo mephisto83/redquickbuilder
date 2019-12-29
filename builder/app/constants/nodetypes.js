@@ -16,6 +16,7 @@ export const NodeTypes = {
   Screen: "screen",
   EventMethod: "EventMethod",
   NavigationAction: "NavigationAction",
+  Lists: "Lists",
   EventMethodInstance: "EventMethodInstance",
   LifeCylceMethod: "LifeCylceMethod",
   LifeCylceMethodInstance: "LifeCylceMethodInstance",
@@ -99,7 +100,8 @@ export const ReactNativeTypes = {
   ControllerActions: "controller-actions",
   Configuration: "configuration",
   Selectors: "selectors",
-  DataChainFunctions: "data-chain"
+  DataChainFunctions: "data-chain",
+  Lists: "lists"
 };
 export const IdentityManagement = {
   RedQuickViews: "RedQuickViews"
@@ -193,7 +195,8 @@ export const NodeTypeColors = {
   [NodeTypes.MethodApiParameters]: "#ff0001",
   [NodeTypes.ComponentApi]: "#E2C044",
   [NodeTypes.ComponentExternalApi]: "#2E5266",
-  [NodeTypes.NavigationAction]: "#1282A2"
+  [NodeTypes.NavigationAction]: "#1282A2",
+  [NodeTypes.Lists]: "#2DC7FF"
 };
 
 export const NavigateTypes = {
@@ -451,7 +454,9 @@ export const NodeProperties = {
   Model: "Model",
   Screen: "Screen",
   ChainNodeInput1: "ChainNodeInput1",
+  List: "List",
   UIModelType: "uiModelType",
+  Lambda: "Lambda",
   StateKey: "StateKey",
   DataChainReference: "DataChainReference",
   NumberParameter: "NumberParameter",
@@ -616,6 +621,7 @@ export const LinkType = {
   ValidatorServiceMethod: "ValidatorServiceMethod",
   PermissionServiceMethod: "PermissionServiceMethod",
   ComponentApiConnection: "ComponentApiConnection",
+  Lists: "Lists",
   EventHandler: "EventHandler",
   SharedComponentInstance: "SharedComponentInstance",
   Executor: "executor",
@@ -851,6 +857,9 @@ export const LinkProperties = {
   PermissionServiceMethod: {
     type: LinkType.PermissionServiceMethod,
     nodeTypes: [NodeTypes.ServiceInterfaceMethod]
+  },
+  Lists: {
+    type: LinkType.Lists
   },
   ComponentApiConnection: {
     type: LinkType.ComponentApiConnection

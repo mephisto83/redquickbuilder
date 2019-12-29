@@ -54,6 +54,9 @@ class DataChainActvityMenu extends Component {
     let showModel = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.model
       : false;
+    let lambda = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.lambda
+      : false;
     let showDataChainRef = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.dataref
       : false;
@@ -87,6 +90,9 @@ class DataChainActvityMenu extends Component {
     let stateKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.stateKey
       : false;
+    let listkey = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.list
+      : false;
     let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
     let selector_nodes = UIA.NodesByType(
       state,
@@ -106,6 +112,7 @@ class DataChainActvityMenu extends Component {
         );
       })
       .toNodeSelect();
+    let lists = UIA.NodesByType(state, NodeTypes.Lists).toNodeSelect();
     let all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
 
     return (
@@ -166,6 +173,20 @@ class DataChainActvityMenu extends Component {
                 currentNode,
                 NodeProperties.NumberParameter
               )}
+            />
+          ) : null}
+          {lambda ? (
+            <TextInput
+              onChange={value => {
+                var id = currentNode.id;
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.Lambda,
+                  id,
+                  value
+                });
+              }}
+              label={Titles.Lambda}
+              value={UIA.GetNodeProp(currentNode, NodeProperties.Lambda)}
             />
           ) : null}
           {showModel ? (
@@ -344,6 +365,14 @@ class DataChainActvityMenu extends Component {
                 NodeProperties.ChainNodeInput1
               )}
               options={node_inputs}
+            />
+          ) : null}
+          {listkey ? (
+            <SelectInput
+              onChange={DataChainContextMethods.List.bind(this, currentNode)}
+              label={`${Titles.List}`}
+              value={UIA.GetNodeProp(currentNode, NodeProperties.List)}
+              options={lists}
             />
           ) : null}
           {showNode2 ? (

@@ -38,6 +38,7 @@ import {
 import BatchMenu from "./batchmenu";
 import AgentBasedMethods from "./agentbasedmethods";
 import HomeView from "../nodepacks/HomeView";
+import GetProjectUrlsDataChain from "../nodepacks/GetProjectUrlsDataChain";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -169,6 +170,14 @@ class QuickMethods extends Component<any, any, any> {
                       currentNode,
                       GetSpecificModels
                     );
+                  }}
+                />
+                <TreeViewMenu
+                  hideArrow
+                  title={'Get Project Urls Data Chain'}
+                  icon={"fa fa-plus"}
+                  onClick={() => {
+                    this.props.graphOperation(GetProjectUrlsDataChain());
                   }}
                 />
                 <TreeViewMenu

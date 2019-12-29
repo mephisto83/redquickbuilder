@@ -297,6 +297,19 @@ export const ComponentTypes = {
       },
       ui: true
     },
+    Menu: {
+      template: "./app/templates/components/menu.tpl",
+      properties: {
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
+        label: {
+          nodeProperty: NodeProperties.Label,
+          template: true
+        }
+      }
+    },
     MultiViewList: {
       layout: true,
       specialLayout: true,

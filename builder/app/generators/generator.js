@@ -25,7 +25,7 @@ import ExecutorGenerator from "./executiongenerator";
 import ModelReturnGenerator from "./modelreturngenerator";
 import ModelExceptionGenerator from "./modelexceptiongenerator";
 import ModelItemFilter from "./modelitemfiltergenerator";
-import ThemeService from './themeservicegenerator';
+import ThemeService from "./themeservicegenerator";
 import CustomService from "./customservicegenerator";
 import ModelGetGenerator from "./modelgetgenerators";
 import ReactNativeScreens from "./screengenerator";
@@ -35,6 +35,7 @@ import ReactNativeConfiguration from "./configurationgenerator";
 import ReactNativeControllerActions from "./controlleractionsgenerator";
 import ReactNativeDataChainFunctions from "./datachaingenerator";
 import ReactNativeSelectorFunctions from "./selectorgenerator";
+import ReactNativeLists from './listsgenerator';
 import ValidatorGenerator from "./validatorgenerator";
 export default class Generator {
   static generate(options) {
@@ -147,6 +148,8 @@ export default class Generator {
         return ReactNativeDataChainFunctions.Generate({ state, key, language });
       case ReactNativeTypes.Selectors:
         return ReactNativeSelectorFunctions.Generate({ state, key, language });
+      case ReactNativeTypes.Lists:
+        return ReactNativeLists.Generate({ state, key, language });
     }
   }
 }

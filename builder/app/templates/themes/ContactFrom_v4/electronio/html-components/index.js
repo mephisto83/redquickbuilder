@@ -18,6 +18,7 @@ import StyleProvider from './components/styleprovider';
 import FlatList from './components/flatlist';
 import MultiSelectList from './components/multiselectlist';
 import H3 from './components/h3';
+import Menu from './components/menu';
 import Label from './components/label';
 import Image from './components/image';
 import Form from './components/form';
@@ -31,6 +32,7 @@ export {
   Title,
   H3,
   Form,
+  Menu,
   Footer,
   Label,
   Item,
