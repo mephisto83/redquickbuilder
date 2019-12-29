@@ -61,12 +61,15 @@ export const DataChainFunctionKeys = {
   Pass: "Pass",
   SetBearerAccessToken: "SetBearerAccessToken",
   ReferenceDataChain: "Data Chain Ref.",
+  Merge: "Merge",
   Map: "Map",
   ArrayLength: "Array Length",
   ListReference: "List Reference",
+  DataChainReferences: "DataChainReferences",
   StringConcat: "String Concat {0} {1}",
   SaveModelArrayToState: "Save Model Array To State",
   Navigate: "Navigate",
+  NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
   SaveModelIdsToState: "Save Model Array Ids to State Under Key",
   NewRedGraph: "New Red Graph",
@@ -109,6 +112,15 @@ export const DataChainFunctions = {
     },
     value: "Navigate"
   },
+  [DataChainFunctionKeys.NavigateTo]: {
+    ui: {
+      navigateMethod: NodeProperties.NavigationAction
+    },
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: "NavigateTo"
+  },
   [DataChainFunctionKeys.ListReference]: {
     ui: {
       list: NodeProperties.List
@@ -122,6 +134,14 @@ export const DataChainFunctions = {
     },
     filter: {},
     value: DataChainFunctionKeys.Map
+  },
+  [DataChainFunctionKeys.Merge]: {
+    ui: {
+      lambda: NodeProperties.Lambda,
+      datareferences: NodeProperties.DataChainReferences
+    },
+    filter: {},
+    value: DataChainFunctionKeys.Merge
   },
   [DataChainFunctionKeys.IfTrue]: {
     ui: {

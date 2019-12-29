@@ -158,8 +158,8 @@ export function constructCssFile(css, clsName) {
         .map(key => {
           let temp = key.replace(/([a-z])([A-Z])/g, "$1-$2");
           let value = style[key];
-          if(!isNaN(value)){
-            value = `${value}px`
+          if (!isNaN(value)) {
+            value = `${value}px`;
           }
           return `${temp.toLowerCase()}: ${value};`;
         })
@@ -378,7 +378,7 @@ export function bindComponent(node, componentBindingDefinition) {
             return getMethodInvocation(methodInstanceCall);
           })
           .join(NEW_LINE);
-        return `${ComponentEvents[cevents[i]]}={()=> {
+        return `${ComponentEvents[cevents[i]]}={(value)=> {
 ${invocations}
     }}`;
       });
@@ -1236,6 +1236,11 @@ export function getMethodInvocation(methodInstanceCall) {
     type: LinkType.NavigationMethod,
     direction: SOURCE
   }).find(x => x);
+  let dataChain = getNodesByLinkType(graph, {
+    id: methodInstanceCall.id,
+    type: LinkType.DataChainLink,
+    direction: SOURCE
+  }).find(x => x);
   if (method) {
     let parts = [];
     let body = getNodesByLinkType(graph, {
@@ -1344,6 +1349,8 @@ export function getMethodInvocation(methodInstanceCall) {
       navigationMethod,
       NodeProperties.NavigationAction
     )}();`;
+  } else if (dataChain) {
+    return `DC.${GetCodeName(dataChain)}(value);`;
   }
 }
 export function GetComponentDidUpdate(parent) {
@@ -1394,7 +1401,7 @@ export function GetComponentDidMount(screenOption) {
     })
     .join(NEW_LINE);
 
-  let componentDidMount = `componentDidMount() {
+  let componentDidMount = `componentDidMount(value) {
         ${outOfBandCall}
         ${invocations}
         this.props.setGetState();
@@ -1487,7 +1494,7 @@ function GenerateElectronIORoutes(screens) {
     );
   });
   let routeFile = bindTemplate(routefile, {
-    routes: routes.join(NEW_LINE),
+    routes: routes.sort((a, b) => b.length - a.length).join(NEW_LINE),
     route_imports: _screens.join(NEW_LINE)
   });
   return {

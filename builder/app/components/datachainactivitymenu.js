@@ -41,6 +41,7 @@ import {
   DataChainFunctions,
   DataChainContextMethods
 } from "../constants/datachain";
+import ButtonList from "./buttonlist";
 
 class DataChainActvityMenu extends Component {
   render() {
@@ -93,6 +94,11 @@ class DataChainActvityMenu extends Component {
     let listkey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.list
       : false;
+    let dataChainReferences = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.datareferences
+      : false;
+    let datachainreferenceValues =
+      UIA.GetNodeProp(currentNode, NodeProperties.DataChainReferences) || {};
     let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
     let selector_nodes = UIA.NodesByType(
       state,
@@ -177,6 +183,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {lambda ? (
             <TextInput
+              textarea={true}
               onChange={value => {
                 var id = currentNode.id;
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -300,6 +307,86 @@ class DataChainActvityMenu extends Component {
                 NodeProperties.DataChainReference
               )}
               options={data_chain_entry}
+            />
+          ) : null}
+          {dataChainReferences ? (
+            <SelectInput
+              onChange={value => {
+                var id = currentNode.id;
+                // this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                //   source:
+                //     currentNode.properties[
+                //       UIA.NodeProperties.DataChainReference
+                //     ],
+                //   target: id
+                // });
+
+                let currentValue =
+                  UIA.GetNodeProp(
+                    currentNode,
+                    NodeProperties.DataChainReferences
+                  ) || {};
+                let freeKey = "abcdefghijklmnopqrstuvwxyz"
+                  .split("")
+                  .find(v => !currentValue[v]);
+                currentValue[freeKey] = value;
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.DataChainReferences,
+                  id,
+                  value: currentValue
+                });
+                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                  source: value,
+                  target: id,
+                  properties: { ...UIA.LinkProperties.DataChainLink }
+                });
+              }}
+              label={`${Titles.DataChain}`}
+              value={
+                Object.values(
+                  UIA.GetNodeProp(
+                    currentNode,
+                    NodeProperties.DataChainReference
+                  ) || {}
+                )[0]
+              }
+              options={data_chain_entry}
+            />
+          ) : null}
+          {dataChainReferences && datachainreferenceValues ? (
+            <ButtonList
+              active={true}
+              isSelected={() => true}
+              items={Object.keys(datachainreferenceValues).map(key => {
+                return {
+                  title: `[${key}]: ${UIA.GetNodeTitle(
+                    datachainreferenceValues[key]
+                  )}`,
+                  value: datachainreferenceValues[key],
+                  id: datachainreferenceValues[key]
+                };
+              })}
+              onClick={item => {
+                this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                  source: item.value,
+                  target: currentNode.id
+                });
+                let currentValue =
+                  UIA.GetNodeProp(
+                    currentNode,
+                    NodeProperties.DataChainReference
+                  ) || {};
+                Object.keys(datachainreferenceValues)
+                  .filter(v => datachainreferenceValues[v] === item.value)
+                  .map(v => {
+                    delete currentValue[v];
+                  });
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.DataChainReferences,
+                  id,
+                  value: currentValue
+                });
+              }}
             />
           ) : null}
           {showSelector ? (

@@ -60,6 +60,11 @@ export function GoForward(params = {}) {
     dispatch(goForward());
   }
 }
+export function Go(params = {}) {
+  return (dispatch, getState) => {
+    dispatch(push(params.route));
+  };
+}
 export function Replace(params = {}) {
   return (dispatch, getState) => {
     if(params.route) {

@@ -299,6 +299,7 @@ export const ComponentTypes = {
     },
     Menu: {
       template: "./app/templates/components/menu.tpl",
+      eventApi: [ComponentEvents.onPress],
       properties: {
         value: {
           nodeProperty: NodeProperties.value,
@@ -471,6 +472,21 @@ ComponentTypes[UITypes.ElectronIO].Button = {
     }
   }
 };
+ComponentTypes[UITypes.ElectronIO].Menu = {
+  ...ComponentTypes[UITypes.ElectronIO].Menu,
+  eventApi: [ComponentEvents.onClick],
+  properties: {
+    ...ComponentTypes[UITypes.ElectronIO].Menu.properties,
+    onClick: {
+      nodeProperty: "onClick",
+      template: "() => { {{value}} }",
+      method: true,
+      nowrap: true,
+      options: [NAVIGATION, APP_METHOD],
+      ui: true
+    }
+  }
+}
 export const HandlerTypes = {
   Blur: "blur",
   Change: "change",

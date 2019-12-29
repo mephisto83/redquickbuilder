@@ -7,9 +7,9 @@ export default class RedGraph {
   }
 
   static addNode(graph, properties, id) {
-    graph.nodes[id] = {
+    graph.nodes[id || properties.id] = {
       properties,
-      id: id
+      id: id || properties.id
     };
     return graph;
   }

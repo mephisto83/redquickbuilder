@@ -282,6 +282,7 @@ class ContextMenu extends Component {
           NodeProperties.ComponentType
         );
         switch (componentType) {
+          case 'Menu':
           case "Button":
             return [this.getButtonEventMenu(currentNode)];
         }

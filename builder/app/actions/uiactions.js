@@ -1484,6 +1484,7 @@ export function GenerateDataChainMethod(id) {
   let property = GetNodeProp(node, NodeProperties.Property);
   let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
+  let funcs = (GetNodeProp(node, NodeProperties.DataChainReferences));
   let selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
@@ -1546,9 +1547,16 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.GreaterThanOrEqualTo:
       return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
     case DataChainFunctionKeys.Map:
-      return `${lambda}`;
+      return `($a) => ($a || []).map(${lambda})`;
+    case DataChainFunctionKeys.Merge:
+      return `() => {
+        ${Object.keys(funcs||{}).map(key=>{
+          return `let ${key} = ${GetCodeName(funcs[key])}();`
+        }).join(NodeConstants.NEW_LINE)}
+        ${lambda}
+      }`;
     case DataChainFunctionKeys.ListReference:
-      return `(a) => RedList.${GetCodeName(listReference)}`;
+      return `(a) => RedLists.${GetCodeName(listReference)}`;
     case DataChainFunctionKeys.NumericalDefault:
       return `(a) => numericalDefault(a, ${numberParameter})`;
     case DataChainFunctionKeys.ArrayLength:
@@ -1572,6 +1580,11 @@ export function GenerateDataChainMethod(id) {
         navigate.${NavigateTypes[navigateMethod]}({ route: routes.${GetCodeName(
         $screen
       )} })(GetDispatch(), GetState());
+        return a;
+      }`;
+    case DataChainFunctionKeys.NavigateTo:
+      return `(a) => {
+        navigate.${NavigateTypes[navigateMethod]}({ route: routes[a] })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.SetBearerAccessToken:

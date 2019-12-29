@@ -1,1 +1,1 @@
-<Menu value={{{value}}} />
+<Menu value={{{value}}} {{events}} />

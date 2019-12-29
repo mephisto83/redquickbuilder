@@ -202,7 +202,8 @@ export const NodeTypeColors = {
 export const NavigateTypes = {
   Back: "GoBack",
   Replace: "Replace",
-  Forward: "GoForward"
+  Forward: "GoForward",
+  Go: "Go"
 };
 
 export const FunctionGroups = {
@@ -456,6 +457,7 @@ export const NodeProperties = {
   ChainNodeInput1: "ChainNodeInput1",
   List: "List",
   UIModelType: "uiModelType",
+  DataChainReferences: "DataChainReferences",
   Lambda: "Lambda",
   StateKey: "StateKey",
   DataChainReference: "DataChainReference",
