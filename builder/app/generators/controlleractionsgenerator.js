@@ -31,7 +31,7 @@ export default class ControllerActionGenerator {
                         endpoints[GetJSCodeName(method)] = `${GetNodeProp(method, NodeProperties.HttpRoute)}`
                     }
                     else {
-                        endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode)}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
+                        endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(controllerNode).toLowerCase()}/${GetNodeProp(method, NodeProperties.HttpRoute)}`
                     }
                     let methodType = GetNodeProp(method, NodeProperties.HttpMethod);
                     let asForm = '';
@@ -83,11 +83,11 @@ import * as Util from './util';
         `;
         let controllerActions = temp.map(node => {
             let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(node)}, { ...parameters }, {
-    loading: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown}, 
-    objectType: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown} 
+    loading: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown},
+    objectType: Models.${GetCodeName(GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)) || Titles.Unknown}
 }, (result) => {
     var { dataChain } = (parameters || {});
-    if (dataChain) { 
+    if (dataChain) {
         return dataChain(result);
     }
     else {
