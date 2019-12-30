@@ -19,9 +19,9 @@ namespace {{namespace}}.Controllers
         {
             var result = new List<Claim>();
 {{children}}
-            if (string.IsNullOrEmpty(user.Id))
+            if (!string.IsNullOrEmpty(user.Id))
                 result.Add(new Claim("Id", user.Id));
-            if (string.IsNullOrEmpty(user.UserName))
+            if (!string.IsNullOrEmpty(user.UserName))
                 result.Add(new Claim("UserName", user.UserName));
 
             return result;
