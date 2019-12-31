@@ -207,12 +207,29 @@ export function scaffoldProject(options = {}) {
       .then(() => {
         let namespace = root ? root[GraphKeys.NAMESPACE] : null;
         let server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
+        let graph = root;
         let userNode = NodesByType(state, NodeTypes.Model).find(x =>
           GetNodeProp(x, NodeProperties.IsUser)
         );
+        let logicalParents = GetNodesLinkedTo(graph, {
+          id: userNode.id,
+          link: LinkType.UserLink
+        })
+          .filter(x => x.id !== userNode.id);
         let logicalChildren = GetLogicalChildren(userNode.id);
         if (server_side_setup) {
-          let children = logicalChildren
+          let children = [
+            ...logicalChildren,
+            ...logicalParents,
+            ...GetModelPropertyChildren(userNode.id).filter(
+              x =>
+                GetNodeProp(x, NodeProperties.UIAttributeType) ===
+                NodeAttributePropertyTypes.STRING
+            )
+          ]
+            .unique(x => x.id)
+            .filter(x => GetCodeName(x) !== "Id")
+            .filter(x => GetCodeName(x) !== "UserName")
             .map(child => {
               return `
             if (string.IsNullOrEmpty(user.${GetCodeName(child.id)}))
@@ -237,16 +254,12 @@ export function scaffoldProject(options = {}) {
             )
           );
 
-          let graph = root;
-          let logicalParents = GetNodesLinkedTo(graph, {
-            id: userNode.id,
-            link: LinkType.UserLink
-          }).filter(x => x.id !== userNode.id);
-
           let props = [
             ...logicalParents,
-            ...GetModelPropertyChildren(userNode.id).filter(x =>
-              GetNodeProp(x, NodeProperties.UIAttributeType) === NodeAttributePropertyTypes.STRING
+            ...GetModelPropertyChildren(userNode.id).filter(
+              x =>
+                GetNodeProp(x, NodeProperties.UIAttributeType) ===
+                NodeAttributePropertyTypes.STRING
             )
           ]
             .map(prop => {

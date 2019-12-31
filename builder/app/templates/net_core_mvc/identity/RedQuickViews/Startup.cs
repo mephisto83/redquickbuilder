@@ -34,6 +34,7 @@ namespace {{namespace}}.Web
             RedStrapper.Add(builder =>
             {
                 builder.RegisterType<ClaimService>().As<IClaimService<{{model}}>>();
+                builder.RegisterType<ClaimService>().As<ICreateUser>();
             });
 
             // DI
@@ -52,7 +53,7 @@ namespace {{namespace}}.Web
             app.UseStaticFiles();
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-            
+
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>

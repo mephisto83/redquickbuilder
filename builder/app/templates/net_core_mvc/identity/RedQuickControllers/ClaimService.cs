@@ -26,6 +26,11 @@ namespace {{namespace}}.Controllers
           foreach (var claim in claimList)
           {
               {{create_properties}};
+
+              if(claim.Type == "UserName")
+              {
+                result.UserName = claim.Value;
+              }
           }
           return result;
         }
