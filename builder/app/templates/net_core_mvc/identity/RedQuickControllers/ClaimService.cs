@@ -13,8 +13,23 @@ using System.Threading.Tasks;
 
 namespace {{namespace}}.Controllers
 {
-    public class ClaimService : IClaimService<{{model}}>
+    public interface ICreateUser
     {
+      {{model}} Create(IEnumerable<Claim> claimList);
+    }
+
+    public class ClaimService : IClaimService<{{model}}>, ICreateUser
+    {
+        public {{model}} Create(IEnumerable<Claim> claimList)
+        {
+          var result = {{model}}.Create();
+          foreach (var claim in claimList)
+          {
+              {{create_properties}};
+          }
+          return result;
+        }
+
         public async Task<IList<Claim>> CreateClaims({{model}} user)
         {
             var result = new List<Claim>();

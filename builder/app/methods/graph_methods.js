@@ -894,7 +894,7 @@ const DEFAULT_PROPERTIES = [
   { title: "Created", type: NodePropertyTypes.DATETIME },
   { title: "Updated", type: NodePropertyTypes.DATETIME },
   { title: "Deleted", type: NodePropertyTypes.BOOLEAN },
-  { title: "Version", type: NodePropertyTypes.STRING }
+  { title: "Version", type: NodePropertyTypes.INT }
 ].map(t => {
   t.nodeType = NodeTypes.Property;
   return t;

@@ -1,5 +1,11 @@
 import { HandlerEvents } from "../ipc/handler-events";
-import { GraphKeys } from "../methods/graph_methods";
+import {
+  GraphKeys,
+  getNodesByLinkType,
+  TARGET,
+  SOURCE,
+  GetNodesLinkedTo
+} from "../methods/graph_methods";
 import {
   GetRootGraph,
   NodesByType,
@@ -14,7 +20,8 @@ import {
   GetLogicalChildren,
   GetCodeName,
   toggleNodeMark,
-  setInComponentMode
+  setInComponentMode,
+  GetModelPropertyChildren
 } from "./uiactions";
 import fs from "fs";
 const { ipcRenderer } = require("electron");
@@ -23,7 +30,10 @@ import {
   GeneratedTypes,
   NodeTypes,
   ReactNativeTypes,
-  UITypes
+  UITypes,
+  LinkType,
+  NEW_LINE,
+  NodeAttributePropertyTypes
 } from "../constants/nodetypes";
 import Generator from "../generators/generator";
 import { fstat, writeFileSync } from "fs";
@@ -227,6 +237,30 @@ export function scaffoldProject(options = {}) {
             )
           );
 
+          let graph = root;
+          let logicalParents = GetNodesLinkedTo(graph, {
+            id: userNode.id,
+            link: LinkType.UserLink
+          }).filter(x => x.id !== userNode.id);
+
+          let props = [
+            ...logicalParents,
+            ...GetModelPropertyChildren(userNode.id).filter(x =>
+              GetNodeProp(x, NodeProperties.UIAttributeType) === NodeAttributePropertyTypes.STRING
+            )
+          ]
+            .map(prop => {
+              return GetCodeName(prop);
+            })
+            .unique()
+            .map(v => {
+              return `if (claim.Type == "${v}")
+              {
+                result.${v} = claim.Value;
+              }`;
+            })
+            .join(NEW_LINE);
+
           generateFolderStructure(
             path.join(
               `./app/templates/net_core_mvc/identity/RedQuickControllers`
@@ -234,7 +268,8 @@ export function scaffoldProject(options = {}) {
             {
               model: GetNodeProp(userNode, NodeProperties.CodeName),
               namespace,
-              children
+              children,
+              create_properties: props
             },
             null,
             path.join(
