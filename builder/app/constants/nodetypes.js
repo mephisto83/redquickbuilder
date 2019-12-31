@@ -1180,6 +1180,7 @@ export const ValidationRules = {
   Zip: "zip",
   SocialSecurity: "socialsecurity",
   ListOfGuids: "listofguids",
+  IsNull: "isNull",
   OneOf: "one-of"
 };
 
@@ -2188,6 +2189,13 @@ export const FilterUI = {
   [ValidationRules.UrlEmpty]: {
     code: {
       [ProgrammingLanguages.CSHARP]: "UrlEmptyAttribute"
+    },
+    template: "./app/templates/validation/validation_generic.tpl",
+    arguments: { ...COMMON_STRING_ARGS }
+  },
+  [ValidationRules.IsNull]: {
+    code: {
+      [ProgrammingLanguages.CSHARP]: "IsNullAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
     arguments: { ...COMMON_STRING_ARGS }

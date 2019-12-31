@@ -33,6 +33,7 @@ export const FunctionTypes = {
   Get_Parent_Child_Agent_Value__Child: 'Get/Parent-Child/Agent/Value => Child',
   Delete_Parent_Child_Agent_Value__Child: 'Delete/Parent-Child/Agent/Value => Child',
 
+
   //Functions width Object result.
   Create_Object_Agent_Value__Object: 'Create/Object/Agent/Value => Object',
   Update_Object_Agent_Value__Object: 'Update/Object/Agent/Value => Object',
@@ -43,6 +44,7 @@ export const FunctionTypes = {
   Create_Object_Agent_Many_to_Many_CompositeInput__Object: 'Create/Object/Agent/Many to Many with Composite Input => Object',
   Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET: 'Create M2M Object with Agent and Return the updated M2M set',
 
+  Create_Object_With_User: 'Create/Object=>Object(with users)',
   Create_Object__Object: 'Create/Object => Object',
   Update_Object__Object: 'Update/Object => Object',
   Delete_Object__Object: 'Delete/Object => Object',
@@ -407,7 +409,8 @@ export const AFTER_EFFECTS = {
   }
 }
 
-const COMMON_CONSTRAINTS_OBJECT_METHOD = {
+
+const COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT = {
   [FunctionTemplateKeys.User]: {
     [NodeProperties.IsUser]: true,
     key: FunctionTemplateKeys.User,
@@ -430,6 +433,14 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD = {
     key: FunctionTemplateKeys.ModelFilter,
     nodeTypes: [NodeTypes.ModelFilter]
   }
+};
+const COMMON_CONSTRAINTS_OBJECT_METHOD = {
+  ...COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT,
+  [FunctionTemplateKeys.Agent]: {
+    [NodeProperties.IsAgent]: true,
+    key: FunctionTemplateKeys.Agent,
+    nodeTypes: [NodeTypes.Model]
+  },
 };
 
 
@@ -626,6 +637,13 @@ export const COMMON_FUNCTION_TEMPLATE_KEYS = {
   agent: 'agent',
   agent_type: 'agent_type'
 }
+export const COMMON_FUNCTION_TEMPLATE_KEYS_USER = {
+  model: 'model',
+  function_name: 'function_name',
+  user: 'user',
+  user_instance: 'user_instance',
+  value: 'value'
+}
 const PERMISSION_DEFAULTS = {
   implementation: './app/templates/permissions/permission_method.tpl',
   interface_: './app/templates/permissions/permission_method_interface.tpl',
@@ -686,6 +704,33 @@ export const MethodFunctions = {
     isList: false,
     method: Methods.Create,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
+  [FunctionTypes.Create_Object_With_User]:{
+    title: Titles.Create_Object_With_User,
+    titleTemplate: function (t, a) {
+      return `Create ${t} by ${a}`
+    },
+    template: fs.readFileSync('./app/templates/standard/create_model_user_object.tpl', 'utf8'),
+    interface: fs.readFileSync('./app/templates/standard/create_model_user_object_interface.tpl', 'utf8'),
+    templates: {
+    },
+    permission: {
+      ...PERMISSION_DEFAULTS,
+      params: [FunctionTemplateKeys.Model, FunctionTemplateKeys.User]
+    },
+    parameters: {
+      body: true,
+      parameters: false
+    },
+    constraints: {
+      ...COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT,
+      ...COMMON_CREATE_UPDATE_CONSTRAINTS
+    }, output: {
+      ...COMMON_OUTPUT.OBJECT
+    },
+    isList: false,
+    method: Methods.Create,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS_USER }
   },
   [FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
     title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,

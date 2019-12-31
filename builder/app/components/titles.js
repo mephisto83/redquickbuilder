@@ -300,6 +300,7 @@ export const Create_Object_Agent_Many_to_Many_CompositeInput__Object =
   "Create Object by Agent M2M with Composite Input";
 
 export const Create_Object__Object = "Create Object => Object";
+export const Create_Object_With_User = "Create Object with User";
 export const AddAllProperties = "Add all properties";
 export const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
 

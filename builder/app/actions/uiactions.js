@@ -780,7 +780,16 @@ export function GetJSCodeName(node) {
 export function GetModelPropertyChildren(id) {
   let property_nodes = GetModelPropertyNodes(id);
   let logicalChildren = GetLogicalChildren(id);
-  return [...property_nodes, ...logicalChildren].filter(x => x.id !== id);
+  let userModels = [];
+  if (
+    GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model ||
+    GetNodeProp(id, NodeProperties.IsUser)
+  ) {
+    userModels = GetUserReferenceNodes(id);
+  }
+  return [...userModels, ...property_nodes, ...logicalChildren].filter(
+    x => x.id !== id
+  );
 }
 export function GetMethodParameters(methodId) {
   let method = GetNodeById(methodId);
@@ -1484,7 +1493,7 @@ export function GenerateDataChainMethod(id) {
   let property = GetNodeProp(node, NodeProperties.Property);
   let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
-  let funcs = (GetNodeProp(node, NodeProperties.DataChainReferences));
+  let funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
   let selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
@@ -1550,9 +1559,11 @@ export function GenerateDataChainMethod(id) {
       return `($a) => ($a || []).map(${lambda})`;
     case DataChainFunctionKeys.Merge:
       return `() => {
-        ${Object.keys(funcs||{}).map(key=>{
-          return `let ${key} = ${GetCodeName(funcs[key])}();`
-        }).join(NodeConstants.NEW_LINE)}
+        ${Object.keys(funcs || {})
+          .map(key => {
+            return `let ${key} = ${GetCodeName(funcs[key])}();`;
+          })
+          .join(NodeConstants.NEW_LINE)}
         ${lambda}
       }`;
     case DataChainFunctionKeys.ListReference:
@@ -1584,7 +1595,9 @@ export function GenerateDataChainMethod(id) {
       }`;
     case DataChainFunctionKeys.NavigateTo:
       return `(a) => {
-        navigate.${NavigateTypes[navigateMethod]}({ route: routes[a] })(GetDispatch(), GetState());
+        navigate.${
+          NavigateTypes[navigateMethod]
+        }({ route: routes[a] })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.SetBearerAccessToken:
@@ -2081,6 +2094,14 @@ export function GetConditionClause(
         validation_Func_name: "MinAttribute"
       };
       break;
+    case NodeConstants.ValidationRules.IsNull:
+      properties = {
+        model: clauseKey,
+        model_property: propertyName,
+        parameters: ``,
+        validation_Func_name: "IsNullAttribute"
+      };
+      break;
     case NodeConstants.ValidationRules.Email:
       properties = {
         model: clauseKey,
@@ -2286,6 +2307,18 @@ export function GetModelPropertyNodes(refId) {
   }).filter(
     x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Property
   );
+}
+export function GetUserReferenceNodes(refId) {
+  var state = _getState();
+  return GraphMethods.GetLinkChain(state, {
+    id: refId,
+    links: [
+      {
+        type: NodeConstants.LinkType.UserLink,
+        direction: GraphMethods.TARGET
+      }
+    ]
+  }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
 }
 
 export function GetLogicalChildren(id) {
