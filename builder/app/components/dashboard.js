@@ -156,13 +156,23 @@ class Dashboard extends Component {
 
               this.props.setVisual(CONNECTING_NODE, {
                 ...LinkProperties.ClaimServiceAuthorizationMethod,
-                singleLink: true,
                 nodeTypes: [NodeTypes.Method]
               });
             },
             icon: 'fa fa-gears',
             title: Titles.ClaimServiceRegistrationCalls
+          },{
+            onClick: () => {
+
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.ClaimServiceUpdateUserMethod,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa fa-truck',
+            title: Titles.ClaimServiceUpdateUserMethod
           }];
+
         case NodeTypes.LifeCylceMethod:
           return this.getLifeCylcleMethods();
         case NodeTypes.EventMethod:

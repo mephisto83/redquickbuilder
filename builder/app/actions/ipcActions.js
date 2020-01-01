@@ -258,13 +258,40 @@ export function scaffoldProject(options = {}) {
           );
           let more_interfaces = "";
           let interface_implementations = [];
+          let user_update_implementation = [];
+          let post_registrations = [];
           let claim_service_interfaces = "";
+          let user_node = null;
           let template_name = "ICreateAgents";
           let interfaceFunctions = NodesByType(state, NodeTypes.ClaimService)
             .map(claimService => {
               let authMethods = GetNodesLinkedTo(graph, {
                 id: claimService.id,
                 link: LinkType.ClaimServiceAuthorizationMethod
+              });
+              let userUpdateMethods = GetNodesLinkedTo(graph, {
+                id: claimService.id,
+                link: LinkType.ClaimServiceUpdateUserMethod
+              });
+              userUpdateMethods.map(method => {
+                let parameters = GetMethodProps(method);
+                if (parameters && parameters[FunctionTemplateKeys.Model]) {
+                  let model = GetCodeName(
+                    parameters[FunctionTemplateKeys.Model]
+                  );
+                  let user = GetCodeName(parameters[FunctionTemplateKeys.User]);
+                  let maestro = GetMaestroNode(method.id);
+                  if (maestro) {
+                    let controller = GetControllerNode(maestro.id);
+                    if (controller) {
+                      user_node = user;
+                      user_update_implementation.push(`
+  var maestro = RedStrapper.Resolve<I${GetCodeName(maestro)}>();
+  user = await maestro.${GetCodeName(method)}(user, user);
+                      `);
+                    }
+                  }
+                }
               });
               return authMethods
                 .map(method => {
@@ -280,13 +307,20 @@ export function scaffoldProject(options = {}) {
                     if (maestro) {
                       let controller = GetControllerNode(maestro.id);
                       if (controller) {
+                        user_node = user;
                         interface_implementations.push(`
                     public async Task<${model}> Create(${user} user, ${model} model)
                     {
-                      var maestro = RedStrapper.Resolve<I${GetCodeName(maestro)}>();
+                      var maestro = RedStrapper.Resolve<I${GetCodeName(
+                        maestro
+                      )}>();
                       return await maestro.${GetCodeName(method)}(user, model);
                     }`);
-
+                        post_registrations.push(`
+                    var  ${model.toLowerCase()} =  ${model}.Create();
+                    ${model.toLowerCase()}.Owner = user.Id;
+                    ${model.toLowerCase()} = await Create(user, ${model.toLowerCase()});
+                    user.${model}  = ${model.toLowerCase()}.Id;`);
                         return `Task<${model}> Create(${user} ${
                           FunctionTemplateKeys.User
                         }, ${model} ${FunctionTemplateKeys.Model});`;
@@ -299,7 +333,51 @@ export function scaffoldProject(options = {}) {
             })
             .flatten()
             .unique();
+
+          /**
+             *
+        public async Task<Agent> Create(User user, Agent model)
+        {
+            var maestro = RedStrapper.Resolve<IAgentMaestro>();
+            return await maestro.CreateAgentByUser(user, model);
+        }
+
+        public async Task<User> Update(User user)
+        {
+            var maestro = RedStrapper.Resolve<IUserMaestro>();
+            return await maestro.UpdateUserByUser(user, user);
+        }
+
+        public async Task<User> PostRegistration(User user)
+        {
+            var agent = Agent.Create();
+            agent.Owner = user.Id;
+            agent = await Create(user, agent);
+            user.Agent = agent.Id;
+
+
+            user = await Update(user);
+
+            return user;
+        }
+             */
           if (interfaceFunctions && interfaceFunctions.length) {
+            interface_implementations.push(`
+
+public async Task<User> Update(User user)
+{
+${user_update_implementation.join(NEW_LINE)}
+  return user;
+}
+
+public async Task<${user_node}> PostRegistration(${user_node} user)
+{
+${post_registrations.join(NEW_LINE)}
+
+    user = await Update(user);
+
+    return user;
+} `);
             claim_service_interfaces = `public interface ${template_name} {
 ${interfaceFunctions.join(NEW_LINE)}
 }`;
@@ -334,7 +412,9 @@ ${interfaceFunctions.join(NEW_LINE)}
               namespace,
               children,
               more_interfaces,
-              interface_implementations,
+              interface_implementations: interface_implementations.join(
+                NEW_LINE
+              ),
               claim_service_interfaces,
               create_properties: props
             },

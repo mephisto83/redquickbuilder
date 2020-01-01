@@ -26,16 +26,12 @@ class ExecutorPropertyMenu extends Component {
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var executor;
         if (currentNode && UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel)) {
-            var propertyNodes = getNodesByLinkType(graph, {
-                id: UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel),
-                direction: SOURCE,
-                type: LinkType.PropertyLink
-            }).filter(x => UIA.GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.Model).map(t => {
-                return {
-                    title: UIA.GetNodeTitle(t),
-                    value: t.id
-                }
-            });
+            // var propertyNodes = getNodesByLinkType(graph, {
+            //     id: UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel),
+            //     direction: SOURCE,
+            //     type: LinkType.PropertyLink
+            // }).filter(x => UIA.GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.Model).toNodeSelect();
+            var  propertyNodes = UIA.GetModelPropertyChildren(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ExecutorModel)).toNodeSelect();
             executor = UIA.GetNodeProp(currentNode, NodeProperties.Executor);
         }
         let addProperty = (values) => {

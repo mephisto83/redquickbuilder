@@ -194,7 +194,8 @@ export const AddAfterMethodsDescription =
   "Adding an after method node, will allow you to append functions to execute after.";
 export const AddModelItemFilter = "Add model item filter";
 export const ConnectModelItemFilter = "Connect Model Item Filter";
-export const ClaimServiceRegistrationCalls = 'Registration Calls Methods';
+export const ClaimServiceRegistrationCalls = "Registration Calls Methods";
+export const ClaimServiceUpdateUserMethod = "Update User Methods";
 export const AddModelItemFilterDescription =
   "Add model item filter for get functions";
 export const PermissionType = "Permissions";
@@ -301,6 +302,7 @@ export const Create_Object_Agent_Many_to_Many_CompositeInput__Object =
   "Create Object by Agent M2M with Composite Input";
 
 export const Create_Object__Object = "Create Object => Object";
+export const Update_Object_With_User = "Update Object => Object";
 export const Create_Object_With_User = "Create Object with User";
 export const AddAllProperties = "Add all properties";
 export const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
