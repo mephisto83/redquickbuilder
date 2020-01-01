@@ -150,6 +150,19 @@ class Dashboard extends Component {
         case NodeTypes.Validator:
           result.push(...this.getValidatorContext());
           return result;
+        case NodeTypes.ClaimService:
+          return [{
+            onClick: () => {
+
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.ClaimServiceAuthorizationMethod,
+                singleLink: true,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa fa-gears',
+            title: Titles.ClaimServiceRegistrationCalls
+          }];
         case NodeTypes.LifeCylceMethod:
           return this.getLifeCylcleMethods();
         case NodeTypes.EventMethod:

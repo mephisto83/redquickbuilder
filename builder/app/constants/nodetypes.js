@@ -52,6 +52,7 @@ export const NodeTypes = {
   AfterEffect: "after-effect", // executes after a method finishes successfully.
   Action: "action", //NGRX like action
   Parameter: "parameter",
+  ClaimService: "ClaimService",
   FunctionOutput: "function-output",
   Controller: "controller",
   Maestro: "maestro",
@@ -196,7 +197,8 @@ export const NodeTypeColors = {
   [NodeTypes.ComponentApi]: "#E2C044",
   [NodeTypes.ComponentExternalApi]: "#2E5266",
   [NodeTypes.NavigationAction]: "#1282A2",
-  [NodeTypes.Lists]: "#2DC7FF"
+  [NodeTypes.Lists]: "#2DC7FF",
+  [NodeTypes.ClaimService]: "#034748"
 };
 
 export const NavigateTypes = {
@@ -613,6 +615,7 @@ export const LinkType = {
   MethodApiParameters: "MethodApiParameters",
   DefaultViewType: "DefaultViewType",
   SharedComponent: "SharedComponent",
+  ClaimServiceAuthorizationMethod: "ClaimServiceAuthorizationMethod",
   ExecutorServiceMethod: "ExecutorServiceMethod",
   StateKey: "StateKey",
   LifeCylceMethod: "LifeCylceMethod",
@@ -834,6 +837,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent
+  },
+  ClaimServiceAuthorizationMethod: {
+    type: LinkType.ClaimServiceAuthorizationMethod
   },
   StateKey: {
     type: LinkType.StateKey

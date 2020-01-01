@@ -18,7 +18,9 @@ namespace {{namespace}}.Controllers
       {{model}} Create(IEnumerable<Claim> claimList);
     }
 
-    public class ClaimService : IClaimService<{{model}}>, ICreateUser
+{{claim_service_interfaces}}
+
+    public class ClaimService : IClaimService<{{model}}>, ICreateUser{{more_interfaces}}
     {
         public {{model}} Create(IEnumerable<Claim> claimList)
         {
@@ -60,5 +62,6 @@ namespace {{namespace}}.Controllers
 
             return tokenDescriptor;
         }
+{{interface_implementations}}
     }
 }

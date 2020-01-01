@@ -194,6 +194,7 @@ export const AddAfterMethodsDescription =
   "Adding an after method node, will allow you to append functions to execute after.";
 export const AddModelItemFilter = "Add model item filter";
 export const ConnectModelItemFilter = "Connect Model Item Filter";
+export const ClaimServiceRegistrationCalls = 'Registration Calls Methods';
 export const AddModelItemFilterDescription =
   "Add model item filter for get functions";
 export const PermissionType = "Permissions";

@@ -21,7 +21,11 @@ import {
   GetCodeName,
   toggleNodeMark,
   setInComponentMode,
-  GetModelPropertyChildren
+  GetModelPropertyChildren,
+  GetMethodsProperties,
+  GetMethodProps,
+  GetMaestroNode,
+  GetControllerNode
 } from "./uiactions";
 import fs from "fs";
 const { ipcRenderer } = require("electron");
@@ -37,7 +41,7 @@ import {
 } from "../constants/nodetypes";
 import Generator from "../generators/generator";
 import { fstat, writeFileSync } from "fs";
-import { bindTemplate } from "../constants/functiontypes";
+import { bindTemplate, FunctionTemplateKeys } from "../constants/functiontypes";
 import { uuidv4 } from "../utils/array";
 import { platform } from "os";
 import {
@@ -214,8 +218,7 @@ export function scaffoldProject(options = {}) {
         let logicalParents = GetNodesLinkedTo(graph, {
           id: userNode.id,
           link: LinkType.UserLink
-        })
-          .filter(x => x.id !== userNode.id);
+        }).filter(x => x.id !== userNode.id);
         let logicalChildren = GetLogicalChildren(userNode.id);
         if (server_side_setup) {
           let children = [
@@ -253,7 +256,55 @@ export function scaffoldProject(options = {}) {
               solutionName + path.join(".Web")
             )
           );
+          let more_interfaces = "";
+          let interface_implementations = [];
+          let claim_service_interfaces = "";
+          let template_name = "ICreateAgents";
+          let interfaceFunctions = NodesByType(state, NodeTypes.ClaimService)
+            .map(claimService => {
+              let authMethods = GetNodesLinkedTo(graph, {
+                id: claimService.id,
+                link: LinkType.ClaimServiceAuthorizationMethod
+              });
+              return authMethods
+                .map(method => {
+                  let parameters = GetMethodProps(method);
+                  if (parameters && parameters[FunctionTemplateKeys.Model]) {
+                    let model = GetCodeName(
+                      parameters[FunctionTemplateKeys.Model]
+                    );
+                    let user = GetCodeName(
+                      parameters[FunctionTemplateKeys.User]
+                    );
+                    let maestro = GetMaestroNode(method.id);
+                    if (maestro) {
+                      let controller = GetControllerNode(maestro.id);
+                      if (controller) {
+                        interface_implementations.push(`
+                    public async Task<${model}> Create(${user} user, ${model} model)
+                    {
+                      var maestro = RedStrapper.Resolve<I${GetCodeName(maestro)}>();
+                      return await maestro.${GetCodeName(method)}(user, model);
+                    }`);
 
+                        return `Task<${model}> Create(${user} ${
+                          FunctionTemplateKeys.User
+                        }, ${model} ${FunctionTemplateKeys.Model});`;
+                      }
+                    }
+                  }
+                  return null;
+                })
+                .filter(x => x);
+            })
+            .flatten()
+            .unique();
+          if (interfaceFunctions && interfaceFunctions.length) {
+            claim_service_interfaces = `public interface ${template_name} {
+${interfaceFunctions.join(NEW_LINE)}
+}`;
+            more_interfaces = `, ${template_name}`;
+          }
           let props = [
             ...logicalParents,
             ...GetModelPropertyChildren(userNode.id).filter(
@@ -282,6 +333,9 @@ export function scaffoldProject(options = {}) {
               model: GetNodeProp(userNode, NodeProperties.CodeName),
               namespace,
               children,
+              more_interfaces,
+              interface_implementations,
+              claim_service_interfaces,
               create_properties: props
             },
             null,
