@@ -4,7 +4,7 @@
 
             if(await {{user#lower}}Permissions.{{permission_function}}(value, _user).ConfigureAwait(false)) {
 
-                var parameters = {{model}}ChangeBy{{user}}.Create(_user, value, FunctionName.{{function_name}});
+                var parameters = {{model}}ChangeBy{{user}}.Update(_user, value, FunctionName.{{function_name}});
 
                 var result = await StreamProcess.{{model}}_{{user}}(parameters);
 

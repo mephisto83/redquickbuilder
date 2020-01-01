@@ -16,6 +16,11 @@ using Swashbuckle.AspNetCore.Swagger;
 using RedQuick.Util;
 using Autofac;
 using {{namespace}}.Controllers;
+using {{namespace}}.Permissions;
+using {{namespace}}.Interface;
+using {{namespace}}.Executors;
+using {{namespace}}.ActionStream;
+using {{namespace}}.Validations;
 
 namespace {{namespace}}.Web
 {
@@ -34,7 +39,13 @@ namespace {{namespace}}.Web
             RedStrapper.Add(builder =>
             {
                 builder.RegisterType<ClaimService>().As<IClaimService<{{model}}>>();
+                builder.RegisterType<StreamProcessOrchestration>().As<IStreamProcessOrchestration>();
                 builder.RegisterType<ClaimService>().As<ICreateUser>();
+                {{maestro_registrations}}
+                {{permission_registrations}}
+                {{executor_registrations}}
+                {{orchestration_registrations}}
+                {{validation_registrations}}
             });
 
             // DI

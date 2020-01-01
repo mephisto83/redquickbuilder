@@ -41,7 +41,11 @@ import {
 } from "../constants/nodetypes";
 import Generator from "../generators/generator";
 import { fstat, writeFileSync } from "fs";
-import { bindTemplate, FunctionTemplateKeys } from "../constants/functiontypes";
+import {
+  bindTemplate,
+  FunctionTemplateKeys,
+  ReturnTypes
+} from "../constants/functiontypes";
 import { uuidv4 } from "../utils/array";
 import { platform } from "os";
 import {
@@ -235,7 +239,7 @@ export function scaffoldProject(options = {}) {
             .filter(x => GetCodeName(x) !== "UserName")
             .map(child => {
               return `
-            if (string.IsNullOrEmpty(user.${GetCodeName(child.id)}))
+            if (!string.IsNullOrEmpty(user.${GetCodeName(child.id)}))
                 result.Add(new Claim("${GetCodeName(
                   child.id
                 )}", user.${GetCodeName(child.id)}));
@@ -247,6 +251,39 @@ export function scaffoldProject(options = {}) {
               `./app/templates/net_core_mvc/identity/${server_side_setup}`
             ),
             {
+              maestro_registrations: CreateRegistrations(
+                NodesByType(null, NodeTypes.Maestro).filter(
+                  x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
+                )
+              ),
+              permission_registrations: CreateRegistrations(
+                NodesByType(null, NodeTypes.Model).filter(x =>
+                  GetNodeProp(x, NodeProperties.IsAgent)
+                ),
+                v => `Permissions${GetCodeName(v)}`,
+                v => `IPermissions${GetCodeName(v)}`
+              ),
+              executor_registrations: CreateRegistrations(
+                NodesByType(null, NodeTypes.Model).filter(x =>
+                  GetNodeProp(x, NodeProperties.IsAgent)
+                ),
+                v => `${GetCodeName(v)}Executor`,
+                v => `I${GetCodeName(v)}Executor`
+              ),
+              orchestration_registrations:CreateRegistrations(
+                NodesByType(null, NodeTypes.Model).filter(x =>
+                  GetNodeProp(x, NodeProperties.IsAgent)
+                ),
+                v => `${GetCodeName(v)}StreamProcessOrchestration`,
+                v => `I${GetCodeName(v)}StreamProcessOrchestration`
+              ),
+              validation_registrations:CreateRegistrations(
+                NodesByType(null, NodeTypes.Model).filter(x =>
+                  GetNodeProp(x, NodeProperties.IsAgent)
+                ),
+                v => `${GetCodeName(v)}Validations`,
+                v => `I${GetCodeName(v)}Validations`
+              ),
               model: GetNodeProp(userNode, NodeProperties.CodeName),
               namespace
             },
@@ -334,33 +371,6 @@ export function scaffoldProject(options = {}) {
             .flatten()
             .unique();
 
-          /**
-             *
-        public async Task<Agent> Create(User user, Agent model)
-        {
-            var maestro = RedStrapper.Resolve<IAgentMaestro>();
-            return await maestro.CreateAgentByUser(user, model);
-        }
-
-        public async Task<User> Update(User user)
-        {
-            var maestro = RedStrapper.Resolve<IUserMaestro>();
-            return await maestro.UpdateUserByUser(user, user);
-        }
-
-        public async Task<User> PostRegistration(User user)
-        {
-            var agent = Agent.Create();
-            agent.Owner = user.Id;
-            agent = await Create(user, agent);
-            user.Agent = agent.Id;
-
-
-            user = await Update(user);
-
-            return user;
-        }
-             */
           if (interfaceFunctions && interfaceFunctions.length) {
             interface_implementations.push(`
 
@@ -620,7 +630,25 @@ function generateFiles(workspace, solutionName, state) {
     );
   }
 }
-
+function CreateRegistrations(nodes, namefunc = null, interfacefunc = null) {
+  namefunc =
+    namefunc ||
+    function(v) {
+      return GetCodeName(v);
+    };
+  interfacefunc =
+    interfacefunc ||
+    function(v) {
+      return `I${GetCodeName(v)}`;
+    };
+  return nodes
+    .map(v => {
+      return `builder.RegisterType<${namefunc(v)}>().As<${interfacefunc(
+        v
+      )}>();`;
+    })
+    .join(NEW_LINE);
+}
 function ensureDirectory(dir) {
   if (!fs.existsSync(dir)) {
     console.log("doesnt exist : " + dir);

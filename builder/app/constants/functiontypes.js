@@ -754,11 +754,11 @@ export const MethodFunctions = {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
-      "./app/templates/standard/create_model_user_object.tpl",
+      "./app/templates/standard/update_model_user_object.tpl",
       "utf8"
     ),
     interface: fs.readFileSync(
-      "./app/templates/standard/create_model_user_object_interface.tpl",
+      "./app/templates/standard/update_model_user_object_interface.tpl",
       "utf8"
     ),
     templates: {},

@@ -2665,6 +2665,7 @@ export function HasCurrentGraph(options = {}) {
   return !!currentGraph;
 }
 export function NodesByType(state, nodeType, options = {}) {
+  state = state || GetState();
   var currentGraph = options.useRoot
     ? GetRootGraph(state)
     : GetCurrentGraph(state);
