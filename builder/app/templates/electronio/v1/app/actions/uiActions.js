@@ -214,8 +214,8 @@ export function GetScreenInst (state) {
 export function GetAppState (state) {
   return GetC(state, APP_STATE, APP_STATE)
 }
-export function GetModelInst (state, instance) {
-  return GetK(state, MODEL_INSTANCE, MODEL_INSTANCE, instance)
+export function GetModelInst (state, instance, id) {
+  return GetK(state, UI_MODELS, instance, id)
 }
 
 export function GetScreenInstanceBlur (key, id) {
@@ -462,9 +462,9 @@ export function GetAppStateObject (key) {
 export function GetModelInstanceObject (key, instance) {
   if (_getState) {
     let state = _getState()
-    let modelInstance = GetModelInst(state, instance)
+    let modelInstance = GetModelInst(state, instance, key)
     if (modelInstance) {
-      return modelInstance[key]
+      return modelInstance;
     }
   }
   return null

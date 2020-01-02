@@ -377,6 +377,10 @@ export const ComponentTypes = {
       internalApiNode: ComponentApiKeys.DATA,
       externalApiNode: ComponentApiKeys.DATA,
       properties: {
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
         data: {
           ui: true,
           nodeProperty: ComponentApiKeys.DATA,

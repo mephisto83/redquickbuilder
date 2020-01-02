@@ -1,4 +1,4 @@
-        public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) { 
+        public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 
@@ -8,7 +8,7 @@
 
                 var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
-                return await arbiter{{model}}.Get<{{model}}>(result.Id);
+                return await arbiter{{model}}.Get<{{model}}>(result.IdValue);
             }
             throw new PermissionException();
         }

@@ -125,7 +125,7 @@ export function GetItemRender(node, imports, language) {
   let properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
-  return `({item, index, separators})=> <${GetCodeName(
+  return `({item, index, separators, key})=> <${GetCodeName(
     listItemNode
   )} ${properties} />`;
 }
@@ -135,7 +135,7 @@ export function GetItemRenderImport(node) {
     listItem: true
   });
 
-  return `({item, index, separators})=> <${GetCodeName(
+  return `({item, index, separators, key})=> <${GetCodeName(
     listItemNode
   )} ${properties} />`;
 }
@@ -933,7 +933,11 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
           innerValue = `GetScreenParam('query')`;
         } else {
           if (options.listItem) {
-            innerValue = GetJSCodeName(externalConnection);
+            let listItemAttribute = GetJSCodeName(externalConnection);
+            innerValue =
+              listItemAttribute === "viewModel"
+                ? `this.state.${listItemAttribute}`
+                : listItemAttribute;
           } else {
             let defaulComponentValue =
               GetNodeProp(
