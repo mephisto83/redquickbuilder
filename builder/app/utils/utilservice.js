@@ -76,23 +76,57 @@ export function getGuids(str = "") {
   return result;
 }
 
+export function getGroupGuids(str = "") {
+  const regex = /group\-(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
+  let m;
+  let result = [];
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
+
+    // The result can be accessed through the `m`-variable.
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result
+    .map(v => getGuids(v))
+    .flatten()
+    .filter(x => x);
+}
 export function processRecording(str) {
   let guids = getGuids(str).unique();
-
+  let groupGuids = getGroupGuids(str).unique();
+  let nodeIndexes = {};
+  groupGuids.map((v, index) => {
+    nodeIndexes[guids.indexOf(v) - index] = index;
+  });
+  guids = guids.filter(v => !groupGuids.some(t => v == t));
   let commands = JSON.parse(str);
   let unaccountedGuids = [...guids];
   commands.map(command => {
     if (command.callback) {
       if (command.options) {
-        command.options.callback = command.callback;
+        if (command.callbackGroup && command.options.groupProperties) {
+          command.options.callbackg = command.callback;
+        } else {
+          command.options.callback = command.callback;
+        }
       }
     }
+
     if (unaccountedGuids.some(v => v === command.callback)) {
       unaccountedGuids = [
         ...unaccountedGuids.filter(x => x !== command.callback)
       ];
     }
     delete command.callback;
+    delete command.callbackGroup;
   });
   str = JSON.stringify(commands, null, 4);
   guids.map((guid, index) => {
@@ -101,12 +135,25 @@ export function processRecording(str) {
       subregex,
       `"callback": function(node) { context.node${index} = node.id; }`
     );
+    subregex = new RegExp(`"callbackg": "${guid}"`, "g");
+    str = str.replace(
+      subregex,
+      `"callback": function(node, graph, group) { context.node${index} = node.id;
+      context.group${nodeIndexes[index]} = group;
+    }`
+    );
     subregex = new RegExp(`"${guid}":`, "g");
     str = str.replace(subregex, `[context.node${index}]:`);
     subregex = new RegExp(`"${guid}"`, "g");
     str = str.replace(subregex, `context.node${index}`);
   });
 
+  groupGuids.map((guid, index) => {
+    var subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.group${index}]:`);
+    subregex = new RegExp(`"${guid}"`, "g");
+    str = str.replace(subregex, `context.group${index}`);
+  });
   let firstFunction$re = /\[ *\n *{/gm;
   str = str.replace(
     firstFunction$re,
@@ -141,14 +188,25 @@ export function processRecording(str) {
   );
 
   return `export default function(args = {}) {
-    // ${unaccountedGuids.map(v => {
-      let index = guids.indexOf(v);
-      return "node" + index;
-    }).join()}
+    // ${unaccountedGuids
+      .map(v => {
+        let index = guids.indexOf(v);
+        return "node" + index;
+      })
+      .join()}
     let context = {
       ...args
     };
 
-    return ${str}
+    let result = ${str};
+
+    return [...result,
+      function() {
+        if (context.callback) {
+          context.entry = context.node0;
+          context.callback(context);
+        }
+        return [];
+      }];
   }`;
 }

@@ -39,6 +39,7 @@ import BatchMenu from "./batchmenu";
 import AgentBasedMethods from "./agentbasedmethods";
 import HomeView from "../nodepacks/HomeView";
 import GetProjectUrlsDataChain from "../nodepacks/GetProjectUrlsDataChain";
+import temppack from "../nodepacks/temppack";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -178,6 +179,14 @@ class QuickMethods extends Component<any, any, any> {
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.graphOperation(GetProjectUrlsDataChain());
+                  }}
+                />
+                <TreeViewMenu
+                  hideArrow
+                  title={'Test Command'}
+                  icon={"fa fa-plus"}
+                  onClick={() => {
+                    this.props.graphOperation(temppack());
                   }}
                 />
                 <TreeViewMenu

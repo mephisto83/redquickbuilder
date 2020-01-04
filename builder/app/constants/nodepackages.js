@@ -119,6 +119,7 @@ import PostAuthenticate from "../nodepacks/PostAuthenticate";
 import HomeView from "../nodepacks/HomeView";
 import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
 import AddCancelLabel from "../nodepacks/AddCancelLabel";
+import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDataChainSelectorDC";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -5462,18 +5463,15 @@ function setupPropertyApi(args) {
     modelProperty,
     currentNode,
     modelComponentSelectors,
-    isSharedComponent,
-    viewModelNodeId,
-    propertyDataChainAccesors,
     apiList,
     apiDataChainLists,
-    uiType,
     viewType,
     newItems
   } = args;
 
   newItems.apiDataChain = newItems.apiDataChain || {};
   newItems.apiDataChain[childId] = apiDataChainLists;
+  debugger;
   PerformGraphOperation([
     ...apiList
       .map(api => {
@@ -5496,182 +5494,197 @@ function setupPropertyApi(args) {
           [NodeProperties.DataChainProperty]: modelProperty.id
         };
         let skip = false;
+        let _context = null;
         return [
-          {
-            operation: ADD_NEW_NODE,
-            options: function(graph) {
-              let $node = GetNodeByProperties(
-                {
-                  ...dataChainProps
-                },
-                graph
-              );
-              if ($node) {
-                apiDataChainLists[apiProperty] = $node.id;
-                skip = true;
-                return false;
-              }
-              return {
-                nodeType: NodeTypes.DataChain,
-                properties: {
-                  ...viewPackage,
-                  ...dataChainProps,
-                  [NodeProperties.Pinned]: false
-                },
-                links: [],
-                callback: dataChainApis => {
-                  apiDataChainLists[apiProperty] = dataChainApis.id;
-                }
-              };
+          ...CreateSelectorToDataChainSelectorDC({
+            model: currentNode.id,
+            property: modelProperty.id,
+            viewName,
+            viewType,
+            propertyName: GetNodeTitle(modelProperty),
+            external_api: apiProperty,
+            callback: context => {
+              _context = context;
+              apiDataChainLists[apiProperty] = _context.entry;
             }
-          },
-          {
-            operation: ADD_NEW_NODE,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              let temp = SplitDataCommand(
-                GetNodeById(apiDataChainLists[apiProperty], graph),
-                split => {
-                  splitId = split.id;
-                },
-                viewPackage
-              );
-              return temp.options;
-            }
-          },
-          {
-            operation: ADD_NEW_NODE,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              let temp = AddChainCommand(
-                GetNodeById(splitId, graph),
-                complete => {
-                  completeId = complete.id;
-                },
-                graph,
-                viewPackage
-              );
-              return temp.options;
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.DataChainFunctionType,
-                id: completeId,
-                value: DataChainFunctionKeys.Pass
-              };
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.UIText,
-                id: completeId,
-                value: `${apiProperty} Complete`
-              };
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.AsOutput,
-                id: completeId,
-                value: true
-              };
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.DataChainFunctionType,
-                id: splitId,
-                value: DataChainFunctionKeys.ReferenceDataChain
-              };
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.UIText,
-                id: splitId,
-                value: `${GetNodeTitle(modelProperty)} ${apiProperty}`
-              };
-            }
-          },
-          {
-            operation: CHANGE_NODE_PROPERTY,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                prop: NodeProperties.DataChainReference,
-                id: splitId,
-                value: propDataChainNodeId
-              };
-            }
-          },
-          {
-            operation: ADD_LINK_BETWEEN_NODES,
-            options: function(graph) {
-              if (skip) {
-                return false;
-              }
-              return {
-                source: splitId,
-                target: propDataChainNodeId,
-                properties: { ...LinkProperties.DataChainLink }
-              };
-            }
-          },
-          {
-            operation: ADD_LINK_BETWEEN_NODES,
-            options: function(graph) {
-              if (
-                newItems.eventApis &&
-                newItems.eventApis[childComponents[propertyIndex]] &&
-                newItems.eventApis[childComponents[propertyIndex]][
-                  apiNameEventHandler
-                ] &&
-                apiDataChainLists[apiProperty]
-              ) {
-                return {
-                  source:
-                    newItems.eventApis[childComponents[propertyIndex]][
-                      apiNameEventHandler
-                    ],
-                  target: apiDataChainLists[apiProperty],
-                  properties: { ...LinkProperties.DataChainLink }
-                };
-              }
-            }
-          }
+          })
         ];
+        // return [
+        //   {
+        //     operation: ADD_NEW_NODE,
+        //     options: function(graph) {
+        //       let $node = GetNodeByProperties(
+        //         {
+        //           ...dataChainProps
+        //         },
+        //         graph
+        //       );
+        //       if ($node) {
+        //         apiDataChainLists[apiProperty] = $node.id;
+        //         skip = true;
+        //         return false;
+        //       }
+        //       return {
+        //         nodeType: NodeTypes.DataChain,
+        //         properties: {
+        //           ...viewPackage,
+        //           ...dataChainProps,
+        //           [NodeProperties.Pinned]: false
+        //         },
+        //         links: [],
+        //         callback: dataChainApis => {
+        //           apiDataChainLists[apiProperty] = dataChainApis.id;
+        //         }
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: ADD_NEW_NODE,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       let temp = SplitDataCommand(
+        //         GetNodeById(apiDataChainLists[apiProperty], graph),
+        //         split => {
+        //           splitId = split.id;
+        //         },
+        //         viewPackage
+        //       );
+        //       return temp.options;
+        //     }
+        //   },
+        //   {
+        //     operation: ADD_NEW_NODE,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       let temp = AddChainCommand(
+        //         GetNodeById(splitId, graph),
+        //         complete => {
+        //           completeId = complete.id;
+        //         },
+        //         graph,
+        //         viewPackage
+        //       );
+        //       return temp.options;
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.DataChainFunctionType,
+        //         id: completeId,
+        //         value: DataChainFunctionKeys.Pass
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.UIText,
+        //         id: completeId,
+        //         value: `${apiProperty} Complete`
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.AsOutput,
+        //         id: completeId,
+        //         value: true
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.DataChainFunctionType,
+        //         id: splitId,
+        //         value: DataChainFunctionKeys.ReferenceDataChain
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.UIText,
+        //         id: splitId,
+        //         value: `${GetNodeTitle(modelProperty)} ${apiProperty}`
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: CHANGE_NODE_PROPERTY,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         prop: NodeProperties.DataChainReference,
+        //         id: splitId,
+        //         value: propDataChainNodeId
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: ADD_LINK_BETWEEN_NODES,
+        //     options: function(graph) {
+        //       if (skip) {
+        //         return false;
+        //       }
+        //       return {
+        //         source: splitId,
+        //         target: propDataChainNodeId,
+        //         properties: { ...LinkProperties.DataChainLink }
+        //       };
+        //     }
+        //   },
+        //   {
+        //     operation: ADD_LINK_BETWEEN_NODES,
+        //     options: function(graph) {
+        //       if (
+        //         newItems.eventApis &&
+        //         newItems.eventApis[childComponents[propertyIndex]] &&
+        //         newItems.eventApis[childComponents[propertyIndex]][
+        //           apiNameEventHandler
+        //         ] &&
+        //         apiDataChainLists[apiProperty]
+        //       ) {
+        //         return {
+        //           source:
+        //             newItems.eventApis[childComponents[propertyIndex]][
+        //               apiNameEventHandler
+        //             ],
+        //           target: apiDataChainLists[apiProperty],
+        //           properties: { ...LinkProperties.DataChainLink }
+        //         };
+        //       }
+        //     }
+        //   }
+        // ];
       })
       .flatten()
       .filter(x => x),

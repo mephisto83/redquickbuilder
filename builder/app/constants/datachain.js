@@ -53,6 +53,7 @@ export const DataChainFunctionKeys = {
   Title: "Title",
   NumericalDefault: "Default (number)",
   IfFalse: "IfFalse",
+  IfThanElse: "IfThanElse",
   Model: "Model",
   Models: "Models", // Gets an array of models of a type
   Subset: "Subset", //Gets a subset of an array
@@ -69,6 +70,8 @@ export const DataChainFunctionKeys = {
   StringConcat: "String Concat {0} {1}",
   SaveModelArrayToState: "Save Model Array To State",
   Navigate: "Navigate",
+  Lambda: "Lambda",
+  Validation: "Validation",
   NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
   SaveModelIdsToState: "Save Model Array Ids to State Under Key",
@@ -143,6 +146,18 @@ export const DataChainFunctions = {
     filter: {},
     value: DataChainFunctionKeys.Merge
   },
+  [DataChainFunctionKeys.Lambda]: {
+    ui: {
+      lambda: NodeProperties.Lambda
+    },
+    filter: {},
+    value: DataChainFunctionKeys.Lambda
+  },
+  [DataChainFunctionKeys.Validation]: {
+    ui: {},
+    filter: {},
+    value: DataChainFunctionKeys.Validation
+  },
   [DataChainFunctionKeys.IfTrue]: {
     ui: {
       node_1: NodeProperties.ChainNodeInput1,
@@ -201,6 +216,17 @@ export const DataChainFunctions = {
       [NodeProperties.NODEType]: true
     },
     value: "AreEquals"
+  },
+  [DataChainFunctionKeys.IfThanElse]: {
+    ui: {
+      node_1: NodeProperties.ChainNodeInput1,
+      node_2: NodeProperties.ChainNodeInput2
+    },
+    merge: true,
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.IfThanElse
   },
   [DataChainFunctionKeys.BooleanOr]: {
     ui: {

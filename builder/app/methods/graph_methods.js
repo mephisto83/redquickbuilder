@@ -590,7 +590,6 @@ export function getMethodValidationForParameter(
   if (methodValidation) {
     let temp = getMethodValidationType(methodValidation, methodType);
     if (!temp) {
-
       methodValidation.methods[methodType] = createMethodValidation(
         methodType
       ).methods[methodType];
@@ -1009,18 +1008,25 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
       });
     }
   }
-
+  let groupId = null;
   if (groupProperties) {
-    graph = updateNodeGroup(graph, { id: node.id, groupProperties, parent });
+    graph = updateNodeGroup(graph, {
+      id: node.id,
+      groupProperties,
+      parent,
+      callback: _gid => {
+        groupId = _gid;
+      }
+    });
   }
   if (callback) {
-    graph = callback(GetNodeById(node.id, graph), graph) || graph;
+    graph = callback(GetNodeById(node.id, graph), graph, groupId) || graph;
   }
 
   return graph;
 }
 export function updateNodeGroup(graph, options) {
-  var { id, groupProperties, parent } = options;
+  var { id, groupProperties, parent, callback } = options;
   var group = null;
   if (groupProperties && groupProperties.id) {
     group = getGroup(graph, groupProperties.id);
@@ -1076,6 +1082,9 @@ export function updateNodeGroup(graph, options) {
           prop: gp,
           value: groupProperties[gp]
         });
+      }
+      if (callback) {
+        callback(group.id);
       }
     }
   }

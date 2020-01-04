@@ -1495,6 +1495,8 @@ export function GenerateDataChainMethod(id) {
   let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
   let funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
   let selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
+  let nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
+  let nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
@@ -1553,10 +1555,28 @@ export function GenerateDataChainMethod(id) {
       return `(a, b) => a && b`;
     case DataChainFunctionKeys.BooleanOr:
       return `(a, b) => a || b`;
+    case DataChainFunctionKeys.IfTrue:
+      return `(a, b) => {
+        if(a) {
+          return b;
+        }
+        return undefined;
+      }`;
+    case DataChainFunctionKeys.IfThanElse:
+      return `(a) => {
+        if(a){
+          return ${GetCodeName(nodeInput1)}(a);
+        }
+        else {
+          return ${GetCodeName(nodeInput2)}(a);
+        }
+      }`;
     case DataChainFunctionKeys.GreaterThanOrEqualTo:
       return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
     case DataChainFunctionKeys.Map:
       return `($a) => ($a || []).map(${lambda})`;
+    case DataChainFunctionKeys.Lambda:
+      return `${lambda}`;
     case DataChainFunctionKeys.Merge:
       return `() => {
         ${Object.keys(funcs || {})
@@ -2666,6 +2686,7 @@ export function HasCurrentGraph(options = {}) {
 }
 export function NodesByType(state, nodeType, options = {}) {
   state = state || GetState();
+
   var currentGraph = options.useRoot
     ? GetRootGraph(state)
     : GetCurrentGraph(state);
@@ -3334,6 +3355,10 @@ export function graphOperation(operation, options) {
               currentGraph.nodes && currentGraph.nodes.length
                 ? currentGraph.nodes[currentGraph.nodes.length - 1]
                 : null;
+            let currentLastGroup =
+              currentGraph.groups && currentGraph.groups.length
+                ? currentGraph.groups[currentGraph.groups.length - 1]
+                : null;
             switch (operation) {
               case SET_DEPTH:
                 currentGraph = GraphMethods.setDepth(currentGraph, options);
@@ -3664,6 +3689,12 @@ export function graphOperation(operation, options) {
               recording.push({
                 operation,
                 options,
+                callbackGroup: `group-${
+                  currentLastGroup !==
+                  currentGraph.groups[currentGraph.groups.length - 1]
+                    ? currentGraph.groups[currentGraph.groups.length - 1]
+                    : null
+                }`,
                 callback:
                   currentLastNode !==
                   currentGraph.nodes[currentGraph.nodes.length - 1]

@@ -494,9 +494,8 @@ class DataChainActvityMenu extends Component {
             <SelectInput
               onChange={DataChainContextMethods.Value.bind(this, currentNode)}
               label={`${Titles.Value}`}
-              disabled={true}
               value={UIA.GetNodeProp(currentNode, NodeProperties.Value)}
-              options={all_inputs}
+              options={node_inputs}
             />
           ) : null}
         </FormControl>
