@@ -7,7 +7,7 @@ export default function(args = {}) {
   };
   let propertyName = context.propertyName;
 
-  return [
+  let result = [
     function(graph) {
       return [
         {
@@ -27,7 +27,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: `Get Success For ${propertyName}`
+            value: `Get Success For ${propertyName} ${args.viewName}`
           }
         }
       ];
@@ -842,6 +842,30 @@ export default function(args = {}) {
           }
         }
       ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "AsOutput",
+            id: context.node10,
+            value: true
+          }
+        }
+      ];
+    }
+  ];
+
+  return [
+    ...result,
+    function() {
+      if (context.callback) {
+        context.entry = context.node0;
+        context.callback(context);
+      }
+      return [];
     }
   ];
 }

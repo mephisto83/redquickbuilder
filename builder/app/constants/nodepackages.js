@@ -96,7 +96,8 @@ import {
   GENERAL_COMPONENT_API,
   SCREEN_COMPONENT_EVENTS,
   ComponentEvents,
-  PropertyApiList
+  PropertyApiList,
+  ApiProperty
 } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from "../components/titles";
@@ -120,6 +121,8 @@ import HomeView from "../nodepacks/HomeView";
 import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
 import AddCancelLabel from "../nodepacks/AddCancelLabel";
 import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDataChainSelectorDC";
+import AttributeSuccess from "../nodepacks/AttributeSuccess";
+import AttributeError from "../nodepacks/AttributeError";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -732,8 +735,19 @@ export const AddAgentUser = {
             },
             properties: {
               [NodeProperties.UIText]: `User`,
-              [NodeProperties.IsUser]: true
+              [NodeProperties.IsUser]: true,
+              [NodeProperties.IsAgent]: true
             }
+          };
+        }
+      },
+      {
+        operation: CHANGE_NODE_PROPERTY,
+        options: function() {
+          return {
+            id: userId,
+            prop: NodeProperties.UIUser,
+            value: userId
           };
         }
       },
@@ -3668,7 +3682,6 @@ export const CreateDefaultView = {
                 // the 'current' id to be able to query for the children objects.
 
                 if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-                  debugger;
                   _ui_model_type = GetNodeProp(
                     modelProperty,
                     NodeProperties.UIModelType
@@ -5471,7 +5484,7 @@ function setupPropertyApi(args) {
 
   newItems.apiDataChain = newItems.apiDataChain || {};
   newItems.apiDataChain[childId] = apiDataChainLists;
-  debugger;
+
   PerformGraphOperation([
     ...apiList
       .map(api => {
@@ -5495,6 +5508,34 @@ function setupPropertyApi(args) {
         };
         let skip = false;
         let _context = null;
+        switch (apiProperty) {
+          case ApiProperty.Success:
+            return [
+              ...AttributeSuccess({
+                model: currentNode.id,
+                property: modelProperty.id,
+                propertyName: GetNodeTitle(modelProperty),
+                viewName,
+                callback: context => {
+                  _context = context;
+                  apiDataChainLists[apiProperty] = _context.entry;
+                }
+              })
+            ];
+          case ApiProperty.Error:
+            return [
+              ...AttributeError({
+                model: currentNode.id,
+                property: modelProperty.id,
+                propertyName: `${viewName} ${GetNodeTitle(modelProperty)}`,
+                viewName,
+                callback: context => {
+                  _context = context;
+                  apiDataChainLists[apiProperty] = _context.entry;
+                }
+              })
+            ];
+        }
         return [
           ...CreateSelectorToDataChainSelectorDC({
             model: currentNode.id,

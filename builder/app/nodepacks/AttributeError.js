@@ -3,7 +3,9 @@ export default function(args = {}) {
 
   // propertyName
   let context = {
-    ...args
+    ...args,
+    node4: args.model,
+    node5: args.property
   };
 
   let result = [
@@ -830,7 +832,98 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node10,
+            value: "Not"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "DataChainFunctionType",
+            id: context.node10,
+            value: ""
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "DataChainFunctionType",
+            id: context.node10,
+            value: "Not"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "ADD_NEW_NODE",
+          options: {
+            parent: context.node10,
+            nodeType: "data-chain",
+            groupProperties: {
+              id: context.group0
+            },
+            properties: {
+              ChainParent: context.node10
+            },
+            linkProperties: {
+              properties: {
+                type: "data-chain-link",
+                "data-chain-link": {}
+              }
+            },
+            callback: function(node, graph, group) {
+              context.node11 = node.id;
+            }
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "DataChainFunctionType",
+            id: context.node11,
+            value: "Pass"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_TEXT",
+          options: {
+            id: context.node11,
             value: "complete"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "AsOutput",
+            id: context.node11,
+            value: true
           }
         }
       ];

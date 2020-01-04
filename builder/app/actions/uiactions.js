@@ -1652,6 +1652,8 @@ export function GenerateDataChainMethod(id) {
       return `(a) => a ? a.${selectorProp} : undefined`;
     case DataChainFunctionKeys.Models:
       return `a => GetItems(Models.${GetCodeName(model)})`;
+    case DataChainFunctionKeys.Validation:
+      return `a => true/*TBI*/`;
     default:
       throw `${functionType} is not a defined function type.`;
   }

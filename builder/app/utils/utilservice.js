@@ -55,6 +55,27 @@ BsRGB = B8bit/255
   return L;
 }
 
+export function getStringInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\${[a-zA-Z0-9]*}/gm;
+  let m;
+  let result = [];
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
+
+    // The result can be accessed through the `m`-variable.
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
 export function getGuids(str = "") {
   const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
   let m;
@@ -186,7 +207,16 @@ export function processRecording(str) {
   }]
 `
   );
-
+  let inserts = getStringInserts(str);
+  inserts.map(insert => {
+    var subregex = new RegExp("\\" + insert, "g");
+    str = str.replace(
+      subregex,
+      `" + args.${insert.substr(2, insert.length - 3)} + "`
+    );
+  });
+  const regex = /context.groupundefined = group;/gm;
+  str = str.replace(regex, '');
   return `export default function(args = {}) {
     // ${unaccountedGuids
       .map(v => {
@@ -194,6 +224,10 @@ export function processRecording(str) {
         return "node" + index;
       })
       .join()}
+
+      // ${inserts
+        .map(insert => insert.substr(2, insert.length - 3))
+        .join(", ")}
     let context = {
       ...args
     };

@@ -70,6 +70,11 @@ export const SCREEN_COMPONENT_EVENTS = [
 export const PropertyApiList = ["error", "success", VALUE].map(v => ({
   value: v
 }));
+export const ApiProperty = {
+  Error: "error",
+  Success: "success",
+  Value: "value"
+};
 const INPUT_DEFAULT_API = [
   VALUE,
   ON_BLUR,
@@ -490,7 +495,7 @@ ComponentTypes[UITypes.ElectronIO].Menu = {
       ui: true
     }
   }
-}
+};
 export const HandlerTypes = {
   Blur: "blur",
   Change: "change",
