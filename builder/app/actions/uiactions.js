@@ -1323,8 +1323,17 @@ export function GetSelectorsNodes(id) {
   );
 }
 
-export function GenerateChainFunctions() {
-  let entryNodes = GetDataChainEntryNodes().map(x => x.id);
+export function GenerateChainFunctions(options) {
+  let { language } = options;
+  let entryNodes = GetDataChainEntryNodes()
+    .filter(x => {
+      let uiType = GetNodeProp(x, NodeProperties.UIType);
+      if (uiType) {
+        return language === uiType;
+      }
+      return true;
+    })
+    .map(x => x.id);
   return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
 }
 export function GenerateChainFunctionSpecs() {
@@ -3175,6 +3184,7 @@ export function addInstanceFunc(node, callback) {
       },
       properties: {
         [NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
+        [NodeProperties.Pinned]: false,
         [NodeProperties.AutoDelete]: {
           properties: {
             [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector

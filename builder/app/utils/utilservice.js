@@ -1,3 +1,5 @@
+import { NEW_LINE } from "../constants/nodetypes";
+
 export function calculateContrast(c1, c2) {
   let c1_ = relativeLuminance(c1);
   let c2_ = relativeLuminance(c2);
@@ -217,6 +219,18 @@ export function processRecording(str) {
   });
   const regex = /context.groupundefined = group;/gm;
   str = str.replace(regex, '');
+  let temp = guids.map((x,index)=>{
+    return   `{
+      operation: CHANGE_NODE_PROPERTY,
+      options: function() {
+          return {
+          prop: NodeProperties.Pinned,
+          id: context.node${index},
+          value: false
+        }
+      }
+    }`;
+    }).subset(1).join(','+NEW_LINE);
   return `export default function(args = {}) {
     // ${unaccountedGuids
       .map(v => {
@@ -233,8 +247,9 @@ export function processRecording(str) {
     };
 
     let result = ${str};
-
+    let clearPinned = [${temp}];
     return [...result,
+      ...clearPinned,
       function() {
         if (context.callback) {
           context.entry = context.node0;

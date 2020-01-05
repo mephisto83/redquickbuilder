@@ -31,7 +31,7 @@ export default function(args = {}) {
             id: context.node0,
             value: `Get Selector DataChain Value ${args.viewName} ${
               args.viewType
-            } ${args.propertyName} ${args.external_api}`
+            } ${args.propertyName} ${args.external_api} ${args.screen} ${args.uiType}`
           }
         }
       ];
@@ -49,6 +49,21 @@ export default function(args = {}) {
         }
       ];
     },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "UIType",
+            id: context.node0,
+            value: args.uiType
+          }
+        }
+      ];
+    },
+
+
 
     function(graph) {
       return [
@@ -380,6 +395,23 @@ export default function(args = {}) {
         }
       ];
     },
+    ...[]
+      .interpolate(0, 7, x => {
+        if (x !== 4 && x !== 5 && x !== 2) {
+          return {
+            operation: "CHANGE_NODE_PROPERTY",
+            options: function() {
+              return {
+                prop: "Pinned",
+                id: context["node" + x],
+                value: false
+              };
+            }
+          };
+        }
+        return null;
+      })
+      .filter(x => x),
     function() {
       if (context.callback) {
         context.entry = context.node0;

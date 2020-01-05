@@ -442,6 +442,7 @@ export const CreateLoginModels = {
           properties: {
             ...viewPackage,
             [NodeProperties.ExcludeFromController]: true,
+            [NodeProperties.Pinned]: false,
             [NodeProperties.UIText]: `Red Login Model`
           },
           callback: newNode => {
@@ -467,6 +468,7 @@ export const CreateLoginModels = {
               parent: newStuff.loginModel,
               properties: {
                 ...viewPackage,
+                [NodeProperties.Pinned]: false,
                 [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
                 [NodeProperties.UIText]: propName
               }
@@ -482,7 +484,8 @@ export const CreateLoginModels = {
           properties: {
             ...viewPackage,
             [NodeProperties.ExcludeFromController]: true,
-            [NodeProperties.UIText]: `Red Register View Model`
+            [NodeProperties.UIText]: `Red Register View Model`,
+            [NodeProperties.Pinned]: false
           },
           callback: newNode => {
             // methodProps = { ...methodProps, ...(GetNodeProp(GetNodeById(methodNode.id), NodeProperties.MethodProps) || {}) };
@@ -513,6 +516,7 @@ export const CreateLoginModels = {
                 [NodeProperties.NodePackage]: nodePackage,
                 [NodeProperties.UIAttributeType]:
                   propType || NodePropertyTypes.STRING,
+                [NodeProperties.Pinned]: false,
                 [NodeProperties.NodePackageType]: nodePackageType,
                 [NodeProperties.UIText]: propName
               }
@@ -528,6 +532,7 @@ export const CreateLoginModels = {
             properties: {
               ...viewPackage,
               [NodeProperties.ExcludeFromGeneration]: true,
+              [NodeProperties.Pinned]: false,
               [NodeProperties.UIText]: "Authorization"
             },
             callback: node => {
@@ -550,6 +555,7 @@ export const CreateLoginModels = {
             properties: {
               ...viewPackage,
               [NodeProperties.ExcludeFromGeneration]: true,
+              [NodeProperties.Pinned]: false,
               [NodeProperties.UIText]: "Authorization Maestro"
             },
             callback: node => {
@@ -688,7 +694,7 @@ function addInstanceEventsToForms(args) {
         options: function(graph) {
           return {
             prop: NodeProperties.Pinned,
-            value: true,
+            value: false,
             id: method_results.formButton
           };
         }
@@ -3767,6 +3773,7 @@ export const CreateDefaultView = {
             viewPackage,
             propertyDataChainAccesors,
             apiList,
+            uiType,
             apiDataChainLists,
             propDataChainNodeId,
             uiType,
@@ -5479,6 +5486,7 @@ function setupPropertyApi(args) {
     apiList,
     apiDataChainLists,
     viewType,
+    uiType,
     newItems
   } = args;
 
@@ -5516,6 +5524,7 @@ function setupPropertyApi(args) {
                 property: modelProperty.id,
                 propertyName: GetNodeTitle(modelProperty),
                 viewName,
+                uiType,
                 callback: context => {
                   _context = context;
                   apiDataChainLists[apiProperty] = _context.entry;
@@ -5527,7 +5536,7 @@ function setupPropertyApi(args) {
               ...AttributeError({
                 model: currentNode.id,
                 property: modelProperty.id,
-                propertyName: `${viewName} ${GetNodeTitle(modelProperty)}`,
+                propertyName: `${viewName} ${GetNodeTitle(modelProperty)} ${uiType}`,
                 viewName,
                 callback: context => {
                   _context = context;
@@ -5542,7 +5551,9 @@ function setupPropertyApi(args) {
             property: modelProperty.id,
             viewName,
             viewType,
+            uiType,
             propertyName: GetNodeTitle(modelProperty),
+            screen: GetNodeTitle(newItems.screenNodeId),
             external_api: apiProperty,
             callback: context => {
               _context = context;
@@ -5550,182 +5561,6 @@ function setupPropertyApi(args) {
             }
           })
         ];
-        // return [
-        //   {
-        //     operation: ADD_NEW_NODE,
-        //     options: function(graph) {
-        //       let $node = GetNodeByProperties(
-        //         {
-        //           ...dataChainProps
-        //         },
-        //         graph
-        //       );
-        //       if ($node) {
-        //         apiDataChainLists[apiProperty] = $node.id;
-        //         skip = true;
-        //         return false;
-        //       }
-        //       return {
-        //         nodeType: NodeTypes.DataChain,
-        //         properties: {
-        //           ...viewPackage,
-        //           ...dataChainProps,
-        //           [NodeProperties.Pinned]: false
-        //         },
-        //         links: [],
-        //         callback: dataChainApis => {
-        //           apiDataChainLists[apiProperty] = dataChainApis.id;
-        //         }
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: ADD_NEW_NODE,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       let temp = SplitDataCommand(
-        //         GetNodeById(apiDataChainLists[apiProperty], graph),
-        //         split => {
-        //           splitId = split.id;
-        //         },
-        //         viewPackage
-        //       );
-        //       return temp.options;
-        //     }
-        //   },
-        //   {
-        //     operation: ADD_NEW_NODE,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       let temp = AddChainCommand(
-        //         GetNodeById(splitId, graph),
-        //         complete => {
-        //           completeId = complete.id;
-        //         },
-        //         graph,
-        //         viewPackage
-        //       );
-        //       return temp.options;
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.DataChainFunctionType,
-        //         id: completeId,
-        //         value: DataChainFunctionKeys.Pass
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.UIText,
-        //         id: completeId,
-        //         value: `${apiProperty} Complete`
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.AsOutput,
-        //         id: completeId,
-        //         value: true
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.DataChainFunctionType,
-        //         id: splitId,
-        //         value: DataChainFunctionKeys.ReferenceDataChain
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.UIText,
-        //         id: splitId,
-        //         value: `${GetNodeTitle(modelProperty)} ${apiProperty}`
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: CHANGE_NODE_PROPERTY,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         prop: NodeProperties.DataChainReference,
-        //         id: splitId,
-        //         value: propDataChainNodeId
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: ADD_LINK_BETWEEN_NODES,
-        //     options: function(graph) {
-        //       if (skip) {
-        //         return false;
-        //       }
-        //       return {
-        //         source: splitId,
-        //         target: propDataChainNodeId,
-        //         properties: { ...LinkProperties.DataChainLink }
-        //       };
-        //     }
-        //   },
-        //   {
-        //     operation: ADD_LINK_BETWEEN_NODES,
-        //     options: function(graph) {
-        //       if (
-        //         newItems.eventApis &&
-        //         newItems.eventApis[childComponents[propertyIndex]] &&
-        //         newItems.eventApis[childComponents[propertyIndex]][
-        //           apiNameEventHandler
-        //         ] &&
-        //         apiDataChainLists[apiProperty]
-        //       ) {
-        //         return {
-        //           source:
-        //             newItems.eventApis[childComponents[propertyIndex]][
-        //               apiNameEventHandler
-        //             ],
-        //           target: apiDataChainLists[apiProperty],
-        //           properties: { ...LinkProperties.DataChainLink }
-        //         };
-        //       }
-        //     }
-        //   }
-        // ];
       })
       .flatten()
       .filter(x => x),

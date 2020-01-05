@@ -25,6 +25,20 @@ export default function(args = {}) {
     function(graph) {
       return [
         {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "UIType",
+            id: context.node0,
+            value: args.uiType
+          }
+        }
+      ];
+    },
+
+
+    function(graph) {
+      return [
+        {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
@@ -927,7 +941,24 @@ export default function(args = {}) {
           }
         }
       ];
-    }
+    },
+    ...[]
+      .interpolate(0, 12, x => {
+        if (x !== 4 && x !== 5) {
+          return {
+            operation: 'CHANGE_NODE_PROPERTY',
+            options: function() {
+              return {
+                prop: 'Pinned',
+                id: context["node" + x],
+                value: false
+              };
+            }
+          };
+        }
+        return null;
+      })
+      .filter(x => x)
   ];
   return [
     ...result,

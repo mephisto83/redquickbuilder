@@ -73,6 +73,20 @@ export default function(args = {}) {
           }
         }
       ];
-    }
+    },
+    ...[]
+      .interpolate(0, 3, x => {
+        return {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: function() {
+            return {
+              prop: "Pinned",
+              id: context["node" + x],
+              value: false
+            };
+          }
+        };
+      })
+      .filter(x => x)
   ];
 }

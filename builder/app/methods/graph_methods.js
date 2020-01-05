@@ -933,6 +933,11 @@ export function addDefaultProperties(graph, options) {
           prop: NodeProperties.UIAttributeType,
           value: dp.type
         });
+        _graph = updateNodeProperty(_graph, {
+          id: new_node.id,
+          prop: NodeProperties.Pinned,
+          value: false
+        });
         return _graph;
       }
     );
