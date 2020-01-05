@@ -2480,6 +2480,7 @@ export function findLinkInstance(graph, options) {
   let link = graph.links
     ? graph.links.find(
         x =>
+          graph.linkLib[x] &&
           graph.linkLib[x].source === source &&
           graph.linkLib[x].target == target
       )
