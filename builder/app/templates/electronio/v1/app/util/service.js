@@ -5,11 +5,11 @@ import { endPoints } from "./endPoints";
 import * as Globals from "./globals";
 
 //require('es6-promise').polyfill();
-if (typeof self !== "undefined" && !fetch) {
-  //when its in the web.
-  console.log("-- --- using isomorphic-fetch");
-  require("isomorphic-fetch");
-}
+// if (typeof self !== "undefined" && !fetch) {
+//   //when its in the web.
+//   console.log("-- --- using isomorphic-fetch");
+//   require("isomorphic-fetch");
+// }
 var accessToken = "";
 var getEndpoint = (baseDomain, path) => {
   var endpoint = baseDomain + path;

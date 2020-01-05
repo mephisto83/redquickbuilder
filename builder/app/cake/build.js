@@ -103,12 +103,12 @@ function createElectronIo () {
       )
     })
     .then(() => {
-      console.log('installing yarn')
-      console.log(path.join(localDir, appName))
-      return executeSpawnCmd('npm', ['install', 'isomorphic-fetch'], {
-        shell: true,
-        cwd: path.join(localDir, appName)
-      })
+      // console.log('installing yarn')
+      // console.log(path.join(localDir, appName))
+      // return executeSpawnCmd('npm', ['install', 'isomorphic-fetch'], {
+      //   shell: true,
+      //   cwd: path.join(localDir, appName)
+      // })
     })
     .then(() => {
       console.log('installing yarn')
