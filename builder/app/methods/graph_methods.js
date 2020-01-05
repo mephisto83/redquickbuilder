@@ -2463,6 +2463,12 @@ export function findLinkInstance(graph, options) {
             !graph.linkLib[x].properties ||
             graph.linkLib[x].properties[i] !== properties[i]
           ) {
+            if (typeof graph.linkLib[x].properties[i] === "object") {
+              return (
+                JSON.stringify(graph.linkLib[x].properties) ===
+                JSON.stringify(properties)
+              );
+            }
             return false;
           }
         }
@@ -2471,9 +2477,13 @@ export function findLinkInstance(graph, options) {
     });
     return link;
   }
-  let link = graph.links.find(
-    x => graph.linkLib[x].source === source && graph.linkLib[x].target == target
-  );
+  let link = graph.links
+    ? graph.links.find(
+        x =>
+          graph.linkLib[x].source === source &&
+          graph.linkLib[x].target == target
+      )
+    : null;
   return link;
 }
 export function getLinkInstance(graph, options) {

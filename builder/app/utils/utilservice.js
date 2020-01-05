@@ -218,20 +218,25 @@ export function processRecording(str) {
     );
   });
   const regex = /context.groupundefined = group;/gm;
-  str = str.replace(regex, '');
-  let temp = guids.map((x,index)=>{
-    return   `{
-      operation: CHANGE_NODE_PROPERTY,
+  str = str.replace(regex, "");
+  let temp = guids
+    .map((x, index) => {
+      return `{
+      operation: 'CHANGE_NODE_PROPERTY',
       options: function() {
           return {
-          prop: NodeProperties.Pinned,
+          prop: 'Pinned',
           id: context.node${index},
           value: false
         }
       }
     }`;
-    }).subset(1).join(','+NEW_LINE);
-  return `export default function(args = {}) {
+    })
+    .subset(1)
+    .join("," + NEW_LINE);
+  return `
+  import { uuidv4 } from "../utils/array";
+  export default function(args = {}) {
     // ${unaccountedGuids
       .map(v => {
         let index = guids.indexOf(v);
@@ -242,10 +247,22 @@ export function processRecording(str) {
       // ${inserts
         .map(insert => insert.substr(2, insert.length - 3))
         .join(", ")}
-    let context = {
-      ...args
-    };
 
+    let context = {
+      ...args${
+        unaccountedGuids.length
+          ? "," +
+            NEW_LINE +
+            unaccountedGuids
+              .map(v => {
+                let index = guids.indexOf(v);
+                return "node" + index + ": uuidv4() ";
+              })
+              .join("," + NEW_LINE)
+          : ""
+      }
+    };
+    let { viewPackages = {} } = args;
     let result = ${str};
     let clearPinned = [${temp}];
     return [...result,

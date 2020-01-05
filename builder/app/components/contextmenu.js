@@ -16,8 +16,8 @@ import {
 } from "../constants/nodetypes";
 import AddNameDescription from "../nodepacks/AddNameDescription";
 import TinyTweaks from "../nodepacks/TinyTweaks";
-import BasicApplicationLayout from '../nodepacks/BasicApplicationLayout';
-import BasicDoubleSideColumn from '../nodepacks/BasicDoubleSideColumn';
+import BasicApplicationLayout from "../nodepacks/BasicApplicationLayout";
+import BasicDoubleSideColumn from "../nodepacks/BasicDoubleSideColumn";
 import GenericPropertyContainer from "./genericpropertycontainer";
 import ModelContextMenu from "./modelcontextmenu";
 import ComponentNodeMenu from "./componentnodemenu";
@@ -29,6 +29,7 @@ import TreeViewButtonGroup from "./treeviewbuttongroup";
 import ViewTypeMenu from "./viewtypecontextmenu";
 import FourColumn from "../nodepacks/FourColumn";
 import ThreeColumn from "../nodepacks/ThreeColumn";
+import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -166,6 +167,56 @@ class ContextMenu extends Component {
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 
     switch (currentNodeType) {
+      case NodeTypes.ComponentExternalApi:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`Connect to Title Service`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation([
+                  {
+                    operation: UIA.CONNECT_TO_TITLE_SERVICE,
+                    options: {
+                      id: currentNode.id
+                    }
+                  }
+                ]);
+              }}
+            />
+          </TreeViewMenu>
+        ];
+      case NodeTypes.Executor:
+        //UpdateUserExecutor
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`${Titles.Add} Update User`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  UpdateUserExecutor({ node0: currentNode.id })
+                );
+              }}
+            />
+          </TreeViewMenu>
+        ];
       case NodeTypes.Model:
         return [
           <TreeViewMenu
@@ -178,7 +229,7 @@ class ContextMenu extends Component {
             }}
           >
             <TreeViewMenu
-              title={`${Titles.Add} Label`}
+              title={`${Titles.Add} Name|Description`}
               hideArrow={true}
               onClick={() => {
                 this.props.graphOperation(
@@ -282,7 +333,7 @@ class ContextMenu extends Component {
           NodeProperties.ComponentType
         );
         switch (componentType) {
-          case 'Menu':
+          case "Menu":
           case "Button":
             return [this.getButtonEventMenu(currentNode)];
         }

@@ -622,7 +622,11 @@ export function addComponentEventTo(node, apiName) {
     ])(dispatch, getState);
   };
 }
+export function GetTitleService(graph) {
+  graph = GetCurrentGraph();
 
+  return NodesByType(GetState(), NodeTypes.TitleService).find(x => x);
+}
 export function AgentHasExecutor(model) {
   var state = GetState();
   var graphRoot = GetCurrentGraph();
@@ -1336,9 +1340,35 @@ export function GenerateChainFunctions(options) {
     .map(x => x.id);
   return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
 }
-export function GenerateChainFunctionSpecs() {
+
+export function GetComponentExternalApiNode(api, parent, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id: parent,
+    link: NodeConstants.LinkType.ComponentExternalApi
+  }).find(v => GetNodeTitle(v) === api);
+}
+
+export function GetComponentInternalApiNode(api, parent, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id: parent,
+    link: NodeConstants.LinkType.ComponentInternalApi
+  }).find(v => GetNodeTitle(v) === api);
+}
+
+export function GenerateChainFunctionSpecs(options) {
+  let { language } = options;
   let result = [];
-  let entryNodes = GetDataChainEntryNodes().map(x => x.id);
+  let entryNodes = GetDataChainEntryNodes()
+    .filter(x => {
+      let uiType = GetNodeProp(x, NodeProperties.UIType);
+      if (uiType) {
+        return language === uiType;
+      }
+      return true;
+    })
+    .map(x => x.id);
 
   let basicentryvalues = [
     undefined,
@@ -1520,7 +1550,9 @@ export function GenerateDataChainMethod(id) {
     return null;`;
       }
       return `(id) => {
-    let item = GetItem(Models.${GetCodeName(model)}, id);
+    let item = typeof(id) ==='object' ? id : GetItem(Models.${GetCodeName(
+      model
+    )}, id);
     ${lastpart}
 }`;
     case DataChainFunctionKeys.Model:
@@ -2131,6 +2163,14 @@ export function GetConditionClause(
         model_property: propertyName,
         parameters: ``,
         validation_Func_name: "IsNullAttribute"
+      };
+      break;
+    case NodeConstants.ValidationRules.IsNotNull:
+      properties = {
+        model: clauseKey,
+        model_property: propertyName,
+        parameters: ``,
+        validation_Func_name: "IsNotNullAttribute"
       };
       break;
     case NodeConstants.ValidationRules.Email:
@@ -3140,6 +3180,7 @@ export const NEW_OPTION_ITEM_NODE = "NEW_OPTION_ITEM_NODE";
 export const NEW_OPTION_NODE = "NEW_OPTION_NODE";
 export const NEW_CUSTOM_OPTION = "NEW_CUSTOM_OPTION";
 export const UPDATE_GROUP_PROPERTY = "UPDATE_GROUP_PROPERTY";
+export const CONNECT_TO_TITLE_SERVICE = "CONNECT_TO_TITLE_SERVICE";
 export const NEW_DATA_SOURCE = "NEW_DATA_SOURCE";
 export const NEW_COMPONENT_NODE = "NEW_COMPONENT_NODE";
 export const NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE =
@@ -3399,6 +3440,23 @@ export function graphOperation(operation, options) {
                   currentGraph,
                   options
                 );
+                break;
+              case CONNECT_TO_TITLE_SERVICE:
+                let titleService = GetTitleService(currentGraph);
+                if (titleService) {
+                  currentGraph = GraphMethods.addLinkBetweenNodes(
+                    currentGraph,
+                    {
+                      source: options.id,
+                      target: titleService.id,
+                      properties: {
+                        ...LinkProperties.TitleServiceLink,
+                        singleLink: true,
+                        nodeTypes: [NodeTypes.TitleService]
+                      }
+                    }
+                  );
+                }
                 break;
               case REMOVE_LINK_BETWEEN_NODES:
                 currentGraph = GraphMethods.removeLinkBetweenNodes(

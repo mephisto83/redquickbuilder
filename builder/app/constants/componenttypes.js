@@ -32,7 +32,9 @@ export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = "value";
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
-
+export const ComponentApiTypes = {
+  ViewModel: "viewModel"
+};
 export const ComponentLifeCycleEvents = {
   ComponentDidMount: "componentDidMount",
   ComponentWillUnmount: "componentWillUnmount"

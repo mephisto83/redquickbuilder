@@ -40,6 +40,8 @@ import AgentBasedMethods from "./agentbasedmethods";
 import HomeView from "../nodepacks/HomeView";
 import GetProjectUrlsDataChain from "../nodepacks/GetProjectUrlsDataChain";
 import temppack from "../nodepacks/temppack";
+import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
+import CreateConfiguration from "../nodepacks/CreateConfiguration";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -195,6 +197,22 @@ class QuickMethods extends Component<any, any, any> {
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.executeGraphOperation(currentNode, GetAllModels);
+                  }}
+                />
+                <TreeViewMenu
+                  hideArrow
+                  title={'Create Dashboard 1'}
+                  icon={"fa fa-plus"}
+                  onClick={() => {
+                    this.props.graphOperation(CreateDashboard_1());
+                  }}
+                />
+                <TreeViewMenu
+                  hideArrow
+                  title={'Create Configuration'}
+                  icon={"fa fa-plus"}
+                  onClick={() => {
+                    this.props.graphOperation(CreateConfiguration());
                   }}
                 />
 

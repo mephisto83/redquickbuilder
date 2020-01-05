@@ -4,7 +4,7 @@ export default function(args = {}) {
     node0: args.button,
     ...args
   };
-
+  let { viewPackages = {} } = args;
   return [
     function(graph) {
       return [
@@ -21,6 +21,7 @@ export default function(args = {}) {
             parent: context.node0,
             groupProperties: {},
             properties: {
+              ...viewPackages,
               text: "label",
               Pinned: false,
               UseAsValue: true
@@ -48,6 +49,7 @@ export default function(args = {}) {
             },
             groupProperties: {},
             properties: {
+              ...viewPackages,
               text: "label",
               Pinned: false
             },

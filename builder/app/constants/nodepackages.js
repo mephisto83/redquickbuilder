@@ -59,7 +59,9 @@ import {
   GetSharedComponentFor,
   NodesByType,
   addInstanceFunc,
-  connectLifeCycleMethod
+  connectLifeCycleMethod,
+  GetComponentExternalApiNode,
+  GetComponentInternalApiNode
 } from "../actions/uiactions";
 import {
   newNode,
@@ -97,7 +99,8 @@ import {
   SCREEN_COMPONENT_EVENTS,
   ComponentEvents,
   PropertyApiList,
-  ApiProperty
+  ApiProperty,
+  ComponentApiTypes
 } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from "../components/titles";
@@ -123,6 +126,7 @@ import AddCancelLabel from "../nodepacks/AddCancelLabel";
 import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDataChainSelectorDC";
 import AttributeSuccess from "../nodepacks/AttributeSuccess";
 import AttributeError from "../nodepacks/AttributeError";
+import ConnectListViewModelToExternalViewModel from "../nodepacks/ConnectListViewModelToExternalViewModel";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -685,6 +689,36 @@ export const CreateLoginModels = {
     )(GetDispatchFunc(), GetStateFunc());
   }
 };
+function addTitleService(args) {
+  let { newItems } = args;
+  return {
+    operation: ADD_NEW_NODE,
+    options: function(graph) {
+      let $node = GetNodeByProperties(
+        {
+          [NodeProperties.UIText]: `Title Service`,
+          [NodeProperties.NODEType]: NodeTypes.TitleService
+        },
+        graph
+      );
+      if ($node) {
+        newItems.titleService = $node.id;
+        return false;
+      }
+      return {
+        nodeType: NodeTypes.TitleService,
+        properties: {
+          [NodeProperties.Pinned]: false,
+          [NodeProperties.UIText]: `Title Service`
+        },
+
+        callback: res => {
+          newItems.titleService = res.id;
+        }
+      };
+    }
+  };
+}
 function addInstanceEventsToForms(args) {
   var { method_results, targetMethod } = args;
   if (method_results && method_results.formButton) {
@@ -3001,8 +3035,11 @@ export const CreateDefaultView = {
               }
             },
 
+            addTitleService({ newItems }),
             ...addButtonApiNodes(newItems),
-            ...addButtonApiNodes(newItems, newItems.cancelbutton),
+            ...addButtonApiNodes(newItems, () => {
+              return newItems.cancelbutton;
+            }),
             {
               operation: ADD_NEW_NODE,
               options: function(currentGraph) {
@@ -3338,11 +3375,6 @@ export const CreateDefaultView = {
           AddNavigateBackHandler({
             button: newItems.cancelbutton,
             evt: uiType === UITypes.ReactNative ? "onPress" : "onClick"
-          })
-        )(GetDispatchFunc(), GetStateFunc());
-        PerformGraphOperation(
-          AddCancelLabel({
-            button: newItems.cancelbutton
           })
         )(GetDispatchFunc(), GetStateFunc());
 
@@ -3936,6 +3968,32 @@ export const CreateDefaultView = {
         ])(GetDispatchFunc(), GetStateFunc());
         createConnections.map(t => t());
         createListConnections.map(t => t());
+        if (isList) {
+          if (newItems.listComponentId) {
+            // GetNodesLinkedTo(graph, {
+            //   id: parent,
+            //   link: LinkType.ComponentExternalConnection
+            // }).find(v => GetNodeProp(v, ComponentApiTypes.ViewModel));
+            let listViewModel = GetComponentExternalApiNode(
+              ComponentApiTypes.ViewModel,
+              newItems.listComponentId
+            );
+
+            let screenViewModelInternal = GetComponentInternalApiNode(
+              ComponentApiTypes.ViewModel,
+              newItems.screenNodeOptionId
+            );
+            if (listViewModel && screenViewModelInternal) {
+              PerformGraphOperation(
+                ConnectListViewModelToExternalViewModel({
+                  target: screenViewModelInternal.id,
+                  source: listViewModel.id
+                })
+              )(GetDispatchFunc(), GetStateFunc());
+            }
+          }
+          //ConnectListViewModelToExternalViewModel
+        }
       }
 
       SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
@@ -5090,6 +5148,8 @@ function addComponentApiNodes(
 function addButtonApiNodes(newItems, btn) {
   let buttonInternalApi = null;
   let buttonExternalApi = null;
+  btn = btn || (() => null);
+
   return [
     {
       operation: ADD_NEW_NODE,
@@ -5102,7 +5162,7 @@ function addButtonApiNodes(newItems, btn) {
           linkProperties: {
             properties: { ...LinkProperties.ComponentInternalApi }
           },
-          parent: btn || newItems.button,
+          parent: btn() || newItems.button,
           groupProperties: {},
           properties: {
             [NodeProperties.UIText]: `label`,
@@ -5120,7 +5180,7 @@ function addButtonApiNodes(newItems, btn) {
           callback: nn => {
             buttonExternalApi = nn.id;
           },
-          parent: btn || newItems.button,
+          parent: btn() || newItems.button,
           linkProperties: {
             properties: { ...LinkProperties.ComponentExternalApi }
           },
@@ -5536,7 +5596,9 @@ function setupPropertyApi(args) {
               ...AttributeError({
                 model: currentNode.id,
                 property: modelProperty.id,
-                propertyName: `${viewName} ${GetNodeTitle(modelProperty)} ${uiType}`,
+                propertyName: `${viewName} ${GetNodeTitle(
+                  modelProperty
+                )} ${uiType}`,
                 viewName,
                 callback: context => {
                   _context = context;

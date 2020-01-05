@@ -1,3 +1,5 @@
+import postAuthenticate_ from "./postAuthenticate_";
+
 export default function(args = {}) {
   // node0
   let context = {
@@ -254,6 +256,15 @@ export default function(args = {}) {
         }
       ];
     },
+
+    ...postAuthenticate_({
+      head: () => {
+        return context.node0;
+      },
+      tail: () => {
+        return context.node1;
+      }
+    }),
     ...[]
       .interpolate(0, 4, x => {
         if (x !== 2) {

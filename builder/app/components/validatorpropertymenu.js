@@ -66,7 +66,7 @@ class ValidatorPropertyMenu extends Component {
 
         return (
             <TabPane active={active}>
-                {currentNode ? (<FormControl>
+                {currentNode&&false ? (<FormControl>
                     <SelectInput
                         options={propertyNodes}
                         defaultSelectText={Titles.SelectProperty}

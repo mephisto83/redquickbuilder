@@ -1191,6 +1191,7 @@ export const ValidationRules = {
   SocialSecurity: "socialsecurity",
   ListOfGuids: "listofguids",
   IsNull: "isNull",
+  IsNotNull: "isNotNull",
   OneOf: "one-of"
 };
 
@@ -2206,6 +2207,13 @@ export const FilterUI = {
   [ValidationRules.IsNull]: {
     code: {
       [ProgrammingLanguages.CSHARP]: "IsNullAttribute"
+    },
+    template: "./app/templates/validation/validation_generic.tpl",
+    arguments: { ...COMMON_STRING_ARGS }
+  },
+  [ValidationRules.IsNotNull]: {
+    code: {
+      [ProgrammingLanguages.CSHARP]: "IsNotNullAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
     arguments: { ...COMMON_STRING_ARGS }
