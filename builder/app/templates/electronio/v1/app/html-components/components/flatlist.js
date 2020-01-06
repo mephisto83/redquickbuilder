@@ -17,19 +17,17 @@ export default class FlatList extends React.Component {
     };
     delete props.children;
     return (
-      <StyleProvider>
-        <ul className={"list-group"}>
-          {(this.props.data || [])
-            .map((item, index) => {
-              if (this.props.renderItem) {
-                let key = this.props.keyExtractor(item);
-                let res = this.props.renderItem({ item, index, key });
-                return res;
-              }
-            })
-            .filter(x => x)}
-        </ul>
-      </StyleProvider>
+      <ul className={"list-group"}>
+        {(this.props.data || [])
+          .map((item, index) => {
+            if (this.props.renderItem) {
+              let key = this.props.keyExtractor(item);
+              let res = this.props.renderItem({ item, index, key });
+              return res;
+            }
+          })
+          .filter(x => x)}
+      </ul>
     );
   }
 }

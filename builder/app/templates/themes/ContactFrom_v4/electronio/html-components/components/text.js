@@ -4,7 +4,7 @@ import StyleProvider from "./styleprovider";
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class ListItem extends React.Component {
+export default class Text extends React.Component {
   constructor(props) {
     super(props);
 

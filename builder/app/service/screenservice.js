@@ -125,9 +125,12 @@ export function GetItemRender(node, imports, language) {
   let properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
-  return `({item, index, separators, key})=> <${GetCodeName(
+  return `({item, index, separators, key})=>{
+    let value = item;
+    return  <${GetCodeName(
     listItemNode
-  )} ${properties} />`;
+  )} ${properties} id={item ? item.id : item}/>
+  }`;
 }
 export function GetItemRenderImport(node) {
   let listItemNode = GetListItemNode(node.id);

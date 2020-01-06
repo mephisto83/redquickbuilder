@@ -127,6 +127,7 @@ import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDa
 import AttributeSuccess from "../nodepacks/AttributeSuccess";
 import AttributeError from "../nodepacks/AttributeError";
 import ConnectListViewModelToExternalViewModel from "../nodepacks/ConnectListViewModelToExternalViewModel";
+import CreateSelectorToDataChainRead from "../nodepacks/CreateSelectorToDataChainRead";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -3800,6 +3801,7 @@ export const CreateDefaultView = {
             modelProperty,
             currentNode,
             modelComponentSelectors,
+            useModelInstance,
             isSharedComponent,
             viewModelNodeId,
             viewPackage,
@@ -5539,6 +5541,7 @@ function setupPropertyApi(args) {
     viewName,
     modelProperty,
     apiDataChainLists,
+    useModelInstance,
     viewName,
     modelProperty,
     currentNode,
@@ -5608,7 +5611,9 @@ function setupPropertyApi(args) {
             ];
         }
         return [
-          ...CreateSelectorToDataChainSelectorDC({
+          ...(useModelInstance
+            ? CreateSelectorToDataChainSelectorDC
+            : CreateSelectorToDataChainRead)({
             model: currentNode.id,
             property: modelProperty.id,
             viewName,
