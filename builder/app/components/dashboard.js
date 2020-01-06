@@ -975,6 +975,9 @@ class Dashboard extends Component {
                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                 }} /> : null}
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow={true} title={Titles.Layout} icon={'fa fa-code'} onClick={() => {
+                  this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+                }} /> : null}
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                 <SideBarHeader title={Titles.FileMenu} />

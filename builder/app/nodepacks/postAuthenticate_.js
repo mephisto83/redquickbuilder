@@ -18,7 +18,6 @@ export default function(args = {}) {
       return [];
     },
     function(graph) {
-      debugger;
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",

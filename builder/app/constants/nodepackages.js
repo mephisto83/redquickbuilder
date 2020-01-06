@@ -5611,9 +5611,7 @@ function setupPropertyApi(args) {
             ];
         }
         return [
-          ...(useModelInstance
-            ? CreateSelectorToDataChainSelectorDC
-            : CreateSelectorToDataChainRead)({
+          ...(CreateSelectorToDataChainSelectorDC)({
             model: currentNode.id,
             property: modelProperty.id,
             viewName,
