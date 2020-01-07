@@ -70,11 +70,13 @@ export const DataChainFunctionKeys = {
   StringConcat: "String Concat {0} {1}",
   SaveModelArrayToState: "Save Model Array To State",
   Navigate: "Navigate",
+  StateKey: "StateKey",
   Lambda: "Lambda",
   Validation: "Validation",
   NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
   SaveModelIdsToState: "Save Model Array Ids to State Under Key",
+  GetStateKeyValue: "Get Values Under State Key",
   NewRedGraph: "New Red Graph",
   AddUrlsToGraph: "Add Urls to Graph"
 };
@@ -474,6 +476,20 @@ export const DataChainFunctions = {
     },
     filter: {},
     value: DataChainFunctionKeys.SaveModelIdsToState
+  },
+  [DataChainFunctionKeys.GetStateKeyValue]: {
+    ui: {
+      stateKey: NodeProperties.StateKey
+    },
+    filter: {},
+    value: DataChainFunctionKeys.GetStateKeyValue
+  },
+  [DataChainFunctionKeys.StateKey]: {
+    ui: {
+      stateKey: NodeProperties.StateKey
+    },
+    filter: {},
+    value: DataChainFunctionKeys.StateKey
   },
   [DataChainFunctionKeys.StringConcat]: {
     ui: {

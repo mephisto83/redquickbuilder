@@ -129,7 +129,7 @@ export function GetItemRender(node, imports, language) {
     let value = item;
     return  <${GetCodeName(
     listItemNode
-  )} ${properties} id={item ? item.id : item}/>
+  )} ${properties} id={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetItemRenderImport(node) {

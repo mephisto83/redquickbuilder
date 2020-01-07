@@ -1349,6 +1349,14 @@ export function GetComponentExternalApiNode(api, parent, graph) {
   }).find(v => GetNodeTitle(v) === api);
 }
 
+export function GetNodeMethodCall(id, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id,
+    link: NodeConstants.LinkType.MethodCall
+  }).find(v => v);
+}
+
 export function GetComponentInternalApiNode(api, parent, graph) {
   graph = graph || GetCurrentGraph();
   return GraphMethods.GetNodesLinkedTo(graph, {
@@ -1689,6 +1697,14 @@ export function GenerateDataChainMethod(id) {
       return `(a) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(
         stateKey
       )}, a)); return a; }`;
+    case DataChainFunctionKeys.GetStateKeyValue:
+      return `(a) =>  {
+        let stateFunc = GetState();
+        return GetC(stateFunc(),'Data', StateKeys.${GetCodeName(
+        stateKey
+      )})}`;
+    case DataChainFunctionKeys.StateKey:
+      return `(a) => StateKeys.${GetCodeName(stateKey)}`;
     case DataChainFunctionKeys.Selector:
       return `(a) => a ? a.${selectorProp} : undefined`;
     case DataChainFunctionKeys.Models:

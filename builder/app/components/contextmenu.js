@@ -30,6 +30,8 @@ import ViewTypeMenu from "./viewtypecontextmenu";
 import FourColumn from "../nodepacks/FourColumn";
 import ThreeColumn from "../nodepacks/ThreeColumn";
 import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
+import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
+import { FunctionTemplateKeys } from "../constants/functiontypes";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -167,6 +169,47 @@ class ContextMenu extends Component {
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 
     switch (currentNodeType) {
+      case NodeTypes.LifeCylceMethodInstance:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`Add Store Model Array Standard Handler`}
+              hideArrow={true}
+              onClick={() => {
+                let methodCall = UIA.GetNodeMethodCall(currentNode.id);
+                if (methodCall) {
+                  let model =
+                    UIA.GetMethodProps(methodCall.id) ||
+                    UIA.GetMethodProps(
+                      methodCall.id,
+                      FunctionTemplateKeys.Model
+                    );
+                  if (model) {
+                    model =
+                      model[FunctionTemplateKeys.ModelOutput] ||
+                      model[FunctionTemplateKeys.Model];
+                    if (model) {
+                      this.props.graphOperation(
+                        StoreModelArrayStandard({
+                          model,
+                          state_key: `${UIA.GetNodeTitle(model)} State`
+                        })
+                      );
+                    }
+                  }
+                }
+              }}
+            />
+          </TreeViewMenu>
+        ];
       case NodeTypes.ComponentExternalApi:
         return [
           <TreeViewMenu

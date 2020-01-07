@@ -59,7 +59,7 @@ BsRGB = B8bit/255
 
 export function getStringInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\${[a-zA-Z0-9]*}/gm;
+  const regex = /\${[a-zA-Z0-9_]*}/gm;
   let m;
   let result = [];
   while ((m = regex.exec(str)) !== null) {
