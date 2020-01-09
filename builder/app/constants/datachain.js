@@ -71,6 +71,7 @@ export const DataChainFunctionKeys = {
   SaveModelArrayToState: "Save Model Array To State",
   Navigate: "Navigate",
   StateKey: "StateKey",
+  ModelKey: "ModelKey",
   Lambda: "Lambda",
   Validation: "Validation",
   NavigateTo: "Navigate To",
@@ -483,6 +484,14 @@ export const DataChainFunctions = {
     },
     filter: {},
     value: DataChainFunctionKeys.GetStateKeyValue
+  },
+
+  [DataChainFunctionKeys.ModelKey]: {
+    ui: {
+      modelKey: NodeProperties.ModelKey
+    },
+    filter: {},
+    value: DataChainFunctionKeys.ModelKey
   },
   [DataChainFunctionKeys.StateKey]: {
     ui: {

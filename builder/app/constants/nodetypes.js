@@ -461,7 +461,7 @@ export const NodeProperties = {
   UIModelType: "uiModelType",
   DataChainReferences: "DataChainReferences",
   Lambda: "Lambda",
-  StateKey: "StateKey",
+  ModelKey: "ModelKey",
   DataChainReference: "DataChainReference",
   NumberParameter: "NumberParameter",
 
@@ -619,6 +619,7 @@ export const LinkType = {
   ClaimServiceUpdateUserMethod: "ClaimServiceUpdateUserMethod",
   ExecutorServiceMethod: "ExecutorServiceMethod",
   StateKey: "StateKey",
+  ModelKey: "ModelKey",
   LifeCylceMethod: "LifeCylceMethod",
   EventMethod: "EventMethod",
   EventMethodInstance: "EventMethodInstance",
@@ -844,6 +845,9 @@ export const LinkProperties = {
   },
   ClaimServiceUpdateUserMethod: {
     type: LinkType.ClaimServiceUpdateUserMethod
+  },
+  ModelKey: {
+    type: LinkType.ModelKey
   },
   StateKey: {
     type: LinkType.StateKey

@@ -1536,6 +1536,7 @@ export function GenerateDataChainMethod(id) {
   let node = GetNodeById(id);
   let model = GetNodeProp(node, NodeProperties.UIModelType);
   let stateKey = GetNodeProp(node, NodeProperties.StateKey);
+  let modelKey = GetNodeProp(node, NodeProperties.ModelKey);
   let numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
   let property = GetNodeProp(node, NodeProperties.Property);
   let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
@@ -1700,11 +1701,11 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.GetStateKeyValue:
       return `(a) =>  {
         let stateFunc = GetState();
-        return GetC(stateFunc(),'Data', StateKeys.${GetCodeName(
-        stateKey
-      )})}`;
+        return GetC(stateFunc(),'Data', StateKeys.${GetCodeName(stateKey)})}`;
     case DataChainFunctionKeys.StateKey:
       return `(a) => StateKeys.${GetCodeName(stateKey)}`;
+    case DataChainFunctionKeys.ModelKey:
+      return `(a) => ModelKeys.${GetCodeName(modelKey)}`;
     case DataChainFunctionKeys.Selector:
       return `(a) => a ? a.${selectorProp} : undefined`;
     case DataChainFunctionKeys.Models:

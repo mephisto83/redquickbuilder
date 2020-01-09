@@ -32,6 +32,7 @@ import ThreeColumn from "../nodepacks/ThreeColumn";
 import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
 import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
+import NavigateBack from "../nodepacks/NavigateBack";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -169,6 +170,31 @@ class ContextMenu extends Component {
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 
     switch (currentNodeType) {
+      case NodeTypes.EventMethodInstance:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`Navigate Back After`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  NavigateBack({
+                    eventMethodInstance: currentNode.id,
+                    name: `${UIA.GetNodeTitle(currentNode)}`
+                  })
+                );
+              }}
+            />
+          </TreeViewMenu>
+        ];
       case NodeTypes.LifeCylceMethodInstance:
         return [
           <TreeViewMenu

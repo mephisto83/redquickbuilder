@@ -1043,7 +1043,7 @@ class Dashboard extends Component {
             <Content>
               <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
-              <MindMap
+            {main_content === MIND_MAP||true ? ( <MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {
                   if (UIA.Visual(state, CONNECTING_NODE)) {
@@ -1212,7 +1212,7 @@ class Dashboard extends Component {
                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
                 graph={vgraph || graph}></MindMap>
-            </Content>
+                ):null}             </Content>
             <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab

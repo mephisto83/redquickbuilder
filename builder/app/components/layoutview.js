@@ -31,6 +31,8 @@ import {
   HandlerTypes,
   ComponentTags
 } from "../constants/componenttypes";
+import FormControl from "./formcontrol";
+import { StyleLib } from "../constants/styles";
 
 class LayoutView extends Component {
   constructor(props) {
@@ -705,11 +707,10 @@ class LayoutView extends Component {
               <Box maxheight={350} title={Titles.Properties}>
                 {cellProperties && cellProperties.properties ? (
                   <SelectInput
-                    options={[
-                      "Content",
-                      "Container",
-                      "View"
-                    ].map(t => ({ title: t, value: t }))}
+                    options={["Content", "Container", "View"].map(t => ({
+                      title: t,
+                      value: t
+                    }))}
                     onChange={val => {
                       let layout = nodeLayout || CreateLayout();
 
@@ -768,6 +769,31 @@ class LayoutView extends Component {
                   />
                 ) : null}
               </Box>
+              <Box maxheight={500} title={Titles.Style}>
+                <FormControl>
+                  <TextInput
+                    value={this.state.filter}
+                    immediate={true}
+                    onChange={value => {
+                      this.setState({ filter: value });
+                    }}
+                    placeholder={Titles.Filter}
+                  />
+                </FormControl>
+                {this.getStyleSelect()}
+                {cellStyle
+                  ? this.selectedStyle(value => {
+                      cellStyle[this.state.selectedStyleKey] = value;
+                      let layout = nodeLayout || CreateLayout();
+                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: layout
+                      });
+                    }, cellStyle[this.state.selectedStyleKey])
+                  : null}
+                {cellStyle ? this.getCurrentStyling(cellStyle) : null}
+              </Box>
             </div>
             <div className="col-md-10">
               <LayoutCreator
@@ -785,6 +811,78 @@ class LayoutView extends Component {
         </section>
       </TopViewer>
     );
+  }
+  selectedStyle(callback, value) {
+    if (this.state.selectedStyleKey) {
+      switch (this.state.selectedStyleKey) {
+        default:
+          return (
+            <FormControl>
+              <TextInput
+                value={value}
+                label={this.state.selectedStyleKey}
+                immediate={true}
+                onChange={callback}
+                placeholder={Titles.Filter}
+              />
+            </FormControl>
+          );
+      }
+    }
+    return null;
+  }
+  getStyleSelect() {
+    if (this.state.filter) {
+      return (
+        <ul
+          style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}
+        >
+          {Object.keys(StyleLib.js)
+            .filter(x => x.indexOf(this.state.filter) !== -1)
+            .map(key => {
+              return (
+                <li
+                  className={"treeview"}
+                  style={{ padding: 3, cursor: "pointer" }}
+                  label={"Style"}
+                  key={key}
+                  onClick={() => {
+                    this.setState({ selectedStyleKey: key, filter: "" });
+                  }}
+                >
+                  {key}
+                </li>
+              );
+            })}
+        </ul>
+      );
+    }
+    return [];
+  }
+  getCurrentStyling(currentStyle) {
+    if (currentStyle) {
+      return (
+        <ul
+          style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}
+        >
+          {Object.keys(currentStyle).map(key => {
+            return (
+              <li
+                className={"treeview"}
+                style={{ padding: 3, cursor: "pointer" }}
+                key={key}
+                onClick={() => {
+                  this.setState({ selectedStyleKey: key, filter: "" });
+                }}
+              >
+                [{key}]: {currentStyle[key]}
+              </li>
+            );
+          })}
+        </ul>
+      );
+    }
+    return [];
   }
 }
 

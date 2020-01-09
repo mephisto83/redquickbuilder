@@ -34,6 +34,7 @@ import routes from '../constants/routes';
 
 import * as RedLists from './lists.js';
 import * as StateKeys from '../state_keys';
+import * as ModelKeys from '../model_keys';
 import * as ViewModelKeys from '../viewmodel_keys';
 import * as Models from '../model_keys.js';
 import RedObservable from './observable.js';

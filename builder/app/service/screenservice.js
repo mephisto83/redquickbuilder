@@ -128,8 +128,8 @@ export function GetItemRender(node, imports, language) {
   return `({item, index, separators, key})=>{
     let value = item;
     return  <${GetCodeName(
-    listItemNode
-  )} ${properties} id={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+      listItemNode
+    )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetItemRenderImport(node) {
@@ -162,7 +162,7 @@ export function constructCssFile(css, clsName) {
           let temp = key.replace(/([a-z])([A-Z])/g, "$1-$2");
           let value = style[key];
           if (!isNaN(value)) {
-            value = `${value}px`;
+            // value = `${value}px`;
           }
           return `${temp.toLowerCase()}: ${value};`;
         })

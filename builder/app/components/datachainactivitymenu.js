@@ -91,6 +91,9 @@ class DataChainActvityMenu extends Component {
     let stateKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.stateKey
       : false;
+    let modelKey = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.modelKey
+      : false;
     let listkey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.list
       : false;
@@ -279,6 +282,36 @@ class DataChainActvityMenu extends Component {
               ]).toNodeSelect()}
             />
           ) : null}
+          {modelKey ? (
+            <SelectInput
+              onChange={value => {
+                var id = currentNode.id;
+                this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                  target: UIA.GetNodeProp(
+                    currentNode,
+                    UIA.NodeProperties.ModelKey
+                  ),
+                  source: id
+                });
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.ModelKey,
+                  id,
+                  value
+                });
+                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                  target: value,
+                  source: id,
+                  properties: { ...UIA.LinkProperties.ModelKey }
+                });
+              }}
+              label={Titles.ModelKey}
+              value={UIA.GetNodeProp(currentNode, NodeProperties.ModelKey)}
+              options={UIA.NodesByType(state, [
+                NodeTypes.Model
+              ]).toNodeSelect()}
+            />
+          ) : null}
+
           {showDataChainRef ? (
             <SelectInput
               onChange={value => {
