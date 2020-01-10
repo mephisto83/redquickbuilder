@@ -100,6 +100,9 @@ class DataChainActvityMenu extends Component {
     let dataChainReferences = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.datareferences
       : false;
+    let useNavigationParms = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.useParams
+      : false;
     let datachainreferenceValues =
       UIA.GetNodeProp(currentNode, NodeProperties.DataChainReferences) || {};
     let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
@@ -306,9 +309,7 @@ class DataChainActvityMenu extends Component {
               }}
               label={Titles.ModelKey}
               value={UIA.GetNodeProp(currentNode, NodeProperties.ModelKey)}
-              options={UIA.NodesByType(state, [
-                NodeTypes.Model
-              ]).toNodeSelect()}
+              options={UIA.NodesByType(state, [NodeTypes.Model]).toNodeSelect()}
             />
           ) : null}
 
@@ -384,6 +385,18 @@ class DataChainActvityMenu extends Component {
                 )[0]
               }
               options={data_chain_entry}
+            />
+          ) : null}
+          {useNavigationParms ? (
+            <CheckBox
+              value={UIA.GetNodeProp(currentNode, useNavigationParms)}
+              onChange={value => {
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: useNavigationParms,
+                  id: currentNode.id,
+                  value
+                });
+              }}
             />
           ) : null}
           {dataChainReferences && datachainreferenceValues ? (

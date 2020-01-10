@@ -973,6 +973,11 @@ export const MethodFunctions = {
     output: {
       ...COMMON_OUTPUT.OBJECT
     },
+
+    parameters: {
+      body: true,
+      parameters: false
+    },
     isList: false,
     method: Methods.Update,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }

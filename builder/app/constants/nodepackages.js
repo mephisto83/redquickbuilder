@@ -1710,6 +1710,7 @@ export const CreateDefaultView = {
                           ? InstanceTypes.ModelInstance
                           : InstanceTypes.ScreenInstance,
                         [NodeProperties.UIText]: `${viewName} Form`,
+                        [NodeProperties.ViewType]: viewType,
                         [NodeProperties.Model]: currentNode.id
                       },
                       graph
@@ -1731,6 +1732,7 @@ export const CreateDefaultView = {
                         [NodeProperties.InstanceType]: useModelInstance
                           ? InstanceTypes.ModelInstance
                           : InstanceTypes.ScreenInstance,
+                        [NodeProperties.ViewType]: viewType,
                         [NodeProperties.UIText]: `${viewName} Form`,
                         [NodeProperties.Model]: currentNode.id
                       }
@@ -5611,7 +5613,7 @@ function setupPropertyApi(args) {
             ];
         }
         return [
-          ...(CreateSelectorToDataChainSelectorDC)({
+          ...CreateSelectorToDataChainSelectorDC({
             model: currentNode.id,
             property: modelProperty.id,
             viewName,

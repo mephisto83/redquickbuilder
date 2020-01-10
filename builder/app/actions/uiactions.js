@@ -1547,6 +1547,7 @@ export function GenerateDataChainMethod(id) {
   let nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
+  let userParams = GetNodeProp(node, NodeProperties.UseNavigationParams);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
   let listReference = GetNodeProp(node, NodeProperties.List);
   let lastpart = "return item;";
@@ -1660,7 +1661,7 @@ export function GenerateDataChainMethod(id) {
       return `(a) => {
         navigate.${NavigateTypes[navigateMethod]}({ route: routes.${GetCodeName(
         $screen
-      )} })(GetDispatch(), GetState());
+      )}${userParams ? ", params: { ...(a || {}) }" : ""} })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:

@@ -111,7 +111,8 @@ export const DataChainFunctions = {
   [DataChainFunctionKeys.Navigate]: {
     ui: {
       screen: NodeProperties.Screen,
-      navigateMethod: NodeProperties.NavigationAction
+      navigateMethod: NodeProperties.NavigationAction,
+      useParams: NodeProperties.UseNavigationParams
     },
     filter: {
       [NodeProperties.NODEType]: true

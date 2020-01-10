@@ -278,6 +278,7 @@ export const NodeProperties = {
   InstanceType: "InstanceType",
   ComponentParameters: "ComponentParameters",
   NavigationParameters: "NavigationParameters",
+  UseNavigationParams:"UseNavigationParams",
   ClientMethod: "ClientMethod",
   MethodParameters: "MethodParameters",
   NavigationParametersProperty: "NavigationParametersProperty",

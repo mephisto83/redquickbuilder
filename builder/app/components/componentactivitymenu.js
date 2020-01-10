@@ -259,8 +259,7 @@ class ComponentActivityMenu extends Component {
           } else if (prop_obj.boolean) {
             components.push(
               <CheckBox
-                label={key}
-                key={`${_ui_type} - ${componentType}- ${key}`}
+                label={' Use Parameter in url '}
                 value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
                 onChange={value => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
