@@ -1357,6 +1357,7 @@ export function getMethodInvocation(methodInstanceCall) {
       NodeProperties.NavigationAction
     )}();`;
   } else if (dataChain) {
+    //Buttons need to use this.state.value, so a new property for datachains should exist.
     return `DC.${GetCodeName(dataChain)}(value);`;
   }
 }

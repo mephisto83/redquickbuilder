@@ -1283,17 +1283,28 @@ class Dashboard extends Component {
                           value
                         });
                       }} />
-                    <CheckBox
-                      label={Titles.Selected}
-                      title={Titles.SelectedShortCut}
-                      value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
-                      onChange={(value) => {
-                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                          prop: UIA.NodeProperties.Selected,
-                          id: currentNode.id,
-                          value
-                        });
-                      }} />
+                      <CheckBox
+                        label={Titles.Selected}
+                        title={Titles.SelectedShortCut}
+                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+                        onChange={(value) => {
+                          this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.Selected,
+                            id: currentNode.id,
+                            value
+                          });
+                        }} />
+                       {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentExternalApi?( <CheckBox
+                          label={Titles.IsUrlParameter}
+                          title={Titles.IsUrlParameter}
+                          value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
+                          onChange={(value) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                              prop: UIA.NodeProperties.IsUrlParameter,
+                              id: currentNode.id,
+                              value
+                            });
+                          }} />):null}
                   </FormControl>
 
                 </SideMenuContainer>) : null}

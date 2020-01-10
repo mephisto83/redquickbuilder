@@ -1349,6 +1349,14 @@ export function GetComponentExternalApiNode(api, parent, graph) {
   }).find(v => GetNodeTitle(v) === api);
 }
 
+export function GetComponentExternalApiNodes(parent, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id: parent,
+    link: NodeConstants.LinkType.ComponentExternalApi
+  });
+}
+
 export function GetNodeMethodCall(id, graph) {
   graph = graph || GetCurrentGraph();
   return GraphMethods.GetNodesLinkedTo(graph, {
@@ -1661,7 +1669,9 @@ export function GenerateDataChainMethod(id) {
       return `(a) => {
         navigate.${NavigateTypes[navigateMethod]}({ route: routes.${GetCodeName(
         $screen
-      )}${userParams ? ", params: { ...(a || {}) }" : ""} })(GetDispatch(), GetState());
+      )}${
+        userParams ? " + `${a}`" : ""
+      } })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:

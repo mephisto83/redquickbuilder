@@ -83,6 +83,7 @@ export const SelectedShortCut = "Ctrl + q";
 export const ColorScheme = "Color Scheme";
 export const EnableMenu = "Enable Menu";
 export const ScreenOptions = "Screen Options";
+export const IsUrlParameter = 'Is Url Parameter';
 export const TitleService = "Title Service";
 export const UseInView = "Use In View";
 export const InternalApiConnection = "Internal Api Connection";
