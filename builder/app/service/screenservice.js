@@ -1248,6 +1248,11 @@ export function getMethodInvocation(methodInstanceCall) {
     type: LinkType.DataChainLink,
     direction: SOURCE
   }).find(x => x);
+  let internalApiConnection = getNodesByLinkType(graph, {
+    id: methodInstanceCall.id,
+    type: LinkType.ComponentApi,
+    direction: SOURCE
+  }).find(x => x);
   if (method) {
     let parts = [];
     let body = getNodesByLinkType(graph, {
@@ -1358,6 +1363,11 @@ export function getMethodInvocation(methodInstanceCall) {
     )}();`;
   } else if (dataChain) {
     //Buttons need to use this.state.value, so a new property for datachains should exist.
+    if (internalApiConnection) {
+      return `DC.${GetCodeName(dataChain)}(this.state.${GetJSCodeName(
+        internalApiConnection
+      )});`;
+    }
     return `DC.${GetCodeName(dataChain)}(value);`;
   }
 }
@@ -1410,9 +1420,9 @@ export function GetComponentDidMount(screenOption) {
     .join(NEW_LINE);
 
   let componentDidMount = `componentDidMount(value) {
+        this.props.setGetState();
         ${outOfBandCall}
         ${invocations}
-        this.props.setGetState();
 {{handles}}
 }
 `;
@@ -1479,7 +1489,13 @@ export function GetScreens() {
   return screens;
 }
 function GenerateElectronIORoutes(screens) {
-  let template = `<Route path={routes.{{route_name}}} component={{{component}}} />`;
+  let template = `<Route path={routes.{{route_name}}} render={({ match, history, location }) => {
+    console.log(match.params);
+    let {{{screenApiParams}}} = match.params;
+    {{overrides}}
+    setParameters({{{screenApiParams}}});
+    return <{{component}} {{screenApi}} />}} />
+  }`;
   let routefile = fs.readFileSync(
     "./app/templates/electronio/routes.tpl",
     "utf8"
@@ -1488,10 +1504,35 @@ function GenerateElectronIORoutes(screens) {
   let routes = [];
   let _screens = [];
   screens.map(screen => {
+    let screenApis = getNodesByLinkType(GetCurrentGraph(), {
+      id: screen.id,
+      type: LinkType.ComponentExternalApi,
+      direction: SOURCE
+    });
+    let screenApi = screenApis
+      .map(v => `${GetJSCodeName(v)}={${GetJSCodeName(v)}}`)
+      .join(" ");
+    let viewModel = screenApis.find(x => GetNodeTitle(x) === "viewModel");
+    let overrides = "";
+    if (viewModel) {
+      let viewModelDataLink = getNodesByLinkType(GetCurrentGraph(), {
+        id: viewModel.id,
+        type: LinkType.DataChainLink,
+        direction: SOURCE
+      }).find(x => x);
+      if (viewModelDataLink) {
+        overrides = `viewModel = DC.${GetCodeName(viewModelDataLink)}();`;
+      }
+    }
+    let screenApiParams = screenApis.map(v => `${GetJSCodeName(v)}`).join();
+
     routes.push(
       bindTemplate(template, {
         route_name: `${GetCodeName(screen)}`,
-        component: GetCodeName(screen)
+        overrides,
+        component: GetCodeName(screen),
+        screenApiParams,
+        screenApi
       })
     );
     _screens.push(

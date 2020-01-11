@@ -602,6 +602,16 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-chain',
       title: `${Titles.DataChain}`
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.ComponentApi,
+          singleLink: true,
+          nodeTypes: [NodeTypes.ComponentApi]
+        });
+      },
+      icon: 'fa fa-genderless',
+      title: `${Titles.InternalApiConnection}`
     }, {
       onClick: () => {
         if (currentNode)

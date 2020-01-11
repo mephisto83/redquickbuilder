@@ -1666,12 +1666,17 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.ReferenceDataChain:
       return `(a) => ${func}(a)`;
     case DataChainFunctionKeys.Navigate:
+      let insert = '';
+      if(userParams){
+        insert = `Object.keys(a).map(v=>{
+          let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
+          route = route.replace(regex, a[v]);
+        })`
+      }
       return `(a) => {
-        navigate.${NavigateTypes[navigateMethod]}({ route: routes.${GetCodeName(
-        $screen
-      )}${
-        userParams ? " + `${a}`" : ""
-      } })(GetDispatch(), GetState());
+        let route = routes.${GetCodeName($screen)};
+        ${insert}
+        navigate.${NavigateTypes[navigateMethod]}({ route })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:

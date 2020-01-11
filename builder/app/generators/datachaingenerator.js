@@ -13,7 +13,7 @@ export default class DataChainGenerator {
 
     let temps = [
       {
-        template: `import { GetC, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems } from './uiActions';
+        template: `import { GetC, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
 import {
     validateEmail,
     maxLength,
@@ -39,6 +39,8 @@ import * as ViewModelKeys from '../viewmodel_keys';
 import * as Models from '../model_keys.js';
 import RedObservable from './observable.js';
 import RedGraph from './redgraph.js';
+import { useParameters, fetchModel } from './redutils.js';
+
 ${funcs}`,
         relative: "./src/actions",
         relativeFilePath: `./data-chain.js`,
@@ -55,6 +57,14 @@ ${funcs}`,
         relative: "./src/actions",
         relativeFilePath: "./redgraph.js",
         name: "redgraph.js"
+      },
+      //Specific for web sites
+      //Need an alternative for ReactNative
+      {
+        template: readFileSync("./app/utils/redutils.js", "utf8"),
+        relative: "./src/actions",
+        relativeFilePath: "./redutils.js",
+        name: "redutils.js"
       }
     ];
     switch (language) {
