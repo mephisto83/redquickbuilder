@@ -10,6 +10,7 @@ export const SelectedValidations = "Selected Validations";
 export const Remove = "Remove";
 export const GraphOperations = "Graph Operations";
 export const AgentBaseMethods = "Agent Based Methods";
+export const LinkType = 'Link Type';
 export const AddServiceInterfaceMenu = "Add Interface Method";
 export const AddDefaults = "Add Defaults";
 export const Type = "Type";

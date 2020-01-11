@@ -2494,6 +2494,13 @@ export function getLinkInstance(graph, options) {
   }
   return null;
 }
+export function getLink(graph, options) {
+  let { id } = options;
+  if (id && graph && graph.linkLib) {
+    return graph.linkLib[id];
+  }
+  return null;
+}
 export function getAllLinksWithNode(graph, id) {
   return graph.links.filter(
     x => graph.linkLib[x].source === id || graph.linkLib[x].target === id

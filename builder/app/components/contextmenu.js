@@ -12,7 +12,9 @@ import {
   MAIN_CONTENT,
   MIND_MAP,
   CODE_VIEW,
-  UITypes
+  UITypes,
+  LinkProperties,
+  LinkPropertyKeys
 } from "../constants/nodetypes";
 import AddNameDescription from "../nodepacks/AddNameDescription";
 import TinyTweaks from "../nodepacks/TinyTweaks";
@@ -33,6 +35,10 @@ import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
 import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
 import NavigateBack from "../nodepacks/NavigateBack";
+import TreeViewItemContainer from "./treeviewitemcontainer";
+import { getLinkInstance } from "../methods/graph_methods";
+import SelectInput from "./selectinput";
+import CheckBox from './checkbox';
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -91,8 +97,90 @@ class ContextMenu extends Component {
     result.push(...this.apiMenu());
     result.push(...this.operations());
     result.push(this.minimizeMenu());
+    result.push(...this.linkOperations());
     result.push(this.hideTypeMenu());
     return result.filter(x => x);
+  }
+  linkOperations() {
+    let result = [];
+    var { state } = this.props;
+    let selectedLink = UIA.Visual(state, UIA.SELECTED_LINK);
+    if (selectedLink) {
+      let link = getLinkInstance(UIA.GetCurrentGraph(), {
+        target: selectedLink.target,
+        source: selectedLink.source
+      });
+      if (link) {
+        result.push(
+          ...[
+            <TreeViewMenu
+              open={UIA.Visual(state, Titles.LinkType)}
+              active={true}
+              title={Titles.LinkType}
+              key={selectedLink.id}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual(Titles.LinkType);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={Object.keys(LinkType).map(v => ({
+                    title: v,
+                    value: LinkType[v],
+                    id: LinkType[v]
+                  }))}
+                  label={Titles.LinkType}
+                  onChange={value => {}}
+                  value={UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)}
+                />
+              </TreeViewItemContainer>
+            </TreeViewMenu>
+          ]
+        );
+        switch (UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
+          case LinkType.SelectorLink:
+            result.push(
+              <TreeViewMenu
+                open={UIA.Visual(state, LinkType.SelectorLink)}
+                active={true}
+                title={Titles.LinkType}
+                key={selectedLink.id}
+                innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+                toggle={() => {
+                  this.props.toggleVisual(LinkType.SelectorLink);
+                }}
+              >
+                <TreeViewItemContainer>
+                  <CheckBox
+                    label={LinkPropertyKeys.InstanceUpdate}
+                    value={UIA.GetLinkProperty(
+                      link,
+                      LinkPropertyKeys.InstanceUpdate
+                    )}
+                    onChange={value => {
+                      this.props.graphOperation([
+                        {
+                          operation: UIA.UPDATE_LINK_PROPERTY,
+                          options: function() {
+                            return {
+                              id: link.id,
+                              prop: LinkPropertyKeys.InstanceUpdate,
+                              value: value
+                            };
+                          }
+                        }
+                      ]);
+                    }}
+                  />
+                </TreeViewItemContainer>
+              </TreeViewMenu>
+            );
+            break;
+        }
+      }
+    }
+    return result;
   }
   hideTypeMenu() {
     let HIDE_TYPE_MENU = "HIDE_TYPE_MENU";

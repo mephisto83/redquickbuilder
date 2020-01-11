@@ -836,6 +836,7 @@ export const LinkPropertyKeys = {
   CONSTRAINTS: "constraints",
   VALID_CONSTRAINTS: "valid-constraints",
   FUNCTION_ID: "function-id",
+  InstanceUpdate: "InstanceUpdate",
   ViewType: "viewType"
 };
 export const LinkProperties = {

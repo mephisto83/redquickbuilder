@@ -1540,6 +1540,7 @@ export function hasGroup(id, graph) {
 export function IsEndOfDataChain(id) {
   return GetDataChainFrom(id).length === 1;
 }
+
 export function GenerateDataChainMethod(id) {
   let node = GetNodeById(id);
   let model = GetNodeProp(node, NodeProperties.UIModelType);
@@ -1666,17 +1667,19 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.ReferenceDataChain:
       return `(a) => ${func}(a)`;
     case DataChainFunctionKeys.Navigate:
-      let insert = '';
-      if(userParams){
+      let insert = "";
+      if (userParams) {
         insert = `Object.keys(a).map(v=>{
           let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
           route = route.replace(regex, a[v]);
-        })`
+        })`;
       }
       return `(a) => {
         let route = routes.${GetCodeName($screen)};
         ${insert}
-        navigate.${NavigateTypes[navigateMethod]}({ route })(GetDispatch(), GetState());
+        navigate.${
+          NavigateTypes[navigateMethod]
+        }({ route })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:
@@ -2480,6 +2483,14 @@ export function GetLinkProperty(link, prop) {
   return link && link.properties && link.properties[prop];
 }
 
+export function GetLink(linkId) {
+  let graph = GetCurrentGraph();
+
+  return GraphMethods.getLink(graph, {
+    id: linkId
+  });
+}
+
 export function GetGroupProperty(group, prop) {
   return group && group.properties && group.properties[prop];
 }
@@ -3225,6 +3236,8 @@ export const ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY =
   "ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY";
 export const APPLY_FUNCTION_CONSTRAINTS = "APPLY_FUNCTION_CONSTRAINTS";
 export const ADD_NEW_REFERENCE_NODE = "ADD_NEW_REFERENCE_NODE;";
+export const UPDATE_LINK_PROPERTY = "UPDATE_LINK_PROPERTY";
+
 export const SET_DEPTH = "SET_DEPTH";
 export function PerformGraphOperation(commands) {
   return graphOperation(commands);
@@ -3644,6 +3657,9 @@ export function graphOperation(operation, options) {
                   SELECTED_NODE,
                   currentGraph.nodes[currentGraph.nodes.length - 1]
                 )(dispatch, getState);
+                break;
+              case UPDATE_LINK_PROPERTY:
+                currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
                 break;
               case NEW_CHOICE_TYPE:
                 currentGraph = GraphMethods.addNewNodeOfType(
