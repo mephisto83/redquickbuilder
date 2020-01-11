@@ -1,6 +1,8 @@
 export const BATCH = "BATCH";
 export const UI_UPDATE = "UI_UPDATE";
 export const UISI_UPDATE = "UISI_UPDATE";
+export const UISMI_UPDATE = "UISMI_UPDATE";
+export const UISMI_UPDATE_OBJECT = "UISMI_UPDATE_OBJECT";
 export const UISP_UPDATE = "UISP_UPDATE";
 export const UIMI_UPDATE = "UIMI_UPDATE";
 export const UI_MODELS = "UI_MODELS";
@@ -17,6 +19,8 @@ export const MODEL_INSTANCE_ON_FOCUS = "MODEL_INSTANCE_ON_FOCUS";
 export const APP_STATE = "APP_STATE";
 
 export const SCREEN_INSTANCE = "SCREEN_INSTANCE";
+export const SCREEN_MODEL_INSTANCE = "SCREEN_MODEL_INSTANCE";
+export const SCREEN_MODEL_INSTANCE_OBJECT = "SCREEN_MODEL_INSTANCE_OBJECT";
 export const SCREEN_INSTANCE_DIRTY = "SCREEN_INSTANCE_DIRTY";
 export const SCREEN_INSTANCE_ON_BLUR = "SCREEN_INSTANCE_ON_BLUR";
 export const SCREEN_INSTANCE_FOCUSED = "SCREEN_INSTANCE_FOCUSED";
@@ -87,6 +91,14 @@ export function GetState() {
   }
 }
 
+export function setTestGetState(func) {
+  _getState = func;
+}
+
+export function setDispatch(func) {
+  _dispatch = func;
+}
+
 export function UIV(item, value) {
   return UIC(VISUAL, item, value);
 }
@@ -124,6 +136,27 @@ export function UISI(form, model, item, value) {
     value
   };
 }
+export function UISMI(form, model, instance, item, value) {
+  return {
+    type: UISMI_UPDATE,
+    key: SCREEN_MODEL_INSTANCE,
+    form,
+    model,
+    instance,
+    item,
+    value
+  };
+}
+export function UISMIO(form, model, instance, value) {
+  return {
+    type: UISMI_UPDATE_OBJECT,
+    key: SCREEN_MODEL_INSTANCE_OBJECT,
+    form,
+    model,
+    instance,
+    value
+  };
+}
 export function UIMI(form, model, instance, item, value) {
   return {
     type: UIMI_UPDATE,
@@ -149,16 +182,19 @@ export function Visual(state, key) {
   return null;
 }
 export function GetC(state, key, id) {
-  if (state)
+  if (state) {
     if (state.uiReducer && state.uiReducer[key])
       return state.uiReducer[key][id];
+  }
   return null;
 }
 
 export function GetK(state, key, id, instance) {
-  if (state)
-    if (state.uiReducer && state.uiReducer[key])
+  if (state) {
+    if (state.uiReducer && state.uiReducer[key]) {
       if (state.uiReducer[key][id]) return state.uiReducer[key][id][instance];
+    }
+  }
   return null;
 }
 
@@ -205,10 +241,64 @@ export function GetModelInstance(key, instance, id) {
 export function GetScreenInst(state) {
   return GetC(state, SCREEN_INSTANCE, SCREEN_INSTANCE);
 }
+
+export function GetScreenModelInst(state, instance, id) {
+  let item = GetK(state, SCREEN_INSTANCE, SCREEN_INSTANCE, instance, id);
+  if (item) {
+    return item[id] || null;
+  }
+  return null;
+}
+export function GetScreenModelDirtyInst(state, instance, id) {
+  let item = GetK(state, SCREEN_INSTANCE, SCREEN_INSTANCE_DIRTY, instance, id);
+  if (item) {
+    return item[id] || null;
+  }
+  return null;
+}
+export function GetScreenModelFocusedInst(state, instance, id) {
+  let item = GetK(
+    state,
+    SCREEN_INSTANCE,
+    SCREEN_INSTANCE_FOCUSED,
+    instance,
+    id
+  );
+  if (item) {
+    return item[id] || null;
+  }
+  return null;
+}
+export function GetScreenModelBlurInst(state, instance, id) {
+  let item = GetK(
+    state,
+    SCREEN_INSTANCE,
+    SCREEN_INSTANCE_ON_BLUR,
+    instance,
+    id
+  );
+  if (item) {
+    return item[id] || null;
+  }
+  return null;
+}
+export function GetScreenModelFocusInst(state, instance, id) {
+  let item = GetK(
+    state,
+    SCREEN_INSTANCE_ON_FOCUS,
+    SCREEN_INSTANCE_ON_FOCUS,
+    instance,
+    id
+  );
+  if (item) {
+    return item[id] || null;
+  }
+  return null;
+}
+
 export function GetAppState(state) {
   return GetC(state, APP_STATE, APP_STATE);
 }
-
 export function GetModelInst(state, instance, id) {
   return GetK(state, UI_MODELS, instance, id);
 }
@@ -443,7 +533,56 @@ export function GetScreenInstanceObject(key) {
   }
   return null;
 }
-
+export function GetScreenModelInstance(key, viewModel) {
+  if (_getState) {
+    let state = _getState();
+    let screenInstance = GetScreenModelInst(state, viewModel, key);
+    if (screenInstance) {
+      return screenInstance;
+    }
+  }
+  return null;
+}
+export function GetScreenModelBlurInstance(key, viewModel) {
+  if (_getState) {
+    let state = _getState();
+    let screenInstance = GetScreenModelBlurInst(state, viewModel, key);
+    if (screenInstance) {
+      return screenInstance;
+    }
+  }
+  return null;
+}
+export function GetScreenModelDirtyInstance(key, viewModel) {
+  if (_getState) {
+    let state = _getState();
+    let screenInstance = GetScreenModelDirtyInst(state, viewModel, key);
+    if (screenInstance) {
+      return screenInstance;
+    }
+  }
+  return null;
+}
+export function GetScreenModelFocusInstance(key, viewModel) {
+  if (_getState) {
+    let state = _getState();
+    let screenInstance = GetScreenModelFocusInst(state, viewModel, key);
+    if (screenInstance) {
+      return screenInstance;
+    }
+  }
+  return null;
+}
+export function GetScreenModelFocusedInstance(key, viewModel) {
+  if (_getState) {
+    let state = _getState();
+    let screenInstance = GetScreenModelFocusedInst(state, viewModel, key);
+    if (screenInstance) {
+      return screenInstance;
+    }
+  }
+  return null;
+}
 export function GetAppStateObject(key) {
   if (_getState) {
     let state = _getState();
@@ -457,58 +596,105 @@ export function GetAppStateObject(key) {
 export function GetModelInstanceObject(key, instance) {
   if (_getState) {
     let state = _getState();
-    let modelInstance = GetModelInst(state, instance);
+    let modelInstance = GetModelInst(state, instance, key);
     if (modelInstance) {
-      return modelInstance[key];
+      return modelInstance;
     }
   }
   return null;
 }
 
-export function updateScreenInstance(model, id, value) {
+export function updateScreenInstance(model, id, value, options = {}) {
   return (dispatch, getState) => {
-    dispatch(
-      Batch(
-        UISI(SCREEN_INSTANCE, model, id, value),
-        UISI(SCREEN_INSTANCE_DIRTY, model, id, true)
-      )
-    );
+    if (options && options.update) {
+      dispatch(
+        Batch(
+          UISMI(SCREEN_INSTANCE, model, options.value, id, value),
+          UISMI(SCREEN_INSTANCE_DIRTY, model, options.value, id, true)
+        )
+      );
+    } else {
+      dispatch(
+        Batch(
+          UISI(SCREEN_INSTANCE, model, id, value),
+          UISI(SCREEN_INSTANCE_DIRTY, model, id, true)
+        )
+      );
+    }
   };
 }
 
-export function clearScreenInstance(model, id) {
+export function updateScreenInstanceObject(model, instance,  value) {
   return (dispatch, getState) => {
-    dispatch(
-      Batch(
-        UISI(SCREEN_INSTANCE_ON_BLUR, model, id, false),
-        UISI(SCREEN_INSTANCE_ON_FOCUS, model, id, false),
-        UISI(SCREEN_INSTANCE_DIRTY, model, id, false),
-        UISI(SCREEN_INSTANCE_FOCUSED, model, id, false),
-        UISI(SCREEN_INSTANCE_FOCUSED, model, id, false)
-      )
-    );
+    dispatch(Batch(UISMIO(SCREEN_INSTANCE, model, instance, value)));
   };
 }
 
-export function updateScreenInstanceBlur(model, id) {
+export function clearScreenInstance(model, id, options = {}) {
   return (dispatch, getState) => {
-    dispatch(
-      Batch(
-        UISI(SCREEN_INSTANCE_ON_BLUR, model, id, true),
-        UISI(SCREEN_INSTANCE_FOCUSED, model, id, false)
-      )
-    );
+    if (options && options.update) {
+      dispatch(
+        Batch(
+          UISMI(SCREEN_INSTANCE, model, options.value, id, null),
+          UISMI(SCREEN_INSTANCE_ON_BLUR, model, options.value, id, false),
+          UISMI(SCREEN_INSTANCE_ON_FOCUS, model, options.value, id, false),
+          UISMI(SCREEN_INSTANCE_DIRTY, model, options.value, id, false),
+          UISMI(SCREEN_INSTANCE_FOCUSED, model, options.value, id, false),
+          UISMI(SCREEN_INSTANCE_FOCUSED, model, options.value, id, false)
+        )
+      );
+    } else {
+      dispatch(
+        Batch(
+          UISI(SCREEN_INSTANCE, model, id, null),
+          UISI(SCREEN_INSTANCE_ON_BLUR, model, id, false),
+          UISI(SCREEN_INSTANCE_ON_FOCUS, model, id, false),
+          UISI(SCREEN_INSTANCE_DIRTY, model, id, false),
+          UISI(SCREEN_INSTANCE_FOCUSED, model, id, false),
+          UISI(SCREEN_INSTANCE_FOCUSED, model, id, false)
+        )
+      );
+    }
   };
 }
 
-export function updateScreenInstanceFocus(model, id) {
+export function updateScreenInstanceBlur(model, id, options = {}) {
   return (dispatch, getState) => {
-    dispatch(
-      Batch(
-        UISI(SCREEN_INSTANCE_ON_FOCUS, model, id, true),
-        UISI(SCREEN_INSTANCE_FOCUSED, model, id, true)
-      )
-    );
+    if (options && options.update) {
+      dispatch(
+        Batch(
+          UISMI(SCREEN_INSTANCE_ON_BLUR, model, options.value, id, true),
+          UISMI(SCREEN_INSTANCE_FOCUSED, model, options.value, id, false)
+        )
+      );
+    } else {
+      dispatch(
+        Batch(
+          UISI(SCREEN_INSTANCE_ON_BLUR, model, id, true),
+          UISI(SCREEN_INSTANCE_FOCUSED, model, id, false)
+        )
+      );
+    }
+  };
+}
+
+export function updateScreenInstanceFocus(model, id, options = {}) {
+  return (dispatch, getState) => {
+    if (options && options.update) {
+      dispatch(
+        Batch(
+          UISMI(SCREEN_INSTANCE_ON_FOCUS, model, options.value, id, true),
+          UISMI(SCREEN_INSTANCE_FOCUSED, model, options.value, id, true)
+        )
+      );
+    } else {
+      dispatch(
+        Batch(
+          UISI(SCREEN_INSTANCE_ON_FOCUS, model, id, true),
+          UISI(SCREEN_INSTANCE_FOCUSED, model, id, true)
+        )
+      );
+    }
   };
 }
 

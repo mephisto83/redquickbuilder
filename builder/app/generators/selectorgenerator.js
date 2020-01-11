@@ -1,58 +1,79 @@
 import { InstanceTypeSelectorFunction } from "../constants/componenttypes";
-import { NodesByType, GetState, GetNodeProp, GetJSCodeName, GetSelectorsNodes } from "../actions/uiactions";
+import {
+  NodesByType,
+  GetState,
+  GetNodeProp,
+  GetJSCodeName,
+  GetSelectorsNodes
+} from "../actions/uiactions";
 import { NodeTypes, NEW_LINE, NodeProperties } from "../constants/nodetypes";
 import { addNewLine } from "../utils/array";
 
 export default class SelectorGenerator {
-
-    static Generate(options) {
-        let funcs = GenerateSelectorFunctions();
-        let temps = [{
-            template: `import * as UIA from './uiActions';
+  static Generate(options) {
+    let funcs = GenerateSelectorFunctions();
+    let temps = [
+      {
+        template: `import * as UIA from './uiActions';
 ${funcs.join(NEW_LINE)}`,
-            relative: './src/actions',
-            relativeFilePath: `./selector.js`,
-            name: 'selector'
-        }];
+        relative: "./src/actions",
+        relativeFilePath: `./selector.js`,
+        name: "selector"
+      }
+    ];
 
-        let result = {};
+    let result = {};
 
-        temps.map(t => {
-            result[t.name] = t;
-        });
+    temps.map(t => {
+      result[t.name] = t;
+    });
 
-        return result;
-    }
+    return result;
+  }
 }
-
-
 
 export function GenerateSelectorFunctions() {
-    let nodes = NodesByType(GetState(), NodeTypes.Selector);
+  let nodes = NodesByType(GetState(), NodeTypes.Selector);
 
-    return nodes.map(node => {
-        return GenerateSelectorFunction(node);
-    });
+  return nodes.map(node => {
+    return GenerateSelectorFunction(node);
+  });
 }
 export function GenerateSelectorFunction(node) {
-    let _parts = GetSelectorsNodes(node.id);
+  let _parts = GetSelectorsNodes(node.id);
 
-    let parts = _parts.map(part => {
-        switch (GetNodeProp(part, NodeProperties.NODEType)) {
-            case NodeTypes.ViewModel:
-                let instanceType = GetNodeProp(part, NodeProperties.InstanceType)
-                let method = InstanceTypeSelectorFunction[instanceType];
-                return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}'${GetNodeProp(node, NodeProperties.InstanceType) ? ', value' : ''})`
-            case NodeTypes.Selector:
-                return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}(${GetNodeProp(part, NodeProperties.InstanceType) ? 'value' : ''})`;
-            default:
-                throw 'unhandled generate selector function type ' + GetNodeProp(part, NodeProperties.NODEType);
+  let parts = _parts.map(part => {
+    switch (GetNodeProp(part, NodeProperties.NODEType)) {
+      case NodeTypes.ViewModel:
+        let instanceType = GetNodeProp(part, NodeProperties.InstanceType);
+        let method = InstanceTypeSelectorFunction[instanceType];
+        return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}'${
+          GetNodeProp(node, NodeProperties.InstanceType) ? ", value" : ""
+        })`;
+      case NodeTypes.Selector:
+        return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}(${
+          GetNodeProp(part, NodeProperties.InstanceType) ? "value" : ""
+        })`;
+      default:
+        throw "unhandled generate selector function type " +
+          GetNodeProp(part, NodeProperties.NODEType);
+    }
+  });
+  let result = null;
+
+  result = `
+export function ${GetJSCodeName(node)}(value, viewModel, options = {}) {
+    if(options){
+      if(options.update){
+        return  {
+          dirty:UIA.GetScreenModelDirtyInstance(value, viewModel),
+          focus:UIA.GetScreenModelFocusInstance(value, viewModel),
+          blur: UIA.GetScreenModelBlurInstance(value, viewModel),
+          focused:UIA.GetScreenModelFocusedInstance(value, viewModel),
+          object:UIA.GetScreenModelInstance(value, viewModel)
         }
-    });
-    let result = null;
-
-    result = `
-export function ${GetJSCodeName(node)}(value, viewModel) {
+      }
+    }
     return {
         dirty: value
             ? UIA.GetModelInstanceDirtyObject(value, viewModel)
@@ -72,5 +93,5 @@ export function ${GetJSCodeName(node)}(value, viewModel) {
     }
 }
 `;
-    return result;
+  return result;
 }

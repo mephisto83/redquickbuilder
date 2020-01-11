@@ -266,6 +266,7 @@ export const SelectorPropertyKeys = {
 };
 export const NodeProperties = {
   ViewPackage: "view-package",
+  StateKey: "StateKey",
   DefaultComponentApiValue: "DefaultComponentApiValue",
   ExcludeFromGeneration: "ExcludeFromGeneration",
   ViewPackageTitle: "view-package-title",

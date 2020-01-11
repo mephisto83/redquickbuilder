@@ -15,7 +15,8 @@ import {
   ViewTypes,
   GetCurrentGraph,
   GetNodeByProperties,
-  GetNodes
+  GetNodes,
+  GetLinkProperty
 } from "../actions/uiactions";
 import fs from "fs";
 import path from "path";
@@ -27,7 +28,8 @@ import {
   NodeTypes,
   LinkType,
   ProgrammingLanguages,
-  NodePropertiesDirtyChain
+  NodePropertiesDirtyChain,
+  LinkPropertyKeys
 } from "../constants/nodetypes";
 import {
   buildLayoutTree,
@@ -58,7 +60,8 @@ import {
   GetLinkByNodes,
   getNodesByLinkType,
   getNodesLinkedTo,
-  getNodesLinkedFrom
+  getNodesLinkedFrom,
+  GetLinkBetween
 } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
@@ -767,9 +770,24 @@ function WriteDescribedStateUpdates(parent) {
       innerValue = externalKey;
       if (innerValue) {
         if (selector) {
+          let link_selector = GetLinkBetween(
+            selector.id,
+            externalApiNode.id,
+            GetCurrentGraph()
+          );
+          let addiontionalParams = "";
+          if (link_selector) {
+            let instanceUpdate = GetLinkProperty(
+              link_selector,
+              LinkPropertyKeys.InstanceUpdate
+            );
+            if (instanceUpdate) {
+              addiontionalParams = `{ update: true }`;
+            }
+          }
           innerValue = `S.${GetJSCodeName(
             selector
-          )}({{temp}}, this.state.viewModel)`;
+          )}({{temp}}, this.state.viewModel${addiontionalParams})`;
         } else {
           innerValue = "{{temp}}";
         }
@@ -837,7 +855,7 @@ function GetDefaultComponentValue(node, key) {
         if (selector) {
           innerValue = `S.${GetJSCodeName(
             selector
-          )}({{temp}}, this.state.viewModel)`;
+          )}({{temp}}, this.state.viewModel$)`;
         } else {
           innerValue = "{{temp}}";
         }
@@ -959,9 +977,28 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         }
       }
       if (!noSelector && selector) {
+        let addiontionalParams = "";
+        let link_selector =
+          componentExternalApi && externalConnection
+            ? GetLinkBetween(
+                componentExternalApi.id,
+                externalConnection.id,
+                GetCurrentGraph()
+              )
+            : null;
+        if (link_selector) {
+          let instanceUpdate = GetLinkProperty(
+            link_selector,
+            LinkPropertyKeys.InstanceUpdate
+          );
+          if (instanceUpdate) {
+            addiontionalParams = `, { update: true }`;
+          }
+        }
+
         innerValue = `S.${GetJSCodeName(
           selector
-        )}(${innerValue}, this.state.viewModel)`;
+        )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
       }
       if (!noDataChain && dataChain) {
         innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
@@ -998,11 +1035,26 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               eventMethodHandler,
               NodeProperties.EventType
             );
-            let method_call = null;
-            let modelJsName = `'${GetJSCodeName(viewModel)}'`;
-            if (!viewModel) {
-              modelJsName = `this.props.viewModel`;
+            let addiontionalParams = "";
+            let link_selector =
+              componentEventHandler && eventInstance
+                ? GetLinkBetween(
+                    componentEventHandler.id,
+                    eventInstance.id,
+                    GetCurrentGraph()
+                  )
+                : null;
+            if (link_selector) {
+              let instanceUpdate = GetLinkProperty(
+                link_selector,
+                LinkPropertyKeys.InstanceUpdate
+              );
+              if (instanceUpdate) {
+                addiontionalParams = `, { update: true, value: this.state.value/*hard coded*/ }`;
+              }
             }
+
+            let method_call = null;
             let modelProperty = GetJSCodeName(property);
             let screenOrModel = GetNodeProp(
               eventMethodHandler,
@@ -1012,16 +1064,16 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               : "Screen";
             switch (eventType) {
               case ComponentEvents.onBlur:
-                method_call = `this.props.update${screenOrModel}InstanceBlur(this.state.viewModel, '${modelProperty}')`;
+                method_call = `this.props.update${screenOrModel}InstanceBlur(this.state.viewModel, '${modelProperty}'${addiontionalParams})`;
                 break;
               case ComponentEvents.onFocus:
-                method_call = `this.props.update${screenOrModel}InstanceFocus(this.state.viewModel, '${modelProperty}')`;
+                method_call = `this.props.update${screenOrModel}InstanceFocus(this.state.viewModel, '${modelProperty}'${addiontionalParams})`;
                 break;
               case ComponentEvents.onChangeText:
-                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg)`;
+                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg${addiontionalParams})`;
                 break;
               case ComponentEvents.onChange:
-                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.text)`;
+                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.text${addiontionalParams})`;
                 break;
             }
             return method_call;

@@ -38,7 +38,7 @@ import NavigateBack from "../nodepacks/NavigateBack";
 import TreeViewItemContainer from "./treeviewitemcontainer";
 import { getLinkInstance } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
-import CheckBox from './checkbox';
+import CheckBox from "./checkbox";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -117,7 +117,7 @@ class ContextMenu extends Component {
               open={UIA.Visual(state, Titles.LinkType)}
               active={true}
               title={Titles.LinkType}
-              key={selectedLink.id}
+              key={Titles.LinkType}
               innerStyle={{ maxHeight: 300, overflowY: "auto" }}
               toggle={() => {
                 this.props.toggleVisual(Titles.LinkType);
@@ -138,17 +138,19 @@ class ContextMenu extends Component {
             </TreeViewMenu>
           ]
         );
+        let linkType = UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE);
         switch (UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
-          case LinkType.SelectorLink:
+          case LinkType.ComponentExternalConnection:
+          case LinkType.EventMethodInstance:
             result.push(
               <TreeViewMenu
-                open={UIA.Visual(state, LinkType.SelectorLink)}
+                open={UIA.Visual(state, linkType)}
                 active={true}
-                title={Titles.LinkType}
-                key={selectedLink.id}
+                title={linkType}
+                key={`${linkType}${selectedLink.id}`}
                 innerStyle={{ maxHeight: 300, overflowY: "auto" }}
                 toggle={() => {
-                  this.props.toggleVisual(LinkType.SelectorLink);
+                  this.props.toggleVisual(linkType);
                 }}
               >
                 <TreeViewItemContainer>

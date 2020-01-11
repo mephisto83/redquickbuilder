@@ -1732,7 +1732,7 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Validation:
       return `a => true/*TBI*/`;
     default:
-      throw `${functionType} is not a defined function type.`;
+      throw `${GetNodeTitle(node)} ${(node.id)} - ${functionType} is not a defined function type.`;
   }
 }
 export function GetPermissionsSortedByAgent() {
