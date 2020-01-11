@@ -139,7 +139,7 @@ export function UISI(form, model, item, value) {
 export function UISMI(form, model, instance, item, value) {
   return {
     type: UISMI_UPDATE,
-    key: SCREEN_MODEL_INSTANCE,
+    key: SCREEN_INSTANCE,
     form,
     model,
     instance,
@@ -150,7 +150,7 @@ export function UISMI(form, model, instance, item, value) {
 export function UISMIO(form, model, instance, value) {
   return {
     type: UISMI_UPDATE_OBJECT,
-    key: SCREEN_MODEL_INSTANCE_OBJECT,
+    key: SCREEN_INSTANCE,
     form,
     model,
     instance,
