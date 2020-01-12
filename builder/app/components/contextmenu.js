@@ -125,7 +125,7 @@ class ContextMenu extends Component {
             >
               <TreeViewItemContainer>
                 <SelectInput
-                  options={Object.keys(LinkType).map(v => ({
+                  options={Object.keys(LinkType).sort().map(v => ({
                     title: v,
                     value: LinkType[v],
                     id: LinkType[v]
