@@ -139,7 +139,7 @@ export function UISI(form, model, item, value) {
 export function UISMI(form, model, instance, item, value) {
   return {
     type: UISMI_UPDATE,
-    key: SCREEN_INSTANCE,
+    key: SCREEN_MODEL_INSTANCE,
     form,
     model,
     instance,
@@ -150,7 +150,7 @@ export function UISMI(form, model, instance, item, value) {
 export function UISMIO(form, model, instance, value) {
   return {
     type: UISMI_UPDATE_OBJECT,
-    key: SCREEN_INSTANCE,
+    key: SCREEN_MODEL_INSTANCE,
     form,
     model,
     instance,
@@ -243,14 +243,14 @@ export function GetScreenInst(state) {
 }
 
 export function GetScreenModelInst(state, instance, id) {
-  let item = GetK(state, SCREEN_INSTANCE, SCREEN_INSTANCE, instance, id);
+  let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE, instance, id);
   if (item) {
     return item[id] || null;
   }
   return null;
 }
 export function GetScreenModelDirtyInst(state, instance, id) {
-  let item = GetK(state, SCREEN_INSTANCE, SCREEN_INSTANCE_DIRTY, instance, id);
+  let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_DIRTY, instance, id);
   if (item) {
     return item[id] || null;
   }
@@ -259,7 +259,7 @@ export function GetScreenModelDirtyInst(state, instance, id) {
 export function GetScreenModelFocusedInst(state, instance, id) {
   let item = GetK(
     state,
-    SCREEN_INSTANCE,
+    SCREEN_MODEL_INSTANCE,
     SCREEN_INSTANCE_FOCUSED,
     instance,
     id
@@ -272,7 +272,7 @@ export function GetScreenModelFocusedInst(state, instance, id) {
 export function GetScreenModelBlurInst(state, instance, id) {
   let item = GetK(
     state,
-    SCREEN_INSTANCE,
+    SCREEN_MODEL_INSTANCE,
     SCREEN_INSTANCE_ON_BLUR,
     instance,
     id
@@ -285,7 +285,7 @@ export function GetScreenModelBlurInst(state, instance, id) {
 export function GetScreenModelFocusInst(state, instance, id) {
   let item = GetK(
     state,
-    SCREEN_INSTANCE_ON_FOCUS,
+    SCREEN_MODEL_INSTANCE,
     SCREEN_INSTANCE_ON_FOCUS,
     instance,
     id

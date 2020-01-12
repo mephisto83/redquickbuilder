@@ -770,21 +770,10 @@ function WriteDescribedStateUpdates(parent) {
       innerValue = externalKey;
       if (innerValue) {
         if (selector) {
-          let link_selector = GetLinkBetween(
+          let addiontionalParams = getUpdateFunctionOption(
             selector.id,
-            externalApiNode.id,
-            GetCurrentGraph()
+            externalApiNode.id
           );
-          let addiontionalParams = "";
-          if (link_selector) {
-            let instanceUpdate = GetLinkProperty(
-              link_selector,
-              LinkPropertyKeys.InstanceUpdate
-            );
-            if (instanceUpdate) {
-              addiontionalParams = `{ update: true }`;
-            }
-          }
           innerValue = `S.${GetJSCodeName(
             selector
           )}({{temp}}, this.state.viewModel${addiontionalParams})`;
@@ -977,24 +966,13 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         }
       }
       if (!noSelector && selector) {
-        let addiontionalParams = "";
-        let link_selector =
+        let addiontionalParams =
           componentExternalApi && externalConnection
-            ? GetLinkBetween(
+            ? getUpdateFunctionOption(
                 componentExternalApi.id,
-                externalConnection.id,
-                GetCurrentGraph()
+                externalConnection.id
               )
-            : null;
-        if (link_selector) {
-          let instanceUpdate = GetLinkProperty(
-            link_selector,
-            LinkPropertyKeys.InstanceUpdate
-          );
-          if (instanceUpdate) {
-            addiontionalParams = `, { update: true }`;
-          }
-        }
+            : "";
 
         innerValue = `S.${GetJSCodeName(
           selector
@@ -1035,24 +1013,14 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               eventMethodHandler,
               NodeProperties.EventType
             );
-            let addiontionalParams = "";
-            let link_selector =
+            let addiontionalParams =
               componentEventHandler && eventInstance
-                ? GetLinkBetween(
+                ? getUpdateFunctionOption(
                     componentEventHandler.id,
                     eventInstance.id,
-                    GetCurrentGraph()
+                    `, { update: true, value: this.state.value/*hard coded*/ }`
                   )
-                : null;
-            if (link_selector) {
-              let instanceUpdate = GetLinkProperty(
-                link_selector,
-                LinkPropertyKeys.InstanceUpdate
-              );
-              if (instanceUpdate) {
-                addiontionalParams = `, { update: true, value: this.state.value/*hard coded*/ }`;
-              }
-            }
+                : "";
 
             let method_call = null;
             let modelProperty = GetJSCodeName(property);
@@ -1324,6 +1292,12 @@ export function getMethodInvocation(methodInstanceCall) {
     }).find(x => {
       return GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChain;
     });
+    let methodInstanceSource = GetNodesLinkedTo(graph, {
+      id: methodInstanceCall.id,
+      link: LinkType.EventMethodInstance
+    }).find(x => {
+      return GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.EventMethod;
+    });
     let body_input = null;
     if (body) {
       let body_param = getNodesByLinkType(graph, {
@@ -1342,9 +1316,14 @@ export function getMethodInvocation(methodInstanceCall) {
         );
         let innervalue = "";
         if (body_selector) {
+          let addiontionalParams = getUpdateFunctionOption(
+            methodInstanceSource.id,
+            methodInstanceCall.id
+          );
+
           innervalue = `S.${GetJSCodeName(
             body_selector
-          )}(this.state.value, this.state.viewModel)`;
+          )}(this.state.value, this.state.viewModel${addiontionalParams})`;
         }
         let body_value = getNodesByLinkType(graph, {
           id: body_param.id,
@@ -1422,6 +1401,29 @@ export function getMethodInvocation(methodInstanceCall) {
     }
     return `DC.${GetCodeName(dataChain)}(value);`;
   }
+}
+
+export function getUpdateFunctionOption(
+  methodId,
+  methodInstanceCallId,
+  addParams
+) {
+  let link_selector = GetLinkBetween(
+    methodId,
+    methodInstanceCallId,
+    GetCurrentGraph()
+  );
+  let addiontionalParams = "";
+  if (link_selector) {
+    let instanceUpdate = GetLinkProperty(
+      link_selector,
+      LinkPropertyKeys.InstanceUpdate
+    );
+    if (instanceUpdate) {
+      addiontionalParams = addParams || `, { update: true }`;
+    }
+  }
+  return addiontionalParams;
 }
 export function GetComponentDidUpdate(parent) {
   let describedApi = "";

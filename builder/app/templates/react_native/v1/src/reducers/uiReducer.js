@@ -28,7 +28,8 @@ export function updateUISMIO(state, action) {
   newstate[key][form][model] = newstate[key][form][model] || {};
   newstate[key][form][model][instance] =
     newstate[key][form][model][instance] || {};
-  newstate[key][form][model][instance] = value;
+  newstate[key][form][model][instance] =
+    typeof value === "object" ? { ...value } : value;
 
   return newstate;
 }
