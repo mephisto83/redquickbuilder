@@ -100,7 +100,8 @@ import {
   ComponentEvents,
   PropertyApiList,
   ApiProperty,
-  ComponentApiTypes
+  ComponentApiTypes,
+  ComponentLifeCycleEvents
 } from "./componenttypes";
 import { debug } from "util";
 import * as Titles from "../components/titles";
@@ -128,6 +129,9 @@ import AttributeSuccess from "../nodepacks/AttributeSuccess";
 import AttributeError from "../nodepacks/AttributeError";
 import ConnectListViewModelToExternalViewModel from "../nodepacks/ConnectListViewModelToExternalViewModel";
 import CreateSelectorToDataChainRead from "../nodepacks/CreateSelectorToDataChainRead";
+import LoadModel from "../nodepacks/LoadModel";
+import ConnectLifecycleMethodToDataChain from "../nodepacks/ConnectLifecycleMethodToDataChain";
+import SetModelsApiLinkForInstanceUpdate from "../nodepacks/SetModelsApiLinkForInstanceUpdate";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -1641,6 +1645,12 @@ export const CreateDefaultView = {
       let viewComponentType = null;
       let viewComponent = null;
       let multi_item_component = ComponentTypes[uiType].List.key;
+      let needsLoadToScreenState = false;
+      switch (viewType) {
+        case ViewTypes.Update:
+          needsLoadToScreenState = true;
+          break;
+      }
       switch (viewType) {
         case ViewTypes.Get:
         case ViewTypes.GetAll:
@@ -1767,6 +1777,18 @@ export const CreateDefaultView = {
                   });
                 }
               : null,
+            //Adding load data chain
+            ...(needsLoadToScreenState
+              ? LoadModel({
+                  model_view_name: `${viewName} Load ${GetNodeTitle(
+                    currentNode
+                  )}`,
+                  model_item: `Models.${GetNodeTitle(currentNode)}`,
+                  callback: context => {
+                    newItems.dataChainForLoading = context.entry;
+                  }
+                })
+              : []),
             !isSharedComponent && isList
               ? {
                   // The selector for a list screen
@@ -1809,6 +1831,7 @@ export const CreateDefaultView = {
                   }
                 }
               : false,
+
             {
               operation: ADD_NEW_NODE,
               options: function(graph) {
@@ -2123,6 +2146,19 @@ export const CreateDefaultView = {
                 })
               : []),
 
+            ...(needsLoadToScreenState
+              ? ConnectLifecycleMethodToDataChain({
+                  lifeCycleMethod: graph => {
+                    let sce = screenComponentEvents.find(
+                      x =>
+                        GetNodeProp(x, NodeProperties.EventType, graph) ===
+                        ComponentLifeCycleEvents.ComponentDidMount
+                    );
+                    return sce;
+                  },
+                  dataChain: () => newItems.dataChainForLoading
+                })
+              : []),
             !isSharedComponent && isList
               ? createViewPagingDataChain(newItems, viewName, viewPackage, true)
               : false,
@@ -2932,8 +2968,14 @@ export const CreateDefaultView = {
                                 newItems,
                                 parent: ct.id,
                                 key: GetNodeProp(t, NodeProperties.UIText),
-                                properties:
-                                  LinkProperties.ComponentExternalConnection,
+                                properties: {
+                                  ...LinkProperties.ComponentExternalConnection,
+                                  ...(needsLoadToScreenState
+                                    ? {
+                                        [LinkPropertyKeys.InstanceUpdate]: true
+                                      }
+                                    : {})
+                                },
                                 child: childComponents[modelIndex]
                               })
                             );
@@ -3103,7 +3145,12 @@ export const CreateDefaultView = {
                   target: newItems.screenComponentIdInternalApi,
                   source: newItems.buttonExternalApi,
                   properties: {
-                    ...LinkProperties.ComponentExternalConnection
+                    ...LinkProperties.ComponentExternalConnection,
+                    ...(needsLoadToScreenState
+                      ? {
+                          [LinkPropertyKeys.InstanceUpdate]: true
+                        }
+                      : {})
                   }
                 };
               }
@@ -3120,7 +3167,14 @@ export const CreateDefaultView = {
                 newItems,
                 parent: newItems.screenComponentId,
                 key: "viewModel",
-                properties: LinkProperties.ComponentExternalConnection,
+                properties: {
+                  ...LinkProperties.ComponentExternalConnection,
+                  ...(needsLoadToScreenState
+                    ? {
+                        [LinkPropertyKeys.InstanceUpdate]: true
+                      }
+                    : {})
+                },
                 child: newItems.button
               });
             },
@@ -3974,10 +4028,6 @@ export const CreateDefaultView = {
         createListConnections.map(t => t());
         if (isList) {
           if (newItems.listComponentId) {
-            // GetNodesLinkedTo(graph, {
-            //   id: parent,
-            //   link: LinkType.ComponentExternalConnection
-            // }).find(v => GetNodeProp(v, ComponentApiTypes.ViewModel));
             let listViewModel = GetComponentExternalApiNode(
               ComponentApiTypes.ViewModel,
               newItems.listComponentId
@@ -3999,7 +4049,13 @@ export const CreateDefaultView = {
           //ConnectListViewModelToExternalViewModel
         }
       }
-
+      if (needsLoadToScreenState) {
+        PerformGraphOperation(
+          SetModelsApiLinkForInstanceUpdate({
+            viewPackage: viewPackage[NodeProperties.ViewPackage]
+          })
+        )(GetDispatchFunc(), GetStateFunc());
+      }
       SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
     };
     let { uiTypes } = _args;

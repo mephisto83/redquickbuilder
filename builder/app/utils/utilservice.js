@@ -247,7 +247,12 @@ export function processRecording(str) {
       // ${inserts
         .map(insert => insert.substr(2, insert.length - 3))
         .join(", ")}
-
+      ${inserts.map(insert=>{
+        let temp = insert.substr(2, insert.length -3);
+        return `if(!args.${temp}){
+          throw 'missing ${temp} argument';
+        }`;
+      })}
     let context = {
       ...args${
         unaccountedGuids.length

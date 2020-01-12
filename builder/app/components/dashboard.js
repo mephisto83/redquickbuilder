@@ -74,6 +74,7 @@ import ModelFilterMenu from './modelfiltermenu';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import DataChainOperator from './datachainoperator';
+import CurrentNodeProperties from './currentnodeproperties';
 import Slider from './slider';
 import SideMenuContainer from './sidemenucontainer';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
@@ -517,6 +518,9 @@ class Dashboard extends Component {
             return {
               nodeType: NodeTypes.LifeCylceMethodInstance,
               parent: currentNode.id,
+              linkProperties:{
+                properties: LinkProperties.LifeCylceMethodInstance
+              },
               groupProperties: {},
               properties: {
                 [NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Instance`,
@@ -1316,7 +1320,6 @@ class Dashboard extends Component {
                             });
                           }} />):null}
                   </FormControl>
-
                 </SideMenuContainer>) : null}
 
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
@@ -1390,6 +1393,7 @@ class Dashboard extends Component {
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
               </SideBarContent>) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? ( <CurrentNodeProperties />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ServiceIntefaceMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}

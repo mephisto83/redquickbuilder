@@ -622,6 +622,7 @@ export const LinkType = {
   ClaimServiceUpdateUserMethod: "ClaimServiceUpdateUserMethod",
   ExecutorServiceMethod: "ExecutorServiceMethod",
   StateKey: "StateKey",
+  LifeCylceMethodInstance: "LifeCylceMethodInstance",
   ModelKey: "ModelKey",
   LifeCylceMethod: "LifeCylceMethod",
   EventMethod: "EventMethod",
@@ -843,6 +844,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent
+  },
+  LifeCylceMethodInstance: {
+    type: LinkType.LifeCylceMethodInstance
   },
   ClaimServiceAuthorizationMethod: {
     type: LinkType.ClaimServiceAuthorizationMethod
