@@ -61,9 +61,9 @@ for (let j = 0; j < process.argv.length; j++) {
 }
 const appSettingsCopySettings = `
 <ItemGroup>
-<None Update="appsettings.json">
+<Content Update="appsettings.json">
   <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-</None>
+</Content>
 </ItemGroup>
 `
 function createElectronIo () {

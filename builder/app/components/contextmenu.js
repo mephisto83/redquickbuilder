@@ -39,6 +39,7 @@ import TreeViewItemContainer from "./treeviewitemcontainer";
 import { getLinkInstance } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
+import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   getMenuMode(mode) {
@@ -125,11 +126,13 @@ class ContextMenu extends Component {
             >
               <TreeViewItemContainer>
                 <SelectInput
-                  options={Object.keys(LinkType).sort().map(v => ({
-                    title: v,
-                    value: LinkType[v],
-                    id: LinkType[v]
-                  }))}
+                  options={Object.keys(LinkType)
+                    .sort()
+                    .map(v => ({
+                      title: v,
+                      value: LinkType[v],
+                      id: LinkType[v]
+                    }))}
                   label={Titles.LinkType}
                   onChange={value => {}}
                   value={UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)}
@@ -394,6 +397,24 @@ class ContextMenu extends Component {
                 this.props.graphOperation(
                   AddNameDescription({ node0: currentNode.id })
                 );
+              }}
+            />
+            <TreeViewMenu
+              title={`Create Claim Service`}
+              hideArrow={true}
+              onClick={() => {
+                let claimService = UIA.GetNodeByProperties({
+                  [NodeProperties.NODEType]: NodeTypes.ClaimService
+                });
+                if (!claimService) {
+                  this.props.graphOperation(
+                    CreateStandardClaimService({
+                      modelName: UIA.GetNodeTitle(currentNode),
+                      model: currentNode.id,
+                      user: UIA.GetNodeProp(currentNode, NodeProperties.UIUser)
+                    })
+                  );
+                }
               }}
             />
           </TreeViewMenu>

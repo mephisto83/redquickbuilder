@@ -2477,14 +2477,15 @@ export function findLinkInstance(graph, options) {
     });
     return link;
   }
-  let link = graph.links
-    ? graph.links.find(
-        x =>
-          graph.linkLib[x] &&
-          graph.linkLib[x].source === source &&
-          graph.linkLib[x].target == target
-      )
-    : null;
+  let link =
+    graph && graph.links
+      ? graph.links.find(
+          x =>
+            graph.linkLib[x] &&
+            graph.linkLib[x].source === source &&
+            graph.linkLib[x].target == target
+        )
+      : null;
   return link;
 }
 export function getLinkInstance(graph, options) {

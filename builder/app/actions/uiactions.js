@@ -1732,7 +1732,9 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Validation:
       return `a => true/*TBI*/`;
     default:
-      throw `${GetNodeTitle(node)} ${(node.id)} - ${functionType} is not a defined function type.`;
+      throw `${GetNodeTitle(node)} ${
+        node.id
+      } - ${functionType} is not a defined function type.`;
   }
 }
 export function GetPermissionsSortedByAgent() {
@@ -2074,6 +2076,7 @@ export function GetConditionClause(
     case NodeConstants.FilterRules.IsInModelPropertyCollection:
     case NodeConstants.FilterRules.EqualsModelProperty:
     case NodeConstants.FilterRules.EqualsFalse:
+    case NodeConstants.FilterRules.EqualsTrue:
     case NodeConstants.FilterRules.EqualsParent:
     case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
       properties = {
@@ -3659,7 +3662,10 @@ export function graphOperation(operation, options) {
                 )(dispatch, getState);
                 break;
               case UPDATE_LINK_PROPERTY:
-                currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
+                currentGraph = GraphMethods.updateLinkProperty(
+                  currentGraph,
+                  options
+                );
                 break;
               case NEW_CHOICE_TYPE:
                 currentGraph = GraphMethods.addNewNodeOfType(
