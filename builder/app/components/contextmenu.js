@@ -636,6 +636,7 @@ class ContextMenu extends Component {
     }
   }
   getComponentExternalMenu(currentNode) {
+    let { state } = this.props;
     return (
       <TreeViewMenu
         open={true}

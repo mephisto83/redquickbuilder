@@ -279,19 +279,6 @@ export default function(args = {}) {
           }
         }
       ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "AsOutput",
-            id: context.node2,
-            value: false
-          }
-        }
-      ];
     }
   ];
   let clearPinned = [
