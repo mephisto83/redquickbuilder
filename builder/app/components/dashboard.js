@@ -113,8 +113,8 @@ class Dashboard extends Component {
   componentDidMount() {
     this.props.setState();
     this.props.setRemoteState();
-    this.props.setVisual(UIA.NODE_COST, 25);
-    this.props.setVisual(UIA.NODE_CONNECTION_COST, 2);
+    this.props.setVisual(UIA.NODE_COST, 5);
+    this.props.setVisual(UIA.NODE_CONNECTION_COST, 1.5);
   }
   minified() {
     var { state } = this.props;

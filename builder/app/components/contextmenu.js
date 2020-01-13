@@ -115,11 +115,11 @@ class ContextMenu extends Component {
         result.push(
           ...[
             <TreeViewMenu
-              open={UIA.Visual(state, Titles.LinkType)}
               active={true}
               title={Titles.LinkType}
               key={Titles.LinkType}
               innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              open={UIA.Visual(state, Titles.LinkType)}
               toggle={() => {
                 this.props.toggleVisual(Titles.LinkType);
               }}
@@ -641,7 +641,10 @@ class ContextMenu extends Component {
         open={true}
         active={true}
         title={Titles.Select}
-        toggle={() => {}}
+        open={UIA.Visual(state, Titles.Select)}
+        toggle={() => {
+          this.props.toggleVisual(Titles.Select);
+        }}
       >
         <TreeViewMenu
           title={LinkType.ComponentExternalConnection}
@@ -680,13 +683,16 @@ class ContextMenu extends Component {
     if (!current || !current.id) {
       return [];
     }
+    let { state } = this.props;
     var linkTypes = UIA.GetNodesLinkTypes(current.id);
     return (
       <TreeViewMenu
-        open={true}
         active={true}
         title={Titles.Select}
-        toggle={() => {}}
+        open={UIA.Visual(state, Titles.Select)}
+        toggle={() => {
+          this.props.toggleVisual(Titles.Select);
+        }}
       >
         {linkTypes.map(linkType => {
           return (

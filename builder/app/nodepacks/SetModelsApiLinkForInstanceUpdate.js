@@ -13,7 +13,7 @@ export default function(args = {}) {
   if (!viewPackage) {
     throw "no view package";
   }
-  debugger;
+
   let components = GetNodesByProperties(
     {
       [NodeProperties.ViewPackage]: viewPackage,
