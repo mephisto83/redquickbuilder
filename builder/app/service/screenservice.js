@@ -381,6 +381,7 @@ export function bindComponent(node, componentBindingDefinition) {
       .map((methodInstances, i) => {
         let invocations = methodInstances
           .map(methodInstanceCall => {
+            if (!methodInstanceCall) debugger;
             return getMethodInvocation(methodInstanceCall);
           })
           .join(NEW_LINE);
@@ -1317,8 +1318,8 @@ export function getMethodInvocation(methodInstanceCall) {
         let innervalue = "";
         if (body_selector) {
           let addiontionalParams = getUpdateFunctionOption(
-            methodInstanceSource.id,
-            methodInstanceCall.id
+            methodInstanceSource ? methodInstanceSource.id : null,
+            methodInstanceCall ? methodInstanceCall.id : null
           );
 
           innervalue = `S.${GetJSCodeName(
@@ -1408,19 +1409,21 @@ export function getUpdateFunctionOption(
   methodInstanceCallId,
   addParams
 ) {
-  let link_selector = GetLinkBetween(
-    methodId,
-    methodInstanceCallId,
-    GetCurrentGraph()
-  );
   let addiontionalParams = "";
-  if (link_selector) {
-    let instanceUpdate = GetLinkProperty(
-      link_selector,
-      LinkPropertyKeys.InstanceUpdate
+  if (methodId && methodInstanceCallId) {
+    let link_selector = GetLinkBetween(
+      methodId,
+      methodInstanceCallId,
+      GetCurrentGraph()
     );
-    if (instanceUpdate) {
-      addiontionalParams = addParams || `, { update: true }`;
+    if (link_selector) {
+      let instanceUpdate = GetLinkProperty(
+        link_selector,
+        LinkPropertyKeys.InstanceUpdate
+      );
+      if (instanceUpdate) {
+        addiontionalParams = addParams || `, { update: true }`;
+      }
     }
   }
   return addiontionalParams;
@@ -1467,7 +1470,7 @@ export function GetComponentDidMount(screenOption) {
     ComponentLifeCycleEvents.ComponentDidMount
   );
 
-  let invocations = methodInstances
+  let invocations = (methodInstances || [])
     .map(methodInstanceCall => {
       return getMethodInvocation(methodInstanceCall);
     })

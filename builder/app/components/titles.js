@@ -10,7 +10,7 @@ export const SelectedValidations = "Selected Validations";
 export const Remove = "Remove";
 export const GraphOperations = "Graph Operations";
 export const AgentBaseMethods = "Agent Based Methods";
-export const LinkType = 'Link Type';
+export const LinkType = "Link Type";
 export const AddServiceInterfaceMenu = "Add Interface Method";
 export const AddDefaults = "Add Defaults";
 export const Type = "Type";
@@ -84,7 +84,7 @@ export const SelectedShortCut = "Ctrl + q";
 export const ColorScheme = "Color Scheme";
 export const EnableMenu = "Enable Menu";
 export const ScreenOptions = "Screen Options";
-export const IsUrlParameter = 'Is Url Parameter';
+export const IsUrlParameter = "Is Url Parameter";
 export const TitleService = "Title Service";
 export const UseInView = "Use In View";
 export const InternalApiConnection = "Internal Api Connection";
@@ -338,7 +338,7 @@ export const Get_Object_Agent_Value__IListObject =
 export const Get_Agent_Value__IListObject = "Get Objects for an Agent";
 export const Can_Execute_Agent_Parent_In_Valid_List =
   "Can Execute Agent Parent In Valid List";
-
+export const AddButtonToComponent = "Add Button";
 export const Get_Object_Agent_Value__Object = "Get Object by Agent";
 export const Update_Object_Agent_Value__Object = "Update Object by Agent";
 export const Update_Object_Agent_Value__Object_With_Object =

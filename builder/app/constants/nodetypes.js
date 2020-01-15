@@ -257,6 +257,10 @@ export const GeneratedDataTypes = {
 export const ConfigurationProperties = {
   Domain: "Configuration_Domain"
 };
+
+export const ApiNodeKeys = {
+  ViewModel: "viewModel"
+};
 export const SelectorPropertyKeys = {
   Dirty: "dirty",
   Focused: "focused",

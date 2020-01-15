@@ -40,8 +40,14 @@ import { getLinkInstance } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
 import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService";
+import GetModelViewModelForList from "../nodepacks/GetModelViewModelForList";
+import AddButtonToComponent from "../nodepacks/AddButtonToComponent";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
   getMenuMode(mode) {
     let result = [];
     let exit = () => {
@@ -354,6 +360,47 @@ class ContextMenu extends Component {
                 ]);
               }}
             />
+            {UIA.GetNodeTitle(currentNode) === "viewModel" ? (
+              <TreeViewMenu
+                title={`Setup View Model On Screen`}
+                open={UIA.Visual(state, `Setup View Model On Screen`)}
+                active={true}
+                onClick={() => {
+                  // this.props.graphOperation(GetModelViewModelForList({}));
+                  this.props.toggleVisual(`Setup View Model On Screen`);
+                }}
+              >
+                <TreeViewItemContainer>
+                  <SelectInput
+                    label={Titles.Models}
+                    options={UIA.NodesByType(
+                      this.props.state,
+                      NodeTypes.Model
+                    ).toNodeSelect()}
+                    onChange={value => {
+                      this.setState({
+                        model: value
+                      });
+                    }}
+                    value={this.state.model}
+                  />
+                </TreeViewItemContainer>
+                {this.state.model ? (
+                  <TreeViewMenu
+                    label={`Execute`}
+                    onClick={() => {
+                      this.props.graphOperation(
+                        GetModelViewModelForList({
+                          model: this.state.model,
+                          modelViewName: UIA.GetNodeTitle(this.state.model),
+                          viewModel: currentNode.id
+                        })
+                      );
+                    }}
+                  />
+                ) : null}
+              </TreeViewMenu>
+            ) : null}
           </TreeViewMenu>
         ];
       case NodeTypes.Executor:
@@ -400,7 +447,7 @@ class ContextMenu extends Component {
               }}
             />
             <TreeViewMenu
-              title={`Create Claim Service`}
+              title={`Create Claim Service(Agent)`}
               hideArrow={true}
               onClick={() => {
                 let claimService = UIA.GetNodeByProperties({
@@ -421,6 +468,25 @@ class ContextMenu extends Component {
         ];
       case NodeTypes.ScreenOption:
         return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "ComponentNode")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("ComponentNode");
+            }}
+          >
+            <TreeViewMenu
+              title={Titles.AddButtonToComponent}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  AddButtonToComponent({ component: currentNode.id })
+                );
+              }}
+            />
+          </TreeViewMenu>,
           <TreeViewMenu
             open={UIA.Visual(state, "ScreenOptionOperations")}
             active={true}
@@ -472,6 +538,28 @@ class ContextMenu extends Component {
               onClick={() => {
                 this.props.graphOperation(
                   ThreeColumn({ component: currentNode.id })
+                );
+              }}
+            />
+          </TreeViewMenu>
+        ];
+      case NodeTypes.ComponentNode:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "ComponentNode")}
+            active={true}
+            title={Titles.Layout}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("ComponentNode");
+            }}
+          >
+            <TreeViewMenu
+              title={Titles.AddButtonToComponent}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  AddButtonToComponent({ component: currentNode.id })
                 );
               }}
             />

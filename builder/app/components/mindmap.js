@@ -109,7 +109,8 @@ export default class MindMap extends Component {
 
         var svg = makeSVG();
         function makeSVG() {
-            var outer = d3.select(`#${me.state.id}`).append("svg")
+            let body =  d3.select(`#${me.state.id}`);
+            var outer = body.append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .attr("pointer-events", "all");
@@ -140,6 +141,7 @@ export default class MindMap extends Component {
             function redraw() {
                 var { x = 0, y = 0 } = (me.mouseMoved || {});
                 vis.attr('transform', `scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`);
+                body.attr('data-transform', `(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`);
             }
             outer.on('mousemove', function (x, v) {
                 if (me.panning) {

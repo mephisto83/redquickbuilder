@@ -16,7 +16,8 @@ import {
   GroupProperties,
   LinkType,
   LinkPropertyKeys,
-  SelectorPropertyKeys
+  SelectorPropertyKeys,
+  ApiNodeKeys
 } from "./nodetypes";
 import PostRegister from "../nodepacks/PostRegister";
 import {
@@ -132,6 +133,7 @@ import CreateSelectorToDataChainRead from "../nodepacks/CreateSelectorToDataChai
 import LoadModel from "../nodepacks/LoadModel";
 import ConnectLifecycleMethodToDataChain from "../nodepacks/ConnectLifecycleMethodToDataChain";
 import SetModelsApiLinkForInstanceUpdate from "../nodepacks/SetModelsApiLinkForInstanceUpdate";
+import SetupViewModelOnScreen from "../nodepacks/SetupViewModelOnScreen";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -1765,7 +1767,7 @@ export const CreateDefaultView = {
               ? function(graph) {
                   return addComponentApiToForm({
                     newItems,
-                    text: "viewModel",
+                    text: ApiNodeKeys.ViewModel,
                     parent: newItems.screenNodeId,
                     graph,
                     isSingular: true,
@@ -2086,7 +2088,7 @@ export const CreateDefaultView = {
               ? function() {
                   return addComponentApiToForm({
                     newItems,
-                    text: "viewModel",
+                    text: ApiNodeKeys.ViewModel,
                     parent: newItems.screenNodeOptionId
                   });
                 }
@@ -2108,7 +2110,7 @@ export const CreateDefaultView = {
                     newItems,
                     parent: newItems.screenNodeId,
                     properties: LinkProperties.ComponentExternalConnection,
-                    key: "viewModel",
+                    key: ApiNodeKeys.ViewModel,
                     child: newItems.screenNodeOptionId
                   });
                 }
@@ -2221,7 +2223,7 @@ export const CreateDefaultView = {
                               PerformGraphOperation([
                                 ...[
                                   "value",
-                                  "viewModel",
+                                  ApiNodeKeys.ViewModel,
                                   "label",
                                   "placeholder",
                                   "error",
@@ -2274,7 +2276,7 @@ export const CreateDefaultView = {
               ? function() {
                   return addListItemComponentApi(
                     newItems,
-                    "viewModel",
+                    ApiNodeKeys.ViewModel,
                     false,
                     (v, _i) => {
                       newItems.componentItemListViewModel = _i;
@@ -2514,7 +2516,7 @@ export const CreateDefaultView = {
             function() {
               return addListItemComponentApi(
                 newItems,
-                "viewModel",
+                ApiNodeKeys.ViewModel,
                 false,
                 (v, _i) => {
                   newItems.componentViewModelApiIds = _i;
@@ -2684,12 +2686,12 @@ export const CreateDefaultView = {
                         source: getApiConnectors(
                           newItems,
                           newItems.screenComponentId,
-                          "viewModel"
+                          ApiNodeKeys.ViewModel
                         ).externalId,
                         target: getApiConnectors(
                           newItems,
                           isList ? listComponentId : screenNodeOptionId,
-                          "viewModel"
+                          ApiNodeKeys.ViewModel
                         ).internalId,
                         properties: {
                           ...LinkProperties.ComponentExternalConnection
@@ -2779,7 +2781,7 @@ export const CreateDefaultView = {
                   return [
                     ...[
                       "value",
-                      "viewModel",
+                      ApiNodeKeys.ViewModel,
                       "label",
                       "placeholder",
                       "error",
@@ -2887,7 +2889,7 @@ export const CreateDefaultView = {
                       childComponents,
                       modelIndex,
                       viewComponent,
-                      "viewModel",
+                      ApiNodeKeys.ViewModel,
                       newItems.componentViewModelApiIds.internalId
                     );
                   },
@@ -2906,7 +2908,7 @@ export const CreateDefaultView = {
 
                   ...[
                     "value",
-                    "viewModel",
+                    ApiNodeKeys.ViewModel,
                     "label",
                     "placeholder",
                     "error",
@@ -3158,7 +3160,7 @@ export const CreateDefaultView = {
             function() {
               return addComponentApiToForm({
                 newItems,
-                text: "viewModel",
+                text: ApiNodeKeys.ViewModel,
                 parent: newItems.button
               });
             },
@@ -3166,7 +3168,7 @@ export const CreateDefaultView = {
               return connectComponentToExternalApi({
                 newItems,
                 parent: newItems.screenComponentId,
-                key: "viewModel",
+                key: ApiNodeKeys.ViewModel,
                 properties: {
                   ...LinkProperties.ComponentExternalConnection,
                   ...(needsLoadToScreenState
@@ -4055,7 +4057,16 @@ export const CreateDefaultView = {
             viewPackage: viewPackage[NodeProperties.ViewPackage]
           })
         )(GetDispatchFunc(), GetStateFunc());
+        if (isSharedComponent) {
+          PerformGraphOperation(
+            SetupViewModelOnScreen({
+              model: currentNode.id,
+              screen: screenNodeId
+            })
+          )(GetDispatchFunc(), GetStateFunc());
+        }
       }
+
       SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
     };
     let { uiTypes } = _args;
