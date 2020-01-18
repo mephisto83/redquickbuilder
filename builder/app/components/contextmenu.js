@@ -42,6 +42,8 @@ import CheckBox from "./checkbox";
 import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService";
 import GetModelViewModelForList from "../nodepacks/GetModelViewModelForList";
 import AddButtonToComponent from "../nodepacks/AddButtonToComponent";
+import GetScreenValueParameter from "../nodepacks/GetScreenValueParameter";
+import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChainToCompontApiConnector";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -269,6 +271,69 @@ class ContextMenu extends Component {
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 
     switch (currentNodeType) {
+      case NodeTypes.ComponentApiConnector:
+        let temp;
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`Assign Screen Value Parameter`}
+              open={UIA.Visual(state, `Assign Screen Value Parmater`)}
+              active={true}
+              onClick={() => {
+                // this.props.graphOperation(GetModelViewModelForList({}));
+                this.props.toggleVisual(`Assign Screen Value Parmater`);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Screen}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Screen
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      screen: value
+                    });
+                  }}
+                  value={this.state.screen}
+                />
+              </TreeViewItemContainer>
+              {this.state.screen ? (
+                <TreeViewMenu
+                  title={Titles.Execute}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation([
+                      ...GetScreenValueParameter({
+                        screen: UIA.GetNodeTitle(this.state.screen),
+                        callback: dataChain => {
+                          temp = dataChain;
+                        }
+                      }),
+                      ...ConnectDataChainToCompontApiConnector({
+                        dataChain: function() {
+                          return temp.entry;
+                        },
+                        componentApiConnector: function() {
+                          return currentNode.id;
+                        }
+                      })
+                    ]);
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
+          </TreeViewMenu>
+        ];
       case NodeTypes.EventMethodInstance:
         return [
           <TreeViewMenu

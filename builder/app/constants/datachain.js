@@ -72,6 +72,7 @@ export const DataChainFunctionKeys = {
   Navigate: "Navigate",
   StateKey: "StateKey",
   ModelKey: "ModelKey",
+  ViewModelKey: "ViewModelKey",
   Lambda: "Lambda",
   Validation: "Validation",
   NavigateTo: "Navigate To",
@@ -500,6 +501,13 @@ export const DataChainFunctions = {
     },
     filter: {},
     value: DataChainFunctionKeys.StateKey
+  },
+  [DataChainFunctionKeys.ViewModelKey]: {
+    ui: {
+      viewModelKey: NodeProperties.ViewModelKey
+    },
+    filter: {},
+    value: DataChainFunctionKeys.ViewModelKey
   },
   [DataChainFunctionKeys.StringConcat]: {
     ui: {

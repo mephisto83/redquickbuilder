@@ -94,6 +94,9 @@ class DataChainActvityMenu extends Component {
     let modelKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.modelKey
       : false;
+    let viewModelKey = DataChainFunctions[dataChainFuncType]
+      ? DataChainFunctions[dataChainFuncType].ui.viewModelKey
+      : false;
     let listkey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.list
       : false;
@@ -312,7 +315,34 @@ class DataChainActvityMenu extends Component {
               options={UIA.NodesByType(state, [NodeTypes.Model]).toNodeSelect()}
             />
           ) : null}
+          {viewModelKey ? (
+            <SelectInput
+              onChange={value => {
+                var id = currentNode.id;
+                this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                  target: UIA.GetNodeProp(
+                    currentNode,
+                    UIA.NodeProperties.ViewModelKey
+                  ),
+                  source: id
+                });
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.ViewModelKey,
+                  id,
+                  value
+                });
+                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                  target: value,
+                  source: id,
+                  properties: { ...UIA.LinkProperties.ViewModelKey }
+                });
 
+              }}
+              label={Titles.ViewModel}
+              value={UIA.GetNodeProp(currentNode, NodeProperties.ViewModelKey)}
+              options={UIA.NodesByType(state, [NodeTypes.Screen]).toNodeSelect()}
+            />
+          ) : null}
           {showDataChainRef ? (
             <SelectInput
               onChange={value => {
@@ -389,6 +419,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {useNavigationParms ? (
             <CheckBox
+              label={Titles.UseNavigationParams}
               value={UIA.GetNodeProp(currentNode, useNavigationParms)}
               onChange={value => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

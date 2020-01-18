@@ -134,6 +134,8 @@ import LoadModel from "../nodepacks/LoadModel";
 import ConnectLifecycleMethodToDataChain from "../nodepacks/ConnectLifecycleMethodToDataChain";
 import SetModelsApiLinkForInstanceUpdate from "../nodepacks/SetModelsApiLinkForInstanceUpdate";
 import SetupViewModelOnScreen from "../nodepacks/SetupViewModelOnScreen";
+import AppendGetIdsToDataChain from "../nodepacks/AppendGetIdsToDataChain";
+import GetModelViewModelForUpdate from "../nodepacks/GetModelViewModelForUpdate";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -3551,8 +3553,9 @@ export const CreateDefaultView = {
                     }
                     let temp = SplitDataCommand(
                       GetNodeById(listDataChainId, graph),
-                      split => {
+                      (split, graph, groupId) => {
                         listDataChainExitId = split.id;
+                        newItems.listDataChainExitGroupId = groupId;
                       },
                       viewPackage
                     );
@@ -3603,6 +3606,17 @@ export const CreateDefaultView = {
                       value: true
                     };
                   }
+                }
+              : false,
+            isList
+              ? function(graph) {
+                  if (skipModelDataChainListParts) {
+                    return null;
+                  }
+                  AppendGetIdsToDataChain({
+                    dataChain: listDataChainExitId,
+                    dataChainGroup: newItems.listDataChainExitGroupId
+                  });
                 }
               : false,
             isList
@@ -4057,13 +4071,50 @@ export const CreateDefaultView = {
             viewPackage: viewPackage[NodeProperties.ViewPackage]
           })
         )(GetDispatchFunc(), GetStateFunc());
-        if (isSharedComponent) {
+        if (isList) {
           PerformGraphOperation(
             SetupViewModelOnScreen({
               model: currentNode.id,
               screen: screenNodeId
             })
           )(GetDispatchFunc(), GetStateFunc());
+        } else {
+          let modelView_DataChain;
+          PerformGraphOperation([
+            ...GetModelViewModelForUpdate({
+              screen: GetNodeTitle(screenNodeId),
+              viewModel: screenNodeId,
+              callback: ctx => {
+                let { entry } = ctx;
+                modelView_DataChain = entry;
+              }
+            }),
+            function(graph) {
+              let externalNode = GetNodesLinkedTo(graph, {
+                id: screenNodeId,
+                link: LinkType.ComponentExternalApi
+              }).find(
+                x =>
+                  GetNodeProp(x, NodeProperties.NODEType) ===
+                    NodeTypes.ComponentExternalApi &&
+                  GetNodeTitle(x) === ApiNodeKeys.ViewModel
+              );
+              return [
+                {
+                  operation: ADD_LINK_BETWEEN_NODES,
+                  options: function() {
+                    return {
+                      target: modelView_DataChain,
+                      source: externalNode.id,
+                      properties: {
+                        ...LinkProperties.DataChainLink
+                      }
+                    };
+                  }
+                }
+              ];
+            }
+          ])(GetDispatchFunc(), GetStateFunc());
         }
       }
 

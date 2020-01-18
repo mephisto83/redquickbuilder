@@ -1393,12 +1393,12 @@ class Dashboard extends Component {
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
               </SideBarContent>) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
-              {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? ( <CurrentNodeProperties />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ServiceIntefaceMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<QuickMethods />) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? ( <CurrentNodeProperties />) : null}
             </SideBar>
           </div>
         </div >

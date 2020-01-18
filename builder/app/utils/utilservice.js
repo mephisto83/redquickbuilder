@@ -236,6 +236,7 @@ export function processRecording(str) {
     .join("," + NEW_LINE);
   return `
   import { uuidv4 } from "../utils/array";
+  import { NodeProperties } from "../constants/nodetypes";
   export default function(args = {}) {
     // ${unaccountedGuids
       .map(v => {
@@ -247,8 +248,8 @@ export function processRecording(str) {
       // ${inserts
         .map(insert => insert.substr(2, insert.length - 3))
         .join(", ")}
-      ${inserts.map(insert=>{
-        let temp = insert.substr(2, insert.length -3);
+      ${inserts.map(insert => {
+        let temp = insert.substr(2, insert.length - 3);
         return `if(!args.${temp}){
           throw 'missing ${temp} argument';
         }`;
@@ -267,11 +268,36 @@ export function processRecording(str) {
           : ""
       }
     };
-    let { viewPackages = {} } = args;
+    let {
+      viewPackages
+    } = args;
+    viewPackages = {
+      [NodeProperties.ViewPackage]: uuidv4(),
+      ...(viewPackages||{})
+    };
     let result = ${str};
     let clearPinned = [${temp}];
-    return [...result,
+    let applyViewPackages = [${guids
+      .map((guid, index) => {
+        if (unaccountedGuids.indexOf(guid) === -1) {
+          return `{
+          operation: 'UPDATE_NODE_PROPERTY',
+          options : function() {
+            return {
+              id: context.node${index},
+              properties: viewPackages
+            }
+          }
+        }`;
+        }
+        return false;
+      })
+      .filter(x => x)
+      .join()}]
+    return [
+      ...result,
       ...clearPinned,
+      ...applyViewPackages,
       function() {
         if (context.callback) {
           context.entry = context.node0;

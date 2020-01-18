@@ -270,6 +270,7 @@ export const SelectorPropertyKeys = {
 };
 export const NodeProperties = {
   ViewPackage: "view-package",
+  ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
   DefaultComponentApiValue: "DefaultComponentApiValue",
   ExcludeFromGeneration: "ExcludeFromGeneration",
@@ -628,7 +629,9 @@ export const LinkType = {
   StateKey: "StateKey",
   LifeCylceMethodInstance: "LifeCylceMethodInstance",
   ModelKey: "ModelKey",
+  ViewModelKey: "ViewModelKey",
   LifeCylceMethod: "LifeCylceMethod",
+  ComponentApiConnector: "Component Api Connector",
   EventMethod: "EventMethod",
   EventMethodInstance: "EventMethodInstance",
   NavigationMethod: "NavigationMethod",
@@ -849,6 +852,9 @@ export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent
   },
+  ComponentApiConnector: {
+    type: LinkType.ComponentApiConnector
+  },
   LifeCylceMethodInstance: {
     type: LinkType.LifeCylceMethodInstance
   },
@@ -857,6 +863,9 @@ export const LinkProperties = {
   },
   ClaimServiceUpdateUserMethod: {
     type: LinkType.ClaimServiceUpdateUserMethod
+  },
+  ViewModelKey: {
+    type: LinkType.ViewModelKey
   },
   ModelKey: {
     type: LinkType.ModelKey

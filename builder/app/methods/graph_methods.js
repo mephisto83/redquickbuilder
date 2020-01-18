@@ -2771,6 +2771,16 @@ export function updateAppSettings(graph, options) {
   }
   return graph;
 }
+
+export function updateNodeProperties(graph, options) {
+  let { properties, id } = options || {};
+  if (properties) {
+    for (var i in properties) {
+      graph = updateNodeProperty(graph, { id, value: properties[i], prop: i });
+    }
+  }
+  return graph;
+}
 export function updateNodeProperty(graph, options) {
   let { id, value, prop } = options;
   let additionalChange = {};

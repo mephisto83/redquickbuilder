@@ -706,13 +706,18 @@ export const QUERY_PARAMETER_KEYS = {
   Skip: "skip",
   Take: "take",
   Filter: "filter",
-  Sort: "sort"
+  Sort: "sort",
+  Id: "id"
 };
 export const QUERY_PARAMETERS = {
   [QUERY_PARAMETER_KEYS.Skip]: true,
   [QUERY_PARAMETER_KEYS.Take]: true,
   [QUERY_PARAMETER_KEYS.Filter]: true,
   [QUERY_PARAMETER_KEYS.Sort]: true
+};
+
+export const GET_QUERY_PARAMETERS = {
+  [QUERY_PARAMETER_KEYS.Id]: true
 };
 
 export const MethodFunctions = {
@@ -816,6 +821,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
     title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,
+    titleTemplate: function(t, a) {
+      return `Create ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set.tpl",
       "utf8"
@@ -843,6 +851,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
     title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
+    titleTemplate: function(t, a) {
+      return `Create ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl",
       "utf8"
@@ -885,6 +896,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
     title: Titles.Create_Object_Agent_Value__IListObject,
+    titleTemplate: function(t, a) {
+      return `Create ${t} by ${a} and Return List of ${t}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/create_model_agent_listobject.tpl",
       "utf8"
@@ -931,6 +945,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
     title: Titles.Update_Object_Agent_Value__IListObject,
+    titleTemplate: function(t, a) {
+      return `Update ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/update_model_agent_listobject.tpl",
       "utf8"
@@ -955,6 +972,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__Object]: {
     title: Titles.Update_Object_Agent_Value__Object,
+    titleTemplate: function(t, a) {
+      return `Update ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/update_model_agent_object.tpl",
       "utf8"
@@ -984,6 +1004,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__Object_With_Object]: {
     title: Titles.Update_Object_Agent_Value__Object_With_Object,
+    titleTemplate: function(t, a) {
+      return `Update ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/update_model_agent_object_with_model.tpl",
       "utf8"
@@ -1018,6 +1041,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
     title: Titles.Delete_Object_Agent_Value__IListObject,
+    titleTemplate: function(t, a) {
+      return `Delete ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/delete_model_agent_listobject.tpl",
       "utf8"
@@ -1042,6 +1068,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Delete_M2M_By_Reference]: {
     title: FunctionTypes.Delete_M2M_By_Reference,
+    titleTemplate: function(t, a) {
+      return `Delete ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/delete_m2m_by_reference.tpl",
       "utf8"
@@ -1119,6 +1148,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Agent_Value__IListObject]: {
     title: Titles.Get_Agent_Value__IListObject,
+    titleTemplate: function(t, a) {
+      return `Get ${t}s List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/get_agent_listobject.tpl",
       "utf8"
@@ -1182,9 +1214,6 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Register]: {
     title: Titles.Register,
-    // template: fs.readFileSync('./app/templates/standard/get_agent_listobject.tpl', 'utf8'),
-    // interface: fs.readFileSync('./app/templates/standard/get_agent_listobject_interface.tpl', 'utf8'),
-    // controller: fs.readFileSync('./app/templates/standard/get_agent_listobjects_controller.tpl', 'utf8'),
     constraints: {
       ...COMMON_CONSTRAINTS_ANONYMOUS
     },
@@ -1204,6 +1233,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Create ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/create_agent_childparent_listchild.tpl",
       "utf8"
@@ -1235,6 +1267,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Update_Parent$Child_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Update ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/update_agent_childparent_listchild.tpl",
       "utf8"
@@ -1260,6 +1295,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Get_Parent$Child_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Get ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/get_agent_childparent_listchild.tpl",
       "utf8"
@@ -1340,6 +1378,9 @@ export const MethodFunctions = {
 
   [FunctionTypes.Get_Object_Agent_Value__IListObject_By_Specific]: {
     title: Titles.Get_Object_Agent_Value__IListObject_By_Specific,
+    titleTemplate: function(t, a) {
+      return `Get ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/get_model_agent_listobject_specific.tpl",
       "utf8"
@@ -1401,6 +1442,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Object_Agent_Value__Object]: {
     title: Titles.Get_Object_Agent_Value__Object,
+    titleTemplate: function(t, a) {
+      return `Get ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/get_model_agent_object.tpl",
       "utf8"
@@ -1439,12 +1483,22 @@ export const MethodFunctions = {
     output: {
       ...COMMON_OUTPUT.OBJECT
     },
+
+    parameters: {
+      body: false,
+      parameters: {
+        query: { ...GET_QUERY_PARAMETERS }
+      }
+    },
     isList: false,
     method: Methods.Get,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
   },
   [FunctionTypes.Get_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Get_ManyToMany_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Get ${t} List by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/get_agent_manytomany_listchild.tpl",
       "utf8"
@@ -1474,6 +1528,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Create_ManyToMany_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Create ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/create_agent_manytomany_listchild.tpl",
       "utf8"
@@ -1499,6 +1556,9 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Update_ManyToMany_Agent_Value__IListChild,
+    titleTemplate: function(t, a) {
+      return `Update ${t} by ${a}`;
+    },
     template: fs.readFileSync(
       "./app/templates/standard/update_agent_manytomany_listchild.tpl",
       "utf8"
@@ -1528,6 +1588,9 @@ export const MethodFunctions = {
       "./app/templates/can_execute/can_execute_childparent_valid_list.tpl",
       "utf8"
     ),
+    titleTemplate: function(t, a) {
+      return `Can Execute ${t} by ${a}`;
+    },
     permission: {
       ...PERMISSION_DEFAULTS
     },

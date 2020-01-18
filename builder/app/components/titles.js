@@ -285,6 +285,7 @@ export const NavigationAction = "Navigation Action";
 export const StateKey = "StateKey";
 export const Property = "Property";
 export const ModelKey = "ModelKey";
+export const ViewModel= 'View Model';
 export const AddDataChain = "Add data chain";
 export const SplitDataChain = "Split data chain";
 export const HandlerType = "Handler type";
@@ -326,6 +327,8 @@ export const Update_Parent$Child_Agent_Value__IListChild =
   "Update Parent/Child => IList<Child>";
 export const Get_Parent$Child_Agent_Value__IListChild =
   "Get Parent/Child => IList<Child>";
+
+export const UseNavigationParams = "Use Navigation Params";
 
 export const Create_Object_Agent_Value__IListObject =
   "Create Object by Agent => IList<Object>";

@@ -2,11 +2,11 @@
         [Route("{{http_route}}")]
         [{{http_method}}]
         public async Task<ActionResult<{{output_type}}>> {{functionName}}([FromBody] {{input_type}} obj)
-        {       
+        {
             var maestro = RedStrapper.Resolve<{{maestro_interface}}>();
             try
             {
-                var result = await maestro.{{maestro_function}}({{user_instance}}, obj).ConfigureAwait(false);
+                var result = await maestro.{{maestro_function}}({{user_instance}}, obj);
 
                 return Ok(result);
             }
