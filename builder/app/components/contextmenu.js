@@ -44,6 +44,7 @@ import GetModelViewModelForList from "../nodepacks/GetModelViewModelForList";
 import AddButtonToComponent from "../nodepacks/AddButtonToComponent";
 import GetScreenValueParameter from "../nodepacks/GetScreenValueParameter";
 import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChainToCompontApiConnector";
+import CreateNavigateToScreenDC from "../nodepacks/CreateNavigateToScreenDC";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -357,6 +358,43 @@ class ContextMenu extends Component {
                 );
               }}
             />
+            <TreeViewMenu
+              title={`Navigate to screen`}
+              open={UIA.Visual(state, `Navigate to screen`)}
+              active={true}
+              onClick={() => {
+                // this.props.graphOperation(GetModelViewModelForList({}));
+                this.props.toggleVisual(`Navigate to screen`);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Screen}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Screen
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      screen: value
+                    });
+                  }}
+                  value={this.state.screen}
+                />
+              </TreeViewItemContainer>
+              {this.state.screen ? (
+                <TreeViewMenu
+                  title={`Execute`}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      CreateNavigateToScreenDC({
+                        screen: UIA.GetNodeTitle(this.state.screen)
+                      })
+                    );
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
           </TreeViewMenu>
         ];
       case NodeTypes.LifeCylceMethodInstance:
@@ -452,7 +490,7 @@ class ContextMenu extends Component {
                 </TreeViewItemContainer>
                 {this.state.model ? (
                   <TreeViewMenu
-                    label={`Execute`}
+                    title={`Execute`}
                     onClick={() => {
                       this.props.graphOperation(
                         GetModelViewModelForList({

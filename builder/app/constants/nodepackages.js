@@ -3555,6 +3555,7 @@ export const CreateDefaultView = {
                       GetNodeById(listDataChainId, graph),
                       (split, graph, groupId) => {
                         listDataChainExitId = split.id;
+                        newItems.listDataChainExitId = listDataChainExitId;
                         newItems.listDataChainExitGroupId = groupId;
                       },
                       viewPackage
@@ -3606,17 +3607,6 @@ export const CreateDefaultView = {
                       value: true
                     };
                   }
-                }
-              : false,
-            isList
-              ? function(graph) {
-                  if (skipModelDataChainListParts) {
-                    return null;
-                  }
-                  AppendGetIdsToDataChain({
-                    dataChain: listDataChainExitId,
-                    dataChainGroup: newItems.listDataChainExitGroupId
-                  });
                 }
               : false,
             isList
@@ -4063,6 +4053,17 @@ export const CreateDefaultView = {
             }
           }
           //ConnectListViewModelToExternalViewModel
+        }
+      }
+      if (isList) {
+        debugger;
+        if (newItems.listDataChainExitId && newItems.listDataChainExitGroupId) {
+          PerformGraphOperation(
+            AppendGetIdsToDataChain({
+              dataChain: newItems.listDataChainExitId,
+              dataChainGroup: newItems.listDataChainExitGroupId
+            })
+          )(GetDispatchFunc(), GetStateFunc());
         }
       }
       if (needsLoadToScreenState) {

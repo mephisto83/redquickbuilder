@@ -1,4 +1,5 @@
 import { uuidv4 } from "../utils/array";
+import { NodeProperties } from "../constants/nodetypes";
 export default function(args = {}) {
   // node0,node1
 
@@ -14,7 +15,11 @@ export default function(args = {}) {
     node0: args.dataChain,
     node1: args.dataChainGroup
   };
-  let { viewPackages = {} } = args;
+  let {
+    viewPackages = {
+      [NodeProperties.ViewPackage]: uuidv4()
+    }
+  } = args;
   let result = [
     function(graph) {
       return [

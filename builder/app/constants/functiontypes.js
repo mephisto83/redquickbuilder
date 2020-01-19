@@ -1443,7 +1443,7 @@ export const MethodFunctions = {
   [FunctionTypes.Get_Object_Agent_Value__Object]: {
     title: Titles.Get_Object_Agent_Value__Object,
     titleTemplate: function(t, a) {
-      return `Get ${t} List by ${a}`;
+      return `Get ${t} by ${a}`;
     },
     template: fs.readFileSync(
       "./app/templates/standard/get_model_agent_object.tpl",

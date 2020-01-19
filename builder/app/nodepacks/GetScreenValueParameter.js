@@ -158,7 +158,7 @@ export default function(args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: "x => getParams()"
+            value: "x => useParameters()"
           }
         }
       ];
@@ -249,6 +249,18 @@ export default function(args = {}) {
             prop: "Lambda",
             id: context.node2,
             value: "x => x.value"
+          }
+        }
+      ];
+    },
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "AsOutput",
+            id: context.node2,
+            value: true
           }
         }
       ];

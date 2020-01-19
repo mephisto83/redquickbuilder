@@ -1,22 +1,27 @@
 // @flow
-import React, { Component } from 'react';
-import { RelativeMenuCss } from '../constants/visual';
-
+import React, { Component } from "react";
+import { RelativeMenuCss } from "../constants/visual";
 
 export default class Header extends Component {
-    relative() {
-        return this.props.relative ? RelativeMenuCss : {};
+  relative() {
+    return this.props.relative ? RelativeMenuCss : {};
+  }
+  overflow() {
+    return this.props.overflow ? { maxHeight: "100vh", overflowY: "auto" } : {};
+  }
+  render() {
+    if (this.props.notactive) {
+      return <div />;
     }
-    render() {
-        if (this.props.notactive) {
-            return <div></div>
-        }
-        return (
-            <aside className={`main-sidebar`} style={this.relative()}>
-                <section className="sidebar" style={{ height: 'auto' }}>
-                    {this.props.children}
-                </section>
-            </aside>
-        );
-    }
+    return (
+      <aside
+        className={`main-sidebar`}
+        style={{ ...this.relative(), ...this.overflow() }}
+      >
+        <section className="sidebar" style={{ height: "auto" }}>
+          {this.props.children}
+        </section>
+      </aside>
+    );
+  }
 }

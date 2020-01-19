@@ -978,7 +978,7 @@ class Dashboard extends Component {
                 </NavBarMenu>
               </DashboardNavBar>
             </Header>
-            <MainSideBar>
+            <MainSideBar overflow={true}>
               <SideBarMenu>
                 <SideBarHeader title={Titles.MainNavigation} onClick={() => {
                   this.props.toggleVisual('MAIN_NAV');

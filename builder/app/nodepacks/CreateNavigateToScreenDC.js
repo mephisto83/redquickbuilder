@@ -1,8 +1,7 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
 export default function(args = {}) {
-  // node2
+  // node3
 
   // screen
   if (!args.screen) {
@@ -10,13 +9,13 @@ export default function(args = {}) {
   }
   let context = {
     ...args,
-    node2: args.viewModel
+    node3: uuidv4()
   };
-  let {
-    viewPackages = {
-      [NodeProperties.ViewPackage]: uuidv4()
-    }
-  } = args;
+  let { viewPackages } = args;
+  viewPackages = {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
   let result = [
     function(graph) {
       return [
@@ -37,7 +36,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Get " + args.screen + " view model"
+            value: "Nabigate to Screen " + args.screen + ""
           }
         }
       ];
@@ -146,18 +145,7 @@ export default function(args = {}) {
           options: {
             prop: "DataChainFunctionType",
             id: context.node1,
-            value: "ViewModelKey"
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "REMOVE_LINK_BETWEEN_NODES",
-          options: {
-            source: context.node1
+            value: "Lambda"
           }
         }
       ];
@@ -168,25 +156,9 @@ export default function(args = {}) {
         {
           operation: "CHANGE_NODE_PROPERTY",
           options: {
-            prop: "ViewModelKey",
+            prop: "Lambda",
             id: context.node1,
-            value: context.node2
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "ADD_LINK_BETWEEN_NODES",
-          options: {
-            target: context.node2,
-            source: context.node1,
-            properties: {
-              type: "ViewModelKey",
-              ViewModelKey: {}
-            }
+            value: "x => ({ value: x})"
           }
         }
       ];
@@ -198,18 +170,72 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node1,
-            value: "get form view model"
+            value: "get param"
           }
         }
       ];
     },
+
+    function(graph) {
+      return [
+        {
+          operation: "ADD_NEW_NODE",
+          options: {
+            parent: context.node1,
+            nodeType: "data-chain",
+            groupProperties: {
+              id: context.group0
+            },
+            properties: {
+              ChainParent: context.node1
+            },
+            linkProperties: {
+              properties: {
+                type: "data-chain-link",
+                "data-chain-link": {}
+              }
+            },
+            callback: function(node, graph, group) {
+              context.node2 = node.id;
+            }
+          }
+        }
+      ];
+    },
+
     function(graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
           options: {
-            prop: "AsOutput",
-            id: context.node1,
+            prop: "DataChainFunctionType",
+            id: context.node2,
+            value: "Navigate To"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "DataChainFunctionType",
+            id: context.node2,
+            value: "Navigate"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "UseNavigationParams",
+            id: context.node2,
             value: true
           }
         }
@@ -221,8 +247,7 @@ export default function(args = {}) {
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
           options: {
-            target: context.node2,
-            source: context.node1
+            source: context.node2
           }
         }
       ];
@@ -233,9 +258,22 @@ export default function(args = {}) {
         {
           operation: "CHANGE_NODE_PROPERTY",
           options: {
-            prop: "ViewModelKey",
-            id: context.node1,
-            value: context.node2
+            prop: "Screen",
+            id: context.node2,
+            value: context.node3
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "AsOutput",
+            id: context.node2,
+            value: true
           }
         }
       ];
@@ -246,12 +284,37 @@ export default function(args = {}) {
         {
           operation: "ADD_LINK_BETWEEN_NODES",
           options: {
-            target: context.node2,
-            source: context.node1,
+            source: context.node2,
+            target: context.node3,
             properties: {
-              type: "ViewModelKey",
-              ViewModelKey: {}
+              type: "data-chain-link",
+              "data-chain-link": {}
             }
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "NavigationAction",
+            id: context.node2,
+            value: "Go"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_TEXT",
+          options: {
+            id: context.node2,
+            value: "go to place"
           }
         }
       ];
@@ -281,7 +344,7 @@ export default function(args = {}) {
   ];
   let applyViewPackages = [
     {
-      operation: UPDATE_NODE_PROPERTY,
+      operation: "UPDATE_NODE_PROPERTY",
       options: function() {
         return {
           id: context.node0,
@@ -290,7 +353,7 @@ export default function(args = {}) {
       }
     },
     {
-      operation: UPDATE_NODE_PROPERTY,
+      operation: "UPDATE_NODE_PROPERTY",
       options: function() {
         return {
           id: context.node1,
@@ -299,7 +362,7 @@ export default function(args = {}) {
       }
     },
     {
-      operation: UPDATE_NODE_PROPERTY,
+      operation: "UPDATE_NODE_PROPERTY",
       options: function() {
         return {
           id: context.node2,

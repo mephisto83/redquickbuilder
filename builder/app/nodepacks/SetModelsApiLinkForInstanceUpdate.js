@@ -52,6 +52,30 @@ export default function(args = {}) {
           );
       });
     });
+
+    let eventMethods = GetNodesLinkedTo(graph, {
+      id: component.id,
+      link: LinkType.EventMethod
+    });
+    eventMethods.map(eventMethod => {
+      let eventMethodInstances = GetNodesLinkedTo(graph, {
+        id: eventMethod.id,
+        link: LinkType.EventMethodInstance
+      });
+      eventMethodInstances.map(eventMethodInstance => {
+        let link = GetLinkBetween(
+          eventMethod.id,
+          eventMethodInstance.id,
+          graph
+        );
+        if (link)
+          result.push(
+            ...SetLinkInstanceUpdateTrue({
+              link: link.id
+            })
+          );
+      });
+    });
   });
 
   return result;
