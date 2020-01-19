@@ -624,7 +624,7 @@ export default class MindMap extends Component {
           return d.y + h / 2 - d.height + -pad / 2 - iconSize;
         });
     }
-    let initialUnconstrainedIterations = this.props.linkDistance || 280;
+    let initialUnconstrainedIterations = 100;
     let initialUserConstraintIterations = 15;
     let initialAllConstraintsIterations = 20;
     let gridSnapIterations = null;
@@ -632,12 +632,12 @@ export default class MindMap extends Component {
     let centerGraph = true;
 
     force.start(
-      null && initialUnconstrainedIterations,
-      initialUserConstraintIterations,
-      null && initialAllConstraintsIterations,
-      null && gridSnapIterations,
-      keepRunning,
-      centerGraph
+      // initialUnconstrainedIterations,
+      // initialUserConstraintIterations,
+      // initialAllConstraintsIterations,
+      // null && gridSnapIterations,
+      // keepRunning,
+      // centerGraph
     );
   }
   buildNode(graph, cola, color) {

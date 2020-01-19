@@ -4056,7 +4056,6 @@ export const CreateDefaultView = {
         }
       }
       if (isList) {
-        debugger;
         if (newItems.listDataChainExitId && newItems.listDataChainExitGroupId) {
           PerformGraphOperation(
             AppendGetIdsToDataChain({

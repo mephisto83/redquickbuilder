@@ -122,6 +122,12 @@ export function getGroupGuids(str = "") {
     .flatten()
     .filter(x => x);
 }
+export function getNodePropertyGuids(obj) {
+  let str = JSON.stringify(obj);
+  let guids = getGuids(str).unique();
+
+  return guids;
+}
 export function processRecording(str) {
   let guids = getGuids(str).unique();
   let groupGuids = getGroupGuids(str).unique();

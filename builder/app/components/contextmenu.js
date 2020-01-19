@@ -36,7 +36,7 @@ import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
 import NavigateBack from "../nodepacks/NavigateBack";
 import TreeViewItemContainer from "./treeviewitemcontainer";
-import { getLinkInstance } from "../methods/graph_methods";
+import { getLinkInstance, GetNodesLinkedTo } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
 import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService";
@@ -668,6 +668,106 @@ class ContextMenu extends Component {
             />
           </TreeViewMenu>
         ];
+      case NodeTypes.Permission:
+        // getNodePropertyGuids()
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, NodeTypes.Permission)}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual(NodeTypes.Permission);
+            }}
+          >
+            <TreeViewItemContainer>
+              <SelectInput
+                options={UIA.NodesByType(this.props.state, NodeTypes.Permission)
+                  .toNodeSelect()
+                  .filter(x => x.id !== currentNode.id)}
+                label={Titles.CopyPermissionConditions}
+                onChange={value => {
+                  this.setState({ permission: value });
+                }}
+                value={this.state.permission}
+              />
+            </TreeViewItemContainer>
+            {this.state.permission ? (
+              <TreeViewMenu
+                title={Titles.Execute}
+                hideArrow={true}
+                onClick={() => {
+                  let conditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                    id: this.state.permission,
+                    link: LinkType.Condition
+                  }).map(v => UIA.GetNodeProp(v, NodeProperties.Condition));
+                  let method = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                    id: this.state.permission,
+                    link: LinkType.FunctionOperator
+                  }).find(x => x);
+                  let currentConditions = GetNodesLinkedTo(
+                    UIA.GetCurrentGraph(),
+                    {
+                      id: currentNode.id,
+                      link: LinkType.Condition
+                    }
+                  );
+                  let currentNodeMethod = GetNodesLinkedTo(
+                    UIA.GetCurrentGraph(),
+                    {
+                      id: currentNode.id,
+                      link: LinkType.FunctionOperator
+                    }
+                  ).find(x => x);
+                  let functionType = UIA.GetNodeProp(
+                    method,
+                    NodeProperties.FunctionType
+                  );
+                  let currentNodeMethodFunctionType = UIA.GetNodeProp(
+                    currentNodeMethod,
+                    NodeProperties.FunctionType
+                  );
+                  let result = [];
+                  currentConditions.map(cc => {
+                    result.push({
+                      operation: UIA.REMOVE_NODE,
+                      options: function() {
+                        return {
+                          id: cc.id
+                        };
+                      }
+                    });
+                  });
+                  conditions.map(condition => {
+                    result.push({
+                      operation: UIA.ADD_NEW_NODE,
+                      options: function() {
+                        let temp = JSON.parse(JSON.stringify(condition));
+                        temp.methods[currentNodeMethodFunctionType] =
+                          temp.methods[functionType];
+                        delete temp.methods[functionType];
+                        return {
+                          nodeType: NodeTypes.Condition,
+                          properties: {
+                            [NodeProperties.Condition]: temp
+                          },
+                          parent: currentNode.id,
+                          groupProperties: {},
+                          linkProperties: {
+                            properties: {
+                              ...LinkProperties.ConditionLink
+                            }
+                          }
+                        };
+                      }
+                    });
+                  });
+                  this.props.graphOperation(result);
+                }}
+              />
+            ) : null}
+          </TreeViewMenu>
+        ];
     }
     return [];
   }
@@ -719,8 +819,8 @@ class ContextMenu extends Component {
     switch (currentNodeType) {
       case NodeTypes.Condition:
         return this.getConditionMenu();
-      case NodeTypes.Model:
-        return this.getModelMenu();
+      // case NodeTypes.Model:
+      //   return this.getModelMenu();
       case NodeTypes.ViewType:
         return this.getViewTypes();
       case NodeTypes.ComponentExternalApi:
