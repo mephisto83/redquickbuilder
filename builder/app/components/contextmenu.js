@@ -817,14 +817,14 @@ class ContextMenu extends Component {
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
     switch (currentNodeType) {
-      case NodeTypes.Condition:
-        return this.getConditionMenu();
-      // case NodeTypes.Model:
-      //   return this.getModelMenu();
-      case NodeTypes.ViewType:
-        return this.getViewTypes();
-      case NodeTypes.ComponentExternalApi:
-        return this.getComponentExternalMenu(currentNode);
+      // case NodeTypes.Condition:
+      //   return this.getConditionMenu();
+      // // case NodeTypes.Model:
+      // //   return this.getModelMenu();
+      // case NodeTypes.ViewType:
+      //   return this.getViewTypes();
+      // case NodeTypes.ComponentExternalApi:
+      //   return this.getComponentExternalMenu(currentNode);
       case NodeTypes.ComponentNode:
       case NodeTypes.Screen:
       case NodeTypes.ScreenOption:
@@ -1089,7 +1089,6 @@ class ContextMenu extends Component {
             zIndex: 1000,
             position: "fixed",
             width: 250,
-            height: 400,
             display,
             top: 250,
             left: 500

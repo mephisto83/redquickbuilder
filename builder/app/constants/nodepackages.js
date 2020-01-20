@@ -62,7 +62,8 @@ import {
   addInstanceFunc,
   connectLifeCycleMethod,
   GetComponentExternalApiNode,
-  GetComponentInternalApiNode
+  GetComponentInternalApiNode,
+  GetNodeCode
 } from "../actions/uiactions";
 import {
   newNode,
@@ -1787,7 +1788,7 @@ export const CreateDefaultView = {
                   model_view_name: `${viewName} Load ${GetNodeTitle(
                     currentNode
                   )}`,
-                  model_item: `Models.${GetNodeTitle(currentNode)}`,
+                  model_item: `Models.${GetCodeName(currentNode)}`,
                   callback: context => {
                     newItems.dataChainForLoading = context.entry;
                   }
@@ -4071,50 +4072,52 @@ export const CreateDefaultView = {
             viewPackage: viewPackage[NodeProperties.ViewPackage]
           })
         )(GetDispatchFunc(), GetStateFunc());
-        if (isList) {
-          PerformGraphOperation(
-            SetupViewModelOnScreen({
-              model: currentNode.id,
-              screen: screenNodeId
-            })
-          )(GetDispatchFunc(), GetStateFunc());
-        } else {
-          let modelView_DataChain;
-          PerformGraphOperation([
-            ...GetModelViewModelForUpdate({
-              screen: GetNodeTitle(screenNodeId),
-              viewModel: screenNodeId,
-              callback: ctx => {
-                let { entry } = ctx;
-                modelView_DataChain = entry;
-              }
-            }),
-            function(graph) {
-              let externalNode = GetNodesLinkedTo(graph, {
-                id: screenNodeId,
-                link: LinkType.ComponentExternalApi
-              }).find(
-                x =>
-                  GetNodeProp(x, NodeProperties.NODEType) ===
-                    NodeTypes.ComponentExternalApi &&
-                  GetNodeTitle(x) === ApiNodeKeys.ViewModel
-              );
-              return [
-                {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
-                    return {
-                      target: modelView_DataChain,
-                      source: externalNode.id,
-                      properties: {
-                        ...LinkProperties.DataChainLink
-                      }
-                    };
-                  }
+        if (!isSharedComponent) {
+          if (isList) {
+            PerformGraphOperation(
+              SetupViewModelOnScreen({
+                model: currentNode.id,
+                screen: screenNodeId
+              })
+            )(GetDispatchFunc(), GetStateFunc());
+          } else {
+            let modelView_DataChain;
+            PerformGraphOperation([
+              ...GetModelViewModelForUpdate({
+                screen: GetNodeTitle(screenNodeId),
+                viewModel: screenNodeId,
+                callback: ctx => {
+                  let { entry } = ctx;
+                  modelView_DataChain = entry;
                 }
-              ];
-            }
-          ])(GetDispatchFunc(), GetStateFunc());
+              }),
+              function(graph) {
+                let externalNode = GetNodesLinkedTo(graph, {
+                  id: screenNodeId,
+                  link: LinkType.ComponentExternalApi
+                }).find(
+                  x =>
+                    GetNodeProp(x, NodeProperties.NODEType) ===
+                      NodeTypes.ComponentExternalApi &&
+                    GetNodeTitle(x) === ApiNodeKeys.ViewModel
+                );
+                return [
+                  {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function() {
+                      return {
+                        target: modelView_DataChain,
+                        source: externalNode.id,
+                        properties: {
+                          ...LinkProperties.DataChainLink
+                        }
+                      };
+                    }
+                  }
+                ];
+              }
+            ])(GetDispatchFunc(), GetStateFunc());
+          }
         }
       }
 

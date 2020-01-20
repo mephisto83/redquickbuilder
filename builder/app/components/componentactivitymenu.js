@@ -13,7 +13,8 @@ import {
   NodeProperties,
   MAIN_CONTENT,
   LAYOUT_VIEW,
-  LinkProperties
+  LinkProperties,
+  UITypes
 } from "../constants/nodetypes";
 import SelectInput from "./selectinput";
 import {
@@ -208,7 +209,9 @@ class ComponentActivityMenu extends Component {
           TARGET
         )
       : null;
-    let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
+    let _ui_type =
+      UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType) ||
+      UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType);
     let componentTypes = ComponentTypes[_ui_type] || {};
     let componentType = UIA.GetNodeProp(
       currentNode,
@@ -259,7 +262,7 @@ class ComponentActivityMenu extends Component {
           } else if (prop_obj.boolean) {
             components.push(
               <CheckBox
-                label={' Use Parameter in url '}
+                label={" Use Parameter in url "}
                 value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
                 onChange={value => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -287,6 +290,21 @@ class ComponentActivityMenu extends Component {
               onChange={value => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.Label,
+                  id: currentNode.id,
+                  value
+                });
+              }}
+            />
+            <SelectInput
+              label={Titles.UIType}
+              options={Object.keys(UITypes).map(t => ({
+                title: t,
+                value: t
+              }))}
+              value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)}
+              onChange={value => {
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.UIType,
                   id: currentNode.id,
                   value
                 });
