@@ -37,7 +37,7 @@ export function GenerateSelectorFunctions() {
 
   return nodes.map(node => {
     return GenerateSelectorFunction(node);
-  });
+  }).unique();
 }
 export function GenerateSelectorFunction(node) {
   let _parts = GetSelectorsNodes(node.id);

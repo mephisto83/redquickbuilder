@@ -63,7 +63,8 @@ import {
   connectLifeCycleMethod,
   GetComponentExternalApiNode,
   GetComponentInternalApiNode,
-  GetNodeCode
+  GetNodeCode,
+  ADD_LINKS_BETWEEN_NODES
 } from "../actions/uiactions";
 import {
   newNode,
@@ -3439,20 +3440,36 @@ export const CreateDefaultView = {
             evt: uiType === UITypes.ReactNative ? "onPress" : "onClick"
           })
         )(GetDispatchFunc(), GetStateFunc());
-
+        let selectorNode = GetNodesByProperties({
+          [NodeProperties.Model]: currentNode.id,
+          [NodeProperties.NODEType]: NodeTypes.Selector
+          //  [NodeProperties.IsShared]: isSharedComponent,
+          // [NodeProperties.InstanceType]: useModelInstance
+        }).find(x => x);
         PerformGraphOperation([
           {
-            operation: ADD_NEW_NODE,
+            operation: selectorNode ? ADD_LINKS_BETWEEN_NODES : ADD_NEW_NODE,
             options: function(graph) {
-              let selectorNode = GetNodesByProperties({
-                [NodeProperties.Model]: currentNode.id,
-                [NodeProperties.NODEType]: NodeTypes.Selector,
-                [NodeProperties.IsShared]: isSharedComponent,
-                [NodeProperties.InstanceType]: useModelInstance
-              }).find(x => x);
               if (selectorNode) {
                 modelComponentSelectors.push(selectorNode.id);
-                return false;
+                return {
+                  links: [
+                    ...vmsIds()
+                      .filter(x => x)
+                      .map(t => ({
+                        target: t,
+                        source: selectorNode.id,
+                        properties: {
+                          ...LinkProperties.SelectorLink
+                        }
+                      })),
+                    {
+                      source: selectorNode.id,
+                      target: currentNode.id,
+                      properties: { ...LinkProperties.ModelTypeLink }
+                    }
+                  ]
+                };
               }
               return {
                 nodeType: NodeTypes.Selector,
@@ -3463,8 +3480,8 @@ export const CreateDefaultView = {
                   }`,
                   [NodeProperties.Model]: currentNode.id,
                   [NodeProperties.Pinned]: false,
-                  [NodeProperties.IsShared]: isSharedComponent,
-                  [NodeProperties.InstanceType]: useModelInstance
+                  // [NodeProperties.IsShared]: isSharedComponent,
+                  // [NodeProperties.InstanceType]: useModelInstance
                 },
                 links: [
                   ...vmsIds()

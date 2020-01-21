@@ -14,9 +14,14 @@ export default function(args = {}) {
     node9: uuidv4(),
     node10: uuidv4(),
     node11: uuidv4(),
-    node12: uuidv4()
+    node12: uuidv4(),
+    name: args.name || "Dashboard"
   };
-  let { viewPackages = {} } = args;
+  let {
+    viewPackages = {
+      [NodeProperties.ViewPackage]: uuidv4()
+    }
+  } = args;
   let result = [
     function(graph) {
       return [
@@ -37,7 +42,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Dashboard"
+            value: "" + context.name + ""
           }
         }
       ];
@@ -110,7 +115,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node1,
-            value: "Dashboard IO"
+            value: "" + context.name + " IO"
           }
         }
       ];
@@ -1548,7 +1553,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node2,
-            value: "Dashboard IO Title"
+            value: "" + context.name + " IO Title"
           }
         }
       ];
@@ -1841,9 +1846,23 @@ export default function(args = {}) {
       }
     }
   ];
+  let applyViewPackages = [
+    ...["node0", "node1", "node2"].map(v => {
+      return {
+        operation: UPDATE_NODE_PROPERTY,
+        options: function() {
+          return {
+            id: context[v],
+            properties: viewPackages
+          };
+        }
+      };
+    })
+  ];
   return [
     ...result,
     ...clearPinned,
+    ...applyViewPackages,
     function() {
       if (context.callback) {
         context.entry = context.node0;

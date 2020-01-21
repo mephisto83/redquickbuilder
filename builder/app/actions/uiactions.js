@@ -3217,6 +3217,7 @@ export const NEW_PROPERTY_NODE = "NEW_PROPERTY_NODE";
 export const NEW_PERMISSION_NODE = "NEW_PERMISSION_NODE";
 export const NEW_ATTRIBUTE_NODE = "NEW_ATTRIBUTE_NODE";
 export const ADD_LINK_BETWEEN_NODES = "ADD_LINK_BETWEEN_NODES";
+export const ADD_LINKS_BETWEEN_NODES = "ADD_LINKS_BETWEEN_NODES";
 export const NEW_CONDITION_NODE = "NEW_CONDITION_NODE";
 export const ADD_NEW_NODE = "ADD_NEW_NODE";
 export const REMOVE_LINK_BETWEEN_NODES = "REMOVE_LINK_BETWEEN_NODES";
@@ -3503,6 +3504,12 @@ export function graphOperation(operation, options) {
                       options
                     );
                     break;
+                  case ADD_LINKS_BETWEEN_NODES:
+                    currentGraph = GraphMethods.addLinksBetweenNodes(
+                      currentGraph,
+                      options
+                    );
+                    break;
                   case CONNECT_TO_TITLE_SERVICE:
                     let titleService = GetTitleService(currentGraph);
                     if (titleService) {
@@ -3590,7 +3597,7 @@ export function graphOperation(operation, options) {
                     currentGraph = GraphMethods.updateNodeProperties(
                       currentGraph,
                       options
-                    )
+                    );
                     break;
                   case NEW_CONDITION_NODE:
                     currentGraph = GraphMethods.addNewNodeOfType(

@@ -2442,6 +2442,15 @@ export function addLink(graph, options, link) {
   }
   return graph;
 }
+export function addLinksBetweenNodes(graph, options) {
+  let { links } = options;
+  if (links && links.length) {
+    links.map(link => {
+      graph = addLinkBetweenNodes(graph, link);
+    });
+  }
+  return graph;
+}
 export function addLinkBetweenNodes(graph, options) {
   let { target, source, properties } = options;
   if (target !== source && target) {
