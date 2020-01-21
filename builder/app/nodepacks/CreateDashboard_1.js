@@ -1,4 +1,6 @@
 import { uuidv4 } from "../utils/array";
+import { NodeProperties } from "../constants/nodetypes";
+import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
 export default function(args = {}) {
   // node3,node4,node5,node6,node7,node8,node9,node10,node11,node12
 

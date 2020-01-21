@@ -45,6 +45,8 @@ import AddButtonToComponent from "../nodepacks/AddButtonToComponent";
 import GetScreenValueParameter from "../nodepacks/GetScreenValueParameter";
 import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChainToCompontApiConnector";
 import CreateNavigateToScreenDC from "../nodepacks/CreateNavigateToScreenDC";
+import TextInput from "./textinput";
+import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -52,7 +54,7 @@ class ContextMenu extends Component {
     this.state = {};
   }
   getMenuMode(mode) {
-    let result = [];
+    let result = [...this.generalMenu()];
     let exit = () => {
       this.props.setVisual(UIA.CONTEXT_MENU_MODE, null);
     };
@@ -265,6 +267,58 @@ class ContextMenu extends Component {
           })}
       </TreeViewMenu>
     );
+  }
+  generalMenu() {
+    let { state } = this.props;
+    return [
+      <TreeViewMenu
+        open={UIA.Visual(state, "GENERAL_MENU")}
+        active={true}
+        title={Titles.Operations}
+        innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+        toggle={() => {
+          this.props.toggleVisual("GENERAL_MENU");
+        }}
+      >
+        <TreeViewMenu
+          title={`Create Dashboard`}
+          open={UIA.Visual(state, `Create Dashboard`)}
+          active={true}
+          onClick={() => {
+            // this.props.graphOperation(GetModelViewModelForList({}));
+            this.props.toggleVisual(`Create Dashboard`);
+          }}
+        >
+          <TreeViewItemContainer>
+            <TextInput
+              immediate={true}
+              label={Titles.Name}
+              placeholder={Titles.EnterName}
+              onChange={value => {
+                this.setState({
+                  dashboard: value
+                });
+              }}
+              value={this.state.dashboard}
+            />
+          </TreeViewItemContainer>
+          {this.state.dashboard ? (
+            <TreeViewMenu
+              title={Titles.Execute}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  CreateDashboard_1({
+                    name: this.state.dashboard
+                  })
+                );
+                this.setState({ dashboard: "" });
+              }}
+            />
+          ) : null}
+        </TreeViewMenu>
+      </TreeViewMenu>
+    ];
   }
   operations() {
     var { state } = this.props;
@@ -856,6 +910,13 @@ class ContextMenu extends Component {
           hideArrow={true}
           onClick={() => {
             this.props.addComponentApiNodes(currentNode.id, "value");
+          }}
+        />
+        <TreeViewMenu
+          title={`${Titles.Add} ViewModel`}
+          hideArrow={true}
+          onClick={() => {
+            this.props.addComponentApiNodes(currentNode.id, "viewModel");
           }}
         />
       </TreeViewMenu>

@@ -960,7 +960,7 @@ class Dashboard extends Component {
                   {rootGraph ? <NavBarButton title={Titles.SaveAs} icon={'fa fa-cloud-upload'} onClick={() => {
                     this.props.saveGraphToFile();
                   }} /> : null}
-                  {rootGraph && rootGraph.fileName ? <NavBarButton title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                  {rootGraph && rootGraph.graphFile ? <NavBarButton title={Titles.Save} icon={'fa fa-save'} onClick={() => {
                     this.props.saveGraph();
                   }} /> : null}
                   {rootGraph ? <NavBarButton title={Titles.Scaffold} icon={'fa fa-building'} onClick={() => {
