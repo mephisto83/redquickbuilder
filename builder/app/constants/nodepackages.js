@@ -5671,7 +5671,6 @@ function setModelPropertyViewTypePropNode(
 
 function setupPropertyApi(args) {
   var {
-    newItems,
     childId,
     apiList,
     viewPackage,
@@ -5679,15 +5678,11 @@ function setupPropertyApi(args) {
     propertyIndex,
     propDataChainNodeId,
     viewName,
-    modelProperty,
     apiDataChainLists,
     useModelInstance,
-    viewName,
     modelProperty,
     currentNode,
     modelComponentSelectors,
-    apiList,
-    apiDataChainLists,
     viewType,
     uiType,
     newItems
