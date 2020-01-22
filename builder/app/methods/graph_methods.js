@@ -14,12 +14,12 @@ import {
   LinkEvents
 } from "../constants/nodetypes";
 import {
-  Functions,
   FunctionTemplateKeys,
   FunctionConstraintKeys,
   FUNCTION_REQUIREMENT_KEYS,
   INTERNAL_TEMPLATE_REQUIREMENTS
 } from "../constants/functiontypes";
+import * as Functions from '../constants/functiontypes';
 import {
   GetNodeProp,
   GetLinkProperty,

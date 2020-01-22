@@ -31,10 +31,10 @@ import {
   createEventProp,
   GetNode,
   removeValidator,
-  removeValidatorValidation,
-  uuidv4
+  removeValidatorValidation
 } from "../methods/graph_methods";
 import SideBarMenu from "./sidebarmenu";
+import { uuidv4 } from "../utils/array";
 
 class ValidatorPropertyActivityMenu extends Component {
   render() {
