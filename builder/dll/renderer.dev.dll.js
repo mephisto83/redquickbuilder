@@ -207,6 +207,18 @@ eval("module.exports = react-dom;\n\n//# sourceURL=webpack://renderer/external_%
 
 /***/ }),
 
+/***/ "react-draggable":
+/*!**********************************!*\
+  !*** external "react-draggable" ***!
+  \**********************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports) {
+
+eval("module.exports = react-draggable;\n\n//# sourceURL=webpack://renderer/external_%22react-draggable%22?");
+
+/***/ }),
+
 /***/ "react-hot-loader":
 /*!***********************************!*\
   !*** external "react-hot-loader" ***!

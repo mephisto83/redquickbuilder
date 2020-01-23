@@ -348,6 +348,7 @@ export const Update_Object_Agent_Value__Object = "Update Object by Agent";
 export const Update_Object_Agent_Value__Object_With_Object =
   "Update Object by Agent with object";
 export const CopyPermissionConditions = "Copy Permission Conditions";
+export const CopyValidationConditions = "Copy Validation Conditions";
 export const Functions = "Functions";
 export const Login = "Login";
 export const DeleteAllSelected = "Delete All Selected";

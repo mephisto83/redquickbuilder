@@ -125,7 +125,7 @@ function createElectronIo () {
       let port = Math.floor(Math.random() * 30000) + 1000
       packageJson.scripts.dev = devScript.replace(
         /START_HOT=1/g,
-        'START_HOT=1 PORT=' + 1231
+        'START_HOT=1 PORT=' + port
       )
       fs.writeFileSync(packagejsonfilepath, JSON.stringify(packageJson), 'utf8')
     })

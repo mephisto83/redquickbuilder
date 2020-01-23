@@ -434,6 +434,20 @@ ${interfaceFunctions.join(NEW_LINE)}
               solutionName + path.join(".Controllers")
             )
           );
+
+          generateFolderStructure(
+            path.join(
+              `./app/templates/net_core_mvc/identity/RedQuickTests`
+            ),
+            {
+              namespace
+            },
+            null,
+            path.join(
+              path.join(workspace, root.title, "netcore"),
+              solutionName + path.join(".Tests")
+            )
+          );
         }
       })
       .then(() => {

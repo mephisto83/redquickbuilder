@@ -1341,7 +1341,10 @@ export function GenerateChainFunctions(options) {
       return true;
     })
     .map(x => x.id);
-  return entryNodes.map(GenerateChainFunction).join(NodeConstants.NEW_LINE);
+  return entryNodes
+    .map(GenerateChainFunction)
+    .unique(x => x)
+    .join(NodeConstants.NEW_LINE);
 }
 
 export function GetComponentExternalApiNode(api, parent, graph) {

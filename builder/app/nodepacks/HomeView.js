@@ -312,7 +312,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node4,
-            value: "Authenticate Button"
+            value: "Register"
           }
         }
       ];
@@ -388,7 +388,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node5,
-            value: "Register Button"
+            value: "Authenticate"
           }
         }
       ];
