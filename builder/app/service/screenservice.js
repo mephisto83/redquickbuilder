@@ -105,7 +105,9 @@ export function GenerateScreenMarkup(id, language) {
       title: `"${GetNodeTitle(screen)}"`,
       imports: imports.join(NEW_LINE),
       elements: elements.join(NEW_LINE),
-      component_did_update: GetComponentDidUpdate(screenOption),
+      component_did_update: GetComponentDidUpdate(screenOption, {
+        isScreen: true
+      }),
       component_did_mount: GetComponentDidMount(screenOption)
     });
   }
@@ -1428,18 +1430,24 @@ export function getUpdateFunctionOption(
   }
   return addiontionalParams;
 }
-export function GetComponentDidUpdate(parent) {
+export function GetComponentDidUpdate(parent, options = {}) {
+  let { isScreen } = options;
   let describedApi = "";
   if (parent) {
     describedApi = WriteDescribedStateUpdates(parent).trim();
   }
 
-  let componentDidUpdate = `componentDidUpdate(prevProps) {
+  let componentDidUpdate =
+    `componentDidUpdate(prevProps) {
         this.captureValues();
       }
-      componentDidMount(prevProps) {
+      ` +
+    (!isScreen
+      ? `componentDidMount(prevProps) {
         this.captureValues();
-      }
+      }`
+      : "") +
+    `
       captureValues(){
         ${describedApi}
       }`;
@@ -1478,6 +1486,7 @@ export function GetComponentDidMount(screenOption) {
 
   let componentDidMount = `componentDidMount(value) {
         this.props.setGetState();
+        this.captureValues();
         ${outOfBandCall}
         ${invocations}
 {{handles}}

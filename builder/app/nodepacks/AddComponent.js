@@ -155,71 +155,6 @@ export default function(args = {}) {
           }
         }
       ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "ADD_NEW_NODE",
-          options: {
-            nodeType: "EventMethod",
-            properties: {
-              EventType: "onClick",
-              text: "onClick"
-            },
-            links: [
-              function(graph) {
-                return [
-                  {
-                    target: context.node1,
-                    linkProperties: {
-                      properties: {
-                        type: "EventMethod",
-                        EventMethod: {}
-                      }
-                    }
-                  }
-                ];
-              }
-            ],
-            callback: function(node) {
-              context.node4 = node.id;
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "ADD_NEW_NODE",
-          options: {
-            nodeType: "EventMethodInstance",
-            parent: context.node4,
-            groupProperties: {},
-            linkProperties: {
-              properties: {
-                type: "EventMethodInstance",
-                EventMethodInstance: {}
-              }
-            },
-            properties: {
-              text: "onClick Instance",
-              Pinned: false,
-              AutoDelete: {
-                properties: {
-                  nodeType: "component-api-connector"
-                }
-              }
-            },
-            callback: function(node, graph, group) {
-              context.node5 = node.id;
-              context.group1 = group;
-            }
-          }
-        }
-      ];
     }
   ];
   let clearPinned = !args.clearPinned
@@ -251,26 +186,6 @@ export default function(args = {}) {
             return {
               prop: "Pinned",
               id: context.node3,
-              value: false
-            };
-          }
-        },
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node4,
-              value: false
-            };
-          }
-        },
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node5,
               value: false
             };
           }

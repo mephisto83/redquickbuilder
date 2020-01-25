@@ -47,6 +47,9 @@ import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChain
 import CreateNavigateToScreenDC from "../nodepacks/CreateNavigateToScreenDC";
 import TextInput from "./textinput";
 import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
+import { ComponentTypes } from "../constants/componenttypes";
+import AddComponent from "../nodepacks/AddComponent";
+import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -326,6 +329,89 @@ class ContextMenu extends Component {
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 
     switch (currentNodeType) {
+      case NodeTypes.DataChain:
+        //DataChain_SelectPropertyValue
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              title={`Select Model Property`}
+              open={UIA.Visual(state, `Select Model Property`)}
+              active={true}
+              onClick={() => {
+                // this.props.graphOperation(GetModelViewModelForList({}));
+                this.props.toggleVisual(`Select Model Property`);
+              }}
+            >
+              <TreeViewItemContainer>
+                <TextInput
+                  label={Titles.Name}
+                  immediate={true}
+                  onChange={value => {
+                    this.setState({
+                      name: value
+                    });
+                  }}
+                  value={this.state.name}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Models}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Model
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      model: value
+                    });
+                  }}
+                  value={this.state.model}
+                />
+              </TreeViewItemContainer>
+              {this.state.model ? (
+                <TreeViewItemContainer>
+                  <SelectInput
+                    label={Titles.Properties}
+                    options={UIA.GetModelPropertyChildren(
+                      this.state.model
+                    ).toNodeSelect()}
+                    onChange={value => {
+                      this.setState({
+                        property: value
+                      });
+                    }}
+                    value={this.state.property}
+                  />
+                </TreeViewItemContainer>
+              ) : null}
+              {this.state.model && this.state.name && this.state.property ? (
+                <TreeViewMenu
+                  title={Titles.Execute}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation([
+                      ...DataChain_SelectPropertyValue({
+                        name: this.state.name,
+                        dataChain: currentNode.id,
+                        model: this.state.model,
+                        property: this.state.property
+                      })
+                    ]);
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
+          </TreeViewMenu>
+        ];
       case NodeTypes.ComponentApiConnector:
         let temp;
         return [
@@ -720,6 +806,44 @@ class ContextMenu extends Component {
                 );
               }}
             />
+            <TreeViewMenu
+              open={UIA.Visual(state, "Adding Component")}
+              active={true}
+              title={Titles.AddComponentNew}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("Adding Component");
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={Object.keys(ComponentTypes.ReactNative).map(v => ({
+                    title: v,
+                    id: v,
+                    value: v
+                  }))}
+                  label={Titles.ComponentType}
+                  onChange={value => {
+                    this.setState({ componentType: value });
+                  }}
+                  value={this.state.componentType}
+                />
+              </TreeViewItemContainer>
+              {this.state.componentType ? (
+                <TreeViewMenu
+                  title={`${Titles.Add} ${this.state.componentType}`}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      AddComponent({
+                        component: currentNode.id,
+                        componentType: this.state.componentType
+                      })
+                    );
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
           </TreeViewMenu>
         ];
       case NodeTypes.Validator:
