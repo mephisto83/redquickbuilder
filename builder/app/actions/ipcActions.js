@@ -270,14 +270,14 @@ export function scaffoldProject(options = {}) {
                 v => `${GetCodeName(v)}Executor`,
                 v => `I${GetCodeName(v)}Executor`
               ),
-              orchestration_registrations:CreateRegistrations(
+              orchestration_registrations: CreateRegistrations(
                 NodesByType(null, NodeTypes.Model).filter(x =>
                   GetNodeProp(x, NodeProperties.IsAgent)
                 ),
                 v => `${GetCodeName(v)}StreamProcessOrchestration`,
                 v => `I${GetCodeName(v)}StreamProcessOrchestration`
               ),
-              validation_registrations:CreateRegistrations(
+              validation_registrations: CreateRegistrations(
                 NodesByType(null, NodeTypes.Model).filter(x =>
                   GetNodeProp(x, NodeProperties.IsAgent)
                 ),
@@ -436,9 +436,7 @@ ${interfaceFunctions.join(NEW_LINE)}
           );
 
           generateFolderStructure(
-            path.join(
-              `./app/templates/net_core_mvc/identity/RedQuickTests`
-            ),
+            path.join(`./app/templates/net_core_mvc/identity/RedQuickTests`),
             {
               namespace
             },
@@ -586,6 +584,7 @@ function generateFiles(workspace, solutionName, state) {
     NodeTypes.Model,
     NodeTypes.ExtensionType,
     NodeTypes.Maestro,
+    NodeTypes.FetchService,
     ...Object.values(GeneratedTypes)
   ];
   let root = GetRootGraph(state);
@@ -686,6 +685,7 @@ const CodeTypeToArea = {
   [NodeTypes.Controller]: path.join(".Web", "Controllers"),
   [NodeTypes.Model]: ".Models",
   [NodeTypes.ExtensionType]: ".Models",
+  [NodeTypes.FetchService]: path.join(".Web", "Controllers"),
   [NodeTypes.Maestro]: ".Controllers",
   [GeneratedTypes.ChangeParameter]: ".Models",
   [GeneratedTypes.ChangeResponse]: ".Models",

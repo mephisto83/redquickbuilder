@@ -38,6 +38,8 @@ export const ViewTypes = "View Types";
 export const List = "List";
 export const All = "All";
 export const DataChain = "Data Chain";
+export const SetFetchServiceOutput = 'Set Fetch Service Output';
+export const AddMethod= 'Add Method';
 export const ComponentPropertyMenu = "Component Properties";
 export const ComponentAPIMenu = "Component API";
 export const Domain = "Domain";
@@ -310,6 +312,7 @@ export const Create_Object_Agent_Many_to_Many_CompositeInput__Object =
 export const Create_Object__Object = "Create Object => Object";
 export const Update_Object_With_User = "Update Object => Object";
 export const Create_Object_With_User = "Create Object with User";
+export const GetObjectsFromLIstOfIds ='Get Objects From List of IDs';
 export const AddAllProperties = "Add all properties";
 export const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
 

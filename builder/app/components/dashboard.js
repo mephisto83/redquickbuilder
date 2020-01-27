@@ -259,6 +259,28 @@ class Dashboard extends Component {
             icon: 'fa fa-list',
             title: 'Add All of [Type] list'
           }];
+        case NodeTypes.FetchService:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.FetchService,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa fa-bicycle',
+            title: Titles.AddMethod
+          },{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.FetchServiceOuput,
+                singleLink: true,
+                nodeTypes: [NodeTypes.Model]
+              });
+            },
+            icon: 'fa fa-plug',
+            title: Titles.SetFetchServiceOutput
+          });
+          return result;
         case NodeTypes.ComponentExternalApi:
           result.push({
             onClick: () => {

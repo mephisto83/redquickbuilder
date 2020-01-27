@@ -35,8 +35,9 @@ import ReactNativeConfiguration from "./configurationgenerator";
 import ReactNativeControllerActions from "./controlleractionsgenerator";
 import ReactNativeDataChainFunctions from "./datachaingenerator";
 import ReactNativeSelectorFunctions from "./selectorgenerator";
-import ReactNativeLists from './listsgenerator';
+import ReactNativeLists from "./listsgenerator";
 import ValidatorGenerator from "./validatorgenerator";
+import FetchServiceGenerator from "./fetchservicegenerator";
 export default class Generator {
   static generate(options) {
     var { state, type, key, language } = options;
@@ -44,6 +45,8 @@ export default class Generator {
       case NodeTypes.Controller:
         let temp = ControllerGenerator.Generate({ state, key, language });
         return temp;
+      case NodeTypes.FetchService:
+        return FetchServiceGenerator.Generate({ state, key, language });
       case NodeTypes.Model:
         return ModelGenerator.Generate({ state, key, language });
       case NodeTypes.ExtensionType:

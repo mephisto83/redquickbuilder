@@ -12,7 +12,8 @@ export const FunctionTypes = {
     "Get/ManyToMany/Agent/Value => IList<Child>",
   Delete_ManyToMany_Agent_Value__IListChild:
     "Delete/ManyToMany/Agent/Value => IList<Child>",
-
+  // Functions For Getting Data from lists of ids
+  Get_Objects_From_List_Of_Ids: "Get_Objects_From_List_Of_Ids",
   //Functions with List<Child> result
   Create_Parent$Child_Agent_Value__IListChild:
     "Create/Parent-Child/Agent/Value => IList<Child>",
@@ -108,7 +109,8 @@ export const FunctionTemplateKeys = {
   ModelFilter: "model_filter",
   Value: "value",
   CompositeInput: "composite-input",
-  CompositeInputProperty: "composite-input-property"
+  CompositeInputProperty: "composite-input-property",
+  FetchParameter: "fetch_parameter"
 };
 
 export const FunctionConstraintKeys = {
@@ -436,6 +438,10 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT = {
   },
   [FunctionTemplateKeys.Model]: {
     key: FunctionTemplateKeys.Model,
+    nodeTypes: [NodeTypes.Model]
+  },
+  [FunctionTemplateKeys.ModelOutput]: {
+    key: FunctionTemplateKeys.ModelOutput,
     nodeTypes: [NodeTypes.Model]
   },
   [FunctionTemplateKeys.Agent]: {
@@ -784,6 +790,58 @@ export const MethodFunctions = {
     },
     isList: false,
     method: Methods.Update,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS_USER }
+  },
+  [FunctionTypes.Get_Objects_From_List_Of_Ids]: {
+    title: Titles.GetObjectsFromLIstOfIds,
+    titleTemplate: function(t, a) {
+      return `Get ${t}s With IdList by ${a}`;
+    },
+    template: fs.readFileSync(
+      "./app/templates/standard/get_agent_listobject_with_id_list.tpl",
+      "utf-8"
+    ),
+    interface: fs.readFileSync(
+      "./app/templates/standard/get_agent_listobject_with_id_list_interface.tpl",
+      "utf-8"
+    ),
+    controller: fs.readFileSync(
+      "./app/templates/controller/controller_get_all_by_ids.tpl",
+      "utf-8"
+    ), //controller_get_all_by_ids
+    templates: {},
+    permission: {
+      ...PERMISSION_DEFAULTS,
+      params: [FunctionTemplateKeys.Agent]
+    },
+    parameters: {
+      body: true,
+      parameters: false
+    },
+    filter: {
+      ...FILTER_DEFAULTS,
+      params: [
+        FunctionTemplateKeys.Agent,
+        FunctionTemplateKeys.FetchParameter,
+        {
+          key: FunctionTemplateKeys.ModelOutput,
+          metaparameter: FunctionTemplateKeys.ModelOutput
+        }
+      ]
+    },
+    constraints: {
+      ...COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT,
+      [FunctionTemplateKeys.FetchParameter]: {
+        key: FunctionTemplateKeys.FetchParameter,
+        nodeTypes: [NodeTypes.Model]
+      }
+    },
+    output: {
+      ...COMMON_OUTPUT.OBJECT
+    },
+    isList: true,
+    isFetchCompatible: true,
+    method: Methods.GetAll,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS_USER }
   },
   [FunctionTypes.Create_Object_With_User]: {
@@ -1773,6 +1831,43 @@ export function bindTemplate(templateString, data) {
     if (hasTemplate) {
       for (var t in data) {
         var subregex = new RegExp("({{)" + t + "(}})", "g");
+        var val = data[t];
+        templateString = templateString.replace(
+          subregex,
+          val === null || val === undefined ? "" : val
+        );
+      }
+    }
+  } catch (e) {
+    console.log("-------------");
+    console.log(t);
+    console.log(`"${singularSymbol}"`);
+    console.log(`"${templateString}"`);
+    throw e;
+  }
+  return templateString;
+}
+
+export function bindReferenceTemplate(templateString, data) {
+  var singularSymbol = "@";
+  try {
+    var regex = new RegExp(
+      "#({)[A-Za-z0-9_." + singularSymbol + " ,'|]*(})",
+      "g"
+    );
+    var hasTemplate;
+    try {
+      hasTemplate = regex.test(templateString);
+    } catch (e) {}
+    Object.keys(data).map(t => {
+      if (!data[t + "#lower"]) {
+        data[t + "#lower"] = `${data[t]}`.toLowerCase();
+      }
+    });
+
+    if (hasTemplate) {
+      for (var t in data) {
+        var subregex = new RegExp("(#{)" + t + "(})", "g");
         var val = data[t];
         templateString = templateString.replace(
           subregex,

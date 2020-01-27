@@ -5,6 +5,7 @@ import { NavigateTypes } from "../constants/nodetypes";
 import {
   MethodFunctions,
   bindTemplate,
+  bindReferenceTemplate,
   FunctionTemplateKeys,
   ReturnTypes
 } from "../constants/functiontypes";
@@ -14,6 +15,7 @@ import {
 } from "../constants/datachain";
 import { uuidv4 } from "../utils/array";
 import { currentId } from "async_hooks";
+import { getReferenceInserts } from "../utils/utilservice";
 
 var fs = require("fs");
 export const VISUAL = "VISUAL";
@@ -1565,6 +1567,10 @@ export function GenerateDataChainMethod(id) {
   let $screen = GetNodeProp(node, NodeProperties.Screen);
   let userParams = GetNodeProp(node, NodeProperties.UseNavigationParams);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
+  let lambdaInsertArguments = GetNodeProp(
+    node,
+    NodeProperties.LambdaInsertArguments
+  );
   let listReference = GetNodeProp(node, NodeProperties.List);
   let lastpart = "return item;";
   switch (functionType) {
@@ -1643,6 +1649,18 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Map:
       return `($a) => ($a || []).map(${lambda})`;
     case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda)
+        .map(v => v.substr(2, v.length - 3))
+        .unique()
+        .map(insert => {
+          let args = insert.split("|");
+          let property = args[0];
+          let prop = lambdaInsertArguments[property];
+          let node = GetNodeById(prop);
+          lambda = bindReferenceTemplate(lambda, {
+            [property]: GetCodeName(node)
+          });
+        });
       return `${lambda}`;
     case DataChainFunctionKeys.Merge:
       return `() => {

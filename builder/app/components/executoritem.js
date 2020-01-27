@@ -198,6 +198,7 @@ class ExecutorItem extends Component {
                 return functionVariableControl
             }
             else if (validatorItem.arguments && validatorItem.arguments.modelproperty) {
+
                 let modelParameters = function_variables || UIA.GetMethodFilterParameters(currentNode.id, true);
                 let node_value = validatorItem ? validatorItem.node : '';
                 let nodeProperty = validatorItem ? validatorItem.nodeProperty : '';
@@ -428,7 +429,7 @@ class ExecutorItem extends Component {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (validatorItem.arguments.condition) {
-            
+
             let formControll = (<FormControl>
                 <TextInput value={validatorItem && validatorItem.condition ? validatorItem.condition : ''} label={Titles.Condition} onChange={(value) => {
                     if (validatorItem.arguments.condition.type === NodePropertyTypes.INT && isNaN(value)) {

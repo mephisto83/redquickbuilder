@@ -62,7 +62,8 @@ export const NodeTypes = {
   DataChain: "data-chain",
   ServiceInterface: "service-interface",
   ServiceInterfaceMethod: "service-interface-method",
-  ViewModel: "view-model"
+  ViewModel: "view-model",
+  FetchService: "FetchService"
 };
 export const NodeTypeIcons = {};
 export function GetNodeTypeIcon(type) {
@@ -198,7 +199,8 @@ export const NodeTypeColors = {
   [NodeTypes.ComponentExternalApi]: "#2E5266",
   [NodeTypes.NavigationAction]: "#1282A2",
   [NodeTypes.Lists]: "#2DC7FF",
-  [NodeTypes.ClaimService]: "#034748"
+  [NodeTypes.ClaimService]: "#034748",
+  [NodeTypes.FetchService]: "#BA1200"
 };
 
 export const NavigateTypes = {
@@ -270,6 +272,7 @@ export const SelectorPropertyKeys = {
 };
 export const NodeProperties = {
   ViewPackage: "view-package",
+  IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
   DefaultComponentApiValue: "DefaultComponentApiValue",
@@ -469,6 +472,7 @@ export const NodeProperties = {
   UIModelType: "uiModelType",
   DataChainReferences: "DataChainReferences",
   Lambda: "Lambda",
+  LambdaInsertArguments: "LambdaInsertArguments",
   ModelKey: "ModelKey",
   DataChainReference: "DataChainReference",
   NumberParameter: "NumberParameter",
@@ -623,6 +627,8 @@ export const LinkType = {
   MethodApiParameters: "MethodApiParameters",
   DefaultViewType: "DefaultViewType",
   SharedComponent: "SharedComponent",
+  // Connections to arguments used inside a lambda
+  LambdaInsertArguments: "LambdaInsertArguments",
   ClaimServiceAuthorizationMethod: "ClaimServiceAuthorizationMethod",
   ClaimServiceUpdateUserMethod: "ClaimServiceUpdateUserMethod",
   ExecutorServiceMethod: "ExecutorServiceMethod",
@@ -671,6 +677,8 @@ export const LinkType = {
   Extension: "extension",
   ScreenOptions: "screen-options",
   ListItem: "list-item",
+  FetchService: "FetchService",
+  FetchServiceOuput: "FetchServiceOuput",
   Enumeration: "enumeration",
   ClientMethod: "ClientMethod",
   DataSource: "DataSource",
@@ -852,6 +860,9 @@ export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent
   },
+  LambdaInsertArguments: {
+    type: LinkType.LambdaInsertArguments
+  },
   ComponentApiConnector: {
     type: LinkType.ComponentApiConnector
   },
@@ -923,6 +934,12 @@ export const LinkProperties = {
   },
   EnumerationLink: {
     type: LinkType.Enumeration
+  },
+  FetchService: {
+    type: LinkType.FetchService
+  },
+  FetchServiceOuput: {
+    type: LinkType.FetchServiceOuput
   },
   ClientMethodLink: {
     type: LinkType.ClientMethod

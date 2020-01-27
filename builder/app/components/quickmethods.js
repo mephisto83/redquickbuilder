@@ -42,6 +42,7 @@ import GetProjectUrlsDataChain from "../nodepacks/GetProjectUrlsDataChain";
 import temppack from "../nodepacks/temppack";
 import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import CreateConfiguration from "../nodepacks/CreateConfiguration";
+import CreateFetchParameters from "../nodepacks/CreateFetchParameters";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -177,7 +178,7 @@ class QuickMethods extends Component<any, any, any> {
                 />
                 <TreeViewMenu
                   hideArrow
-                  title={'Get Project Urls Data Chain'}
+                  title={"Get Project Urls Data Chain"}
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.graphOperation(GetProjectUrlsDataChain());
@@ -185,7 +186,7 @@ class QuickMethods extends Component<any, any, any> {
                 />
                 <TreeViewMenu
                   hideArrow
-                  title={'Test Command'}
+                  title={"Test Command"}
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.graphOperation(temppack());
@@ -201,7 +202,7 @@ class QuickMethods extends Component<any, any, any> {
                 />
                 <TreeViewMenu
                   hideArrow
-                  title={'Create Dashboard 1'}
+                  title={"Create Dashboard 1"}
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.graphOperation(CreateDashboard_1());
@@ -209,7 +210,20 @@ class QuickMethods extends Component<any, any, any> {
                 />
                 <TreeViewMenu
                   hideArrow
-                  title={'Create Configuration'}
+                  title={"Create Fetch Parameters"}
+                  icon={"fa fa-plus"}
+                  onClick={() => {
+                    let nodes = UIA.GetNodeByProperties({
+                      [NodeProperties.IsFetchParameter]: true
+                    });
+                    if (!nodes) {
+                      this.props.graphOperation(CreateFetchParameters());
+                    }
+                  }}
+                />
+                <TreeViewMenu
+                  hideArrow
+                  title={"Create Configuration"}
                   icon={"fa fa-plus"}
                   onClick={() => {
                     this.props.graphOperation(CreateConfiguration());

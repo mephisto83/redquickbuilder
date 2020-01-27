@@ -43,6 +43,8 @@ import {
 } from "../constants/datachain";
 import ButtonList from "./buttonlist";
 
+import { getReferenceInserts } from "../utils/utilService";
+
 class DataChainActvityMenu extends Component {
   render() {
     var { state } = this.props;
@@ -58,6 +60,56 @@ class DataChainActvityMenu extends Component {
     let lambda = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.lambda
       : false;
+    let inserts = [];
+
+    if (lambda) {
+      let lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
+       inserts = getReferenceInserts(lambdaText || "")
+        .map(v => v.substr(2, v.length - 3))
+        .unique()
+        .map(insert => {
+          let args = insert.split("|");
+          let property = args[0];
+          let types = args.subset(1);
+          if (!types.length) {
+            types = [NodeTypes.Model];
+          }
+          let value =
+            UIA.GetNodeProp(
+              currentNode,
+              NodeProperties.LambdaInsertArguments
+            ) || {};
+
+          return (
+            <SelectInput
+              onChange={_value => {
+                var id = currentNode.id;
+                this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                  target: UIA.GetNodeProp(
+                    currentNode,
+                    UIA.NodeProperties.LambdaInsertArguments
+                  ),
+                  source: id
+                });
+                value[property] = _value;
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.LambdaInsertArguments,
+                  id,
+                  value: value
+                });
+                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                  target: _value,
+                  source: id,
+                  properties: { ...UIA.LinkProperties.LambdaInsertArguments }
+                });
+              }}
+              label={property}
+              value={value[property]}
+              options={UIA.NodesByType(state, types).toNodeSelect()}
+            />
+          );
+        });
+    }
     let showDataChainRef = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.dataref
       : false;
@@ -205,6 +257,7 @@ class DataChainActvityMenu extends Component {
               value={UIA.GetNodeProp(currentNode, NodeProperties.Lambda)}
             />
           ) : null}
+          {lambda ? inserts : null}
           {showModel ? (
             <SelectInput
               onChange={value => {
@@ -336,11 +389,12 @@ class DataChainActvityMenu extends Component {
                   source: id,
                   properties: { ...UIA.LinkProperties.ViewModelKey }
                 });
-
               }}
               label={Titles.ViewModel}
               value={UIA.GetNodeProp(currentNode, NodeProperties.ViewModelKey)}
-              options={UIA.NodesByType(state, [NodeTypes.Screen]).toNodeSelect()}
+              options={UIA.NodesByType(state, [
+                NodeTypes.Screen
+              ]).toNodeSelect()}
             />
           ) : null}
           {showDataChainRef ? (
