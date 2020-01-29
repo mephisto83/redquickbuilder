@@ -9,7 +9,9 @@ import {
   GetMethodProps,
   GetCurrentGraph,
   GetMethodsProperty,
-  GetControllerNode
+  GetControllerNode,
+  GetMaestroNode,
+  GetNodeById
 } from "../actions/uiactions";
 import {
   LinkType,
@@ -81,27 +83,40 @@ export default class FetchServiceGenerator {
       link: LinkType.FetchService
     }).filter(x => {
       let methodType = GetNodeProp(x, NodeProperties.FunctionType);
-      return FunctionTypes[methodType].isFetchCompatible;
+      let functionType = MethodFunctions[methodType];
+      return functionType.isFetchCompatible;
     });
 
     let functions = "";
     let set_outputs = "";
+    let controllers = [];
     set_outputs = methods
       .map(method => {
-        let methodProperties = GetNodeProp(
-          maestro_function,
-          NodeProperties.MethodProps
-        );
-        let modelNode = GraphMethods.GetNode(root, methodProperties.model);
+        let methodProperties = GetNodeProp(method, NodeProperties.MethodProps);
+        let modelNode =
+          GetNodeById(methodProperties.model_output) ||
+          GetNodeById(methodProperties.model);
         let maestro = GetMaestroNode(method.id);
-        let controller = GetControllerNode(GetMaestroNode.id);
-        let output_type = GetNodeProp(modelNode, NodeProperties.CodeName);
+        let controller = GetControllerNode(maestro.id);
+        let output_type = GetCodeName(modelNode);
+        controllers.push(controller.id);
         return bindTemplate(fetchServiceFunctionGetProperty, {
-          model_output: GetCodeName(output_type),
+          model_output: output_type,
           functionName: GetCodeName(method),
           controller: GetCodeName(controller),
           controller_user: controllerUser
         });
+      })
+      .join(NEW_LINE);
+    controllers = controllers
+      .unique()
+      .map(v => {
+        return bindTemplate(
+          `var {{controller#lower}} = new {{controller}}();`,
+          {
+            controller: GetCodeName(v)
+          }
+        );
       })
       .join(NEW_LINE);
     let httpMethod = `${GetNodeProp(controller, NodeProperties.HttpMethod)}`;
@@ -113,7 +128,8 @@ export default class FetchServiceGenerator {
       functionName: "FetchItems",
       http_route: httpRoute || "{controller_generator_http_method}",
       http_method: "HttpPost",
-      set_outputs
+      set_outputs,
+      controllers
     });
     controllerTemplateClass = bindTemplate(controllerTemplateClass, {
       codeName: codeName,

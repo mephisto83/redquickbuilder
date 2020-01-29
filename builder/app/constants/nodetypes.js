@@ -470,6 +470,7 @@ export const NodeProperties = {
   ChainNodeInput1: "ChainNodeInput1",
   List: "List",
   UIModelType: "uiModelType",
+  IsTypeList: "IsTypeList",
   DataChainReferences: "DataChainReferences",
   Lambda: "Lambda",
   LambdaInsertArguments: "LambdaInsertArguments",

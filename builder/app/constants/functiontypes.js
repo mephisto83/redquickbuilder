@@ -181,41 +181,6 @@ const COMMON_CONSTRAINTS = {
   }
 };
 
-//Deprecated 6.12.2019
-const COMMON_CONSTRAINTS_AGENT_OBJECT = {
-  [FunctionTemplateKeys.Model]: {
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.Model
-  },
-  [FunctionTemplateKeys.AgentType]: {
-    [FunctionConstraintKeys.IsAgent]: true,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.AgentType
-  },
-  [FunctionTemplateKeys.User]: {
-    [FunctionConstraintKeys.IsUser]: true,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.User
-  },
-  [FunctionTemplateKeys.UserInstance]: {
-    [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    key: FunctionTemplateKeys.UserInstance,
-    [FunctionConstraintKeys.IsInstanceVariable]: true,
-    [FunctionConstraintKeys.IsInputVariable]: true
-  },
-  [FunctionTemplateKeys.Value]: {
-    [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    key: FunctionTemplateKeys.Value,
-    [FunctionConstraintKeys.IsInstanceVariable]: true,
-    [FunctionConstraintKeys.IsInputVariable]: true
-  }
-};
-
 const COMMON_CONSTRAINTS_ANONYMOUS = {
   [FunctionTemplateKeys.Model]: {
     key: FunctionTemplateKeys.Model,

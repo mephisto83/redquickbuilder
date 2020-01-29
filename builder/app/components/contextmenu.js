@@ -50,6 +50,7 @@ import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import { ComponentTypes } from "../constants/componenttypes";
 import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
+import CreatePropertiesForFetch from "../nodepacks/CreatePropertiesForFetch";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -702,6 +703,23 @@ class ContextMenu extends Component {
                       modelName: UIA.GetNodeTitle(currentNode),
                       model: currentNode.id,
                       user: UIA.GetNodeProp(currentNode, NodeProperties.UIUser)
+                    })
+                  );
+                }
+              }}
+            />
+            <TreeViewMenu
+              title={`Setup Fetch Result`}
+              hideArrow={true}
+              onClick={() => {
+                let connectedNodes = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                  id: currentNode.id,
+                  link: LinkType.FetchServiceOuput
+                });
+                if (connectedNodes.length) {
+                  this.props.graphOperation(
+                    CreatePropertiesForFetch({
+                      id: currentNode.id
                     })
                   );
                 }

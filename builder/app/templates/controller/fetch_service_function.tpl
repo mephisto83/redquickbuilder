@@ -6,6 +6,7 @@
             try
             {
                 var result = {{output_type}}.Create();
+{{controllers}}
 {{set_outputs}}
                 return Ok(result);
             }
