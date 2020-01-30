@@ -279,6 +279,19 @@ class Dashboard extends Component {
             },
             icon: 'fa fa-plug',
             title: Titles.SetFetchServiceOutput
+          },{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.FetchSserviceAgent,
+                singleLink: true,
+                nodeTypes: [NodeTypes.Model],
+                properties:{
+                  [NodeProperties.IsAgent]:true
+                }
+              });
+            },
+            icon: 'fa  fa-user-secret',
+            title: Titles.SetFetchSericeAgent
           });
           return result;
         case NodeTypes.ComponentExternalApi:
@@ -1189,6 +1202,14 @@ class Dashboard extends Component {
 
                       }
                       else {
+                        let skip =false;
+                        if(properties&&properties.properties && Object.keys(properties.properties).map(key=>{
+                          return UIA.GetNodeProp(nodeId, key) !== properties.properties[key];
+                        }).find(x=>x)) {
+                          skip =true;
+                        }
+                        if(skip){}
+                        else
                         if (properties.singleLink) {
 
                           this.props.graphOperation([...getNodesByLinkType(graph, {

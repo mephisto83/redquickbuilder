@@ -61,7 +61,7 @@ export function updateModels(state, action) {
     if (
       newstate[type][model][val.id] &&
       newstate[type][model][val.id].hasOwnProperty("version") &&
-      newstate[type][model][val.id].version < val.version
+      newstate[type][model][val.id].version <= val.version
     ) {
       newstate[type][model][val.id] = val;
     } else if (!newstate[type][model][val.id]) {

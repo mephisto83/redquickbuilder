@@ -680,6 +680,7 @@ export const LinkType = {
   ListItem: "list-item",
   FetchService: "FetchService",
   FetchServiceOuput: "FetchServiceOuput",
+  FetchSserviceAgent: "FetchSserviceAgent",
   Enumeration: "enumeration",
   ClientMethod: "ClientMethod",
   DataSource: "DataSource",
@@ -938,6 +939,9 @@ export const LinkProperties = {
   },
   FetchService: {
     type: LinkType.FetchService
+  },
+  FetchSserviceAgent: {
+    type: LinkType.FetchSserviceAgent
   },
   FetchServiceOuput: {
     type: LinkType.FetchServiceOuput

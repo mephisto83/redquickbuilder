@@ -14,6 +14,7 @@ let fetchServiceFunc = null;
 const modelStorage = {
   state: DEFAULT,
   pending: [],
+  presend: [],
   maxRequested: 50
 };
 
@@ -30,8 +31,12 @@ let fetchServiceThread = Promise.resolve();
 export function setFetchServiceFunction(func) {
   fetchServiceFunc = func;
 }
+
+function createPackageToSendDefault() {
+  return {};
+}
 function sendItems() {
-  let packageToSend = {};
+  let packageToSend = createPackageToSendDefault();
   modelStorage.presend.map(v => {
     packageToSend[v.modelType] = packageToSend[v.modelType] || [];
     packageToSend[v.modelType].push(v.id);
