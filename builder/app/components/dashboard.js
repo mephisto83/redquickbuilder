@@ -292,6 +292,16 @@ class Dashboard extends Component {
             },
             icon: 'fa  fa-user-secret',
             title: Titles.SetFetchSericeAgent
+          },{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.DataChainLink,
+                singleLink: true,
+                nodeTypes: [NodeTypes.DataChain]
+              });
+            },
+            icon: 'fa fa-share-alt',
+            title: Titles.DataChain
           });
           return result;
         case NodeTypes.ComponentExternalApi:
