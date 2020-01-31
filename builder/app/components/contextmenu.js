@@ -805,6 +805,38 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ComponentNode:
+        /**
+         * SCREEN_COMPONENT_EVENTS.map(t => {
+                  return {
+                    operation: ADD_NEW_NODE,
+                    options: function() {
+                      return {
+                        nodeType: NodeTypes.LifeCylceMethod,
+                        properties: {
+                          ...viewPackage,
+                          [NodeProperties.InstanceType]: useModelInstance
+                            ? InstanceTypes.ModelInstance
+                            : InstanceTypes.ScreenInstance,
+                          [NodeProperties.EventType]: t,
+                          [NodeProperties.Pinned]: false,
+                          [NodeProperties.UIText]: `${t}`
+                        },
+                        links: [
+                          {
+                            target: newItems.screenNodeOptionId,
+                            linkProperties: {
+                              properties: { ...LinkProperties.LifeCylceMethod }
+                            }
+                          }
+                        ],
+                        callback: screenNode => {
+                          screenComponentEvents.push(screenNode.id);
+                        }
+                      };
+                    }
+                  };
+                })
+         */
         return [
           <TreeViewMenu
             open={UIA.Visual(state, "ComponentNode")}
