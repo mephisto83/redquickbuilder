@@ -131,7 +131,7 @@ export default class ControllerActionGenerator {
       let datachain = GetNodesLinkedTo(GetCurrentGraph(), {
         id: fetchService.id,
         link: LinkType.DataChainLink
-      });
+      })[0];
       let service = `
 import { setFetchServiceFunction } from './redutils';
 import { GetState, GetDispatch } from './uiActions';
