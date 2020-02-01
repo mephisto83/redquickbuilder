@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class FlatList extends React.Component {
+export default class SingleSelect extends React.Component {
   constructor(props) {
     super(props);
 
@@ -23,7 +23,17 @@ export default class FlatList extends React.Component {
             if (this.props.renderItem) {
               let key = this.props.keyExtractor(item);
               let res = this.props.renderItem({ item, index, key });
-              return res;
+              return (
+                <li
+                  onClick={() => {
+                    if (this.props.onClick) {
+                      this.props.onClick(item);
+                    }
+                  }}
+                >
+                  {res}
+                </li>
+              );
             }
           })
           .filter(x => x)}
@@ -32,7 +42,7 @@ export default class FlatList extends React.Component {
   }
 }
 
-FlatList.propTypes = {
+SingleSelect.propTypes = {
   renderItem: function(v) {
     return typeof v === "function";
   },

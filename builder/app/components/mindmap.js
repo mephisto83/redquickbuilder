@@ -631,14 +631,15 @@ export default class MindMap extends Component {
     let keepRunning = true;
     let centerGraph = true;
 
-    force.start(
+    force
+      .start
       // initialUnconstrainedIterations,
       // initialUserConstraintIterations,
       // initialAllConstraintsIterations,
       // null && gridSnapIterations,
       // keepRunning,
       // centerGraph
-    );
+      ();
   }
   buildNode(graph, cola, color) {
     var me = this;
@@ -680,6 +681,7 @@ export default class MindMap extends Component {
     nn.width = 40;
     nn.height = 40;
     nn.name = nn.id;
+    nn.fixed = false;
     return nn;
   }
   componentWillReceiveProps(props, state) {
@@ -702,8 +704,12 @@ export default class MindMap extends Component {
         this.state.graph.nodes.removeIndices(removedNodes);
         var newNodes = graph.nodes.relativeCompliment(
           this.state.graph.nodes,
-          (x, y) => x === y.id
+          (x, y) => {
+            return x === y.id;
+          }
         );
+        this.state.graph.nodes.map(v => (v.fixed = true));
+
         newNodes.map(nn => {
           this.state.graph.nodes.push(
             this.applyNodeVisualData(
@@ -726,12 +732,12 @@ export default class MindMap extends Component {
           if (nl && nl.properties) {
             nn.properties = { ...nl.properties };
           }
-          if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
-            if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
-            else {
-              nn.fixed = false;
-            }
-          }
+          // if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
+          //   if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
+          //   else {
+          //     nn.fixed = false;
+          //   }
+          // }
         });
 
         draw = draw || newNodes.length || removedNodes.length;

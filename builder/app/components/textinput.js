@@ -133,13 +133,16 @@ export default class TextInput extends Component {
         {this.props.inputgroup ? (
           <span className="input-group-btn">
             <button
-              onClick={() => {
+              onClick={e => {
                 if (this.props.onClick) {
                   this.props.onClick();
                 }
+                if (this.props.onChange) {
+                  this.props.onChange(this.state.value);
+                }
+                e.stopPropagation();
+                e.preventDefault();
               }}
-              name="search"
-              id="search-btn"
               className="btn btn-flat"
             >
               <i className="fa fa-edit" />

@@ -47,6 +47,13 @@ export const ComponentEvents = {
   onChange: "onChange",
   onChangeText: "onChangeText"
 };
+export const ComponentEventStandardHandler = {
+  [ComponentEvents.onChange]: `onChange={(evt)=>{
+    if(this.props.onChange) {
+      this.props.onChange(evt);
+    }
+  }}`
+};
 export const ComponentEventArgs = {
   [ComponentEvents.onBlur]: {
     [NodeTypes.Property]: true,
@@ -354,6 +361,9 @@ export const ComponentTypes = {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
+      events: {
+        [ComponentEvents.onChange]: true
+      },
       template: "./app/templates/components/singleselect.tpl",
       datasource: true,
       properties: {
