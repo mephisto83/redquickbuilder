@@ -246,10 +246,11 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     }
     let data = GetItemData(node);
     let item_render = GetItemRender(node, extraimports, language);
-
+    let apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(fs.readFileSync(template, "utf8"), {
       item_render: item_render,
-      data: data
+      data: data,
+      apiProperties
     });
   }
 

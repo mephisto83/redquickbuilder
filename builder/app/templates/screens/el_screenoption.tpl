@@ -12,6 +12,7 @@ import {
   Container, ListItem, Header, Title,
   H3, H1, H2, Footer, FooterTab,
   Button, Left, Right, Body, Icon,
+  SingleSelect,
   Text, View, Form, Item,
   Input, Label, List, Thumbnail,
   Menu

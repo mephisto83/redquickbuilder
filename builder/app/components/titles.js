@@ -351,10 +351,13 @@ export const Get_Object_Agent_Value__Object = "Get Object by Agent";
 export const Update_Object_Agent_Value__Object = "Update Object by Agent";
 export const Update_Object_Agent_Value__Object_With_Object =
   "Update Object by Agent with object";
+export const AddLifeCylceEvents = "Add Life Cycle Events";
 export const CopyPermissionConditions = "Copy Permission Conditions";
 export const CopyValidationConditions = "Copy Validation Conditions";
 export const Functions = "Functions";
+export const IncludeEventHandler = "Include Event Handler";
 export const Login = "Login";
+export const AddEvent = "Add Event";
 export const DeleteAllSelected = "Delete All Selected";
 export const SelectProperties = "Select Properties";
 export const SelectAllConnected = "Selected All Connected";

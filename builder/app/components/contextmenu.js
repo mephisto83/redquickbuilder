@@ -47,10 +47,15 @@ import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChain
 import CreateNavigateToScreenDC from "../nodepacks/CreateNavigateToScreenDC";
 import TextInput from "./textinput";
 import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
-import { ComponentTypes } from "../constants/componenttypes";
+import {
+  ComponentTypes,
+  SCREEN_COMPONENT_EVENTS,
+  ComponentEvents
+} from "../constants/componenttypes";
 import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
 import CreatePropertiesForFetch from "../nodepacks/CreatePropertiesForFetch";
+import AddEvent from "../nodepacks/AddEvent";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -805,38 +810,6 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ComponentNode:
-        /**
-         * SCREEN_COMPONENT_EVENTS.map(t => {
-                  return {
-                    operation: ADD_NEW_NODE,
-                    options: function() {
-                      return {
-                        nodeType: NodeTypes.LifeCylceMethod,
-                        properties: {
-                          ...viewPackage,
-                          [NodeProperties.InstanceType]: useModelInstance
-                            ? InstanceTypes.ModelInstance
-                            : InstanceTypes.ScreenInstance,
-                          [NodeProperties.EventType]: t,
-                          [NodeProperties.Pinned]: false,
-                          [NodeProperties.UIText]: `${t}`
-                        },
-                        links: [
-                          {
-                            target: newItems.screenNodeOptionId,
-                            linkProperties: {
-                              properties: { ...LinkProperties.LifeCylceMethod }
-                            }
-                          }
-                        ],
-                        callback: screenNode => {
-                          screenComponentEvents.push(screenNode.id);
-                        }
-                      };
-                    }
-                  };
-                })
-         */
         return [
           <TreeViewMenu
             open={UIA.Visual(state, "ComponentNode")}
@@ -848,6 +821,46 @@ class ContextMenu extends Component {
             }}
           >
             <TreeViewMenu
+              title={Titles.AddLifeCylceEvents}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  SCREEN_COMPONENT_EVENTS.filter(x => {
+                    return !GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                      id: currentNode.id,
+                      link: LinkType.LifeCylceMethod
+                    }).find(
+                      _y => UIA.GetNodeProp(_y, NodeProperties.Event) === x
+                    );
+                  }).map(t => {
+                    return {
+                      operation: UIA.ADD_NEW_NODE,
+                      options: function() {
+                        return {
+                          nodeType: NodeTypes.LifeCylceMethod,
+                          properties: {
+                            [NodeProperties.EventType]: t,
+                            [NodeProperties.Pinned]: false,
+                            [NodeProperties.UIText]: `${t}`
+                          },
+                          links: [
+                            {
+                              target: currentNode.id,
+                              linkProperties: {
+                                properties: {
+                                  ...LinkProperties.LifeCylceMethod
+                                }
+                              }
+                            }
+                          ]
+                        };
+                      }
+                    };
+                  })
+                );
+              }}
+            />
+            <TreeViewMenu
               title={Titles.AddButtonToComponent}
               hideArrow={true}
               onClick={() => {
@@ -856,6 +869,59 @@ class ContextMenu extends Component {
                 );
               }}
             />
+            <TreeViewMenu
+              open={UIA.Visual(state, `${currentNodeType} eventtype`)}
+              active={true}
+              title={Titles.Operations}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual(`${currentNodeType} eventtype`);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={Object.keys(ComponentEvents).map(v => ({
+                    title: v,
+                    id: v,
+                    value: v
+                  }))}
+                  label={Titles.Select}
+                  onChange={value => {
+                    this.setState({ eventType: value });
+                  }}
+                  value={this.state.eventType}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={[true, false].map(v => ({
+                    title: `${v}`,
+                    id: v,
+                    value: v
+                  }))}
+                  label={Titles.IncludeEventHandler}
+                  onChange={value => {
+                    this.setState({ eventTypeHandler: value });
+                  }}
+                  value={this.state.eventTypeHandler}
+                />
+              </TreeViewItemContainer>
+              {this.state.eventType ? (
+                <TreeViewMenu
+                  title={Titles.AddEvent}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      AddEvent({
+                        component: currentNode.id,
+                        eventType: this.state.eventType,
+                        eventTypeHandler: this.state.eventTypeHandler
+                      })
+                    );
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
             <TreeViewMenu
               open={UIA.Visual(state, "Adding Component")}
               active={true}
@@ -1093,6 +1159,72 @@ class ContextMenu extends Component {
                 }}
               />
             ) : null}
+          </TreeViewMenu>
+        ];
+      case NodeTypes.ViewType:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, currentNodeType)}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual(currentNodeType);
+            }}
+          >
+            <TreeViewMenu
+              open={UIA.Visual(state, `${currentNodeType} eventtype`)}
+              active={true}
+              title={Titles.Operations}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual(`${currentNodeType} eventtype`);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={Object.keys(ComponentEvents).map(v => ({
+                    title: v,
+                    id: v,
+                    value: v
+                  }))}
+                  label={Titles.Select}
+                  onChange={value => {
+                    this.setState({ eventType: value });
+                  }}
+                  value={this.state.eventType}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  options={[true, false].map(v => ({
+                    title: `${v}`,
+                    id: v,
+                    value: v
+                  }))}
+                  label={Titles.IncludeEventHandler}
+                  onChange={value => {
+                    this.setState({ eventTypeHandler: value });
+                  }}
+                  value={this.state.eventTypeHandler}
+                />
+              </TreeViewItemContainer>
+              {this.state.eventType ? (
+                <TreeViewMenu
+                  title={Titles.AddEvent}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      AddEvent({
+                        component: currentNode.id,
+                        eventType: this.state.eventType,
+                        eventTypeHandler: this.state.eventTypeHandler
+                      })
+                    );
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
           </TreeViewMenu>
         ];
     }

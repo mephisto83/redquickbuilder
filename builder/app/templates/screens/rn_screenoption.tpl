@@ -10,7 +10,11 @@ import material from '{{relative_depth}}../native-base-theme/variables/variables
 import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
-import { Container, ListItem, Header, Title, Footer, FooterTab, H3, H1, H2, Button, Left, Right, Body, Icon, Text, View, Form, Item,
+import { SingleSelect, Container, ListItem,
+ Header, Title, Footer, FooterTab,
+  H3, H1, H2, Button, Left,
+  Right, Body, Icon, Text,
+  View, Form, Item,
 Input, Label, List, Thumbnail } from 'native-base';
 import { NavigationActions } from 'react-navigation';
 {{imports}}

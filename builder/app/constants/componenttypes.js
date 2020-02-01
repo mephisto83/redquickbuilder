@@ -350,6 +350,22 @@ export const ComponentTypes = {
       },
       ui: true
     },
+    SingleSelect: {
+      layout: true,
+      specialLayout: true,
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/singleselect.tpl",
+      datasource: true,
+      properties: {
+        item_attributes: {
+          nodeProperty: NodeProperties.TextType,
+          template: "{{value}}",
+          component_options: [NodeTypes.ComponentNode],
+          ui: true
+        }
+      },
+      ui: true
+    },
     ListItem: {
       layout: true,
       ui: true,

@@ -25,6 +25,7 @@ import H2 from './components/h2';
 import Menu from './components/menu';
 import H1 from './components/h1';
 import MultiViewList from './components/multiviewlist';
+import SingleSelect from './components/singleselect';
 import Form from './components/form';
 export {
   Content,
@@ -54,5 +55,6 @@ export {
   FlatList,
   MultiSelectList,
   MultiViewList,
-  Image
+  Image,
+  SingleSelect
 };
