@@ -36,7 +36,12 @@ import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
 import NavigateBack from "../nodepacks/NavigateBack";
 import TreeViewItemContainer from "./treeviewitemcontainer";
-import { getLinkInstance, GetNodesLinkedTo } from "../methods/graph_methods";
+import {
+  getLinkInstance,
+  GetNodesLinkedTo,
+  TARGET,
+  SOURCE
+} from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
 import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService";
@@ -56,6 +61,8 @@ import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
 import CreatePropertiesForFetch from "../nodepacks/CreatePropertiesForFetch";
 import AddEvent from "../nodepacks/AddEvent";
+import CreateModelPropertyGetterDC from "../nodepacks/CreateModelPropertyGetterDC";
+import ReattachComponent from "../nodepacks/ReattachComponent";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -333,6 +340,7 @@ class ContextMenu extends Component {
     var { state } = this.props;
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+    let temp;
 
     switch (currentNodeType) {
       case NodeTypes.DataChain:
@@ -419,7 +427,6 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ComponentApiConnector:
-        let temp;
         return [
           <TreeViewMenu
             open={UIA.Visual(state, "OPERATIONS")}
@@ -595,6 +602,73 @@ class ContextMenu extends Component {
               this.props.toggleVisual("OPERATIONS");
             }}
           >
+            <TreeViewMenu
+              open={UIA.Visual(state, "AddModelPropertyGetterDC")}
+              title={"Add Model Property Getter"}
+              active={true}
+              onClick={() => {
+                this.props.toggleVisual("AddModelPropertyGetterDC");
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Models}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Model
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      model: value
+                    });
+                  }}
+                  value={this.state.model}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Models}
+                  options={UIA.GetModelPropertyChildren(
+                    this.state.model
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      property: value
+                    });
+                  }}
+                  value={this.state.property}
+                />
+              </TreeViewItemContainer>
+              {this.state.model && this.state.property ? (
+                <TreeViewMenu
+                  title={`Execute`}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation([
+                      ...CreateModelPropertyGetterDC({
+                        model: this.state.model,
+                        property: this.state.property,
+                        propertyName: UIA.GetNodeTitle(this.state.property),
+                        modelName: UIA.GetNodeTitle(this.state.model),
+                        callback: context => {
+                          temp = context.entry;
+                        }
+                      }),
+                      {
+                        operation: UIA.ADD_LINK_BETWEEN_NODES,
+                        options: function() {
+                          return {
+                            source: currentNode.id,
+                            target: temp,
+                            properties: { ...LinkProperties.DataChainLink }
+                          };
+                        }
+                      }
+                    ]);
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
             <TreeViewMenu
               title={`Connect to Title Service`}
               hideArrow={true}
@@ -810,6 +884,25 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ComponentNode:
+        let componentType = UIA.GetNodeProp(
+          currentNode,
+          NodeProperties.ComponentType
+        );
+        let uiType = UIA.GetNodeProp(currentNode, NodeProperties.UIType);
+        let parent = null;
+        if (
+          ComponentTypes[uiType] &&
+          ComponentTypes[uiType][componentType] &&
+          ComponentTypes[uiType][componentType].layout &&
+          UIA.Visual(state, "Reattach Component")
+        ) {
+          let graph = UIA.GetCurrentGraph();
+          parent = GetNodesLinkedTo(graph, {
+            id: currentNode.id,
+            link: LinkType.Component,
+            direction: TARGET
+          })[0];
+        }
         return [
           <TreeViewMenu
             open={UIA.Visual(state, "ComponentNode")}
@@ -872,7 +965,7 @@ class ContextMenu extends Component {
             <TreeViewMenu
               open={UIA.Visual(state, `${currentNodeType} eventtype`)}
               active={true}
-              title={Titles.Operations}
+              title={Titles.AddEvent}
               innerStyle={{ maxHeight: 300, overflowY: "auto" }}
               toggle={() => {
                 this.props.toggleVisual(`${currentNodeType} eventtype`);
@@ -911,13 +1004,24 @@ class ContextMenu extends Component {
                   title={Titles.AddEvent}
                   hideArrow={true}
                   onClick={() => {
-                    this.props.graphOperation(
-                      AddEvent({
-                        component: currentNode.id,
-                        eventType: this.state.eventType,
-                        eventTypeHandler: this.state.eventTypeHandler
-                      })
+                    let properties = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                      id: currentNode.id,
+                      link: LinkType.DefaultViewType
+                    }).filter(
+                      x =>
+                        UIA.GetNodeProp(x, NodeProperties.NODEType) ===
+                        NodeTypes.Property
                     );
+                    if (properties.length) {
+                      this.props.graphOperation(
+                        AddEvent({
+                          component: currentNode.id,
+                          eventType: this.state.eventType,
+                          eventTypeHandler: this.state.eventTypeHandler,
+                          property: properties[0].id
+                        })
+                      );
+                    }
                   }}
                 />
               ) : null}
@@ -954,6 +1058,48 @@ class ContextMenu extends Component {
                       AddComponent({
                         component: currentNode.id,
                         componentType: this.state.componentType
+                      })
+                    );
+                  }}
+                />
+              ) : null}
+            </TreeViewMenu>
+            <TreeViewMenu
+              open={UIA.Visual(state, "Reattach Component")}
+              active={true}
+              title={Titles.ReattachComponent}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("Reattach Component");
+              }}
+            >
+              {parent ? (
+                <TreeViewItemContainer>
+                  <SelectInput
+                    options={GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                      id: parent.id,
+                      link: LinkType.Component
+                    })
+                      .filter(x => x.id !== currentNode.id)
+                      .toNodeSelect()}
+                    label={Titles.ComponentType}
+                    onChange={value => {
+                      this.setState({ component: value });
+                    }}
+                    value={this.state.component}
+                  />
+                </TreeViewItemContainer>
+              ) : null}
+              {parent && this.state.component ? (
+                <TreeViewMenu
+                  title={Titles.Execute}
+                  hideArrow={true}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      ReattachComponent({
+                        component: this.state.component,
+                        base: currentNode.id,
+                        parent: parent.id
                       })
                     );
                   }}
@@ -1175,7 +1321,7 @@ class ContextMenu extends Component {
             <TreeViewMenu
               open={UIA.Visual(state, `${currentNodeType} eventtype`)}
               active={true}
-              title={Titles.Operations}
+              title={Titles.AddEvent}
               innerStyle={{ maxHeight: 300, overflowY: "auto" }}
               toggle={() => {
                 this.props.toggleVisual(`${currentNodeType} eventtype`);
@@ -1214,13 +1360,24 @@ class ContextMenu extends Component {
                   title={Titles.AddEvent}
                   hideArrow={true}
                   onClick={() => {
-                    this.props.graphOperation(
-                      AddEvent({
-                        component: currentNode.id,
-                        eventType: this.state.eventType,
-                        eventTypeHandler: this.state.eventTypeHandler
-                      })
+                    let properties = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                      id: currentNode.id,
+                      link: LinkType.DefaultViewType
+                    }).filter(
+                      x =>
+                        UIA.GetNodeProp(x, NodeProperties.NODEType) ===
+                        NodeTypes.Property
                     );
+                    if (properties.length) {
+                      this.props.graphOperation(
+                        AddEvent({
+                          component: currentNode.id,
+                          eventType: this.state.eventType,
+                          eventTypeHandler: this.state.eventTypeHandler,
+                          property: properties[0].id
+                        })
+                      );
+                    }
                   }}
                 />
               ) : null}
@@ -1276,14 +1433,6 @@ class ContextMenu extends Component {
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
     switch (currentNodeType) {
-      // case NodeTypes.Condition:
-      //   return this.getConditionMenu();
-      // // case NodeTypes.Model:
-      // //   return this.getModelMenu();
-      // case NodeTypes.ViewType:
-      //   return this.getViewTypes();
-      // case NodeTypes.ComponentExternalApi:
-      //   return this.getComponentExternalMenu(currentNode);
       case NodeTypes.ComponentNode:
       case NodeTypes.Screen:
       case NodeTypes.ScreenOption:
@@ -1328,12 +1477,15 @@ class ContextMenu extends Component {
     );
   }
   getGenericComponentApiMenu(currentNode) {
+    let { state } = this.props;
     return (
       <TreeViewMenu
-        open={true}
+        open={UIA.Visual(state, Titles.ComponentAPIMenu)}
         active={true}
         title={Titles.ComponentAPIMenu}
-        toggle={() => {}}
+        toggle={() => {
+          this.props.toggleVisual(Titles.ComponentAPIMenu);
+        }}
       >
         <TreeViewMenu
           title={`${Titles.Add} Label`}
@@ -1349,6 +1501,41 @@ class ContextMenu extends Component {
             this.props.addComponentApiNodes(currentNode.id, "value");
           }}
         />
+        <TreeViewMenu
+          title={`${Titles.Add} Custom`}
+          open={UIA.Visual(state, "Custom Api Menu")}
+          active={true}
+          onClick={() => {
+            // this.props.addComponentApiNodes(currentNode.id, "value");
+            this.props.toggleVisual("Custom Api Menu");
+          }}
+        >
+          <TreeViewItemContainer>
+            <TextInput
+              immediate={true}
+              label={Titles.Name}
+              placeholder={Titles.EnterName}
+              onChange={value => {
+                this.setState({
+                  customApi: value
+                });
+              }}
+              value={this.state.customApi}
+            />
+          </TreeViewItemContainer>
+          {this.state.customApi ? (
+            <TreeViewMenu
+              title={`${Titles.Add} ${this.state.customApi}`}
+              hideArrow={true}
+              onClick={() => {
+                this.props.addComponentApiNodes(
+                  currentNode.id,
+                  this.state.customApi
+                );
+              }}
+            />
+          ) : null}
+        </TreeViewMenu>
       </TreeViewMenu>
     );
   }
@@ -1357,10 +1544,12 @@ class ContextMenu extends Component {
       case UITypes.ReactNative:
         return (
           <TreeViewMenu
-            open={true}
+            open={UIA.Visual(state, Titles.Events)}
             active={true}
             title={Titles.Events}
-            toggle={() => {}}
+            toggle={() => {
+              this.props.toggleVisual(Titles.Events);
+            }}
           >
             <TreeViewMenu
               title={`${Titles.Add} onPress`}

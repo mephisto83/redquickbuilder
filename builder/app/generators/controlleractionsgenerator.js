@@ -133,18 +133,20 @@ export default class ControllerActionGenerator {
         link: LinkType.DataChainLink
       })[0];
       let service = `
-import { setFetchServiceFunction } from './redutils';
-import { GetState, GetDispatch } from './uiActions';
-import { ${GetCodeName(datachain)} } from './data-chain';
-import * as Util from "./util";
+import { setFetchServiceFunction } from '../actions/redutils';
+import { GetState, GetDispatch } from '../actions/uiActions';
+import { ${GetCodeName(datachain)} } from '../actions/data-chain';
+import * as Util from "../actions/util";
+
 export const FETCH_CALL = 'FETCH_CALL';
-setFetchServiceFunction(function(package) {
+
+setFetchServiceFunction(function(body) {
   return Promise.resolve().then(() => {
       let dispatch = GetDispatch();
       let getState = GetState();
       return  (Util.simple(
         service.${GetJSCodeName(fetchService)},
-        { body: package },
+        { body },
         {
           loading: FETCH_CALL
         },

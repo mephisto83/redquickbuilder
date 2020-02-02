@@ -1,12 +1,3 @@
-import { setFetchServiceFunction } from './redutils';
-
-setFetchServiceFunction(function(package) {
-  return Promise.resolve().then(() => {
-
-  });
-});
-
-
 export const BATCH = "BATCH";
 export const UI_UPDATE = "UI_UPDATE";
 export const UISI_UPDATE = "UISI_UPDATE";

@@ -1,4 +1,5 @@
 import { uuidv4 } from "../utils/array";
+import { LinkProperties, NodeProperties } from "../constants/nodetypes";
 export default function(args = {}) {
   // node0
 
@@ -9,11 +10,20 @@ export default function(args = {}) {
   if (!args.eventType) {
     throw "missing eventType";
   }
+  if (args.eventTypeHandler && !args.property) {
+    throw "missing property";
+  }
   let context = {
     ...args,
     node0: args.component
   };
-  let { viewPackages = {} } = args;
+
+  let { viewPackages } = args;
+  viewPackages = {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+
   let result = [
     function(graph) {
       return [
@@ -23,6 +33,7 @@ export default function(args = {}) {
             nodeType: "EventMethod",
             parent: context.node0,
             properties: {
+              ...viewPackages,
               EventType: context.eventType,
               text: context.eventType
             },
@@ -58,6 +69,7 @@ export default function(args = {}) {
               text: context.eventType + " Instance",
               EventType: context.eventType,
               Pinned: false,
+              ...viewPackages,
               AutoDelete: {
                 properties: {
                   nodeType: "component-api-connector"
@@ -80,6 +92,7 @@ export default function(args = {}) {
               options: {
                 nodeType: "EventHandler",
                 parent: context.node5,
+                ...viewPackages,
                 groupProperties: {},
                 linkProperties: {
                   properties: {
@@ -101,6 +114,20 @@ export default function(args = {}) {
                   context.node5 = node.id;
                   context.group1 = group;
                 }
+              }
+            }
+          ];
+        }
+      : null,
+    context.eventTypeHandler
+      ? function(graph) {
+          return [
+            {
+              operation: "ADD_LINK_BETWEEN_NODES",
+              options: {
+                source: context.node5,
+                target: context.property,
+                properties: { ...LinkProperties.PropertyLink }
               }
             }
           ];

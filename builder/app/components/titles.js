@@ -54,6 +54,7 @@ export const Models = "Models";
 export const MethodName = "Method Name";
 export const OutputModel = "Output Model";
 export const AddComponentNew = "Add Component";
+export const ReattachComponent= 'Reattach Component';
 export const Height = "Height";
 export const Get_Object_Agent_Value__IListObject_By_Specific =
   "Get Specific Items";

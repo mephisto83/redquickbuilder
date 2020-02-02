@@ -886,18 +886,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
 
   let isViewType =
     GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType;
-  let componentType = GetNodeProp(node, NodeProperties.ComponentType);
-  let uiType = GetNodeProp(node, NodeProperties.UIType);
-  if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
-    let { events } = ComponentTypes[uiType][componentType];
-    for (var _event in events) {
-      switch (_event) {
-        case ComponentEvents.onChange:
-          result.push(ComponentEventStandardHandler[_event]);
-          break;
-      }
-    }
-  }
+
   result = componentExternalApis
     .unique(x => GetJSCodeName(x))
     .map(componentExternalApi => {
@@ -922,6 +911,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
           case "viewModel":
             noSelector = true;
             noDataChain = true;
+            break;
           default:
             stateKey = "value";
             break;
@@ -1074,7 +1064,18 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         .filter(x => x)
         .join(NEW_LINE);
     });
-
+  let componentType = GetNodeProp(node, NodeProperties.ComponentType);
+  let uiType = GetNodeProp(node, NodeProperties.UIType);
+  if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
+    let { events } = ComponentTypes[uiType][componentType];
+    for (var _event in events) {
+      switch (_event) {
+        case ComponentEvents.onChange:
+          result.push(ComponentEventStandardHandler[_event]);
+          break;
+      }
+    }
+  }
   result.push(...res);
   return NEW_LINE + result.join(NEW_LINE);
 }

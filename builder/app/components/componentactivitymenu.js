@@ -330,8 +330,7 @@ class ComponentActivityMenu extends Component {
             />
           </FormControl>
         ) : null}
-        {false &&
-        componentType &&
+        {componentType &&
         componentTypes &&
         componentTypes[componentType] &&
         componentTypes[componentType].layout ? (

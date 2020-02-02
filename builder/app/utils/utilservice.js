@@ -280,7 +280,7 @@ export function processRecording(str) {
         return `if(!args.${temp}){
           throw 'missing ${temp} argument';
         }`;
-      })}
+      }).join('')}
     let context = {
       ...args${
         unaccountedGuids.length
