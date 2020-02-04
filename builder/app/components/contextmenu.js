@@ -63,6 +63,7 @@ import CreatePropertiesForFetch from "../nodepacks/CreatePropertiesForFetch";
 import AddEvent from "../nodepacks/AddEvent";
 import CreateModelPropertyGetterDC from "../nodepacks/CreateModelPropertyGetterDC";
 import ReattachComponent from "../nodepacks/ReattachComponent";
+import AddTitleToComponent from "../nodepacks/AddTitleToComponent";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -959,6 +960,15 @@ class ContextMenu extends Component {
               onClick={() => {
                 this.props.graphOperation(
                   AddButtonToComponent({ component: currentNode.id })
+                );
+              }}
+            />
+            <TreeViewMenu
+              title={Titles.AddTitleToComponent}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  AddTitleToComponent({ component: currentNode.id })
                 );
               }}
             />

@@ -54,7 +54,7 @@ export const Models = "Models";
 export const MethodName = "Method Name";
 export const OutputModel = "Output Model";
 export const AddComponentNew = "Add Component";
-export const ReattachComponent= 'Reattach Component';
+export const ReattachComponent = "Reattach Component";
 export const Height = "Height";
 export const Get_Object_Agent_Value__IListObject_By_Specific =
   "Get Specific Items";
@@ -348,6 +348,7 @@ export const Get_Agent_Value__IListObject = "Get Objects for an Agent";
 export const Can_Execute_Agent_Parent_In_Valid_List =
   "Can Execute Agent Parent In Valid List";
 export const AddButtonToComponent = "Add Button";
+export const AddTitleToComponent = "Add Title";
 export const Get_Object_Agent_Value__Object = "Get Object by Agent";
 export const Update_Object_Agent_Value__Object = "Update Object by Agent";
 export const Update_Object_Agent_Value__Object_With_Object =
