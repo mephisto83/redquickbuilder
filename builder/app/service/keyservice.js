@@ -27,7 +27,7 @@ export function GenerateModelKeys(options) {
         return bindTemplate(template, {
             name: GetCodeName(model)
         });
-    });
+    }).unique();
 
     return [{
         template: templates.join(NEW_LINE),
