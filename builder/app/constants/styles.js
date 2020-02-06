@@ -17,6 +17,8 @@ export const StyleLib = {
     "border-left-style": "borderLeftStyle",
     "border-left-width": "borderLeftWidth",
     "border-right": "borderRight",
+    "border-radius": "borderRadius",
+    cursor: "pointer",
     "border-right-color": "borderRightColor",
     "border-right-style": "borderRightStyle",
     "border-right-width": "borderRightWidth",

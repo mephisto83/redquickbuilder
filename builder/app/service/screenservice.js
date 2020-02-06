@@ -1451,17 +1451,16 @@ export function GetComponentDidUpdate(parent, options = {}) {
   if (parent) {
     describedApi = WriteDescribedStateUpdates(parent).trim();
   }
-
+  let componentDidMount = GetComponentDidMount(parent, {
+    skipOutOfBand: true,
+    skipSetGetState: true
+  });
   let componentDidUpdate =
     `componentDidUpdate(prevProps) {
         this.captureValues();
       }
       ` +
-    (!isScreen
-      ? `componentDidMount(prevProps) {
-        this.captureValues();
-      }`
-      : "") +
+    (!isScreen ? componentDidMount : "") +
     `
       captureValues(){
         ${describedApi}
@@ -1469,7 +1468,7 @@ export function GetComponentDidUpdate(parent, options = {}) {
 
   return componentDidUpdate;
 }
-export function GetComponentDidMount(screenOption) {
+export function GetComponentDidMount(screenOption, options = {}) {
   let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
   let outOfBandCall = "";
   if (
@@ -1500,9 +1499,9 @@ export function GetComponentDidMount(screenOption) {
     .join(NEW_LINE);
 
   let componentDidMount = `componentDidMount(value) {
-        this.props.setGetState();
+        ${options.skipSetGetState ? "" : `this.props.setGetState();`}
         this.captureValues();
-        ${outOfBandCall}
+        ${options.skipOutOfBand ? "" : outOfBandCall}
         ${invocations}
 {{handles}}
 }

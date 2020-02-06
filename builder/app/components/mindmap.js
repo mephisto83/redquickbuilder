@@ -128,6 +128,8 @@ export default class MindMap extends Component {
         .attr("height", height)
         .attr("pointer-events", "all");
       // define arrow markers for graph links
+      var centerGuid = body.append("div");
+
       outer
         .append("svg:defs")
         .append("svg:marker")
@@ -160,15 +162,20 @@ export default class MindMap extends Component {
       });
       function redraw() {
         var { x = 0, y = 0 } = me.mouseMoved || {};
+        let ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
         vis.attr(
           "transform",
-          `scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me
+          ` scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me
             .mapTranslate.y + y})`
         );
         body.attr(
           "data-transform",
           `(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate
             .y + y})y`
+        );
+        centerGuid.attr(
+          "style",
+          `position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(ang)}deg)`
         );
       }
       outer.on("mousemove", function(x, v) {
@@ -843,7 +850,11 @@ export default class MindMap extends Component {
   }
   render() {
     return (
-      <div id={this.state.id} className="mindmap" style={{ minHeight: 946 }} />
+      <div
+        id={this.state.id}
+        className="mindmap"
+        style={{ minHeight: 946}}
+      />
     );
   }
 }
@@ -907,3 +918,88 @@ const throttle = (func, limit) => {
     }
   };
 };
+
+function angle(cx, cy, ex, ey) {
+  let vect1 = new Vector(ex, ey, 0);
+  vect1 = vect1.normalisedVector();
+  ex = vect1.getX();
+  ey = vect1.getY();
+  var dy = ey - cy;
+  var dx = ex - cx;
+  var theta = Math.atan2(dy, dx); // range (-PI, PI]
+  theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+  return theta;
+}
+
+var Vector = (function() {
+  function Vector(pX, pY, pZ) {
+    this.setX(pX);
+    this.setY(pY);
+    this.setZ(pZ);
+  }
+  Vector.prototype.getX = function() {
+    return this.mX;
+  };
+  Vector.prototype.setX = function(pX) {
+    this.mX = pX;
+  };
+  Vector.prototype.getY = function() {
+    return this.mY;
+  };
+  Vector.prototype.setY = function(pY) {
+    this.mY = pY;
+  };
+  Vector.prototype.getZ = function() {
+    return this.mZ;
+  };
+  Vector.prototype.setZ = function(pZ) {
+    this.mZ = pZ;
+  };
+
+  Vector.prototype.add = function(v) {
+    return new Vector(
+      this.getX() + v.getX(),
+      this.getY() + v.getY(),
+      this.getZ() + v.getZ()
+    );
+  };
+
+  Vector.prototype.subtract = function(v) {
+    return new Vector(
+      this.getX() - v.getX(),
+      this.getY() - v.getY(),
+      this.getZ() - v.getZ()
+    );
+  };
+
+  Vector.prototype.multiply = function(scalar) {
+    return new Vector(
+      this.getX() * scalar,
+      this.getY() * scalar,
+      this.getZ() * scalar
+    );
+  };
+
+  Vector.prototype.divide = function(scalar) {
+    return new Vector(
+      this.getX() / scalar,
+      this.getY() / scalar,
+      this.getZ() / scalar
+    );
+  };
+
+  Vector.prototype.magnitude = function() {
+    return Math.sqrt(
+      this.getX() * this.getX() +
+        this.getY() * this.getY() +
+        this.getZ() * this.getZ()
+    );
+  };
+
+  //this is the vector I have tried for the normalisation
+  Vector.prototype.normalisedVector = function() {
+    var vec = new Vector(this.getX(), this.getY(), this.getZ());
+    return (vec.divide(this.magnitude()));
+  };
+  return Vector;
+})();

@@ -17,7 +17,7 @@ export default class SingleSelect extends React.Component {
     };
     delete props.children;
     return (
-      <ul className={"list-group"}>
+      <ul className={`${this.props.className} list-group`}>
         {(this.props.data || [])
           .map((item, index) => {
             if (this.props.renderItem) {

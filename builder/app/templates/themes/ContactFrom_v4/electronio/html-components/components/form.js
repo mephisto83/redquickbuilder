@@ -14,7 +14,7 @@ export default class Content extends React.Component {
 
     delete props.children;
     return (
-      <form {...props} className="contact100-form validate-form">
+      <form {...props} className={`${this.props.className} contact100-form validate-form`}>
         {this.props.children}
       </form>
     );

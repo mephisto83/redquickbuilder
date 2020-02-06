@@ -13,6 +13,7 @@ import Icon from './components/icon';
 import Text from './components/text';
 import Input from './components/input';
 import View from './components/view';
+import SingleSelect from './components/singleselect';
 import StyleSheet from './components/stylesheet';
 import StyleProvider from './components/styleprovider';
 import FlatList from './components/flatlist';
@@ -32,6 +33,7 @@ export {
   Title,
   H3,
   Form,
+  SingleSelect,
   Menu,
   Footer,
   Label,
