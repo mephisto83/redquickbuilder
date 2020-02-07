@@ -63,7 +63,8 @@ export const NodeTypes = {
   ServiceInterface: "service-interface",
   ServiceInterfaceMethod: "service-interface-method",
   ViewModel: "view-model",
-  FetchService: "FetchService"
+  FetchService: "FetchService",
+  Style: "Style"
 };
 export const NodeTypeIcons = {};
 export function GetNodeTypeIcon(type) {
@@ -200,7 +201,8 @@ export const NodeTypeColors = {
   [NodeTypes.NavigationAction]: "#1282A2",
   [NodeTypes.Lists]: "#2DC7FF",
   [NodeTypes.ClaimService]: "#034748",
-  [NodeTypes.FetchService]: "#BA1200"
+  [NodeTypes.FetchService]: "#BA1200",
+  [NodeTypes.Style]: "#f12100"
 };
 
 export const NavigateTypes = {
@@ -275,6 +277,18 @@ export const NodeProperties = {
   IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
+  HoverStyle: ":hover",
+  ActiveStyle: ":active",
+  BeforeStyle: "::before",
+  AfterStyle: "::after",
+  CheckedStyle: ":checked",
+  DisabledStyle: ":disabled",
+  EmptyStyle: ":empty",
+  EnabledStyle: ":enabled",
+  FirstChildStyle: ":first-child",
+  LastChildStyle: ":last-child",
+  FocusStyle: ":focus",
+  ReadOnlyStyle: ":read-only",
   DefaultComponentApiValue: "DefaultComponentApiValue",
   ExcludeFromGeneration: "ExcludeFromGeneration",
   ViewPackageTitle: "view-package-title",
@@ -429,6 +443,7 @@ export const NodeProperties = {
   Error: "Error",
   Placeholder: "Placeholder",
   Success: "Success",
+  Style: "Style",
   MethodProps: "methodProperties",
   FilterPropreties: "filterproperties",
   UIValidationType: "uiValidationType",
@@ -731,7 +746,8 @@ export const LinkType = {
   PermissionDependencyPropertyManyToManyLink:
     "permission-dependency-property-many-to-many", //There is a link between a property and a dependency in a many to many situation.
   PermissionPropertyDependencyManyToManyLink:
-    "permission-property-dependency-many-to-many" //There is a link between a permision and a property in a many to many situnation.
+    "permission-property-dependency-many-to-many", //There is a link between a permision and a property in a many to many situnation.
+  Style: "Style"
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -856,6 +872,7 @@ export const LinkPropertyKeys = {
   VALID_CONSTRAINTS: "valid-constraints",
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
+  ComponentTag:'ComponentTag',
   ViewType: "viewType"
 };
 export const LinkProperties = {
@@ -910,6 +927,9 @@ export const LinkProperties = {
   },
   Lists: {
     type: LinkType.Lists
+  },
+  Style: {
+    type: LinkType.Style
   },
   ComponentApiConnection: {
     type: LinkType.ComponentApiConnection

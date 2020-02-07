@@ -17,7 +17,10 @@ export const ComponentTags = {
   TopMenu: "TopMenu",
   LeftContainer: "LeftContainer",
   RightContainer: "RightContainer",
-  SecondaryMain: "SecondaryMain"
+  SecondaryMain: "SecondaryMain",
+  Bottom: "Bottom",
+  ListItem: "ListItem",
+  Footer: "Footer"
 };
 
 export const NAVIGATION = "-NAVIGATION";

@@ -21,7 +21,7 @@ export const UseHttps = "Use Https";
 export const Parameter = "Parameter";
 export const ServerSideSetup = "Service Side Setup";
 export const Theme = "Theme";
-export const Properties = "Properties;";
+export const Properties = "Properties";
 export const EventHandlerActivityMenu = "Event Handlers";
 export const AddCondition = "Add Condition";
 export const Style = "Style";
@@ -333,7 +333,7 @@ export const Update_Parent$Child_Agent_Value__IListChild =
   "Update Parent/Child => IList<Child>";
 export const Get_Parent$Child_Agent_Value__IListChild =
   "Get Parent/Child => IList<Child>";
-
+export const Hover = "Hover";
 export const UseNavigationParams = "Use Navigation Params";
 
 export const Create_Object_Agent_Value__IListObject =

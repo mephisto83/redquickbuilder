@@ -55,7 +55,8 @@ import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import {
   ComponentTypes,
   SCREEN_COMPONENT_EVENTS,
-  ComponentEvents
+  ComponentEvents,
+  ComponentTags
 } from "../constants/componenttypes";
 import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
@@ -171,6 +172,49 @@ class ContextMenu extends Component {
         );
         let linkType = UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE);
         switch (UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
+          case LinkType.Style:
+            result.push(
+              <TreeViewMenu
+                open={UIA.Visual(state, `linkType coponent`)}
+                active={true}
+                title={linkType}
+                key={`${linkType}${selectedLink.id} componenttag`}
+                innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+                toggle={() => {
+                  this.props.toggleVisual(`linkType coponent`);
+                }}
+              >
+                <TreeViewItemContainer>
+                  <SelectInput
+                    options={Object.keys(ComponentTags).map(x => ({
+                      id: x,
+                      value: x,
+                      title: x
+                    }))}
+                    label={Titles.LinkType}
+                    onChange={value => {
+                      this.props.graphOperation([
+                        {
+                          operation: UIA.UPDATE_LINK_PROPERTY,
+                          options: function() {
+                            return {
+                              id: link.id,
+                              prop: LinkPropertyKeys.ComponentTag,
+                              value: value
+                            };
+                          }
+                        }
+                      ]);
+                    }}
+                    value={UIA.GetLinkProperty(
+                      link,
+                      LinkPropertyKeys.ComponentTag
+                    )}
+                  />
+                </TreeViewItemContainer>
+              </TreeViewMenu>
+            );
+            break;
           case LinkType.ComponentExternalConnection:
           case LinkType.EventMethodInstance:
             result.push(

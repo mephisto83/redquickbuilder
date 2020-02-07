@@ -104,6 +104,7 @@ import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType,
 import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
 import { currentId } from 'async_hooks';
+import StyleMenu from './stylemenu';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -238,6 +239,20 @@ class Dashboard extends Component {
             title: Titles.Body
           })
           break;
+        case NodeTypes.Style:
+          return [
+            {
+              onClick: () => {
+                this.props.setVisual(CONNECTING_NODE, {
+                  ...LinkProperties.Style,
+                  singleLink: false,
+                  nodeTypes: [NodeTypes.Style]
+                });
+              },
+              icon: 'fa fa-css3',
+              title: Titles.Style
+            }
+          ]
         case NodeTypes.Lists:
           return [{
             onClick: () => {
@@ -746,6 +761,16 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-plus-circle',
       title: `${Titles.AddComponentExtApi}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.Style,
+          singleLink: false,
+          nodeTypes: [NodeTypes.Style]
+        });
+      },
+      icon: 'fa fa-css3',
+      title: Titles.Style
     })
 
     return result;
@@ -1447,6 +1472,7 @@ class Dashboard extends Component {
               </SideBarContent>) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ServiceIntefaceMenu />) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<StyleMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<UIParameters />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}
