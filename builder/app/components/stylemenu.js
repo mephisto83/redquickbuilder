@@ -6,7 +6,11 @@ import TabPane from "./tabpane";
 import SideMenuContainer from "./sidemenucontainer";
 import * as Titles from "./titles";
 import CheckBoxProperty from "./checkboxproperty";
-import { NodeProperties, NodeTypes } from "../constants/nodetypes";
+import {
+  NodeProperties,
+  NodeTypes,
+  MediaQueries
+} from "../constants/nodetypes";
 import FormControl from "./formcontrol";
 import SideBar from "./sidebar";
 import SideBarMenu from "./sidebarmenu";
@@ -15,8 +19,10 @@ import { StyleLib } from "../constants/styles";
 import TextInput from "./textinput";
 import TreeViewItemContainer from "./treeviewitemcontainer";
 import TreeViewMenu from "./treeviewmenu";
+import SelectProperty from "./selectproperty";
 import GenericPropertyContainer from "./genericpropertycontainer";
-
+import GridAreaSelect from "./gridareaselect";
+import GridPlacement from "./gridplacement";
 class StyleMenu extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +35,8 @@ class StyleMenu extends Component {
     if (!currentNode || !active) {
       return <TabPane active={active} />;
     }
-    let cellStyle = UIA.GetNodeProp(currentNode, NodeProperties.Style) || {};
+    let cellStyle =
+      UIA.GetNodeProp(currentNode, UIA.NodeProperties.Style) || {};
     return (
       <SideBarMenu relative={true}>
         <GenericPropertyContainer
@@ -61,14 +68,45 @@ class StyleMenu extends Component {
             ].map(x => {
               return (
                 <TreeViewItemContainer key={x}>
-                  <CheckBoxProperty
-                    title={x}
-                    node={currentNode}
-                    property={x}
-                  />
+                  <CheckBoxProperty title={x} node={currentNode} property={x} />
                 </TreeViewItemContainer>
               );
             })}
+          </TreeViewMenu>
+        </GenericPropertyContainer>
+        <GenericPropertyContainer
+          active={true}
+          title="asdf"
+          subTitle="afaf"
+          nodeType={NodeTypes.Selector}
+        >
+          <TreeViewMenu
+            open={UIA.Visual(state, Titles.MediaQuery)}
+            active={true}
+            title={Titles.MediaQuery}
+            toggle={() => {
+              this.props.toggleVisual(Titles.MediaQuery);
+            }}
+          >
+            {[NodeProperties.UseMediaQuery].map(x => {
+              return (
+                <TreeViewItemContainer key={x}>
+                  <CheckBoxProperty title={x} node={currentNode} property={x} />
+                </TreeViewItemContainer>
+              );
+            })}
+            <TreeViewItemContainer>
+              <SelectProperty
+                title={Titles.MediaQuery}
+                options={Object.keys(MediaQueries).map(v => ({
+                  title: v,
+                  id: v,
+                  value: v
+                }))}
+                node={currentNode}
+                property={NodeProperties.MediaQuery}
+              />
+            </TreeViewItemContainer>
           </TreeViewMenu>
         </GenericPropertyContainer>
         <GenericPropertyContainer
@@ -111,6 +149,48 @@ class StyleMenu extends Component {
               </FormControl>
             </TreeViewItemContainer>
           </TreeViewMenu>
+          {currentNode ? (
+            <TreeViewMenu
+              open={UIA.Visual(state, Titles.GridAreas)}
+              active={true}
+              title={Titles.GridAreas}
+              toggle={() => {
+                this.props.toggleVisual(Titles.GridAreas);
+              }}
+            >
+              <TreeViewItemContainer>
+                <GridAreaSelect node={currentNode} />
+              </TreeViewItemContainer>
+            </TreeViewMenu>
+          ) : null}
+          {currentNode ? (
+            <TreeViewMenu
+              open={UIA.Visual(state, Titles.GridRow)}
+              active={true}
+              title={Titles.GridRow}
+              toggle={() => {
+                this.props.toggleVisual(Titles.GridRow);
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectProperty
+                  title={Titles.Rows}
+                  options={[]
+                    .interpolate(0, 10, x => x)
+                    .map(v => ({
+                      title: v,
+                      id: v,
+                      value: v
+                    }))}
+                  node={currentNode}
+                  property={NodeProperties.GridRowCount}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <GridPlacement node={currentNode} />
+              </TreeViewItemContainer>
+            </TreeViewMenu>
+          ) : null}
         </GenericPropertyContainer>
       </SideBarMenu>
     );
@@ -122,8 +202,8 @@ class StyleMenu extends Component {
           return (
             <TextInput
               value={value}
-              label={this.state.selectedStyleKey}
               immediate={true}
+              label={this.state.selectedStyleKey}
               onChange={callback}
               placeholder={Titles.Filter}
             />
@@ -161,7 +241,7 @@ class StyleMenu extends Component {
   getCurrentStyling(currentStyle) {
     if (currentStyle) {
       return (
-        <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
+        <ul style={{ padding: 2, maxHeight: 400, overflowY: "auto" }}>
           {Object.keys(currentStyle).map(key => {
             return (
               <li
@@ -172,7 +252,9 @@ class StyleMenu extends Component {
                   this.setState({ selectedStyleKey: key, filter: "" });
                 }}
               >
-                [{key}]: {currentStyle[key]}
+                [{key}]:
+                <div>{currentStyle[key]}</div>
+                <hr style={{ padding: 0, margin: 0 }} />
               </li>
             );
           })}

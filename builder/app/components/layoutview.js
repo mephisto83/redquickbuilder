@@ -385,12 +385,12 @@ class LayoutView extends Component {
       if (cellProperties) {
         cellStyle = cellProperties.style;
         cellProperties.children = cellProperties.children || {};
+        cellProperties.name = cellProperties.name || {};
         cellChildren = cellProperties.children;
         cellProperties.cellModel = cellProperties.cellModel || {};
         cellModel = cellProperties.cellModel;
 
         cellProperties.properties = cellProperties.properties || {};
-
         cellProperties.cellModelProperty =
           cellProperties.cellModelProperty || {};
         cellModelProperty = cellProperties.cellModelProperty;
@@ -497,6 +497,28 @@ class LayoutView extends Component {
                   label={Titles.Sections}
                   value={Object.keys(selectedLayoutRoot || {}).length}
                 />
+                {cellProperties &&
+                cellProperties.name &&
+                this.state.selectedCell ? (
+                  <TextInput
+                    immediate={true}
+                    onChange={val => {
+                      let layout = nodeLayout || CreateLayout();
+                      if (!cellProperties.name !== "object") {
+                        cellProperties.name = {};
+                      }
+
+                      cellProperties.name[this.state.selectedCell] = val;
+                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: layout
+                      });
+                    }}
+                    label={Titles.Name}
+                    value={cellProperties.name[this.state.selectedCell]}
+                  />
+                ) : null}
                 {cellStyle ? (
                   <SelectInput
                     options={["column", "row"].map(t => ({
@@ -834,9 +856,7 @@ class LayoutView extends Component {
   getStyleSelect() {
     if (this.state.filter) {
       return (
-        <ul
-          style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}
-        >
+        <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
           {Object.keys(StyleLib.js)
             .filter(x => x.indexOf(this.state.filter) !== -1)
             .map(key => {
@@ -862,9 +882,7 @@ class LayoutView extends Component {
   getCurrentStyling(currentStyle) {
     if (currentStyle) {
       return (
-        <ul
-          style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}
-        >
+        <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
           {Object.keys(currentStyle).map(key => {
             return (
               <li

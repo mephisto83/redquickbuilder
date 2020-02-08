@@ -272,15 +272,27 @@ export const SelectorPropertyKeys = {
   Object: "object",
   Blur: "blur"
 };
+export const MediaQueries = {
+  ["Extra small devices"]: "@media only screen and (max-width: 600px)",
+  ["Small devices"]: "@media only screen and (min-width: 600px)",
+  ["Media devices"]: "@media only screen and (min-width: 768px)",
+  ["Large devices"]: "@media only screen and (min-width: 992px)",
+  ["Extra devices"]: "@media only screen and (min-width: 1200px)"
+};
 export const NodeProperties = {
   ViewPackage: "view-package",
   IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
+  GridPlacement: "GridPlacement",
+  GridRowCount: "GridRowCount",
   HoverStyle: ":hover",
   ActiveStyle: ":active",
   BeforeStyle: "::before",
+  GridAreas: "GridAreas",
   AfterStyle: "::after",
+  MediaQuery: "MediaQuery",
+  UseMediaQuery: "UseMediaQuery",
   CheckedStyle: ":checked",
   DisabledStyle: ":disabled",
   EmptyStyle: ":empty",
@@ -872,7 +884,7 @@ export const LinkPropertyKeys = {
   VALID_CONSTRAINTS: "valid-constraints",
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
-  ComponentTag:'ComponentTag',
+  ComponentTag: "ComponentTag",
   ViewType: "viewType"
 };
 export const LinkProperties = {
