@@ -1,47 +1,31 @@
 import {
   GenerateChainFunctions,
-  GenerateChainFunctionSpecs
+  GenerateChainFunctionSpecs,
+  GetDataChainCollections,
+  NodesByType
 } from "../actions/uiactions";
 import { readFileSync } from "fs";
-import { UITypes, NEW_LINE } from "../constants/nodetypes";
+import { UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
 import { bindTemplate } from "../constants/functiontypes";
 
 export default class DataChainGenerator {
   static Generate(options) {
     let { language } = options;
     let funcs = GenerateChainFunctions(options);
-
+    let collections = GetDataChainCollections(options);
+    let collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
     let temps = [
+      ...collectionNodes.map(cn => {
+        let _cfunc = GenerateChainFunctions({ language, collection: cn.id });
+        return {
+          template: dcTemplate("", _cfunc),
+          relative: "./src/actions",
+          relativeFilePath: `./${GetJSCodeName(nc)}.js`,
+          name: `${GetJSCodeName(nc)}`
+        };
+      }),
       {
-        template: `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
-import {
-    validateEmail,
-    maxLength,
-    minLength,
-    greaterThanOrEqualTo,
-    lessThanOrEqualTo,
-    arrayLength,
-    numericalDefault,
-    equalsLength,
-    alphanumericLike,
-    alphanumeric,
-    alpha
-} from './validation';
-
-import * as navigate from './navigationActions';
-import * as $service from '../util/service';
-import routes from '../constants/routes';
-
-import * as RedLists from './lists.js';
-import * as StateKeys from '../state_keys';
-import * as ModelKeys from '../model_keys';
-import * as ViewModelKeys from '../viewmodel_keys';
-import * as Models from '../model_keys.js';
-import RedObservable from './observable.js';
-import RedGraph from './redgraph.js';
-import { useParameters, fetchModel } from './redutils.js';
-
-${funcs}`,
+        template: dcTemplate(collections, funcs),
         relative: "./src/actions",
         relativeFilePath: `./data-chain.js`,
         name: "data-chain"
@@ -92,3 +76,37 @@ ${funcs}`,
     return result;
   }
 }
+
+let dcTemplate = (
+  collections,
+  funcs
+) => `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
+import {
+    validateEmail,
+    maxLength,
+    minLength,
+    greaterThanOrEqualTo,
+    lessThanOrEqualTo,
+    arrayLength,
+    numericalDefault,
+    equalsLength,
+    alphanumericLike,
+    alphanumeric,
+    alpha
+} from './validation';
+
+import * as navigate from './navigationActions';
+import * as $service from '../util/service';
+import routes from '../constants/routes';
+
+import * as RedLists from './lists.js';
+import * as StateKeys from '../state_keys';
+import * as ModelKeys from '../model_keys';
+import * as ViewModelKeys from '../viewmodel_keys';
+import * as Models from '../model_keys.js';
+import RedObservable from './observable.js';
+import RedGraph from './redgraph.js';
+import { useParameters, fetchModel } from './redutils.js';
+${collections}
+
+${funcs}`;

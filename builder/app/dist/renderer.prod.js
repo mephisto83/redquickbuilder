@@ -134,6 +134,7 @@ __webpack_require__.d(functiontypes_namespaceObject, "FunctionPerpetrators", fun
 __webpack_require__.d(functiontypes_namespaceObject, "ReturnTypes", function() { return ReturnTypes; });
 __webpack_require__.d(functiontypes_namespaceObject, "hasTemplate", function() { return hasTemplate; });
 __webpack_require__.d(functiontypes_namespaceObject, "bindTemplate", function() { return bindTemplate; });
+__webpack_require__.d(functiontypes_namespaceObject, "bindReferenceTemplate", function() { return bindReferenceTemplate; });
 var uiactions_namespaceObject = {};
 __webpack_require__.r(uiactions_namespaceObject);
 __webpack_require__.d(uiactions_namespaceObject, "VISUAL", function() { return VISUAL; });
@@ -886,12 +887,15 @@ const AddDefaults = "Add Defaults";
 const Type = "Type";
 const EventType = "Event Type";
 const titles_UIParameters = "UI Parameters";
+const GridAreas = "Grid Areas";
+const GridRow = "GridRow";
+const Rows = "Row Count";
 const Navigation = "Navigation";
 const UseHttps = "Use Https";
 const Parameter = "Parameter";
 const ServerSideSetup = "Service Side Setup";
 const Theme = "Theme";
-const Properties = "Properties;";
+const Properties = "Properties";
 const titles_EventHandlerActivityMenu = "Event Handlers";
 const AddCondition = "Add Condition";
 const Style = "Style";
@@ -908,6 +912,8 @@ const ViewTypes = "View Types";
 const List = "List";
 const All = "All";
 const DataChain = "Data Chain";
+const SetFetchServiceOutput = "Set Fetch Service Output";
+const AddMethod = "Add Method";
 const titles_ComponentPropertyMenu = "Component Properties";
 const titles_ComponentAPIMenu = "Component API";
 const Domain = "Domain";
@@ -922,6 +928,7 @@ const Models = "Models";
 const MethodName = "Method Name";
 const OutputModel = "Output Model";
 const AddComponentNew = "Add Component";
+const ReattachComponent = "Reattach Component";
 const Height = "Height";
 const Get_Object_Agent_Value__IListObject_By_Specific = "Get Specific Items";
 const Component = "Component";
@@ -959,6 +966,7 @@ const UseInView = "Use In View";
 const InternalApiConnection = "Internal Api Connection";
 const Selector = "Selector";
 const Collapsed = "Collapsed";
+const MediaQuery = "Media Query";
 const GenericLink = "General Link";
 const OnLoad = "On Load";
 const AddQueryMethodApi = "Add Query Api";
@@ -978,7 +986,7 @@ const UseAsRoot = "Use as top element";
 const OnChange = " On Change";
 const OnClick = "On Click";
 const OnPress = "On Press";
-const SelectProperty = "Select Property";
+const titles_SelectProperty = "Select Property";
 const DisallowedEnums = "Disallowed values";
 const ManyToMany = "Many 2 Many";
 const Many2ManyProperties = "Many 2 Many Properties";
@@ -995,6 +1003,7 @@ const UICheckBox = "UI Checkbox";
 const PermissionsDependencyAttribute = "Permission Dependency Attribute";
 const GeneratedConstants = "Generated Constants";
 const KeyField = "Key fields, are used as constants through out the app.";
+const SetFetchSericeAgent = "Set Service Agent";
 const GeneratedMethodsConstants = "Generated Methods Constants";
 const TargetModel = "Target Model";
 const UseEnumeration = "Use Enumeration";
@@ -1160,6 +1169,7 @@ const Create_Object_Agent_Many_to_Many_CompositeInput__Object = "Create Object b
 const Create_Object__Object = "Create Object => Object";
 const Update_Object_With_User = "Update Object => Object";
 const Create_Object_With_User = "Create Object with User";
+const GetObjectsFromLIstOfIds = "Get Objects From List of IDs";
 const AddAllProperties = "Add all properties";
 const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
 const Get_ManyToMany_Agent_Value__IListChild = "Get Many to Many => IList<Child>";
@@ -1169,6 +1179,7 @@ const Delete_ManyToMany_Agent_Value__IListChild = "Delete Many to Many => IList<
 const Create_Parent$Child_Agent_Value__IListChild = "Create Parent/Child => IList<Child>";
 const Update_Parent$Child_Agent_Value__IListChild = "Update Parent/Child => IList<Child>";
 const Get_Parent$Child_Agent_Value__IListChild = "Get Parent/Child => IList<Child>";
+const Hover = "Hover";
 const UseNavigationParams = "Use Navigation Params";
 const Create_Object_Agent_Value__IListObject = "Create Object by Agent => IList<Object>";
 const Update_Object_Agent_Value__IListObject = "Update Object by Agent => IList<Object>";
@@ -1177,12 +1188,17 @@ const Get_Object_Agent_Value__IListObject = "Get Object by Agent => IList<Object
 const Get_Agent_Value__IListObject = "Get Objects for an Agent";
 const Can_Execute_Agent_Parent_In_Valid_List = "Can Execute Agent Parent In Valid List";
 const AddButtonToComponent = "Add Button";
+const AddTitleToComponent = "Add Title";
 const Get_Object_Agent_Value__Object = "Get Object by Agent";
 const Update_Object_Agent_Value__Object = "Update Object by Agent";
 const Update_Object_Agent_Value__Object_With_Object = "Update Object by Agent with object";
+const AddLifeCylceEvents = "Add Life Cycle Events";
 const CopyPermissionConditions = "Copy Permission Conditions";
+const CopyValidationConditions = "Copy Validation Conditions";
 const Functions = "Functions";
+const IncludeEventHandler = "Include Event Handler";
 const Login = "Login";
+const AddEvent = "Add Event";
 const DeleteAllSelected = "Delete All Selected";
 const SelectProperties = "Select Properties";
 const SelectAllConnected = "Selected All Connected";
@@ -1323,7 +1339,9 @@ const NodeTypes = {
   DataChain: "data-chain",
   ServiceInterface: "service-interface",
   ServiceInterfaceMethod: "service-interface-method",
-  ViewModel: "view-model"
+  ViewModel: "view-model",
+  FetchService: "FetchService",
+  Style: "Style"
 };
 const NodeTypeIcons = {};
 function GetNodeTypeIcon(type) {
@@ -1431,7 +1449,9 @@ const NodeTypeColors = {
   [NodeTypes.ComponentExternalApi]: "#2E5266",
   [NodeTypes.NavigationAction]: "#1282A2",
   [NodeTypes.Lists]: "#2DC7FF",
-  [NodeTypes.ClaimService]: "#034748"
+  [NodeTypes.ClaimService]: "#034748",
+  [NodeTypes.FetchService]: "#BA1200",
+  [NodeTypes.Style]: "#f12100"
 };
 const NavigateTypes = {
   Back: "GoBack",
@@ -1495,10 +1515,35 @@ const SelectorPropertyKeys = {
   Object: "object",
   Blur: "blur"
 };
+const MediaQueries = {
+  ["Extra small devices"]: "@media only screen and (max-width: 600px)",
+  ["Small devices"]: "@media only screen and (min-width: 600px)",
+  ["Media devices"]: "@media only screen and (min-width: 768px)",
+  ["Large devices"]: "@media only screen and (min-width: 992px)",
+  ["Extra devices"]: "@media only screen and (min-width: 1200px)"
+};
 const nodetypes_NodeProperties = {
   ViewPackage: "view-package",
+  IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
+  GridPlacement: "GridPlacement",
+  GridRowCount: "GridRowCount",
+  HoverStyle: ":hover",
+  ActiveStyle: ":active",
+  BeforeStyle: "::before",
+  GridAreas: "GridAreas",
+  AfterStyle: "::after",
+  MediaQuery: "MediaQuery",
+  UseMediaQuery: "UseMediaQuery",
+  CheckedStyle: ":checked",
+  DisabledStyle: ":disabled",
+  EmptyStyle: ":empty",
+  EnabledStyle: ":enabled",
+  FirstChildStyle: ":first-child",
+  LastChildStyle: ":last-child",
+  FocusStyle: ":focus",
+  ReadOnlyStyle: ":read-only",
   DefaultComponentApiValue: "DefaultComponentApiValue",
   ExcludeFromGeneration: "ExcludeFromGeneration",
   ViewPackageTitle: "view-package-title",
@@ -1657,6 +1702,7 @@ const nodetypes_NodeProperties = {
   Error: "Error",
   Placeholder: "Placeholder",
   Success: "Success",
+  Style: "Style",
   MethodProps: "methodProperties",
   FilterPropreties: "filterproperties",
   UIValidationType: "uiValidationType",
@@ -1692,8 +1738,10 @@ const nodetypes_NodeProperties = {
   ChainNodeInput1: "ChainNodeInput1",
   List: "List",
   UIModelType: "uiModelType",
+  IsTypeList: "IsTypeList",
   DataChainReferences: "DataChainReferences",
   Lambda: "Lambda",
+  LambdaInsertArguments: "LambdaInsertArguments",
   ModelKey: "ModelKey",
   DataChainReference: "DataChainReference",
   NumberParameter: "NumberParameter",
@@ -1827,6 +1875,8 @@ const nodetypes_LinkType = {
   MethodApiParameters: "MethodApiParameters",
   DefaultViewType: "DefaultViewType",
   SharedComponent: "SharedComponent",
+  // Connections to arguments used inside a lambda
+  LambdaInsertArguments: "LambdaInsertArguments",
   ClaimServiceAuthorizationMethod: "ClaimServiceAuthorizationMethod",
   ClaimServiceUpdateUserMethod: "ClaimServiceUpdateUserMethod",
   ExecutorServiceMethod: "ExecutorServiceMethod",
@@ -1872,6 +1922,9 @@ const nodetypes_LinkType = {
   Extension: "extension",
   ScreenOptions: "screen-options",
   ListItem: "list-item",
+  FetchService: "FetchService",
+  FetchServiceOuput: "FetchServiceOuput",
+  FetchSserviceAgent: "FetchSserviceAgent",
   Enumeration: "enumeration",
   ClientMethod: "ClientMethod",
   DataSource: "DataSource",
@@ -1927,8 +1980,9 @@ const nodetypes_LinkType = {
   //There is a link bewteen a property and a dependency
   PermissionDependencyPropertyManyToManyLink: "permission-dependency-property-many-to-many",
   //There is a link between a property and a dependency in a many to many situation.
-  PermissionPropertyDependencyManyToManyLink: "permission-property-dependency-many-to-many" //There is a link between a permision and a property in a many to many situnation.
-
+  PermissionPropertyDependencyManyToManyLink: "permission-property-dependency-many-to-many",
+  //There is a link between a permision and a property in a many to many situnation.
+  Style: "Style"
 };
 const VIKTIG_LINKS = 5;
 const LinkStyles = {
@@ -2052,11 +2106,15 @@ const LinkPropertyKeys = {
   VALID_CONSTRAINTS: "valid-constraints",
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
+  ComponentTag: "ComponentTag",
   ViewType: "viewType"
 };
 const LinkProperties = {
   SharedComponent: {
     type: nodetypes_LinkType.SharedComponent
+  },
+  LambdaInsertArguments: {
+    type: nodetypes_LinkType.LambdaInsertArguments
   },
   ComponentApiConnector: {
     type: nodetypes_LinkType.ComponentApiConnector
@@ -2104,6 +2162,9 @@ const LinkProperties = {
   Lists: {
     type: nodetypes_LinkType.Lists
   },
+  Style: {
+    type: nodetypes_LinkType.Style
+  },
   ComponentApiConnection: {
     type: nodetypes_LinkType.ComponentApiConnection
   },
@@ -2129,6 +2190,15 @@ const LinkProperties = {
   },
   EnumerationLink: {
     type: nodetypes_LinkType.Enumeration
+  },
+  FetchService: {
+    type: nodetypes_LinkType.FetchService
+  },
+  FetchSserviceAgent: {
+    type: nodetypes_LinkType.FetchSserviceAgent
+  },
+  FetchServiceOuput: {
+    type: nodetypes_LinkType.FetchServiceOuput
   },
   ClientMethodLink: {
     type: nodetypes_LinkType.ClientMethod
@@ -3582,6 +3652,8 @@ const functiontypes_FunctionTypes = {
   Update_ManyToMany_Agent_Value__IListChild: "Update/ManyToMany/Agent/Value => IList<Child>",
   Get_ManyToMany_Agent_Value__IListChild: "Get/ManyToMany/Agent/Value => IList<Child>",
   Delete_ManyToMany_Agent_Value__IListChild: "Delete/ManyToMany/Agent/Value => IList<Child>",
+  // Functions For Getting Data from lists of ids
+  Get_Objects_From_List_Of_Ids: "Get_Objects_From_List_Of_Ids",
   //Functions with List<Child> result
   Create_Parent$Child_Agent_Value__IListChild: "Create/Parent-Child/Agent/Value => IList<Child>",
   Update_Parent$Child_Agent_Value__IListChild: "Update/Parent-Child/Agent/Value => IList<Child>",
@@ -3652,7 +3724,8 @@ const FunctionTemplateKeys = {
   ModelFilter: "model_filter",
   Value: "value",
   CompositeInput: "composite-input",
-  CompositeInputProperty: "composite-input-property"
+  CompositeInputProperty: "composite-input-property",
+  FetchParameter: "fetch_parameter"
 };
 const FunctionConstraintKeys = {
   IsAgent: "isAgent",
@@ -3692,40 +3765,6 @@ const COMMON_CONSTRAINTS = {
     [FunctionConstraintKeys.IsSingleLink]: true,
     [FunctionConstraintKeys.IsModel]: true,
     key: FunctionTemplateKeys.Parent
-  },
-  [FunctionTemplateKeys.AgentType]: {
-    [FunctionConstraintKeys.IsAgent]: true,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.AgentType
-  },
-  [FunctionTemplateKeys.User]: {
-    [FunctionConstraintKeys.IsUser]: true,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.User
-  },
-  [FunctionTemplateKeys.UserInstance]: {
-    [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.User,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    key: FunctionTemplateKeys.UserInstance,
-    [FunctionConstraintKeys.IsInstanceVariable]: true,
-    [FunctionConstraintKeys.IsInputVariable]: true
-  },
-  [FunctionTemplateKeys.Value]: {
-    [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Model,
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    key: FunctionTemplateKeys.Value,
-    [FunctionConstraintKeys.IsInstanceVariable]: true,
-    [FunctionConstraintKeys.IsInputVariable]: true
-  }
-}; //Deprecated 6.12.2019
-
-const COMMON_CONSTRAINTS_AGENT_OBJECT = {
-  [FunctionTemplateKeys.Model]: {
-    [FunctionConstraintKeys.IsSingleLink]: true,
-    [FunctionConstraintKeys.IsModel]: true,
-    key: FunctionTemplateKeys.Model
   },
   [FunctionTemplateKeys.AgentType]: {
     [FunctionConstraintKeys.IsAgent]: true,
@@ -3967,6 +4006,10 @@ const COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT = {
   },
   [FunctionTemplateKeys.Model]: {
     key: FunctionTemplateKeys.Model,
+    nodeTypes: [NodeTypes.Model]
+  },
+  [FunctionTemplateKeys.ModelOutput]: {
+    key: FunctionTemplateKeys.ModelOutput,
     nodeTypes: [NodeTypes.Model]
   },
   [FunctionTemplateKeys.Agent]: {
@@ -4262,6 +4305,43 @@ const MethodFunctions = {
     },
     isList: false,
     method: nodetypes_Methods.Update,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS_USER
+    }
+  },
+  [functiontypes_FunctionTypes.Get_Objects_From_List_Of_Ids]: {
+    title: GetObjectsFromLIstOfIds,
+    titleTemplate: function (t, a) {
+      return `Get ${t}s With IdList by ${a}`;
+    },
+    template: external_fs_default.a.readFileSync("./app/templates/standard/get_agent_listobject_with_id_list.tpl", "utf-8"),
+    interface: external_fs_default.a.readFileSync("./app/templates/standard/get_agent_listobject_with_id_list_interface.tpl", "utf-8"),
+    controller: external_fs_default.a.readFileSync("./app/templates/controller/controller_get_all_by_ids.tpl", "utf-8"),
+    //controller_get_all_by_ids
+    templates: {},
+    permission: { ...PERMISSION_DEFAULTS,
+      params: [FunctionTemplateKeys.Agent]
+    },
+    parameters: {
+      body: true,
+      parameters: false
+    },
+    filter: { ...FILTER_DEFAULTS,
+      params: [FunctionTemplateKeys.Agent, FunctionTemplateKeys.FetchParameter, {
+        key: FunctionTemplateKeys.ModelOutput,
+        metaparameter: FunctionTemplateKeys.ModelOutput
+      }]
+    },
+    constraints: { ...COMMON_CONSTRAINTS_OBJECT_METHOD_OBJECT,
+      [FunctionTemplateKeys.FetchParameter]: {
+        key: FunctionTemplateKeys.FetchParameter,
+        nodeTypes: [NodeTypes.Model]
+      }
+    },
+    output: { ...COMMON_OUTPUT.OBJECT
+    },
+    isList: true,
+    isFetchCompatible: true,
+    method: nodetypes_Methods.GetAll,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS_USER
     }
   },
@@ -5060,6 +5140,40 @@ function bindTemplate(templateString, data) {
     if (hasTemplate) {
       for (var t in data) {
         var subregex = new RegExp("({{)" + t + "(}})", "g");
+        var val = data[t];
+        templateString = templateString.replace(subregex, val === null || val === undefined ? "" : val);
+      }
+    }
+  } catch (e) {
+    console.log("-------------");
+    console.log(t);
+    console.log(`"${singularSymbol}"`);
+    console.log(`"${templateString}"`);
+    throw e;
+  }
+
+  return templateString;
+}
+function bindReferenceTemplate(templateString, data) {
+  var singularSymbol = "@";
+
+  try {
+    var regex = new RegExp("#({)[A-Za-z0-9_." + singularSymbol + " ,'|]*(})", "g");
+    var hasTemplate;
+
+    try {
+      hasTemplate = regex.test(templateString);
+    } catch (e) {}
+
+    Object.keys(data).map(t => {
+      if (!data[t + "#lower"]) {
+        data[t + "#lower"] = `${data[t]}`.toLowerCase();
+      }
+    });
+
+    if (hasTemplate) {
+      for (var t in data) {
+        var subregex = new RegExp("(#{)" + t + "(})", "g");
         var val = data[t];
         templateString = templateString.replace(subregex, val === null || val === undefined ? "" : val);
       }
@@ -9157,7 +9271,294 @@ const DataChainContextMethods = {
 // EXTERNAL MODULE: external "async_hooks"
 var external_async_hooks_ = __webpack_require__("async_hooks");
 
+// CONCATENATED MODULE: ./app/utils/utilservice.js
+
+
+function calculateContrast(c1, c2) {
+  let c1_ = relativeLuminance(c1);
+  let c2_ = relativeLuminance(c2);
+  let L1 = Math.max(c1_, c2_);
+  let L2 = Math.min(c1_, c2_);
+  return (L1 + 0.05) / (L2 + 0.05);
+}
+function relativeLuminance(color) {
+  /**
+     * relative luminance
+  the relative brightness of any point in a colorspace, normalized to 0 for darkest black and 1 for lightest white
+  Note 1: For the sRGB colorspace, the relative luminance of a color is defined as L = 0.2126 * R + 0.7152 * G + 0.0722 * B where R, G and B are defined as:
+  if RsRGB <= 0.03928 then R = RsRGB/12.92 else R = ((RsRGB+0.055)/1.055) ^ 2.4
+  if GsRGB <= 0.03928 then G = GsRGB/12.92 else G = ((GsRGB+0.055)/1.055) ^ 2.4
+  if BsRGB <= 0.03928 then B = BsRGB/12.92 else B = ((BsRGB+0.055)/1.055) ^ 2.4
+  and RsRGB, GsRGB, and BsRGB are defined as:
+  RsRGB = R8bit/255
+  GsRGB = G8bit/255
+  BsRGB = B8bit/255
+     */
+  if (color.startsWith("#")) {
+    color = color.split("").subset(1).join("");
+  }
+
+  let Rs = parseInt(`${color[0]}${color[1]}`, 16) / 255;
+  let Gs = parseInt(`${color[2]}${color[3]}`, 16) / 255;
+  let Bs = parseInt(`${color[4]}${color[5]}`, 16) / 255;
+  let r, g, b;
+  let minv = 0.03928;
+
+  function calc(c) {
+    let r;
+
+    if (c <= minv) {
+      r = c / 12.92;
+    } else {
+      r = Math.pow((c + 0.55) / 1.055, 2.4);
+    }
+
+    return r;
+  }
+
+  r = calc(Rs);
+  g = calc(Gs);
+  b = calc(Bs);
+  let L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return L;
+}
+function getStringInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\${[a-zA-Z0-9_]*}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function getReferenceInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\#{[a-zA-Z0-9_]*}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function getGuids(str = "") {
+  const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function getGroupGuids(str = "") {
+  const regex = /group\-(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result.map(v => getGuids(v)).flatten().filter(x => x);
+}
+function getNodePropertyGuids(obj) {
+  let str = JSON.stringify(obj);
+  let guids = getGuids(str).unique();
+  return guids;
+}
+function processRecording(str) {
+  let guids = getGuids(str).unique();
+  let groupGuids = getGroupGuids(str).unique();
+  let nodeIndexes = {};
+  groupGuids.map((v, index) => {
+    nodeIndexes[guids.indexOf(v) - index] = index;
+  });
+  guids = guids.filter(v => !groupGuids.some(t => v == t));
+  let commands = JSON.parse(str);
+  let unaccountedGuids = [...guids];
+  commands.map(command => {
+    if (command.callback) {
+      if (command.options) {
+        if (command.callbackGroup && command.options.groupProperties) {
+          command.options.callbackg = command.callback;
+        } else {
+          command.options.callback = command.callback;
+        }
+      }
+    }
+
+    if (unaccountedGuids.some(v => v === command.callback)) {
+      unaccountedGuids = [...unaccountedGuids.filter(x => x !== command.callback)];
+    }
+
+    delete command.callback;
+    delete command.callbackGroup;
+  });
+  str = JSON.stringify(commands, null, 4);
+  guids.map((guid, index) => {
+    var subregex = new RegExp(`"callback": "${guid}"`, "g");
+    str = str.replace(subregex, `"callback": function(node) { context.node${index} = node.id; }`);
+    subregex = new RegExp(`"callbackg": "${guid}"`, "g");
+    str = str.replace(subregex, `"callback": function(node, graph, group) { context.node${index} = node.id;
+      context.group${nodeIndexes[index]} = group;
+    }`);
+    subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.node${index}]:`);
+    subregex = new RegExp(`"${guid}"`, "g");
+    str = str.replace(subregex, `context.node${index}`);
+  });
+  groupGuids.map((guid, index) => {
+    var subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.group${index}]:`);
+    subregex = new RegExp(`"${guid}"`, "g");
+    str = str.replace(subregex, `context.group${index}`);
+  });
+  let firstFunction$re = /\[ *\n *{/gm;
+  str = str.replace(firstFunction$re, `[
+      function(graph) {
+      return [{
+`);
+  let functionStart$re = /,\n *{/gm;
+  str = str.replace(functionStart$re, `,
+    {
+    function(graph) {
+      return [{
+`);
+  let functionEnd$re = /},\n *{/gm;
+  str = str.replace(functionEnd$re, `}]
+    },
+`);
+  let lastFunction$re = /}\n *]/gm;
+  str = str.replace(lastFunction$re, `}]
+  }]
+`);
+  let inserts = getStringInserts(str);
+  inserts.map(insert => {
+    var subregex = new RegExp("\\" + insert, "g");
+    str = str.replace(subregex, `" + args.${insert.substr(2, insert.length - 3)} + "`);
+  });
+  const regex = /context.groupundefined = group;/gm;
+  str = str.replace(regex, "");
+  let temp = guids.map((x, index) => {
+    return `{
+      operation: 'CHANGE_NODE_PROPERTY',
+      options: function() {
+          return {
+          prop: 'Pinned',
+          id: context.node${index},
+          value: false
+        }
+      }
+    }`;
+  }).subset(1).join("," + nodetypes_NEW_LINE);
+  return `
+  import { uuidv4 } from "../utils/array";
+  import { NodeProperties } from "../constants/nodetypes";
+  export default function(args = {}) {
+    // ${unaccountedGuids.map(v => {
+    let index = guids.indexOf(v);
+    return "node" + index;
+  }).join()}
+
+      // ${inserts.map(insert => insert.substr(2, insert.length - 3)).join(", ")}
+      ${inserts.map(insert => {
+    let temp = insert.substr(2, insert.length - 3);
+    return `if(!args.${temp}){
+          throw 'missing ${temp} argument';
+        }`;
+  }).join('')}
+    let context = {
+      ...args${unaccountedGuids.length ? "," + nodetypes_NEW_LINE + unaccountedGuids.map(v => {
+    let index = guids.indexOf(v);
+    return "node" + index + ": uuidv4() ";
+  }).join("," + nodetypes_NEW_LINE) : ""}
+    };
+    let {
+      viewPackages
+    } = args;
+    viewPackages = {
+      [NodeProperties.ViewPackage]: uuidv4(),
+      ...(viewPackages||{})
+    };
+    let result = ${str};
+    let clearPinned = [${temp}];
+    let applyViewPackages = [${guids.map((guid, index) => {
+    if (unaccountedGuids.indexOf(guid) === -1) {
+      return `{
+          operation: 'UPDATE_NODE_PROPERTY',
+          options : function() {
+            return {
+              id: context.node${index},
+              properties: viewPackages
+            }
+          }
+        }`;
+    }
+
+    return false;
+  }).filter(x => x).join()}]
+    return [
+      ...result,
+      ...clearPinned,
+      ...applyViewPackages,
+      function() {
+        if (context.callback) {
+          context.entry = context.node0;
+          context.callback(context);
+        }
+        return [];
+      }];
+  }`;
+}
 // CONCATENATED MODULE: ./app/actions/uiactions.js
+
 
 
 
@@ -10330,7 +10731,7 @@ function GenerateChainFunctions(options) {
 
     return true;
   }).map(x => x.id);
-  return entryNodes.map(GenerateChainFunction).join(nodetypes_NEW_LINE);
+  return entryNodes.map(GenerateChainFunction).unique(x => x).join(nodetypes_NEW_LINE);
 }
 function GetComponentExternalApiNode(api, parent, graph) {
   graph = graph || GetCurrentGraph();
@@ -10524,6 +10925,7 @@ function GenerateDataChainMethod(id) {
   let $screen = uiactions_GetNodeProp(node, uiactions_NodeProperties.Screen);
   let userParams = uiactions_GetNodeProp(node, uiactions_NodeProperties.UseNavigationParams);
   let lambda = uiactions_GetNodeProp(node, uiactions_NodeProperties.Lambda);
+  let lambdaInsertArguments = uiactions_GetNodeProp(node, uiactions_NodeProperties.LambdaInsertArguments);
   let listReference = uiactions_GetNodeProp(node, uiactions_NodeProperties.List);
   let lastpart = "return item;";
 
@@ -10618,6 +11020,15 @@ function GenerateDataChainMethod(id) {
       return `($a) => ($a || []).map(${lambda})`;
 
     case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda).map(v => v.substr(2, v.length - 3)).unique().map(insert => {
+        let args = insert.split("|");
+        let property = args[0];
+        let prop = lambdaInsertArguments[property];
+        let node = GetNodeById(prop);
+        lambda = bindReferenceTemplate(lambda, {
+          [property]: GetCodeName(node)
+        });
+      });
       return `${lambda}`;
 
     case DataChainFunctionKeys.Merge:
@@ -12692,13 +13103,13 @@ class namespacegenerator_NamespaceGenerator {
 
 
 
-const CONTROLLER_CLASS_TEMPLATE = './app/templates/controller/controller.tpl';
-const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
-const CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE = './app/templates/controller/controller_functions_get.tpl';
+const CONTROLLER_CLASS_TEMPLATE = "./app/templates/controller/controller.tpl";
+const CONTROLLER_CLASS_FUNCTION_TEMPLATE = "./app/templates/controller/controller_functions.tpl";
+const CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE = "./app/templates/controller/controller_functions_get.tpl";
 const PROPERTY_TABS = 6;
 class controllergenerator_ControllerGenerator {
   static Tabs(c) {
-    let res = '';
+    let res = "";
 
     for (var i = 0; i < c; i++) {
       res += TAB;
@@ -12716,18 +13127,18 @@ class controllergenerator_ControllerGenerator {
     let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
     let controllers = uiactions_NodesByType(state, uiactions_NodeTypes.Controller).filter(x => !uiactions_GetNodeProp(x, uiactions_NodeProperties.ExcludeFromGeneration));
 
-    let _controllerTemplateClass = external_fs_default.a.readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf8');
+    let _controllerTemplateClass = external_fs_default.a.readFileSync(CONTROLLER_CLASS_TEMPLATE, "utf8");
 
-    let _controllerTemplateFunction = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf8');
+    let _controllerTemplateFunction = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, "utf8");
 
-    let _controllerTemplateFunctionGet = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE, 'utf8');
+    let _controllerTemplateFunctionGet = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE, "utf8");
 
     let root = GetRootGraph(state);
     let result = {};
     controllers.map(controller => {
       let controllerTemplateClass = _controllerTemplateClass;
-      let functions = '';
-      let statics = '';
+      let functions = "";
+      let statics = "";
       let codeName = `${uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName)}`;
       let userNode = uiactions_NodesByType(state, uiactions_NodeTypes.Model).find(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.IsUser));
       let maestro_functions = [];
@@ -12750,16 +13161,16 @@ class controllergenerator_ControllerGenerator {
 
             if (ft) {
               let tempFunction = ft.controller || _controllerTemplateFunction;
-              let parameters = '';
-              let parameter_route = '';
-              let parameter_values = ''; //If the function is a get then, use the get template.
+              let parameters = "";
+              let parameter_route = "";
+              let parameter_values = ""; //If the function is a get then, use the get template.
 
               if (!ft.controller) if ([nodetypes_Methods.Get, nodetypes_Methods.GetAll].some(v => v === uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.MethodType))) {
                 tempFunction = _controllerTemplateFunctionGet;
-                let paramName = 'modelId';
+                let paramName = "modelId";
 
                 if (ft.parentGet) {
-                  paramName = 'parentId';
+                  paramName = "parentId";
                 }
 
                 parameters = `string ${paramName}`;
@@ -12772,7 +13183,7 @@ class controllergenerator_ControllerGenerator {
                 parameters = ft.controller_parameters.params.map(cp => {
                   return `${GetCodeName(methodprops[cp])} ${cp}`;
                 }).join();
-                parameter_route = '';
+                parameter_route = "";
                 parameter_values = ft.controller_parameters.params.map(cp => {
                   return `${cp}`;
                 }).join();
@@ -12790,8 +13201,9 @@ class controllergenerator_ControllerGenerator {
               let methodProperties = uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.MethodProps);
               if (!methodProperties) return;
               let modelNode = GetNode(root, methodProperties.model);
+              let fetch_parameter = GetNode(root, methodProperties.fetch_parameter);
               let compositeInput = GetNode(graphRoot, methodProperties[FunctionTemplateKeys.CompositeInput]);
-              let output_type = '{controller_generator_missing_model}';
+              let output_type = "{controller_generator_missing_model}";
 
               if (modelNode) {
                 output_type = uiactions_GetNodeProp(modelNode, uiactions_NodeProperties.CodeName) || output_type;
@@ -12807,12 +13219,13 @@ class controllergenerator_ControllerGenerator {
                 parameters,
                 parameter_values,
                 parameter_route,
-                http_route: httpRoute || '{controller_generator_http_method',
-                http_method: httpMethod || '{controller_generator_http_method',
-                user_instance: controller ? uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeUser) : '{controller_generator_code_name}',
+                http_route: httpRoute || "{controller_generator_http_method",
+                http_method: httpMethod || "{controller_generator_http_method",
+                user_instance: controller ? uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeUser) : "{controller_generator_code_name}",
                 output_type: output_type,
+                fetch_parameter: GetCodeName(fetch_parameter),
                 maestro_interface: ToInterface(maestroName),
-                input_type: compositeInput || modelNode ? GetCodeName(compositeInput || modelNode) : '{controller_generator_missing_model}'
+                input_type: compositeInput || modelNode ? GetCodeName(compositeInput || modelNode) : "{controller_generator_missing_model}"
               }); // let template = ft.template;
               // if (ft.template_keys) {
               //     for (var template_key in template_key) {
@@ -12828,9 +13241,9 @@ class controllergenerator_ControllerGenerator {
 
         controllerTemplateClass = bindTemplate(controllerTemplateClass, {
           codeName: codeName,
-          'codeName#alllower': codeName.toLowerCase(),
-          user_instance: controller ? uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeUser) : '{controller_generator_code_name}',
-          user: userNode ? uiactions_GetNodeProp(userNode, uiactions_NodeProperties.CodeName) : '{controller_generator_code_name}',
+          "codeName#alllower": codeName.toLowerCase(),
+          user_instance: controller ? uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeUser) : "{controller_generator_code_name}",
+          user: userNode ? uiactions_GetNodeProp(userNode, uiactions_NodeProperties.CodeName) : "{controller_generator_code_name}",
           functions
         });
       });
@@ -12839,7 +13252,7 @@ class controllergenerator_ControllerGenerator {
         name: uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName),
         template: namespacegenerator_NamespaceGenerator.Generate({
           template: controllerTemplateClass,
-          usings: [...STANDARD_CONTROLLER_USING, `${namespace}${nodetypes_NameSpace.Model}`, 'Microsoft.AspNetCore.Mvc'],
+          usings: [...STANDARD_CONTROLLER_USING, `${namespace}${nodetypes_NameSpace.Model}`, "Microsoft.AspNetCore.Mvc"],
           namespace,
           space: nodetypes_NameSpace.Controllers
         })
@@ -12862,10 +13275,10 @@ const TAB = `   `;
 
 
 
-const MODEL_TEMPLATE = './app/templates/models/model.tpl';
-const MODEL_PROPERTY_TEMPLATE = './app/templates/models/model_property.tpl';
-const MODEL_STATIC_TEMPLATES = './app/templates/models/model_statics.tpl';
-const MODEL_ATTRIBUTE_TEMPLATE = './app/templates/models/model_attributes.tpl';
+const MODEL_TEMPLATE = "./app/templates/models/model.tpl";
+const MODEL_PROPERTY_TEMPLATE = "./app/templates/models/model_property.tpl";
+const MODEL_STATIC_TEMPLATES = "./app/templates/models/model_statics.tpl";
+const MODEL_ATTRIBUTE_TEMPLATE = "./app/templates/models/model_attributes.tpl";
 class modelgenerators_ModelGenerator {
   static Generate(options) {
     var {
@@ -12904,8 +13317,8 @@ class modelgenerators_ModelGenerator {
     }
 
     templateSwapDictionary.model = uiactions_GetNodeProp(node, uiactions_NodeProperties.CodeName);
-    templateSwapDictionary.base_model = uiactions_GetNodeProp(node, uiactions_NodeProperties.IsUser) ? 'RedUser' : 'DBaseData';
-    templateSwapDictionary.account_enabling_func = '';
+    templateSwapDictionary.base_model = uiactions_GetNodeProp(node, uiactions_NodeProperties.IsUser) ? "RedUser" : "DBaseData";
+    templateSwapDictionary.account_enabling_func = "";
 
     if (uiactions_GetNodeProp(node, uiactions_NodeProperties.IsUser)) {
       templateSwapDictionary.account_enabling_func = `
@@ -12928,7 +13341,7 @@ class modelgenerators_ModelGenerator {
         }`;
     }
 
-    templateSwapDictionary.attributes = '';
+    templateSwapDictionary.attributes = "";
     var connectedProperties = getNodesByLinkType(graph, {
       id: node.id,
       type: nodetypes_LinkType.PropertyLink,
@@ -12940,14 +13353,14 @@ class modelgenerators_ModelGenerator {
       direction: TARGET
     }).filter(x => x.id !== node.id);
     connectedProperties = [...connectedProperties, ...logicalParents];
-    let propertyTemplate = external_fs_default.a.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
-    let attributeTemplate = external_fs_default.a.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
-    let staticFunctionTemplate = external_fs_default.a.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+    let propertyTemplate = external_fs_default.a.readFileSync(MODEL_PROPERTY_TEMPLATE, "utf8");
+    let attributeTemplate = external_fs_default.a.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, "utf8");
+    let staticFunctionTemplate = external_fs_default.a.readFileSync(MODEL_STATIC_TEMPLATES, "utf8");
     let validatorFunctions = getNodesByLinkType(graph, {
       id: nodeId,
       type: nodetypes_LinkType.ValidatorModel,
       direction: TARGET
-    }).map(t => uiactions_GetNodeProp(t, uiactions_NodeProperties.CodeName)).map(t => modelgenerators_ModelGenerator.tabs(1) + `[${t}]` + nodetypes_NEW_LINE).join('');
+    }).map(t => uiactions_GetNodeProp(t, uiactions_NodeProperties.CodeName)).map(t => modelgenerators_ModelGenerator.tabs(1) + `[${t}]` + nodetypes_NEW_LINE).join("");
     templateSwapDictionary.attributes = validatorFunctions;
     let staticFunctions = [];
     let properties = connectedProperties.filter(x => !uiactions_GetNodeProp(x, uiactions_NodeProperties.IsDefaultProperty)).filter(x => x.id !== nodeId).map(propNode => {
@@ -12965,10 +13378,20 @@ class modelgenerators_ModelGenerator {
 
       let propType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
 
-      if (uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UIModelType)) {
-        propType = 'string';
+      if (uiactions_GetNodeProp(propNode, uiactions_NodeProperties.IsTypeList)) {
+        let types = GetNodesLinkedTo(graph, {
+          id: propNode.id,
+          link: nodetypes_LinkType.ModelTypeLink
+        });
+
+        if (types && types.length) {
+          propType = GetCodeName(types[0]);
+          propType = `IList<${propType}>`;
+        }
+      } else if (uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UIModelType)) {
+        propType = "string";
       } else if (uiactions_GetNodeProp(propNode, uiactions_NodeProperties.NODEType) === NodeTypes.Model) {
-        propType = 'string';
+        propType = "string";
       }
 
       if (uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UseModelAsType)) {
@@ -13038,20 +13461,20 @@ class modelgenerators_ModelGenerator {
           }
 
           let options = options_list && options_list.length ? bindTemplate(`Options = new string[] { {{options_list}} },`, {
-            options_list: options_list.map(t => `${t}`).join(', ')
-          }) : '';
+            options_list: options_list.map(t => `${t}`).join(", ")
+          }) : "";
           let validation_rules = validations && validations.length ? bindTemplate(`ValidationRules = new string[] { {{validation_list}} },`, {
-            validation_list: validations.map(t => `${t}`).join(', ')
-          }) : '';
+            validation_list: validations.map(t => `${t}`).join(", ")
+          }) : "";
           let choice_type_list = [];
-          let choice_type = choice_name ? bindTemplate('ChoiceType = {{choice_type}}.Name,', {
+          let choice_type = choice_name ? bindTemplate("ChoiceType = {{choice_type}}.Name,", {
             choice_type: choice_name
-          }) : '';
+          }) : "";
           let attributeSwapDictionary = {
             property: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.CodeName),
             property_type: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UseModelAsType) ? uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UIModelType) : uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UIAttributeType),
             ui_title: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UIName),
-            singular: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UISingular) ? 'true' : 'false',
+            singular: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.UISingular) ? "true" : "false",
             options,
             choice_type,
             validation_rules
@@ -13060,7 +13483,7 @@ class modelgenerators_ModelGenerator {
           if (attr && attr.uiValidationType) {}
 
           return bindTemplate(attributeTemplate, attributeSwapDictionary);
-        }).filter(x => x).join('\r\n')
+        }).filter(x => x).join("\r\n")
       };
       property_instance_template = bindTemplate(property_instance_template, propSwapDictionary);
       return property_instance_template;
@@ -13072,7 +13495,7 @@ class modelgenerators_ModelGenerator {
         let propSwapDictionary = {
           property_type: NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiactions_NodePropertyTypes.STRING],
           property: uiactions_GetNodeProp(propNode, uiactions_NodeProperties.CodeName),
-          attributes: ''
+          attributes: ""
         };
         properties.push(bindTemplate(propertyTemplate, propSwapDictionary));
       });
@@ -13090,16 +13513,16 @@ class modelgenerators_ModelGenerator {
         let propSwapDictionary = {
           property_type: NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiactions_NodePropertyTypes.STRING],
           property: uiactions_GetNodeProp(agent, uiactions_NodeProperties.CodeName),
-          attributes: ''
+          attributes: ""
         };
         property_instance_template = bindTemplate(property_instance_template, propSwapDictionary);
         properties.push(property_instance_template);
       });
     }
 
-    templateSwapDictionary.properties = properties.join('');
-    templateSwapDictionary.staticFunctions = staticFunctions.unique(x => x).join('\n');
-    let modelTemplate = external_fs_default.a.readFileSync(MODEL_TEMPLATE, 'utf8');
+    templateSwapDictionary.properties = properties.join("");
+    templateSwapDictionary.staticFunctions = staticFunctions.unique(x => x).join("\n");
+    let modelTemplate = external_fs_default.a.readFileSync(MODEL_TEMPLATE, "utf8");
     modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
     var result = {
       id: uiactions_GetNodeProp(node, uiactions_NodeProperties.CodeName),
@@ -13115,7 +13538,7 @@ class modelgenerators_ModelGenerator {
   }
 
   static tabs(c) {
-    let res = '';
+    let res = "";
     var TAB = "\t";
 
     for (var i = 0; i < c; i++) {
@@ -15600,18 +16023,18 @@ class modelitemfiltergenerator_ModelItemFilterGenerator {
 
 
 
-const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
-const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
-const maestrogenerator_CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
-const maestrogenerator_TEST_CLASS = './app/templates/tests/tests.tpl';
-const MAESTRO_FUNCTION_TESTS = './app/templates/maestro/tests/maestro.tpl';
-const MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS = './app/templates/maestro/tests/maestro_same_agent_model.tpl';
-const get_agent_manytomany_listchild_interface = './app/templates/maestro/tests/get_agent_manytomany_listchild_interface.tpl';
-const MAESTRO_FUNCTION_GET_TESTS = './app/templates/maestro/tests/maestro_get.tpl';
+const MAESTRO_CLASS_TEMPLATE = "./app/templates/maestro/maestro.tpl";
+const MAESTRO_INTERFACE_TEMPLATE = "./app/templates/maestro/imaestro.tpl";
+const maestrogenerator_CONTROLLER_CLASS_FUNCTION_TEMPLATE = "./app/templates/controller/controller_functions.tpl";
+const maestrogenerator_TEST_CLASS = "./app/templates/tests/tests.tpl";
+const MAESTRO_FUNCTION_TESTS = "./app/templates/maestro/tests/maestro.tpl";
+const MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS = "./app/templates/maestro/tests/maestro_same_agent_model.tpl";
+const get_agent_manytomany_listchild_interface = "./app/templates/maestro/tests/get_agent_manytomany_listchild_interface.tpl";
+const MAESTRO_FUNCTION_GET_TESTS = "./app/templates/maestro/tests/maestro_get.tpl";
 const maestrogenerator_PROPERTY_TABS = 6;
 class maestrogenerator_MaestroGenerator {
   static Tabs(c) {
-    let res = '';
+    let res = "";
 
     for (var i = 0; i < c; i++) {
       res += maestrogenerator_TAB;
@@ -15629,23 +16052,23 @@ class maestrogenerator_MaestroGenerator {
     let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
     let maestros = uiactions_NodesByType(state, uiactions_NodeTypes.Maestro).filter(x => !uiactions_GetNodeProp(x, uiactions_NodeProperties.ExcludeFromGeneration));
 
-    let _maestroTemplateClass = external_fs_default.a.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf8');
+    let _maestroTemplateClass = external_fs_default.a.readFileSync(MAESTRO_CLASS_TEMPLATE, "utf8");
 
-    let _MAESTRO_INTERFACE_TEMPLATE = external_fs_default.a.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf8');
+    let _MAESTRO_INTERFACE_TEMPLATE = external_fs_default.a.readFileSync(MAESTRO_INTERFACE_TEMPLATE, "utf8");
 
-    let _testClass = external_fs_default.a.readFileSync(maestrogenerator_TEST_CLASS, 'utf8');
+    let _testClass = external_fs_default.a.readFileSync(maestrogenerator_TEST_CLASS, "utf8");
 
-    let testFunctionTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf8');
-    let testFunctionGetSameParentTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf8');
-    let testFunctionGetTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf8');
+    let testFunctionTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_TESTS, "utf8");
+    let testFunctionGetSameParentTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, "utf8");
+    let testFunctionGetTemplate = external_fs_default.a.readFileSync(MAESTRO_FUNCTION_GET_TESTS, "utf8");
     let root = GetRootGraph(state);
     let graph = GetCurrentGraph(state);
     let result = {};
     maestros.map(maestro => {
       let maestroTemplateClass = _maestroTemplateClass;
-      let functions = '';
-      let functionsInterface = '';
-      let statics = '';
+      let functions = "";
+      let functionsInterface = "";
+      let statics = "";
       let codeName = `${uiactions_GetNodeProp(maestro, uiactions_NodeProperties.CodeName)}`;
       let maestro_functions = [];
       let tempfunctions = getNodesByLinkType(root, {
@@ -15668,17 +16091,18 @@ class maestrogenerator_MaestroGenerator {
             let tempFunction = ft.template;
             let interfaceFunction = ft.interface;
             let testFunction = ft.test;
-            let value_type = '';
-            let parent_type = '';
+            let value_type = "";
+            let parent_type = "";
 
             if (ft.parentGet) {
-              value_type = 'string';
+              value_type = "string";
             }
 
             let functionName = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.CodeName)}`;
             let httpMethod = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.HttpMethod)}`;
             let httpRoute = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.HttpRoute)}`;
             let agentTypeNode = null;
+            let fetchTypeNode = null;
             let userTypeNode = null;
             let parentNode = null;
             let permissionNode = null;
@@ -15686,17 +16110,18 @@ class maestrogenerator_MaestroGenerator {
             let compositeInput = null;
             let manyToManyNode = null;
             let connectingNode = null;
-            let parent_setup = '';
+            let parent_setup = "";
             let modelNode = null;
             let parent = null;
             let model_output = null;
             let methodProps = uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.MethodProps);
-            let predicates = '';
+            let predicates = "";
 
             if (methodProps) {
               agentTypeNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.AgentType] || methodProps[FunctionTemplateKeys.Agent]);
               modelNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
               userTypeNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
+              fetchTypeNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.FetchParameter]);
               permissionNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.Permission]);
               modelFilterNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.ModelFilter]);
               compositeInput = GetNode(graphRoot, methodProps[FunctionTemplateKeys.CompositeInput]);
@@ -15704,7 +16129,7 @@ class maestrogenerator_MaestroGenerator {
               connectingNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.ConnectionType]);
               model_output = GetCodeName(methodProps[FunctionTemplateKeys.ModelOutput]);
               parentNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.Parent]);
-              parent_type = parentNode ? uiactions_GetNodeProp(parentNode, uiactions_NodeProperties.CodeName) : '{missing parent name}';
+              parent_type = parentNode ? uiactions_GetNodeProp(parentNode, uiactions_NodeProperties.CodeName) : "{missing parent name}";
               manyToManyNode = GetNode(graphRoot, methodProps[FunctionTemplateKeys.ManyToManyModel]);
               var modelItemFilters = GetLinkChain(state, {
                 id: maestro_function.id,
@@ -15717,9 +16142,9 @@ class maestrogenerator_MaestroGenerator {
               predicates = modelitemfiltergenerator_ModelItemFilterGenerator.predicates(modelItemFilters, out_predicate);
 
               if (predicates.length) {
-                predicates = predicates.join(', ');
+                predicates = predicates.join(", ");
               } else {
-                predicates = '';
+                predicates = "";
               }
 
               if (out_predicate.parent) {
@@ -15731,7 +16156,7 @@ class maestrogenerator_MaestroGenerator {
             let model_type = modelNode ? uiactions_GetNodeProp(modelNode, uiactions_NodeProperties.CodeName) : `{maestro_generator_mising_model}`;
             let agent_type = agentTypeNode ? `${uiactions_GetNodeProp(agentTypeNode, uiactions_NodeProperties.CodeName)}` : `{maestro_generator_mising_agentTypeNode}`;
             let methodType = uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.MethodType);
-            let connect_type = connectingNode ? GetCodeName(connectingNode) : '{maestro_connection_type_missing}';
+            let connect_type = connectingNode ? GetCodeName(connectingNode) : "{maestro_connection_type_missing}";
             if (parentNode) arbiters.push(parent_type);
             let manyNodes = GetManyToManyNodes(graphRoot, [modelNode ? modelNode.id : false, agentTypeNode ? agentTypeNode.id : null].filter(x => x)) || [];
             arbiters.push(...manyNodes.map(manyNode => {
@@ -15742,11 +16167,11 @@ class maestrogenerator_MaestroGenerator {
               agent_type,
               model_type
             });
-            let value = '';
+            let value = "";
             let agentAndModelIsTheSame = false;
 
             if (ft.parentGet) {
-              value = parentNode ? `${uiactions_GetNodeProp(parentNode, uiactions_NodeProperties.CodeName)}`.toLowerCase() : '{missing parent name}';
+              value = parentNode ? `${uiactions_GetNodeProp(parentNode, uiactions_NodeProperties.CodeName)}`.toLowerCase() : "{missing parent name}";
 
               if (agentTypeNode && parentNode) {
                 agentAndModelIsTheSame = agentTypeNode.id === parentNode.id;
@@ -15758,10 +16183,10 @@ class maestrogenerator_MaestroGenerator {
             let bindOptions = {
               function_name: functionName,
               agent_type: agent_type,
-              'agent_type#lower': `${agent_type}`.toLowerCase(),
+              "agent_type#lower": `${agent_type}`.toLowerCase(),
               parent_type,
               agent: agent,
-              'composite-input': GetCodeName(compositeInput) || '',
+              "composite-input": GetCodeName(compositeInput) || "",
               model_input: GetCodeName(compositeInput) || model_type,
               value_type,
               value,
@@ -15770,18 +16195,19 @@ class maestrogenerator_MaestroGenerator {
               parent: GetCodeName(parentNode),
               model: model_type,
               connect_type,
-              comma: predicates.length ? ',' : '',
+              comma: predicates.length ? "," : "",
               predicates,
               maestro_function: functionName,
-              filter_function: modelFilterNode ? uiactions_GetNodeProp(modelFilterNode, uiactions_NodeProperties.CodeName) : '{missing filter node}',
+              filter_function: modelFilterNode ? uiactions_GetNodeProp(modelFilterNode, uiactions_NodeProperties.CodeName) : "{missing filter node}",
               user: userTypeNode ? uiactions_GetNodeProp(userTypeNode, uiactions_NodeProperties.CodeName) : `{maestro_generator_mising_user}`,
-              http_route: httpRoute || '{maestro_generator_http_method',
-              http_method: httpMethod || '{maestro_generator_http_method',
+              http_route: httpRoute || "{maestro_generator_http_method",
+              http_method: httpMethod || "{maestro_generator_http_method",
+              fetch_parameter: fetchTypeNode ? `${uiactions_GetNodeProp(fetchTypeNode, uiactions_NodeProperties.CodeName)}` : `{maestro_generator_mising_fetchParameter}`,
               user_instance: userTypeNode ? `${uiactions_GetNodeProp(userTypeNode, uiactions_NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_userNode}`,
-              output_type: modelNode ? GetCodeName(modelNode) : '{maestro_generator_missing_model}',
+              output_type: modelNode ? GetCodeName(modelNode) : "{maestro_generator_missing_model}",
               maestro_interface: ToInterface(maestroName),
               permission_function: permissionNode ? uiactions_GetNodeProp(permissionNode, uiactions_NodeProperties.CodeName) : `{MISSING_PERMISSION_FUNCTION}`,
-              input_type: modelNode ? GetCodeName(modelNode) : '{maestro_generator_missing_model}'
+              input_type: modelNode ? GetCodeName(modelNode) : "{maestro_generator_missing_model}"
             };
             tempFunction = bindTemplate(tempFunction, bindOptions);
             interfaceFunction = bindTemplate(interfaceFunction, bindOptions);
@@ -15862,7 +16288,7 @@ class maestrogenerator_MaestroGenerator {
 
                 switch (function_type) {
                   case functiontypes_FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-                    templ = external_fs_default.a.readFileSync(get_agent_manytomany_listchild_interface, 'utf8');
+                    templ = external_fs_default.a.readFileSync(get_agent_manytomany_listchild_interface, "utf8");
                     break;
                 }
 
@@ -15874,7 +16300,7 @@ class maestrogenerator_MaestroGenerator {
                   agent: agent_type,
                   many_to_many: uiactions_GetNodeProp(manyToManyNode, uiactions_NodeProperties.CodeName),
                   parent: uiactions_GetNodeProp(parentNode, uiactions_NodeProperties.CodeName),
-                  set_many_to_many_properties: '//{not set yet}',
+                  set_many_to_many_properties: "//{not set yet}",
                   value: modelNode ? `${uiactions_GetNodeProp(modelNode, uiactions_NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`,
                   model: model_type,
                   model_input: GetCodeName(compositeInput) || model_type,
@@ -15906,17 +16332,17 @@ class maestrogenerator_MaestroGenerator {
       maestroTemplateClass = bindTemplate(maestroTemplateClass, {
         codeName: codeName,
         set_properties: [...set_properties, ...set_permissions].join(maestrogenerator_jNL),
-        properties: [...permissions_properties, ...properties].join(' '),
-        injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => maestrogenerator_jNL + maestrogenerator_MaestroGenerator.Tabs(7) + t).join(','),
-        'codeName#alllower': codeName.toLowerCase(),
+        properties: [...permissions_properties, ...properties].join(" "),
+        injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => maestrogenerator_jNL + maestrogenerator_MaestroGenerator.Tabs(7) + t).join(","),
+        "codeName#alllower": codeName.toLowerCase(),
         functions
       });
       let maestro_interface_template = bindTemplate(_MAESTRO_INTERFACE_TEMPLATE, {
         codeName: codeName,
         set_properties: [...set_properties, ...set_permissions].join(maestrogenerator_jNL),
-        properties: [...permissions_properties, ...properties].join(' '),
-        injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => maestrogenerator_jNL + maestrogenerator_MaestroGenerator.Tabs(7) + t).join(','),
-        'codeName#alllower': codeName.toLowerCase(),
+        properties: [...permissions_properties, ...properties].join(" "),
+        injected_services: [...injectedServices, ...injectedPermissionServices].map((t, ti) => maestrogenerator_jNL + maestrogenerator_MaestroGenerator.Tabs(7) + t).join(","),
+        "codeName#alllower": codeName.toLowerCase(),
         functions: functionsInterface
       });
       result[uiactions_GetNodeProp(maestro, uiactions_NodeProperties.CodeName)] = {
@@ -17685,7 +18111,10 @@ const ComponentTags = {
   TopMenu: "TopMenu",
   LeftContainer: "LeftContainer",
   RightContainer: "RightContainer",
-  SecondaryMain: "SecondaryMain"
+  SecondaryMain: "SecondaryMain",
+  Bottom: "Bottom",
+  ListItem: "ListItem",
+  Footer: "Footer"
 };
 const NAVIGATION = "-NAVIGATION";
 const APP_METHOD = "-APP_METHOD";
@@ -17717,6 +18146,13 @@ const ComponentEvents = {
   onBlur: "onBlur",
   onChange: "onChange",
   onChangeText: "onChangeText"
+};
+const ComponentEventStandardHandler = {
+  [ComponentEvents.onChange]: `onChange={(evt)=>{
+    if(this.props.onChange) {
+      this.props.onChange(evt);
+    }
+  }}`
 };
 const ComponentEventArgs = {
   [ComponentEvents.onBlur]: {
@@ -17975,6 +18411,25 @@ const ComponentTypes = {
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
       template: "./app/templates/components/multiselectlist.tpl",
+      datasource: true,
+      properties: {
+        item_attributes: {
+          nodeProperty: uiactions_NodeProperties.TextType,
+          template: "{{value}}",
+          component_options: [NodeTypes.ComponentNode],
+          ui: true
+        }
+      },
+      ui: true
+    },
+    SingleSelect: {
+      layout: true,
+      specialLayout: true,
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      events: {
+        [ComponentEvents.onChange]: true
+      },
+      template: "./app/templates/components/singleselect.tpl",
       datasource: true,
       properties: {
         item_attributes: {
@@ -18516,7 +18971,9 @@ function GenerateScreenMarkup(id, language) {
       title: `"${GetNodeTitle(screen)}"`,
       imports: imports.join(nodetypes_NEW_LINE),
       elements: elements.join(nodetypes_NEW_LINE),
-      component_did_update: GetComponentDidUpdate(screenOption),
+      component_did_update: GetComponentDidUpdate(screenOption, {
+        isScreen: true
+      }),
       component_did_mount: GetComponentDidMount(screenOption)
     });
   }
@@ -18580,6 +19037,22 @@ function constructCssFile(css, clsName) {
   }).join(nodetypes_NEW_LINE);
   return rules;
 }
+/*
+A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
+*/
+
+function buildStyle(node) {
+  let styleNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: node.id,
+    link: nodetypes_LinkType.Style
+  });
+  styleNodes.map(styleNode => {
+    let style = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.Style);
+    let areas = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridAreas);
+    let gridRowCount = parseInt(uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridRowCount) || 1, 10);
+    let gridplacement = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridPlacement);
+  });
+}
 function GetItemData(node) {
   let dataSourceNode = uiactions_GetDataSourceNode(node.id);
   let connectedNode = uiactions_GetNodeProp(dataSourceNode, nodetypes_NodeProperties.DataChain);
@@ -18638,9 +19111,11 @@ function GenerateRNScreenOptionSource(node, relativePath, language) {
 
     let data = GetItemData(node);
     let item_render = GetItemRender(node, extraimports, language);
+    let apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(external_fs_default.a.readFileSync(template, "utf8"), {
       item_render: item_render,
-      data: data
+      data: data,
+      apiProperties
     });
   }
 
@@ -18667,6 +19142,7 @@ function GenerateRNScreenOptionSource(node, relativePath, language) {
   switch (language) {
     case UITypes.ElectronIO:
       templateStr = external_fs_default.a.readFileSync("./app/templates/screens/el_screenoption.tpl", "utf8");
+      buildStyle(node);
       cssFile = constructCssFile(css, `.${(GetCodeName(node) || "").toJavascriptName()}`);
       cssImport = `import styles from './${(GetCodeName(node) || "").toJavascriptName()}.css'`;
       break;
@@ -19189,6 +19665,7 @@ function WriteDescribedApiProperties(node, options = {
         case "viewModel":
           noSelector = true;
           noDataChain = true;
+          break;
 
         default:
           stateKey = "value";
@@ -19303,6 +19780,23 @@ function WriteDescribedApiProperties(node, options = {
       }
     }).filter(x => x).join(nodetypes_NEW_LINE);
   });
+  let componentType = uiactions_GetNodeProp(node, nodetypes_NodeProperties.ComponentType);
+  let uiType = uiactions_GetNodeProp(node, nodetypes_NodeProperties.UIType);
+
+  if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
+    let {
+      events
+    } = ComponentTypes[uiType][componentType];
+
+    for (var _event in events) {
+      switch (_event) {
+        case ComponentEvents.onChange:
+          result.push(ComponentEventStandardHandler[_event]);
+          break;
+      }
+    }
+  }
+
   result.push(...res);
   return nodetypes_NEW_LINE + result.join(nodetypes_NEW_LINE);
 }
@@ -19631,25 +20125,30 @@ function getUpdateFunctionOption(methodId, methodInstanceCallId, addParams) {
 
   return addiontionalParams;
 }
-function GetComponentDidUpdate(parent) {
+function GetComponentDidUpdate(parent, options = {}) {
+  let {
+    isScreen
+  } = options;
   let describedApi = "";
 
   if (parent) {
     describedApi = WriteDescribedStateUpdates(parent).trim();
   }
 
+  let componentDidMount = GetComponentDidMount(parent, {
+    skipOutOfBand: true,
+    skipSetGetState: true
+  });
   let componentDidUpdate = `componentDidUpdate(prevProps) {
         this.captureValues();
       }
-      componentDidMount(prevProps) {
-        this.captureValues();
-      }
+      ` + (!isScreen ? componentDidMount : "") + `
       captureValues(){
         ${describedApi}
       }`;
   return componentDidUpdate;
 }
-function GetComponentDidMount(screenOption) {
+function GetComponentDidMount(screenOption, options = {}) {
   let events = uiactions_GetNodeProp(screenOption, nodetypes_NodeProperties.ComponentDidMountEvent);
   let outOfBandCall = "";
 
@@ -19666,8 +20165,9 @@ function GetComponentDidMount(screenOption) {
     return getMethodInvocation(methodInstanceCall);
   }).join(nodetypes_NEW_LINE);
   let componentDidMount = `componentDidMount(value) {
-        this.props.setGetState();
-        ${outOfBandCall}
+        ${options.skipSetGetState ? "" : `this.props.setGetState();`}
+        this.captureValues();
+        ${options.skipOutOfBand ? "" : outOfBandCall}
         ${invocations}
 {{handles}}
 }
@@ -20049,7 +20549,7 @@ function GenerateModelKeys(options) {
     return bindTemplate(template, {
       name: GetCodeName(model)
     });
-  });
+  }).unique();
   return [{
     template: templates.join(nodetypes_NEW_LINE),
     relative: './src',
@@ -20175,13 +20675,14 @@ class configurationgenerator_ConfigurationGenerator {
 
 
 
+
 class controlleractionsgenerator_ControllerActionGenerator {
   static GenerateService(options) {
     let {
       state
     } = options;
     let temp = uiactions_NodesByType(state, uiactions_NodeTypes.Method);
-    let serviceTemplate = external_fs_default.a.readFileSync('./app/templates/screens/service.tpl', 'utf8');
+    let serviceTemplate = external_fs_default.a.readFileSync("./app/templates/screens/service.tpl", "utf8");
     let methodTemplate = `
 {{methodName}}: async (params) => {
     let { parameters } = params;
@@ -20193,7 +20694,20 @@ class controlleractionsgenerator_ControllerActionGenerator {
     return redservice().{{methodType}}(endpoints.{{methodName}}, body, {{options}});
 }`;
     let endpoints = {};
-    temp = temp.map(method => {
+    let fetchServices = uiactions_NodesByType(state, uiactions_NodeTypes.FetchService);
+    let fetchServiceMethodImplementation = false;
+
+    if (fetchServices.length) {
+      let fetchService = fetchServices[0];
+      endpoints[GetJSCodeName(fetchService)] = `api/fetchservice/${uiactions_GetNodeProp(fetchService, uiactions_NodeProperties.HttpRoute)}`;
+      fetchServiceMethodImplementation = bindTemplate(postMethodTemplate, {
+        methodName: GetJSCodeName(fetchService),
+        methodType: `post`,
+        options: `{}`
+      });
+    }
+
+    temp = [fetchServiceMethodImplementation, ...temp.map(method => {
       let maestroNode = GetMaestroNode(method.id);
 
       if (maestroNode) {
@@ -20207,13 +20721,13 @@ class controlleractionsgenerator_ControllerActionGenerator {
           }
 
           let methodType = uiactions_GetNodeProp(method, uiactions_NodeProperties.HttpMethod);
-          let asForm = '';
-          let collectCookies = '';
-          let asText = '';
+          let asForm = "";
+          let collectCookies = "";
+          let asText = "";
 
           if (uiactions_GetNodeProp(method, uiactions_NodeProperties.AsForm)) {
             if (uiactions_GetNodeProp(method, uiactions_NodeProperties.CollectCookies)) {
-              collectCookies = ' collectCookies: true';
+              collectCookies = " collectCookies: true";
             }
 
             asForm = ` asForm: true`;
@@ -20226,21 +20740,72 @@ class controlleractionsgenerator_ControllerActionGenerator {
           let options = [asForm, collectCookies, asText].filter(x => x).join();
           return bindTemplate(methodType === HTTP_METHODS.POST ? postMethodTemplate : methodTemplate, {
             methodName: GetJSCodeName(method),
-            methodType: `${methodType}`.toLowerCase().split('http').join(''),
+            methodType: `${methodType}`.toLowerCase().split("http").join(""),
             options: `{${options} }`
           });
         }
       }
-    }).filter(x => x).join(',' + nodetypes_NEW_LINE);
+    })].filter(x => x).join("," + nodetypes_NEW_LINE);
     return {
       template: bindTemplate(serviceTemplate, {
         service_methods: addNewLine(temp, 1),
         endpoints: JSON.stringify(endpoints, null, 4)
       }),
-      relative: './src/util',
+      relative: "./src/util",
       relativeFilePath: `./controllerService.js`,
-      name: 'controllerService'
+      name: "controllerService"
     };
+  }
+
+  static GenerateFetchService(options) {
+    let {
+      state
+    } = options;
+    let fetchServices = uiactions_NodesByType(state, uiactions_NodeTypes.FetchService);
+
+    if (fetchServices.length) {
+      let fetchService = fetchServices[0];
+      let datachain = GetNodesLinkedTo(GetCurrentGraph(), {
+        id: fetchService.id,
+        link: nodetypes_LinkType.DataChainLink
+      })[0];
+      let service = `
+import { setFetchServiceFunction } from '../actions/redutils';
+import { GetState, GetDispatch } from '../actions/uiActions';
+import { ${GetCodeName(datachain)} } from '../actions/data-chain';
+import * as Util from "../actions/util";
+
+export const FETCH_CALL = 'FETCH_CALL';
+
+setFetchServiceFunction(function(body) {
+  return Promise.resolve().then(() => {
+      let dispatch = GetDispatch();
+      let getState = GetState();
+      return  (Util.simple(
+        service.${GetJSCodeName(fetchService)},
+        { body },
+        {
+          loading: FETCH_CALL
+        },
+        result => {
+          let dataChain = ${GetCodeName(datachain)};
+          if (dataChain) {
+            return dataChain(result);
+          } else {
+            console.low("missing data chain");
+          }
+        }
+      ))(dispatch, getState);
+  });
+});
+      `;
+      return {
+        template: service,
+        relative: "./src/util",
+        relativeFilePath: `./fetchService.js`,
+        name: "fetchService"
+      };
+    }
   }
 
   static Generate(options) {
@@ -20275,17 +20840,17 @@ import * as Util from './util';
       return bindTemplate(ControllerMethodTemplate, {
         methodName: GetJSCodeName(node),
         method_call: addNewLine(method_call, 1),
-        arguments: 'parameters'
+        arguments: "parameters"
       });
     }).join(nodetypes_NEW_LINE);
     let temps = [{
       template: bindTemplate(controllerActionTemplate, {
         body: addNewLine(controllerActions, 1)
       }),
-      relative: './src/actions',
+      relative: "./src/actions",
       relativeFilePath: `./controllerActions.js`,
-      name: 'controllerActions'
-    }, controlleractionsgenerator_ControllerActionGenerator.GenerateService(options)];
+      name: "controllerActions"
+    }, controlleractionsgenerator_ControllerActionGenerator.GenerateService(options), controlleractionsgenerator_ControllerActionGenerator.GenerateFetchService(options)].filter(x => x);
     let result = {};
     temps.map(t => {
       result[t.name] = t;
@@ -20505,7 +21070,117 @@ class validatorgenerator_ValidatorGenerator {
   }
 
 }
+// CONCATENATED MODULE: ./app/generators/fetchservicegenerator.js
+
+
+
+
+
+
+const CONTROLLER_CLASS_FETCH_FUNCTION = "./app/templates/controller/fetch_service_function.tpl";
+const CONTROLLER_CLASS_FETCH_FUNCTION_Get_PROPERTY = "./app/templates/controller/fetch_service_set_property.tpl";
+const fetchservicegenerator_CONTROLLER_CLASS_TEMPLATE = "./app/templates/controller/controller.tpl";
+const fetchservicegenerator_PROPERTY_TABS = 6;
+class fetchservicegenerator_FetchServiceGenerator {
+  static Tabs(c) {
+    let res = "";
+
+    for (var i = 0; i < c; i++) {
+      res += fetchservicegenerator_TAB;
+    }
+
+    return res;
+  }
+
+  static Generate(options) {
+    var {
+      state,
+      key
+    } = options;
+    let graphRoot = GetRootGraph(state);
+    let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
+    let result = {};
+    let controllers = uiactions_NodesByType(state, uiactions_NodeTypes.FetchService);
+    controllers.map(controller => {
+      let controllerUser = "controllerUser";
+      let controllerTemplateClass = external_fs_default.a.readFileSync(fetchservicegenerator_CONTROLLER_CLASS_TEMPLATE, "utf-8");
+      let fetchServiceFunction = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FETCH_FUNCTION, "utf-8");
+      let fetchServiceFunctionGetProperty = external_fs_default.a.readFileSync(CONTROLLER_CLASS_FETCH_FUNCTION_Get_PROPERTY, "utf-8");
+      let userNode = uiactions_NodesByType(state, uiactions_NodeTypes.Model).find(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.IsUser));
+      let outputType = GetNodesLinkedTo(GetCurrentGraph(), {
+        id: controller.id,
+        link: nodetypes_LinkType.FetchServiceOuput
+      })[0];
+      let methods = GetNodesLinkedTo(GetCurrentGraph(), {
+        id: controller.id,
+        link: nodetypes_LinkType.FetchService
+      }).filter(x => {
+        let methodType = uiactions_GetNodeProp(x, uiactions_NodeProperties.FunctionType);
+        let functionType = MethodFunctions[methodType];
+        return functionType.isFetchCompatible;
+      });
+      let functions = "";
+      let set_outputs = "";
+      let controllers = [];
+      set_outputs = methods.map(method => {
+        let methodProperties = uiactions_GetNodeProp(method, uiactions_NodeProperties.MethodProps);
+        let modelNode = GetNodeById(methodProperties.model_output) || GetNodeById(methodProperties.model);
+        let maestro = GetMaestroNode(method.id);
+        let controller = GetControllerNode(maestro.id);
+        let output_type = GetCodeName(modelNode);
+        controllers.push(controller.id);
+        return bindTemplate(fetchServiceFunctionGetProperty, {
+          model_output: output_type,
+          functionName: GetCodeName(method),
+          controller: GetCodeName(controller),
+          controller_user: controllerUser
+        });
+      }).join(nodetypes_NEW_LINE);
+      controllers = controllers.unique().map(v => {
+        return bindTemplate(`var {{controller#lower}} = new {{controller}}();`, {
+          controller: GetCodeName(v)
+        });
+      }).join(nodetypes_NEW_LINE);
+      let httpMethod = `${uiactions_GetNodeProp(controller, uiactions_NodeProperties.HttpMethod)}`;
+      let httpRoute = `${uiactions_GetNodeProp(controller, uiactions_NodeProperties.HttpRoute)}`;
+      let codeName = `${uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName)}`;
+      functions = bindTemplate(fetchServiceFunction, {
+        output_type: GetCodeName(outputType),
+        functionName: "FetchItems",
+        http_route: httpRoute || "{controller_generator_http_method}",
+        http_method: "HttpPost",
+        set_outputs,
+        controllers
+      });
+      controllerTemplateClass = bindTemplate(controllerTemplateClass, {
+        codeName: codeName,
+        "codeName#alllower": codeName.toLowerCase(),
+        user_instance: controllerUser,
+        user: userNode ? uiactions_GetNodeProp(userNode, uiactions_NodeProperties.CodeName) : "{controller_generator_code_name}",
+        functions
+      });
+      result[uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName)] = {
+        id: uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName),
+        name: uiactions_GetNodeProp(controller, uiactions_NodeProperties.CodeName),
+        template: namespacegenerator_NamespaceGenerator.Generate({
+          template: controllerTemplateClass,
+          usings: [...STANDARD_CONTROLLER_USING, `${namespace}${nodetypes_NameSpace.Model}`, "Microsoft.AspNetCore.Mvc"],
+          namespace,
+          space: nodetypes_NameSpace.Controllers
+        })
+      };
+    });
+    return result;
+  }
+
+}
+const fetchservicegenerator_NL = `
+                    `;
+const fetchservicegenerator_jNL = `
+`;
+const fetchservicegenerator_TAB = `   `;
 // CONCATENATED MODULE: ./app/generators/generator.js
+
 
 
 
@@ -20553,6 +21228,13 @@ class generator_Generator {
           language
         });
         return temp;
+
+      case NodeTypes.FetchService:
+        return fetchservicegenerator_FetchServiceGenerator.Generate({
+          state,
+          key,
+          language
+        });
 
       case NodeTypes.Model:
         return modelgenerators_ModelGenerator.Generate({
@@ -20761,270 +21443,6 @@ class generator_Generator {
 // EXTERNAL MODULE: external "os"
 var external_os_ = __webpack_require__("os");
 
-// CONCATENATED MODULE: ./app/utils/utilservice.js
-
-
-function calculateContrast(c1, c2) {
-  let c1_ = relativeLuminance(c1);
-  let c2_ = relativeLuminance(c2);
-  let L1 = Math.max(c1_, c2_);
-  let L2 = Math.min(c1_, c2_);
-  return (L1 + 0.05) / (L2 + 0.05);
-}
-function relativeLuminance(color) {
-  /**
-     * relative luminance
-  the relative brightness of any point in a colorspace, normalized to 0 for darkest black and 1 for lightest white
-  Note 1: For the sRGB colorspace, the relative luminance of a color is defined as L = 0.2126 * R + 0.7152 * G + 0.0722 * B where R, G and B are defined as:
-  if RsRGB <= 0.03928 then R = RsRGB/12.92 else R = ((RsRGB+0.055)/1.055) ^ 2.4
-  if GsRGB <= 0.03928 then G = GsRGB/12.92 else G = ((GsRGB+0.055)/1.055) ^ 2.4
-  if BsRGB <= 0.03928 then B = BsRGB/12.92 else B = ((BsRGB+0.055)/1.055) ^ 2.4
-  and RsRGB, GsRGB, and BsRGB are defined as:
-  RsRGB = R8bit/255
-  GsRGB = G8bit/255
-  BsRGB = B8bit/255
-     */
-  if (color.startsWith("#")) {
-    color = color.split("").subset(1).join("");
-  }
-
-  let Rs = parseInt(`${color[0]}${color[1]}`, 16) / 255;
-  let Gs = parseInt(`${color[2]}${color[3]}`, 16) / 255;
-  let Bs = parseInt(`${color[4]}${color[5]}`, 16) / 255;
-  let r, g, b;
-  let minv = 0.03928;
-
-  function calc(c) {
-    let r;
-
-    if (c <= minv) {
-      r = c / 12.92;
-    } else {
-      r = Math.pow((c + 0.55) / 1.055, 2.4);
-    }
-
-    return r;
-  }
-
-  r = calc(Rs);
-  g = calc(Gs);
-  b = calc(Bs);
-  let L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return L;
-}
-function getStringInserts(str = "") {
-  ///\${[a-zA-Z0-9]*}
-  const regex = /\${[a-zA-Z0-9_]*}/gm;
-  let m;
-  let result = [];
-
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    } // The result can be accessed through the `m`-variable.
-
-
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
-      }
-    });
-  }
-
-  return result;
-}
-function getGuids(str = "") {
-  const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
-  let m;
-  let result = [];
-
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    } // The result can be accessed through the `m`-variable.
-
-
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
-      }
-    });
-  }
-
-  return result;
-}
-function getGroupGuids(str = "") {
-  const regex = /group\-(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
-  let m;
-  let result = [];
-
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    } // The result can be accessed through the `m`-variable.
-
-
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
-      }
-    });
-  }
-
-  return result.map(v => getGuids(v)).flatten().filter(x => x);
-}
-function getNodePropertyGuids(obj) {
-  let str = JSON.stringify(obj);
-  let guids = getGuids(str).unique();
-  return guids;
-}
-function processRecording(str) {
-  let guids = getGuids(str).unique();
-  let groupGuids = getGroupGuids(str).unique();
-  let nodeIndexes = {};
-  groupGuids.map((v, index) => {
-    nodeIndexes[guids.indexOf(v) - index] = index;
-  });
-  guids = guids.filter(v => !groupGuids.some(t => v == t));
-  let commands = JSON.parse(str);
-  let unaccountedGuids = [...guids];
-  commands.map(command => {
-    if (command.callback) {
-      if (command.options) {
-        if (command.callbackGroup && command.options.groupProperties) {
-          command.options.callbackg = command.callback;
-        } else {
-          command.options.callback = command.callback;
-        }
-      }
-    }
-
-    if (unaccountedGuids.some(v => v === command.callback)) {
-      unaccountedGuids = [...unaccountedGuids.filter(x => x !== command.callback)];
-    }
-
-    delete command.callback;
-    delete command.callbackGroup;
-  });
-  str = JSON.stringify(commands, null, 4);
-  guids.map((guid, index) => {
-    var subregex = new RegExp(`"callback": "${guid}"`, "g");
-    str = str.replace(subregex, `"callback": function(node) { context.node${index} = node.id; }`);
-    subregex = new RegExp(`"callbackg": "${guid}"`, "g");
-    str = str.replace(subregex, `"callback": function(node, graph, group) { context.node${index} = node.id;
-      context.group${nodeIndexes[index]} = group;
-    }`);
-    subregex = new RegExp(`"${guid}":`, "g");
-    str = str.replace(subregex, `[context.node${index}]:`);
-    subregex = new RegExp(`"${guid}"`, "g");
-    str = str.replace(subregex, `context.node${index}`);
-  });
-  groupGuids.map((guid, index) => {
-    var subregex = new RegExp(`"${guid}":`, "g");
-    str = str.replace(subregex, `[context.group${index}]:`);
-    subregex = new RegExp(`"${guid}"`, "g");
-    str = str.replace(subregex, `context.group${index}`);
-  });
-  let firstFunction$re = /\[ *\n *{/gm;
-  str = str.replace(firstFunction$re, `[
-      function(graph) {
-      return [{
-`);
-  let functionStart$re = /,\n *{/gm;
-  str = str.replace(functionStart$re, `,
-    {
-    function(graph) {
-      return [{
-`);
-  let functionEnd$re = /},\n *{/gm;
-  str = str.replace(functionEnd$re, `}]
-    },
-`);
-  let lastFunction$re = /}\n *]/gm;
-  str = str.replace(lastFunction$re, `}]
-  }]
-`);
-  let inserts = getStringInserts(str);
-  inserts.map(insert => {
-    var subregex = new RegExp("\\" + insert, "g");
-    str = str.replace(subregex, `" + args.${insert.substr(2, insert.length - 3)} + "`);
-  });
-  const regex = /context.groupundefined = group;/gm;
-  str = str.replace(regex, "");
-  let temp = guids.map((x, index) => {
-    return `{
-      operation: 'CHANGE_NODE_PROPERTY',
-      options: function() {
-          return {
-          prop: 'Pinned',
-          id: context.node${index},
-          value: false
-        }
-      }
-    }`;
-  }).subset(1).join("," + nodetypes_NEW_LINE);
-  return `
-  import { uuidv4 } from "../utils/array";
-  import { NodeProperties } from "../constants/nodetypes";
-  export default function(args = {}) {
-    // ${unaccountedGuids.map(v => {
-    let index = guids.indexOf(v);
-    return "node" + index;
-  }).join()}
-
-      // ${inserts.map(insert => insert.substr(2, insert.length - 3)).join(", ")}
-      ${inserts.map(insert => {
-    let temp = insert.substr(2, insert.length - 3);
-    return `if(!args.${temp}){
-          throw 'missing ${temp} argument';
-        }`;
-  })}
-    let context = {
-      ...args${unaccountedGuids.length ? "," + nodetypes_NEW_LINE + unaccountedGuids.map(v => {
-    let index = guids.indexOf(v);
-    return "node" + index + ": uuidv4() ";
-  }).join("," + nodetypes_NEW_LINE) : ""}
-    };
-    let {
-      viewPackages
-    } = args;
-    viewPackages = {
-      [NodeProperties.ViewPackage]: uuidv4(),
-      ...(viewPackages||{})
-    };
-    let result = ${str};
-    let clearPinned = [${temp}];
-    let applyViewPackages = [${guids.map((guid, index) => {
-    if (unaccountedGuids.indexOf(guid) === -1) {
-      return `{
-          operation: 'UPDATE_NODE_PROPERTY',
-          options : function() {
-            return {
-              id: context.node${index},
-              properties: viewPackages
-            }
-          }
-        }`;
-    }
-
-    return false;
-  }).filter(x => x).join()}]
-    return [
-      ...result,
-      ...clearPinned,
-      ...applyViewPackages,
-      function() {
-        if (context.callback) {
-          context.entry = context.node0;
-          context.callback(context);
-        }
-        return [];
-      }];
-  }`;
-}
 // CONCATENATED MODULE: ./app/actions/remoteActions.js
 
 
@@ -21562,6 +21980,9 @@ ${interfaceFunctions.join(nodetypes_NEW_LINE)}
           claim_service_interfaces,
           create_properties: props
         }, null, external_path_default.a.join(external_path_default.a.join(workspace, root.title, "netcore"), solutionName + external_path_default.a.join(".Controllers")));
+        generateFolderStructure(external_path_default.a.join(`./app/templates/net_core_mvc/identity/RedQuickTests`), {
+          namespace
+        }, null, external_path_default.a.join(external_path_default.a.join(workspace, root.title, "netcore"), solutionName + external_path_default.a.join(".Tests")));
       }
     }).then(() => {
       console.log("Write react-native files");
@@ -21659,7 +22080,7 @@ function generateElectronIOTheme(workspace, state) {
 }
 
 function generateFiles(workspace, solutionName, state) {
-  var code_types = [NodeTypes.Controller, NodeTypes.Model, NodeTypes.ExtensionType, NodeTypes.Maestro, ...Object.values(GeneratedTypes)];
+  var code_types = [NodeTypes.Controller, NodeTypes.Model, NodeTypes.ExtensionType, NodeTypes.Maestro, NodeTypes.FetchService, ...Object.values(GeneratedTypes)];
   let root = GetRootGraph(state);
   code_types.map(code_type => {
     var temp = generator_Generator.generate({
@@ -21735,6 +22156,7 @@ const CodeTypeToArea = {
   [NodeTypes.Controller]: external_path_default.a.join(".Web", "Controllers"),
   [NodeTypes.Model]: ".Models",
   [NodeTypes.ExtensionType]: ".Models",
+  [NodeTypes.FetchService]: external_path_default.a.join(".Web", "Controllers"),
   [NodeTypes.Maestro]: ".Controllers",
   [GeneratedTypes.ChangeParameter]: ".Models",
   [GeneratedTypes.ChangeResponse]: ".Models",
@@ -22291,13 +22713,18 @@ class textinput_TextInput extends external_react_["Component"] {
     }), this.props.inputgroup ? textinput_jsx("span", {
       className: "input-group-btn"
     }, void 0, textinput_jsx("button", {
-      onClick: () => {
+      onClick: e => {
         if (this.props.onClick) {
           this.props.onClick();
         }
+
+        if (this.props.onChange) {
+          this.props.onChange(this.state.value);
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
       },
-      name: "search",
-      id: "search-btn",
       className: "btn btn-flat"
     }, void 0, _ref2)) : null);
   }
@@ -23701,7 +24128,7 @@ function removeComponentApi(props, ops) {
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node4,
-        value: "Authenticate Button"
+        value: "Register"
       }
     }];
   }, function (graph) {
@@ -23757,7 +24184,7 @@ function removeComponentApi(props, ops) {
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node5,
-        value: "Register Button"
+        value: "Authenticate"
       }
     }];
   }, function (graph) {
@@ -35501,11 +35928,164 @@ class agentbasedmethods_AgentBasedMethods extends external_react_["Component"] {
     return [];
   }];
 });
+// CONCATENATED MODULE: ./app/nodepacks/CreateFetchParameters.js
+
+
+/* harmony default export */ var CreateFetchParameters = (function (args = {}) {
+  //
+  //
+  let context = { ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Fetch Parameters"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "model"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "IsFetchParameter",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "NEW_PROPERTY_NODE",
+      options: {
+        parent: context.node0,
+        properties: {
+          uiAttributeType: "STRING"
+        },
+        groupProperties: {},
+        linkProperties: {
+          properties: {
+            type: "property-link",
+            "property-link": {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "uiAttributeType",
+        id: context.node1,
+        value: "LISTOFSTRINGS"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "Ids"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "UseInView",
+        id: context.node1,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "ExcludeFromController",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node1,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
 // CONCATENATED MODULE: ./app/components/quickmethods.js
 
 var quickmethods_REACT_ELEMENT_TYPE;
 
 function quickmethods_jsx(type, props, key, children) { if (!quickmethods_REACT_ELEMENT_TYPE) { quickmethods_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: quickmethods_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
 
 
 
@@ -35661,14 +36241,14 @@ class quickmethods_QuickMethods extends external_react_["Component"] {
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
-      title: 'Get Project Urls Data Chain',
+      title: "Get Project Urls Data Chain",
       icon: "fa fa-plus",
       onClick: () => {
         this.props.graphOperation(GetProjectUrlsDataChain());
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
-      title: 'Test Command',
+      title: "Test Command",
       icon: "fa fa-plus",
       onClick: () => {
         this.props.graphOperation(temppack());
@@ -35682,14 +36262,27 @@ class quickmethods_QuickMethods extends external_react_["Component"] {
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
-      title: 'Create Dashboard 1',
+      title: "Create Dashboard 1",
       icon: "fa fa-plus",
       onClick: () => {
         this.props.graphOperation(CreateDashboard_1());
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
-      title: 'Create Configuration',
+      title: "Create Fetch Parameters",
+      icon: "fa fa-plus",
+      onClick: () => {
+        let nodes = GetNodeByProperties({
+          [nodetypes_NodeProperties.IsFetchParameter]: true
+        });
+
+        if (!nodes) {
+          this.props.graphOperation(CreateFetchParameters());
+        }
+      }
+    }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
+      hideArrow: true,
+      title: "Create Configuration",
       icon: "fa fa-plus",
       onClick: () => {
         this.props.graphOperation(CreateConfiguration());
@@ -37690,9 +38283,9 @@ function conditionfiltermenu_jsx(type, props, key, children) { if (!conditionfil
 
 
 
-const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
-const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = 'condition-filter-menu-parameter-properties';
-const DATA_SOURCE = 'DATA_SOURCE';
+const CONDITION_FILTER_MENU_PARAMETER = "condition-filter-menu-parameter";
+const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES = "condition-filter-menu-parameter-properties";
+const DATA_SOURCE = "DATA_SOURCE";
 
 var conditionfiltermenu_ref =
 /*#__PURE__*/
@@ -37705,13 +38298,13 @@ conditionfiltermenu_jsx("div", {});
 var conditionfiltermenu_ref3 =
 /*#__PURE__*/
 conditionfiltermenu_jsx(sidebarheader_SideBarHeader, {
-  title: 'Parameters'
+  title: "Parameters"
 });
 
 var conditionfiltermenu_ref4 =
 /*#__PURE__*/
 conditionfiltermenu_jsx(sidebarheader_SideBarHeader, {
-  title: 'Parameter Properties'
+  title: "Parameter Properties"
 });
 
 class conditionfiltermenu_ConditionFilterMenu extends external_react_["Component"] {
@@ -37761,13 +38354,29 @@ class conditionfiltermenu_ConditionFilterMenu extends external_react_["Component
     }
 
     let filterParameters = GetMethodPermissionParameters(interestingNode.id, true);
+
+    if (currentNode) {
+      switch (methodDefinitionKey) {
+        case PERMISSION:
+          break;
+
+        case FILTER:
+          filterParameters = GetMethodFilterParameters(interestingNode.id, true);
+          break;
+
+        case VALIDATION:
+          filterParameters = GetMethodValidationParameters(interestingNode.id, true);
+          break;
+      }
+    }
+
     let id = currentNode.id;
     let models = [];
 
     if (methodDefinition) {
       let mdparams = methodDefinition[methodDefinitionKey].params;
       models = mdparams.map(t => {
-        if (typeof t === 'object') {
+        if (typeof t === "object") {
           return t.key;
         }
 
@@ -37775,7 +38384,7 @@ class conditionfiltermenu_ConditionFilterMenu extends external_react_["Component
       }).map((t, t_index) => {
         if (mdparams[t_index] && mdparams[t_index].changeparameter) {
           let mdprops = {};
-          mdparams.filter(x => typeof x === 'string').map(x => {
+          mdparams.filter(x => typeof x === "string").map(x => {
             mdprops[x] = GetNodeTitle(methodProps[x]);
           });
           return {
@@ -37940,7 +38549,7 @@ class conditionfiltermenu_ConditionFilterMenu extends external_react_["Component
     }, void 0, conditionfiltermenu_jsx(treeviewmenu_TreeViewMenu, {
       open: Visual(state, filterMenuParameter),
       active: Visual(state, filterMenuParameter),
-      title: `${GetNodeTitle(methodProps[selectedParameter])} (${selectedParameter})` || 'Parameters',
+      title: `${GetNodeTitle(methodProps[selectedParameter])} (${selectedParameter})` || "Parameters",
       toggle: () => {
         this.props.toggleVisual(filterMenuParameter);
       }
@@ -37962,7 +38571,7 @@ class conditionfiltermenu_ConditionFilterMenu extends external_react_["Component
     })), conditionfiltermenu_jsx(treeviewmenu_TreeViewMenu, {
       open: Visual(state, filterMenuParameterProperties),
       active: Visual(state, filterMenuParameterProperties),
-      title: GetNodeTitle(Visual(state, param_property_list_key)) || 'Parameter Properties',
+      title: GetNodeTitle(Visual(state, param_property_list_key)) || "Parameter Properties",
       toggle: () => {
         this.props.toggleVisual(filterMenuParameterProperties);
       }
@@ -38073,7 +38682,7 @@ function set(type, name, callback) {
 
 /* harmony default export */ var src_dispatch = (dispatch_dispatch);
 
-// CONCATENATED MODULE: ./node_modules/d3-dispatch/src/index.js
+// CONCATENATED MODULE: ./node_modules/d3-dispatch/index.js
 
 
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/namespaces.js
@@ -38121,6 +38730,202 @@ function creatorFixed(fullname) {
   return (fullname.local
       ? creatorFixed
       : creatorInherit)(fullname);
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/local.js
+var nextId = 0;
+
+function local() {
+  return new Local;
+}
+
+function Local() {
+  this._ = "@" + (++nextId).toString(36);
+}
+
+Local.prototype = local.prototype = {
+  constructor: Local,
+  get: function(node) {
+    var id = this._;
+    while (!(id in node)) if (!(node = node.parentNode)) return;
+    return node[id];
+  },
+  set: function(node, value) {
+    return node[this._] = value;
+  },
+  remove: function(node) {
+    return this._ in node && delete node[this._];
+  },
+  toString: function() {
+    return this._;
+  }
+};
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/matcher.js
+var matcher = function(selector) {
+  return function() {
+    return this.matches(selector);
+  };
+};
+
+if (typeof document !== "undefined") {
+  var matcher_element = document.documentElement;
+  if (!matcher_element.matches) {
+    var vendorMatches = matcher_element.webkitMatchesSelector
+        || matcher_element.msMatchesSelector
+        || matcher_element.mozMatchesSelector
+        || matcher_element.oMatchesSelector;
+    matcher = function(selector) {
+      return function() {
+        return vendorMatches.call(this, selector);
+      };
+    };
+  }
+}
+
+/* harmony default export */ var src_matcher = (matcher);
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/on.js
+var filterEvents = {};
+
+var on_event = null;
+
+if (typeof document !== "undefined") {
+  var on_element = document.documentElement;
+  if (!("onmouseenter" in on_element)) {
+    filterEvents = {mouseenter: "mouseover", mouseleave: "mouseout"};
+  }
+}
+
+function filterContextListener(listener, index, group) {
+  listener = contextListener(listener, index, group);
+  return function(event) {
+    var related = event.relatedTarget;
+    if (!related || (related !== this && !(related.compareDocumentPosition(this) & 8))) {
+      listener.call(this, event);
+    }
+  };
+}
+
+function contextListener(listener, index, group) {
+  return function(event1) {
+    var event0 = on_event; // Events can be reentrant (e.g., focus).
+    on_event = event1;
+    try {
+      listener.call(this, this.__data__, index, group);
+    } finally {
+      on_event = event0;
+    }
+  };
+}
+
+function on_parseTypenames(typenames) {
+  return typenames.trim().split(/^|\s+/).map(function(t) {
+    var name = "", i = t.indexOf(".");
+    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+    return {type: t, name: name};
+  });
+}
+
+function onRemove(typename) {
+  return function() {
+    var on = this.__on;
+    if (!on) return;
+    for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
+      if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.capture);
+      } else {
+        on[++i] = o;
+      }
+    }
+    if (++i) on.length = i;
+    else delete this.__on;
+  };
+}
+
+function onAdd(typename, value, capture) {
+  var wrap = filterEvents.hasOwnProperty(typename.type) ? filterContextListener : contextListener;
+  return function(d, i, group) {
+    var on = this.__on, o, listener = wrap(value, i, group);
+    if (on) for (var j = 0, m = on.length; j < m; ++j) {
+      if ((o = on[j]).type === typename.type && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.capture);
+        this.addEventListener(o.type, o.listener = listener, o.capture = capture);
+        o.value = value;
+        return;
+      }
+    }
+    this.addEventListener(typename.type, listener, capture);
+    o = {type: typename.type, name: typename.name, value: value, listener: listener, capture: capture};
+    if (!on) this.__on = [o];
+    else on.push(o);
+  };
+}
+
+/* harmony default export */ var selection_on = (function(typename, value, capture) {
+  var typenames = on_parseTypenames(typename + ""), i, n = typenames.length, t;
+
+  if (arguments.length < 2) {
+    var on = this.node().__on;
+    if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
+      for (i = 0, o = on[j]; i < n; ++i) {
+        if ((t = typenames[i]).type === o.type && t.name === o.name) {
+          return o.value;
+        }
+      }
+    }
+    return;
+  }
+
+  on = value ? onAdd : onRemove;
+  if (capture == null) capture = false;
+  for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
+  return this;
+});
+
+function customEvent(event1, listener, that, args) {
+  var event0 = on_event;
+  event1.sourceEvent = on_event;
+  on_event = event1;
+  try {
+    return listener.apply(that, args);
+  } finally {
+    on_event = event0;
+  }
+}
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/sourceEvent.js
+
+
+/* harmony default export */ var sourceEvent = (function() {
+  var current = on_event, source;
+  while (source = current.sourceEvent) current = source;
+  return current;
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/point.js
+/* harmony default export */ var src_point = (function(node, event) {
+  var svg = node.ownerSVGElement || node;
+
+  if (svg.createSVGPoint) {
+    var point = svg.createSVGPoint();
+    point.x = event.clientX, point.y = event.clientY;
+    point = point.matrixTransform(node.getScreenCTM().inverse());
+    return [point.x, point.y];
+  }
+
+  var rect = node.getBoundingClientRect();
+  return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/mouse.js
+
+
+
+/* harmony default export */ var mouse = (function(node) {
+  var event = sourceEvent();
+  if (event.changedTouches) event = event.changedTouches[0];
+  return src_point(node, event);
 });
 
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selector.js
@@ -38181,19 +38986,12 @@ function selectorAll_empty() {
   return new Selection(subgroups, parents);
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/matcher.js
-/* harmony default export */ var matcher = (function(selector) {
-  return function() {
-    return this.matches(selector);
-  };
-});
-
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/filter.js
 
 
 
 /* harmony default export */ var selection_filter = (function(match) {
-  if (typeof match !== "function") match = matcher(match);
+  if (typeof match !== "function") match = src_matcher(match);
 
   for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
     for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
@@ -38370,15 +39168,6 @@ function bindKey(parent, group, enter, update, exit, data, key) {
   return new Selection(this._exit || this._groups.map(sparse), this._parents);
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/join.js
-/* harmony default export */ var join = (function(onenter, onupdate, onexit) {
-  var enter = this.enter(), update = this, exit = this.exit();
-  enter = typeof onenter === "function" ? onenter(enter) : enter.append(onenter + "");
-  if (onupdate != null) update = onupdate(update);
-  if (onexit == null) exit.remove(); else onexit(exit);
-  return enter && update ? enter.merge(update).order() : update;
-});
-
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/merge.js
 
 
@@ -38405,7 +39194,7 @@ function bindKey(parent, group, enter, update, exit, data, key) {
   for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
     for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
       if (node = group[i]) {
-        if (next && node.compareDocumentPosition(next) ^ 4) next.parentNode.insertBefore(node, next);
+        if (next && next !== node.nextSibling) next.parentNode.insertBefore(node, next);
         next = node;
       }
     }
@@ -38810,134 +39599,12 @@ function remove_remove() {
   return this.each(remove_remove);
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/clone.js
-function selection_cloneShallow() {
-  return this.parentNode.insertBefore(this.cloneNode(false), this.nextSibling);
-}
-
-function selection_cloneDeep() {
-  return this.parentNode.insertBefore(this.cloneNode(true), this.nextSibling);
-}
-
-/* harmony default export */ var clone = (function(deep) {
-  return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
-});
-
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/datum.js
 /* harmony default export */ var datum = (function(value) {
   return arguments.length
       ? this.property("__data__", value)
       : this.node().__data__;
 });
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/on.js
-var filterEvents = {};
-
-var on_event = null;
-
-if (typeof document !== "undefined") {
-  var on_element = document.documentElement;
-  if (!("onmouseenter" in on_element)) {
-    filterEvents = {mouseenter: "mouseover", mouseleave: "mouseout"};
-  }
-}
-
-function filterContextListener(listener, index, group) {
-  listener = contextListener(listener, index, group);
-  return function(event) {
-    var related = event.relatedTarget;
-    if (!related || (related !== this && !(related.compareDocumentPosition(this) & 8))) {
-      listener.call(this, event);
-    }
-  };
-}
-
-function contextListener(listener, index, group) {
-  return function(event1) {
-    var event0 = on_event; // Events can be reentrant (e.g., focus).
-    on_event = event1;
-    try {
-      listener.call(this, this.__data__, index, group);
-    } finally {
-      on_event = event0;
-    }
-  };
-}
-
-function on_parseTypenames(typenames) {
-  return typenames.trim().split(/^|\s+/).map(function(t) {
-    var name = "", i = t.indexOf(".");
-    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
-    return {type: t, name: name};
-  });
-}
-
-function onRemove(typename) {
-  return function() {
-    var on = this.__on;
-    if (!on) return;
-    for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
-      if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
-        this.removeEventListener(o.type, o.listener, o.capture);
-      } else {
-        on[++i] = o;
-      }
-    }
-    if (++i) on.length = i;
-    else delete this.__on;
-  };
-}
-
-function onAdd(typename, value, capture) {
-  var wrap = filterEvents.hasOwnProperty(typename.type) ? filterContextListener : contextListener;
-  return function(d, i, group) {
-    var on = this.__on, o, listener = wrap(value, i, group);
-    if (on) for (var j = 0, m = on.length; j < m; ++j) {
-      if ((o = on[j]).type === typename.type && o.name === typename.name) {
-        this.removeEventListener(o.type, o.listener, o.capture);
-        this.addEventListener(o.type, o.listener = listener, o.capture = capture);
-        o.value = value;
-        return;
-      }
-    }
-    this.addEventListener(typename.type, listener, capture);
-    o = {type: typename.type, name: typename.name, value: value, listener: listener, capture: capture};
-    if (!on) this.__on = [o];
-    else on.push(o);
-  };
-}
-
-/* harmony default export */ var selection_on = (function(typename, value, capture) {
-  var typenames = on_parseTypenames(typename + ""), i, n = typenames.length, t;
-
-  if (arguments.length < 2) {
-    var on = this.node().__on;
-    if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
-      for (i = 0, o = on[j]; i < n; ++i) {
-        if ((t = typenames[i]).type === o.type && t.name === o.name) {
-          return o.value;
-        }
-      }
-    }
-    return;
-  }
-
-  on = value ? onAdd : onRemove;
-  if (capture == null) capture = false;
-  for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
-  return this;
-});
-
-function customEvent(event1, listener, that, args) {
-  var event0 = on_event;
-  event1.sourceEvent = on_event;
-  on_event = event1;
-  try {
-    return listener.apply(that, args);
-  } finally {
-    on_event = event0;
-  }
-}
 
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/dispatch.js
 
@@ -39006,8 +39673,6 @@ function dispatchFunction(type, params) {
 
 
 
-
-
 var selection_root = [null];
 
 function Selection(groups, parents) {
@@ -39027,7 +39692,6 @@ Selection.prototype = selection_selection.prototype = {
   data: selection_data,
   enter: selection_enter,
   exit: selection_exit,
-  join: join,
   merge: selection_merge,
   order: order,
   sort: sort,
@@ -39048,7 +39712,6 @@ Selection.prototype = selection_selection.prototype = {
   append: append,
   insert: selection_insert,
   remove: selection_remove,
-  clone: clone,
   datum: datum,
   on: selection_on,
   dispatch: selection_dispatch
@@ -39063,77 +39726,6 @@ Selection.prototype = selection_selection.prototype = {
   return typeof selector === "string"
       ? new Selection([[document.querySelector(selector)]], [document.documentElement])
       : new Selection([[selector]], selection_root);
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/create.js
-
-
-
-/* harmony default export */ var src_create = (function(name) {
-  return src_select(creator(name).call(document.documentElement));
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/local.js
-var nextId = 0;
-
-function local() {
-  return new Local;
-}
-
-function Local() {
-  this._ = "@" + (++nextId).toString(36);
-}
-
-Local.prototype = local.prototype = {
-  constructor: Local,
-  get: function(node) {
-    var id = this._;
-    while (!(id in node)) if (!(node = node.parentNode)) return;
-    return node[id];
-  },
-  set: function(node, value) {
-    return node[this._] = value;
-  },
-  remove: function(node) {
-    return this._ in node && delete node[this._];
-  },
-  toString: function() {
-    return this._;
-  }
-};
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/sourceEvent.js
-
-
-/* harmony default export */ var sourceEvent = (function() {
-  var current = on_event, source;
-  while (source = current.sourceEvent) current = source;
-  return current;
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/point.js
-/* harmony default export */ var src_point = (function(node, event) {
-  var svg = node.ownerSVGElement || node;
-
-  if (svg.createSVGPoint) {
-    var point = svg.createSVGPoint();
-    point.x = event.clientX, point.y = event.clientY;
-    point = point.matrixTransform(node.getScreenCTM().inverse());
-    return [point.x, point.y];
-  }
-
-  var rect = node.getBoundingClientRect();
-  return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/mouse.js
-
-
-
-/* harmony default export */ var mouse = (function(node) {
-  var event = sourceEvent();
-  if (event.changedTouches) event = event.changedTouches[0];
-  return src_point(node, event);
 });
 
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selectAll.js
@@ -39175,8 +39767,7 @@ Local.prototype = local.prototype = {
   return points;
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/index.js
-
+// CONCATENATED MODULE: ./node_modules/d3-selection/index.js
 
 
 
@@ -39432,983 +40023,9 @@ function defaultTouchable() {
   return drag;
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-drag/src/index.js
+// CONCATENATED MODULE: ./node_modules/d3-drag/index.js
 
 
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/define.js
-/* harmony default export */ var define = (function(constructor, factory, prototype) {
-  constructor.prototype = factory.prototype = prototype;
-  prototype.constructor = constructor;
-});
-
-function extend(parent, definition) {
-  var prototype = Object.create(parent.prototype);
-  for (var key in definition) prototype[key] = definition[key];
-  return prototype;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/color.js
-
-
-function Color() {}
-
-var darker = 0.7;
-var brighter = 1 / darker;
-
-var reI = "\\s*([+-]?\\d+)\\s*",
-    reN = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*",
-    reP = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*",
-    reHex3 = /^#([0-9a-f]{3})$/,
-    reHex6 = /^#([0-9a-f]{6})$/,
-    reRgbInteger = new RegExp("^rgb\\(" + [reI, reI, reI] + "\\)$"),
-    reRgbPercent = new RegExp("^rgb\\(" + [reP, reP, reP] + "\\)$"),
-    reRgbaInteger = new RegExp("^rgba\\(" + [reI, reI, reI, reN] + "\\)$"),
-    reRgbaPercent = new RegExp("^rgba\\(" + [reP, reP, reP, reN] + "\\)$"),
-    reHslPercent = new RegExp("^hsl\\(" + [reN, reP, reP] + "\\)$"),
-    reHslaPercent = new RegExp("^hsla\\(" + [reN, reP, reP, reN] + "\\)$");
-
-var named = {
-  aliceblue: 0xf0f8ff,
-  antiquewhite: 0xfaebd7,
-  aqua: 0x00ffff,
-  aquamarine: 0x7fffd4,
-  azure: 0xf0ffff,
-  beige: 0xf5f5dc,
-  bisque: 0xffe4c4,
-  black: 0x000000,
-  blanchedalmond: 0xffebcd,
-  blue: 0x0000ff,
-  blueviolet: 0x8a2be2,
-  brown: 0xa52a2a,
-  burlywood: 0xdeb887,
-  cadetblue: 0x5f9ea0,
-  chartreuse: 0x7fff00,
-  chocolate: 0xd2691e,
-  coral: 0xff7f50,
-  cornflowerblue: 0x6495ed,
-  cornsilk: 0xfff8dc,
-  crimson: 0xdc143c,
-  cyan: 0x00ffff,
-  darkblue: 0x00008b,
-  darkcyan: 0x008b8b,
-  darkgoldenrod: 0xb8860b,
-  darkgray: 0xa9a9a9,
-  darkgreen: 0x006400,
-  darkgrey: 0xa9a9a9,
-  darkkhaki: 0xbdb76b,
-  darkmagenta: 0x8b008b,
-  darkolivegreen: 0x556b2f,
-  darkorange: 0xff8c00,
-  darkorchid: 0x9932cc,
-  darkred: 0x8b0000,
-  darksalmon: 0xe9967a,
-  darkseagreen: 0x8fbc8f,
-  darkslateblue: 0x483d8b,
-  darkslategray: 0x2f4f4f,
-  darkslategrey: 0x2f4f4f,
-  darkturquoise: 0x00ced1,
-  darkviolet: 0x9400d3,
-  deeppink: 0xff1493,
-  deepskyblue: 0x00bfff,
-  dimgray: 0x696969,
-  dimgrey: 0x696969,
-  dodgerblue: 0x1e90ff,
-  firebrick: 0xb22222,
-  floralwhite: 0xfffaf0,
-  forestgreen: 0x228b22,
-  fuchsia: 0xff00ff,
-  gainsboro: 0xdcdcdc,
-  ghostwhite: 0xf8f8ff,
-  gold: 0xffd700,
-  goldenrod: 0xdaa520,
-  gray: 0x808080,
-  green: 0x008000,
-  greenyellow: 0xadff2f,
-  grey: 0x808080,
-  honeydew: 0xf0fff0,
-  hotpink: 0xff69b4,
-  indianred: 0xcd5c5c,
-  indigo: 0x4b0082,
-  ivory: 0xfffff0,
-  khaki: 0xf0e68c,
-  lavender: 0xe6e6fa,
-  lavenderblush: 0xfff0f5,
-  lawngreen: 0x7cfc00,
-  lemonchiffon: 0xfffacd,
-  lightblue: 0xadd8e6,
-  lightcoral: 0xf08080,
-  lightcyan: 0xe0ffff,
-  lightgoldenrodyellow: 0xfafad2,
-  lightgray: 0xd3d3d3,
-  lightgreen: 0x90ee90,
-  lightgrey: 0xd3d3d3,
-  lightpink: 0xffb6c1,
-  lightsalmon: 0xffa07a,
-  lightseagreen: 0x20b2aa,
-  lightskyblue: 0x87cefa,
-  lightslategray: 0x778899,
-  lightslategrey: 0x778899,
-  lightsteelblue: 0xb0c4de,
-  lightyellow: 0xffffe0,
-  lime: 0x00ff00,
-  limegreen: 0x32cd32,
-  linen: 0xfaf0e6,
-  magenta: 0xff00ff,
-  maroon: 0x800000,
-  mediumaquamarine: 0x66cdaa,
-  mediumblue: 0x0000cd,
-  mediumorchid: 0xba55d3,
-  mediumpurple: 0x9370db,
-  mediumseagreen: 0x3cb371,
-  mediumslateblue: 0x7b68ee,
-  mediumspringgreen: 0x00fa9a,
-  mediumturquoise: 0x48d1cc,
-  mediumvioletred: 0xc71585,
-  midnightblue: 0x191970,
-  mintcream: 0xf5fffa,
-  mistyrose: 0xffe4e1,
-  moccasin: 0xffe4b5,
-  navajowhite: 0xffdead,
-  navy: 0x000080,
-  oldlace: 0xfdf5e6,
-  olive: 0x808000,
-  olivedrab: 0x6b8e23,
-  orange: 0xffa500,
-  orangered: 0xff4500,
-  orchid: 0xda70d6,
-  palegoldenrod: 0xeee8aa,
-  palegreen: 0x98fb98,
-  paleturquoise: 0xafeeee,
-  palevioletred: 0xdb7093,
-  papayawhip: 0xffefd5,
-  peachpuff: 0xffdab9,
-  peru: 0xcd853f,
-  pink: 0xffc0cb,
-  plum: 0xdda0dd,
-  powderblue: 0xb0e0e6,
-  purple: 0x800080,
-  rebeccapurple: 0x663399,
-  red: 0xff0000,
-  rosybrown: 0xbc8f8f,
-  royalblue: 0x4169e1,
-  saddlebrown: 0x8b4513,
-  salmon: 0xfa8072,
-  sandybrown: 0xf4a460,
-  seagreen: 0x2e8b57,
-  seashell: 0xfff5ee,
-  sienna: 0xa0522d,
-  silver: 0xc0c0c0,
-  skyblue: 0x87ceeb,
-  slateblue: 0x6a5acd,
-  slategray: 0x708090,
-  slategrey: 0x708090,
-  snow: 0xfffafa,
-  springgreen: 0x00ff7f,
-  steelblue: 0x4682b4,
-  tan: 0xd2b48c,
-  teal: 0x008080,
-  thistle: 0xd8bfd8,
-  tomato: 0xff6347,
-  turquoise: 0x40e0d0,
-  violet: 0xee82ee,
-  wheat: 0xf5deb3,
-  white: 0xffffff,
-  whitesmoke: 0xf5f5f5,
-  yellow: 0xffff00,
-  yellowgreen: 0x9acd32
-};
-
-define(Color, color_color, {
-  displayable: function() {
-    return this.rgb().displayable();
-  },
-  hex: function() {
-    return this.rgb().hex();
-  },
-  toString: function() {
-    return this.rgb() + "";
-  }
-});
-
-function color_color(format) {
-  var m;
-  format = (format + "").trim().toLowerCase();
-  return (m = reHex3.exec(format)) ? (m = parseInt(m[1], 16), new Rgb((m >> 8 & 0xf) | (m >> 4 & 0x0f0), (m >> 4 & 0xf) | (m & 0xf0), ((m & 0xf) << 4) | (m & 0xf), 1)) // #f00
-      : (m = reHex6.exec(format)) ? rgbn(parseInt(m[1], 16)) // #ff0000
-      : (m = reRgbInteger.exec(format)) ? new Rgb(m[1], m[2], m[3], 1) // rgb(255, 0, 0)
-      : (m = reRgbPercent.exec(format)) ? new Rgb(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, 1) // rgb(100%, 0%, 0%)
-      : (m = reRgbaInteger.exec(format)) ? rgba(m[1], m[2], m[3], m[4]) // rgba(255, 0, 0, 1)
-      : (m = reRgbaPercent.exec(format)) ? rgba(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, m[4]) // rgb(100%, 0%, 0%, 1)
-      : (m = reHslPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, 1) // hsl(120, 50%, 50%)
-      : (m = reHslaPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, m[4]) // hsla(120, 50%, 50%, 1)
-      : named.hasOwnProperty(format) ? rgbn(named[format])
-      : format === "transparent" ? new Rgb(NaN, NaN, NaN, 0)
-      : null;
-}
-
-function rgbn(n) {
-  return new Rgb(n >> 16 & 0xff, n >> 8 & 0xff, n & 0xff, 1);
-}
-
-function rgba(r, g, b, a) {
-  if (a <= 0) r = g = b = NaN;
-  return new Rgb(r, g, b, a);
-}
-
-function rgbConvert(o) {
-  if (!(o instanceof Color)) o = color_color(o);
-  if (!o) return new Rgb;
-  o = o.rgb();
-  return new Rgb(o.r, o.g, o.b, o.opacity);
-}
-
-function color_rgb(r, g, b, opacity) {
-  return arguments.length === 1 ? rgbConvert(r) : new Rgb(r, g, b, opacity == null ? 1 : opacity);
-}
-
-function Rgb(r, g, b, opacity) {
-  this.r = +r;
-  this.g = +g;
-  this.b = +b;
-  this.opacity = +opacity;
-}
-
-define(Rgb, color_rgb, extend(Color, {
-  brighter: function(k) {
-    k = k == null ? brighter : Math.pow(brighter, k);
-    return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
-  },
-  darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
-    return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
-  },
-  rgb: function() {
-    return this;
-  },
-  displayable: function() {
-    return (0 <= this.r && this.r <= 255)
-        && (0 <= this.g && this.g <= 255)
-        && (0 <= this.b && this.b <= 255)
-        && (0 <= this.opacity && this.opacity <= 1);
-  },
-  hex: function() {
-    return "#" + hex(this.r) + hex(this.g) + hex(this.b);
-  },
-  toString: function() {
-    var a = this.opacity; a = isNaN(a) ? 1 : Math.max(0, Math.min(1, a));
-    return (a === 1 ? "rgb(" : "rgba(")
-        + Math.max(0, Math.min(255, Math.round(this.r) || 0)) + ", "
-        + Math.max(0, Math.min(255, Math.round(this.g) || 0)) + ", "
-        + Math.max(0, Math.min(255, Math.round(this.b) || 0))
-        + (a === 1 ? ")" : ", " + a + ")");
-  }
-}));
-
-function hex(value) {
-  value = Math.max(0, Math.min(255, Math.round(value) || 0));
-  return (value < 16 ? "0" : "") + value.toString(16);
-}
-
-function hsla(h, s, l, a) {
-  if (a <= 0) h = s = l = NaN;
-  else if (l <= 0 || l >= 1) h = s = NaN;
-  else if (s <= 0) h = NaN;
-  return new Hsl(h, s, l, a);
-}
-
-function hslConvert(o) {
-  if (o instanceof Hsl) return new Hsl(o.h, o.s, o.l, o.opacity);
-  if (!(o instanceof Color)) o = color_color(o);
-  if (!o) return new Hsl;
-  if (o instanceof Hsl) return o;
-  o = o.rgb();
-  var r = o.r / 255,
-      g = o.g / 255,
-      b = o.b / 255,
-      min = Math.min(r, g, b),
-      max = Math.max(r, g, b),
-      h = NaN,
-      s = max - min,
-      l = (max + min) / 2;
-  if (s) {
-    if (r === max) h = (g - b) / s + (g < b) * 6;
-    else if (g === max) h = (b - r) / s + 2;
-    else h = (r - g) / s + 4;
-    s /= l < 0.5 ? max + min : 2 - max - min;
-    h *= 60;
-  } else {
-    s = l > 0 && l < 1 ? 0 : h;
-  }
-  return new Hsl(h, s, l, o.opacity);
-}
-
-function hsl(h, s, l, opacity) {
-  return arguments.length === 1 ? hslConvert(h) : new Hsl(h, s, l, opacity == null ? 1 : opacity);
-}
-
-function Hsl(h, s, l, opacity) {
-  this.h = +h;
-  this.s = +s;
-  this.l = +l;
-  this.opacity = +opacity;
-}
-
-define(Hsl, hsl, extend(Color, {
-  brighter: function(k) {
-    k = k == null ? brighter : Math.pow(brighter, k);
-    return new Hsl(this.h, this.s, this.l * k, this.opacity);
-  },
-  darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
-    return new Hsl(this.h, this.s, this.l * k, this.opacity);
-  },
-  rgb: function() {
-    var h = this.h % 360 + (this.h < 0) * 360,
-        s = isNaN(h) || isNaN(this.s) ? 0 : this.s,
-        l = this.l,
-        m2 = l + (l < 0.5 ? l : 1 - l) * s,
-        m1 = 2 * l - m2;
-    return new Rgb(
-      hsl2rgb(h >= 240 ? h - 240 : h + 120, m1, m2),
-      hsl2rgb(h, m1, m2),
-      hsl2rgb(h < 120 ? h + 240 : h - 120, m1, m2),
-      this.opacity
-    );
-  },
-  displayable: function() {
-    return (0 <= this.s && this.s <= 1 || isNaN(this.s))
-        && (0 <= this.l && this.l <= 1)
-        && (0 <= this.opacity && this.opacity <= 1);
-  }
-}));
-
-/* From FvD 13.37, CSS Color Module Level 3 */
-function hsl2rgb(h, m1, m2) {
-  return (h < 60 ? m1 + (m2 - m1) * h / 60
-      : h < 180 ? m2
-      : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60
-      : m1) * 255;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/math.js
-var deg2rad = Math.PI / 180;
-var rad2deg = 180 / Math.PI;
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/lab.js
-
-
-
-
-// https://beta.observablehq.com/@mbostock/lab-and-rgb
-var K = 18,
-    Xn = 0.96422,
-    Yn = 1,
-    Zn = 0.82521,
-    lab_t0 = 4 / 29,
-    lab_t1 = 6 / 29,
-    t2 = 3 * lab_t1 * lab_t1,
-    t3 = lab_t1 * lab_t1 * lab_t1;
-
-function labConvert(o) {
-  if (o instanceof Lab) return new Lab(o.l, o.a, o.b, o.opacity);
-  if (o instanceof Hcl) {
-    if (isNaN(o.h)) return new Lab(o.l, 0, 0, o.opacity);
-    var h = o.h * deg2rad;
-    return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
-  }
-  if (!(o instanceof Rgb)) o = rgbConvert(o);
-  var r = rgb2lrgb(o.r),
-      g = rgb2lrgb(o.g),
-      b = rgb2lrgb(o.b),
-      y = xyz2lab((0.2225045 * r + 0.7168786 * g + 0.0606169 * b) / Yn), x, z;
-  if (r === g && g === b) x = z = y; else {
-    x = xyz2lab((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / Xn);
-    z = xyz2lab((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / Zn);
-  }
-  return new Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), o.opacity);
-}
-
-function gray(l, opacity) {
-  return new Lab(l, 0, 0, opacity == null ? 1 : opacity);
-}
-
-function lab(l, a, b, opacity) {
-  return arguments.length === 1 ? labConvert(l) : new Lab(l, a, b, opacity == null ? 1 : opacity);
-}
-
-function Lab(l, a, b, opacity) {
-  this.l = +l;
-  this.a = +a;
-  this.b = +b;
-  this.opacity = +opacity;
-}
-
-define(Lab, lab, extend(Color, {
-  brighter: function(k) {
-    return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-  },
-  darker: function(k) {
-    return new Lab(this.l - K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-  },
-  rgb: function() {
-    var y = (this.l + 16) / 116,
-        x = isNaN(this.a) ? y : y + this.a / 500,
-        z = isNaN(this.b) ? y : y - this.b / 200;
-    x = Xn * lab2xyz(x);
-    y = Yn * lab2xyz(y);
-    z = Zn * lab2xyz(z);
-    return new Rgb(
-      lrgb2rgb( 3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
-      lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
-      lrgb2rgb( 0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
-      this.opacity
-    );
-  }
-}));
-
-function xyz2lab(t) {
-  return t > t3 ? Math.pow(t, 1 / 3) : t / t2 + lab_t0;
-}
-
-function lab2xyz(t) {
-  return t > lab_t1 ? t * t * t : t2 * (t - lab_t0);
-}
-
-function lrgb2rgb(x) {
-  return 255 * (x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055);
-}
-
-function rgb2lrgb(x) {
-  return (x /= 255) <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-}
-
-function hclConvert(o) {
-  if (o instanceof Hcl) return new Hcl(o.h, o.c, o.l, o.opacity);
-  if (!(o instanceof Lab)) o = labConvert(o);
-  if (o.a === 0 && o.b === 0) return new Hcl(NaN, 0, o.l, o.opacity);
-  var h = Math.atan2(o.b, o.a) * rad2deg;
-  return new Hcl(h < 0 ? h + 360 : h, Math.sqrt(o.a * o.a + o.b * o.b), o.l, o.opacity);
-}
-
-function lch(l, c, h, opacity) {
-  return arguments.length === 1 ? hclConvert(l) : new Hcl(h, c, l, opacity == null ? 1 : opacity);
-}
-
-function hcl(h, c, l, opacity) {
-  return arguments.length === 1 ? hclConvert(h) : new Hcl(h, c, l, opacity == null ? 1 : opacity);
-}
-
-function Hcl(h, c, l, opacity) {
-  this.h = +h;
-  this.c = +c;
-  this.l = +l;
-  this.opacity = +opacity;
-}
-
-define(Hcl, hcl, extend(Color, {
-  brighter: function(k) {
-    return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
-  },
-  darker: function(k) {
-    return new Hcl(this.h, this.c, this.l - K * (k == null ? 1 : k), this.opacity);
-  },
-  rgb: function() {
-    return labConvert(this).rgb();
-  }
-}));
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/cubehelix.js
-
-
-
-
-var A = -0.14861,
-    B = +1.78277,
-    C = -0.29227,
-    D = -0.90649,
-    E = +1.97294,
-    ED = E * D,
-    EB = E * B,
-    BC_DA = B * C - D * A;
-
-function cubehelixConvert(o) {
-  if (o instanceof Cubehelix) return new Cubehelix(o.h, o.s, o.l, o.opacity);
-  if (!(o instanceof Rgb)) o = rgbConvert(o);
-  var r = o.r / 255,
-      g = o.g / 255,
-      b = o.b / 255,
-      l = (BC_DA * b + ED * r - EB * g) / (BC_DA + ED - EB),
-      bl = b - l,
-      k = (E * (g - l) - C * bl) / D,
-      s = Math.sqrt(k * k + bl * bl) / (E * l * (1 - l)), // NaN if l=0 or l=1
-      h = s ? Math.atan2(k, bl) * rad2deg - 120 : NaN;
-  return new Cubehelix(h < 0 ? h + 360 : h, s, l, o.opacity);
-}
-
-function cubehelix_cubehelix(h, s, l, opacity) {
-  return arguments.length === 1 ? cubehelixConvert(h) : new Cubehelix(h, s, l, opacity == null ? 1 : opacity);
-}
-
-function Cubehelix(h, s, l, opacity) {
-  this.h = +h;
-  this.s = +s;
-  this.l = +l;
-  this.opacity = +opacity;
-}
-
-define(Cubehelix, cubehelix_cubehelix, extend(Color, {
-  brighter: function(k) {
-    k = k == null ? brighter : Math.pow(brighter, k);
-    return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
-  },
-  darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
-    return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
-  },
-  rgb: function() {
-    var h = isNaN(this.h) ? 0 : (this.h + 120) * deg2rad,
-        l = +this.l,
-        a = isNaN(this.s) ? 0 : this.s * l * (1 - l),
-        cosh = Math.cos(h),
-        sinh = Math.sin(h);
-    return new Rgb(
-      255 * (l + a * (A * cosh + B * sinh)),
-      255 * (l + a * (C * cosh + D * sinh)),
-      255 * (l + a * (E * cosh)),
-      this.opacity
-    );
-  }
-}));
-
-// CONCATENATED MODULE: ./node_modules/d3-color/src/index.js
-
-
-
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/basis.js
-function basis(t1, v0, v1, v2, v3) {
-  var t2 = t1 * t1, t3 = t2 * t1;
-  return ((1 - 3 * t1 + 3 * t2 - t3) * v0
-      + (4 - 6 * t2 + 3 * t3) * v1
-      + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2
-      + t3 * v3) / 6;
-}
-
-/* harmony default export */ var src_basis = (function(values) {
-  var n = values.length - 1;
-  return function(t) {
-    var i = t <= 0 ? (t = 0) : t >= 1 ? (t = 1, n - 1) : Math.floor(t * n),
-        v1 = values[i],
-        v2 = values[i + 1],
-        v0 = i > 0 ? values[i - 1] : 2 * v1 - v2,
-        v3 = i < n - 1 ? values[i + 2] : 2 * v2 - v1;
-    return basis((t - i / n) * n, v0, v1, v2, v3);
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/basisClosed.js
-
-
-/* harmony default export */ var basisClosed = (function(values) {
-  var n = values.length;
-  return function(t) {
-    var i = Math.floor(((t %= 1) < 0 ? ++t : t) * n),
-        v0 = values[(i + n - 1) % n],
-        v1 = values[i % n],
-        v2 = values[(i + 1) % n],
-        v3 = values[(i + 2) % n];
-    return basis((t - i / n) * n, v0, v1, v2, v3);
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/constant.js
-/* harmony default export */ var d3_interpolate_src_constant = (function(x) {
-  return function() {
-    return x;
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/color.js
-
-
-function linear(a, d) {
-  return function(t) {
-    return a + t * d;
-  };
-}
-
-function exponential(a, b, y) {
-  return a = Math.pow(a, y), b = Math.pow(b, y) - a, y = 1 / y, function(t) {
-    return Math.pow(a + t * b, y);
-  };
-}
-
-function color_hue(a, b) {
-  var d = b - a;
-  return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : d3_interpolate_src_constant(isNaN(a) ? b : a);
-}
-
-function gamma(y) {
-  return (y = +y) === 1 ? nogamma : function(a, b) {
-    return b - a ? exponential(a, b, y) : d3_interpolate_src_constant(isNaN(a) ? b : a);
-  };
-}
-
-function nogamma(a, b) {
-  var d = b - a;
-  return d ? linear(a, d) : d3_interpolate_src_constant(isNaN(a) ? b : a);
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/rgb.js
-
-
-
-
-
-/* harmony default export */ var src_rgb = ((function rgbGamma(y) {
-  var color = gamma(y);
-
-  function rgb(start, end) {
-    var r = color((start = color_rgb(start)).r, (end = color_rgb(end)).r),
-        g = color(start.g, end.g),
-        b = color(start.b, end.b),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.r = r(t);
-      start.g = g(t);
-      start.b = b(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
-
-  rgb.gamma = rgbGamma;
-
-  return rgb;
-})(1));
-
-function rgbSpline(spline) {
-  return function(colors) {
-    var n = colors.length,
-        r = new Array(n),
-        g = new Array(n),
-        b = new Array(n),
-        i, color;
-    for (i = 0; i < n; ++i) {
-      color = color_rgb(colors[i]);
-      r[i] = color.r || 0;
-      g[i] = color.g || 0;
-      b[i] = color.b || 0;
-    }
-    r = spline(r);
-    g = spline(g);
-    b = spline(b);
-    color.opacity = 1;
-    return function(t) {
-      color.r = r(t);
-      color.g = g(t);
-      color.b = b(t);
-      return color + "";
-    };
-  };
-}
-
-var rgbBasis = rgbSpline(src_basis);
-var rgbBasisClosed = rgbSpline(basisClosed);
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/array.js
-
-
-/* harmony default export */ var array = (function(a, b) {
-  var nb = b ? b.length : 0,
-      na = a ? Math.min(nb, a.length) : 0,
-      x = new Array(na),
-      c = new Array(nb),
-      i;
-
-  for (i = 0; i < na; ++i) x[i] = src_value(a[i], b[i]);
-  for (; i < nb; ++i) c[i] = b[i];
-
-  return function(t) {
-    for (i = 0; i < na; ++i) c[i] = x[i](t);
-    return c;
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/date.js
-/* harmony default export */ var date = (function(a, b) {
-  var d = new Date;
-  return a = +a, b -= a, function(t) {
-    return d.setTime(a + b * t), d;
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/number.js
-/* harmony default export */ var number = (function(a, b) {
-  return a = +a, b -= a, function(t) {
-    return a + b * t;
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/object.js
-
-
-/* harmony default export */ var object = (function(a, b) {
-  var i = {},
-      c = {},
-      k;
-
-  if (a === null || typeof a !== "object") a = {};
-  if (b === null || typeof b !== "object") b = {};
-
-  for (k in b) {
-    if (k in a) {
-      i[k] = src_value(a[k], b[k]);
-    } else {
-      c[k] = b[k];
-    }
-  }
-
-  return function(t) {
-    for (k in i) c[k] = i[k](t);
-    return c;
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/string.js
-
-
-var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g,
-    reB = new RegExp(reA.source, "g");
-
-function zero(b) {
-  return function() {
-    return b;
-  };
-}
-
-function one(b) {
-  return function(t) {
-    return b(t) + "";
-  };
-}
-
-/* harmony default export */ var string = (function(a, b) {
-  var bi = reA.lastIndex = reB.lastIndex = 0, // scan index for next number in b
-      am, // current match in a
-      bm, // current match in b
-      bs, // string preceding current number in b, if any
-      i = -1, // index in s
-      s = [], // string constants and placeholders
-      q = []; // number interpolators
-
-  // Coerce inputs to strings.
-  a = a + "", b = b + "";
-
-  // Interpolate pairs of numbers in a & b.
-  while ((am = reA.exec(a))
-      && (bm = reB.exec(b))) {
-    if ((bs = bm.index) > bi) { // a string precedes the next number in b
-      bs = b.slice(bi, bs);
-      if (s[i]) s[i] += bs; // coalesce with previous string
-      else s[++i] = bs;
-    }
-    if ((am = am[0]) === (bm = bm[0])) { // numbers in a & b match
-      if (s[i]) s[i] += bm; // coalesce with previous string
-      else s[++i] = bm;
-    } else { // interpolate non-matching numbers
-      s[++i] = null;
-      q.push({i: i, x: number(am, bm)});
-    }
-    bi = reB.lastIndex;
-  }
-
-  // Add remains of b.
-  if (bi < b.length) {
-    bs = b.slice(bi);
-    if (s[i]) s[i] += bs; // coalesce with previous string
-    else s[++i] = bs;
-  }
-
-  // Special optimization for only a single match.
-  // Otherwise, interpolate each of the numbers and rejoin the string.
-  return s.length < 2 ? (q[0]
-      ? one(q[0].x)
-      : zero(b))
-      : (b = q.length, function(t) {
-          for (var i = 0, o; i < b; ++i) s[(o = q[i]).i] = o.x(t);
-          return s.join("");
-        });
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/value.js
-
-
-
-
-
-
-
-
-
-/* harmony default export */ var src_value = (function(a, b) {
-  var t = typeof b, c;
-  return b == null || t === "boolean" ? d3_interpolate_src_constant(b)
-      : (t === "number" ? number
-      : t === "string" ? ((c = color_color(b)) ? (b = c, src_rgb) : string)
-      : b instanceof color_color ? src_rgb
-      : b instanceof Date ? date
-      : Array.isArray(b) ? array
-      : typeof b.valueOf !== "function" && typeof b.toString !== "function" || isNaN(b) ? object
-      : number)(a, b);
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/discrete.js
-/* harmony default export */ var discrete = (function(range) {
-  var n = range.length;
-  return function(t) {
-    return range[Math.max(0, Math.min(n - 1, Math.floor(t * n)))];
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/hue.js
-
-
-/* harmony default export */ var src_hue = (function(a, b) {
-  var i = color_hue(+a, +b);
-  return function(t) {
-    var x = i(t);
-    return x - 360 * Math.floor(x / 360);
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/round.js
-/* harmony default export */ var round = (function(a, b) {
-  return a = +a, b -= a, function(t) {
-    return Math.round(a + b * t);
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/decompose.js
-var degrees = 180 / Math.PI;
-
-var identity = {
-  translateX: 0,
-  translateY: 0,
-  rotate: 0,
-  skewX: 0,
-  scaleX: 1,
-  scaleY: 1
-};
-
-/* harmony default export */ var decompose = (function(a, b, c, d, e, f) {
-  var scaleX, scaleY, skewX;
-  if (scaleX = Math.sqrt(a * a + b * b)) a /= scaleX, b /= scaleX;
-  if (skewX = a * c + b * d) c -= a * skewX, d -= b * skewX;
-  if (scaleY = Math.sqrt(c * c + d * d)) c /= scaleY, d /= scaleY, skewX /= scaleY;
-  if (a * d < b * c) a = -a, b = -b, skewX = -skewX, scaleX = -scaleX;
-  return {
-    translateX: e,
-    translateY: f,
-    rotate: Math.atan2(b, a) * degrees,
-    skewX: Math.atan(skewX) * degrees,
-    scaleX: scaleX,
-    scaleY: scaleY
-  };
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/parse.js
-
-
-var cssNode,
-    cssRoot,
-    cssView,
-    svgNode;
-
-function parseCss(value) {
-  if (value === "none") return identity;
-  if (!cssNode) cssNode = document.createElement("DIV"), cssRoot = document.documentElement, cssView = document.defaultView;
-  cssNode.style.transform = value;
-  value = cssView.getComputedStyle(cssRoot.appendChild(cssNode), null).getPropertyValue("transform");
-  cssRoot.removeChild(cssNode);
-  value = value.slice(7, -1).split(",");
-  return decompose(+value[0], +value[1], +value[2], +value[3], +value[4], +value[5]);
-}
-
-function parseSvg(value) {
-  if (value == null) return identity;
-  if (!svgNode) svgNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  svgNode.setAttribute("transform", value);
-  if (!(value = svgNode.transform.baseVal.consolidate())) return identity;
-  value = value.matrix;
-  return decompose(value.a, value.b, value.c, value.d, value.e, value.f);
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/index.js
-
-
-
-function interpolateTransform(parse, pxComma, pxParen, degParen) {
-
-  function pop(s) {
-    return s.length ? s.pop() + " " : "";
-  }
-
-  function translate(xa, ya, xb, yb, s, q) {
-    if (xa !== xb || ya !== yb) {
-      var i = s.push("translate(", null, pxComma, null, pxParen);
-      q.push({i: i - 4, x: number(xa, xb)}, {i: i - 2, x: number(ya, yb)});
-    } else if (xb || yb) {
-      s.push("translate(" + xb + pxComma + yb + pxParen);
-    }
-  }
-
-  function rotate(a, b, s, q) {
-    if (a !== b) {
-      if (a - b > 180) b += 360; else if (b - a > 180) a += 360; // shortest path
-      q.push({i: s.push(pop(s) + "rotate(", null, degParen) - 2, x: number(a, b)});
-    } else if (b) {
-      s.push(pop(s) + "rotate(" + b + degParen);
-    }
-  }
-
-  function skewX(a, b, s, q) {
-    if (a !== b) {
-      q.push({i: s.push(pop(s) + "skewX(", null, degParen) - 2, x: number(a, b)});
-    } else if (b) {
-      s.push(pop(s) + "skewX(" + b + degParen);
-    }
-  }
-
-  function scale(xa, ya, xb, yb, s, q) {
-    if (xa !== xb || ya !== yb) {
-      var i = s.push(pop(s) + "scale(", null, ",", null, ")");
-      q.push({i: i - 4, x: number(xa, xb)}, {i: i - 2, x: number(ya, yb)});
-    } else if (xb !== 1 || yb !== 1) {
-      s.push(pop(s) + "scale(" + xb + "," + yb + ")");
-    }
-  }
-
-  return function(a, b) {
-    var s = [], // string constants and placeholders
-        q = []; // number interpolators
-    a = parse(a), b = parse(b);
-    translate(a.translateX, a.translateY, b.translateX, b.translateY, s, q);
-    rotate(a.rotate, b.rotate, s, q);
-    skewX(a.skewX, b.skewX, s, q);
-    scale(a.scaleX, a.scaleY, b.scaleX, b.scaleY, s, q);
-    a = b = null; // gc
-    return function(t) {
-      var i = -1, n = q.length, o;
-      while (++i < n) s[(o = q[i]).i] = o.x(t);
-      return s.join("");
-    };
-  };
-}
-
-var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
-var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
 
 // CONCATENATED MODULE: ./node_modules/d3-interpolate/src/zoom.js
 var rho = Math.SQRT2,
@@ -40416,11 +40033,11 @@ var rho = Math.SQRT2,
     rho4 = 4,
     epsilon2 = 1e-12;
 
-function zoom_cosh(x) {
+function cosh(x) {
   return ((x = Math.exp(x)) + 1 / x) / 2;
 }
 
-function zoom_sinh(x) {
+function sinh(x) {
   return ((x = Math.exp(x)) - 1 / x) / 2;
 }
 
@@ -40461,12 +40078,12 @@ function tanh(x) {
     S = (r1 - r0) / rho;
     i = function(t) {
       var s = t * S,
-          coshr0 = zoom_cosh(r0),
-          u = w0 / (rho2 * d1) * (coshr0 * tanh(rho * s + r0) - zoom_sinh(r0));
+          coshr0 = cosh(r0),
+          u = w0 / (rho2 * d1) * (coshr0 * tanh(rho * s + r0) - sinh(r0));
       return [
         ux0 + u * dx,
         uy0 + u * dy,
-        w0 * coshr0 / zoom_cosh(rho * s + r0)
+        w0 * coshr0 / cosh(rho * s + r0)
       ];
     }
   }
@@ -40475,140 +40092,6 @@ function tanh(x) {
 
   return i;
 });
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/hsl.js
-
-
-
-function hsl_hsl(hue) {
-  return function(start, end) {
-    var h = hue((start = hsl(start)).h, (end = hsl(end)).h),
-        s = nogamma(start.s, end.s),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.s = s(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
-}
-
-/* harmony default export */ var src_hsl = (hsl_hsl(color_hue));
-var hslLong = hsl_hsl(nogamma);
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/lab.js
-
-
-
-function lab_lab(start, end) {
-  var l = nogamma((start = lab(start)).l, (end = lab(end)).l),
-      a = nogamma(start.a, end.a),
-      b = nogamma(start.b, end.b),
-      opacity = nogamma(start.opacity, end.opacity);
-  return function(t) {
-    start.l = l(t);
-    start.a = a(t);
-    start.b = b(t);
-    start.opacity = opacity(t);
-    return start + "";
-  };
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/hcl.js
-
-
-
-function hcl_hcl(hue) {
-  return function(start, end) {
-    var h = hue((start = hcl(start)).h, (end = hcl(end)).h),
-        c = nogamma(start.c, end.c),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.c = c(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
-}
-
-/* harmony default export */ var src_hcl = (hcl_hcl(color_hue));
-var hclLong = hcl_hcl(nogamma);
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/cubehelix.js
-
-
-
-function src_cubehelix_cubehelix(hue) {
-  return (function cubehelixGamma(y) {
-    y = +y;
-
-    function cubehelix(start, end) {
-      var h = hue((start = cubehelix_cubehelix(start)).h, (end = cubehelix_cubehelix(end)).h),
-          s = nogamma(start.s, end.s),
-          l = nogamma(start.l, end.l),
-          opacity = nogamma(start.opacity, end.opacity);
-      return function(t) {
-        start.h = h(t);
-        start.s = s(t);
-        start.l = l(Math.pow(t, y));
-        start.opacity = opacity(t);
-        return start + "";
-      };
-    }
-
-    cubehelix.gamma = cubehelixGamma;
-
-    return cubehelix;
-  })(1);
-}
-
-/* harmony default export */ var src_cubehelix = (src_cubehelix_cubehelix(color_hue));
-var cubehelixLong = src_cubehelix_cubehelix(nogamma);
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/piecewise.js
-function piecewise(interpolate, values) {
-  var i = 0, n = values.length - 1, v = values[0], I = new Array(n < 0 ? 0 : n);
-  while (i < n) I[i] = interpolate(v, v = values[++i]);
-  return function(t) {
-    var i = Math.max(0, Math.min(n - 1, Math.floor(t *= n)));
-    return I[i](t - i);
-  };
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/quantize.js
-/* harmony default export */ var quantize = (function(interpolator, n) {
-  var samples = new Array(n);
-  for (var i = 0; i < n; ++i) samples[i] = interpolator(i / (n - 1));
-  return samples;
-});
-
-// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/index.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // CONCATENATED MODULE: ./node_modules/d3-timer/src/timer.js
 var timer_frame = 0, // is an animation frame pending?
@@ -40750,7 +40233,7 @@ function sleep(time) {
   return t;
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-timer/src/index.js
+// CONCATENATED MODULE: ./node_modules/d3-timer/index.js
 
 
 
@@ -40947,6 +40430,133 @@ function schedule_create(node, id, self) {
   });
 });
 
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/number.js
+/* harmony default export */ var number = (function(a, b) {
+  return a = +a, b = +b, function(t) {
+    return a * (1 - t) + b * t;
+  };
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/decompose.js
+var degrees = 180 / Math.PI;
+
+var identity = {
+  translateX: 0,
+  translateY: 0,
+  rotate: 0,
+  skewX: 0,
+  scaleX: 1,
+  scaleY: 1
+};
+
+/* harmony default export */ var decompose = (function(a, b, c, d, e, f) {
+  var scaleX, scaleY, skewX;
+  if (scaleX = Math.sqrt(a * a + b * b)) a /= scaleX, b /= scaleX;
+  if (skewX = a * c + b * d) c -= a * skewX, d -= b * skewX;
+  if (scaleY = Math.sqrt(c * c + d * d)) c /= scaleY, d /= scaleY, skewX /= scaleY;
+  if (a * d < b * c) a = -a, b = -b, skewX = -skewX, scaleX = -scaleX;
+  return {
+    translateX: e,
+    translateY: f,
+    rotate: Math.atan2(b, a) * degrees,
+    skewX: Math.atan(skewX) * degrees,
+    scaleX: scaleX,
+    scaleY: scaleY
+  };
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/parse.js
+
+
+var cssNode,
+    cssRoot,
+    cssView,
+    svgNode;
+
+function parseCss(value) {
+  if (value === "none") return identity;
+  if (!cssNode) cssNode = document.createElement("DIV"), cssRoot = document.documentElement, cssView = document.defaultView;
+  cssNode.style.transform = value;
+  value = cssView.getComputedStyle(cssRoot.appendChild(cssNode), null).getPropertyValue("transform");
+  cssRoot.removeChild(cssNode);
+  value = value.slice(7, -1).split(",");
+  return decompose(+value[0], +value[1], +value[2], +value[3], +value[4], +value[5]);
+}
+
+function parseSvg(value) {
+  if (value == null) return identity;
+  if (!svgNode) svgNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  svgNode.setAttribute("transform", value);
+  if (!(value = svgNode.transform.baseVal.consolidate())) return identity;
+  value = value.matrix;
+  return decompose(value.a, value.b, value.c, value.d, value.e, value.f);
+}
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/transform/index.js
+
+
+
+function interpolateTransform(parse, pxComma, pxParen, degParen) {
+
+  function pop(s) {
+    return s.length ? s.pop() + " " : "";
+  }
+
+  function translate(xa, ya, xb, yb, s, q) {
+    if (xa !== xb || ya !== yb) {
+      var i = s.push("translate(", null, pxComma, null, pxParen);
+      q.push({i: i - 4, x: number(xa, xb)}, {i: i - 2, x: number(ya, yb)});
+    } else if (xb || yb) {
+      s.push("translate(" + xb + pxComma + yb + pxParen);
+    }
+  }
+
+  function rotate(a, b, s, q) {
+    if (a !== b) {
+      if (a - b > 180) b += 360; else if (b - a > 180) a += 360; // shortest path
+      q.push({i: s.push(pop(s) + "rotate(", null, degParen) - 2, x: number(a, b)});
+    } else if (b) {
+      s.push(pop(s) + "rotate(" + b + degParen);
+    }
+  }
+
+  function skewX(a, b, s, q) {
+    if (a !== b) {
+      q.push({i: s.push(pop(s) + "skewX(", null, degParen) - 2, x: number(a, b)});
+    } else if (b) {
+      s.push(pop(s) + "skewX(" + b + degParen);
+    }
+  }
+
+  function scale(xa, ya, xb, yb, s, q) {
+    if (xa !== xb || ya !== yb) {
+      var i = s.push(pop(s) + "scale(", null, ",", null, ")");
+      q.push({i: i - 4, x: number(xa, xb)}, {i: i - 2, x: number(ya, yb)});
+    } else if (xb !== 1 || yb !== 1) {
+      s.push(pop(s) + "scale(" + xb + "," + yb + ")");
+    }
+  }
+
+  return function(a, b) {
+    var s = [], // string constants and placeholders
+        q = []; // number interpolators
+    a = parse(a), b = parse(b);
+    translate(a.translateX, a.translateY, b.translateX, b.translateY, s, q);
+    rotate(a.rotate, b.rotate, s, q);
+    skewX(a.skewX, b.skewX, s, q);
+    scale(a.scaleX, a.scaleY, b.scaleX, b.scaleY, s, q);
+    a = b = null; // gc
+    return function(t) {
+      var i = -1, n = q.length, o;
+      while (++i < n) s[(o = q[i]).i] = o.x(t);
+      return s.join("");
+    };
+  };
+}
+
+var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
+var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
+
 // CONCATENATED MODULE: ./node_modules/d3-transition/src/transition/tween.js
 
 
@@ -41029,6 +40639,588 @@ function tweenValue(transition, name, value) {
     return schedule_get(node, id).value[name];
   };
 }
+
+// CONCATENATED MODULE: ./node_modules/d3-color/src/define.js
+/* harmony default export */ var define = (function(constructor, factory, prototype) {
+  constructor.prototype = factory.prototype = prototype;
+  prototype.constructor = constructor;
+});
+
+function extend(parent, definition) {
+  var prototype = Object.create(parent.prototype);
+  for (var key in definition) prototype[key] = definition[key];
+  return prototype;
+}
+
+// CONCATENATED MODULE: ./node_modules/d3-color/src/color.js
+
+
+function Color() {}
+
+var darker = 0.7;
+var brighter = 1 / darker;
+
+var reI = "\\s*([+-]?\\d+)\\s*",
+    reN = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*",
+    reP = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*",
+    reHex = /^#([0-9a-f]{3,8})$/,
+    reRgbInteger = new RegExp("^rgb\\(" + [reI, reI, reI] + "\\)$"),
+    reRgbPercent = new RegExp("^rgb\\(" + [reP, reP, reP] + "\\)$"),
+    reRgbaInteger = new RegExp("^rgba\\(" + [reI, reI, reI, reN] + "\\)$"),
+    reRgbaPercent = new RegExp("^rgba\\(" + [reP, reP, reP, reN] + "\\)$"),
+    reHslPercent = new RegExp("^hsl\\(" + [reN, reP, reP] + "\\)$"),
+    reHslaPercent = new RegExp("^hsla\\(" + [reN, reP, reP, reN] + "\\)$");
+
+var named = {
+  aliceblue: 0xf0f8ff,
+  antiquewhite: 0xfaebd7,
+  aqua: 0x00ffff,
+  aquamarine: 0x7fffd4,
+  azure: 0xf0ffff,
+  beige: 0xf5f5dc,
+  bisque: 0xffe4c4,
+  black: 0x000000,
+  blanchedalmond: 0xffebcd,
+  blue: 0x0000ff,
+  blueviolet: 0x8a2be2,
+  brown: 0xa52a2a,
+  burlywood: 0xdeb887,
+  cadetblue: 0x5f9ea0,
+  chartreuse: 0x7fff00,
+  chocolate: 0xd2691e,
+  coral: 0xff7f50,
+  cornflowerblue: 0x6495ed,
+  cornsilk: 0xfff8dc,
+  crimson: 0xdc143c,
+  cyan: 0x00ffff,
+  darkblue: 0x00008b,
+  darkcyan: 0x008b8b,
+  darkgoldenrod: 0xb8860b,
+  darkgray: 0xa9a9a9,
+  darkgreen: 0x006400,
+  darkgrey: 0xa9a9a9,
+  darkkhaki: 0xbdb76b,
+  darkmagenta: 0x8b008b,
+  darkolivegreen: 0x556b2f,
+  darkorange: 0xff8c00,
+  darkorchid: 0x9932cc,
+  darkred: 0x8b0000,
+  darksalmon: 0xe9967a,
+  darkseagreen: 0x8fbc8f,
+  darkslateblue: 0x483d8b,
+  darkslategray: 0x2f4f4f,
+  darkslategrey: 0x2f4f4f,
+  darkturquoise: 0x00ced1,
+  darkviolet: 0x9400d3,
+  deeppink: 0xff1493,
+  deepskyblue: 0x00bfff,
+  dimgray: 0x696969,
+  dimgrey: 0x696969,
+  dodgerblue: 0x1e90ff,
+  firebrick: 0xb22222,
+  floralwhite: 0xfffaf0,
+  forestgreen: 0x228b22,
+  fuchsia: 0xff00ff,
+  gainsboro: 0xdcdcdc,
+  ghostwhite: 0xf8f8ff,
+  gold: 0xffd700,
+  goldenrod: 0xdaa520,
+  gray: 0x808080,
+  green: 0x008000,
+  greenyellow: 0xadff2f,
+  grey: 0x808080,
+  honeydew: 0xf0fff0,
+  hotpink: 0xff69b4,
+  indianred: 0xcd5c5c,
+  indigo: 0x4b0082,
+  ivory: 0xfffff0,
+  khaki: 0xf0e68c,
+  lavender: 0xe6e6fa,
+  lavenderblush: 0xfff0f5,
+  lawngreen: 0x7cfc00,
+  lemonchiffon: 0xfffacd,
+  lightblue: 0xadd8e6,
+  lightcoral: 0xf08080,
+  lightcyan: 0xe0ffff,
+  lightgoldenrodyellow: 0xfafad2,
+  lightgray: 0xd3d3d3,
+  lightgreen: 0x90ee90,
+  lightgrey: 0xd3d3d3,
+  lightpink: 0xffb6c1,
+  lightsalmon: 0xffa07a,
+  lightseagreen: 0x20b2aa,
+  lightskyblue: 0x87cefa,
+  lightslategray: 0x778899,
+  lightslategrey: 0x778899,
+  lightsteelblue: 0xb0c4de,
+  lightyellow: 0xffffe0,
+  lime: 0x00ff00,
+  limegreen: 0x32cd32,
+  linen: 0xfaf0e6,
+  magenta: 0xff00ff,
+  maroon: 0x800000,
+  mediumaquamarine: 0x66cdaa,
+  mediumblue: 0x0000cd,
+  mediumorchid: 0xba55d3,
+  mediumpurple: 0x9370db,
+  mediumseagreen: 0x3cb371,
+  mediumslateblue: 0x7b68ee,
+  mediumspringgreen: 0x00fa9a,
+  mediumturquoise: 0x48d1cc,
+  mediumvioletred: 0xc71585,
+  midnightblue: 0x191970,
+  mintcream: 0xf5fffa,
+  mistyrose: 0xffe4e1,
+  moccasin: 0xffe4b5,
+  navajowhite: 0xffdead,
+  navy: 0x000080,
+  oldlace: 0xfdf5e6,
+  olive: 0x808000,
+  olivedrab: 0x6b8e23,
+  orange: 0xffa500,
+  orangered: 0xff4500,
+  orchid: 0xda70d6,
+  palegoldenrod: 0xeee8aa,
+  palegreen: 0x98fb98,
+  paleturquoise: 0xafeeee,
+  palevioletred: 0xdb7093,
+  papayawhip: 0xffefd5,
+  peachpuff: 0xffdab9,
+  peru: 0xcd853f,
+  pink: 0xffc0cb,
+  plum: 0xdda0dd,
+  powderblue: 0xb0e0e6,
+  purple: 0x800080,
+  rebeccapurple: 0x663399,
+  red: 0xff0000,
+  rosybrown: 0xbc8f8f,
+  royalblue: 0x4169e1,
+  saddlebrown: 0x8b4513,
+  salmon: 0xfa8072,
+  sandybrown: 0xf4a460,
+  seagreen: 0x2e8b57,
+  seashell: 0xfff5ee,
+  sienna: 0xa0522d,
+  silver: 0xc0c0c0,
+  skyblue: 0x87ceeb,
+  slateblue: 0x6a5acd,
+  slategray: 0x708090,
+  slategrey: 0x708090,
+  snow: 0xfffafa,
+  springgreen: 0x00ff7f,
+  steelblue: 0x4682b4,
+  tan: 0xd2b48c,
+  teal: 0x008080,
+  thistle: 0xd8bfd8,
+  tomato: 0xff6347,
+  turquoise: 0x40e0d0,
+  violet: 0xee82ee,
+  wheat: 0xf5deb3,
+  white: 0xffffff,
+  whitesmoke: 0xf5f5f5,
+  yellow: 0xffff00,
+  yellowgreen: 0x9acd32
+};
+
+define(Color, color_color, {
+  copy: function(channels) {
+    return Object.assign(new this.constructor, this, channels);
+  },
+  displayable: function() {
+    return this.rgb().displayable();
+  },
+  hex: color_formatHex, // Deprecated! Use color.formatHex.
+  formatHex: color_formatHex,
+  formatHsl: color_formatHsl,
+  formatRgb: color_formatRgb,
+  toString: color_formatRgb
+});
+
+function color_formatHex() {
+  return this.rgb().formatHex();
+}
+
+function color_formatHsl() {
+  return hslConvert(this).formatHsl();
+}
+
+function color_formatRgb() {
+  return this.rgb().formatRgb();
+}
+
+function color_color(format) {
+  var m, l;
+  format = (format + "").trim().toLowerCase();
+  return (m = reHex.exec(format)) ? (l = m[1].length, m = parseInt(m[1], 16), l === 6 ? rgbn(m) // #ff0000
+      : l === 3 ? new Rgb((m >> 8 & 0xf) | (m >> 4 & 0xf0), (m >> 4 & 0xf) | (m & 0xf0), ((m & 0xf) << 4) | (m & 0xf), 1) // #f00
+      : l === 8 ? new Rgb(m >> 24 & 0xff, m >> 16 & 0xff, m >> 8 & 0xff, (m & 0xff) / 0xff) // #ff000000
+      : l === 4 ? new Rgb((m >> 12 & 0xf) | (m >> 8 & 0xf0), (m >> 8 & 0xf) | (m >> 4 & 0xf0), (m >> 4 & 0xf) | (m & 0xf0), (((m & 0xf) << 4) | (m & 0xf)) / 0xff) // #f000
+      : null) // invalid hex
+      : (m = reRgbInteger.exec(format)) ? new Rgb(m[1], m[2], m[3], 1) // rgb(255, 0, 0)
+      : (m = reRgbPercent.exec(format)) ? new Rgb(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, 1) // rgb(100%, 0%, 0%)
+      : (m = reRgbaInteger.exec(format)) ? rgba(m[1], m[2], m[3], m[4]) // rgba(255, 0, 0, 1)
+      : (m = reRgbaPercent.exec(format)) ? rgba(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, m[4]) // rgb(100%, 0%, 0%, 1)
+      : (m = reHslPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, 1) // hsl(120, 50%, 50%)
+      : (m = reHslaPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, m[4]) // hsla(120, 50%, 50%, 1)
+      : named.hasOwnProperty(format) ? rgbn(named[format]) // eslint-disable-line no-prototype-builtins
+      : format === "transparent" ? new Rgb(NaN, NaN, NaN, 0)
+      : null;
+}
+
+function rgbn(n) {
+  return new Rgb(n >> 16 & 0xff, n >> 8 & 0xff, n & 0xff, 1);
+}
+
+function rgba(r, g, b, a) {
+  if (a <= 0) r = g = b = NaN;
+  return new Rgb(r, g, b, a);
+}
+
+function rgbConvert(o) {
+  if (!(o instanceof Color)) o = color_color(o);
+  if (!o) return new Rgb;
+  o = o.rgb();
+  return new Rgb(o.r, o.g, o.b, o.opacity);
+}
+
+function color_rgb(r, g, b, opacity) {
+  return arguments.length === 1 ? rgbConvert(r) : new Rgb(r, g, b, opacity == null ? 1 : opacity);
+}
+
+function Rgb(r, g, b, opacity) {
+  this.r = +r;
+  this.g = +g;
+  this.b = +b;
+  this.opacity = +opacity;
+}
+
+define(Rgb, color_rgb, extend(Color, {
+  brighter: function(k) {
+    k = k == null ? brighter : Math.pow(brighter, k);
+    return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
+  },
+  darker: function(k) {
+    k = k == null ? darker : Math.pow(darker, k);
+    return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
+  },
+  rgb: function() {
+    return this;
+  },
+  displayable: function() {
+    return (-0.5 <= this.r && this.r < 255.5)
+        && (-0.5 <= this.g && this.g < 255.5)
+        && (-0.5 <= this.b && this.b < 255.5)
+        && (0 <= this.opacity && this.opacity <= 1);
+  },
+  hex: rgb_formatHex, // Deprecated! Use color.formatHex.
+  formatHex: rgb_formatHex,
+  formatRgb: rgb_formatRgb,
+  toString: rgb_formatRgb
+}));
+
+function rgb_formatHex() {
+  return "#" + hex(this.r) + hex(this.g) + hex(this.b);
+}
+
+function rgb_formatRgb() {
+  var a = this.opacity; a = isNaN(a) ? 1 : Math.max(0, Math.min(1, a));
+  return (a === 1 ? "rgb(" : "rgba(")
+      + Math.max(0, Math.min(255, Math.round(this.r) || 0)) + ", "
+      + Math.max(0, Math.min(255, Math.round(this.g) || 0)) + ", "
+      + Math.max(0, Math.min(255, Math.round(this.b) || 0))
+      + (a === 1 ? ")" : ", " + a + ")");
+}
+
+function hex(value) {
+  value = Math.max(0, Math.min(255, Math.round(value) || 0));
+  return (value < 16 ? "0" : "") + value.toString(16);
+}
+
+function hsla(h, s, l, a) {
+  if (a <= 0) h = s = l = NaN;
+  else if (l <= 0 || l >= 1) h = s = NaN;
+  else if (s <= 0) h = NaN;
+  return new Hsl(h, s, l, a);
+}
+
+function hslConvert(o) {
+  if (o instanceof Hsl) return new Hsl(o.h, o.s, o.l, o.opacity);
+  if (!(o instanceof Color)) o = color_color(o);
+  if (!o) return new Hsl;
+  if (o instanceof Hsl) return o;
+  o = o.rgb();
+  var r = o.r / 255,
+      g = o.g / 255,
+      b = o.b / 255,
+      min = Math.min(r, g, b),
+      max = Math.max(r, g, b),
+      h = NaN,
+      s = max - min,
+      l = (max + min) / 2;
+  if (s) {
+    if (r === max) h = (g - b) / s + (g < b) * 6;
+    else if (g === max) h = (b - r) / s + 2;
+    else h = (r - g) / s + 4;
+    s /= l < 0.5 ? max + min : 2 - max - min;
+    h *= 60;
+  } else {
+    s = l > 0 && l < 1 ? 0 : h;
+  }
+  return new Hsl(h, s, l, o.opacity);
+}
+
+function hsl(h, s, l, opacity) {
+  return arguments.length === 1 ? hslConvert(h) : new Hsl(h, s, l, opacity == null ? 1 : opacity);
+}
+
+function Hsl(h, s, l, opacity) {
+  this.h = +h;
+  this.s = +s;
+  this.l = +l;
+  this.opacity = +opacity;
+}
+
+define(Hsl, hsl, extend(Color, {
+  brighter: function(k) {
+    k = k == null ? brighter : Math.pow(brighter, k);
+    return new Hsl(this.h, this.s, this.l * k, this.opacity);
+  },
+  darker: function(k) {
+    k = k == null ? darker : Math.pow(darker, k);
+    return new Hsl(this.h, this.s, this.l * k, this.opacity);
+  },
+  rgb: function() {
+    var h = this.h % 360 + (this.h < 0) * 360,
+        s = isNaN(h) || isNaN(this.s) ? 0 : this.s,
+        l = this.l,
+        m2 = l + (l < 0.5 ? l : 1 - l) * s,
+        m1 = 2 * l - m2;
+    return new Rgb(
+      hsl2rgb(h >= 240 ? h - 240 : h + 120, m1, m2),
+      hsl2rgb(h, m1, m2),
+      hsl2rgb(h < 120 ? h + 240 : h - 120, m1, m2),
+      this.opacity
+    );
+  },
+  displayable: function() {
+    return (0 <= this.s && this.s <= 1 || isNaN(this.s))
+        && (0 <= this.l && this.l <= 1)
+        && (0 <= this.opacity && this.opacity <= 1);
+  },
+  formatHsl: function() {
+    var a = this.opacity; a = isNaN(a) ? 1 : Math.max(0, Math.min(1, a));
+    return (a === 1 ? "hsl(" : "hsla(")
+        + (this.h || 0) + ", "
+        + (this.s || 0) * 100 + "%, "
+        + (this.l || 0) * 100 + "%"
+        + (a === 1 ? ")" : ", " + a + ")");
+  }
+}));
+
+/* From FvD 13.37, CSS Color Module Level 3 */
+function hsl2rgb(h, m1, m2) {
+  return (h < 60 ? m1 + (m2 - m1) * h / 60
+      : h < 180 ? m2
+      : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60
+      : m1) * 255;
+}
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/basis.js
+function basis(t1, v0, v1, v2, v3) {
+  var t2 = t1 * t1, t3 = t2 * t1;
+  return ((1 - 3 * t1 + 3 * t2 - t3) * v0
+      + (4 - 6 * t2 + 3 * t3) * v1
+      + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2
+      + t3 * v3) / 6;
+}
+
+/* harmony default export */ var src_basis = (function(values) {
+  var n = values.length - 1;
+  return function(t) {
+    var i = t <= 0 ? (t = 0) : t >= 1 ? (t = 1, n - 1) : Math.floor(t * n),
+        v1 = values[i],
+        v2 = values[i + 1],
+        v0 = i > 0 ? values[i - 1] : 2 * v1 - v2,
+        v3 = i < n - 1 ? values[i + 2] : 2 * v2 - v1;
+    return basis((t - i / n) * n, v0, v1, v2, v3);
+  };
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/basisClosed.js
+
+
+/* harmony default export */ var basisClosed = (function(values) {
+  var n = values.length;
+  return function(t) {
+    var i = Math.floor(((t %= 1) < 0 ? ++t : t) * n),
+        v0 = values[(i + n - 1) % n],
+        v1 = values[i % n],
+        v2 = values[(i + 1) % n],
+        v3 = values[(i + 2) % n];
+    return basis((t - i / n) * n, v0, v1, v2, v3);
+  };
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/constant.js
+/* harmony default export */ var d3_interpolate_src_constant = (function(x) {
+  return function() {
+    return x;
+  };
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/color.js
+
+
+function linear(a, d) {
+  return function(t) {
+    return a + t * d;
+  };
+}
+
+function exponential(a, b, y) {
+  return a = Math.pow(a, y), b = Math.pow(b, y) - a, y = 1 / y, function(t) {
+    return Math.pow(a + t * b, y);
+  };
+}
+
+function hue(a, b) {
+  var d = b - a;
+  return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : d3_interpolate_src_constant(isNaN(a) ? b : a);
+}
+
+function gamma(y) {
+  return (y = +y) === 1 ? nogamma : function(a, b) {
+    return b - a ? exponential(a, b, y) : d3_interpolate_src_constant(isNaN(a) ? b : a);
+  };
+}
+
+function nogamma(a, b) {
+  var d = b - a;
+  return d ? linear(a, d) : d3_interpolate_src_constant(isNaN(a) ? b : a);
+}
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/rgb.js
+
+
+
+
+
+/* harmony default export */ var src_rgb = ((function rgbGamma(y) {
+  var color = gamma(y);
+
+  function rgb(start, end) {
+    var r = color((start = color_rgb(start)).r, (end = color_rgb(end)).r),
+        g = color(start.g, end.g),
+        b = color(start.b, end.b),
+        opacity = nogamma(start.opacity, end.opacity);
+    return function(t) {
+      start.r = r(t);
+      start.g = g(t);
+      start.b = b(t);
+      start.opacity = opacity(t);
+      return start + "";
+    };
+  }
+
+  rgb.gamma = rgbGamma;
+
+  return rgb;
+})(1));
+
+function rgbSpline(spline) {
+  return function(colors) {
+    var n = colors.length,
+        r = new Array(n),
+        g = new Array(n),
+        b = new Array(n),
+        i, color;
+    for (i = 0; i < n; ++i) {
+      color = color_rgb(colors[i]);
+      r[i] = color.r || 0;
+      g[i] = color.g || 0;
+      b[i] = color.b || 0;
+    }
+    r = spline(r);
+    g = spline(g);
+    b = spline(b);
+    color.opacity = 1;
+    return function(t) {
+      color.r = r(t);
+      color.g = g(t);
+      color.b = b(t);
+      return color + "";
+    };
+  };
+}
+
+var rgbBasis = rgbSpline(src_basis);
+var rgbBasisClosed = rgbSpline(basisClosed);
+
+// CONCATENATED MODULE: ./node_modules/d3-interpolate/src/string.js
+
+
+var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g,
+    reB = new RegExp(reA.source, "g");
+
+function zero(b) {
+  return function() {
+    return b;
+  };
+}
+
+function one(b) {
+  return function(t) {
+    return b(t) + "";
+  };
+}
+
+/* harmony default export */ var string = (function(a, b) {
+  var bi = reA.lastIndex = reB.lastIndex = 0, // scan index for next number in b
+      am, // current match in a
+      bm, // current match in b
+      bs, // string preceding current number in b, if any
+      i = -1, // index in s
+      s = [], // string constants and placeholders
+      q = []; // number interpolators
+
+  // Coerce inputs to strings.
+  a = a + "", b = b + "";
+
+  // Interpolate pairs of numbers in a & b.
+  while ((am = reA.exec(a))
+      && (bm = reB.exec(b))) {
+    if ((bs = bm.index) > bi) { // a string precedes the next number in b
+      bs = b.slice(bi, bs);
+      if (s[i]) s[i] += bs; // coalesce with previous string
+      else s[++i] = bs;
+    }
+    if ((am = am[0]) === (bm = bm[0])) { // numbers in a & b match
+      if (s[i]) s[i] += bm; // coalesce with previous string
+      else s[++i] = bm;
+    } else { // interpolate non-matching numbers
+      s[++i] = null;
+      q.push({i: i, x: number(am, bm)});
+    }
+    bi = reB.lastIndex;
+  }
+
+  // Add remains of b.
+  if (bi < b.length) {
+    bs = b.slice(bi);
+    if (s[i]) s[i] += bs; // coalesce with previous string
+    else s[++i] = bs;
+  }
+
+  // Special optimization for only a single match.
+  // Otherwise, interpolate each of the numbers and rejoin the string.
+  return s.length < 2 ? (q[0]
+      ? one(q[0].x)
+      : zero(b))
+      : (b = q.length, function(t) {
+          for (var i = 0, o; i < b; ++i) s[(o = q[i]).i] = o.x(t);
+          return s.join("");
+        });
+});
 
 // CONCATENATED MODULE: ./node_modules/d3-transition/src/transition/interpolate.js
 
@@ -41127,13 +41319,13 @@ function attr_attrFunctionNS(fullname, interpolate, value) {
 
 function attrInterpolate(name, i) {
   return function(t) {
-    this.setAttribute(name, i(t));
+    this.setAttribute(name, i.call(this, t));
   };
 }
 
 function attrInterpolateNS(fullname, i) {
   return function(t) {
-    this.setAttributeNS(fullname.space, fullname.local, i(t));
+    this.setAttributeNS(fullname.space, fullname.local, i.call(this, t));
   };
 }
 
@@ -41241,7 +41433,7 @@ function easeConstant(id, value) {
 
 
 /* harmony default export */ var transition_filter = (function(match) {
-  if (typeof match !== "function") match = matcher(match);
+  if (typeof match !== "function") match = src_matcher(match);
 
   for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
     for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
@@ -41468,7 +41660,7 @@ function styleMaybeRemove(id, name) {
 // CONCATENATED MODULE: ./node_modules/d3-transition/src/transition/styleTween.js
 function styleInterpolate(name, i, priority) {
   return function(t) {
-    this.style.setProperty(name, i(t), priority);
+    this.style.setProperty(name, i.call(this, t), priority);
   };
 }
 
@@ -41511,6 +41703,32 @@ function text_textFunction(value) {
   return this.tween("text", typeof value === "function"
       ? text_textFunction(tweenValue(this, "text", value))
       : text_textConstant(value == null ? "" : value + ""));
+});
+
+// CONCATENATED MODULE: ./node_modules/d3-transition/src/transition/textTween.js
+function textInterpolate(i) {
+  return function(t) {
+    this.textContent = i.call(this, t);
+  };
+}
+
+function textTween(value) {
+  var t0, i0;
+  function tween() {
+    var i = value.apply(this, arguments);
+    if (i !== i0) t0 = (i0 = i) && textInterpolate(i);
+    return t0;
+  }
+  tween._value = value;
+  return tween;
+}
+
+/* harmony default export */ var transition_textTween = (function(value) {
+  var key = "text";
+  if (arguments.length < 1) return (key = this.tween(key)) && key._value;
+  if (value == null) return this.tween(key, null);
+  if (typeof value !== "function") throw new Error;
+  return this.tween(key, textTween(value));
 });
 
 // CONCATENATED MODULE: ./node_modules/d3-transition/src/transition/transition.js
@@ -41588,6 +41806,7 @@ function text_textFunction(value) {
 
 
 
+
 var transition_id = 0;
 
 function Transition(groups, parents, name, id) {
@@ -41627,6 +41846,7 @@ Transition.prototype = src_transition_transition.prototype = {
   style: transition_style,
   styleTween: transition_styleTween,
   text: transition_text,
+  textTween: transition_textTween,
   remove: transition_remove,
   tween: transition_tween,
   delay: transition_delay,
@@ -41634,24 +41854,6 @@ Transition.prototype = src_transition_transition.prototype = {
   ease: ease,
   end: transition_end
 };
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/linear.js
-function linear_linear(t) {
-  return +t;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/quad.js
-function quadIn(t) {
-  return t * t;
-}
-
-function quadOut(t) {
-  return t * (2 - t);
-}
-
-function quadInOut(t) {
-  return ((t *= 2) <= 1 ? t * t : --t * (2 - t) + 1) / 2;
-}
 
 // CONCATENATED MODULE: ./node_modules/d3-ease/src/cubic.js
 function cubicIn(t) {
@@ -41665,217 +41867,6 @@ function cubicOut(t) {
 function cubicInOut(t) {
   return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
 }
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/poly.js
-var exponent = 3;
-
-var polyIn = (function custom(e) {
-  e = +e;
-
-  function polyIn(t) {
-    return Math.pow(t, e);
-  }
-
-  polyIn.exponent = custom;
-
-  return polyIn;
-})(exponent);
-
-var polyOut = (function custom(e) {
-  e = +e;
-
-  function polyOut(t) {
-    return 1 - Math.pow(1 - t, e);
-  }
-
-  polyOut.exponent = custom;
-
-  return polyOut;
-})(exponent);
-
-var polyInOut = (function custom(e) {
-  e = +e;
-
-  function polyInOut(t) {
-    return ((t *= 2) <= 1 ? Math.pow(t, e) : 2 - Math.pow(2 - t, e)) / 2;
-  }
-
-  polyInOut.exponent = custom;
-
-  return polyInOut;
-})(exponent);
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/sin.js
-var pi = Math.PI,
-    halfPi = pi / 2;
-
-function sinIn(t) {
-  return 1 - Math.cos(t * halfPi);
-}
-
-function sinOut(t) {
-  return Math.sin(t * halfPi);
-}
-
-function sinInOut(t) {
-  return (1 - Math.cos(pi * t)) / 2;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/exp.js
-function expIn(t) {
-  return Math.pow(2, 10 * t - 10);
-}
-
-function expOut(t) {
-  return 1 - Math.pow(2, -10 * t);
-}
-
-function expInOut(t) {
-  return ((t *= 2) <= 1 ? Math.pow(2, 10 * t - 10) : 2 - Math.pow(2, 10 - 10 * t)) / 2;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/circle.js
-function circleIn(t) {
-  return 1 - Math.sqrt(1 - t * t);
-}
-
-function circleOut(t) {
-  return Math.sqrt(1 - --t * t);
-}
-
-function circleInOut(t) {
-  return ((t *= 2) <= 1 ? 1 - Math.sqrt(1 - t * t) : Math.sqrt(1 - (t -= 2) * t) + 1) / 2;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/bounce.js
-var b1 = 4 / 11,
-    b2 = 6 / 11,
-    b3 = 8 / 11,
-    b4 = 3 / 4,
-    b5 = 9 / 11,
-    b6 = 10 / 11,
-    b7 = 15 / 16,
-    b8 = 21 / 22,
-    b9 = 63 / 64,
-    b0 = 1 / b1 / b1;
-
-function bounceIn(t) {
-  return 1 - bounceOut(1 - t);
-}
-
-function bounceOut(t) {
-  return (t = +t) < b1 ? b0 * t * t : t < b3 ? b0 * (t -= b2) * t + b4 : t < b6 ? b0 * (t -= b5) * t + b7 : b0 * (t -= b8) * t + b9;
-}
-
-function bounceInOut(t) {
-  return ((t *= 2) <= 1 ? 1 - bounceOut(1 - t) : bounceOut(t - 1) + 1) / 2;
-}
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/back.js
-var overshoot = 1.70158;
-
-var backIn = (function custom(s) {
-  s = +s;
-
-  function backIn(t) {
-    return t * t * ((s + 1) * t - s);
-  }
-
-  backIn.overshoot = custom;
-
-  return backIn;
-})(overshoot);
-
-var backOut = (function custom(s) {
-  s = +s;
-
-  function backOut(t) {
-    return --t * t * ((s + 1) * t + s) + 1;
-  }
-
-  backOut.overshoot = custom;
-
-  return backOut;
-})(overshoot);
-
-var backInOut = (function custom(s) {
-  s = +s;
-
-  function backInOut(t) {
-    return ((t *= 2) < 1 ? t * t * ((s + 1) * t - s) : (t -= 2) * t * ((s + 1) * t + s) + 2) / 2;
-  }
-
-  backInOut.overshoot = custom;
-
-  return backInOut;
-})(overshoot);
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/elastic.js
-var tau = 2 * Math.PI,
-    amplitude = 1,
-    period = 0.3;
-
-var elasticIn = (function custom(a, p) {
-  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
-
-  function elasticIn(t) {
-    return a * Math.pow(2, 10 * --t) * Math.sin((s - t) / p);
-  }
-
-  elasticIn.amplitude = function(a) { return custom(a, p * tau); };
-  elasticIn.period = function(p) { return custom(a, p); };
-
-  return elasticIn;
-})(amplitude, period);
-
-var elasticOut = (function custom(a, p) {
-  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
-
-  function elasticOut(t) {
-    return 1 - a * Math.pow(2, -10 * (t = +t)) * Math.sin((t + s) / p);
-  }
-
-  elasticOut.amplitude = function(a) { return custom(a, p * tau); };
-  elasticOut.period = function(p) { return custom(a, p); };
-
-  return elasticOut;
-})(amplitude, period);
-
-var elasticInOut = (function custom(a, p) {
-  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
-
-  function elasticInOut(t) {
-    return ((t = t * 2 - 1) < 0
-        ? a * Math.pow(2, 10 * t) * Math.sin((s - t) / p)
-        : 2 - a * Math.pow(2, -10 * t) * Math.sin((s + t) / p)) / 2;
-  }
-
-  elasticInOut.amplitude = function(a) { return custom(a, p * tau); };
-  elasticInOut.period = function(p) { return custom(a, p); };
-
-  return elasticInOut;
-})(amplitude, period);
-
-// CONCATENATED MODULE: ./node_modules/d3-ease/src/index.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // CONCATENATED MODULE: ./node_modules/d3-transition/src/selection/transition.js
 
@@ -42021,7 +42012,8 @@ var transform_identity = new Transform(1, 0, 0);
 transform_transform.prototype = Transform.prototype;
 
 function transform_transform(node) {
-  return node.__zoom || transform_identity;
+  while (!node.__zoom) if (!(node = node.parentNode)) return transform_identity;
+  return node.__zoom;
 }
 
 // CONCATENATED MODULE: ./node_modules/d3-zoom/src/noevent.js
@@ -42049,20 +42041,20 @@ function noevent_nopropagation() {
 
 // Ignore right-click, since that should open the context menu.
 function zoom_defaultFilter() {
-  return !on_event.button;
+  return !on_event.ctrlKey && !on_event.button;
 }
 
 function defaultExtent() {
-  var e = this, w, h;
+  var e = this;
   if (e instanceof SVGElement) {
     e = e.ownerSVGElement || e;
-    w = e.width.baseVal.value;
-    h = e.height.baseVal.value;
-  } else {
-    w = e.clientWidth;
-    h = e.clientHeight;
+    if (e.hasAttribute("viewBox")) {
+      e = e.viewBox.baseVal;
+      return [[e.x, e.y], [e.x + e.width, e.y + e.height]];
+    }
+    return [[0, 0], [e.width.baseVal.value, e.height.baseVal.value]];
   }
-  return [[0, 0], [w, h]];
+  return [[0, 0], [e.clientWidth, e.clientHeight]];
 }
 
 function defaultTransform() {
@@ -42070,11 +42062,11 @@ function defaultTransform() {
 }
 
 function defaultWheelDelta() {
-  return -on_event.deltaY * (on_event.deltaMode ? 120 : 1) / 500;
+  return -on_event.deltaY * (on_event.deltaMode === 1 ? 0.05 : on_event.deltaMode ? 1 : 0.002);
 }
 
 function zoom_defaultTouchable() {
-  return "ontouchstart" in this;
+  return navigator.maxTouchPoints || ("ontouchstart" in this);
 }
 
 function defaultConstrain(transform, extent, translateExtent) {
@@ -42098,7 +42090,6 @@ function defaultConstrain(transform, extent, translateExtent) {
       translateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]],
       duration = 250,
       interpolate = src_zoom,
-      gestures = [],
       listeners = src_dispatch("start", "zoom", "end"),
       touchstarting,
       touchending,
@@ -42120,11 +42111,11 @@ function defaultConstrain(transform, extent, translateExtent) {
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
   }
 
-  zoom.transform = function(collection, transform) {
+  zoom.transform = function(collection, transform, point) {
     var selection = collection.selection ? collection.selection() : collection;
     selection.property("__zoom", defaultTransform);
     if (collection !== selection) {
-      schedule(collection, transform);
+      schedule(collection, transform, point);
     } else {
       selection.interrupt().each(function() {
         gesture(this, arguments)
@@ -42135,23 +42126,23 @@ function defaultConstrain(transform, extent, translateExtent) {
     }
   };
 
-  zoom.scaleBy = function(selection, k) {
+  zoom.scaleBy = function(selection, k, p) {
     zoom.scaleTo(selection, function() {
       var k0 = this.__zoom.k,
           k1 = typeof k === "function" ? k.apply(this, arguments) : k;
       return k0 * k1;
-    });
+    }, p);
   };
 
-  zoom.scaleTo = function(selection, k) {
+  zoom.scaleTo = function(selection, k, p) {
     zoom.transform(selection, function() {
       var e = extent.apply(this, arguments),
           t0 = this.__zoom,
-          p0 = centroid(e),
+          p0 = p == null ? centroid(e) : typeof p === "function" ? p.apply(this, arguments) : p,
           p1 = t0.invert(p0),
           k1 = typeof k === "function" ? k.apply(this, arguments) : k;
       return constrain(translate(scale(t0, k1), p0, p1), e, translateExtent);
-    });
+    }, p);
   };
 
   zoom.translateBy = function(selection, x, y) {
@@ -42163,16 +42154,16 @@ function defaultConstrain(transform, extent, translateExtent) {
     });
   };
 
-  zoom.translateTo = function(selection, x, y) {
+  zoom.translateTo = function(selection, x, y, p) {
     zoom.transform(selection, function() {
       var e = extent.apply(this, arguments),
           t = this.__zoom,
-          p = centroid(e);
-      return constrain(transform_identity.translate(p[0], p[1]).scale(t.k).translate(
+          p0 = p == null ? centroid(e) : typeof p === "function" ? p.apply(this, arguments) : p;
+      return constrain(transform_identity.translate(p0[0], p0[1]).scale(t.k).translate(
         typeof x === "function" ? -x.apply(this, arguments) : -x,
         typeof y === "function" ? -y.apply(this, arguments) : -y
       ), e, translateExtent);
-    });
+    }, p);
   };
 
   function scale(transform, k) {
@@ -42189,7 +42180,7 @@ function defaultConstrain(transform, extent, translateExtent) {
     return [(+extent[0][0] + +extent[1][0]) / 2, (+extent[0][1] + +extent[1][1]) / 2];
   }
 
-  function schedule(transition, transform, center) {
+  function schedule(transition, transform, point) {
     transition
         .on("start.zoom", function() { gesture(this, arguments).start(); })
         .on("interrupt.zoom end.zoom", function() { gesture(this, arguments).end(); })
@@ -42198,7 +42189,7 @@ function defaultConstrain(transform, extent, translateExtent) {
               args = arguments,
               g = gesture(that, args),
               e = extent.apply(that, args),
-              p = center || centroid(e),
+              p = point == null ? centroid(e) : typeof point === "function" ? point.apply(that, args) : point,
               w = Math.max(e[1][0] - e[0][0], e[1][1] - e[0][1]),
               a = that.__zoom,
               b = typeof transform === "function" ? transform.apply(that, args) : transform,
@@ -42211,27 +42202,22 @@ function defaultConstrain(transform, extent, translateExtent) {
         });
   }
 
-  function gesture(that, args) {
-    for (var i = 0, n = gestures.length, g; i < n; ++i) {
-      if ((g = gestures[i]).that === that) {
-        return g;
-      }
-    }
-    return new Gesture(that, args);
+  function gesture(that, args, clean) {
+    return (!clean && that.__zooming) || new Gesture(that, args);
   }
 
   function Gesture(that, args) {
     this.that = that;
     this.args = args;
-    this.index = -1;
     this.active = 0;
     this.extent = extent.apply(that, args);
+    this.taps = 0;
   }
 
   Gesture.prototype = {
     start: function() {
       if (++this.active === 1) {
-        this.index = gestures.push(this) - 1;
+        this.that.__zooming = this;
         this.emit("start");
       }
       return this;
@@ -42246,8 +42232,7 @@ function defaultConstrain(transform, extent, translateExtent) {
     },
     end: function() {
       if (--this.active === 0) {
-        gestures.splice(this.index, 1);
-        this.index = -1;
+        delete this.that.__zooming;
         this.emit("end");
       }
       return this;
@@ -42295,7 +42280,7 @@ function defaultConstrain(transform, extent, translateExtent) {
 
   function mousedowned() {
     if (touchending || !filter.apply(this, arguments)) return;
-    var g = gesture(this, arguments),
+    var g = gesture(this, arguments, true),
         v = src_select(on_event.view).on("mousemove.zoom", mousemoved, true).on("mouseup.zoom", mouseupped, true),
         p = mouse(this),
         x0 = on_event.clientX,
@@ -42339,44 +42324,37 @@ function defaultConstrain(transform, extent, translateExtent) {
 
   function touchstarted() {
     if (!filter.apply(this, arguments)) return;
-    var g = gesture(this, arguments),
-        touches = on_event.changedTouches,
-        started,
-        n = touches.length, i, t, p;
+    var touches = on_event.touches,
+        n = touches.length,
+        g = gesture(this, arguments, on_event.changedTouches.length === n),
+        started, i, t, p;
 
     noevent_nopropagation();
     for (i = 0; i < n; ++i) {
       t = touches[i], p = src_touch(this, touches, t.identifier);
       p = [p, this.__zoom.invert(p), t.identifier];
-      if (!g.touch0) g.touch0 = p, started = true;
-      else if (!g.touch1) g.touch1 = p;
+      if (!g.touch0) g.touch0 = p, started = true, g.taps = 1 + !!touchstarting;
+      else if (!g.touch1 && g.touch0[2] !== p[2]) g.touch1 = p, g.taps = 0;
     }
 
-    // If this is a dbltap, reroute to the (optional) dblclick.zoom handler.
-    if (touchstarting) {
-      touchstarting = clearTimeout(touchstarting);
-      if (!g.touch1) {
-        g.end();
-        p = src_select(this).on("dblclick.zoom");
-        if (p) p.apply(this, arguments);
-        return;
-      }
-    }
+    if (touchstarting) touchstarting = clearTimeout(touchstarting);
 
     if (started) {
-      touchstarting = setTimeout(function() { touchstarting = null; }, touchDelay);
+      if (g.taps < 2) touchstarting = setTimeout(function() { touchstarting = null; }, touchDelay);
       interrupt(this);
       g.start();
     }
   }
 
   function touchmoved() {
+    if (!this.__zooming) return;
     var g = gesture(this, arguments),
         touches = on_event.changedTouches,
         n = touches.length, i, t, p, l;
 
     src_noevent();
     if (touchstarting) touchstarting = clearTimeout(touchstarting);
+    g.taps = 0;
     for (i = 0; i < n; ++i) {
       t = touches[i], p = src_touch(this, touches, t.identifier);
       if (g.touch0 && g.touch0[2] === t.identifier) g.touch0[0] = p;
@@ -42398,6 +42376,7 @@ function defaultConstrain(transform, extent, translateExtent) {
   }
 
   function touchended() {
+    if (!this.__zooming) return;
     var g = gesture(this, arguments),
         touches = on_event.changedTouches,
         n = touches.length, i, t;
@@ -42412,7 +42391,14 @@ function defaultConstrain(transform, extent, translateExtent) {
     }
     if (g.touch1 && !g.touch0) g.touch0 = g.touch1, delete g.touch1;
     if (g.touch0) g.touch0[1] = this.__zoom.invert(g.touch0[0]);
-    else g.end();
+    else {
+      g.end();
+      // If this was a dbltap, reroute to the (optional) dblclick.zoom handler.
+      if (g.taps === 2) {
+        var p = src_select(this).on("dblclick.zoom");
+        if (p) p.apply(this, arguments);
+      }
+    }
   }
 
   zoom.wheelDelta = function(_) {
@@ -42463,7 +42449,7 @@ function defaultConstrain(transform, extent, translateExtent) {
   return zoom;
 });
 
-// CONCATENATED MODULE: ./node_modules/d3-zoom/index.js
+// CONCATENATED MODULE: ./node_modules/d3-zoom/src/index.js
 
 
 
@@ -42599,6 +42585,7 @@ class mindmap_MindMap extends external_react_["Component"] {
       let body = external_d3_["select"](`#${me.state.id}`);
       var outer = body.append("svg").attr("width", width).attr("height", height).attr("pointer-events", "all"); // define arrow markers for graph links
 
+      var centerGuid = body.append("div");
       outer.append("svg:defs").append("svg:marker").attr("id", "end-arrow").attr("viewBox", "0 -5 10 10").attr("refX", 5).attr("markerWidth", 3).attr("markerHeight", 3).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5L2,0").attr("stroke-width", "0px").attr("fill", function (d) {
         if (d && d.properties && d.properties.type && LinkStyles[d.properties.type] && LinkStyles[d.properties.type].stroke) {
           return LinkStyles[d.properties.type].stroke;
@@ -42617,8 +42604,10 @@ class mindmap_MindMap extends external_react_["Component"] {
           x = 0,
           y = 0
         } = me.mouseMoved || {};
-        vis.attr("transform", `scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`);
+        let ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
+        vis.attr("transform", ` scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`);
         body.attr("data-transform", `(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`);
+        centerGuid.attr("style", `position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(ang)}deg)`);
       }
 
       outer.on("mousemove", function (x, v) {
@@ -42941,7 +42930,13 @@ class mindmap_MindMap extends external_react_["Component"] {
     let gridSnapIterations = null;
     let keepRunning = true;
     let centerGraph = true;
-    force.start();
+    force.start // initialUnconstrainedIterations,
+    // initialUserConstraintIterations,
+    // initialAllConstraintsIterations,
+    // null && gridSnapIterations,
+    // keepRunning,
+    // centerGraph
+    ();
   }
 
   buildNode(graph, cola, color) {
@@ -42970,6 +42965,7 @@ class mindmap_MindMap extends external_react_["Component"] {
     nn.width = 40;
     nn.height = 40;
     nn.name = nn.id;
+    nn.fixed = false;
     return nn;
   }
 
@@ -42987,7 +42983,10 @@ class mindmap_MindMap extends external_react_["Component"] {
           return this.state.graph.nodes.indexOf(t);
         });
         this.state.graph.nodes.removeIndices(removedNodes);
-        var newNodes = graph.nodes.relativeCompliment(this.state.graph.nodes, (x, y) => x === y.id);
+        var newNodes = graph.nodes.relativeCompliment(this.state.graph.nodes, (x, y) => {
+          return x === y.id;
+        });
+        this.state.graph.nodes.map(v => v.fixed = true);
         newNodes.map(nn => {
           this.state.graph.nodes.push(this.applyNodeVisualData(duplicateNode(graph.nodeLib[nn])));
         });
@@ -43010,13 +43009,13 @@ class mindmap_MindMap extends external_react_["Component"] {
           if (nl && nl.properties) {
             nn.properties = { ...nl.properties
             };
-          }
+          } // if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
+          //   if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
+          //   else {
+          //     nn.fixed = false;
+          //   }
+          // }
 
-          if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
-            if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;else {
-              nn.fixed = false;
-            }
-          }
         });
         draw = draw || newNodes.length || removedNodes.length;
       }
@@ -43155,6 +43154,80 @@ const throttle = (func, limit) => {
     }
   };
 };
+
+function angle(cx, cy, ex, ey) {
+  let vect1 = new Vector(ex, ey, 0);
+  vect1 = vect1.normalisedVector();
+  ex = vect1.getX();
+  ey = vect1.getY();
+  var dy = ey - cy;
+  var dx = ex - cx;
+  var theta = Math.atan2(dy, dx); // range (-PI, PI]
+
+  theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+
+  return theta;
+}
+
+var Vector = function () {
+  function Vector(pX, pY, pZ) {
+    this.setX(pX);
+    this.setY(pY);
+    this.setZ(pZ);
+  }
+
+  Vector.prototype.getX = function () {
+    return this.mX;
+  };
+
+  Vector.prototype.setX = function (pX) {
+    this.mX = pX;
+  };
+
+  Vector.prototype.getY = function () {
+    return this.mY;
+  };
+
+  Vector.prototype.setY = function (pY) {
+    this.mY = pY;
+  };
+
+  Vector.prototype.getZ = function () {
+    return this.mZ;
+  };
+
+  Vector.prototype.setZ = function (pZ) {
+    this.mZ = pZ;
+  };
+
+  Vector.prototype.add = function (v) {
+    return new Vector(this.getX() + v.getX(), this.getY() + v.getY(), this.getZ() + v.getZ());
+  };
+
+  Vector.prototype.subtract = function (v) {
+    return new Vector(this.getX() - v.getX(), this.getY() - v.getY(), this.getZ() - v.getZ());
+  };
+
+  Vector.prototype.multiply = function (scalar) {
+    return new Vector(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar);
+  };
+
+  Vector.prototype.divide = function (scalar) {
+    return new Vector(this.getX() / scalar, this.getY() / scalar, this.getZ() / scalar);
+  };
+
+  Vector.prototype.magnitude = function () {
+    return Math.sqrt(this.getX() * this.getX() + this.getY() * this.getY() + this.getZ() * this.getZ());
+  }; //this is the vector I have tried for the normalisation
+
+
+  Vector.prototype.normalisedVector = function () {
+    var vec = new Vector(this.getX(), this.getY(), this.getZ());
+    return vec.divide(this.magnitude());
+  };
+
+  return Vector;
+}();
 // CONCATENATED MODULE: ./app/components/modelactivitymenu.js
 var modelactivitymenu_REACT_ELEMENT_TYPE;
 
@@ -43914,12 +43987,299 @@ class propertyactivitymenu_PropertyActivityMenu extends external_react_["Compone
 }
 
 /* harmony default export */ var propertyactivitymenu = (UIConnect(propertyactivitymenu_PropertyActivityMenu));
+// CONCATENATED MODULE: ./app/utils/utilService.js
+
+
+function utilService_calculateContrast(c1, c2) {
+  let c1_ = utilService_relativeLuminance(c1);
+  let c2_ = utilService_relativeLuminance(c2);
+  let L1 = Math.max(c1_, c2_);
+  let L2 = Math.min(c1_, c2_);
+  return (L1 + 0.05) / (L2 + 0.05);
+}
+function utilService_relativeLuminance(color) {
+  /**
+     * relative luminance
+  the relative brightness of any point in a colorspace, normalized to 0 for darkest black and 1 for lightest white
+  Note 1: For the sRGB colorspace, the relative luminance of a color is defined as L = 0.2126 * R + 0.7152 * G + 0.0722 * B where R, G and B are defined as:
+  if RsRGB <= 0.03928 then R = RsRGB/12.92 else R = ((RsRGB+0.055)/1.055) ^ 2.4
+  if GsRGB <= 0.03928 then G = GsRGB/12.92 else G = ((GsRGB+0.055)/1.055) ^ 2.4
+  if BsRGB <= 0.03928 then B = BsRGB/12.92 else B = ((BsRGB+0.055)/1.055) ^ 2.4
+  and RsRGB, GsRGB, and BsRGB are defined as:
+  RsRGB = R8bit/255
+  GsRGB = G8bit/255
+  BsRGB = B8bit/255
+     */
+  if (color.startsWith("#")) {
+    color = color.split("").subset(1).join("");
+  }
+
+  let Rs = parseInt(`${color[0]}${color[1]}`, 16) / 255;
+  let Gs = parseInt(`${color[2]}${color[3]}`, 16) / 255;
+  let Bs = parseInt(`${color[4]}${color[5]}`, 16) / 255;
+  let r, g, b;
+  let minv = 0.03928;
+
+  function calc(c) {
+    let r;
+
+    if (c <= minv) {
+      r = c / 12.92;
+    } else {
+      r = Math.pow((c + 0.55) / 1.055, 2.4);
+    }
+
+    return r;
+  }
+
+  r = calc(Rs);
+  g = calc(Gs);
+  b = calc(Bs);
+  let L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return L;
+}
+function utilService_getStringInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\${[a-zA-Z0-9_]*}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function utilService_getReferenceInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\#{[a-zA-Z0-9_]*}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function utilService_getGuids(str = "") {
+  const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result;
+}
+function utilService_getGroupGuids(str = "") {
+  const regex = /group\-(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
+  let m;
+  let result = [];
+
+  while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    } // The result can be accessed through the `m`-variable.
+
+
+    m.forEach((match, groupIndex) => {
+      if (match) {
+        result.push(match);
+      }
+    });
+  }
+
+  return result.map(v => utilService_getGuids(v)).flatten().filter(x => x);
+}
+function utilService_getNodePropertyGuids(obj) {
+  let str = JSON.stringify(obj);
+  let guids = utilService_getGuids(str).unique();
+  return guids;
+}
+function utilService_processRecording(str) {
+  let guids = utilService_getGuids(str).unique();
+  let groupGuids = utilService_getGroupGuids(str).unique();
+  let nodeIndexes = {};
+  groupGuids.map((v, index) => {
+    nodeIndexes[guids.indexOf(v) - index] = index;
+  });
+  guids = guids.filter(v => !groupGuids.some(t => v == t));
+  let commands = JSON.parse(str);
+  let unaccountedGuids = [...guids];
+  commands.map(command => {
+    if (command.callback) {
+      if (command.options) {
+        if (command.callbackGroup && command.options.groupProperties) {
+          command.options.callbackg = command.callback;
+        } else {
+          command.options.callback = command.callback;
+        }
+      }
+    }
+
+    if (unaccountedGuids.some(v => v === command.callback)) {
+      unaccountedGuids = [...unaccountedGuids.filter(x => x !== command.callback)];
+    }
+
+    delete command.callback;
+    delete command.callbackGroup;
+  });
+  str = JSON.stringify(commands, null, 4);
+  guids.map((guid, index) => {
+    var subregex = new RegExp(`"callback": "${guid}"`, "g");
+    str = str.replace(subregex, `"callback": function(node) { context.node${index} = node.id; }`);
+    subregex = new RegExp(`"callbackg": "${guid}"`, "g");
+    str = str.replace(subregex, `"callback": function(node, graph, group) { context.node${index} = node.id;
+      context.group${nodeIndexes[index]} = group;
+    }`);
+    subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.node${index}]:`);
+    subregex = new RegExp(`"${guid}"`, "g");
+    str = str.replace(subregex, `context.node${index}`);
+  });
+  groupGuids.map((guid, index) => {
+    var subregex = new RegExp(`"${guid}":`, "g");
+    str = str.replace(subregex, `[context.group${index}]:`);
+    subregex = new RegExp(`"${guid}"`, "g");
+    str = str.replace(subregex, `context.group${index}`);
+  });
+  let firstFunction$re = /\[ *\n *{/gm;
+  str = str.replace(firstFunction$re, `[
+      function(graph) {
+      return [{
+`);
+  let functionStart$re = /,\n *{/gm;
+  str = str.replace(functionStart$re, `,
+    {
+    function(graph) {
+      return [{
+`);
+  let functionEnd$re = /},\n *{/gm;
+  str = str.replace(functionEnd$re, `}]
+    },
+`);
+  let lastFunction$re = /}\n *]/gm;
+  str = str.replace(lastFunction$re, `}]
+  }]
+`);
+  let inserts = utilService_getStringInserts(str);
+  inserts.map(insert => {
+    var subregex = new RegExp("\\" + insert, "g");
+    str = str.replace(subregex, `" + args.${insert.substr(2, insert.length - 3)} + "`);
+  });
+  const regex = /context.groupundefined = group;/gm;
+  str = str.replace(regex, "");
+  let temp = guids.map((x, index) => {
+    return `{
+      operation: 'CHANGE_NODE_PROPERTY',
+      options: function() {
+          return {
+          prop: 'Pinned',
+          id: context.node${index},
+          value: false
+        }
+      }
+    }`;
+  }).subset(1).join("," + nodetypes_NEW_LINE);
+  return `
+  import { uuidv4 } from "../utils/array";
+  import { NodeProperties } from "../constants/nodetypes";
+  export default function(args = {}) {
+    // ${unaccountedGuids.map(v => {
+    let index = guids.indexOf(v);
+    return "node" + index;
+  }).join()}
+
+      // ${inserts.map(insert => insert.substr(2, insert.length - 3)).join(", ")}
+      ${inserts.map(insert => {
+    let temp = insert.substr(2, insert.length - 3);
+    return `if(!args.${temp}){
+          throw 'missing ${temp} argument';
+        }`;
+  }).join('')}
+    let context = {
+      ...args${unaccountedGuids.length ? "," + nodetypes_NEW_LINE + unaccountedGuids.map(v => {
+    let index = guids.indexOf(v);
+    return "node" + index + ": uuidv4() ";
+  }).join("," + nodetypes_NEW_LINE) : ""}
+    };
+    let {
+      viewPackages
+    } = args;
+    viewPackages = {
+      [NodeProperties.ViewPackage]: uuidv4(),
+      ...(viewPackages||{})
+    };
+    let result = ${str};
+    let clearPinned = [${temp}];
+    let applyViewPackages = [${guids.map((guid, index) => {
+    if (unaccountedGuids.indexOf(guid) === -1) {
+      return `{
+          operation: 'UPDATE_NODE_PROPERTY',
+          options : function() {
+            return {
+              id: context.node${index},
+              properties: viewPackages
+            }
+          }
+        }`;
+    }
+
+    return false;
+  }).filter(x => x).join()}]
+    return [
+      ...result,
+      ...clearPinned,
+      ...applyViewPackages,
+      function() {
+        if (context.callback) {
+          context.entry = context.node0;
+          context.callback(context);
+        }
+        return [];
+      }];
+  }`;
+}
 // CONCATENATED MODULE: ./app/components/datachainactivitymenu.js
 
 
 var datachainactivitymenu_REACT_ELEMENT_TYPE;
 
 function datachainactivitymenu_jsx(type, props, key, children) { if (!datachainactivitymenu_REACT_ELEMENT_TYPE) { datachainactivitymenu_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: datachainactivitymenu_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
 
 
 
@@ -43951,6 +44311,47 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
     let dataChainFuncType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.DataChainFunctionType);
     let showModel = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.model : false;
     let lambda = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.lambda : false;
+    let inserts = [];
+
+    if (lambda) {
+      let lambdaText = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Lambda);
+      inserts = utilService_getReferenceInserts(lambdaText || "").map(v => v.substr(2, v.length - 3)).unique().map(insert => {
+        let args = insert.split("|");
+        let property = args[0];
+        let types = args.subset(1);
+
+        if (!types.length) {
+          types = [NodeTypes.Model];
+        }
+
+        let value = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.LambdaInsertArguments) || {};
+        return datachainactivitymenu_jsx(selectinput_SelectInput, {
+          onChange: _value => {
+            var id = currentNode.id;
+            this.props.graphOperation(uiactions_REMOVE_LINK_BETWEEN_NODES, {
+              target: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.LambdaInsertArguments),
+              source: id
+            });
+            value[property] = _value;
+            this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+              prop: uiactions_NodeProperties.LambdaInsertArguments,
+              id,
+              value: value
+            });
+            this.props.graphOperation(uiactions_ADD_LINK_BETWEEN_NODES, {
+              target: _value,
+              source: id,
+              properties: { ...uiactions_LinkProperties.LambdaInsertArguments
+              }
+            });
+          },
+          label: property,
+          value: value[property],
+          options: uiactions_NodesByType(state, types).toNodeSelect()
+        });
+      });
+    }
+
     let showDataChainRef = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.dataref : false;
     let showNumber = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.number : false;
     let showProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.property : false;
@@ -44042,7 +44443,7 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
       },
       label: Lambda,
       value: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Lambda)
-    }) : null, showModel ? datachainactivitymenu_jsx(selectinput_SelectInput, {
+    }) : null, lambda ? inserts : null, showModel ? datachainactivitymenu_jsx(selectinput_SelectInput, {
       onChange: value => {
         var id = currentNode.id;
         this.props.graphOperation(uiactions_REMOVE_LINK_BETWEEN_NODES, {
@@ -45290,7 +45691,67 @@ class componentactivitymenu_ComponentActivityMenu extends external_react_["Compo
           value
         });
       }
-    })) : null,  false ? undefined : null,  false ? undefined : null);
+    })) : null, componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].layout ? componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenu, {}, void 0, componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
+      onClick: () => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: uiactions_NodeProperties.Layout,
+          id: currentNode.id,
+          value: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Layout) || CreateLayout()
+        });
+        this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+      },
+      icon: "fa fa-puzzle-piece",
+      title: SetupLayout,
+      description: SetupLayout
+    }), componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
+      onClick: () => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: uiactions_NodeProperties.Layout,
+          id: currentNode.id,
+          value: null
+        });
+        this.props.setVisual(MAIN_CONTENT, null);
+      },
+      icon: "fa fa-puzzle-piece",
+      title: ClearLayout,
+      description: ClearLayout
+    }), componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
+      onClick: () => {
+        this.props.graphOperation(NEW_COMPONENT_NODE, {
+          parent: Visual(state, SELECTED_NODE),
+          groupProperties: {},
+          properties: {
+            [uiactions_NodeProperties.UIType]: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.UIType)
+          },
+          linkProperties: {
+            properties: { ...LinkProperties.ComponentLink
+            }
+          }
+        });
+        this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+      },
+      icon: "fa fa-puzzle-piece",
+      title: AddComponentNew,
+      description: AddComponentNew
+    }), uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentType) === ComponentTypes.ReactNative.List.key ? componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
+      onClick: () => {
+        this.props.graphOperation(NEW_COMPONENT_NODE, {
+          parent: Visual(state, SELECTED_NODE),
+          groupProperties: {},
+          properties: {
+            [uiactions_NodeProperties.UIType]: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.UIType)
+          },
+          linkProperties: {
+            properties: { ...LinkProperties.ListItem
+            }
+          }
+        });
+        this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+      },
+      icon: "fa fa-puzzle-piece",
+      title: SetListItem,
+      description: SetListItem
+    }) : null) : null,  false ? undefined : null);
   }
 
 }
@@ -46096,7 +46557,7 @@ class executorpropertymenu_ExecutorPropertyMenu extends external_react_["Compone
       className: "btn btn-default btn-flat"
     }, void 0, executorpropertymenu_ref2)), executorpropertymenu_jsx(selectinput_SelectInput, {
       options: propertyNodes,
-      defaultSelectText: SelectProperty,
+      defaultSelectText: titles_SelectProperty,
       label: Property,
       onChange: v => addProperty([v]),
       value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.ExecutorModel] : ""
@@ -47408,7 +47869,7 @@ class validatorpropertymenu_ValidatorPropertyMenu extends external_react_["Compo
       active: active
     }, void 0, currentNode && false ? validatorpropertymenu_jsx(formcontrol_FormControl, {}, void 0, validatorpropertymenu_jsx(selectinput_SelectInput, {
       options: propertyNodes,
-      defaultSelectText: SelectProperty,
+      defaultSelectText: titles_SelectProperty,
       label: Property,
       onChange: value => {
         var id = currentNode.id;
@@ -49557,14 +50018,14 @@ function nodemanagement_jsx(type, props, key, children) { if (!nodemanagement_RE
 
 
 
-const nodemanagement_NODE_MANAGEMENT_MENU = 'NODE_MANAGEMENT_MENU';
-const nodemanagement_NODE_MANAGEMENT = 'NODE_MANAGEMENT';
+const nodemanagement_NODE_MANAGEMENT_MENU = "NODE_MANAGEMENT_MENU";
+const nodemanagement_NODE_MANAGEMENT = "NODE_MANAGEMENT";
 
 class nodemanagement_NodeManagement extends external_react_["Component"] {
   constructor(props) {
     super(props);
     this.state = {
-      filter: ''
+      filter: ""
     };
   }
 
@@ -49578,7 +50039,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
       state
     } = me.props;
     var graph = GetCurrentGraph(state);
-    let filter = (this.state.filter || '').toLowerCase();
+    let filter = (this.state.filter || "").toLowerCase();
     let groups = GetNodes(state).filter(x => {
       if (!filter || !x) {
         return false;
@@ -49594,7 +50055,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
         return nodemanagement_jsx(treeviewmenu_TreeViewMenu, {
           hideArrow: true,
           title: uiactions_GetNodeProp(gn, nodetypes_NodeProperties.UIText),
-          icon: !uiactions_GetNodeProp(gn, nodetypes_NodeProperties.Pinned) ? "fa fa-circle-o" : 'fa fa-check-circle-o',
+          icon: !uiactions_GetNodeProp(gn, nodetypes_NodeProperties.Pinned) ? "fa fa-circle-o" : "fa fa-check-circle-o",
           toggle: () => {
             this.props.graphOperation(CHANGE_NODE_PROPERTY, {
               prop: uiactions_NodeProperties.Pinned,
@@ -49610,7 +50071,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
         open: Visual(state, groupKey),
         innerStyle: {
           maxHeight: 400,
-          overflowY: 'auto'
+          overflowY: "auto"
         },
         active: Visual(state, groupKey),
         right: nodemanagement_jsx("span", {
@@ -49622,8 +50083,8 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
       }, `node-${group}-${gi}`, groupNodes);
     });
     return nodemanagement_jsx(treeviewmenu_TreeViewMenu, {
-      title: `${Nodes} ${graph ? Object.keys(graph.visibleNodes || {}).length : ''}`,
-      icon: 'fa fa-object-group',
+      title: `${Nodes} ${graph ? Object.keys(graph.visibleNodes || {}).length : ""}`,
+      icon: "fa fa-object-group",
       open: Visual(state, nodemanagement_NODE_MANAGEMENT),
       active: Visual(state, nodemanagement_NODE_MANAGEMENT),
       onClick: () => {
@@ -49640,7 +50101,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
     }, void 0, nodemanagement_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
       title: ClearPinned,
-      icon: 'fa fa-times',
+      icon: "fa fa-times",
       onClick: () => {
         this.props.graphOperation(GetNodes(state).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.Pinned)).subset(0, 100).map(node => {
           return {
@@ -49657,7 +50118,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
       sidebarform: true
     }, void 0, nodemanagement_jsx(textinput_TextInput, {
       value: this.state.filter,
-      immediate: true,
+      immediate: false,
       onChange: value => {
         this.setState({
           filter: value
@@ -50070,7 +50531,7 @@ class modelfilteritemactivitymenu_ModelFilterItemActivityMenu extends external_r
       disabled: true
     }), modelfilteritemactivitymenu_jsx(selectinput_SelectInput, {
       options: propertyNodes,
-      defaultSelectText: SelectProperty,
+      defaultSelectText: titles_SelectProperty,
       label: Property,
       onChange: value => {
         var id = currentNode.id;
@@ -57972,7 +58433,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
       options: {
         prop: "component-type",
         id: context.node1,
-        value: "Button"
+        value: args.componentType || "Button"
       }
     }];
   }, function (graph) {
@@ -57980,7 +58441,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node1,
-        value: "Button"
+        value: args.componentType || "Button"
       }
     }];
   }, function (graph) {
@@ -58777,6 +59238,1552 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     return [];
   }];
 });
+// CONCATENATED MODULE: ./app/nodepacks/AddComponent.js
+
+/* harmony default export */ var AddComponent = (function (args = {}) {
+  // node0
+  //
+  if (!args.component) {
+    throw "missing component";
+  }
+
+  let context = { ...args,
+    node0: args.component
+  };
+  let {
+    viewPackages = {}
+  } = args;
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_COMPONENT_NODE",
+      options: {
+        parent: context.node0,
+        groupProperties: {},
+        properties: {
+          UIType: "ElectronIO"
+        },
+        linkProperties: {
+          properties: {
+            type: "component",
+            stroke: "#B7245C",
+            component: {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "component-type",
+        id: context.node1,
+        value: args.componentType || "Button"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: args.componentType || "Button"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentApi",
+        linkProperties: {
+          properties: {
+            type: "component-internal-api",
+            "component-internal-api": {}
+          }
+        },
+        parent: context.node1,
+        groupProperties: {},
+        properties: {
+          text: "label",
+          Pinned: false,
+          UseAsValue: true
+        },
+        callback: function (node, graph, group) {
+          context.node2 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentExternalApi",
+        parent: context.node1,
+        linkProperties: {
+          properties: {
+            type: "component-external-api",
+            "component-external-api": {}
+          }
+        },
+        groupProperties: {},
+        properties: {
+          text: "label",
+          Pinned: false
+        },
+        callback: function (node, graph, group) {
+          context.node3 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2,
+        target: context.node3,
+        properties: {
+          type: "component-internal-connection",
+          "component-internal-connection": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node3,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CONNECT_TO_TITLE_SERVICE",
+      options: {
+        id: context.node3
+      }
+    }];
+  }];
+  let clearPinned = !args.clearPinned ? [] : [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node2,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node3,
+        value: false
+      };
+    }
+  }];
+  return [...result, ...clearPinned, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/DataChain_SelectPropertyValue.js
+
+
+/* harmony default export */ var DataChain_SelectPropertyValue = (function (args = {}) {
+  // node0,node3,node4
+  // name
+  if (!args.name) {
+    throw "missing name argument";
+  }
+
+  let context = { ...args,
+    node0: args.dataChain,
+    node3: args.model,
+    node4: args.property
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node0,
+        value: "Pass"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "" + args.name + ""
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node0,
+        nodeType: "data-chain",
+        groupProperties: {
+          GroupEntryNode: context.node0,
+          GroupExitNode: context.node0
+        },
+        properties: {
+          Pinned: false,
+          ChainParent: context.node0
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        links: [],
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node1,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node1,
+        value: "Lambda"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Lambda",
+        id: context.node1,
+        value: "x => x ? x.object : null"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "get object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node1,
+        nodeType: "data-chain",
+        groupProperties: {
+          id: context.group0
+        },
+        properties: {
+          ChainParent: context.node1
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node2 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node2,
+        value: "Model - Property"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "uiModelType",
+        id: context.node2,
+        value: context.node3
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node3,
+        source: context.node2,
+        properties: {
+          type: "model-type-link",
+          "model-type-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node2,
+        value: "get model property"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Property",
+        id: context.node2,
+        value: context.node4
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node4,
+        source: context.node2,
+        properties: {
+          type: "property-link",
+          "property-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node2,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node2,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node3,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node4,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node1,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node2,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreatePropertiesForFetch.js
+
+
+
+
+/* harmony default export */ var CreatePropertiesForFetch = (function (args = {}) {
+  let {
+    id
+  } = args;
+  debugger;
+  let fetchServices = GetNodesLinkedTo(GetCurrentGraph(), {
+    id,
+    link: nodetypes_LinkType.FetchServiceOuput
+  });
+  let result = [];
+
+  if (fetchServices && fetchServices.length) {
+    let fetchService = fetchServices[0];
+    GetNodesLinkedTo(GetCurrentGraph(), {
+      id,
+      link: nodetypes_LinkType.PropertyLink
+    }).map(v => {
+      result.push({
+        operation: REMOVE_NODE,
+        options: {
+          id: v.id
+        }
+      });
+    });
+    let models = GetNodesLinkedTo(GetCurrentGraph(), {
+      id: fetchService.id,
+      link: nodetypes_LinkType.FetchService
+    }).map(model => {
+      let methodprops = uiactions_GetNodeProp(model.id, nodetypes_NodeProperties.MethodProps) || {};
+      return methodprops[FunctionTemplateKeys.ModelOutput] || methodprops[FunctionTemplateKeys.Model];
+    }).filter(x => x).unique().map(v => GetNodeById(v));
+    models.map(model => {
+      result.push({
+        operation: ADD_NEW_NODE,
+        options: function () {
+          return {
+            nodeType: NodeTypes.Property,
+            parent: id,
+            properties: {
+              [nodetypes_NodeProperties.UseModelAsType]: true,
+              [nodetypes_NodeProperties.UIModelType]: model.id,
+              [nodetypes_NodeProperties.UIText]: GetNodeTitle(model),
+              [nodetypes_NodeProperties.IsTypeList]: true
+            },
+            groupProperties: {},
+            linkProperties: {
+              properties: { ...LinkProperties.PropertyLink
+              }
+            },
+            links: [{
+              target: model.id,
+              linkProperties: {
+                properties: { ...LinkProperties.ModelTypeLink
+                }
+              }
+            }]
+          };
+        }
+      });
+    });
+  }
+
+  return result;
+});
+// CONCATENATED MODULE: ./app/nodepacks/AddEvent.js
+
+
+/* harmony default export */ var nodepacks_AddEvent = (function (args = {}) {
+  // node0
+  //
+  if (!args.component) {
+    throw "missing component";
+  }
+
+  if (!args.eventType) {
+    throw "missing eventType";
+  }
+
+  if (args.eventTypeHandler && !args.property) {
+    throw "missing property";
+  }
+
+  let context = { ...args,
+    node0: args.component
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "EventMethod",
+        parent: context.node0,
+        properties: { ...viewPackages,
+          EventType: context.eventType,
+          text: context.eventType
+        },
+        linkProperties: {
+          properties: {
+            type: "EventMethod",
+            EventMethod: {}
+          }
+        },
+        callback: function (node) {
+          context.node4 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "EventMethodInstance",
+        parent: context.node4,
+        groupProperties: {},
+        linkProperties: {
+          properties: {
+            type: "EventMethodInstance",
+            EventMethodInstance: {}
+          }
+        },
+        properties: {
+          text: context.eventType + " Instance",
+          EventType: context.eventType,
+          Pinned: false,
+          ...viewPackages,
+          AutoDelete: {
+            properties: {
+              nodeType: "component-api-connector"
+            }
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node5 = node.id;
+          context.group1 = group;
+        }
+      }
+    }];
+  }, context.eventTypeHandler ? function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "EventHandler",
+        parent: context.node5,
+        ...viewPackages,
+        groupProperties: {},
+        linkProperties: {
+          properties: {
+            type: "EventHandler",
+            EventMethodInstance: {}
+          }
+        },
+        properties: {
+          text: context.eventType + " Handler",
+          Pinned: false,
+          EventType: context.eventType,
+          AutoDelete: {
+            properties: {
+              nodeType: "component-api-connector"
+            }
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node5 = node.id;
+          context.group1 = group;
+        }
+      }
+    }];
+  } : null, context.eventTypeHandler ? function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node5,
+        target: context.property,
+        properties: { ...LinkProperties.PropertyLink
+        }
+      }
+    }];
+  } : null].filter(x => x);
+  let clearPinned = !args.clearPinned ? [] : [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node4,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node5,
+        value: false
+      };
+    }
+  }];
+  return [...result, ...clearPinned, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreateModelPropertyGetterDC.js
+
+
+/* harmony default export */ var CreateModelPropertyGetterDC = (function (args = {}) {
+  // node3,node4,node5
+  // modelName, propertyName
+  if (!args.modelName) {
+    throw "missing modelName argument";
+  }
+
+  if (!args.propertyName) {
+    throw "missing propertyName argument";
+  }
+
+  if (!args.model) {
+    throw "missing model argument";
+  }
+
+  if (!args.property) {
+    throw "missing propertyName argument";
+  }
+
+  let context = { ...args,
+    node3: args.model,
+    node4: args.model,
+    node5: args.property
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Get " + args.modelName + " " + args.propertyName + ""
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "data-chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node0,
+        nodeType: "data-chain",
+        groupProperties: {
+          GroupEntryNode: context.node0,
+          GroupExitNode: context.node0
+        },
+        properties: {
+          DataChainFunctionType: "Pass",
+          Pinned: false,
+          ChainParent: context.node0
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        links: [],
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node1,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node1,
+        value: "Lambda"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Lambda",
+        id: context.node1,
+        value: "x => x.object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "get object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node1,
+        nodeType: "data-chain",
+        groupProperties: {
+          id: context.group0
+        },
+        properties: {
+          ChainParent: context.node1
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node2 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node2,
+        value: "get object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node2,
+        value: "Model - Property"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "uiModelType",
+        id: context.node2,
+        value: context.node3
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node3,
+        source: context.node2,
+        properties: {
+          type: "model-type-link",
+          "model-type-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node3,
+        source: context.node2
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "uiModelType",
+        id: context.node2,
+        value: context.node4
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node4,
+        source: context.node2,
+        properties: {
+          type: "model-type-link",
+          "model-type-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Property",
+        id: context.node2,
+        value: context.node5
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node5,
+        source: context.node2,
+        properties: {
+          type: "property-link",
+          "property-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node2,
+        value: "get object property"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node2,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node2,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node3,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node4,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node5,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node1,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node2,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/ReattachComponent.js
+
+
+
+
+/* harmony default export */ var nodepacks_ReattachComponent = (function (args = {}) {
+  // node0
+  let result = []; //
+
+  if (!args.component) {
+    throw "missing component";
+  }
+
+  if (!args.base) {
+    throw "missing base";
+  }
+
+  if (!args.parent) {
+    throw "missing parent";
+  }
+
+  let context = { ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let graph = GetCurrentGraph();
+  let component_parent_link = GetLinkBetween(context.parent, context.component, graph);
+  result.push({
+    operation: uiactions_REMOVE_LINK_BETWEEN_NODES,
+    options: {
+      source: context.parent,
+      target: context.component
+    }
+  });
+  result.push({
+    operation: uiactions_ADD_LINK_BETWEEN_NODES,
+    options: {
+      target: args.component,
+      source: args.base,
+      properties: { ...component_parent_link.properties
+      }
+    }
+  });
+  let baseInternalApisNodes = GetNodesLinkedTo(graph, {
+    id: context.base,
+    link: nodetypes_LinkType.ComponentInternalApi
+  });
+  let parentInternalApis = GetNodesLinkedTo(graph, {
+    id: context.parent,
+    link: nodetypes_LinkType.ComponentInternalApi
+  });
+  let tocreate = parentInternalApis.relativeCompliment(baseInternalApisNodes, (x, y) => {
+    return GetCodeName(x) === GetCodeName(y);
+  });
+  result.push(...tocreate.map(internalApi => {
+    return $addComponentApiNodes(context.base, GetNodeTitle(internalApi), internalApi.id);
+  }).flatten());
+  let exteranlApiNodes = GetNodesLinkedTo(graph, {
+    id: context.component,
+    link: nodetypes_LinkType.ComponentExternalApi,
+    direction: SOURCE
+  });
+  let previousLinked = {};
+  exteranlApiNodes.map(externalApiNode => {
+    let internalApiComponents = GetNodesLinkedTo(graph, {
+      id: externalApiNode.id,
+      link: nodetypes_LinkType.ComponentExternalConnection,
+      direction: SOURCE
+    });
+    internalApiComponents.map(internalApiComponent => {
+      let isThereAConnection = parentInternalApis.find(parentInternalApi => GetLinkBetween(externalApiNode.id, parentInternalApi.id, graph));
+      previousLinked[GetNodeTitle(externalApiNode)] = previousLinked[GetNodeTitle(externalApiNode)] || [];
+
+      if (isThereAConnection) {
+        previousLinked[GetNodeTitle(externalApiNode)].push({
+          id: externalApiNode.id,
+          properties: isThereAConnection.properties
+        });
+      }
+
+      result.push({
+        operation: uiactions_REMOVE_LINK_BETWEEN_NODES,
+        options: {
+          source: externalApiNode.id,
+          target: internalApiComponent.id
+        }
+      });
+    });
+  });
+  result.push(function (graph) {
+    let res = [];
+    baseInternalApisNodes = GetNodesLinkedTo(graph, {
+      id: context.base,
+      link: nodetypes_LinkType.ComponentInternalApi
+    });
+
+    for (var i in previousLinked) {
+      let baseInternalApiNode = baseInternalApisNodes.find(v => GetNodeTitle(v) === i.id);
+
+      if (baseInternalApiNode) {
+        previousLinked[i].map(pl => {
+          res.push({
+            operation: uiactions_ADD_LINK_BETWEEN_NODES,
+            options: {
+              target: baseInternalApiNode.id,
+              source: pl.id,
+              properties: { ...pl.properties
+              }
+            }
+          });
+        });
+      }
+    }
+
+    return res;
+  });
+  return result;
+});
+// CONCATENATED MODULE: ./app/nodepacks/AddTitleToComponent.js
+
+
+/* harmony default export */ var nodepacks_AddTitleToComponent = (function (args = {}) {
+  // node0
+  if (!args.component) {
+    throw "no component";
+  } //
+
+
+  let context = { ...args,
+    node0: args.component
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_COMPONENT_NODE",
+      options: {
+        parent: context.node0,
+        groupProperties: {},
+        properties: {
+          UIType: "ElectronIO"
+        },
+        linkProperties: {
+          properties: {
+            type: "component",
+            stroke: "#B7245C",
+            component: {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "component-type",
+        id: context.node1,
+        value: "Button"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "Button"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentApi",
+        linkProperties: {
+          properties: {
+            type: "component-internal-api",
+            "component-internal-api": {}
+          }
+        },
+        parent: context.node1,
+        groupProperties: {},
+        properties: {
+          text: "label",
+          Pinned: false,
+          UseAsValue: true
+        },
+        callback: function (node, graph, group) {
+          context.node2 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentExternalApi",
+        parent: context.node1,
+        linkProperties: {
+          properties: {
+            type: "component-external-api",
+            "component-external-api": {}
+          }
+        },
+        groupProperties: {},
+        properties: {
+          text: "label",
+          Pinned: false
+        },
+        callback: function (node, graph, group) {
+          context.node3 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node2,
+        target: context.node3,
+        properties: {
+          type: "component-internal-connection",
+          "component-internal-connection": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node3,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CONNECT_TO_TITLE_SERVICE",
+      options: {
+        id: context.node3
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "EventMethod",
+        properties: {
+          EventType: "onClick",
+          text: "onClick"
+        },
+        links: [null],
+        callback: function (node) {
+          context.node4 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "EventMethodInstance",
+        parent: context.node4,
+        groupProperties: {},
+        linkProperties: {
+          properties: {
+            type: "EventMethodInstance",
+            EventMethodInstance: {}
+          }
+        },
+        properties: {
+          text: "onClick Instance",
+          Pinned: false,
+          AutoDelete: {
+            properties: {
+              nodeType: "component-api-connector"
+            }
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node5 = node.id;
+          context.group1 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "component-type",
+        id: context.node1,
+        value: "Image"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "component-type",
+        id: context.node1,
+        value: "Title"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentApi",
+        linkProperties: {
+          properties: {
+            type: "component-internal-api",
+            "component-internal-api": {}
+          }
+        },
+        parent: context.node1,
+        groupProperties: {},
+        properties: {
+          text: "value",
+          Pinned: false,
+          UseAsValue: true
+        },
+        callback: function (node, graph, group) {
+          context.node6 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        nodeType: "ComponentExternalApi",
+        parent: context.node1,
+        linkProperties: {
+          properties: {
+            type: "component-external-api",
+            "component-external-api": {}
+          }
+        },
+        groupProperties: {},
+        properties: {
+          text: "value",
+          Pinned: false
+        },
+        callback: function (node, graph, group) {
+          context.node7 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node6,
+        target: context.node7,
+        properties: {
+          type: "component-internal-connection",
+          "component-internal-connection": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Label",
+        id: context.node1,
+        value: "Title"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "Title"
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node2,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node3,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node4,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node5,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node6,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node7,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node1,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node2,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node3,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node4,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node5,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node6,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node7,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
 // CONCATENATED MODULE: ./app/components/contextmenu.js
 
 var contextmenu_REACT_ELEMENT_TYPE;
@@ -58787,6 +60794,14 @@ function contextmenu_jsx(type, props, key, children) { if (!contextmenu_REACT_EL
 
 
  // The default
+
+
+
+
+
+
+
+
 
 
 
@@ -58948,6 +60963,41 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         let linkType = GetLinkProperty(link, LinkPropertyKeys.TYPE);
 
         switch (GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
+          case nodetypes_LinkType.Style:
+            result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+              open: Visual(state, `linkType coponent`),
+              active: true,
+              title: linkType,
+              innerStyle: {
+                maxHeight: 300,
+                overflowY: "auto"
+              },
+              toggle: () => {
+                this.props.toggleVisual(`linkType coponent`);
+              }
+            }, `${linkType}${selectedLink.id} componenttag`, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+              options: Object.keys(ComponentTags).map(x => ({
+                id: x,
+                value: x,
+                title: x
+              })),
+              label: LinkType,
+              onChange: value => {
+                this.props.graphOperation([{
+                  operation: UPDATE_LINK_PROPERTY,
+                  options: function () {
+                    return {
+                      id: link.id,
+                      prop: LinkPropertyKeys.ComponentTag,
+                      value: value
+                    };
+                  }
+                }]);
+              },
+              value: GetLinkProperty(link, LinkPropertyKeys.ComponentTag)
+            }))));
+            break;
+
           case nodetypes_LinkType.ComponentExternalConnection:
           case nodetypes_LinkType.EventMethodInstance:
             result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -59094,10 +61144,71 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     let currentNodeType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType);
+    let temp;
 
     switch (currentNodeType) {
+      case NodeTypes.DataChain:
+        //DataChain_SelectPropertyValue
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "OPERATIONS"),
+          active: true,
+          title: Operations,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("OPERATIONS");
+          }
+        }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Select Model Property`,
+          open: Visual(state, `Select Model Property`),
+          active: true,
+          onClick: () => {
+            // this.props.graphOperation(GetModelViewModelForList({}));
+            this.props.toggleVisual(`Select Model Property`);
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+          label: Name,
+          immediate: true,
+          onChange: value => {
+            this.setState({
+              name: value
+            });
+          },
+          value: this.state.name
+        })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Models,
+          options: uiactions_NodesByType(this.props.state, NodeTypes.Model).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              model: value
+            });
+          },
+          value: this.state.model
+        })), this.state.model ? contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Properties,
+          options: GetModelPropertyChildren(this.state.model).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              property: value
+            });
+          },
+          value: this.state.property
+        })) : null, this.state.model && this.state.name && this.state.property ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: Execute,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation([...DataChain_SelectPropertyValue({
+              name: this.state.name,
+              dataChain: currentNode.id,
+              model: this.state.model,
+              property: this.state.property
+            })]);
+          }
+        }) : null))];
+
       case NodeTypes.ComponentApiConnector:
-        let temp;
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           open: Visual(state, "OPERATIONS"),
           active: true,
@@ -59241,6 +61352,55 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
             this.props.toggleVisual("OPERATIONS");
           }
         }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "AddModelPropertyGetterDC"),
+          title: "Add Model Property Getter",
+          active: true,
+          onClick: () => {
+            this.props.toggleVisual("AddModelPropertyGetterDC");
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Models,
+          options: uiactions_NodesByType(this.props.state, NodeTypes.Model).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              model: value
+            });
+          },
+          value: this.state.model
+        })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Models,
+          options: GetModelPropertyChildren(this.state.model).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              property: value
+            });
+          },
+          value: this.state.property
+        })), this.state.model && this.state.property ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Execute`,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation([...CreateModelPropertyGetterDC({
+              model: this.state.model,
+              property: this.state.property,
+              propertyName: GetNodeTitle(this.state.property),
+              modelName: GetNodeTitle(this.state.model),
+              callback: context => {
+                temp = context.entry;
+              }
+            }), {
+              operation: uiactions_ADD_LINK_BETWEEN_NODES,
+              options: function () {
+                return {
+                  source: currentNode.id,
+                  target: temp,
+                  properties: { ...LinkProperties.DataChainLink
+                  }
+                };
+              }
+            }]);
+          }
+        }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `Connect to Title Service`,
           hideArrow: true,
           onClick: () => {
@@ -59338,6 +61498,21 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               }));
             }
           }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Setup Fetch Result`,
+          hideArrow: true,
+          onClick: () => {
+            let connectedNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.FetchServiceOuput
+            });
+
+            if (connectedNodes.length) {
+              this.props.graphOperation(CreatePropertiesForFetch({
+                id: currentNode.id
+              }));
+            }
+          }
         }))];
 
       case NodeTypes.ScreenOption:
@@ -59414,6 +61589,19 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         }))];
 
       case NodeTypes.ComponentNode:
+        let componentType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.ComponentType);
+        let uiType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.UIType);
+        let parent = null;
+
+        if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType] && ComponentTypes[uiType][componentType].layout && Visual(state, "Reattach Component")) {
+          let graph = GetCurrentGraph();
+          parent = GetNodesLinkedTo(graph, {
+            id: currentNode.id,
+            link: nodetypes_LinkType.Component,
+            direction: TARGET
+          })[0];
+        }
+
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           open: Visual(state, "ComponentNode"),
           active: true,
@@ -59426,6 +61614,38 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
             this.props.toggleVisual("ComponentNode");
           }
         }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddLifeCylceEvents,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation(SCREEN_COMPONENT_EVENTS.filter(x => {
+              return !GetNodesLinkedTo(GetCurrentGraph(), {
+                id: currentNode.id,
+                link: nodetypes_LinkType.LifeCylceMethod
+              }).find(_y => uiactions_GetNodeProp(_y, nodetypes_NodeProperties.Event) === x);
+            }).map(t => {
+              return {
+                operation: ADD_NEW_NODE,
+                options: function () {
+                  return {
+                    nodeType: NodeTypes.LifeCylceMethod,
+                    properties: {
+                      [nodetypes_NodeProperties.EventType]: t,
+                      [nodetypes_NodeProperties.Pinned]: false,
+                      [nodetypes_NodeProperties.UIText]: `${t}`
+                    },
+                    links: [{
+                      target: currentNode.id,
+                      linkProperties: {
+                        properties: { ...LinkProperties.LifeCylceMethod
+                        }
+                      }
+                    }]
+                  };
+                }
+              };
+            }));
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: AddButtonToComponent,
           hideArrow: true,
           onClick: () => {
@@ -59433,7 +61653,216 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               component: currentNode.id
             }));
           }
-        }))];
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddTitleToComponent,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation(nodepacks_AddTitleToComponent({
+              component: currentNode.id
+            }));
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, `${currentNodeType} eventtype`),
+          active: true,
+          title: AddEvent,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual(`${currentNodeType} eventtype`);
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: Object.keys(ComponentEvents).map(v => ({
+            title: v,
+            id: v,
+            value: v
+          })),
+          label: Select,
+          onChange: value => {
+            this.setState({
+              eventType: value
+            });
+          },
+          value: this.state.eventType
+        })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: [true, false].map(v => ({
+            title: `${v}`,
+            id: v,
+            value: v
+          })),
+          label: IncludeEventHandler,
+          onChange: value => {
+            this.setState({
+              eventTypeHandler: value
+            });
+          },
+          value: this.state.eventTypeHandler
+        })), this.state.eventType ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddEvent,
+          hideArrow: true,
+          onClick: () => {
+            let properties = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.DefaultViewType
+            }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.Property);
+
+            if (properties.length) {
+              this.props.graphOperation(nodepacks_AddEvent({
+                component: currentNode.id,
+                eventType: this.state.eventType,
+                eventTypeHandler: this.state.eventTypeHandler,
+                property: properties[0].id
+              }));
+            }
+          }
+        }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Adding Component"),
+          active: true,
+          title: AddComponentNew,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("Adding Component");
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: Object.keys(ComponentTypes.ReactNative).map(v => ({
+            title: v,
+            id: v,
+            value: v
+          })),
+          label: ComponentType,
+          onChange: value => {
+            this.setState({
+              componentType: value
+            });
+          },
+          value: this.state.componentType
+        })), this.state.componentType ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `${Add} ${this.state.componentType}`,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation(AddComponent({
+              component: currentNode.id,
+              componentType: this.state.componentType
+            }));
+          }
+        }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Reattach Component"),
+          active: true,
+          title: ReattachComponent,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("Reattach Component");
+          }
+        }, void 0, parent ? contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: GetNodesLinkedTo(GetCurrentGraph(), {
+            id: parent.id,
+            link: nodetypes_LinkType.Component
+          }).filter(x => x.id !== currentNode.id).toNodeSelect(),
+          label: ComponentType,
+          onChange: value => {
+            this.setState({
+              component: value
+            });
+          },
+          value: this.state.component
+        })) : null, parent && this.state.component ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: Execute,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation(nodepacks_ReattachComponent({
+              component: this.state.component,
+              base: currentNode.id,
+              parent: parent.id
+            }));
+          }
+        }) : null))];
+
+      case NodeTypes.Validator:
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, NodeTypes.Validator),
+          active: true,
+          title: Operations,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual(NodeTypes.Validator);
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: uiactions_NodesByType(this.props.state, NodeTypes.Validator).toNodeSelect().filter(x => x.id !== currentNode.id),
+          label: CopyValidationConditions,
+          onChange: value => {
+            this.setState({
+              validator: value
+            });
+          },
+          value: this.state.validator
+        })), this.state.validator ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: Execute,
+          hideArrow: true,
+          onClick: () => {
+            let conditions = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: this.state.validator,
+              link: nodetypes_LinkType.Condition
+            }).map(v => uiactions_GetNodeProp(v, nodetypes_NodeProperties.Condition));
+            let method = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: this.state.validator,
+              link: nodetypes_LinkType.FunctionOperator
+            }).find(x => x);
+            let currentConditions = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.Condition
+            });
+            let currentNodeMethod = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.FunctionOperator
+            }).find(x => x);
+            let functionType = uiactions_GetNodeProp(method, nodetypes_NodeProperties.FunctionType);
+            let currentNodeMethodFunctionType = uiactions_GetNodeProp(currentNodeMethod, nodetypes_NodeProperties.FunctionType);
+            let result = [];
+            currentConditions.map(cc => {
+              result.push({
+                operation: REMOVE_NODE,
+                options: function () {
+                  return {
+                    id: cc.id
+                  };
+                }
+              });
+            });
+            conditions.map(condition => {
+              result.push({
+                operation: ADD_NEW_NODE,
+                options: function () {
+                  let temp = JSON.parse(JSON.stringify(condition));
+                  temp.methods[currentNodeMethodFunctionType] = temp.methods[functionType];
+                  delete temp.methods[functionType];
+                  return {
+                    nodeType: NodeTypes.Condition,
+                    properties: {
+                      [nodetypes_NodeProperties.Condition]: temp
+                    },
+                    parent: currentNode.id,
+                    groupProperties: {},
+                    linkProperties: {
+                      properties: { ...LinkProperties.ConditionLink
+                      }
+                    }
+                  };
+                }
+              });
+            });
+            this.props.graphOperation(result);
+          }
+        }) : null)];
 
       case NodeTypes.Permission:
         // getNodePropertyGuids()
@@ -59515,6 +61944,75 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
             this.props.graphOperation(result);
           }
         }) : null)];
+
+      case NodeTypes.ViewType:
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, currentNodeType),
+          active: true,
+          title: Operations,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual(currentNodeType);
+          }
+        }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, `${currentNodeType} eventtype`),
+          active: true,
+          title: AddEvent,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual(`${currentNodeType} eventtype`);
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: Object.keys(ComponentEvents).map(v => ({
+            title: v,
+            id: v,
+            value: v
+          })),
+          label: Select,
+          onChange: value => {
+            this.setState({
+              eventType: value
+            });
+          },
+          value: this.state.eventType
+        })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          options: [true, false].map(v => ({
+            title: `${v}`,
+            id: v,
+            value: v
+          })),
+          label: IncludeEventHandler,
+          onChange: value => {
+            this.setState({
+              eventTypeHandler: value
+            });
+          },
+          value: this.state.eventTypeHandler
+        })), this.state.eventType ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddEvent,
+          hideArrow: true,
+          onClick: () => {
+            let properties = GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.DefaultViewType
+            }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.Property);
+
+            if (properties.length) {
+              this.props.graphOperation(nodepacks_AddEvent({
+                component: currentNode.id,
+                eventType: this.state.eventType,
+                eventTypeHandler: this.state.eventTypeHandler,
+                property: properties[0].id
+              }));
+            }
+          }
+        }) : null))];
     }
 
     return [];
@@ -59579,14 +62077,6 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
     let currentNodeType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType);
 
     switch (currentNodeType) {
-      // case NodeTypes.Condition:
-      //   return this.getConditionMenu();
-      // // case NodeTypes.Model:
-      // //   return this.getModelMenu();
-      // case NodeTypes.ViewType:
-      //   return this.getViewTypes();
-      // case NodeTypes.ComponentExternalApi:
-      //   return this.getComponentExternalMenu(currentNode);
       case NodeTypes.ComponentNode:
       case NodeTypes.Screen:
       case NodeTypes.ScreenOption:
@@ -59628,11 +62118,16 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
   }
 
   getGenericComponentApiMenu(currentNode) {
+    let {
+      state
+    } = this.props;
     return contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-      open: true,
+      open: Visual(state, titles_ComponentAPIMenu),
       active: true,
       title: titles_ComponentAPIMenu,
-      toggle: () => {}
+      toggle: () => {
+        this.props.toggleVisual(titles_ComponentAPIMenu);
+      }
     }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
       title: `${Add} Label`,
       hideArrow: true,
@@ -59645,17 +62140,43 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
       onClick: () => {
         this.props.addComponentApiNodes(currentNode.id, "value");
       }
-    }));
+    }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: `${Add} Custom`,
+      open: Visual(state, "Custom Api Menu"),
+      active: true,
+      onClick: () => {
+        // this.props.addComponentApiNodes(currentNode.id, "value");
+        this.props.toggleVisual("Custom Api Menu");
+      }
+    }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+      immediate: true,
+      label: Name,
+      placeholder: EnterName,
+      onChange: value => {
+        this.setState({
+          customApi: value
+        });
+      },
+      value: this.state.customApi
+    })), this.state.customApi ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: `${Add} ${this.state.customApi}`,
+      hideArrow: true,
+      onClick: () => {
+        this.props.addComponentApiNodes(currentNode.id, this.state.customApi);
+      }
+    }) : null));
   }
 
   getButtonEventMenu(currentNode) {
     switch (uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.UIType)) {
       case UITypes.ReactNative:
         return contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          open: true,
+          open: Visual(state, Events),
           active: true,
           title: Events,
-          toggle: () => {}
+          toggle: () => {
+            this.props.toggleVisual(Events);
+          }
         }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `${Add} onPress`,
           hideArrow: true,
@@ -61033,6 +63554,8 @@ const StyleLib = {
     "border-left-style": "borderLeftStyle",
     "border-left-width": "borderLeftWidth",
     "border-right": "borderRight",
+    "border-radius": "borderRadius",
+    cursor: "pointer",
     "border-right-color": "borderRightColor",
     "border-right-style": "borderRightStyle",
     "border-right-width": "borderRightWidth",
@@ -61048,6 +63571,12 @@ const StyleLib = {
     cursor: "cursor",
     display: "display",
     filter: "filter",
+    flex: "flex",
+    "flex-direction": "flexDirection",
+    "flex-flow": "flexFlow",
+    "justify-content": "justifyContent",
+    "align-items": "alignItems",
+    "align-content": "alignContents",
     float: "cssFloat",
     font: "font",
     "font-family": "fontFamily",
@@ -61056,6 +63585,30 @@ const StyleLib = {
     "font-weight": "fontWeight",
     height: "height",
     left: "left",
+    "grid-template-columns": "gridTemplateColumns",
+    "grid-template-rows": "gridTemplateRows",
+    "grid-template-areas": "gridTemplateAreas",
+    "grid-template": "gridTemplate",
+    "grid-column-gap": "gridColumnGap",
+    "grid-row-gap": "gridRowGap",
+    "grid-gap": "gridGap",
+    "justify-items": "justifyItems",
+    "place-items": "placeItems",
+    "place-content": "placeContent",
+    "grid-auto-columns": "gridAutoColumns",
+    "grid-auto-rows": "gridAutoRows",
+    "grid-auto-flow": "gridAutoFlow",
+    grid: "grid",
+    "grid-column-start": "gridColumnStart",
+    "grid-column-end": "gridColumnEnd",
+    "grid-row-start": "gridRowStart",
+    "grid-row-end": "gridRowEnd",
+    "grid-column": "gridColumn",
+    "grid-row": "gridRow",
+    "grid-area": "gridArea",
+    "justify-self": "justifySelf",
+    "align-self": "alignSelf",
+    "place-self": "placeSelf",
     "letter-spacing": "letterSpacing",
     "line-height": "lineHeight",
     "list-style": "listStyle",
@@ -61389,6 +63942,7 @@ class layoutview_LayoutView extends external_react_["Component"] {
       if (cellProperties) {
         cellStyle = cellProperties.style;
         cellProperties.children = cellProperties.children || {};
+        cellProperties.name = cellProperties.name || {};
         cellChildren = cellProperties.children;
         cellProperties.cellModel = cellProperties.cellModel || {};
         cellModel = cellProperties.cellModel;
@@ -61473,7 +64027,25 @@ class layoutview_LayoutView extends external_react_["Component"] {
       },
       label: Sections,
       value: Object.keys(selectedLayoutRoot || {}).length
-    }), cellStyle ? layoutview_jsx(selectinput_SelectInput, {
+    }), cellProperties && cellProperties.name && this.state.selectedCell ? layoutview_jsx(textinput_TextInput, {
+      immediate: true,
+      onChange: val => {
+        let layout = nodeLayout || CreateLayout();
+
+        if (!cellProperties.name !== "object") {
+          cellProperties.name = {};
+        }
+
+        cellProperties.name[this.state.selectedCell] = val;
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: uiactions_NodeProperties.Layout,
+          id: currentNode.id,
+          value: layout
+        });
+      },
+      label: Name,
+      value: cellProperties.name[this.state.selectedCell]
+    }) : null, cellStyle ? layoutview_jsx(selectinput_SelectInput, {
       options: ["column", "row"].map(t => ({
         title: t,
         value: t
@@ -61792,6 +64364,485 @@ class layoutview_LayoutView extends external_react_["Component"] {
 }
 
 /* harmony default export */ var layoutview = (UIConnect(layoutview_LayoutView));
+// CONCATENATED MODULE: ./app/components/checkboxproperty.js
+var checkboxproperty_REACT_ELEMENT_TYPE;
+
+function checkboxproperty_jsx(type, props, key, children) { if (!checkboxproperty_REACT_ELEMENT_TYPE) { checkboxproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: checkboxproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+class checkboxproperty_CheckBoxProperty extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    return checkboxproperty_jsx(checkbox_CheckBox, {
+      label: this.props.title,
+      title: this.props.title,
+      value: uiactions_GetNodeProp(currentNode, this.props.property),
+      onChange: value => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property,
+          id: currentNode.id,
+          value: value
+        });
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var checkboxproperty = (UIConnect(checkboxproperty_CheckBoxProperty));
+// CONCATENATED MODULE: ./app/components/selectproperty.js
+var selectproperty_REACT_ELEMENT_TYPE;
+
+function selectproperty_jsx(type, props, key, children) { if (!selectproperty_REACT_ELEMENT_TYPE) { selectproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: selectproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+class selectproperty_SelectProperty extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    return selectproperty_jsx(selectinput_SelectInput, {
+      label: this.props.title,
+      title: this.props.title,
+      options: this.props.options,
+      value: uiactions_GetNodeProp(currentNode, this.props.property),
+      onChange: value => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property,
+          id: currentNode.id,
+          value: value
+        });
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var selectproperty = (UIConnect(selectproperty_SelectProperty));
+// CONCATENATED MODULE: ./app/components/gridareaselect.js
+
+var gridareaselect_REACT_ELEMENT_TYPE;
+
+function gridareaselect_jsx(type, props, key, children) { if (!gridareaselect_REACT_ELEMENT_TYPE) { gridareaselect_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: gridareaselect_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+
+
+class gridareaselect_GridAreaSelect extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    let tags = uiactions_GetNodeProp(currentNode, this.props.property || nodetypes_NodeProperties.GridAreas) || [];
+    return gridareaselect_jsx(buttonlist_ButtonList, {
+      label: this.props.title || GridAreas,
+      title: this.props.title || GridAreas,
+      active: true,
+      items: Object.keys(ComponentTags).map(x => ({
+        id: x,
+        value: x,
+        title: x
+      })),
+      value: uiactions_GetNodeProp(currentNode, this.props.property || nodetypes_NodeProperties.GridAreas),
+      isSelected: item => {
+        if (tags) {
+          return (tags || []).some(v => v === item.value);
+        }
+
+        return false;
+      },
+      onClick: item => {
+        if (tags.find(v => v === item.value)) {
+          let index = tags.findIndex(v => v === item.value);
+          tags.splice(index, 1);
+        } else {
+          tags.push(item.value);
+        }
+
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property || nodetypes_NodeProperties.GridAreas,
+          id: currentNode.id,
+          value: tags
+        });
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var gridareaselect = (UIConnect(gridareaselect_GridAreaSelect));
+// CONCATENATED MODULE: ./app/components/gridplacement.js
+var gridplacement_REACT_ELEMENT_TYPE;
+
+function gridplacement_jsx(type, props, key, children) { if (!gridplacement_REACT_ELEMENT_TYPE) { gridplacement_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: gridplacement_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+
+
+
+
+var gridplacement_ref =
+/*#__PURE__*/
+gridplacement_jsx("div", {});
+
+var gridplacement_ref2 =
+/*#__PURE__*/
+gridplacement_jsx("i", {
+  className: "fa  fa-times"
+});
+
+class gridplacement_GridPlacement extends external_react_["Component"] {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    let currentNode = this.props.node;
+    let tags = uiactions_GetNodeProp(currentNode, this.props.property || nodetypes_NodeProperties.GridAreas) || [];
+    let cellStyle = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Style) || {};
+
+    if (cellStyle && !cellStyle["gridTemplateColumns"]) {
+      return gridplacement_ref;
+    }
+
+    let gridColumns = cellStyle["gridTemplateColumns"];
+    let gridRowCount = parseInt(uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.GridRowCount) || 1, 10);
+    let columns = gridColumns.split(" ").filter(x => x);
+    let square = {
+      display: "flex",
+      flex: 1,
+      height: 24,
+      border: "solid 1px #414141",
+      ...(this.state.currentSection ? {
+        cursor: "pointer"
+      } : {})
+    };
+    let gridplacement = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.GridPlacement) || [].interpolate(0, 100, t => "");
+    return gridplacement_jsx("div", {}, void 0, gridplacement_jsx(selectinput_SelectInput, {
+      label: GridAreas,
+      title: GridAreas,
+      options: tags.map(x => ({
+        title: x,
+        id: x,
+        value: x
+      })),
+      value: this.state.currentSection,
+      onChange: value => {
+        this.setState({
+          currentSection: value
+        });
+      }
+    }), gridplacement_jsx("div", {
+      style: {
+        paddingBottom: 5
+      }
+    }, void 0, gridplacement_jsx("div", {
+      className: "btn-group"
+    }, void 0, gridplacement_jsx("button", {
+      className: "btn btn-default bg-olive btn-flat",
+      onClick: () => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property || nodetypes_NodeProperties.GridPlacement,
+          id: currentNode.id,
+          value: null
+        });
+      }
+    }, void 0, gridplacement_ref2))), gridplacement_jsx("div", {
+      style: {
+        display: "flex",
+        flex: "1",
+        flexDirection: "column"
+      }
+    }, void 0, [].interpolate(0, gridRowCount, row => {
+      return gridplacement_jsx("div", {
+        style: {
+          display: "flex",
+          flexDirection: "row"
+        }
+      }, void 0, columns.map((_, col) => {
+        return gridplacement_jsx("div", {
+          title: gridplacement[row * columns.length + col],
+          style: { ...square,
+            ...(gridplacement[row * columns.length + col] === this.state.currentSection ? {
+              backgroundColor: Colors.SelectedNode
+            } : gridplacement[row * columns.length + col] ? {
+              backgroundColor: Colors.MarkedNode
+            } : {})
+          },
+          onClick: () => {
+            if (this.state.currentSection) {
+              if (gridplacement[row * columns.length + col] !== this.state.currentSection) {
+                gridplacement[row * columns.length + col] = this.state.currentSection;
+              } else {
+                gridplacement[row * columns.length + col] = "";
+              }
+
+              this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+                prop: this.props.property || nodetypes_NodeProperties.GridPlacement,
+                id: currentNode.id,
+                value: gridplacement
+              });
+            }
+          }
+        });
+      }), " ");
+    })));
+  }
+
+}
+
+/* harmony default export */ var components_gridplacement = (UIConnect(gridplacement_GridPlacement));
+// CONCATENATED MODULE: ./app/components/stylemenu.js
+
+var stylemenu_REACT_ELEMENT_TYPE;
+
+function stylemenu_jsx(type, props, key, children) { if (!stylemenu_REACT_ELEMENT_TYPE) { stylemenu_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: stylemenu_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class stylemenu_StyleMenu extends external_react_["Component"] {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    var {
+      state
+    } = this.props;
+    var active = IsCurrentNodeA(state, uiactions_NodeTypes.Style);
+    var currentNode = Node(state, Visual(state, SELECTED_NODE));
+
+    if (!currentNode || !active) {
+      return stylemenu_jsx(tabpane_TabPane, {
+        active: active
+      });
+    }
+
+    let cellStyle = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.Style) || {};
+    return stylemenu_jsx(sidebarmenu_SideBarMenu, {
+      relative: true
+    }, void 0, stylemenu_jsx(genericpropertycontainer, {
+      active: true,
+      title: "asdf",
+      subTitle: "afaf",
+      nodeType: NodeTypes.Selector
+    }, void 0, stylemenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, Selector),
+      active: true,
+      title: Selector,
+      toggle: () => {
+        this.props.toggleVisual(Selector);
+      }
+    }, void 0, [nodetypes_NodeProperties.ActiveStyle, nodetypes_NodeProperties.CheckedStyle, nodetypes_NodeProperties.DisabledStyle, nodetypes_NodeProperties.EmptyStyle, nodetypes_NodeProperties.EnabledStyle, nodetypes_NodeProperties.FirstChildStyle, nodetypes_NodeProperties.LastChildStyle, nodetypes_NodeProperties.FocusStyle, nodetypes_NodeProperties.ReadOnlyStyle, nodetypes_NodeProperties.BeforeStyle, nodetypes_NodeProperties.AfterStyle].map(x => {
+      return stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, x, stylemenu_jsx(checkboxproperty, {
+        title: x,
+        node: currentNode,
+        property: x
+      }));
+    }))), stylemenu_jsx(genericpropertycontainer, {
+      active: true,
+      title: "asdf",
+      subTitle: "afaf",
+      nodeType: NodeTypes.Selector
+    }, void 0, stylemenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, MediaQuery),
+      active: true,
+      title: MediaQuery,
+      toggle: () => {
+        this.props.toggleVisual(MediaQuery);
+      }
+    }, void 0, [nodetypes_NodeProperties.UseMediaQuery].map(x => {
+      return stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, x, stylemenu_jsx(checkboxproperty, {
+        title: x,
+        node: currentNode,
+        property: x
+      }));
+    }), stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, stylemenu_jsx(selectproperty, {
+      title: MediaQuery,
+      options: Object.keys(MediaQueries).map(v => ({
+        title: v,
+        id: v,
+        value: v
+      })),
+      node: currentNode,
+      property: nodetypes_NodeProperties.MediaQuery
+    })))), stylemenu_jsx(genericpropertycontainer, {
+      active: true,
+      title: "asdf",
+      subTitle: "afaf",
+      nodeType: NodeTypes.Style
+    }, void 0, stylemenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, Style),
+      active: true,
+      title: Style,
+      toggle: () => {
+        this.props.toggleVisual(Style);
+      }
+    }, void 0, stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, stylemenu_jsx(formcontrol_FormControl, {}, void 0, stylemenu_jsx(textinput_TextInput, {
+      value: this.state.filter,
+      label: Filter,
+      immediate: true,
+      onChange: value => {
+        this.setState({
+          filter: value
+        });
+      },
+      placeholder: Filter
+    }), this.getStyleSelect(), cellStyle && currentNode ? this.selectedStyle(value => {
+      cellStyle[this.state.selectedStyleKey] = value;
+      this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+        prop: uiactions_NodeProperties.Style,
+        id: currentNode.id,
+        value: cellStyle
+      });
+    }, cellStyle[this.state.selectedStyleKey]) : null, cellStyle ? this.getCurrentStyling(cellStyle) : null))), currentNode ? stylemenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, GridAreas),
+      active: true,
+      title: GridAreas,
+      toggle: () => {
+        this.props.toggleVisual(GridAreas);
+      }
+    }, void 0, stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, stylemenu_jsx(gridareaselect, {
+      node: currentNode
+    }))) : null, currentNode ? stylemenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, GridRow),
+      active: true,
+      title: GridRow,
+      toggle: () => {
+        this.props.toggleVisual(GridRow);
+      }
+    }, void 0, stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, stylemenu_jsx(selectproperty, {
+      title: Rows,
+      options: [].interpolate(0, 10, x => x).map(v => ({
+        title: v,
+        id: v,
+        value: v
+      })),
+      node: currentNode,
+      property: nodetypes_NodeProperties.GridRowCount
+    })), stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, stylemenu_jsx(components_gridplacement, {
+      node: currentNode
+    }))) : null));
+  }
+
+  selectedStyle(callback, value) {
+    if (this.state.selectedStyleKey) {
+      switch (this.state.selectedStyleKey) {
+        default:
+          return stylemenu_jsx(textinput_TextInput, {
+            value: value,
+            immediate: true,
+            label: this.state.selectedStyleKey,
+            onChange: callback,
+            placeholder: Filter
+          });
+      }
+    }
+
+    return null;
+  }
+
+  getStyleSelect() {
+    if (this.state.filter) {
+      return stylemenu_jsx("ul", {
+        style: {
+          padding: 2,
+          maxHeight: 200,
+          overflowY: "auto"
+        }
+      }, void 0, Object.keys(StyleLib.js).filter(x => x.indexOf(this.state.filter) !== -1).map(key => {
+        return stylemenu_jsx("li", {
+          className: "treeview",
+          style: {
+            padding: 3,
+            cursor: "pointer"
+          },
+          label: "Style",
+          onClick: () => {
+            this.setState({
+              selectedStyleKey: key,
+              filter: ""
+            });
+          }
+        }, key, key);
+      }));
+    }
+
+    return [];
+  }
+
+  getCurrentStyling(currentStyle) {
+    if (currentStyle) {
+      return stylemenu_jsx("ul", {
+        style: {
+          padding: 2,
+          maxHeight: 400,
+          overflowY: "auto"
+        }
+      }, void 0, Object.keys(currentStyle).map(key => {
+        return stylemenu_jsx("li", {
+          className: "treeview",
+          style: {
+            padding: 3,
+            cursor: "pointer"
+          },
+          onClick: () => {
+            this.setState({
+              selectedStyleKey: key,
+              filter: ""
+            });
+          }
+        }, key, "[", key, "]:", stylemenu_jsx("div", {}, void 0, currentStyle[key]), stylemenu_jsx("hr", {
+          style: {
+            padding: 0,
+            margin: 0
+          }
+        }));
+      }));
+    }
+
+    return [];
+  }
+
+}
+
+/* harmony default export */ var stylemenu = (UIConnect(stylemenu_StyleMenu));
 // CONCATENATED MODULE: ./app/components/dashboard.js
 
 
@@ -61807,6 +64858,7 @@ function dashboard_jsx(type, props, key, children) { if (!dashboard_REACT_ELEMEN
 const {
   clipboard
 } = __webpack_require__("electron");
+
 
 
 
@@ -62032,25 +65084,29 @@ dashboard_jsx(serviceinterfacemenu, {});
 
 var _ref28 =
 /*#__PURE__*/
-dashboard_jsx(uiparameters, {});
+dashboard_jsx(stylemenu, {});
 
 var _ref29 =
 /*#__PURE__*/
-dashboard_jsx(navigationparametermenu, {});
+dashboard_jsx(uiparameters, {});
 
 var _ref30 =
 /*#__PURE__*/
-dashboard_jsx(methodparameteremenu, {});
+dashboard_jsx(navigationparametermenu, {});
 
 var _ref31 =
 /*#__PURE__*/
-dashboard_jsx(quickmethods, {});
+dashboard_jsx(methodparameteremenu, {});
 
 var _ref32 =
 /*#__PURE__*/
-dashboard_jsx(currentnodeproperties, {});
+dashboard_jsx(quickmethods, {});
 
 var _ref33 =
+/*#__PURE__*/
+dashboard_jsx(currentnodeproperties, {});
+
+var _ref34 =
 /*#__PURE__*/
 dashboard_jsx(contextmenu, {});
 
@@ -62200,6 +65256,18 @@ class dashboard_Dashboard extends external_react_["Component"] {
           });
           break;
 
+        case NodeTypes.Style:
+          return [{
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.Style,
+                singleLink: false,
+                nodeTypes: [NodeTypes.Style]
+              });
+            },
+            icon: 'fa fa-css3',
+            title: Style
+          }];
+
         case NodeTypes.Lists:
           return [{
             onClick: () => {
@@ -62219,6 +65287,48 @@ class dashboard_Dashboard extends external_react_["Component"] {
             icon: 'fa fa-list',
             title: 'Add All of [Type] list'
           }];
+
+        case NodeTypes.FetchService:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.FetchService,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa fa-bicycle',
+            title: AddMethod
+          }, {
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.FetchServiceOuput,
+                singleLink: true,
+                nodeTypes: [NodeTypes.Model]
+              });
+            },
+            icon: 'fa fa-plug',
+            title: SetFetchServiceOutput
+          }, {
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.FetchSserviceAgent,
+                singleLink: true,
+                nodeTypes: [NodeTypes.Model],
+                properties: {
+                  [nodetypes_NodeProperties.IsAgent]: true
+                }
+              });
+            },
+            icon: 'fa  fa-user-secret',
+            title: SetFetchSericeAgent
+          }, {
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.DataChainLink,
+                singleLink: true,
+                nodeTypes: [NodeTypes.DataChain]
+              });
+            },
+            icon: 'fa fa-share-alt',
+            title: DataChain
+          });
+          return result;
 
         case NodeTypes.ComponentExternalApi:
           result.push({
@@ -62360,7 +65470,7 @@ class dashboard_Dashboard extends external_react_["Component"] {
         onClick: () => {
           this.props.setVisual(CONNECTING_NODE, true);
         },
-        icon: 'fa fa-link',
+        icon: 'fas fa-plug',
         title: GenericLink
       });
     }
@@ -62635,6 +65745,15 @@ class dashboard_Dashboard extends external_react_["Component"] {
       },
       icon: 'fa fa-plus-circle',
       title: `${AddComponentExtApi}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.Style,
+          singleLink: false,
+          nodeTypes: [NodeTypes.Style]
+        });
+      },
+      icon: 'fa fa-css3',
+      title: Style
     });
     return result;
   }
@@ -63174,7 +66293,15 @@ class dashboard_Dashboard extends external_react_["Component"] {
             let targetNodeType = uiactions_GetNodeProp(nodeId, nodetypes_NodeProperties.NODEType);
 
             if (properties.nodeTypes && properties.nodeTypes.length && !properties.nodeTypes.some(t => targetNodeType === t)) {} else {
-              if (properties.singleLink) {
+              let skip = false;
+
+              if (properties && properties.properties && Object.keys(properties.properties).map(key => {
+                return uiactions_GetNodeProp(nodeId, key) !== properties.properties[key];
+              }).find(x => x)) {
+                skip = true;
+              }
+
+              if (skip) {} else if (properties.singleLink) {
                 this.props.graphOperation([...getNodesByLinkType(graph, {
                   type: properties.type,
                   direction: SOURCE,
@@ -63342,7 +66469,7 @@ class dashboard_Dashboard extends external_react_["Component"] {
       modelKey: nodetypes_NodeProperties.Condition,
       nodeType: NodeTypes.Condition,
       nodeProp: nodetypes_NodeProperties.Condition
-    }) : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref25 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_DEFAULT_TAB) ? _ref26 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_DEFAULT_TAB) ? _ref27 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref28 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref29 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref30 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref31 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref32 : null))), _ref33);
+    }) : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref25 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_DEFAULT_TAB) ? _ref26 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_DEFAULT_TAB) ? _ref27 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_DEFAULT_TAB) ? _ref28 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref29 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref30 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_SCOPE_TAB) ? _ref31 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref32 : null, VisualEq(state, dashboard_SELECTED_TAB, dashboard_QUICK_MENU) ? _ref33 : null))), _ref34);
   }
 
 }
@@ -66385,7 +69512,7 @@ module.exports = function (it) {
 /***/ "./node_modules/core-js/modules/_core.js":
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.5.7' };
+var core = module.exports = { version: '2.6.9' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -66526,6 +69653,14 @@ module.exports = function (exec) {
     return true;
   }
 };
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/_function-to-string.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__("./node_modules/core-js/modules/_shared.js")('native-function-to-string', Function.toString);
 
 
 /***/ }),
@@ -66929,8 +70064,8 @@ var global = __webpack_require__("./node_modules/core-js/modules/_global.js");
 var hide = __webpack_require__("./node_modules/core-js/modules/_hide.js");
 var has = __webpack_require__("./node_modules/core-js/modules/_has.js");
 var SRC = __webpack_require__("./node_modules/core-js/modules/_uid.js")('src');
+var $toString = __webpack_require__("./node_modules/core-js/modules/_function-to-string.js");
 var TO_STRING = 'toString';
-var $toString = Function[TO_STRING];
 var TPL = ('' + $toString).split(TO_STRING);
 
 __webpack_require__("./node_modules/core-js/modules/_core.js").inspectSource = function (it) {
@@ -66999,7 +70134,7 @@ var store = global[SHARED] || (global[SHARED] = {});
 })('versions', []).push({
   version: core.version,
   mode: __webpack_require__("./node_modules/core-js/modules/_library.js") ? 'pure' : 'global',
-  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
 });
 
 

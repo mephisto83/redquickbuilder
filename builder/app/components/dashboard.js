@@ -464,7 +464,7 @@ class Dashboard extends Component {
         onClick: () => {
           this.props.setVisual(CONNECTING_NODE, true);
         },
-        icon: 'fa fa-link',
+        icon: 'fa fa-plug',
         title: Titles.GenericLink
       })
     }
@@ -771,7 +771,17 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-css3',
       title: Titles.Style
-    })
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.DataChainLink,
+          singleLink: false,
+          nodeTypes: [NodeTypes.DataChain]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${Titles.DataChain}`
+    },)
 
     return result;
   }

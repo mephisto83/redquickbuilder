@@ -182,6 +182,25 @@ export function constructCssFile(css, clsName) {
   return rules;
 }
 
+/*
+A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
+*/
+export function buildStyle(node) {
+  let styleNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: node.id,
+    link: LinkType.Style
+  });
+  styleNodes.map(styleNode => {
+    let style = GetNodeProp(styleNode, NodeProperties.Style);
+    let areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
+    let gridRowCount = parseInt(
+      GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
+      10
+    );
+    let gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
+  });
+}
+
 export function GetItemData(node) {
   let dataSourceNode = GetDataSourceNode(node.id);
   let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
@@ -190,7 +209,9 @@ export function GetItemData(node) {
   if (connectedNode) {
     // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
     return `(()=> {
-    return DC.${GetCodeName(connectedNode)}(${defaultValue});
+    return DC.${GetCodeName(connectedNode, {
+      includeNameSpace: true
+    })}(${defaultValue});
 })()`;
   }
   return `(()=> {
@@ -280,6 +301,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
       );
+      buildStyle(node);
       cssFile = constructCssFile(
         css,
         `.${(GetCodeName(node) || "").toJavascriptName()}`
@@ -786,7 +808,9 @@ function WriteDescribedStateUpdates(parent) {
           innerValue = "{{temp}}";
         }
         if (dataChain) {
-          innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+          innerValue = `DC.${GetCodeName(dataChain, {
+            includeNameSpace: true
+          })}(${innerValue})`;
         }
 
         result = `
@@ -854,7 +878,9 @@ function GetDefaultComponentValue(node, key) {
           innerValue = "{{temp}}";
         }
         if (dataChain) {
-          innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+          innerValue = `DC.${GetCodeName(dataChain, {
+            includeNameSpace: true
+          })}(${innerValue})`;
         }
 
         result = `${bindTemplate(innerValue, {
@@ -985,7 +1011,9 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
       }
       if (!noDataChain && dataChain) {
-        innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+        innerValue = `DC.${GetCodeName(dataChain, {
+          includeNameSpace: true
+        })}(${innerValue})`;
       }
       if (innerValue) {
         return `${GetJSCodeName(componentExternalApi)}={${innerValue}}`;
@@ -1172,7 +1200,9 @@ export function writeApiProperties(apiConfig) {
       }
       if (property) {
         if (dataChain) {
-          let codeName = GetCodeName(dataChain);
+          let codeName = GetCodeName(dataChain, {
+            includeNameSpace: true
+          });
           property = `DC.${codeName}(${property})`;
         }
         // There is an opportunity to wrapp the result in a getter.
@@ -1352,7 +1382,9 @@ export function getMethodInvocation(methodInstanceCall) {
             GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.DataChain
         );
         if (body_value) {
-          body_input = `body: DC.${GetCodeName(body_value)}(${innervalue})`;
+          body_input = `body: DC.${GetCodeName(body_value, {
+            includeNameSpace: true
+          })}(${innervalue})`;
         }
       }
       if (body_input) {
@@ -1388,7 +1420,10 @@ export function getMethodInvocation(methodInstanceCall) {
             );
             if (value) {
               return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(
-                value
+                value,
+                {
+                  includeNameSpace: true
+                }
               )}(this.props.state)`;
             }
           }
@@ -1401,7 +1436,10 @@ export function getMethodInvocation(methodInstanceCall) {
     let dataChainInput = "";
     if (dataChain) {
       dataChainInput =
-        (parts.length ? "," : "") + `dataChain: DC.${GetCodeName(dataChain)}`;
+        (parts.length ? "," : "") +
+        `dataChain: DC.${GetCodeName(dataChain, {
+          includeNameSpace: true
+        })}`;
     }
     let query = parts.join();
     return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}});`;
@@ -1413,11 +1451,13 @@ export function getMethodInvocation(methodInstanceCall) {
   } else if (dataChain) {
     //Buttons need to use this.state.value, so a new property for datachains should exist.
     if (internalApiConnection) {
-      return `DC.${GetCodeName(dataChain)}(this.state.${GetJSCodeName(
-        internalApiConnection
-      )});`;
+      return `DC.${GetCodeName(dataChain, {
+        includeNameSpace: true
+      })}(this.state.${GetJSCodeName(internalApiConnection)});`;
     }
-    return `DC.${GetCodeName(dataChain)}(value);`;
+    return `DC.${GetCodeName(dataChain, {
+      includeNameSpace: true
+    })}(value);`;
   }
 }
 
@@ -1601,7 +1641,9 @@ function GenerateElectronIORoutes(screens) {
         direction: SOURCE
       }).find(x => x);
       if (viewModelDataLink) {
-        overrides = `viewModel = DC.${GetCodeName(viewModelDataLink)}();`;
+        overrides = `viewModel = DC.${GetCodeName(viewModelDataLink, {
+          includeNameSpace: true
+        })}();`;
       }
     }
     let screenApiParams = screenApis.map(v => `${GetJSCodeName(v)}`).join();

@@ -6,7 +6,12 @@ import {
   GetJSCodeName,
   GetSelectorsNodes
 } from "../actions/uiactions";
-import { NodeTypes, NEW_LINE, NodeProperties } from "../constants/nodetypes";
+import {
+  NodeTypes,
+  NEW_LINE,
+  NodeProperties,
+  SelectorType
+} from "../constants/nodetypes";
 import { addNewLine } from "../utils/array";
 
 export default class SelectorGenerator {
@@ -35,32 +40,25 @@ ${funcs.join(NEW_LINE)}`,
 export function GenerateSelectorFunctions() {
   let nodes = NodesByType(GetState(), NodeTypes.Selector);
 
-  return nodes.map(node => {
-    return GenerateSelectorFunction(node);
-  }).unique();
+  return nodes
+    .map(node => {
+      return GenerateSelectorFunction(node);
+    })
+    .unique();
 }
 export function GenerateSelectorFunction(node) {
-  let _parts = GetSelectorsNodes(node.id);
-
-  let parts = _parts.map(part => {
-    switch (GetNodeProp(part, NodeProperties.NODEType)) {
-      case NodeTypes.ViewModel:
-        let instanceType = GetNodeProp(part, NodeProperties.InstanceType);
-        let method = InstanceTypeSelectorFunction[instanceType];
-        return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}'${
-          GetNodeProp(node, NodeProperties.InstanceType) ? ", value" : ""
-        })`;
-      case NodeTypes.Selector:
-        return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}(${
-          GetNodeProp(part, NodeProperties.InstanceType) ? "value" : ""
-        })`;
-      default:
-        throw "unhandled generate selector function type " +
-          GetNodeProp(part, NodeProperties.NODEType);
-    }
-  });
   let result = null;
-
+  let selectType = GetNodeProp(node, NodeProperties.SelectorType);
+  switch (selectType) {
+    case SelectorType.InternalProperties:
+      return `export function ${GetJSCodeName(node)}(state) {
+        let { value, viewModel } = state;
+        return {
+          value,
+          viewModel
+        }
+      }`
+  }
   result = `
 export function ${GetJSCodeName(node)}(value, viewModel, options = {}) {
     if(options){

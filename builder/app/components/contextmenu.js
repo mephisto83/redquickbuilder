@@ -14,7 +14,8 @@ import {
   CODE_VIEW,
   UITypes,
   LinkProperties,
-  LinkPropertyKeys
+  LinkPropertyKeys,
+  SelectorType
 } from "../constants/nodetypes";
 import AddNameDescription from "../nodepacks/AddNameDescription";
 import TinyTweaks from "../nodepacks/TinyTweaks";
@@ -949,6 +950,65 @@ class ContextMenu extends Component {
           })[0];
         }
         return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "Styling")}
+            active={true}
+            title={Titles.Styling}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("Styling");
+            }}
+          >
+            <TreeViewMenu
+              title={Titles.AddDataChain}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation([
+                  {
+                    operation: UIA.ADD_NEW_NODE,
+                    options: function() {
+                      return {
+                        nodeType: NodeTypes.DataChain,
+                        linkProperties: {
+                          properties: { ...LinkProperties.DataChainLink }
+                        },
+                        parent: currentNode.id,
+                        properties: {
+                          [NodeProperties.UIText]: `data chain`
+                        },
+                        groupProperties: {}
+                      };
+                    }
+                  }
+                ]);
+              }}
+            />
+            <TreeViewMenu
+              title={Titles.AddSelector}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation([
+                  {
+                    operation: UIA.ADD_NEW_NODE,
+                    options: function() {
+                      return {
+                        nodeType: NodeTypes.Selector,
+                        linkProperties: {
+                          properties: { ...LinkProperties.SelectorLink }
+                        },
+                        parent: currentNode.id,
+                        properties: {
+                          [NodeProperties.UIText]: `select internal variables`,
+                          [NodeProperties.SelectorType]: SelectorType.InternalProperties
+                        },
+                        groupProperties: {}
+                      };
+                    }
+                  }
+                ]);
+              }}
+            />
+          </TreeViewMenu>,
           <TreeViewMenu
             open={UIA.Visual(state, "ComponentNode")}
             active={true}

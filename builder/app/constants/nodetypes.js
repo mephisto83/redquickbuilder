@@ -64,7 +64,8 @@ export const NodeTypes = {
   ServiceInterfaceMethod: "service-interface-method",
   ViewModel: "view-model",
   FetchService: "FetchService",
-  Style: "Style"
+  Style: "Style",
+  DataChainCollection: "DataChainCollection"
 };
 export const NodeTypeIcons = {};
 export function GetNodeTypeIcon(type) {
@@ -202,7 +203,8 @@ export const NodeTypeColors = {
   [NodeTypes.Lists]: "#2DC7FF",
   [NodeTypes.ClaimService]: "#034748",
   [NodeTypes.FetchService]: "#BA1200",
-  [NodeTypes.Style]: "#f12100"
+  [NodeTypes.Style]: "#f12100",
+  [NodeTypes.DataChainCollection]: "#2191FB"
 };
 
 export const NavigateTypes = {
@@ -278,6 +280,9 @@ export const MediaQueries = {
   ["Media devices"]: "@media only screen and (min-width: 768px)",
   ["Large devices"]: "@media only screen and (min-width: 992px)",
   ["Extra devices"]: "@media only screen and (min-width: 1200px)"
+};
+export const SelectorType = {
+  InternalProperties: "InternalProperties"
 };
 export const NodeProperties = {
   ViewPackage: "view-package",
@@ -531,7 +536,8 @@ export const NodeProperties = {
   AsForm: "as-form",
   CollectCookies: "collect-cookies",
   AsText: "as-text",
-  ClassConstructionInformation: "ClassConstructionInformation"
+  ClassConstructionInformation: "ClassConstructionInformation",
+  DataChainCollection: "DataChainCollection"
 };
 
 function codeTypeWord(x) {
@@ -759,7 +765,8 @@ export const LinkType = {
     "permission-dependency-property-many-to-many", //There is a link between a property and a dependency in a many to many situation.
   PermissionPropertyDependencyManyToManyLink:
     "permission-property-dependency-many-to-many", //There is a link between a permision and a property in a many to many situnation.
-  Style: "Style"
+  Style: "Style",
+  DataChainCollection: "DataChainCollection"
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -896,6 +903,9 @@ export const LinkProperties = {
   },
   ComponentApiConnector: {
     type: LinkType.ComponentApiConnector
+  },
+  DataChainCollection: {
+    type: LinkType.DataChainCollection
   },
   LifeCylceMethodInstance: {
     type: LinkType.LifeCylceMethodInstance

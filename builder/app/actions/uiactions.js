@@ -771,9 +771,23 @@ export function IsAgent(node) {
 export function GetLinkChainItem(options) {
   return GraphMethods.GetLinkChainItem(GetState(), options);
 }
-export function GetCodeName(node) {
+export function GetCodeName(node, options) {
   if (typeof node === "string") {
     node = GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+  }
+  if (options && options.includeNameSpace) {
+    if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.DataChain) {
+      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+        id: node.id,
+        link: NodeConstants.LinkType.DataChainCollection
+      });
+      if (collections && collections.length) {
+        return `${GetJSCodeName(collections[0])}.${GetNodeProp(
+          node,
+          NodeProperties.CodeName
+        )}`;
+      }
+    }
   }
   return GetNodeProp(node, NodeProperties.CodeName);
 }
@@ -1333,7 +1347,7 @@ export function GetSelectorsNodes(id) {
 }
 
 export function GenerateChainFunctions(options) {
-  let { language } = options;
+  let { language, collection } = options;
   let entryNodes = GetDataChainEntryNodes()
     .filter(x => {
       let uiType = GetNodeProp(x, NodeProperties.UIType);
@@ -1342,10 +1356,31 @@ export function GenerateChainFunctions(options) {
       }
       return true;
     })
-    .map(x => x.id);
+    .map(x => x.id)
+    .filter(x => {
+      let collections = GetNodesLinkedTo(graph, {
+        id: ct.id,
+        link: NodeConstants.LinkType.DataChainCollection
+      });
+      if (collection) {
+        return collections.find(v => v.id === collection);
+      }
+      return !collections || !collections.length;
+    });
   return entryNodes
     .map(GenerateChainFunction)
     .unique(x => x)
+    .join(NodeConstants.NEW_LINE);
+}
+
+export function GetDataChainCollections(options) {
+  return NodesByType(null, NodeTypes.DataChainCollection)
+    .map(dataChainCollection => {
+      return `export * as ${GetJSCodeName(
+        dataChainCollection
+      )} from './${GetJSCodeName(dataChainCollection)};`;
+    })
+    .unique()
     .join(NodeConstants.NEW_LINE);
 }
 
@@ -1382,7 +1417,7 @@ export function GetComponentInternalApiNode(api, parent, graph) {
 }
 
 export function GenerateChainFunctionSpecs(options) {
-  let { language } = options;
+  let { language, collection } = options;
   let result = [];
   let entryNodes = GetDataChainEntryNodes()
     .filter(x => {
@@ -1392,7 +1427,17 @@ export function GenerateChainFunctionSpecs(options) {
       }
       return true;
     })
-    .map(x => x.id);
+    .map(x => x.id)
+    .filter(x => {
+      let collections = GetNodesLinkedTo(graph, {
+        id: ct.id,
+        link: NodeConstants.LinkType.DataChainCollection
+      });
+      if (collection) {
+        return collections.find(v => v.id === collection);
+      }
+      return !collections || !collections.length;
+    });
 
   let basicentryvalues = [
     undefined,
@@ -1430,7 +1475,9 @@ export function GenerateSimpleTest(node, val) {
   }"', () => {
     let error = undefined;
     try {
-        DC.${GetCodeName(node)}(${_value});
+        DC.${GetCodeName(node, {
+          includeNameSpace: true
+        })}(${_value});
     }
     catch(e) {
         error = e;

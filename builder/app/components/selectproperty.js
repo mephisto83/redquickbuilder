@@ -15,11 +15,38 @@ class SelectProperty extends Component {
         options={this.props.options}
         value={UIA.GetNodeProp(currentNode, this.props.property)}
         onChange={value => {
-          this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-            prop: this.props.property,
-            id: currentNode.id,
-            value: value
-          });
+          let ops = [];
+          if (this.props.link) {
+            let oldprop = UIA.GetNodeProp(currentNode, this.props.property);
+            if (oldprop) {
+              ops.push({
+                operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                options: {
+                  source: currentNode.id,
+                  target: oldprop
+                }
+              });
+            }
+            ops.push({
+              operation: UIA.ADD_LINK_BETWEEN_NODES,
+              options: {
+                source: currentNode.id,
+                target: value,
+                properties: { ...this.props.link }
+              }
+            });
+          }
+          this.props.graphOperation([
+            ...ops,
+            {
+              operation: UIA.CHANGE_NODE_PROPERTY,
+              options: {
+                prop: this.props.property,
+                id: currentNode.id,
+                value: value
+              }
+            }
+          ]);
         }}
       />
     );

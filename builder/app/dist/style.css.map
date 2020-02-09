@@ -1,1 +1,1 @@
-{"version":3,"sources":["D:/dev/redquickbuilder/builder/app/app.global.css"],"names":[],"mappings":"AAAA,YACE,iBAAmB,CACpB","file":"style.css","sourcesContent":[".asdkflajsd {\n  position: relative;\n}\n"]}
+{"version":3,"sources":["D:/dev/redquickbuilder/builder/app/app.global.css","style.css"],"names":[],"mappings":"AAAA,YACE,iBCCF","file":"style.css","sourcesContent":[".asdkflajsd {\n  position: relative;\n}\n",".asdkflajsd {\n  position: relative;\n}\n\n"]}
