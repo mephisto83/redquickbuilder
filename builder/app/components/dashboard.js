@@ -875,7 +875,7 @@ class Dashboard extends Component {
         });
       },
       icon: 'fa fa-chain',
-      title: `${Titles.Value}`
+      title: `${Titles.StandardLink}`
     }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
@@ -885,6 +885,24 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-yc',
       title: `${Titles.Insert}`
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.Style,
+          nodeTypes: [NodeTypes.Style]
+        });
+      },
+      icon: 'fa fa-css3',
+      title: 'Modify Style'
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.SelectorLink,
+          nodeTypes: [NodeTypes.Selector]
+        });
+      },
+      icon: 'fa fa-fire',
+      title: 'Selector Input'
     });
 
     return result;

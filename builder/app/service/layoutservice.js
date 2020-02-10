@@ -7,7 +7,8 @@ import {
 } from "../actions/uiactions";
 import {
   GenerateMarkupTag,
-  ConvertViewTypeToComponentNode
+  ConvertViewTypeToComponentNode,
+  GetStylesFor
 } from "./screenservice";
 import {
   GetCellProperties,
@@ -293,8 +294,21 @@ export function createSection(args) {
         control = layoutProperties.componentType;
       }
       let className = "";
+      let tagBasedStyles = "";
       if (UITypes.ReactNative !== language) {
-        className = `className={styles.${section}}`;
+        if (
+          layoutProperties &&
+          layoutProperties.tags &&
+          Object.keys(layoutProperties.tags).length
+        ) {
+
+          tagBasedStyles = layoutProperties.tags
+            .map(tag => {
+              return GetStylesFor(node, tag);
+            })
+            .filter(x => x).join('');
+        }
+        className = `className={\`$\{styles.${section}} ${tagBasedStyles} \`}`;
       } else {
         className = `style={${JSON.stringify({ ..._style }, null, 4)}}`;
       }

@@ -29,7 +29,8 @@ import {
   LinkType,
   ProgrammingLanguages,
   NodePropertiesDirtyChain,
-  LinkPropertyKeys
+  LinkPropertyKeys,
+  MediaQueries
 } from "../constants/nodetypes";
 import {
   buildLayoutTree,
@@ -62,10 +63,12 @@ import {
   getNodesByLinkType,
   getNodesLinkedTo,
   getNodesLinkedFrom,
-  GetLinkBetween
+  GetLinkBetween,
+  existsLinkBetween
 } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
+import { StyleLib } from "../constants/styles";
 
 export function GenerateScreens(options) {
   let { language } = options;
@@ -182,23 +185,113 @@ export function constructCssFile(css, clsName) {
   return rules;
 }
 
+export function GetStylesFor(node, tag) {
+  if (typeof node === "string") {
+    node = GetNodeById(node);
+  }
+  let graph = GetCurrentGraph();
+  let styleNodes = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.Style
+  }).filter(
+    x => (GetNodeProp(x, NodeProperties.GridAreas) || []).indexOf(tag) !== -1
+  );
+
+  let dataChainsConnectedToStyle = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.DataChain
+  }).filter(x => {
+    let connectedStyleNodes = GetNodesLinkedTo(graph, {
+      id: x.id,
+      link: LinkType.Style
+    });
+    return connectedStyleNodes.some(x => {
+      return styleNodes.some(node => node.id === x.id);
+    });
+  });
+
+  return styleNodes.map(styleNode => {
+    let dataChainTest = dataChainsConnectedToStyle
+      .filter(dc => {
+        return existsLinkBetween(graph, {
+          source: dc.id,
+          target: styleNode.id
+        });
+      })
+      .map(dc => {
+        let selector = GetNodesLinkedTo(graph, {
+          id: dc.id,
+          link: LinkType.SelectorLink
+        })[0];
+        let input = "";
+        if (selector) {
+          let inputs = GetNodesLinkedTo(graph, {
+            id: selector.id,
+            link: LinkType.SelectorLink
+          }).filter(
+            x =>
+              GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi
+          );
+          input = `S.${GetCodeName(selector)}({${inputs
+            .map(
+              input => `${GetCodeName(input)}: this.state.${GetCodeName(input)}`
+            )
+            .join()}})`;
+        }
+        return `DC.${GetCodeName(dc, { includeNameSpace: true })}(${input})`;
+      })
+      .join(" && ");
+    return `$\{${dataChainTest} ? styles.${GetJSCodeName(styleNode)} : '' }`;
+  });
+}
 /*
 A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
 */
 export function buildStyle(node) {
-  let styleNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+  let graph = GetCurrentGraph();
+  if (typeof node === "string") {
+    node = GetNodeById(node, graph);
+  }
+  let styleNodes = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.Style
   });
-  styleNodes.map(styleNode => {
-    let style = GetNodeProp(styleNode, NodeProperties.Style);
-    let areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
-    let gridRowCount = parseInt(
-      GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
-      10
-    );
-    let gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
-  });
+
+  let styleSheetRules = styleNodes
+    .map(styleNode => {
+      let style = GetNodeProp(styleNode, NodeProperties.Style);
+      let areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
+      let gridRowCount = parseInt(
+        GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
+        10
+      );
+      let gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
+      let styleObj = GetNodeProp(styleNode, NodeProperties.Style);
+      let useMediaQuery = GetNodeProp(style, NodeProperties.UseMediaQuery);
+      let mediaquery_start = "";
+      let mediaquery_end = "";
+      if (useMediaQuery) {
+        mediaquery_start =
+          MediaQueries[GetNodeProp(styleNode, NodeProperties.MediaQuery)];
+        if (mediaquery_start) {
+          mediaquery_start = `${mediaquery_start} {`;
+          mediaquery_end = `}`;
+        }
+      }
+      let stylesheet = `${mediaquery_start}
+    .${GetJSCodeName(styleNode)} {
+      ${Object.keys(styleObj)
+        .map(s => {
+          return `${StyleLib.js[s]}: ${styleObj[s]};`;
+        })
+        .join(NEW_LINE)}
+    }
+    ${mediaquery_end}`;
+
+      return stylesheet;
+    })
+    .join(NEW_LINE);
+  return styleSheetRules;
 }
 
 export function GetItemData(node) {
@@ -301,11 +394,13 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
       );
-      buildStyle(node);
+      let styleRules = buildStyle(node);
       cssFile = constructCssFile(
         css,
         `.${(GetCodeName(node) || "").toJavascriptName()}`
       );
+      cssFile = cssFile + styleRules;
+
       cssImport = `import styles from './${(
         GetCodeName(node) || ""
       ).toJavascriptName()}.css'`;

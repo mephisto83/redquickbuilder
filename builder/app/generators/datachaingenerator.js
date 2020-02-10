@@ -2,7 +2,8 @@ import {
   GenerateChainFunctions,
   GenerateChainFunctionSpecs,
   GetDataChainCollections,
-  NodesByType
+  NodesByType,
+  GetJSCodeName
 } from "../actions/uiactions";
 import { readFileSync } from "fs";
 import { UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
@@ -15,8 +16,8 @@ export default class DataChainGenerator {
     let collections = GetDataChainCollections(options);
     let collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
     let temps = [
-      ...collectionNodes.map(cn => {
-        let _cfunc = GenerateChainFunctions({ language, collection: cn.id });
+      ...collectionNodes.map(nc => {
+        let _cfunc = GenerateChainFunctions({ language, collection: nc.id });
         return {
           template: dcTemplate("", _cfunc),
           relative: "./src/actions",

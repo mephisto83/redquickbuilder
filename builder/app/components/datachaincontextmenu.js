@@ -92,17 +92,6 @@ class DataChainContextMenu extends Component {
             exit();
           }}
         />
-        <TreeViewMenu
-          title={Titles.Snip}
-          hideArrow={true}
-          icon={"fa fa-taxi"}
-          key={"mindmap"}
-          onClick={() => {
-            DataChainContextMethods.SnipDataChain.bind(this)(currentNode);
-            exit();
-          }}
-        />
-
         <TreeViewItemContainer>
           <SelectProperty
             title={Titles.DataChainCollection}

@@ -772,8 +772,9 @@ export function GetLinkChainItem(options) {
   return GraphMethods.GetLinkChainItem(GetState(), options);
 }
 export function GetCodeName(node, options) {
+  let graph = GetCurrentGraph(GetState());
   if (typeof node === "string") {
-    node = GraphMethods.GetNode(GetCurrentGraph(GetState()), node);
+    node = GraphMethods.GetNode(graph, node);
   }
   if (options && options.includeNameSpace) {
     if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.DataChain) {
@@ -1348,6 +1349,7 @@ export function GetSelectorsNodes(id) {
 
 export function GenerateChainFunctions(options) {
   let { language, collection } = options;
+  let graph = GetCurrentGraph();
   let entryNodes = GetDataChainEntryNodes()
     .filter(x => {
       let uiType = GetNodeProp(x, NodeProperties.UIType);
@@ -1357,9 +1359,9 @@ export function GenerateChainFunctions(options) {
       return true;
     })
     .map(x => x.id)
-    .filter(x => {
-      let collections = GetNodesLinkedTo(graph, {
-        id: ct.id,
+    .filter(ct => {
+      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+        id: ct,
         link: NodeConstants.LinkType.DataChainCollection
       });
       if (collection) {
@@ -1378,7 +1380,7 @@ export function GetDataChainCollections(options) {
     .map(dataChainCollection => {
       return `export * as ${GetJSCodeName(
         dataChainCollection
-      )} from './${GetJSCodeName(dataChainCollection)};`;
+      )} from './${GetJSCodeName(dataChainCollection)}';`;
     })
     .unique()
     .join(NodeConstants.NEW_LINE);
@@ -1419,6 +1421,7 @@ export function GetComponentInternalApiNode(api, parent, graph) {
 export function GenerateChainFunctionSpecs(options) {
   let { language, collection } = options;
   let result = [];
+  let graph = GetCurrentGraph();
   let entryNodes = GetDataChainEntryNodes()
     .filter(x => {
       let uiType = GetNodeProp(x, NodeProperties.UIType);
@@ -1428,9 +1431,9 @@ export function GenerateChainFunctionSpecs(options) {
       return true;
     })
     .map(x => x.id)
-    .filter(x => {
-      let collections = GetNodesLinkedTo(graph, {
-        id: ct.id,
+    .filter(ct => {
+      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+        id: ct,
         link: NodeConstants.LinkType.DataChainCollection
       });
       if (collection) {

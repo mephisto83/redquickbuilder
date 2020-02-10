@@ -224,7 +224,9 @@ export const ComponentTypes = {
             return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, "data"));
+            let func = GetCodeName(GetNodeProp(node, "data"), {
+              includeNameSpace: true
+            });
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,
@@ -425,7 +427,9 @@ export const ComponentTypes = {
             return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA));
+            let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
+              includeNameSpace: true
+            });
             if (GetNodeProp(node, "component-as-label")) {
               return `titleService.get('${GetNodeProp(
                 node,
@@ -455,7 +459,9 @@ export const ComponentTypes = {
             return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, "data"));
+            let func = GetCodeName(GetNodeProp(node, "data"), {
+              includeNameSpace: true
+            });
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,

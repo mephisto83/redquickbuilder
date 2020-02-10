@@ -181,6 +181,7 @@ export const Enumerable = "Enumerable";
 export const Value = "Value";
 export const AppMenu = "Application Menu";
 export const Snip = "Snip";
+export const StandardLink = 'Standard Link';
 export const Insert = "Insert";
 export const CodeName = "Code Name";
 export const ValueName = "Value Name";
