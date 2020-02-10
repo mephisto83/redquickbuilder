@@ -780,10 +780,11 @@ export function GetCodeName(node, options) {
     if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.DataChain) {
       let collections = GraphMethods.GetNodesLinkedTo(graph, {
         id: node.id,
-        link: NodeConstants.LinkType.DataChainCollection
+        link: NodeConstants.LinkType.DataChainCollection,
+        direction: GraphMethods.SOURCE
       });
       if (collections && collections.length) {
-        return `${GetJSCodeName(collections[0])}.${GetNodeProp(
+        return `${computeNamespace(collections[0])}.${GetNodeProp(
           node,
           NodeProperties.CodeName
         )}`;
@@ -791,6 +792,22 @@ export function GetCodeName(node, options) {
     }
   }
   return GetNodeProp(node, NodeProperties.CodeName);
+}
+
+export function computeNamespace(node) {
+  let graph = GetCurrentGraph(GetState());
+  let dc = GraphMethods.GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: NodeConstants.LinkType.DataChainCollection,
+    direction: GraphMethods.SOURCE
+  });
+  if (dc && dc.length) {
+    let namesp = computeNamespace(dc[0]);
+    if (namesp) {
+      return `${namesp}.${GetJSCodeName(node)}`;
+    }
+  }
+  return `${GetJSCodeName(node)}`;
 }
 
 export function GetJSCodeName(node) {
@@ -1376,11 +1393,46 @@ export function GenerateChainFunctions(options) {
 }
 
 export function GetDataChainCollections(options) {
+  let { collection } = options;
+
+  let temp = collection
+    ? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+        id: collection,
+        link: NodeConstants.LinkType.DataChainCollection,
+        direction: GraphMethods.TARGET
+      }).filter(
+        x =>
+          GetNodeProp(x, NodeProperties.NODEType) ===
+          NodeTypes.DataChainCollection
+      )
+    : [];
+
   return NodesByType(null, NodeTypes.DataChainCollection)
+    .filter(x => {
+      if (collection) {
+        let res = temp.some(v => v.id === x.id);
+        if (res) {
+          return true;
+        }
+        return false;
+      }
+      ///only reference the top levels in data-chain.js
+      return (
+        GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+          id: x.id,
+          link: NodeConstants.LinkType.DataChainCollection,
+          direction: GraphMethods.SOURCE
+        }).filter(
+          x =>
+            GetNodeProp(x, NodeProperties.NODEType) ===
+            NodeTypes.DataChainCollection
+        ).length === 0
+      );
+    })
     .map(dataChainCollection => {
       return `export * as ${GetJSCodeName(
         dataChainCollection
-      )} from './${GetJSCodeName(dataChainCollection)}';`;
+      )} from './datachains/${GetJSCodeName(dataChainCollection)}';`;
     })
     .unique()
     .join(NodeConstants.NEW_LINE);

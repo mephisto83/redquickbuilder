@@ -389,6 +389,56 @@ class ContextMenu extends Component {
     let temp;
 
     switch (currentNodeType) {
+      case NodeTypes.DataChainCollection:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "OPERATIONS")}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              active={true}
+              title={Titles.AddDataChainCollection}
+              onClick={() => {
+                if (
+                  !GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                    id: currentNode.id,
+                    link: LinkType.DataChainCollection,
+                    direction: SOURCE
+                  }).some(
+                    v =>
+                      UIA.GetNodeProp(v, NodeProperties.NODEType) ===
+                      currentNodeType
+                  )
+                ) {
+                  this.props.graphOperation([
+                    {
+                      operation: UIA.ADD_NEW_NODE,
+                      options: function() {
+                        return {
+                          nodeType: NodeTypes.DataChainCollection,
+                          linkProperties: {
+                            properties: {
+                              ...LinkProperties.DataChainCollection
+                            }
+                          },
+                          parent: currentNode.id,
+                          properties: {
+                            [NodeProperties.UIText]: currentNodeType
+                          }
+                        };
+                      }
+                    }
+                  ]);
+                }
+              }}
+            />
+          </TreeViewMenu>
+        ];
       case NodeTypes.DataChain:
         //DataChain_SelectPropertyValue
         return [
@@ -999,7 +1049,8 @@ class ContextMenu extends Component {
                         parent: currentNode.id,
                         properties: {
                           [NodeProperties.UIText]: `select internal variables`,
-                          [NodeProperties.SelectorType]: SelectorType.InternalProperties
+                          [NodeProperties.SelectorType]:
+                            SelectorType.InternalProperties
                         },
                         groupProperties: {}
                       };

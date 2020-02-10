@@ -18,9 +18,13 @@ export default class DataChainGenerator {
     let temps = [
       ...collectionNodes.map(nc => {
         let _cfunc = GenerateChainFunctions({ language, collection: nc.id });
+        let _colections = GetDataChainCollections({
+          language,
+          collection: nc.id
+        });
         return {
-          template: dcTemplate("", _cfunc),
-          relative: "./src/actions",
+          template: dcTemplate(_colections, _cfunc, "../"),
+          relative: "./src/actions/datachains",
           relativeFilePath: `./${GetJSCodeName(nc)}.js`,
           name: `${GetJSCodeName(nc)}`
         };
@@ -78,10 +82,11 @@ export default class DataChainGenerator {
   }
 }
 
-let dcTemplate = (
-  collections,
-  funcs
-) => `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
+let dcTemplate = (collections, funcs, rel = "") => {
+  if (!funcs || !funcs.trim()) {
+    return `${collections}`;
+  }
+  return `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
 import {
     validateEmail,
     maxLength,
@@ -94,20 +99,21 @@ import {
     alphanumericLike,
     alphanumeric,
     alpha
-} from './validation';
+} from './${rel}validation';
 
-import * as navigate from './navigationActions';
-import * as $service from '../util/service';
-import routes from '../constants/routes';
+import * as navigate from '../${rel}actions/navigationActions';
+import * as $service from '../${rel}util/service';
+import routes from '../${rel}constants/routes';
 
-import * as RedLists from './lists.js';
-import * as StateKeys from '../state_keys';
-import * as ModelKeys from '../model_keys';
-import * as ViewModelKeys from '../viewmodel_keys';
-import * as Models from '../model_keys.js';
-import RedObservable from './observable.js';
-import RedGraph from './redgraph.js';
-import { useParameters, fetchModel } from './redutils.js';
+import * as RedLists from '../${rel}actions/lists.js';
+import * as StateKeys from '../${rel}state_keys';
+import * as ModelKeys from '../${rel}model_keys';
+import * as ViewModelKeys from '../${rel}viewmodel_keys';
+import * as Models from '../${rel}model_keys.js';
+import RedObservable from '../${rel}actions/observable.js';
+import RedGraph from '../${rel}actions/redgraph.js';
+import { useParameters, fetchModel } from '../${rel}actions/redutils.js';
 ${collections}
 
 ${funcs}`;
+};
