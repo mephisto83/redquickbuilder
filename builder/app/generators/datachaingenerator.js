@@ -3,25 +3,43 @@ import {
   GenerateChainFunctionSpecs,
   GetDataChainCollections,
   NodesByType,
-  GetJSCodeName
+  GetJSCodeName,
+  GetNodeProp,
+  GetCurrentGraph
 } from "../actions/uiactions";
 import { readFileSync } from "fs";
-import { UITypes, NEW_LINE, NodeTypes } from "../constants/nodetypes";
+import {
+  UITypes,
+  NEW_LINE,
+  NodeTypes,
+  LinkType,
+  NodeProperties
+} from "../constants/nodetypes";
 import { bindTemplate } from "../constants/functiontypes";
+import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from "../methods/graph_methods";
 
 export default class DataChainGenerator {
   static Generate(options) {
-    let { language } = options;
+    let { state, language } = options;
+    let graph = GetCurrentGraph(state);
     let funcs = GenerateChainFunctions(options);
     let collections = GetDataChainCollections(options);
     let collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
     let temps = [
       ...collectionNodes.map(nc => {
-        let _cfunc = GenerateChainFunctions({ language, collection: nc.id });
-        let _colections = GetDataChainCollections({
-          language,
-          collection: nc.id
-        });
+        let isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
+        let _cfunc = isInLanguage
+          ? GenerateChainFunctions({ language, collection: nc.id })
+          : null;
+        let _colections = isInLanguage
+          ? GetDataChainCollections({
+              language,
+              collection: nc.id
+            })
+          : null;
+        if (!isInLanguage) {
+          return false;
+        }
         return {
           template: dcTemplate(_colections, _cfunc, "../"),
           relative: "./src/actions/datachains",
@@ -55,7 +73,7 @@ export default class DataChainGenerator {
         relativeFilePath: "./redutils.js",
         name: "redutils.js"
       }
-    ];
+    ].filter(x => x);
     switch (language) {
       case UITypes.ElectronIO:
         let tests = GenerateChainFunctionSpecs(options);
@@ -117,3 +135,32 @@ ${collections}
 
 ${funcs}`;
 };
+
+export function CollectionIsInLanguage(graph, collection, language) {
+  let reference = GetNodeLinkedTo(graph, {
+    id: collection,
+    link: LinkType.DataChainCollectionReference
+  });
+  if (reference) {
+    if (GetNodeProp(reference, NodeProperties.UIType) === language) {
+      return true;
+    } else if (GetNodeProp(reference, NodeProperties.UIType)) {
+      return false;
+    } else {
+      let parent = GetNodesLinkedTo(graph, {
+        id: collection,
+        link: LinkType.DataChainCollection,
+        direction: TARGET
+      }).filter(
+        x =>
+          GetNodeProp(x, NodeProperties.NODEType) ===
+          NodeTypes.DataChainCollection
+      )[0];
+      if (parent) {
+        return CollectionIsInLanguage(graph, parent.id, language);
+      }
+    }
+  }
+
+  return false;
+}

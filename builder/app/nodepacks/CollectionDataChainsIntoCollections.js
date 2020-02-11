@@ -198,11 +198,15 @@ export default function(args = {}) {
         graph,
         component
       );
+      let internalApiDataChains = getComponentInternalApiDataChains(
+        graph,
+        component
+      );
       if (!reference) {
         return [];
       }
       return [
-        ...externalApiDataChains.map(dc => {
+        ...[...externalApiDataChains, ...internalApiDataChains].map(dc => {
           return {
             operation: ADD_LINK_BETWEEN_NODES,
             options: {
@@ -245,6 +249,24 @@ function getComponentExternalApiDataChains(graph, node) {
   GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.ComponentExternalApi,
+    direction: SOURCE
+  }).map(res => {
+    result.push(
+      ...GetNodesLinkedTo(graph, {
+        id: res.id,
+        link: LinkType.DataChainLink,
+        direction: SOURCE
+      }).filter(x => GetNodeProp(x, NodeProperties.EntryPoint))
+    );
+  });
+  return result;
+}
+
+function getComponentInternalApiDataChains(graph, node) {
+  let result = [];
+  GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.ComponentInternalApi,
     direction: SOURCE
   }).map(res => {
     result.push(
