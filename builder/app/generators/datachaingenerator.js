@@ -16,7 +16,11 @@ import {
   NodeProperties
 } from "../constants/nodetypes";
 import { bindTemplate } from "../constants/functiontypes";
-import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from "../methods/graph_methods";
+import {
+  GetNodeLinkedTo,
+  TARGET,
+  GetNodesLinkedTo
+} from "../methods/graph_methods";
 
 export default class DataChainGenerator {
   static Generate(options) {
@@ -104,7 +108,18 @@ let dcTemplate = (collections, funcs, rel = "") => {
   if (!funcs || !funcs.trim()) {
     return `${collections}`;
   }
-  return `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
+  return `import {
+    GetC,
+    updateScreenInstanceObject,
+    GetItem,
+    Chain,
+    UIModels, GetDispatch,
+    GetState, UIC,
+    GetItems,UI_MODELS,
+    GetK, updateScreenInstance,
+    clearScreenInstance
+
+  } from '../${rel}actions/uiActions';
 import {
     validateEmail,
     maxLength,
@@ -142,7 +157,9 @@ export function CollectionIsInLanguage(graph, collection, language) {
     link: LinkType.DataChainCollectionReference
   });
   if (reference) {
-    if (GetNodeProp(reference, NodeProperties.UIType) === language) {
+    if (GetNodeProp(reference, NodeProperties.NODEType) === NodeTypes.Screen) {
+      return true;
+    } else if (GetNodeProp(reference, NodeProperties.UIType) === language) {
       return true;
     } else if (GetNodeProp(reference, NodeProperties.UIType)) {
       return false;
@@ -160,6 +177,8 @@ export function CollectionIsInLanguage(graph, collection, language) {
         return CollectionIsInLanguage(graph, parent.id, language);
       }
     }
+  } else {
+    return true;
   }
 
   return false;

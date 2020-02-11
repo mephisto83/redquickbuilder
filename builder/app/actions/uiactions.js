@@ -1430,9 +1430,9 @@ export function GetDataChainCollections(options) {
       );
     })
     .map(dataChainCollection => {
-      return `export * as ${GetJSCodeName(
-        dataChainCollection
-      )} from './datachains/${GetJSCodeName(dataChainCollection)}';`;
+      return `export * as ${GetJSCodeName(dataChainCollection)} from './${
+        collection ? "" : `datachains/`
+      }${GetJSCodeName(dataChainCollection)}';`;
     })
     .unique()
     .join(NodeConstants.NEW_LINE);
