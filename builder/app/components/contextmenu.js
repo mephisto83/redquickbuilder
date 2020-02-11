@@ -66,6 +66,7 @@ import AddEvent from "../nodepacks/AddEvent";
 import CreateModelPropertyGetterDC from "../nodepacks/CreateModelPropertyGetterDC";
 import ReattachComponent from "../nodepacks/ReattachComponent";
 import AddTitleToComponent from "../nodepacks/AddTitleToComponent";
+import CollectionDataChainsIntoCollections from "../nodepacks/CollectionDataChainsIntoCollections";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -342,6 +343,13 @@ class ContextMenu extends Component {
           this.props.toggleVisual("GENERAL_MENU");
         }}
       >
+        <TreeViewMenu
+          title={"Update DC Collections"}
+          active={true}
+          onClick={() => {
+            this.props.graphOperation(CollectionDataChainsIntoCollections());
+          }}
+        />
         <TreeViewMenu
           title={`Create Dashboard`}
           open={UIA.Visual(state, `Create Dashboard`)}
@@ -1705,6 +1713,7 @@ class ContextMenu extends Component {
     );
   }
   getButtonEventMenu(currentNode) {
+    let { state } = this.props;
     switch (UIA.GetNodeProp(currentNode, NodeProperties.UIType)) {
       case UITypes.ReactNative:
         return (

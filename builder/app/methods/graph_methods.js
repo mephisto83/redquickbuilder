@@ -19,7 +19,7 @@ import {
   FUNCTION_REQUIREMENT_KEYS,
   INTERNAL_TEMPLATE_REQUIREMENTS
 } from "../constants/functiontypes";
-import * as Functions from '../constants/functiontypes';
+import * as Functions from "../constants/functiontypes";
 import {
   GetNodeProp,
   GetLinkProperty,
@@ -2337,7 +2337,9 @@ export function getNodeLinked(graph, options) {
   }
   return [];
 }
-
+export function GetNodeLinkedTo(graph, options) {
+  return GetNodesLinkedTo(graph, options)[0];
+}
 export function GetNodesLinkedTo(graph, options) {
   if (options) {
     var { id, direction, link } = options;
