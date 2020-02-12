@@ -25,9 +25,15 @@ export default class SingleSelect extends React.Component {
               let res = this.props.renderItem({ item, index, key });
               return (
                 <li
+                  key={key}
                   onClick={() => {
                     if (this.props.onClick) {
                       this.props.onClick(item);
+                    }
+                    if (this.props.onChange) {
+                      this.props.onChange({
+                        nativeEvent: { value: item, text: item }
+                      });
                     }
                   }}
                 >

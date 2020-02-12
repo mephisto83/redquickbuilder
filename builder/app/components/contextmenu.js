@@ -1185,16 +1185,17 @@ class ContextMenu extends Component {
                         UIA.GetNodeProp(x, NodeProperties.NODEType) ===
                         NodeTypes.Property
                     );
-                    if (properties.length) {
-                      this.props.graphOperation(
-                        AddEvent({
-                          component: currentNode.id,
-                          eventType: this.state.eventType,
-                          eventTypeHandler: this.state.eventTypeHandler,
-                          property: properties[0].id
-                        })
-                      );
-                    }
+
+                    this.props.graphOperation(
+                      AddEvent({
+                        component: currentNode.id,
+                        eventType: this.state.eventType,
+                        eventTypeHandler: properties.length
+                          ? this.state.eventTypeHandler
+                          : false,
+                        property: properties.length ? properties[0].id : null
+                      })
+                    );
                   }}
                 />
               ) : null}
@@ -1541,16 +1542,17 @@ class ContextMenu extends Component {
                         UIA.GetNodeProp(x, NodeProperties.NODEType) ===
                         NodeTypes.Property
                     );
-                    if (properties.length) {
-                      this.props.graphOperation(
-                        AddEvent({
-                          component: currentNode.id,
-                          eventType: this.state.eventType,
-                          eventTypeHandler: this.state.eventTypeHandler,
-                          property: properties[0].id
-                        })
-                      );
-                    }
+
+                    this.props.graphOperation(
+                      AddEvent({
+                        component: currentNode.id,
+                        eventType: this.state.eventType,
+                        eventTypeHandler: properties.length
+                          ? this.state.eventTypeHandler
+                          : false,
+                        property: properties.length ? properties[0].id : null
+                      })
+                    );
                   }}
                 />
               ) : null}
@@ -1620,10 +1622,12 @@ class ContextMenu extends Component {
   getButtonApiMenu(currentNode) {
     return (
       <TreeViewMenu
-        open={true}
+        open={UIA.Visual(state, Titles.ComponentAPIMenu)}
         active={true}
         title={Titles.ComponentAPIMenu}
-        toggle={() => {}}
+        toggle={() => {
+          this.props.toggleVisual(Titles.ComponentAPIMenu);
+        }}
       >
         <TreeViewMenu
           title={`${Titles.Add} Label`}

@@ -227,7 +227,7 @@ export function GetStylesFor(node, tag) {
         if (selector) {
           let inputs = GetNodesLinkedTo(graph, {
             id: selector.id,
-            link: LinkType.SelectorLink
+            link: LinkType.SelectorInputLink
           }).filter(
             x =>
               GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi
@@ -1142,6 +1142,12 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               eventMethodHandler,
               NodeProperties.EventType
             );
+            let useValue = GetNodeProp(
+              eventMethodHandler,
+              NodeProperties.UseValue
+            )
+              ? "value"
+              : "text";
             let addiontionalParams =
               componentEventHandler && eventInstance
                 ? getUpdateFunctionOption(
@@ -1170,7 +1176,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg${addiontionalParams})`;
                 break;
               case ComponentEvents.onChange:
-                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.text${addiontionalParams})`;
+                method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.${useValue}${addiontionalParams})`;
                 break;
             }
             return method_call;

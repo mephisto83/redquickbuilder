@@ -298,6 +298,7 @@ export const NodeProperties = {
   AfterStyle: "::after",
   MediaQuery: "MediaQuery",
   UseMediaQuery: "UseMediaQuery",
+  UseValue: "UseValue",
   CheckedStyle: ":checked",
   DisabledStyle: ":disabled",
   EmptyStyle: ":empty",
@@ -727,6 +728,7 @@ export const LinkType = {
   DataChainLink: "data-chain-link",
   QueryLink: "query-link",
   SelectorLink: "selector-link",
+  SelectorInputLink: "selector-input-link",
   TitleServiceLink: "title-service-link",
   ComponentProperty: "component-link",
   EnumerationReference: "enumeration-reference",
@@ -767,7 +769,7 @@ export const LinkType = {
     "permission-property-dependency-many-to-many", //There is a link between a permision and a property in a many to many situnation.
   Style: "Style",
   DataChainCollection: "DataChainCollection",
-  DataChainCollectionReference:'DataChainCollectionReference'
+  DataChainCollectionReference: "DataChainCollectionReference"
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -1018,6 +1020,9 @@ export const LinkProperties = {
   },
   SelectorLink: {
     type: LinkType.SelectorLink
+  },
+  SelectorInputLink: {
+    type: LinkType.SelectorInputLink
   },
   TitleServiceLink: {
     type: LinkType.TitleServiceLink

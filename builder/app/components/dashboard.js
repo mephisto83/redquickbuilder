@@ -481,6 +481,14 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-font',
       title: `${Titles.Selector}`
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.SelectorInputLink,
+        });
+      },
+      icon: 'fa fa-exchange',
+      title: `${Titles.SelectorInput}`
     })
     return result;
   }

@@ -119,7 +119,7 @@ export default function(args = {}) {
           ];
         }
       : null,
-    context.eventTypeHandler
+    context.eventTypeHandler && context.property
       ? function(graph) {
           return [
             {
