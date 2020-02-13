@@ -2342,7 +2342,7 @@ export function GetNodeLinkedTo(graph, options) {
 }
 export function GetNodesLinkedTo(graph, options) {
   if (options) {
-    var { id, direction, link } = options;
+    var { id, direction, link, componentType } = options;
     if (graph && graph.nodeConnections && id) {
       var nodeLinks = graph.nodeConnections[id];
       if (nodeLinks) {
@@ -2373,7 +2373,13 @@ export function GetNodesLinkedTo(graph, options) {
             }
             return graph.nodeLib[target];
           })
-          .filter(x => x);
+          .filter(x => x)
+          .filter(x => {
+            if (componentType) {
+              return GetNodeProp(x, NodeProperties.NODEType) === componentType;
+            }
+            return true;
+          });
       }
     }
   }

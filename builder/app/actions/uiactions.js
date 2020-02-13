@@ -1391,10 +1391,42 @@ export function GenerateChainFunctions(options) {
     .unique(x => x)
     .join(NodeConstants.NEW_LINE);
 }
+export function CollectionIsInLanguage(graph, collection, language) {
+  let reference = GraphMethods.GetNodeLinkedTo(graph, {
+    id: collection,
+    link: NodeConstants.LinkType.DataChainCollectionReference
+  });
+  if (reference) {
+    if (GetNodeProp(reference, NodeProperties.NODEType) === NodeTypes.Screen) {
+      return true;
+    } else if (GetNodeProp(reference, NodeProperties.UIType) === language) {
+      return true;
+    } else if (GetNodeProp(reference, NodeProperties.UIType)) {
+      return false;
+    } else {
+      let parent = GraphMethods.GetNodesLinkedTo(graph, {
+        id: collection,
+        link: NodeConstants.LinkType.DataChainCollection,
+        direction: GraphMethods.TARGET
+      }).filter(
+        x =>
+          GetNodeProp(x, NodeProperties.NODEType) ===
+          NodeTypes.DataChainCollection
+      )[0];
+      if (parent) {
+        return CollectionIsInLanguage(graph, parent.id, language);
+      }
+    }
+  } else {
+    return true;
+  }
+
+  return false;
+}
 
 export function GetDataChainCollections(options) {
-  let { collection } = options;
-
+  let { collection , language} = options;
+  let graph = GetCurrentGraph();
   let temp = collection
     ? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
         id: collection,
@@ -1403,7 +1435,7 @@ export function GetDataChainCollections(options) {
       }).filter(
         x =>
           GetNodeProp(x, NodeProperties.NODEType) ===
-          NodeTypes.DataChainCollection
+          NodeTypes.DataChainCollection && CollectionIsInLanguage(graph, x.id, language)
       )
     : [];
 
@@ -2546,6 +2578,47 @@ export function GetModelPropertyNodes(refId) {
   }).filter(
     x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Property
   );
+}
+
+export function getTopComponent(graph, node) {
+  let parent = GraphMethods.GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: NodeConstants.LinkType.Component,
+    direction: TARGET
+  }).filter(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
+  )[0];
+
+  if (parent) {
+    return getTopComponent(graph, parent);
+  }
+  return node;
+}
+export function GetParentComponent(node, graph) {
+  graph = graph || GetCurrentGraph();
+  let parent = GraphMethods.GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: NodeConstants.LinkType.Component,
+    direction: GraphMethods.TARGET
+  }).filter(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
+  )[0];
+  return parent;
+}
+export function ComponentIsViewType(component, viewType, graph) {
+  graph = graph || GetCurrentGraph();
+  let currentType = GetNodeProp(component, NodeProperties.ViewType);
+  if (currentType === viewType) {
+    return true;
+  } else if (currentType) {
+    return false;
+  } else {
+    let parent = GetParentComponent(component, graph);
+    if (parent) {
+      return ComponentIsViewType(parent, viewType, graph);
+    }
+  }
+  return false;
 }
 export function GetUserReferenceNodes(refId) {
   var state = _getState();

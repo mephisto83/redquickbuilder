@@ -1,5 +1,3 @@
-
-
 export const BATCH = "BATCH";
 export const UI_UPDATE = "UI_UPDATE";
 export const UISI_UPDATE = "UISI_UPDATE";
@@ -258,6 +256,7 @@ export function GetScreenModelDirtyInst(state, instance, id) {
   }
   return null;
 }
+
 export function GetScreenModelFocusedInst(state, instance, id) {
   let item = GetK(
     state,

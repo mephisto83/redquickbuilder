@@ -36,9 +36,7 @@ import ControlSideBarMenu, {
   ControlSideBarMenuItem
 } from "./controlsidebarmenu";
 import TextInput from "./textinput";
-import TreeViewMenu from "./treeviewmenu";
-import SideBarMenu from "./sidebarmenu";
-import TreeViewItem from "./treeviewitem";
+import SelectInputProperty from "./selectproperty";
 import CommandHeader from "./commandheader";
 import CheckBox from "./checkbox";
 import { getComponentApiList } from "../methods/component_api_methods";
@@ -327,6 +325,16 @@ class ComponentActivityMenu extends Component {
                   value
                 });
               }}
+            />
+            <SelectInputProperty
+              node={currentNode}
+              title={Titles.ViewTypes}
+              property={NodeProperties.ViewType}
+              options={Object.keys(UIA.ViewTypes).map(v => ({
+                title: v,
+                value: UIA.ViewTypes[v],
+                id: v
+              }))}
             />
           </FormControl>
         ) : null}

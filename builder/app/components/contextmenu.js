@@ -67,6 +67,7 @@ import CreateModelPropertyGetterDC from "../nodepacks/CreateModelPropertyGetterD
 import ReattachComponent from "../nodepacks/ReattachComponent";
 import AddTitleToComponent from "../nodepacks/AddTitleToComponent";
 import CollectionDataChainsIntoCollections from "../nodepacks/CollectionDataChainsIntoCollections";
+import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -348,6 +349,14 @@ class ContextMenu extends Component {
           active={true}
           onClick={() => {
             this.props.graphOperation(CollectionDataChainsIntoCollections());
+          }}
+        />
+        <TreeViewMenu
+          title={"Modify Update Links"}
+          active={true}
+          hideArrow={true}
+          onClick={() => {
+            this.props.graphOperation(ModifyUpdateLinks());
           }}
         />
         <TreeViewMenu
@@ -1620,6 +1629,7 @@ class ContextMenu extends Component {
     return <ViewTypeMenu />;
   }
   getButtonApiMenu(currentNode) {
+    let { state } = this.props;
     return (
       <TreeViewMenu
         open={UIA.Visual(state, Titles.ComponentAPIMenu)}

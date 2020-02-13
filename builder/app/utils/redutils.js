@@ -39,7 +39,9 @@ function sendItems() {
   let packageToSend = createPackageToSendDefault();
   modelStorage.presend.map(v => {
     packageToSend[v.modelType] = packageToSend[v.modelType] || [];
-    packageToSend[v.modelType].push(v.id);
+    if (packageToSend[v.modelType].indexOf(v.id) === -1) {
+      packageToSend[v.modelType].push(v.id);
+    }
   });
   if (fetchServiceFunc) {
     fetchServiceThread

@@ -137,7 +137,7 @@ import { setFetchServiceFunction } from '../actions/redutils';
 import { GetState, GetDispatch } from '../actions/uiActions';
 import { ${GetCodeName(datachain)} } from '../actions/data-chain';
 import * as Util from "../actions/util";
-
+import service from './controllerService';
 export const FETCH_CALL = 'FETCH_CALL';
 
 setFetchServiceFunction(function(body) {
