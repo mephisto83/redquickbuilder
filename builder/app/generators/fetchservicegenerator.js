@@ -116,7 +116,9 @@ export default class FetchServiceGenerator {
         .unique()
         .map(v => {
           return bindTemplate(
-            `var {{controller#lower}} = new {{controller}}();`,
+            `var {{controller#lower}} = new {{controller}}();
+            {{controller#lower}}.${GetNodeProp(v, NodeProperties.CodeUser)} = ${controllerUser};
+            `,
             {
               controller: GetCodeName(v)
             }

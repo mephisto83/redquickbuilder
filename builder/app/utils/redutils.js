@@ -35,13 +35,17 @@ export function setFetchServiceFunction(func) {
 function createPackageToSendDefault() {
   return {};
 }
+function addToPackage(packageToSend, v) {
+  packageToSend[v.modelType] = packageToSend[v.modelType] || { ids: [] };
+  if (packageToSend[v.modelType].ids.indexOf(v.id) === -1) {
+    packageToSend[v.modelType].ids.push(v.id);
+  }
+}
+
 function sendItems() {
   let packageToSend = createPackageToSendDefault();
   modelStorage.presend.map(v => {
-    packageToSend[v.modelType] = packageToSend[v.modelType] || [];
-    if (packageToSend[v.modelType].indexOf(v.id) === -1) {
-      packageToSend[v.modelType].push(v.id);
-    }
+    addToPackage(packageToSend, v);
   });
   if (fetchServiceFunc) {
     fetchServiceThread

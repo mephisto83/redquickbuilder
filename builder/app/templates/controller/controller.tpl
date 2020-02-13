@@ -4,7 +4,7 @@
     {
         {{user}} _{{user_instance}};
 
-        {{user}} {{user_instance}}
+        public {{user}} {{user_instance}}
         {
            get
            {

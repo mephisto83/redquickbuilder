@@ -1,1 +1,4 @@
-                result.{{model_output}} = (await {{controller#lower}}.{{functionName}}(obj["{{model_output#lower}}"])).Value;
+                if(obj.ContainsKey("{{model_output}}")) {
+                  var temp_{{model_output#lower}} = (await {{controller#lower}}.{{functionName}}(obj["{{model_output}}"]));
+                  result.{{model_output}} = (temp_{{model_output#lower}}.Result as OkObjectResult).Value as IList<{{model_output}}>;
+                }
