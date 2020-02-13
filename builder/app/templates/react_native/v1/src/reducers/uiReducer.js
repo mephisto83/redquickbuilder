@@ -57,7 +57,8 @@ export function updateModels(state, action) {
   let newstate = { ...state };
   newstate[type] = newstate[type] || {};
   newstate[type][model] = newstate[type][model] || {};
-  value.map(val => {
+
+  (value || []).map(val => {
     if (
       newstate[type][model][val.id] &&
       newstate[type][model][val.id].hasOwnProperty("version") &&

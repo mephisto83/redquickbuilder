@@ -1,3 +1,4 @@
+import { GetItem } from "./uiActions";
 const context = {};
 export function setParameters(params) {
   context.params = params;
@@ -36,9 +37,11 @@ function createPackageToSendDefault() {
   return {};
 }
 function addToPackage(packageToSend, v) {
-  packageToSend[v.modelType] = packageToSend[v.modelType] || { ids: [] };
-  if (packageToSend[v.modelType].ids.indexOf(v.id) === -1) {
-    packageToSend[v.modelType].ids.push(v.id);
+  if (!GetItem(v.modelType, v.id)) {
+    packageToSend[v.modelType] = packageToSend[v.modelType] || { ids: [] };
+    if (packageToSend[v.modelType].ids.indexOf(v.id) === -1) {
+      packageToSend[v.modelType].ids.push(v.id);
+    }
   }
 }
 
@@ -51,10 +54,17 @@ function sendItems() {
     fetchServiceThread
       .then(() => {
         modelStorage.state = SENDING;
-        return fetchServiceFunc(packageToSend);
+        if (packageToSend && Object.keys(packageToSend).length) {
+          return fetchServiceFunc(packageToSend);
+        }
       })
       .catch(e => {
         console.log(e);
+      })
+      .then(() => {
+        modelStorage.presend = modelStorage.presend.filter(x => {
+          return !GetItem(x.modelType, x.id);
+        });
       })
       .then(() => {
         modelStorage.state = DEFAULT;
