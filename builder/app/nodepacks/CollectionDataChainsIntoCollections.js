@@ -11,7 +11,8 @@ import {
   ADD_NEW_NODE,
   GetNodeProp,
   ADD_LINK_BETWEEN_NODES,
-  GetCurrentGraph
+  GetCurrentGraph,
+  GetNodeByProperties
 } from "../actions/uiactions";
 import {
   GetNodesLinkedTo,
@@ -190,39 +191,200 @@ export default function(args = {}) {
       });
     });
   });
-  let componentNodes = NodesByType(null, NodeTypes.ComponentNode);
-  componentNodes.map(component => {
-    result.push(function(graph) {
-      let reference = getComponentNodeCollectionReference(graph, component);
-      let externalApiDataChains = getComponentExternalApiDataChains(
-        graph,
-        component
-      );
-      let internalApiDataChains = getComponentInternalApiDataChains(
-        graph,
-        component
-      );
-      if (!reference) {
-        return [];
+  let sharedReferenceCollection = GetNodeByProperties(
+    {
+      [NodeProperties.SharedReferenceCollection]: true
+    },
+    graph
+  );
+  if (!sharedReferenceCollection) {
+    result.push({
+      operation: ADD_NEW_NODE,
+      options: function() {
+        return {
+          nodeType: NodeTypes.DataChainCollection,
+          properties: {
+            [NodeProperties.UIText]: `Shared Components`,
+            [NodeProperties.Pinned]: false,
+            [NodeProperties.SharedReferenceCollection]: true
+          },
+          callback: node => {
+            sharedReferenceCollection = node;
+          }
+        };
       }
-      return [
-        ...[...externalApiDataChains, ...internalApiDataChains].map(dc => {
-          return {
-            operation: ADD_LINK_BETWEEN_NODES,
-            options: {
-              target: reference.id,
-              source: dc.id,
-              properties: { ...LinkProperties.DataChainCollection }
-            }
-          };
-        })
-      ];
     });
-  });
+  }
+  let componentNodes = NodesByType(null, NodeTypes.ComponentNode);
+  let topComponents = componentNodes
+    .map(d => getTopComponent(graph, d))
+    .filter(x => GetNodeProp(x, NodeProperties.SharedComponent))
+    .unique();
+  result.push(
+    ...topComponents.map(component => {
+      return function(graph) {
+        let reference = getCollectionReference(graph, component);
+        if (!reference && sharedReferenceCollection) {
+          return [
+            {
+              operation: ADD_LINK_BETWEEN_NODES,
+              options: {
+                target: sharedReferenceCollection.id,
+                source: component.id,
+                properties: { ...LinkProperties.DataChainCollectionReference }
+              }
+            }
+          ];
+        }
+
+        return [];
+      };
+    })
+  );
+  componentNodes
+    .sort((a, b) => {
+      let a_lineage = getComponentLineage(graph, a);
+      let b_lineage = getComponentLineage(graph, b);
+      let intersects = a_lineage.intersection(b_lineage);
+      if (intersects.length === 0) {
+        return a_lineage.length - b_lineage.length;
+      }
+      if (a_lineage.length !== b_lineage.length) {
+        return a_lineage.length - b_lineage.length;
+      }
+      return 0;
+    })
+    .map(component => {
+      result.push(function(graph) {
+        let externalApiDataChains = getComponentExternalApiDataChains(
+          graph,
+          component
+        );
+        let internalApiDataChains = getComponentInternalApiDataChains(
+          graph,
+          component
+        );
+        let reference = null;
+        let steps = [];
+        reference = getCollectionReference(graph, component);
+        if (!reference) {
+          steps.push({
+            operation: ADD_NEW_NODE,
+            options: function(graph) {
+              let parentReference = getParentCollectionReference(
+                graph,
+                component
+              );
+              if (parentReference) {
+                return {
+                  nodeType: NodeTypes.DataChainCollection,
+                  properties: {
+                    [NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+                    [NodeProperties.Pinned]: false
+                  },
+                  links: [
+                    {
+                      target: parentReference.id,
+                      linkProperties: {
+                        properties: {
+                          ...LinkProperties.DataChainCollection
+                        }
+                      }
+                    },
+                    {
+                      linkProperties: {
+                        properties: {
+                          ...LinkProperties.DataChainCollectionReference
+                        }
+                      },
+                      target: component.id
+                    }
+                  ],
+                  callback: node => {
+                    reference = node;
+                  }
+                };
+              } else {
+                throw "parent should have a reference before getting here";
+              }
+            }
+          });
+        }
+        return [
+          ...steps,
+          ...[...externalApiDataChains, ...internalApiDataChains].map(dc => {
+            return {
+              operation: ADD_LINK_BETWEEN_NODES,
+              options: function(graph) {
+                reference =
+                  reference || getCollectionReference(graph, component);
+                return {
+                  target: reference.id,
+                  source: dc.id,
+                  properties: { ...LinkProperties.DataChainCollection }
+                };
+              }
+            };
+          })
+        ];
+      });
+    });
   return result.filter(x => x);
 }
-
-function getTopComponent(graph, node) {
+function getComponentLineage(graph, node) {
+  let parent = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.Component,
+    direction: TARGET
+  }).filter(
+    x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
+  )[0];
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: LinkType.Component,
+      direction: TARGET
+    }).filter(
+      x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption
+    )[0];
+  }
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: LinkType.ListItem,
+      direction: TARGET
+    }).filter(
+      x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
+    )[0];
+  }
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: LinkType.ScreenOptions,
+      direction: TARGET
+    }).filter(
+      x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen
+    )[0];
+  }
+  if (parent) {
+    return [...getComponentLineage(graph, parent), node.id];
+  }
+  return [node.id];
+}
+function getParentCollectionReference(graph, node) {
+  node = getParentComponent(graph, node);
+  return GetNodeLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.DataChainCollectionReference
+  });
+}
+function getCollectionReference(graph, node) {
+  return GetNodeLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.DataChainCollectionReference
+  });
+}
+function getParentComponent(graph, node) {
   let parent = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.Component,
@@ -231,6 +393,23 @@ function getTopComponent(graph, node) {
     x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
   )[0];
 
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: LinkType.ListItem,
+      direction: TARGET
+    }).filter(
+      x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
+    )[0];
+    if (parent) {
+
+    }
+  }
+
+  return parent;
+}
+function getTopComponent(graph, node) {
+  let parent = getParentComponent(graph, node);
   if (parent) {
     return getTopComponent(graph, parent);
   }
