@@ -394,6 +394,7 @@ export const AsForm = "As Form";
 export const AsText = "As Text";
 export const CollectCookies = "Collect Cookies";
 export const Maestros = "Maestros";
+export const Collections = "Collections";
 export const SaveAs = "Save as ...";
 export const NoApiPrefix = "No api prefix";
 export const Save = "Save";

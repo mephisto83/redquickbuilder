@@ -794,6 +794,19 @@ export function GetCodeName(node, options) {
   return GetNodeProp(node, NodeProperties.CodeName);
 }
 
+export function GetRelativeDataChainPath(node) {
+  let graph = GetCurrentGraph();
+  let collections = GraphMethods.GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: NodeConstants.LinkType.DataChainCollection,
+    direction: GraphMethods.SOURCE
+  });
+  if (collections && collections.length) {
+    return [...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node)];
+  }
+  return [GetJSCodeName(node)];
+}
+
 export function computeNamespace(node) {
   let graph = GetCurrentGraph(GetState());
   let dc = GraphMethods.GetNodesLinkedTo(graph, {
@@ -1421,11 +1434,11 @@ export function CollectionIsInLanguage(graph, collection, language) {
     return true;
   }
 
-  return false;
+  return true;
 }
 
 export function GetDataChainCollections(options) {
-  let { collection , language} = options;
+  let { collection, language } = options;
   let graph = GetCurrentGraph();
   let temp = collection
     ? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
@@ -1435,7 +1448,8 @@ export function GetDataChainCollections(options) {
       }).filter(
         x =>
           GetNodeProp(x, NodeProperties.NODEType) ===
-          NodeTypes.DataChainCollection && CollectionIsInLanguage(graph, x.id, language)
+            NodeTypes.DataChainCollection &&
+          CollectionIsInLanguage(graph, x.id, language)
       )
     : [];
 
@@ -1462,9 +1476,12 @@ export function GetDataChainCollections(options) {
       );
     })
     .map(dataChainCollection => {
+      let _path = GetRelativeDataChainPath(dataChainCollection);
       return `export * as ${GetJSCodeName(dataChainCollection)} from './${
         collection ? "" : `datachains/`
-      }${GetJSCodeName(dataChainCollection)}';`;
+      }${[..._path, GetJSCodeName(dataChainCollection)]
+        .subset(_path.length - 1)
+        .join("/")}';`;
     })
     .unique()
     .join(NodeConstants.NEW_LINE);

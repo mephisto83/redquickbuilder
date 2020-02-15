@@ -220,27 +220,27 @@ export default function(args = {}) {
     .map(d => getTopComponent(graph, d))
     .filter(x => GetNodeProp(x, NodeProperties.SharedComponent))
     .unique();
-  result.push(
-    ...topComponents.map(component => {
-      return function(graph) {
-        let reference = getCollectionReference(graph, component);
-        if (!reference && sharedReferenceCollection) {
-          return [
-            {
-              operation: ADD_LINK_BETWEEN_NODES,
-              options: {
-                target: sharedReferenceCollection.id,
-                source: component.id,
-                properties: { ...LinkProperties.DataChainCollectionReference }
-              }
-            }
-          ];
-        }
+  // result.push(
+  //   ...topComponents.map(component => {
+  //     return function(graph) {
+  //       let reference = getCollectionReference(graph, component);
+  //       if (!reference && sharedReferenceCollection) {
+  //         return [
+  //           {
+  //             operation: ADD_LINK_BETWEEN_NODES,
+  //             options: {
+  //               target: sharedReferenceCollection.id,
+  //               source: component.id,
+  //               properties: { ...LinkProperties.DataChainCollectionReference }
+  //             }
+  //           }
+  //         ];
+  //       }
 
-        return [];
-      };
-    })
-  );
+  //       return [];
+  //     };
+  //   })
+  // );
   componentNodes
     .sort((a, b) => {
       let a_lineage = getComponentLineage(graph, a);
@@ -275,7 +275,7 @@ export default function(args = {}) {
                 graph,
                 component
               );
-              if (parentReference) {
+              if (true || parentReference) {
                 return {
                   nodeType: NodeTypes.DataChainCollection,
                   properties: {
@@ -284,7 +284,7 @@ export default function(args = {}) {
                   },
                   links: [
                     {
-                      target: parentReference.id,
+                      target: (parentReference || sharedReferenceCollection).id,
                       linkProperties: {
                         properties: {
                           ...LinkProperties.DataChainCollection
@@ -299,13 +299,14 @@ export default function(args = {}) {
                       },
                       target: component.id
                     }
-                  ],
+                  ].filter(x => x),
                   callback: node => {
                     reference = node;
                   }
                 };
               } else {
-                throw "parent should have a reference before getting here";
+                console.log(component.id);
+                //  throw "parent should have a reference before getting here";
               }
             }
           });
@@ -373,10 +374,12 @@ function getComponentLineage(graph, node) {
 }
 function getParentCollectionReference(graph, node) {
   node = getParentComponent(graph, node);
-  return GetNodeLinkedTo(graph, {
-    id: node.id,
-    link: LinkType.DataChainCollectionReference
-  });
+  if (node)
+    return GetNodeLinkedTo(graph, {
+      id: node.id,
+      link: LinkType.DataChainCollectionReference
+    });
+  return null;
 }
 function getCollectionReference(graph, node) {
   return GetNodeLinkedTo(graph, {
@@ -402,7 +405,6 @@ function getParentComponent(graph, node) {
       x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
     )[0];
     if (parent) {
-
     }
   }
 

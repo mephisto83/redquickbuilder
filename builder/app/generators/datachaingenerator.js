@@ -5,7 +5,8 @@ import {
   NodesByType,
   GetJSCodeName,
   GetNodeProp,
-  GetCurrentGraph
+  GetCurrentGraph,
+  GetRelativeDataChainPath
 } from "../actions/uiactions";
 import { readFileSync } from "fs";
 import {
@@ -44,11 +45,21 @@ export default class DataChainGenerator {
         if (!isInLanguage) {
           return false;
         }
+        let chainPath = GetRelativeDataChainPath(nc);
         return {
-          template: dcTemplate(_colections, _cfunc, "../"),
-          relative: "./src/actions/datachains",
+          template: dcTemplate(
+            _colections,
+            _cfunc,
+            []
+              .interpolate(0, chainPath.length + 1)
+              .map(d => "../")
+              .join("")
+          ),
+          relative: `./src/actions/datachains/${chainPath.join("/")}${
+            chainPath.length ? "/" : ""
+          }`,
           relativeFilePath: `./${GetJSCodeName(nc)}.js`,
-          name: `${GetJSCodeName(nc)}`
+          name: `${chainPath.join('_')}${GetJSCodeName(nc)}`
         };
       }),
       {

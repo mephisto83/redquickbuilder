@@ -515,6 +515,7 @@ function generateReactNative(workspace, state) {
   code_types.map(code_type => {
     let temp = Generator.generate({
       type: code_type,
+      language: UITypes.ReactNative,
       state
     });
 

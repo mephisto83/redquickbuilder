@@ -345,12 +345,36 @@ class ContextMenu extends Component {
         }}
       >
         <TreeViewMenu
-          title={"Update DC Collections"}
+          open={UIA.Visual(state, "dccollections")}
           active={true}
-          onClick={() => {
-            this.props.graphOperation(CollectionDataChainsIntoCollections());
+          title={Titles.Collections}
+          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+          toggle={() => {
+            this.props.toggleVisual("dccollections");
           }}
-        />
+        >
+          <TreeViewMenu
+            title={"Update"}
+            active={true}
+            onClick={() => {
+              this.props.graphOperation(CollectionDataChainsIntoCollections());
+            }}
+          />
+          <TreeViewMenu
+            title={"Clear"}
+            active={true}
+            onClick={() => {
+              this.props.graphOperation(
+                UIA.NodesByType(null, NodeTypes.DataChainCollection).map(v => ({
+                  operation: UIA.REMOVE_NODE,
+                  options: {
+                    id: v.id
+                  }
+                }))
+              );
+            }}
+          />
+        </TreeViewMenu>
         <TreeViewMenu
           title={"Modify Update Links"}
           active={true}
