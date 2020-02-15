@@ -9,7 +9,8 @@ import CheckBoxProperty from "./checkboxproperty";
 import {
   NodeProperties,
   NodeTypes,
-  MediaQueries
+  MediaQueries,
+  StyleNodeProperties
 } from "../constants/nodetypes";
 import FormControl from "./formcontrol";
 import SideBar from "./sidebar";
@@ -53,19 +54,7 @@ class StyleMenu extends Component {
               this.props.toggleVisual(Titles.Selector);
             }}
           >
-            {[
-              NodeProperties.ActiveStyle,
-              NodeProperties.CheckedStyle,
-              NodeProperties.DisabledStyle,
-              NodeProperties.EmptyStyle,
-              NodeProperties.EnabledStyle,
-              NodeProperties.FirstChildStyle,
-              NodeProperties.LastChildStyle,
-              NodeProperties.FocusStyle,
-              NodeProperties.ReadOnlyStyle,
-              NodeProperties.BeforeStyle,
-              NodeProperties.AfterStyle
-            ].map(x => {
+            {StyleNodeProperties.map(x => {
               return (
                 <TreeViewItemContainer key={x}>
                   <CheckBoxProperty title={x} node={currentNode} property={x} />

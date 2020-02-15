@@ -541,7 +541,20 @@ export const NodeProperties = {
   ClassConstructionInformation: "ClassConstructionInformation",
   DataChainCollection: "DataChainCollection"
 };
-
+export const StyleNodeProperties = [
+  NodeProperties.ActiveStyle,
+  NodeProperties.HoverStyle,
+  NodeProperties.CheckedStyle,
+  NodeProperties.DisabledStyle,
+  NodeProperties.EmptyStyle,
+  NodeProperties.EnabledStyle,
+  NodeProperties.FirstChildStyle,
+  NodeProperties.LastChildStyle,
+  NodeProperties.FocusStyle,
+  NodeProperties.ReadOnlyStyle,
+  NodeProperties.BeforeStyle,
+  NodeProperties.AfterStyle
+];
 function codeTypeWord(x) {
   if (typeof x === "string") {
     return x

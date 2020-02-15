@@ -30,7 +30,8 @@ import {
   ProgrammingLanguages,
   NodePropertiesDirtyChain,
   LinkPropertyKeys,
-  MediaQueries
+  MediaQueries,
+  StyleNodeProperties
 } from "../constants/nodetypes";
 import {
   buildLayoutTree,
@@ -241,6 +242,9 @@ export function GetStylesFor(node, tag) {
         return `DC.${GetCodeName(dc, { includeNameSpace: true })}(${input})`;
       })
       .join(" && ");
+    if (!dataChainTest) {
+      return `$\{styles.${GetJSCodeName(styleNode)}}`;
+    }
     return `$\{${dataChainTest} ? styles.${GetJSCodeName(styleNode)} : '' }`;
   });
 }
@@ -260,6 +264,11 @@ export function buildStyle(node) {
   let styleSheetRules = styleNodes
     .map(styleNode => {
       let style = GetNodeProp(styleNode, NodeProperties.Style);
+      let styleSelectors = StyleNodeProperties.filter(x =>
+        GetNodeProp(styleNode, x)
+      ).map(styleProp => {
+        return styleProp;
+      });
       let areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
       let gridRowCount = parseInt(
         GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
@@ -278,8 +287,14 @@ export function buildStyle(node) {
           mediaquery_end = `}`;
         }
       }
+      let styleName = GetJSCodeName(styleNode);
+      let stylesSelectorsName = styleSelectors
+        .map(styleSelector => {
+          return `${styleName}${styleSelector}`;
+        })
+        .join();
       let stylesheet = `${mediaquery_start}
-    .${GetJSCodeName(styleNode)} {
+    .${stylesSelectorsName || styleName} {
       ${Object.keys(styleObj)
         .map(s => {
           return `${StyleLib.js[s]}: ${styleObj[s]};`;
