@@ -1046,7 +1046,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             return;
           case "viewModel":
             noSelector = true;
-            noDataChain = true;
+            noDataChain = false;
             break;
           default:
             stateKey = "value";

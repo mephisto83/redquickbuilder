@@ -16,7 +16,7 @@ export default class TreeViewMenu extends Component {
     }
     render() {
         return (
-            <li className={`treeview ${this.active()} ${this.open()}`}>
+            <li title={this.props.description} className={`treeview ${this.active()} ${this.open()}`}>
                 <a onClick={() => {
                     if (this.props.toggle)
                         this.props.toggle()

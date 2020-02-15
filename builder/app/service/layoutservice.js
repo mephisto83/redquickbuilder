@@ -304,9 +304,9 @@ export function createSection(args) {
 
           tagBasedStyles = layoutProperties.tags
             .map(tag => {
-              return GetStylesFor(node, tag);
+              return GetStylesFor(node, tag).join(' ');
             })
-            .filter(x => x).join('');
+            .filter(x => x).join(' ');
         }
         className = `className={\`$\{styles.${section}} ${tagBasedStyles} \`}`;
       } else {

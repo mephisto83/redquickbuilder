@@ -67,6 +67,7 @@ import CreateModelPropertyGetterDC from "../nodepacks/CreateModelPropertyGetterD
 import ReattachComponent from "../nodepacks/ReattachComponent";
 import AddTitleToComponent from "../nodepacks/AddTitleToComponent";
 import CollectionDataChainsIntoCollections from "../nodepacks/CollectionDataChainsIntoCollections";
+import AttachDataChainsToViewTypeViewModel from "../nodepacks/AttachDataChainsToViewTypeViewModel";
 import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -1590,6 +1591,18 @@ class ContextMenu extends Component {
                 />
               ) : null}
             </TreeViewMenu>
+            <TreeViewMenu
+              hideArrow={true}
+              title={Titles.AddSharedViewModel}
+              description={AttachDataChainsToViewTypeViewModel.description}
+              onClick={() => {
+                this.props.graphOperation(
+                  AttachDataChainsToViewTypeViewModel({
+                    viewType: currentNode.id
+                  })
+                );
+              }}
+            />
           </TreeViewMenu>
         ];
     }

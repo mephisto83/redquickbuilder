@@ -397,6 +397,7 @@ export const Maestros = "Maestros";
 export const Collections = "Collections";
 export const SaveAs = "Save as ...";
 export const NoApiPrefix = "No api prefix";
+export const AddSharedViewModel = 'Add Shared View Model';
 export const Save = "Save";
 export const Open = "Open";
 export const Record = "Record";
