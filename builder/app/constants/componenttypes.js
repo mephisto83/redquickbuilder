@@ -36,7 +36,8 @@ export const VALUE = "value";
 export const SHARED_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 export const GENERAL_COMPONENT_API = [VALUE].map(x => ({ property: x }));
 export const ComponentApiTypes = {
-  ViewModel: "viewModel"
+  ViewModel: "viewModel",
+  Value: "value"
 };
 export const ComponentLifeCycleEvents = {
   ComponentDidMount: "componentDidMount",
@@ -134,6 +135,11 @@ INPUT_DEFAULT_API.map(x => {
     ui: true
   };
 });
+export const ComponentTypeKeys = {
+  SingleSelect: "SingleSelect",
+  List: "List",
+  MultiSelectList: "MultiSelectList"
+};
 export const ComponentTypes = {
   ReactNative: {
     Badge: {},
@@ -299,7 +305,7 @@ export const ComponentTypes = {
     Item: {},
     Label: {},
     Left: {},
-    List: {
+    [ComponentTypeKeys.List]: {
       library: "react-native",
       layout: true,
       specialLayout: true,
@@ -346,7 +352,7 @@ export const ComponentTypes = {
       },
       ui: true
     },
-    MultiSelectList: {
+    [ComponentTypeKeys.MultiSelectList]: {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
@@ -362,7 +368,7 @@ export const ComponentTypes = {
       },
       ui: true
     },
-    SingleSelect: {
+    [ComponentTypeKeys.SingleSelect]: {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],

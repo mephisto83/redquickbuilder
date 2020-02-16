@@ -52,10 +52,11 @@ export function GenerateSelectorFunction(node) {
   switch (selectType) {
     case SelectorType.InternalProperties:
       return `export function ${GetJSCodeName(node)}(state) {
-        let { value, viewModel } = state;
+        let { value = null, viewModel = null, selected = null } = state;
         return {
           value,
-          viewModel
+          viewModel,
+          selected
         }
       }`
   }

@@ -1494,6 +1494,13 @@ export function GetComponentExternalApiNode(api, parent, graph) {
     link: NodeConstants.LinkType.ComponentExternalApi
   }).find(v => GetNodeTitle(v) === api);
 }
+export function GetComponentApiNode(api, parent, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.GetNodesLinkedTo(graph, {
+    id: parent,
+    link: NodeConstants.LinkType.ComponentInternalApi
+  }).find(v => GetNodeTitle(v) === api);
+}
 
 export function GetComponentExternalApiNodes(parent, graph) {
   graph = graph || GetCurrentGraph();
@@ -3054,7 +3061,7 @@ export function NodesConnectedTo(state, nodeId) {
 let _getState;
 let _dispatch;
 export function GetState() {
-  return _getState();
+  if (_getState) return _getState();
 }
 export function GetDispatchFunc() {
   return _dispatch;

@@ -292,6 +292,7 @@ export const NodeProperties = {
   GridPlacement: "GridPlacement",
   GridRowCount: "GridRowCount",
   HoverStyle: ":hover",
+  AsLocalContext: "AsLocalContext",
   ActiveStyle: ":active",
   SharedReferenceCollection: "SharedReferenceCollection",
   BeforeStyle: "::before",

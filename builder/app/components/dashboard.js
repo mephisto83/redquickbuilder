@@ -1422,17 +1422,28 @@ class Dashboard extends Component {
                             value
                           });
                         }} />
-                       {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentExternalApi?( <CheckBox
-                          label={Titles.IsUrlParameter}
-                          title={Titles.IsUrlParameter}
-                          value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
-                          onChange={(value) => {
-                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                              prop: UIA.NodeProperties.IsUrlParameter,
-                              id: currentNode.id,
-                              value
-                            });
-                          }} />):null}
+                        {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentExternalApi?( <CheckBox
+                           label={Titles.IsUrlParameter}
+                           title={Titles.IsUrlParameter}
+                           value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
+                           onChange={(value) => {
+                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                               prop: UIA.NodeProperties.IsUrlParameter,
+                               id: currentNode.id,
+                               value
+                             });
+                           }} />):null}
+                           {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentApi?( <CheckBox
+                              label={Titles.AsLocalContext}
+                              title={`${Titles.AsLocalContext}, usually for listitem.`}
+                              value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
+                              onChange={(value) => {
+                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                  prop: UIA.NodeProperties.AsLocalContext,
+                                  id: currentNode.id,
+                                  value
+                                });
+                              }} />):null}
                   </FormControl>
                 </SideMenuContainer>) : null}
 

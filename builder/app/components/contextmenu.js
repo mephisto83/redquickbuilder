@@ -41,7 +41,8 @@ import {
   getLinkInstance,
   GetNodesLinkedTo,
   TARGET,
-  SOURCE
+  SOURCE,
+  existsLinkBetween
 } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
@@ -69,6 +70,8 @@ import AddTitleToComponent from "../nodepacks/AddTitleToComponent";
 import CollectionDataChainsIntoCollections from "../nodepacks/CollectionDataChainsIntoCollections";
 import AttachDataChainsToViewTypeViewModel from "../nodepacks/AttachDataChainsToViewTypeViewModel";
 import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
+import SetInnerApiValueToLocalContextInLists from "../nodepacks/SetInnerApiValueToLocalContextInLists";
+import SetupApiBetweenComponents from "../nodepacks/SetupApiBetweenComponents";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -221,42 +224,59 @@ class ContextMenu extends Component {
             break;
           case LinkType.ComponentExternalConnection:
           case LinkType.EventMethodInstance:
-            result.push(
-              <TreeViewMenu
-                open={UIA.Visual(state, linkType)}
-                active={true}
-                title={linkType}
-                key={`${linkType}${selectedLink.id}`}
-                innerStyle={{ maxHeight: 300, overflowY: "auto" }}
-                toggle={() => {
-                  this.props.toggleVisual(linkType);
-                }}
-              >
-                <TreeViewItemContainer>
-                  <CheckBox
-                    label={LinkPropertyKeys.InstanceUpdate}
-                    value={UIA.GetLinkProperty(
-                      link,
-                      LinkPropertyKeys.InstanceUpdate
-                    )}
-                    onChange={value => {
-                      this.props.graphOperation([
-                        {
-                          operation: UIA.UPDATE_LINK_PROPERTY,
-                          options: function() {
-                            return {
-                              id: link.id,
-                              prop: LinkPropertyKeys.InstanceUpdate,
-                              value: value
-                            };
+          case LinkType.ComponentExternalApi:
+            let skip = false;
+            if (LinkType.ComponentExternalApi === linkType) {
+              if (
+                ![NodeTypes.ViewType].some(
+                  v =>
+                    v === UIA.GetNodeProp(link.source, NodeProperties.NODEType)
+                ) &&
+                ![NodeTypes.ViewType].some(
+                  v =>
+                    v === UIA.GetNodeProp(link.target, NodeProperties.NODEType)
+                )
+              ) {
+                skip = true;
+              }
+            }
+            if (!skip)
+              result.push(
+                <TreeViewMenu
+                  open={UIA.Visual(state, linkType)}
+                  active={true}
+                  title={linkType}
+                  key={`${linkType}${selectedLink.id}`}
+                  innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+                  toggle={() => {
+                    this.props.toggleVisual(linkType);
+                  }}
+                >
+                  <TreeViewItemContainer>
+                    <CheckBox
+                      label={LinkPropertyKeys.InstanceUpdate}
+                      value={UIA.GetLinkProperty(
+                        link,
+                        LinkPropertyKeys.InstanceUpdate
+                      )}
+                      onChange={value => {
+                        this.props.graphOperation([
+                          {
+                            operation: UIA.UPDATE_LINK_PROPERTY,
+                            options: function() {
+                              return {
+                                id: link.id,
+                                prop: LinkPropertyKeys.InstanceUpdate,
+                                value: value
+                              };
+                            }
                           }
-                        }
-                      ]);
-                    }}
-                  />
-                </TreeViewItemContainer>
-              </TreeViewMenu>
-            );
+                        ]);
+                      }}
+                    />
+                  </TreeViewItemContainer>
+                </TreeViewMenu>
+              );
             break;
         }
       }
@@ -335,6 +355,7 @@ class ContextMenu extends Component {
   }
   generalMenu() {
     let { state } = this.props;
+    let graph = UIA.GetCurrentGraph();
     return [
       <TreeViewMenu
         open={UIA.Visual(state, "GENERAL_MENU")}
@@ -384,6 +405,160 @@ class ContextMenu extends Component {
             this.props.graphOperation(ModifyUpdateLinks());
           }}
         />
+        <TreeViewMenu
+          title={NodeTypes.ComponentApi}
+          open={UIA.Visual(state, NodeTypes.ComponentApi)}
+          active={true}
+          onClick={() => {
+            this.props.toggleVisual(NodeTypes.ComponentApi);
+          }}
+        >
+          <TreeViewMenu
+            title={"Value(s) To Local Context"}
+            description={SetInnerApiValueToLocalContextInLists.description}
+            active={true}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                SetInnerApiValueToLocalContextInLists()
+              );
+            }}
+          />
+          <TreeViewMenu
+            title={"Create Component Api"}
+            open={UIA.Visual(state, "Create Component Api")}
+            active={true}
+            onClick={() => {
+              this.props.toggleVisual("Create Component Api");
+            }}
+          >
+            <TreeViewItemContainer>
+              <SelectInput
+                label={`${Titles.Component} A`}
+                options={UIA.NodesByType(
+                  this.props.state,
+                  NodeTypes.ComponentNode
+                )
+                  .sort((a, b) => {
+                    return UIA.GetNodeTitle(a).localeCompare(
+                      UIA.GetNodeTitle(b)
+                    );
+                  })
+                  .toNodeSelect()}
+                onChange={value => {
+                  this.setState({
+                    componentA: value
+                  });
+                }}
+                value={this.state.componentA}
+              />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <TextInput
+                immediate={true}
+                label={`${Titles.ExternalApi} A`}
+                placeholder={`${Titles.ExternalApi} A`}
+                onChange={value => {
+                  this.setState({
+                    externalApiA: value
+                  });
+                }}
+                value={this.state.externalApiA}
+              />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <TextInput
+                immediate={true}
+                label={`${Titles.InternalApi} A`}
+                placeholder={Titles.InternalApi}
+                onChange={value => {
+                  this.setState({
+                    internalApiA: value
+                  });
+                }}
+                value={this.state.internalApiA}
+              />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <SelectInput
+                label={`${Titles.Component} B`}
+                options={UIA.NodesByType(
+                  this.props.state,
+                  NodeTypes.ComponentNode
+                )
+                  .filter(x =>
+                    existsLinkBetween(graph, {
+                      source: this.state.componentA,
+                      target: x.id
+                    })
+                  )
+                  .toNodeSelect()}
+                onChange={value => {
+                  this.setState({
+                    componentB: value
+                  });
+                }}
+                value={this.state.componentB}
+              />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <TextInput
+                immediate={true}
+                label={`${Titles.ExternalApi} B`}
+                placeholder={`${Titles.ExternalApi} B`}
+                onChange={value => {
+                  this.setState({
+                    externalApiB: value
+                  });
+                }}
+                value={this.state.externalApiB}
+              />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <TextInput
+                immediate={true}
+                label={`${Titles.InternalApi} B`}
+                placeholder={`${Titles.InternalApi} B`}
+                onChange={value => {
+                  this.setState({
+                    internalApiB: value
+                  });
+                }}
+                value={this.state.internalApiB}
+              />
+            </TreeViewItemContainer>
+            {this.state.componentA &&
+            this.state.componentB &&
+            this.state.externalApiB &&
+            this.state.internalApiB &&
+            this.state.internalApiA &&
+            this.state.externalApiA ? (
+              <TreeViewMenu
+                title={"Setup Api Between Components"}
+                description={SetupApiBetweenComponents.description}
+                active={true}
+                hideArrow={true}
+                onClick={() => {
+                  this.props.graphOperation(
+                    SetupApiBetweenComponents({
+                      component_a: {
+                        id: this.state.componentA,
+                        external: this.state.externalApiA,
+                        internal: this.state.internalApiA
+                      },
+                      component_b: {
+                        id: this.state.componentB,
+                        external: this.state.externalApiB,
+                        internal: this.state.internalApiB
+                      }
+                    })
+                  );
+                }}
+              />
+            ) : null}
+          </TreeViewMenu>
+        </TreeViewMenu>
+
         <TreeViewMenu
           title={`Create Dashboard`}
           open={UIA.Visual(state, `Create Dashboard`)}

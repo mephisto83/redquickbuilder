@@ -1086,10 +1086,15 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         } else {
           if (options.listItem) {
             let listItemAttribute = GetJSCodeName(externalConnection);
-            innerValue =
-              listItemAttribute === "viewModel"
-                ? `this.state.${listItemAttribute}`
-                : listItemAttribute;
+            // innerValue = ["viewModel", "selected"].some(
+            //   vv => vv === listItemAttribute
+            // )
+            innerValue = !GetNodeProp(
+              externalConnection,
+              NodeProperties.AsLocalContext
+            )
+              ? `this.state.${listItemAttribute}`
+              : listItemAttribute;
           } else {
             let defaulComponentValue =
               GetNodeProp(
@@ -1115,10 +1120,21 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 externalConnection.id
               )
             : "";
+        if (isViewType) {
+          let addiontionalParams =
+            componentExternalApi && node
+              ? getUpdateFunctionOption(node.id, componentExternalApi.id)
+              : "";
 
-        innerValue = `S.${GetJSCodeName(
-          selector
-        )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+          innerValue = `S.${GetJSCodeName(
+            selector
+          )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+        } else {
+          //TODO: this might be able to go away;
+          innerValue = `S.${GetJSCodeName(
+            selector
+          )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+        }
       }
       if (!noDataChain && dataChain) {
         innerValue = `DC.${GetCodeName(dataChain, {
