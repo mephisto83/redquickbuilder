@@ -1,17 +1,24 @@
 import { uuidv4 } from "../utils/array";
-import { GetNodesLinkedTo, GetLinkBetween } from "../methods/graph_methods";
+import {
+  GetNodesLinkedTo,
+  GetLinkBetween,
+  getNodeLinks
+} from "../methods/graph_methods";
 import {
   GetCurrentGraph,
   NodesByType,
   ViewTypes,
   UPDATE_LINK_PROPERTY,
-  ComponentIsViewType
+  ComponentIsViewType,
+  GetNodeProp,
+  GetLinkProperty
 } from "../actions/uiactions";
 import {
   LinkType,
   NodeTypes,
   LinkProperties,
-  LinkPropertyKeys
+  LinkPropertyKeys,
+  NodeProperties
 } from "../constants/nodetypes";
 export default function(args = { name: "Replace Name" }) {
   // node2
@@ -21,7 +28,30 @@ export default function(args = { name: "Replace Name" }) {
 
   let graph = GetCurrentGraph();
   let eventMethods = NodesByType(null, NodeTypes.EventMethod);
-
+  NodesByType(null, NodeTypes.ViewType)
+    .filter(x => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Update)
+    .map(node => {
+      getNodeLinks(graph, node.id)
+        .filter(
+          x =>
+            GetLinkProperty(x, LinkPropertyKeys.TYPE) ===
+            LinkType.ComponentExternalApi
+        )
+        .map(link => {
+          result.push(function() {
+            return [
+              {
+                operation: UPDATE_LINK_PROPERTY,
+                options: {
+                  prop: LinkPropertyKeys.InstanceUpdate,
+                  value: true,
+                  id: link.id
+                }
+              }
+            ];
+          });
+        });
+    });
   eventMethods.map(eventMethod => {
     let components = GetNodesLinkedTo(graph, {
       id: eventMethod.id,

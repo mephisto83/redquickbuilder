@@ -138,7 +138,8 @@ INPUT_DEFAULT_API.map(x => {
 export const ComponentTypeKeys = {
   SingleSelect: "SingleSelect",
   List: "List",
-  MultiSelectList: "MultiSelectList"
+  MultiSelectList: "MultiSelectList",
+  InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
 export const ComponentTypes = {
   ReactNative: {
@@ -357,6 +358,22 @@ export const ComponentTypes = {
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
       template: "./app/templates/components/multiselectlist.tpl",
+      datasource: true,
+      properties: {
+        item_attributes: {
+          nodeProperty: NodeProperties.TextType,
+          template: "{{value}}",
+          component_options: [NodeTypes.ComponentNode],
+          ui: true
+        }
+      },
+      ui: true
+    },
+    [ComponentTypeKeys.InfiniteList]: {
+      layout: true,
+      specialLayout: true,
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/infinitelist.tpl",
       datasource: true,
       properties: {
         item_attributes: {
