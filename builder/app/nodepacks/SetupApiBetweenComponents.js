@@ -42,6 +42,8 @@ let func = function(args = {}) {
     throw "missing component_b.internal";
   }
 
+  let { viewPackages } = args;
+
   result.push(function(graph) {
     let result = [];
     let a_id = getId(args.component_a.id);
@@ -87,6 +89,7 @@ let func = function(args = {}) {
               parent: componentA.id,
               groupProperties: {},
               properties: {
+                ...viewPackages,
                 [NodeProperties.UIText]: a_external_id
               },
               linkProperties: {
@@ -108,6 +111,7 @@ let func = function(args = {}) {
               parent: componentA.id,
               groupProperties: {},
               properties: {
+                ...viewPackages,
                 [NodeProperties.UIText]: a_internal_id
               },
               linkProperties: {
@@ -146,6 +150,7 @@ let func = function(args = {}) {
               parent: componentB.id,
               groupProperties: {},
               properties: {
+                ...viewPackages,
                 [NodeProperties.UIText]: b_external_id
               },
               linkProperties: {
@@ -167,6 +172,7 @@ let func = function(args = {}) {
               parent: componentB.id,
               groupProperties: {},
               properties: {
+                ...viewPackages,
                 [NodeProperties.UIText]: b_internal_id
               },
               linkProperties: {
@@ -201,7 +207,7 @@ let func = function(args = {}) {
         options: function(graph) {
           let thereIsAnExistingLink = existsLinkBetween(graph, {
             source: componentB_external_node.id,
-            target: componentA_internal_node.id,
+            target: componentA_internal_node.id
           });
           if (!thereIsAnExistingLink)
             return {

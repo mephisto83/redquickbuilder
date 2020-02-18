@@ -689,6 +689,7 @@ export const LinkType = {
   LifeCylceMethod: "LifeCylceMethod",
   ComponentApiConnector: "Component Api Connector",
   EventMethod: "EventMethod",
+  UsingSharedComponent: "UsingSharedComponent",
   EventMethodInstance: "EventMethodInstance",
   NavigationMethod: "NavigationMethod",
   MethodCall: "MethodCall",

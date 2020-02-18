@@ -72,6 +72,7 @@ import AttachDataChainsToViewTypeViewModel from "../nodepacks/AttachDataChainsTo
 import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
 import SetInnerApiValueToLocalContextInLists from "../nodepacks/SetInnerApiValueToLocalContextInLists";
 import SetupApiBetweenComponents from "../nodepacks/SetupApiBetweenComponents";
+import CreateForm from "../nodepacks/CreateForm";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -604,7 +605,65 @@ class ContextMenu extends Component {
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
     let temp;
-
+    let layoutoptions = () => {
+      return (
+        <TreeViewMenu
+          open={UIA.Visual(state, "ScreenOptionOperations")}
+          active={true}
+          title={Titles.Layout}
+          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+          toggle={() => {
+            this.props.toggleVisual("ScreenOptionOperations");
+          }}
+        >
+          <TreeViewMenu
+            title={`Set Tiny Tweaks Layout`}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                TinyTweaks({ component: currentNode.id })
+              );
+            }}
+          />
+          <TreeViewMenu
+            title={`Basic Application Layout`}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                BasicApplicationLayout({ component: currentNode.id })
+              );
+            }}
+          />
+          <TreeViewMenu
+            title={`Basic Double Side Column`}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                BasicDoubleSideColumn({ component: currentNode.id })
+              );
+            }}
+          />
+          <TreeViewMenu
+            title={`Four Column`}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                FourColumn({ component: currentNode.id })
+              );
+            }}
+          />
+          <TreeViewMenu
+            title={`Three Column`}
+            hideArrow={true}
+            onClick={() => {
+              this.props.graphOperation(
+                ThreeColumn({ component: currentNode.id })
+              );
+            }}
+          />
+        </TreeViewMenu>
+      );
+    };
     switch (currentNodeType) {
       case NodeTypes.DataChainCollection:
         return [
@@ -1140,61 +1199,7 @@ class ContextMenu extends Component {
               }}
             />
           </TreeViewMenu>,
-          <TreeViewMenu
-            open={UIA.Visual(state, "ScreenOptionOperations")}
-            active={true}
-            title={Titles.Layout}
-            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
-            toggle={() => {
-              this.props.toggleVisual("ScreenOptionOperations");
-            }}
-          >
-            <TreeViewMenu
-              title={`Set Tiny Tweaks Layout`}
-              hideArrow={true}
-              onClick={() => {
-                this.props.graphOperation(
-                  TinyTweaks({ component: currentNode.id })
-                );
-              }}
-            />
-            <TreeViewMenu
-              title={`Basic Application Layout`}
-              hideArrow={true}
-              onClick={() => {
-                this.props.graphOperation(
-                  BasicApplicationLayout({ component: currentNode.id })
-                );
-              }}
-            />
-            <TreeViewMenu
-              title={`Basic Double Side Column`}
-              hideArrow={true}
-              onClick={() => {
-                this.props.graphOperation(
-                  BasicDoubleSideColumn({ component: currentNode.id })
-                );
-              }}
-            />
-            <TreeViewMenu
-              title={`Four Column`}
-              hideArrow={true}
-              onClick={() => {
-                this.props.graphOperation(
-                  FourColumn({ component: currentNode.id })
-                );
-              }}
-            />
-            <TreeViewMenu
-              title={`Three Column`}
-              hideArrow={true}
-              onClick={() => {
-                this.props.graphOperation(
-                  ThreeColumn({ component: currentNode.id })
-                );
-              }}
-            />
-          </TreeViewMenu>
+          layoutoptions()
         ];
       case NodeTypes.ComponentNode:
         let componentType = UIA.GetNodeProp(
@@ -1226,6 +1231,60 @@ class ContextMenu extends Component {
               this.props.toggleVisual("Styling");
             }}
           >
+            {layoutoptions()}
+            <TreeViewMenu
+              open={UIA.Visual(state, "Create Form")}
+              active={true}
+              title={"Create Form"}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("Create Form");
+              }}
+            >
+              <TreeViewItemContainer>
+                <TextInput
+                  immediate={true}
+                  label={Titles.Name}
+                  placeholder={Titles.EnterName}
+                  onChange={value => {
+                    this.setState({
+                      viewName: value
+                    });
+                  }}
+                  value={this.state.viewName}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Models}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Model
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      model: value
+                    });
+                  }}
+                  value={this.state.model}
+                />
+              </TreeViewItemContainer>
+              <TreeViewButtonGroup>
+                <TreeViewGroupButton
+                  title={"Create Form"}
+                  onClick={() => {
+                    this.props.graphOperation(
+                      CreateForm({
+                        component: currentNode.id,
+                        model: this.state.model,
+                        viewName: this.state.viewName
+                      })
+                    );
+                  }}
+                  icon={"fa fa-plus"}
+                />
+              </TreeViewButtonGroup>
+            </TreeViewMenu>
             <TreeViewMenu
               title={Titles.AddDataChain}
               hideArrow={true}
