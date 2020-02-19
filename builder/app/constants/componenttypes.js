@@ -1,4 +1,4 @@
-import { NodeTypes, UITypes } from "./nodetypes";
+import { NodeTypes, UITypes, LinkType, LinkPropertyKeys } from "./nodetypes";
 import {
   NodeProperties,
   GetRootGraph,
@@ -630,6 +630,20 @@ export function GetListItemNode(id) {
       GetNodeProp(x, NodeProperties.ComponentType) ===
         ComponentTypes.ReactNative.ListItem.key
   );
+  if (nodes && nodes.length) {
+    return nodes[0];
+  }
+  return null;
+}
+
+export function GetFormItemNode(id) {
+  let state = GetState();
+  let graph = GetRootGraph(state);
+  let nodes = GetNodesLinkedTo(graph, {
+    id,
+    link: LinkType.Component,
+    properties: { [LinkPropertyKeys.AsForm]: true }
+  });
   if (nodes && nodes.length) {
     return nodes[0];
   }

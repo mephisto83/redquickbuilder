@@ -180,6 +180,44 @@ class ContextMenu extends Component {
         );
         let linkType = UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE);
         switch (UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
+          case LinkType.Component:
+            result.push(
+              <TreeViewMenu
+                open={UIA.Visual(state, `linkType coponent`)}
+                active={true}
+                title={linkType}
+                key={`${linkType}${selectedLink.id} componenttag`}
+                innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+                toggle={() => {
+                  this.props.toggleVisual(`linkType coponent`);
+                }}
+              >
+                <TreeViewItemContainer>
+                  <CheckBox
+                    label={Titles.AsForm}
+                    onChange={value => {
+                      this.props.graphOperation([
+                        {
+                          operation: UIA.UPDATE_LINK_PROPERTY,
+                          options: function() {
+                            return {
+                              id: link.id,
+                              prop: LinkPropertyKeys.AsForm,
+                              value: value
+                            };
+                          }
+                        }
+                      ]);
+                    }}
+                    value={UIA.GetLinkProperty(
+                      link,
+                      LinkPropertyKeys.AsForm
+                    )}
+                  />
+                </TreeViewItemContainer>
+              </TreeViewMenu>
+            );
+            break;
           case LinkType.Style:
             result.push(
               <TreeViewMenu

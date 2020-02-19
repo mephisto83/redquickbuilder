@@ -911,8 +911,10 @@ export const LinkPropertyKeys = {
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
   ComponentTag: "ComponentTag",
-  ViewType: "viewType"
+  ViewType: "viewType",
+  AsForm: "AsForm"
 };
+
 export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent

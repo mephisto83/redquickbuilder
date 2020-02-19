@@ -50,7 +50,8 @@ import {
   HandlerTypes,
   ComponentLifeCycleEvents,
   ComponentEvents,
-  ComponentEventStandardHandler
+  ComponentEventStandardHandler,
+  GetFormItemNode
 } from "../constants/componenttypes";
 import {
   getComponentProperty,
@@ -131,6 +132,22 @@ export function GetDefaultElement(language) {
 }
 export function GetItemRender(node, imports, language) {
   let listItemNode = GetListItemNode(node.id);
+  imports.push(GenerateComponentImport(listItemNode, node, language));
+  let properties = WriteDescribedApiProperties(listItemNode, {
+    listItem: true
+  });
+  return `({item, index, separators, key})=>{
+    let value = item;
+    return  <${GetCodeName(
+      listItemNode
+    )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  }`;
+}
+export function GetFormRender(node, imports, language) {
+  let listItemNode = GetFormItemNode(node.id);
+  if (!listItemNode) {
+    return "";
+  }
   imports.push(GenerateComponentImport(listItemNode, node, language));
   let properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
@@ -376,9 +393,11 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     }
     let data = GetItemData(node);
     let item_render = GetItemRender(node, extraimports, language);
+    let form_render = GetFormRender(node, extraimports, language);
     let apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(fs.readFileSync(template, "utf8"), {
       item_render: item_render,
+      form_render,
       data: data,
       apiProperties
     });
