@@ -73,6 +73,7 @@ import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
 import SetInnerApiValueToLocalContextInLists from "../nodepacks/SetInnerApiValueToLocalContextInLists";
 import SetupApiBetweenComponents from "../nodepacks/SetupApiBetweenComponents";
 import CreateForm from "../nodepacks/CreateForm";
+import _create_get_view_model from "../nodepacks/_create_get_view_model";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -209,10 +210,7 @@ class ContextMenu extends Component {
                         }
                       ]);
                     }}
-                    value={UIA.GetLinkProperty(
-                      link,
-                      LinkPropertyKeys.AsForm
-                    )}
+                    value={UIA.GetLinkProperty(link, LinkPropertyKeys.AsForm)}
                   />
                 </TreeViewItemContainer>
               </TreeViewMenu>
@@ -1082,6 +1080,7 @@ class ContextMenu extends Component {
             <TreeViewMenu
               title={`Connect to Title Service`}
               hideArrow={true}
+              active={true}
               onClick={() => {
                 this.props.graphOperation([
                   {
@@ -1093,6 +1092,41 @@ class ContextMenu extends Component {
                 ]);
               }}
             />
+            <TreeViewMenu
+              open={UIA.Visual(state, "Attach View Model Data Chain")}
+              title={"Attach View Model Data Chain"}
+              description={_create_get_view_model.description}
+              active={true}
+              onClick={() => {
+                this.props.toggleVisual("Attach View Model Data Chain");
+              }}
+            >
+              <TreeViewItemContainer>
+                <TextInput
+                  label={Titles.ViewModel}
+                  placeholder={Titles.ViewModel}
+                  onChange={value => {
+                    this.setState({
+                      viewModelName: value
+                    });
+                  }}
+                  value={this.state.viewModelName}
+                />
+              </TreeViewItemContainer>
+              <TreeViewMenu
+                title={`Attach View Model Data Chain`}
+                hideArrow={true}
+                active={true}
+                onClick={() => {
+                  this.props.graphOperation([
+                    ..._create_get_view_model({
+                      viewModel: currentNode.id,
+                      model: this.state.viewModelName
+                    })
+                  ]);
+                }}
+              />
+            </TreeViewMenu>
             {UIA.GetNodeTitle(currentNode) === "viewModel" ? (
               <TreeViewMenu
                 title={`Setup View Model On Screen`}
