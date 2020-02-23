@@ -73,7 +73,11 @@ import ModifyUpdateLinks from "../nodepacks/ModifyUpdateLinks";
 import SetInnerApiValueToLocalContextInLists from "../nodepacks/SetInnerApiValueToLocalContextInLists";
 import SetupApiBetweenComponents from "../nodepacks/SetupApiBetweenComponents";
 import CreateForm from "../nodepacks/CreateForm";
+import CopyPermissionConditions from "../nodepacks/CopyPermissionConditions";
 import _create_get_view_model from "../nodepacks/_create_get_view_model";
+import AddAllPropertiesToExecutor from "../nodepacks/AddAllPropertiesToExecutor";
+import AddCopyPropertiesToExecutor from "../nodepacks/AddCopyPropertiesToExecutor";
+import NameLikeValidation from "../nodepacks/validation/NameLikeValidation";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -431,6 +435,52 @@ class ContextMenu extends Component {
                   }
                 }))
               );
+            }}
+          />
+        </TreeViewMenu>
+
+        <TreeViewMenu
+          open={UIA.Visual(state, "executor OPERATIONS")}
+          active={true}
+          title={`Executor ${Titles.Operations}`}
+          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+          toggle={() => {
+            this.props.toggleVisual("executor OPERATIONS");
+          }}
+        >
+          <TreeViewMenu
+            active={true}
+            title={`Have all properties`}
+            description={
+              "Executors will have all properties added in executor."
+            }
+            onClick={() => {
+              let executors = UIA.NodesByType(null, NodeTypes.Executor);
+              let result = [];
+              executors.map(executor => {
+                let steps = AddAllPropertiesToExecutor({
+                  currentNode: executor
+                });
+                result.push(...steps);
+              });
+              this.props.graphOperation(result);
+            }}
+          />
+          <TreeViewMenu
+            active={true}
+            title={AddCopyPropertiesToExecutor.title}
+            description={AddCopyPropertiesToExecutor.description}
+            onClick={() => {
+              let executors = UIA.NodesByType(null, NodeTypes.Executor);
+              let result = [];
+              executors.map(executor => {
+                let steps = AddCopyPropertiesToExecutor({
+                  currentNode: executor,
+                  executor: UIA.GetNodeProp(executor, NodeProperties.Executor)
+                });
+                result.push(...steps);
+              });
+              this.props.graphOperation(result);
             }}
           />
         </TreeViewMenu>
@@ -1191,6 +1241,82 @@ class ContextMenu extends Component {
                 );
               }}
             />
+            <TreeViewMenu
+              active={true}
+              title={`Have all properties`}
+              onClick={() => {
+                let steps = AddAllPropertiesToExecutor({ currentNode });
+                this.props.graphOperation(steps);
+              }}
+            />
+
+            <TreeViewMenu
+              active={true}
+              title={AddCopyPropertiesToExecutor.title}
+              description={AddCopyPropertiesToExecutor.description}
+              onClick={() => {
+                let result = AddCopyPropertiesToExecutor({
+                  currentNode: currentNode,
+                  executor: UIA.GetNodeProp(
+                    currentNode,
+                    NodeProperties.Executor
+                  )
+                });
+                this.props.graphOperation(result);
+              }}
+            />
+          </TreeViewMenu>
+        ];
+      case NodeTypes.Condition:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, "condition OPERATIONS")}
+            active={true}
+            title={`Condition ${Titles.Operations}`}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual("condition OPERATIONS");
+            }}
+          >
+            <TreeViewMenu
+              active={true}
+              title={NameLikeValidation.title}
+              description={AddCopyPropertiesToExecutor.description}
+              onClick={() => {
+                let result = NameLikeValidation({
+                  condition: currentNode.id
+                });
+                this.props.graphOperation(result);
+              }}
+            />
+            <TreeViewMenu
+              open={UIA.Visual(state, "Validations")}
+              active={true}
+              title={`Validationss`}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("Validations");
+              }}
+            >
+              (
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.Properties}
+                  options={UIA.GetModelPropertyChildren(
+                    UIA.GetPermissionMethodModel(
+                      UIA.GetPermissionNode(currentNode.id)
+                    )
+                  ).toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      property: value
+                    });
+                  }}
+                  value={this.state.property}
+                />
+              </TreeViewItemContainer>
+              )
+            </TreeViewMenu>
           </TreeViewMenu>
         ];
       case NodeTypes.Model:
@@ -1721,6 +1847,46 @@ class ContextMenu extends Component {
             ) : null}
           </TreeViewMenu>
         ];
+      case NodeTypes.ModelFilter:
+        return [
+          <TreeViewMenu
+            open={UIA.Visual(state, NodeTypes.ModelFilter)}
+            active={true}
+            title={Titles.Operations}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual(NodeTypes.ModelFilter);
+            }}
+          >
+            <TreeViewMenu
+              active={true}
+              title={`${Titles.SelectAll} on all nodes`}
+              onClick={() => {
+                let filters = UIA.NodesByType(null, NodeTypes.ModelFilter);
+                filters.map(filter => {
+                  let model = UIA.GetNodeProp(
+                    filter,
+                    NodeProperties.FilterModel
+                  );
+                  let propnodes = UIA.GetModelPropertyChildren(model);
+                  let fprops =
+                    UIA.GetNodeProp(
+                      filter,
+                      UIA.NodeProperties.FilterPropreties
+                    ) || {};
+                  propnodes.map(node => {
+                    fprops[node.id] = true;
+                  });
+                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: UIA.NodeProperties.FilterPropreties,
+                    id: filter.id,
+                    value: fprops
+                  });
+                });
+              }}
+            />
+          </TreeViewMenu>
+        ];
       case NodeTypes.Permission:
         // getNodePropertyGuids()
         return [
@@ -1750,75 +1916,34 @@ class ContextMenu extends Component {
                 title={Titles.Execute}
                 hideArrow={true}
                 onClick={() => {
-                  let conditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
-                    id: this.state.permission,
-                    link: LinkType.Condition
-                  }).map(v => UIA.GetNodeProp(v, NodeProperties.Condition));
-                  let method = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
-                    id: this.state.permission,
-                    link: LinkType.FunctionOperator
-                  }).find(x => x);
-                  let currentConditions = GetNodesLinkedTo(
-                    UIA.GetCurrentGraph(),
-                    {
-                      id: currentNode.id,
-                      link: LinkType.Condition
-                    }
-                  );
-                  let currentNodeMethod = GetNodesLinkedTo(
-                    UIA.GetCurrentGraph(),
-                    {
-                      id: currentNode.id,
-                      link: LinkType.FunctionOperator
-                    }
-                  ).find(x => x);
-                  let functionType = UIA.GetNodeProp(
-                    method,
-                    NodeProperties.FunctionType
-                  );
-                  let currentNodeMethodFunctionType = UIA.GetNodeProp(
-                    currentNodeMethod,
-                    NodeProperties.FunctionType
-                  );
-                  let result = [];
-                  currentConditions.map(cc => {
-                    result.push({
-                      operation: UIA.REMOVE_NODE,
-                      options: function() {
-                        return {
-                          id: cc.id
-                        };
-                      }
-                    });
-                  });
-                  conditions.map(condition => {
-                    result.push({
-                      operation: UIA.ADD_NEW_NODE,
-                      options: function() {
-                        let temp = JSON.parse(JSON.stringify(condition));
-                        temp.methods[currentNodeMethodFunctionType] =
-                          temp.methods[functionType];
-                        delete temp.methods[functionType];
-                        return {
-                          nodeType: NodeTypes.Condition,
-                          properties: {
-                            [NodeProperties.Condition]: temp
-                          },
-                          parent: currentNode.id,
-                          groupProperties: {},
-                          linkProperties: {
-                            properties: {
-                              ...LinkProperties.ConditionLink
-                            }
-                          }
-                        };
-                      }
-                    });
+                  let result = CopyPermissionConditions({
+                    permission: this.state.permission,
+                    node: currentNode.id
                   });
                   this.props.graphOperation(result);
                 }}
               />
             ) : null}
+            <TreeViewMenu
+              hideArrow={true}
+              active={true}
+              onClick={() => {
+                let permissions = UIA.NodesByType(null, NodeTypes.Permission);
+                let result = [];
+                permissions
+                  .filter(x => x.id !== currentNode.id)
+                  .map(permission => {
+                    result.push(
+                      ...CopyPermissionConditions({
+                        permission: currentNode.id,
+                        node: permission.id
+                      })
+                    );
+                  });
+                this.props.graphOperation(result);
+              }}
+              title={Titles.CopyToAll}
+            />
           </TreeViewMenu>
         ];
       case NodeTypes.ViewType:

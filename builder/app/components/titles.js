@@ -37,6 +37,7 @@ export const SelectorType = "Selector Type";
 export const GraphPropertiesMenu = "Graph Properties";
 export const Execute = "Execute";
 export const Cancel = "Cancel";
+export const CopyToAll = "Copy To All";
 export const ViewTypes = "View Types";
 export const List = "List";
 export const All = "All";

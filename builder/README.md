@@ -26,3 +26,8 @@
     1. Build view for models
 1. Create Shared Views
     1. Build shared views for the relationships between models.
+1. Create Login Screen
+1. Create Configuration Node
+1. Create APIs
+    1. Models that require management will need basic CRUD functionality
+    1. Depending on which Agents can interact, different methods need generation.

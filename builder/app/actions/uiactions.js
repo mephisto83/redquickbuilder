@@ -3303,6 +3303,15 @@ export function GetPermissionMethod(permission) {
     ]
   });
 }
+export function GetPermissionMethodModel(permission) {
+  let method = GetPermissionMethod(permission);
+  if (method) {
+    let props = GetMethodProps(method);
+
+    return props ? props[FunctionTemplateKeys.Model] : null;
+  }
+  return null;
+}
 export function GetNodesMethod(id) {
   return GetPermissionMethod(GetNodeById(id));
 }
