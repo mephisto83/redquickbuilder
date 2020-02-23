@@ -601,6 +601,7 @@ export function connectLifeCycleMethod(args) {
     }, 100);
   };
 }
+
 export function addComponentEventTo(node, apiName) {
   return (dispatch, getState) => {
     graphOperation([
@@ -3293,22 +3294,47 @@ export function GetMethodValidationParameters(id, all) {
   return GetMethod_Parameters(id, "validation", all);
 }
 export function GetPermissionMethod(permission) {
-  return GetLinkChainItem({
-    id: permission.id,
-    links: [
-      {
-        type: NodeConstants.LinkType.FunctionOperator,
-        direction: GraphMethods.TARGET
-      }
-    ]
-  });
+  if (permission)
+    return GetLinkChainItem({
+      id: permission.id,
+      links: [
+        {
+          type: NodeConstants.LinkType.FunctionOperator,
+          direction: GraphMethods.TARGET
+        }
+      ]
+    });
+  return null;
 }
 export function GetPermissionMethodModel(permission) {
-  let method = GetPermissionMethod(permission);
+  let method = permission ? GetPermissionMethod(permission) : null;
   if (method) {
     let props = GetMethodProps(method);
 
     return props ? props[FunctionTemplateKeys.Model] : null;
+  }
+  return null;
+}
+
+export function GetValidatorMethod(permission) {
+  if (permission)
+    return GetLinkChainItem({
+      id: permission.id,
+      links: [
+        {
+          type: NodeConstants.LinkType.FunctionOperator,
+          direction: GraphMethods.TARGET
+        }
+      ]
+    });
+  return null;
+}
+export function GetFunctionMethodKey(validation, templateKey = FunctionTemplateKeys.Model) {
+  let method = validation ? GetValidatorMethod(validation) : null;
+  if (method) {
+    let props = GetMethodProps(method);
+
+    return props ? props[templateKey] : null;
   }
   return null;
 }

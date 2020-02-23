@@ -1,5 +1,6 @@
 import { uuidv4 } from "../../utils/array";
 import { NodeProperties } from "../../constants/nodetypes";
+import { GetNodeProp, GetNodeById } from "../../actions/uiactions";
 function NameLikeValidation(args = { condition: null, property: null }) {
   // node0,node1,node2,node3,node4,node5
 
@@ -7,7 +8,9 @@ function NameLikeValidation(args = { condition: null, property: null }) {
     throw "missing condition";
   }
   //
-
+  if (!args.methodType) {
+    throw "missing method type";
+  }
   let context = {
     ...args,
     node0: args.condition,
@@ -24,6 +27,23 @@ function NameLikeValidation(args = { condition: null, property: null }) {
   };
   let result = [
     function(graph) {
+      let previousCondition = GetNodeProp(
+        GetNodeById(context.condition, graph),
+        NodeProperties.Condition
+      );
+      let properties = {};
+      if (
+        previousCondition &&
+        previousCondition.methods &&
+        previousCondition.methods[context.methodType] &&
+        previousCondition.methods[context.methodType][context.methodKey] &&
+        previousCondition.methods[context.methodType][context.methodKey]
+          .properties
+      ) {
+        properties =
+          previousCondition.methods[context.methodType][context.methodKey]
+            .properties;
+      }
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -35,6 +55,7 @@ function NameLikeValidation(args = { condition: null, property: null }) {
                 "Create/Object => Object": {
                   model: {
                     properties: {
+                      ...properties,
                       [context.node1]: {
                         validators: {
                           [context.node2]: {
@@ -56,7 +77,7 @@ function NameLikeValidation(args = { condition: null, property: null }) {
                                 defaultValue: 0
                               }
                             },
-                            condition: "3"
+                            condition: context.minLength || "3"
                           },
                           [context.node3]: {
                             type: "maxlengthEqual",
@@ -77,487 +98,7 @@ function NameLikeValidation(args = { condition: null, property: null }) {
                                 defaultValue: 0
                               }
                             },
-                            condition: "50"
-                          },
-                          [context.node4]: {
-                            type: "alphaonly",
-                            code: {
-                              csharp: "AlphaOnlyAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          },
-                          [context.node5]: {
-                            type: "isNotNull",
-                            code: {
-                              csharp: "IsNotNullAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Condition",
-            id: context.node0,
-            value: {
-              methods: {
-                "Create/Object => Object": {
-                  model: {
-                    properties: {
-                      [context.node1]: {
-                        validators: {
-                          [context.node2]: {
-                            type: "minLengthEqual",
-                            code: {
-                              csharp: "MinAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "3"
-                          },
-                          [context.node3]: {
-                            type: "maxlengthEqual",
-                            code: {
-                              csharp: "MaximumLengthAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "50"
-                          },
-                          [context.node4]: {
-                            type: "alphaonly",
-                            code: {
-                              csharp: "AlphaOnlyAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          },
-                          [context.node5]: {
-                            type: "isNotNull",
-                            code: {
-                              csharp: "IsNotNullAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Condition",
-            id: context.node0,
-            value: {
-              methods: {
-                "Create/Object => Object": {
-                  model: {
-                    properties: {
-                      [context.node1]: {
-                        validators: {
-                          [context.node2]: {
-                            type: "minLengthEqual",
-                            code: {
-                              csharp: "MinAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "3"
-                          },
-                          [context.node3]: {
-                            type: "maxlengthEqual",
-                            code: {
-                              csharp: "MaximumLengthAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "50"
-                          },
-                          [context.node4]: {
-                            type: "alphaonly",
-                            code: {
-                              csharp: "AlphaOnlyAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          },
-                          [context.node5]: {
-                            type: "isNotNull",
-                            code: {
-                              csharp: "IsNotNullAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Condition",
-            id: context.node0,
-            value: {
-              methods: {
-                "Create/Object => Object": {
-                  model: {
-                    properties: {
-                      [context.node1]: {
-                        validators: {
-                          [context.node2]: {
-                            type: "minLengthEqual",
-                            code: {
-                              csharp: "MinAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "3"
-                          },
-                          [context.node3]: {
-                            type: "maxlengthEqual",
-                            code: {
-                              csharp: "MaximumLengthAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "50"
-                          },
-                          [context.node4]: {
-                            type: "alphaonly",
-                            code: {
-                              csharp: "AlphaOnlyAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          },
-                          [context.node5]: {
-                            type: "isNotNull",
-                            code: {
-                              csharp: "IsNotNullAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Condition",
-            id: context.node0,
-            value: {
-              methods: {
-                "Create/Object => Object": {
-                  model: {
-                    properties: {
-                      [context.node1]: {
-                        validators: {
-                          [context.node2]: {
-                            type: "minLengthEqual",
-                            code: {
-                              csharp: "MinAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "3"
-                          },
-                          [context.node3]: {
-                            type: "maxlengthEqual",
-                            code: {
-                              csharp: "MaximumLengthAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "50"
-                          },
-                          [context.node4]: {
-                            type: "alphaonly",
-                            code: {
-                              csharp: "AlphaOnlyAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          },
-                          [context.node5]: {
-                            type: "isNotNull",
-                            code: {
-                              csharp: "IsNotNullAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "STRING",
-                                nodeType: "model-property"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Condition",
-            id: context.node0,
-            value: {
-              methods: {
-                "Create/Object => Object": {
-                  model: {
-                    properties: {
-                      [context.node1]: {
-                        validators: {
-                          [context.node2]: {
-                            type: "minLengthEqual",
-                            code: {
-                              csharp: "MinAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "3"
-                          },
-                          [context.node3]: {
-                            type: "maxlengthEqual",
-                            code: {
-                              csharp: "MaximumLengthAttribute"
-                            },
-                            template:
-                              "./app/templates/validation/validation_generic.tpl",
-                            arguments: {
-                              value: {
-                                type: "INT",
-                                nodeType: "model-property"
-                              },
-                              condition: {
-                                type: "INT",
-                                nodeType: null,
-                                equals: true,
-                                defaultValue: 0
-                              }
-                            },
-                            condition: "50"
+                            condition: context.maxLength || "50"
                           },
                           [context.node4]: {
                             type: "alphaonly",

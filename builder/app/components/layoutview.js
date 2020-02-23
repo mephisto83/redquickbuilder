@@ -497,6 +497,23 @@ class LayoutView extends Component {
                   label={Titles.Sections}
                   value={Object.keys(selectedLayoutRoot || {}).length}
                 />
+
+                {cellChildren ? (
+                  <SelectInput
+                    options={componentNodes.toNodeSelect()}
+                    onChange={val => {
+                      let layout = nodeLayout || CreateLayout();
+                      cellChildren[this.state.selectedCell] = val;
+                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: layout
+                      });
+                    }}
+                    label={Titles.Component}
+                    value={cellChildren[this.state.selectedCell]}
+                  />
+                ) : null}
                 {cellProperties &&
                 cellProperties.name &&
                 this.state.selectedCell ? (
@@ -644,22 +661,6 @@ class LayoutView extends Component {
                     }}
                     label={Titles.Width}
                     value={cellStyle.width}
-                  />
-                ) : null}
-                {cellChildren ? (
-                  <SelectInput
-                    options={componentNodes.toNodeSelect()}
-                    onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
-                      cellChildren[this.state.selectedCell] = val;
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }}
-                    label={Titles.Component}
-                    value={cellChildren[this.state.selectedCell]}
                   />
                 ) : null}
                 {cellChildren && cellChildren[this.state.selectedCell]

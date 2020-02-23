@@ -25,6 +25,7 @@ export const Parameter = "Parameter";
 export const ServerSideSetup = "Service Side Setup";
 export const Theme = "Theme";
 export const Properties = "Properties";
+export const Key = "Key";
 export const EventHandlerActivityMenu = "Event Handlers";
 export const AddCondition = "Add Condition";
 export const Style = "Style";

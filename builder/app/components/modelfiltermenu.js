@@ -79,7 +79,7 @@ class ModelFilterMenu extends Component {
     }
     return (
       <TabPane active={active}>
-        <div class="btn-group">
+        <div className="btn-group">
           <button
             title={Titles.SelectAll}
             onClick={() => {

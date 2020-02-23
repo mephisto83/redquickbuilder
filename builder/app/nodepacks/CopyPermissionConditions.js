@@ -49,7 +49,8 @@ export default function CopyPermissionConditions(args = { permission }) {
         let temp = JSON.parse(JSON.stringify(condition));
         temp.methods[currentNodeMethodFunctionType] =
           temp.methods[functionType];
-        delete temp.methods[functionType];
+        if (functionType !== currentNodeMethodFunctionType)
+          delete temp.methods[functionType];
         return {
           nodeType: NodeTypes.Condition,
           properties: {

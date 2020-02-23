@@ -33,8 +33,12 @@ import ViewTypeMenu from "./viewtypecontextmenu";
 import FourColumn from "../nodepacks/FourColumn";
 import ThreeColumn from "../nodepacks/ThreeColumn";
 import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
+import { MethodFunctions } from "../constants/functiontypes";
 import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
-import { FunctionTemplateKeys } from "../constants/functiontypes";
+import {
+  FunctionTemplateKeys,
+  MethodTemplateKeys
+} from "../constants/functiontypes";
 import NavigateBack from "../nodepacks/NavigateBack";
 import TreeViewItemContainer from "./treeviewitemcontainer";
 import {
@@ -78,6 +82,8 @@ import _create_get_view_model from "../nodepacks/_create_get_view_model";
 import AddAllPropertiesToExecutor from "../nodepacks/AddAllPropertiesToExecutor";
 import AddCopyPropertiesToExecutor from "../nodepacks/AddCopyPropertiesToExecutor";
 import NameLikeValidation from "../nodepacks/validation/NameLikeValidation";
+import DescriptionLikeValidation from "../nodepacks/validation/DescriptionLikeValidation";
+import ScreenConnect from "../nodepacks/screens/ScreenConnect";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -396,6 +402,7 @@ class ContextMenu extends Component {
   }
   generalMenu() {
     let { state } = this.props;
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let graph = UIA.GetCurrentGraph();
     return [
       <TreeViewMenu
@@ -439,6 +446,92 @@ class ContextMenu extends Component {
           />
         </TreeViewMenu>
 
+        {UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+        NodeTypes.Permission ? (
+          <TreeViewMenu
+            open={UIA.Visual(
+              state,
+              `${NodeTypes.Permission} ${Titles.Operations}`
+            )}
+            active={true}
+            title={`Permission ${Titles.Operations}`}
+            innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+            toggle={() => {
+              this.props.toggleVisual(
+                `${NodeTypes.Permission} ${Titles.Operations}`
+              );
+            }}
+          >
+            <TreeViewMenu
+              hideArrow={true}
+              active={true}
+              onClick={() => {
+                let permissions = UIA.NodesByType(null, NodeTypes.Permission);
+                let result = [];
+                permissions
+                  .filter(x => x.id !== currentNode.id)
+                  .filter(x => {
+                    let methodNode = UIA.GetMethodNode(x.id);
+                    let currentMethodNode = UIA.GetMethodNode(currentNode.id);
+                    return (
+                      UIA.GetMethodNodeProp(
+                        methodNode.id,
+                        FunctionTemplateKeys.Agent
+                      ) ===
+                      UIA.GetMethodNodeProp(
+                        currentMethodNode.id,
+                        FunctionTemplateKeys.Agent
+                      )
+                    );
+                  })
+                  .map(permission => {
+                    result.push(
+                      ...CopyPermissionConditions({
+                        permission: currentNode.id,
+                        node: permission.id
+                      })
+                    );
+                  });
+                this.props.graphOperation(result);
+              }}
+              title={Titles.CopyToAll}
+            />
+          </TreeViewMenu>
+        ) : null}
+        <TreeViewMenu
+          open={UIA.Visual(state, "modelfilter OPERATIONS")}
+          active={true}
+          title={`Model Filter ${Titles.Operations}`}
+          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+          toggle={() => {
+            this.props.toggleVisual("modelfilter OPERATIONS");
+          }}
+        >
+          <TreeViewMenu
+            active={true}
+            title={`${Titles.SelectAll} on all nodes`}
+            onClick={() => {
+              let filters = UIA.NodesByType(null, NodeTypes.ModelFilter);
+              filters.map(filter => {
+                let model = UIA.GetNodeProp(filter, NodeProperties.FilterModel);
+                let propnodes = UIA.GetModelPropertyChildren(model);
+                let fprops =
+                  UIA.GetNodeProp(
+                    filter,
+                    UIA.NodeProperties.FilterPropreties
+                  ) || {};
+                propnodes.map(node => {
+                  fprops[node.id] = true;
+                });
+                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                  prop: UIA.NodeProperties.FilterPropreties,
+                  id: filter.id,
+                  value: fprops
+                });
+              });
+            }}
+          />
+        </TreeViewMenu>
         <TreeViewMenu
           open={UIA.Visual(state, "executor OPERATIONS")}
           active={true}
@@ -801,6 +894,68 @@ class ContextMenu extends Component {
             />
           </TreeViewMenu>
         ];
+      case NodeTypes.Screen:
+        switch (UIA.GetNodeProp(currentNode, NodeProperties.ViewType)) {
+          case UIA.ViewTypes.GetAll:
+            return [
+              <TreeViewMenu
+                open={UIA.Visual(state, "OPERATIONS")}
+                active={true}
+                title={Titles.Operations}
+                innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+                toggle={() => {
+                  this.props.toggleVisual("OPERATIONS");
+                }}
+              >
+                <TreeViewMenu
+                  title={`Connect`}
+                  open={UIA.Visual(state, `Connect`)}
+                  active={true}
+                  onClick={() => {
+                    this.props.toggleVisual(`Connect`);
+                  }}
+                >
+                  <TreeViewItemContainer>
+                    <SelectInput
+                      label={Titles.Methods}
+                      options={UIA.NodesByType(
+                        this.props.state,
+                        NodeTypes.Method
+                      )
+                        .filter(
+                          x =>
+                            (
+                              MethodFunctions[
+                                UIA.GetNodeProp(x, NodeProperties.FunctionType)
+                              ] || {}
+                            ).method === UIA.ViewTypes.GetAll
+                        )
+                        .toNodeSelect()}
+                      onChange={value => {
+                        this.setState({
+                          method: value
+                        });
+                      }}
+                      value={this.state.method}
+                    />
+                  </TreeViewItemContainer>
+                  {this.state.method ? (
+                    <TreeViewMenu
+                      title={Titles.Execute}
+                      onClick={() => {
+                        this.props.graphOperation([
+                          ...ScreenConnect({
+                            method: this.state.method,
+                            node: currentNode.id
+                          })
+                        ]);
+                      }}
+                    />
+                  ) : null}
+                </TreeViewMenu>
+              </TreeViewMenu>
+            ];
+        }
       case NodeTypes.DataChain:
         //DataChain_SelectPropertyValue
         return [
@@ -1279,17 +1434,6 @@ class ContextMenu extends Component {
             }}
           >
             <TreeViewMenu
-              active={true}
-              title={NameLikeValidation.title}
-              description={AddCopyPropertiesToExecutor.description}
-              onClick={() => {
-                let result = NameLikeValidation({
-                  condition: currentNode.id
-                });
-                this.props.graphOperation(result);
-              }}
-            />
-            <TreeViewMenu
               open={UIA.Visual(state, "Validations")}
               active={true}
               title={`Validationss`}
@@ -1298,24 +1442,84 @@ class ContextMenu extends Component {
                 this.props.toggleVisual("Validations");
               }}
             >
-              (
+              {" "}
               <TreeViewItemContainer>
                 <SelectInput
-                  label={Titles.Properties}
-                  options={UIA.GetModelPropertyChildren(
-                    UIA.GetPermissionMethodModel(
-                      UIA.GetPermissionNode(currentNode.id)
-                    )
-                  ).toNodeSelect()}
+                  label={Titles.Key}
+                  options={Object.keys(FunctionTemplateKeys).map(x => ({
+                    title: x,
+                    value: FunctionTemplateKeys[x],
+                    id: FunctionTemplateKeys[x]
+                  }))}
                   onChange={value => {
                     this.setState({
-                      property: value
+                      key: value
                     });
                   }}
-                  value={this.state.property}
+                  value={this.state.key}
                 />
               </TreeViewItemContainer>
-              )
+              {this.state.key ? (
+                <TreeViewItemContainer>
+                  <SelectInput
+                    label={Titles.Properties}
+                    options={UIA.GetModelPropertyChildren(
+                      UIA.GetFunctionMethodKey(
+                        UIA.GetValidationNode(currentNode.id)
+                      ),
+                      this.state.key
+                    ).toNodeSelect()}
+                    onChange={value => {
+                      this.setState({
+                        property: value
+                      });
+                    }}
+                    value={this.state.property}
+                  />
+                </TreeViewItemContainer>
+              ) : null}
+              <TreeViewMenu
+                active={true}
+                title={NameLikeValidation.title}
+                description={NameLikeValidation.description}
+                onClick={() => {
+                  let validation = UIA.GetValidationNode(currentNode.id);
+                  let methodNode = UIA.GetMethodNode(
+                    validation ? validation.id : null
+                  );
+                  let result = NameLikeValidation({
+                    condition: currentNode.id,
+                    property: this.state.property,
+                    methodKey: this.state.key,
+                    methodType: UIA.GetNodeProp(
+                      methodNode,
+                      NodeProperties.FunctionType
+                    )
+                  });
+                  this.props.graphOperation(result);
+                }}
+              />
+              <TreeViewMenu
+                active={true}
+                title={DescriptionLikeValidation.title}
+                description={DescriptionLikeValidation.description}
+                onClick={() => {
+                  let validation = UIA.GetValidationNode(currentNode.id);
+                  let methodNode = UIA.GetMethodNode(
+                    validation ? validation.id : null
+                  );
+                  let result = DescriptionLikeValidation({
+                    condition: currentNode.id,
+                    property: this.state.property,
+                    methodKey: this.state.key,
+                    methodType: UIA.GetNodeProp(
+                      methodNode,
+                      NodeProperties.FunctionType
+                    )
+                  });
+                  this.props.graphOperation(result);
+                }}
+              />
             </TreeViewMenu>
           </TreeViewMenu>
         ];
@@ -1857,35 +2061,7 @@ class ContextMenu extends Component {
             toggle={() => {
               this.props.toggleVisual(NodeTypes.ModelFilter);
             }}
-          >
-            <TreeViewMenu
-              active={true}
-              title={`${Titles.SelectAll} on all nodes`}
-              onClick={() => {
-                let filters = UIA.NodesByType(null, NodeTypes.ModelFilter);
-                filters.map(filter => {
-                  let model = UIA.GetNodeProp(
-                    filter,
-                    NodeProperties.FilterModel
-                  );
-                  let propnodes = UIA.GetModelPropertyChildren(model);
-                  let fprops =
-                    UIA.GetNodeProp(
-                      filter,
-                      UIA.NodeProperties.FilterPropreties
-                    ) || {};
-                  propnodes.map(node => {
-                    fprops[node.id] = true;
-                  });
-                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                    prop: UIA.NodeProperties.FilterPropreties,
-                    id: filter.id,
-                    value: fprops
-                  });
-                });
-              }}
-            />
-          </TreeViewMenu>
+          />
         ];
       case NodeTypes.Permission:
         // getNodePropertyGuids()

@@ -31,3 +31,4 @@
 1. Create APIs
     1. Models that require management will need basic CRUD functionality
     1. Depending on which Agents can interact, different methods need generation.
+1. Update Post Authenticate Data Chain to go to the HomePage/Dashboard. "Select Target Screen"
