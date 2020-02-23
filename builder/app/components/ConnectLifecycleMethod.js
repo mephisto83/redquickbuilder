@@ -15,14 +15,16 @@ import {
 } from "../actions/uiactions";
 import * as GraphMethods from "../methods/graph_methods";
 export default function(args = {}) {
-  let { target, source, viewPackages } = args;
+  let { target, source, viewPackages, graph } = args;
   let state = GetState();
   viewPackages = viewPackages || {};
 
   let apiConnectors = GraphMethods.GetConnectedNodesByType(
     state,
     source,
-    NodeTypes.ComponentApiConnector
+    NodeTypes.ComponentApiConnector,
+    null,
+    graph
   ).map(x => {
     return {
       operation: REMOVE_NODE,
@@ -32,32 +34,53 @@ export default function(args = {}) {
     };
   });
 
-  let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(state, source, [
-    NodeTypes.LifeCylceMethod,
-    NodeTypes.EventMethod
-  ]);
-  let model = GraphMethods.GetConnectedNodeByType(state, lifeCycleMethod.id, [
-    NodeTypes.Model
-  ]);
+  let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(
+    state,
+    source,
+    [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod],
+    null,
+    graph
+  );
+  let model = GraphMethods.GetConnectedNodeByType(
+    state,
+    lifeCycleMethod.id,
+    [NodeTypes.Model],
+    null,
+    graph
+  );
   let dataChain = model
-    ? GraphMethods.GetConnectedNodeByType(state, model.id, [
-        NodeTypes.DataChain
-      ])
+    ? GraphMethods.GetConnectedNodeByType(
+        state,
+        model.id,
+        [NodeTypes.DataChain],
+        null,
+        graph
+      )
     : null;
   let selectorNode = model
-    ? GraphMethods.GetConnectedNodeByType(state, model.id, [NodeTypes.Selector])
+    ? GraphMethods.GetConnectedNodeByType(
+        state,
+        model.id,
+        [NodeTypes.Selector],
+        null,
+        graph
+      )
     : null;
   let componentNode = GraphMethods.GetConnectedNodeByType(
     state,
     lifeCycleMethod.id,
-    [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption]
+    [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption],
+    null,
+    graph
   );
 
   let apiEndpoints = [];
   GraphMethods.GetConnectedNodesByType(
     state,
     target,
-    NodeTypes.MethodApiParameters
+    NodeTypes.MethodApiParameters,
+    null,
+    graph
   )
     .filter(x => {
       if (GetNodeProp(x, NodeProperties.QueryParameterObject)) {
@@ -73,7 +96,9 @@ export default function(args = {}) {
       GraphMethods.GetConnectedNodesByType(
         state,
         queryObj.id,
-        NodeTypes.MethodApiParameters
+        NodeTypes.MethodApiParameters,
+        null,
+        graph
       ).map(queryParam => {
         if (GetNodeProp(queryParam, NodeProperties.QueryParameterParam)) {
           apiEndpoints.push(queryParam);

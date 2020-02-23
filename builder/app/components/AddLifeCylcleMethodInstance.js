@@ -15,7 +15,7 @@ export default function(args = { node, viewPackages }) {
           nodeType: NodeTypes.LifeCylceMethodInstance,
           parent: node,
           linkProperties: {
-            properties: LinkProperties.LifeCylceMethodInstance
+            properties: { ...LinkProperties.LifeCylceMethodInstance }
           },
           groupProperties: {},
           properties: {

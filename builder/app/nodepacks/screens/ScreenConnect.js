@@ -50,7 +50,10 @@ export default function ScreenConnect(args = { method, node }) {
         });
         lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
           let inPackageNodes = GetNodesByProperties({
-            [NodeProperties.ViewPackage]: GetNodeProp(lifeCylcleMethodInstance, NodeProperties.ViewPackage)
+            [NodeProperties.ViewPackage]: GetNodeProp(
+              lifeCylcleMethodInstance,
+              NodeProperties.ViewPackage
+            )
           });
 
           inPackageNodes.map(inPackageNode => {
@@ -65,25 +68,26 @@ export default function ScreenConnect(args = { method, node }) {
           });
         });
         let cycleInstance = null;
-          result.push(
-            ...AddLifeCylcleMethodInstance({
-              node: lifeCylcleMethod.id,
-              viewPackages,
-              callback: _cycleInstance => {
-                cycleInstance = _cycleInstance;
-              }
-            }),
-            function() {
-              if (cycleInstance) {
-                return ConnectLifecycleMethod({
-                  target: method,
-                  source: cycleInstance.id,
-                  viewPackages
-                });
-              }
-              return [];
+        result.push(
+          ...AddLifeCylcleMethodInstance({
+            node: lifeCylcleMethod.id,
+            viewPackages,
+            callback: _cycleInstance => {
+              cycleInstance = _cycleInstance;
             }
-          );
+          }),
+          function(graph) {
+            if (cycleInstance) {
+              return ConnectLifecycleMethod({
+                target: method,
+                source: cycleInstance.id,
+                graph,
+                viewPackages
+              });
+            }
+            return [];
+          }
+        );
       });
   });
 

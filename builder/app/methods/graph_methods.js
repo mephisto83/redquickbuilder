@@ -2175,11 +2175,11 @@ export function GetDataChainEntryNodes(state) {
     GetNodeProp(x, NodeProperties.EntryPoint)
   );
 }
-export function GetConnectedNodeByType(state, id, type, direction) {
+export function GetConnectedNodeByType(state, id, type, direction, graph) {
   if (!Array.isArray(type)) {
     type = [type];
   }
-  let graph = GetRootGraph(state);
+  graph = graph || GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id,
     direction
@@ -2530,9 +2530,15 @@ export function getLink(graph, options) {
   return null;
 }
 export function getAllLinksWithNode(graph, id) {
-  return graph.links.filter(
-    x => graph.linkLib[x].source === id || graph.linkLib[x].target === id
-  );
+  return graph.links.filter(x => {
+    if (!graph.linkLib[x]) {
+      delete graph.linkLib[x];
+    }
+    return (
+      graph.linkLib[x] &&
+      (graph.linkLib[x].source === id || graph.linkLib[x].target === id)
+    );
+  });
 }
 export function removeLinkBetweenNodes(graph, options) {
   let link = findLinkInstance(graph, options);
@@ -2903,7 +2909,7 @@ export function updateGroupProperty(graph, options) {
 function noSameLink(graph, ops) {
   return !graph.links.some(x => {
     let temp = graph.linkLib[x];
-    return temp.source === ops.source && temp.target === ops.target;
+    return temp && temp.source === ops.source && temp.target === ops.target;
   });
 }
 function createGroup() {
