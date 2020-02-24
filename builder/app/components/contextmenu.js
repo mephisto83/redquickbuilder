@@ -15,7 +15,8 @@ import {
   UITypes,
   LinkProperties,
   LinkPropertyKeys,
-  SelectorType
+  SelectorType,
+  Methods
 } from "../constants/nodetypes";
 import AddNameDescription from "../nodepacks/AddNameDescription";
 import TinyTweaks from "../nodepacks/TinyTweaks";
@@ -46,7 +47,8 @@ import {
   GetNodesLinkedTo,
   TARGET,
   SOURCE,
-  existsLinkBetween
+  existsLinkBetween,
+  GetNodeLinkedTo
 } from "../methods/graph_methods";
 import SelectInput from "./selectinput";
 import CheckBox from "./checkbox";
@@ -84,6 +86,7 @@ import AddCopyPropertiesToExecutor from "../nodepacks/AddCopyPropertiesToExecuto
 import NameLikeValidation from "../nodepacks/validation/NameLikeValidation";
 import DescriptionLikeValidation from "../nodepacks/validation/DescriptionLikeValidation";
 import ScreenConnect from "../nodepacks/screens/ScreenConnect";
+import AddFiltersToGetAll from "../nodepacks/method/AddFiltersToGetAll";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -529,6 +532,23 @@ class ContextMenu extends Component {
                   value: fprops
                 });
               });
+            }}
+          />
+        </TreeViewMenu>
+        <TreeViewMenu
+          open={UIA.Visual(state, "method OPERATIONS")}
+          active={true}
+          title={`Method ${Titles.Operations}`}
+          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+          toggle={() => {
+            this.props.toggleVisual("method OPERATIONS");
+          }}
+        >
+          <TreeViewMenu
+            active={true}
+            title={`Add Filters to GetAll`}
+            onClick={() => {
+              this.props.graphOperation(AddFiltersToGetAll({}));
             }}
           />
         </TreeViewMenu>

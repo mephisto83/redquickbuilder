@@ -24,6 +24,7 @@
     1. Those claims are used to recreate the user object, that is used when executing a function in the controller.
 1. Create Views
     1. Build view for models
+    1. All GetALL views need to have filters attached.
 1. Create Shared Views
     1. Build shared views for the relationships between models.
 1. Create Login Screen

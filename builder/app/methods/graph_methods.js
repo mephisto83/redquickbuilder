@@ -2342,6 +2342,7 @@ export function GetNodeLinkedTo(graph, options) {
 }
 export function GetNodesLinkedTo(graph, options) {
   if (options) {
+    graph = graph || GetCurrentGraph();
     var { id, direction, link, componentType, properties } = options;
     if (graph && graph.nodeConnections && id) {
       var nodeLinks = graph.nodeConnections[id];

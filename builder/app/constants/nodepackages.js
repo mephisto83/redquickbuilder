@@ -3037,6 +3037,7 @@ export const CreateDefaultView = {
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
+                    [NodeProperties.ExecuteComponent]: true,
                     [NodeProperties.ComponentType]:
                       ComponentTypes[uiType].Button.key,
                     [NodeProperties.InstanceType]: useModelInstance
@@ -3479,7 +3480,7 @@ export const CreateDefaultView = {
                     useModelInstance ? " Instance" : ""
                   }`,
                   [NodeProperties.Model]: currentNode.id,
-                  [NodeProperties.Pinned]: false,
+                  [NodeProperties.Pinned]: false
                   // [NodeProperties.IsShared]: isSharedComponent,
                   // [NodeProperties.InstanceType]: useModelInstance
                 },

@@ -484,6 +484,7 @@ export const NodeProperties = {
   UseModelAsType: "useModelAsType",
 
   IsDefaultProperty: "isDefaultProperty",
+  ExecuteComponent: "ExecuteComponent",
 
   HasLogicalChildren: "hasLogicalChildren",
   LogicalChildrenTypes: "logicalChildrenTypes",

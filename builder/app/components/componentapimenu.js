@@ -16,6 +16,7 @@ import SideMenuContainer from './sidemenucontainer';
 import ButtonList from './buttonlist';
 import { SCOPE_TAB } from './dashboard';
 import { createComponentApi, removeComponentApi, addComponentApi } from '../methods/component_api_methods';
+import checkboxproperty from './checkboxproperty';
 class ComponentAPIMenu extends Component {
     constructor(props) {
         super(props);
@@ -33,67 +34,7 @@ class ComponentAPIMenu extends Component {
         return (
             <SideMenuContainer active={active} tab={SCOPE_TAB} visual={"component-api-menu"} title={Titles.ComponentAPIMenu}>
                 <TabPane active={active}>
-                    {currentNode ? (<FormControl>
-                        <TextInput
-                            label={Titles.Property}
-                            value={this.state.modelProp}
-                            onChange={(value) => {
-                                this.setState({ modelProp: value });
-                            }} />
-                    </FormControl>) : null}
-                    {componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType] ? (
-                        <ControlSideBarMenu>
-                            <ControlSideBarMenuItem onClick={() => {
-                                if (this.state.modelProp) {
-                                    componentProps = addComponentApi(componentProps, {
-                                        modelProp: this.state.modelProp
-                                    })
-                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                        prop: UIA.NodeProperties.ComponentApi,
-                                        id: currentNode.id,
-                                        value: componentProps
-                                    });
-                                }
-                            }} icon={'fa fa-plus'} title={Titles.Add} description={Titles.Add} />
-                            <ControlSideBarMenuItem onClick={() => {
-                                if (this.state.modelProp) {
-                                    componentProps = removeComponentApi(componentProps, { modelProp: this.state.modelProp })
-                                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                        prop: UIA.NodeProperties.ComponentApi,
-                                        id: currentNode.id,
-                                        value: componentProps
-                                    });
-
-                                }
-                            }} icon={'fa fa-plus'} title={Titles.Remove} description={Titles.Remove} />
-                            {componentTypes[componentType] && componentTypes[componentType].defaultApi ? <ControlSideBarMenuItem onClick={() => {
-
-                                let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
-                                let componentTypes = ComponentTypes[_ui_type] || {};
-                                let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);
-
-                                componentTypes[componentType].defaultApi.map(x => {
-                                    componentProps = addComponentApi(componentProps, {
-                                        modelProp: x.property
-                                    })
-                                })
-                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                    prop: UIA.NodeProperties.ComponentApi,
-                                    id: currentNode.id,
-                                    value: componentProps
-                                });
-                                this.applyDefaultComponentProperties()
-                            }} icon={'fa fa-plus'} title={Titles.AddDefaults} description={Titles.AddDefaults} /> : null}
-                        </ControlSideBarMenu>
-                    ) : null}
-                    <ButtonList active={true} isSelected={(item) => { return item.value === this.state.selectedItem; }}
-                        items={getComponentPropertyList(UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentApi))}
-                        onClick={(item) => {
-                            this.setState({
-                                modelProp: item.value,
-                                selectedItem: item.value
-                            })
-                        }} />
+                    <checkboxproperty />
                 </TabPane>
             </SideMenuContainer>
         );
