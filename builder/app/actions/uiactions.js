@@ -3329,7 +3329,10 @@ export function GetValidatorMethod(permission) {
     });
   return null;
 }
-export function GetFunctionMethodKey(validation, templateKey = FunctionTemplateKeys.Model) {
+export function GetFunctionMethodKey(
+  validation,
+  templateKey = FunctionTemplateKeys.Model
+) {
   let method = validation ? GetValidatorMethod(validation) : null;
   if (method) {
     let props = GetMethodProps(method);
@@ -3527,7 +3530,8 @@ export function executeGraphOperation(model, op, args = {}) {
 export function GetNodesLinkTypes(id) {
   return GraphMethods.getNodesLinkTypes(GetCurrentGraph(GetState()), { id });
 }
-export function addInstanceFunc(node, callback) {
+export function addInstanceFunc(node, callback, viewPackages) {
+  viewPackages = viewPackages || {};
   return function() {
     return {
       nodeType: NodeTypes.EventMethodInstance,
@@ -3539,6 +3543,7 @@ export function addInstanceFunc(node, callback) {
       properties: {
         [NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
         [NodeProperties.Pinned]: false,
+        ...viewPackages,
         [NodeProperties.AutoDelete]: {
           properties: {
             [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector

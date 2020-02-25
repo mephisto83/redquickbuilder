@@ -325,6 +325,7 @@ export const NodeProperties = {
   ClientMethod: "ClientMethod",
   MethodParameters: "MethodParameters",
   NavigationParametersProperty: "NavigationParametersProperty",
+  ExecuteButton: "ExecuteButton",
   MethodParameterProperty: "MethodParameterProperty",
   ScreenParameters: "ScreenParameters",
   SelectedLayoutCell: "SelectedLayoutCell",

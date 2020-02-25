@@ -217,6 +217,7 @@ export const AddModelItemFilter = "Add model item filter";
 export const ConnectModelItemFilter = "Connect Model Item Filter";
 export const ClaimServiceRegistrationCalls = "Registration Calls Methods";
 export const ClaimServiceUpdateUserMethod = "Update User Methods";
+export const ExecuteButton = "Execute Button";
 export const AddModelItemFilterDescription =
   "Add model item filter for get functions";
 export const PermissionType = "Permissions";

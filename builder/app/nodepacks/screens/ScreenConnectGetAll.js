@@ -3,22 +3,24 @@ import {
   GetCurrentGraph,
   GetNodeProp,
   GetNodesByProperties,
-  REMOVE_NODE
+  REMOVE_NODE,
+  ViewTypes
 } from "../../actions/uiactions";
 import { LinkType, NodeProperties } from "../../constants/nodetypes";
 import { ComponentLifeCycleEvents } from "../../constants/componenttypes";
-import AddLifeCylcleMethodInstance from "../../components/AddLifeCylcleMethodInstance";
+import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 
-export default function ScreenConnect(args = { method, node }) {
-  let { node, method } = args;
+export default function ScreenConnectGetAll(args = { method, node }) {
+  let { node, method, viewType } = args;
   if (!node) {
     throw "no node";
   }
   if (!method) {
     throw "no method";
   }
+
   let graph = GetCurrentGraph();
   let screen_options = GetNodesLinkedTo(graph, {
     id: node,

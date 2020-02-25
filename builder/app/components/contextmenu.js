@@ -85,7 +85,8 @@ import AddAllPropertiesToExecutor from "../nodepacks/AddAllPropertiesToExecutor"
 import AddCopyPropertiesToExecutor from "../nodepacks/AddCopyPropertiesToExecutor";
 import NameLikeValidation from "../nodepacks/validation/NameLikeValidation";
 import DescriptionLikeValidation from "../nodepacks/validation/DescriptionLikeValidation";
-import ScreenConnect from "../nodepacks/screens/ScreenConnect";
+import ScreenConnectGetAll from "../nodepacks/screens/ScreenConnectGetAll";
+import ScreenConnectCreate from '../nodepacks/screens/ScreenConnectCreate';
 import AddFiltersToGetAll from "../nodepacks/method/AddFiltersToGetAll";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -915,8 +916,10 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.Screen:
-        switch (UIA.GetNodeProp(currentNode, NodeProperties.ViewType)) {
+        let viewType = UIA.GetNodeProp(currentNode, NodeProperties.ViewType);
+        switch (viewType) {
           case UIA.ViewTypes.GetAll:
+          case UIA.ViewTypes.Create:
             return [
               <TreeViewMenu
                 open={UIA.Visual(state, "OPERATIONS")}
@@ -948,7 +951,7 @@ class ContextMenu extends Component {
                               MethodFunctions[
                                 UIA.GetNodeProp(x, NodeProperties.FunctionType)
                               ] || {}
-                            ).method === UIA.ViewTypes.GetAll
+                            ).method === viewType
                         )
                         .toNodeSelect()}
                       onChange={value => {
@@ -963,12 +966,23 @@ class ContextMenu extends Component {
                     <TreeViewMenu
                       title={Titles.Execute}
                       onClick={() => {
-                        this.props.graphOperation([
-                          ...ScreenConnect({
-                            method: this.state.method,
-                            node: currentNode.id
-                          })
-                        ]);
+                        let commands = [];
+                        switch (viewType) {
+                          case UIA.ViewTypes.GetAll:
+                            commands = ScreenConnectGetAll({
+                              method: this.state.method,
+                              node: currentNode.id
+                            });
+                            break;
+                          case UIA.ViewTypes.Create:
+                            commands = ScreenConnectCreate({
+                              method: this.state.method,
+                              node: currentNode.id
+                            });
+                            break;
+
+                        }
+                        this.props.graphOperation([...commands]);
                       }}
                     />
                   ) : null}
