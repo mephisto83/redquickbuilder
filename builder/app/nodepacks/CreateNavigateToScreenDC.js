@@ -1,5 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
+import { GetNodeTitle } from "../actions/uiactions";
 export default function(args = {}) {
   // node3
 
@@ -9,7 +10,7 @@ export default function(args = {}) {
   }
   let context = {
     ...args,
-    node3: uuidv4()
+    node3: args.screen
   };
   let { viewPackages } = args;
   viewPackages = {
@@ -36,7 +37,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Nabigate to Screen " + args.screen + ""
+            value: "Navigate to Screen " + GetNodeTitle(args.screen) + ""
           }
         }
       ];

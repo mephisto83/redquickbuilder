@@ -207,6 +207,7 @@ export const IsAgent = "Agent";
 export const IsOwnedByAgents = "Is Owned By Agents";
 export const IsOwnedByAgentsDescriptions =
   "That would mean any agent/model could own this object.";
+export const ComponentDidMount = "Component Did Mount";
 export const IsUser = "User";
 export const ParameterType = "Parameter Type";
 export const OwnedResources = "Owned Resources";

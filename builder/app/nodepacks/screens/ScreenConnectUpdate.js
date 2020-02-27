@@ -17,14 +17,18 @@ import {
 import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
+import ModifyUpdateLinks from "../ModifyUpdateLinks";
 
-export default function ScreenConnectCreate(args = { method, node }) {
-  let { node, method, viewType } = args;
+export default function ScreenConnectUpdate(args = { method, node }) {
+  let { node, method, componentDidMountMethod, viewType } = args;
   if (!node) {
     throw "no node";
   }
   if (!method) {
     throw "no method";
+  }
+  if (!componentDidMountMethod) {
+    throw "no componentDidMountMethod";
   }
   let graph = GetCurrentGraph();
   let screen_options = GetNodesLinkedTo(graph, {
@@ -39,6 +43,67 @@ export default function ScreenConnectCreate(args = { method, node }) {
   };
 
   screen_options.map(screen_option => {
+    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: LinkType.LifeCylceMethod
+    });
+
+    lifeCylcleMethods
+      .filter(
+        x =>
+          GetNodeProp(x, NodeProperties.UIText) ===
+          ComponentLifeCycleEvents.ComponentDidMount
+      )
+      .map(lifeCylcleMethod => {
+        let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+          id: lifeCylcleMethod.id,
+          link: LinkType.LifeCylceMethodInstance
+        });
+        lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
+          let vp = GetNodeProp(
+            lifeCylcleMethodInstance,
+            NodeProperties.ViewPackage
+          );
+          if (vp) {
+            let inPackageNodes = GetNodesByProperties({
+              [NodeProperties.ViewPackage]: vp
+            });
+
+            inPackageNodes.map(inPackageNode => {
+              result.push({
+                operation: REMOVE_NODE,
+                options: function(graph) {
+                  return {
+                    id: inPackageNode.id
+                  };
+                }
+              });
+            });
+          }
+        });
+        let cycleInstance = null;
+        result.push(
+          ...AddLifeCylcleMethodInstance({
+            node: lifeCylcleMethod.id,
+            viewPackages,
+            callback: _cycleInstance => {
+              cycleInstance = _cycleInstance;
+            }
+          }),
+          function(graph) {
+            if (cycleInstance) {
+              return ConnectLifecycleMethod({
+                target: componentDidMountMethod,
+                source: cycleInstance.id,
+                graph,
+                viewPackages
+              });
+            }
+            return [];
+          }
+        );
+      });
+
     let components = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.Component
@@ -71,8 +136,12 @@ export default function ScreenConnectCreate(args = { method, node }) {
               let vp = GetNodeProp(instance, NodeProperties.ViewPackage);
               if (vp) {
                 let inPackageNodes = GetNodesByProperties({
-                  [NodeProperties.ViewPackage]: vp
+                  [NodeProperties.ViewPackage]: GetNodeProp(
+                    instance,
+                    NodeProperties.ViewPackage
+                  )
                 });
+
                 inPackageNodes.map(inPackageNode => {
                   result.push({
                     operation: REMOVE_NODE,
@@ -86,6 +155,7 @@ export default function ScreenConnectCreate(args = { method, node }) {
               }
             });
           }
+
           let _instanceNode = null;
           result.push(
             ...[
@@ -116,6 +186,6 @@ export default function ScreenConnectCreate(args = { method, node }) {
       }
     });
   });
-
+  result = [...result, ...ModifyUpdateLinks()];
   return result;
 }

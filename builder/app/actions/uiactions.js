@@ -3720,6 +3720,9 @@ export function graphOperation(operation, options) {
           _op
             .filter(x => x)
             .map(op => {
+              if (typeof op === "function") {
+                op();
+              }
               let { operation, options } = op;
               if (typeof options === "function") {
                 options = options(currentGraph);

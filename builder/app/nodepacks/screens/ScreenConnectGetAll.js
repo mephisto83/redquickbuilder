@@ -4,16 +4,27 @@ import {
   GetNodeProp,
   GetNodesByProperties,
   REMOVE_NODE,
-  ViewTypes
+  ViewTypes,
+  addInstanceFunc,
+  ADD_NEW_NODE,
+  ADD_LINK_BETWEEN_NODES
 } from "../../actions/uiactions";
-import { LinkType, NodeProperties } from "../../constants/nodetypes";
-import { ComponentLifeCycleEvents } from "../../constants/componenttypes";
+import {
+  LinkType,
+  NodeProperties,
+  LinkProperties
+} from "../../constants/nodetypes";
+import {
+  ComponentLifeCycleEvents,
+  ComponentEvents
+} from "../../constants/componenttypes";
 import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
+import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
-  let { node, method, viewType } = args;
+  let { node, method, navigateTo } = args;
   if (!node) {
     throw "no node";
   }
@@ -34,6 +45,102 @@ export default function ScreenConnectGetAll(args = { method, node }) {
   };
 
   screen_options.map(screen_option => {
+    let components = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: LinkType.Component
+    });
+
+    components.map(component => {
+      let listItems = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: LinkType.ListItem
+      });
+
+      listItems.map(listItem => {
+        let subcomponents = GetNodesLinkedTo(graph, {
+          id: listItem.id,
+          link: LinkType.Component
+        }).filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
+        if (subcomponents && subcomponents.length === 1) {
+          let subcomponent = subcomponents[0];
+          let events = GetNodesLinkedTo(graph, {
+            id: subcomponent.id,
+            link: LinkType.EventMethod
+          }).filter(x =>
+            [ComponentEvents.onClick, ComponentEvents.onPress].some(
+              v => v === GetNodeProp(x, NodeProperties.EventType)
+            )
+          );
+          events.map(evnt => {
+            let eventMethodInstances = GetNodesLinkedTo(graph, {
+              id: evnt.id,
+              link: LinkType.EventMethodInstance
+            });
+            eventMethodInstances.map(eventMethodInstance => {
+              let vp = GetNodeProp(
+                eventMethodInstance,
+                NodeProperties.ViewPackage
+              );
+              if (vp) {
+                let inPackageNodes = GetNodesByProperties({
+                  [NodeProperties.ViewPackage]: vp
+                });
+
+                inPackageNodes.map(inPackageNode => {
+                  result.push({
+                    operation: REMOVE_NODE,
+                    options: function(graph) {
+                      return {
+                        id: inPackageNode.id
+                      };
+                    }
+                  });
+                });
+              }
+            });
+
+            let _instanceNode = null;
+            let _navigateContext = null;
+            result.push(
+              ...[
+                {
+                  operation: ADD_NEW_NODE,
+                  options: addInstanceFunc(
+                    evnt,
+                    instanceNode => {
+                      _instanceNode = instanceNode;
+                    },
+                    viewPackages
+                  )
+                }
+              ],
+              ...CreateNavigateToScreenDC({
+                screen: navigateTo,
+                viewPackages,
+                callback: navigateContext => {
+                  _navigateContext = navigateContext;
+                }
+              }),
+              function(graph) {
+                return [
+                  {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function() {
+                      return {
+                        source: _instanceNode.id,
+                        target: _navigateContext.entry,
+                        properties: { ...LinkProperties.DataChainLink }
+                      };
+                    }
+                  }
+                ];
+              }
+            );
+          });
+        }
+      });
+    });
+
     let lifeCylcleMethods = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.LifeCylceMethod
@@ -51,23 +158,26 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           link: LinkType.LifeCylceMethodInstance
         });
         lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
-          let inPackageNodes = GetNodesByProperties({
-            [NodeProperties.ViewPackage]: GetNodeProp(
-              lifeCylcleMethodInstance,
-              NodeProperties.ViewPackage
-            )
-          });
-
-          inPackageNodes.map(inPackageNode => {
-            result.push({
-              operation: REMOVE_NODE,
-              options: function(graph) {
-                return {
-                  id: inPackageNode.id
-                };
-              }
+          let vp = GetNodeProp(
+            lifeCylcleMethodInstance,
+            NodeProperties.ViewPackage
+          );
+          if (vp) {
+            let inPackageNodes = GetNodesByProperties({
+              [NodeProperties.ViewPackage]: vp
             });
-          });
+
+            inPackageNodes.map(inPackageNode => {
+              result.push({
+                operation: REMOVE_NODE,
+                options: function(graph) {
+                  return {
+                    id: inPackageNode.id
+                  };
+                }
+              });
+            });
+          }
         });
         let cycleInstance = null;
         result.push(

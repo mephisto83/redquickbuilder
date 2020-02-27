@@ -86,8 +86,9 @@ import AddCopyPropertiesToExecutor from "../nodepacks/AddCopyPropertiesToExecuto
 import NameLikeValidation from "../nodepacks/validation/NameLikeValidation";
 import DescriptionLikeValidation from "../nodepacks/validation/DescriptionLikeValidation";
 import ScreenConnectGetAll from "../nodepacks/screens/ScreenConnectGetAll";
-import ScreenConnectCreate from '../nodepacks/screens/ScreenConnectCreate';
+import ScreenConnectCreate from "../nodepacks/screens/ScreenConnectCreate";
 import AddFiltersToGetAll from "../nodepacks/method/AddFiltersToGetAll";
+import ScreenConnectUpdate from "../nodepacks/screens/ScreenConnectUpdate";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -920,6 +921,11 @@ class ContextMenu extends Component {
         switch (viewType) {
           case UIA.ViewTypes.GetAll:
           case UIA.ViewTypes.Create:
+          case UIA.ViewTypes.Update:
+            let screenModel = UIA.GetNodeProp(
+              currentNode,
+              NodeProperties.Model
+            );
             return [
               <TreeViewMenu
                 open={UIA.Visual(state, "OPERATIONS")}
@@ -953,6 +959,21 @@ class ContextMenu extends Component {
                               ] || {}
                             ).method === viewType
                         )
+                        .filter(x => {
+                          if (screenModel) {
+                            let modelOutput =
+                              UIA.GetMethodNodeProp(
+                                x,
+                                FunctionTemplateKeys.ModelOutput
+                              ) ||
+                              UIA.GetMethodNodeProp(
+                                x,
+                                FunctionTemplateKeys.Model
+                              );
+                            return modelOutput === screenModel;
+                          }
+                          return true;
+                        })
                         .toNodeSelect()}
                       onChange={value => {
                         this.setState({
@@ -962,6 +983,83 @@ class ContextMenu extends Component {
                       value={this.state.method}
                     />
                   </TreeViewItemContainer>
+                  {viewType === UIA.ViewTypes.GetAll ? (
+                    <TreeViewItemContainer>
+                      <SelectInput
+                        label={Titles.NavigateTo}
+                        options={UIA.NodesByType(
+                          this.props.state,
+                          NodeTypes.Screen
+                        )
+                          .filter(
+                            x =>
+                              UIA.GetNodeProp(x, NodeProperties.ViewType) ===
+                              UIA.ViewTypes.Get
+                          )
+                          .filter(x => {
+                            if (screenModel) {
+                              let modelOutput = UIA.GetNodeProp(
+                                x,
+                                NodeProperties.Model
+                              );
+                              return modelOutput === screenModel;
+                            }
+                            return true;
+                          })
+                          .toNodeSelect()}
+                        onChange={value => {
+                          this.setState({
+                            navigateTo: value
+                          });
+                        }}
+                        value={this.state.navigateTo}
+                      />
+                    </TreeViewItemContainer>
+                  ) : null}
+                  {viewType === UIA.ViewTypes.Update ? (
+                    <TreeViewItemContainer>
+                      <SelectInput
+                        label={Titles.ComponentDidMount}
+                        options={UIA.NodesByType(
+                          this.props.state,
+                          NodeTypes.Method
+                        )
+                          .filter(
+                            x =>
+                              (
+                                MethodFunctions[
+                                  UIA.GetNodeProp(
+                                    x,
+                                    NodeProperties.FunctionType
+                                  )
+                                ] || {}
+                              ).method === UIA.ViewTypes.Get
+                          )
+                          .filter(x => {
+                            if (screenModel) {
+                              let modelOutput =
+                                UIA.GetMethodNodeProp(
+                                  x,
+                                  FunctionTemplateKeys.ModelOutput
+                                ) ||
+                                UIA.GetMethodNodeProp(
+                                  x,
+                                  FunctionTemplateKeys.Model
+                                );
+                              return modelOutput === screenModel;
+                            }
+                            return true;
+                          })
+                          .toNodeSelect()}
+                        onChange={value => {
+                          this.setState({
+                            componentDidMountMethod: value
+                          });
+                        }}
+                        value={this.state.componentDidMountMethod}
+                      />
+                    </TreeViewItemContainer>
+                  ) : null}
                   {this.state.method ? (
                     <TreeViewMenu
                       title={Titles.Execute}
@@ -971,7 +1069,8 @@ class ContextMenu extends Component {
                           case UIA.ViewTypes.GetAll:
                             commands = ScreenConnectGetAll({
                               method: this.state.method,
-                              node: currentNode.id
+                              node: currentNode.id,
+                              navigateTo: this.state.navigateTo
                             });
                             break;
                           case UIA.ViewTypes.Create:
@@ -980,7 +1079,13 @@ class ContextMenu extends Component {
                               node: currentNode.id
                             });
                             break;
-
+                          case UIA.ViewTypes.Update:
+                            commands = ScreenConnectUpdate({
+                              method: this.state.method,
+                              componentDidMountMethod: this.state
+                                .componentDidMountMethod,
+                              node: currentNode.id
+                            });
                         }
                         this.props.graphOperation([...commands]);
                       }}

@@ -24,10 +24,8 @@ import { NodeType } from "../components/titles";
 export default function(args = {}) {
   let result = [];
   let graph = GetCurrentGraph();
-  let screenWithoutDataChainCollection = NodesByType(
-    null,
-    NodeTypes.Screen
-  ).filter(screen => {
+  let screens = NodesByType(null, NodeTypes.Screen);
+  let screenWithoutDataChainCollection = screens.filter(screen => {
     return !GetNodesLinkedTo(graph, {
       id: screen.id,
       link: LinkType.DataChainCollectionReference
@@ -220,27 +218,7 @@ export default function(args = {}) {
     .map(d => getTopComponent(graph, d))
     .filter(x => GetNodeProp(x, NodeProperties.SharedComponent))
     .unique();
-  // result.push(
-  //   ...topComponents.map(component => {
-  //     return function(graph) {
-  //       let reference = getCollectionReference(graph, component);
-  //       if (!reference && sharedReferenceCollection) {
-  //         return [
-  //           {
-  //             operation: ADD_LINK_BETWEEN_NODES,
-  //             options: {
-  //               target: sharedReferenceCollection.id,
-  //               source: component.id,
-  //               properties: { ...LinkProperties.DataChainCollectionReference }
-  //             }
-  //           }
-  //         ];
-  //       }
 
-  //       return [];
-  //     };
-  //   })
-  // );
   componentNodes
     .sort((a, b) => {
       let a_lineage = getComponentLineage(graph, a);
@@ -264,6 +242,7 @@ export default function(args = {}) {
           graph,
           component
         );
+        let eventApiDataChains = getComponentEventDataChains(graph, component);
         let reference = null;
         let steps = [];
         reference = getCollectionReference(graph, component);
@@ -313,7 +292,11 @@ export default function(args = {}) {
         }
         return [
           ...steps,
-          ...[...externalApiDataChains, ...internalApiDataChains].map(dc => {
+          ...[
+            ...externalApiDataChains,
+            ...internalApiDataChains,
+            ...eventApiDataChains
+          ].map(dc => {
             return {
               operation: ADD_LINK_BETWEEN_NODES,
               options: function(graph) {
@@ -330,6 +313,39 @@ export default function(args = {}) {
         ];
       });
     });
+  screens.map(screen => {
+    let screen_data_chains = [];
+    let externalApiDataChains = getComponentExternalApiDataChains(
+      graph,
+      screen
+    );
+    let internalApiDataChains = getComponentInternalApiDataChains(
+      graph,
+      screen
+    );
+    let eventApiDataChains = getComponentEventDataChains(graph, screen);
+    screen_data_chains.push(
+      ...externalApiDataChains,
+      ...internalApiDataChains,
+      ...eventApiDataChains
+    );
+    let reference = null;
+    result.push(
+      ...[...screen_data_chains].map(dc => {
+        return {
+          operation: ADD_LINK_BETWEEN_NODES,
+          options: function(graph) {
+            reference = reference || getCollectionReference(graph, screen);
+            return {
+              target: reference.id,
+              source: dc.id,
+              properties: { ...LinkProperties.DataChainCollection }
+            };
+          }
+        };
+      })
+    );
+  });
   return result.filter(x => x);
 }
 function getComponentLineage(graph, node) {
@@ -457,6 +473,31 @@ function getComponentInternalApiDataChains(graph, node) {
         direction: SOURCE
       }).filter(x => GetNodeProp(x, NodeProperties.EntryPoint))
     );
+  });
+  return result;
+}
+
+function getComponentEventDataChains(graph, node) {
+  let result = [];
+  GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: LinkType.EventMethod,
+    componentType: NodeTypes.EventMethod
+  }).map(res => {
+    let instances = GetNodesLinkedTo(graph, {
+      id: res.id,
+      link: LinkType.EventMethodInstance,
+      componentType: NodeTypes.EventMethodInstance
+    });
+    instances.map(res => {
+      result.push(
+        ...GetNodesLinkedTo(graph, {
+          id: res.id,
+          link: LinkType.DataChainLink,
+          componentType: NodeTypes.DataChain
+        }).filter(x => GetNodeProp(x, NodeProperties.EntryPoint))
+      );
+    });
   });
   return result;
 }
