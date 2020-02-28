@@ -67,10 +67,12 @@ class DataChainContextMenu extends Component {
     };
     return (
       <TreeViewMenu
-        open={true}
         active={true}
         title={Titles.DataChain}
-        toggle={() => {}}
+        open={UIA.Visual(state, `datachaincontextmenu`)}
+        toggle={() => {
+          this.props.toggleVisual(`datachaincontextmenu`);
+        }}
       >
         <TreeViewMenu
           title={Titles.SplitDataChain}

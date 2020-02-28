@@ -89,6 +89,7 @@ import ScreenConnectGetAll from "../nodepacks/screens/ScreenConnectGetAll";
 import ScreenConnectCreate from "../nodepacks/screens/ScreenConnectCreate";
 import AddFiltersToGetAll from "../nodepacks/method/AddFiltersToGetAll";
 import ScreenConnectUpdate from "../nodepacks/screens/ScreenConnectUpdate";
+import ScreenConnectGet from "../nodepacks/screens/ScreenConnectGet";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -920,6 +921,7 @@ class ContextMenu extends Component {
         let viewType = UIA.GetNodeProp(currentNode, NodeProperties.ViewType);
         switch (viewType) {
           case UIA.ViewTypes.GetAll:
+          case UIA.ViewTypes.Get:
           case UIA.ViewTypes.Create:
           case UIA.ViewTypes.Update:
             let screenModel = UIA.GetNodeProp(
@@ -983,7 +985,9 @@ class ContextMenu extends Component {
                       value={this.state.method}
                     />
                   </TreeViewItemContainer>
-                  {viewType === UIA.ViewTypes.GetAll ? (
+                  {[UIA.ViewTypes.GetAll, UIA.ViewTypes.Get].some(
+                    v => v === viewType
+                  ) ? (
                     <TreeViewItemContainer>
                       <SelectInput
                         label={Titles.NavigateTo}
@@ -991,11 +995,18 @@ class ContextMenu extends Component {
                           this.props.state,
                           NodeTypes.Screen
                         )
-                          .filter(
-                            x =>
+                          .filter(x => {
+                            if (viewType === UIA.ViewTypes.Get) {
+                              return (
+                                UIA.GetNodeProp(x, NodeProperties.ViewType) ===
+                                UIA.ViewTypes.Update
+                              );
+                            }
+                            return (
                               UIA.GetNodeProp(x, NodeProperties.ViewType) ===
                               UIA.ViewTypes.Get
-                          )
+                            );
+                          })
                           .filter(x => {
                             if (screenModel) {
                               let modelOutput = UIA.GetNodeProp(
@@ -1066,6 +1077,13 @@ class ContextMenu extends Component {
                       onClick={() => {
                         let commands = [];
                         switch (viewType) {
+                          case UIA.ViewTypes.Get:
+                            commands = ScreenConnectGet({
+                              method: this.state.method,
+                              node: currentNode.id,
+                              navigateTo: this.state.navigateTo
+                            });
+                            break;
                           case UIA.ViewTypes.GetAll:
                             commands = ScreenConnectGetAll({
                               method: this.state.method,

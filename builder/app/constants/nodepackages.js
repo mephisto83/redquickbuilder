@@ -444,6 +444,7 @@ export const CreateLoginModels = {
     let nodePackageType = "login-models";
     let nodePackage = "login-models";
     let viewPackage = {
+      [NodeProperties.ViewPackage]: uuidv4(),
       [NodeProperties.NodePackage]: nodePackage,
       [NodeProperties.NodePackageType]: nodePackageType
     };
@@ -3037,7 +3038,7 @@ export const CreateDefaultView = {
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
-                    [NodeProperties.ExecuteComponent]: true,
+                    [NodeProperties.ExecuteButton]: true,
                     [NodeProperties.ComponentType]:
                       ComponentTypes[uiType].Button.key,
                     [NodeProperties.InstanceType]: useModelInstance
