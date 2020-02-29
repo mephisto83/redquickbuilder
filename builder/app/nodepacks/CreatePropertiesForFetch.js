@@ -18,7 +18,7 @@ import { FunctionTemplateKeys } from "../constants/functiontypes";
 
 export default function(args = {}) {
   let { id } = args;
-  debugger;
+
   let fetchServices = GetNodesLinkedTo(GetCurrentGraph(), {
     id,
     link: LinkType.FetchServiceOuput

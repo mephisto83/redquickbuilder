@@ -36,6 +36,11 @@
 1. Update Post Authenticate Data Chain to go to the HomePage/Dashboard. "Select Target Screen"
 1. Fetch Service
     1. Create Fetch Service Node
+    1. Create Fetch Parameter Model
     1. Add Fetch Service compatible functions
         1. Quick methods
         1. Agent Based Methods
+        1. Connect to Fetch Parameters Model
+    1. Create Fetch Output Model
+        1.  Operation => Setup Fetch Result
+
