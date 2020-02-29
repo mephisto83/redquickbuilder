@@ -26,6 +26,12 @@ import {
 export default class DataChainGenerator {
   static Generate(options) {
     let { state, language } = options;
+    let fileEnding = ".js";
+    switch (language) {
+      case UITypes.ElectronIO:
+        fileEnding = ".ts";
+        break;
+    }
     let graph = GetCurrentGraph(state);
     let funcs = GenerateChainFunctions(options);
     let collections = GetDataChainCollections(options);
@@ -58,26 +64,26 @@ export default class DataChainGenerator {
           relative: `./src/actions/datachains/${chainPath.join("/")}${
             chainPath.length ? "/" : ""
           }`,
-          relativeFilePath: `./${GetJSCodeName(nc)}.js`,
-          name: `${chainPath.join('_')}${GetJSCodeName(nc)}`
+          relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
+          name: `${chainPath.join("_")}${GetJSCodeName(nc)}`
         };
       }),
       {
         template: dcTemplate(collections, funcs),
         relative: "./src/actions",
-        relativeFilePath: `./data-chain.js`,
+        relativeFilePath: `./data-chain${fileEnding}`,
         name: "data-chain"
       },
       {
         template: readFileSync("./app/utils/observable.js", "utf8"),
         relative: "./src/actions",
-        relativeFilePath: "./observable.js",
+        relativeFilePath: `./observable${fileEnding}`,
         name: "observable"
       },
       {
         template: readFileSync("./app/utils/redgraph.js", "utf8"),
         relative: "./src/actions",
-        relativeFilePath: "./redgraph.js",
+        relativeFilePath: `./redgraph${fileEnding}`,
         name: "redgraph.js"
       },
       //Specific for web sites
@@ -85,7 +91,7 @@ export default class DataChainGenerator {
       {
         template: readFileSync("./app/utils/redutils.js", "utf8"),
         relative: "./src/actions",
-        relativeFilePath: "./redutils.js",
+        relativeFilePath: `./redutils${fileEnding}`,
         name: "redutils.js"
       }
     ].filter(x => x);

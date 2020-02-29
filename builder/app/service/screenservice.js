@@ -422,8 +422,10 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
   let cssFile = null;
   let cssImport = null;
   let templateStr = null;
+  let ending = ".js";
   switch (language) {
     case UITypes.ElectronIO:
+      ending = ".tsx";
       templateStr = fs.readFileSync(
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
@@ -488,10 +490,12 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     {
       template: templateStr,
       relative: relativePath || "./src/components",
-      relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}.js`,
+      relativeFilePath: `./${(
+        GetCodeName(node) || ""
+      ).toJavascriptName()}${ending}`,
       name:
         (relativePath || "./src/components/") +
-        `${(GetCodeName(node) || "").toJavascriptName()}.js`
+        `${(GetCodeName(node) || "").toJavascriptName()}${ending}`
     },
     cssFile
       ? {
@@ -696,6 +700,12 @@ export function GenerateRNComponents(
 ) {
   let result = [];
   let layoutObj = GetNodeProp(node, NodeProperties.Layout);
+  let fileEnding = ".js";
+  switch (language) {
+    case UITypes.ElectronIO:
+      fileEnding = ".tsx";
+      break;
+  }
   let componentType = GetNodeProp(node, NodeProperties.ComponentType);
   if (
     !layoutObj &&
@@ -770,10 +780,10 @@ export function GenerateRNComponents(
           relative: relative || "./src/components",
           relativeFilePath: `./${(
             GetCodeName(node) || ""
-          ).toJavascriptName()}.js`,
+          ).toJavascriptName()}${fileEnding}`,
           name:
             (relative || "./src/components") +
-            `/${(GetCodeName(node) || "").toJavascriptName()}.js`,
+            `/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
           template
         });
         break;
@@ -1822,14 +1832,21 @@ function GenerateElectronIORoutes(screens) {
   return {
     template: routeFile,
     relative: "./src",
-    relativeFilePath: `./Routes.js`,
-    name: `Routes.js`
+    relativeFilePath: `./Routes.tsx`,
+    name: `Routes.tsx`
   };
 }
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
   var screens = GetScreens();
   let template = fs.readFileSync("./app/templates/screens/screen.tpl", "utf8");
   let moreresults = [];
+  let fileEnding = ".js";
+  switch (language) {
+    case UITypes.ElectronIO:
+      fileEnding = ".tsx";
+      break;
+  }
+
   let result = screens
     .map(screen => {
       let screenOptions = GetConnectedScreenOptions(screen.id);
@@ -1857,7 +1874,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
           title: `"${GetNodeTitle(screen)}"`
         }),
         relative: "./src/screens",
-        relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}.js`,
+        relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}${fileEnding}`,
         name: GetCodeName(screen)
       };
     })

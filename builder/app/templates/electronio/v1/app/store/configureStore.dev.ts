@@ -5,8 +5,24 @@ import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
 import * as counterActions from '../actions/counter';
-import * as controllerActions from '../actions/controllerActions';
-import type { counterStateType } from '../reducers/types';
+import { counterStateType } from '../reducers/types';
+import * as controllerActions from "../actions/controllerActions";
+import * as navigationActions from "../actions/navigationActions";
+import * as uiActions from "../actions/uiActions";
+
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      obj: Record<string, any>
+    ) => Function;
+  }
+  interface NodeModule {
+    hot?: {
+      accept: (path: string, cb: () => void) => void;
+    };
+  }
+}
 
 const history = createHashHistory();
 
@@ -37,9 +53,11 @@ const configureStore = (initialState?: counterStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
-    ...controllerActions,
     ...counterActions,
-    ...routerActions
+    ...routerActions,
+    ...navigationActions,
+    ...controllerActions,
+    ...uiActions
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */
