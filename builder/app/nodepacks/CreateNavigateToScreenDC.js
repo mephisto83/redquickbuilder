@@ -1,6 +1,12 @@
 import { uuidv4 } from "../utils/array";
-import { NodeProperties } from "../constants/nodetypes";
-import { GetNodeTitle } from "../actions/uiactions";
+import { NodeProperties, LinkType } from "../constants/nodetypes";
+import {
+  GetNodeTitle,
+  ADD_LINK_BETWEEN_NODES,
+  LinkProperties
+} from "../actions/uiactions";
+import ClearPreviousViewPackage from "./ClearPreviousViewPackage";
+import { GetNodesLinkedTo } from "../methods/graph_methods";
 export default function(args = {}) {
   // node3
 
@@ -8,8 +14,12 @@ export default function(args = {}) {
   if (!args.screen) {
     throw "missing screen argument";
   }
+  if (!args.node) {
+    throw "missing node argument";
+  }
   let context = {
     ...args,
+    node: args.node,
     node3: args.screen
   };
   let { viewPackages } = args;
@@ -18,6 +28,21 @@ export default function(args = {}) {
     ...(viewPackages || {})
   };
   let result = [
+    function(graph) {
+      let temp = typeof args.node === "function" ? args.node() : args.node;
+      let tempnodes = GetNodesLinkedTo(graph, {
+        id: temp,
+        link: LinkType.DataChainLink
+      });
+      return [
+        ...tempnodes.map(node =>
+          ClearPreviousViewPackage({
+            node: node.id,
+            graph
+          })
+        )
+      ].flatten();
+    },
     function(graph) {
       return [
         {
@@ -316,6 +341,23 @@ export default function(args = {}) {
           options: {
             id: context.node2,
             value: "go to place"
+          }
+        }
+      ];
+    },
+    function(graph) {
+      return [
+        {
+          operation: ADD_LINK_BETWEEN_NODES,
+          options: function() {
+            return {
+              source:
+                typeof context.node === "function"
+                  ? context.node()
+                  : context.node,
+              target: context.node0,
+              properties: { ...LinkProperties.DataChainLink }
+            };
           }
         }
       ];

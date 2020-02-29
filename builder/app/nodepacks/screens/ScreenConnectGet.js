@@ -110,25 +110,12 @@ export default function ScreenConnectGet(args = { method, node }) {
             ],
             ...CreateNavigateToScreenDC({
               screen: navigateTo,
+              node: () => _instanceNode.id,
               viewPackages,
               callback: navigateContext => {
                 _navigateContext = navigateContext;
               }
-            }),
-            function(graph) {
-              return [
-                {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
-                    return {
-                      source: _instanceNode.id,
-                      target: _navigateContext.entry,
-                      properties: { ...LinkProperties.DataChainLink }
-                    };
-                  }
-                }
-              ];
-            }
+            })
           );
         });
       }

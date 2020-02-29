@@ -1,4 +1,5 @@
 import { uuidv4 } from "../utils/array";
+import { NodeProperties } from "../constants/nodetypes";
 export default function(args = {}) {
   // node0
 
@@ -11,7 +12,11 @@ export default function(args = {}) {
     ...args,
     node0: args.component
   };
-  let { viewPackages = {} } = args;
+  let { viewPackages } = args;
+  viewPackages = {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
   let result = [
     function(graph) {
       return [
@@ -21,7 +26,8 @@ export default function(args = {}) {
             parent: context.node0,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: "ElectronIO",
+              ...viewPackages
             },
             linkProperties: {
               properties: {
@@ -80,7 +86,8 @@ export default function(args = {}) {
             properties: {
               text: "label",
               Pinned: false,
-              UseAsValue: true
+              UseAsValue: true,
+              ...viewPackages
             },
             callback: function(node, graph, group) {
               context.node2 = node.id;
@@ -107,7 +114,8 @@ export default function(args = {}) {
             groupProperties: {},
             properties: {
               text: "label",
-              Pinned: false
+              Pinned: false,
+              ...viewPackages
             },
             callback: function(node, graph, group) {
               context.node3 = node.id;
@@ -165,7 +173,8 @@ export default function(args = {}) {
             nodeType: "EventMethod",
             properties: {
               EventType: "onClick",
-              text: "onClick"
+              text: "onClick",
+              ...viewPackages
             },
             links: [
               function(graph) {
@@ -207,6 +216,7 @@ export default function(args = {}) {
             properties: {
               text: "onClick Instance",
               Pinned: false,
+              ...viewPackages,
               AutoDelete: {
                 properties: {
                   nodeType: "component-api-connector"

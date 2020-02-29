@@ -90,6 +90,7 @@ import ScreenConnectCreate from "../nodepacks/screens/ScreenConnectCreate";
 import AddFiltersToGetAll from "../nodepacks/method/AddFiltersToGetAll";
 import ScreenConnectUpdate from "../nodepacks/screens/ScreenConnectUpdate";
 import ScreenConnectGet from "../nodepacks/screens/ScreenConnectGet";
+import ClearExecutor from "../nodepacks/ClearExecutor";
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
   constructor(props) {
@@ -1309,11 +1310,16 @@ class ContextMenu extends Component {
                 <TreeViewMenu
                   title={`Execute`}
                   onClick={() => {
-                    this.props.graphOperation(
-                      CreateNavigateToScreenDC({
-                        screen: UIA.GetNodeTitle(this.state.screen)
+                    let _navigateContext = null;
+                    this.props.graphOperation([
+                      ...CreateNavigateToScreenDC({
+                        screen: this.state.screen,
+                        node: currentNode.id,
+                        callback: navigateContext => {
+                          _navigateContext = navigateContext;
+                        }
                       })
-                    );
+                    ]);
                   }}
                 />
               ) : null}
@@ -1546,7 +1552,6 @@ class ContextMenu extends Component {
           >
             <TreeViewMenu
               title={`${Titles.Add} Update User`}
-              hideArrow={true}
               onClick={() => {
                 this.props.graphOperation(
                   UpdateUserExecutor({ node0: currentNode.id })
@@ -1554,16 +1559,21 @@ class ContextMenu extends Component {
               }}
             />
             <TreeViewMenu
-              active={true}
               title={`Have all properties`}
               onClick={() => {
                 let steps = AddAllPropertiesToExecutor({ currentNode });
                 this.props.graphOperation(steps);
               }}
             />
+            <TreeViewMenu
+              title={`Clear all properties`}
+              onClick={() => {
+                let steps = ClearExecutor({ currentNode });
+                this.props.graphOperation(steps);
+              }}
+            />
 
             <TreeViewMenu
-              active={true}
               title={AddCopyPropertiesToExecutor.title}
               description={AddCopyPropertiesToExecutor.description}
               onClick={() => {
@@ -1593,7 +1603,7 @@ class ContextMenu extends Component {
             <TreeViewMenu
               open={UIA.Visual(state, "Validations")}
               active={true}
-              title={`Validationss`}
+              title={`Validations`}
               innerStyle={{ maxHeight: 300, overflowY: "auto" }}
               toggle={() => {
                 this.props.toggleVisual("Validations");

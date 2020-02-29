@@ -52,7 +52,7 @@ function NameLikeValidation(args = { condition: null, property: null }) {
             id: context.node0,
             value: {
               methods: {
-                "Create/Object => Object": {
+                [context.methodType]: {
                   model: {
                     properties: {
                       ...properties,

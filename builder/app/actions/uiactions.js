@@ -832,9 +832,10 @@ export function GetJSCodeName(node) {
   return l;
 }
 
-export function GetModelPropertyChildren(id) {
+export function GetModelPropertyChildren(id, options = {}) {
+  let { skipLogicalChildren } = options;
   let property_nodes = GetModelPropertyNodes(id);
-  let logicalChildren = GetLogicalChildren(id);
+  let logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
   let userModels = [];
   if (
     GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model ||
