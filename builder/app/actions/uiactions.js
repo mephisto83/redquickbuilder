@@ -16,6 +16,7 @@ import {
 import { uuidv4 } from "../utils/array";
 import { currentId } from "async_hooks";
 import { getReferenceInserts } from "../utils/utilservice";
+import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
 
 var fs = require("fs");
 export const VISUAL = "VISUAL";
@@ -465,16 +466,27 @@ export function connectLifeCycleMethod(args) {
           lifeCycleMethod.id,
           [NodeTypes.Model]
         );
-        let dataChain = model
-          ? GraphMethods.GetConnectedNodeByType(state, model.id, [
-              NodeTypes.DataChain
-            ])
-          : null;
         let selectorNode = model
           ? GraphMethods.GetConnectedNodeByType(state, model.id, [
               NodeTypes.Selector
             ])
           : null;
+        let _chain = GetNodesByProperties({
+          [NodeProperties.Selector]: selectorNode.id,
+          [NodeProperties.EntryPoint]: true,
+          [NodeProperties.NODEType]: NodeTypes.DataChain,
+          [NodeProperties.SelectorProperty]:
+            NodeConstants.SelectorPropertyKeys.Object
+        }).find(x => {
+          return (
+            GraphMethods.GetNodesLinkedTo(graph, {
+              id: x.id,
+              link: NodeConstants.LinkType.DataChainLink,
+              componentType: NodeTypes.DataChain
+            }).length === 0
+          );
+        });
+        let dataChain = model ? _chain : null;
         let componentNode = GraphMethods.GetConnectedNodeByType(
           state,
           lifeCycleMethod.id,
@@ -512,6 +524,15 @@ export function connectLifeCycleMethod(args) {
           });
 
         PerformGraphOperation([
+          ...(dataChain
+            ? []
+            : CreateDataChainGetBody({
+                selector: selectorNode.id,
+                model: GetNodeTitle(model),
+                callback: (_m, graph) => {
+                  dataChain = GetNodeById(_m.entry, graph);
+                }
+              })),
           ...apiConnectors,
           {
             operation: ADD_LINK_BETWEEN_NODES,
@@ -538,10 +559,7 @@ export function connectLifeCycleMethod(args) {
                   [NodeProperties.Component]: componentNode.id,
                   [NodeProperties.IsPaging]: true
                 });
-                if (model) {
-                }
-                if (dataChain) {
-                }
+
                 return {
                   nodeType: NodeTypes.ComponentApiConnector,
                   groupProperties: {},

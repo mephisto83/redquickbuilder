@@ -155,14 +155,14 @@ import * as navigate from '../${rel}actions/navigationActions';
 import * as $service from '../${rel}util/service';
 import routes from '../${rel}constants/routes';
 
-import * as RedLists from '../${rel}actions/lists.js';
+import * as RedLists from '../${rel}actions/lists';
 import * as StateKeys from '../${rel}state_keys';
 import * as ModelKeys from '../${rel}model_keys';
 import * as ViewModelKeys from '../${rel}viewmodel_keys';
-import * as Models from '../${rel}model_keys.js';
-import RedObservable from '../${rel}actions/observable.js';
-import RedGraph from '../${rel}actions/redgraph.js';
-import { useParameters, fetchModel } from '../${rel}actions/redutils.js';
+import * as Models from '../${rel}model_keys';
+import RedObservable from '../${rel}actions/observable';
+import RedGraph from '../${rel}actions/redgraph';
+import { useParameters, fetchModel } from '../${rel}actions/redutils';
 ${collections}
 
 ${funcs}`;
