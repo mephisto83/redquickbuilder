@@ -1767,6 +1767,7 @@ class ContextMenu extends Component {
                 );
               }}
             />
+
           </TreeViewMenu>,
           layoutoptions()
         ];

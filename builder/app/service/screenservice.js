@@ -51,7 +51,8 @@ import {
   ComponentLifeCycleEvents,
   ComponentEvents,
   ComponentEventStandardHandler,
-  GetFormItemNode
+  GetFormItemNode,
+  ComponentTypeKeys
 } from "../constants/componenttypes";
 import {
   getComponentProperty,
@@ -897,7 +898,9 @@ export function GenerateMarkupTag(node, language, parent) {
           });
         }
         if (!describedApi) {
-          describedApi = WriteDescribedApiProperties(node);
+          describedApi = WriteDescribedApiProperties(node, {
+            listItem: GetNodeProp(node, NodeProperties.ComponentType) === ComponentTypeKeys.ListItem
+          });
         }
       }
       return `<${GetCodeName(node)} ${describedApi} />`;

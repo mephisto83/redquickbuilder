@@ -7,12 +7,14 @@ import {
   ViewTypes,
   addInstanceFunc,
   ADD_NEW_NODE,
-  ADD_LINK_BETWEEN_NODES
+  ADD_LINK_BETWEEN_NODES,
+  GetNodeTitle
 } from "../../actions/uiactions";
 import {
   LinkType,
   NodeProperties,
-  LinkProperties
+  LinkProperties,
+  NodeTypes
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
@@ -22,6 +24,7 @@ import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
+import StoreModelArrayStandard from "../StoreModelArrayStandard";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -167,6 +170,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           }
         });
         let cycleInstance = null;
+        let storeModelDataChain = null;
         result.push(
           ...AddLifeCylcleMethodInstance({
             node: lifeCylcleMethod.id,
@@ -185,6 +189,36 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               });
             }
             return [];
+          },
+          ...StoreModelArrayStandard({
+            viewPackages,
+            model: GetNodeProp(node, NodeProperties.Model),
+            state_key: `${GetNodeTitle(
+              GetNodeProp(node, NodeProperties.Model)
+            )} State`,
+            callback: context => {
+              storeModelDataChain = context.entry;
+            }
+          }),
+          function(graph) {
+            return [
+              {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function() {
+                  return {
+                    target: storeModelDataChain,
+                    source: cycleInstance.id,
+                    linkProperties: {
+                      properties: {
+                        ...LinkProperties.DataChainLink,
+                        singleLink: true,
+                        nodeTypes: [NodeTypes.DataChain]
+                      }
+                    }
+                  };
+                }
+              }
+            ];
           }
         );
       });

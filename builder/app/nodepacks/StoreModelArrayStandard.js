@@ -1,4 +1,5 @@
 import { uuidv4 } from "../utils/array";
+import { NodeProperties } from "../constants/nodetypes";
 export default function(args = { state_key: "StateKeyReplace" }) {
   // node2
 
@@ -8,7 +9,13 @@ export default function(args = { state_key: "StateKeyReplace" }) {
     ...args,
     node2: args.model
   };
-  let { viewPackages = {} } = args;
+
+  let { viewPackages } = args;
+  viewPackages = {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+
   let result = [
     function(graph) {
       return [
@@ -100,6 +107,7 @@ export default function(args = { state_key: "StateKeyReplace" }) {
             },
             properties: {
               Pinned: false,
+              ...viewPackages,
               ChainParent: context.node0
             },
             linkProperties: {
@@ -207,6 +215,7 @@ export default function(args = { state_key: "StateKeyReplace" }) {
               id: context.group0
             },
             properties: {
+              ...viewPackages,
               ChainParent: context.node1
             },
             linkProperties: {
@@ -285,6 +294,7 @@ export default function(args = { state_key: "StateKeyReplace" }) {
               id: context.group0
             },
             properties: {
+              ...viewPackages,
               ChainParent: context.node3
             },
             linkProperties: {

@@ -30,7 +30,6 @@ export default function(args = {}) {
             linkProperties: {
               properties: {
                 type: "component",
-                stroke: "#B7245C",
                 component: {}
               }
             },

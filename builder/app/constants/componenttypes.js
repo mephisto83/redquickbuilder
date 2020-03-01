@@ -138,6 +138,7 @@ INPUT_DEFAULT_API.map(x => {
 export const ComponentTypeKeys = {
   SingleSelect: "SingleSelect",
   List: "List",
+  ListItem: "ListItem",
   MultiSelectList: "MultiSelectList",
   InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
@@ -404,7 +405,7 @@ export const ComponentTypes = {
       },
       ui: true
     },
-    ListItem: {
+    [ComponentTypeKeys.ListItem]: {
       layout: true,
       ui: true,
       [NAVIGATION]: true,

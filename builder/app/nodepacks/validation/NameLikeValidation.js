@@ -101,9 +101,9 @@ function NameLikeValidation(args = { condition: null, property: null }) {
                             condition: context.maxLength || "50"
                           },
                           [context.node4]: {
-                            type: "alphaonly",
+                            type: "alphaonlywithspaces",
                             code: {
-                              csharp: "AlphaOnlyAttribute"
+                              csharp: "AlphaOnlyWithSpacesAttribute"
                             },
                             template:
                               "./app/templates/validation/validation_generic.tpl",
