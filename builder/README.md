@@ -33,6 +33,7 @@
 1. Create APIs
     1. Models that require management will need basic CRUD functionality
     1. Depending on which Agents can interact, different methods need generation.
+1. Create a Dashboard/AuthenticatedHomePage
 1. Update Post Authenticate Data Chain to go to the HomePage/Dashboard. "Select Target Screen"
 1. Fetch Service
     1. Create Fetch Service Node

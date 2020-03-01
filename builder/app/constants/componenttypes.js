@@ -140,6 +140,7 @@ export const ComponentTypeKeys = {
   List: "List",
   ListItem: "ListItem",
   MultiSelectList: "MultiSelectList",
+  Text: "Text",
   InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
 export const ComponentTypes = {
@@ -433,7 +434,7 @@ export const ComponentTypes = {
     TabBar: {},
     TabContainer: {},
     TabHeader: {},
-    Text: {
+    [ComponentTypeKeys.Text]: {
       template: "./app/templates/components/text.tpl",
       defaultApi: LABEL_DEFAULT_API,
       internalApiNode: ComponentApiKeys.DATA,

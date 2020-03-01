@@ -64,7 +64,8 @@ import {
   ComponentTypes,
   SCREEN_COMPONENT_EVENTS,
   ComponentEvents,
-  ComponentTags
+  ComponentTags,
+  ComponentTypeKeys
 } from "../constants/componenttypes";
 import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
@@ -1767,7 +1768,18 @@ class ContextMenu extends Component {
                 );
               }}
             />
-
+            <TreeViewMenu
+              title={'Add Text'}
+              hideArrow={true}
+              onClick={() => {
+                this.props.graphOperation(
+                  AddButtonToComponent({
+                    componentType: ComponentTypeKeys.Text,
+                    component: currentNode.id
+                  })
+                );
+              }}
+            />
           </TreeViewMenu>,
           layoutoptions()
         ];

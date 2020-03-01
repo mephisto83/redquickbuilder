@@ -759,6 +759,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Objects_From_List_Of_Ids]: {
     title: Titles.GetObjectsFromLIstOfIds,
+    description: "Gets objects from a list of Ids",
     titleTemplate: function(t, a) {
       return `Get ${t}s With IdList by ${a}`;
     },
