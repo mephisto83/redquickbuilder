@@ -8,7 +8,9 @@ import {
   addInstanceFunc,
   ADD_NEW_NODE,
   ADD_LINK_BETWEEN_NODES,
-  GetNodeTitle
+  GetNodeTitle,
+  UPDATE_NODE_PROPERTY,
+  ComponentApiKeys
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -18,7 +20,8 @@ import {
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
-  ComponentEvents
+  ComponentEvents,
+  ComponentTypeKeys
 } from "../../constants/componenttypes";
 import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
@@ -54,6 +57,41 @@ export default function ScreenConnectGetAll(args = { method, node }) {
     });
 
     components.map(component => {
+      let internalComponentApi = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: LinkType.ComponentInternalApi
+      });
+
+      internalComponentApi
+        .filter(
+          x =>
+            GetNodeProp(component, NodeProperties.ComponentType) ===
+            ComponentTypeKeys.List
+        )
+        .filter(x =>
+          [
+            ComponentApiKeys.Value,
+            ComponentApiKeys.Index,
+            ComponentApiKeys.Item,
+            ComponentApiKeys.Separators
+          ].some(v => v === GetNodeTitle(x))
+        )
+        .map(internal => {
+          result.push(function() {
+            return [
+              {
+                operation: UPDATE_NODE_PROPERTY,
+                options: {
+                  id: internal.id,
+                  properties: {
+                    [NodeProperties.AsLocalContext]: true
+                  }
+                }
+              }
+            ];
+          });
+        });
+
       let listItems = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.ListItem

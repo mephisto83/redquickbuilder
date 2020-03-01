@@ -3478,7 +3478,11 @@ export function BuildPackage(model, _package) {
   }
 }
 export const ComponentApiKeys = {
-  DATA: "data"
+  DATA: "data",
+  Value: "value",
+  Item: "item",
+  Index: "index",
+  Separators: "separators"
 };
 export const UPDATE_GRAPH_TITLE = "UPDATE_GRAPH_TITLE";
 export const NEW_NODE = "NEW_NODE";
