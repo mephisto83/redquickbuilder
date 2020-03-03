@@ -2,6 +2,7 @@ export default function(args = {}) {
   // node0
   let context = {
     node2: args.screen,
+    name: args.name,
     node3: args.clickInstance,
     node5: args.pressInstance,
     ...args
@@ -174,7 +175,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Post Register"
+            value: context.name || "Post Register"
           }
         }
       ];
@@ -231,41 +232,45 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
-      return [
-        {
-          operation: "NEW_LINK",
-          options: {
-            target: context.node3,
-            source: context.node0,
-            properties: {
-              type: "data-chain-link",
-              "data-chain-link": {},
-              singleLink: true,
-              nodeTypes: ["data-chain"]
+    context.node3
+      ? function(graph) {
+          return [
+            {
+              operation: "NEW_LINK",
+              options: {
+                target: context.node3,
+                source: context.node0,
+                properties: {
+                  type: "data-chain-link",
+                  "data-chain-link": {},
+                  singleLink: true,
+                  nodeTypes: ["data-chain"]
+                }
+              }
             }
-          }
+          ];
         }
-      ];
-    },
+      : false,
 
-    function(graph) {
-      return [
-        {
-          operation: "NEW_LINK",
-          options: {
-            target: context.node5,
-            source: context.node0,
-            properties: {
-              type: "data-chain-link",
-              "data-chain-link": {},
-              singleLink: true,
-              nodeTypes: ["data-chain"]
+    context.node5
+      ? function(graph) {
+          return [
+            {
+              operation: "NEW_LINK",
+              options: {
+                target: context.node5,
+                source: context.node0,
+                properties: {
+                  type: "data-chain-link",
+                  "data-chain-link": {},
+                  singleLink: true,
+                  nodeTypes: ["data-chain"]
+                }
+              }
             }
-          }
+          ];
         }
-      ];
-    },
+      : false,
     ...[]
       .interpolate(0, 6, x => {
         if (x !== 2) {
@@ -283,5 +288,5 @@ export default function(args = {}) {
         return null;
       })
       .filter(x => x)
-  ];
+  ].filter(x => x);
 }

@@ -645,13 +645,18 @@ export const CreateLoginModels = {
       targetMethod: loginResult.methodNode.id
     });
     if (method_results.instanceFunc) {
-      PerformGraphOperation(
-        PostAuthenticate({
+      PerformGraphOperation([
+        ...PostAuthenticate({
           screen: null,
-          clickInstance: method_results.instanceFunc.onClick,
+          functionName: "Post Authenticate ReactNative",
           pressInstance: method_results.instanceFunc.onPress
+        }),
+        ...PostAuthenticate({
+          screen: null,
+          functionName: "Post Authenticate ElectronIo",
+          clickInstance: method_results.instanceFunc.onClick
         })
-      )(GetDispatchFunc(), GetStateFunc());
+      ])(GetDispatchFunc(), GetStateFunc());
     }
     viewName = "Register";
     chosenChildren = GetModelPropertyChildren(newStuff.registerModel).map(
@@ -681,13 +686,18 @@ export const CreateLoginModels = {
     });
     let registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
-      PerformGraphOperation(
-        PostRegister({
+      PerformGraphOperation([
+        ...PostRegister({
           screen: authenticateScreen,
-          clickInstance: method_results.instanceFunc.onClick,
+          name: "Post Register ReactNative",
           pressInstance: method_results.instanceFunc.onPress
+        }),
+        ...PostRegister({
+          screen: authenticateScreen,
+          name: "Post Register ElectronIO",
+          clickInstance: method_results.instanceFunc.onClick
         })
-      )(GetDispatchFunc(), GetStateFunc());
+      ])(GetDispatchFunc(), GetStateFunc());
     }
     let titleService = GetNodeByProperties({
       [NodeProperties.NODEType]: NodeTypes.TitleService

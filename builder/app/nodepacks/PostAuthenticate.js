@@ -29,7 +29,7 @@ export default function(args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Post Authenticate"
+            value: context.functionName || "Post Authenticate"
           }
         }
       ];
@@ -221,41 +221,45 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
-      return [
-        {
-          operation: "NEW_LINK",
-          options: {
-            target: context.node3,
-            source: context.node0,
-            properties: {
-              type: "data-chain-link",
-              "data-chain-link": {},
-              singleLink: true,
-              nodeTypes: ["data-chain"]
+    context.node3
+      ? function(graph) {
+          return [
+            {
+              operation: "NEW_LINK",
+              options: {
+                target: context.node3,
+                source: context.node0,
+                properties: {
+                  type: "data-chain-link",
+                  "data-chain-link": {},
+                  singleLink: true,
+                  nodeTypes: ["data-chain"]
+                }
+              }
             }
-          }
+          ];
         }
-      ];
-    },
+      : false,
 
-    function(graph) {
-      return [
-        {
-          operation: "NEW_LINK",
-          options: {
-            target: context.node5,
-            source: context.node0,
-            properties: {
-              type: "data-chain-link",
-              "data-chain-link": {},
-              singleLink: true,
-              nodeTypes: ["data-chain"]
+    context.node5
+      ? function(graph) {
+          return [
+            {
+              operation: "NEW_LINK",
+              options: {
+                target: context.node5,
+                source: context.node0,
+                properties: {
+                  type: "data-chain-link",
+                  "data-chain-link": {},
+                  singleLink: true,
+                  nodeTypes: ["data-chain"]
+                }
+              }
             }
-          }
+          ];
         }
-      ];
-    },
+      : false,
 
     ...postAuthenticate_({
       head: () => {
@@ -282,5 +286,5 @@ export default function(args = {}) {
         return null;
       })
       .filter(x => x)
-  ];
+  ].filter(x => x);
 }

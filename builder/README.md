@@ -44,4 +44,3 @@
         1. Connect to Fetch Parameters Model
     1. Create Fetch Output Model
         1.  Operation => Setup Fetch Result
-
