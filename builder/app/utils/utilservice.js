@@ -80,7 +80,7 @@ export function getStringInserts(str = "") {
 }
 export function getReferenceInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\#{[a-zA-Z0-9_@ ]*}/gm;
+  const regex = /\#{[a-zA-Z0-9_@| ]*}/gm;
 
   let m;
   let result = [];

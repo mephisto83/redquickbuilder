@@ -10,6 +10,7 @@ import TabPane from "./tabpane";
 import SideBar from "./sidebar";
 import TreeViewMenu from "./treeviewmenu";
 import * as Titles from "./titles";
+import SelectInputProperty from "./selectinputproperty";
 import CheckBox from "./checkbox";
 import ControlSideBarMenu, {
   ControlSideBarMenuItem
@@ -111,15 +112,19 @@ class DataChainActvityMenu extends Component {
         .unique(_insert => {
           let temp = _insert.split("@");
           let insert = temp.length > 1 ? temp[1] : temp[0];
-          let args = insert.split("|");
+          let args = insert.split("|").filter(x => x);
           let property = args[0];
+          if (args.length > 1) {
+            return args[1];
+          }
           return property || _insert;
         })
         .map(_insert => {
           let temp = _insert.split("@");
           let insert = temp.length > 1 ? temp[1] : temp[0];
           let args = insert.split("|");
-          let property = args[0];
+          let model = args[0];
+          let property = args[1];
           let types = args.subset(1);
           if (!types.length) {
             types = [NodeTypes.Model];
@@ -129,35 +134,50 @@ class DataChainActvityMenu extends Component {
               currentNode,
               NodeProperties.LambdaInsertArguments
             ) || {};
-
+          let nodes = property
+            ? GetNodesLinkedTo(null, {
+                id: value[model],
+                link: LinkType.PropertyLink
+              })
+            : UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
           return (
-            <SelectInput
-              onChange={_value => {
-                var id = currentNode.id;
-                this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                  target: UIA.GetNodeProp(
-                    currentNode,
-                    UIA.NodeProperties.LambdaInsertArguments
-                  ),
-                  source: id
-                });
-                value[property] = _value;
-                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                  prop: UIA.NodeProperties.LambdaInsertArguments,
-                  id,
-                  value: value
-                });
-                this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
-                  target: _value,
-                  source: id,
-                  properties: { ...UIA.LinkProperties.LambdaInsertArguments }
-                });
-              }}
-              label={property}
-              value={value[property]}
-              options={UIA.NodesByType(state, types).toNodeSelect()}
+            <SelectInputProperty
+              label={property ? `${model}.${property}` : model}
+              model={property || model}
+              valueObj={value}
+              value={property ? value[property] : value[model]}
+              node={currentNode}
+              options={nodes.toNodeSelect()}
             />
           );
+          // return (
+          //   <SelectInput
+          //     onChange={_value => {
+          //       var id = currentNode.id;
+          //       this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+          //         target: UIA.GetNodeProp(
+          //           currentNode,
+          //           UIA.NodeProperties.LambdaInsertArguments
+          //         ),
+          //         source: id
+          //       });
+          //       value[model] = _value;
+          //       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+          //         prop: UIA.NodeProperties.LambdaInsertArguments,
+          //         id,
+          //         value: value
+          //       });
+          //       this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+          //         target: _value,
+          //         source: id,
+          //         properties: { ...UIA.LinkProperties.LambdaInsertArguments }
+          //       });
+          //     }}
+          //     label={model}
+          //     value={value[model]}
+          //     options={UIA.NodesByType(state, types).toNodeSelect()}
+          //   />
+          // );
         });
     }
     let showDataChainRef = DataChainFunctions[dataChainFuncType]

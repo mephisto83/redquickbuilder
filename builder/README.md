@@ -44,3 +44,9 @@
         1. Connect to Fetch Parameters Model
     1. Create Fetch Output Model
         1.  Operation => Setup Fetch Result
+1. CS DataChains
+  1. Example
+    1. #{var temp @user} = #{arbiter get@user}(#{user @user|prop});
+      1. #{var temp @user} => User temp;
+      1. #{arbiter get@user}(#{user @user|prop}); => await userArbiter.Get(user.Prop);
+      1. #{return model_output @model_ouput}; => return model_output //Model_Output
