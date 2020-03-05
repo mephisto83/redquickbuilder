@@ -80,22 +80,26 @@ export function getStringInserts(str = "") {
 }
 export function getReferenceInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\#{[a-zA-Z0-9_]*}/gm;
+  const regex = /\#{[a-zA-Z0-9_@ ]*}/gm;
+
   let m;
   let result = [];
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    }
-
-    // The result can be accessed through the `m`-variable.
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
+  let regexes = [regex];
+  regexes.map(regex => {
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
       }
-    });
-  }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach((match, groupIndex) => {
+        if (match) {
+          result.push(match);
+        }
+      });
+    }
+  });
 
   return result;
 }
@@ -275,12 +279,14 @@ export function processRecording(str) {
       // ${inserts
         .map(insert => insert.substr(2, insert.length - 3))
         .join(", ")}
-      ${inserts.map(insert => {
-        let temp = insert.substr(2, insert.length - 3);
-        return `if(!args.${temp}){
+      ${inserts
+        .map(insert => {
+          let temp = insert.substr(2, insert.length - 3);
+          return `if(!args.${temp}){
           throw 'missing ${temp} argument';
         }`;
-      }).join('')}
+        })
+        .join("")}
     let context = {
       ...args${
         unaccountedGuids.length

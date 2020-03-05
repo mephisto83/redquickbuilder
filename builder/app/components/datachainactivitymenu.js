@@ -108,8 +108,16 @@ class DataChainActvityMenu extends Component {
       let lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
       inserts = getReferenceInserts(lambdaText || "")
         .map(v => v.substr(2, v.length - 3))
-        .unique()
-        .map(insert => {
+        .unique(_insert => {
+          let temp = _insert.split("@");
+          let insert = temp.length > 1 ? temp[1] : temp[0];
+          let args = insert.split("|");
+          let property = args[0];
+          return property || _insert;
+        })
+        .map(_insert => {
+          let temp = _insert.split("@");
+          let insert = temp.length > 1 ? temp[1] : temp[0];
           let args = insert.split("|");
           let property = args[0];
           let types = args.subset(1);

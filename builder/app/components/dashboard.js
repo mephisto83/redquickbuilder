@@ -1351,7 +1351,7 @@ class Dashboard extends Component {
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
                 graph={vgraph || graph}></MindMap>
                 ):null}             </Content>
-            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{overflowY:'auto','maxHeight':'100vh'}} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{overflowY:'auto','maxHeight':'100vh','height':'100vh'}} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab
                   icon="fa fa-cog"

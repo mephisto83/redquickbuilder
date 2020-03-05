@@ -1257,10 +1257,10 @@ export function GenerateCSChainFunction(id) {
     if (index === 0) {
       args = GetDataChainArgs(c);
     }
-    let temp = GenerateDataChainMethod(c);
-    observables.push(GenerateDataChainFunc(c, index));
-    setArgs.push(GenerateArgs(c, chain));
-    setProcess.push(GenerateSetProcess(c, chain));
+    let temp = GenerateCDDataChainMethod(c);
+    observables.push(GenerateDataChainFunc(c, chain, index));
+    // setArgs.push(GenerateArgs(c, chain));
+    // setProcess.push(GenerateSetProcess(c, chain));
     subscribes.push(GetSubscribes(c, chain));
     return temp;
   });
@@ -1434,7 +1434,8 @@ export function GenerateObservable(id, index) {
   let nodeName = GetCodeName(id);
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
 }
-export function GenerateDataChainFunc(id, index) {
+export function GenerateDataChainFunc(id, chain, index) {
+  //Should be able to capture the args throw the link between nodes.
   return `private async Task ${nodeName}(/*define args*/) {
     throw new NotImplementedException();
   }`;
@@ -1795,6 +1796,35 @@ export function IsEndOfDataChain(id) {
   return GetDataChainFrom(id).length === 1;
 }
 
+export function GenerateCDDataChainMethod(id){
+  let node = GetNodeById(id);
+  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+  let lambdaInsertArguments = GetNodeProp(
+    node,
+    NodeProperties.LambdaInsertArguments
+  );
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda)
+        .map(v => v.substr(2, v.length - 3))
+        .unique()
+        .map(insert => {
+          let args = insert.split("|");
+          let property = args[0];
+          let prop = lambdaInsertArguments[property];
+          let node = GetNodeById(prop);
+          lambda = bindReferenceTemplate(lambda, {
+            [property]: GetCodeName(node)
+          });
+        });
+      return `${lambda}`;
+    default:
+      throw `${GetNodeTitle(node)} ${
+        node.id
+      } - ${functionType} is not a defined function type.`;
+  }
+}
 export function GenerateDataChainMethod(id) {
   let node = GetNodeById(id);
   let model = GetNodeProp(node, NodeProperties.UIModelType);
