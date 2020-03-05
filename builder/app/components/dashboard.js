@@ -189,6 +189,16 @@ class Dashboard extends Component {
           result.push(...this.getComponentApiContextMenu());
           break;
         case NodeTypes.Method:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.DataChainLink,
+                nodeTypes: [NodeTypes.DataChain]
+              });
+            },
+            icon: 'fa fa-chain',
+            title: Titles.DataChain
+          })
         case NodeTypes.Action:
           result.push({
             onClick: () => {
@@ -1341,7 +1351,7 @@ class Dashboard extends Component {
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
                 graph={vgraph || graph}></MindMap>
                 ):null}             </Content>
-            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{overflowY:'auto','maxHeight':'100vh'}} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab
                   icon="fa fa-cog"

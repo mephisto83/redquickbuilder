@@ -30,12 +30,14 @@ import {
   GetNode,
   GetLinkChain,
   GetLinkChainItem,
-  createExecutor
+  createExecutor,
+  GetNodesLinkedTo
 } from "../methods/graph_methods";
 import SideBarMenu from "./sidebarmenu";
 import {
   FunctionTypes,
-  FunctionTemplateKeys
+  FunctionTemplateKeys,
+  MethodFunctions
 } from "../constants/functiontypes";
 import {
   DataChainFunctions,
@@ -44,8 +46,48 @@ import {
 import ButtonList from "./buttonlist";
 
 import { getReferenceInserts } from "../utils/utilService";
+import CheckBoxProperty from "./checkboxproperty";
+import genericpropertycontainer from "./genericpropertycontainer";
 
 class DataChainActvityMenu extends Component {
+  getLambdaVariableTree() {
+    var { state } = this.props;
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    let lambdaVariables = null;
+    if (UIA.GetNodeProp(currentNode, UIA.NodeProperties.CS)) {
+      let methods = GetNodesLinkedTo(null, {
+        id: currentNode.id,
+        link: LinkType.DataChainLink,
+        componentType: NodeTypes.Method
+      });
+      if (methods.length) {
+        let functionType = UIA.GetNodeProp(
+          methods[0],
+          UIA.NodeProperties.FunctionType
+        );
+        let { lambda } = MethodFunctions[functionType];
+        if (lambda && lambda.default) {
+          let methodProps = UIA.GetMethodProps(methods[0]);
+          lambdaVariables = (
+            <ButtonList
+              active={true}
+              isSelected={() => true}
+              items={Object.keys(lambda.default).map(key => {
+                return {
+                  title: `[${key}]: ${UIA.GetCodeName(
+                    methodProps[lambda.default[key]]
+                  ) || lambda.default[key]}`,
+                  value: key,
+                  id: key
+                };
+              })}
+            />
+          );
+        }
+      }
+    }
+    return lambdaVariables;
+  }
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.DataChain);
@@ -64,7 +106,7 @@ class DataChainActvityMenu extends Component {
 
     if (lambda) {
       let lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
-       inserts = getReferenceInserts(lambdaText || "")
+      inserts = getReferenceInserts(lambdaText || "")
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(insert => {
@@ -181,6 +223,7 @@ class DataChainActvityMenu extends Component {
       .toNodeSelect();
     let lists = UIA.NodesByType(state, NodeTypes.Lists).toNodeSelect();
     let all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
+    let lambdaVariables = this.getLambdaVariableTree();
 
     return (
       <TabPane active={active}>
@@ -195,6 +238,16 @@ class DataChainActvityMenu extends Component {
                 value: value
               });
             }}
+          />
+          <CheckBoxProperty
+            title={Titles.CSEntryPoint}
+            node={currentNode}
+            property={UIA.NodeProperties.CSEntryPoint}
+          />
+          <CheckBoxProperty
+            title={Titles.CSharp}
+            node={currentNode}
+            property={UIA.NodeProperties.CS}
           />
           <CheckBox
             label={Titles.AsOutput}
@@ -258,6 +311,7 @@ class DataChainActvityMenu extends Component {
             />
           ) : null}
           {lambda ? inserts : null}
+          {lambdaVariables}
           {showModel ? (
             <SelectInput
               onChange={value => {

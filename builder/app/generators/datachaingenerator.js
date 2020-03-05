@@ -24,6 +24,17 @@ import {
 } from "../methods/graph_methods";
 
 export default class DataChainGenerator {
+  static GenerateCS(options) {
+    let { state, language } = options;
+    let result = {};
+
+    let _cfunc = GenerateChainFunctions({
+      cs: true,
+      language
+    });
+
+    return result;
+  }
   static Generate(options) {
     let { state, language } = options;
     let fileEnding = ".js";

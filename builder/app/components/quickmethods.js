@@ -43,6 +43,7 @@ import temppack from "../nodepacks/temppack";
 import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import CreateConfiguration from "../nodepacks/CreateConfiguration";
 import CreateFetchParameters from "../nodepacks/CreateFetchParameters";
+import CreateFetchServiceIdempotently from "../nodepacks/CreateFetchServiceIdempotently";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -210,17 +211,13 @@ class QuickMethods extends Component<any, any, any> {
                 />
                 <TreeViewMenu
                   hideArrow
-                  title={"Create Fetch Parameters"}
+                  title={"Create Fetch Service"}
                   icon={"fa fa-plus"}
                   onClick={() => {
-                    let nodes = UIA.GetNodeByProperties({
-                      [NodeProperties.IsFetchParameter]: true
-                    });
-                    if (!nodes) {
-                      this.props.graphOperation(CreateFetchParameters());
-                    }
+                    this.props.graphOperation(CreateFetchServiceIdempotently());
                   }}
                 />
+
                 <TreeViewMenu
                   hideArrow
                   title={"Create Configuration"}

@@ -1243,10 +1243,73 @@ export function GetModelItemConditions(id) {
 export function GetConditionSetup(condition) {
   return GetNodeProp(condition, NodeProperties.Condition);
 }
-export function GetDataChainEntryNodes() {
-  return GraphMethods.GetDataChainEntryNodes(_getState());
+export function GetDataChainEntryNodes(cs) {
+  return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
-export function GenerateChainFunction(id) {
+export function GenerateCSChainFunction(id) {
+  let chain = GetDataChainParts(id);
+  let args = null;
+  let observables = [];
+  let setArgs = [];
+  let subscribes = [];
+  let setProcess = [];
+  let funcs = chain.map((c, index) => {
+    if (index === 0) {
+      args = GetDataChainArgs(c);
+    }
+    let temp = GenerateDataChainMethod(c);
+    observables.push(GenerateDataChainFunc(c, index));
+    setArgs.push(GenerateArgs(c, chain));
+    setProcess.push(GenerateSetProcess(c, chain));
+    subscribes.push(GetSubscribes(c, chain));
+    return temp;
+  });
+  let index = chain.indexOf(id);
+  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
+  let lastLink = GetLastChainLink(chain);
+  let lastLinkindex = chain.indexOf(lastLink);
+  let lastNodeName = (
+    GetJSCodeName(lastLink) || "node" + lastLinkindex
+  ).toJavascriptName();
+  let currentNode = GetNodeById(id);
+  let lambdaVariables = null;
+  if (GetNodeProp(currentNode, NodeProperties.CS)) {
+    let methods = GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: NodeConstants.LinkType.DataChainLink,
+      componentType: NodeTypes.Method
+    });
+    let _arguments = "";
+    if (methods.length) {
+      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      let { lambda } = MethodFunctions[functionType];
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+        _arguments = Object.keys(lambda.default)
+          .map(key => {
+            return `${GetCodeName(methodProps[lambda.default[key]]) ||
+              lambda.default[key]} ${key}`;
+          })
+          .join(", ");
+      }
+    }
+  }
+  let method = `public class ${GetCodeName(id)}
+{
+  ${observables.join(NodeConstants.NEW_LINE)}
+  ${setProcess.join(NodeConstants.NEW_LINE)}
+  ${setArgs.join(NodeConstants.NEW_LINE)}
+    public async Task<OutputType> Execute(${_arguments}) {
+      ${subscribes.join(NodeConstants.NEW_LINE)}
+      ${nodeName}.update($id , '$id');
+
+      return ${lastNodeName}.value;
+    }
+}`;
+
+  return method;
+}
+export function GenerateChainFunction(id, cs) {
   let chain = GetDataChainParts(id);
   let args = null;
   let observables = [];
@@ -1368,8 +1431,13 @@ export function GetLastChainLink(parts) {
   return lastLink;
 }
 export function GenerateObservable(id, index) {
-  let nodeName = (GetCodeName(id) || "node" + index).toJavascriptName();
+  let nodeName = GetCodeName(id);
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
+}
+export function GenerateDataChainFunc(id, index) {
+  return `private async Task ${nodeName}(/*define args*/) {
+    throw new NotImplementedException();
+  }`;
 }
 export function GetDataChainArgs(id) {
   let node = GetNodeById(id);
@@ -1398,9 +1466,9 @@ export function GetSelectorsNodes(id) {
 }
 
 export function GenerateChainFunctions(options) {
-  let { language, collection } = options;
+  let { cs, language, collection } = options;
   let graph = GetCurrentGraph();
-  let entryNodes = GetDataChainEntryNodes()
+  let entryNodes = GetDataChainEntryNodes(cs)
     .filter(x => {
       let uiType = GetNodeProp(x, NodeProperties.UIType);
       if (uiType) {
@@ -1420,7 +1488,7 @@ export function GenerateChainFunctions(options) {
       return !collections || !collections.length;
     });
   return entryNodes
-    .map(GenerateChainFunction)
+    .map(v => (cs ? GenerateCSChainFunction(v) : GenerateChainFunction(v)))
     .unique(x => x)
     .join(NodeConstants.NEW_LINE);
 }

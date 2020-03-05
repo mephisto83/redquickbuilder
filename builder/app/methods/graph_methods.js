@@ -2169,10 +2169,12 @@ export function GetConnectedNodesByType(state, id, type, direction) {
     direction
   }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === type);
 }
-export function GetDataChainEntryNodes(state) {
+export function GetDataChainEntryNodes(state, cs) {
   let graph = GetRootGraph(state);
-  return NodesByType(graph, NodeTypes.DataChain).filter(x =>
-    GetNodeProp(x, NodeProperties.EntryPoint)
+  return NodesByType(graph, NodeTypes.DataChain).filter(
+    x =>
+      (!cs && GetNodeProp(x, NodeProperties.EntryPoint)) ||
+      (cs && GetNodeProp(x, NodeProperties.CSEntryPoint))
   );
 }
 export function GetConnectedNodeByType(state, id, type, direction, graph) {

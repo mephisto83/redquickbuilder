@@ -45,30 +45,40 @@ class NodeManagement extends Component {
       .groupBy(x => UIA.GetNodeProp(x, NodeProperties.NODEType));
     let body = [];
     body = Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b))
       .filter(group => groups[group].length)
       .map((group, gi) => {
         let groupKey = `NodeManagement-${group}`;
-        let groupNodes = groups[group].subset(0, 100).map((gn, gni) => {
-          return (
-            <TreeViewMenu
-              key={`node-${group}-${gi}-${gni}`}
-              hideArrow={true}
-              title={UIA.GetNodeProp(gn, NodeProperties.UIText)}
-              icon={
-                !UIA.GetNodeProp(gn, NodeProperties.Pinned)
-                  ? "fa fa-circle-o"
-                  : "fa fa-check-circle-o"
-              }
-              toggle={() => {
-                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                  prop: UIA.NodeProperties.Pinned,
-                  id: gn.id,
-                  value: !UIA.GetNodeProp(gn, NodeProperties.Pinned)
-                });
-              }}
-            />
-          );
-        });
+        let groupNodes = UIA.Visual(state, groupKey)
+          ? groups[group]
+              .subset(0, 100)
+              .sort((a, b) =>
+                UIA.GetNodeProp(a, NodeProperties.UIText).localeCompare(
+                  UIA.GetNodeProp(b, NodeProperties.UIText)
+                )
+              )
+              .map((gn, gni) => {
+                return (
+                  <TreeViewMenu
+                    key={`node-${group}-${gi}-${gni}`}
+                    hideArrow={true}
+                    title={UIA.GetNodeProp(gn, NodeProperties.UIText)}
+                    icon={
+                      !UIA.GetNodeProp(gn, NodeProperties.Pinned)
+                        ? "fa fa-circle-o"
+                        : "fa fa-check-circle-o"
+                    }
+                    toggle={() => {
+                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                        prop: UIA.NodeProperties.Pinned,
+                        id: gn.id,
+                        value: !UIA.GetNodeProp(gn, NodeProperties.Pinned)
+                      });
+                    }}
+                  />
+                );
+              })
+          : [];
         return (
           <TreeViewMenu
             title={group}

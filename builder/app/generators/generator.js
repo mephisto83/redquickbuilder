@@ -147,6 +147,8 @@ export default class Generator {
         return ReactNativeConfiguration.Generate({ state, key, language });
       case ReactNativeTypes.ControllerActions:
         return ReactNativeControllerActions.Generate({ state, key, language });
+      case GeneratedTypes.CSDataChain:
+        return ReactNativeDataChainFunctions.GenerateCS({ state, key, language });
       case ReactNativeTypes.DataChainFunctions:
         return ReactNativeDataChainFunctions.Generate({ state, key, language });
       case ReactNativeTypes.Selectors:

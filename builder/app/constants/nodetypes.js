@@ -83,6 +83,7 @@ export const ExcludeDefaultNode = {
 };
 export const GeneratedTypes = {
   ChangeParameter: "change-parameter",
+  CSDataChain: "data-chain-cs",
   ChangeResponse: "change-response",
   Constants: "constants",
   Validators: "validator-generated",
@@ -286,6 +287,7 @@ export const SelectorType = {
 };
 export const NodeProperties = {
   ViewPackage: "view-package",
+  IsFetchOutput: "IsFetchOutput",
   IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
@@ -334,6 +336,8 @@ export const NodeProperties = {
   ClientMethodParameters: "ClientMethodParameters",
   AsOutput: "AsOutput",
   EntryPoint: "EntryPoint",
+  CSEntryPoint: "CSEntryPoint",
+  CS: "CS",
   Property: "Property",
   DataChainEntry: "DataChainEntry",
   MergeChain: "MergeChain",

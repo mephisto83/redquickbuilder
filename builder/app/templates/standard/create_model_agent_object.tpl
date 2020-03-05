@@ -8,7 +8,9 @@
 
                 var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 
-                return await arbiter{{model}}.Get<{{model}}>(result.IdValue);
+                var model_output = await arbiter{{model}}.Get<{{model}}>(result.IdValue);
+
+                return model_output;
             }
             throw new PermissionException();
         }

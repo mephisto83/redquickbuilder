@@ -713,6 +713,15 @@ export const MethodFunctions = {
       body: true,
       parameters: false
     },
+    lambda: {
+      default: {
+        user: "user",
+        value: "model",
+        model_output: "model",
+        "result.IdValue": "string",
+        agent: "agent"
+      }
+    },
     constraints: {
       ...COMMON_CONSTRAINTS_OBJECT_METHOD,
       ...COMMON_CREATE_UPDATE_CONSTRAINTS
