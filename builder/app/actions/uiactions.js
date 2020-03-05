@@ -1247,39 +1247,15 @@ export function GetDataChainEntryNodes(cs) {
   return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
 export function GenerateCSChainFunction(id) {
-  let chain = GetDataChainParts(id);
-  let args = null;
-  let observables = [];
-  let setArgs = [];
-  let subscribes = [];
-  let setProcess = [];
-  let funcs = chain.map((c, index) => {
-    if (index === 0) {
-      args = GetDataChainArgs(c);
-    }
-    let temp = GenerateCDDataChainMethod(c);
-    observables.push(GenerateDataChainFunc(c, chain, index));
-    // setArgs.push(GenerateArgs(c, chain));
-    // setProcess.push(GenerateSetProcess(c, chain));
-    subscribes.push(GetSubscribes(c, chain));
-    return temp;
-  });
-  let index = chain.indexOf(id);
-  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
-  let lastLink = GetLastChainLink(chain);
-  let lastLinkindex = chain.indexOf(lastLink);
-  let lastNodeName = (
-    GetJSCodeName(lastLink) || "node" + lastLinkindex
-  ).toJavascriptName();
+  let lastNodeName = GenerateCDDataChainMethod(id);
   let currentNode = GetNodeById(id);
-  let lambdaVariables = null;
+  let _arguments = "";
   if (GetNodeProp(currentNode, NodeProperties.CS)) {
-    let methods = GetNodesLinkedTo(null, {
+    let methods = GraphMethods.GetNodesLinkedTo(null, {
       id: currentNode.id,
       link: NodeConstants.LinkType.DataChainLink,
       componentType: NodeTypes.Method
     });
-    let _arguments = "";
     if (methods.length) {
       let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
       let { lambda } = MethodFunctions[functionType];
@@ -1288,7 +1264,7 @@ export function GenerateCSChainFunction(id) {
         _arguments = Object.keys(lambda.default)
           .map(key => {
             return `${GetCodeName(methodProps[lambda.default[key]]) ||
-              lambda.default[key]} ${key}`;
+              lambda.default[key]} ${key.split(".").join("")}`;
           })
           .join(", ");
       }
@@ -1296,14 +1272,8 @@ export function GenerateCSChainFunction(id) {
   }
   let method = `public class ${GetCodeName(id)}
 {
-  ${observables.join(NodeConstants.NEW_LINE)}
-  ${setProcess.join(NodeConstants.NEW_LINE)}
-  ${setArgs.join(NodeConstants.NEW_LINE)}
     public async Task<OutputType> Execute(${_arguments}) {
-      ${subscribes.join(NodeConstants.NEW_LINE)}
-      ${nodeName}.update($id , '$id');
-
-      return ${lastNodeName}.value;
+      ${lastNodeName}
     }
 }`;
 
@@ -1435,6 +1405,7 @@ export function GenerateObservable(id, index) {
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
 }
 export function GenerateDataChainFunc(id, chain, index) {
+  let nodeName = GetCodeName(id);
   //Should be able to capture the args throw the link between nodes.
   return `private async Task ${nodeName}(/*define args*/) {
     throw new NotImplementedException();
@@ -1488,10 +1459,18 @@ export function GenerateChainFunctions(options) {
       }
       return !collections || !collections.length;
     });
-  return entryNodes
-    .map(v => (cs ? GenerateCSChainFunction(v) : GenerateChainFunction(v)))
-    .unique(x => x)
-    .join(NodeConstants.NEW_LINE);
+  let temp = entryNodes
+    .map(v =>
+      cs
+        ? { node: v, class: GenerateCSChainFunction(v) }
+        : GenerateChainFunction(v)
+    )
+    .unique(x => x);
+  // sorry this is bad.
+  if (cs) {
+    return temp;
+  }
+  return temp.join(NodeConstants.NEW_LINE);
 }
 export function CollectionIsInLanguage(graph, collection, language) {
   let reference = GraphMethods.GetNodeLinkedTo(graph, {
@@ -1796,7 +1775,28 @@ export function IsEndOfDataChain(id) {
   return GetDataChainFrom(id).length === 1;
 }
 
-export function GenerateCDDataChainMethod(id){
+export function GetLambdaVariableNode(id, key) {
+  let currentNode = GetNodeById(id);
+  if (GetNodeProp(currentNode, NodeProperties.CS)) {
+    let methods = GraphMethods.GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: NodeConstants.LinkType.DataChainLink,
+      componentType: NodeTypes.Method
+    });
+    if (methods.length) {
+      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      let { lambda } = MethodFunctions[functionType];
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+
+        return GetNodeById(methodProps[key]);
+      }
+    }
+  }
+  return null;
+}
+
+export function GenerateCDDataChainMethod(id) {
   let node = GetNodeById(id);
   let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
@@ -1809,14 +1809,29 @@ export function GenerateCDDataChainMethod(id){
       getReferenceInserts(lambda)
         .map(v => v.substr(2, v.length - 3))
         .unique()
-        .map(insert => {
-          let args = insert.split("|");
-          let property = args[0];
-          let prop = lambdaInsertArguments[property];
-          let node = GetNodeById(prop);
-          lambda = bindReferenceTemplate(lambda, {
-            [property]: GetCodeName(node)
-          });
+        .map(_insert => {
+          let temp = _insert.split("@");
+          let insert = temp.length > 1 ? temp[1] : temp[0];
+          if (temp.length > 1) {
+            let swap = temp[0];
+            switch (temp[0]) {
+              case "arbiter get":
+                let lambdaNode = GetLambdaVariableNode(id, insert);
+                swap = `await arbiter${GetCodeName(lambdaNode)}.Get`;
+                break;
+              default:
+                break;
+            }
+            lambda = lambda.replace(`#{${_insert}}`, swap);
+          } else {
+            let args = insert.split("|");
+            let property = args[0];
+            let prop = lambdaInsertArguments[property];
+            let node = GetNodeById(prop);
+            lambda = bindReferenceTemplate(lambda, {
+              [property]: GetCodeName(node)
+            });
+          }
         });
       return `${lambda}`;
     default:

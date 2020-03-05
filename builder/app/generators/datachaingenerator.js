@@ -6,7 +6,8 @@ import {
   GetJSCodeName,
   GetNodeProp,
   GetCurrentGraph,
-  GetRelativeDataChainPath
+  GetRelativeDataChainPath,
+  GetRootGraph
 } from "../actions/uiactions";
 import { readFileSync } from "fs";
 import {
@@ -14,7 +15,9 @@ import {
   NEW_LINE,
   NodeTypes,
   LinkType,
-  NodeProperties
+  NodeProperties,
+  NameSpace,
+  STANDARD_CONTROLLER_USING
 } from "../constants/nodetypes";
 import { bindTemplate } from "../constants/functiontypes";
 import {
@@ -22,15 +25,43 @@ import {
   TARGET,
   GetNodesLinkedTo
 } from "../methods/graph_methods";
+import NamespaceGenerator from "./namespacegenerator";
+import * as GraphMethods from "../methods/graph_methods";
 
 export default class DataChainGenerator {
   static GenerateCS(options) {
     let { state, language } = options;
     let result = {};
+    let graphRoot = GetRootGraph(state);
+
+    let namespace = graphRoot
+      ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
+      : null;
 
     let _cfunc = GenerateChainFunctions({
       cs: true,
       language
+    }).map(f => {
+      let dataChain = f.node;
+
+      result[GetNodeProp(dataChain, NodeProperties.CodeName)] = {
+        id: GetNodeProp(dataChain, NodeProperties.CodeName),
+        name: GetNodeProp(dataChain, NodeProperties.CodeName),
+        template: NamespaceGenerator.Generate({
+          template: f.class,
+          usings: [
+            ...STANDARD_CONTROLLER_USING,
+            `${namespace}${NameSpace.Model}`,
+            `${namespace}${NameSpace.Interface}`,
+            `${namespace}${NameSpace.StreamProcess}`,
+            `${namespace}${NameSpace.Constants}`,
+            `${namespace}${NameSpace.Permissions}`,
+            `${namespace}${NameSpace.Parameters}`
+          ],
+          namespace,
+          space: NameSpace.Controllers
+        })
+      };
     });
 
     return result;
