@@ -16,7 +16,7 @@ export default class Header extends Component {
     return (
       <aside
         className={`main-sidebar`}
-        style={{ ...this.relative(), ...this.overflow() }}
+        style={{ minHeight: 0, ...this.relative(), ...this.overflow() }}
       >
         <section className="sidebar" style={{ height: "auto" }}>
           {this.props.children}

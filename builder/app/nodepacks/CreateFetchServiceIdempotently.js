@@ -16,6 +16,7 @@ import {
 } from "../actions/uiactions";
 import CreateFetchParameters from "./CreateFetchParameters";
 import CreateFetchService from "./CreateFetchService";
+import CreateFetchOutput from './CreateFetchOutput';
 import {
   MethodFunctions,
   FunctionTemplateKeys

@@ -13,7 +13,7 @@ import {
   DataChainFunctionKeys,
   DataChainFunctions
 } from "../constants/datachain";
-import { uuidv4 } from "../utils/array";
+import { uuidv4, addNewLine } from "../utils/array";
 import { currentId } from "async_hooks";
 import { getReferenceInserts } from "../utils/utilservice";
 import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
@@ -1246,8 +1246,50 @@ export function GetConditionSetup(condition) {
 export function GetDataChainEntryNodes(cs) {
   return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
+export function GetLambdaDefinition(method) {
+  let functionType = GetNodeProp(method, NodeProperties.FunctionType);
+  let { lambda } = MethodFunctions[functionType];
+  return lambda;
+}
+export function GenerateDataChainArguments(id) {
+  let currentNode = GetNodeById(id);
+  let _arguments = "";
+  if (GetNodeProp(currentNode, NodeProperties.CS)) {
+    let methods = GraphMethods.GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: NodeConstants.LinkType.DataChainLink,
+      componentType: NodeTypes.Method
+    });
+    if (methods.length) {
+      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      let { lambda } = MethodFunctions[functionType];
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+        _arguments = Object.keys(lambda.default)
+          .map(key => {
+            return `${key.split(".").join("")}:${lambda.default[key]} `;
+          })
+          .join(", ");
+      }
+    }
+  }
+  return _arguments;
+}
 export function GenerateCSChainFunction(id) {
   let lastNodeName = GenerateCDDataChainMethod(id);
+  let arbiters = GetArbitersInCSDataChainMethod(id);
+  let outputType = GetOutputTypeInCSDataChainMethod(id);
+  let arbiterInterfaces = arbiters
+    .map(arb => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
+    .join(", ");
+  let arbiterSets = addNewLine(
+    arbiters
+      .map(arb => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`)
+      .join(NodeConstants.NEW_LINE)
+  );
+  let arbiterProperties = arbiters
+    .map(arb => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
+    .join(NodeConstants.NEW_LINE);
   let currentNode = GetNodeById(id);
   let _arguments = "";
   if (GetNodeProp(currentNode, NodeProperties.CS)) {
@@ -1272,7 +1314,11 @@ export function GenerateCSChainFunction(id) {
   }
   let method = `public class ${GetCodeName(id)}
 {
-    public async Task<OutputType> Execute(${_arguments}) {
+${arbiterProperties}
+    public ${GetCodeName(id)}(${arbiterInterfaces}) {
+${arbiterSets}
+    }
+    public async Task<${GetCodeName(outputType)}> Execute(${_arguments}) {
       ${lastNodeName}
     }
 }`;
@@ -1796,6 +1842,60 @@ export function GetLambdaVariableNode(id, key) {
   return null;
 }
 
+export function GetArbitersInCSDataChainMethod(id) {
+  let node = GetNodeById(id);
+  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+
+  let result = [];
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda)
+        .map(v => v.substr(2, v.length - 3))
+        .unique()
+        .map(_insert => {
+          let temp = _insert.split("@");
+          let insert = temp.length > 1 ? temp[1] : temp[0];
+          if (temp.length > 1) {
+            switch (temp[0]) {
+              case "arbiter get":
+                let lambdaNode = GetLambdaVariableNode(id, insert);
+                if (lambdaNode) result.push(lambdaNode);
+                break;
+              default:
+                break;
+            }
+          }
+        });
+  }
+  return result;
+}
+
+export function GetOutputTypeInCSDataChainMethod(id) {
+  let node = GetNodeById(id);
+  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+
+  let result = null;
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda)
+        .map(v => v.substr(2, v.length - 3))
+        .unique()
+        .map(_insert => {
+          let temp = _insert.split("@");
+          let insert = temp.length > 1 ? temp[1] : temp[0];
+          if (temp.length > 1) {
+            if (temp[0].indexOf("return") === 0) {
+              let vari = temp[0].split(" ").filter(x => x);
+              let lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
+              if (lambdaNode) result = lambdaNode;
+            }
+          }
+        });
+  }
+  return result;
+}
 export function GenerateCDDataChainMethod(id) {
   let node = GetNodeById(id);
   let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
@@ -1814,12 +1914,22 @@ export function GenerateCDDataChainMethod(id) {
           let insert = temp.length > 1 ? temp[1] : temp[0];
           if (temp.length > 1) {
             let swap = temp[0];
+            let args = insert.split("|");
+            let model = args[0];
+            let property = args[1];
+
             switch (temp[0]) {
               case "arbiter get":
                 let lambdaNode = GetLambdaVariableNode(id, insert);
-                swap = `await arbiter${GetCodeName(lambdaNode)}.Get`;
+                swap = `await arbiter${GetCodeName(
+                  lambdaNode
+                )}.Get<${GetCodeName(lambdaNode)}>`;
                 break;
               default:
+                if (property) {
+                  let lambdaNode = lambdaInsertArguments[property];
+                  swap = `${model}.${GetCodeName(lambdaNode)}`;
+                }
                 break;
             }
             lambda = lambda.replace(`#{${_insert}}`, swap);

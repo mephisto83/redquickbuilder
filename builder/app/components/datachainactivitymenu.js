@@ -73,15 +73,17 @@ class DataChainActvityMenu extends Component {
             <ButtonList
               active={true}
               isSelected={() => true}
-              items={Object.keys(lambda.default).map(key => {
-                return {
-                  title: `[${key}]: ${UIA.GetCodeName(
-                    methodProps[lambda.default[key]]
-                  ) || lambda.default[key]}`,
-                  value: key,
-                  id: key
-                };
-              })}
+              items={Object.keys(lambda.default)
+                .filter(key => key !== "return")
+                .map(key => {
+                  return {
+                    title: `[${key}]: ${UIA.GetCodeName(
+                      methodProps[lambda.default[key]]
+                    ) || lambda.default[key]}`,
+                    value: key,
+                    id: key
+                  };
+                })}
             />
           );
         }

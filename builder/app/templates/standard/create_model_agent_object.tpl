@@ -10,7 +10,7 @@
 
                 var model_output = await arbiter{{model}}.Get<{{model}}>(result.IdValue);
 
-                return model_output;
+                return {{lambda.default}};
             }
             throw new PermissionException();
         }

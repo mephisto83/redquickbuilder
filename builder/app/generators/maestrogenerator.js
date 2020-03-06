@@ -6,7 +6,9 @@ import {
   NodesByType,
   GetRootGraph,
   GetCurrentGraph,
-  GetCodeName
+  GetCodeName,
+  GenerateDataChainArguments,
+  GetLambdaDefinition
 } from "../actions/uiactions";
 import {
   LinkType,
@@ -133,6 +135,33 @@ export default class MaestroGenerator {
                 maestro_function,
                 NodeProperties.HttpRoute
               )}`;
+              let datachainoptions = { "lambda.default": "" };
+              let dataChainNodes = GraphMethods.GetNodesLinkedTo(null, {
+                id: maestro_function.id,
+                link: LinkType.DataChainLink
+              });
+              dataChainNodes.map(dataChainNode => {
+                let lambda = GetLambdaDefinition(maestro_function);
+                if (lambda) {
+                  if (dataChainNode) {
+                    let dataChainArgs = GenerateDataChainArguments(
+                      dataChainNode.id
+                    );
+                    let link = GraphMethods.GetLinkBetween(
+                      maestro_function.id,
+                      dataChainNode.id,
+                      GetCurrentGraph()
+                    );
+                    datachainoptions["lambda.default"] = `await ${GetCodeName(
+                      dataChainNode
+                    )}(${dataChainArgs});`;
+                  } else if (lambda.default) {
+                    datachainoptions = {
+                      "lambda.default": lambda.default.return
+                    };
+                  }
+                }
+              });
               let agentTypeNode = null;
               let fetchTypeNode = null;
               let userTypeNode = null;
@@ -281,6 +310,7 @@ export default class MaestroGenerator {
               }
 
               let bindOptions = {
+                ...datachainoptions,
                 function_name: functionName,
                 agent_type: agent_type,
                 "agent_type#lower": `${agent_type}`.toLowerCase(),

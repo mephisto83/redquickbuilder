@@ -719,7 +719,8 @@ export const MethodFunctions = {
         value: "model",
         model_output: "model",
         "result.IdValue": "string",
-        agent: "agent"
+        agent: "agent",
+        return: "model_output"
       }
     },
     constraints: {

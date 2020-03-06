@@ -130,6 +130,32 @@ class Dashboard extends Component {
         case NodeTypes.DataChain:
           result.push(...this.getDataChainContext());
           return result;
+          case NodeTypes.Controller:
+            result.push({
+                onClick: () => {
+                  this.props.setVisual(CONNECTING_NODE, {
+                    ...LinkProperties.MaestroLink,
+                    nodeTypes: [NodeTypes.Maestro]
+                  });
+                },
+                icon: 'fa  fa-music',
+                title: Titles.AddMaestros
+              }
+            );
+            return result;
+            case NodeTypes.Maestro:
+              result.push({
+                  onClick: () => {
+                    this.props.setVisual(CONNECTING_NODE, {
+                      ...LinkProperties.FunctionLink,
+                      nodeTypes: [NodeTypes.Method]
+                    });
+                  },
+                  icon: 'fa  fa-music',
+                  title: Titles.AddFunction
+                }
+              );
+              return result;
         case NodeTypes.Selector:
           result.push(...this.getSelectorContext())
           return result;
