@@ -7,7 +7,8 @@ import {
   NodePropertyTypes,
   NEW_LINK,
   GetCurrentGraph,
-  GetCodeName
+  GetCodeName,
+  GetModelPropertyChildren
 } from "../actions/uiactions";
 import {
   LinkType,
@@ -310,6 +311,40 @@ export default class ModelGenerator {
     let staticDic = {
       model: GetNodeProp(node, NodeProperties.CodeName)
     };
+
+    let _properties = GetModelPropertyChildren(node.id, {
+      skipLogicalChildren: true
+    })
+      .map(v => {
+        let propType = GetNodeProp(v, NodeProperties.UIAttributeType);
+        switch (propType) {
+          case NodePropertyTypes.STRING:
+            return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
+            model.${GetCodeName(v)} = b.${GetCodeName(v)};
+          }`;
+          case NodePropertyTypes.LISTOFSTRINGS:
+          case NodePropertyTypes.PHONENUMBER:
+          case NodePropertyTypes.EMAIL:
+          case NodePropertyTypes.DATETIME:
+            return `if(a.${GetCodeName(v)} == null){
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+          case NodePropertyTypes.BOOLEAN:
+            return `if(!a.${GetCodeName(v)}){
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+          case NodePropertyTypes.DOUBLE:
+          case NodePropertyTypes.FLOAT:
+          case NodePropertyTypes.INT:
+            return `if(a.${GetCodeName(v)} == 0){
+                  model.${GetCodeName(v)} = b.${GetCodeName(v)};
+                }`;
+        }
+      })
+      .filter(x => x)
+      .join(NEW_LINE);
+    staticDic.property_set_merge = _properties;
+
     staticFunctions.push(bindTemplate(staticFunctionTemplate, staticDic));
 
     if (GetNodeProp(node, NodeProperties.IsUser)) {
