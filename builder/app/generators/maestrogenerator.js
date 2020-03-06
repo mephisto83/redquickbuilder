@@ -152,12 +152,12 @@ export default class MaestroGenerator {
                       dataChainNode.id,
                       GetCurrentGraph()
                     );
-                    datachainoptions["lambda.default"] = `await ${GetCodeName(
-                      dataChainNode
-                    )}(${dataChainArgs});`;
+                    datachainoptions["lambda.default"] = `
+        var ${GetCodeName(dataChainNode).toLowerCase()} = RedStrapper.Resolve<${GetCodeName(dataChainNode)}>();
+        return await ${GetCodeName(dataChainNode).toLowerCase()}.Execute(${dataChainArgs});`;
                   } else if (lambda.default) {
                     datachainoptions = {
-                      "lambda.default": lambda.default.return
+                      "lambda.default": `return ${lambda.default.return};`
                     };
                   }
                 }

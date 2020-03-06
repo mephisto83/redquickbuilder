@@ -1266,8 +1266,9 @@ export function GenerateDataChainArguments(id) {
       if (lambda && lambda.default) {
         let methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
+          .filter(x => x !== "return")
           .map(key => {
-            return `${key.split(".").join("")}:${lambda.default[key]} `;
+            return `${key.split(".").join("")}:${key} `;
           })
           .join(", ");
       }
@@ -1304,6 +1305,7 @@ export function GenerateCSChainFunction(id) {
       if (lambda && lambda.default) {
         let methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
+          .filter(x => x !== "return")
           .map(key => {
             return `${GetCodeName(methodProps[lambda.default[key]]) ||
               lambda.default[key]} ${key.split(".").join("")}`;
