@@ -43,7 +43,7 @@ export default class MindMap extends Component {
   }
   componentDidMount() {
     // Draw for the first time to initialize.
-    this.draw();
+    this.draw(true);
 
     // Redraw based on the new size whenever the browser window is resized.
     window.addEventListener("resize", this.draw);
@@ -91,12 +91,15 @@ export default class MindMap extends Component {
         (text || "").split(" ").length > 1 ? `200px` : "300px";
       div.style.top = "-10000px";
       div.style.padding = pad * 2 + "px";
-      document.querySelector(`#${this.state.id}`).appendChild(div);
+      let statenode = document.querySelector(`#${this.state.id}`);
+      if (statenode) {
+        statenode.appendChild(div);
+      }
     }
     div.innerHTML = text;
     return div.getBoundingClientRect();
   }
-  draw() {
+  draw(options = { once: false }) {
     var me = this;
     var domObj = document.querySelector(`#${this.state.id}`);
 
@@ -175,7 +178,9 @@ export default class MindMap extends Component {
         );
         centerGuid.attr(
           "style",
-          `position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(ang)}deg)`
+          `position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
+            ang
+          )}deg)`
         );
       }
       outer.on("mousemove", function(x, v) {
@@ -638,15 +643,7 @@ export default class MindMap extends Component {
     let keepRunning = true;
     let centerGraph = true;
 
-    force
-      .start
-      // initialUnconstrainedIterations,
-      // initialUserConstraintIterations,
-      // initialAllConstraintsIterations,
-      // null && gridSnapIterations,
-      // keepRunning,
-      // centerGraph
-      ();
+    force.start(null, null, null, null, !options.once);
   }
   buildNode(graph, cola, color) {
     var me = this;
@@ -839,9 +836,10 @@ export default class MindMap extends Component {
         //     var _group = graph.groupLib[group.id];
         // })
       }
-
       if (draw) {
-        this.draw();
+        this.draw({
+          once: !(this.state.graph.nodes && this.state.graph.nodes.length)
+        });
       }
     }
   }
@@ -850,11 +848,7 @@ export default class MindMap extends Component {
   }
   render() {
     return (
-      <div
-        id={this.state.id}
-        className="mindmap"
-        style={{ minHeight: 946}}
-      />
+      <div id={this.state.id} className="mindmap" style={{ minHeight: 946 }} />
     );
   }
 }
@@ -999,7 +993,7 @@ var Vector = (function() {
   //this is the vector I have tried for the normalisation
   Vector.prototype.normalisedVector = function() {
     var vec = new Vector(this.getX(), this.getY(), this.getZ());
-    return (vec.divide(this.magnitude()));
+    return vec.divide(this.magnitude());
   };
   return Vector;
 })();

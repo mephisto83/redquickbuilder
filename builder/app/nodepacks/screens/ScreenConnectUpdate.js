@@ -7,9 +7,16 @@ import {
   ViewTypes,
   ADD_NEW_NODE,
   addInstanceFunc,
-  GetNodeById
+  GetNodeById,
+  GetNodeTitle,
+  ADD_LINK_BETWEEN_NODES,
+  ComponentApiKeys
 } from "../../actions/uiactions";
-import { LinkType, NodeProperties } from "../../constants/nodetypes";
+import {
+  LinkType,
+  NodeProperties,
+  LinkProperties
+} from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
   ComponentEvents
@@ -18,6 +25,8 @@ import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import ModifyUpdateLinks from "../ModifyUpdateLinks";
+import CreateValidatorForProperty from "../CreateValidatorForProperty";
+import AppendValidations from "./AppendValidations";
 
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method, componentDidMountMethod, viewType } = args;
@@ -187,61 +196,9 @@ export default function ScreenConnectUpdate(args = { method, node }) {
         });
       }
 
-      if (subcomponents.length) {
-        subcomponents.map(subcomponent => {
-          let componentType = GetNodeProp(
-            subcomponent,
-            NodeProperties.ComponentType
-          );
-          switch (componentType) {
-            default:
-              let externalValidationApi = GetNodesLinkedTo(null, {
-                id: subcomponent.id,
-                link: LinkType.ComponentExternalApi
-              }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
-              if (externalValidationApi) {
-                let modelId = GetNodeProp(screen_option, NodeProperties.Model);
-                let propertyId = GetNodeProp(
-                  subcomponent,
-                  NodeProperties.Property
-                );
-                if (!propertyId) {
-                  propertyId = GetModelPropertyChildren(modelId).find(
-                    v => GetNodeTitle(v) === GetNodeTitle(subcomponent)
-                  );
-                  if (propertyId) {
-                    propertyId = propertyId.id;
-                  }
-                }
-                let validatorNode = null;
-                result.push(
-                  ...CreateValidatorForProperty({
-                    modelText: GetNodeTitle(modelId),
-                    propertyText: GetNodeTitle(propertyId),
-                    model: modelId,
-                    property: propertyId,
-                    method,
-                    viewPackages,
-                    callback: context => {
-                      validatorNode = context.entry;
-                    }
-                  }),
-                  {
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options: function() {
-                      return {
-                        target: validatorNode,
-                        source: externalValidationApi.id,
-                        properties: { ...LinkProperties.DataChainLink }
-                      };
-                    }
-                  }
-                );
-              }
-              break;
-          }
-        });
-      }
+
+      result.push(...AppendValidations({ subcomponents }));
+
     });
   });
   result = [...result, ...ModifyUpdateLinks()];

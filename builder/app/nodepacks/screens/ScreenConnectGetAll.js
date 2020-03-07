@@ -28,6 +28,7 @@ import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import StoreModelArrayStandard from "../StoreModelArrayStandard";
+import AppendValidations from "./AppendValidations";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -101,9 +102,12 @@ export default function ScreenConnectGetAll(args = { method, node }) {
         let subcomponents = GetNodesLinkedTo(graph, {
           id: listItem.id,
           link: LinkType.Component
-        }).filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
-        if (subcomponents && subcomponents.length === 1) {
-          let subcomponent = subcomponents[0];
+        });
+        let executeButtons = subcomponents.filter(x =>
+          GetNodeProp(x, NodeProperties.ExecuteButton)
+        );
+        if (executeButtons && executeButtons.length === 1) {
+          let subcomponent = executeButtons[0];
           let events = GetNodesLinkedTo(graph, {
             id: subcomponent.id,
             link: LinkType.EventMethod
@@ -166,6 +170,8 @@ export default function ScreenConnectGetAll(args = { method, node }) {
             );
           });
         }
+
+        result.push(...AppendValidations({ subcomponents }));
       });
     });
 

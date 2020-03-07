@@ -7,7 +7,10 @@ import {
   ViewTypes,
   addInstanceFunc,
   ADD_NEW_NODE,
-  ADD_LINK_BETWEEN_NODES
+  ADD_LINK_BETWEEN_NODES,
+  GetNodeTitle,
+  GetModelPropertyChildren,
+  ComponentApiKeys
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -22,6 +25,8 @@ import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
+import CreateValidatorForProperty from "../CreateValidatorForProperty";
+import AppendValidations from "./AppendValidations";
 
 export default function ScreenConnectGet(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -54,9 +59,12 @@ export default function ScreenConnectGet(args = { method, node }) {
       let subcomponents = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.Component
-      }).filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
-      if (subcomponents && subcomponents.length === 1) {
-        let subcomponent = subcomponents[0];
+      });
+      let buttonComponents = subcomponents.filter(x =>
+        GetNodeProp(x, NodeProperties.ExecuteButton)
+      );
+      if (buttonComponents && buttonComponents.length === 1) {
+        let subcomponent = buttonComponents[0];
         let events = GetNodesLinkedTo(graph, {
           id: subcomponent.id,
           link: LinkType.EventMethod
@@ -119,6 +127,8 @@ export default function ScreenConnectGet(args = { method, node }) {
           );
         });
       }
+      result.push(...AppendValidations({ subcomponents }));
+
     });
 
     let lifeCylcleMethods = GetNodesLinkedTo(graph, {

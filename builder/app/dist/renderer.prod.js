@@ -194,6 +194,8 @@ __webpack_require__.d(uiactions_namespaceObject, "GetConditionNodes", function()
 __webpack_require__.d(uiactions_namespaceObject, "IsAgent", function() { return uiactions_IsAgent; });
 __webpack_require__.d(uiactions_namespaceObject, "GetLinkChainItem", function() { return uiactions_GetLinkChainItem; });
 __webpack_require__.d(uiactions_namespaceObject, "GetCodeName", function() { return GetCodeName; });
+__webpack_require__.d(uiactions_namespaceObject, "GetRelativeDataChainPath", function() { return GetRelativeDataChainPath; });
+__webpack_require__.d(uiactions_namespaceObject, "computeNamespace", function() { return computeNamespace; });
 __webpack_require__.d(uiactions_namespaceObject, "GetJSCodeName", function() { return GetJSCodeName; });
 __webpack_require__.d(uiactions_namespaceObject, "GetModelPropertyChildren", function() { return GetModelPropertyChildren; });
 __webpack_require__.d(uiactions_namespaceObject, "GetMethodParameters", function() { return GetMethodParameters; });
@@ -218,16 +220,23 @@ __webpack_require__.d(uiactions_namespaceObject, "GetValidationsConditions", fun
 __webpack_require__.d(uiactions_namespaceObject, "GetModelItemConditions", function() { return GetModelItemConditions; });
 __webpack_require__.d(uiactions_namespaceObject, "GetConditionSetup", function() { return GetConditionSetup; });
 __webpack_require__.d(uiactions_namespaceObject, "GetDataChainEntryNodes", function() { return uiactions_GetDataChainEntryNodes; });
+__webpack_require__.d(uiactions_namespaceObject, "GetLambdaDefinition", function() { return GetLambdaDefinition; });
+__webpack_require__.d(uiactions_namespaceObject, "GenerateDataChainArguments", function() { return GenerateDataChainArguments; });
+__webpack_require__.d(uiactions_namespaceObject, "GenerateCSChainFunction", function() { return GenerateCSChainFunction; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateChainFunction", function() { return GenerateChainFunction; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateSetProcess", function() { return GenerateSetProcess; });
 __webpack_require__.d(uiactions_namespaceObject, "GetSubscribes", function() { return GetSubscribes; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateArgs", function() { return GenerateArgs; });
 __webpack_require__.d(uiactions_namespaceObject, "GetLastChainLink", function() { return GetLastChainLink; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateObservable", function() { return GenerateObservable; });
+__webpack_require__.d(uiactions_namespaceObject, "GenerateDataChainFunc", function() { return GenerateDataChainFunc; });
 __webpack_require__.d(uiactions_namespaceObject, "GetDataChainArgs", function() { return GetDataChainArgs; });
 __webpack_require__.d(uiactions_namespaceObject, "GetSelectorsNodes", function() { return GetSelectorsNodes; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateChainFunctions", function() { return GenerateChainFunctions; });
+__webpack_require__.d(uiactions_namespaceObject, "CollectionIsInLanguage", function() { return CollectionIsInLanguage; });
+__webpack_require__.d(uiactions_namespaceObject, "GetDataChainCollections", function() { return GetDataChainCollections; });
 __webpack_require__.d(uiactions_namespaceObject, "GetComponentExternalApiNode", function() { return GetComponentExternalApiNode; });
+__webpack_require__.d(uiactions_namespaceObject, "GetComponentApiNode", function() { return GetComponentApiNode; });
 __webpack_require__.d(uiactions_namespaceObject, "GetComponentExternalApiNodes", function() { return GetComponentExternalApiNodes; });
 __webpack_require__.d(uiactions_namespaceObject, "GetNodeMethodCall", function() { return GetNodeMethodCall; });
 __webpack_require__.d(uiactions_namespaceObject, "GetComponentInternalApiNode", function() { return GetComponentInternalApiNode; });
@@ -241,6 +250,10 @@ __webpack_require__.d(uiactions_namespaceObject, "GetDataChainFrom", function() 
 __webpack_require__.d(uiactions_namespaceObject, "getGroup", function() { return uiactions_getGroup; });
 __webpack_require__.d(uiactions_namespaceObject, "hasGroup", function() { return uiactions_hasGroup; });
 __webpack_require__.d(uiactions_namespaceObject, "IsEndOfDataChain", function() { return IsEndOfDataChain; });
+__webpack_require__.d(uiactions_namespaceObject, "GetLambdaVariableNode", function() { return GetLambdaVariableNode; });
+__webpack_require__.d(uiactions_namespaceObject, "GetArbitersInCSDataChainMethod", function() { return GetArbitersInCSDataChainMethod; });
+__webpack_require__.d(uiactions_namespaceObject, "GetOutputTypeInCSDataChainMethod", function() { return GetOutputTypeInCSDataChainMethod; });
+__webpack_require__.d(uiactions_namespaceObject, "GenerateCDDataChainMethod", function() { return GenerateCDDataChainMethod; });
 __webpack_require__.d(uiactions_namespaceObject, "GenerateDataChainMethod", function() { return GenerateDataChainMethod; });
 __webpack_require__.d(uiactions_namespaceObject, "GetPermissionsSortedByAgent", function() { return GetPermissionsSortedByAgent; });
 __webpack_require__.d(uiactions_namespaceObject, "GetValidationsSortedByAgent", function() { return GetValidationsSortedByAgent; });
@@ -273,6 +286,9 @@ __webpack_require__.d(uiactions_namespaceObject, "attachToNavigateNode", functio
 __webpack_require__.d(uiactions_namespaceObject, "_attachToNavigateNode", function() { return _attachToNavigateNode; });
 __webpack_require__.d(uiactions_namespaceObject, "GetConnectedScreen", function() { return GetConnectedScreen; });
 __webpack_require__.d(uiactions_namespaceObject, "GetModelPropertyNodes", function() { return GetModelPropertyNodes; });
+__webpack_require__.d(uiactions_namespaceObject, "getTopComponent", function() { return getTopComponent; });
+__webpack_require__.d(uiactions_namespaceObject, "GetParentComponent", function() { return GetParentComponent; });
+__webpack_require__.d(uiactions_namespaceObject, "ComponentIsViewType", function() { return ComponentIsViewType; });
 __webpack_require__.d(uiactions_namespaceObject, "GetUserReferenceNodes", function() { return GetUserReferenceNodes; });
 __webpack_require__.d(uiactions_namespaceObject, "GetLogicalChildren", function() { return GetLogicalChildren; });
 __webpack_require__.d(uiactions_namespaceObject, "GetMethodNodeSelectOptions", function() { return GetMethodNodeSelectOptions; });
@@ -344,6 +360,9 @@ __webpack_require__.d(uiactions_namespaceObject, "GetMethodFilterMetaParameters"
 __webpack_require__.d(uiactions_namespaceObject, "GetMethodPermissionParameters", function() { return GetMethodPermissionParameters; });
 __webpack_require__.d(uiactions_namespaceObject, "GetMethodValidationParameters", function() { return GetMethodValidationParameters; });
 __webpack_require__.d(uiactions_namespaceObject, "GetPermissionMethod", function() { return GetPermissionMethod; });
+__webpack_require__.d(uiactions_namespaceObject, "GetPermissionMethodModel", function() { return GetPermissionMethodModel; });
+__webpack_require__.d(uiactions_namespaceObject, "GetValidatorMethod", function() { return GetValidatorMethod; });
+__webpack_require__.d(uiactions_namespaceObject, "GetFunctionMethodKey", function() { return GetFunctionMethodKey; });
 __webpack_require__.d(uiactions_namespaceObject, "GetNodesMethod", function() { return GetNodesMethod; });
 __webpack_require__.d(uiactions_namespaceObject, "GetAppSettings", function() { return GetAppSettings; });
 __webpack_require__.d(uiactions_namespaceObject, "GetCurrentGraph", function() { return GetCurrentGraph; });
@@ -882,20 +901,24 @@ const Remove = "Remove";
 const GraphOperations = "Graph Operations";
 const AgentBaseMethods = "Agent Based Methods";
 const LinkType = "Link Type";
+const DefaultViewModel = "Default View Model";
 const AddServiceInterfaceMenu = "Add Interface Method";
 const AddDefaults = "Add Defaults";
 const Type = "Type";
 const EventType = "Event Type";
 const titles_UIParameters = "UI Parameters";
+const IsFetchOutput = "Is Fetch Output";
 const GridAreas = "Grid Areas";
 const GridRow = "GridRow";
 const Rows = "Row Count";
 const Navigation = "Navigation";
 const UseHttps = "Use Https";
 const Parameter = "Parameter";
+const Parameters = "Parameters";
 const ServerSideSetup = "Service Side Setup";
 const Theme = "Theme";
 const Properties = "Properties";
+const Key = "Key";
 const titles_EventHandlerActivityMenu = "Event Handlers";
 const AddCondition = "Add Condition";
 const Style = "Style";
@@ -908,10 +931,12 @@ const SelectorType = "Selector Type";
 const GraphPropertiesMenu = "Graph Properties";
 const Execute = "Execute";
 const Cancel = "Cancel";
+const CopyToAll = "Copy To All";
 const ViewTypes = "View Types";
 const List = "List";
 const All = "All";
 const DataChain = "Data Chain";
+const Styling = "Styling";
 const SetFetchServiceOutput = "Set Fetch Service Output";
 const AddMethod = "Add Method";
 const titles_ComponentPropertyMenu = "Component Properties";
@@ -919,6 +944,8 @@ const titles_ComponentAPIMenu = "Component API";
 const Domain = "Domain";
 const ClientMethod = "Client Method";
 const Layout = "Layout";
+const CSEntryPoint = "C# Entry Point";
+const CSharp = "C#";
 const NodeLabel = "Node Label";
 const NodeType = "Node Type";
 const ComponentModel = "Component Model";
@@ -959,18 +986,23 @@ const Selected = "Selected";
 const SelectedShortCut = "Ctrl + q";
 const ColorScheme = "Color Scheme";
 const EnableMenu = "Enable Menu";
+const ExternalApi = "External Api";
+const InternalApi = "Internal Api";
 const ScreenOptions = "Screen Options";
 const IsUrlParameter = "Is Url Parameter";
+const AsLocalContext = "As local context";
 const TitleService = "Title Service";
 const UseInView = "Use In View";
 const InternalApiConnection = "Internal Api Connection";
 const Selector = "Selector";
+const SelectorInput = "Selector Input";
 const Collapsed = "Collapsed";
 const MediaQuery = "Media Query";
 const GenericLink = "General Link";
 const OnLoad = "On Load";
 const AddQueryMethodApi = "Add Query Api";
 const ChildLink = "Child link";
+const UseValue = "Use Value";
 const OnFailureLink = "On failure result";
 const Lambda = "Lambda";
 const ExternalApiConnection = "External Api Connection";
@@ -1046,10 +1078,12 @@ const Enumerable = "Enumerable";
 const Value = "Value";
 const AppMenu = "Application Menu";
 const Snip = "Snip";
+const StandardLink = "Standard Link";
 const Insert = "Insert";
 const CodeName = "Code Name";
 const ValueName = "Value Name";
 const AgentName = "Agent Name";
+const DataChainCollection = "Data Chain Collection";
 const FileMenu = "File Menu";
 const Code = "Code";
 const MainNavigation = "Main Navigation";
@@ -1061,6 +1095,7 @@ const AddFunctionOutputDescription = "The output of the function";
 const IsAgent = "Agent";
 const IsOwnedByAgents = "Is Owned By Agents";
 const IsOwnedByAgentsDescriptions = "That would mean any agent/model could own this object.";
+const ComponentDidMount = "Component Did Mount";
 const IsUser = "User";
 const ParameterType = "Parameter Type";
 const OwnedResources = "Owned Resources";
@@ -1070,6 +1105,7 @@ const AddModelItemFilter = "Add model item filter";
 const ConnectModelItemFilter = "Connect Model Item Filter";
 const ClaimServiceRegistrationCalls = "Registration Calls Methods";
 const ClaimServiceUpdateUserMethod = "Update User Methods";
+const ExecuteButton = "Execute Button";
 const AddModelItemFilterDescription = "Add model item filter for get functions";
 const PermissionType = "Permissions";
 const PermissionAttributes = "Permission Attributes";
@@ -1154,6 +1190,7 @@ const Property = "Property";
 const ModelKey = "ModelKey";
 const ViewModel = "View Model";
 const AddDataChain = "Add data chain";
+const AddSelector = "Add Selector";
 const SplitDataChain = "Split data chain";
 const HandlerType = "Handler type";
 const MergeChain = "Merge data chain";
@@ -1169,7 +1206,7 @@ const Create_Object_Agent_Many_to_Many_CompositeInput__Object = "Create Object b
 const Create_Object__Object = "Create Object => Object";
 const Update_Object_With_User = "Update Object => Object";
 const Create_Object_With_User = "Create Object with User";
-const GetObjectsFromLIstOfIds = "Get Objects From List of IDs";
+const GetObjectsFromLIstOfIds = "Fetch Service compatible function";
 const AddAllProperties = "Add all properties";
 const ApplyCopyToAllProperties = `Apply 'copy' to all properties`;
 const Get_ManyToMany_Agent_Value__IListChild = "Get Many to Many => IList<Child>";
@@ -1207,6 +1244,7 @@ const PinSelected = "Pin Selected";
 const UnPinSelected = "Unpin Selected";
 const ClearMarked = "Clear Marked";
 const Clear = "Clear";
+const AddDataChainCollection = "Add Data Chain Collection Parent";
 const SelectAll = "Select All";
 const CreateComponents = "Create Components";
 const Register = "Register";
@@ -1222,8 +1260,10 @@ const AsForm = "As Form";
 const AsText = "As Text";
 const CollectCookies = "Collect Cookies";
 const Maestros = "Maestros";
+const Collections = "Collections";
 const SaveAs = "Save as ...";
 const NoApiPrefix = "No api prefix";
+const AddSharedViewModel = "Add Shared View Model";
 const Save = "Save";
 const Open = "Open";
 const Record = "Record";
@@ -1341,7 +1381,8 @@ const NodeTypes = {
   ServiceInterfaceMethod: "service-interface-method",
   ViewModel: "view-model",
   FetchService: "FetchService",
-  Style: "Style"
+  Style: "Style",
+  DataChainCollection: "DataChainCollection"
 };
 const NodeTypeIcons = {};
 function GetNodeTypeIcon(type) {
@@ -1360,6 +1401,7 @@ const ExcludeDefaultNode = {
 };
 const GeneratedTypes = {
   ChangeParameter: "change-parameter",
+  CSDataChain: "data-chain-cs",
   ChangeResponse: "change-response",
   Constants: "constants",
   Validators: "validator-generated",
@@ -1451,7 +1493,8 @@ const NodeTypeColors = {
   [NodeTypes.Lists]: "#2DC7FF",
   [NodeTypes.ClaimService]: "#034748",
   [NodeTypes.FetchService]: "#BA1200",
-  [NodeTypes.Style]: "#f12100"
+  [NodeTypes.Style]: "#f12100",
+  [NodeTypes.DataChainCollection]: "#2191FB"
 };
 const NavigateTypes = {
   Back: "GoBack",
@@ -1522,20 +1565,27 @@ const MediaQueries = {
   ["Large devices"]: "@media only screen and (min-width: 992px)",
   ["Extra devices"]: "@media only screen and (min-width: 1200px)"
 };
+const nodetypes_SelectorType = {
+  InternalProperties: "InternalProperties"
+};
 const nodetypes_NodeProperties = {
   ViewPackage: "view-package",
+  IsFetchOutput: "IsFetchOutput",
   IsFetchParameter: "IsFetchParameter",
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
   GridPlacement: "GridPlacement",
   GridRowCount: "GridRowCount",
   HoverStyle: ":hover",
+  AsLocalContext: "AsLocalContext",
   ActiveStyle: ":active",
+  SharedReferenceCollection: "SharedReferenceCollection",
   BeforeStyle: "::before",
   GridAreas: "GridAreas",
   AfterStyle: "::after",
   MediaQuery: "MediaQuery",
   UseMediaQuery: "UseMediaQuery",
+  UseValue: "UseValue",
   CheckedStyle: ":checked",
   DisabledStyle: ":disabled",
   EmptyStyle: ":empty",
@@ -1548,6 +1598,7 @@ const nodetypes_NodeProperties = {
   ExcludeFromGeneration: "ExcludeFromGeneration",
   ViewPackageTitle: "view-package-title",
   ComponentApi: "component-api",
+  DefaultViewModel: "DefaultViewModel",
   SelectorType: "selector-type",
   UseInstanceType: "UseInstanceType",
   SharedComponent: "SharedComponent",
@@ -1560,14 +1611,18 @@ const nodetypes_NodeProperties = {
   ClientMethod: "ClientMethod",
   MethodParameters: "MethodParameters",
   NavigationParametersProperty: "NavigationParametersProperty",
+  ExecuteButton: "ExecuteButton",
   MethodParameterProperty: "MethodParameterProperty",
   ScreenParameters: "ScreenParameters",
+  Method: "Method",
   SelectedLayoutCell: "SelectedLayoutCell",
   ChainParent: "ChainParent",
   Navigation: "Navigation",
   ClientMethodParameters: "ClientMethodParameters",
   AsOutput: "AsOutput",
   EntryPoint: "EntryPoint",
+  CSEntryPoint: "CSEntryPoint",
+  CS: "CS",
   Property: "Property",
   DataChainEntry: "DataChainEntry",
   MergeChain: "MergeChain",
@@ -1721,6 +1776,7 @@ const nodetypes_NodeProperties = {
   PermissionValueType: "PermissionValueType",
   UseModelAsType: "useModelAsType",
   IsDefaultProperty: "isDefaultProperty",
+  ExecuteComponent: "ExecuteComponent",
   HasLogicalChildren: "hasLogicalChildren",
   LogicalChildrenTypes: "logicalChildrenTypes",
   HasLogicalNieces: "hasLogicalNieces",
@@ -1770,8 +1826,10 @@ const nodetypes_NodeProperties = {
   AsForm: "as-form",
   CollectCookies: "collect-cookies",
   AsText: "as-text",
-  ClassConstructionInformation: "ClassConstructionInformation"
+  ClassConstructionInformation: "ClassConstructionInformation",
+  DataChainCollection: "DataChainCollection"
 };
+const StyleNodeProperties = [nodetypes_NodeProperties.ActiveStyle, nodetypes_NodeProperties.HoverStyle, nodetypes_NodeProperties.CheckedStyle, nodetypes_NodeProperties.DisabledStyle, nodetypes_NodeProperties.EmptyStyle, nodetypes_NodeProperties.EnabledStyle, nodetypes_NodeProperties.FirstChildStyle, nodetypes_NodeProperties.LastChildStyle, nodetypes_NodeProperties.FocusStyle, nodetypes_NodeProperties.ReadOnlyStyle, nodetypes_NodeProperties.BeforeStyle, nodetypes_NodeProperties.AfterStyle];
 
 function codeTypeWord(x) {
   if (typeof x === "string") {
@@ -1887,6 +1945,7 @@ const nodetypes_LinkType = {
   LifeCylceMethod: "LifeCylceMethod",
   ComponentApiConnector: "Component Api Connector",
   EventMethod: "EventMethod",
+  UsingSharedComponent: "UsingSharedComponent",
   EventMethodInstance: "EventMethodInstance",
   NavigationMethod: "NavigationMethod",
   MethodCall: "MethodCall",
@@ -1938,6 +1997,7 @@ const nodetypes_LinkType = {
   DataChainLink: "data-chain-link",
   QueryLink: "query-link",
   SelectorLink: "selector-link",
+  SelectorInputLink: "selector-input-link",
   TitleServiceLink: "title-service-link",
   ComponentProperty: "component-link",
   EnumerationReference: "enumeration-reference",
@@ -1982,7 +2042,9 @@ const nodetypes_LinkType = {
   //There is a link between a property and a dependency in a many to many situation.
   PermissionPropertyDependencyManyToManyLink: "permission-property-dependency-many-to-many",
   //There is a link between a permision and a property in a many to many situnation.
-  Style: "Style"
+  Style: "Style",
+  DataChainCollection: "DataChainCollection",
+  DataChainCollectionReference: "DataChainCollectionReference"
 };
 const VIKTIG_LINKS = 5;
 const LinkStyles = {
@@ -2107,7 +2169,8 @@ const LinkPropertyKeys = {
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
   ComponentTag: "ComponentTag",
-  ViewType: "viewType"
+  ViewType: "viewType",
+  AsForm: "AsForm"
 };
 const LinkProperties = {
   SharedComponent: {
@@ -2118,6 +2181,12 @@ const LinkProperties = {
   },
   ComponentApiConnector: {
     type: nodetypes_LinkType.ComponentApiConnector
+  },
+  DataChainCollection: {
+    type: nodetypes_LinkType.DataChainCollection
+  },
+  DataChainCollectionReference: {
+    type: nodetypes_LinkType.DataChainCollectionReference
   },
   LifeCylceMethodInstance: {
     type: nodetypes_LinkType.LifeCylceMethodInstance
@@ -2226,6 +2295,9 @@ const LinkProperties = {
   },
   SelectorLink: {
     type: nodetypes_LinkType.SelectorLink
+  },
+  SelectorInputLink: {
+    type: nodetypes_LinkType.SelectorInputLink
   },
   TitleServiceLink: {
     type: nodetypes_LinkType.TitleServiceLink
@@ -4273,6 +4345,16 @@ const MethodFunctions = {
       body: true,
       parameters: false
     },
+    lambda: {
+      default: {
+        user: "user",
+        value: "model",
+        model_output: "model",
+        "result.IdValue": "string",
+        agent: "agent",
+        return: "model_output"
+      }
+    },
     constraints: { ...COMMON_CONSTRAINTS_OBJECT_METHOD,
       ...COMMON_CREATE_UPDATE_CONSTRAINTS
     },
@@ -4310,6 +4392,7 @@ const MethodFunctions = {
   },
   [functiontypes_FunctionTypes.Get_Objects_From_List_Of_Ids]: {
     title: GetObjectsFromLIstOfIds,
+    description: "Gets objects from a list of Ids",
     titleTemplate: function (t, a) {
       return `Get ${t}s With IdList by ${a}`;
     },
@@ -5158,7 +5241,7 @@ function bindReferenceTemplate(templateString, data) {
   var singularSymbol = "@";
 
   try {
-    var regex = new RegExp("#({)[A-Za-z0-9_." + singularSymbol + " ,'|]*(})", "g");
+    var regex = new RegExp("#({)[A-Za-z0-9_." + singularSymbol + " ,'|~]*(})", "g");
     var hasTemplate;
 
     try {
@@ -5888,7 +5971,7 @@ function removeNode(graph, options = {}) {
     let existNodes = getNodesByLinkType(graph, {
       exist: true,
       id,
-      direction: TARGET,
+      direction: graph_methods_TARGET,
       type: nodetypes_LinkType.Exist
     });
     graph = incrementBuild(graph); //links
@@ -5945,7 +6028,7 @@ function getPropertyNodes(graph, id) {
 function getDataChainNodes(graph, id) {
   return getNodesByLinkType(graph, {
     id,
-    direction: TARGET,
+    direction: graph_methods_TARGET,
     type: nodetypes_LinkType.DataChainLink
   });
 }
@@ -6356,7 +6439,7 @@ function GetChildComponentAncestors(state, id) {
   let graph = GetRootGraph(state);
   let ancestors = GetNodesLinkedTo(graph, {
     id,
-    direction: TARGET
+    direction: graph_methods_TARGET
   }).filter(x => {
     let nodeType = uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType);
 
@@ -7237,7 +7320,7 @@ function GetTargetNode(graph, linkId) {
 }
 function getNodesLinkedFrom(graph, options) {
   return getNodeLinked(graph, { ...(options || {}),
-    direction: TARGET
+    direction: graph_methods_TARGET
   });
 }
 function getNodesLinkedTo(graph, options) {
@@ -7340,16 +7423,16 @@ function GetConnectedNodesByType(state, id, type, direction) {
     direction
   }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === type);
 }
-function GetDataChainEntryNodes(state) {
+function GetDataChainEntryNodes(state, cs) {
   let graph = GetRootGraph(state);
-  return NodesByType(graph, NodeTypes.DataChain).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EntryPoint));
+  return NodesByType(graph, NodeTypes.DataChain).filter(x => !cs && uiactions_GetNodeProp(x, nodetypes_NodeProperties.EntryPoint) || cs && uiactions_GetNodeProp(x, nodetypes_NodeProperties.CSEntryPoint));
 }
-function GetConnectedNodeByType(state, id, type, direction) {
+function GetConnectedNodeByType(state, id, type, direction, graph) {
   if (!Array.isArray(type)) {
     type = [type];
   }
 
-  let graph = GetRootGraph(state);
+  graph = graph || GetRootGraph(state);
   return GetNodesLinkedTo(graph, {
     id,
     direction
@@ -7438,7 +7521,7 @@ function getNodesByLinkType(graph, options) {
 
       if (nodeLinks) {
         return Object.keys(nodeLinks).filter(x => nodeLinks[x]).map(_id => {
-          var target = graph.linkLib[_id] ? direction === TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target : null;
+          var target = graph.linkLib[_id] ? direction === graph_methods_TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target : null;
 
           if (!target) {
             console.warn("Missing value in linkLib");
@@ -7477,7 +7560,7 @@ function getNodeLinked(graph, options) {
 
       if (nodeLinks) {
         return Object.keys(nodeLinks).filter(x => nodeLinks[x] === direction).map(_id => {
-          var target = graph.linkLib[_id] ? direction === TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target : null;
+          var target = graph.linkLib[_id] ? direction === graph_methods_TARGET ? graph.linkLib[_id].source : graph.linkLib[_id].target : null;
 
           if (!target) {
             console.warn("Missing value in linkLib");
@@ -7503,12 +7586,18 @@ function getNodeLinked(graph, options) {
 
   return [];
 }
+function GetNodeLinkedTo(graph, options) {
+  return GetNodesLinkedTo(graph, options)[0];
+}
 function GetNodesLinkedTo(graph, options) {
   if (options) {
+    graph = graph || GetCurrentGraph();
     var {
       id,
       direction,
-      link
+      link,
+      componentType,
+      properties
     } = options;
 
     if (graph && graph.nodeConnections && id) {
@@ -7522,11 +7611,19 @@ function GetNodesLinkedTo(graph, options) {
             if (GetLinkProperty(graph.linkLib[_id], LinkPropertyKeys.TYPE) !== link) {
               return null;
             }
+
+            if (properties) {
+              for (var prop in properties) {
+                if (properties[prop] !== GetLinkProperty(graph.linkLib[_id], prop)) {
+                  return null;
+                }
+              }
+            }
           }
 
           if (graph.linkLib[_id]) {
             if (graph.linkLib[_id].source !== id) {
-              if (!direction || direction === TARGET) target = graph.linkLib[_id].source;
+              if (!direction || direction === graph_methods_TARGET) target = graph.linkLib[_id].source;
             } else {
               if (!direction || direction === SOURCE) target = graph.linkLib[_id].target;
             }
@@ -7538,7 +7635,13 @@ function GetNodesLinkedTo(graph, options) {
           }
 
           return graph.nodeLib[target];
-        }).filter(x => x);
+        }).filter(x => x).filter(x => {
+          if (componentType) {
+            return uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === componentType;
+          }
+
+          return true;
+        });
       }
     }
   }
@@ -7546,7 +7649,7 @@ function GetNodesLinkedTo(graph, options) {
   return [];
 }
 const SOURCE = "SOURCE";
-const TARGET = "TARGET";
+const graph_methods_TARGET = "TARGET";
 function addLink(graph, options, link) {
   let {
     target,
@@ -7572,7 +7675,7 @@ function addLink(graph, options, link) {
 
         graph.nodeConnections[link.target] = { ...(graph.nodeConnections[link.target] || {}),
           ...{
-            [link.id]: TARGET
+            [link.id]: graph_methods_TARGET
           }
         }; //Keeps track of the number of links between nodes.
 
@@ -7693,7 +7796,13 @@ function getLink(graph, options) {
   return null;
 }
 function getAllLinksWithNode(graph, id) {
-  return graph.links.filter(x => graph.linkLib[x].source === id || graph.linkLib[x].target === id);
+  return graph.links.filter(x => {
+    if (!graph.linkLib[x]) {
+      delete graph.linkLib[x];
+    }
+
+    return graph.linkLib[x] && (graph.linkLib[x].source === id || graph.linkLib[x].target === id);
+  });
 }
 function removeLinkBetweenNodes(graph, options) {
   let link = findLinkInstance(graph, options);
@@ -8101,7 +8210,7 @@ function updateGroupProperty(graph, options) {
 function noSameLink(graph, ops) {
   return !graph.links.some(x => {
     let temp = graph.linkLib[x];
-    return temp.source === ops.source && temp.target === ops.target;
+    return temp && temp.source === ops.source && temp.target === ops.target;
   });
 }
 
@@ -8532,6 +8641,7 @@ const DataChainFunctionKeys = {
   ModelKey: "ModelKey",
   ViewModelKey: "ViewModelKey",
   Lambda: "Lambda",
+  MethodBaseValidation: "MethodBaseValidation",
   Validation: "Validation",
   NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids",
@@ -8567,6 +8677,15 @@ const DataChainFunctions = {
       [nodetypes_NodeProperties.NODEType]: true
     },
     value: "Selector"
+  },
+  [DataChainFunctionKeys.MethodBaseValidation]: {
+    ui: {
+      method: nodetypes_NodeProperties.Method
+    },
+    filter: {
+      [nodetypes_NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.MethodBaseValidation
   },
   [DataChainFunctionKeys.Navigate]: {
     ui: {
@@ -9255,6 +9374,7 @@ const DataChainContextMethods = {
   List: connectNodeChain(nodetypes_NodeProperties.List),
   Selector: connectNodeChain(nodetypes_NodeProperties.Selector),
   Screen: connectNodeChain(nodetypes_NodeProperties.Screen, true),
+  Method: connectNodeChain(nodetypes_NodeProperties.Method, true),
   SelectorProperty: connectNodeChain(nodetypes_NodeProperties.SelectorProperty),
   Value: connectNodeChain(nodetypes_NodeProperties.Value),
   StandardLink: connectChain(),
@@ -9346,24 +9466,25 @@ function getStringInserts(str = "") {
 }
 function getReferenceInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\#{[a-zA-Z0-9_]*}/gm;
+  const regex = /\#{[a-zA-Z0-9_@| ~]*}/gm;
   let m;
   let result = [];
+  let regexes = [regex];
+  regexes.map(regex => {
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      } // The result can be accessed through the `m`-variable.
 
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    } // The result can be accessed through the `m`-variable.
 
-
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
-      }
-    });
-  }
-
+      m.forEach((match, groupIndex) => {
+        if (match) {
+          result.push(match);
+        }
+      });
+    }
+  });
   return result;
 }
 function getGuids(str = "") {
@@ -9513,7 +9634,7 @@ function processRecording(str) {
     return `if(!args.${temp}){
           throw 'missing ${temp} argument';
         }`;
-  }).join('')}
+  }).join("")}
     let context = {
       ...args${unaccountedGuids.length ? "," + nodetypes_NEW_LINE + unaccountedGuids.map(v => {
     let index = guids.indexOf(v);
@@ -9557,7 +9678,179 @@ function processRecording(str) {
       }];
   }`;
 }
+// CONCATENATED MODULE: ./app/nodepacks/CreateDataChainGetBody.js
+
+
+/* harmony default export */ var CreateDataChainGetBody = (function (args = {}) {
+  // node1
+  if (!args.selector) {
+    throw "missing selector";
+  } // model
+
+
+  if (!args.model) {
+    throw "missing model argument";
+  }
+
+  let context = { ...args,
+    node1: args.selector
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "data-chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node0,
+        value: "Selector"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node0
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Selector",
+        id: context.node0,
+        value: context.node1
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node1,
+        target: context.node0,
+        properties: {
+          type: "data-chain-link",
+          "data-chain-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node0
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "SelectorProperty",
+        id: context.node0,
+        value: "object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: "object",
+        target: context.node0,
+        properties: {
+          type: "data-chain-link",
+          "data-chain-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Get " + args.model + " Object"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function (graph) {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context, graph);
+    }
+
+    return [];
+  }];
+});
 // CONCATENATED MODULE: ./app/actions/uiactions.js
+
 
 
 
@@ -9948,8 +10241,22 @@ function connectLifeCycleMethod(args) {
         });
         let lifeCycleMethod = GetConnectedNodeByType(state, source, [uiactions_NodeTypes.LifeCylceMethod, uiactions_NodeTypes.EventMethod]);
         let model = GetConnectedNodeByType(state, lifeCycleMethod.id, [uiactions_NodeTypes.Model]);
-        let dataChain = model ? GetConnectedNodeByType(state, model.id, [uiactions_NodeTypes.DataChain]) : null;
         let selectorNode = model ? GetConnectedNodeByType(state, model.id, [uiactions_NodeTypes.Selector]) : null;
+
+        let _chain = GetNodesByProperties({
+          [uiactions_NodeProperties.Selector]: selectorNode.id,
+          [uiactions_NodeProperties.EntryPoint]: true,
+          [uiactions_NodeProperties.NODEType]: uiactions_NodeTypes.DataChain,
+          [uiactions_NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object
+        }).find(x => {
+          return GetNodesLinkedTo(graph, {
+            id: x.id,
+            link: nodetypes_LinkType.DataChainLink,
+            componentType: uiactions_NodeTypes.DataChain
+          }).length === 0;
+        });
+
+        let dataChain = model ? _chain : null;
         let componentNode = GetConnectedNodeByType(state, lifeCycleMethod.id, [uiactions_NodeTypes.ComponentNode, uiactions_NodeTypes.Screen, uiactions_NodeTypes.ScreenOption]);
         state = getState();
         graph = GetCurrentGraph(state);
@@ -9972,7 +10279,13 @@ function connectLifeCycleMethod(args) {
             }
           });
         });
-        PerformGraphOperation([...apiConnectors, {
+        PerformGraphOperation([...(dataChain ? [] : CreateDataChainGetBody({
+          selector: selectorNode.id,
+          model: GetNodeTitle(model),
+          callback: (_m, graph) => {
+            dataChain = GetNodeById(_m.entry, graph);
+          }
+        })), ...apiConnectors, {
           operation: uiactions_ADD_LINK_BETWEEN_NODES,
           options: function () {
             return {
@@ -9992,11 +10305,6 @@ function connectLifeCycleMethod(args) {
                 [uiactions_NodeProperties.Component]: componentNode.id,
                 [uiactions_NodeProperties.IsPaging]: true
               });
-
-              if (model) {}
-
-              if (dataChain) {}
-
               return {
                 nodeType: uiactions_NodeTypes.ComponentApiConnector,
                 groupProperties: {},
@@ -10195,12 +10503,60 @@ function uiactions_IsAgent(node) {
 function uiactions_GetLinkChainItem(options) {
   return GetLinkChainItem(GetState(), options);
 }
-function GetCodeName(node) {
+function GetCodeName(node, options) {
+  let graph = GetCurrentGraph(GetState());
+
   if (typeof node === "string") {
-    node = GetNode(GetCurrentGraph(GetState()), node);
+    node = GetNode(graph, node);
+  }
+
+  if (options && options.includeNameSpace) {
+    if (uiactions_GetNodeProp(node, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.DataChain) {
+      let collections = GetNodesLinkedTo(graph, {
+        id: node.id,
+        link: nodetypes_LinkType.DataChainCollection,
+        direction: SOURCE
+      });
+
+      if (collections && collections.length) {
+        return `${computeNamespace(collections[0])}.${uiactions_GetNodeProp(node, uiactions_NodeProperties.CodeName)}`;
+      }
+    }
   }
 
   return uiactions_GetNodeProp(node, uiactions_NodeProperties.CodeName);
+}
+function GetRelativeDataChainPath(node) {
+  let graph = GetCurrentGraph();
+  let collections = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChainCollection,
+    direction: SOURCE
+  });
+
+  if (collections && collections.length) {
+    return [...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node)];
+  }
+
+  return [GetJSCodeName(node)];
+}
+function computeNamespace(node) {
+  let graph = GetCurrentGraph(GetState());
+  let dc = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChainCollection,
+    direction: SOURCE
+  });
+
+  if (dc && dc.length) {
+    let namesp = computeNamespace(dc[0]);
+
+    if (namesp) {
+      return `${namesp}.${GetJSCodeName(node)}`;
+    }
+  }
+
+  return `${GetJSCodeName(node)}`;
 }
 function GetJSCodeName(node) {
   var l = GetCodeName(node);
@@ -10211,9 +10567,12 @@ function GetJSCodeName(node) {
 
   return l;
 }
-function GetModelPropertyChildren(id) {
+function GetModelPropertyChildren(id, options = {}) {
+  let {
+    skipLogicalChildren
+  } = options;
   let property_nodes = GetModelPropertyNodes(id);
-  let logicalChildren = GetLogicalChildren(id);
+  let logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
   let userModels = [];
 
   if (uiactions_GetNodeProp(id, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.Model || uiactions_GetNodeProp(id, uiactions_NodeProperties.IsUser)) {
@@ -10585,10 +10944,89 @@ function GetModelItemConditions(id) {
 function GetConditionSetup(condition) {
   return uiactions_GetNodeProp(condition, uiactions_NodeProperties.Condition);
 }
-function uiactions_GetDataChainEntryNodes() {
-  return GetDataChainEntryNodes(_getState());
+function uiactions_GetDataChainEntryNodes(cs) {
+  return GetDataChainEntryNodes(_getState(), cs);
 }
-function GenerateChainFunction(id) {
+function GetLambdaDefinition(method) {
+  let functionType = uiactions_GetNodeProp(method, uiactions_NodeProperties.FunctionType);
+  let {
+    lambda
+  } = MethodFunctions[functionType];
+  return lambda;
+}
+function GenerateDataChainArguments(id) {
+  let currentNode = GetNodeById(id);
+  let _arguments = "";
+
+  if (uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.CS)) {
+    let methods = GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: nodetypes_LinkType.DataChainLink,
+      componentType: uiactions_NodeTypes.Method
+    });
+
+    if (methods.length) {
+      let functionType = uiactions_GetNodeProp(methods[0], uiactions_NodeProperties.FunctionType);
+      let {
+        lambda
+      } = MethodFunctions[functionType];
+
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+        _arguments = Object.keys(lambda.default).filter(x => x !== "return").map(key => {
+          return `${key.split(".").join("")}:${key} `;
+        }).join(", ");
+      }
+    }
+  }
+
+  return _arguments;
+}
+function GenerateCSChainFunction(id) {
+  let lastNodeName = GenerateCDDataChainMethod(id);
+  let arbiters = GetArbitersInCSDataChainMethod(id);
+  let outputType = GetOutputTypeInCSDataChainMethod(id);
+  let arbiterInterfaces = arbiters.map(arb => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`).join(", ");
+  let arbiterSets = addNewLine(arbiters.map(arb => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`).join(nodetypes_NEW_LINE));
+  let arbiterProperties = arbiters.map(arb => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`).join(nodetypes_NEW_LINE);
+  let currentNode = GetNodeById(id);
+  let _arguments = "";
+
+  if (uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.CS)) {
+    let methods = GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: nodetypes_LinkType.DataChainLink,
+      componentType: uiactions_NodeTypes.Method
+    });
+
+    if (methods.length) {
+      let functionType = uiactions_GetNodeProp(methods[0], uiactions_NodeProperties.FunctionType);
+      let {
+        lambda
+      } = MethodFunctions[functionType];
+
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+        _arguments = Object.keys(lambda.default).filter(x => x !== "return").map(key => {
+          return `${GetCodeName(methodProps[lambda.default[key]]) || lambda.default[key]} ${key.split(".").join("")}`;
+        }).join(", ");
+      }
+    }
+  }
+
+  let method = `public class ${GetCodeName(id)}
+{
+${arbiterProperties}
+    public ${GetCodeName(id)}(${arbiterInterfaces}) {
+${arbiterSets}
+    }
+    public async Task<${GetCodeName(outputType)}> Execute(${_arguments}) {
+      ${lastNodeName}
+    }
+}`;
+  return method;
+}
+function GenerateChainFunction(id, cs) {
   let chain = GetDataChainParts(id);
   let args = null;
   let observables = [];
@@ -10687,8 +11125,15 @@ function GetLastChainLink(parts) {
   return lastLink;
 }
 function GenerateObservable(id, index) {
-  let nodeName = (GetCodeName(id) || "node" + index).toJavascriptName();
+  let nodeName = GetCodeName(id);
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
+}
+function GenerateDataChainFunc(id, chain, index) {
+  let nodeName = GetCodeName(id); //Should be able to capture the args throw the link between nodes.
+
+  return `private async Task ${nodeName}(/*define args*/) {
+    throw new NotImplementedException();
+  }`;
 }
 function GetDataChainArgs(id) {
   let node = GetNodeById(id);
@@ -10720,9 +11165,12 @@ function GetSelectorsNodes(id) {
 }
 function GenerateChainFunctions(options) {
   let {
-    language
+    cs,
+    language,
+    collection
   } = options;
-  let entryNodes = uiactions_GetDataChainEntryNodes().filter(x => {
+  let graph = GetCurrentGraph();
+  let entryNodes = uiactions_GetDataChainEntryNodes(cs).filter(x => {
     let uiType = uiactions_GetNodeProp(x, uiactions_NodeProperties.UIType);
 
     if (uiType) {
@@ -10730,14 +11178,105 @@ function GenerateChainFunctions(options) {
     }
 
     return true;
-  }).map(x => x.id);
-  return entryNodes.map(GenerateChainFunction).unique(x => x).join(nodetypes_NEW_LINE);
+  }).map(x => x.id).filter(ct => {
+    let collections = GetNodesLinkedTo(graph, {
+      id: ct,
+      link: nodetypes_LinkType.DataChainCollection
+    });
+
+    if (collection) {
+      return collections.find(v => v.id === collection);
+    }
+
+    return !collections || !collections.length;
+  });
+  let temp = entryNodes.map(v => cs ? {
+    node: v,
+    class: GenerateCSChainFunction(v)
+  } : GenerateChainFunction(v)).unique(x => x); // sorry this is bad.
+
+  if (cs) {
+    return temp;
+  }
+
+  return temp.join(nodetypes_NEW_LINE);
+}
+function CollectionIsInLanguage(graph, collection, language) {
+  let reference = GetNodeLinkedTo(graph, {
+    id: collection,
+    link: nodetypes_LinkType.DataChainCollectionReference
+  });
+
+  if (reference) {
+    if (uiactions_GetNodeProp(reference, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.Screen) {
+      return true;
+    } else if (uiactions_GetNodeProp(reference, uiactions_NodeProperties.UIType) === language) {
+      return true;
+    } else if (uiactions_GetNodeProp(reference, uiactions_NodeProperties.UIType)) {
+      return false;
+    } else {
+      let parent = GetNodesLinkedTo(graph, {
+        id: collection,
+        link: nodetypes_LinkType.DataChainCollection,
+        direction: graph_methods_TARGET
+      }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.DataChainCollection)[0];
+
+      if (parent) {
+        return CollectionIsInLanguage(graph, parent.id, language);
+      }
+    }
+  } else {
+    return true;
+  }
+
+  return true;
+}
+function GetDataChainCollections(options) {
+  let {
+    collection,
+    language
+  } = options;
+  let graph = GetCurrentGraph();
+  let temp = collection ? GetNodesLinkedTo(GetCurrentGraph(), {
+    id: collection,
+    link: nodetypes_LinkType.DataChainCollection,
+    direction: graph_methods_TARGET
+  }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.DataChainCollection && CollectionIsInLanguage(graph, x.id, language)) : [];
+  return uiactions_NodesByType(null, uiactions_NodeTypes.DataChainCollection).filter(x => {
+    if (collection) {
+      let res = temp.some(v => v.id === x.id);
+
+      if (res) {
+        return true;
+      }
+
+      return false;
+    } ///only reference the top levels in data-chain.js
+
+
+    return GetNodesLinkedTo(GetCurrentGraph(), {
+      id: x.id,
+      link: nodetypes_LinkType.DataChainCollection,
+      direction: SOURCE
+    }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.DataChainCollection).length === 0;
+  }).map(dataChainCollection => {
+    let _path = GetRelativeDataChainPath(dataChainCollection);
+
+    return `export * as ${GetJSCodeName(dataChainCollection)} from './${collection ? "" : `datachains/`}${[..._path, GetJSCodeName(dataChainCollection)].subset(_path.length - 1).join("/")}';`;
+  }).unique().join(nodetypes_NEW_LINE);
 }
 function GetComponentExternalApiNode(api, parent, graph) {
   graph = graph || GetCurrentGraph();
   return GetNodesLinkedTo(graph, {
     id: parent,
     link: nodetypes_LinkType.ComponentExternalApi
+  }).find(v => GetNodeTitle(v) === api);
+}
+function GetComponentApiNode(api, parent, graph) {
+  graph = graph || GetCurrentGraph();
+  return GetNodesLinkedTo(graph, {
+    id: parent,
+    link: nodetypes_LinkType.ComponentInternalApi
   }).find(v => GetNodeTitle(v) === api);
 }
 function GetComponentExternalApiNodes(parent, graph) {
@@ -10763,9 +11302,11 @@ function GetComponentInternalApiNode(api, parent, graph) {
 }
 function GenerateChainFunctionSpecs(options) {
   let {
-    language
+    language,
+    collection
   } = options;
   let result = [];
+  let graph = GetCurrentGraph();
   let entryNodes = uiactions_GetDataChainEntryNodes().filter(x => {
     let uiType = uiactions_GetNodeProp(x, uiactions_NodeProperties.UIType);
 
@@ -10774,7 +11315,18 @@ function GenerateChainFunctionSpecs(options) {
     }
 
     return true;
-  }).map(x => x.id);
+  }).map(x => x.id).filter(ct => {
+    let collections = GetNodesLinkedTo(graph, {
+      id: ct,
+      link: nodetypes_LinkType.DataChainCollection
+    });
+
+    if (collection) {
+      return collections.find(v => v.id === collection);
+    }
+
+    return !collections || !collections.length;
+  });
   let basicentryvalues = [undefined, null, 0, {}, "a string", 1.1, [], [1], ["1"], ["1", 1]];
   entryNodes.map(entryNode => {
     basicentryvalues.map(val => {
@@ -10795,7 +11347,9 @@ function GenerateSimpleTest(node, val) {
   let template = `it('${GetCodeName(node)} - should be able to handle a "${typeof val === "object" ? JSON.stringify(val) : val}"', () => {
     let error = undefined;
     try {
-        DC.${GetCodeName(node)}(${_value});
+        DC.${GetCodeName(node, {
+    includeNameSpace: true
+  })}(${_value});
     }
     catch(e) {
         error = e;
@@ -10906,6 +11460,136 @@ function uiactions_hasGroup(id, graph) {
 }
 function IsEndOfDataChain(id) {
   return GetDataChainFrom(id).length === 1;
+}
+function GetLambdaVariableNode(id, key) {
+  let currentNode = GetNodeById(id);
+
+  if (uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.CS)) {
+    let methods = GetNodesLinkedTo(null, {
+      id: currentNode.id,
+      link: nodetypes_LinkType.DataChainLink,
+      componentType: uiactions_NodeTypes.Method
+    });
+
+    if (methods.length) {
+      let functionType = uiactions_GetNodeProp(methods[0], uiactions_NodeProperties.FunctionType);
+      let {
+        lambda
+      } = MethodFunctions[functionType];
+
+      if (lambda && lambda.default) {
+        let methodProps = GetMethodProps(methods[0]);
+        return GetNodeById(methodProps[key]);
+      }
+    }
+  }
+
+  return null;
+}
+function GetArbitersInCSDataChainMethod(id) {
+  let node = GetNodeById(id);
+  let functionType = uiactions_GetNodeProp(node, uiactions_NodeProperties.DataChainFunctionType);
+  let lambda = uiactions_GetNodeProp(node, uiactions_NodeProperties.Lambda);
+  let result = [];
+
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda).map(v => v.substr(2, v.length - 3)).unique().map(_insert => {
+        let temp = _insert.split("@");
+
+        let insert = temp.length > 1 ? temp[1] : temp[0];
+
+        if (temp.length > 1) {
+          switch (temp[0]) {
+            case "arbiter get":
+              let lambdaNode = GetLambdaVariableNode(id, insert);
+              if (lambdaNode) result.push(lambdaNode);
+              break;
+
+            default:
+              break;
+          }
+        }
+      });
+  }
+
+  return result;
+}
+function GetOutputTypeInCSDataChainMethod(id) {
+  let node = GetNodeById(id);
+  let functionType = uiactions_GetNodeProp(node, uiactions_NodeProperties.DataChainFunctionType);
+  let lambda = uiactions_GetNodeProp(node, uiactions_NodeProperties.Lambda);
+  let result = null;
+
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda).map(v => v.substr(2, v.length - 3)).unique().map(_insert => {
+        let temp = _insert.split("@");
+
+        let insert = temp.length > 1 ? temp[1] : temp[0];
+
+        if (temp.length > 1) {
+          if (temp[0].indexOf("return") === 0) {
+            let vari = temp[0].split(" ").filter(x => x);
+            let lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
+            if (lambdaNode) result = lambdaNode;
+          }
+        }
+      });
+  }
+
+  return result;
+}
+function GenerateCDDataChainMethod(id) {
+  let node = GetNodeById(id);
+  let functionType = uiactions_GetNodeProp(node, uiactions_NodeProperties.DataChainFunctionType);
+  let lambda = uiactions_GetNodeProp(node, uiactions_NodeProperties.Lambda);
+  let lambdaInsertArguments = uiactions_GetNodeProp(node, uiactions_NodeProperties.LambdaInsertArguments);
+
+  switch (functionType) {
+    case DataChainFunctionKeys.Lambda:
+      getReferenceInserts(lambda).map(v => v.substr(2, v.length - 3)).unique().map(_insert => {
+        let temp = _insert.split("@");
+
+        let insert = temp.length > 1 ? temp[1] : temp[0];
+
+        if (temp.length > 1) {
+          let swap = temp[0];
+          let args = insert.split("~");
+          let model = args[0];
+          let property = args[1];
+
+          switch (temp[0]) {
+            case "arbiter get":
+              let lambdaNode = GetLambdaVariableNode(id, insert);
+              swap = `await arbiter${GetCodeName(lambdaNode)}.Get<${GetCodeName(lambdaNode)}>`;
+              break;
+
+            default:
+              if (property) {
+                let lambdaNode = lambdaInsertArguments[property];
+                swap = `${model}.${GetCodeName(lambdaNode)}`;
+              }
+
+              break;
+          }
+
+          lambda = lambda.replace(`#{${_insert}}`, swap);
+        } else {
+          let args = insert.split("~");
+          let property = args[0];
+          let prop = lambdaInsertArguments[property];
+          let node = GetNodeById(prop);
+          lambda = bindReferenceTemplate(lambda, {
+            [property]: GetCodeName(node)
+          });
+        }
+      });
+      return `${lambda}`;
+
+    default:
+      throw `${GetNodeTitle(node)} ${node.id} - ${functionType} is not a defined function type.`;
+  }
 }
 function GenerateDataChainMethod(id) {
   let node = GetNodeById(id);
@@ -11021,12 +11705,19 @@ function GenerateDataChainMethod(id) {
 
     case DataChainFunctionKeys.Lambda:
       getReferenceInserts(lambda).map(v => v.substr(2, v.length - 3)).unique().map(insert => {
-        let args = insert.split("|");
-        let property = args[0];
+        let args = insert.split("~");
+        let property = args.length > 1 ? args[1] : args[0];
+        let model = args[0];
         let prop = lambdaInsertArguments[property];
         let node = GetNodeById(prop);
+        let bindValue = GetCodeName(node);
+
+        if (args.length > 1) {
+          bindValue = bindValue.toLowerCase();
+        }
+
         lambda = bindReferenceTemplate(lambda, {
-          [property]: GetCodeName(node)
+          [insert]: bindValue
         });
       });
       return `${lambda}`;
@@ -11145,6 +11836,9 @@ function GenerateDataChainMethod(id) {
 
     case DataChainFunctionKeys.Validation:
       return `a => true/*TBI*/`;
+
+    case DataChainFunctionKeys.MethodBaseValidation:
+      return `a => false`;
 
     default:
       throw `${GetNodeTitle(node)} ${node.id} - ${functionType} is not a defined function type.`;
@@ -11756,6 +12450,46 @@ function GetModelPropertyNodes(refId) {
     }]
   }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.Property);
 }
+function getTopComponent(graph, node) {
+  let parent = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.Component,
+    direction: TARGET
+  }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentNode)[0];
+
+  if (parent) {
+    return getTopComponent(graph, parent);
+  }
+
+  return node;
+}
+function GetParentComponent(node, graph) {
+  graph = graph || GetCurrentGraph();
+  let parent = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.Component,
+    direction: graph_methods_TARGET
+  }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentNode)[0];
+  return parent;
+}
+function ComponentIsViewType(component, viewType, graph) {
+  graph = graph || GetCurrentGraph();
+  let currentType = uiactions_GetNodeProp(component, uiactions_NodeProperties.ViewType);
+
+  if (currentType === viewType) {
+    return true;
+  } else if (currentType) {
+    return false;
+  } else {
+    let parent = GetParentComponent(component, graph);
+
+    if (parent) {
+      return ComponentIsViewType(parent, viewType, graph);
+    }
+  }
+
+  return false;
+}
 function GetUserReferenceNodes(refId) {
   var state = _getState();
 
@@ -11763,7 +12497,7 @@ function GetUserReferenceNodes(refId) {
     id: refId,
     links: [{
       type: nodetypes_LinkType.UserLink,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }]
   }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.Model);
 }
@@ -12134,7 +12868,7 @@ let _getState;
 let _dispatch;
 
 function GetState() {
-  return _getState();
+  if (_getState) return _getState();
 }
 function GetDispatchFunc() {
   return _dispatch;
@@ -12361,13 +13095,44 @@ function GetMethodValidationParameters(id, all) {
   return GetMethod_Parameters(id, "validation", all);
 }
 function GetPermissionMethod(permission) {
-  return uiactions_GetLinkChainItem({
+  if (permission) return uiactions_GetLinkChainItem({
     id: permission.id,
     links: [{
       type: nodetypes_LinkType.FunctionOperator,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }]
   });
+  return null;
+}
+function GetPermissionMethodModel(permission) {
+  let method = permission ? GetPermissionMethod(permission) : null;
+
+  if (method) {
+    let props = GetMethodProps(method);
+    return props ? props[FunctionTemplateKeys.Model] : null;
+  }
+
+  return null;
+}
+function GetValidatorMethod(permission) {
+  if (permission) return uiactions_GetLinkChainItem({
+    id: permission.id,
+    links: [{
+      type: nodetypes_LinkType.FunctionOperator,
+      direction: graph_methods_TARGET
+    }]
+  });
+  return null;
+}
+function GetFunctionMethodKey(validation, templateKey = FunctionTemplateKeys.Model) {
+  let method = validation ? GetValidatorMethod(validation) : null;
+
+  if (method) {
+    let props = GetMethodProps(method);
+    return props ? props[templateKey] : null;
+  }
+
+  return null;
 }
 function GetNodesMethod(id) {
   return GetPermissionMethod(GetNodeById(id));
@@ -12500,7 +13265,12 @@ function BuildPackage(model, _package) {
   }
 }
 const ComponentApiKeys = {
-  DATA: "data"
+  DATA: "data",
+  Value: "value",
+  Item: "item",
+  Index: "index",
+  Separators: "separators",
+  Error: "error"
 };
 const UPDATE_GRAPH_TITLE = "UPDATE_GRAPH_TITLE";
 const NEW_NODE = "NEW_NODE";
@@ -12575,7 +13345,8 @@ function GetNodesLinkTypes(id) {
     id
   });
 }
-function addInstanceFunc(node, callback) {
+function addInstanceFunc(node, callback, viewPackages) {
+  viewPackages = viewPackages || {};
   return function () {
     return {
       nodeType: uiactions_NodeTypes.EventMethodInstance,
@@ -12588,6 +13359,7 @@ function addInstanceFunc(node, callback) {
       properties: {
         [uiactions_NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
         [uiactions_NodeProperties.Pinned]: false,
+        ...viewPackages,
         [uiactions_NodeProperties.AutoDelete]: {
           properties: {
             [uiactions_NodeProperties.NODEType]: uiactions_NodeTypes.ComponentApiConnector
@@ -12765,6 +13537,10 @@ function graphOperation(operation, options) {
       }
 
       if (_op) _op.filter(x => x).map(op => {
+        if (typeof op === "function") {
+          op();
+        }
+
         let {
           operation,
           options
@@ -13350,7 +14126,7 @@ class modelgenerators_ModelGenerator {
     let logicalParents = getNodesByLinkType(graph, {
       id: node.id,
       type: nodetypes_LinkType.LogicalChildren,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }).filter(x => x.id !== node.id);
     connectedProperties = [...connectedProperties, ...logicalParents];
     let propertyTemplate = external_fs_default.a.readFileSync(MODEL_PROPERTY_TEMPLATE, "utf8");
@@ -13359,7 +14135,7 @@ class modelgenerators_ModelGenerator {
     let validatorFunctions = getNodesByLinkType(graph, {
       id: nodeId,
       type: nodetypes_LinkType.ValidatorModel,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }).map(t => uiactions_GetNodeProp(t, uiactions_NodeProperties.CodeName)).map(t => modelgenerators_ModelGenerator.tabs(1) + `[${t}]` + nodetypes_NEW_LINE).join("");
     templateSwapDictionary.attributes = validatorFunctions;
     let staticFunctions = [];
@@ -13504,6 +14280,41 @@ class modelgenerators_ModelGenerator {
     let staticDic = {
       model: uiactions_GetNodeProp(node, uiactions_NodeProperties.CodeName)
     };
+
+    let _properties = GetModelPropertyChildren(node.id, {
+      skipLogicalChildren: true
+    }).map(v => {
+      let propType = uiactions_GetNodeProp(v, uiactions_NodeProperties.UIAttributeType);
+
+      switch (propType) {
+        case uiactions_NodePropertyTypes.STRING:
+          return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
+            model.${GetCodeName(v)} = b.${GetCodeName(v)};
+          }`;
+
+        case uiactions_NodePropertyTypes.LISTOFSTRINGS:
+        case uiactions_NodePropertyTypes.PHONENUMBER:
+        case uiactions_NodePropertyTypes.EMAIL:
+        case uiactions_NodePropertyTypes.DATETIME:
+          return `if(a.${GetCodeName(v)} == null){
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+
+        case uiactions_NodePropertyTypes.BOOLEAN:
+          return `if(!a.${GetCodeName(v)}){
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+
+        case uiactions_NodePropertyTypes.DOUBLE:
+        case uiactions_NodePropertyTypes.FLOAT:
+        case uiactions_NodePropertyTypes.INT:
+          return `if(a.${GetCodeName(v)} == 0){
+                  model.${GetCodeName(v)} = b.${GetCodeName(v)};
+                }`;
+      }
+    }).filter(x => x).join(nodetypes_NEW_LINE);
+
+    staticDic.property_set_merge = _properties;
     staticFunctions.push(bindTemplate(staticFunctionTemplate, staticDic));
 
     if (uiactions_GetNodeProp(node, uiactions_NodeProperties.IsUser)) {
@@ -14172,10 +14983,10 @@ class permissiongenerator_PermissionGenerator {
                       id: permission.id,
                       links: [{
                         type: nodetypes_LinkType.Condition,
-                        direction: TARGET
+                        direction: graph_methods_TARGET
                       }, {
                         type: nodetypes_LinkType.FunctionOperator,
-                        direction: TARGET
+                        direction: graph_methods_TARGET
                       }]
                     });
                     let method = methods.find(x => x);
@@ -14216,10 +15027,10 @@ class permissiongenerator_PermissionGenerator {
                       id: permission.id,
                       links: [{
                         type: nodetypes_LinkType.Condition,
-                        direction: TARGET
+                        direction: graph_methods_TARGET
                       }, {
                         type: nodetypes_LinkType.FunctionOperator,
-                        direction: TARGET
+                        direction: graph_methods_TARGET
                       }]
                     });
                     let method = methods.find(x => x);
@@ -14315,7 +15126,7 @@ class permissiongenerator_PermissionGenerator {
       id: permission.id,
       links: [{
         type: nodetypes_LinkType.FunctionOperator,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }]
     });
     let methodProps = uiactions_GetNodeProp(methodNode, uiactions_NodeProperties.MethodProps);
@@ -14507,7 +15318,7 @@ class permissiongenerator_PermissionGenerator {
       id: permission.id,
       links: [{
         type: nodetypes_LinkType.FunctionOperator,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }]
     }) : null;
     parent = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.Parent);
@@ -14738,7 +15549,7 @@ class permissiongenerator_PermissionGenerator {
             var methodNode = permissionNode ? uiactions_GetLinkChainItem({
               id: permissionNode.id,
               links: [{
-                direction: TARGET,
+                direction: graph_methods_TARGET,
                 type: nodetypes_LinkType.FunctionOperator
               }]
             }) : null;
@@ -16101,6 +16912,30 @@ class maestrogenerator_MaestroGenerator {
             let functionName = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.CodeName)}`;
             let httpMethod = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.HttpMethod)}`;
             let httpRoute = `${uiactions_GetNodeProp(maestro_function, uiactions_NodeProperties.HttpRoute)}`;
+            let datachainoptions = {
+              "lambda.default": ""
+            };
+            let dataChainNodes = GetNodesLinkedTo(null, {
+              id: maestro_function.id,
+              link: nodetypes_LinkType.DataChainLink
+            });
+            dataChainNodes.map(dataChainNode => {
+              let lambda = GetLambdaDefinition(maestro_function);
+
+              if (lambda) {
+                if (dataChainNode) {
+                  let dataChainArgs = GenerateDataChainArguments(dataChainNode.id);
+                  let link = GetLinkBetween(maestro_function.id, dataChainNode.id, GetCurrentGraph());
+                  datachainoptions["lambda.default"] = `
+        var ${GetCodeName(dataChainNode).toLowerCase()} = RedStrapper.Resolve<${GetCodeName(dataChainNode)}>();
+        return await ${GetCodeName(dataChainNode).toLowerCase()}.Execute(${dataChainArgs});`;
+                } else if (lambda.default) {
+                  datachainoptions = {
+                    "lambda.default": `return ${lambda.default.return};`
+                  };
+                }
+              }
+            });
             let agentTypeNode = null;
             let fetchTypeNode = null;
             let userTypeNode = null;
@@ -16180,7 +17015,7 @@ class maestrogenerator_MaestroGenerator {
               value = modelNode ? `${uiactions_GetNodeProp(modelNode, uiactions_NodeProperties.CodeName)}`.toLowerCase() : `{maestro_generator_mising_model}`;
             }
 
-            let bindOptions = {
+            let bindOptions = { ...datachainoptions,
               function_name: functionName,
               agent_type: agent_type,
               "agent_type#lower": `${agent_type}`.toLowerCase(),
@@ -16387,15 +17222,15 @@ const maestrogenerator_TAB = `   `;
 
 
 
-const changeparametergenerator_TEST_CLASS = './app/templates/tests/tests.tpl';
-const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = './app/templates/stream_process/stream_process_change_class_extention.tpl';
-const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = './app/templates/stream_process/stream_process_change_class_constructor.tpl';
-const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS = './app/templates/stream_process/tests/stream_process_change_class_constructor.tpl';
-const changeparametergenerator_MODEL_STATIC_TEMPLATES = './app/templates/models/model_statics.tpl';
+const changeparametergenerator_TEST_CLASS = "./app/templates/tests/tests.tpl";
+const STREAM_PROCESS_CHANGE_CLASS_EXTENSION = "./app/templates/stream_process/stream_process_change_class_extention.tpl";
+const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR = "./app/templates/stream_process/stream_process_change_class_constructor.tpl";
+const STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS = "./app/templates/stream_process/tests/stream_process_change_class_constructor.tpl";
+const changeparametergenerator_MODEL_STATIC_TEMPLATES = "./app/templates/models/model_statics.tpl";
 const changeparametergenerator_PROPERTY_TABS = 6;
 class changeparametergenerator_ChangeParameterGenerator {
   static Tabs(c) {
-    let res = '';
+    let res = "";
 
     for (var i = 0; i < c; i++) {
       res += changeparametergenerator_TAB;
@@ -16415,25 +17250,25 @@ class changeparametergenerator_ChangeParameterGenerator {
     let graphRoot = GetRootGraph(state);
     let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
 
-    let _testClass = external_fs_default.a.readFileSync(changeparametergenerator_TEST_CLASS, 'utf8');
+    let _testClass = external_fs_default.a.readFileSync(changeparametergenerator_TEST_CLASS, "utf8");
 
-    let _streamProcessChangeClassExtension = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
+    let _streamProcessChangeClassExtension = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, "utf8");
 
-    let _streamProcessChangeClassConstructors = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
+    let _streamProcessChangeClassConstructors = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, "utf8");
 
-    let _streamProcessChangeClassConstrictorsTest = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, 'utf8');
+    let _streamProcessChangeClassConstrictorsTest = external_fs_default.a.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS, "utf8");
 
     let result = {};
     models.map(model => {
       agents.map(agent => {
         let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
         let testClass = _testClass;
-        let properties = '';
-        let statics = '';
+        let properties = "";
+        let statics = "";
         let constructors = [];
         let tests = [];
         let updates_with = [];
-        let staticFunctionTemplate = external_fs_default.a.readFileSync(changeparametergenerator_MODEL_STATIC_TEMPLATES, 'utf8');
+        let staticFunctionTemplate = external_fs_default.a.readFileSync(changeparametergenerator_MODEL_STATIC_TEMPLATES, "utf8");
         afterEffects.filter(afterEffect => {
           let functionType = uiactions_GetNodeProp(afterEffect, uiactions_NodeProperties.AfterMethod);
           let setup = uiactions_GetNodeProp(afterEffect, uiactions_NodeProperties.AfterMethodSetup);
@@ -16457,13 +17292,13 @@ class changeparametergenerator_ChangeParameterGenerator {
             let stream_process_change_parameter = AFTER_EFFECTS[functionType][MethodTemplateKeys.stream_process_change_parameter];
 
             if (stream_process_change_parameter) {
-              let spcp_template = external_fs_default.a.readFileSync(stream_process_change_parameter, 'utf8');
+              let spcp_template = external_fs_default.a.readFileSync(stream_process_change_parameter, "utf8");
               spcp_template = bindTemplate(spcp_template, {
                 model: GetCodeName(model),
-                value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || 'value',
+                value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || "value",
                 agent_type: GetCodeName(agent),
                 model_update: GetCodeName(GetMethodNodeProp(methodNode, setup[functionType][FunctionTemplateKeys.UpdateModel])),
-                agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || 'agent',
+                agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || "agent",
                 change_type: `Methods.${setup[functionType][FunctionTemplateKeys.MethodType]}`,
                 method: setup[functionType][FunctionTemplateKeys.MethodType]
               });
@@ -16473,7 +17308,7 @@ class changeparametergenerator_ChangeParameterGenerator {
             let update_with = AFTER_EFFECTS[functionType][MethodTemplateKeys.update_with];
 
             if (update_with) {
-              let spcp_template = external_fs_default.a.readFileSync(update_with, 'utf8');
+              let spcp_template = external_fs_default.a.readFileSync(update_with, "utf8");
               spcp_template = bindTemplate(spcp_template, {
                 model_update: GetCodeName(GetMethodNodeProp(methodNode, setup[functionType][FunctionTemplateKeys.UpdateModel]))
               });
@@ -16485,18 +17320,18 @@ class changeparametergenerator_ChangeParameterGenerator {
           let streamProcessChangeClassConstructors = _streamProcessChangeClassConstructors;
           streamProcessChangeClassConstructors = bindTemplate(streamProcessChangeClassConstructors, {
             model: GetCodeName(model),
-            value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || 'value',
+            value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || "value",
             agent_type: GetCodeName(agent),
-            agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || 'agent',
+            agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || "agent",
             change_type: `Methods.${method}`,
             method
           });
           let streamProcessChangeClassConstrictorsTest = _streamProcessChangeClassConstrictorsTest;
           streamProcessChangeClassConstrictorsTest = bindTemplate(streamProcessChangeClassConstrictorsTest, {
             model: GetCodeName(model),
-            value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || 'value',
+            value: uiactions_GetNodeProp(model, uiactions_NodeProperties.ValueName) || "value",
             agent_type: GetCodeName(agent),
-            agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || 'agent',
+            agent: uiactions_GetNodeProp(agent, uiactions_NodeProperties.AgentName) || "agent",
             change_type: `Methods.${method}`,
             method
           });
@@ -16504,18 +17339,19 @@ class changeparametergenerator_ChangeParameterGenerator {
           tests.push(streamProcessChangeClassConstrictorsTest);
         });
         let staticDic = {
+          property_set_merge: "",
           model: `${uiactions_GetNodeProp(model, uiactions_NodeProperties.CodeName)}ChangeBy${uiactions_GetNodeProp(agent, uiactions_NodeProperties.CodeName)}`
         };
         constructors.push(bindTemplate(staticFunctionTemplate, staticDic));
         streamProcessChangeClassExtension = bindTemplate(streamProcessChangeClassExtension, {
           model: uiactions_GetNodeProp(model, uiactions_NodeProperties.CodeName),
           agent_type: uiactions_GetNodeProp(agent, uiactions_NodeProperties.CodeName),
-          updates_with: updates_with.unique().join(''),
+          updates_with: updates_with.unique().join(""),
           constructors: constructors.unique().join(changeparametergenerator_jNL)
         });
         testClass = bindTemplate(testClass, {
           name: `${uiactions_GetNodeProp(model, uiactions_NodeProperties.CodeName)}ChangeBy${uiactions_GetNodeProp(agent, uiactions_NodeProperties.CodeName)}`,
-          tests: tests.unique(x => x).join('')
+          tests: tests.unique(x => x).join("")
         });
         let change_param_name = `${uiactions_GetNodeProp(model, uiactions_NodeProperties.CodeName)}ChangeBy${uiactions_GetNodeProp(agent, uiactions_NodeProperties.CodeName)}`;
         result[change_param_name] = {
@@ -18133,7 +18969,8 @@ const GENERAL_COMPONENT_API = [VALUE].map(x => ({
   property: x
 }));
 const ComponentApiTypes = {
-  ViewModel: "viewModel"
+  ViewModel: "viewModel",
+  Value: "value"
 };
 const ComponentLifeCycleEvents = {
   ComponentDidMount: "componentDidMount",
@@ -18208,6 +19045,15 @@ INPUT_DEFAULT_API.map(x => {
     ui: true
   };
 });
+const ComponentTypeKeys = {
+  SingleSelect: "SingleSelect",
+  List: "List",
+  ListItem: "ListItem",
+  MultiSelectList: "MultiSelectList",
+  Text: "Text",
+  InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
+
+};
 const ComponentTypes = {
   ReactNative: {
     Badge: {},
@@ -18298,7 +19144,9 @@ const ComponentTypes = {
             return uiactions_GetNodeProp(item, uiactions_NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(uiactions_GetNodeProp(node, "data"));
+            let func = GetCodeName(uiactions_GetNodeProp(node, "data"), {
+              includeNameSpace: true
+            });
 
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
@@ -18359,7 +19207,7 @@ const ComponentTypes = {
     Item: {},
     Label: {},
     Left: {},
-    List: {
+    [ComponentTypeKeys.List]: {
       library: "react-native",
       layout: true,
       specialLayout: true,
@@ -18406,7 +19254,7 @@ const ComponentTypes = {
       },
       ui: true
     },
-    MultiSelectList: {
+    [ComponentTypeKeys.MultiSelectList]: {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
@@ -18422,7 +19270,23 @@ const ComponentTypes = {
       },
       ui: true
     },
-    SingleSelect: {
+    [ComponentTypeKeys.InfiniteList]: {
+      layout: true,
+      specialLayout: true,
+      eventApi: ["onEndReachedThreshold", "onEndReached"],
+      template: "./app/templates/components/infinitelist.tpl",
+      datasource: true,
+      properties: {
+        item_attributes: {
+          nodeProperty: uiactions_NodeProperties.TextType,
+          template: "{{value}}",
+          component_options: [NodeTypes.ComponentNode],
+          ui: true
+        }
+      },
+      ui: true
+    },
+    [ComponentTypeKeys.SingleSelect]: {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
@@ -18441,7 +19305,7 @@ const ComponentTypes = {
       },
       ui: true
     },
-    ListItem: {
+    [ComponentTypeKeys.ListItem]: {
       layout: true,
       ui: true,
       [NAVIGATION]: true,
@@ -18469,7 +19333,7 @@ const ComponentTypes = {
     TabBar: {},
     TabContainer: {},
     TabHeader: {},
-    Text: {
+    [ComponentTypeKeys.Text]: {
       template: "./app/templates/components/text.tpl",
       defaultApi: LABEL_DEFAULT_API,
       internalApiNode: ComponentApiKeys.DATA,
@@ -18487,7 +19351,9 @@ const ComponentTypes = {
             return uiactions_GetNodeProp(item, uiactions_NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(uiactions_GetNodeProp(node, ComponentApiKeys.DATA));
+            let func = GetCodeName(uiactions_GetNodeProp(node, ComponentApiKeys.DATA), {
+              includeNameSpace: true
+            });
 
             if (uiactions_GetNodeProp(node, "component-as-label")) {
               return `titleService.get('${uiactions_GetNodeProp(node, uiactions_NodeProperties.Label)}')`;
@@ -18517,7 +19383,9 @@ const ComponentTypes = {
             return uiactions_GetNodeProp(item, uiactions_NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(uiactions_GetNodeProp(node, "data"));
+            let func = GetCodeName(uiactions_GetNodeProp(node, "data"), {
+              includeNameSpace: true
+            });
 
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
@@ -18646,6 +19514,23 @@ function GetListItemNode(id) {
   let nodes = GetNodesLinkedTo(graph, {
     id
   }).filter(x => uiactions_GetNodeProp(x, uiactions_NodeProperties.NODEType) === NodeTypes.ComponentNode && uiactions_GetNodeProp(x, uiactions_NodeProperties.ComponentType) === ComponentTypes.ReactNative.ListItem.key);
+
+  if (nodes && nodes.length) {
+    return nodes[0];
+  }
+
+  return null;
+}
+function GetFormItemNode(id) {
+  let state = GetState();
+  let graph = GetRootGraph(state);
+  let nodes = GetNodesLinkedTo(graph, {
+    id,
+    link: nodetypes_LinkType.Component,
+    properties: {
+      [LinkPropertyKeys.AsForm]: true
+    }
+  });
 
   if (nodes && nodes.length) {
     return nodes[0];
@@ -18908,9 +19793,16 @@ function createSection(args) {
       }
 
       let className = "";
+      let tagBasedStyles = "";
 
       if (UITypes.ReactNative !== language) {
-        className = `className={styles.${section}}`;
+        if (layoutProperties && layoutProperties.tags && Object.keys(layoutProperties.tags).length) {
+          tagBasedStyles = layoutProperties.tags.map(tag => {
+            return GetStylesFor(node, tag).join(' ');
+          }).filter(x => x).join(' ');
+        }
+
+        className = `className={\`$\{styles.${section}} ${tagBasedStyles} \`}`;
       } else {
         className = `style={${JSON.stringify({ ..._style
         }, null, 4)}}`;
@@ -18923,7 +19815,122 @@ ${addNewLine(tree.tightenPs())}
             `;
   }
 }
+// CONCATENATED MODULE: ./app/constants/styles.js
+
+const StyleLib = {
+  style: {
+    background: "background",
+    "background-attachment": "backgroundAttachment",
+    "background-color": "backgroundColor",
+    "background-image": "backgroundImage",
+    "background-position": "backgroundPosition",
+    "background-repeat": "backgroundRepeat",
+    border: "border",
+    "border-bottom": "borderBottom",
+    "border-bottom-color": "borderBottomColor",
+    "border-bottom-style": "borderBottomStyle",
+    "border-bottom-width": "borderBottomWidth",
+    "border-color": "borderColor",
+    "border-left": "borderLeft",
+    "border-left-color": "borderLeftColor",
+    "border-left-style": "borderLeftStyle",
+    "border-left-width": "borderLeftWidth",
+    "border-right": "borderRight",
+    "border-radius": "borderRadius",
+    cursor: "pointer",
+    "border-right-color": "borderRightColor",
+    "border-right-style": "borderRightStyle",
+    "border-right-width": "borderRightWidth",
+    "border-style": "borderStyle",
+    "border-top": "borderTop",
+    "border-top-color": "borderTopColor",
+    "border-top-style": "borderTopStyle",
+    "border-top-width": "borderTopWidth",
+    "border-width": "borderWidth",
+    clear: "clear",
+    clip: "clip",
+    color: "color",
+    cursor: "cursor",
+    display: "display",
+    filter: "filter",
+    flex: "flex",
+    "flex-direction": "flexDirection",
+    "flex-flow": "flexFlow",
+    "justify-content": "justifyContent",
+    "align-items": "alignItems",
+    "align-content": "alignContents",
+    float: "cssFloat",
+    font: "font",
+    "font-family": "fontFamily",
+    "font-size": "fontSize",
+    "font-variant": "fontVariant",
+    "font-weight": "fontWeight",
+    height: "height",
+    left: "left",
+    "grid-template-columns": "gridTemplateColumns",
+    "grid-template-rows": "gridTemplateRows",
+    "grid-template-areas": "gridTemplateAreas",
+    "grid-template": "gridTemplate",
+    "grid-column-gap": "gridColumnGap",
+    "grid-row-gap": "gridRowGap",
+    "grid-gap": "gridGap",
+    "justify-items": "justifyItems",
+    "place-items": "placeItems",
+    "place-content": "placeContent",
+    "grid-auto-columns": "gridAutoColumns",
+    "grid-auto-rows": "gridAutoRows",
+    "grid-auto-flow": "gridAutoFlow",
+    grid: "grid",
+    "grid-column-start": "gridColumnStart",
+    "grid-column-end": "gridColumnEnd",
+    "grid-row-start": "gridRowStart",
+    "grid-row-end": "gridRowEnd",
+    "grid-column": "gridColumn",
+    "grid-row": "gridRow",
+    "grid-area": "gridArea",
+    "justify-self": "justifySelf",
+    "align-self": "alignSelf",
+    "place-self": "placeSelf",
+    "letter-spacing": "letterSpacing",
+    "line-height": "lineHeight",
+    "list-style": "listStyle",
+    "list-style-image": "listStyleImage",
+    "list-style-position": "listStylePosition",
+    "list-style-type": "listStyleType",
+    margin: "margin",
+    "margin-bottom": "marginBottom",
+    "margin-left": "marginLeft",
+    "margin-right": "marginRight",
+    "margin-top": "marginTop",
+    overflow: "overflow",
+    padding: "padding",
+    "padding-bottom": "paddingBottom",
+    "padding-left": "paddingLeft",
+    "padding-right": "paddingRight",
+    "padding-top": "paddingTop",
+    "page-break-after": "pageBreakAfter",
+    "page-break-before": "pageBreakBefore",
+    position: "position",
+    "stroke-dasharray": "strokeDasharray",
+    "stroke-dashoffset": "strokeDashoffset",
+    "stroke-width": "strokeWidth",
+    "text-align": "textAlign",
+    "text-decoration": "textDecoration",
+    "text-indent": "textIndent",
+    "text-transform": "textTransform",
+    top: "top",
+    "vertical-align": "verticalAlign",
+    visibility: "visibility",
+    width: "width",
+    "z-index": "zIndex"
+  },
+  js: {}
+};
+Object.keys(StyleLib.style).map(v => {
+  StyleLib.js[StyleLib.style[v]] = v;
+});
 // CONCATENATED MODULE: ./app/service/screenservice.js
+
 
 
 
@@ -18999,6 +20006,22 @@ function GetItemRender(node, imports, language) {
     return  <${GetCodeName(listItemNode)} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
+function GetFormRender(node, imports, language) {
+  let listItemNode = GetFormItemNode(node.id);
+
+  if (!listItemNode) {
+    return "";
+  }
+
+  imports.push(GenerateComponentImport(listItemNode, node, language));
+  let properties = WriteDescribedApiProperties(listItemNode, {
+    listItem: true
+  });
+  return `({item, index, separators, key})=>{
+    let value = item;
+    return  <${GetCodeName(listItemNode)} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  }`;
+}
 function GetItemRenderImport(node) {
   let listItemNode = GetListItemNode(node.id);
   let properties = WriteDescribedApiProperties(listItemNode, {
@@ -19037,21 +20060,112 @@ function constructCssFile(css, clsName) {
   }).join(nodetypes_NEW_LINE);
   return rules;
 }
+function GetStylesFor(node, tag) {
+  if (typeof node === "string") {
+    node = GetNodeById(node);
+  }
+
+  let graph = GetCurrentGraph();
+  let styleNodes = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.Style
+  }).filter(x => (uiactions_GetNodeProp(x, nodetypes_NodeProperties.GridAreas) || []).indexOf(tag) !== -1);
+  let dataChainsConnectedToStyle = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChain
+  }).filter(x => {
+    let connectedStyleNodes = GetNodesLinkedTo(graph, {
+      id: x.id,
+      link: nodetypes_LinkType.Style
+    });
+    return connectedStyleNodes.some(x => {
+      return styleNodes.some(node => node.id === x.id);
+    });
+  });
+  return styleNodes.map(styleNode => {
+    let dataChainTest = dataChainsConnectedToStyle.filter(dc => {
+      return existsLinkBetween(graph, {
+        source: dc.id,
+        target: styleNode.id
+      });
+    }).map(dc => {
+      let selector = GetNodesLinkedTo(graph, {
+        id: dc.id,
+        link: nodetypes_LinkType.SelectorLink
+      })[0];
+      let input = "";
+
+      if (selector) {
+        let inputs = GetNodesLinkedTo(graph, {
+          id: selector.id,
+          link: nodetypes_LinkType.SelectorInputLink
+        }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ComponentApi);
+        input = `S.${GetCodeName(selector)}({${inputs.map(input => `${GetCodeName(input)}: this.state.${GetCodeName(input)}`).join()}})`;
+      }
+
+      return `DC.${GetCodeName(dc, {
+        includeNameSpace: true
+      })}(${input})`;
+    }).join(" && ");
+
+    if (!dataChainTest) {
+      return `$\{styles.${GetJSCodeName(styleNode)}}`;
+    }
+
+    return `$\{${dataChainTest} ? styles.${GetJSCodeName(styleNode)} : '' }`;
+  });
+}
 /*
 A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
 */
 
 function buildStyle(node) {
-  let styleNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+  let graph = GetCurrentGraph();
+
+  if (typeof node === "string") {
+    node = GetNodeById(node, graph);
+  }
+
+  let styleNodes = GetNodesLinkedTo(graph, {
     id: node.id,
     link: nodetypes_LinkType.Style
   });
-  styleNodes.map(styleNode => {
+  let styleSheetRules = styleNodes.map(styleNode => {
     let style = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.Style);
+    let styleSelectors = StyleNodeProperties.filter(x => uiactions_GetNodeProp(styleNode, x)).map(styleProp => {
+      return styleProp;
+    });
     let areas = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridAreas);
     let gridRowCount = parseInt(uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridRowCount) || 1, 10);
     let gridplacement = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.GridPlacement);
-  });
+    let styleObj = uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.Style);
+    let useMediaQuery = uiactions_GetNodeProp(style, nodetypes_NodeProperties.UseMediaQuery);
+    let mediaquery_start = "";
+    let mediaquery_end = "";
+
+    if (useMediaQuery) {
+      mediaquery_start = MediaQueries[uiactions_GetNodeProp(styleNode, nodetypes_NodeProperties.MediaQuery)];
+
+      if (mediaquery_start) {
+        mediaquery_start = `${mediaquery_start} {`;
+        mediaquery_end = `}`;
+      }
+    }
+
+    let styleName = GetJSCodeName(styleNode);
+    let stylesSelectorsName = styleSelectors.map(styleSelector => {
+      return `${styleName}${styleSelector}`;
+    }).join();
+    let stylesheet = `${mediaquery_start}
+    .${stylesSelectorsName || styleName} {
+      ${Object.keys(styleObj).map(s => {
+      return `${StyleLib.js[s]}: ${styleObj[s]};`;
+    }).join(nodetypes_NEW_LINE)}
+    }
+    ${mediaquery_end}`;
+    return stylesheet;
+  }).join(nodetypes_NEW_LINE);
+  return styleSheetRules;
 }
 function GetItemData(node) {
   let dataSourceNode = uiactions_GetDataSourceNode(node.id);
@@ -19062,7 +20176,9 @@ function GetItemData(node) {
   if (connectedNode) {
     // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
     return `(()=> {
-    return DC.${GetCodeName(connectedNode)}(${defaultValue});
+    return DC.${GetCodeName(connectedNode, {
+      includeNameSpace: true
+    })}(${defaultValue});
 })()`;
   }
 
@@ -19111,9 +20227,11 @@ function GenerateRNScreenOptionSource(node, relativePath, language) {
 
     let data = GetItemData(node);
     let item_render = GetItemRender(node, extraimports, language);
+    let form_render = GetFormRender(node, extraimports, language);
     let apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(external_fs_default.a.readFileSync(template, "utf8"), {
       item_render: item_render,
+      form_render,
       data: data,
       apiProperties
     });
@@ -19138,12 +20256,15 @@ function GenerateRNScreenOptionSource(node, relativePath, language) {
   let cssFile = null;
   let cssImport = null;
   let templateStr = null;
+  let ending = ".js";
 
   switch (language) {
     case UITypes.ElectronIO:
+      ending = ".tsx";
       templateStr = external_fs_default.a.readFileSync("./app/templates/screens/el_screenoption.tpl", "utf8");
-      buildStyle(node);
+      let styleRules = buildStyle(node);
       cssFile = constructCssFile(css, `.${(GetCodeName(node) || "").toJavascriptName()}`);
+      cssFile = cssFile + styleRules;
       cssImport = `import styles from './${(GetCodeName(node) || "").toJavascriptName()}.css'`;
       break;
 
@@ -19178,8 +20299,8 @@ function GenerateRNScreenOptionSource(node, relativePath, language) {
   return [{
     template: templateStr,
     relative: relativePath || "./src/components",
-    relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}.js`,
-    name: (relativePath || "./src/components/") + `${(GetCodeName(node) || "").toJavascriptName()}.js`
+    relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}${ending}`,
+    name: (relativePath || "./src/components/") + `${(GetCodeName(node) || "").toJavascriptName()}${ending}`
   }, cssFile ? {
     template: cssFile,
     relative: relativePath || "./src/components",
@@ -19363,6 +20484,14 @@ ${elements}
 function GenerateRNComponents(node, relative = "./src/components", language = UITypes.ReactNative) {
   let result = [];
   let layoutObj = uiactions_GetNodeProp(node, nodetypes_NodeProperties.Layout);
+  let fileEnding = ".js";
+
+  switch (language) {
+    case UITypes.ElectronIO:
+      fileEnding = ".tsx";
+      break;
+  }
+
   let componentType = uiactions_GetNodeProp(node, nodetypes_NodeProperties.ComponentType);
 
   if (!layoutObj && (!ComponentTypes[language] || !ComponentTypes[language][componentType] || !ComponentTypes[language][componentType].specialLayout)) {
@@ -19411,8 +20540,8 @@ function GenerateRNComponents(node, relative = "./src/components", language = UI
         });
         result.push({
           relative: relative || "./src/components",
-          relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}.js`,
-          name: (relative || "./src/components") + `/${(GetCodeName(node) || "").toJavascriptName()}.js`,
+          relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
+          name: (relative || "./src/components") + `/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
           template
         });
         break;
@@ -19509,7 +20638,9 @@ function GenerateMarkupTag(node, language, parent) {
         }
 
         if (!describedApi) {
-          describedApi = WriteDescribedApiProperties(node);
+          describedApi = WriteDescribedApiProperties(node, {
+            listItem: uiactions_GetNodeProp(node, nodetypes_NodeProperties.ComponentType) === ComponentTypeKeys.ListItem
+          });
         }
       }
 
@@ -19555,7 +20686,9 @@ function WriteDescribedStateUpdates(parent) {
       }
 
       if (dataChain) {
-        innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+        innerValue = `DC.${GetCodeName(dataChain, {
+          includeNameSpace: true
+        })}(${innerValue})`;
       }
 
       result = `
@@ -19610,7 +20743,9 @@ function GetDefaultComponentValue(node, key) {
       }
 
       if (dataChain) {
-        innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+        innerValue = `DC.${GetCodeName(dataChain, {
+          includeNameSpace: true
+        })}(${innerValue})`;
       }
 
       result = `${bindTemplate(innerValue, {
@@ -19664,7 +20799,7 @@ function WriteDescribedApiProperties(node, options = {
 
         case "viewModel":
           noSelector = true;
-          noDataChain = true;
+          noDataChain = false;
           break;
 
         default:
@@ -19698,8 +20833,11 @@ function WriteDescribedApiProperties(node, options = {
         innerValue = `GetScreenParam('query')`;
       } else {
         if (options.listItem) {
-          let listItemAttribute = GetJSCodeName(externalConnection);
-          innerValue = listItemAttribute === "viewModel" ? `this.state.${listItemAttribute}` : listItemAttribute;
+          let listItemAttribute = GetJSCodeName(externalConnection); // innerValue = ["viewModel", "selected"].some(
+          //   vv => vv === listItemAttribute
+          // )
+
+          innerValue = !uiactions_GetNodeProp(externalConnection, nodetypes_NodeProperties.AsLocalContext) ? `this.state.${listItemAttribute}` : listItemAttribute;
         } else {
           let defaulComponentValue = uiactions_GetNodeProp(externalConnection, nodetypes_NodeProperties.DefaultComponentApiValue) || "";
 
@@ -19716,11 +20854,20 @@ function WriteDescribedApiProperties(node, options = {
 
     if (!noSelector && selector) {
       let addiontionalParams = componentExternalApi && externalConnection ? getUpdateFunctionOption(componentExternalApi.id, externalConnection.id) : "";
-      innerValue = `S.${GetJSCodeName(selector)}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+
+      if (isViewType) {
+        let addiontionalParams = componentExternalApi && node ? getUpdateFunctionOption(node.id, componentExternalApi.id) : "";
+        innerValue = `S.${GetJSCodeName(selector)}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+      } else {
+        //TODO: this might be able to go away;
+        innerValue = `S.${GetJSCodeName(selector)}(${innerValue}, this.state.viewModel${addiontionalParams})`;
+      }
     }
 
     if (!noDataChain && dataChain) {
-      innerValue = `DC.${GetCodeName(dataChain)}(${innerValue})`;
+      innerValue = `DC.${GetCodeName(dataChain, {
+        includeNameSpace: true
+      })}(${innerValue})`;
     }
 
     if (innerValue) {
@@ -19747,6 +20894,7 @@ function WriteDescribedApiProperties(node, options = {
           link: nodetypes_LinkType.ViewModelLink
         }).find(x => x);
         let eventType = uiactions_GetNodeProp(eventMethodHandler, nodetypes_NodeProperties.EventType);
+        let useValue = uiactions_GetNodeProp(eventMethodHandler, nodetypes_NodeProperties.UseValue) ? "value" : "text";
         let addiontionalParams = componentEventHandler && eventInstance ? getUpdateFunctionOption(componentEventHandler.id, eventInstance.id, `, { update: true, value: this.state.value/*hard coded*/ }`) : "";
         let method_call = null;
         let modelProperty = GetJSCodeName(property);
@@ -19766,7 +20914,7 @@ function WriteDescribedApiProperties(node, options = {
             break;
 
           case ComponentEvents.onChange:
-            method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.text${addiontionalParams})`;
+            method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.${useValue}${addiontionalParams})`;
             break;
         }
 
@@ -19890,7 +21038,9 @@ function writeApiProperties(apiConfig) {
 
       if (property) {
         if (dataChain) {
-          let codeName = GetCodeName(dataChain);
+          let codeName = GetCodeName(dataChain, {
+            includeNameSpace: true
+          });
           property = `DC.${codeName}(${property})`;
         } // There is an opportunity to wrapp the result in a getter.
 
@@ -19942,7 +21092,7 @@ function getMethodInstancesForLifeCylcEvntType(node, evtType) {
   let methods = getNodesByLinkType(graph, {
     id: node.id,
     type: nodetypes_LinkType.LifeCylceMethod,
-    direction: TARGET,
+    direction: graph_methods_TARGET,
     exist: true
   }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType) === evtType);
   let methodInstances = [];
@@ -19963,7 +21113,7 @@ function getMethodInstancesForEvntType(node, evtType) {
   let methods = getNodesByLinkType(graph, {
     id: node.id,
     type: nodetypes_LinkType.EventMethod,
-    direction: TARGET,
+    direction: graph_methods_TARGET,
     exist: true
   }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType) === evtType);
   let methodInstances = [];
@@ -20003,12 +21153,12 @@ function getMethodInvocation(methodInstanceCall) {
     let body = getNodesByLinkType(graph, {
       id: method.id,
       type: nodetypes_LinkType.MethodApiParameters,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }).find(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.UriBody));
     let queryObject = getNodesByLinkType(graph, {
       id: method.id,
       type: nodetypes_LinkType.MethodApiParameters,
-      direction: TARGET
+      direction: graph_methods_TARGET
     }).find(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.QueryParameterObject));
     let dataChain = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
@@ -20028,7 +21178,7 @@ function getMethodInvocation(methodInstanceCall) {
       let body_param = getNodesByLinkType(graph, {
         id: body.id,
         type: nodetypes_LinkType.ComponentApiConnection,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }).find(x => x);
 
       if (body_param) {
@@ -20051,7 +21201,9 @@ function getMethodInvocation(methodInstanceCall) {
         }).find(x_temp => uiactions_GetNodeProp(x_temp, nodetypes_NodeProperties.NODEType) === NodeTypes.DataChain);
 
         if (body_value) {
-          body_input = `body: DC.${GetCodeName(body_value)}(${innervalue})`;
+          body_input = `body: DC.${GetCodeName(body_value, {
+            includeNameSpace: true
+          })}(${innervalue})`;
         }
       }
 
@@ -20071,7 +21223,7 @@ function getMethodInvocation(methodInstanceCall) {
         let param = getNodesByLinkType(graph, {
           id: queryParameter.id,
           type: nodetypes_LinkType.ComponentApiConnection,
-          direction: TARGET
+          direction: graph_methods_TARGET
         }).find(x_temp => x_temp);
 
         if (param) {
@@ -20082,7 +21234,9 @@ function getMethodInvocation(methodInstanceCall) {
           }).find(x_temp => uiactions_GetNodeProp(x_temp, nodetypes_NodeProperties.NODEType) === NodeTypes.DataChain);
 
           if (value) {
-            return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value)}(this.props.state)`;
+            return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value, {
+              includeNameSpace: true
+            })}(this.props.state)`;
           }
         }
       }).filter(temp => temp);
@@ -20092,7 +21246,9 @@ function getMethodInvocation(methodInstanceCall) {
     let dataChainInput = "";
 
     if (dataChain) {
-      dataChainInput = (parts.length ? "," : "") + `dataChain: DC.${GetCodeName(dataChain)}`;
+      dataChainInput = (parts.length ? "," : "") + `dataChain: DC.${GetCodeName(dataChain, {
+        includeNameSpace: true
+      })}`;
     }
 
     let query = parts.join();
@@ -20102,10 +21258,14 @@ function getMethodInvocation(methodInstanceCall) {
   } else if (dataChain) {
     //Buttons need to use this.state.value, so a new property for datachains should exist.
     if (internalApiConnection) {
-      return `DC.${GetCodeName(dataChain)}(this.state.${GetJSCodeName(internalApiConnection)});`;
+      return `DC.${GetCodeName(dataChain, {
+        includeNameSpace: true
+      })}(this.state.${GetJSCodeName(internalApiConnection)});`;
     }
 
-    return `DC.${GetCodeName(dataChain)}(value);`;
+    return `DC.${GetCodeName(dataChain, {
+      includeNameSpace: true
+    })}(value);`;
   }
 }
 function getUpdateFunctionOption(methodId, methodInstanceCallId, addParams) {
@@ -20254,7 +21414,9 @@ function GenerateElectronIORoutes(screens) {
       }).find(x => x);
 
       if (viewModelDataLink) {
-        overrides = `viewModel = DC.${GetCodeName(viewModelDataLink)}();`;
+        overrides = `viewModel = DC.${GetCodeName(viewModelDataLink, {
+          includeNameSpace: true
+        })}();`;
       }
     }
 
@@ -20279,8 +21441,8 @@ function GenerateElectronIORoutes(screens) {
   return {
     template: routeFile,
     relative: "./src",
-    relativeFilePath: `./Routes.js`,
-    name: `Routes.js`
+    relativeFilePath: `./Routes.tsx`,
+    name: `Routes.tsx`
   };
 }
 
@@ -20288,6 +21450,14 @@ function BindScreensToTemplate(language = UITypes.ReactNative) {
   var screens = GetScreens();
   let template = external_fs_default.a.readFileSync("./app/templates/screens/screen.tpl", "utf8");
   let moreresults = [];
+  let fileEnding = ".js";
+
+  switch (language) {
+    case UITypes.ElectronIO:
+      fileEnding = ".tsx";
+      break;
+  }
+
   let result = screens.map(screen => {
     let screenOptions = GetConnectedScreenOptions(screen.id);
 
@@ -20312,7 +21482,7 @@ function BindScreensToTemplate(language = UITypes.ReactNative) {
         title: `"${GetNodeTitle(screen)}"`
       }),
       relative: "./src/screens",
-      relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}.js`,
+      relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}${fileEnding}`,
       name: GetCodeName(screen)
     };
   }).filter(x => x);
@@ -20774,7 +21944,7 @@ import { setFetchServiceFunction } from '../actions/redutils';
 import { GetState, GetDispatch } from '../actions/uiActions';
 import { ${GetCodeName(datachain)} } from '../actions/data-chain';
 import * as Util from "../actions/util";
-
+import service from './controllerService';
 export const FETCH_CALL = 'FETCH_CALL';
 
 setFetchServiceFunction(function(body) {
@@ -20864,63 +22034,103 @@ import * as Util from './util';
 
 
 
+
+
+
 class datachaingenerator_DataChainGenerator {
-  static Generate(options) {
+  static GenerateCS(options) {
     let {
+      state,
       language
     } = options;
+    let result = {};
+    let graphRoot = GetRootGraph(state);
+    let namespace = graphRoot ? graphRoot[GraphKeys.NAMESPACE] : null;
+
+    let _cfunc = GenerateChainFunctions({
+      cs: true,
+      language
+    }).map(f => {
+      let dataChain = f.node;
+      result[uiactions_GetNodeProp(dataChain, nodetypes_NodeProperties.CodeName)] = {
+        id: uiactions_GetNodeProp(dataChain, nodetypes_NodeProperties.CodeName),
+        name: uiactions_GetNodeProp(dataChain, nodetypes_NodeProperties.CodeName),
+        template: namespacegenerator_NamespaceGenerator.Generate({
+          template: f.class,
+          usings: [...STANDARD_CONTROLLER_USING, `${namespace}${nodetypes_NameSpace.Model}`, `${namespace}${nodetypes_NameSpace.Interface}`, `${namespace}${nodetypes_NameSpace.StreamProcess}`, `${namespace}${nodetypes_NameSpace.Constants}`, `${namespace}${nodetypes_NameSpace.Permissions}`, `${namespace}${nodetypes_NameSpace.Parameters}`],
+          namespace,
+          space: nodetypes_NameSpace.Controllers
+        })
+      };
+    });
+
+    return result;
+  }
+
+  static Generate(options) {
+    let {
+      state,
+      language
+    } = options;
+    let fileEnding = ".js";
+
+    switch (language) {
+      case UITypes.ElectronIO:
+        fileEnding = ".ts";
+        break;
+    }
+
+    let graph = GetCurrentGraph(state);
     let funcs = GenerateChainFunctions(options);
-    let temps = [{
-      template: `import { GetC, updateScreenInstanceObject, GetItem, Chain, UIModels, GetDispatch, GetState, UIC, GetItems,UI_MODELS, GetK, updateScreenInstance, clearScreenInstance } from './uiActions';
-import {
-    validateEmail,
-    maxLength,
-    minLength,
-    greaterThanOrEqualTo,
-    lessThanOrEqualTo,
-    arrayLength,
-    numericalDefault,
-    equalsLength,
-    alphanumericLike,
-    alphanumeric,
-    alpha
-} from './validation';
+    let collections = GetDataChainCollections(options);
+    let collectionNodes = uiactions_NodesByType(null, NodeTypes.DataChainCollection);
+    let temps = [...collectionNodes.map(nc => {
+      let isInLanguage = datachaingenerator_CollectionIsInLanguage(graph, nc.id, language);
 
-import * as navigate from './navigationActions';
-import * as $service from '../util/service';
-import routes from '../constants/routes';
+      let _cfunc = isInLanguage ? GenerateChainFunctions({
+        language,
+        collection: nc.id
+      }) : null;
 
-import * as RedLists from './lists.js';
-import * as StateKeys from '../state_keys';
-import * as ModelKeys from '../model_keys';
-import * as ViewModelKeys from '../viewmodel_keys';
-import * as Models from '../model_keys.js';
-import RedObservable from './observable.js';
-import RedGraph from './redgraph.js';
-import { useParameters, fetchModel } from './redutils.js';
+      let _colections = isInLanguage ? GetDataChainCollections({
+        language,
+        collection: nc.id
+      }) : null;
 
-${funcs}`,
+      if (!isInLanguage) {
+        return false;
+      }
+
+      let chainPath = GetRelativeDataChainPath(nc);
+      return {
+        template: dcTemplate(_colections, _cfunc, [].interpolate(0, chainPath.length + 1).map(d => "../").join("")),
+        relative: `./src/actions/datachains/${chainPath.join("/")}${chainPath.length ? "/" : ""}`,
+        relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
+        name: `${chainPath.join("_")}${GetJSCodeName(nc)}`
+      };
+    }), {
+      template: dcTemplate(collections, funcs),
       relative: "./src/actions",
-      relativeFilePath: `./data-chain.js`,
+      relativeFilePath: `./data-chain${fileEnding}`,
       name: "data-chain"
     }, {
       template: Object(external_fs_["readFileSync"])("./app/utils/observable.js", "utf8"),
       relative: "./src/actions",
-      relativeFilePath: "./observable.js",
+      relativeFilePath: `./observable${fileEnding}`,
       name: "observable"
     }, {
       template: Object(external_fs_["readFileSync"])("./app/utils/redgraph.js", "utf8"),
       relative: "./src/actions",
-      relativeFilePath: "./redgraph.js",
+      relativeFilePath: `./redgraph${fileEnding}`,
       name: "redgraph.js"
     }, //Specific for web sites
     //Need an alternative for ReactNative
     {
       template: Object(external_fs_["readFileSync"])("./app/utils/redutils.js", "utf8"),
       relative: "./src/actions",
-      relativeFilePath: "./redutils.js",
+      relativeFilePath: `./redutils${fileEnding}`,
       name: "redutils.js"
-    }];
+    }].filter(x => x);
 
     switch (language) {
       case UITypes.ElectronIO:
@@ -20943,6 +22153,85 @@ ${funcs}`,
     return result;
   }
 
+}
+
+let dcTemplate = (collections, funcs, rel = "") => {
+  if (!funcs || !funcs.trim()) {
+    return `${collections}`;
+  }
+
+  return `import {
+    GetC,
+    updateScreenInstanceObject,
+    GetItem,
+    Chain,
+    UIModels, GetDispatch,
+    GetState, UIC,
+    GetItems,UI_MODELS,
+    GetK, updateScreenInstance,
+    clearScreenInstance
+
+  } from '../${rel}actions/uiActions';
+import {
+    validateEmail,
+    maxLength,
+    minLength,
+    greaterThanOrEqualTo,
+    lessThanOrEqualTo,
+    arrayLength,
+    numericalDefault,
+    equalsLength,
+    alphanumericLike,
+    alphanumeric,
+    alpha
+} from './${rel}validation';
+
+import * as navigate from '../${rel}actions/navigationActions';
+import * as $service from '../${rel}util/service';
+import routes from '../${rel}constants/routes';
+
+import * as RedLists from '../${rel}actions/lists';
+import * as StateKeys from '../${rel}state_keys';
+import * as ModelKeys from '../${rel}model_keys';
+import * as ViewModelKeys from '../${rel}viewmodel_keys';
+import * as Models from '../${rel}model_keys';
+import RedObservable from '../${rel}actions/observable';
+import RedGraph from '../${rel}actions/redgraph';
+import { useParameters, fetchModel } from '../${rel}actions/redutils';
+${collections}
+
+${funcs}`;
+};
+
+function datachaingenerator_CollectionIsInLanguage(graph, collection, language) {
+  let reference = GetNodeLinkedTo(graph, {
+    id: collection,
+    link: nodetypes_LinkType.DataChainCollectionReference
+  });
+
+  if (reference) {
+    if (uiactions_GetNodeProp(reference, nodetypes_NodeProperties.NODEType) === NodeTypes.Screen) {
+      return true;
+    } else if (uiactions_GetNodeProp(reference, nodetypes_NodeProperties.UIType) === language) {
+      return true;
+    } else if (uiactions_GetNodeProp(reference, nodetypes_NodeProperties.UIType)) {
+      return false;
+    } else {
+      let parent = GetNodesLinkedTo(graph, {
+        id: collection,
+        link: nodetypes_LinkType.DataChainCollection,
+        direction: graph_methods_TARGET
+      }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.DataChainCollection)[0];
+
+      if (parent) {
+        return datachaingenerator_CollectionIsInLanguage(graph, parent.id, language);
+      }
+    }
+  } else {
+    return true;
+  }
+
+  return false;
 }
 // CONCATENATED MODULE: ./app/generators/selectorgenerator.js
 
@@ -20974,26 +22263,23 @@ function GenerateSelectorFunctions() {
   }).unique();
 }
 function GenerateSelectorFunction(node) {
-  let _parts = GetSelectorsNodes(node.id);
-
-  let parts = _parts.map(part => {
-    switch (uiactions_GetNodeProp(part, nodetypes_NodeProperties.NODEType)) {
-      case NodeTypes.ViewModel:
-        let instanceType = uiactions_GetNodeProp(part, nodetypes_NodeProperties.InstanceType);
-        let method = InstanceTypeSelectorFunction[instanceType];
-        return `${GetJSCodeName(part)}: UIA.${method}('${GetJSCodeName(part)}'${uiactions_GetNodeProp(node, nodetypes_NodeProperties.InstanceType) ? ", value" : ""})`;
-
-      case NodeTypes.Selector:
-        return `${GetJSCodeName(part)}: ${GetJSCodeName(part)}(${uiactions_GetNodeProp(part, nodetypes_NodeProperties.InstanceType) ? "value" : ""})`;
-
-      default:
-        throw "unhandled generate selector function type " + uiactions_GetNodeProp(part, nodetypes_NodeProperties.NODEType);
-    }
-  });
-
   let result = null;
+  let selectType = uiactions_GetNodeProp(node, nodetypes_NodeProperties.SelectorType);
+
+  switch (selectType) {
+    case nodetypes_SelectorType.InternalProperties:
+      return `export function ${GetJSCodeName(node)}(state) {
+        let { value = null, viewModel = null, selected = null } = state;
+        return {
+          value,
+          viewModel,
+          selected
+        }
+      }`;
+  }
+
   result = `
-export function ${GetJSCodeName(node)}(value, viewModel, options = {}) {
+export function ${GetJSCodeName(node)}(value, viewModel = '${uiactions_GetNodeProp(node, nodetypes_NodeProperties.DefaultViewModel) || GetNodeTitle(node) || ""}', options = {}) {
     if(options){
       if(options.update){
         return  {
@@ -21137,7 +22423,9 @@ class fetchservicegenerator_FetchServiceGenerator {
         });
       }).join(nodetypes_NEW_LINE);
       controllers = controllers.unique().map(v => {
-        return bindTemplate(`var {{controller#lower}} = new {{controller}}();`, {
+        return bindTemplate(`var {{controller#lower}} = new {{controller}}();
+            {{controller#lower}}.${uiactions_GetNodeProp(v, uiactions_NodeProperties.CodeUser)} = ${controllerUser};
+            `, {
           controller: GetCodeName(v)
         });
       }).join(nodetypes_NEW_LINE);
@@ -21411,6 +22699,13 @@ class generator_Generator {
 
       case ReactNativeTypes.ControllerActions:
         return controlleractionsgenerator_ControllerActionGenerator.Generate({
+          state,
+          key,
+          language
+        });
+
+      case GeneratedTypes.CSDataChain:
+        return datachaingenerator_DataChainGenerator.GenerateCS({
           state,
           key,
           language
@@ -22035,6 +23330,7 @@ function generateReactNative(workspace, state) {
   code_types.map(code_type => {
     let temp = generator_Generator.generate({
       type: code_type,
+      language: UITypes.ReactNative,
       state
     });
 
@@ -22168,6 +23464,7 @@ const CodeTypeToArea = {
   [GeneratedTypes.Constants]: ".Models",
   [GeneratedTypes.Permissions]: ".Controllers",
   [GeneratedTypes.Validators]: ".Controllers",
+  [GeneratedTypes.CSDataChain]: ".Controllers",
   [GeneratedTypes.ModelItemFilter]: ".Controllers",
   [GeneratedTypes.StreamProcess]: ".Controllers",
   [GeneratedTypes.StreamProcessOrchestration]: ".Controllers"
@@ -22391,7 +23688,9 @@ class mainsidebar_Header extends external_react_["Component"] {
 
     return mainsidebar_jsx("aside", {
       className: `main-sidebar`,
-      style: { ...this.relative(),
+      style: {
+        minHeight: 0,
+        ...this.relative(),
         ...this.overflow()
       }
     }, void 0, mainsidebar_jsx("section", {
@@ -22847,6 +24146,98 @@ class checkbox_CheckBox extends external_react_["Component"] {
   }
 
 }
+// CONCATENATED MODULE: ./app/components/selectproperty.js
+var selectproperty_REACT_ELEMENT_TYPE;
+
+function selectproperty_jsx(type, props, key, children) { if (!selectproperty_REACT_ELEMENT_TYPE) { selectproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: selectproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+class selectproperty_SelectProperty extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    return selectproperty_jsx(selectinput_SelectInput, {
+      label: this.props.title,
+      title: this.props.title,
+      options: this.props.options,
+      value: uiactions_GetNodeProp(currentNode, this.props.property),
+      onChange: value => {
+        let ops = [];
+
+        if (this.props.link) {
+          let oldprop = uiactions_GetNodeProp(currentNode, this.props.property);
+
+          if (oldprop) {
+            ops.push({
+              operation: uiactions_REMOVE_LINK_BETWEEN_NODES,
+              options: {
+                source: currentNode.id,
+                target: oldprop
+              }
+            });
+          }
+
+          ops.push({
+            operation: uiactions_ADD_LINK_BETWEEN_NODES,
+            options: {
+              source: currentNode.id,
+              target: value,
+              properties: { ...this.props.link
+              }
+            }
+          });
+        }
+
+        this.props.graphOperation([...ops, {
+          operation: CHANGE_NODE_PROPERTY,
+          options: {
+            prop: this.props.property,
+            id: currentNode.id,
+            value: value
+          }
+        }]);
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var selectproperty = (UIConnect(selectproperty_SelectProperty));
+// CONCATENATED MODULE: ./app/components/textproperty.js
+var textproperty_REACT_ELEMENT_TYPE;
+
+function textproperty_jsx(type, props, key, children) { if (!textproperty_REACT_ELEMENT_TYPE) { textproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: textproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+class textproperty_TextProperty extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    return textproperty_jsx(textinput_TextInput, {
+      label: this.props.label,
+      title: this.props.title,
+      immediate: this.props.immediate,
+      value: currentNode.properties ? currentNode.properties[this.props.property] : "",
+      onChange: value => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property,
+          id: currentNode.id,
+          value
+        });
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var textproperty = (UIConnect(textproperty_TextProperty));
 // EXTERNAL MODULE: external "webcola"
 var external_webcola_ = __webpack_require__("webcola");
 
@@ -22915,12 +24306,10 @@ const SystemSettings = {
   Domain: 'Domain'
 };
 // CONCATENATED MODULE: ./app/components/selectoractivitymenu.js
+
 var selectoractivitymenu_REACT_ELEMENT_TYPE;
 
 function selectoractivitymenu_jsx(type, props, key, children) { if (!selectoractivitymenu_REACT_ELEMENT_TYPE) { selectoractivitymenu_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: selectoractivitymenu_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
-
-
-
 
 
 
@@ -22944,7 +24333,21 @@ class selectoractivitymenu_SelectorActivityMenu extends external_react_["Compone
     let componentNodeProperties = active ? GetComponentNodeProperties() : null;
     return selectoractivitymenu_jsx(tabpane_TabPane, {
       active: active
-    });
+    }, void 0, selectoractivitymenu_jsx(selectproperty, {
+      title: SelectorType,
+      options: Object.keys(nodetypes_SelectorType).map(v => ({
+        title: v,
+        id: v,
+        value: v
+      })),
+      node: currentNode,
+      property: nodetypes_NodeProperties.SelectorType
+    }), selectoractivitymenu_jsx(textproperty, {
+      title: DefaultViewModel,
+      label: DefaultViewModel,
+      node: currentNode,
+      property: nodetypes_NodeProperties.DefaultViewModel
+    }));
   }
 
 }
@@ -23084,11 +24487,11 @@ function sidebar_jsx(type, props, key, children) { if (!sidebar_REACT_ELEMENT_TY
 
 class sidebar_SideBar extends external_react_["Component"] {
   open() {
-    return this.props.open ? 'control-sidebar-open' : '';
+    return this.props.open ? "control-sidebar-open" : "";
   }
 
   extraWidth() {
-    return this.props.extraWide ? 'extra-wide' : '';
+    return this.props.extraWide ? "extra-wide" : "";
   }
 
   relative() {
@@ -23098,6 +24501,7 @@ class sidebar_SideBar extends external_react_["Component"] {
   render() {
     return sidebar_jsx("aside", {
       style: { ...this.relative(),
+        minHeight: "auto",
         ...(this.props.style || {})
       },
       className: `control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`
@@ -23120,23 +24524,24 @@ treeviewmenu_jsx("i", {
 
 class treeviewmenu_TreeViewMenu extends external_react_["Component"] {
   active() {
-    return this.props.active ? 'active' : '';
+    return this.props.active ? "active" : "";
   }
 
   open() {
-    return this.props.open ? 'menu-open' : '';
+    return this.props.open ? "menu-open" : "";
   }
 
   display() {
-    return this.props.open ? 'block' : 'block';
+    return this.props.open ? "block" : "block";
   }
 
   icon() {
-    return this.props.icon || "fa fa-dashboard";
+    return this.props.icon || (this.props.children ? "fa fa-folder" : null) || "fa fa-wrench";
   }
 
   render() {
     return treeviewmenu_jsx("li", {
+      title: this.props.description,
       className: `treeview ${this.active()} ${this.open()}`
     }, void 0, treeviewmenu_jsx("a", {
       onClick: () => {
@@ -23149,8 +24554,8 @@ class treeviewmenu_TreeViewMenu extends external_react_["Component"] {
     }, void 0, this.props.hideIcon ? null : treeviewmenu_jsx("i", {
       className: `${this.icon()}`
     }), treeviewmenu_jsx("span", {
-      title: this.props.title
-    }, void 0, this.props.title), this.props.hideArrow ? null : treeviewmenu_jsx("span", {
+      title: this.props.description || this.props.title
+    }, void 0, this.props.title), this.props.hideArrow || !this.props.children ? null : treeviewmenu_jsx("span", {
       className: "pull-right-container"
     }, void 0, treeviewmenu_ref, this.props.right ? this.props.right : null), !this.props.hideArrow && this.props.right ? null : treeviewmenu_jsx("span", {
       className: "pull-right-container"
@@ -23280,6 +24685,7 @@ var external_electron_ = __webpack_require__("electron");
   // node0
   let context = {
     node2: args.screen,
+    name: args.name,
     node3: args.clickInstance,
     node5: args.pressInstance,
     ...args
@@ -23405,7 +24811,7 @@ var external_electron_ = __webpack_require__("electron");
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node0,
-        value: "Post Register"
+        value: context.name || "Post Register"
       }
     }];
   }, function (graph) {
@@ -23443,7 +24849,7 @@ var external_electron_ = __webpack_require__("electron");
         value: true
       }
     }];
-  }, function (graph) {
+  }, context.node3 ? function (graph) {
     return [{
       operation: "NEW_LINK",
       options: {
@@ -23457,7 +24863,7 @@ var external_electron_ = __webpack_require__("electron");
         }
       }
     }];
-  }, function (graph) {
+  } : false, context.node5 ? function (graph) {
     return [{
       operation: "NEW_LINK",
       options: {
@@ -23471,7 +24877,7 @@ var external_electron_ = __webpack_require__("electron");
         }
       }
     }];
-  }, ...[].interpolate(0, 6, x => {
+  } : false, ...[].interpolate(0, 6, x => {
     if (x !== 2) {
       return {
         operation: "CHANGE_NODE_PROPERTY",
@@ -23486,7 +24892,7 @@ var external_electron_ = __webpack_require__("electron");
     }
 
     return null;
-  }).filter(x => x)];
+  }).filter(x => x)].filter(x => x);
 });
 // CONCATENATED MODULE: ./app/methods/component_api_methods.js
 
@@ -23695,7 +25101,7 @@ function removeComponentApi(props, ops) {
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node0,
-        value: "Post Authenticate"
+        value: context.functionName || "Post Authenticate"
       }
     }];
   }, function (graph) {
@@ -23832,7 +25238,7 @@ function removeComponentApi(props, ops) {
         value: true
       }
     }];
-  }, function (graph) {
+  }, context.node3 ? function (graph) {
     return [{
       operation: "NEW_LINK",
       options: {
@@ -23846,7 +25252,7 @@ function removeComponentApi(props, ops) {
         }
       }
     }];
-  }, function (graph) {
+  } : false, context.node5 ? function (graph) {
     return [{
       operation: "NEW_LINK",
       options: {
@@ -23860,7 +25266,7 @@ function removeComponentApi(props, ops) {
         }
       }
     }];
-  }, ...postAuthenticate_({
+  } : false, ...postAuthenticate_({
     head: () => {
       return context.node0;
     },
@@ -23882,7 +25288,7 @@ function removeComponentApi(props, ops) {
     }
 
     return null;
-  }).filter(x => x)];
+  }).filter(x => x)].filter(x => x);
 });
 // CONCATENATED MODULE: ./app/nodepacks/HomeView.js
 
@@ -28640,6 +30046,7 @@ const CreateLoginModels = {
     let nodePackageType = "login-models";
     let nodePackage = "login-models";
     let viewPackage = {
+      [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
       [nodetypes_NodeProperties.NodePackage]: nodePackage,
       [nodetypes_NodeProperties.NodePackageType]: nodePackageType
     };
@@ -28838,11 +30245,15 @@ const CreateLoginModels = {
     });
 
     if (method_results.instanceFunc) {
-      PerformGraphOperation(PostAuthenticate({
+      PerformGraphOperation([...PostAuthenticate({
         screen: null,
-        clickInstance: method_results.instanceFunc.onClick,
+        functionName: "Post Authenticate ReactNative",
         pressInstance: method_results.instanceFunc.onPress
-      }))(GetDispatchFunc(), GetStateFunc());
+      }), ...PostAuthenticate({
+        screen: null,
+        functionName: "Post Authenticate ElectronIo",
+        clickInstance: method_results.instanceFunc.onClick
+      })])(GetDispatchFunc(), GetStateFunc());
     }
 
     viewName = "Register";
@@ -28872,11 +30283,15 @@ const CreateLoginModels = {
     let registerScreen = method_results.screenNodeId;
 
     if (method_results.instanceFunc) {
-      PerformGraphOperation(PostRegister({
+      PerformGraphOperation([...PostRegister({
         screen: authenticateScreen,
-        clickInstance: method_results.instanceFunc.onClick,
+        name: "Post Register ReactNative",
         pressInstance: method_results.instanceFunc.onPress
-      }))(GetDispatchFunc(), GetStateFunc());
+      }), ...PostRegister({
+        screen: authenticateScreen,
+        name: "Post Register ElectronIO",
+        clickInstance: method_results.instanceFunc.onClick
+      })])(GetDispatchFunc(), GetStateFunc());
     }
 
     let titleService = GetNodeByProperties({
@@ -30566,6 +31981,7 @@ const CreateDefaultView = {
                   [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(modelProperty)}`,
                   [nodetypes_NodeProperties.UIType]: uiType,
                   [nodetypes_NodeProperties.Label]: GetNodeTitle(modelProperty),
+                  [nodetypes_NodeProperties.Property]: modelProperty.id,
                   [nodetypes_NodeProperties.ComponentType]: sharedComponent || componentTypeToUse,
                   [nodetypes_NodeProperties.UsingSharedComponent]: !!sharedComponent,
                   [nodetypes_NodeProperties.Pinned]: false,
@@ -30684,6 +32100,7 @@ const CreateDefaultView = {
                 [nodetypes_NodeProperties.UIType]: uiType,
                 [nodetypes_NodeProperties.Pinned]: false,
                 [nodetypes_NodeProperties.Label]: `${viewName} ${Execute}`,
+                [nodetypes_NodeProperties.ExecuteButton]: true,
                 [nodetypes_NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
                 [nodetypes_NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
               },
@@ -33272,7 +34689,7 @@ class agentbasedmethods_AgentBasedMethods extends external_react_["Component"] {
       }
     }), agentbasedmethods_jsx("button", {
       type: "button",
-      className: "btn btn-block btn-warning btn-sm",
+      className: "btn btn-block btn-info btn-sm",
       onClick: () => {
         this.props.executeGraphOperations(uiactions_NodesByType(state, NodeTypes.Model).filter(x => {
           return uiactions_GetNodeProp(x, nodetypes_NodeProperties.AgentBasedMethod);
@@ -33297,7 +34714,7 @@ class agentbasedmethods_AgentBasedMethods extends external_react_["Component"] {
           };
         }));
       }
-    }, void 0, "Warning")));
+    }, void 0, "Build")));
   }
 
 }
@@ -36080,11 +37497,400 @@ class agentbasedmethods_AgentBasedMethods extends external_react_["Component"] {
     return [];
   }];
 });
+// CONCATENATED MODULE: ./app/nodepacks/CreateFetchService.js
+
+
+/* harmony default export */ var CreateFetchService = (function (args = {}) {
+  // 
+  // 
+  let context = { ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      "operation": "NEW_NODE",
+      "options": {
+        "callback": function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_TEXT",
+      "options": {
+        "id": context.node0,
+        "value": "Fetch Service"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_PROPERTY",
+      "options": {
+        "prop": "nodeType",
+        "id": context.node0,
+        "value": "screen"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_PROPERTY",
+      "options": {
+        "prop": "nodeType",
+        "id": context.node0,
+        "value": "selector"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_PROPERTY",
+      "options": {
+        "prop": "nodeType",
+        "id": context.node0,
+        "value": "service-interface"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_PROPERTY",
+      "options": {
+        "prop": "nodeType",
+        "id": context.node0,
+        "value": "FetchService"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      "operation": "CHANGE_NODE_PROPERTY",
+      "options": {
+        "prop": "Pinned",
+        "id": context.node0,
+        "value": true
+      }
+    }];
+  }];
+  let clearPinned = [];
+  let applyViewPackages = [{
+    operation: 'UPDATE_NODE_PROPERTY',
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreateFetchOutput.js
+
+
+/* harmony default export */ var CreateFetchOutput = (function (args = {}) {
+  //
+  //
+  let context = { ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Fetch Output"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "FetchService"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "maestro"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "model"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "IsFetchOutput",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreatePropertiesForFetch.js
+
+
+
+
+/* harmony default export */ var CreatePropertiesForFetch = (function (args = {}) {
+  let {
+    id
+  } = args;
+  let fetchServices = GetNodesLinkedTo(GetCurrentGraph(), {
+    id,
+    link: nodetypes_LinkType.FetchServiceOuput
+  });
+  let result = [];
+
+  if (fetchServices && fetchServices.length) {
+    let fetchService = fetchServices[0];
+    GetNodesLinkedTo(GetCurrentGraph(), {
+      id,
+      link: nodetypes_LinkType.PropertyLink
+    }).map(v => {
+      result.push({
+        operation: REMOVE_NODE,
+        options: {
+          id: v.id
+        }
+      });
+    });
+    let models = GetNodesLinkedTo(GetCurrentGraph(), {
+      id: fetchService.id,
+      link: nodetypes_LinkType.FetchService
+    }).map(model => {
+      let methodprops = uiactions_GetNodeProp(model.id, nodetypes_NodeProperties.MethodProps) || {};
+      return methodprops[FunctionTemplateKeys.ModelOutput] || methodprops[FunctionTemplateKeys.Model];
+    }).filter(x => x).unique().map(v => GetNodeById(v));
+    models.map(model => {
+      result.push({
+        operation: ADD_NEW_NODE,
+        options: function () {
+          return {
+            nodeType: NodeTypes.Property,
+            parent: id,
+            properties: {
+              [nodetypes_NodeProperties.UseModelAsType]: true,
+              [nodetypes_NodeProperties.UIModelType]: model.id,
+              [nodetypes_NodeProperties.UIText]: GetNodeTitle(model),
+              [nodetypes_NodeProperties.IsTypeList]: true
+            },
+            groupProperties: {},
+            linkProperties: {
+              properties: { ...LinkProperties.PropertyLink
+              }
+            },
+            links: [{
+              target: model.id,
+              linkProperties: {
+                properties: { ...LinkProperties.ModelTypeLink
+                }
+              }
+            }]
+          };
+        }
+      });
+    });
+  }
+
+  return result;
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreateFetchServiceIdempotently.js
+
+
+
+
+
+
+
+
+/* harmony default export */ var CreateFetchServiceIdempotently = (function (args = {}) {
+  //
+  let result = [];
+  let context = { ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let graph = GetCurrentGraph();
+  let fetchParameter = GetNodeByProperties({
+    [nodetypes_NodeProperties.IsFetchParameter]: true
+  }, graph);
+  let fetchOutput = GetNodeByProperties({
+    [nodetypes_NodeProperties.IsFetchOutput]: true
+  }, graph);
+  let fetchCompatibleMethods = uiactions_NodesByType(null, NodeTypes.Method).filter(method => {
+    let funcType = uiactions_GetNodeProp(method, nodetypes_NodeProperties.FunctionType);
+    let {
+      isFetchCompatible
+    } = funcType && MethodFunctions[funcType] ? MethodFunctions[funcType] : {};
+    return isFetchCompatible;
+  });
+  let fetchService = GetNodeByProperties({
+    [nodetypes_NodeProperties.NODEType]: NodeTypes.FetchService
+  });
+
+  if (!fetchParameter) {
+    result.push(...CreateFetchParameters({
+      callback: context => {
+        fetchParameter = GetNodeById(context.entry, graph);
+      }
+    }));
+  }
+
+  if (!fetchOutput) {
+    result.push(...CreateFetchOutput({
+      callback: context => {
+        fetchOutput = GetNodeById(context.entry, graph);
+      }
+    }));
+  }
+
+  if (!fetchService) {
+    result.push(...CreateFetchService({
+      callback: context => {
+        fetchService = GetNodeById(context.entry, graph);
+      }
+    }));
+  }
+
+  fetchCompatibleMethods.map(fetchMethod => {
+    result.push({
+      operation: uiactions_ADD_LINK_BETWEEN_NODES,
+      options: function () {
+        return {
+          target: fetchMethod.id,
+          source: fetchService.id,
+          properties: { ...uiactions_LinkProperties.FetchService
+          }
+        };
+      }
+    });
+    let param = GetMethodNodeProp(fetchMethod, FunctionTemplateKeys.FetchParameter);
+
+    if (param !== fetchParameter.id) {
+      let methodProps = { ...(uiactions_GetNodeProp(fetchMethod, nodetypes_NodeProperties.MethodProps) || {})
+      };
+      methodProps[FunctionTemplateKeys.FetchParameter] = fetchParameter.id;
+      result.push({
+        operation: uiactions_REMOVE_LINK_BETWEEN_NODES,
+        options: {
+          source: fetchMethod.id,
+          target: param
+        }
+      }, {
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: {
+          source: fetchMethod.id,
+          target: fetchParameter.id,
+          properties: { ...uiactions_LinkProperties.FunctionOperator
+          }
+        }
+      }, {
+        operation: UPDATE_NODE_PROPERTY,
+        options: function () {
+          return {
+            id: fetchMethod.id,
+            properties: {
+              [nodetypes_NodeProperties.MethodProps]: methodProps
+            }
+          };
+        }
+      });
+    }
+  });
+  result.push({
+    operation: uiactions_ADD_LINK_BETWEEN_NODES,
+    options: function () {
+      return {
+        target: fetchOutput.id,
+        source: fetchService.id,
+        properties: { ...uiactions_LinkProperties.FetchServiceOuput
+        }
+      };
+    }
+  });
+  result.push(function () {
+    return CreatePropertiesForFetch({
+      id: fetchOutput.id
+    });
+  });
+  return result;
+});
 // CONCATENATED MODULE: ./app/components/quickmethods.js
 
 var quickmethods_REACT_ELEMENT_TYPE;
 
 function quickmethods_jsx(type, props, key, children) { if (!quickmethods_REACT_ELEMENT_TYPE) { quickmethods_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: quickmethods_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
 
 
 
@@ -36269,16 +38075,10 @@ class quickmethods_QuickMethods extends external_react_["Component"] {
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
-      title: "Create Fetch Parameters",
+      title: "Create Fetch Service",
       icon: "fa fa-plus",
       onClick: () => {
-        let nodes = GetNodeByProperties({
-          [nodetypes_NodeProperties.IsFetchParameter]: true
-        });
-
-        if (!nodes) {
-          this.props.graphOperation(CreateFetchParameters());
-        }
+        this.props.graphOperation(CreateFetchServiceIdempotently());
       }
     }), quickmethods_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
@@ -36496,11 +38296,42 @@ class serviceinterfacemenu_ServiceInterfaceMenu extends external_react_["Compone
 }
 
 /* harmony default export */ var serviceinterfacemenu = (UIConnect(serviceinterfacemenu_ServiceInterfaceMenu));
+// CONCATENATED MODULE: ./app/components/checkboxproperty.js
+var checkboxproperty_REACT_ELEMENT_TYPE;
+
+function checkboxproperty_jsx(type, props, key, children) { if (!checkboxproperty_REACT_ELEMENT_TYPE) { checkboxproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: checkboxproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+class checkboxproperty_CheckBoxProperty extends external_react_["Component"] {
+  render() {
+    let currentNode = this.props.node;
+    return checkboxproperty_jsx(checkbox_CheckBox, {
+      label: this.props.title,
+      title: this.props.title,
+      value: uiactions_GetNodeProp(currentNode, this.props.property),
+      onChange: value => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: this.props.property,
+          id: currentNode.id,
+          value: value
+        });
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ var checkboxproperty = (UIConnect(checkboxproperty_CheckBoxProperty));
 // CONCATENATED MODULE: ./app/components/eventhandleractivitymenu.js
 
 var eventhandleractivitymenu_REACT_ELEMENT_TYPE;
 
 function eventhandleractivitymenu_jsx(type, props, key, children) { if (!eventhandleractivitymenu_REACT_ELEMENT_TYPE) { eventhandleractivitymenu_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: eventhandleractivitymenu_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
 
 
 
@@ -36553,6 +38384,10 @@ class eventhandleractivitymenu_EventHandlerActivityMenu extends external_react_[
         });
       },
       value: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.EventType)
+    }), eventhandleractivitymenu_jsx(checkboxproperty, {
+      title: UseValue,
+      property: uiactions_NodeProperties.UseValue,
+      node: currentNode
     })) : null));
   }
 
@@ -36613,7 +38448,7 @@ class navigationparametermenu_NavigationParameterMenu extends external_react_["C
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     var active = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentNode;
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
+    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, graph_methods_TARGET) : null;
 
     let _ui_type = uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType);
 
@@ -37439,7 +39274,7 @@ class executoritem_ExecutorItem extends external_react_["Component"] {
       var methods = GetLinkChainFromGraph(graph, {
         id: currentNode.id,
         links: [{
-          direction: TARGET,
+          direction: graph_methods_TARGET,
           type: nodetypes_LinkType.ModelItemFilter
         }]
       }, [NodeTypes.Method]);
@@ -42503,7 +44338,7 @@ class mindmap_MindMap extends external_react_["Component"] {
 
   componentDidMount() {
     // Draw for the first time to initialize.
-    this.draw(); // Redraw based on the new size whenever the browser window is resized.
+    this.draw(true); // Redraw based on the new size whenever the browser window is resized.
 
     window.addEventListener("resize", this.draw);
     window.addEventListener("mousemove", this.mouseMove);
@@ -42556,14 +44391,20 @@ class mindmap_MindMap extends external_react_["Component"] {
       div.style.maxWidth = (text || "").split(" ").length > 1 ? `200px` : "300px";
       div.style.top = "-10000px";
       div.style.padding = pad * 2 + "px";
-      document.querySelector(`#${this.state.id}`).appendChild(div);
+      let statenode = document.querySelector(`#${this.state.id}`);
+
+      if (statenode) {
+        statenode.appendChild(div);
+      }
     }
 
     div.innerHTML = text;
     return div.getBoundingClientRect();
   }
 
-  draw() {
+  draw(options = {
+    once: false
+  }) {
     var me = this;
     var domObj = document.querySelector(`#${this.state.id}`);
     domObj.innerHTML = "";
@@ -42930,13 +44771,7 @@ class mindmap_MindMap extends external_react_["Component"] {
     let gridSnapIterations = null;
     let keepRunning = true;
     let centerGraph = true;
-    force.start // initialUnconstrainedIterations,
-    // initialUserConstraintIterations,
-    // initialAllConstraintsIterations,
-    // null && gridSnapIterations,
-    // keepRunning,
-    // centerGraph
-    ();
+    force.start(null, null, null, null, !options.once);
   }
 
   buildNode(graph, cola, color) {
@@ -43077,7 +44912,9 @@ class mindmap_MindMap extends external_react_["Component"] {
       }
 
       if (draw) {
-        this.draw();
+        this.draw({
+          once: !(this.state.graph.nodes && this.state.graph.nodes.length)
+        });
       }
     }
   }
@@ -43252,6 +45089,7 @@ function modelactivitymenu_jsx(type, props, key, children) { if (!modelactivitym
 
 
 
+
 class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
   render() {
     var {
@@ -43277,7 +45115,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
       active: active
     }, void 0, currentNode ? modelactivitymenu_jsx(formcontrol_FormControl, {}, void 0, modelactivitymenu_jsx(checkbox_CheckBox, {
       label: IsAgent,
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsAgent] : '',
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsAgent] : "",
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
           prop: uiactions_NodeProperties.IsAgent,
@@ -43312,10 +45150,10 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIUser] : ''
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIUser] : ""
     }) : null, modelactivitymenu_jsx(checkbox_CheckBox, {
       label: IsUser,
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsUser] : '',
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsUser] : "",
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
           prop: uiactions_NodeProperties.IsUser,
@@ -43326,7 +45164,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
     }), modelactivitymenu_jsx(checkbox_CheckBox, {
       label: IsOwnedByAgents,
       title: IsOwnedByAgentsDescriptions,
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsOwnedByAgents] : '',
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsOwnedByAgents] : "",
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
           prop: uiactions_NodeProperties.IsOwnedByAgents,
@@ -43368,6 +45206,10 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           value
         });
       }
+    }), modelactivitymenu_jsx(checkboxproperty, {
+      node: currentNode,
+      property: nodetypes_NodeProperties.IsFetchOutput,
+      title: IsFetchOutput
     }), many_to_many_enabled ? modelactivitymenu_jsx(selectinput_SelectInput, {
       options: uiactions_NodesByType(state, NodeTypes.Model).map(x => {
         return {
@@ -43396,7 +45238,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         }]);
       },
-      value: ''
+      value: ""
     }) : null) : null, modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuHeader, {
       title: ModelActions
     }), modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenu, {}, void 0, modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
@@ -43410,7 +45252,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      icon: 'fa fa-puzzle-piece',
+      icon: "fa fa-puzzle-piece",
       title: SetDefaultProperties,
       description: SetDefaultPropertiesDescription
     }), modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
@@ -43427,14 +45269,14 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      icon: 'fa fa-puzzle-piece',
+      icon: "fa fa-puzzle-piece",
       title: AddProperty,
       description: AddPropertyDescription
     }), modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
       onClick: () => {
         external_electron_["clipboard"].writeText(generateDataSeed(currentNode));
       },
-      icon: 'fa fa-puzzle-piece',
+      icon: "fa fa-puzzle-piece",
       title: CreateObjectDataSeed,
       description: CreateObjectDataSeed
     }), modelactivitymenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -43444,25 +45286,25 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
       toggle: () => {
         this.props.toggleVisual(titles_QuickMethods);
       },
-      icon: 'fa fa-tag'
+      icon: "fa fa-tag"
     }, void 0, modelactivitymenu_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
       title: GetSpecificModels.type,
-      icon: 'fa fa-plus',
+      icon: "fa fa-plus",
       onClick: () => {
         this.props.executeGraphOperation(currentNode, GetSpecificModels);
       }
     }), modelactivitymenu_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
       title: GetAllModels.type,
-      icon: 'fa fa-plus',
+      icon: "fa fa-plus",
       onClick: () => {
         this.props.executeGraphOperation(currentNode, GetAllModels);
       }
     }), modelactivitymenu_jsx(treeviewmenu_TreeViewMenu, {
       hideArrow: true,
       title: CreateLoginModels.type,
-      icon: 'fa fa-plus',
+      icon: "fa fa-plus",
       onClick: () => {
         this.props.executeGraphOperation(currentNode, CreateLoginModels);
       }
@@ -43478,10 +45320,10 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIPermissions] : ''
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIPermissions] : ""
     }) : null, currentNode ? modelactivitymenu_jsx(formcontrol_FormControl, {}, void 0, modelactivitymenu_jsx(checkbox_CheckBox, {
       label: IsParent,
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsParent] : '',
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.IsParent] : "",
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
           prop: uiactions_NodeProperties.IsParent,
@@ -43516,7 +45358,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIChoiceNode] : ''
+      value: currentNode.properties ? currentNode.properties[uiactions_NodeProperties.UIChoiceNode] : ""
     }) : null, modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenu, {}, void 0, is_agent ? modelactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
       onClick: () => {
         this.props.graphOperation(NEW_PERMISSION_NODE, {
@@ -43527,7 +45369,7 @@ class modelactivitymenu_ModelActivityMenu extends external_react_["Component"] {
           }
         });
       },
-      icon: 'fa fa-puzzle-piece',
+      icon: "fa fa-puzzle-piece",
       title: AddPermission,
       description: AddPermissionDescription
     }) : null)));
@@ -43987,6 +45829,61 @@ class propertyactivitymenu_PropertyActivityMenu extends external_react_["Compone
 }
 
 /* harmony default export */ var propertyactivitymenu = (UIConnect(propertyactivitymenu_PropertyActivityMenu));
+// CONCATENATED MODULE: ./app/components/selectinputproperty.js
+var selectinputproperty_REACT_ELEMENT_TYPE;
+
+function selectinputproperty_jsx(type, props, key, children) { if (!selectinputproperty_REACT_ELEMENT_TYPE) { selectinputproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: selectinputproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
+
+
+
+
+
+
+
+
+class selectinputproperty_SelectInputProperty extends external_react_["Component"] {
+  render() {
+    let {
+      state,
+      value,
+      model,
+      valueObj
+    } = this.props;
+    let currentNode = this.props.node;
+
+    if (typeof valueObj === "object") {
+      value = valueObj;
+    }
+
+    return selectinputproperty_jsx(selectinput_SelectInput, {
+      onChange: _value => {
+        var id = currentNode.id;
+        this.props.graphOperation(uiactions_REMOVE_LINK_BETWEEN_NODES, {
+          target: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.LambdaInsertArguments),
+          source: id
+        });
+        value[model] = _value;
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: nodetypes_NodeProperties.LambdaInsertArguments,
+          id,
+          value: value
+        });
+        this.props.graphOperation(uiactions_ADD_LINK_BETWEEN_NODES, {
+          target: _value,
+          source: id,
+          properties: { ...uiactions_LinkProperties.LambdaInsertArguments
+          }
+        });
+      },
+      label: this.props.label,
+      value: this.props.value,
+      options: this.props.options
+    });
+  }
+
+}
+
+/* harmony default export */ var selectinputproperty = (UIConnect(selectinputproperty_SelectInputProperty));
 // CONCATENATED MODULE: ./app/utils/utilService.js
 
 
@@ -44062,24 +45959,25 @@ function utilService_getStringInserts(str = "") {
 }
 function utilService_getReferenceInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\#{[a-zA-Z0-9_]*}/gm;
+  const regex = /\#{[a-zA-Z0-9_@| ~]*}/gm;
   let m;
   let result = [];
+  let regexes = [regex];
+  regexes.map(regex => {
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      } // The result can be accessed through the `m`-variable.
 
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    } // The result can be accessed through the `m`-variable.
 
-
-    m.forEach((match, groupIndex) => {
-      if (match) {
-        result.push(match);
-      }
-    });
-  }
-
+      m.forEach((match, groupIndex) => {
+        if (match) {
+          result.push(match);
+        }
+      });
+    }
+  });
   return result;
 }
 function utilService_getGuids(str = "") {
@@ -44229,7 +46127,7 @@ function utilService_processRecording(str) {
     return `if(!args.${temp}){
           throw 'missing ${temp} argument';
         }`;
-  }).join('')}
+  }).join("")}
     let context = {
       ...args${unaccountedGuids.length ? "," + nodetypes_NEW_LINE + unaccountedGuids.map(v => {
     let index = guids.indexOf(v);
@@ -44301,7 +46199,50 @@ function datachainactivitymenu_jsx(type, props, key, children) { if (!datachaina
 
 
 
+
+
+
 class datachainactivitymenu_DataChainActvityMenu extends external_react_["Component"] {
+  getLambdaVariableTree() {
+    var {
+      state
+    } = this.props;
+    var currentNode = Node(state, Visual(state, SELECTED_NODE));
+    let lambdaVariables = null;
+
+    if (uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.CS)) {
+      let methods = GetNodesLinkedTo(null, {
+        id: currentNode.id,
+        link: nodetypes_LinkType.DataChainLink,
+        componentType: NodeTypes.Method
+      });
+
+      if (methods.length) {
+        let functionType = uiactions_GetNodeProp(methods[0], uiactions_NodeProperties.FunctionType);
+        let {
+          lambda
+        } = MethodFunctions[functionType];
+
+        if (lambda && lambda.default) {
+          let methodProps = GetMethodProps(methods[0]);
+          lambdaVariables = datachainactivitymenu_jsx(buttonlist_ButtonList, {
+            active: true,
+            isSelected: () => true,
+            items: Object.keys(lambda.default).filter(key => key !== "return").map(key => {
+              return {
+                title: `[${key}]: ${GetCodeName(methodProps[lambda.default[key]]) || lambda.default[key]}`,
+                value: key,
+                id: key
+              };
+            })
+          });
+        }
+      }
+    }
+
+    return lambdaVariables;
+  }
+
   render() {
     var {
       state
@@ -44315,9 +46256,25 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
 
     if (lambda) {
       let lambdaText = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Lambda);
-      inserts = utilService_getReferenceInserts(lambdaText || "").map(v => v.substr(2, v.length - 3)).unique().map(insert => {
-        let args = insert.split("|");
+      inserts = utilService_getReferenceInserts(lambdaText || "").map(v => v.substr(2, v.length - 3)).unique(_insert => {
+        let temp = _insert.split("@");
+
+        let insert = temp.length > 1 ? temp[1] : temp[0];
+        let args = insert.split("~").filter(x => x);
         let property = args[0];
+
+        if (args.length > 1) {
+          return args[1];
+        }
+
+        return property || _insert;
+      }).map(_insert => {
+        let temp = _insert.split("@");
+
+        let insert = temp.length > 1 ? temp[1] : temp[0];
+        let args = insert.split("~");
+        let model = args[0];
+        let property = args[1];
         let types = args.subset(1);
 
         if (!types.length) {
@@ -44325,29 +46282,18 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
         }
 
         let value = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.LambdaInsertArguments) || {};
-        return datachainactivitymenu_jsx(selectinput_SelectInput, {
-          onChange: _value => {
-            var id = currentNode.id;
-            this.props.graphOperation(uiactions_REMOVE_LINK_BETWEEN_NODES, {
-              target: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.LambdaInsertArguments),
-              source: id
-            });
-            value[property] = _value;
-            this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-              prop: uiactions_NodeProperties.LambdaInsertArguments,
-              id,
-              value: value
-            });
-            this.props.graphOperation(uiactions_ADD_LINK_BETWEEN_NODES, {
-              target: _value,
-              source: id,
-              properties: { ...uiactions_LinkProperties.LambdaInsertArguments
-              }
-            });
-          },
-          label: property,
-          value: value[property],
-          options: uiactions_NodesByType(state, types).toNodeSelect()
+        let nodes = property ? GetNodesLinkedTo(null, {
+          id: value[model],
+          link: nodetypes_LinkType.PropertyLink
+        }) : uiactions_NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
+
+        return datachainactivitymenu_jsx(selectinputproperty, {
+          label: property ? `${model}.${property}` : model,
+          model: property || model,
+          valueObj: value,
+          value: property ? value[property] : value[model],
+          node: currentNode,
+          options: nodes.toNodeSelect()
         });
       });
     }
@@ -44358,6 +46304,7 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
     let showNode1 = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.node_1 : false;
     let showValue = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.value : false;
     let showScreens = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.screen : false;
+    let showMethods = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.method : false;
     let shownavigateMethod = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.navigateMethod : false;
     let showSelector = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selector : false;
     let showSelectorProperty = DataChainFunctions[dataChainFuncType] ? DataChainFunctions[dataChainFuncType].ui.selectorProperty : false;
@@ -44380,6 +46327,7 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
     }).toNodeSelect();
     let lists = uiactions_NodesByType(state, NodeTypes.Lists).toNodeSelect();
     let all_inputs = uiactions_NodesByType(state, NodeTypes.DataChain).toNodeSelect();
+    let lambdaVariables = this.getLambdaVariableTree();
     return datachainactivitymenu_jsx(tabpane_TabPane, {
       active: active
     }, void 0, datachainactivitymenu_jsx(formcontrol_FormControl, {}, void 0, datachainactivitymenu_jsx(checkbox_CheckBox, {
@@ -44392,6 +46340,14 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
           value: value
         });
       }
+    }), datachainactivitymenu_jsx(checkboxproperty, {
+      title: CSEntryPoint,
+      node: currentNode,
+      property: uiactions_NodeProperties.CSEntryPoint
+    }), datachainactivitymenu_jsx(checkboxproperty, {
+      title: CSharp,
+      node: currentNode,
+      property: uiactions_NodeProperties.CS
     }), datachainactivitymenu_jsx(checkbox_CheckBox, {
       label: AsOutput,
       value: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.AsOutput),
@@ -44443,7 +46399,7 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
       },
       label: Lambda,
       value: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Lambda)
-    }) : null, lambda ? inserts : null, showModel ? datachainactivitymenu_jsx(selectinput_SelectInput, {
+    }) : null, lambda ? inserts : null, lambdaVariables, showModel ? datachainactivitymenu_jsx(selectinput_SelectInput, {
       onChange: value => {
         var id = currentNode.id;
         this.props.graphOperation(uiactions_REMOVE_LINK_BETWEEN_NODES, {
@@ -44653,6 +46609,11 @@ class datachainactivitymenu_DataChainActvityMenu extends external_react_["Compon
       label: `${Screen}`,
       value: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Screen),
       options: uiactions_NodesByType(state, NodeTypes.Screen).toNodeSelect()
+    }) : null, showMethods ? datachainactivitymenu_jsx(selectinput_SelectInput, {
+      onChange: DataChainContextMethods.Method.bind(this, currentNode),
+      label: `${Methods}`,
+      value: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Method),
+      options: uiactions_NodesByType(state, NodeTypes.Method).toNodeSelect()
     }) : null, shownavigateMethod ? datachainactivitymenu_jsx(selectinput_SelectInput, {
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
@@ -45469,8 +47430,6 @@ function componentactivitymenu_jsx(type, props, key, children) { if (!componenta
 
 
 
-
-
 class componentactivitymenu_ComponentActivityMenu extends external_react_["Component"] {
   constructor(props) {
     super(props);
@@ -45589,7 +47548,7 @@ class componentactivitymenu_ComponentActivityMenu extends external_react_["Compo
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     var active = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentNode;
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
+    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, graph_methods_TARGET) : null;
 
     let _ui_type = uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType) || uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.UIType);
 
@@ -45691,6 +47650,15 @@ class componentactivitymenu_ComponentActivityMenu extends external_react_["Compo
           value
         });
       }
+    }), componentactivitymenu_jsx(selectproperty, {
+      node: currentNode,
+      title: ViewTypes,
+      property: nodetypes_NodeProperties.ViewType,
+      options: Object.keys(uiactions_ViewTypes).map(v => ({
+        title: v,
+        value: uiactions_ViewTypes[v],
+        id: v
+      }))
     })) : null, componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType].layout ? componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenu, {}, void 0, componentactivitymenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
       onClick: () => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
@@ -45792,7 +47760,7 @@ class componentpropertymenu_ComponentPropertyMenu extends external_react_["Compo
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     var active = [uiactions_NodeTypes.ComponentNode, uiactions_NodeTypes.ScreenOption].some(v => v === uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.NODEType));
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
+    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, graph_methods_TARGET) : null;
     let componentTypes = ComponentTypes[uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType)] || {};
     let componentType = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentType);
     let models = uiactions_NodesByType(state, NodeTypes.Model).toNodeSelect();
@@ -46002,18 +47970,9 @@ class modelfilteractivitymenu_ModelFilterActivityMenu extends external_react_["C
 
 /* harmony default export */ var modelfilteractivitymenu = (UIConnect(modelfilteractivitymenu_ModelFilterActivityMenu));
 // CONCATENATED MODULE: ./app/components/componentapimenu.js
-
 var componentapimenu_REACT_ELEMENT_TYPE;
 
 function componentapimenu_jsx(type, props, key, children) { if (!componentapimenu_REACT_ELEMENT_TYPE) { componentapimenu_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: componentapimenu_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
-
-
-
-
-
-
-
-
 
 
 
@@ -46037,11 +47996,6 @@ class componentapimenu_ComponentAPIMenu extends external_react_["Component"] {
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     var active = [uiactions_NodeTypes.ComponentNode, uiactions_NodeTypes.ScreenOption].some(v => v === uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.NODEType));
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
-    let componentTypes = ComponentTypes[uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType)] || {};
-    let componentType = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentType);
-    let models = uiactions_NodesByType(state, NodeTypes.Model).toNodeSelect();
-    let componentProps = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentApi) || createComponentApi();
     return componentapimenu_jsx(sidemenucontainer, {
       active: active,
       tab: dashboard_SCOPE_TAB,
@@ -46049,113 +48003,11 @@ class componentapimenu_ComponentAPIMenu extends external_react_["Component"] {
       title: titles_ComponentAPIMenu
     }, void 0, componentapimenu_jsx(tabpane_TabPane, {
       active: active
-    }, void 0, currentNode ? componentapimenu_jsx(formcontrol_FormControl, {}, void 0, componentapimenu_jsx(textinput_TextInput, {
-      label: Property,
-      value: this.state.modelProp,
-      onChange: value => {
-        this.setState({
-          modelProp: value
-        });
-      }
-    })) : null, componentType && componentTypes && componentTypes[componentType] && componentTypes[componentType] ? componentapimenu_jsx(controlsidebarmenu_ControlSideBarMenu, {}, void 0, componentapimenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
-      onClick: () => {
-        if (this.state.modelProp) {
-          componentProps = addComponentApi(componentProps, {
-            modelProp: this.state.modelProp
-          });
-          this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-            prop: uiactions_NodeProperties.ComponentApi,
-            id: currentNode.id,
-            value: componentProps
-          });
-        }
-      },
-      icon: 'fa fa-plus',
-      title: Add,
-      description: Add
-    }), componentapimenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
-      onClick: () => {
-        if (this.state.modelProp) {
-          componentProps = removeComponentApi(componentProps, {
-            modelProp: this.state.modelProp
-          });
-          this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-            prop: uiactions_NodeProperties.ComponentApi,
-            id: currentNode.id,
-            value: componentProps
-          });
-        }
-      },
-      icon: 'fa fa-plus',
-      title: Remove,
-      description: Remove
-    }), componentTypes[componentType] && componentTypes[componentType].defaultApi ? componentapimenu_jsx(controlsidebarmenu_ControlSideBarMenuItem, {
-      onClick: () => {
-        let _ui_type = uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType);
-
-        let componentTypes = ComponentTypes[_ui_type] || {};
-        let componentType = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentType);
-        componentTypes[componentType].defaultApi.map(x => {
-          componentProps = addComponentApi(componentProps, {
-            modelProp: x.property
-          });
-        });
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-          prop: uiactions_NodeProperties.ComponentApi,
-          id: currentNode.id,
-          value: componentProps
-        });
-        this.applyDefaultComponentProperties();
-      },
-      icon: 'fa fa-plus',
-      title: AddDefaults,
-      description: AddDefaults
-    }) : null) : null, componentapimenu_jsx(buttonlist_ButtonList, {
-      active: true,
-      isSelected: item => {
-        return item.value === this.state.selectedItem;
-      },
-      items: getComponentPropertyList(uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentApi)),
-      onClick: item => {
-        this.setState({
-          modelProp: item.value,
-          selectedItem: item.value
-        });
-      }
+    }, void 0, componentapimenu_jsx(checkboxproperty, {
+      title: ExecuteButton,
+      property: nodetypes_NodeProperties.ExecuteButton,
+      node: currentNode
     })));
-  }
-
-  applyDefaultComponentProperties() {
-    var {
-      state
-    } = this.props;
-    var currentNode = Node(state, Visual(state, SELECTED_NODE));
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
-
-    let _ui_type = uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType);
-
-    let componentTypes = ComponentTypes[_ui_type] || {};
-    let componentType = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ComponentType);
-    Object.keys(componentTypes[componentType].properties).map(key => {
-      let prop_obj = componentTypes[componentType].properties[key];
-
-      if (prop_obj.parameterConfig) {
-        let selectedComponentApiProperty = key;
-        let componentProperties = uiactions_GetNodeProp(currentNode, prop_obj.nodeProperty);
-        componentProperties = componentProperties || {};
-        componentProperties[selectedComponentApiProperty] = componentProperties[selectedComponentApiProperty] || {};
-        componentProperties[selectedComponentApiProperty] = {
-          instanceType: InstanceTypes.ApiProperty,
-          isHandler: prop_obj.isHandler,
-          apiProperty: prop_obj.nodeProperty
-        };
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-          prop: prop_obj.nodeProperty,
-          id: currentNode.id,
-          value: componentProperties
-        });
-      }
-    });
   }
 
 }
@@ -46692,10 +48544,10 @@ class conditionactivitymenu_ConditionActivityMenu extends external_react_["Compo
       id: currentNode.id,
       links: [{
         type: nodetypes_LinkType.Condition,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }, {
         type: nodetypes_LinkType.FunctionOperator,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }]
     }) : [];
     let ref2_properties = [];
@@ -46824,7 +48676,7 @@ class conditionactivitymenu_ConditionActivityMenu extends external_react_["Compo
       id: currentNode.id,
       links: [{
         type: nodetypes_LinkType.Condition,
-        direction: TARGET
+        direction: graph_methods_TARGET
       }]
     })[0];
     var temp = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.EnumerationReference) || {
@@ -47248,7 +49100,7 @@ class parameteractivitymenu_ParameterActivityMenu extends external_react_["Compo
     var {
       state
     } = this.props;
-    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, TARGET);
+    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, graph_methods_TARGET);
 
     for (var i = 0; i < links.length; i++) {
       var x = links[i];
@@ -47266,7 +49118,7 @@ class parameteractivitymenu_ParameterActivityMenu extends external_react_["Compo
     var {
       state
     } = this.props;
-    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, TARGET);
+    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, graph_methods_TARGET);
 
     for (var i = 0; i < links.length; i++) {
       var x = links[i];
@@ -47284,7 +49136,7 @@ class parameteractivitymenu_ParameterActivityMenu extends external_react_["Compo
     var {
       state
     } = this.props;
-    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, TARGET);
+    var links = getNodeLinks(GetCurrentGraph(state), currentNode.id, graph_methods_TARGET);
 
     for (var i = 0; i < links.length; i++) {
       var x = links[i];
@@ -48404,7 +50256,7 @@ class permissionsactivitymenu_PermissionActivityMenu extends external_react_["Co
     var methodNode = currentNode ? GetLinkChainItem(state, {
       id: currentNode.id,
       links: [{
-        direction: TARGET,
+        direction: graph_methods_TARGET,
         type: nodetypes_LinkType.FunctionOperator
       }]
     }) : null;
@@ -48815,7 +50667,7 @@ class modelfiltermenu_ModelFilterMenu extends external_react_["Component"] {
     return modelfiltermenu_jsx(tabpane_TabPane, {
       active: active
     }, void 0, modelfiltermenu_jsx("div", {
-      class: "btn-group"
+      className: "btn-group"
     }, void 0, modelfiltermenu_jsx("button", {
       title: SelectAll,
       onClick: () => {
@@ -50049,9 +51901,9 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
       return str.indexOf(filter) !== -1;
     }).groupBy(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType));
     let body = [];
-    body = Object.keys(groups).filter(group => groups[group].length).map((group, gi) => {
+    body = Object.keys(groups).sort((a, b) => a.localeCompare(b)).filter(group => groups[group].length).map((group, gi) => {
       let groupKey = `NodeManagement-${group}`;
-      let groupNodes = groups[group].subset(0, 100).map((gn, gni) => {
+      let groupNodes = Visual(state, groupKey) ? groups[group].subset(0, 100).sort((a, b) => uiactions_GetNodeProp(a, nodetypes_NodeProperties.UIText).localeCompare(uiactions_GetNodeProp(b, nodetypes_NodeProperties.UIText))).map((gn, gni) => {
         return nodemanagement_jsx(treeviewmenu_TreeViewMenu, {
           hideArrow: true,
           title: uiactions_GetNodeProp(gn, nodetypes_NodeProperties.UIText),
@@ -50064,7 +51916,7 @@ class nodemanagement_NodeManagement extends external_react_["Component"] {
             });
           }
         }, `node-${group}-${gi}-${gni}`);
-      });
+      }) : [];
       return nodemanagement_jsx(treeviewmenu_TreeViewMenu, {
         title: group,
         icon: "fa fa-dot-circle-o",
@@ -50170,7 +52022,7 @@ class methodparameteremenu_MethodParameterMenu extends external_react_["Componen
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
     var active = uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentNode;
-    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
+    let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, graph_methods_TARGET) : null;
 
     let _ui_type = uiactions_GetNodeProp(screenOption, uiactions_NodeProperties.UIType);
 
@@ -50485,7 +52337,7 @@ class modelfilteritemactivitymenu_ModelFilterItemActivityMenu extends external_r
       var methodNode = GetLinkChainItem(state, {
         id: currentNode.id,
         links: [{
-          direction: TARGET,
+          direction: graph_methods_TARGET,
           type: nodetypes_LinkType.ModelItemFilter
         }]
       });
@@ -54968,8 +56820,10 @@ function datachaincontextmenu_jsx(type, props, key, children) { if (!datachainco
 
 
 
-const datachaincontextmenu_CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
-const datachaincontextmenu_DATA_SOURCE = 'DATA_SOURCE';
+
+
+const datachaincontextmenu_CONDITION_FILTER_MENU_PARAMETER = "condition-filter-menu-parameter";
+const datachaincontextmenu_DATA_SOURCE = "DATA_SOURCE";
 
 class datachaincontextmenu_DataChainContextMenu extends external_react_["Component"] {
   render() {
@@ -54977,7 +56831,7 @@ class datachaincontextmenu_DataChainContextMenu extends external_react_["Compone
       state
     } = this.props;
     var currentNode = Node(state, Visual(state, SELECTED_NODE));
-    let display = Visual(state, CONTEXT_MENU_MODE) ? 'block' : 'none';
+    let display = Visual(state, CONTEXT_MENU_MODE) ? "block" : "none";
     let nodeType = Visual(state, CONTEXT_MENU_MODE) ? uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType) : null;
     let menuMode = Visual(state, CONTEXT_MENU_MODE);
 
@@ -54986,27 +56840,35 @@ class datachaincontextmenu_DataChainContextMenu extends external_react_["Compone
     };
 
     return datachaincontextmenu_jsx(treeviewmenu_TreeViewMenu, {
-      open: true,
       active: true,
       title: DataChain,
-      toggle: () => {}
+      open: Visual(state, `datachaincontextmenu`),
+      toggle: () => {
+        this.props.toggleVisual(`datachaincontextmenu`);
+      }
     }, void 0, datachaincontextmenu_jsx(treeviewmenu_TreeViewMenu, {
       title: SplitDataChain,
       hideArrow: true,
-      icon: 'fa  fa-share-alt',
+      icon: "fa  fa-share-alt",
       onClick: () => {
         DataChainContextMethods.SplitDataChain.bind(this)(currentNode);
         exit();
       }
-    }, 'split-data-chain'), datachaincontextmenu_jsx(treeviewmenu_TreeViewMenu, {
+    }, "split-data-chain"), datachaincontextmenu_jsx(treeviewmenu_TreeViewMenu, {
       title: Snip,
       hideArrow: true,
-      icon: 'fa fa-taxi',
+      icon: "fa fa-taxi",
       onClick: () => {
         DataChainContextMethods.SnipDataChain.bind(this)(currentNode);
         exit();
       }
-    }, 'mindmap'));
+    }, "mindmap"), datachaincontextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, datachaincontextmenu_jsx(selectproperty, {
+      title: DataChainCollection,
+      link: LinkProperties.DataChainCollection,
+      options: uiactions_NodesByType(this.props.state, NodeTypes.DataChainCollection).toNodeSelect(),
+      node: currentNode,
+      property: nodetypes_NodeProperties.DataChainCollection
+    })));
   }
 
 }
@@ -56448,6 +58310,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
 });
 // CONCATENATED MODULE: ./app/nodepacks/StoreModelArrayStandard.js
 
+
 /* harmony default export */ var StoreModelArrayStandard = (function (args = {
   state_key: "StateKeyReplace"
 }) {
@@ -56457,8 +58320,12 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     node2: args.model
   };
   let {
-    viewPackages = {}
+    viewPackages
   } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
   let result = [function (graph) {
     return [{
       operation: "NEW_NODE",
@@ -56524,6 +58391,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         },
         properties: {
           Pinned: false,
+          ...viewPackages,
           ChainParent: context.node0
         },
         linkProperties: {
@@ -56602,7 +58470,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         groupProperties: {
           id: context.group0
         },
-        properties: {
+        properties: { ...viewPackages,
           ChainParent: context.node1
         },
         linkProperties: {
@@ -56660,7 +58528,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         groupProperties: {
           id: context.group0
         },
-        properties: {
+        properties: { ...viewPackages,
           ChainParent: context.node3
         },
         linkProperties: {
@@ -58393,6 +60261,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
 });
 // CONCATENATED MODULE: ./app/nodepacks/AddButtonToComponent.js
 
+
 /* harmony default export */ var nodepacks_AddButtonToComponent = (function (args = {}) {
   // node0
   //
@@ -58404,8 +60273,12 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     node0: args.component
   };
   let {
-    viewPackages = {}
+    viewPackages
   } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
   let result = [function (graph) {
     return [{
       operation: "NEW_COMPONENT_NODE",
@@ -58413,7 +60286,8 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         parent: context.node0,
         groupProperties: {},
         properties: {
-          UIType: "ElectronIO"
+          UIType: "ElectronIO",
+          ...viewPackages
         },
         linkProperties: {
           properties: {
@@ -58460,7 +60334,8 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         properties: {
           text: "label",
           Pinned: false,
-          UseAsValue: true
+          UseAsValue: true,
+          ...viewPackages
         },
         callback: function (node, graph, group) {
           context.node2 = node.id;
@@ -58483,7 +60358,8 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         groupProperties: {},
         properties: {
           text: "label",
-          Pinned: false
+          Pinned: false,
+          ...viewPackages
         },
         callback: function (node, graph, group) {
           context.node3 = node.id;
@@ -58525,7 +60401,8 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         nodeType: "EventMethod",
         properties: {
           EventType: "onClick",
-          text: "onClick"
+          text: "onClick",
+          ...viewPackages
         },
         links: [function (graph) {
           return [{
@@ -58559,6 +60436,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         properties: {
           text: "onClick Instance",
           Pinned: false,
+          ...viewPackages,
           AutoDelete: {
             properties: {
               nodeType: "component-api-connector"
@@ -58945,7 +60823,39 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     return [];
   }];
 });
+// CONCATENATED MODULE: ./app/nodepacks/ClearPreviousViewPackage.js
+
+
+function ClearPreviosuViewPackage(args = {}) {
+  let {
+    graph,
+    node
+  } = args;
+  let result = [];
+  let vp = uiactions_GetNodeProp(node, nodetypes_NodeProperties.ViewPackage);
+
+  if (vp) {
+    let inPackageNodes = GetNodesByProperties({
+      [nodetypes_NodeProperties.ViewPackage]: vp
+    });
+    inPackageNodes.map(inPackageNode => {
+      result.push({
+        operation: REMOVE_NODE,
+        options: function (graph) {
+          return {
+            id: inPackageNode.id
+          };
+        }
+      });
+    });
+  }
+
+  return result;
+}
 // CONCATENATED MODULE: ./app/nodepacks/CreateNavigateToScreenDC.js
+
+
+
 
 
 /* harmony default export */ var CreateNavigateToScreenDC = (function (args = {}) {
@@ -58955,8 +60865,13 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     throw "missing screen argument";
   }
 
+  if (!args.node) {
+    throw "missing node argument";
+  }
+
   let context = { ...args,
-    node3: uuidv4()
+    node: args.node,
+    node3: args.screen
   };
   let {
     viewPackages
@@ -58966,6 +60881,16 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     ...(viewPackages || {})
   };
   let result = [function (graph) {
+    let temp = typeof args.node === "function" ? args.node() : args.node;
+    let tempnodes = GetNodesLinkedTo(graph, {
+      id: temp,
+      link: nodetypes_LinkType.DataChainLink
+    });
+    return [...tempnodes.map(node => ClearPreviosuViewPackage({
+      node: node.id,
+      graph
+    }))].flatten();
+  }, function (graph) {
     return [{
       operation: "NEW_NODE",
       options: {
@@ -58979,7 +60904,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
       operation: "CHANGE_NODE_TEXT",
       options: {
         id: context.node0,
-        value: "Nabigate to Screen " + args.screen + ""
+        value: "Navigate to Screen " + GetNodeTitle(args.screen) + ""
       }
     }];
   }, function (graph) {
@@ -59182,6 +61107,18 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
       options: {
         id: context.node2,
         value: "go to place"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: uiactions_ADD_LINK_BETWEEN_NODES,
+      options: function () {
+        return {
+          source: typeof context.node === "function" ? context.node() : context.node,
+          target: context.node0,
+          properties: { ...uiactions_LinkProperties.DataChainLink
+          }
+        };
       }
     }];
   }];
@@ -59682,75 +61619,6 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     return [];
   }];
 });
-// CONCATENATED MODULE: ./app/nodepacks/CreatePropertiesForFetch.js
-
-
-
-
-/* harmony default export */ var CreatePropertiesForFetch = (function (args = {}) {
-  let {
-    id
-  } = args;
-  debugger;
-  let fetchServices = GetNodesLinkedTo(GetCurrentGraph(), {
-    id,
-    link: nodetypes_LinkType.FetchServiceOuput
-  });
-  let result = [];
-
-  if (fetchServices && fetchServices.length) {
-    let fetchService = fetchServices[0];
-    GetNodesLinkedTo(GetCurrentGraph(), {
-      id,
-      link: nodetypes_LinkType.PropertyLink
-    }).map(v => {
-      result.push({
-        operation: REMOVE_NODE,
-        options: {
-          id: v.id
-        }
-      });
-    });
-    let models = GetNodesLinkedTo(GetCurrentGraph(), {
-      id: fetchService.id,
-      link: nodetypes_LinkType.FetchService
-    }).map(model => {
-      let methodprops = uiactions_GetNodeProp(model.id, nodetypes_NodeProperties.MethodProps) || {};
-      return methodprops[FunctionTemplateKeys.ModelOutput] || methodprops[FunctionTemplateKeys.Model];
-    }).filter(x => x).unique().map(v => GetNodeById(v));
-    models.map(model => {
-      result.push({
-        operation: ADD_NEW_NODE,
-        options: function () {
-          return {
-            nodeType: NodeTypes.Property,
-            parent: id,
-            properties: {
-              [nodetypes_NodeProperties.UseModelAsType]: true,
-              [nodetypes_NodeProperties.UIModelType]: model.id,
-              [nodetypes_NodeProperties.UIText]: GetNodeTitle(model),
-              [nodetypes_NodeProperties.IsTypeList]: true
-            },
-            groupProperties: {},
-            linkProperties: {
-              properties: { ...LinkProperties.PropertyLink
-              }
-            },
-            links: [{
-              target: model.id,
-              linkProperties: {
-                properties: { ...LinkProperties.ModelTypeLink
-                }
-              }
-            }]
-          };
-        }
-      });
-    });
-  }
-
-  return result;
-});
 // CONCATENATED MODULE: ./app/nodepacks/AddEvent.js
 
 
@@ -59860,7 +61728,7 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         }
       }
     }];
-  } : null, context.eventTypeHandler ? function (graph) {
+  } : null, context.eventTypeHandler && context.property ? function (graph) {
     return [{
       operation: "ADD_LINK_BETWEEN_NODES",
       options: {
@@ -60418,7 +62286,6 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
         linkProperties: {
           properties: {
             type: "component",
-            stroke: "#B7245C",
             component: {}
           }
         },
@@ -60784,6 +62651,3034 @@ class viewtypecontextmenu_ViewTypeMenu extends external_react_["Component"] {
     return [];
   }];
 });
+// CONCATENATED MODULE: ./app/nodepacks/CollectionDataChainsIntoCollections.js
+
+
+
+
+
+/* harmony default export */ var CollectionDataChainsIntoCollections = (function (args = {}) {
+  let result = [];
+  let graph = GetCurrentGraph();
+  let screens = uiactions_NodesByType(null, NodeTypes.Screen);
+  let screenWithoutDataChainCollection = screens.filter(screen => {
+    return !GetNodesLinkedTo(graph, {
+      id: screen.id,
+      link: nodetypes_LinkType.DataChainCollectionReference
+    }).length;
+  });
+  screenWithoutDataChainCollection.map(screen => {
+    let temp = {};
+    let screenoptions = GetNodesLinkedTo(graph, {
+      id: screen.id,
+      link: nodetypes_LinkType.ScreenOptions
+    });
+    result.push({
+      operation: ADD_NEW_NODE,
+      options: function () {
+        return {
+          nodeType: NodeTypes.DataChainCollection,
+          linkProperties: {
+            properties: { ...LinkProperties.DataChainCollectionReference
+            }
+          },
+          parent: screen.id,
+          properties: {
+            [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(screen)}`,
+            [nodetypes_NodeProperties.Pinned]: false
+          },
+          callback: node => {
+            temp.screen = node;
+          }
+        };
+      }
+    });
+    screenoptions.map(screenoption => {
+      if (GetNodesLinkedTo(graph, {
+        id: screenoption.id,
+        link: nodetypes_LinkType.DataChainCollectionReference
+      }).length) {
+        return null;
+      }
+
+      result.push(function (graph) {
+        let screen = GetNodeLinkedTo(graph, {
+          id: screenoption.id,
+          link: nodetypes_LinkType.ScreenOptions
+        });
+        let collectionReference;
+
+        if (screen) {
+          collectionReference = GetNodeLinkedTo(graph, {
+            id: screen.id,
+            link: nodetypes_LinkType.DataChainCollectionReference
+          });
+        }
+
+        let temp;
+        return [{
+          operation: ADD_NEW_NODE,
+          options: function (graph) {
+            return {
+              nodeType: NodeTypes.DataChainCollection,
+              linkProperties: {
+                properties: { ...LinkProperties.DataChainCollectionReference
+                }
+              },
+              parent: screenoption.id,
+              properties: {
+                [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
+                [nodetypes_NodeProperties.Pinned]: false
+              },
+              callback: node => {
+                temp = node;
+              }
+            };
+          }
+        }, collectionReference ? {
+          operation: uiactions_ADD_LINK_BETWEEN_NODES,
+          options: function () {
+            return {
+              source: temp.id,
+              target: collectionReference.id,
+              properties: { ...LinkProperties.DataChainCollection
+              }
+            };
+          }
+        } : null];
+      });
+      let components = GetNodesLinkedTo(graph, {
+        id: screenoption.id,
+        link: nodetypes_LinkType.Component
+      });
+      components.map(component => {
+        let nodes_linked = GetNodesLinkedTo(graph, {
+          id: component.id,
+          link: nodetypes_LinkType.DataChainCollectionReference
+        });
+
+        if (nodes_linked.length) {
+          return null;
+        }
+
+        result.push(function (graph) {
+          let screenoption = GetNodesLinkedTo(graph, {
+            id: component.id,
+            link: nodetypes_LinkType.Component
+          }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ScreenOption)[0];
+          let collectionReference;
+
+          if (screenoption) {
+            collectionReference = GetNodeLinkedTo(graph, {
+              id: screenoption.id,
+              link: nodetypes_LinkType.DataChainCollectionReference
+            });
+          }
+
+          let temp;
+          return [{
+            operation: ADD_NEW_NODE,
+            options: function (graph) {
+              return {
+                nodeType: NodeTypes.DataChainCollection,
+                linkProperties: {
+                  properties: { ...LinkProperties.DataChainCollectionReference
+                  }
+                },
+                parent: component.id,
+                properties: {
+                  [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+                  [nodetypes_NodeProperties.Pinned]: false
+                },
+                callback: node => {
+                  temp = node;
+                }
+              };
+            }
+          }, collectionReference ? {
+            operation: uiactions_ADD_LINK_BETWEEN_NODES,
+            options: function () {
+              return {
+                source: temp.id,
+                target: collectionReference.id,
+                properties: { ...LinkProperties.DataChainCollection
+                }
+              };
+            }
+          } : null];
+        });
+      });
+    });
+  });
+  let sharedReferenceCollection = GetNodeByProperties({
+    [nodetypes_NodeProperties.SharedReferenceCollection]: true
+  }, graph);
+
+  if (!sharedReferenceCollection) {
+    result.push({
+      operation: ADD_NEW_NODE,
+      options: function () {
+        return {
+          nodeType: NodeTypes.DataChainCollection,
+          properties: {
+            [nodetypes_NodeProperties.UIText]: `Shared Components`,
+            [nodetypes_NodeProperties.Pinned]: false,
+            [nodetypes_NodeProperties.SharedReferenceCollection]: true
+          },
+          callback: node => {
+            sharedReferenceCollection = node;
+          }
+        };
+      }
+    });
+  }
+
+  let componentNodes = uiactions_NodesByType(null, NodeTypes.ComponentNode);
+  let topComponents = componentNodes.map(d => CollectionDataChainsIntoCollections_getTopComponent(graph, d)).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.SharedComponent)).unique();
+  componentNodes.sort((a, b) => {
+    let a_lineage = getComponentLineage(graph, a);
+    let b_lineage = getComponentLineage(graph, b);
+    let intersects = a_lineage.intersection(b_lineage);
+
+    if (intersects.length === 0) {
+      return a_lineage.length - b_lineage.length;
+    }
+
+    if (a_lineage.length !== b_lineage.length) {
+      return a_lineage.length - b_lineage.length;
+    }
+
+    return 0;
+  }).map(component => {
+    result.push(function (graph) {
+      let externalApiDataChains = getComponentExternalApiDataChains(graph, component);
+      let internalApiDataChains = getComponentInternalApiDataChains(graph, component);
+      let eventApiDataChains = getComponentEventDataChains(graph, component);
+      let reference = null;
+      let steps = [];
+      reference = getCollectionReference(graph, component);
+
+      if (!reference) {
+        steps.push({
+          operation: ADD_NEW_NODE,
+          options: function (graph) {
+            let parentReference = getParentCollectionReference(graph, component);
+
+            if (true) {
+              return {
+                nodeType: NodeTypes.DataChainCollection,
+                properties: {
+                  [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+                  [nodetypes_NodeProperties.Pinned]: false
+                },
+                links: [{
+                  target: (parentReference || sharedReferenceCollection).id,
+                  linkProperties: {
+                    properties: { ...LinkProperties.DataChainCollection
+                    }
+                  }
+                }, {
+                  linkProperties: {
+                    properties: { ...LinkProperties.DataChainCollectionReference
+                    }
+                  },
+                  target: component.id
+                }].filter(x => x),
+                callback: node => {
+                  reference = node;
+                }
+              };
+            } else {}
+          }
+        });
+      }
+
+      return [...steps, ...[...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains].map(dc => {
+        return {
+          operation: uiactions_ADD_LINK_BETWEEN_NODES,
+          options: function (graph) {
+            reference = reference || getCollectionReference(graph, component);
+            return {
+              target: reference.id,
+              source: dc.id,
+              properties: { ...LinkProperties.DataChainCollection
+              }
+            };
+          }
+        };
+      })];
+    });
+  });
+  screens.map(screen => {
+    let screen_data_chains = [];
+    let externalApiDataChains = getComponentExternalApiDataChains(graph, screen);
+    let internalApiDataChains = getComponentInternalApiDataChains(graph, screen);
+    let eventApiDataChains = getComponentEventDataChains(graph, screen);
+    screen_data_chains.push(...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains);
+    let reference = null;
+    result.push(...[...screen_data_chains].map(dc => {
+      return {
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: function (graph) {
+          reference = reference || getCollectionReference(graph, screen);
+          return {
+            target: reference.id,
+            source: dc.id,
+            properties: { ...LinkProperties.DataChainCollection
+            }
+          };
+        }
+      };
+    }));
+  });
+  return result.filter(x => x);
+});
+
+function getComponentLineage(graph, node) {
+  let parent = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.Component,
+    direction: graph_methods_TARGET
+  }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
+
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: nodetypes_LinkType.Component,
+      direction: graph_methods_TARGET
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ScreenOption)[0];
+  }
+
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: nodetypes_LinkType.ListItem,
+      direction: graph_methods_TARGET
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
+  }
+
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: nodetypes_LinkType.ScreenOptions,
+      direction: graph_methods_TARGET
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.Screen)[0];
+  }
+
+  if (parent) {
+    return [...getComponentLineage(graph, parent), node.id];
+  }
+
+  return [node.id];
+}
+
+function getParentCollectionReference(graph, node) {
+  node = getParentComponent(graph, node);
+  if (node) return GetNodeLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChainCollectionReference
+  });
+  return null;
+}
+
+function getCollectionReference(graph, node) {
+  return GetNodeLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChainCollectionReference
+  });
+}
+
+function getParentComponent(graph, node) {
+  let parent = GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.Component,
+    direction: graph_methods_TARGET
+  }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
+
+  if (!parent) {
+    parent = GetNodesLinkedTo(graph, {
+      id: node.id,
+      link: nodetypes_LinkType.ListItem,
+      direction: graph_methods_TARGET
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
+
+    if (parent) {}
+  }
+
+  return parent;
+}
+
+function CollectionDataChainsIntoCollections_getTopComponent(graph, node) {
+  let parent = getParentComponent(graph, node);
+
+  if (parent) {
+    return CollectionDataChainsIntoCollections_getTopComponent(graph, parent);
+  }
+
+  return node;
+}
+
+function getComponentNodeCollectionReference(graph, node) {
+  node = CollectionDataChainsIntoCollections_getTopComponent(graph, node);
+  return GetNodeLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.DataChainCollectionReference
+  });
+}
+
+function getComponentExternalApiDataChains(graph, node) {
+  let result = [];
+  GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.ComponentExternalApi,
+    direction: SOURCE
+  }).map(res => {
+    result.push(...GetNodesLinkedTo(graph, {
+      id: res.id,
+      link: nodetypes_LinkType.DataChainLink,
+      direction: SOURCE
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EntryPoint)));
+  });
+  return result;
+}
+
+function getComponentInternalApiDataChains(graph, node) {
+  let result = [];
+  GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.ComponentInternalApi,
+    direction: SOURCE
+  }).map(res => {
+    result.push(...GetNodesLinkedTo(graph, {
+      id: res.id,
+      link: nodetypes_LinkType.DataChainLink,
+      direction: SOURCE
+    }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EntryPoint)));
+  });
+  return result;
+}
+
+function getComponentEventDataChains(graph, node) {
+  let result = [];
+  GetNodesLinkedTo(graph, {
+    id: node.id,
+    link: nodetypes_LinkType.EventMethod,
+    componentType: NodeTypes.EventMethod
+  }).map(res => {
+    let instances = GetNodesLinkedTo(graph, {
+      id: res.id,
+      link: nodetypes_LinkType.EventMethodInstance,
+      componentType: NodeTypes.EventMethodInstance
+    });
+    instances.map(res => {
+      result.push(...GetNodesLinkedTo(graph, {
+        id: res.id,
+        link: nodetypes_LinkType.DataChainLink,
+        componentType: NodeTypes.DataChain
+      }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.EntryPoint)));
+    });
+  });
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/CreateSetViewModelDataChain.js
+
+
+/* harmony default export */ var CreateSetViewModelDataChain = (function (args = {}) {
+  // node1
+  // model
+  if (!args.model) {
+    throw "missing model argument";
+  }
+
+  let context = { ...args,
+    node1: args.modelId
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Data Chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "data-chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node0,
+        value: "Lambda"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Lambda",
+        id: context.node0,
+        value: "x => Models.#{model}"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node0
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "LambdaInsertArguments",
+        id: context.node0,
+        value: {
+          model: context.node1
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node1,
+        source: context.node0,
+        properties: {
+          type: "LambdaInsertArguments",
+          LambdaInsertArguments: {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Set View Model To " + args.model + ""
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/AttachDataChainsToViewTypeViewModel.js
+
+
+
+
+
+
+
+let AttachDataChainsToViewTypeViewModel_func = function (args = {
+  viewType
+}) {
+  // node0,node1
+  //
+  if (!args.viewType) {
+    throw "missing viewType";
+  }
+
+  let graph = GetCurrentGraph();
+  let {
+    viewType
+  } = args;
+  let viewModelNode = GetComponentExternalApiNode(ComponentApiTypes.ViewModel, viewType);
+  let property = GetNodesLinkedTo(graph, {
+    id: viewType,
+    link: nodetypes_LinkType.DefaultViewType
+  }).find(x => [NodeTypes.Property].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType)));
+  let model = GetNodesLinkedTo(graph, {
+    id: viewType,
+    link: nodetypes_LinkType.DefaultViewType
+  }).find(x => [NodeTypes.Model].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType)));
+
+  if (property) {
+    model = GetNodeLinkedTo(graph, {
+      id: property.id,
+      link: nodetypes_LinkType.ModelTypeLink
+    }) || model;
+  }
+
+  let result = [];
+
+  if (viewModelNode) {
+    let dataChains = GetNodesLinkedTo(graph, {
+      id: viewModelNode.id,
+      link: nodetypes_LinkType.DataChainLink
+    });
+
+    if (!dataChains.length) {
+      let _context = null;
+      result.push(...CreateSetViewModelDataChain({
+        model: GetNodeTitle(model),
+        modelId: model.id,
+        callback: node => {
+          _context = node;
+        }
+      }), {
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: function () {
+          return {
+            source: viewModelNode.id,
+            target: _context.entry,
+            properties: { ...LinkProperties.DataChainLink
+            }
+          };
+        }
+      });
+    }
+  }
+
+  return result;
+};
+
+AttachDataChainsToViewTypeViewModel_func.description = "Appends a data chain to a view type component, which will default the view Model to the type of model that the component expects";
+/* harmony default export */ var AttachDataChainsToViewTypeViewModel = (AttachDataChainsToViewTypeViewModel_func);
+// CONCATENATED MODULE: ./app/nodepacks/ModifyUpdateLinks.js
+
+
+
+
+/* harmony default export */ var ModifyUpdateLinks = (function (args = {
+  name: "Replace Name"
+}) {
+  // node2
+  // name
+  let result = [];
+  let graph = GetCurrentGraph();
+  let eventMethods = uiactions_NodesByType(null, NodeTypes.EventMethod);
+  uiactions_NodesByType(null, NodeTypes.ViewType).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.ViewType) === uiactions_ViewTypes.Update).map(node => {
+    getNodeLinks(graph, node.id).filter(x => GetLinkProperty(x, LinkPropertyKeys.TYPE) === nodetypes_LinkType.ComponentExternalApi).map(link => {
+      result.push(function () {
+        return [{
+          operation: UPDATE_LINK_PROPERTY,
+          options: {
+            prop: LinkPropertyKeys.InstanceUpdate,
+            value: true,
+            id: link.id
+          }
+        }];
+      });
+    });
+  });
+  eventMethods.map(eventMethod => {
+    let components = GetNodesLinkedTo(graph, {
+      id: eventMethod.id,
+      link: nodetypes_LinkType.EventMethod,
+      componentType: NodeTypes.ComponentNode
+    }).filter(x => ComponentIsViewType(x, uiactions_ViewTypes.Update, graph));
+
+    if (components.length) {
+      let eventMethodInstances = GetNodesLinkedTo(graph, {
+        id: eventMethod.id,
+        link: nodetypes_LinkType.EventMethodInstance
+      });
+      eventMethodInstances.map(eventMethodInstance => {
+        let link = GetLinkBetween(eventMethod.id, eventMethodInstance.id, graph); // modify link
+
+        if (link) {
+          result.push(function () {
+            return [{
+              operation: UPDATE_LINK_PROPERTY,
+              options: {
+                prop: LinkPropertyKeys.InstanceUpdate,
+                value: true,
+                id: link.id
+              }
+            }];
+          });
+        }
+      });
+    }
+  });
+  return result;
+});
+// CONCATENATED MODULE: ./app/nodepacks/SetInnerApiValueToLocalContextInLists.js
+
+
+
+
+let SetInnerApiValueToLocalContextInLists_func = function () {
+  // node0,node1
+  //
+  let result = [];
+  let lists = uiactions_NodesByType(null, NodeTypes.ComponentNode).filter(x => [ComponentTypeKeys.List, ComponentTypeKeys.MultiSelectList, ComponentTypeKeys.SingleSelect].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.ComponentType)));
+
+  if (lists && lists.length) {
+    lists.map(list => {
+      let valueApiNode = GetComponentApiNode(ComponentApiTypes.Value, list.id);
+
+      if (valueApiNode) {
+        result.push({
+          operation: CHANGE_NODE_PROPERTY,
+          options: {
+            id: valueApiNode.id,
+            prop: nodetypes_NodeProperties.AsLocalContext,
+            value: true
+          }
+        });
+      }
+    });
+  }
+
+  return result;
+};
+
+SetInnerApiValueToLocalContextInLists_func.description = "Sets the inner api component value to use the local context.";
+/* harmony default export */ var SetInnerApiValueToLocalContextInLists = (SetInnerApiValueToLocalContextInLists_func);
+// CONCATENATED MODULE: ./app/nodepacks/SetupApiBetweenComponents.js
+
+
+
+
+let SetupApiBetweenComponents_func = function (args = {}) {
+  //
+  let result = [];
+
+  if (!args.component_a) {
+    throw "missing component_a";
+  }
+
+  if (!args.component_b) {
+    throw "missing component_b";
+  }
+
+  if (!args.component_a.id) {
+    throw "missing component_a.id";
+  }
+
+  if (!args.component_b.id) {
+    throw "missing component_b.id";
+  }
+
+  if (!args.component_a.external) {
+    throw "missing component_a.external";
+  }
+
+  if (!args.component_a.internal) {
+    throw "missing component_a.internal";
+  }
+
+  if (!args.component_b.external) {
+    throw "missing component_b.external";
+  }
+
+  if (!args.component_b.internal) {
+    throw "missing component_b.internal";
+  }
+
+  let {
+    viewPackages
+  } = args;
+  result.push(function (graph) {
+    let result = [];
+    let a_id = getId(args.component_a.id);
+    let b_id = getId(args.component_b.id);
+    let a_external_id = getId(args.component_a.external);
+    let b_external_id = getId(args.component_b.external);
+    let a_internal_id = getId(args.component_a.internal);
+    let b_internal_id = getId(args.component_b.internal);
+    let componentA = GetNodeById(a_id, graph);
+    let componentB = GetNodeById(b_id, graph);
+    let componentA_external_node = GetComponentExternalApiNode(a_external_id, componentA.id, graph);
+    let componentB_external_node = GetComponentExternalApiNode(b_external_id, componentB.id, graph);
+    let componentB_internal_node = GetComponentApiNode(b_internal_id, componentB.id, graph);
+    let componentA_internal_node = GetComponentApiNode(a_internal_id, componentA.id, graph);
+
+    if (componentA && componentB) {
+      if (!componentA_external_node) {
+        result.push({
+          operation: ADD_NEW_NODE,
+          options: function () {
+            return {
+              nodeType: NodeTypes.ComponentExternalApi,
+              parent: componentA.id,
+              groupProperties: {},
+              properties: { ...viewPackages,
+                [nodetypes_NodeProperties.UIText]: a_external_id
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.ComponentExternalApi
+                }
+              },
+              callback: node => {
+                componentA_external_node = node;
+              }
+            };
+          }
+        });
+      }
+
+      if (!componentA_internal_node) {
+        result.push({
+          operation: ADD_NEW_NODE,
+          options: function () {
+            return {
+              nodeType: NodeTypes.ComponentApi,
+              parent: componentA.id,
+              groupProperties: {},
+              properties: { ...viewPackages,
+                [nodetypes_NodeProperties.UIText]: a_internal_id
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.ComponentInternalApi
+                }
+              },
+              callback: node => {
+                componentA_internal_node = node;
+              }
+            };
+          }
+        });
+      }
+
+      result.push({
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: function (graph) {
+          let thereIsAnExistingLink = existsLinkBetween(graph, {
+            source: componentA_internal_node.id,
+            target: componentA_external_node.id
+          });
+          if (!thereIsAnExistingLink) return {
+            source: componentA_internal_node.id,
+            target: componentA_external_node.id,
+            properties: { ...LinkProperties.ComponentInternalConnection
+            }
+          };
+          return null;
+        }
+      });
+
+      if (!componentB_external_node) {
+        result.push({
+          operation: ADD_NEW_NODE,
+          options: function () {
+            return {
+              nodeType: NodeTypes.ComponentExternalApi,
+              parent: componentB.id,
+              groupProperties: {},
+              properties: { ...viewPackages,
+                [nodetypes_NodeProperties.UIText]: b_external_id
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.ComponentExternalApi
+                }
+              },
+              callback: node => {
+                componentB_external_node = node;
+              }
+            };
+          }
+        });
+      }
+
+      if (!componentB_internal_node) {
+        result.push({
+          operation: ADD_NEW_NODE,
+          options: function () {
+            return {
+              nodeType: NodeTypes.ComponentApi,
+              parent: componentB.id,
+              groupProperties: {},
+              properties: { ...viewPackages,
+                [nodetypes_NodeProperties.UIText]: b_internal_id
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.ComponentInternalApi
+                }
+              },
+              callback: node => {
+                componentB_internal_node = node;
+              }
+            };
+          }
+        });
+      }
+
+      result.push({
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: function (graph) {
+          let thereIsAnExistingLink = existsLinkBetween(graph, {
+            source: componentB_internal_node.id,
+            target: componentB_external_node.id
+          });
+          if (!thereIsAnExistingLink) return {
+            source: componentB_internal_node.id,
+            target: componentB_external_node.id,
+            properties: { ...LinkProperties.ComponentInternalConnection
+            }
+          };
+          return null;
+        }
+      });
+      result.push({
+        operation: uiactions_ADD_LINK_BETWEEN_NODES,
+        options: function (graph) {
+          let thereIsAnExistingLink = existsLinkBetween(graph, {
+            source: componentB_external_node.id,
+            target: componentA_internal_node.id
+          });
+          if (!thereIsAnExistingLink) return {
+            source: componentB_external_node.id,
+            target: componentA_internal_node.id,
+            properties: { ...LinkProperties.ComponentExternalConnection
+            }
+          };
+          return null;
+        }
+      });
+    }
+
+    return result;
+  });
+  return result;
+};
+
+function getId(val) {
+  if (typeof val === "function") {
+    return val();
+  }
+
+  return val;
+}
+
+SetupApiBetweenComponents_func.description = "Sets the inner api component value to use the local context.";
+/* harmony default export */ var SetupApiBetweenComponents = (SetupApiBetweenComponents_func);
+// CONCATENATED MODULE: ./app/nodepacks/CreateFormInput.js
+
+
+
+
+
+function createForm(args = {
+  modelProperty: null,
+  parent: null,
+  uiType: null,
+  sharedComponent: false,
+  viewType: false
+}) {
+  //
+  if (args.parent) {
+    if (!args.uiType) {
+      args.uiType = uiactions_GetNodeProp(args.parent, nodetypes_NodeProperties.UIType);
+    }
+  } //
+
+
+  if (!args.modelProperty) {
+    throw "missing a modelProperty";
+  }
+
+  if (!args.viewType) {
+    throw "missing a viewType";
+  }
+
+  if (!args.parent) {
+    throw "missing a parent";
+  }
+
+  if (!args.uiType) {
+    throw "missing uiType";
+  }
+
+  let context = { ...args
+  };
+  let result = [];
+  let {
+    parent,
+    modelProperty,
+    sharedComponent,
+    viewComponentType,
+    viewType,
+    uiType
+  } = context;
+  let useModelInstance = [uiactions_ViewTypes.Get, uiactions_ViewTypes.GetAll, uiactions_ViewTypes.Delete].some(v => viewType === v);
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  result.push({
+    operation: NEW_COMPONENT_NODE,
+    options: function () {
+      // Check if the property has a default view to use for different types of situations
+      return {
+        parent,
+        groupProperties: {},
+        properties: { ...viewPackages,
+          [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(modelProperty)}`,
+          [nodetypes_NodeProperties.UIType]: uiType,
+          [nodetypes_NodeProperties.Label]: GetNodeTitle(modelProperty),
+          [nodetypes_NodeProperties.ComponentType]: sharedComponent || viewComponentType,
+          [nodetypes_NodeProperties.UsingSharedComponent]: !!sharedComponent,
+          [nodetypes_NodeProperties.Pinned]: false,
+          [nodetypes_NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
+        },
+        linkProperties: {
+          properties: { ...uiactions_LinkProperties.ComponentLink
+          }
+        },
+        callback: component => {
+          if (args.callback) {
+            args.callback(component);
+          }
+        }
+      };
+    }
+  });
+  return result;
+}
+
+createForm.description = "Create a form based on a modelProperty";
+/* harmony default export */ var CreateFormInput = (createForm);
+// CONCATENATED MODULE: ./app/nodepacks/CreateForm.js
+
+
+
+
+
+
+
+function CreateForm_createForm(args = {
+  model: null,
+  component: null,
+  viewName: null
+}) {
+  //
+  args.viewType = uiactions_GetNodeProp(args.component, nodetypes_NodeProperties.ViewType) || args.viewType;
+  args.uiType = uiactions_GetNodeProp(args.component, nodetypes_NodeProperties.UIType) || args.uiType; //
+
+  if (!args.component) {
+    throw "missing component";
+  }
+
+  if (!args.viewName) {
+    throw "view Name";
+  }
+
+  if (!args.viewType) {
+    throw "missing a viewType";
+  }
+
+  if (!args.uiType) {
+    throw "missing uiType";
+  }
+
+  let context = { ...args
+  };
+  let result = [];
+  let {
+    viewPackages,
+    uiType,
+    viewType
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let isSharedComponent = uiactions_GetNodeProp(args.component, nodetypes_NodeProperties.SharedComponent);
+  let useModelInstance = [uiactions_ViewTypes.Get, uiactions_ViewTypes.GetAll, uiactions_ViewTypes.Delete].some(v => viewType === v);
+  let properties = GetModelPropertyChildren(args.model).filter(x => !uiactions_GetNodeProp(x, nodetypes_NodeProperties.IsDefaultProperty));
+  let formComponent = null;
+  result.push({
+    operation: NEW_COMPONENT_NODE,
+    options: function (currentGraph) {
+      return {
+        callback: screenComponent => {
+          formComponent = screenComponent.id;
+        },
+        parent: context.component,
+        properties: { ...viewPackages,
+          [nodetypes_NodeProperties.UIText]: `${context.viewName}`,
+          [nodetypes_NodeProperties.UIType]: uiType,
+          [nodetypes_NodeProperties.ViewType]: viewType,
+          [nodetypes_NodeProperties.SharedComponent]: isSharedComponent,
+          [nodetypes_NodeProperties.ComponentType]: ComponentTypes[uiType].Form.key,
+          [nodetypes_NodeProperties.InstanceType]: useModelInstance ? InstanceTypes.ModelInstance : InstanceTypes.ScreenInstance
+        },
+        groupProperties: {},
+        linkProperties: {
+          properties: { ...LinkProperties.ComponentLink
+          }
+        }
+      };
+    }
+  });
+  properties.map(property => {
+    let componentProperty = null;
+    result.push(function (graph) {
+      return [...CreateFormInput({
+        modelProperty: property.id,
+        parent: formComponent,
+        viewType,
+        viewPackages,
+        graph,
+        callback: node => {
+          componentProperty = node;
+        }
+      })];
+    }, ...["value", "viewModel"].map(api => {
+      return SetupApiBetweenComponents({
+        viewPackages: { ...viewPackages,
+          [nodetypes_NodeProperties.Pinned]: false
+        },
+        component_a: {
+          id: () => args.component,
+          external: api,
+          internal: api
+        },
+        component_b: {
+          id: () => formComponent,
+          external: api,
+          internal: api
+        }
+      });
+    }).flatten(), ...["value", "viewModel"].map(api => {
+      return SetupApiBetweenComponents({
+        viewPackages: { ...viewPackages,
+          [nodetypes_NodeProperties.Pinned]: false
+        },
+        component_a: {
+          id: () => formComponent,
+          external: api,
+          internal: api
+        },
+        component_b: {
+          id: () => componentProperty.id,
+          external: api,
+          internal: api
+        }
+      });
+    }).flatten(), ...["error", "success", "placeholder", "label"].map(api => {
+      return SetupApiBetweenComponents({
+        viewPackages: { ...viewPackages,
+          [nodetypes_NodeProperties.Pinned]: false
+        },
+        component_a: {
+          id: () => formComponent,
+          external: "value",
+          internal: "value"
+        },
+        component_b: {
+          id: () => componentProperty.id,
+          external: api,
+          internal: api
+        }
+      });
+    }).flatten());
+  });
+  return result;
+}
+
+CreateForm_createForm.description = "Create a form based on a model";
+/* harmony default export */ var CreateForm = (CreateForm_createForm);
+// CONCATENATED MODULE: ./app/nodepacks/CopyPermissionConditions.js
+
+
+
+function CopyPermissionConditions_CopyPermissionConditions(args = {
+  permission
+}) {
+  let {
+    permission,
+    node
+  } = args;
+  let conditions = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: permission,
+    link: nodetypes_LinkType.Condition
+  }).map(v => uiactions_GetNodeProp(v, nodetypes_NodeProperties.Condition));
+  let method = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: permission,
+    link: nodetypes_LinkType.FunctionOperator
+  }).find(x => x);
+  let currentConditions = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: node,
+    link: nodetypes_LinkType.Condition
+  });
+  let currentNodeMethod = GetNodesLinkedTo(GetCurrentGraph(), {
+    id: node,
+    link: nodetypes_LinkType.FunctionOperator
+  }).find(x => x);
+  let functionType = uiactions_GetNodeProp(method, nodetypes_NodeProperties.FunctionType);
+  let currentNodeMethodFunctionType = uiactions_GetNodeProp(currentNodeMethod, nodetypes_NodeProperties.FunctionType);
+  let result = [];
+  currentConditions.map(cc => {
+    result.push({
+      operation: REMOVE_NODE,
+      options: function () {
+        return {
+          id: cc.id
+        };
+      }
+    });
+  });
+  conditions.map(condition => {
+    result.push({
+      operation: ADD_NEW_NODE,
+      options: function () {
+        let temp = JSON.parse(JSON.stringify(condition));
+        temp.methods[currentNodeMethodFunctionType] = temp.methods[functionType];
+        if (functionType !== currentNodeMethodFunctionType) delete temp.methods[functionType];
+        return {
+          nodeType: NodeTypes.Condition,
+          properties: {
+            [nodetypes_NodeProperties.Condition]: temp,
+            [nodetypes_NodeProperties.Pinned]: false
+          },
+          parent: node,
+          groupProperties: {},
+          linkProperties: {
+            properties: { ...LinkProperties.ConditionLink
+            }
+          }
+        };
+      }
+    });
+  });
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/_create_get_view_model.js
+
+
+
+function create_get_view_model(args = {
+  viewModel: null
+}) {
+  // node1
+  if (!args.viewModel) {
+    throw "missing view model argument";
+  } // model
+
+
+  if (!args.model) {
+    throw "missing model argument";
+  }
+
+  let context = { ...args,
+    node1: args.viewModel
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Add View Model"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "action"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "attribute-property"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "data-chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node0,
+        value: "Lambda"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Lambda",
+        id: context.node0,
+        value: "x => " + args.model + ""
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: "Get View Model"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "NEW_LINK",
+      options: {
+        target: context.node0,
+        source: context.node1,
+        properties: {
+          type: "data-chain-link",
+          "data-chain-link": {},
+          singleLink: true,
+          nodeTypes: ["data-chain"]
+        }
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+}
+
+create_get_view_model.description = 'Creates a data chain that will return a defined string.';
+/* harmony default export */ var _create_get_view_model = (create_get_view_model);
+// CONCATENATED MODULE: ./app/nodepacks/AddAllPropertiesToExecutor.js
+
+
+
+function AddAllPropertiesToExecutor(args = {
+  currentNode
+}) {
+  let {
+    currentNode
+  } = args;
+  var propertyNodes = GetModelPropertyChildren(uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ExecutorModel), {
+    skipLogicalChildren: true
+  }).toNodeSelect();
+  return AddAllPropertiesToExecutor_addProperty(propertyNodes.filter(x => !uiactions_GetNodeProp(x.value, nodetypes_NodeProperties.IsDefaultProperty)).map(t => {
+    return t.value;
+  }), currentNode);
+}
+AddAllPropertiesToExecutor.description = "Add all properties to executor (execpt default properties)";
+
+let AddAllPropertiesToExecutor_addProperty = (values, currentNode) => {
+  let executor = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Executor) || createExecutor();
+  var operation = values.map(value => {
+    var id = currentNode.id;
+    executor = addValidatator(executor, {
+      id: value
+    });
+    return [{
+      operation: CHANGE_NODE_PROPERTY,
+      options: function () {
+        return {
+          id: currentNode.id,
+          prop: nodetypes_NodeProperties.Executor,
+          value: executor,
+          callback: _updatedExecutor => {
+            executor = _updatedExecutor;
+          }
+        };
+      }
+    }, {
+      operation: uiactions_ADD_LINK_BETWEEN_NODES,
+      options: function () {
+        return {
+          target: value,
+          source: id,
+          properties: { ...uiactions_LinkProperties.ExecutorModelLink,
+            ...createEventProp(LinkEvents.Remove, {
+              function: "OnRemoveExecutorPropConnection"
+            })
+          }
+        };
+      }
+    }];
+  }).flatten();
+  return operation;
+};
+// CONCATENATED MODULE: ./app/nodepacks/AddCopyPropertiesToExecutor.js
+
+
+
+
+
+
+function AddCopyPropertiesToExecutor(args = {
+  executor,
+  currentNode
+}) {
+  let {
+    executor,
+    currentNode
+  } = args;
+
+  if (executor && executor.properties) {
+    Object.keys(executor.properties).map(key => {
+      executor = addValidatator(executor, {
+        id: key,
+        validator: uuidv4(),
+        validatorArgs: {
+          type: ExecutorRules.Copy,
+          ...ExecutorUI[ExecutorRules.Copy]
+        }
+      });
+    });
+    return [{
+      operations: CHANGE_NODE_PROPERTY,
+      options: {
+        id: currentNode.id,
+        prop: nodetypes_NodeProperties.Executor,
+        value: executor
+      }
+    }];
+  }
+
+  return [];
+}
+
+AddCopyPropertiesToExecutor.title = 'Add Copy Command';
+AddCopyPropertiesToExecutor.description = 'Adds a copy command to each property in the executor';
+/* harmony default export */ var nodepacks_AddCopyPropertiesToExecutor = (AddCopyPropertiesToExecutor);
+// CONCATENATED MODULE: ./app/nodepacks/validation/NameLikeValidation.js
+
+
+
+
+function NameLikeValidation(args = {
+  condition: null,
+  property: null
+}) {
+  // node0,node1,node2,node3,node4,node5
+  if (!args.condition) {
+    throw "missing condition";
+  } //
+
+
+  if (!args.methodType) {
+    throw "missing method type";
+  }
+
+  let context = { ...args,
+    node0: args.condition,
+    node1: args.property,
+    node2: uuidv4(),
+    node3: uuidv4(),
+    node4: uuidv4(),
+    node5: uuidv4()
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    let previousCondition = uiactions_GetNodeProp(GetNodeById(context.condition, graph), nodetypes_NodeProperties.Condition);
+    let properties = {};
+
+    if (previousCondition && previousCondition.methods && previousCondition.methods[context.methodType] && previousCondition.methods[context.methodType][context.methodKey] && previousCondition.methods[context.methodType][context.methodKey].properties) {
+      properties = previousCondition.methods[context.methodType][context.methodKey].properties;
+    }
+
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Condition",
+        id: context.node0,
+        value: {
+          methods: {
+            [context.methodType]: {
+              model: {
+                properties: { ...properties,
+                  [context.node1]: {
+                    validators: {
+                      [context.node2]: {
+                        type: "minLengthEqual",
+                        code: {
+                          csharp: "MinAttribute"
+                        },
+                        template: "./app/templates/validation/validation_generic.tpl",
+                        arguments: {
+                          value: {
+                            type: "INT",
+                            nodeType: "model-property"
+                          },
+                          condition: {
+                            type: "INT",
+                            nodeType: null,
+                            equals: true,
+                            defaultValue: 0
+                          }
+                        },
+                        condition: context.minLength || "3"
+                      },
+                      [context.node3]: {
+                        type: "maxlengthEqual",
+                        code: {
+                          csharp: "MaximumLengthAttribute"
+                        },
+                        template: "./app/templates/validation/validation_generic.tpl",
+                        arguments: {
+                          value: {
+                            type: "INT",
+                            nodeType: "model-property"
+                          },
+                          condition: {
+                            type: "INT",
+                            nodeType: null,
+                            equals: true,
+                            defaultValue: 0
+                          }
+                        },
+                        condition: context.maxLength || "50"
+                      },
+                      [context.node4]: {
+                        type: "alphaonlywithspaces",
+                        code: {
+                          csharp: "AlphaOnlyWithSpacesAttribute"
+                        },
+                        template: "./app/templates/validation/validation_generic.tpl",
+                        arguments: {
+                          value: {
+                            type: "STRING",
+                            nodeType: "model-property"
+                          }
+                        }
+                      },
+                      [context.node5]: {
+                        type: "isNotNull",
+                        code: {
+                          csharp: "IsNotNullAttribute"
+                        },
+                        template: "./app/templates/validation/validation_generic.tpl",
+                        arguments: {
+                          value: {
+                            type: "STRING",
+                            nodeType: "model-property"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }];
+  }];
+  let clearPinned = [];
+  let applyViewPackages = [];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+}
+
+NameLikeValidation.title = "Name List Validation";
+NameLikeValidation.description = "Minimum length 3, Max length 50 and just alpha chars.";
+/* harmony default export */ var validation_NameLikeValidation = (NameLikeValidation);
+// CONCATENATED MODULE: ./app/nodepacks/validation/DescriptionLikeValidation.js
+
+
+
+
+
+function DescriptionLikeValidation(args) {
+  // node0,node1,node2,node3,node4,node5
+  return validation_NameLikeValidation({ ...args,
+    maxLength: 500
+  });
+}
+
+DescriptionLikeValidation.title = "Description List Validation";
+DescriptionLikeValidation.description = "Minimum length 3, Max length 500 and just alpha chars.";
+/* harmony default export */ var validation_DescriptionLikeValidation = (DescriptionLikeValidation);
+// CONCATENATED MODULE: ./app/nodepacks/AddLifeCylcleMethodInstance.js
+
+
+/* harmony default export */ var AddLifeCylcleMethodInstance = (function (args = {
+  node,
+  viewPackages
+}) {
+  let {
+    node,
+    viewPackages
+  } = args;
+  return [{
+    operation: ADD_NEW_NODE,
+    options: function () {
+      return {
+        nodeType: NodeTypes.LifeCylceMethodInstance,
+        parent: node,
+        linkProperties: {
+          properties: { ...LinkProperties.LifeCylceMethodInstance
+          }
+        },
+        groupProperties: {},
+        properties: {
+          [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
+          [nodetypes_NodeProperties.AutoDelete]: {
+            properties: {
+              [nodetypes_NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+            }
+          },
+          ...viewPackages
+        },
+        callback: node => {
+          if (args.callback) {
+            args.callback(node);
+          }
+        }
+      };
+    }
+  }];
+});
+// CONCATENATED MODULE: ./app/components/ConnectLifecycleMethod.js
+
+
+
+/* harmony default export */ var ConnectLifecycleMethod = (function (args = {}) {
+  let {
+    target,
+    source,
+    viewPackages,
+    graph
+  } = args;
+  let state = GetState();
+  viewPackages = viewPackages || {};
+  let apiConnectors = GetConnectedNodesByType(state, source, NodeTypes.ComponentApiConnector, null, graph).map(x => {
+    return {
+      operation: REMOVE_NODE,
+      options: {
+        id: x.id
+      }
+    };
+  });
+  let lifeCycleMethod = GetConnectedNodeByType(state, source, [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod], null, graph);
+  let model = GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.Model], null, graph);
+  let dataChain = model ? GetConnectedNodeByType(state, model.id, [NodeTypes.DataChain], null, graph) : null;
+  let selectorNode = model ? GetConnectedNodeByType(state, model.id, [NodeTypes.Selector], null, graph) : null;
+  let componentNode = GetConnectedNodeByType(state, lifeCycleMethod.id, [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption], null, graph);
+  let apiEndpoints = [];
+  GetConnectedNodesByType(state, target, NodeTypes.MethodApiParameters, null, graph).filter(x => {
+    if (uiactions_GetNodeProp(x, nodetypes_NodeProperties.QueryParameterObject)) {
+      return true;
+    }
+
+    if (uiactions_GetNodeProp(x, nodetypes_NodeProperties.UriBody)) {
+      apiEndpoints.push(x);
+      return false;
+    }
+
+    return true;
+  }).map(queryObj => {
+    GetConnectedNodesByType(state, queryObj.id, NodeTypes.MethodApiParameters, null, graph).map(queryParam => {
+      if (uiactions_GetNodeProp(queryParam, nodetypes_NodeProperties.QueryParameterParam)) {
+        apiEndpoints.push(queryParam);
+      }
+    });
+  });
+  let result = [...apiConnectors, {
+    operation: uiactions_ADD_LINK_BETWEEN_NODES,
+    options: function () {
+      return {
+        target,
+        source,
+        properties: { ...LinkProperties.MethodCall
+        }
+      };
+    }
+  }, ...apiEndpoints.map(ae => {
+    return {
+      operation: ADD_NEW_NODE,
+      options: function () {
+        let skipOrTake = GetNodeByProperties({
+          [nodetypes_NodeProperties.QueryParameterType]: uiactions_GetNodeProp(ae, nodetypes_NodeProperties.QueryParameterParamType),
+          [nodetypes_NodeProperties.NODEType]: NodeTypes.DataChain,
+          [nodetypes_NodeProperties.Component]: componentNode.id,
+          [nodetypes_NodeProperties.IsPaging]: true
+        });
+
+        if (model) {}
+
+        if (dataChain) {}
+
+        return {
+          nodeType: NodeTypes.ComponentApiConnector,
+          groupProperties: {},
+          parent: source,
+          properties: {
+            [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
+            ...viewPackages
+          },
+          linkProperties: {
+            properties: { ...LinkProperties.ComponentApiConnector
+            }
+          },
+          links: [{
+            target: ae.id,
+            linkProperties: {
+              properties: { ...LinkProperties.ComponentApiConnection
+              }
+            }
+          }, skipOrTake ? {
+            target: skipOrTake.id,
+            linkProperties: {
+              properties: { ...LinkProperties.ComponentApiConnection
+              }
+            }
+          } : null, dataChain ? {
+            target: dataChain.id,
+            linkProperties: {
+              properties: { ...LinkProperties.ComponentApiConnection
+              }
+            }
+          } : null, selectorNode ? {
+            target: selectorNode.id,
+            linkProperties: {
+              properties: { ...LinkProperties.ComponentApiConnection
+              }
+            }
+          } : null].filter(x => x)
+        };
+      }
+    };
+  })];
+  return result;
+});
+// CONCATENATED MODULE: ./app/nodepacks/CreateValidatorForProperty.js
+
+
+/* harmony default export */ var CreateValidatorForProperty = (function (args = {}) {
+  // node2,node3,node5
+  //
+  if (!args.model) {
+    throw "missing model";
+  }
+
+  if (!args.modelText) {
+    throw "missing modelText";
+  }
+
+  let model = args.modelText;
+
+  if (!args.property) {
+    throw "missing property";
+  }
+
+  if (!args.propertyText) {
+    throw "missing propertyText";
+  }
+
+  let property = args.propertyText;
+
+  if (!args.method) {
+    throw "missing method";
+  }
+
+  let context = { ...args,
+    node2: args.model,
+    node3: args.property,
+    node5: args.method
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [function (graph) {
+    return [{
+      operation: "NEW_NODE",
+      options: {
+        callback: function (node) {
+          context.node0 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "nodeType",
+        id: context.node0,
+        value: "data-chain"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node0,
+        value: `Validate ${model} ${property}`
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node0,
+        value: "Pass"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "EntryPoint",
+        id: context.node0,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node0,
+        nodeType: "data-chain",
+        groupProperties: {
+          GroupEntryNode: context.node0,
+          GroupExitNode: context.node0
+        },
+        properties: {
+          Pinned: false,
+          ChainParent: context.node0
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        links: [],
+        callback: function (node, graph, group) {
+          context.node1 = node.id;
+          context.group0 = group;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Pinned",
+        id: context.node1,
+        value: true
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node1,
+        value: "check for dirty"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node1,
+        value: "Lambda"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Lambda",
+        id: context.node1,
+        value: "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {}\n  if(dirty) {\n      //#{model}\n      // #{model~property}\n     let { #{model~property} } = dirty;\n      if( #{model~property} ) \n {\n        return x;\n      }\n  }\n    // only dirty fields, will be validatated.\n return null;\n}"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node1
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "LambdaInsertArguments",
+        id: context.node1,
+        value: {
+          model: context.node2,
+          property: context.node3
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node2,
+        source: context.node1,
+        properties: {
+          type: "LambdaInsertArguments",
+          LambdaInsertArguments: {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        target: {
+          model: context.node2,
+          property: context.node3
+        },
+        source: context.node1
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "LambdaInsertArguments",
+        id: context.node1,
+        value: {
+          model: context.node2,
+          property: context.node3
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        target: context.node3,
+        source: context.node1,
+        properties: {
+          type: "LambdaInsertArguments",
+          LambdaInsertArguments: {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_NEW_NODE",
+      options: {
+        parent: context.node1,
+        nodeType: "data-chain",
+        groupProperties: {
+          id: context.group0
+        },
+        properties: {
+          ChainParent: context.node1
+        },
+        linkProperties: {
+          properties: {
+            type: "data-chain-link",
+            "data-chain-link": {}
+          }
+        },
+        callback: function (node, graph, group) {
+          context.node4 = node.id;
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_TEXT",
+      options: {
+        id: context.node4,
+        value: `validate ${model}`
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "DataChainFunctionType",
+        id: context.node4,
+        value: "MethodBaseValidation"
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "REMOVE_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node4
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "Method",
+        id: context.node4,
+        value: context.node5
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "ADD_LINK_BETWEEN_NODES",
+      options: {
+        source: context.node4,
+        target: context.node5,
+        properties: {
+          type: "data-chain-link",
+          "data-chain-link": {}
+        }
+      }
+    }];
+  }, function (graph) {
+    return [{
+      operation: "CHANGE_NODE_PROPERTY",
+      options: {
+        prop: "AsOutput",
+        id: context.node4,
+        value: true
+      }
+    }];
+  }];
+  let clearPinned = [{
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node1,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node2,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node3,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node4,
+        value: false
+      };
+    }
+  }, {
+    operation: "CHANGE_NODE_PROPERTY",
+    options: function () {
+      return {
+        prop: "Pinned",
+        id: context.node5,
+        value: false
+      };
+    }
+  }];
+  let applyViewPackages = [{
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node1,
+        properties: viewPackages
+      };
+    }
+  }, {
+    operation: "UPDATE_NODE_PROPERTY",
+    options: function () {
+      return {
+        id: context.node4,
+        properties: viewPackages
+      };
+    }
+  }];
+  return [...result, ...clearPinned, ...applyViewPackages, function () {
+    if (context.callback) {
+      context.entry = context.node0;
+      context.callback(context);
+    }
+
+    return [];
+  }];
+});
+// CONCATENATED MODULE: ./app/nodepacks/screens/AppendValidations.js
+
+
+
+
+function AppendValidations({
+  subcomponents
+}) {
+  if (!subcomponents) {
+    throw "no subcomponents";
+  }
+
+  let result = [];
+
+  if (subcomponents.length) {
+    subcomponents.map(subcomponent => {
+      let componentType = uiactions_GetNodeProp(subcomponent, nodetypes_NodeProperties.ComponentType);
+
+      switch (componentType) {
+        default:
+          let externalValidationApi = GetNodesLinkedTo(null, {
+            id: subcomponent.id,
+            link: nodetypes_LinkType.ComponentExternalApi
+          }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+
+          if (externalValidationApi) {
+            let modelId = uiactions_GetNodeProp(screen_option, nodetypes_NodeProperties.Model);
+            let propertyId = uiactions_GetNodeProp(subcomponent, nodetypes_NodeProperties.Property);
+
+            if (!propertyId) {
+              propertyId = GetModelPropertyChildren(modelId).find(v => GetNodeTitle(v) === GetNodeTitle(subcomponent));
+
+              if (propertyId) {
+                propertyId = propertyId.id;
+              }
+            }
+
+            let validatorNode = null;
+            result.push(...CreateValidatorForProperty({
+              modelText: GetNodeTitle(modelId),
+              propertyText: GetNodeTitle(propertyId),
+              model: modelId,
+              property: propertyId,
+              method,
+              viewPackages,
+              callback: context => {
+                validatorNode = context.entry;
+              }
+            }), {
+              operation: uiactions_ADD_LINK_BETWEEN_NODES,
+              options: function () {
+                return {
+                  target: validatorNode,
+                  source: externalValidationApi.id,
+                  properties: { ...LinkProperties.DataChainLink
+                  }
+                };
+              }
+            });
+          }
+
+          break;
+      }
+    });
+  }
+
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/screens/ScreenConnectGetAll.js
+
+
+
+
+
+
+
+
+
+
+function ScreenConnectGetAll(args = {
+  method,
+  node
+}) {
+  let {
+    node,
+    method,
+    navigateTo
+  } = args;
+
+  if (!node) {
+    throw "no node";
+  }
+
+  if (!method) {
+    throw "no method";
+  }
+
+  let graph = GetCurrentGraph();
+  let screen_options = GetNodesLinkedTo(graph, {
+    id: node,
+    link: nodetypes_LinkType.ScreenOptions
+  });
+  let result = [];
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  screen_options.map(screen_option => {
+    let components = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.Component
+    });
+    components.map(component => {
+      let internalComponentApi = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: nodetypes_LinkType.ComponentInternalApi
+      });
+      internalComponentApi.filter(x => uiactions_GetNodeProp(component, nodetypes_NodeProperties.ComponentType) === ComponentTypeKeys.List).filter(x => [ComponentApiKeys.Value, ComponentApiKeys.Index, ComponentApiKeys.Item, ComponentApiKeys.Separators].some(v => v === GetNodeTitle(x))).map(internal => {
+        result.push(function () {
+          return [{
+            operation: UPDATE_NODE_PROPERTY,
+            options: {
+              id: internal.id,
+              properties: {
+                [nodetypes_NodeProperties.AsLocalContext]: true
+              }
+            }
+          }];
+        });
+      });
+      let listItems = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: nodetypes_LinkType.ListItem
+      });
+      listItems.map(listItem => {
+        let subcomponents = GetNodesLinkedTo(graph, {
+          id: listItem.id,
+          link: nodetypes_LinkType.Component
+        });
+        let executeButtons = subcomponents.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.ExecuteButton));
+
+        if (executeButtons && executeButtons.length === 1) {
+          let subcomponent = executeButtons[0];
+          let events = GetNodesLinkedTo(graph, {
+            id: subcomponent.id,
+            link: nodetypes_LinkType.EventMethod
+          }).filter(x => [ComponentEvents.onClick, ComponentEvents.onPress].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType)));
+          events.map(evnt => {
+            let eventMethodInstances = GetNodesLinkedTo(graph, {
+              id: evnt.id,
+              link: nodetypes_LinkType.EventMethodInstance
+            });
+            eventMethodInstances.map(eventMethodInstance => {
+              let vp = uiactions_GetNodeProp(eventMethodInstance, nodetypes_NodeProperties.ViewPackage);
+
+              if (vp) {
+                let inPackageNodes = GetNodesByProperties({
+                  [nodetypes_NodeProperties.ViewPackage]: vp
+                });
+                inPackageNodes.map(inPackageNode => {
+                  result.push({
+                    operation: REMOVE_NODE,
+                    options: function (graph) {
+                      return {
+                        id: inPackageNode.id
+                      };
+                    }
+                  });
+                });
+              }
+            });
+            let _instanceNode = null;
+            let _navigateContext = null;
+            result.push(...[{
+              operation: ADD_NEW_NODE,
+              options: addInstanceFunc(evnt, instanceNode => {
+                _instanceNode = instanceNode;
+              }, viewPackages)
+            }], ...CreateNavigateToScreenDC({
+              screen: navigateTo,
+              node: () => _instanceNode.id,
+              viewPackages,
+              callback: navigateContext => {
+                _navigateContext = navigateContext;
+              }
+            }));
+          });
+        }
+
+        result.push(...AppendValidations({
+          subcomponents
+        }));
+      });
+    });
+    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.LifeCylceMethod
+    });
+    lifeCylcleMethods.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount).map(lifeCylcleMethod => {
+      let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+        id: lifeCylcleMethod.id,
+        link: nodetypes_LinkType.LifeCylceMethodInstance
+      });
+      lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
+        let vp = uiactions_GetNodeProp(lifeCylcleMethodInstance, nodetypes_NodeProperties.ViewPackage);
+
+        if (vp) {
+          let inPackageNodes = GetNodesByProperties({
+            [nodetypes_NodeProperties.ViewPackage]: vp
+          });
+          inPackageNodes.map(inPackageNode => {
+            result.push({
+              operation: REMOVE_NODE,
+              options: function (graph) {
+                return {
+                  id: inPackageNode.id
+                };
+              }
+            });
+          });
+        }
+      });
+      let cycleInstance = null;
+      let storeModelDataChain = null;
+      result.push(...AddLifeCylcleMethodInstance({
+        node: lifeCylcleMethod.id,
+        viewPackages,
+        callback: _cycleInstance => {
+          cycleInstance = _cycleInstance;
+        }
+      }), function (graph) {
+        if (cycleInstance) {
+          return ConnectLifecycleMethod({
+            target: method,
+            source: cycleInstance.id,
+            graph,
+            viewPackages
+          });
+        }
+
+        return [];
+      }, ...StoreModelArrayStandard({
+        viewPackages,
+        model: uiactions_GetNodeProp(node, nodetypes_NodeProperties.Model),
+        state_key: `${GetNodeTitle(uiactions_GetNodeProp(node, nodetypes_NodeProperties.Model))} State`,
+        callback: context => {
+          storeModelDataChain = context.entry;
+        }
+      }), function (graph) {
+        return [{
+          operation: uiactions_ADD_LINK_BETWEEN_NODES,
+          options: function () {
+            return {
+              target: storeModelDataChain,
+              source: cycleInstance.id,
+              linkProperties: {
+                properties: { ...LinkProperties.DataChainLink,
+                  singleLink: true,
+                  nodeTypes: [NodeTypes.DataChain]
+                }
+              }
+            };
+          }
+        }];
+      });
+    });
+  });
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/screens/ScreenConnectCreate.js
+
+
+
+
+
+
+
+
+
+function ScreenConnectCreate(args = {
+  method,
+  node
+}) {
+  let {
+    node,
+    method,
+    viewType
+  } = args;
+
+  if (!node) {
+    throw "no node";
+  }
+
+  if (!method) {
+    throw "no method";
+  }
+
+  let graph = GetCurrentGraph();
+  let screen_options = GetNodesLinkedTo(graph, {
+    id: node,
+    link: nodetypes_LinkType.ScreenOptions
+  });
+  let result = [];
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  screen_options.map(screen_option => {
+    let components = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.Component
+    });
+    components.map(component => {
+      let subcomponents = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: nodetypes_LinkType.Component
+      });
+      let executeButtons = subcomponents.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.ExecuteButton));
+
+      if (executeButtons.length === 1) {
+        // There should be only 1 execute button
+        let executeButton = executeButtons[0];
+        let onEvents = GetNodesLinkedTo(graph, {
+          id: executeButton.id,
+          link: nodetypes_LinkType.EventMethod
+        }).filter(x => [ComponentEvents.onClick, ComponentEvents.onPress].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType)));
+        onEvents.filter(x => {
+          let t = GetNodesLinkedTo(graph, {
+            id: x.id,
+            link: nodetypes_LinkType.EventMethodInstance
+          });
+
+          if (t && t.length) {
+            t.map(instance => {
+              let vp = uiactions_GetNodeProp(instance, nodetypes_NodeProperties.ViewPackage);
+
+              if (vp) {
+                let inPackageNodes = GetNodesByProperties({
+                  [nodetypes_NodeProperties.ViewPackage]: vp
+                });
+                inPackageNodes.map(inPackageNode => {
+                  result.push({
+                    operation: REMOVE_NODE,
+                    options: function (graph) {
+                      return {
+                        id: inPackageNode.id
+                      };
+                    }
+                  });
+                });
+              }
+            });
+          }
+
+          let _instanceNode = null;
+          result.push(...[{
+            operation: ADD_NEW_NODE,
+            options: addInstanceFunc(x, instanceNode => {
+              _instanceNode = instanceNode;
+            }, viewPackages)
+          }], function (graph) {
+            if (_instanceNode) {
+              return ConnectLifecycleMethod({
+                target: method,
+                source: _instanceNode.id,
+                graph,
+                viewPackages
+              });
+            }
+
+            return [];
+          });
+        });
+      }
+
+      result.push(...AppendValidations({
+        subcomponents
+      }));
+    });
+  });
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/method/AddFiltersToGetAll.js
+
+
+
+
+function AddFiltersToGetAll() {
+  let methods = uiactions_NodesByType(null, NodeTypes.Method);
+  let result = [];
+  methods.filter(x => (MethodFunctions[uiactions_GetNodeProp(x, nodetypes_NodeProperties.FunctionType)] || {}).method === nodetypes_Methods.GetAll).filter(x => {
+    return !GetNodeLinkedTo(null, {
+      id: x.id,
+      link: nodetypes_LinkType.ModelItemFilter
+    });
+  }).map(method => {
+    let _node = null;
+    let methodProps = GetMethodNodeProp(method, FunctionTemplateKeys.Agent) || GetMethodNodeProp(method, FunctionTemplateKeys.User) || "";
+    result.push({
+      operation: NEW_MODEL_ITEM_FILTER,
+      options: {
+        parent: method.id,
+        groupProperties: {},
+        linkProperties: {
+          properties: { ...LinkProperties.ModelItemFilter
+          }
+        },
+        callback: node => {
+          _node = node;
+        }
+      }
+    }, function () {
+      return {
+        operation: UPDATE_NODE_PROPERTY,
+        options: {
+          id: _node.id,
+          properties: {
+            [nodetypes_NodeProperties.UIText]: `${GetNodeTitle(method)} Filter`
+          }
+        }
+      };
+    });
+  });
+  return result;
+}
+AddFiltersToGetAll.title = "Add Filters to GetALL methods";
+AddFiltersToGetAll.description = "Adds default filters to all the get all methods";
+// CONCATENATED MODULE: ./app/nodepacks/screens/ScreenConnectUpdate.js
+
+
+
+
+
+
+
+
+
+
+function ScreenConnectUpdate(args = {
+  method,
+  node
+}) {
+  let {
+    node,
+    method,
+    componentDidMountMethod,
+    viewType
+  } = args;
+
+  if (!node) {
+    throw "no node";
+  }
+
+  if (!method) {
+    throw "no method";
+  }
+
+  if (!componentDidMountMethod) {
+    throw "no componentDidMountMethod";
+  }
+
+  let graph = GetCurrentGraph();
+  let screen_options = GetNodesLinkedTo(graph, {
+    id: node,
+    link: nodetypes_LinkType.ScreenOptions
+  });
+  let result = [];
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  screen_options.map(screen_option => {
+    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.LifeCylceMethod
+    });
+    lifeCylcleMethods.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount).map(lifeCylcleMethod => {
+      let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+        id: lifeCylcleMethod.id,
+        link: nodetypes_LinkType.LifeCylceMethodInstance
+      });
+      lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
+        let vp = uiactions_GetNodeProp(lifeCylcleMethodInstance, nodetypes_NodeProperties.ViewPackage);
+
+        if (vp) {
+          let inPackageNodes = GetNodesByProperties({
+            [nodetypes_NodeProperties.ViewPackage]: vp
+          });
+          inPackageNodes.map(inPackageNode => {
+            result.push({
+              operation: REMOVE_NODE,
+              options: function (graph) {
+                return {
+                  id: inPackageNode.id
+                };
+              }
+            });
+          });
+        }
+      });
+      let cycleInstance = null;
+      result.push(...AddLifeCylcleMethodInstance({
+        node: lifeCylcleMethod.id,
+        viewPackages,
+        callback: _cycleInstance => {
+          cycleInstance = _cycleInstance;
+        }
+      }), function (graph) {
+        if (cycleInstance) {
+          return ConnectLifecycleMethod({
+            target: componentDidMountMethod,
+            source: cycleInstance.id,
+            graph,
+            viewPackages
+          });
+        }
+
+        return [];
+      });
+    });
+    let components = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.Component
+    });
+    components.map(component => {
+      let subcomponents = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: nodetypes_LinkType.Component
+      });
+      let executiveButtons = subcomponents.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.ExecuteButton));
+
+      if (executiveButtons.length === 1) {
+        // There should be only 1 execute button
+        let executeButton = executiveButtons[0];
+        let onEvents = GetNodesLinkedTo(graph, {
+          id: executeButton.id,
+          link: nodetypes_LinkType.EventMethod
+        }).filter(x => [ComponentEvents.onClick, ComponentEvents.onPress].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType)));
+        onEvents.filter(x => {
+          let t = GetNodesLinkedTo(graph, {
+            id: x.id,
+            link: nodetypes_LinkType.EventMethodInstance
+          });
+
+          if (t && t.length) {
+            t.map(instance => {
+              let vp = uiactions_GetNodeProp(instance, nodetypes_NodeProperties.ViewPackage);
+
+              if (vp) {
+                let inPackageNodes = GetNodesByProperties({
+                  [nodetypes_NodeProperties.ViewPackage]: uiactions_GetNodeProp(instance, nodetypes_NodeProperties.ViewPackage)
+                });
+                inPackageNodes.map(inPackageNode => {
+                  result.push({
+                    operation: REMOVE_NODE,
+                    options: function (graph) {
+                      return {
+                        id: inPackageNode.id
+                      };
+                    }
+                  });
+                });
+              }
+            });
+          }
+
+          let _instanceNode = null;
+          result.push(...[{
+            operation: ADD_NEW_NODE,
+            options: addInstanceFunc(x, instanceNode => {
+              _instanceNode = instanceNode;
+            }, viewPackages)
+          }], function (graph) {
+            if (_instanceNode) {
+              return ConnectLifecycleMethod({
+                target: method,
+                source: _instanceNode.id,
+                graph,
+                viewPackages
+              });
+            }
+
+            return [];
+          });
+        });
+      }
+
+      result.push(...AppendValidations({
+        subcomponents
+      }));
+    });
+  });
+  result = [...result, ...ModifyUpdateLinks()];
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/screens/ScreenConnectGet.js
+
+
+
+
+
+
+
+
+
+
+function ScreenConnectGet(args = {
+  method,
+  node
+}) {
+  let {
+    node,
+    method,
+    navigateTo
+  } = args;
+
+  if (!node) {
+    throw "no node";
+  }
+
+  if (!method) {
+    throw "no method";
+  }
+
+  let graph = GetCurrentGraph();
+  let screen_options = GetNodesLinkedTo(graph, {
+    id: node,
+    link: nodetypes_LinkType.ScreenOptions
+  });
+  let result = [];
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [nodetypes_NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  screen_options.map(screen_option => {
+    let components = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.Component
+    });
+    components.map(component => {
+      let subcomponents = GetNodesLinkedTo(graph, {
+        id: component.id,
+        link: nodetypes_LinkType.Component
+      });
+      let buttonComponents = subcomponents.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.ExecuteButton));
+
+      if (buttonComponents && buttonComponents.length === 1) {
+        let subcomponent = buttonComponents[0];
+        let events = GetNodesLinkedTo(graph, {
+          id: subcomponent.id,
+          link: nodetypes_LinkType.EventMethod
+        }).filter(x => [ComponentEvents.onClick, ComponentEvents.onPress].some(v => v === uiactions_GetNodeProp(x, nodetypes_NodeProperties.EventType)));
+        events.map(evnt => {
+          let eventMethodInstances = GetNodesLinkedTo(graph, {
+            id: evnt.id,
+            link: nodetypes_LinkType.EventMethodInstance
+          });
+          eventMethodInstances.map(eventMethodInstance => {
+            let vp = uiactions_GetNodeProp(eventMethodInstance, nodetypes_NodeProperties.ViewPackage);
+
+            if (vp) {
+              let inPackageNodes = GetNodesByProperties({
+                [nodetypes_NodeProperties.ViewPackage]: vp
+              });
+              inPackageNodes.map(inPackageNode => {
+                result.push({
+                  operation: REMOVE_NODE,
+                  options: function (graph) {
+                    return {
+                      id: inPackageNode.id
+                    };
+                  }
+                });
+              });
+            }
+          });
+          let _instanceNode = null;
+          let _navigateContext = null;
+          result.push(...[{
+            operation: ADD_NEW_NODE,
+            options: addInstanceFunc(evnt, instanceNode => {
+              _instanceNode = instanceNode;
+            }, viewPackages)
+          }], ...CreateNavigateToScreenDC({
+            screen: navigateTo,
+            node: () => _instanceNode.id,
+            viewPackages,
+            callback: navigateContext => {
+              _navigateContext = navigateContext;
+            }
+          }));
+        });
+      }
+
+      result.push(...AppendValidations({
+        subcomponents
+      }));
+    });
+    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: nodetypes_LinkType.LifeCylceMethod
+    });
+    lifeCylcleMethods.filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount).map(lifeCylcleMethod => {
+      let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+        id: lifeCylcleMethod.id,
+        link: nodetypes_LinkType.LifeCylceMethodInstance
+      });
+      lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
+        let vp = uiactions_GetNodeProp(lifeCylcleMethodInstance, nodetypes_NodeProperties.ViewPackage);
+
+        if (vp) {
+          let inPackageNodes = GetNodesByProperties({
+            [nodetypes_NodeProperties.ViewPackage]: vp
+          });
+          inPackageNodes.map(inPackageNode => {
+            result.push({
+              operation: REMOVE_NODE,
+              options: function (graph) {
+                return {
+                  id: inPackageNode.id
+                };
+              }
+            });
+          });
+        }
+      });
+      let cycleInstance = null;
+      result.push(...AddLifeCylcleMethodInstance({
+        node: lifeCylcleMethod.id,
+        viewPackages,
+        callback: _cycleInstance => {
+          cycleInstance = _cycleInstance;
+        }
+      }), function (graph) {
+        if (cycleInstance) {
+          return ConnectLifecycleMethod({
+            target: method,
+            source: cycleInstance.id,
+            graph,
+            viewPackages
+          });
+        }
+
+        return [];
+      });
+    });
+  });
+  return result;
+}
+// CONCATENATED MODULE: ./app/nodepacks/ClearExecutor.js
+
+
+
+function ClearExecutor(args = {
+  currentNode
+}) {
+  let {
+    currentNode
+  } = args;
+  var propertyNodes = GetModelPropertyChildren(uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.ExecutorModel), {
+    skipLogicalChildren: true
+  }).toNodeSelect();
+  return ClearExecutor_addProperty(propertyNodes.filter(x => !uiactions_GetNodeProp(x.value, nodetypes_NodeProperties.IsDefaultProperty)).map(t => {
+    return t.value;
+  }), currentNode);
+}
+ClearExecutor.description = "Clears all executors";
+
+let ClearExecutor_addProperty = (values, currentNode) => {
+  let executor = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Executor) || createExecutor();
+  var operation = values.map(value => {
+    var id = currentNode.id;
+    executor = addValidatator(executor, {
+      id: value
+    });
+    return [{
+      operation: CHANGE_NODE_PROPERTY,
+      options: function () {
+        return {
+          id: currentNode.id,
+          prop: nodetypes_NodeProperties.Executor,
+          value: null
+        };
+      }
+    }];
+  }).flatten();
+  return operation;
+};
 // CONCATENATED MODULE: ./app/components/contextmenu.js
 
 var contextmenu_REACT_ELEMENT_TYPE;
@@ -60794,6 +65689,25 @@ function contextmenu_jsx(type, props, key, children) { if (!contextmenu_REACT_EL
 
 
  // The default
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -60963,6 +65877,36 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         let linkType = GetLinkProperty(link, LinkPropertyKeys.TYPE);
 
         switch (GetLinkProperty(link, LinkPropertyKeys.TYPE)) {
+          case nodetypes_LinkType.Component:
+            result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+              open: Visual(state, `linkType coponent`),
+              active: true,
+              title: linkType,
+              innerStyle: {
+                maxHeight: 300,
+                overflowY: "auto"
+              },
+              toggle: () => {
+                this.props.toggleVisual(`linkType coponent`);
+              }
+            }, `${linkType}${selectedLink.id} componenttag`, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(checkbox_CheckBox, {
+              label: AsForm,
+              onChange: value => {
+                this.props.graphOperation([{
+                  operation: UPDATE_LINK_PROPERTY,
+                  options: function () {
+                    return {
+                      id: link.id,
+                      prop: LinkPropertyKeys.AsForm,
+                      value: value
+                    };
+                  }
+                }]);
+              },
+              value: GetLinkProperty(link, LinkPropertyKeys.AsForm)
+            }))));
+            break;
+
           case nodetypes_LinkType.Style:
             result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
               open: Visual(state, `linkType coponent`),
@@ -61000,7 +65944,16 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
 
           case nodetypes_LinkType.ComponentExternalConnection:
           case nodetypes_LinkType.EventMethodInstance:
-            result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          case nodetypes_LinkType.ComponentExternalApi:
+            let skip = false;
+
+            if (nodetypes_LinkType.ComponentExternalApi === linkType) {
+              if (![NodeTypes.ViewType].some(v => v === uiactions_GetNodeProp(link.source, nodetypes_NodeProperties.NODEType)) && ![NodeTypes.ViewType].some(v => v === uiactions_GetNodeProp(link.target, nodetypes_NodeProperties.NODEType))) {
+                skip = true;
+              }
+            }
+
+            if (!skip) result.push(contextmenu_jsx(treeviewmenu_TreeViewMenu, {
               open: Visual(state, linkType),
               active: true,
               title: linkType,
@@ -61095,6 +66048,8 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
     let {
       state
     } = this.props;
+    var currentNode = Node(state, Visual(state, SELECTED_NODE));
+    let graph = GetCurrentGraph();
     return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
       open: Visual(state, "GENERAL_MENU"),
       active: true,
@@ -61107,6 +66062,264 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         this.props.toggleVisual("GENERAL_MENU");
       }
     }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, "dccollections"),
+      active: true,
+      title: Collections,
+      innerStyle: {
+        maxHeight: 300,
+        overflowY: "auto"
+      },
+      toggle: () => {
+        this.props.toggleVisual("dccollections");
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Update",
+      active: true,
+      onClick: () => {
+        this.props.graphOperation(CollectionDataChainsIntoCollections());
+      }
+    }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Clear",
+      active: true,
+      onClick: () => {
+        this.props.graphOperation(uiactions_NodesByType(null, NodeTypes.DataChainCollection).map(v => ({
+          operation: REMOVE_NODE,
+          options: {
+            id: v.id
+          }
+        })));
+      }
+    })), uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType) === NodeTypes.Permission ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, `${NodeTypes.Permission} ${Operations}`),
+      active: true,
+      title: `Permission ${Operations}`,
+      innerStyle: {
+        maxHeight: 300,
+        overflowY: "auto"
+      },
+      toggle: () => {
+        this.props.toggleVisual(`${NodeTypes.Permission} ${Operations}`);
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      hideArrow: true,
+      active: true,
+      onClick: () => {
+        let permissions = uiactions_NodesByType(null, NodeTypes.Permission);
+        let result = [];
+        permissions.filter(x => x.id !== currentNode.id).filter(x => {
+          let methodNode = uiactions_GetMethodNode(x.id);
+          let currentMethodNode = uiactions_GetMethodNode(currentNode.id);
+          return GetMethodNodeProp(methodNode.id, FunctionTemplateKeys.Agent) === GetMethodNodeProp(currentMethodNode.id, FunctionTemplateKeys.Agent);
+        }).map(permission => {
+          result.push(...CopyPermissionConditions_CopyPermissionConditions({
+            permission: currentNode.id,
+            node: permission.id
+          }));
+        });
+        this.props.graphOperation(result);
+      },
+      title: CopyToAll
+    })) : null, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, "modelfilter OPERATIONS"),
+      active: true,
+      title: `Model Filter ${Operations}`,
+      innerStyle: {
+        maxHeight: 300,
+        overflowY: "auto"
+      },
+      toggle: () => {
+        this.props.toggleVisual("modelfilter OPERATIONS");
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      active: true,
+      title: `${SelectAll} on all nodes`,
+      onClick: () => {
+        let filters = uiactions_NodesByType(null, NodeTypes.ModelFilter);
+        filters.map(filter => {
+          let model = uiactions_GetNodeProp(filter, nodetypes_NodeProperties.FilterModel);
+          let propnodes = GetModelPropertyChildren(model);
+          let fprops = uiactions_GetNodeProp(filter, uiactions_NodeProperties.FilterPropreties) || {};
+          propnodes.map(node => {
+            fprops[node.id] = true;
+          });
+          this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+            prop: uiactions_NodeProperties.FilterPropreties,
+            id: filter.id,
+            value: fprops
+          });
+        });
+      }
+    })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, "method OPERATIONS"),
+      active: true,
+      title: `Method ${Operations}`,
+      innerStyle: {
+        maxHeight: 300,
+        overflowY: "auto"
+      },
+      toggle: () => {
+        this.props.toggleVisual("method OPERATIONS");
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      active: true,
+      title: `Add Filters to GetAll`,
+      onClick: () => {
+        this.props.graphOperation(AddFiltersToGetAll({}));
+      }
+    })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      open: Visual(state, "executor OPERATIONS"),
+      active: true,
+      title: `Executor ${Operations}`,
+      innerStyle: {
+        maxHeight: 300,
+        overflowY: "auto"
+      },
+      toggle: () => {
+        this.props.toggleVisual("executor OPERATIONS");
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      active: true,
+      title: `Have all properties`,
+      description: "Executors will have all properties added in executor.",
+      onClick: () => {
+        let executors = uiactions_NodesByType(null, NodeTypes.Executor);
+        let result = [];
+        executors.map(executor => {
+          let steps = AddAllPropertiesToExecutor({
+            currentNode: executor
+          });
+          result.push(...steps);
+        });
+        this.props.graphOperation(result);
+      }
+    }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      active: true,
+      title: nodepacks_AddCopyPropertiesToExecutor.title,
+      description: nodepacks_AddCopyPropertiesToExecutor.description,
+      onClick: () => {
+        let executors = uiactions_NodesByType(null, NodeTypes.Executor);
+        let result = [];
+        executors.map(executor => {
+          let steps = nodepacks_AddCopyPropertiesToExecutor({
+            currentNode: executor,
+            executor: uiactions_GetNodeProp(executor, nodetypes_NodeProperties.Executor)
+          });
+          result.push(...steps);
+        });
+        this.props.graphOperation(result);
+      }
+    })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Modify Update Links",
+      active: true,
+      hideArrow: true,
+      onClick: () => {
+        this.props.graphOperation(ModifyUpdateLinks());
+      }
+    }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: NodeTypes.ComponentApi,
+      open: Visual(state, NodeTypes.ComponentApi),
+      active: true,
+      onClick: () => {
+        this.props.toggleVisual(NodeTypes.ComponentApi);
+      }
+    }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Value(s) To Local Context",
+      description: SetInnerApiValueToLocalContextInLists.description,
+      active: true,
+      hideArrow: true,
+      onClick: () => {
+        this.props.graphOperation(SetInnerApiValueToLocalContextInLists());
+      }
+    }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Create Component Api",
+      open: Visual(state, "Create Component Api"),
+      active: true,
+      onClick: () => {
+        this.props.toggleVisual("Create Component Api");
+      }
+    }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+      label: `${Component} A`,
+      options: uiactions_NodesByType(this.props.state, NodeTypes.ComponentNode).sort((a, b) => {
+        return GetNodeTitle(a).localeCompare(GetNodeTitle(b));
+      }).toNodeSelect(),
+      onChange: value => {
+        this.setState({
+          componentA: value
+        });
+      },
+      value: this.state.componentA
+    })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+      immediate: true,
+      label: `${ExternalApi} A`,
+      placeholder: `${ExternalApi} A`,
+      onChange: value => {
+        this.setState({
+          externalApiA: value
+        });
+      },
+      value: this.state.externalApiA
+    })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+      immediate: true,
+      label: `${InternalApi} A`,
+      placeholder: InternalApi,
+      onChange: value => {
+        this.setState({
+          internalApiA: value
+        });
+      },
+      value: this.state.internalApiA
+    })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+      label: `${Component} B`,
+      options: uiactions_NodesByType(this.props.state, NodeTypes.ComponentNode).filter(x => existsLinkBetween(graph, {
+        source: this.state.componentA,
+        target: x.id
+      })).toNodeSelect(),
+      onChange: value => {
+        this.setState({
+          componentB: value
+        });
+      },
+      value: this.state.componentB
+    })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+      immediate: true,
+      label: `${ExternalApi} B`,
+      placeholder: `${ExternalApi} B`,
+      onChange: value => {
+        this.setState({
+          externalApiB: value
+        });
+      },
+      value: this.state.externalApiB
+    })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+      immediate: true,
+      label: `${InternalApi} B`,
+      placeholder: `${InternalApi} B`,
+      onChange: value => {
+        this.setState({
+          internalApiB: value
+        });
+      },
+      value: this.state.internalApiB
+    })), this.state.componentA && this.state.componentB && this.state.externalApiB && this.state.internalApiB && this.state.internalApiA && this.state.externalApiA ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+      title: "Setup Api Between Components",
+      description: SetupApiBetweenComponents.description,
+      active: true,
+      hideArrow: true,
+      onClick: () => {
+        this.props.graphOperation(SetupApiBetweenComponents({
+          component_a: {
+            id: this.state.componentA,
+            external: this.state.externalApiA,
+            internal: this.state.internalApiA
+          },
+          component_b: {
+            id: this.state.componentB,
+            external: this.state.externalApiB,
+            internal: this.state.internalApiB
+          }
+        }));
+      }
+    }) : null)), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
       title: `Create Dashboard`,
       open: Visual(state, `Create Dashboard`),
       active: true,
@@ -61146,7 +66359,226 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
     let currentNodeType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType);
     let temp;
 
+    let layoutoptions = () => {
+      return contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        open: Visual(state, "ScreenOptionOperations"),
+        active: true,
+        title: Layout,
+        innerStyle: {
+          maxHeight: 300,
+          overflowY: "auto"
+        },
+        toggle: () => {
+          this.props.toggleVisual("ScreenOptionOperations");
+        }
+      }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        title: `Set Tiny Tweaks Layout`,
+        hideArrow: true,
+        onClick: () => {
+          this.props.graphOperation(TinyTweaks({
+            component: currentNode.id
+          }));
+        }
+      }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        title: `Basic Application Layout`,
+        hideArrow: true,
+        onClick: () => {
+          this.props.graphOperation(BasicApplicationLayout({
+            component: currentNode.id
+          }));
+        }
+      }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        title: `Basic Double Side Column`,
+        hideArrow: true,
+        onClick: () => {
+          this.props.graphOperation(BasicDoubleSideColumn({
+            component: currentNode.id
+          }));
+        }
+      }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        title: `Four Column`,
+        hideArrow: true,
+        onClick: () => {
+          this.props.graphOperation(FourColumn({
+            component: currentNode.id
+          }));
+        }
+      }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        title: `Three Column`,
+        hideArrow: true,
+        onClick: () => {
+          this.props.graphOperation(ThreeColumn({
+            component: currentNode.id
+          }));
+        }
+      }));
+    };
+
     switch (currentNodeType) {
+      case NodeTypes.DataChainCollection:
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "OPERATIONS"),
+          active: true,
+          title: Operations,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("OPERATIONS");
+          }
+        }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          active: true,
+          title: AddDataChainCollection,
+          onClick: () => {
+            if (!GetNodesLinkedTo(GetCurrentGraph(), {
+              id: currentNode.id,
+              link: nodetypes_LinkType.DataChainCollection,
+              direction: SOURCE
+            }).some(v => uiactions_GetNodeProp(v, nodetypes_NodeProperties.NODEType) === currentNodeType)) {
+              this.props.graphOperation([{
+                operation: ADD_NEW_NODE,
+                options: function () {
+                  return {
+                    nodeType: NodeTypes.DataChainCollection,
+                    linkProperties: {
+                      properties: { ...LinkProperties.DataChainCollection
+                      }
+                    },
+                    parent: currentNode.id,
+                    properties: {
+                      [nodetypes_NodeProperties.UIText]: currentNodeType
+                    }
+                  };
+                }
+              }]);
+            }
+          }
+        }))];
+
+      case NodeTypes.Screen:
+        let viewType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.ViewType);
+
+        switch (viewType) {
+          case uiactions_ViewTypes.GetAll:
+          case uiactions_ViewTypes.Get:
+          case uiactions_ViewTypes.Create:
+          case uiactions_ViewTypes.Update:
+            let screenModel = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Model);
+            return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+              open: Visual(state, "OPERATIONS"),
+              active: true,
+              title: Operations,
+              innerStyle: {
+                maxHeight: 300,
+                overflowY: "auto"
+              },
+              toggle: () => {
+                this.props.toggleVisual("OPERATIONS");
+              }
+            }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+              title: `Connect`,
+              open: Visual(state, `Connect`),
+              active: true,
+              onClick: () => {
+                this.props.toggleVisual(`Connect`);
+              }
+            }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+              label: Methods,
+              options: uiactions_NodesByType(this.props.state, NodeTypes.Method).filter(x => (MethodFunctions[uiactions_GetNodeProp(x, nodetypes_NodeProperties.FunctionType)] || {}).method === viewType).filter(x => {
+                if (screenModel) {
+                  let modelOutput = GetMethodNodeProp(x, FunctionTemplateKeys.ModelOutput) || GetMethodNodeProp(x, FunctionTemplateKeys.Model);
+                  return modelOutput === screenModel;
+                }
+
+                return true;
+              }).toNodeSelect(),
+              onChange: value => {
+                this.setState({
+                  method: value
+                });
+              },
+              value: this.state.method
+            })), [uiactions_ViewTypes.GetAll, uiactions_ViewTypes.Get].some(v => v === viewType) ? contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+              label: NavigateTo,
+              options: uiactions_NodesByType(this.props.state, NodeTypes.Screen).filter(x => {
+                if (viewType === uiactions_ViewTypes.Get) {
+                  return uiactions_GetNodeProp(x, nodetypes_NodeProperties.ViewType) === uiactions_ViewTypes.Update;
+                }
+
+                return uiactions_GetNodeProp(x, nodetypes_NodeProperties.ViewType) === uiactions_ViewTypes.Get;
+              }).filter(x => {
+                if (screenModel) {
+                  let modelOutput = uiactions_GetNodeProp(x, nodetypes_NodeProperties.Model);
+                  return modelOutput === screenModel;
+                }
+
+                return true;
+              }).toNodeSelect(),
+              onChange: value => {
+                this.setState({
+                  navigateTo: value
+                });
+              },
+              value: this.state.navigateTo
+            })) : null, viewType === uiactions_ViewTypes.Update ? contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+              label: ComponentDidMount,
+              options: uiactions_NodesByType(this.props.state, NodeTypes.Method).filter(x => (MethodFunctions[uiactions_GetNodeProp(x, nodetypes_NodeProperties.FunctionType)] || {}).method === uiactions_ViewTypes.Get).filter(x => {
+                if (screenModel) {
+                  let modelOutput = GetMethodNodeProp(x, FunctionTemplateKeys.ModelOutput) || GetMethodNodeProp(x, FunctionTemplateKeys.Model);
+                  return modelOutput === screenModel;
+                }
+
+                return true;
+              }).toNodeSelect(),
+              onChange: value => {
+                this.setState({
+                  componentDidMountMethod: value
+                });
+              },
+              value: this.state.componentDidMountMethod
+            })) : null, this.state.method ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+              title: Execute,
+              onClick: () => {
+                let commands = [];
+
+                switch (viewType) {
+                  case uiactions_ViewTypes.Get:
+                    commands = ScreenConnectGet({
+                      method: this.state.method,
+                      node: currentNode.id,
+                      navigateTo: this.state.navigateTo
+                    });
+                    break;
+
+                  case uiactions_ViewTypes.GetAll:
+                    commands = ScreenConnectGetAll({
+                      method: this.state.method,
+                      node: currentNode.id,
+                      navigateTo: this.state.navigateTo
+                    });
+                    break;
+
+                  case uiactions_ViewTypes.Create:
+                    commands = ScreenConnectCreate({
+                      method: this.state.method,
+                      node: currentNode.id
+                    });
+                    break;
+
+                  case uiactions_ViewTypes.Update:
+                    commands = ScreenConnectUpdate({
+                      method: this.state.method,
+                      componentDidMountMethod: this.state.componentDidMountMethod,
+                      node: currentNode.id
+                    });
+                }
+
+                this.props.graphOperation([...commands]);
+              }
+            }) : null))];
+        }
+
       case NodeTypes.DataChain:
         //DataChain_SelectPropertyValue
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -61298,9 +66730,14 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         })), this.state.screen ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `Execute`,
           onClick: () => {
-            this.props.graphOperation(CreateNavigateToScreenDC({
-              screen: GetNodeTitle(this.state.screen)
-            }));
+            let _navigateContext = null;
+            this.props.graphOperation([...CreateNavigateToScreenDC({
+              screen: this.state.screen,
+              node: currentNode.id,
+              callback: navigateContext => {
+                _navigateContext = navigateContext;
+              }
+            })]);
           }
         }) : null))];
 
@@ -61403,6 +66840,7 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
         }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `Connect to Title Service`,
           hideArrow: true,
+          active: true,
           onClick: () => {
             this.props.graphOperation([{
               operation: CONNECT_TO_TITLE_SERVICE,
@@ -61411,7 +66849,34 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               }
             }]);
           }
-        }), GetNodeTitle(currentNode) === "viewModel" ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Attach View Model Data Chain"),
+          title: "Attach View Model Data Chain",
+          description: _create_get_view_model.description,
+          active: true,
+          onClick: () => {
+            this.props.toggleVisual("Attach View Model Data Chain");
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+          label: ViewModel,
+          placeholder: ViewModel,
+          onChange: value => {
+            this.setState({
+              viewModelName: value
+            });
+          },
+          value: this.state.viewModelName
+        })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Attach View Model Data Chain`,
+          hideArrow: true,
+          active: true,
+          onClick: () => {
+            this.props.graphOperation([..._create_get_view_model({
+              viewModel: currentNode.id,
+              model: this.state.viewModelName
+            })]);
+          }
+        })), GetNodeTitle(currentNode) === "viewModel" ? contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `Setup View Model On Screen`,
           open: Visual(state, `Setup View Model On Screen`),
           active: true,
@@ -61454,13 +66919,115 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
           }
         }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           title: `${Add} Update User`,
-          hideArrow: true,
           onClick: () => {
             this.props.graphOperation(UpdateUserExecutor({
               node0: currentNode.id
             }));
           }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Have all properties`,
+          onClick: () => {
+            let steps = AddAllPropertiesToExecutor({
+              currentNode
+            });
+            this.props.graphOperation(steps);
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: `Clear all properties`,
+          onClick: () => {
+            let steps = ClearExecutor({
+              currentNode
+            });
+            this.props.graphOperation(steps);
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: nodepacks_AddCopyPropertiesToExecutor.title,
+          description: nodepacks_AddCopyPropertiesToExecutor.description,
+          onClick: () => {
+            let result = nodepacks_AddCopyPropertiesToExecutor({
+              currentNode: currentNode,
+              executor: uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.Executor)
+            });
+            this.props.graphOperation(result);
+          }
         }))];
+
+      case NodeTypes.Condition:
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "condition OPERATIONS"),
+          active: true,
+          title: `Condition ${Operations}`,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("condition OPERATIONS");
+          }
+        }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Validations"),
+          active: true,
+          title: `Validations`,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("Validations");
+          }
+        }, void 0, " ", contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Key,
+          options: Object.keys(FunctionTemplateKeys).map(x => ({
+            title: x,
+            value: FunctionTemplateKeys[x],
+            id: FunctionTemplateKeys[x]
+          })),
+          onChange: value => {
+            this.setState({
+              key: value
+            });
+          },
+          value: this.state.key
+        })), this.state.key ? contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Properties,
+          options: GetModelPropertyChildren(GetFunctionMethodKey(uiactions_GetValidationNode(currentNode.id)), this.state.key).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              property: value
+            });
+          },
+          value: this.state.property
+        })) : null, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          active: true,
+          title: validation_NameLikeValidation.title,
+          description: validation_NameLikeValidation.description,
+          onClick: () => {
+            let validation = uiactions_GetValidationNode(currentNode.id);
+            let methodNode = uiactions_GetMethodNode(validation ? validation.id : null);
+            let result = validation_NameLikeValidation({
+              condition: currentNode.id,
+              property: this.state.property,
+              methodKey: this.state.key,
+              methodType: uiactions_GetNodeProp(methodNode, nodetypes_NodeProperties.FunctionType)
+            });
+            this.props.graphOperation(result);
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          active: true,
+          title: validation_DescriptionLikeValidation.title,
+          description: validation_DescriptionLikeValidation.description,
+          onClick: () => {
+            let validation = uiactions_GetValidationNode(currentNode.id);
+            let methodNode = uiactions_GetMethodNode(validation ? validation.id : null);
+            let result = validation_DescriptionLikeValidation({
+              condition: currentNode.id,
+              property: this.state.property,
+              methodKey: this.state.key,
+              methodType: uiactions_GetNodeProp(methodNode, nodetypes_NodeProperties.FunctionType)
+            });
+            this.props.graphOperation(result);
+          }
+        })))];
 
       case NodeTypes.Model:
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -61535,58 +67102,16 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               component: currentNode.id
             }));
           }
-        })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          open: Visual(state, "ScreenOptionOperations"),
-          active: true,
-          title: Layout,
-          innerStyle: {
-            maxHeight: 300,
-            overflowY: "auto"
-          },
-          toggle: () => {
-            this.props.toggleVisual("ScreenOptionOperations");
-          }
-        }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          title: `Set Tiny Tweaks Layout`,
-          hideArrow: true,
-          onClick: () => {
-            this.props.graphOperation(TinyTweaks({
-              component: currentNode.id
-            }));
-          }
         }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          title: `Basic Application Layout`,
+          title: 'Add Text',
           hideArrow: true,
           onClick: () => {
-            this.props.graphOperation(BasicApplicationLayout({
+            this.props.graphOperation(nodepacks_AddButtonToComponent({
+              componentType: ComponentTypeKeys.Text,
               component: currentNode.id
             }));
           }
-        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          title: `Basic Double Side Column`,
-          hideArrow: true,
-          onClick: () => {
-            this.props.graphOperation(BasicDoubleSideColumn({
-              component: currentNode.id
-            }));
-          }
-        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          title: `Four Column`,
-          hideArrow: true,
-          onClick: () => {
-            this.props.graphOperation(FourColumn({
-              component: currentNode.id
-            }));
-          }
-        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-          title: `Three Column`,
-          hideArrow: true,
-          onClick: () => {
-            this.props.graphOperation(ThreeColumn({
-              component: currentNode.id
-            }));
-          }
-        }))];
+        })), layoutoptions()];
 
       case NodeTypes.ComponentNode:
         let componentType = uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.ComponentType);
@@ -61598,11 +67123,107 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
           parent = GetNodesLinkedTo(graph, {
             id: currentNode.id,
             link: nodetypes_LinkType.Component,
-            direction: TARGET
+            direction: graph_methods_TARGET
           })[0];
         }
 
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Styling"),
+          active: true,
+          title: Styling,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("Styling");
+          }
+        }, void 0, layoutoptions(), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, "Create Form"),
+          active: true,
+          title: "Create Form",
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual("Create Form");
+          }
+        }, void 0, contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(textinput_TextInput, {
+          immediate: true,
+          label: Name,
+          placeholder: EnterName,
+          onChange: value => {
+            this.setState({
+              viewName: value
+            });
+          },
+          value: this.state.viewName
+        })), contextmenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, void 0, contextmenu_jsx(selectinput_SelectInput, {
+          label: Models,
+          options: uiactions_NodesByType(this.props.state, NodeTypes.Model).toNodeSelect(),
+          onChange: value => {
+            this.setState({
+              model: value
+            });
+          },
+          value: this.state.model
+        })), contextmenu_jsx(treeviewbuttongroup_TreeViewButtonGroup, {}, void 0, contextmenu_jsx(treeviewgroupbutton_TreeViewGroupButton, {
+          title: "Create Form",
+          onClick: () => {
+            this.props.graphOperation(CreateForm({
+              component: currentNode.id,
+              model: this.state.model,
+              viewName: this.state.viewName
+            }));
+          },
+          icon: "fa fa-plus"
+        }))), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddDataChain,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation([{
+              operation: ADD_NEW_NODE,
+              options: function () {
+                return {
+                  nodeType: NodeTypes.DataChain,
+                  linkProperties: {
+                    properties: { ...LinkProperties.DataChainLink
+                    }
+                  },
+                  parent: currentNode.id,
+                  properties: {
+                    [nodetypes_NodeProperties.UIText]: `data chain`
+                  },
+                  groupProperties: {}
+                };
+              }
+            }]);
+          }
+        }), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          title: AddSelector,
+          hideArrow: true,
+          onClick: () => {
+            this.props.graphOperation([{
+              operation: ADD_NEW_NODE,
+              options: function () {
+                return {
+                  nodeType: NodeTypes.Selector,
+                  linkProperties: {
+                    properties: { ...LinkProperties.SelectorLink
+                    }
+                  },
+                  parent: currentNode.id,
+                  properties: {
+                    [nodetypes_NodeProperties.UIText]: `select internal variables`,
+                    [nodetypes_NodeProperties.SelectorType]: nodetypes_SelectorType.InternalProperties
+                  },
+                  groupProperties: {}
+                };
+              }
+            }]);
+          }
+        })), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           open: Visual(state, "ComponentNode"),
           active: true,
           title: Layout,
@@ -61706,15 +67327,12 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               id: currentNode.id,
               link: nodetypes_LinkType.DefaultViewType
             }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.Property);
-
-            if (properties.length) {
-              this.props.graphOperation(nodepacks_AddEvent({
-                component: currentNode.id,
-                eventType: this.state.eventType,
-                eventTypeHandler: this.state.eventTypeHandler,
-                property: properties[0].id
-              }));
-            }
+            this.props.graphOperation(nodepacks_AddEvent({
+              component: currentNode.id,
+              eventType: this.state.eventType,
+              eventTypeHandler: properties.length ? this.state.eventTypeHandler : false,
+              property: properties.length ? properties[0].id : null
+            }));
           }
         }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
           open: Visual(state, "Adding Component"),
@@ -61864,6 +67482,20 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
           }
         }) : null)];
 
+      case NodeTypes.ModelFilter:
+        return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          open: Visual(state, NodeTypes.ModelFilter),
+          active: true,
+          title: Operations,
+          innerStyle: {
+            maxHeight: 300,
+            overflowY: "auto"
+          },
+          toggle: () => {
+            this.props.toggleVisual(NodeTypes.ModelFilter);
+          }
+        })];
+
       case NodeTypes.Permission:
         // getNodePropertyGuids()
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -61890,60 +67522,28 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
           title: Execute,
           hideArrow: true,
           onClick: () => {
-            let conditions = GetNodesLinkedTo(GetCurrentGraph(), {
-              id: this.state.permission,
-              link: nodetypes_LinkType.Condition
-            }).map(v => uiactions_GetNodeProp(v, nodetypes_NodeProperties.Condition));
-            let method = GetNodesLinkedTo(GetCurrentGraph(), {
-              id: this.state.permission,
-              link: nodetypes_LinkType.FunctionOperator
-            }).find(x => x);
-            let currentConditions = GetNodesLinkedTo(GetCurrentGraph(), {
-              id: currentNode.id,
-              link: nodetypes_LinkType.Condition
-            });
-            let currentNodeMethod = GetNodesLinkedTo(GetCurrentGraph(), {
-              id: currentNode.id,
-              link: nodetypes_LinkType.FunctionOperator
-            }).find(x => x);
-            let functionType = uiactions_GetNodeProp(method, nodetypes_NodeProperties.FunctionType);
-            let currentNodeMethodFunctionType = uiactions_GetNodeProp(currentNodeMethod, nodetypes_NodeProperties.FunctionType);
-            let result = [];
-            currentConditions.map(cc => {
-              result.push({
-                operation: REMOVE_NODE,
-                options: function () {
-                  return {
-                    id: cc.id
-                  };
-                }
-              });
-            });
-            conditions.map(condition => {
-              result.push({
-                operation: ADD_NEW_NODE,
-                options: function () {
-                  let temp = JSON.parse(JSON.stringify(condition));
-                  temp.methods[currentNodeMethodFunctionType] = temp.methods[functionType];
-                  delete temp.methods[functionType];
-                  return {
-                    nodeType: NodeTypes.Condition,
-                    properties: {
-                      [nodetypes_NodeProperties.Condition]: temp
-                    },
-                    parent: currentNode.id,
-                    groupProperties: {},
-                    linkProperties: {
-                      properties: { ...LinkProperties.ConditionLink
-                      }
-                    }
-                  };
-                }
-              });
+            let result = CopyPermissionConditions_CopyPermissionConditions({
+              permission: this.state.permission,
+              node: currentNode.id
             });
             this.props.graphOperation(result);
           }
-        }) : null)];
+        }) : null, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          hideArrow: true,
+          active: true,
+          onClick: () => {
+            let permissions = uiactions_NodesByType(null, NodeTypes.Permission);
+            let result = [];
+            permissions.filter(x => x.id !== currentNode.id).map(permission => {
+              result.push(...CopyPermissionConditions_CopyPermissionConditions({
+                permission: currentNode.id,
+                node: permission.id
+              }));
+            });
+            this.props.graphOperation(result);
+          },
+          title: CopyToAll
+        }))];
 
       case NodeTypes.ViewType:
         return [contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -62002,17 +67602,23 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
               id: currentNode.id,
               link: nodetypes_LinkType.DefaultViewType
             }).filter(x => uiactions_GetNodeProp(x, nodetypes_NodeProperties.NODEType) === NodeTypes.Property);
-
-            if (properties.length) {
-              this.props.graphOperation(nodepacks_AddEvent({
-                component: currentNode.id,
-                eventType: this.state.eventType,
-                eventTypeHandler: this.state.eventTypeHandler,
-                property: properties[0].id
-              }));
-            }
+            this.props.graphOperation(nodepacks_AddEvent({
+              component: currentNode.id,
+              eventType: this.state.eventType,
+              eventTypeHandler: properties.length ? this.state.eventTypeHandler : false,
+              property: properties.length ? properties[0].id : null
+            }));
           }
-        }) : null))];
+        }) : null), contextmenu_jsx(treeviewmenu_TreeViewMenu, {
+          hideArrow: true,
+          title: AddSharedViewModel,
+          description: AttachDataChainsToViewTypeViewModel.description,
+          onClick: () => {
+            this.props.graphOperation(AttachDataChainsToViewTypeViewModel({
+              viewType: currentNode.id
+            }));
+          }
+        }))];
     }
 
     return [];
@@ -62091,11 +67697,16 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
   }
 
   getButtonApiMenu(currentNode) {
+    let {
+      state
+    } = this.props;
     return contextmenu_jsx(treeviewmenu_TreeViewMenu, {
-      open: true,
+      open: Visual(state, titles_ComponentAPIMenu),
       active: true,
       title: titles_ComponentAPIMenu,
-      toggle: () => {}
+      toggle: () => {
+        this.props.toggleVisual(titles_ComponentAPIMenu);
+      }
     }, void 0, contextmenu_jsx(treeviewmenu_TreeViewMenu, {
       title: `${Add} Label`,
       hideArrow: true,
@@ -62168,6 +67779,10 @@ class contextmenu_ContextMenu extends external_react_["Component"] {
   }
 
   getButtonEventMenu(currentNode) {
+    let {
+      state
+    } = this.props;
+
     switch (uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.UIType)) {
       case UITypes.ReactNative:
         return contextmenu_jsx(treeviewmenu_TreeViewMenu, {
@@ -63106,7 +68721,7 @@ class topviewer_TopViewer extends external_react_["Component"] {
         width: '100%',
         transition: 'all 1s',
         pointerEvents: active ? 'all' : 'none',
-        top: active ? 0 : '-1000px',
+        top: active ? 0 : '-2000px',
         backgroundColor: '#dd4b39d2'
       }
     }, void 0, this.props.children));
@@ -63533,120 +69148,6 @@ class layoutcreator_LayoutCreator extends external_react_["Component"] {
   }
 
 }
-// CONCATENATED MODULE: ./app/constants/styles.js
-
-const StyleLib = {
-  style: {
-    background: "background",
-    "background-attachment": "backgroundAttachment",
-    "background-color": "backgroundColor",
-    "background-image": "backgroundImage",
-    "background-position": "backgroundPosition",
-    "background-repeat": "backgroundRepeat",
-    border: "border",
-    "border-bottom": "borderBottom",
-    "border-bottom-color": "borderBottomColor",
-    "border-bottom-style": "borderBottomStyle",
-    "border-bottom-width": "borderBottomWidth",
-    "border-color": "borderColor",
-    "border-left": "borderLeft",
-    "border-left-color": "borderLeftColor",
-    "border-left-style": "borderLeftStyle",
-    "border-left-width": "borderLeftWidth",
-    "border-right": "borderRight",
-    "border-radius": "borderRadius",
-    cursor: "pointer",
-    "border-right-color": "borderRightColor",
-    "border-right-style": "borderRightStyle",
-    "border-right-width": "borderRightWidth",
-    "border-style": "borderStyle",
-    "border-top": "borderTop",
-    "border-top-color": "borderTopColor",
-    "border-top-style": "borderTopStyle",
-    "border-top-width": "borderTopWidth",
-    "border-width": "borderWidth",
-    clear: "clear",
-    clip: "clip",
-    color: "color",
-    cursor: "cursor",
-    display: "display",
-    filter: "filter",
-    flex: "flex",
-    "flex-direction": "flexDirection",
-    "flex-flow": "flexFlow",
-    "justify-content": "justifyContent",
-    "align-items": "alignItems",
-    "align-content": "alignContents",
-    float: "cssFloat",
-    font: "font",
-    "font-family": "fontFamily",
-    "font-size": "fontSize",
-    "font-variant": "fontVariant",
-    "font-weight": "fontWeight",
-    height: "height",
-    left: "left",
-    "grid-template-columns": "gridTemplateColumns",
-    "grid-template-rows": "gridTemplateRows",
-    "grid-template-areas": "gridTemplateAreas",
-    "grid-template": "gridTemplate",
-    "grid-column-gap": "gridColumnGap",
-    "grid-row-gap": "gridRowGap",
-    "grid-gap": "gridGap",
-    "justify-items": "justifyItems",
-    "place-items": "placeItems",
-    "place-content": "placeContent",
-    "grid-auto-columns": "gridAutoColumns",
-    "grid-auto-rows": "gridAutoRows",
-    "grid-auto-flow": "gridAutoFlow",
-    grid: "grid",
-    "grid-column-start": "gridColumnStart",
-    "grid-column-end": "gridColumnEnd",
-    "grid-row-start": "gridRowStart",
-    "grid-row-end": "gridRowEnd",
-    "grid-column": "gridColumn",
-    "grid-row": "gridRow",
-    "grid-area": "gridArea",
-    "justify-self": "justifySelf",
-    "align-self": "alignSelf",
-    "place-self": "placeSelf",
-    "letter-spacing": "letterSpacing",
-    "line-height": "lineHeight",
-    "list-style": "listStyle",
-    "list-style-image": "listStyleImage",
-    "list-style-position": "listStylePosition",
-    "list-style-type": "listStyleType",
-    margin: "margin",
-    "margin-bottom": "marginBottom",
-    "margin-left": "marginLeft",
-    "margin-right": "marginRight",
-    "margin-top": "marginTop",
-    overflow: "overflow",
-    padding: "padding",
-    "padding-bottom": "paddingBottom",
-    "padding-left": "paddingLeft",
-    "padding-right": "paddingRight",
-    "padding-top": "paddingTop",
-    "page-break-after": "pageBreakAfter",
-    "page-break-before": "pageBreakBefore",
-    position: "position",
-    "stroke-dasharray": "strokeDasharray",
-    "stroke-dashoffset": "strokeDashoffset",
-    "stroke-width": "strokeWidth",
-    "text-align": "textAlign",
-    "text-decoration": "textDecoration",
-    "text-indent": "textIndent",
-    "text-transform": "textTransform",
-    top: "top",
-    "vertical-align": "verticalAlign",
-    visibility: "visibility",
-    width: "width",
-    "z-index": "zIndex"
-  },
-  js: {}
-};
-Object.keys(StyleLib.style).map(v => {
-  StyleLib.js[StyleLib.style[v]] = v;
-});
 // CONCATENATED MODULE: ./app/components/layoutview.js
 
 var layoutview_REACT_ELEMENT_TYPE;
@@ -64027,7 +69528,20 @@ class layoutview_LayoutView extends external_react_["Component"] {
       },
       label: Sections,
       value: Object.keys(selectedLayoutRoot || {}).length
-    }), cellProperties && cellProperties.name && this.state.selectedCell ? layoutview_jsx(textinput_TextInput, {
+    }), cellChildren ? layoutview_jsx(selectinput_SelectInput, {
+      options: componentNodes.toNodeSelect(),
+      onChange: val => {
+        let layout = nodeLayout || CreateLayout();
+        cellChildren[this.state.selectedCell] = val;
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: uiactions_NodeProperties.Layout,
+          id: currentNode.id,
+          value: layout
+        });
+      },
+      label: Component,
+      value: cellChildren[this.state.selectedCell]
+    }) : null, cellProperties && cellProperties.name && this.state.selectedCell ? layoutview_jsx(textinput_TextInput, {
       immediate: true,
       onChange: val => {
         let layout = nodeLayout || CreateLayout();
@@ -64147,19 +69661,6 @@ class layoutview_LayoutView extends external_react_["Component"] {
       },
       label: Width,
       value: cellStyle.width
-    }) : null, cellChildren ? layoutview_jsx(selectinput_SelectInput, {
-      options: componentNodes.toNodeSelect(),
-      onChange: val => {
-        let layout = nodeLayout || CreateLayout();
-        cellChildren[this.state.selectedCell] = val;
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-          prop: uiactions_NodeProperties.Layout,
-          id: currentNode.id,
-          value: layout
-        });
-      },
-      label: Component,
-      value: cellChildren[this.state.selectedCell]
     }) : null, cellChildren && cellChildren[this.state.selectedCell] ? this.getComponentApi(cellChildren) : null, cellChildren && cellChildren[this.state.selectedCell] ? layoutview_jsx(checkbox_CheckBox, {
       label: UseAsRoot,
       onChange: val => {
@@ -64364,68 +69865,6 @@ class layoutview_LayoutView extends external_react_["Component"] {
 }
 
 /* harmony default export */ var layoutview = (UIConnect(layoutview_LayoutView));
-// CONCATENATED MODULE: ./app/components/checkboxproperty.js
-var checkboxproperty_REACT_ELEMENT_TYPE;
-
-function checkboxproperty_jsx(type, props, key, children) { if (!checkboxproperty_REACT_ELEMENT_TYPE) { checkboxproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: checkboxproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
-
-
-
-
-
-
-class checkboxproperty_CheckBoxProperty extends external_react_["Component"] {
-  render() {
-    let currentNode = this.props.node;
-    return checkboxproperty_jsx(checkbox_CheckBox, {
-      label: this.props.title,
-      title: this.props.title,
-      value: uiactions_GetNodeProp(currentNode, this.props.property),
-      onChange: value => {
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-          prop: this.props.property,
-          id: currentNode.id,
-          value: value
-        });
-      }
-    });
-  }
-
-}
-
-/* harmony default export */ var checkboxproperty = (UIConnect(checkboxproperty_CheckBoxProperty));
-// CONCATENATED MODULE: ./app/components/selectproperty.js
-var selectproperty_REACT_ELEMENT_TYPE;
-
-function selectproperty_jsx(type, props, key, children) { if (!selectproperty_REACT_ELEMENT_TYPE) { selectproperty_REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7; } var defaultProps = type && type.defaultProps; var childrenLength = arguments.length - 3; if (!props && childrenLength !== 0) { props = { children: void 0 }; } if (props && defaultProps) { for (var propName in defaultProps) { if (props[propName] === void 0) { props[propName] = defaultProps[propName]; } } } else if (!props) { props = defaultProps || {}; } if (childrenLength === 1) { props.children = children; } else if (childrenLength > 1) { var childArray = new Array(childrenLength); for (var i = 0; i < childrenLength; i++) { childArray[i] = arguments[i + 3]; } props.children = childArray; } return { $$typeof: selectproperty_REACT_ELEMENT_TYPE, type: type, key: key === undefined ? null : '' + key, ref: null, props: props, _owner: null }; }
-
-
-
-
-
-
-
-class selectproperty_SelectProperty extends external_react_["Component"] {
-  render() {
-    let currentNode = this.props.node;
-    return selectproperty_jsx(selectinput_SelectInput, {
-      label: this.props.title,
-      title: this.props.title,
-      options: this.props.options,
-      value: uiactions_GetNodeProp(currentNode, this.props.property),
-      onChange: value => {
-        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-          prop: this.props.property,
-          id: currentNode.id,
-          value: value
-        });
-      }
-    });
-  }
-
-}
-
-/* harmony default export */ var selectproperty = (UIConnect(selectproperty_SelectProperty));
 // CONCATENATED MODULE: ./app/components/gridareaselect.js
 
 var gridareaselect_REACT_ELEMENT_TYPE;
@@ -64669,7 +70108,7 @@ class stylemenu_StyleMenu extends external_react_["Component"] {
       toggle: () => {
         this.props.toggleVisual(Selector);
       }
-    }, void 0, [nodetypes_NodeProperties.ActiveStyle, nodetypes_NodeProperties.CheckedStyle, nodetypes_NodeProperties.DisabledStyle, nodetypes_NodeProperties.EmptyStyle, nodetypes_NodeProperties.EnabledStyle, nodetypes_NodeProperties.FirstChildStyle, nodetypes_NodeProperties.LastChildStyle, nodetypes_NodeProperties.FocusStyle, nodetypes_NodeProperties.ReadOnlyStyle, nodetypes_NodeProperties.BeforeStyle, nodetypes_NodeProperties.AfterStyle].map(x => {
+    }, void 0, StyleNodeProperties.map(x => {
       return stylemenu_jsx(treeviewitemcontainer_TreeViewItemContainer, {}, x, stylemenu_jsx(checkboxproperty, {
         title: x,
         node: currentNode,
@@ -65139,6 +70578,30 @@ class dashboard_Dashboard extends external_react_["Component"] {
           result.push(...this.getDataChainContext());
           return result;
 
+        case NodeTypes.Controller:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.MaestroLink,
+                nodeTypes: [NodeTypes.Maestro]
+              });
+            },
+            icon: 'fa  fa-music',
+            title: AddMaestros
+          });
+          return result;
+
+        case NodeTypes.Maestro:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.FunctionLink,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa  fa-music',
+            title: AddFunction
+          });
+          return result;
+
         case NodeTypes.Selector:
           result.push(...this.getSelectorContext());
           return result;
@@ -65206,6 +70669,16 @@ class dashboard_Dashboard extends external_react_["Component"] {
           break;
 
         case NodeTypes.Method:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.DataChainLink,
+                nodeTypes: [NodeTypes.DataChain]
+              });
+            },
+            icon: 'fa fa-chain',
+            title: DataChain
+          });
+
         case NodeTypes.Action:
           result.push({
             onClick: () => {
@@ -65470,7 +70943,7 @@ class dashboard_Dashboard extends external_react_["Component"] {
         onClick: () => {
           this.props.setVisual(CONNECTING_NODE, true);
         },
-        icon: 'fas fa-plug',
+        icon: 'fa fa-plug',
         title: GenericLink
       });
     }
@@ -65487,6 +70960,13 @@ class dashboard_Dashboard extends external_react_["Component"] {
       },
       icon: 'fa fa-font',
       title: `${Selector}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.SelectorInputLink
+        });
+      },
+      icon: 'fa fa-exchange',
+      title: `${SelectorInput}`
     });
     return result;
   }
@@ -65754,6 +71234,15 @@ class dashboard_Dashboard extends external_react_["Component"] {
       },
       icon: 'fa fa-css3',
       title: Style
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.DataChainLink,
+          singleLink: false,
+          nodeTypes: [NodeTypes.DataChain]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${DataChain}`
     });
     return result;
   }
@@ -65838,7 +71327,7 @@ class dashboard_Dashboard extends external_react_["Component"] {
         });
       },
       icon: 'fa fa-chain',
-      title: `${Value}`
+      title: `${StandardLink}`
     }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.DataChainLink,
@@ -65847,6 +71336,22 @@ class dashboard_Dashboard extends external_react_["Component"] {
       },
       icon: 'fa fa-yc',
       title: `${Insert}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.Style,
+          nodeTypes: [NodeTypes.Style]
+        });
+      },
+      icon: 'fa fa-css3',
+      title: 'Modify Style'
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, { ...LinkProperties.SelectorLink,
+          nodeTypes: [NodeTypes.Selector]
+        });
+      },
+      icon: 'fa fa-fire',
+      title: 'Selector Input'
     });
     return result;
   }
@@ -66358,6 +71863,11 @@ class dashboard_Dashboard extends external_react_["Component"] {
       graph: vgraph || graph
     }) : null, "             "), dashboard_jsx(sidebar_SideBar, {
       open: Visual(state, dashboard_SIDE_PANEL_OPEN),
+      style: {
+        overflowY: 'auto',
+        'maxHeight': '100vh',
+        'height': '100vh'
+      },
       extraWide: IsCurrentNodeA(state, uiactions_NodeTypes.ExtensionType)
     }, void 0, dashboard_jsx(sidebartabs_SideBarTabs, {}, void 0, dashboard_jsx(sidebartab_SideBarTab, {
       icon: "fa fa-cog",
@@ -66455,6 +71965,17 @@ class dashboard_Dashboard extends external_react_["Component"] {
       onChange: value => {
         this.props.graphOperation(CHANGE_NODE_PROPERTY, {
           prop: uiactions_NodeProperties.IsUrlParameter,
+          id: currentNode.id,
+          value
+        });
+      }
+    }) : null, uiactions_GetNodeProp(currentNode, nodetypes_NodeProperties.NODEType) === uiactions_NodeTypes.ComponentApi ? dashboard_jsx(checkbox_CheckBox, {
+      label: AsLocalContext,
+      title: `${AsLocalContext}, usually for listitem.`,
+      value: uiactions_GetNodeProp(currentNode, uiactions_NodeProperties.AsLocalContext),
+      onChange: value => {
+        this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+          prop: uiactions_NodeProperties.AsLocalContext,
           id: currentNode.id,
           value
         });

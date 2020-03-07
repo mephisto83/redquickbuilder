@@ -110,7 +110,7 @@ class AgentBasedMethods extends Component {
             onChange={(value) => {
               this.props.setVisual(UIA.BATCH_FUNCTION_NAME, value);
             }} />
-          <button type="button" className="btn btn-block btn-warning btn-sm" onClick={() => {
+          <button type="button" className="btn btn-block btn-info btn-sm" onClick={() => {
             this.props.executeGraphOperations(UIA.NodesByType(state, NodeTypes.Model).filter(x => {
               return UIA.GetNodeProp(x, NodeProperties.AgentBasedMethod);
             }).map(model => {
@@ -134,7 +134,7 @@ class AgentBasedMethods extends Component {
                 methodType: UIA.Visual(state, UIA.BATCH_FUNCTION_TYPE)
               }
             }));
-          }}>Warning</button>
+          }}>Build</button>
         </FormControl>
       </TabPane >
     );
