@@ -2836,6 +2836,7 @@ export const CreateDefaultView = {
                           )}`,
                           [NodeProperties.UIType]: uiType,
                           [NodeProperties.Label]: GetNodeTitle(modelProperty),
+                          [NodeProperties.Property]: modelProperty.id,
                           [NodeProperties.ComponentType]:
                             sharedComponent || componentTypeToUse,
                           [NodeProperties.UsingSharedComponent]: !!sharedComponent,

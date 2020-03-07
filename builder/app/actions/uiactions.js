@@ -1916,7 +1916,7 @@ export function GenerateCDDataChainMethod(id) {
           let insert = temp.length > 1 ? temp[1] : temp[0];
           if (temp.length > 1) {
             let swap = temp[0];
-            let args = insert.split("|");
+            let args = insert.split("~");
             let model = args[0];
             let property = args[1];
 
@@ -1936,7 +1936,7 @@ export function GenerateCDDataChainMethod(id) {
             }
             lambda = lambda.replace(`#{${_insert}}`, swap);
           } else {
-            let args = insert.split("|");
+            let args = insert.split("~");
             let property = args[0];
             let prop = lambdaInsertArguments[property];
             let node = GetNodeById(prop);
@@ -2056,12 +2056,17 @@ export function GenerateDataChainMethod(id) {
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(insert => {
-          let args = insert.split("|");
-          let property = args[0];
+          let args = insert.split("~");
+          let property = args.length > 1 ? args[1] : args[0];
+          let model = args[0];
           let prop = lambdaInsertArguments[property];
           let node = GetNodeById(prop);
+          let bindValue = GetCodeName(node);
+          if (args.length > 1) {
+            bindValue = bindValue.toLowerCase();
+          }
           lambda = bindReferenceTemplate(lambda, {
-            [property]: GetCodeName(node)
+            [insert]: bindValue
           });
         });
       return `${lambda}`;
@@ -2161,6 +2166,8 @@ export function GenerateDataChainMethod(id) {
       return `a => GetItems(Models.${GetCodeName(model)})`;
     case DataChainFunctionKeys.Validation:
       return `a => true/*TBI*/`;
+    case DataChainFunctionKeys.MethodBaseValidation:
+      return `a => false`;
     default:
       throw `${GetNodeTitle(node)} ${
         node.id
@@ -3707,7 +3714,8 @@ export const ComponentApiKeys = {
   Value: "value",
   Item: "item",
   Index: "index",
-  Separators: "separators"
+  Separators: "separators",
+  Error: "error"
 };
 export const UPDATE_GRAPH_TITLE = "UPDATE_GRAPH_TITLE";
 export const NEW_NODE = "NEW_NODE";

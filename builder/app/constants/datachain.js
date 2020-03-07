@@ -74,6 +74,7 @@ export const DataChainFunctionKeys = {
   ModelKey: "ModelKey",
   ViewModelKey: "ViewModelKey",
   Lambda: "Lambda",
+  MethodBaseValidation: "MethodBaseValidation",
   Validation: "Validation",
   NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
@@ -108,6 +109,15 @@ export const DataChainFunctions = {
       [NodeProperties.NODEType]: true
     },
     value: "Selector"
+  },
+  [DataChainFunctionKeys.MethodBaseValidation]: {
+    ui: {
+      method: NodeProperties.Method
+    },
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.MethodBaseValidation
   },
   [DataChainFunctionKeys.Navigate]: {
     ui: {
@@ -855,6 +865,7 @@ export const DataChainContextMethods = {
   List: connectNodeChain(NodeProperties.List),
   Selector: connectNodeChain(NodeProperties.Selector),
   Screen: connectNodeChain(NodeProperties.Screen, true),
+  Method: connectNodeChain(NodeProperties.Method, true),
   SelectorProperty: connectNodeChain(NodeProperties.SelectorProperty),
   Value: connectNodeChain(NodeProperties.Value),
   StandardLink: connectChain(),

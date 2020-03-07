@@ -4,6 +4,7 @@ import { UIConnect } from "../utils/utils";
 import * as UIA from "../actions/uiactions";
 import TabPane from "./tabpane";
 import SelectProperty from "./selectproperty";
+import TextProperty from './textproperty';
 import * as Titles from "./titles";
 import {
   NodeTypes,
@@ -37,6 +38,12 @@ class SelectorActivityMenu extends Component {
             }))}
           node={currentNode}
           property={NodeProperties.SelectorType}
+        />
+        <TextProperty
+          title={Titles.DefaultViewModel}
+          label={Titles.DefaultViewModel}
+          node={currentNode}
+          property={NodeProperties.DefaultViewModel}
         />
       </TabPane>
     );

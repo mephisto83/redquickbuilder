@@ -1,13 +1,19 @@
-import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, GetAllChildren } from "../../methods/graph_methods";
 import {
   GetCurrentGraph,
   GetNodeProp,
   GetNodesByProperties,
   REMOVE_NODE,
+  GetModelPropertyChildren,
   ViewTypes,
   ADD_NEW_NODE,
   addInstanceFunc,
-  GetNodeById
+  GetNodeById,
+  GetNodeTitle,
+  ComponentApiKeys,
+  GetModelPropertyNodes,
+  LinkProperties,
+  ADD_LINK_BETWEEN_NODES
 } from "../../actions/uiactions";
 import { LinkType, NodeProperties } from "../../constants/nodetypes";
 import {
@@ -17,6 +23,7 @@ import {
 import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
+import CreateValidatorForProperty from "../CreateValidatorForProperty";
 
 export default function ScreenConnectCreate(args = { method, node }) {
   let { node, method, viewType } = args;
@@ -47,11 +54,14 @@ export default function ScreenConnectCreate(args = { method, node }) {
       let subcomponents = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.Component
-      }).filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
+      });
+      let executeButtons = subcomponents.filter(x =>
+        GetNodeProp(x, NodeProperties.ExecuteButton)
+      );
 
-      if (subcomponents.length === 1) {
+      if (executeButtons.length === 1) {
         // There should be only 1 execute button
-        let executeButton = subcomponents[0];
+        let executeButton = executeButtons[0];
 
         let onEvents = GetNodesLinkedTo(graph, {
           id: executeButton.id,
@@ -112,6 +122,62 @@ export default function ScreenConnectCreate(args = { method, node }) {
               return [];
             }
           );
+        });
+      }
+
+      if (subcomponents.length) {
+        subcomponents.map(subcomponent => {
+          let componentType = GetNodeProp(
+            subcomponent,
+            NodeProperties.ComponentType
+          );
+          switch (componentType) {
+            default:
+              let externalValidationApi = GetNodesLinkedTo(null, {
+                id: subcomponent.id,
+                link: LinkType.ComponentExternalApi
+              }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+              if (externalValidationApi) {
+                let modelId = GetNodeProp(screen_option, NodeProperties.Model);
+                let propertyId = GetNodeProp(
+                  subcomponent,
+                  NodeProperties.Property
+                );
+                if (!propertyId) {
+                  propertyId = GetModelPropertyChildren(modelId).find(
+                    v => GetNodeTitle(v) === GetNodeTitle(subcomponent)
+                  );
+                  if (propertyId) {
+                    propertyId = propertyId.id;
+                  }
+                }
+                let validatorNode = null;
+                result.push(
+                  ...CreateValidatorForProperty({
+                    modelText: GetNodeTitle(modelId),
+                    propertyText: GetNodeTitle(propertyId),
+                    model: modelId,
+                    property: propertyId,
+                    method,
+                    viewPackages,
+                    callback: context => {
+                      validatorNode = context.entry;
+                    }
+                  }),
+                  {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function() {
+                      return {
+                        target: validatorNode,
+                        source: externalValidationApi.id,
+                        properties: { ...LinkProperties.DataChainLink }
+                      };
+                    }
+                  }
+                );
+              }
+              break;
+          }
         });
       }
     });

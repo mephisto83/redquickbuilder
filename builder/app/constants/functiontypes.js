@@ -1828,7 +1828,7 @@ export function bindReferenceTemplate(templateString, data) {
   var singularSymbol = "@";
   try {
     var regex = new RegExp(
-      "#({)[A-Za-z0-9_." + singularSymbol + " ,'|]*(})",
+      "#({)[A-Za-z0-9_." + singularSymbol + " ,'|~]*(})",
       "g"
     );
     var hasTemplate;
