@@ -112,11 +112,13 @@ export default function ScreenConnectUpdate(args = { method, node }) {
       let subcomponents = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.Component
-      }).filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
-
-      if (subcomponents.length === 1) {
+      });
+      let executiveButtons = subcomponents.filter(x =>
+        GetNodeProp(x, NodeProperties.ExecuteButton)
+      );
+      if (executiveButtons.length === 1) {
         // There should be only 1 execute button
-        let executeButton = subcomponents[0];
+        let executeButton = executiveButtons[0];
 
         let onEvents = GetNodesLinkedTo(graph, {
           id: executeButton.id,
@@ -182,6 +184,62 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               return [];
             }
           );
+        });
+      }
+
+      if (subcomponents.length) {
+        subcomponents.map(subcomponent => {
+          let componentType = GetNodeProp(
+            subcomponent,
+            NodeProperties.ComponentType
+          );
+          switch (componentType) {
+            default:
+              let externalValidationApi = GetNodesLinkedTo(null, {
+                id: subcomponent.id,
+                link: LinkType.ComponentExternalApi
+              }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+              if (externalValidationApi) {
+                let modelId = GetNodeProp(screen_option, NodeProperties.Model);
+                let propertyId = GetNodeProp(
+                  subcomponent,
+                  NodeProperties.Property
+                );
+                if (!propertyId) {
+                  propertyId = GetModelPropertyChildren(modelId).find(
+                    v => GetNodeTitle(v) === GetNodeTitle(subcomponent)
+                  );
+                  if (propertyId) {
+                    propertyId = propertyId.id;
+                  }
+                }
+                let validatorNode = null;
+                result.push(
+                  ...CreateValidatorForProperty({
+                    modelText: GetNodeTitle(modelId),
+                    propertyText: GetNodeTitle(propertyId),
+                    model: modelId,
+                    property: propertyId,
+                    method,
+                    viewPackages,
+                    callback: context => {
+                      validatorNode = context.entry;
+                    }
+                  }),
+                  {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: function() {
+                      return {
+                        target: validatorNode,
+                        source: externalValidationApi.id,
+                        properties: { ...LinkProperties.DataChainLink }
+                      };
+                    }
+                  }
+                );
+              }
+              break;
+          }
         });
       }
     });
