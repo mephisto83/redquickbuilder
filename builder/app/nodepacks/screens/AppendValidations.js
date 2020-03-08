@@ -13,7 +13,12 @@ import {
 import { GetNodesLinkedTo } from "../../methods/graph_methods";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 
-export default function AppendValidations({ subcomponents }) {
+export default function AppendValidations({
+  subcomponents,
+  screen_option,
+  viewPackages,
+  method
+}) {
   if (!subcomponents) {
     throw "no subcomponents";
   }

@@ -36,7 +36,7 @@ export default function(args = { state_key: "StateKeyReplace" }) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: "Store Model Array Standard"
+            value: "Store Model Array Standard " + (args.modelText || "")
           }
         }
       ];

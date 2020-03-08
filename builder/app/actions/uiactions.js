@@ -17,6 +17,7 @@ import { uuidv4, addNewLine } from "../utils/array";
 import { currentId } from "async_hooks";
 import { getReferenceInserts } from "../utils/utilservice";
 import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
+import { buildValidation } from "../service/validation_js_service";
 
 var fs = require("fs");
 export const VISUAL = "VISUAL";
@@ -471,21 +472,23 @@ export function connectLifeCycleMethod(args) {
               NodeTypes.Selector
             ])
           : null;
-        let _chain = GetNodesByProperties({
-          [NodeProperties.Selector]: selectorNode.id,
-          [NodeProperties.EntryPoint]: true,
-          [NodeProperties.NODEType]: NodeTypes.DataChain,
-          [NodeProperties.SelectorProperty]:
-            NodeConstants.SelectorPropertyKeys.Object
-        }).find(x => {
-          return (
-            GraphMethods.GetNodesLinkedTo(graph, {
-              id: x.id,
-              link: NodeConstants.LinkType.DataChainLink,
-              componentType: NodeTypes.DataChain
-            }).length === 0
-          );
-        });
+        let _chain = selectorNode
+          ? GetNodesByProperties({
+              [NodeProperties.Selector]: selectorNode.id,
+              [NodeProperties.EntryPoint]: true,
+              [NodeProperties.NODEType]: NodeTypes.DataChain,
+              [NodeProperties.SelectorProperty]:
+                NodeConstants.SelectorPropertyKeys.Object
+            }).find(x => {
+              return (
+                GraphMethods.GetNodesLinkedTo(graph, {
+                  id: x.id,
+                  link: NodeConstants.LinkType.DataChainLink,
+                  componentType: NodeTypes.DataChain
+                }).length === 0
+              );
+            })
+          : null;
         let dataChain = model ? _chain : null;
         let componentNode = GraphMethods.GetConnectedNodeByType(
           state,
@@ -525,6 +528,8 @@ export function connectLifeCycleMethod(args) {
 
         PerformGraphOperation([
           ...(dataChain
+            ? []
+            : !selectorNode
             ? []
             : CreateDataChainGetBody({
                 selector: selectorNode.id,
@@ -1449,9 +1454,10 @@ export function GetLastChainLink(parts) {
   return lastLink;
 }
 export function GenerateObservable(id, index) {
-  let nodeName = GetCodeName(id);
+  let nodeName = GetJSCodeName(id);
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
 }
+
 export function GenerateDataChainFunc(id, chain, index) {
   let nodeName = GetCodeName(id);
   //Should be able to capture the args throw the link between nodes.
@@ -1967,6 +1973,7 @@ export function GenerateDataChainMethod(id) {
   let nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
   let nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
+  let methodMethod = GetNodeProp(node, NodeProperties.Method);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
   let userParams = GetNodeProp(node, NodeProperties.UseNavigationParams);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
@@ -2167,6 +2174,9 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Validation:
       return `a => true/*TBI*/`;
     case DataChainFunctionKeys.MethodBaseValidation:
+      if (methodMethod) {
+        return buildValidation({ methodMethod, id });
+      }
       return `a => false`;
     default:
       throw `${GetNodeTitle(node)} ${
@@ -2336,7 +2346,8 @@ export function GetCustomServiceImplementations(
 
 export function GetCombinedCondition(
   id,
-  language = NodeConstants.ProgrammingLanguages.CSHARP
+  language = NodeConstants.ProgrammingLanguages.CSHARP,
+  options = {}
 ) {
   let node = GetGraphNode(id);
   let conditions = [];
@@ -2382,7 +2393,12 @@ export function GetCombinedCondition(
   let clauses = [];
   conditions.map(condition => {
     let selectedConditionSetup = GetSelectedConditionSetup(id, condition);
-    let res = GetConditionsClauses(id, selectedConditionSetup, language);
+    let res = GetConditionsClauses(
+      id,
+      selectedConditionSetup,
+      language,
+      options
+    );
     clauses = [...clauses, ...res.map(t => t.clause)];
   });
   customMethods.map(customMethod => {
@@ -2427,41 +2443,60 @@ export function GetCustomMethodClauses(
     );
 
     if (serviceInterface) {
-      result.push({
-        clause: `var {{result}} = await ${GetJSCodeName(
-          serviceInterface
-        )}.${GetCodeName(customMethod)}(${methodNodeParameters.join()});`
-      });
+      switch (language) {
+        case NodeConstants.UITypes.ElectronIO:
+          break;
+        default:
+          result.push({
+            clause: `var {{result}} = await ${GetJSCodeName(
+              serviceInterface
+            )}.${GetCodeName(customMethod)}(${methodNodeParameters.join()});`
+          });
+          break;
+      }
     }
   }
   return result;
 }
-export function GetConditionsClauses(adjacentId, clauseSetup, language) {
+export function GetConditionsClauses(
+  adjacentId,
+  clauseSetup,
+  language,
+  options = {}
+) {
   let result = [];
   if (clauseSetup) {
     Object.keys(clauseSetup).map(clauseKey => {
       let { properties } = clauseSetup[clauseKey];
       if (properties) {
-        Object.keys(properties).map(modelId => {
-          let propertyName = GetCodeName(modelId);
-          let { validators } = properties[modelId];
-          if (validators) {
-            Object.keys(validators).map(validatorId => {
-              let validator = validators[validatorId];
-              let res = GetConditionClause(
-                adjacentId,
-                clauseKey,
-                propertyName,
-                validator,
-                language
-              );
-              result.push({
-                clause: res,
-                id: validatorId
+        Object.keys(properties)
+          .filter(modelId => {
+            if (options && options.filter && options.filter.property) {
+              return options.filter.property === modelId;
+            }
+            return true;
+          })
+          .map(modelId => {
+            let propertyName = GetCodeName(modelId);
+            let { validators } = properties[modelId];
+            if (validators) {
+              Object.keys(validators).map(validatorId => {
+                let validator = validators[validatorId];
+                let res = GetConditionClause(
+                  adjacentId,
+                  clauseKey,
+                  propertyName,
+                  validator,
+                  language,
+                  options
+                );
+                result.push({
+                  clause: res,
+                  id: validatorId
+                });
               });
-            });
-          }
-        });
+            }
+          });
       }
     });
   }
@@ -2482,6 +2517,7 @@ export function GetConditionClause(
   let {
     type,
     template,
+    templatejs,
     node,
     nodeProperty,
     many2manyProperty,
@@ -2501,8 +2537,23 @@ export function GetConditionClause(
   ) {
     template = NodeConstants.FilterUI[type].template;
   }
+  if (
+    NodeConstants.FilterUI &&
+    NodeConstants.FilterUI[type] &&
+    NodeConstants.FilterUI[type].templatejs &&
+    !templatejs
+  ) {
+    templatejs = NodeConstants.FilterUI[type].templatejs;
+  }
   if (template) {
-    conditionTemplate = fs.readFileSync(template, "utf8");
+    switch (language) {
+      case NodeConstants.ProgrammingLanguages.JavaScript:
+        conditionTemplate = fs.readFileSync(templatejs, "utf8");
+        break;
+      default:
+        conditionTemplate = fs.readFileSync(template, "utf8");
+        break;
+    }
   } else {
     throw "no template found: " + type;
   }

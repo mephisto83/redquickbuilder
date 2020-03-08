@@ -187,12 +187,11 @@ export default function(args = {}) {
             prop: "Lambda",
             id: context.node1,
             value:
-              "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {}\n  if(dirty) {\n      //#{model}\n      // #{model~property}\n     let { #{model~property} } = dirty;\n      if( #{model~property} ) \n {\n        return x;\n      }\n  }\n    // only dirty fields, will be validatated.\n return null;\n}"
+              "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {}\n  if(dirty) {\n      //#{model}\n      // #{model~property}\n     let { #{model~property} } = dirty;\n      if( #{model~property} ) \n {//updated \n        return { ...x, property: '#{model~property}' };\n      }\n  }\n    // only dirty fields, will be validatated.\n return null;\n}"
           }
         }
       ];
     },
-
     function(graph) {
       return [
         {
@@ -305,6 +304,32 @@ export default function(args = {}) {
             callback: function(node, graph, group) {
               context.node4 = node.id;
             }
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "uiModelType",
+            id: context.node4,
+            value: context.node2
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: "Property",
+            id: context.node4,
+            value: context.node3
           }
         }
       ];

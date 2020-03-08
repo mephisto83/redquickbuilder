@@ -1798,9 +1798,14 @@ export function bindTemplate(templateString, data) {
     try {
       hasTemplate = regex.test(templateString);
     } catch (e) {}
-    Object.keys(data).map(t => {
+    data = { ...data };
+    let dataKeyes = Object.keys(data);
+    dataKeyes.map(t => {
       if (!data[t + "#lower"]) {
         data[t + "#lower"] = `${data[t]}`.toLowerCase();
+      }
+      if (!data[t + "#js"]) {
+        data[t + "#js"] = `${data[t]}`.toJavascriptName();
       }
     });
 

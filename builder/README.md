@@ -33,6 +33,7 @@
 1. Create APIs
     1. Models that require management will need basic CRUD functionality
     1. Depending on which Agents can interact, different methods need generation.
+    1. Defing methods for agents to interact.
 1. Create a Dashboard/AuthenticatedHomePage
 1. Update Post Authenticate Data Chain to go to the HomePage/Dashboard. "Select Target Screen"
 1. Fetch Service
@@ -47,5 +48,5 @@
 1. CS DataChains
   1. Example
       1. #{var temp @user} => User temp;
-      1. #{arbiter get@user}(#{user @user|prop}); => await userArbiter.Get(user.Prop);
+      1. #{arbiter get@user}(#{user @user~prop}); => await userArbiter.Get(user.Prop);
       1. #{return model_output @model_ouput}; => return model_output //Model_Output

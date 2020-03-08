@@ -123,6 +123,12 @@ export default class DataChainGenerator {
         name: "observable"
       },
       {
+        template: readFileSync("./app/utils/array.js", "utf8"),
+        relative: "./src/actions",
+        relativeFilePath: `./array${fileEnding}`,
+        name: "array"
+      },
+      {
         template: readFileSync("./app/utils/redgraph.js", "utf8"),
         relative: "./src/actions",
         relativeFilePath: `./redgraph${fileEnding}`,
@@ -190,7 +196,20 @@ import {
     equalsLength,
     alphanumericLike,
     alphanumeric,
-    alpha
+    alpha,
+    MinLengthAttribute,
+    MaxLengthAttribute,
+    AlphaOnlyAttribute,
+    AlphaNumericLikeAttribute,
+    AlphaOnlyWithSpacesAttribute,
+    IsNullAttribute,
+    IsNotNullAttribute,
+    MaxAttribute,
+    MinAttribute,
+    EmailAttribute,
+    EmailEmptyAttribute,
+    ZipAttribute,
+    ZipEmptyAttribute
 } from './${rel}validation';
 
 import * as navigate from '../${rel}actions/navigationActions';

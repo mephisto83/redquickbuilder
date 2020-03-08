@@ -126,8 +126,14 @@ export default function ScreenConnectCreate(args = { method, node }) {
         });
       }
 
-      result.push(...AppendValidations({ subcomponents }));
-
+      result.push(
+        ...AppendValidations({
+          subcomponents,
+          screen_option,
+          method,
+          viewPackages
+        })
+      );
     });
   });
 

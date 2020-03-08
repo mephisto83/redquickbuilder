@@ -171,7 +171,14 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           });
         }
 
-        result.push(...AppendValidations({ subcomponents }));
+        result.push(
+          ...AppendValidations({
+            subcomponents,
+            screen_option,
+            method,
+            viewPackages
+          })
+        );
       });
     });
 
@@ -237,6 +244,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           ...StoreModelArrayStandard({
             viewPackages,
             model: GetNodeProp(node, NodeProperties.Model),
+            modelText: GetNodeTitle(node),
             state_key: `${GetNodeTitle(
               GetNodeProp(node, NodeProperties.Model)
             )} State`,

@@ -112,7 +112,9 @@ export const DataChainFunctions = {
   },
   [DataChainFunctionKeys.MethodBaseValidation]: {
     ui: {
-      method: NodeProperties.Method
+      method: NodeProperties.Method,
+      model: NodeProperties.UIModelType,
+      property: NodeProperties.Property
     },
     filter: {
       [NodeProperties.NODEType]: true

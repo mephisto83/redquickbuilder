@@ -18,7 +18,8 @@ import {
   GetStateFunc
 } from "./uiactions";
 import { processRecording } from "../utils/utilservice";
-
+const BUILDER_BACK_UP = ".builder";
+var path = require("path");
 var fs = require("fs");
 const { ipcRenderer } = require("electron");
 const remote = require("electron").remote;
@@ -148,6 +149,7 @@ export function saveGraphToFile() {
             fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
           }
           console.log(fileName);
+
           updateGraphProperty(currentGraph, {
             prop: "graphFile",
             value: fileName
@@ -203,13 +205,41 @@ export function saveRecording(recording) {
     );
   };
 }
+let lastSavedDate = null;
 export function saveGraph(graph) {
   return (dispatch, getState) => {
     var currentGraph = GetRootGraph(getState());
     if (currentGraph && currentGraph.graphFile) {
       if (fs.existsSync(currentGraph.graphFile)) {
+        if (lastSavedDate !== currentGraph.updated) {
+          if (fs.existsSync(currentGraph.graphFile)) {
+            let fileFolder = path.dirname(currentGraph.graphFile);
+            let backupFolder = path.join(fileFolder, BUILDER_BACK_UP);
+            if (!fs.existsSync(backupFolder)) {
+              fs.mkdirSync(backupFolder);
+            }
+            let files = fs.readdirSync(backupFolder);
+            let fileName = path.basename(currentGraph.graphFile);
+            let fileNumber = 0;
+            files.forEach(function(file) {
+              let split = file.split(fileName + ".");
+              let num = split[split.length - 1];
+              if (!isNaN(num)) {
+                num = parseInt(num, 10);
+                if (num >= fileNumber) {
+                  fileNumber = num + 1;
+                }
+              }
+            });
+            fs.copyFileSync(
+              currentGraph.graphFile,
+              path.join(backupFolder, fileName + "." + fileNumber)
+            );
+          }
+        }
         fs.writeFileSync(currentGraph.graphFile, JSON.stringify(currentGraph));
       }
+      lastSavedDate = currentGraph.updated;
     }
   };
 }

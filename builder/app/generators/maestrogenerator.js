@@ -138,7 +138,8 @@ export default class MaestroGenerator {
               let datachainoptions = { "lambda.default": "" };
               let dataChainNodes = GraphMethods.GetNodesLinkedTo(null, {
                 id: maestro_function.id,
-                link: LinkType.DataChainLink
+                link: LinkType.DataChainLink,
+                direction: GraphMethods.SOURCE
               });
               dataChainNodes.map(dataChainNode => {
                 let lambda = GetLambdaDefinition(maestro_function);
@@ -153,8 +154,12 @@ export default class MaestroGenerator {
                       GetCurrentGraph()
                     );
                     datachainoptions["lambda.default"] = `
-        var ${GetCodeName(dataChainNode).toLowerCase()} = RedStrapper.Resolve<${GetCodeName(dataChainNode)}>();
-        return await ${GetCodeName(dataChainNode).toLowerCase()}.Execute(${dataChainArgs});`;
+        var ${GetCodeName(
+          dataChainNode
+        ).toLowerCase()} = RedStrapper.Resolve<${GetCodeName(dataChainNode)}>();
+        return await ${GetCodeName(
+          dataChainNode
+        ).toLowerCase()}.Execute(${dataChainArgs});`;
                   } else if (lambda.default) {
                     datachainoptions = {
                       "lambda.default": `return ${lambda.default.return};`

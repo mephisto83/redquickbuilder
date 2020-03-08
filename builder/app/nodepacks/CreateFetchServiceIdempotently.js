@@ -16,7 +16,7 @@ import {
 } from "../actions/uiactions";
 import CreateFetchParameters from "./CreateFetchParameters";
 import CreateFetchService from "./CreateFetchService";
-import CreateFetchOutput from './CreateFetchOutput';
+import CreateFetchOutput from "./CreateFetchOutput";
 import {
   MethodFunctions,
   FunctionTemplateKeys
@@ -47,14 +47,6 @@ export default function(args = {}) {
       [NodeProperties.IsFetchOutput]: true
     },
     graph
-  );
-  let fetchCompatibleMethods = NodesByType(null, NodeTypes.Method).filter(
-    method => {
-      let funcType = GetNodeProp(method, NodeProperties.FunctionType);
-      let { isFetchCompatible } =
-        funcType && MethodFunctions[funcType] ? MethodFunctions[funcType] : {};
-      return isFetchCompatible;
-    }
   );
   let fetchService = GetNodeByProperties({
     [NodeProperties.NODEType]: NodeTypes.FetchService
@@ -87,54 +79,78 @@ export default function(args = {}) {
       })
     );
   }
-  fetchCompatibleMethods.map(fetchMethod => {
-    result.push({
-      operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
-        return {
-          target: fetchMethod.id,
-          source: fetchService.id,
-          properties: { ...LinkProperties.FetchService }
+  result.push(function() {
+    let fetchCompatibleMethods = NodesByType(null, NodeTypes.Method).filter(
+      method => {
+        let funcType = GetNodeProp(method, NodeProperties.FunctionType);
+        let { isFetchCompatible } =
+          funcType && MethodFunctions[funcType]
+            ? MethodFunctions[funcType]
+            : {};
+        return isFetchCompatible;
+      }
+    );
+    let tempresult = [];
+    fetchCompatibleMethods.map(fetchMethod => {
+      tempresult.push({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: function() {
+          return {
+            target: fetchMethod.id,
+            source: fetchService.id,
+            properties: { ...LinkProperties.FetchService }
+          };
+        }
+      });
+
+      let param = GetMethodNodeProp(
+        fetchMethod,
+        FunctionTemplateKeys.FetchParameter
+      );
+      if (fetchParameter && param !== fetchParameter.id) {
+        let methodProps = {
+          ...(GetNodeProp(fetchMethod, NodeProperties.MethodProps) || {})
         };
+        methodProps[FunctionTemplateKeys.FetchParameter] = fetchParameter.id;
+        tempresult.push(
+          {
+            operation: REMOVE_LINK_BETWEEN_NODES,
+            options: {
+              source: fetchMethod.id,
+              target: param
+            }
+          },
+          {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: {
+              source: fetchMethod.id,
+              target: fetchParameter.id,
+              properties: { ...LinkProperties.FunctionOperator }
+            }
+          },
+          {
+            operation: UPDATE_NODE_PROPERTY,
+            options: function() {
+              return {
+                id: fetchMethod.id,
+                properties: { [NodeProperties.MethodProps]: methodProps }
+              };
+            }
+          },
+          {
+            operation: UPDATE_NODE_PROPERTY,
+            options: function() {
+              return {
+                id: fetchParameter.id,
+                properties: { [NodeProperties.ExcludeFromController]: true }
+              };
+            }
+          }
+        );
       }
     });
 
-    let param = GetMethodNodeProp(
-      fetchMethod,
-      FunctionTemplateKeys.FetchParameter
-    );
-    if (param !== fetchParameter.id) {
-      let methodProps = {
-        ...(GetNodeProp(fetchMethod, NodeProperties.MethodProps) || {})
-      };
-      methodProps[FunctionTemplateKeys.FetchParameter] = fetchParameter.id;
-      result.push(
-        {
-          operation: REMOVE_LINK_BETWEEN_NODES,
-          options: {
-            source: fetchMethod.id,
-            target: param
-          }
-        },
-        {
-          operation: ADD_LINK_BETWEEN_NODES,
-          options: {
-            source: fetchMethod.id,
-            target: fetchParameter.id,
-            properties: { ...LinkProperties.FunctionOperator }
-          }
-        },
-        {
-          operation: UPDATE_NODE_PROPERTY,
-          options: function() {
-            return {
-              id: fetchMethod.id,
-              properties: { [NodeProperties.MethodProps]: methodProps }
-            };
-          }
-        }
-      );
-    }
+    return tempresult;
   });
 
   result.push({

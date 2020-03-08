@@ -1347,7 +1347,8 @@ export const NodePropertyTypes = {
 export const NEW_LINE = `
 `;
 export const ProgrammingLanguages = {
-  CSHARP: "csharp"
+  CSHARP: "csharp",
+  JavaScript: "java-script"
 };
 export const NodePropertyTypesByLanguage = {
   [ProgrammingLanguages.CSHARP]: {
@@ -2250,6 +2251,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "OneOfAttribute"
     },
     template: "./app/templates/filter/one-of.tpl",
+    templatejs: "./app/templates/filter/one-ofjs.tpl",
     arguments: {
       ...COMMON_STRING_ARGS,
       nodeType: NodeTypes.Enumeration,
@@ -2263,6 +2265,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "SocialSecurityAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.Zip]: {
@@ -2270,6 +2273,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "ZipAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.ZipEmpty]: {
@@ -2277,6 +2281,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "ZipEmptyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.PastDate]: {
@@ -2284,6 +2289,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "PastDateAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_DATETIME_ARGS }
   },
   [ValidationRules.BeforeNow]: {
@@ -2291,6 +2297,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "BeforeNowAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_DATETIME_ARGS }
   },
   [ValidationRules.Email]: {
@@ -2298,6 +2305,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "EmailAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.Credit]: {
@@ -2305,6 +2313,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "CreditCardAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.EmailEmpty]: {
@@ -2312,6 +2321,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "EmailEmptyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.Url]: {
@@ -2319,6 +2329,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "UrlAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.UrlEmpty]: {
@@ -2326,6 +2337,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "UrlEmptyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.IsNull]: {
@@ -2333,6 +2345,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "IsNullAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.IsNotNull]: {
@@ -2340,6 +2353,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "IsNotNullAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.AlphaNumericLike]: {
@@ -2347,6 +2361,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "AlphaNumericLikeAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.AlphaOnly]: {
@@ -2354,6 +2369,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "AlphaOnlyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.AlphaOnlyWithSpaces]: {
@@ -2361,6 +2377,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "NotEmptyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.MaxLength]: {
@@ -2368,6 +2385,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MaximumLengthAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER_ARGS }
   },
   [ValidationRules.MinLength]: {
@@ -2375,6 +2393,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MinimumLengthAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER_ARGS }
   },
   [ValidationRules.MaxLengthEqual]: {
@@ -2382,6 +2401,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MaximumLengthAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER__EQ_ARGS }
   },
   [ValidationRules.MinLengthEqual]: {
@@ -2389,6 +2409,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MinAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER__EQ_ARGS }
   },
 
@@ -2397,6 +2418,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MaxAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER_ARGS }
   },
   [ValidationRules.MinValue]: {
@@ -2404,6 +2426,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MinAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER_ARGS }
   },
   [ValidationRules.MaxValueEqual]: {
@@ -2411,6 +2434,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MaxAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER__EQ_ARGS }
   },
   [ValidationRules.MinValueEqual]: {
@@ -2418,6 +2442,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "MinAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_NUMBER__EQ_ARGS }
   },
   [ValidationRules.Email]: {
@@ -2425,6 +2450,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "EmailAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   },
   [ValidationRules.EmailEmpty]: {
@@ -2432,6 +2458,7 @@ export const FilterUI = {
       [ProgrammingLanguages.CSHARP]: "EmailEmptyAttribute"
     },
     template: "./app/templates/validation/validation_generic.tpl",
+    templatejs: "./app/templates/validation/validation_generic_js.tpl",
     arguments: { ...COMMON_STRING_ARGS }
   }
 };

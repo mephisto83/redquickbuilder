@@ -196,9 +196,14 @@ export default function ScreenConnectUpdate(args = { method, node }) {
         });
       }
 
-
-      result.push(...AppendValidations({ subcomponents }));
-
+      result.push(
+        ...AppendValidations({
+          subcomponents,
+          screen_option,
+          method,
+          viewPackages
+        })
+      );
     });
   });
   result = [...result, ...ModifyUpdateLinks()];

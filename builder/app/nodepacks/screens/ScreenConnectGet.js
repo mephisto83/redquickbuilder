@@ -127,8 +127,14 @@ export default function ScreenConnectGet(args = { method, node }) {
           );
         });
       }
-      result.push(...AppendValidations({ subcomponents }));
-
+      result.push(
+        ...AppendValidations({
+          subcomponents,
+          screen_option,
+          method,
+          viewPackages
+        })
+      );
     });
 
     let lifeCylcleMethods = GetNodesLinkedTo(graph, {

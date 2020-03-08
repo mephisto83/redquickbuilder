@@ -46,7 +46,7 @@ import {
 } from "../constants/datachain";
 import ButtonList from "./buttonlist";
 
-import { getReferenceInserts } from "../utils/utilService";
+import { getReferenceInserts } from "../utils/utilservice";
 import CheckBoxProperty from "./checkboxproperty";
 import genericpropertycontainer from "./genericpropertycontainer";
 
