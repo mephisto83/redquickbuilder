@@ -11,13 +11,18 @@ import {
   ADD_LINK_BETWEEN_NODES,
   ADD_NEW_NODE,
   GetNodeByProperties,
-  GetNodeTitle
+  GetNodeTitle,
+  NO_OP
 } from "../actions/uiactions";
 import * as GraphMethods from "../methods/graph_methods";
+import { uuidv4 } from "../utils/array";
 export default function(args = {}) {
   let { target, source, viewPackages, graph } = args;
   let state = GetState();
-  viewPackages = viewPackages || {};
+  viewPackages = viewPackages || {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
 
   let apiConnectors = GraphMethods.GetConnectedNodesByType(
     state,
@@ -73,7 +78,9 @@ export default function(args = {}) {
     null,
     graph
   );
-
+  let context = {
+    apiEndPoints: []
+  };
   let apiEndpoints = [];
   GraphMethods.GetConnectedNodesByType(
     state,
@@ -101,6 +108,8 @@ export default function(args = {}) {
         graph
       ).map(queryParam => {
         if (GetNodeProp(queryParam, NodeProperties.QueryParameterParam)) {
+          apiEndpoints.push(queryParam);
+        } else if (GetNodeProp(queryParam, NodeProperties.TemplateParameter)) {
           apiEndpoints.push(queryParam);
         }
       });
@@ -144,6 +153,9 @@ export default function(args = {}) {
             properties: {
               [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
               ...viewPackages
+            },
+            callback: new_node => {
+              context.apiEndPoints.push(new_node);
             },
             linkProperties: {
               properties: { ...LinkProperties.ComponentApiConnector }
@@ -191,8 +203,16 @@ export default function(args = {}) {
           };
         }
       };
-    })
+    }),
+    {
+      operation: NO_OP,
+      options: function(graph) {
+        if (args.callback) {
+          args.callback(context, graph);
+        }
+      }
+    }
   ];
 
-  return result;
+  return [...result];
 }

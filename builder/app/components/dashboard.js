@@ -579,6 +579,16 @@ class Dashboard extends Component {
     result.push({
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.ComponentApi,
+          singleLink: true,
+          nodeTypes: [NodeTypes.ComponentApi]
+        });
+      },
+      icon: 'fa fa-genderless',
+      title: `${Titles.InternalApiConnection}`
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.ComponentApiConnection
         });
       },
@@ -656,7 +666,17 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-list-ol',
       title: `${Titles.ConnectLifeCylceMethods}`
-    }, {
+    },{
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.ComponentApi,
+          singleLink: true,
+          nodeTypes: [NodeTypes.ComponentApi]
+        });
+      },
+      icon: 'fa fa-genderless',
+      title: `${Titles.InternalApiConnection}`
+    },{
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.DataChainLink,

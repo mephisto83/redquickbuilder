@@ -10,7 +10,8 @@ import {
   ADD_LINK_BETWEEN_NODES,
   GetNodeTitle,
   GetModelPropertyChildren,
-  ComponentApiKeys
+  ComponentApiKeys,
+  GetCodeName
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -27,6 +28,10 @@ import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import AppendValidations from "./AppendValidations";
+import {
+  FunctionTemplateKeys,
+  TEMPLATE_PARAMETERS
+} from "../../constants/functiontypes";
 
 export default function ScreenConnectGet(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -53,6 +58,11 @@ export default function ScreenConnectGet(args = { method, node }) {
     let components = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.Component
+    });
+
+    let internalComponentApis = GetNodesLinkedTo(graph, {
+      id: screen_option.id,
+      link: LinkType.ComponentInternalApi
     });
 
     components.map(component => {
@@ -175,6 +185,7 @@ export default function ScreenConnectGet(args = { method, node }) {
             });
           }
         });
+        let apiEndpoints = {};
         let cycleInstance = null;
         result.push(
           ...AddLifeCylcleMethodInstance({
@@ -190,10 +201,49 @@ export default function ScreenConnectGet(args = { method, node }) {
                 target: method,
                 source: cycleInstance.id,
                 graph,
-                viewPackages
+                viewPackages,
+                callback: (context, graph) => {
+                  if (context.apiEndPoints) {
+                    context.apiEndPoints.filter(d => {
+                      let temp = GetNodesLinkedTo(graph, {
+                        id: d.id,
+                        link: LinkType.ComponentApiConnection
+                      }).find(v => TEMPLATE_PARAMETERS[GetCodeName(v)]);
+                      if (temp) {
+                        apiEndpoints[GetCodeName(temp)] = d;
+                      }
+                      return temp;
+                    });
+                  }
+                }
               });
             }
             return [];
+          },
+          function(graph) {
+            if (apiEndpoints) {
+              return Object.keys(apiEndpoints).map(key => {
+                let apiEndpoint = apiEndpoints[key];
+                let internalComponentApi = internalComponentApis.find(v => {
+                  return GetCodeName(v) === key;
+                });
+                if (!internalComponentApi) {
+                  internalComponentApi = internalComponentApis.find(v => {
+                    return GetCodeName(v) === "value";
+                  });
+                }
+                if (apiEndpoint && internalComponentApi) {
+                  return {
+                    operation: ADD_LINK_BETWEEN_NODES,
+                    options: {
+                      source: apiEndpoint.id,
+                      target: internalComponentApi.id,
+                      properties: { ...LinkProperties.ComponentApi }
+                    }
+                  };
+                }
+              });
+            }
           }
         );
       });

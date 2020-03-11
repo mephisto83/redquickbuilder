@@ -899,7 +899,9 @@ export function GenerateMarkupTag(node, language, parent) {
         }
         if (!describedApi) {
           describedApi = WriteDescribedApiProperties(node, {
-            listItem: GetNodeProp(node, NodeProperties.ComponentType) === ComponentTypeKeys.ListItem
+            listItem:
+              GetNodeProp(node, NodeProperties.ComponentType) ===
+              ComponentTypeKeys.ListItem
           });
         }
       }
@@ -1480,11 +1482,13 @@ export function getMethodInvocation(methodInstanceCall) {
     type: LinkType.DataChainLink,
     direction: SOURCE
   }).find(x => x);
+
   let internalApiConnection = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.ComponentApi,
     direction: SOURCE
   }).find(x => x);
+
   if (method) {
     let parts = [];
     let body = getNodesByLinkType(graph, {
@@ -1497,6 +1501,11 @@ export function getMethodInvocation(methodInstanceCall) {
       type: LinkType.MethodApiParameters,
       direction: TARGET
     }).find(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
+    let templateObject = getNodesByLinkType(graph, {
+      id: method.id,
+      type: LinkType.MethodApiParameters,
+      direction: TARGET
+    }).find(x => GetNodeProp(x, NodeProperties.TemplateParameter));
 
     let dataChain = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
@@ -1555,42 +1564,40 @@ export function getMethodInvocation(methodInstanceCall) {
         parts.push(`${body_input}`);
       }
     }
+    if (templateObject) {
+      let templateParameters = GetNodesLinkedTo(graph, {
+        id: templateObject.id,
+        type: LinkType.MethodApiParameters,
+        direction: SOURCE
+      }).filter(x => GetNodeProp(x, NodeProperties.TemplateParameter));
+
+      let queryParameterValues = templateParameters
+        .map(queryParameter => {
+          return extractApiJsCode({
+            node: queryParameter,
+            graph,
+            internalApiConnection
+          });
+        })
+        .filter(temp => temp);
+      parts.push(
+        `template: {${addNewLine(queryParameterValues.join(", " + NEW_LINE))}}`
+      );
+    }
     if (queryObject) {
       let queryParameters = getNodesByLinkType(graph, {
         id: queryObject.id,
         type: LinkType.MethodApiParameters,
         direction: SOURCE
-      });
-      queryParameters = queryParameters.filter(x =>
-        GetNodeProp(x, NodeProperties.QueryParameterParam)
-      );
+      }).filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
 
       let queryParameterValues = queryParameters
         .map(queryParameter => {
-          let param = getNodesByLinkType(graph, {
-            id: queryParameter.id,
-            type: LinkType.ComponentApiConnection,
-            direction: TARGET
-          }).find(x_temp => x_temp);
-          if (param) {
-            let value = getNodesByLinkType(graph, {
-              id: param.id,
-              type: LinkType.ComponentApiConnection,
-              direction: SOURCE
-            }).find(
-              x_temp =>
-                GetNodeProp(x_temp, NodeProperties.NODEType) ===
-                NodeTypes.DataChain
-            );
-            if (value) {
-              return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(
-                value,
-                {
-                  includeNameSpace: true
-                }
-              )}(this.props.state)`;
-            }
-          }
+          return extractApiJsCode({
+            node: queryParameter,
+            graph,
+            internalApiConnection
+          });
         })
         .filter(temp => temp);
       parts.push(
@@ -1877,7 +1884,9 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
           title: `"${GetNodeTitle(screen)}"`
         }),
         relative: "./src/screens",
-        relativeFilePath: `./${GetCodeName(screen).toJavascriptName()}${fileEnding}`,
+        relativeFilePath: `./${GetCodeName(
+          screen
+        ).toJavascriptName()}${fileEnding}`,
         name: GetCodeName(screen)
       };
     })
@@ -1915,4 +1924,49 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
   });
 
   return [...result, ...moreresults];
+}
+
+/**
+ * Links the api together.
+ * @param {object} args
+ */
+function extractApiJsCode(args = { node, graph }) {
+  let { node, graph } = args;
+  let temp = queryParameter => {
+    let param = getNodesByLinkType(graph, {
+      id: queryParameter.id,
+      type: LinkType.ComponentApiConnection,
+      direction: TARGET
+    }).find(x_temp => x_temp);
+
+    if (param) {
+      let internalApiConnection = getNodesByLinkType(graph, {
+        id: param.id,
+        type: LinkType.ComponentApi,
+        direction: SOURCE
+      }).find(x => x);
+
+      let value = getNodesByLinkType(graph, {
+        id: param.id,
+        type: LinkType.ComponentApiConnection,
+        direction: SOURCE
+      }).find(
+        x_temp =>
+          GetNodeProp(x_temp, NodeProperties.NODEType) === NodeTypes.DataChain
+      );
+      if (value) {
+        let input_ = "this.props.state";
+        if (internalApiConnection) {
+          input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
+        }
+        return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value, {
+          includeNameSpace: true
+        })}(${input_})`;
+      } else if (internalApiConnection) {
+        let input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
+        return `${GetJSCodeName(queryParameter)}:  ${input_}`;
+      }
+    }
+  };
+  return temp(node);
 }

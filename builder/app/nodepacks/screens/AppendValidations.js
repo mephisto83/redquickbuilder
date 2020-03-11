@@ -3,15 +3,18 @@ import {
   GetNodeTitle,
   ComponentApiKeys,
   GetModelPropertyChildren,
-  ADD_LINK_BETWEEN_NODES
+  ADD_LINK_BETWEEN_NODES,
+  GetNodeById
 } from "../../actions/uiactions";
 import {
   NodeProperties,
   LinkType,
-  LinkProperties
+  LinkProperties,
+  LinkPropertyKeys
 } from "../../constants/nodetypes";
-import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
+import { ComponentTypeKeys } from "../../constants/componenttypes";
 
 export default function AppendValidations({
   subcomponents,
@@ -22,6 +25,9 @@ export default function AppendValidations({
   if (!subcomponents) {
     throw "no subcomponents";
   }
+  subcomponents = subcomponents.filter(
+    x => !GetNodeProp(x, NodeProperties.ExecuteButton)
+  );
   let result = [];
 
   if (subcomponents.length) {
@@ -31,6 +37,8 @@ export default function AppendValidations({
         NodeProperties.ComponentType
       );
       switch (componentType) {
+        case ComponentTypeKeys.Button:
+          break;
         default:
           let externalValidationApi = GetNodesLinkedTo(null, {
             id: subcomponent.id,
@@ -39,6 +47,15 @@ export default function AppendValidations({
           if (externalValidationApi) {
             let modelId = GetNodeProp(screen_option, NodeProperties.Model);
             let propertyId = GetNodeProp(subcomponent, NodeProperties.Property);
+            propertyId =
+              propertyId ||
+              GetNodeLinkedTo(null, {
+                id: subcomponent.id,
+                link: LinkType.PropertyLink,
+                properties: {
+                  [LinkPropertyKeys.ComponentProperty]: true
+                }
+              });
             if (!propertyId) {
               propertyId = GetModelPropertyChildren(modelId).find(
                 v => GetNodeTitle(v) === GetNodeTitle(subcomponent)
@@ -46,6 +63,9 @@ export default function AppendValidations({
               if (propertyId) {
                 propertyId = propertyId.id;
               }
+            }
+            if (!GetNodeById(propertyId)) {
+              return;
             }
             let validatorNode = null;
             result.push(

@@ -414,6 +414,8 @@ export const NodeProperties = {
   QueryParameterObject: "QueryParameterObject",
   QueryParameterParam: "QueryParameterParam",
   QueryParameterParamType: "QueryParameterParamType",
+  TemplateParameter: "TemplateParameter",
+  TemplateParameterType: "TemplateParameterType",
   IsQuery: "query",
   AutoDelete: "AutoDelete", // Anything matching the properties etc, will auto delete along with the current node.
   UriBody: "UriBody",
@@ -919,6 +921,7 @@ export const LinkPropertyKeys = {
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
   ComponentTag: "ComponentTag",
+  ComponentProperty: "ComponentProperty",
   ViewType: "viewType",
   AsForm: "AsForm"
 };

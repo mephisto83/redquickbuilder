@@ -167,6 +167,15 @@ export default class MaestroGenerator {
                   }
                 }
               });
+              if (
+                !datachainoptions["lambda.default"] &&
+                ft.lambda &&
+                ft.lambda.default
+              ) {
+                datachainoptions["lambda.default"] = `return ${
+                  ft.lambda.default.return
+                };`;
+              }
               let agentTypeNode = null;
               let fetchTypeNode = null;
               let userTypeNode = null;

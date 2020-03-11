@@ -2836,7 +2836,6 @@ export const CreateDefaultView = {
                           )}`,
                           [NodeProperties.UIType]: uiType,
                           [NodeProperties.Label]: GetNodeTitle(modelProperty),
-                          [NodeProperties.Property]: modelProperty.id,
                           [NodeProperties.ComponentType]:
                             sharedComponent || componentTypeToUse,
                           [NodeProperties.UsingSharedComponent]: !!sharedComponent,
@@ -2848,6 +2847,17 @@ export const CreateDefaultView = {
                         linkProperties: {
                           properties: { ...LinkProperties.ComponentLink }
                         },
+                        links: [
+                          {
+                            target: modelProperty.id,
+                            linkProperties: {
+                              properties: {
+                                ...LinkProperties.PropertyLink,
+                                [LinkPropertyKeys.ComponentProperty]: true
+                              }
+                            }
+                          }
+                        ],
                         callback: component => {
                           childComponents[modelIndex] = component.id;
                         }

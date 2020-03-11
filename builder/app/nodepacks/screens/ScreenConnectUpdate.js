@@ -122,6 +122,8 @@ export default function ScreenConnectUpdate(args = { method, node }) {
         id: component.id,
         link: LinkType.Component
       });
+
+
       let executiveButtons = subcomponents.filter(x =>
         GetNodeProp(x, NodeProperties.ExecuteButton)
       );
@@ -194,6 +196,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             }
           );
         });
+
       }
 
       result.push(

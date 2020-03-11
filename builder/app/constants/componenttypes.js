@@ -138,6 +138,7 @@ INPUT_DEFAULT_API.map(x => {
 export const ComponentTypeKeys = {
   SingleSelect: "SingleSelect",
   List: "List",
+  Button: "Button",
   ListItem: "ListItem",
   MultiSelectList: "MultiSelectList",
   Text: "Text",
@@ -147,7 +148,7 @@ export const ComponentTypes = {
   ReactNative: {
     Badge: {},
     Body: {},
-    Button: {
+    [ComponentTypeKeys.Button]: {
       template: "./app/templates/components/button.tpl",
       defaultApi: BUTTON_DEFAULT_API,
       eventApi: [ComponentEvents.onPress],
@@ -528,11 +529,11 @@ Object.keys(ComponentTypes.ReactNative).map(key => {
   }
 });
 
-ComponentTypes[UITypes.ElectronIO].Button = {
-  ...ComponentTypes[UITypes.ElectronIO].Button,
+ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button] = {
+  ...ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button],
   eventApi: [ComponentEvents.onClick],
   properties: {
-    ...ComponentTypes[UITypes.ElectronIO].Button.properties,
+    ...ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button].properties,
     onClick: {
       nodeProperty: "onClick",
       template: "() => { {{value}} }",

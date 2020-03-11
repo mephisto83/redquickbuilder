@@ -680,13 +680,19 @@ export const QUERY_PARAMETER_KEYS = {
   Sort: "sort",
   Id: "id"
 };
+export const TEMPLATE_PARAMETER_KEYS = {
+  ModelId: "modelId",
+  ParentId: "parentId"
+};
 export const QUERY_PARAMETERS = {
   [QUERY_PARAMETER_KEYS.Skip]: true,
   [QUERY_PARAMETER_KEYS.Take]: true,
   [QUERY_PARAMETER_KEYS.Filter]: true,
   [QUERY_PARAMETER_KEYS.Sort]: true
 };
-
+export const TEMPLATE_PARAMETERS = {
+  [TEMPLATE_PARAMETER_KEYS.ModelId]: true
+};
 export const GET_QUERY_PARAMETERS = {
   [QUERY_PARAMETER_KEYS.Id]: true
 };
@@ -1521,7 +1527,7 @@ export const MethodFunctions = {
     parameters: {
       body: false,
       parameters: {
-        query: { ...GET_QUERY_PARAMETERS }
+        template: { ...TEMPLATE_PARAMETERS }
       }
     },
     isList: false,

@@ -18,6 +18,8 @@ import { currentId } from "async_hooks";
 import { getReferenceInserts } from "../utils/utilservice";
 import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
 import { buildValidation } from "../service/validation_js_service";
+import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
+import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
 
 var fs = require("fs");
 export const VISUAL = "VISUAL";
@@ -439,188 +441,10 @@ export function connectLifeCycleMethod(args) {
     setTimeout(() => {
       let state = getState();
       let graph = GetCurrentGraph(state);
-      if (
-        [NodeTypes.Method, NodeTypes.Screen].some(
-          t => t === GetNodeProp(target, NodeProperties.NODEType)
-        )
-      ) {
-        let apiConnectors = GraphMethods.GetConnectedNodesByType(
-          state,
-          source,
-          NodeTypes.ComponentApiConnector
-        ).map(x => {
-          return {
-            operation: REMOVE_NODE,
-            options: {
-              id: x.id
-            }
-          };
-        });
-
-        let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(
-          state,
-          source,
-          [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod]
-        );
-        let model = GraphMethods.GetConnectedNodeByType(
-          state,
-          lifeCycleMethod.id,
-          [NodeTypes.Model]
-        );
-        let selectorNode = model
-          ? GraphMethods.GetConnectedNodeByType(state, model.id, [
-              NodeTypes.Selector
-            ])
-          : null;
-        let _chain = selectorNode
-          ? GetNodesByProperties({
-              [NodeProperties.Selector]: selectorNode.id,
-              [NodeProperties.EntryPoint]: true,
-              [NodeProperties.NODEType]: NodeTypes.DataChain,
-              [NodeProperties.SelectorProperty]:
-                NodeConstants.SelectorPropertyKeys.Object
-            }).find(x => {
-              return (
-                GraphMethods.GetNodesLinkedTo(graph, {
-                  id: x.id,
-                  link: NodeConstants.LinkType.DataChainLink,
-                  componentType: NodeTypes.DataChain
-                }).length === 0
-              );
-            })
-          : null;
-        let dataChain = model ? _chain : null;
-        let componentNode = GraphMethods.GetConnectedNodeByType(
-          state,
-          lifeCycleMethod.id,
-          [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption]
-        );
-
-        state = getState();
-        graph = GetCurrentGraph(state);
-        let apiEndpoints = [];
-        GraphMethods.GetConnectedNodesByType(
-          state,
-          target,
-          NodeTypes.MethodApiParameters
-        )
-          .filter(x => {
-            if (GetNodeProp(x, NodeProperties.QueryParameterObject)) {
-              return true;
-            }
-            if (GetNodeProp(x, NodeProperties.UriBody)) {
-              apiEndpoints.push(x);
-              return false;
-            }
-            return true;
-          })
-          .map(queryObj => {
-            GraphMethods.GetConnectedNodesByType(
-              state,
-              queryObj.id,
-              NodeTypes.MethodApiParameters
-            ).map(queryParam => {
-              if (GetNodeProp(queryParam, NodeProperties.QueryParameterParam)) {
-                apiEndpoints.push(queryParam);
-              }
-            });
-          });
-
-        PerformGraphOperation([
-          ...(dataChain
-            ? []
-            : !selectorNode
-            ? []
-            : CreateDataChainGetBody({
-                selector: selectorNode.id,
-                model: GetNodeTitle(model),
-                callback: (_m, graph) => {
-                  dataChain = GetNodeById(_m.entry, graph);
-                }
-              })),
-          ...apiConnectors,
-          {
-            operation: ADD_LINK_BETWEEN_NODES,
-            options: function() {
-              return {
-                target,
-                source,
-                properties: {
-                  ...LinkProperties.MethodCall
-                }
-              };
-            }
-          },
-          ...apiEndpoints.map(ae => {
-            return {
-              operation: ADD_NEW_NODE,
-              options: function() {
-                let skipOrTake = GetNodeByProperties({
-                  [NodeProperties.QueryParameterType]: GetNodeProp(
-                    ae,
-                    NodeProperties.QueryParameterParamType
-                  ),
-                  [NodeProperties.NODEType]: NodeTypes.DataChain,
-                  [NodeProperties.Component]: componentNode.id,
-                  [NodeProperties.IsPaging]: true
-                });
-
-                return {
-                  nodeType: NodeTypes.ComponentApiConnector,
-                  groupProperties: {},
-                  parent: source,
-                  properties: {
-                    [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`
-                  },
-                  linkProperties: {
-                    properties: { ...LinkProperties.ComponentApiConnector }
-                  },
-                  links: [
-                    {
-                      target: ae.id,
-                      linkProperties: {
-                        properties: {
-                          ...LinkProperties.ComponentApiConnection
-                        }
-                      }
-                    },
-                    skipOrTake
-                      ? {
-                          target: skipOrTake.id,
-                          linkProperties: {
-                            properties: {
-                              ...LinkProperties.ComponentApiConnection
-                            }
-                          }
-                        }
-                      : null,
-                    dataChain
-                      ? {
-                          target: dataChain.id,
-                          linkProperties: {
-                            properties: {
-                              ...LinkProperties.ComponentApiConnection
-                            }
-                          }
-                        }
-                      : null,
-                    selectorNode
-                      ? {
-                          target: selectorNode.id,
-                          linkProperties: {
-                            properties: {
-                              ...LinkProperties.ComponentApiConnection
-                            }
-                          }
-                        }
-                      : null
-                  ].filter(x => x)
-                };
-              }
-            };
-          })
-        ])(dispatch, getState);
-      }
+      graphOperation(ConnectLifecycleMethod({ target, source, graph }))(
+        dispatch,
+        getState
+      );
     }, 100);
   };
 }
@@ -888,128 +712,12 @@ export function updateMethodParameters(current, methodType) {
     let state = getState();
     let graph = GetRootGraph(state);
     let toRemove = [];
-    GraphMethods.GetNodesLinkedTo(graph, {
-      id: current
-    })
-      .filter(t => {
-        return (
-          GetNodeProp(t, NodeProperties.NODEType) ===
-          NodeTypes.MethodApiParameters
-        );
+    graphOperation(
+      UpdateMethodParameters({
+        methodType,
+        current
       })
-      .map(t => {
-        toRemove.push(t.id);
-        GraphMethods.GetNodesLinkedTo(graph, {
-          id: t.id
-        })
-          .filter(w => {
-            return (
-              GetNodeProp(w, NodeProperties.NODEType) ===
-              NodeTypes.MethodApiParameters
-            );
-          })
-          .map(v => {
-            toRemove.push(v.id);
-          });
-      });
-
-    toRemove.map(v => {
-      graphOperation(REMOVE_NODE, { id: v })(dispatch, getState);
-    });
-    if (MethodFunctions[methodType]) {
-      let { parameters } = MethodFunctions[methodType];
-      let newGroupId = uuidv4();
-      if (parameters) {
-        let { body } = parameters;
-        let params = parameters.parameters;
-        let operations = [
-          body
-            ? {
-                operation: ADD_NEW_NODE,
-                options: function() {
-                  return {
-                    nodeType: NodeTypes.MethodApiParameters,
-                    properties: {
-                      [NodeProperties.UIText]: Titles.Body,
-                      [NodeProperties.UriBody]: true
-                    },
-                    links: [
-                      {
-                        target: current,
-                        linkProperties: {
-                          properties: {
-                            ...LinkProperties.MethodApiParameters,
-                            body: !!body
-                          }
-                        }
-                      }
-                    ]
-                  };
-                }
-              }
-            : false
-        ].filter(x => x);
-        if (params) {
-          let { query } = params;
-          if (query) {
-            let queryNodeId = null;
-            operations.push(
-              {
-                operation: ADD_NEW_NODE,
-                options: function() {
-                  return {
-                    nodeType: NodeTypes.MethodApiParameters,
-                    properties: {
-                      [NodeProperties.UIText]: "Query",
-                      [NodeProperties.QueryParameterObject]: true
-                    },
-                    callback: function(queryNode) {
-                      queryNodeId = queryNode.id;
-                    },
-                    links: [
-                      {
-                        target: current,
-                        linkProperties: {
-                          properties: {
-                            ...LinkProperties.MethodApiParameters,
-                            params: true,
-                            query: true
-                          }
-                        }
-                      }
-                    ]
-                  };
-                }
-              },
-              ...Object.keys(query).map(q => {
-                return {
-                  operation: ADD_NEW_NODE,
-                  options: function() {
-                    return {
-                      nodeType: NodeTypes.MethodApiParameters,
-                      groupProperties: {},
-                      parent: queryNodeId,
-                      properties: {
-                        [NodeProperties.UIText]: q,
-                        [NodeProperties.QueryParameterParam]: true,
-                        [NodeProperties.QueryParameterParamType]: q
-                      },
-                      linkProperties: {
-                        properties: {
-                          ...LinkProperties.MethodApiParameters,
-                          parameter: q
-                        }
-                      }
-                    };
-                  }
-                };
-              })
-            );
-          }
-        }
-        PerformGraphOperation([...operations])(dispatch, getState);
-      }
-    }
+    )(dispatch, getState);
   };
 }
 
@@ -1975,7 +1683,10 @@ export function GenerateDataChainMethod(id) {
   let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
   let methodMethod = GetNodeProp(node, NodeProperties.Method);
   let $screen = GetNodeProp(node, NodeProperties.Screen);
-  let userParams = GetNodeProp(node, NodeProperties.UseNavigationParams);
+  let useNavigationParams = GetNodeProp(
+    node,
+    NodeProperties.UseNavigationParams
+  );
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
   let lambdaInsertArguments = GetNodeProp(
     node,
@@ -2108,7 +1819,7 @@ export function GenerateDataChainMethod(id) {
       return `(a) => ${func}(a)`;
     case DataChainFunctionKeys.Navigate:
       let insert = "";
-      if (userParams) {
+      if (useNavigationParams) {
         insert = `Object.keys(a).map(v=>{
           let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
           route = route.replace(regex, a[v]);
@@ -3789,6 +3500,7 @@ export const ADD_NEW_NODE = "ADD_NEW_NODE";
 export const REMOVE_LINK_BETWEEN_NODES = "REMOVE_LINK_BETWEEN_NODES";
 export const REMOVE_LINK = "REMOVE_LINK";
 export const NEW_CHOICE_ITEM_NODE = "NEW_CHOICE_ITEM_NODE";
+export const NO_OP = "NO_OP";
 export const NEW_PARAMETER_NODE = "NEW_PARAMETER_NODE";
 export const NEW_FUNCTION_OUTPUT_NODE = "NEW_FUNCTION_OUTPUT_NODE";
 export const NEW_MODEL_ITEM_FILTER = "NEW_MODEL_ITEM_FILTER";
@@ -4044,6 +3756,8 @@ export function graphOperation(operation, options) {
                     ? currentGraph.groups[currentGraph.groups.length - 1]
                     : null;
                 switch (operation) {
+                  case NO_OP:
+                    break;
                   case SET_DEPTH:
                     currentGraph = GraphMethods.setDepth(currentGraph, options);
                     break;

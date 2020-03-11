@@ -1,5 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
+import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
 export default function(args = { state_key: "StateKeyReplace" }) {
   // node2
 
@@ -50,6 +51,20 @@ export default function(args = { state_key: "StateKeyReplace" }) {
             prop: "nodeType",
             id: context.node0,
             value: "data-chain"
+          }
+        }
+      ];
+    },
+
+    function(graph) {
+      return [
+        {
+          operation: UPDATE_NODE_PROPERTY,
+          options: {
+            id: context.node0,
+            properties: {
+              ...viewPackages
+            }
           }
         }
       ];

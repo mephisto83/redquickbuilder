@@ -29,6 +29,7 @@ import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import StoreModelArrayStandard from "../StoreModelArrayStandard";
 import AppendValidations from "./AppendValidations";
+import { MethodFunctions, FunctionTypes } from "../../constants/functiontypes";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -108,6 +109,14 @@ export default function ScreenConnectGetAll(args = { method, node }) {
         );
         if (executeButtons && executeButtons.length === 1) {
           let subcomponent = executeButtons[0];
+          let _valueComponentApiNode = GetNodesLinkedTo(graph, {
+            id: subcomponent.id,
+            link: LinkType.ComponentInternalApi
+          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+          let _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+            id: navigateTo,
+            link: LinkType.ComponentExternalApi
+          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
           let events = GetNodesLinkedTo(graph, {
             id: subcomponent.id,
             link: LinkType.EventMethod
@@ -146,6 +155,8 @@ export default function ScreenConnectGetAll(args = { method, node }) {
 
             let _instanceNode = null;
             let _navigateContext = null;
+            let lambdaFunc = "v => ({ value: v })";
+
             result.push(
               ...[
                 {
@@ -162,11 +173,37 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               ...CreateNavigateToScreenDC({
                 screen: navigateTo,
                 node: () => _instanceNode.id,
+                lambda: lambdaFunc,
                 viewPackages,
                 callback: navigateContext => {
                   _navigateContext = navigateContext;
                 }
-              })
+              }),
+              {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function() {
+                  return {
+                    source: _instanceNode.id,
+                    target: _valueComponentApiNode.id,
+                    properties: {
+                      ...LinkProperties.ComponentApi
+                    }
+                  };
+                }
+              },
+              _valueNavigateTargetApi
+                ? {
+                    operation: UPDATE_NODE_PROPERTY,
+                    options: function() {
+                      return {
+                        id: _valueNavigateTargetApi.id,
+                        properties: {
+                          [NodeProperties.IsUrlParameter]: true
+                        }
+                      };
+                    }
+                  }
+                : null
             );
           });
         }
@@ -260,12 +297,10 @@ export default function ScreenConnectGetAll(args = { method, node }) {
                   return {
                     target: storeModelDataChain,
                     source: cycleInstance.id,
-                    linkProperties: {
-                      properties: {
-                        ...LinkProperties.DataChainLink,
-                        singleLink: true,
-                        nodeTypes: [NodeTypes.DataChain]
-                      }
+                    properties: {
+                      ...LinkProperties.DataChainLink,
+                      singleLink: true,
+                      nodeTypes: [NodeTypes.DataChain]
                     }
                   };
                 }
@@ -276,5 +311,5 @@ export default function ScreenConnectGetAll(args = { method, node }) {
       });
   });
 
-  return result;
+  return result.filter(x => x);
 }
