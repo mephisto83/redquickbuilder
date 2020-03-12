@@ -965,14 +965,12 @@ function WriteDescribedStateUpdates(parent) {
             includeNameSpace: true
           })}(${innerValue})`;
         }
-
+        let temp_prop = GetJSCodeName(componentInternalApi);
         result = `
             var new_${externalKey} = ${bindTemplate(innerValue, {
           temp: `this.props.${externalKey}`
         })};
-            if ( new_${externalKey} !== this.state.${GetJSCodeName(
-          componentInternalApi
-        )}) {
+            if ( new_${externalKey} !== this.state.${temp_prop}) {
           {{step}}
         }`;
 
@@ -982,11 +980,6 @@ function WriteDescribedStateUpdates(parent) {
             updates = {...updates, ${GetJSCodeName(
               componentInternalApi
             )}:  new_${externalKey} };`
-          // step: `this.setState((state, props) => {
-          //       return { ${GetJSCodeName(
-          //         componentInternalApi
-          //       )}:  new_${externalKey} };
-          //     });`
         });
       }
     })
@@ -1025,9 +1018,9 @@ function WriteDescribedStateUpdates(parent) {
   let updated = false;
   let updates = {};
   ${result}
-  if(updated){
+  if(updated) {
     this.setState((state, props) => {
-        return updated;
+        return updates;
     }, () => {
       // do stuff here;
       ${invocations}
@@ -1730,12 +1723,12 @@ export function GetComponentDidUpdate(parent, options = {}) {
   });
   let componentDidUpdate =
     `componentDidUpdate(prevProps) {
-        this.captureValues();
+        this.captureValues(prevProps);
       }
       ` +
     (!isScreen ? componentDidMount : "") +
     `
-      captureValues(){
+      captureValues(prevProps){
         ${describedApi}
       }`;
 
@@ -1783,7 +1776,7 @@ export function GetComponentDidMount(screenOption, options = {}) {
 
   let componentDidMount = `componentDidMount(value) {
         ${options.skipSetGetState ? "" : `this.props.setGetState();`}
-        this.captureValues();
+        this.captureValues({});
         ${options.skipOutOfBand ? "" : outOfBandCall}
         ${invocations}
 {{handles}}

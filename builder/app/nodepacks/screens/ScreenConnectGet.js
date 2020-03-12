@@ -11,7 +11,10 @@ import {
   GetNodeTitle,
   GetModelPropertyChildren,
   ComponentApiKeys,
-  GetCodeName
+  GetCodeName,
+  GetComponentApiNode,
+  Connect,
+  UPDATE_NODE_PROPERTY
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -83,6 +86,7 @@ export default function ScreenConnectGet(args = { method, node }) {
             v => v === GetNodeProp(x, NodeProperties.EventType)
           )
         );
+
         events.map(evnt => {
           let eventMethodInstances = GetNodesLinkedTo(graph, {
             id: evnt.id,
@@ -113,6 +117,11 @@ export default function ScreenConnectGet(args = { method, node }) {
 
           let _instanceNode = null;
           let _navigateContext = null;
+          let _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+            id: navigateTo,
+            link: LinkType.ComponentExternalApi
+          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+
           result.push(
             ...[
               {
@@ -133,7 +142,35 @@ export default function ScreenConnectGet(args = { method, node }) {
               callback: navigateContext => {
                 _navigateContext = navigateContext;
               }
-            })
+            }),
+            function(graph) {
+              let valueComponentApiNode = GetComponentApiNode(
+                ComponentApiKeys.Value,
+                subcomponent.id,
+                graph
+              );
+              return {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: Connect(
+                  _instanceNode.id,
+                  valueComponentApiNode.id,
+                  LinkProperties.ComponentApi
+                )
+              };
+            },
+              _valueNavigateTargetApi
+                ? {
+                    operation: UPDATE_NODE_PROPERTY,
+                    options: function() {
+                      return {
+                        id: _valueNavigateTargetApi.id,
+                        properties: {
+                          [NodeProperties.IsUrlParameter]: true
+                        }
+                      };
+                    }
+                  }
+                : null
           );
         });
       }

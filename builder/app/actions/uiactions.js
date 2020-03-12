@@ -720,7 +720,13 @@ export function updateMethodParameters(current, methodType) {
     )(dispatch, getState);
   };
 }
-
+export function Connect(source, target, linkProperties) {
+  return {
+    target,
+    source,
+    properties: { ...(linkProperties || {}) }
+  };
+}
 export function attachMethodToMaestro(methodNodeId, modelId, options) {
   return (dispatch, getState) => {
     let controller = false;
