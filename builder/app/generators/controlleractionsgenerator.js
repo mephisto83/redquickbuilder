@@ -14,7 +14,8 @@ import {
 import {
   ConfigurationProperties,
   NEW_LINE,
-  LinkType
+  LinkType,
+  UITypes
 } from "../constants/nodetypes";
 import fs from "fs";
 import * as Titles from "../components/titles";
@@ -22,14 +23,21 @@ import {
   bindTemplate,
   MethodTemplateKeys,
   FunctionTemplateKeys,
-  HTTP_METHODS
+  HTTP_METHODS,
+  MethodFunctions
 } from "../constants/functiontypes";
 import ControllerGenerator from "./controllergenerator";
 import { addNewLine } from "../utils/array";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 export default class ControllerActionGenerator {
   static GenerateService(options) {
-    let { state } = options;
+    let { state, language } = options;
+    let fileEnd = ".js";
+    switch (language) {
+      case UITypes.ElectronIO:
+        fileEnd = ".ts";
+        break;
+    }
     let temp = NodesByType(state, NodeTypes.Method);
     let serviceTemplate = fs.readFileSync(
       "./app/templates/screens/service.tpl",
@@ -37,22 +45,29 @@ export default class ControllerActionGenerator {
     );
     let methodTemplate = `
 {{methodName}}: async (params) => {
-    let { parameters } = params;
-    return redservice().{{methodType}}(endpoints.{{methodName}});
+    let { template, query } = params;
+    {{template_params_def}}
+    return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`);
 }`;
     let postMethodTemplate = `
 {{methodName}}: async (params) => {
-    let { body, parameters } = params;
-    return redservice().{{methodType}}(endpoints.{{methodName}}, body, {{options}});
+    let { body, template, query } = params;
+    {{template_params_def}}
+    return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`, body, {{options}});
 }`;
     let endpoints = {};
     let fetchServices = NodesByType(state, NodeTypes.FetchService);
     let fetchServiceMethodImplementation = false;
     if (fetchServices.length) {
       let fetchService = fetchServices[0];
-      endpoints[GetJSCodeName(fetchService)] = `api/fetchservice/${GetNodeProp(fetchService, NodeProperties.HttpRoute)}`;
+      endpoints[GetJSCodeName(fetchService)] = `api/fetchservice/${GetNodeProp(
+        fetchService,
+        NodeProperties.HttpRoute
+      )}`;
       fetchServiceMethodImplementation = bindTemplate(postMethodTemplate, {
         methodName: GetJSCodeName(fetchService),
+        template_params: "",
+        template_params_def: "",
         methodType: `post`,
         options: `{}`
       });
@@ -60,6 +75,8 @@ export default class ControllerActionGenerator {
     temp = [
       fetchServiceMethodImplementation,
       ...temp.map(method => {
+        let template_params = "";
+        let template_params_def = "";
         let maestroNode = GetMaestroNode(method.id);
         if (maestroNode) {
           let controllerNode = GetControllerNode(maestroNode.id);
@@ -78,6 +95,7 @@ export default class ControllerActionGenerator {
               )}`;
             }
             let methodType = GetNodeProp(method, NodeProperties.HttpMethod);
+            let functionType = GetNodeProp(method, NodeProperties.FunctionType);
             let asForm = "";
             let collectCookies = "";
             let asText = "";
@@ -94,12 +112,34 @@ export default class ControllerActionGenerator {
             let options = [asForm, collectCookies, asText]
               .filter(x => x)
               .join();
+            if (
+              functionType &&
+              MethodFunctions[functionType] &&
+              MethodFunctions[functionType].parameters &&
+              MethodFunctions[functionType].parameters.parameters &&
+              MethodFunctions[functionType].parameters.parameters.template
+            ) {
+              let { modelId, parentId } = MethodFunctions[
+                functionType
+              ].parameters.parameters.template;
+              if (modelId) {
+                template_params = "/${modelId}";
+              } else if (parentId) {
+                template_params = "/${parentId}";
+              }
+            }
+            if (template_params) {
+              template_params_def =
+                "let { parentId, modelId } = (template || {});";
+            }
             return bindTemplate(
               methodType === HTTP_METHODS.POST
                 ? postMethodTemplate
                 : methodTemplate,
               {
                 methodName: GetJSCodeName(method),
+                template_params,
+                template_params_def,
                 methodType: `${methodType}`
                   .toLowerCase()
                   .split("http")
@@ -119,12 +159,18 @@ export default class ControllerActionGenerator {
         endpoints: JSON.stringify(endpoints, null, 4)
       }),
       relative: "./src/util",
-      relativeFilePath: `./controllerService.js`,
+      relativeFilePath: `./controllerService${fileEnd}`,
       name: "controllerService"
     };
   }
   static GenerateFetchService(options) {
-    let { state } = options;
+    let { state, language } = options;
+    let fileEnd = ".js";
+    switch (language) {
+      case UITypes.ElectronIO:
+        fileEnd = ".ts";
+        break;
+    }
     let fetchServices = NodesByType(state, NodeTypes.FetchService);
     if (fetchServices.length) {
       let fetchService = fetchServices[0];
@@ -165,13 +211,19 @@ setFetchServiceFunction(function(body) {
       return {
         template: service,
         relative: "./src/util",
-        relativeFilePath: `./fetchService.js`,
+        relativeFilePath: `./fetchService${fileEnd}`,
         name: "fetchService"
       };
     }
   }
   static Generate(options) {
-    let { state } = options;
+    let { state, language } = options;
+    let fileEnd = ".js";
+    switch (language) {
+      case UITypes.ElectronIO:
+        fileEnd = ".ts";
+        break;
+    }
     let temp = NodesByType(state, NodeTypes.Method);
 
     const ControllerMethodTemplate = `export function {{methodName}}({{arguments}}){
@@ -219,7 +271,7 @@ import * as Util from './util';
           body: addNewLine(controllerActions, 1)
         }),
         relative: "./src/actions",
-        relativeFilePath: `./controllerActions.js`,
+        relativeFilePath: `./controllerActions${fileEnd}`,
         name: "controllerActions"
       },
       ControllerActionGenerator.GenerateService(options),

@@ -542,8 +542,17 @@ export function bindComponent(node, componentBindingDefinition) {
         let invocations = methodInstances
           .map(methodInstanceCall => {
             if (!methodInstanceCall) debugger;
-            return getMethodInvocation(methodInstanceCall);
+            let invocationDependsOnState = null;
+            let temp = getMethodInvocation(methodInstanceCall, args => {
+              let { statePropertiesThatCauseInvocation } = args;
+              invocationDependsOnState = (
+                statePropertiesThatCauseInvocation || []
+              ).length;
+            });
+            if (invocationDependsOnState) return false;
+            return temp;
           })
+          .filter(x => x)
           .join(NEW_LINE);
         return `${ComponentEvents[cevents[i]]}={(value)=> {
 ${invocations}
@@ -964,23 +973,67 @@ function WriteDescribedStateUpdates(parent) {
             if ( new_${externalKey} !== this.state.${GetJSCodeName(
           componentInternalApi
         )}) {
-
-            {{step}}
+          {{step}}
         }`;
 
         return bindTemplate(result, {
           temp: innerValue,
-          step: `this.setState((state, props) => {
-                return { ${GetJSCodeName(
-                  componentInternalApi
-                )}:  new_${externalKey} };
-              });`
+          step: `updated = true;
+            updates = {...updates, ${GetJSCodeName(
+              componentInternalApi
+            )}:  new_${externalKey} };`
+          // step: `this.setState((state, props) => {
+          //       return { ${GetJSCodeName(
+          //         componentInternalApi
+          //       )}:  new_${externalKey} };
+          //     });`
         });
       }
     })
     .filter(x => x)
     .join(NEW_LINE);
-  return result;
+
+  let methodInstances = getMethodInstancesForLifeCylcEvntType(
+    parent,
+    ComponentLifeCycleEvents.ComponentDidMount
+  );
+
+  let invocations = (methodInstances || [])
+    .map(methodInstanceCall => {
+      let invocationDependsOnState = false;
+      let dependentStateProperties = [];
+      let temp = getMethodInvocation(methodInstanceCall, args => {
+        let { statePropertiesThatCauseInvocation } = args;
+        dependentStateProperties = statePropertiesThatCauseInvocation;
+        invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
+          .length;
+      });
+      if (!invocationDependsOnState) {
+        return false;
+      }
+      let ifstatement = dependentStateProperties
+        .map(v => `updates.hasOwnProperty('${v}')`)
+        .join(" || ");
+      return `if(${ifstatement}) {
+        ${temp}
+      }`;
+    })
+    .filter(x => x)
+    .join(NEW_LINE);
+
+  return `
+  let updated = false;
+  let updates = {};
+  ${result}
+  if(updated){
+    this.setState((state, props) => {
+        return updated;
+    }, () => {
+      // do stuff here;
+      ${invocations}
+    })
+  }
+  `;
 }
 function GetDefaultComponentValue(node, key) {
   let result = ``;
@@ -1465,7 +1518,7 @@ export function getMethodInstancesForEvntType(node, evtType) {
 
   return methodInstances;
 }
-export function getMethodInvocation(methodInstanceCall) {
+export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
   let graph = GetCurrentGraph(GetState());
   let method = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
@@ -1488,7 +1541,7 @@ export function getMethodInvocation(methodInstanceCall) {
     type: LinkType.ComponentApi,
     direction: SOURCE
   }).find(x => x);
-
+  let statePropertiesThatCauseInvocation = [];
   if (method) {
     let parts = [];
     let body = getNodesByLinkType(graph, {
@@ -1576,7 +1629,10 @@ export function getMethodInvocation(methodInstanceCall) {
           return extractApiJsCode({
             node: queryParameter,
             graph,
-            internalApiConnection
+            internalApiConnection,
+            callback: list => {
+              statePropertiesThatCauseInvocation.push(...list);
+            }
           });
         })
         .filter(temp => temp);
@@ -1596,13 +1652,19 @@ export function getMethodInvocation(methodInstanceCall) {
           return extractApiJsCode({
             node: queryParameter,
             graph,
-            internalApiConnection
+            internalApiConnection,
+            callback: list => {
+              statePropertiesThatCauseInvocation.push(...list);
+            }
           });
         })
         .filter(temp => temp);
       parts.push(
         `query: {${addNewLine(queryParameterValues.join(", " + NEW_LINE))}}`
       );
+    }
+    if (callback) {
+      callback({ statePropertiesThatCauseInvocation });
     }
     let dataChainInput = "";
     if (dataChain) {
@@ -1705,8 +1767,18 @@ export function GetComponentDidMount(screenOption, options = {}) {
 
   let invocations = (methodInstances || [])
     .map(methodInstanceCall => {
-      return getMethodInvocation(methodInstanceCall);
+      let invocationDependsOnState = false;
+      let temp = getMethodInvocation(methodInstanceCall, args => {
+        let { statePropertiesThatCauseInvocation } = args;
+        invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
+          .length;
+      });
+      if (invocationDependsOnState) {
+        return false;
+      }
+      return temp;
     })
+    .filter(x => x)
     .join(NEW_LINE);
 
   let componentDidMount = `componentDidMount(value) {
@@ -1931,7 +2003,8 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
  * @param {object} args
  */
 function extractApiJsCode(args = { node, graph }) {
-  let { node, graph } = args;
+  let { node, graph, callback = () => {} } = args;
+  let requiredChanges = [];
   let temp = queryParameter => {
     let param = getNodesByLinkType(graph, {
       id: queryParameter.id,
@@ -1957,16 +2030,20 @@ function extractApiJsCode(args = { node, graph }) {
       if (value) {
         let input_ = "this.props.state";
         if (internalApiConnection) {
+          requiredChanges.push(GetJSCodeName(internalApiConnection));
           input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
         }
         return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value, {
           includeNameSpace: true
         })}(${input_})`;
       } else if (internalApiConnection) {
+        requiredChanges.push(GetJSCodeName(internalApiConnection));
         let input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
         return `${GetJSCodeName(queryParameter)}:  ${input_}`;
       }
     }
   };
-  return temp(node);
+  let result = temp(node);
+  callback(requiredChanges.unique());
+  return result;
 }
