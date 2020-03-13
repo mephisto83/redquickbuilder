@@ -30,7 +30,8 @@ import { uuidv4 } from "../../utils/array";
 import ModifyUpdateLinks from "../ModifyUpdateLinks";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import AppendValidations from "./AppendValidations";
-
+import UpdateModelAndGoBack from "../UpdateModelAndGoBack";
+import AppendPostMethod from "./AppendPostMethod";
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method, componentDidMountMethod, viewType } = args;
   if (!node) {
@@ -216,24 +217,32 @@ export default function ScreenConnectUpdate(args = { method, node }) {
                 });
               }
               return [];
-            }
+            },
+            function(graph) {}
           );
 
-          result.push({
-            operation: UPDATE_LINK_PROPERTY,
-            options: function(graph) {
-              let link = getLinkInstance(graph, {
-                target: _instanceNode.id,
-                source: x.id
-              });
-              if (link)
-                return {
-                  id: link.id,
-                  prop: LinkPropertyKeys.InstanceUpdate,
-                  value: true
-                };
-            }
-          });
+          result.push(
+            {
+              operation: UPDATE_LINK_PROPERTY,
+              options: function(graph) {
+                let link = getLinkInstance(graph, {
+                  target: _instanceNode.id,
+                  source: x.id
+                });
+                if (link)
+                  return {
+                    id: link.id,
+                    prop: LinkPropertyKeys.InstanceUpdate,
+                    value: true
+                  };
+              }
+            },
+            ...AppendPostMethod({
+              method,
+              viewPackages,
+              handler: () => _instanceNode.id
+            })
+          );
         });
       }
 

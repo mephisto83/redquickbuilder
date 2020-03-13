@@ -25,6 +25,7 @@ import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import AppendValidations from "./AppendValidations";
+import AppendPostMethod from "./AppendPostMethod";
 
 export default function ScreenConnectCreate(args = { method, node }) {
   let { node, method, viewType } = args;
@@ -121,7 +122,12 @@ export default function ScreenConnectCreate(args = { method, node }) {
                 });
               }
               return [];
-            }
+            },
+            ...AppendPostMethod({
+              method,
+              viewPackages,
+              handler: () => _instanceNode.id
+            })
           );
         });
       }
