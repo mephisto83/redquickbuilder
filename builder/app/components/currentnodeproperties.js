@@ -55,7 +55,7 @@ class CurrentNodeProperties extends Component {
               open={UIA.Visual(state, "CURRENT_NODE_PROPERTIES")}
               active={true}
               title={Titles.Properties}
-              innerStyle={{ maxHeight: 350, overflowY: "auto" }}
+              innerStyle={{ maxHeight: 600, overflowY: "auto" }}
               toggle={() => {
                 this.props.toggleVisual("CURRENT_NODE_PROPERTIES");
               }}

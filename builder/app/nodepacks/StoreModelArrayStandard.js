@@ -57,6 +57,7 @@ export default function(args = { state_key: "StateKeyReplace" }) {
     },
 
     function(graph) {
+      debugger;
       return [
         {
           operation: UPDATE_NODE_PROPERTY,

@@ -25,12 +25,13 @@ export default function(args = {}) {
   let result = [];
   let graph = GetCurrentGraph();
   let screens = NodesByType(null, NodeTypes.Screen);
-  let screenWithoutDataChainCollection = screens.filter(screen => {
-    return !GetNodesLinkedTo(graph, {
-      id: screen.id,
-      link: LinkType.DataChainCollectionReference
-    }).length;
-  });
+  let screenWithoutDataChainCollection = screens;
+  // .filter(screen => {
+  //   return !GetNodesLinkedTo(graph, {
+  //     id: screen.id,
+  //     link: LinkType.DataChainCollectionReference
+  //   }).length;
+  // });
 
   screenWithoutDataChainCollection.map(screen => {
     let temp = {};
@@ -38,39 +39,42 @@ export default function(args = {}) {
       id: screen.id,
       link: LinkType.ScreenOptions
     });
-    result.push({
-      operation: ADD_NEW_NODE,
-      options: function() {
-        return {
-          nodeType: NodeTypes.DataChainCollection,
-          linkProperties: {
+    if (
+      !GetNodesLinkedTo(graph, {
+        id: screen.id,
+        link: LinkType.DataChainCollectionReference
+      }).length
+    ) {
+      result.push({
+        operation: ADD_NEW_NODE,
+        options: function() {
+          return {
+            nodeType: NodeTypes.DataChainCollection,
+            linkProperties: {
+              properties: {
+                ...LinkProperties.DataChainCollectionReference
+              }
+            },
+            parent: screen.id,
             properties: {
-              ...LinkProperties.DataChainCollectionReference
+              [NodeProperties.UIText]: `${GetNodeTitle(screen)}`,
+              [NodeProperties.Pinned]: false
+            },
+            callback: node => {
+              temp.screen = node;
             }
-          },
-          parent: screen.id,
-          properties: {
-            [NodeProperties.UIText]: `${GetNodeTitle(screen)}`,
-            [NodeProperties.Pinned]: false
-          },
-          callback: node => {
-            temp.screen = node;
-          }
-        };
-      }
-    });
+          };
+        }
+      });
+    }
 
     screenoptions.map(screenoption => {
-      if (
-        GetNodesLinkedTo(graph, {
+      result.push(function(graph) {
+        let add_screenoption_reference = !GetNodesLinkedTo(graph, {
           id: screenoption.id,
           link: LinkType.DataChainCollectionReference
-        }).length
-      ) {
-        return null;
-      }
+        }).length;
 
-      result.push(function(graph) {
         let screen = GetNodeLinkedTo(graph, {
           id: screenoption.id,
           link: LinkType.ScreenOptions
@@ -84,28 +88,30 @@ export default function(args = {}) {
         }
         let temp;
         return [
-          {
-            operation: ADD_NEW_NODE,
-            options: function(graph) {
-              return {
-                nodeType: NodeTypes.DataChainCollection,
-                linkProperties: {
-                  properties: {
-                    ...LinkProperties.DataChainCollectionReference
-                  }
-                },
-                parent: screenoption.id,
-                properties: {
-                  [NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
-                  [NodeProperties.Pinned]: false
-                },
-                callback: node => {
-                  temp = node;
+          add_screenoption_reference
+            ? {
+                operation: ADD_NEW_NODE,
+                options: function(graph) {
+                  return {
+                    nodeType: NodeTypes.DataChainCollection,
+                    linkProperties: {
+                      properties: {
+                        ...LinkProperties.DataChainCollectionReference
+                      }
+                    },
+                    parent: screenoption.id,
+                    properties: {
+                      [NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
+                      [NodeProperties.Pinned]: false
+                    },
+                    callback: node => {
+                      temp = node;
+                    }
+                  };
                 }
-              };
-            }
-          },
-          collectionReference
+              }
+            : false,
+          collectionReference && add_screenoption_reference
             ? {
                 operation: ADD_LINK_BETWEEN_NODES,
                 options: function() {
@@ -187,6 +193,52 @@ export default function(args = {}) {
           ];
         });
       });
+
+      GetNodesLinkedTo(graph, {
+        id: screenoption.id,
+        link: LinkType.LifeCylceMethod
+      })
+        .map(lifeCycleMethod => {
+          let res = GetNodesLinkedTo(graph, {
+            id: lifeCycleMethod.id,
+            link: LinkType.LifeCylceMethodInstance
+          }).map(lifecylceInstanceMethod => {
+            let chains = GetNodesLinkedTo(graph, {
+              id: lifecylceInstanceMethod.id,
+              link: LinkType.DataChainLink
+            }).filter(chain => {
+              return GetNodesLinkedTo(graph, {
+                id: chain.id
+              }).filter(
+                x =>
+                  GetNodeProp(x, NodeProperties.NODEType) !==
+                  NodeTypes.DataChain
+              ).length;
+            });
+            return chains;
+          });
+          return res;
+        })
+        .flatten()
+        .map(chain => {
+          result.push({
+            operation: ADD_LINK_BETWEEN_NODES,
+            options: function(graph) {
+              let screenOptionCollectionReference;
+              if (screenoption) {
+                screenOptionCollectionReference = GetNodeLinkedTo(graph, {
+                  id: screenoption.id,
+                  link: LinkType.DataChainCollectionReference
+                });
+              }
+              return {
+                target: screenOptionCollectionReference.id,
+                source: chain.id,
+                properties: { ...LinkProperties.DataChainCollection }
+              };
+            }
+          });
+        });
     });
   });
   let sharedReferenceCollection = GetNodeByProperties(
@@ -432,14 +484,6 @@ function getTopComponent(graph, node) {
     return getTopComponent(graph, parent);
   }
   return node;
-}
-
-function getComponentNodeCollectionReference(graph, node) {
-  node = getTopComponent(graph, node);
-  return GetNodeLinkedTo(graph, {
-    id: node.id,
-    link: LinkType.DataChainCollectionReference
-  });
 }
 function getComponentExternalApiDataChains(graph, node) {
   let result = [];
