@@ -1,4 +1,4 @@
-import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, getLinkInstance } from "../../methods/graph_methods";
 import {
   GetCurrentGraph,
   GetNodeProp,
@@ -10,12 +10,15 @@ import {
   GetNodeById,
   GetNodeTitle,
   ADD_LINK_BETWEEN_NODES,
-  ComponentApiKeys
+  ComponentApiKeys,
+  UPDATE_NODE_PROPERTY,
+  UPDATE_LINK_PROPERTY
 } from "../../actions/uiactions";
 import {
   LinkType,
   NodeProperties,
-  LinkProperties
+  LinkProperties,
+  LinkPropertyKeys
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
@@ -51,6 +54,26 @@ export default function ScreenConnectUpdate(args = { method, node }) {
     ...(viewPackages || {})
   };
 
+  let _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+    id: node,
+    link: LinkType.ComponentExternalApi
+  }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+
+  result.push(
+    _valueNavigateTargetApi
+      ? {
+          operation: UPDATE_NODE_PROPERTY,
+          options: function() {
+            return {
+              id: _valueNavigateTargetApi.id,
+              properties: {
+                [NodeProperties.IsUrlParameter]: true
+              }
+            };
+          }
+        }
+      : null
+  );
   screen_options.map(screen_option => {
     let lifeCylcleMethods = GetNodesLinkedTo(graph, {
       id: screen_option.id,
@@ -123,7 +146,6 @@ export default function ScreenConnectUpdate(args = { method, node }) {
         link: LinkType.Component
       });
 
-
       let executiveButtons = subcomponents.filter(x =>
         GetNodeProp(x, NodeProperties.ExecuteButton)
       );
@@ -170,6 +192,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
           }
 
           let _instanceNode = null;
+
           result.push(
             ...[
               {
@@ -195,8 +218,23 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               return [];
             }
           );
-        });
 
+          result.push({
+            operation: UPDATE_LINK_PROPERTY,
+            options: function(graph) {
+              let link = getLinkInstance(graph, {
+                target: _instanceNode.id,
+                source: x.id
+              });
+              if (link)
+                return {
+                  id: link.id,
+                  prop: LinkPropertyKeys.InstanceUpdate,
+                  value: true
+                };
+            }
+          });
+        });
       }
 
       result.push(
@@ -209,6 +247,6 @@ export default function ScreenConnectUpdate(args = { method, node }) {
       );
     });
   });
-  result = [...result, ...ModifyUpdateLinks()];
+  result = [...result, ...ModifyUpdateLinks()].filter(x => x);
   return result;
 }

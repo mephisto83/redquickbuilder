@@ -20,7 +20,6 @@ import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
 import { buildValidation } from "../service/validation_js_service";
 import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
-
 var fs = require("fs");
 export const VISUAL = "VISUAL";
 export const MINIMIZED = "MINIMIZED";
@@ -51,14 +50,38 @@ export const BATCH_FUNCTION_NAME = "BATCH_FUNCTION_NAME";
 export const RECORDING = "RECORDING";
 export const BATCH_FUNCTION_TYPE = "BATCH_FUNCTION_TYPE";
 
-export const ViewTypes = {
-  Update: "Update",
-  Delete: "Delete",
-  Create: "Create",
-  Get: "Get",
-  GetAll: "GetAll"
-};
+export { ViewTypes } from "../constants/viewtypes";
 
+// export const ViewTypes = {
+//   Update: "Update",
+//   Delete: "Delete",
+//   Create: "Create",
+//   Get: "Get",
+//   GetAll: "GetAll"
+// };
+export function GetScreenUrl(
+  op,
+  language = NodeConstants.UITypes.ElectronIO,
+  overrideText = null
+) {
+  let params = GetComponentExternalApiNodes(op.id)
+    .filter(externaApiNodes => {
+      return GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter);
+    })
+    .map(v => `:${GetCodeName(v)}`)
+    .join("/");
+  let route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${
+    params ? `/${params}` : ""
+  }`;
+
+  return convertToURLRoute(route);
+}
+export function convertToURLRoute(x) {
+  return [...x.split(" ")]
+    .filter(x => x)
+    .join("/")
+    .toLowerCase();
+}
 export const UI_UPDATE = "UI_UPDATE";
 export function GetC(state, section, item) {
   if (state && state.uiReducer && state.uiReducer[section]) {
@@ -151,6 +174,13 @@ export function GetNodeProp(node, prop, currentGraph) {
     node = GetNodeById(node, currentGraph) || node;
   }
   return node && node.properties && node.properties[prop];
+}
+
+export function GetNodePropDirty(node, prop, currentGraph) {
+  if (typeof node === "string") {
+    node = GetNodeById(node, currentGraph) || node;
+  }
+  return node && node.dirty && node.dirty[prop];
 }
 export function GetGroupProp(id, prop) {
   let group = GraphMethods.GetGroup(GetCurrentGraph(_getState()), id);
@@ -3501,6 +3531,7 @@ export const NEW_ATTRIBUTE_NODE = "NEW_ATTRIBUTE_NODE";
 export const ADD_LINK_BETWEEN_NODES = "ADD_LINK_BETWEEN_NODES";
 export const ESTABLISH_SCOPE = "ESTABLISH_SCOPE";
 export const ADD_LINKS_BETWEEN_NODES = "ADD_LINKS_BETWEEN_NODES";
+export const UPDATE_NODE_DIRTY = "UPDATE_NODE_DIRTY";
 export const NEW_CONDITION_NODE = "NEW_CONDITION_NODE";
 export const ADD_NEW_NODE = "ADD_NEW_NODE";
 export const REMOVE_LINK_BETWEEN_NODES = "REMOVE_LINK_BETWEEN_NODES";
@@ -3782,6 +3813,12 @@ export function graphOperation(operation, options) {
                     break;
                   case UPDATE_GRAPH_TITLE:
                     currentGraph = GraphMethods.updateGraphTitle(
+                      currentGraph,
+                      options
+                    );
+                    break;
+                  case UPDATE_NODE_DIRTY:
+                    currentGraph = GraphMethods.updateNodePropertyDirty(
                       currentGraph,
                       options
                     );

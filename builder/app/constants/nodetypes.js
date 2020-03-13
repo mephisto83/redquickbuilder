@@ -1,5 +1,7 @@
 import * as _ from "../utils/array";
 import fs from "fs";
+import { ViewTypes } from "./viewtypes";
+import { GetNodeProp, convertToURLRoute, GetScreenUrl } from "../actions/uiactions";
 
 export const NodeTypes = {
   Concept: "concept",
@@ -619,12 +621,13 @@ export const NodePropertiesDirtyChain = {
     },
     {
       chainProp: NodeProperties.HttpRoute,
-      chainFunc: x => {
+      chainFunc: (x, node) => {
         if (typeof x === "string") {
-          return x
-            .split(" ")
-            .join("/")
-            .toLowerCase();
+          let template = [];
+          if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.Screen) {
+            return GetScreenUrl(node, undefined, x)
+          }
+          return convertToURLRoute(x);
         }
         return x;
       }

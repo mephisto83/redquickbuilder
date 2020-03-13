@@ -2817,6 +2817,21 @@ export function updateNodeProperties(graph, options) {
   }
   return graph;
 }
+export function updateNodePropertyDirty(graph, options) {
+  let { id, value, prop } = options;
+  if (id && prop && graph.nodeLib && graph.nodeLib[id]) {
+    graph.nodeLib[id] = {
+      ...graph.nodeLib[id],
+      ...{
+        dirty: {
+          ...(graph.nodeLib[id].dirty || {}),
+          [prop]: value
+        }
+      }
+    };
+  }
+  return graph;
+}
 export function updateNodeProperty(graph, options) {
   let { id, value, prop } = options;
   let additionalChange = {};
@@ -2825,7 +2840,10 @@ export function updateNodeProperty(graph, options) {
       let temps = NodePropertiesDirtyChain[prop];
       temps.map(temp => {
         if (!graph.nodeLib[id].dirty[temp.chainProp]) {
-          additionalChange[temp.chainProp] = temp.chainFunc(value);
+          additionalChange[temp.chainProp] = temp.chainFunc(
+            value,
+            graph.nodeLib[id]
+          );
         }
       });
     }

@@ -68,7 +68,23 @@ class CurrentNodeProperties extends Component {
                       title={`${key}: ${nodeProperties[key]}`}
                       key={`component-props-${key}`}
                       hideArrow={true}
-                      icon={"fa fa-square-o"}
+                      onClick={() => {
+                        this.props.graphOperation([
+                          {
+                            operation: UIA.UPDATE_NODE_DIRTY,
+                            options: {
+                              id: currentNode.id,
+                              prop: key,
+                              value: !!!UIA.GetNodePropDirty(currentNode, key)
+                            }
+                          }
+                        ]);
+                      }}
+                      icon={
+                        UIA.GetNodePropDirty(currentNode, key)
+                          ? "fa fa-square"
+                          : "fa fa-square-o"
+                      }
                     />
                   );
                 })}

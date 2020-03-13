@@ -8,7 +8,8 @@ import {
   GetNodeCode,
   GetJSCodeName,
   GetConnectedScreen,
-  GetComponentExternalApiNodes
+  GetComponentExternalApiNodes,
+  GetScreenUrl
 } from "../actions/uiactions";
 import fs from "fs";
 import { bindTemplate } from "../constants/functiontypes";
@@ -104,19 +105,14 @@ export function GenerateRoutes(language) {
   let options = GetScreens();
   let routes = {};
   options.map(op => {
-    let params = GetComponentExternalApiNodes(op.id)
-      .filter(externaApiNodes => {
-        return GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter);
-      })
-      .map(v => `:${GetCodeName(v)}`)
-      .join("/");
     routes = {
       ...routes,
-      [GetCodeName(op)]: `${
-        language === UITypes.ElectronIO ? "/" : ""
-      }${GetNodeProp(op, NodeProperties.HttpRoute)}${
-        params ? `/${params}` : ""
-      }`
+      [GetCodeName(op)]: (
+        (language === UITypes.ElectronIO ? "/" : "") +
+        GetNodeProp(op, NodeProperties.HttpRoute)
+      )
+        .split("//")
+        .join("/")
     };
   });
   return [
