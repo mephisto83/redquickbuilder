@@ -10,7 +10,7 @@ export default function(args = { node, viewPackages }) {
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function() {
+      options() {
         return {
           nodeType: NodeTypes.LifeCylceMethodInstance,
           parent: node,
@@ -27,9 +27,9 @@ export default function(args = { node, viewPackages }) {
             },
             ...viewPackages
           },
-          callback: node => {
+          callback: contextNode => {
             if (args.callback) {
-              args.callback(node);
+              args.callback(contextNode);
             }
           }
         };

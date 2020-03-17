@@ -5,10 +5,10 @@ import {
   GetNodeProp,
   NEW_COMPONENT_NODE,
   LinkProperties,
-  GetNodeTitle,
-  ViewTypes
+  GetNodeTitle
 } from "../actions/uiactions";
 import { InstanceTypes } from "../constants/componenttypes";
+import { ViewTypes } from "../constants/viewtypes";
 function createForm(
   args = {
     modelProperty: null,

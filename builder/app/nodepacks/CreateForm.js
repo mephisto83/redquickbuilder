@@ -3,12 +3,12 @@ import { NodeProperties, LinkProperties } from "../constants/nodetypes";
 import {
   GetModelPropertyChildren,
   GetNodeProp,
-  NEW_COMPONENT_NODE,
-  ViewTypes
+  NEW_COMPONENT_NODE
 } from "../actions/uiactions";
 import CreateFormInput from "./CreateFormInput";
 import { ComponentTypes, InstanceTypes } from "../constants/componenttypes";
 import SetupApiBetweenComponents from "./SetupApiBetweenComponents";
+import { ViewTypes } from "../constants/viewtypes";
 function createForm(
   args = {
     model: null,

@@ -20,6 +20,7 @@ import CreateDataChainGetBody from "../nodepacks/CreateDataChainGetBody";
 import { buildValidation } from "../service/validation_js_service";
 import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
+import { ViewTypes } from "../constants/viewtypes";
 var fs = require("fs");
 export const VISUAL = "VISUAL";
 export const MINIMIZED = "MINIMIZED";
@@ -49,8 +50,6 @@ export const BATCH_PARENT = "BATCH_PARENT";
 export const BATCH_FUNCTION_NAME = "BATCH_FUNCTION_NAME";
 export const RECORDING = "RECORDING";
 export const BATCH_FUNCTION_TYPE = "BATCH_FUNCTION_TYPE";
-
-export { ViewTypes } from "../constants/viewtypes";
 
 // export const ViewTypes = {
 //   Update: "Update",
@@ -737,7 +736,7 @@ export function GetMethodParameters(methodId) {
   }
   return null;
 }
-export function updateMethodParameters(current, methodType) {
+export function updateMethodParameters(current, methodType, viewPackages) {
   return (dispatch, getState) => {
     let state = getState();
     let graph = GetRootGraph(state);
@@ -745,7 +744,8 @@ export function updateMethodParameters(current, methodType) {
     graphOperation(
       UpdateMethodParameters({
         methodType,
-        current
+        current,
+        viewPackages
       })
     )(dispatch, getState);
   };
@@ -757,7 +757,12 @@ export function Connect(source, target, linkProperties) {
     properties: { ...(linkProperties || {}) }
   };
 }
-export function attachMethodToMaestro(methodNodeId, modelId, options) {
+export function attachMethodToMaestro(
+  methodNodeId,
+  modelId,
+  options,
+  viewPackage
+) {
   return (dispatch, getState) => {
     let controller = false;
     let maestro = false;
@@ -795,6 +800,7 @@ export function attachMethodToMaestro(methodNodeId, modelId, options) {
             return {
               nodeType: NodeTypes.Controller,
               properties: {
+                ...(viewPackage || {}),
                 [NodeProperties.UIText]: `${GetNodeTitle(modelId)} Controller`
               },
               links: [
@@ -841,6 +847,7 @@ export function attachMethodToMaestro(methodNodeId, modelId, options) {
             return {
               nodeType: NodeTypes.Maestro,
               properties: {
+                ...(viewPackage || {}),
                 [NodeProperties.UIText]: `${GetNodeTitle(modelId)} Maestro`
               },
               links: [
@@ -3740,6 +3747,10 @@ export function deleteAllSelected() {
       }))
     )(dispatch, getState);
   };
+}
+
+export function setViewPackageStamp(viewPackage) {
+  GraphMethods.setViewPackageStamp(viewPackage);
 }
 
 export function graphOperation(operation, options) {

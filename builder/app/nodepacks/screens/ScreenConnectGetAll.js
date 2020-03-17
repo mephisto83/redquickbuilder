@@ -4,7 +4,6 @@ import {
   GetNodeProp,
   GetNodesByProperties,
   REMOVE_NODE,
-  ViewTypes,
   addInstanceFunc,
   ADD_NEW_NODE,
   ADD_LINK_BETWEEN_NODES,
@@ -29,7 +28,6 @@ import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import StoreModelArrayStandard from "../StoreModelArrayStandard";
 import AppendValidations from "./AppendValidations";
-import { MethodFunctions, FunctionTypes } from "../../constants/functiontypes";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
   let { node, method, navigateTo } = args;
@@ -40,12 +38,12 @@ export default function ScreenConnectGetAll(args = { method, node }) {
     throw "no method";
   }
 
-  let graph = GetCurrentGraph();
-  let screen_options = GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph();
+  const screen_options = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
   });
-  let result = [];
+  const result = [];
   let { viewPackages } = args;
   viewPackages = {
     [NodeProperties.ViewPackage]: uuidv4(),
@@ -53,13 +51,13 @@ export default function ScreenConnectGetAll(args = { method, node }) {
   };
 
   screen_options.map(screen_option => {
-    let components = GetNodesLinkedTo(graph, {
+    const components = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.Component
     });
 
     components.map(component => {
-      let internalComponentApi = GetNodesLinkedTo(graph, {
+      const internalComponentApi = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.ComponentInternalApi
       });
@@ -79,7 +77,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           ].some(v => v === GetNodeTitle(x))
         )
         .map(internal => {
-          result.push(function() {
+          result.push(() => {
             return [
               {
                 operation: UPDATE_NODE_PROPERTY,
@@ -94,30 +92,30 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           });
         });
 
-      let listItems = GetNodesLinkedTo(graph, {
+      const listItems = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.ListItem
       });
 
       listItems.map(listItem => {
-        let subcomponents = GetNodesLinkedTo(graph, {
+        const subcomponents = GetNodesLinkedTo(graph, {
           id: listItem.id,
           link: LinkType.Component
         });
-        let executeButtons = subcomponents.filter(x =>
+        const executeButtons = subcomponents.filter(x =>
           GetNodeProp(x, NodeProperties.ExecuteButton)
         );
         if (executeButtons && executeButtons.length === 1) {
-          let subcomponent = executeButtons[0];
-          let _valueComponentApiNode = GetNodesLinkedTo(graph, {
+          const subcomponent = executeButtons[0];
+          const valueComponentApiNodeItems = GetNodesLinkedTo(graph, {
             id: subcomponent.id,
             link: LinkType.ComponentInternalApi
           }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
-          let _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+          const valueNavigateTargetApiItems = GetNodesLinkedTo(graph, {
             id: navigateTo,
             link: LinkType.ComponentExternalApi
           }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
-          let events = GetNodesLinkedTo(graph, {
+          const events = GetNodesLinkedTo(graph, {
             id: subcomponent.id,
             link: LinkType.EventMethod
           }).filter(x =>
@@ -126,24 +124,24 @@ export default function ScreenConnectGetAll(args = { method, node }) {
             )
           );
           events.map(evnt => {
-            let eventMethodInstances = GetNodesLinkedTo(graph, {
+            const eventMethodInstances = GetNodesLinkedTo(graph, {
               id: evnt.id,
               link: LinkType.EventMethodInstance
             });
             eventMethodInstances.map(eventMethodInstance => {
-              let vp = GetNodeProp(
+              const vp = GetNodeProp(
                 eventMethodInstance,
                 NodeProperties.ViewPackage
               );
               if (vp) {
-                let inPackageNodes = GetNodesByProperties({
+                const inPackageNodes = GetNodesByProperties({
                   [NodeProperties.ViewPackage]: vp
                 });
 
-                inPackageNodes.map(inPackageNode => {
+                inPackageNodes.forEach(inPackageNode => {
                   result.push({
                     operation: REMOVE_NODE,
-                    options: function(graph) {
+                    options(graph) {
                       return {
                         id: inPackageNode.id
                       };
@@ -155,7 +153,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
 
             let _instanceNode = null;
             let _navigateContext = null;
-            let lambdaFunc = "v => ({ value: v })";
+            const lambdaFunc = "v => ({ value: v })";
 
             result.push(
               ...[
@@ -181,22 +179,22 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               }),
               {
                 operation: ADD_LINK_BETWEEN_NODES,
-                options: function() {
+                options() {
                   return {
                     source: _instanceNode.id,
-                    target: _valueComponentApiNode.id,
+                    target: valueComponentApiNodeItems.id,
                     properties: {
                       ...LinkProperties.ComponentApi
                     }
                   };
                 }
               },
-              _valueNavigateTargetApi
+              valueNavigateTargetApiItems
                 ? {
                     operation: UPDATE_NODE_PROPERTY,
-                    options: function() {
+                    options() {
                       return {
-                        id: _valueNavigateTargetApi.id,
+                        id: valueNavigateTargetApiItems.id,
                         properties: {
                           [NodeProperties.IsUrlParameter]: true
                         }
@@ -219,7 +217,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
       });
     });
 
-    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+    const lifeCylcleMethods = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.LifeCylceMethod
     });
@@ -231,24 +229,24 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           ComponentLifeCycleEvents.ComponentDidMount
       )
       .map(lifeCylcleMethod => {
-        let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+        const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
           id: lifeCylcleMethod.id,
           link: LinkType.LifeCylceMethodInstance
         });
         lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
-          let vp = GetNodeProp(
+          const vp = GetNodeProp(
             lifeCylcleMethodInstance,
             NodeProperties.ViewPackage
           );
           if (vp) {
-            let inPackageNodes = GetNodesByProperties({
+            const inPackageNodes = GetNodesByProperties({
               [NodeProperties.ViewPackage]: vp
             });
 
-            inPackageNodes.map(inPackageNode => {
+            inPackageNodes.forEach(inPackageNode => {
               result.push({
                 operation: REMOVE_NODE,
-                options: function(graph) {
+                options() {
                   return {
                     id: inPackageNode.id
                   };
@@ -267,12 +265,12 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               cycleInstance = _cycleInstance;
             }
           }),
-          function(graph) {
+          (currentGraph) => {
             if (cycleInstance) {
               return ConnectLifecycleMethod({
                 target: method,
                 source: cycleInstance.id,
-                graph,
+                graph: currentGraph,
                 viewPackages
               });
             }
@@ -289,11 +287,11 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               storeModelDataChain = context.entry;
             }
           }),
-          function(graph) {
+          (graph) => {
             return [
               {
                 operation: ADD_LINK_BETWEEN_NODES,
-                options: function() {
+                options() {
                   return {
                     target: storeModelDataChain,
                     source: cycleInstance.id,

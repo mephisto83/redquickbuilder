@@ -9,6 +9,7 @@ import {
 } from "../actions/uiactions";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 import { bindTemplate } from "./functiontypes";
+
 export const ComponentTags = {
   MainMenu: "MainMenu",
   Main: "Main",
@@ -453,7 +454,7 @@ export const ComponentTypes = {
             return GetNodeProp(item, NodeProperties.EntryPoint);
           },
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
+            const func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
               includeNameSpace: true
             });
             if (GetNodeProp(node, "component-as-label")) {
@@ -465,10 +466,10 @@ export const ComponentTypes = {
             if (func) {
               return bindTemplate(`DC.{{function}}({{value}})`, {
                 function: func,
-                value: `this.props.` + ComponentApiKeys.DATA
+                value: `this.props.${ComponentApiKeys.DATA}`
               });
             }
-            return `this.props.` + ComponentApiKeys.DATA;
+            return `this.props.${ComponentApiKeys.DATA}`;
           }
         }
       }
@@ -631,7 +632,7 @@ export function GetListItemNode(id) {
     x =>
       GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode &&
       GetNodeProp(x, NodeProperties.ComponentType) ===
-        ComponentTypes.ReactNative.ListItem.key
+      ComponentTypes.ReactNative.ListItem.key
   );
   if (nodes && nodes.length) {
     return nodes[0];

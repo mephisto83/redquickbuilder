@@ -7,7 +7,6 @@ import {
 import {
   GetCurrentGraph,
   NodesByType,
-  ViewTypes,
   UPDATE_LINK_PROPERTY,
   ComponentIsViewType,
   GetNodeProp,
@@ -20,6 +19,7 @@ import {
   LinkPropertyKeys,
   NodeProperties
 } from "../constants/nodetypes";
+import { ViewTypes } from "../constants/viewtypes";
 export default function(args = { name: "Replace Name" }) {
   // node2
 

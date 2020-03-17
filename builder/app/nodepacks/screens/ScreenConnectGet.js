@@ -4,7 +4,6 @@ import {
   GetNodeProp,
   GetNodesByProperties,
   REMOVE_NODE,
-  ViewTypes,
   addInstanceFunc,
   ADD_NEW_NODE,
   ADD_LINK_BETWEEN_NODES,

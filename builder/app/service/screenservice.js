@@ -1,3 +1,6 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-param-reassign */
+/* eslint-disable default-case */
 import {
   GetScreenNodes,
   GetCodeName,
@@ -12,7 +15,6 @@ import {
   GetMethodParameters,
   GetComponentNodeProperties,
   GetLinkChainItem,
-  ViewTypes,
   GetCurrentGraph,
   GetNodeByProperties,
   GetNodes,
@@ -72,11 +74,12 @@ import {
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
 import { StyleLib } from "../constants/styles";
+import { ViewTypes } from "../constants/viewtypes";
 
 export function GenerateScreens(options) {
-  let { language } = options;
-  let temps = BindScreensToTemplate(language || UITypes.ReactNative);
-  let result = {};
+  const { language } = options;
+  const temps = BindScreensToTemplate(language || UITypes.ReactNative);
+  const result = {};
 
   temps.map(t => {
     result[path.join(t.relative, t.name)] = t;
@@ -86,11 +89,11 @@ export function GenerateScreens(options) {
 }
 
 export function GenerateScreenMarkup(id, language) {
-  let screen = GetNodeById(id);
-  let screenOption = GetScreenOption(id, language);
+  const screen = GetNodeById(id);
+  const screenOption = GetScreenOption(id, language);
   if (screenOption) {
-    let imports = GetScreenImports(id, language);
-    let elements = [GenerateMarkupTag(screenOption, language, screen)];
+    const imports = GetScreenImports(id, language);
+    const elements = [GenerateMarkupTag(screenOption, language, screen)];
     let template = null;
     switch (language) {
       case UITypes.ElectronIO:
@@ -132,37 +135,37 @@ export function GetDefaultElement(language) {
   return "<View><Text>DE</Text></View>";
 }
 export function GetItemRender(node, imports, language) {
-  let listItemNode = GetListItemNode(node.id);
+  const listItemNode = GetListItemNode(node.id);
   imports.push(GenerateComponentImport(listItemNode, node, language));
-  let properties = WriteDescribedApiProperties(listItemNode, {
+  const properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
   return `({item, index, separators, key})=>{
     let value = item;
     return  <${GetCodeName(
-      listItemNode
-    )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+    listItemNode
+  )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetFormRender(node, imports, language) {
-  let listItemNode = GetFormItemNode(node.id);
+  const listItemNode = GetFormItemNode(node.id);
   if (!listItemNode) {
     return "";
   }
   imports.push(GenerateComponentImport(listItemNode, node, language));
-  let properties = WriteDescribedApiProperties(listItemNode, {
+  const properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
   return `({item, index, separators, key})=>{
     let value = item;
     return  <${GetCodeName(
-      listItemNode
-    )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+    listItemNode
+  )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetItemRenderImport(node) {
-  let listItemNode = GetListItemNode(node.id);
-  let properties = WriteDescribedApiProperties(listItemNode, {
+  const listItemNode = GetListItemNode(node.id);
+  const properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
 
@@ -181,14 +184,14 @@ function getCssClassName(css, id) {
   return res;
 }
 export function constructCssFile(css, clsName) {
-  let rules = Object.keys(css)
+  const rules = Object.keys(css)
     .map(v => {
-      let style = css[v].style;
+      const style = css[v].style;
 
-      let props = Object.keys(style)
+      const props = Object.keys(style)
         .map(key => {
-          let temp = key.replace(/([a-z])([A-Z])/g, "$1-$2");
-          let value = style[key];
+          const temp = key.replace(/([a-z])([A-Z])/g, "$1-$2");
+          const value = style[key];
           if (!isNaN(value)) {
             // value = `${value}px`;
           }
@@ -208,19 +211,19 @@ export function GetStylesFor(node, tag) {
   if (typeof node === "string") {
     node = GetNodeById(node);
   }
-  let graph = GetCurrentGraph();
-  let styleNodes = GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph();
+  const styleNodes = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.Style
   }).filter(
     x => (GetNodeProp(x, NodeProperties.GridAreas) || []).indexOf(tag) !== -1
   );
 
-  let dataChainsConnectedToStyle = GetNodesLinkedTo(graph, {
+  const dataChainsConnectedToStyle = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.DataChain
   }).filter(x => {
-    let connectedStyleNodes = GetNodesLinkedTo(graph, {
+    const connectedStyleNodes = GetNodesLinkedTo(graph, {
       id: x.id,
       link: LinkType.Style
     });
@@ -230,7 +233,7 @@ export function GetStylesFor(node, tag) {
   });
 
   return styleNodes.map(styleNode => {
-    let dataChainTest = dataChainsConnectedToStyle
+    const dataChainTest = dataChainsConnectedToStyle
       .filter(dc => {
         return existsLinkBetween(graph, {
           source: dc.id,
@@ -238,13 +241,13 @@ export function GetStylesFor(node, tag) {
         });
       })
       .map(dc => {
-        let selector = GetNodesLinkedTo(graph, {
+        const selector = GetNodesLinkedTo(graph, {
           id: dc.id,
           link: LinkType.SelectorLink
         })[0];
         let input = "";
         if (selector) {
-          let inputs = GetNodesLinkedTo(graph, {
+          const inputs = GetNodesLinkedTo(graph, {
             id: selector.id,
             link: LinkType.SelectorInputLink
           }).filter(
@@ -270,31 +273,31 @@ export function GetStylesFor(node, tag) {
 A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
 */
 export function buildStyle(node) {
-  let graph = GetCurrentGraph();
+  const graph = GetCurrentGraph();
   if (typeof node === "string") {
     node = GetNodeById(node, graph);
   }
-  let styleNodes = GetNodesLinkedTo(graph, {
+  const styleNodes = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.Style
   });
 
-  let styleSheetRules = styleNodes
+  const styleSheetRules = styleNodes
     .map(styleNode => {
-      let style = GetNodeProp(styleNode, NodeProperties.Style);
-      let styleSelectors = StyleNodeProperties.filter(x =>
+      const style = GetNodeProp(styleNode, NodeProperties.Style);
+      const styleSelectors = StyleNodeProperties.filter(x =>
         GetNodeProp(styleNode, x)
       ).map(styleProp => {
         return styleProp;
       });
-      let areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
-      let gridRowCount = parseInt(
+      const areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
+      const gridRowCount = parseInt(
         GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
         10
       );
-      let gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
-      let styleObj = GetNodeProp(styleNode, NodeProperties.Style);
-      let useMediaQuery = GetNodeProp(style, NodeProperties.UseMediaQuery);
+      const gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
+      const styleObj = GetNodeProp(styleNode, NodeProperties.Style);
+      const useMediaQuery = GetNodeProp(style, NodeProperties.UseMediaQuery);
       let mediaquery_start = "";
       let mediaquery_end = "";
       if (useMediaQuery) {
@@ -305,19 +308,19 @@ export function buildStyle(node) {
           mediaquery_end = `}`;
         }
       }
-      let styleName = GetJSCodeName(styleNode);
-      let stylesSelectorsName = styleSelectors
+      const styleName = GetJSCodeName(styleNode);
+      const stylesSelectorsName = styleSelectors
         .map(styleSelector => {
           return `${styleName}${styleSelector}`;
         })
         .join();
-      let stylesheet = `${mediaquery_start}
+      const stylesheet = `${mediaquery_start}
     .${stylesSelectorsName || styleName} {
       ${Object.keys(styleObj)
-        .map(s => {
-          return `${StyleLib.js[s]}: ${styleObj[s]};`;
-        })
-        .join(NEW_LINE)}
+          .map(s => {
+            return `${StyleLib.js[s]}: ${styleObj[s]};`;
+          })
+          .join(NEW_LINE)}
     }
     ${mediaquery_end}`;
 
@@ -328,10 +331,10 @@ export function buildStyle(node) {
 }
 
 export function GetItemData(node) {
-  let dataSourceNode = GetDataSourceNode(node.id);
-  let connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
-  let instanceType = GetNodeProp(dataSourceNode, NodeProperties.InstanceType);
-  let defaultValue = GetDefaultComponentValue(node);
+  const dataSourceNode = GetDataSourceNode(node.id);
+  const connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
+  const instanceType = GetNodeProp(dataSourceNode, NodeProperties.InstanceType);
+  const defaultValue = GetDefaultComponentValue(node);
   if (connectedNode) {
     // data = `D.${GetJSCodeName(connectedNode)}(${data})`;
     return `(()=> {
@@ -347,34 +350,34 @@ export function GetItemData(node) {
 export function getRelativePathPrefix(relativePath) {
   return relativePath
     ? relativePath
-        .split("/")
-        .map(t => `../`)
-        .subset(2)
-        .join("")
+      .split("/")
+      .map(t => `../`)
+      .subset(2)
+      .join("")
     : relativePath;
 }
 export function GenerateRNScreenOptionSource(node, relativePath, language) {
-  let layoutObj = GetNodeProp(node, NodeProperties.Layout);
-  let componentType = GetNodeProp(node, NodeProperties.ComponentType);
-  let { specialLayout, template } = ComponentTypes[language][componentType]
+  const layoutObj = GetNodeProp(node, NodeProperties.Layout);
+  const componentType = GetNodeProp(node, NodeProperties.ComponentType);
+  const { specialLayout, template } = ComponentTypes[language][componentType]
     ? ComponentTypes[language][componentType]
     : {};
 
   let imports = [];
-  let extraimports = [];
-  let css = {};
+  const extraimports = [];
+  const css = {};
   let layoutSrc;
   if (!specialLayout) {
     // if not a List or something like that
     layoutSrc = layoutObj
       ? buildLayoutTree({
-          layoutObj,
-          currentRoot: null,
-          language,
-          imports,
-          node,
-          css
-        }).join(NEW_LINE)
+        layoutObj,
+        currentRoot: null,
+        language,
+        imports,
+        node,
+        css
+      }).join(NEW_LINE)
       : GetDefaultElement();
   } else {
     extraimports.push(
@@ -392,10 +395,10 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         css
       }).join(NEW_LINE);
     }
-    let data = GetItemData(node);
-    let item_render = GetItemRender(node, extraimports, language);
-    let form_render = GetFormRender(node, extraimports, language);
-    let apiProperties = WriteDescribedApiProperties(node);
+    const data = GetItemData(node);
+    const item_render = GetItemRender(node, extraimports, language);
+    const form_render = GetFormRender(node, extraimports, language);
+    const apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(fs.readFileSync(template, "utf8"), {
       item_render: item_render,
       form_render,
@@ -411,7 +414,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
           ComponentTypes[language][componentType].properties &&
           ComponentTypes[language][componentType].properties
         ) {
-          let { onPress } = ComponentTypes[language][componentType].properties;
+          const { onPress } = ComponentTypes[language][componentType].properties;
           if (onPress) {
             layoutSrc = wrapOnPress(layoutSrc, onPress, node);
           }
@@ -431,7 +434,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
       );
-      let styleRules = buildStyle(node);
+      const styleRules = buildStyle(node);
       cssFile = constructCssFile(
         css,
         `.${(GetCodeName(node) || "").toJavascriptName()}`
@@ -450,11 +453,11 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
       );
       break;
   }
-  let results = [];
+  const results = [];
   imports
     .filter(x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent))
     .map(t => {
-      let relPath = relativePath
+      const relPath = relativePath
         ? `${relativePath}/${(GetCodeName(node) || "").toJavascriptName()}`
         : `./src/components/${(GetCodeName(node) || "").toJavascriptName()}`;
       results.push(...GenerateRNComponents(GetNodeById(t), relPath, language));
@@ -463,9 +466,9 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     .unique()
     .map(t => GenerateComponentImport(t, node, language));
 
-  let _consts = GetRNConsts(node.id ? node.id : node) || [];
-  let modelInstances = GetRNModelInstances(node.id ? node.id : node) || [];
-  let screen_options = addNewLine(
+  const _consts = GetRNConsts(node.id ? node.id : node) || [];
+  const modelInstances = GetRNModelInstances(node.id ? node.id : node) || [];
+  const screen_options = addNewLine(
     [..._consts, ...modelInstances].unique().join(NEW_LINE),
     4
   );
@@ -500,29 +503,29 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     },
     cssFile
       ? {
-          template: cssFile,
-          relative: relativePath || "./src/components",
-          relativeFilePath: `./${(
-            GetCodeName(node) || ""
-          ).toJavascriptName()}.css`,
-          name:
-            (relativePath || "./src/components/") +
-            `${(GetCodeName(node) || "").toJavascriptName()}.css`
-        }
+        template: cssFile,
+        relative: relativePath || "./src/components",
+        relativeFilePath: `./${(
+          GetCodeName(node) || ""
+        ).toJavascriptName()}.css`,
+        name:
+          (relativePath || "./src/components/") +
+          `${(GetCodeName(node) || "").toJavascriptName()}.css`
+      }
       : null,
     ...results
   ].filter(x => x);
 }
 export function bindComponent(node, componentBindingDefinition) {
   if (componentBindingDefinition && componentBindingDefinition.template) {
-    let template = fs.readFileSync(componentBindingDefinition.template, "utf8");
-    let { properties } = componentBindingDefinition;
-    let bindProps = {};
+    const template = fs.readFileSync(componentBindingDefinition.template, "utf8");
+    const { properties } = componentBindingDefinition;
+    const bindProps = {};
     Object.keys(properties).map(key => {
       if (properties[key] && properties[key].nodeProperty) {
         bindProps[key] = GetNodeProp(node, properties[key].nodeProperty);
         if (properties[key].parameterConfig) {
-          let parameterConfig = GetNodeProp(node, properties[key].nodeProperty);
+          const parameterConfig = GetNodeProp(node, properties[key].nodeProperty);
           if (parameterConfig && parameterConfig[key]) {
             bindProps[key] = writeApiProperties({
               [key]: parameterConfig[key]
@@ -536,15 +539,15 @@ export function bindComponent(node, componentBindingDefinition) {
     });
     var cevents =
       componentBindingDefinition.eventApi || Object.keys(ComponentEvents);
-    let eventHandlers = cevents
+    const eventHandlers = cevents
       .map(t => getMethodInstancesForEvntType(node, ComponentEvents[t]))
       .map((methodInstances, i) => {
-        let invocations = methodInstances
+        const invocations = methodInstances
           .map(methodInstanceCall => {
             if (!methodInstanceCall) debugger;
             let invocationDependsOnState = null;
-            let temp = getMethodInvocation(methodInstanceCall, args => {
-              let { statePropertiesThatCauseInvocation } = args;
+            const temp = getMethodInvocation(methodInstanceCall, args => {
+              const { statePropertiesThatCauseInvocation } = args;
               invocationDependsOnState = (
                 statePropertiesThatCauseInvocation || []
               ).length;
@@ -566,48 +569,48 @@ ${invocations}
   }
 }
 export function wrapOnPress(elements, onPress, node, options) {
-  let onpress = GetNodeProp(node, "onPress");
+  const onpress = GetNodeProp(node, "onPress");
   switch (onpress) {
     case APP_METHOD:
-      let key = "onPress";
-      let methodParams =
+      const key = "onPress";
+      const methodParams =
         GetNodeProp(node, NodeProperties.ClientMethodParameters) || {};
-      let clientMethod = GetNodeProp(node, NodeProperties.ClientMethod);
+      const clientMethod = GetNodeProp(node, NodeProperties.ClientMethod);
       let bodytext = "let body = null;";
-      let parameterstext = `let parameters = null;`;
+      const parameterstext = `let parameters = null;`;
       if (clientMethod) {
-        let jsClientMethodName = GetJSCodeName(clientMethod);
-        let methodParameters = GetMethodParameters(clientMethod);
+        const jsClientMethodName = GetJSCodeName(clientMethod);
+        const methodParameters = GetMethodParameters(clientMethod);
         if (methodParameters) {
-          let { parameters, body } = methodParameters;
+          const { parameters, body } = methodParameters;
           if (body) {
-            let componentNodeProperties = GetComponentNodeProperties();
-            let instanceType = getClientMethod(
+            const componentNodeProperties = GetComponentNodeProperties();
+            const instanceType = getClientMethod(
               methodParams,
               key,
               "body",
               "instanceType"
             );
-            let componentModel = getClientMethod(
+            const componentModel = getClientMethod(
               methodParams,
               key,
               "body",
               "componentModel"
             );
-            let c_props = componentNodeProperties.find(
+            const c_props = componentNodeProperties.find(
               x =>
                 x.id === getClientMethod(methodParams, key, "body", "component")
             );
-            let c_props_options =
+            const c_props_options =
               c_props && c_props.componentPropertiesList
                 ? c_props.componentPropertiesList
                 : [];
             if (c_props_options.length) {
-              let c_prop_option = c_props_options.find(
+              const c_prop_option = c_props_options.find(
                 v => v.value === componentModel
               );
               if (c_prop_option) {
-                let componentModelName = c_prop_option.value;
+                const componentModelName = c_prop_option.value;
                 bodytext = `let body = Get${instanceType}Object('${componentModelName}');`;
               }
             }
@@ -615,7 +618,7 @@ export function wrapOnPress(elements, onPress, node, options) {
           if (parameters) {
             // TODO: Handle parameters;
           }
-          let pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`;
+          const pressfunc = `this.props.${jsClientMethodName}({ body, parameters })`;
           if (options && options.onPress && options.onPress.nowrap) {
             elements = bindTemplate(elements, {
               onPressEvent: `onPress={() => {
@@ -637,29 +640,29 @@ ${pressfunc} }}`
       }
       break;
     case NAVIGATION:
-      let navigation = GetNodeProp(node, NodeProperties.Navigation);
-      let targetScreen = GetNodeById(navigation);
-      let screenParameters = GetNodeProp(
+      const navigation = GetNodeProp(node, NodeProperties.Navigation);
+      const targetScreen = GetNodeById(navigation);
+      const screenParameters = GetNodeProp(
         targetScreen,
         NodeProperties.ScreenParameters
       );
-      let params = [];
+      const params = [];
       if (screenParameters) {
-        let navigationProperties = GetNodeProp(
+        const navigationProperties = GetNodeProp(
           node,
           NodeProperties.NavigationParameters
         );
-        let parameterProperty =
+        const parameterProperty =
           GetNodeProp(node, NodeProperties.NavigationParametersProperty) || {};
-        let componentProperties = GetNodeProp(
+        const componentProperties = GetNodeProp(
           node,
           NodeProperties.ComponentProperties
         );
         screenParameters.map(sparam => {
-          let { title, id } = sparam;
-          let propName = navigationProperties[id];
+          const { title, id } = sparam;
+          const propName = navigationProperties[id];
           if (propName) {
-            let propPropName = parameterProperty[propName];
+            const propPropName = parameterProperty[propName];
             if (propPropName) {
               let listitem = "";
               if (
@@ -668,7 +671,7 @@ ${pressfunc} }}`
               ) {
                 listitem = ".item";
               }
-              let propertyNode = GetNodeById(propPropName);
+              const propertyNode = GetNodeById(propPropName);
               if (propertyNode) {
                 params.push(
                   `${title}: this.props.${propName}${listitem}.${GetJSCodeName(
@@ -683,7 +686,7 @@ ${pressfunc} }}`
         });
       }
       if (navigation && params) {
-        let navfunc = `navigate('${GetCodeName(navigation)}', {${params.join(
+        const navfunc = `navigate('${GetCodeName(navigation)}', {${params.join(
           ", "
         )}})`;
         if (options && options.onPress && options.onPress.nowrap) {
@@ -708,15 +711,15 @@ export function GenerateRNComponents(
   relative = "./src/components",
   language = UITypes.ReactNative
 ) {
-  let result = [];
-  let layoutObj = GetNodeProp(node, NodeProperties.Layout);
+  const result = [];
+  const layoutObj = GetNodeProp(node, NodeProperties.Layout);
   let fileEnding = ".js";
   switch (language) {
     case UITypes.ElectronIO:
       fileEnding = ".tsx";
       break;
   }
-  let componentType = GetNodeProp(node, NodeProperties.ComponentType);
+  const componentType = GetNodeProp(node, NodeProperties.ComponentType);
   if (
     !layoutObj &&
     (!ComponentTypes[language] ||
@@ -755,7 +758,7 @@ export function GenerateRNComponents(
             ComponentTypes[language][componentType].properties &&
             ComponentTypes[language][componentType].properties
           ) {
-            let { onPress, nowrap } = ComponentTypes[language][
+            const { onPress, nowrap } = ComponentTypes[language][
               componentType
             ].properties;
             if (onPress) {
@@ -768,7 +771,7 @@ export function GenerateRNComponents(
             }
           }
         }
-        let component_did_update = GetComponentDidUpdate(node);
+        const component_did_update = GetComponentDidUpdate(node);
 
         template = bindTemplate(template, {
           name: GetCodeName(node),
@@ -800,7 +803,7 @@ export function GenerateRNComponents(
     }
     return result;
   } else {
-    let src = GenerateRNScreenOptionSource(
+    const src = GenerateRNScreenOptionSource(
       node,
       relative || "./src/components",
       language
@@ -808,24 +811,24 @@ export function GenerateRNComponents(
     if (src) result.push(...src);
   }
 
-  let components = GetNodeComponents(layoutObj).filter(
+  const components = GetNodeComponents(layoutObj).filter(
     x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent)
   );
   components.map(component => {
-    let relPath = relative
+    const relPath = relative
       ? `${relative}/${(GetCodeName(node) || "").toJavascriptName()}`
       : `./src/components/${(GetCodeName(node) || "").toJavascriptName()}`;
-    let temp = GenerateRNComponents(component, relPath, language);
+    const temp = GenerateRNComponents(component, relPath, language);
     result.push(...temp);
   });
   return result;
 }
 export function GenerateCss(id, language) {
-  let screen = GetNodeById(id);
-  let screenOption = GetScreenOption(id, language);
+  const screen = GetNodeById(id);
+  const screenOption = GetScreenOption(id, language);
   if (screenOption) {
-    let imports = GetScreenImports(id, language);
-    let elements = [GenerateMarkupTag(screenOption, language, screen)];
+    const imports = GetScreenImports(id, language);
+    const elements = [GenerateMarkupTag(screenOption, language, screen)];
     let template = null;
     switch (language) {
       case UITypes.ElectronIO:
@@ -865,7 +868,7 @@ export function ConvertViewTypeToComponentNode(
 
   switch (GetNodeProp(node, NodeProperties.NODEType)) {
     case NodeTypes.ViewType:
-      let temp = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
+      const temp = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
         id: node.id,
         link: LinkType.DefaultViewType
       })
@@ -877,12 +880,13 @@ export function ConvertViewTypeToComponentNode(
         .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
         .filter(
           x =>
-            GetNodeProp(x, NodeProperties.IsPluralComponent) ===
-            isPluralComponent
+            !!GetNodeProp(x, NodeProperties.IsPluralComponent) ===
+            !!isPluralComponent
         )
         .find(x => x);
       node = temp || node;
       break;
+    default: break;
   }
   if (wasstring) {
     return node.id;
@@ -919,38 +923,38 @@ export function GenerateMarkupTag(node, language, parent) {
 }
 function WriteDescribedStateUpdates(parent) {
   let result = ``;
-  let graph = GetCurrentGraph(GetState());
+  const graph = GetCurrentGraph(GetState());
   if (typeof parent === "string") {
     parent = GetNodeById(parent, graph);
   }
-  let componentInternalApis = GetNodesLinkedTo(graph, {
+  const componentInternalApis = GetNodesLinkedTo(graph, {
     id: parent.id,
     link: LinkType.ComponentInternalApi
   });
   result = componentInternalApis
     .unique(x => GetJSCodeName(x))
     .map(componentInternalApi => {
-      let externalApiNode = GetNodesLinkedTo(graph, {
+      const externalApiNode = GetNodesLinkedTo(graph, {
         id: componentInternalApi.id,
         link: LinkType.ComponentInternalConnection
       }).find(x => x);
 
-      let dataChain = GetNodesLinkedTo(graph, {
+      const dataChain = GetNodesLinkedTo(graph, {
         id: componentInternalApi.id,
         link: LinkType.DataChainLink
       }).find(x => x);
 
-      let selector = GetNodesLinkedTo(graph, {
+      const selector = GetNodesLinkedTo(graph, {
         id: componentInternalApi.id,
         link: LinkType.SelectorLink
       }).find(x => x);
 
       let innerValue = null;
-      let externalKey = GetJSCodeName(externalApiNode);
+      const externalKey = GetJSCodeName(externalApiNode);
       innerValue = externalKey;
       if (innerValue) {
         if (selector) {
-          let addiontionalParams = getUpdateFunctionOption(
+          const addiontionalParams = getUpdateFunctionOption(
             selector.id,
             externalApiNode.id
           );
@@ -965,7 +969,7 @@ function WriteDescribedStateUpdates(parent) {
             includeNameSpace: true
           })}(${innerValue})`;
         }
-        let temp_prop = GetJSCodeName(componentInternalApi);
+        const temp_prop = GetJSCodeName(componentInternalApi);
         result = `
             var new_${externalKey} = ${bindTemplate(innerValue, {
           temp: `this.props.${externalKey}`
@@ -978,25 +982,25 @@ function WriteDescribedStateUpdates(parent) {
           temp: innerValue,
           step: `updated = true;
             updates = {...updates, ${GetJSCodeName(
-              componentInternalApi
-            )}:  new_${externalKey} };`
+            componentInternalApi
+          )}:  new_${externalKey} };`
         });
       }
     })
     .filter(x => x)
     .join(NEW_LINE);
 
-  let methodInstances = getMethodInstancesForLifeCylcEvntType(
+  const methodInstances = getMethodInstancesForLifeCylcEvntType(
     parent,
     ComponentLifeCycleEvents.ComponentDidMount
   );
 
-  let invocations = (methodInstances || [])
+  const invocations = (methodInstances || [])
     .map(methodInstanceCall => {
       let invocationDependsOnState = false;
       let dependentStateProperties = [];
-      let temp = getMethodInvocation(methodInstanceCall, args => {
-        let { statePropertiesThatCauseInvocation } = args;
+      const temp = getMethodInvocation(methodInstanceCall, args => {
+        const { statePropertiesThatCauseInvocation } = args;
         dependentStateProperties = statePropertiesThatCauseInvocation;
         invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
           .length;
@@ -1004,7 +1008,7 @@ function WriteDescribedStateUpdates(parent) {
       if (!invocationDependsOnState) {
         return false;
       }
-      let ifstatement = dependentStateProperties
+      const ifstatement = dependentStateProperties
         .map(v => `updates.hasOwnProperty('${v}')`)
         .join(" || ");
       return `if(${ifstatement}) {
@@ -1030,11 +1034,11 @@ function WriteDescribedStateUpdates(parent) {
 }
 function GetDefaultComponentValue(node, key) {
   let result = ``;
-  let graph = GetCurrentGraph(GetState());
+  const graph = GetCurrentGraph(GetState());
   if (typeof node === "string") {
     node = GetNodeById(node, graph);
   }
-  let componentInternalApis = [
+  const componentInternalApis = [
     GetNodesLinkedTo(graph, {
       id: node.id,
       link: LinkType.ComponentInternalApi
@@ -1046,18 +1050,18 @@ function GetDefaultComponentValue(node, key) {
   result = componentInternalApis
     .unique(x => GetJSCodeName(x))
     .map(componentInternalApi => {
-      let dataChain = GetNodesLinkedTo(graph, {
+      const dataChain = GetNodesLinkedTo(graph, {
         id: componentInternalApi.id,
         link: LinkType.DataChainLink
       }).find(x => x);
 
-      let selector = GetNodesLinkedTo(graph, {
+      const selector = GetNodesLinkedTo(graph, {
         id: componentInternalApi.id,
         link: LinkType.SelectorLink
       }).find(x => x);
 
       let innerValue = null;
-      let externalKey = GetJSCodeName(componentInternalApi);
+      const externalKey = GetJSCodeName(componentInternalApi);
       innerValue = externalKey;
       if (innerValue) {
         if (selector) {
@@ -1090,17 +1094,17 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
   }
 
   let graph = GetCurrentGraph(GetState());
-  let componentExternalApis = GetNodesLinkedTo(graph, {
+  const componentExternalApis = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.ComponentExternalApi
   });
 
-  let componentEventHandlers = GetNodesLinkedTo(graph, {
+  const componentEventHandlers = GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.EventMethod
   });
 
-  let isViewType =
+  const isViewType =
     GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType;
 
   result = componentExternalApis
@@ -1134,22 +1138,22 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         }
       }
 
-      let titleService = GetNodesLinkedTo(graph, {
+      const titleService = GetNodesLinkedTo(graph, {
         id: componentExternalApi.id,
         link: LinkType.TitleServiceLink
       }).find(x => x);
 
-      let query = GetNodesLinkedTo(graph, {
+      const query = GetNodesLinkedTo(graph, {
         id: componentExternalApi.id,
         link: LinkType.QueryLink
       }).find(x => x);
 
-      let dataChain = GetNodesLinkedTo(graph, {
+      const dataChain = GetNodesLinkedTo(graph, {
         id: componentExternalApi.id,
         link: LinkType.DataChainLink
       }).find(x => x);
 
-      let selector = GetNodesLinkedTo(graph, {
+      const selector = GetNodesLinkedTo(graph, {
         id: componentExternalApi.id,
         link: LinkType.SelectorLink
       }).find(x => x);
@@ -1165,7 +1169,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
           innerValue = `GetScreenParam('query')`;
         } else {
           if (options.listItem) {
-            let listItemAttribute = GetJSCodeName(externalConnection);
+            const listItemAttribute = GetJSCodeName(externalConnection);
             // innerValue = ["viewModel", "selected"].some(
             //   vv => vv === listItemAttribute
             // )
@@ -1176,7 +1180,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               ? `this.state.${listItemAttribute}`
               : listItemAttribute;
           } else {
-            let defaulComponentValue =
+            const defaulComponentValue =
               GetNodeProp(
                 externalConnection,
                 NodeProperties.DefaultComponentApiValue
@@ -1193,15 +1197,15 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         }
       }
       if (!noSelector && selector) {
-        let addiontionalParams =
+        const addiontionalParams =
           componentExternalApi && externalConnection
             ? getUpdateFunctionOption(
-                componentExternalApi.id,
-                externalConnection.id
-              )
+              componentExternalApi.id,
+              externalConnection.id
+            )
             : "";
         if (isViewType) {
-          let addiontionalParams =
+          const addiontionalParams =
             componentExternalApi && node
               ? getUpdateFunctionOption(node.id, componentExternalApi.id)
               : "";
@@ -1227,50 +1231,50 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
     })
     .filter(x => x);
 
-  let res = componentEventHandlers
+  const res = componentEventHandlers
     .unique(x => GetJSCodeName(x))
     .map(componentEventHandler => {
-      let eventInstances = GetNodesLinkedTo(graph, {
+      const eventInstances = GetNodesLinkedTo(graph, {
         id: componentEventHandler.id,
         link: LinkType.EventMethodInstance
       });
       return eventInstances
         .map(eventInstance => {
-          let eventMethodHandlers = GetNodesLinkedTo(graph, {
+          const eventMethodHandlers = GetNodesLinkedTo(graph, {
             id: eventInstance.id,
             link: LinkType.EventHandler
           });
-          let method_calls = eventMethodHandlers.map(eventMethodHandler => {
-            let property = GetNodesLinkedTo(graph, {
+          const method_calls = eventMethodHandlers.map(eventMethodHandler => {
+            const property = GetNodesLinkedTo(graph, {
               id: eventMethodHandler.id,
               link: LinkType.PropertyLink
             }).find(x => x);
-            let viewModel = GetNodesLinkedTo(graph, {
+            const viewModel = GetNodesLinkedTo(graph, {
               id: eventMethodHandler.id,
               link: LinkType.ViewModelLink
             }).find(x => x);
-            let eventType = GetNodeProp(
+            const eventType = GetNodeProp(
               eventMethodHandler,
               NodeProperties.EventType
             );
-            let useValue = GetNodeProp(
+            const useValue = GetNodeProp(
               eventMethodHandler,
               NodeProperties.UseValue
             )
               ? "value"
               : "text";
-            let addiontionalParams =
+            const addiontionalParams =
               componentEventHandler && eventInstance
                 ? getUpdateFunctionOption(
-                    componentEventHandler.id,
-                    eventInstance.id,
-                    `, { update: true, value: this.state.value/*hard coded*/ }`
-                  )
+                  componentEventHandler.id,
+                  eventInstance.id,
+                  `, { update: true, value: this.state.value/*hard coded*/ }`
+                )
                 : "";
 
             let method_call = null;
-            let modelProperty = GetJSCodeName(property);
-            let screenOrModel = GetNodeProp(
+            const modelProperty = GetJSCodeName(property);
+            const screenOrModel = GetNodeProp(
               eventMethodHandler,
               NodeProperties.InstanceType
             )
@@ -1304,10 +1308,10 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         .filter(x => x)
         .join(NEW_LINE);
     });
-  let componentType = GetNodeProp(node, NodeProperties.ComponentType);
-  let uiType = GetNodeProp(node, NodeProperties.UIType);
+  const componentType = GetNodeProp(node, NodeProperties.ComponentType);
+  const uiType = GetNodeProp(node, NodeProperties.UIType);
   if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
-    let { events } = ComponentTypes[uiType][componentType];
+    const { events } = ComponentTypes[uiType][componentType];
     for (var _event in events) {
       switch (_event) {
         case ComponentEvents.onChange:
@@ -1326,7 +1330,7 @@ export function writeApiProperties(apiConfig) {
   if (apiConfig) {
     for (var i in apiConfig) {
       let property = null;
-      let {
+      const {
         instanceType,
         model,
         selector,
@@ -1336,7 +1340,7 @@ export function writeApiProperties(apiConfig) {
         isHandler,
         dataChain
       } = apiConfig[i];
-      let modelJsName = GetJSCodeName(model) || model;
+      const modelJsName = GetJSCodeName(model) || model;
       switch (instanceType) {
         case InstanceTypes.ScreenInstance:
           switch (handlerType) {
@@ -1412,7 +1416,7 @@ export function writeApiProperties(apiConfig) {
       }
       if (property) {
         if (dataChain) {
-          let codeName = GetCodeName(dataChain, {
+          const codeName = GetCodeName(dataChain, {
             includeNameSpace: true
           });
           property = `DC.${codeName}(${property})`;
@@ -1428,10 +1432,10 @@ export function writeApiProperties(apiConfig) {
   return result;
 }
 export function GetScreenOption(id, language) {
-  let screen = GetNodeById(id);
-  let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;
+  const screen = GetNodeById(id);
+  const screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;
   if (screenOptions && screenOptions.length) {
-    let reactScreenOption = screenOptions.find(
+    const reactScreenOption = screenOptions.find(
       x => GetNodeProp(x, NodeProperties.UIType) === language
     );
     if (reactScreenOption) {
@@ -1442,10 +1446,10 @@ export function GetScreenOption(id, language) {
 }
 
 export function GetScreenImports(id, language) {
-  let screen = GetNodeById(id);
-  let screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;
+  const screen = GetNodeById(id);
+  const screenOptions = screen ? GetConnectedScreenOptions(screen.id) : null;
   if (screenOptions && screenOptions.length) {
-    let reactScreenOption = screenOptions.find(
+    const reactScreenOption = screenOptions.find(
       x => GetNodeProp(x, NodeProperties.UIType) === language
     );
     if (reactScreenOption) {
@@ -1460,14 +1464,14 @@ export function getMethodInstancesForLifeCylcEvntType(node, evtType) {
   if (typeof node === "string") {
     node = GetNodeById(node);
   }
-  let graph = GetCurrentGraph(GetState());
-  let methods = getNodesByLinkType(graph, {
+  const graph = GetCurrentGraph(GetState());
+  const methods = getNodesByLinkType(graph, {
     id: node.id,
     type: LinkType.LifeCylceMethod,
     direction: TARGET,
     exist: true
   }).filter(x => GetNodeProp(x, NodeProperties.EventType) === evtType);
-  let methodInstances = [];
+  const methodInstances = [];
   methods.map(method => {
     methodInstances.push(
       ...getNodesLinkedTo(graph, {
@@ -1488,14 +1492,14 @@ export function getMethodInstancesForEvntType(node, evtType) {
   if (typeof node === "string") {
     node = GetNodeById(node);
   }
-  let graph = GetCurrentGraph(GetState());
-  let methods = getNodesByLinkType(graph, {
+  const graph = GetCurrentGraph(GetState());
+  const methods = getNodesByLinkType(graph, {
     id: node.id,
     type: LinkType.EventMethod,
     direction: TARGET,
     exist: true
   }).filter(x => GetNodeProp(x, NodeProperties.EventType) === evtType);
-  let methodInstances = [];
+  const methodInstances = [];
   methods.map(method => {
     methodInstances.push(
       ...getNodesLinkedTo(graph, {
@@ -1511,55 +1515,55 @@ export function getMethodInstancesForEvntType(node, evtType) {
 
   return methodInstances;
 }
-export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
-  let graph = GetCurrentGraph(GetState());
-  let method = getNodesByLinkType(graph, {
+export function getMethodInvocation(methodInstanceCall, callback = () => { }) {
+  const graph = GetCurrentGraph(GetState());
+  const method = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.MethodCall,
     direction: SOURCE
   }).find(x => x);
-  let navigationMethod = getNodesByLinkType(graph, {
+  const navigationMethod = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.NavigationMethod,
     direction: SOURCE
   }).find(x => x);
-  let dataChain = getNodesByLinkType(graph, {
+  const dataChain = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.DataChainLink,
     direction: SOURCE
   }).find(x => x);
 
-  let internalApiConnection = getNodesByLinkType(graph, {
+  const internalApiConnection = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.ComponentApi,
     direction: SOURCE
   }).find(x => x);
-  let statePropertiesThatCauseInvocation = [];
+  const statePropertiesThatCauseInvocation = [];
   if (method) {
-    let parts = [];
-    let body = getNodesByLinkType(graph, {
+    const parts = [];
+    const body = getNodesByLinkType(graph, {
       id: method.id,
       type: LinkType.MethodApiParameters,
       direction: TARGET
     }).find(x => GetNodeProp(x, NodeProperties.UriBody));
-    let queryObject = getNodesByLinkType(graph, {
+    const queryObject = getNodesByLinkType(graph, {
       id: method.id,
       type: LinkType.MethodApiParameters,
       direction: TARGET
     }).find(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
-    let templateObject = getNodesByLinkType(graph, {
+    const templateObject = getNodesByLinkType(graph, {
       id: method.id,
       type: LinkType.MethodApiParameters,
       direction: TARGET
     }).find(x => GetNodeProp(x, NodeProperties.TemplateParameter));
 
-    let dataChain = GetNodesLinkedTo(graph, {
+    const dataChain = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
       link: LinkType.DataChainLink
     }).find(x => {
       return GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChain;
     });
-    let methodInstanceSource = GetNodesLinkedTo(graph, {
+    const methodInstanceSource = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
       link: LinkType.EventMethodInstance
     }).find(x => {
@@ -1567,13 +1571,13 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
     });
     let body_input = null;
     if (body) {
-      let body_param = getNodesByLinkType(graph, {
+      const body_param = getNodesByLinkType(graph, {
         id: body.id,
         type: LinkType.ComponentApiConnection,
         direction: TARGET
       }).find(x => x);
       if (body_param) {
-        let body_selector = getNodesByLinkType(graph, {
+        const body_selector = getNodesByLinkType(graph, {
           id: body_param.id,
           type: LinkType.ComponentApiConnection,
           direction: SOURCE
@@ -1583,7 +1587,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
         );
         let innervalue = "";
         if (body_selector) {
-          let addiontionalParams = getUpdateFunctionOption(
+          const addiontionalParams = getUpdateFunctionOption(
             methodInstanceSource ? methodInstanceSource.id : null,
             methodInstanceCall ? methodInstanceCall.id : null
           );
@@ -1592,7 +1596,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
             body_selector
           )}(this.state.value, this.state.viewModel${addiontionalParams})`;
         }
-        let body_value = getNodesByLinkType(graph, {
+        const body_value = getNodesByLinkType(graph, {
           id: body_param.id,
           type: LinkType.ComponentApiConnection,
           direction: SOURCE
@@ -1611,13 +1615,13 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
       }
     }
     if (templateObject) {
-      let templateParameters = GetNodesLinkedTo(graph, {
+      const templateParameters = GetNodesLinkedTo(graph, {
         id: templateObject.id,
         type: LinkType.MethodApiParameters,
         direction: SOURCE
       }).filter(x => GetNodeProp(x, NodeProperties.TemplateParameter));
 
-      let queryParameterValues = templateParameters
+      const queryParameterValues = templateParameters
         .map(queryParameter => {
           return extractApiJsCode({
             node: queryParameter,
@@ -1634,13 +1638,13 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
       );
     }
     if (queryObject) {
-      let queryParameters = getNodesByLinkType(graph, {
+      const queryParameters = getNodesByLinkType(graph, {
         id: queryObject.id,
         type: LinkType.MethodApiParameters,
         direction: SOURCE
       }).filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
 
-      let queryParameterValues = queryParameters
+      const queryParameterValues = queryParameters
         .map(queryParameter => {
           return extractApiJsCode({
             node: queryParameter,
@@ -1667,7 +1671,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => {}) {
           includeNameSpace: true
         })}`;
     }
-    let query = parts.join();
+    const query = parts.join();
     return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}});`;
   } else if (navigationMethod) {
     return `this.props.${GetNodeProp(
@@ -1694,13 +1698,13 @@ export function getUpdateFunctionOption(
 ) {
   let addiontionalParams = "";
   if (methodId && methodInstanceCallId) {
-    let link_selector = GetLinkBetween(
+    const link_selector = GetLinkBetween(
       methodId,
       methodInstanceCallId,
       GetCurrentGraph()
     );
     if (link_selector) {
-      let instanceUpdate = GetLinkProperty(
+      const instanceUpdate = GetLinkProperty(
         link_selector,
         LinkPropertyKeys.InstanceUpdate
       );
@@ -1712,16 +1716,16 @@ export function getUpdateFunctionOption(
   return addiontionalParams;
 }
 export function GetComponentDidUpdate(parent, options = {}) {
-  let { isScreen } = options;
+  const { isScreen } = options;
   let describedApi = "";
   if (parent) {
     describedApi = WriteDescribedStateUpdates(parent).trim();
   }
-  let componentDidMount = GetComponentDidMount(parent, {
+  const componentDidMount = GetComponentDidMount(parent, {
     skipOutOfBand: true,
     skipSetGetState: true
   });
-  let componentDidUpdate =
+  const componentDidUpdate =
     `componentDidUpdate(prevProps) {
         this.captureValues(prevProps);
       }
@@ -1735,7 +1739,7 @@ export function GetComponentDidUpdate(parent, options = {}) {
   return componentDidUpdate;
 }
 export function GetComponentDidMount(screenOption, options = {}) {
-  let events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
+  const events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
   let outOfBandCall = "";
   if (
     GetNodeProp(screenOption, NodeProperties.InstanceType) ===
@@ -1753,16 +1757,16 @@ export function GetComponentDidMount(screenOption, options = {}) {
       )});`;
     }
   }
-  let methodInstances = getMethodInstancesForLifeCylcEvntType(
+  const methodInstances = getMethodInstancesForLifeCylcEvntType(
     screenOption,
     ComponentLifeCycleEvents.ComponentDidMount
   );
 
-  let invocations = (methodInstances || [])
+  const invocations = (methodInstances || [])
     .map(methodInstanceCall => {
       let invocationDependsOnState = false;
-      let temp = getMethodInvocation(methodInstanceCall, args => {
-        let { statePropertiesThatCauseInvocation } = args;
+      const temp = getMethodInvocation(methodInstanceCall, args => {
+        const { statePropertiesThatCauseInvocation } = args;
         invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
           .length;
       });
@@ -1774,7 +1778,7 @@ export function GetComponentDidMount(screenOption, options = {}) {
     .filter(x => x)
     .join(NEW_LINE);
 
-  let componentDidMount = `componentDidMount(value) {
+  const componentDidMount = `componentDidMount(value) {
         ${options.skipSetGetState ? "" : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? "" : outOfBandCall}
@@ -1786,7 +1790,7 @@ export function GetComponentDidMount(screenOption, options = {}) {
   if (events && events.length) {
     evntHandles = events
       .map(evt => {
-        let methodNode = GetNodeById(evt);
+        const methodNode = GetNodeById(evt);
         return `this.props.${GetJSCodeName(methodNode)}();`;
       })
       .join(NEW_LINE);
@@ -1845,33 +1849,33 @@ export function GetScreens() {
   return screens;
 }
 function GenerateElectronIORoutes(screens) {
-  let template = `<Route path={routes.{{route_name}}} render={({ match, history, location }) => {
+  const template = `<Route path={routes.{{route_name}}} render={({ match, history, location }) => {
     console.log(match.params);
     let {{{screenApiParams}}} = match.params;
     {{overrides}}
     setParameters({{{screenApiParams}}});
     return <{{component}} {{screenApi}} />}} />
   }`;
-  let routefile = fs.readFileSync(
+  const routefile = fs.readFileSync(
     "./app/templates/electronio/routes.tpl",
     "utf8"
   );
-  let import_ = `import {{name}} from './screens/{{jsname}}';`;
-  let routes = [];
-  let _screens = [];
+  const import_ = `import {{name}} from './screens/{{jsname}}';`;
+  const routes = [];
+  const _screens = [];
   screens.map(screen => {
-    let screenApis = getNodesByLinkType(GetCurrentGraph(), {
+    const screenApis = getNodesByLinkType(GetCurrentGraph(), {
       id: screen.id,
       type: LinkType.ComponentExternalApi,
       direction: SOURCE
     });
-    let screenApi = screenApis
+    const screenApi = screenApis
       .map(v => `${GetJSCodeName(v)}={${GetJSCodeName(v)}}`)
       .join(" ");
-    let viewModel = screenApis.find(x => GetNodeTitle(x) === "viewModel");
+    const viewModel = screenApis.find(x => GetNodeTitle(x) === "viewModel");
     let overrides = "";
     if (viewModel) {
-      let viewModelDataLink = getNodesByLinkType(GetCurrentGraph(), {
+      const viewModelDataLink = getNodesByLinkType(GetCurrentGraph(), {
         id: viewModel.id,
         type: LinkType.DataChainLink,
         direction: SOURCE
@@ -1882,7 +1886,7 @@ function GenerateElectronIORoutes(screens) {
         })}();`;
       }
     }
-    let screenApiParams = screenApis.map(v => `${GetJSCodeName(v)}`).join();
+    const screenApiParams = screenApis.map(v => `${GetJSCodeName(v)}`).join();
 
     routes.push(
       bindTemplate(template, {
@@ -1900,7 +1904,7 @@ function GenerateElectronIORoutes(screens) {
       })
     );
   });
-  let routeFile = bindTemplate(routefile, {
+  const routeFile = bindTemplate(routefile, {
     routes: routes.sort((a, b) => b.length - a.length).join(NEW_LINE),
     route_imports: _screens.join(NEW_LINE)
   });
@@ -1914,7 +1918,7 @@ function GenerateElectronIORoutes(screens) {
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
   var screens = GetScreens();
   let template = fs.readFileSync("./app/templates/screens/screen.tpl", "utf8");
-  let moreresults = [];
+  const moreresults = [];
   let fileEnding = ".js";
   switch (language) {
     case UITypes.ElectronIO:
@@ -1922,16 +1926,16 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
       break;
   }
 
-  let result = screens
+  const result = screens
     .map(screen => {
-      let screenOptions = GetConnectedScreenOptions(screen.id);
+      const screenOptions = GetConnectedScreenOptions(screen.id);
       if (screenOptions && screenOptions.length) {
-        let reactScreenOption = screenOptions.find(
+        const reactScreenOption = screenOptions.find(
           x => GetNodeProp(x, NodeProperties.UIType) === language
         );
         if (reactScreenOption) {
           template = GenerateScreenMarkup(screen.id, language);
-          let screenOptionSrc = GenerateScreenOptionSource(
+          const screenOptionSrc = GenerateScreenOptionSource(
             reactScreenOption,
             screen,
             language
@@ -1961,11 +1965,11 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
       moreresults.push(GenerateElectronIORoutes(screens));
       break;
   }
-  let all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);
-  let sharedComponents = all_nodes.filter(x =>
+  const all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);
+  const sharedComponents = all_nodes.filter(x =>
     GetNodeProp(x, NodeProperties.SharedComponent)
   );
-  let relPath = "./src/shared";
+  const relPath = "./src/shared";
   sharedComponents.map(sharedComponent => {
     moreresults.push(
       ...GenerateRNComponents(sharedComponent, relPath, language)
@@ -1996,23 +2000,23 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
  * @param {object} args
  */
 function extractApiJsCode(args = { node, graph }) {
-  let { node, graph, callback = () => {} } = args;
-  let requiredChanges = [];
-  let temp = queryParameter => {
-    let param = getNodesByLinkType(graph, {
+  let { node, graph, callback = () => { } } = args;
+  const requiredChanges = [];
+  const temp = queryParameter => {
+    const param = getNodesByLinkType(graph, {
       id: queryParameter.id,
       type: LinkType.ComponentApiConnection,
       direction: TARGET
     }).find(x_temp => x_temp);
 
     if (param) {
-      let internalApiConnection = getNodesByLinkType(graph, {
+      const internalApiConnection = getNodesByLinkType(graph, {
         id: param.id,
         type: LinkType.ComponentApi,
         direction: SOURCE
       }).find(x => x);
 
-      let value = getNodesByLinkType(graph, {
+      const value = getNodesByLinkType(graph, {
         id: param.id,
         type: LinkType.ComponentApiConnection,
         direction: SOURCE
@@ -2031,12 +2035,12 @@ function extractApiJsCode(args = { node, graph }) {
         })}(${input_})`;
       } else if (internalApiConnection) {
         requiredChanges.push(GetJSCodeName(internalApiConnection));
-        let input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
+        const input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
         return `${GetJSCodeName(queryParameter)}:  ${input_}`;
       }
     }
   };
-  let result = temp(node);
+  const result = temp(node);
   callback(requiredChanges.unique());
   return result;
 }

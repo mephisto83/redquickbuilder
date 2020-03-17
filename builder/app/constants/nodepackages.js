@@ -1,10 +1,11 @@
+/* eslint-disable no-constant-condition */
+/* eslint-disable camelcase */
+/* eslint-disable func-names */
 import {
   MethodFunctions,
   FunctionTypes,
   FunctionTemplateKeys,
-  FunctionMethodTypes,
   HTTP_METHODS,
-  QUERY_PARAMETERS,
   QUERY_PARAMETER_KEYS
 } from "./functiontypes";
 import {
@@ -44,8 +45,6 @@ import {
   GetModelPropertyChildren,
   GetDataChainNextId,
   GetNodesByProperties,
-  ViewTypes,
-  GetLinkProperty,
   setSharedComponent,
   getViewTypeEndpointsForDefaults,
   NEW_DATA_SOURCE,
@@ -53,7 +52,6 @@ import {
   GetNodeByProperties,
   getGroup,
   SelectedNode,
-  GetJSCodeName,
   GetCodeName,
   attachMethodToMaestro,
   ADD_DEFAULT_PROPERTIES,
@@ -63,27 +61,18 @@ import {
   connectLifeCycleMethod,
   GetComponentExternalApiNode,
   GetComponentInternalApiNode,
-  GetNodeCode,
-  ADD_LINKS_BETWEEN_NODES
+  ADD_LINKS_BETWEEN_NODES,
+  NO_OP
 } from "../actions/uiactions";
 import {
-  newNode,
   CreateLayout,
   SetCellsLayout,
   GetCellProperties,
   GetFirstCell,
-  GetAllChildren,
-  FindLayoutRootParent,
   GetChildren,
-  GetNode,
   existsLinkBetween,
-  getNodesByLinkType,
-  TARGET,
-  SOURCE,
   GetNodesLinkedTo,
-  findLink,
-  GetLinkBetween,
-  getNodesLinkedTo
+  setViewPackageStamp
 } from "../methods/graph_methods";
 import {
   ComponentTypes,
@@ -96,7 +85,6 @@ import {
   ON_CHANGE,
   ON_CHANGE_TEXT,
   ON_FOCUS,
-  VALUE,
   SHARED_COMPONENT_API,
   GENERAL_COMPONENT_API,
   SCREEN_COMPONENT_EVENTS,
@@ -106,48 +94,41 @@ import {
   ComponentApiTypes,
   ComponentLifeCycleEvents
 } from "./componenttypes";
-import { debug } from "util";
 import * as Titles from "../components/titles";
 import {
   createComponentApi,
-  addComponentApi,
-  getComponentApiList
-} from "../methods/component_api_methods";
+  addComponentApi} from "../methods/component_api_methods";
 import {
   DataChainFunctionKeys,
-  DataChainFunctions,
   SplitDataCommand,
-  ConnectChainCommand,
   AddChainCommand,
-  insertNodeInbetween,
   InsertNodeInbetween
 } from "./datachain";
 import { uuidv4 } from "../utils/array";
 import PostAuthenticate from "../nodepacks/PostAuthenticate";
 import HomeView from "../nodepacks/HomeView";
 import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
-import AddCancelLabel from "../nodepacks/AddCancelLabel";
 import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDataChainSelectorDC";
 import AttributeSuccess from "../nodepacks/AttributeSuccess";
 import AttributeError from "../nodepacks/AttributeError";
 import ConnectListViewModelToExternalViewModel from "../nodepacks/ConnectListViewModelToExternalViewModel";
-import CreateSelectorToDataChainRead from "../nodepacks/CreateSelectorToDataChainRead";
 import LoadModel from "../nodepacks/LoadModel";
 import ConnectLifecycleMethodToDataChain from "../nodepacks/ConnectLifecycleMethodToDataChain";
 import SetModelsApiLinkForInstanceUpdate from "../nodepacks/SetModelsApiLinkForInstanceUpdate";
 import SetupViewModelOnScreen from "../nodepacks/SetupViewModelOnScreen";
 import AppendGetIdsToDataChain from "../nodepacks/AppendGetIdsToDataChain";
 import GetModelViewModelForUpdate from "../nodepacks/GetModelViewModelForUpdate";
+import { ViewTypes } from "./viewtypes";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
   method: args => {
-    let { model, dispatch, getState } = args;
+    const { model, dispatch, getState } = args;
     // Check for existing method of this type
 
     // if no methods exist, then create a new method.
     // graph = GraphMethods.addNewNodeOfType(graph, options, NodeTypes.Model);
-    let agents = GetAgentNodes();
+    const agents = GetAgentNodes();
 
     agents.map(agent => {
       let methodProps;
@@ -155,7 +136,7 @@ export const GetSpecificModels = {
       if (
         ModelNotConnectedToFunction(agent.id, model.id, GetSpecificModels.type)
       ) {
-        let outer_commands = [
+        const outer_commands = [
           {
             operation: ADD_NEW_NODE,
             options: {
@@ -180,11 +161,10 @@ export const GetSpecificModels = {
               callback: methodNode => {
                 setTimeout(() => {
                   new Promise(resolve => {
-                    let { constraints } = MethodFunctions[
+                    const { constraints } = MethodFunctions[
                       FunctionTypes.Get_Object_Agent_Value__IListObject_By_Specific
                     ];
                     let commands = [];
-                    let permissionNode = null;
                     Object.values(constraints).map(constraint => {
                       switch (constraint.key) {
                         case FunctionTemplateKeys.Model:
@@ -441,14 +421,15 @@ export const CreateLoginModels = {
   method: args => {
     // let currentGraph = GetCurrentGraph(GetStateFunc()());
     // currentGraph = newNode(currentGraph);
-    let nodePackageType = "login-models";
-    let nodePackage = "login-models";
-    let viewPackage = {
+    const nodePackageType = "login-models";
+    const nodePackage = "login-models";
+    const viewPackage = {
       [NodeProperties.ViewPackage]: uuidv4(),
       [NodeProperties.NodePackage]: nodePackage,
       [NodeProperties.NodePackageType]: nodePackageType
     };
-    let newStuff = {};
+    const newStuff = {};
+    setViewPackageStamp(viewPackage, "create-login-models");
     PerformGraphOperation([
       {
         operation: ADD_NEW_NODE,
@@ -472,7 +453,7 @@ export const CreateLoginModels = {
           { propName: "Password" },
           { propName: "Remember Me" }
         ].map(v => {
-          let { propName } = v;
+          const { propName } = v;
           return {
             operation: ADD_NEW_NODE,
             options: {
@@ -518,7 +499,7 @@ export const CreateLoginModels = {
           { propName: "Password" },
           { propName: "Confirm Password" }
         ].map(v => {
-          let { propName, propType } = v;
+          const { propName, propType } = v;
           return {
             operation: ADD_NEW_NODE,
             options: {
@@ -542,7 +523,7 @@ export const CreateLoginModels = {
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options() {
           return {
             nodeType: NodeTypes.Controller,
             properties: {
@@ -559,7 +540,7 @@ export const CreateLoginModels = {
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options() {
           return {
             nodeType: NodeTypes.Maestro,
             parent: newStuff.controller,
@@ -585,7 +566,7 @@ export const CreateLoginModels = {
         return [];
       }
     ])(GetDispatchFunc(), GetStateFunc());
-    var regsterResult = CreateAgentFunction({
+    const regsterResult = CreateAgentFunction({
       viewPackage,
       nodePackageType,
       model: GetNodeById(newStuff.registerModel, newStuff.graph),
@@ -600,7 +581,7 @@ export const CreateLoginModels = {
       functionType: FunctionTypes.Register,
       functionName: `Register`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
-    var loginResult = CreateAgentFunction({
+    const loginResult = CreateAgentFunction({
       viewPackage,
       nodePackageType,
       model: GetNodeById(newStuff.loginModel, newStuff.graph),
@@ -639,7 +620,7 @@ export const CreateLoginModels = {
       viewName: `${viewName}`,
       viewType: ViewTypes.Create
     });
-    let authenticateScreen = method_results.screenNodeId;
+    const authenticateScreen = method_results.screenNodeId;
     addInstanceEventsToForms({
       method_results,
       targetMethod: loginResult.methodNode.id
@@ -684,7 +665,7 @@ export const CreateLoginModels = {
       method_results,
       targetMethod: regsterResult.methodNode.id
     });
-    let registerScreen = method_results.screenNodeId;
+    const registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
       PerformGraphOperation([
         ...PostRegister({
@@ -699,7 +680,7 @@ export const CreateLoginModels = {
         })
       ])(GetDispatchFunc(), GetStateFunc());
     }
-    let titleService = GetNodeByProperties({
+    const titleService = GetNodeByProperties({
       [NodeProperties.NODEType]: NodeTypes.TitleService
     });
     PerformGraphOperation(
@@ -709,14 +690,15 @@ export const CreateLoginModels = {
         authenticateForm: authenticateScreen
       })
     )(GetDispatchFunc(), GetStateFunc());
+    setViewPackageStamp(null, "create-login-models");
   }
 };
 function addTitleService(args) {
-  let { newItems } = args;
+  const { newItems } = args;
   return {
     operation: ADD_NEW_NODE,
-    options: function(graph) {
-      let $node = GetNodeByProperties(
+    options(graph) {
+      const $node = GetNodeByProperties(
         {
           [NodeProperties.UIText]: `Title Service`,
           [NodeProperties.NODEType]: NodeTypes.TitleService
@@ -742,12 +724,12 @@ function addTitleService(args) {
   };
 }
 function addInstanceEventsToForms(args) {
-  var { method_results, targetMethod } = args;
+  const { method_results, targetMethod } = args;
   if (method_results && method_results.formButton) {
     PerformGraphOperation([
       {
         operation: CHANGE_NODE_PROPERTY,
-        options: function(graph) {
+        options() {
           return {
             prop: NodeProperties.Pinned,
             value: false,
@@ -761,8 +743,8 @@ function addInstanceEventsToForms(args) {
         Object.keys(method_results.formButtonApi).map(evt => {
           return {
             operation: ADD_NEW_NODE,
-            options: function(graph) {
-              let currentNode = GetNodeById(
+            options(graph) {
+              const currentNode = GetNodeById(
                 method_results.formButtonApi[evt],
                 graph
               );
@@ -789,7 +771,7 @@ export const AddAgentUser = {
     PerformGraphOperation([
       {
         operation: ADD_NEW_NODE,
-        options: function() {
+        options() {
           return {
             nodeType: NodeTypes.Model,
             callback: node => {
@@ -805,7 +787,7 @@ export const AddAgentUser = {
       },
       {
         operation: CHANGE_NODE_PROPERTY,
-        options: function() {
+        options() {
           return {
             id: userId,
             prop: NodeProperties.UIUser,
@@ -815,7 +797,7 @@ export const AddAgentUser = {
       },
       {
         operation: ADD_NEW_NODE,
-        options: function() {
+        options() {
           return {
             nodeType: NodeTypes.Model,
             properties: {
@@ -839,15 +821,15 @@ export const AddAgentUser = {
 };
 
 export function CreatePagingSkipDataChains() {
-  var result = {};
-  var skipResult = false;
+  const result = {};
+  let skipResult = false;
   let arrayLengthNode = null;
   let defaultPagingValue = null;
   PerformGraphOperation([
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.IsDataChainPagingSkip]: true,
             [NodeProperties.EntryPoint]: true
@@ -877,11 +859,11 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
+      options(graph) {
         if (skipResult) {
           return false;
         }
-        let temp = SplitDataCommand(
+        const temp = SplitDataCommand(
           GetNodeById(result.pagingSkip, graph),
           split => {
             result.pagingSkipOuput = split.id;
@@ -915,7 +897,7 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipResult) {
           return false;
         }
@@ -928,7 +910,7 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipResult) {
           return false;
         }
@@ -958,7 +940,7 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipResult) {
           return false;
         }
@@ -971,7 +953,7 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipResult) {
           return false;
         }
@@ -984,7 +966,7 @@ export function CreatePagingSkipDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipResult) {
           return false;
         }
@@ -999,14 +981,14 @@ export function CreatePagingSkipDataChains() {
   return result;
 }
 export function CreatePagingTakeDataChains() {
-  var result = {};
-  var skipTake = false;
+  const result = {};
+  let skipTake = false;
   let defaultPagingValue = null;
   PerformGraphOperation([
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.IsDataChainPagingTake]: true,
             [NodeProperties.EntryPoint]: true
@@ -1036,12 +1018,12 @@ export function CreatePagingTakeDataChains() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
+      options(graph) {
         if (skipTake) {
           return false;
         }
 
-        let temp = SplitDataCommand(
+        const temp = SplitDataCommand(
           GetNodeById(result.pagingTake, graph),
           split => {
             result.pagingTakeOuput = split.id;
@@ -1073,7 +1055,7 @@ export function CreatePagingTakeDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipTake) {
           return false;
         }
@@ -1086,7 +1068,7 @@ export function CreatePagingTakeDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipTake) {
           return false;
         }
@@ -1099,7 +1081,7 @@ export function CreatePagingTakeDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipTake) {
           return false;
         }
@@ -1112,7 +1094,7 @@ export function CreatePagingTakeDataChains() {
     },
     {
       operation: CHANGE_NODE_PROPERTY,
-      options: function(graph) {
+      options() {
         if (skipTake) {
           return false;
         }
@@ -1127,14 +1109,14 @@ export function CreatePagingTakeDataChains() {
   return result;
 }
 export function CreateScreenModel(viewModel, options = { isList: true }) {
-  var result = {};
+  const result = {};
   let pageModelId = null;
   let skip = false;
   PerformGraphOperation([
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let $node = GetNodeByProperties(
+      options(graph) {
+        const $node = GetNodeByProperties(
           {
             [NodeProperties.ExcludeFromController]: true,
             [NodeProperties.UIText]: viewModel + " Model",
@@ -1167,7 +1149,7 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
     options && options.isList
       ? {
           operation: ADD_NEW_NODE,
-          options: function(graph) {
+          options() {
             if (skip) {
               return false;
             }
@@ -1201,14 +1183,14 @@ export function createViewPagingDataChain(
   skipChain = true
 ) {
   let skip = false;
-  let skipOrTake = skipChain ? "Skip" : "Take";
+  const skipOrTake = skipChain ? "Skip" : "Take";
   return function() {
     return [
       {
         // The data chain for a list screen
         operation: ADD_NEW_NODE,
-        options: function(graph) {
-          let $node = GetNodeByProperties(
+        options(graph) {
+          const $node = GetNodeByProperties(
             {
               [NodeProperties.UIText]: skipChain
                 ? `Get ${viewName} Skip`
@@ -1259,11 +1241,11 @@ export function createViewPagingDataChain(
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options(graph) {
           if (skip) {
             return false;
           }
-          let $node = GetNodeByProperties(
+          const $node = GetNodeByProperties(
             {
               [NodeProperties.DataChainFunctionType]:
                 DataChainFunctionKeys.ReferenceDataChain,
@@ -1276,7 +1258,7 @@ export function createViewPagingDataChain(
             newItems.viewModelListRefNode = $node.id;
             return false;
           }
-          let temp = SplitDataCommand(
+          const temp = SplitDataCommand(
             GetNodeById(newItems.pagingEntry, graph),
             split => {
               newItems.viewModelListRefNode = split.id;
@@ -1296,7 +1278,7 @@ export function createViewPagingDataChain(
       },
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options() {
           if (skip) {
             return false;
           }
@@ -1313,11 +1295,11 @@ export function createViewPagingDataChain(
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options(graph) {
           if (skip) {
             return false;
           }
-          let groupProperties = GetNodeProp(
+          const groupProperties = GetNodeProp(
             newItems.viewModelListRefNode,
             NodeProperties.GroupParent,
             graph
@@ -1333,7 +1315,7 @@ export function createViewPagingDataChain(
                 ).id
               }
             : null;
-          let model = GetNodeByProperties(
+          const model = GetNodeByProperties(
             {
               [skipChain
                 ? NodeProperties.IsDataChainPagingSkip
@@ -1343,7 +1325,7 @@ export function createViewPagingDataChain(
             graph
           );
 
-          let $node = GetNodeByProperties(
+          const $node = GetNodeByProperties(
             {
               [NodeProperties.UIText]: `${viewName} ${skipOrTake} Paging Ref`,
               [NodeProperties.DataChainFunctionType]:
@@ -1381,11 +1363,11 @@ export function createViewPagingDataChain(
       },
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options(graph) {
           if (skip) {
             return false;
           }
-          let model = GetNodeByProperties(
+          const model = GetNodeByProperties(
             {
               [skipChain
                 ? NodeProperties.IsDataChainPagingSkip
@@ -1404,11 +1386,11 @@ export function createViewPagingDataChain(
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options(graph) {
           if (skip) {
             return false;
           }
-          let groupProperties = GetNodeProp(
+          const groupProperties = GetNodeProp(
             newItems.pagingRefNode,
             NodeProperties.GroupParent,
             graph
@@ -1446,7 +1428,7 @@ export function createViewPagingDataChain(
   };
 }
 export function CreatePagingModel() {
-  var result = null;
+  let result = null;
   let pageModelId = null;
   let skipModelId = null;
   let takeModelId = null;
@@ -1455,8 +1437,8 @@ export function CreatePagingModel() {
   PerformGraphOperation([
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.IsPagingModel]: true,
             [NodeProperties.NODEType]: NodeTypes.Model
@@ -1484,8 +1466,8 @@ export function CreatePagingModel() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.PagingSkip]: true,
             [NodeProperties.NODEType]: NodeTypes.Property
@@ -1516,8 +1498,8 @@ export function CreatePagingModel() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.PagingTake]: true,
             [NodeProperties.NODEType]: NodeTypes.Property
@@ -1545,8 +1527,8 @@ export function CreatePagingModel() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.PagingFilter]: true,
             [NodeProperties.NODEType]: NodeTypes.Property
@@ -1574,8 +1556,8 @@ export function CreatePagingModel() {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(graph) {
-        let model = GetNodeByProperties(
+      options(graph) {
+        const model = GetNodeByProperties(
           {
             [NodeProperties.PagingSort]: true,
             [NodeProperties.NODEType]: NodeTypes.Property
@@ -1616,9 +1598,9 @@ export function CreatePagingModel() {
 export const CreateDefaultView = {
   type: "Create View - Form",
   methodType: "React Native Views",
-  method: function(_args) {
-    var method_result = {};
-    let default_View_method = (args = {}) => {
+  method(_args) {
+    const method_result = {};
+    const default_View_method = (args = {}) => {
       let {
         viewName,
         viewType,
@@ -1630,35 +1612,35 @@ export const CreateDefaultView = {
         model,
         chosenChildren = []
       } = args;
-      let state = GetState();
-      var currentNode = model || Node(state, Visual(state, SELECTED_NODE));
+      const state = GetState();
+      const currentNode = model || Node(state, Visual(state, SELECTED_NODE));
       let screenNodeId = null;
       let screenComponentId = null;
       let listComponentId = null;
       let screenNodeOptionId = null;
       let childComponents = [];
-      let modelComponentSelectors = [];
-      let modelComponentDataChains = [];
+      const modelComponentSelectors = [];
       let layout = null;
       let listLayout = null;
-      let viewModelNodeDirtyId = null;
-      let viewModelNodeFocusId = null;
-      let viewModelNodeBlurId = null;
-      let viewModelNodeFocusedId = null;
+      const viewModelNodeDirtyId = null;
+      const viewModelNodeFocusId = null;
+      const viewModelNodeBlurId = null;
+      const viewModelNodeFocusedId = null;
       let viewModelNodeId = null;
-      let createConnections = [];
-      let createListConnections = [];
+      const createConnections = [];
+      const createListConnections = [];
       viewName = viewName || GetNodeTitle(currentNode);
-      let useModelInstance = [
+      const useModelInstance = [
         ViewTypes.Get,
         ViewTypes.GetAll,
         ViewTypes.Delete
       ].some(v => viewType === v);
-      let viewPackage = {
+      const viewPackage = {
         [NodeProperties.ViewPackage]: uuidv4(),
         [NodeProperties.ViewPackageTitle]: viewName
       };
-      let newItems = {};
+      setViewPackageStamp(viewPackage, "CreateDefaultView");
+      const newItems = {};
       let viewComponentType = null;
       let viewComponent = null;
       let multi_item_component = ComponentTypes[uiType].List.key;
@@ -1689,19 +1671,24 @@ export const CreateDefaultView = {
             viewComponentType = ComponentTypes[uiType].Text.key;
             multi_item_component = ComponentTypes[uiType].MultiSelectList.key;
             viewComponent = ComponentTypes[uiType].Text;
+          } else if (isSharedComponent) {
+            isList = true;
+            viewComponentType = ComponentTypes[uiType].Text.key;
+            multi_item_component = ComponentTypes[uiType].SingleSelect.key;
+            viewComponent = ComponentTypes[uiType].Text;
           }
           break;
       }
       let dataSourceId;
-      let vmsIds = () => [
+      const vmsIds = () => [
         viewModelNodeDirtyId,
         viewModelNodeFocusId,
         viewModelNodeBlurId,
         viewModelNodeFocusedId,
         viewModelNodeId
       ];
-      let modelType = GetNodeProp(currentNode, NodeProperties.NODEType);
-      let isModel = modelType === NodeTypes.Model;
+      const modelType = GetNodeProp(currentNode, NodeProperties.NODEType);
+      const isModel = modelType === NodeTypes.Model;
 
       if (isModel) {
         let modelChildren = GetModelPropertyChildren(currentNode.id);
@@ -1711,11 +1698,11 @@ export const CreateDefaultView = {
             chosenChildren.some(v => v === x.id)
           );
         }
-        let modelProperties = modelChildren.filter(
+        const modelProperties = modelChildren.filter(
           x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
         );
-        childComponents = modelProperties.map(v => null);
-        let screenComponentEvents = [];
+        childComponents = modelProperties.map(() => null);
+        const screenComponentEvents = [];
         if (isList) {
           CreatePagingModel();
           CreatePagingSkipDataChains();
@@ -1730,8 +1717,8 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let res = GetNodesByProperties(
+                  options(graph) {
+                    const res = GetNodesByProperties(
                       {
                         [NodeProperties.InstanceType]: useModelInstance
                           ? InstanceTypes.ModelInstance
@@ -1810,8 +1797,8 @@ export const CreateDefaultView = {
               ? {
                   // The selector for a list screen
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let $node = GetNodeByProperties(
+                  options(graph) {
+                    const $node = GetNodeByProperties(
                       {
                         [NodeProperties.UIText]: `${viewName} Screen View Model`,
                         [NodeProperties.InstanceType]: InstanceTypes.AppState,
@@ -1851,8 +1838,8 @@ export const CreateDefaultView = {
 
             {
               operation: ADD_NEW_NODE,
-              options: function(graph) {
-                let $node = GetNodeByProperties(
+              options(graph) {
+                const $node = GetNodeByProperties(
                   {
                     [NodeProperties.UIText]: `Title Service`,
                     [NodeProperties.NODEType]: NodeTypes.TitleService
@@ -1880,8 +1867,8 @@ export const CreateDefaultView = {
               ? {
                   // The selector for a list screen
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let $node = GetNodeByProperties(
+                  options(graph) {
+                    const $node = GetNodeByProperties(
                       {
                         [NodeProperties.UIText]: `${viewName} Screen Selector`,
                         [NodeProperties.NODEType]: NodeTypes.Selector
@@ -1917,8 +1904,8 @@ export const CreateDefaultView = {
               ? {
                   // The data chain for a list screen
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let $node = GetNodeByProperties(
+                  options(graph) {
+                    const $node = GetNodeByProperties(
                       {
                         [NodeProperties.UIText]: `${viewName} Screen DC`,
                         [NodeProperties.DataChainFunctionType]:
@@ -1974,8 +1961,8 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let res = GetNodesByProperties(
+                  options(graph) {
+                    const res = GetNodesByProperties(
                       {
                         [NodeProperties.Model]: currentNode.id,
                         [NodeProperties.InstanceType]: useModelInstance
@@ -2022,11 +2009,11 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: NEW_SCREEN_OPTIONS,
-                  options: function() {
+                  options() {
                     let formLayout = CreateLayout();
                     formLayout = SetCellsLayout(formLayout, 1);
-                    let rootCellId = GetFirstCell(formLayout);
-                    let cellProperties = GetCellProperties(
+                    const rootCellId = GetFirstCell(formLayout);
+                    const cellProperties = GetCellProperties(
                       formLayout,
                       rootCellId
                     );
@@ -2045,10 +2032,10 @@ export const CreateDefaultView = {
                         });
                       });
                       GENERAL_COMPONENT_API.map(t => {
-                        let apiProperty = t.property;
+                        const apiProperty = t.property;
                         (function() {
-                          let rootCellId = GetFirstCell(formLayout);
-                          let cellProperties = GetCellProperties(
+                          const rootCellId = GetFirstCell(formLayout);
+                          const cellProperties = GetCellProperties(
                             formLayout,
                             rootCellId
                           );
@@ -2134,7 +2121,7 @@ export const CreateDefaultView = {
               ? SCREEN_COMPONENT_EVENTS.map(t => {
                   return {
                     operation: ADD_NEW_NODE,
-                    options: function() {
+                    options() {
                       return {
                         nodeType: NodeTypes.LifeCylceMethod,
                         properties: {
@@ -2163,10 +2150,10 @@ export const CreateDefaultView = {
                 })
               : []),
 
-            ...(needsLoadToScreenState
+            ...((needsLoadToScreenState && false)
               ? ConnectLifecycleMethodToDataChain({
                   lifeCycleMethod: graph => {
-                    let sce = screenComponentEvents.find(
+                    const sce = screenComponentEvents.find(
                       x =>
                         GetNodeProp(x, NodeProperties.EventType, graph) ===
                         ComponentLifeCycleEvents.ComponentDidMount
@@ -2191,11 +2178,11 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: NEW_COMPONENT_NODE,
-                  options: function(currentGraph) {
+                  options(currentGraph) {
                     listLayout = CreateLayout();
                     listLayout = SetCellsLayout(listLayout, 1);
-                    let rootCellId = GetFirstCell(listLayout);
-                    let cellProperties = GetCellProperties(
+                    const rootCellId = GetFirstCell(listLayout);
+                    const cellProperties = GetCellProperties(
                       listLayout,
                       rootCellId
                     );
@@ -2203,7 +2190,7 @@ export const CreateDefaultView = {
                       ...cellProperties.style,
                       flexDirection: "column"
                     };
-                    let componentProps = null;
+                    const componentProps = null;
 
                     let connectto = [];
                     if (isDefaultComponent) {
@@ -2246,7 +2233,7 @@ export const CreateDefaultView = {
                                 ].map(
                                   v =>
                                     function() {
-                                      let graph = GetCurrentGraph(
+                                      const graph = GetCurrentGraph(
                                         GetStateFunc()()
                                       );
                                       return addComponentApiToForm({
@@ -2321,7 +2308,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(currentGraph) {
+                  options() {
                     return {
                       nodeType: NodeTypes.ComponentApi,
                       callback: nn => {
@@ -2344,7 +2331,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(currentGraph) {
+                  options() {
                     return {
                       nodeType: NodeTypes.ComponentExternalApi,
                       callback: nn => {
@@ -2366,7 +2353,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     return {
                       source: newItems.listComponentInternalApi,
                       target: newItems.listComponentExternalApi,
@@ -2380,7 +2367,7 @@ export const CreateDefaultView = {
             isList && !isSharedComponent
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     return {
                       source: newItems.listComponentExternalApi,
                       target: getApiConnectors(
@@ -2398,32 +2385,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: NEW_DATA_SOURCE,
-                  options: function(currentGraph) {
-                    let res = GetNodesByProperties(
-                      {
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.UIType]: GetNodeProp(
-                          listComponentId,
-                          NodeProperties.UIType,
-                          currentGraph
-                        ),
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.UIText]: `${GetNodeTitle(
-                          currentNode
-                        )} Data Source ${GetNodeProp(
-                          listComponentId,
-                          NodeProperties.UIType,
-                          currentGraph
-                        )}`
-                      },
-                      currentGraph
-                    );
-                    if (res && res.length) {
-                      dataSourceId = res[0].id;
-                      return false;
-                    }
+                  options(currentGraph) {
 
                     return {
                       parent: listComponentId,
@@ -2458,17 +2420,17 @@ export const CreateDefaultView = {
               : false,
             {
               operation: NEW_COMPONENT_NODE,
-              options: function(currentGraph) {
+              options(currentGraph) {
                 layout = CreateLayout();
                 layout = SetCellsLayout(layout, 1);
-                let rootCellId = GetFirstCell(layout);
-                let cellProperties = GetCellProperties(layout, rootCellId);
+                const rootCellId = GetFirstCell(layout);
+                const cellProperties = GetCellProperties(layout, rootCellId);
                 cellProperties.style = {
                   ...cellProperties.style,
                   flexDirection: "column"
                 };
-                let propertyCount = modelProperties.length + 2;
-                let componentProps = null;
+                const propertyCount = modelProperties.length + 2;
+                const componentProps = null;
 
                 layout = SetCellsLayout(layout, propertyCount, rootCellId);
                 let connectto = [];
@@ -2547,7 +2509,7 @@ export const CreateDefaultView = {
                   }
                   return {
                     operation: ADD_LINK_BETWEEN_NODES,
-                    options: function() {
+                    options() {
                       return {
                         target: newItems.componentItemListViewModel.internalId,
                         source: newItems.componentViewModelApiIds.externalId,
@@ -2586,7 +2548,7 @@ export const CreateDefaultView = {
                 }
                 return {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     return {
                       target: newItems["list" + text].internalId,
                       source: newItems["listItem" + text].externalId,
@@ -2600,7 +2562,7 @@ export const CreateDefaultView = {
             }),
             {
               operation: ADD_NEW_NODE,
-              options: function(currentGraph) {
+              options() {
                 return {
                   nodeType: NodeTypes.ComponentApi,
                   callback: nn => {
@@ -2621,7 +2583,7 @@ export const CreateDefaultView = {
             },
             {
               operation: ADD_NEW_NODE,
-              options: function(currentGraph) {
+              options() {
                 return {
                   nodeType: NodeTypes.ComponentExternalApi,
                   callback: nn => {
@@ -2650,7 +2612,7 @@ export const CreateDefaultView = {
             },
             {
               operation: ADD_LINK_BETWEEN_NODES,
-              options: function() {
+              options() {
                 return {
                   source: getApiConnectors(
                     newItems,
@@ -2671,7 +2633,7 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     if (screenNodeOptionId || listComponentId) {
                       return {
                         source: getApiConnectors(
@@ -2695,7 +2657,7 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     if (screenNodeOptionId || listComponentId) {
                       return {
                         source: getApiConnectors(
@@ -2719,14 +2681,14 @@ export const CreateDefaultView = {
             !isSharedComponent
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(currentGraph) {
-                    let formLayout = GetNodeProp(
+                  options(currentGraph) {
+                    const formLayout = GetNodeProp(
                       screenNodeOptionId,
                       NodeProperties.Layout,
                       currentGraph
                     );
-                    let rootCellId = GetFirstCell(formLayout);
-                    let cellProperties = GetCellProperties(
+                    const rootCellId = GetFirstCell(formLayout);
+                    const cellProperties = GetCellProperties(
                       formLayout,
                       rootCellId
                     );
@@ -2746,14 +2708,14 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(currentGraph) {
-                    let formLayout = GetNodeProp(
+                  options(currentGraph) {
+                    const formLayout = GetNodeProp(
                       listComponentId,
                       NodeProperties.Layout,
                       currentGraph
                     );
-                    let rootCellId = GetFirstCell(formLayout);
-                    let cellProperties = GetCellProperties(
+                    const rootCellId = GetFirstCell(formLayout);
+                    const cellProperties = GetCellProperties(
                       formLayout,
                       rootCellId
                     );
@@ -2769,7 +2731,7 @@ export const CreateDefaultView = {
               : false,
             ...modelProperties
               .map((modelProperty, modelIndex) => {
-                let sharedComponent = GetSharedComponentFor(
+                const sharedComponent = GetSharedComponentFor(
                   viewType,
                   modelProperty,
                   currentNode.id,
@@ -2804,7 +2766,7 @@ export const CreateDefaultView = {
                     ].map(
                       v =>
                         function() {
-                          let graph = GetCurrentGraph(GetStateFunc()());
+                          const graph = GetCurrentGraph(GetStateFunc()());
                           return addComponentApiToForm({
                             newItems,
                             text: v,
@@ -2821,8 +2783,8 @@ export const CreateDefaultView = {
                 return [
                   {
                     operation: NEW_COMPONENT_NODE,
-                    options: function() {
-                      let componentTypeToUse = viewComponentType;
+                    options() {
+                      const componentTypeToUse = viewComponentType;
 
                       // Check if the property has a default view to use for different types of situations
 
@@ -2869,8 +2831,7 @@ export const CreateDefaultView = {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
-                      modelIndex,
-                      viewComponent
+                      modelIndex
                     );
                   },
                   function() {
@@ -2878,7 +2839,6 @@ export const CreateDefaultView = {
                       newItems,
                       childComponents,
                       modelIndex,
-                      viewComponent,
                       "label"
                     );
                   },
@@ -2887,7 +2847,6 @@ export const CreateDefaultView = {
                       newItems,
                       childComponents,
                       modelIndex,
-                      viewComponent,
                       "placeholder"
                     );
                   },
@@ -2896,7 +2855,6 @@ export const CreateDefaultView = {
                       newItems,
                       childComponents,
                       modelIndex,
-                      viewComponent,
                       "error"
                     );
                   },
@@ -2905,7 +2863,6 @@ export const CreateDefaultView = {
                       newItems,
                       childComponents,
                       modelIndex,
-                      viewComponent,
                       "success"
                     );
                   },
@@ -2914,7 +2871,6 @@ export const CreateDefaultView = {
                       newItems,
                       childComponents,
                       modelIndex,
-                      viewComponent,
                       ApiNodeKeys.ViewModel,
                       newItems.componentViewModelApiIds.internalId
                     );
@@ -2951,7 +2907,7 @@ export const CreateDefaultView = {
                           );
                         }
 
-                        let shared_to_component_commands = [];
+                        const shared_to_component_commands = [];
                         connectto.map(ct => {
                           shared_to_component_commands.push(
                             ...addComponentApiToForm({
@@ -2979,9 +2935,9 @@ export const CreateDefaultView = {
                           );
                         }
 
-                        let shared_to_component_commands = [];
+                        const shared_to_component_commands = [];
                         connectto.map(ct => {
-                          let temp = GetNodesLinkedTo(graph, {
+                          const temp = GetNodesLinkedTo(graph, {
                             id: ct.id,
                             link: LinkType.ComponentInternalApi
                           }).filter(
@@ -3015,11 +2971,11 @@ export const CreateDefaultView = {
                 ].filter(x => x);
               })
               .flatten(),
-            ...modelProperties.map((modelProperty, modelIndex) => {
+            ...modelProperties.map((modelProperty) => {
               return {
                 operation: ADD_LINK_BETWEEN_NODES,
-                options: function() {
-                  let sharedComponent = GetSharedComponentFor(
+                options() {
+                  const sharedComponent = GetSharedComponentFor(
                     viewType,
                     modelProperty,
                     currentNode.id,
@@ -3047,7 +3003,7 @@ export const CreateDefaultView = {
             }),
             {
               operation: NEW_COMPONENT_NODE,
-              options: function() {
+              options() {
                 return {
                   parent: screenComponentId,
                   groupProperties: {},
@@ -3079,7 +3035,7 @@ export const CreateDefaultView = {
             },
             {
               operation: NEW_COMPONENT_NODE,
-              options: function() {
+              options() {
                 return {
                   parent: screenComponentId,
                   groupProperties: {},
@@ -3116,7 +3072,7 @@ export const CreateDefaultView = {
             }),
             {
               operation: ADD_NEW_NODE,
-              options: function(currentGraph) {
+              options() {
                 return {
                   nodeType: NodeTypes.ComponentApi,
                   callback: nn => {
@@ -3137,7 +3093,7 @@ export const CreateDefaultView = {
             },
             {
               operation: ADD_NEW_NODE,
-              options: function(currentGraph) {
+              options() {
                 return {
                   nodeType: NodeTypes.ComponentExternalApi,
                   callback: nn => {
@@ -3157,7 +3113,7 @@ export const CreateDefaultView = {
             },
             {
               operation: ADD_LINK_BETWEEN_NODES,
-              options: function() {
+              options() {
                 return {
                   source: newItems.buttonInternalApi,
                   target: newItems.buttonExternalApi,
@@ -3169,7 +3125,7 @@ export const CreateDefaultView = {
             },
             {
               operation: ADD_LINK_BETWEEN_NODES,
-              options: function() {
+              options() {
                 return {
                   target: newItems.screenComponentIdInternalApi,
                   source: newItems.buttonExternalApi,
@@ -3210,7 +3166,7 @@ export const CreateDefaultView = {
             ...ComponentTypes[uiType].Button.eventApi.map(t => {
               return {
                 operation: ADD_NEW_NODE,
-                options: function() {
+                options() {
                   return {
                     nodeType: NodeTypes.EventMethod,
                     properties: {
@@ -3222,7 +3178,7 @@ export const CreateDefaultView = {
                       [NodeProperties.UIText]: `${t}`,
                       [NodeProperties.Pinned]: false
                     },
-                    callback: function(component) {
+                    callback(component) {
                       method_result.formButtonApi =
                         method_result.formButtonApi || {};
                       method_result.formButtonApi[t] = component.id;
@@ -3247,12 +3203,12 @@ export const CreateDefaultView = {
             }),
             {
               operation: CHANGE_NODE_PROPERTY,
-              options: function() {
-                let executeButtonComponent = childComponents.length - 2;
-                let rootCellId = GetFirstCell(layout);
-                let children = GetChildren(layout, rootCellId);
-                let childId = children[executeButtonComponent];
-                let cellProperties = GetCellProperties(layout, childId);
+              options() {
+                const executeButtonComponent = childComponents.length - 2;
+                const rootCellId = GetFirstCell(layout);
+                const children = GetChildren(layout, rootCellId);
+                const childId = children[executeButtonComponent];
+                const cellProperties = GetCellProperties(layout, childId);
                 cellProperties.children[childId] =
                   childComponents[executeButtonComponent];
                 cellProperties.style.flex = null;
@@ -3266,12 +3222,12 @@ export const CreateDefaultView = {
             },
             {
               operation: CHANGE_NODE_PROPERTY,
-              options: function() {
-                let executeButtonComponent = childComponents.length - 1;
-                let rootCellId = GetFirstCell(layout);
-                let children = GetChildren(layout, rootCellId);
-                let childId = children[executeButtonComponent];
-                let cellProperties = GetCellProperties(layout, childId);
+              options() {
+                const executeButtonComponent = childComponents.length - 1;
+                const rootCellId = GetFirstCell(layout);
+                const children = GetChildren(layout, rootCellId);
+                const childId = children[executeButtonComponent];
+                const cellProperties = GetCellProperties(layout, childId);
                 cellProperties.children[childId] =
                   childComponents[executeButtonComponent];
                 cellProperties.style.flex = null;
@@ -3286,7 +3242,7 @@ export const CreateDefaultView = {
             ...modelProperties.map((modelProperty, modelIndex) => {
               return {
                 operation: CHANGE_NODE_PROPERTY,
-                options: function() {
+                options() {
                   let sharedComponent = GetSharedComponentFor(
                     viewType,
                     modelProperty,
@@ -3306,7 +3262,7 @@ export const CreateDefaultView = {
                             NodeProperties.UseModelAsType
                           )
                         ) {
-                          let _ui_model_type = GetNodeProp(
+                          const _ui_model_type = GetNodeProp(
                             modelProperty,
                             NodeProperties.UIModelType
                           );
@@ -3327,10 +3283,10 @@ export const CreateDefaultView = {
                     }
                   }
 
-                  let rootCellId = GetFirstCell(layout);
-                  let children = GetChildren(layout, rootCellId);
-                  let childId = children[modelIndex];
-                  let cellProperties = GetCellProperties(layout, childId);
+                  const rootCellId = GetFirstCell(layout);
+                  const children = GetChildren(layout, rootCellId);
+                  const childId = children[modelIndex];
+                  const cellProperties = GetCellProperties(layout, childId);
                   cellProperties.children[childId] =
                     sharedComponent || childComponents[modelIndex];
                   cellProperties.style.flex = null;
@@ -3344,7 +3300,7 @@ export const CreateDefaultView = {
               };
             }),
             ...modelProperties.map((modelProperty, modelIndex) => {
-              let sharedComponent = GetSharedComponentFor(
+              const sharedComponent = GetSharedComponentFor(
                 viewType,
                 modelProperty,
                 currentNode.id,
@@ -3366,12 +3322,12 @@ export const CreateDefaultView = {
               }
               return {
                 operation: CHANGE_NODE_PROPERTY,
-                options: function(graph) {
+                options(graph) {
                   let componentProps = createComponentApi();
-                  let componentTypes = ComponentTypes[uiType];
-                  let compNodeId = childComponents[modelIndex];
-                  let compNode = GetNodeById(compNodeId, graph);
-                  let componentType = GetNodeProp(
+                  const componentTypes = ComponentTypes[uiType];
+                  const compNodeId = childComponents[modelIndex];
+                  const compNode = GetNodeById(compNodeId, graph);
+                  const componentType = GetNodeProp(
                     compNode,
                     NodeProperties.ComponentType
                   );
@@ -3408,12 +3364,12 @@ export const CreateDefaultView = {
             }),
             {
               operation: CHANGE_NODE_PROPERTY,
-              options: function(graph) {
+              options(graph) {
                 let componentProps = createComponentApi();
-                let componentTypes = ComponentTypes[uiType];
-                let compNodeId = childComponents[childComponents.length - 1];
-                let compNode = GetNodeById(compNodeId, graph);
-                let componentType = GetNodeProp(
+                const componentTypes = ComponentTypes[uiType];
+                const compNodeId = childComponents[childComponents.length - 1];
+                const compNode = GetNodeById(compNodeId, graph);
+                const componentType = GetNodeProp(
                   compNode,
                   NodeProperties.ComponentType
                 );
@@ -3432,12 +3388,12 @@ export const CreateDefaultView = {
             },
             {
               operation: CHANGE_NODE_PROPERTY,
-              options: function(graph) {
+              options(graph) {
                 let componentProps = createComponentApi();
-                let componentTypes = ComponentTypes[uiType];
-                let compNodeId = childComponents[childComponents.length - 2];
-                let compNode = GetNodeById(compNodeId, graph);
-                let componentType = GetNodeProp(
+                const componentTypes = ComponentTypes[uiType];
+                const compNodeId = childComponents[childComponents.length - 2];
+                const compNode = GetNodeById(compNodeId, graph);
+                const componentType = GetNodeProp(
                   compNode,
                   NodeProperties.ComponentType
                 );
@@ -3463,7 +3419,7 @@ export const CreateDefaultView = {
             evt: uiType === UITypes.ReactNative ? "onPress" : "onClick"
           })
         )(GetDispatchFunc(), GetStateFunc());
-        let selectorNode = GetNodesByProperties({
+        const selectorNode = GetNodesByProperties({
           [NodeProperties.Model]: currentNode.id,
           [NodeProperties.NODEType]: NodeTypes.Selector
           //  [NodeProperties.IsShared]: isSharedComponent,
@@ -3472,7 +3428,7 @@ export const CreateDefaultView = {
         PerformGraphOperation([
           {
             operation: selectorNode ? ADD_LINKS_BETWEEN_NODES : ADD_NEW_NODE,
-            options: function(graph) {
+            options() {
               if (selectorNode) {
                 modelComponentSelectors.push(selectorNode.id);
                 return {
@@ -3532,9 +3488,9 @@ export const CreateDefaultView = {
           }
         ])(GetDispatchFunc(), GetStateFunc());
 
-        let propertyDataChainAccesors = [];
+        const propertyDataChainAccesors = [];
 
-        let datachainLink = [];
+        const datachainLink = [];
         let skipModelDataChainListParts = false;
         let listDataChainId = null;
         let listDataChainExitId = null;
@@ -3543,8 +3499,8 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
-                    let node = GetNodesByProperties({
+                  options() {
+                    const node = GetNodesByProperties({
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.DataChainFunctionType]:
                         DataChainFunctionKeys.Models,
@@ -3588,11 +3544,11 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_NEW_NODE,
-                  options: function(graph) {
+                  options(graph) {
                     if (skipModelDataChainListParts) {
                       return null;
                     }
-                    let temp = SplitDataCommand(
+                    const temp = SplitDataCommand(
                       GetNodeById(listDataChainId, graph),
                       (split, graph, groupId) => {
                         listDataChainExitId = split.id;
@@ -3608,7 +3564,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(graph) {
+                  options() {
                     if (skipModelDataChainListParts) {
                       return null;
                     }
@@ -3623,7 +3579,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(graph) {
+                  options() {
                     if (skipModelDataChainListParts) {
                       return null;
                     }
@@ -3638,7 +3594,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(graph) {
+                  options() {
                     if (skipModelDataChainListParts) {
                       return null;
                     }
@@ -3653,7 +3609,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(graph) {
+                  options() {
                     return {
                       prop: NodeProperties.DataChain,
                       id: dataSourceId,
@@ -3665,7 +3621,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function(graph) {
+                  options() {
                     return {
                       target: listDataChainId,
                       source: dataSourceId,
@@ -3677,7 +3633,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function(graph) {
+                  options() {
                     return {
                       prop: NodeProperties.UIModelType,
                       id: dataSourceId,
@@ -3689,7 +3645,7 @@ export const CreateDefaultView = {
             isList
               ? {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function(graph) {
+                  options() {
                     return {
                       target: currentNode.id,
                       source: dataSourceId,
@@ -3704,8 +3660,8 @@ export const CreateDefaultView = {
         PerformGraphOperation([
           {
             operation: ADD_NEW_NODE,
-            options: function(graph) {
-              let viewModelInstanceNode = GetNodeByProperties(
+            options(graph) {
+              const viewModelInstanceNode = GetNodeByProperties(
                 {
                   [NodeProperties.Model]: currentNode.id,
                   [NodeProperties.InstanceType]: useModelInstance
@@ -3719,7 +3675,7 @@ export const CreateDefaultView = {
                 skipAddingComplete = true;
                 return null;
               }
-              let node = GetNodesByProperties(
+              const node = GetNodesByProperties(
                 {
                   [NodeProperties.UIText]: `Get ${viewName}`,
                   [NodeProperties.DataChainFunctionType]:
@@ -3781,13 +3737,13 @@ export const CreateDefaultView = {
           },
           {
             operation: ADD_NEW_NODE,
-            options: function(graph) {
+            options(graph) {
               if (skipAddingComplete) {
                 return false;
               }
-              let temp = AddChainCommand(
+              const temp = AddChainCommand(
                 GetNodeById(newItems.getObjectDataChain, graph),
-                complete => {},
+                () => {},
                 graph,
                 {
                   ...viewPackage,
@@ -3841,7 +3797,7 @@ export const CreateDefaultView = {
               break;
           }
 
-          let buildPropertyResult = BuildPropertyDataChainAccessor({
+          const buildPropertyResult = BuildPropertyDataChainAccessor({
             viewName,
             modelProperty,
             currentNode,
@@ -3882,20 +3838,15 @@ export const CreateDefaultView = {
             propertyIndex
           });
 
-          let compNodeId = childComponents[propertyIndex];
+          const compNodeId = childComponents[propertyIndex];
 
-          let compNode = GetNodeById(compNodeId);
-          let componentType = GetNodeProp(
-            compNode,
-            NodeProperties.ComponentType
-          );
-          let componentApi = GetNodeProp(compNode, NodeProperties.ComponentApi);
+          const compNode = GetNodeById(compNodeId);
 
-          let rootCellId = GetFirstCell(layout);
-          let children = GetChildren(layout, rootCellId);
-          let childId = children[propertyIndex];
-          let apiList = PropertyApiList; // getComponentApiList(componentApi);
-          let apiDataChainLists = {};
+          const rootCellId = GetFirstCell(layout);
+          const children = GetChildren(layout, rootCellId);
+          const childId = children[propertyIndex];
+          const apiList = PropertyApiList; // getComponentApiList(componentApi);
+          const apiDataChainLists = {};
           newItems.apiDataChain = newItems.apiDataChain || {};
           newItems.apiDataChain[childId] = apiDataChainLists;
 
@@ -3924,9 +3875,9 @@ export const CreateDefaultView = {
             ...apiList.map(api => {
               return {
                 operation: CHANGE_NODE_PROPERTY,
-                options: function(graph) {
-                  let apiProperty = api.value;
-                  let cellProperties = GetCellProperties(layout, childId);
+                options() {
+                  const apiProperty = api.value;
+                  const cellProperties = GetCellProperties(layout, childId);
                   cellProperties.componentApi =
                     cellProperties.componentApi || {};
                   // let { instanceType, model, selector, handlerType, dataChain, modelProperty } = cellProperties.componentApi[apiProperty] || {};
@@ -3963,7 +3914,7 @@ export const CreateDefaultView = {
                     if (apiDataChainLists[apiProperty]) {
                       datachainLink.push({
                         operation: ADD_LINK_BETWEEN_NODES,
-                        options: function() {
+                        options() {
                           return {
                             target: modelComponentSelectors[0],
                             source: compNodeId,
@@ -4003,11 +3954,13 @@ export const CreateDefaultView = {
                       cellProperties.componentApi[apiProperty].handlerType =
                         HandlerTypes.Focus;
                       break;
+                      default:
+                        break;
                   }
                   if (cellProperties.componentApi[apiProperty].modelProperty) {
                     datachainLink.push({
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target:
                             cellProperties.componentApi[apiProperty]
@@ -4025,7 +3978,7 @@ export const CreateDefaultView = {
                   if (cellProperties.componentApi[apiProperty].model) {
                     datachainLink.push({
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target:
                             cellProperties.componentApi[apiProperty].model,
@@ -4075,12 +4028,12 @@ export const CreateDefaultView = {
         createListConnections.map(t => t());
         if (isList) {
           if (newItems.listComponentId) {
-            let listViewModel = GetComponentExternalApiNode(
+            const listViewModel = GetComponentExternalApiNode(
               ComponentApiTypes.ViewModel,
               newItems.listComponentId
             );
 
-            let screenViewModelInternal = GetComponentInternalApiNode(
+            const screenViewModelInternal = GetComponentInternalApiNode(
               ComponentApiTypes.ViewModel,
               newItems.screenNodeOptionId
             );
@@ -4127,12 +4080,12 @@ export const CreateDefaultView = {
                 screen: GetNodeTitle(screenNodeId),
                 viewModel: screenNodeId,
                 callback: ctx => {
-                  let { entry } = ctx;
+                  const { entry } = ctx;
                   modelView_DataChain = entry;
                 }
               }),
               function(graph) {
-                let externalNode = GetNodesLinkedTo(graph, {
+                const externalNode = GetNodesLinkedTo(graph, {
                   id: screenNodeId,
                   link: LinkType.ComponentExternalApi
                 }).find(
@@ -4144,7 +4097,7 @@ export const CreateDefaultView = {
                 return [
                   {
                     operation: ADD_LINK_BETWEEN_NODES,
-                    options: function() {
+                    options() {
                       return {
                         target: modelView_DataChain,
                         source: externalNode.id,
@@ -4163,15 +4116,17 @@ export const CreateDefaultView = {
 
       SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
     };
-    let { uiTypes } = _args;
+    const { uiTypes } = _args;
     if (uiTypes) {
-      for (var i in uiTypes) {
+      for (const i in uiTypes) {
         if (uiTypes[i]) {
           default_View_method({ ..._args, uiType: i });
+          setViewPackageStamp(null, "CreateDefaultView");
         }
       }
     } else {
       default_View_method({ ..._args });
+      setViewPackageStamp(null, "CreateDefaultView");
     }
     return method_result;
   }
@@ -4182,18 +4137,18 @@ export function applyDefaultComponentProperties(currentNode, _ui_type) {
   // var currentNode = Node(state, Visual(state, SELECTED_NODE));
   // let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
   // let _ui_type = GetNodeProp(screenOption, NodeProperties.UIType);
-  let result = [];
+  const result = [];
   if (currentNode) {
-    let componentTypes = ComponentTypes[_ui_type] || {};
-    let componentType = GetNodeProp(currentNode, NodeProperties.ComponentType);
+    const componentTypes = ComponentTypes[_ui_type] || {};
+    const componentType = GetNodeProp(currentNode, NodeProperties.ComponentType);
     Object.keys(
       componentTypes[componentType]
         ? componentTypes[componentType].properties
         : {}
     ).map(key => {
-      let prop_obj = componentTypes[componentType].properties[key];
+      const prop_obj = componentTypes[componentType].properties[key];
       if (prop_obj.parameterConfig) {
-        let selectedComponentApiProperty = key;
+        const selectedComponentApiProperty = key;
         let componentProperties = GetNodeProp(
           currentNode,
           prop_obj.nodeProperty
@@ -4223,7 +4178,7 @@ export function applyDefaultComponentProperties(currentNode, _ui_type) {
 }
 
 function CreateFunction(option) {
-  let {
+  const {
     nodePackageType,
     methodType,
     httpMethod,
@@ -4246,12 +4201,12 @@ function CreateFunction(option) {
     throw "function name is missing";
   }
   return args => {
-    let { model, dispatch, getState } = args;
+    const { model, dispatch, getState } = args;
     // Check for existing method of this type
 
     // if no methods exist, then create a new method.
     // graph = GraphMethods.addNewNodeOfType(graph, options, NodeTypes.Model);
-    let agents = GetAgentNodes();
+    const agents = GetAgentNodes();
 
     agents
       .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController))
@@ -4259,7 +4214,7 @@ function CreateFunction(option) {
         let methodProps;
 
         if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType)) {
-          let outer_commands = [
+          const outer_commands = [
             {
               operation: ADD_NEW_NODE,
               options: {
@@ -4283,9 +4238,8 @@ function CreateFunction(option) {
                 callback: methodNode => {
                   setTimeout(() => {
                     new Promise(resolve => {
-                      let { constraints } = MethodFunctions[functionType];
+                      const { constraints } = MethodFunctions[functionType];
                       let commands = [];
-                      let permissionNode = null;
                       Object.values(constraints).map(constraint => {
                         switch (constraint.key) {
                           case FunctionTemplateKeys.Model:
@@ -4525,13 +4479,14 @@ function CreateFunction(option) {
 }
 
 export function CreateAgentFunction(option) {
-  let {
+  const {
     nodePackageType,
     methodType,
     parentId: parent,
     httpMethod,
     functionType,
     functionName,
+    viewPackage,
     model,
     agent
   } = option;
@@ -4552,19 +4507,25 @@ export function CreateAgentFunction(option) {
     throw "function name is missing";
   }
   return args => {
-    let { dispatch, getState } = args;
+    const { dispatch, getState } = args;
     // Check for existing method of this type
 
     // if no methods exist, then create a new method.
     // graph = GraphMethods.addNewNodeOfType(graph, options, NodeTypes.Model);
 
     let methodProps;
-    let new_nodes = {};
+    const new_nodes = {};
+    let _viewPackage = null;
+
+    _viewPackage = viewPackage || {
+      [NodeProperties.ViewPackage]: uuidv4()
+    };
+    setViewPackageStamp(_viewPackage, "CreateAgentFunction");
     if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType)) {
-      let outer_commands = [
+      const outer_commands = [
         {
           operation: ADD_NEW_NODE,
-          options: function(graph) {
+          options() {
             return {
               nodeType: NodeTypes.Method,
               groupProperties: {},
@@ -4587,8 +4548,8 @@ export function CreateAgentFunction(option) {
           }
         },
         function() {
-          let { methodNode } = new_nodes;
-          let { constraints } = MethodFunctions[functionType];
+          const { methodNode } = new_nodes;
+          const { constraints } = MethodFunctions[functionType];
           let commands = [
             {
               operation: ADD_DEFAULT_PROPERTIES,
@@ -4627,7 +4588,7 @@ export function CreateAgentFunction(option) {
                       ) || GetUsers()[0].id;
                   commands.push({
                     operation: ADD_LINK_BETWEEN_NODES,
-                    options: function(graph) {
+                    options() {
                       return {
                         source: methodNode.id,
                         target: methodProps[constraint.key],
@@ -4649,7 +4610,7 @@ export function CreateAgentFunction(option) {
                   ...[
                     {
                       operation: ADD_NEW_NODE,
-                      options: function() {
+                      options() {
                         return {
                           parent: methodNode.id,
                           nodeType: NodeTypes.Validator,
@@ -4674,7 +4635,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: model.id,
                           source: validator.id,
@@ -4684,7 +4645,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: agent.id,
                           source: validator.id,
@@ -4694,7 +4655,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: methodNode.id,
                           source: validator.id,
@@ -4714,7 +4675,7 @@ export function CreateAgentFunction(option) {
                   ...[
                     {
                       operation: ADD_NEW_NODE,
-                      options: function() {
+                      options() {
                         return {
                           parent: methodNode.id,
                           nodeType: NodeTypes.Executor,
@@ -4740,7 +4701,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: model.id,
                           source: executor.id,
@@ -4750,7 +4711,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: agent.id,
                           source: executor.id,
@@ -4760,7 +4721,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: methodNode.id,
                           source: executor.id,
@@ -4780,7 +4741,7 @@ export function CreateAgentFunction(option) {
                   ...[
                     {
                       operation: ADD_NEW_NODE,
-                      options: function() {
+                      options() {
                         return {
                           parent: methodNode.id,
                           nodeType:
@@ -4823,7 +4784,7 @@ export function CreateAgentFunction(option) {
                     ...commands,
                     {
                       operation: CHANGE_NODE_PROPERTY,
-                      options: function() {
+                      options() {
                         return {
                           prop: NodeProperties.FilterAgent,
                           id: perOrModelNode.id,
@@ -4833,7 +4794,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: CHANGE_NODE_PROPERTY,
-                      options: function() {
+                      options() {
                         return {
                           prop: NodeProperties.FilterModel,
                           id: perOrModelNode.id,
@@ -4843,7 +4804,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: model.id,
                           source: perOrModelNode.id,
@@ -4853,7 +4814,7 @@ export function CreateAgentFunction(option) {
                     },
                     {
                       operation: ADD_LINK_BETWEEN_NODES,
-                      options: function() {
+                      options() {
                         return {
                           target: agent.id,
                           source: perOrModelNode.id,
@@ -4870,7 +4831,7 @@ export function CreateAgentFunction(option) {
               ...[
                 {
                   operation: CHANGE_NODE_PROPERTY,
-                  options: function() {
+                  options() {
                     return {
                       prop: NodeProperties.MethodProps,
                       id: methodNode.id,
@@ -4880,7 +4841,7 @@ export function CreateAgentFunction(option) {
                 },
                 {
                   operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
+                  options() {
                     return {
                       target: methodProps[constraint.key],
                       source: methodNode.id,
@@ -4896,16 +4857,26 @@ export function CreateAgentFunction(option) {
       ];
       PerformGraphOperation(outer_commands)(dispatch, getState);
 
-      updateMethodParameters(new_nodes.methodNode.id, functionType)(
-        dispatch,
-        getState
-      );
+      updateMethodParameters(
+        new_nodes.methodNode.id,
+        functionType,
+        viewPackage
+      )(dispatch, getState);
       attachMethodToMaestro(new_nodes.methodNode.id, model.id, option)(
         dispatch,
-        getState
+        getState,
+        null,
+        viewPackage
       );
+      PerformGraphOperation([
+        {
+          operation: NO_OP,
+          options() {}
+        }
+      ]);
     }
 
+    setViewPackageStamp(null, "CreateAgentFunction");
     return new_nodes;
   };
 }
@@ -4923,7 +4894,7 @@ function addListItemComponentApi(
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         return {
           nodeType: NodeTypes.ComponentApi,
           callback: nn => {
@@ -4961,7 +4932,7 @@ function addListItemComponentApi(
       ? null
       : {
           operation: ADD_NEW_NODE,
-          options: function(currentGraph) {
+          options() {
             return {
               nodeType: NodeTypes.ComponentExternalApi,
               callback: nn => {
@@ -4983,7 +4954,7 @@ function addListItemComponentApi(
       ? null
       : {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function() {
+          options() {
             if (keyfunc) {
               keyfunc(text, {
                 internalId,
@@ -5011,7 +4982,7 @@ function addListItemComponentApi(
   ].filter(x => x);
 }
 function addComponentEventApiNodes(args) {
-  let {
+  const {
     newItems,
     childComponents,
     modelIndex,
@@ -5021,17 +4992,17 @@ function addComponentEventApiNodes(args) {
     viewPackage,
     useModelInstance
   } = args;
-  let parent = childComponents[modelIndex];
+  const parent = childComponents[modelIndex];
   newItems.eventApis = newItems.eventApis || {};
   return (viewComponent.eventApi || [])
     .map(apiName => {
-      let apiNameInstance = `${apiName} Instance`;
-      let apiNameEventHandler = `${apiName} Event Handler`;
+      const apiNameInstance = `${apiName} Instance`;
+      const apiNameEventHandler = `${apiName} Event Handler`;
 
       return [
         {
           operation: ADD_NEW_NODE,
-          options: function(graph) {
+          options() {
             return {
               nodeType: NodeTypes.EventMethod,
               callback: nn => {
@@ -5069,7 +5040,7 @@ function addComponentEventApiNodes(args) {
         },
         {
           operation: ADD_NEW_NODE,
-          options: function(graph) {
+          options() {
             return {
               nodeType: NodeTypes.EventMethodInstance,
               callback: nn => {
@@ -5106,7 +5077,7 @@ function addComponentEventApiNodes(args) {
         },
         {
           operation: ADD_NEW_NODE,
-          options: function(graph) {
+          options() {
             return {
               nodeType: NodeTypes.EventHandler,
               callback: nn => {
@@ -5135,7 +5106,7 @@ function addComponentEventApiNodes(args) {
         },
         {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function(graph) {
+          options(graph) {
             let viewModelNode = null;
             let instanceType = null;
             switch (apiName) {
@@ -5160,7 +5131,7 @@ function addComponentEventApiNodes(args) {
                   : InstanceTypes.ScreenInstance;
                 break;
             }
-            let res = GetNodesByProperties(
+            const res = GetNodesByProperties(
               {
                 [NodeProperties.Model]: currentNode.id,
                 [NodeProperties.InstanceType]: instanceType,
@@ -5185,7 +5156,7 @@ function addComponentEventApiNodes(args) {
         },
         {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function(graph) {
+          options() {
             return {
               source:
                 newItems.eventApis[childComponents[modelIndex]][
@@ -5206,17 +5177,16 @@ function addComponentApiNodes(
   newItems,
   childComponents,
   modelIndex,
-  viewComponentType,
   apiName = "value",
   externalApiId
 ) {
-  let parent = childComponents[modelIndex];
+  const parent = childComponents[modelIndex];
   let componentInternalValue = null;
   let componentExternalValue = null;
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         return {
           nodeType: NodeTypes.ComponentApi,
           callback: nn => {
@@ -5246,7 +5216,7 @@ function addComponentApiNodes(
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         return {
           nodeType: NodeTypes.ComponentExternalApi,
           callback: nn => {
@@ -5274,7 +5244,7 @@ function addComponentApiNodes(
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         if (parent) {
           setApiConnectors(
             newItems,
@@ -5297,7 +5267,7 @@ function addComponentApiNodes(
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           target: externalApiId || newItems.screenComponentIdInternalApi,
           source: componentExternalValue,
@@ -5318,7 +5288,7 @@ function addButtonApiNodes(newItems, btn) {
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         return {
           nodeType: NodeTypes.ComponentApi,
           callback: nn => {
@@ -5339,7 +5309,7 @@ function addButtonApiNodes(newItems, btn) {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         return {
           nodeType: NodeTypes.ComponentExternalApi,
           callback: nn => {
@@ -5359,7 +5329,7 @@ function addButtonApiNodes(newItems, btn) {
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           source: buttonInternalApi,
           target: buttonExternalApi,
@@ -5371,7 +5341,7 @@ function addButtonApiNodes(newItems, btn) {
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           target: newItems.titleService,
           source: buttonExternalApi,
@@ -5385,20 +5355,20 @@ function addButtonApiNodes(newItems, btn) {
 }
 
 function ConnectExternalApisToSelectors(args) {
-  var {
+  const {
     modelComponentSelectors,
     newItems,
     viewType,
     childComponents,
     propertyIndex
   } = args;
-  let steps = [];
+  const steps = [];
   switch (viewType) {
     case ViewTypes.Update:
     case ViewTypes.Create:
       steps.push({
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function() {
+        options() {
           return {
             target: modelComponentSelectors[0],
             source:
@@ -5419,7 +5389,7 @@ function ConnectExternalApisToSelectors(args) {
     ...steps,
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           target: newItems.titleService,
           source:
@@ -5437,7 +5407,7 @@ function ConnectExternalApisToSelectors(args) {
       ...steps,
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function() {
+        options() {
           return {
             target: newItems.titleService,
             source:
@@ -5454,7 +5424,7 @@ function ConnectExternalApisToSelectors(args) {
 }
 
 function BuildPropertyDataChainAccessor(args) {
-  var {
+  const {
     viewName,
     modelProperty,
     viewPackage,
@@ -5463,12 +5433,7 @@ function BuildPropertyDataChainAccessor(args) {
     viewModelNodeId,
     propertyDataChainAccesors,
     newItems,
-    uiType,
-    viewType,
-    childComponents,
-    isSharedComponent,
-    propertyIndex
-  } = args;
+    viewType  } = args;
   let skip = false;
   let propDataChainNodeId = null;
   let entryNodeProperties = null;
@@ -5538,8 +5503,8 @@ function BuildPropertyDataChainAccessor(args) {
     [
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
-          let node = GetNodesByProperties({
+        options() {
+          const node = GetNodesByProperties({
             ...entryNodeProperties
           }).find(x => x);
           if (node) {
@@ -5578,7 +5543,7 @@ function BuildPropertyDataChainAccessor(args) {
         ? false
         : {
             operation: ADD_NEW_NODE,
-            options: function(graph) {
+            options() {
               if (skip) {
                 return {};
               }
@@ -5624,18 +5589,18 @@ function BuildPropertyDataChainAccessor(args) {
                     }
                   }
                 ],
-                callback: (node, graph) => {}
+                callback: () => {}
               };
             }
           },
       addcomplete
         ? {
             operation: ADD_NEW_NODE,
-            options: function(graph) {
+            options(graph) {
               if (skip) {
                 return false;
               }
-              let groupProperties = GetNodeProp(
+              const groupProperties = GetNodeProp(
                 propDataChainNodeId,
                 NodeProperties.GroupParent,
                 graph
@@ -5693,16 +5658,13 @@ function setModelPropertyViewTypePropNode(
 }
 
 function setupPropertyApi(args) {
-  var {
+  const {
     childId,
     apiList,
-    viewPackage,
     childComponents,
     propertyIndex,
-    propDataChainNodeId,
     viewName,
     apiDataChainLists,
-    useModelInstance,
     modelProperty,
     currentNode,
     modelComponentSelectors,
@@ -5717,25 +5679,13 @@ function setupPropertyApi(args) {
   PerformGraphOperation([
     ...apiList
       .map(api => {
-        let apiProperty = api.value;
-        let apiNameEventHandler = `${apiProperty} Event Handler`;
+        const apiProperty = api.value;
         if (
           ARE_BOOLEANS.some(v => v === apiProperty) ||
           ARE_HANDLERS.some(v => v === apiProperty)
         ) {
           return false;
         }
-        let completeId = null;
-        let splitId = null;
-        let dataChainProps = {
-          [NodeProperties.UIText]: `${viewName} ${viewType} ${GetNodeTitle(
-            modelProperty
-          )} ${apiProperty}`,
-          [NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Pass,
-          [NodeProperties.EntryPoint]: true,
-          [NodeProperties.DataChainProperty]: modelProperty.id
-        };
-        let skip = false;
         let _context = null;
         switch (apiProperty) {
           case ApiProperty.Success:
@@ -5792,7 +5742,7 @@ function setupPropertyApi(args) {
       .map(api_key => {
         return {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function() {
+          options() {
             if (newItems[childComponents[propertyIndex]][api_key]) {
               return {
                 target: apiDataChainLists[api_key],
@@ -5812,7 +5762,7 @@ function setupPropertyApi(args) {
       .map(api_key => {
         return {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function() {
+          options() {
             if (modelComponentSelectors[0]) {
               return {
                 target: modelComponentSelectors[0],
@@ -5830,13 +5780,13 @@ function setupPropertyApi(args) {
   ])(GetDispatchFunc(), GetStateFunc());
 }
 function connectComponentToExternalApi(args) {
-  let { newItems, child, key, parent, properties } = args;
-  let { externalId } = getApiConnectors(newItems, child, key);
-  let { internalId } = getApiConnectors(newItems, parent, key);
+  const { newItems, child, key, parent, properties } = args;
+  const { externalId } = getApiConnectors(newItems, child, key);
+  const { internalId } = getApiConnectors(newItems, parent, key);
   return [
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           source: externalId,
           target: internalId,
@@ -5850,7 +5800,7 @@ function connectComponentToExternalApi(args) {
 }
 
 function addComponentApiToForm(args) {
-  let {
+  const {
     newItems,
     text,
     parent,
@@ -5865,10 +5815,10 @@ function addComponentApiToForm(args) {
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         if (parent) {
           if (isSingular && graph) {
-            let temp = GetNodesLinkedTo(graph, {
+            const temp = GetNodesLinkedTo(graph, {
               id: parent,
               link: LinkType.ComponentInternalApi
             }).find(
@@ -5888,7 +5838,7 @@ function addComponentApiToForm(args) {
             callback: nn => {
               internalId = nn.id;
             },
-            parent: parent,
+            parent,
             linkProperties: {
               properties: { ...LinkProperties.ComponentInternalApi }
             },
@@ -5905,9 +5855,9 @@ function addComponentApiToForm(args) {
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options() {
         if (isSingular && graph) {
-          let temp = GetNodesLinkedTo(graph, {
+          const temp = GetNodesLinkedTo(graph, {
             id: parent,
             link: LinkType.ComponentExternalApi
           }).find(
@@ -5928,7 +5878,7 @@ function addComponentApiToForm(args) {
             callback: nn => {
               externalId = nn.id;
             },
-            parent: parent,
+            parent,
             linkProperties: {
               properties: { ...LinkProperties.ComponentExternalApi }
             },
@@ -5944,7 +5894,7 @@ function addComponentApiToForm(args) {
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         if (parent) {
           setApiConnectors(newItems, parent, { internalId, externalId }, text);
         }
@@ -5974,7 +5924,7 @@ function getApiConnectors(newItems, parent, key) {
 }
 
 function AttachDataChainAccessorTo(nodeId, accessorId) {
-  let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
+  const externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
     id: nodeId,
     link: LinkType.ComponentExternalApi
   });
@@ -5983,7 +5933,7 @@ function AttachDataChainAccessorTo(nodeId, accessorId) {
     ...externalApis.map(externalApi => {
       return {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options() {
           return {
             target: accessorId,
             source: externalApi.id,
@@ -5998,7 +5948,7 @@ function AttachDataChainAccessorTo(nodeId, accessorId) {
 }
 
 function AttachSelectorAccessorTo(nodeId, accessorId) {
-  let externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
+  const externalApis = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
     id: nodeId,
     link: LinkType.ComponentExternalApi
   });
@@ -6007,7 +5957,7 @@ function AttachSelectorAccessorTo(nodeId, accessorId) {
     ...externalApis.map(externalApi => {
       return {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options() {
           return {
             target: accessorId,
             source: externalApi.id,

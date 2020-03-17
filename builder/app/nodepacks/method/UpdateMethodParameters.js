@@ -15,6 +15,7 @@ import {
 } from "../../constants/nodetypes";
 import { uuidv4 } from "../../utils/array";
 import { MethodFunctions } from "../../constants/functiontypes";
+import * as Titles from '../../components/titles';
 
 export default function UpdateMethodParameters(args = { methodType, current }) {
   let { methodType, current } = args;

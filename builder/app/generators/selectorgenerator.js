@@ -5,7 +5,9 @@ import {
   GetNodeProp,
   GetJSCodeName,
   GetSelectorsNodes,
-  GetNodeTitle
+  GetNodeTitle,
+  GetNodeCode,
+  GetCodeName
 } from "../actions/uiactions";
 import {
   NodeTypes,
@@ -60,13 +62,14 @@ export function GenerateSelectorFunction(node) {
           selected
         }
       }`;
+    default: break;
   }
   result = `
 export function ${GetJSCodeName(node)}(value, viewModel = '${GetNodeProp(
     node,
     NodeProperties.DefaultViewModel
   ) ||
-    GetNodeTitle(node) ||
+    GetCodeName(node) ||
     ""}', options = {}) {
     if(options){
       if(options.update){

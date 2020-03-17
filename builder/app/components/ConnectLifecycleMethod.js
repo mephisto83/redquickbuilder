@@ -16,72 +16,72 @@ import {
 } from "../actions/uiactions";
 import * as GraphMethods from "../methods/graph_methods";
 import { uuidv4 } from "../utils/array";
-export default function(args = {}) {
-  let { target, source, viewPackages, graph } = args;
-  let state = GetState();
+
+export default function (args = {}) {
+  const { target, source, graph } = args;
+  let { viewPackages, dataChain } = args;
+  const state = GetState();
   viewPackages = viewPackages || {
     [NodeProperties.ViewPackage]: uuidv4(),
     ...(viewPackages || {})
   };
 
-  let apiConnectors = GraphMethods.GetConnectedNodesByType(
+  const apiConnectors = GraphMethods.GetConnectedNodesByType(
     state,
     source,
     NodeTypes.ComponentApiConnector,
     null,
     graph
-  ).map(x => {
-    return {
-      operation: REMOVE_NODE,
-      options: {
-        id: x.id
-      }
-    };
-  });
+  ).map(x => ({
+    operation: REMOVE_NODE,
+    options: {
+      id: x.id
+    }
+  }));
 
-  let lifeCycleMethod = GraphMethods.GetConnectedNodeByType(
+  const lifeCycleMethod = GraphMethods.GetConnectedNodeByType(
     state,
     source,
     [NodeTypes.LifeCylceMethod, NodeTypes.EventMethod],
     null,
     graph
   );
-  let model = GraphMethods.GetConnectedNodeByType(
+  const model = GraphMethods.GetConnectedNodeByType(
     state,
     lifeCycleMethod.id,
     [NodeTypes.Model],
     null,
     graph
   );
-  let dataChain = model
+  dataChain = dataChain || (model
     ? GraphMethods.GetConnectedNodeByType(
-        state,
-        model.id,
-        [NodeTypes.DataChain],
-        null,
-        graph
-      )
-    : null;
-  let selectorNode = model
+      state,
+      model.id,
+      [NodeTypes.DataChain],
+      null,
+      graph
+    )
+    : null);
+  const selectorNode = model
     ? GraphMethods.GetConnectedNodeByType(
-        state,
-        model.id,
-        [NodeTypes.Selector],
-        null,
-        graph
-      )
+      state,
+      model.id,
+      [NodeTypes.Selector],
+      null,
+      graph
+    )
     : null;
-  let componentNode = GraphMethods.GetConnectedNodeByType(
+  const componentNode = GraphMethods.GetConnectedNodeByType(
     state,
     lifeCycleMethod.id,
     [NodeTypes.ComponentNode, NodeTypes.Screen, NodeTypes.ScreenOption],
     null,
     graph
   );
-  let context = {
+  const context = {
     apiEndPoints: []
   };
-  let apiEndpoints = [];
+  const apiEndpoints = [];
   GraphMethods.GetConnectedNodesByType(
     state,
     target,
@@ -119,7 +119,7 @@ export default function(args = {}) {
     ...apiConnectors,
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options() {
         return {
           target,
           source,
@@ -132,8 +132,8 @@ export default function(args = {}) {
     ...apiEndpoints.map(ae => {
       return {
         operation: ADD_NEW_NODE,
-        options: function() {
-          let skipOrTake = GetNodeByProperties({
+        options() {
+          const skipOrTake = GetNodeByProperties({
             [NodeProperties.QueryParameterType]: GetNodeProp(
               ae,
               NodeProperties.QueryParameterParamType
@@ -142,10 +142,7 @@ export default function(args = {}) {
             [NodeProperties.Component]: componentNode.id,
             [NodeProperties.IsPaging]: true
           });
-          if (model) {
-          }
-          if (dataChain) {
-          }
+
           return {
             nodeType: NodeTypes.ComponentApiConnector,
             groupProperties: {},
@@ -154,8 +151,8 @@ export default function(args = {}) {
               [NodeProperties.UIText]: `${GetNodeTitle(ae)} Parameter`,
               ...viewPackages
             },
-            callback: new_node => {
-              context.apiEndPoints.push(new_node);
+            callback: newNode => {
+              context.apiEndPoints.push(newNode);
             },
             linkProperties: {
               properties: { ...LinkProperties.ComponentApiConnector }
@@ -171,33 +168,33 @@ export default function(args = {}) {
               },
               skipOrTake
                 ? {
-                    target: skipOrTake.id,
-                    linkProperties: {
-                      properties: {
-                        ...LinkProperties.ComponentApiConnection
-                      }
+                  target: skipOrTake.id,
+                  linkProperties: {
+                    properties: {
+                      ...LinkProperties.ComponentApiConnection
                     }
                   }
+                }
                 : null,
               dataChain
                 ? {
-                    target: dataChain.id,
-                    linkProperties: {
-                      properties: {
-                        ...LinkProperties.ComponentApiConnection
-                      }
+                  target: typeof (dataChain) === 'function' ? dataChain() : dataChain.id,
+                  linkProperties: {
+                    properties: {
+                      ...LinkProperties.ComponentApiConnection
                     }
                   }
+                }
                 : null,
               selectorNode
                 ? {
-                    target: selectorNode.id,
-                    linkProperties: {
-                      properties: {
-                        ...LinkProperties.ComponentApiConnection
-                      }
+                  target: selectorNode.id,
+                  linkProperties: {
+                    properties: {
+                      ...LinkProperties.ComponentApiConnection
                     }
                   }
+                }
                 : null
             ].filter(x => x)
           };
@@ -206,9 +203,9 @@ export default function(args = {}) {
     }),
     {
       operation: NO_OP,
-      options: function(graph) {
+      options(currentGraph) {
         if (args.callback) {
-          args.callback(context, graph);
+          args.callback(context, currentGraph);
         }
       }
     }

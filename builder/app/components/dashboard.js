@@ -96,7 +96,6 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import { ViewTypes } from '../actions/uiactions';
 import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
@@ -105,6 +104,7 @@ import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
 import { currentId } from 'async_hooks';
 import StyleMenu from './stylemenu';
+import { ViewTypes } from '../constants/viewtypes';
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';

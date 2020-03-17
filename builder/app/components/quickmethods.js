@@ -44,6 +44,7 @@ import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import CreateConfiguration from "../nodepacks/CreateConfiguration";
 import CreateFetchParameters from "../nodepacks/CreateFetchParameters";
 import CreateFetchServiceIdempotently from "../nodepacks/CreateFetchServiceIdempotently";
+import { ViewTypes } from "../constants/viewtypes";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -346,7 +347,7 @@ class QuickMethods extends Component<any, any, any> {
                     isSelected={item => {
                       return this.state.selectedMethods[item.value];
                     }}
-                    items={Object.keys(UIA.ViewTypes).map(x => ({
+                    items={Object.keys(ViewTypes).map(x => ({
                       id: x,
                       value: x,
                       title: x
@@ -371,10 +372,10 @@ class QuickMethods extends Component<any, any, any> {
                         `${UIA.Visual(state, "View Package Title") || ""}` ||
                         UIA.GetNodeTitle(currentNode);
                       let res = [
-                        UIA.ViewTypes.Create,
-                        UIA.ViewTypes.Update,
-                        UIA.ViewTypes.Delete,
-                        UIA.ViewTypes.Get
+                        ViewTypes.Create,
+                        ViewTypes.Update,
+                        ViewTypes.Delete,
+                        ViewTypes.Get
                       ]
                         .filter(x => this.state.selectedMethods[x])
                         .map(t => {
@@ -388,14 +389,14 @@ class QuickMethods extends Component<any, any, any> {
                             }
                           });
                         });
-                      if (this.state.selectedMethods[UIA.ViewTypes.GetAll]) {
+                      if (this.state.selectedMethods[ViewTypes.GetAll]) {
                         operations.push({
                           node: currentNode,
                           method: CreateDefaultView,
                           options: {
                             ...defaultParameters(),
-                            viewName: `${viewName} ${UIA.ViewTypes.GetAll}`,
-                            viewType: UIA.ViewTypes.GetAll,
+                            viewName: `${viewName} ${ViewTypes.GetAll}`,
+                            viewType: ViewTypes.GetAll,
                             isList: true
                           }
                         });

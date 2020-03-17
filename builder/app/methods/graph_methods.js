@@ -665,8 +665,15 @@ export function setDepth(graph, options) {
 }
 export function newNode(graph, options) {
   let node = createNode();
+  if (_viewPackageStamp) {
+    for (var p in _viewPackageStamp) {
+      node.properties[p] = _viewPackageStamp[p];
+    }
+  }
+
   return addNode(graph, node, options);
 }
+
 export function createExtensionDefinition() {
   return {
     //The code generation will define the unique 'value'.
@@ -954,6 +961,15 @@ function updateNode(node, options) {
     );
   }
 }
+let _viewPackageStamp = null;
+let _view_package_key = null;
+export function setViewPackageStamp(viewPackageStamp, key) {
+  if (!_viewPackageStamp || !viewPackageStamp)
+    if (_view_package_key === key || !_view_package_key) {
+      _viewPackageStamp = viewPackageStamp;
+      _view_package_key = !_viewPackageStamp ? null : key;
+    }
+}
 export function addNewNodeOfType(graph, options, nodeType, callback) {
   let { parent, linkProperties, groupProperties } = options;
   if (!callback) {
@@ -1010,6 +1026,15 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
         id: node.id,
         prop: p,
         value: options.properties[p]
+      });
+    }
+  }
+  if (_viewPackageStamp) {
+    for (var p in _viewPackageStamp) {
+      graph = updateNodeProperty(graph, {
+        id: node.id,
+        prop: p,
+        value: _viewPackageStamp[p]
       });
     }
   }

@@ -40,6 +40,7 @@ import SelectInputProperty from "./selectproperty";
 import CommandHeader from "./commandheader";
 import CheckBox from "./checkbox";
 import { getComponentApiList } from "../methods/component_api_methods";
+import { ViewTypes } from "../constants/viewtypes";
 class ComponentActivityMenu extends Component {
   constructor(props) {
     super(props);
@@ -330,9 +331,9 @@ class ComponentActivityMenu extends Component {
               node={currentNode}
               title={Titles.ViewTypes}
               property={NodeProperties.ViewType}
-              options={Object.keys(UIA.ViewTypes).map(v => ({
+              options={Object.keys(ViewTypes).map(v => ({
                 title: v,
-                value: UIA.ViewTypes[v],
+                value: ViewTypes[v],
                 id: v
               }))}
             />
