@@ -551,7 +551,7 @@ export function bindComponent(node, componentBindingDefinition) {
               invocationDependsOnState = (
                 statePropertiesThatCauseInvocation || []
               ).length;
-            });
+            }, { component: node });
             if (invocationDependsOnState) return false;
             return temp;
           })
@@ -1004,7 +1004,7 @@ function WriteDescribedStateUpdates(parent) {
         dependentStateProperties = statePropertiesThatCauseInvocation;
         invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
           .length;
-      });
+      }, { component: parent });
       if (!invocationDependsOnState) {
         return false;
       }
@@ -1515,7 +1515,7 @@ export function getMethodInstancesForEvntType(node, evtType) {
 
   return methodInstances;
 }
-export function getMethodInvocation(methodInstanceCall, callback = () => { }) {
+export function getMethodInvocation(methodInstanceCall, callback = () => { }, options = {}) {
   const graph = GetCurrentGraph(GetState());
   const method = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
@@ -1625,8 +1625,8 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }) {
         .map(queryParameter => {
           return extractApiJsCode({
             node: queryParameter,
+            options,
             graph,
-            internalApiConnection,
             callback: list => {
               statePropertiesThatCauseInvocation.push(...list);
             }
@@ -1649,6 +1649,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }) {
           return extractApiJsCode({
             node: queryParameter,
             graph,
+            options,
             internalApiConnection,
             callback: list => {
               statePropertiesThatCauseInvocation.push(...list);
@@ -1769,7 +1770,7 @@ export function GetComponentDidMount(screenOption, options = {}) {
         const { statePropertiesThatCauseInvocation } = args;
         invocationDependsOnState = (statePropertiesThatCauseInvocation || [])
           .length;
-      });
+      }, { screenOption });
       if (invocationDependsOnState) {
         return false;
       }
@@ -2000,13 +2001,39 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
  * @param {object} args
  */
 function extractApiJsCode(args = { node, graph }) {
-  let { node, graph, callback = () => { } } = args;
+  let { node, graph } = args;
+  const { options, callback = () => { } } = args;
   const requiredChanges = [];
   const temp = queryParameter => {
     const param = getNodesByLinkType(graph, {
       id: queryParameter.id,
       type: LinkType.ComponentApiConnection,
       direction: TARGET
+    }).filter(item => {
+      const { screenOption, component } = options;
+      return GetNodesLinkedTo(null, {
+        id: item.id,
+        link: LinkType.ComponentApiConnector
+      }).find(instanceEvent => {
+        return [...GetNodesLinkedTo(null, {
+          id: instanceEvent.id,
+          link: LinkType.LifeCylceMethodInstance
+        }), ...GetNodesLinkedTo(null, {
+          id: instanceEvent.id,
+          link: LinkType.EventMethodInstance
+        })].find(lifeCycleMethod => {
+          return (screenOption && existsLinkBetween(graph, {
+            source: lifeCycleMethod.id,
+            target: screenOption.id
+          })) || (component && existsLinkBetween(graph, {
+            source: lifeCycleMethod.id,
+            target: component.id
+          }))
+        })
+      });
+    }).filter(x => {
+
+      return x;
     }).find(x_temp => x_temp);
 
     if (param) {
@@ -2037,6 +2064,8 @@ function extractApiJsCode(args = { node, graph }) {
         requiredChanges.push(GetJSCodeName(internalApiConnection));
         const input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
         return `${GetJSCodeName(queryParameter)}:  ${input_}`;
+      }
+      else {
       }
     }
   };

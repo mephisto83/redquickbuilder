@@ -19,7 +19,7 @@ import { uuidv4 } from "../utils/array";
 
 export default function (args = {}) {
   const { target, source, graph } = args;
-  let { viewPackages, dataChain } = args;
+  let { viewPackages, selectorNode, dataChain } = args;
   const state = GetState();
   viewPackages = viewPackages || {
     [NodeProperties.ViewPackage]: uuidv4(),
@@ -62,7 +62,7 @@ export default function (args = {}) {
       graph
     )
     : null);
-  const selectorNode = model
+  selectorNode = selectorNode || (model
     ? GraphMethods.GetConnectedNodeByType(
       state,
       model.id,
@@ -70,7 +70,7 @@ export default function (args = {}) {
       null,
       graph
     )
-    : null;
+    : null);
   const componentNode = GraphMethods.GetConnectedNodeByType(
     state,
     lifeCycleMethod.id,
@@ -79,7 +79,8 @@ export default function (args = {}) {
     graph
   );
   const context = {
-    apiEndPoints: []
+    apiEndPoints: [],
+    lifeCycleMethod
   };
   const apiEndpoints = [];
   GraphMethods.GetConnectedNodesByType(
@@ -158,6 +159,7 @@ export default function (args = {}) {
               properties: { ...LinkProperties.ComponentApiConnector }
             },
             links: [
+              args.connectToParameter ? args.connectToParameter(ae) : false,
               {
                 target: ae.id,
                 linkProperties: {
@@ -188,7 +190,7 @@ export default function (args = {}) {
                 : null,
               selectorNode
                 ? {
-                  target: selectorNode.id,
+                  target: typeof (selectorNode) === 'function' ? selectorNode() : selectorNode.id,
                   linkProperties: {
                     properties: {
                       ...LinkProperties.ComponentApiConnection

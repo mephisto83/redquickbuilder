@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import { GetNodesLinkedTo } from "../../methods/graph_methods";
 import {
   GetCurrentGraph,
@@ -142,11 +143,11 @@ export default function ScreenConnectGet(args = { method, node }) {
                 _navigateContext = navigateContext;
               }
             }),
-            function(graph) {
-              let valueComponentApiNode = GetComponentApiNode(
+            (currentGraph) => {
+              const valueComponentApiNode = GetComponentApiNode(
                 ComponentApiKeys.Value,
                 subcomponent.id,
-                graph
+                currentGraph
               );
               return {
                 operation: ADD_LINK_BETWEEN_NODES,
@@ -231,7 +232,7 @@ export default function ScreenConnectGet(args = { method, node }) {
               cycleInstance = _cycleInstance;
             }
           }),
-          function(graph) {
+          (graph) => {
             if (cycleInstance) {
               return ConnectLifecycleMethod({
                 target: method,
@@ -256,17 +257,13 @@ export default function ScreenConnectGet(args = { method, node }) {
             }
             return [];
           },
-          function(graph) {
+          () => {
             if (apiEndpoints) {
               return Object.keys(apiEndpoints).map(key => {
-                let apiEndpoint = apiEndpoints[key];
-                let internalComponentApi = internalComponentApis.find(v => {
-                  return GetCodeName(v) === key;
-                });
+                const apiEndpoint = apiEndpoints[key];
+                let internalComponentApi = internalComponentApis.find(v => GetCodeName(v) === key);
                 if (!internalComponentApi) {
-                  internalComponentApi = internalComponentApis.find(v => {
-                    return GetCodeName(v) === "value";
-                  });
+                  internalComponentApi = internalComponentApis.find(v => GetCodeName(v) === "value");
                 }
                 if (apiEndpoint && internalComponentApi) {
                   return {
@@ -278,6 +275,7 @@ export default function ScreenConnectGet(args = { method, node }) {
                     }
                   };
                 }
+                return false;
               });
             }
           }

@@ -1782,7 +1782,7 @@ export const CreateDefaultView = {
                 }
               : null,
             //Adding load data chain
-            ...(needsLoadToScreenState
+            ...((needsLoadToScreenState && false)
               ? LoadModel({
                   model_view_name: `${viewName} Load ${GetNodeTitle(
                     currentNode

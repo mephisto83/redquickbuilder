@@ -9,13 +9,20 @@ import {
   GetNodeTitle,
   ComponentApiKeys,
   UPDATE_NODE_PROPERTY,
+  GetNodeByProperties,
   UPDATE_LINK_PROPERTY,
-  GetNodeById
+  GetNodeById,
+  GetCodeName,
+  ADD_LINK_BETWEEN_NODES,
+  ComponentEventTo
 } from "../../actions/uiactions";
 import {
   LinkType,
   NodeProperties,
-  LinkPropertyKeys
+  LinkPropertyKeys,
+  LinkProperties,
+  UITypes,
+  NodeTypes
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
@@ -28,6 +35,7 @@ import ModifyUpdateLinks from "../ModifyUpdateLinks";
 import AppendValidations from "./AppendValidations";
 import AppendPostMethod from "./AppendPostMethod";
 import GetModelObjectFromSelector from "../GetModelObjectFromSelector";
+import LoadModel from "../LoadModel";
 
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method } = args;
@@ -58,6 +66,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
     link: LinkType.ComponentExternalApi
   }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
 
+
   result.push(
     valueNavigateTargetApi
       ? {
@@ -78,6 +87,12 @@ export default function ScreenConnectUpdate(args = { method, node }) {
       id: screenOptionInstance.id,
       link: LinkType.LifeCylceMethod
     });
+
+
+    const valueScreenOptionNavigateTargetApi = GetNodesLinkedTo(graph, {
+      id: screenOptionInstance.id,
+      link: LinkType.ComponentInternalApi
+    }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
 
     lifeCylcleMethods
       .filter(
@@ -112,6 +127,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             });
           }
         });
+        let dataChainForLoading = null;
         let cycleInstance = null;
         result.push(
           ...AddLifeCylcleMethodInstance({
@@ -124,6 +140,20 @@ export default function ScreenConnectUpdate(args = { method, node }) {
           (currentGraph) => {
             if (cycleInstance) {
               return ConnectLifecycleMethod({
+                connectToParameter: !valueScreenOptionNavigateTargetApi ? null : (ae) => {
+                  switch (GetNodeProp(ae, NodeProperties.UIText)) {
+                    case 'modelId':
+                      return {
+                        target: valueScreenOptionNavigateTargetApi.id,
+                        linkProperties: {
+                          properties: {
+                            ...LinkProperties.ComponentApi
+                          }
+                        }
+                      };
+                    default: return false;
+                  }
+                },
                 target: componentDidMountMethod,
                 source: cycleInstance.id,
                 graph: currentGraph,
@@ -131,6 +161,27 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               });
             }
             return [];
+          },
+          ...LoadModel({
+            viewPackages,
+            model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
+            model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
+            callback: context => {
+              dataChainForLoading = context.entry;
+            }
+          }),
+
+          {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options() {
+              return {
+                target: dataChainForLoading,
+                source: cycleInstance.id,
+                properties: {
+                  ...LinkProperties.DataChainLink
+                }
+              }
+            }
           }
         );
       });
@@ -160,55 +211,77 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             v => v === GetNodeProp(x, NodeProperties.EventType)
           )
         );
-        onEvents.forEach(x => {
-          const t = GetNodesLinkedTo(graph, {
-            id: x.id,
-            link: LinkType.EventMethodInstance
-          });
-          if (t && t.length) {
-            t.forEach(instance => {
-              const vp = GetNodeProp(instance, NodeProperties.ViewPackage);
-              const parentViewPackage = GetNodeProp(x, NodeProperties.ViewPackage);
-              if (vp && vp !== parentViewPackage) {
-                const inPackageNodes = GetNodesByProperties({
-                  [NodeProperties.ViewPackage]: GetNodeProp(
-                    instance,
-                    NodeProperties.ViewPackage
-                  )
-                });
+        const uiType = GetNodeProp(screenOptionInstance, NodeProperties.UIType);
+        let eventType = null;
+        switch (uiType) {
+          case UITypes.ReactNative:
+            eventType = 'onPress';
+            break;
+          default:
+            eventType = 'onClick';
+            break;
+        }
+        let newEventNode = null;
+        if (onEvents.length === 0) {
+          result.push(() => ComponentEventTo(executeButton.id, eventType, (eventNode) => {
+            newEventNode = eventNode;
+          }));
+          onEvents.push({ newEventNode: () => newEventNode })
+        }
+        onEvents.forEach(onEventHandler => {
+          if (!onEventHandler.newEventNode) {
+            const t = GetNodesLinkedTo(graph, {
+              id: onEventHandler.id,
+              link: LinkType.EventMethodInstance
+            });
+            if (t && t.length) {
+              t.forEach(instance => {
+                const vp = GetNodeProp(instance, NodeProperties.ViewPackage);
+                const parentViewPackage = GetNodeProp(onEventHandler, NodeProperties.ViewPackage);
+                if (vp && vp !== parentViewPackage) {
+                  const inPackageNodes = GetNodesByProperties({
+                    [NodeProperties.ViewPackage]: GetNodeProp(
+                      instance,
+                      NodeProperties.ViewPackage
+                    )
+                  });
 
-                inPackageNodes.forEach(inPackageNode => {
+                  inPackageNodes.forEach(inPackageNode => {
+                    result.push({
+                      operation: REMOVE_NODE,
+                      options() {
+                        return {
+                          id: inPackageNode.id
+                        };
+                      }
+                    });
+                  });
+                }
+                else {
                   result.push({
                     operation: REMOVE_NODE,
                     options() {
                       return {
-                        id: inPackageNode.id
+                        id: instance.id
                       };
                     }
                   });
-                });
-              }
-              else{
-                result.push({
-                  operation: REMOVE_NODE,
-                  options() {
-                    return {
-                      id: instance.id
-                    };
-                  }
-                });
-              }
-            });
+                }
+              });
+            }
           }
-
           let instanceNodeItem = null;
           let modelDataChain = null;
+          const modelSelectorNode = GetNodeByProperties({
+            [NodeProperties.NODEType]: NodeTypes.Selector,
+            [NodeProperties.Model]: GetNodeProp(node, NodeProperties.Model)
+          });
           result.push(
             ...[
               {
                 operation: ADD_NEW_NODE,
                 options: addInstanceFunc(
-                  x,
+                  onEventHandler.newEventNode ? onEventHandler.newEventNode : onEventHandler,
                   instanceNode => {
                     instanceNodeItem = instanceNode;
                   },
@@ -227,6 +300,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               if (instanceNodeItem) {
                 return ConnectLifecycleMethod({
                   target: method,
+                  selectorNode: () => modelSelectorNode.id,
                   dataChain: () => modelDataChain.id,
                   source: instanceNodeItem.id,
                   graph: currentGraph,
@@ -234,8 +308,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
                 });
               }
               return [];
-            },
-            () => { }
+            }
           );
 
           result.push(
@@ -244,7 +317,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               options(currentGraph) {
                 const link = getLinkInstance(currentGraph, {
                   target: instanceNodeItem.id,
-                  source: x.id
+                  source: onEventHandler.id
                 });
                 if (link)
                   return {

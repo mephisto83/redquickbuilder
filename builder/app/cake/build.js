@@ -1,22 +1,23 @@
+/* eslint-disable promise/always-return */
 'use strict'
 
-var fs = require('fs')
+const fs = require('fs')
 const cheerio = require('cheerio')
 // import path from 'path';
-var path = require('path')
-var child_process = require('child_process')
+const path = require('path')
+const child_process = require('child_process')
 
-var exec = child_process.exec
+const exec = child_process.exec
 
-var spawn = child_process.spawn
+const spawn = child_process.spawn
 
-function executeSpawnCmd (cmd, args, options) {
+function executeSpawnCmd(cmd, args, options) {
   console.log('execute spawn cmd')
   return new Promise(function (resolve, fail) {
     console.log(cmd)
     console.log(args)
     options = { shell: false, ...(options || {}) }
-    var child
+    let child
     if (process.platform === 'win32') {
       child = spawn(cmd, args, options)
     } else {
@@ -30,7 +31,7 @@ function executeSpawnCmd (cmd, args, options) {
     })
 
     child.stderr.on('data', function (data) {
-      console.log('stderr: ' + data)
+      console.log(`stderr: ${data}`)
     })
     child.on('error', function (err) {
       console.log(err)
@@ -39,11 +40,11 @@ function executeSpawnCmd (cmd, args, options) {
       fail()
     })
     child.on('exit', function (code) {
-      console.log('child process exited with code ' + code)
+      console.log(`child process exited with code ${code}`)
       child.stdin.pause()
       child.kill()
       if (code != 0) {
-        console.log('Failed: ' + code)
+        console.log(`Failed: ${code}`)
         fail(code)
         return
       }
@@ -52,9 +53,9 @@ function executeSpawnCmd (cmd, args, options) {
   })
 }
 
-var command = null
+let command = null
 for (let j = 0; j < process.argv.length; j++) {
-  console.log(j + ' -> ' + process.argv[j])
+  console.log(`${j} -> ${process.argv[j]}`)
   if (j === 2) {
     command = process.argv[j]
   }
@@ -66,11 +67,11 @@ const appSettingsCopySettings = `
 </Content>
 </ItemGroup>
 `
-function createElectronIo () {
-  var build = fs.readFileSync('./workspace.json', 'utf8')
+function createElectronIo() {
+  let build = fs.readFileSync('./workspace.json', 'utf8')
   build = JSON.parse(build)
-  let { appName } = build
-  let localDir = path.join(build.workspace)
+  const { appName } = build
+  const localDir = path.join(build.workspace)
   console.log(localDir)
   return Promise.resolve()
     .then(() => {
@@ -119,13 +120,13 @@ function createElectronIo () {
       })
     })
     .then(() => {
-      let packagejsonfilepath = path.join(localDir, appName, 'package.json')
-      let packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath))
-      let devScript = packageJson.scripts.dev
-      let port = Math.floor(Math.random() * 30000) + 1000
+      const packagejsonfilepath = path.join(localDir, appName, 'package.json')
+      const packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath))
+      const devScript = packageJson.scripts.dev
+      const port = Math.floor(Math.random() * 30000) + 1000
       packageJson.scripts.dev = devScript.replace(
         /START_HOT=1/g,
-        'START_HOT=1 PORT=' + port
+        `START_HOT=1 PORT=${port}`
       )
       fs.writeFileSync(packagejsonfilepath, JSON.stringify(packageJson), 'utf8')
     })
@@ -135,116 +136,92 @@ function createElectronIo () {
       throw e
     })
 }
-function createReactNative () {
-  var build = fs.readFileSync('./workspace.json', 'utf8')
+function createReactNative() {
+  let build = fs.readFileSync('./workspace.json', 'utf8')
   build = JSON.parse(build)
-  let { appName } = build
-  let localDir = path.join(build.workspace, `./${appName}`)
+  const { appName } = build
+  const localDir = path.join(build.workspace, `./${appName}`)
   return Promise.resolve()
-    .then(() => {
-      return executeSpawnCmd('react-native', ['init', appName], {
-        cwd: build.workspace,
-        shell: true
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
+    .then(() => executeSpawnCmd('react-native', ['init', appName], {
+      cwd: build.workspace,
+      shell: true
+    }))
+    .then(() => executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd('react-native', ['link'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd('npm', ['install', 'redux', '--save'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd('npm', ['install', 'redux-thunk', '--save'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
+      shell: true,
+      cwd: localDir
+    }))
+    .then(() => executeSpawnCmd(
+      'npm',
+      ['install', 'react-navigation-stack', '--save'],
+      {
         shell: true,
         cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('react-native', ['link'], {
+      }
+    ))
+    .then(() => executeSpawnCmd(
+      'npm',
+      ['install', 'react-navigation-drawer', '--save'],
+      {
         shell: true,
         cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('npm', ['install', 'redux', '--save'], {
+      }
+    ))
+    .then(() => executeSpawnCmd(
+      'npm',
+      ['install', 'react-native-reanimated', '--save'],
+      {
         shell: true,
         cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
+      }
+    ))
+    .then(() => executeSpawnCmd(
+      'npm',
+      ['install', 'react-native-gesture-handler', '--save'],
+      {
         shell: true,
         cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('npm', ['install', 'redux-thunk', '--save'], {
+      }
+    ))
+    .then(() => executeSpawnCmd(
+      'react-native',
+      ['link', 'react-native-gesture-handler'],
+      {
         shell: true,
         cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
-        shell: true,
-        cwd: localDir
-      })
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'npm',
-        ['install', 'react-navigation-stack', '--save'],
-        {
-          shell: true,
-          cwd: localDir
-        }
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'npm',
-        ['install', 'react-navigation-drawer', '--save'],
-        {
-          shell: true,
-          cwd: localDir
-        }
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'npm',
-        ['install', 'react-native-reanimated', '--save'],
-        {
-          shell: true,
-          cwd: localDir
-        }
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'npm',
-        ['install', 'react-native-gesture-handler', '--save'],
-        {
-          shell: true,
-          cwd: localDir
-        }
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'react-native',
-        ['link', 'react-native-gesture-handler'],
-        {
-          shell: true,
-          cwd: localDir
-        }
-      )
-    })
+      }
+    ))
     .catch(e => {
       console.log(e)
       console.log('SOMETHING WENT WRONG')
     })
 }
-function createWorkSpace () {
-  var build = fs.readFileSync('./workspace.json', 'utf8')
+function createWorkSpace() {
+  let build = fs.readFileSync('./workspace.json', 'utf8')
   build = JSON.parse(build)
-  var solutionPath = path.resolve('./' + build.solutionName + '.sln')
+  const solutionPath = path.resolve(`./${build.solutionName}.sln`)
   return Promise.resolve()
     .then(() => {
-      if (!fs.existsSync('' + build.solutionName + '')) {
+      if (!fs.existsSync(`${build.solutionName}`)) {
         return executeSpawnCmd(
           'dotnet',
           ['new', 'sln', '--force', '-n', build.solutionName],
@@ -252,56 +229,46 @@ function createWorkSpace () {
         )
       }
     })
+    .then(() => executeSpawnCmd(
+      'dotnet',
+      ['new', 'web', '--force', '-n', `${build.solutionName}.Web`],
+      {}
+    ))
+    .then(() => executeSpawnCmd(
+      'dotnet',
+      ['new', 'mstest', '--force', '-n', `${build.solutionName}.Tests`],
+      {}
+    ))
+    .then(() => executeSpawnCmd(
+      'dotnet',
+      ['new', 'classlib', '--force', '-n', `${build.solutionName}.Models`],
+      {}
+    ))
+    .then(() => executeSpawnCmd(
+      'dotnet',
+      [
+        'new',
+        'classlib',
+        '--force',
+        '-n',
+        `${build.solutionName}.Interfaces`
+      ],
+      {}
+    ))
+    .then(() => executeSpawnCmd(
+      'dotnet',
+      [
+        'new',
+        'classlib',
+        '--force',
+        '-n',
+        `${build.solutionName}.Controllers`
+      ],
+      {}
+    ))
     .then(() => {
-      return executeSpawnCmd(
-        'dotnet',
-        ['new', 'mstest', '--force', '-n', build.solutionName + '.Tests'],
-        {}
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'dotnet',
-        ['new', 'web', '--force', '-n', build.solutionName + '.Web'],
-        {}
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'dotnet',
-        ['new', 'classlib', '--force', '-n', build.solutionName + '.Models'],
-        {}
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'dotnet',
-        [
-          'new',
-          'classlib',
-          '--force',
-          '-n',
-          build.solutionName + '.Interfaces'
-        ],
-        {}
-      )
-    })
-    .then(() => {
-      return executeSpawnCmd(
-        'dotnet',
-        [
-          'new',
-          'classlib',
-          '--force',
-          '-n',
-          build.solutionName + '.Controllers'
-        ],
-        {}
-      )
-    })
-    .then(() => {
-      var projectPath =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
+      const projectPath =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -310,8 +277,8 @@ function createWorkSpace () {
       )
     })
     .then(() => {
-      var projectPath =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
+      const projectPath =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -320,8 +287,8 @@ function createWorkSpace () {
       )
     })
     .then(() => {
-      var projectPath =
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj'
+      const projectPath =
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -330,11 +297,11 @@ function createWorkSpace () {
       )
     })
     .then(() => {
-      var projectPath =
-        build.solutionName +
-        '.Interfaces/' +
-        build.solutionName +
-        '.Interfaces.csproj'
+      const projectPath =
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -343,11 +310,11 @@ function createWorkSpace () {
       )
     })
     .then(() => {
-      var projectPath =
-        build.solutionName +
-        '.Controllers/' +
-        build.solutionName +
-        '.Controllers.csproj'
+      const projectPath =
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -357,16 +324,16 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName +
-        '.Controllers/' +
-        build.solutionName +
-        '.Controllers.csproj'
-      var relPath =
-        build.solutionName +
-        '.Interfaces/' +
-        build.solutionName +
-        '.Interfaces.csproj'
+      const projectPath =
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`
+      const relPath =
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -376,13 +343,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName +
-        '.Controllers/' +
-        build.solutionName +
-        '.Controllers.csproj'
-      var relPath =
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj'
+      const projectPath =
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`
+      const relPath =
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -392,13 +359,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
-      var relPath =
-        build.solutionName +
-        '.Interfaces/' +
-        build.solutionName +
-        '.Interfaces.csproj'
+      const projectPath =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
+      const relPath =
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -408,10 +375,10 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
-      var relPath =
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj'
+      const projectPath =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
+      const relPath =
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -421,13 +388,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
-      var relPath =
-        build.solutionName +
-        '.Controllers/' +
-        build.solutionName +
-        '.Controllers.csproj'
+      const projectPath =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
+      const relPath =
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -437,13 +404,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName +
-        '.Interfaces/' +
-        build.solutionName +
-        '.Interfaces.csproj'
-      var relPath =
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj'
+      const projectPath =
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
+      const relPath =
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -453,10 +420,10 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
-      var relPath =
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj'
+      const projectPath =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
+      const relPath =
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -466,13 +433,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
-      var relPath =
-        build.solutionName +
-        '.Interfaces/' +
-        build.solutionName +
-        '.Interfaces.csproj'
+      const projectPath =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
+      const relPath =
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -482,13 +449,13 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
-      var relPath =
-        build.solutionName +
-        '.Controllers/' +
-        build.solutionName +
-        '.Controllers.csproj'
+      const projectPath =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
+      const relPath =
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -498,10 +465,10 @@ function createWorkSpace () {
     })
     .then(() => {
       // dotnet add app/app.csproj reference lib/lib.csproj
-      var projectPath =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
-      var relPath =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
+      const projectPath =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
+      const relPath =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
       // dotnet sln todo.sln add todo-app/todo-app.csproj
       return executeSpawnCmd(
         'dotnet',
@@ -512,25 +479,25 @@ function createWorkSpace () {
     .then(() => {
       // D:\dev\redquick\RedQuick\RedQuickCore
       // Add nuget packages.
-      let source = `D:/dev/redquick/RedQuick/RedQuickCore/bin/Debug`
-      let testProject =
-        build.solutionName + '.Tests/' + build.solutionName + '.Tests.csproj'
-      let webProject =
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj'
-      let projects = [
-        build.solutionName +
-          '.Controllers/' +
-          build.solutionName +
-          '.Controllers.csproj',
-        build.solutionName + '.Web/' + build.solutionName + '.Web.csproj',
-        build.solutionName + '.Models/' + build.solutionName + '.Models.csproj',
-        build.solutionName +
-          '.Interfaces/' +
-          build.solutionName +
-          '.Interfaces.csproj'
+      const source = `D:/dev/redquick/RedQuick/RedQuickCore/bin/Debug`
+      const testProject =
+        `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`
+      const webProject =
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`
+      const projects = [
+        `${build.solutionName
+        }.Controllers/${
+        build.solutionName
+        }.Controllers.csproj`,
+        `${build.solutionName}.Web/${build.solutionName}.Web.csproj`,
+        `${build.solutionName}.Models/${build.solutionName}.Models.csproj`,
+        `${build.solutionName
+        }.Interfaces/${
+        build.solutionName
+        }.Interfaces.csproj`
       ]
-      var promise = Promise.resolve()
-      let dependencies = [
+      let promise = Promise.resolve()
+      const dependencies = [
         'Microsoft.Extensions.Configuration.Json',
         'Microsoft.Extensions.Identity.Core',
         'Autofac',
@@ -539,77 +506,67 @@ function createWorkSpace () {
         'Moq'
       ]
       projects.map(project => {
-        promise = promise.then(() => {
-          return executeSpawnCmd(
-            'dotnet',
-            ['add', project, 'package', 'RedQuick'],//, '-s', source
-            {}
-          )
-        })
-        promise = promise.then(() => {
-          return executeSpawnCmd(
-            'dotnet',
-            ['add', project, 'package', 'Swashbuckle.AspNetCore'],
-            {}
-          )
-        })
-        promise = promise.then(() => {
-          return executeSpawnCmd(
-            'dotnet',
-            ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'],
-            {}
-          )
-        })
+        promise = promise.then(() => executeSpawnCmd(
+          'dotnet',
+          ['add', project, 'package', 'RedQuick'],//, '-s', source
+          {}
+        ))
+        promise = promise.then(() => executeSpawnCmd(
+          'dotnet',
+          ['add', project, 'package', 'Swashbuckle.AspNetCore'],
+          {}
+        ))
+        promise = promise.then(() => executeSpawnCmd(
+          'dotnet',
+          ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'],
+          {}
+        ))
       })
 
-      let webProjectDeps = []
+      const webProjectDeps = []
 
       webProjectDeps.map(dep => {
-        promise = promise.then(() => {
-          return executeSpawnCmd(
-            'dotnet',
-            ['add', webProject, 'package', dep, '-s', source],
-            {}
-          )
-        })
+        promise = promise.then(() => executeSpawnCmd(
+          'dotnet',
+          ['add', webProject, 'package', dep, '-s', source],
+          {}
+        ))
       })
 
       dependencies.map(depen => {
-        promise = promise.then(() => {
-          return executeSpawnCmd(
-            'dotnet',
-            ['add', testProject, 'package', depen],
-            {}
-          )
-        })
+        promise = promise.then(() => executeSpawnCmd(
+          'dotnet',
+          ['add', testProject, 'package', depen],
+          {}
+        ))
       })
 
       promise = promise.then(() => {
         console.log('updating the tests project output setting')
-        let tp = fs.readFileSync(testProject, 'utf8')
+        const tp = fs.readFileSync(testProject, 'utf8')
         const $ = cheerio.load(tp, {
           xmlMode: true
         })
-        var settingsEl = $('[Update="appsettings.json"]')
+        const settingsEl = $('[Update="appsettings.json"]')
 
         if (!settingsEl || settingsEl.length === 0) {
           $('[Sdk="Microsoft.NET.Sdk"]').append(appSettingsCopySettings)
-          var res = $.xml()
+          const res = $.xml()
           fs.writeFileSync(testProject, res, 'utf8')
         }
         console.log('completed the tests project output setting')
       })
       promise = promise.then(() => {
         console.log('updating the webProject output setting')
-        let tp = fs.readFileSync(webProject, 'utf8')
+        const tp = fs.readFileSync(webProject, 'utf8')
         const $ = cheerio.load(tp, {
           xmlMode: true
         })
-        var settingsEl = $('[Update="appsettings.json"]')
+        const settingsEl = $('[Update="appsettings.json"]')
 
         if (!settingsEl || settingsEl.length === 0) {
           $('[Sdk="Microsoft.NET.Sdk.Web"]').append(appSettingsCopySettings)
-          var res = $.xml()
+          const res = $.xml()
           fs.writeFileSync(webProject, res, 'utf8')
         }
         console.log('completed the tests project output setting')
@@ -632,4 +589,5 @@ switch (command) {
   case 'createElectronIo':
     createElectronIo()
     break
+  default: break;
 }

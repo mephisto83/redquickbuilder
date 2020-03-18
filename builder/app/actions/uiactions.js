@@ -71,7 +71,7 @@ export function GetScreenUrl(
     .join("/");
   let route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${
     params ? `/${params}` : ""
-  }`;
+    }`;
 
   return convertToURLRoute(route);
 }
@@ -207,7 +207,7 @@ export function GetSharedComponentFor(
     result =
       result &&
       !!GetNodeProp(x, NodeProperties.IsPluralComponent) ===
-        !!isPluralComponent;
+      !!isPluralComponent;
     return result;
   });
   viewTypeNodes = viewTypeNodes.find(x => {
@@ -400,7 +400,7 @@ export function addQueryMethodParameter() {
     let operations = [];
     operations.push({
       operation: ADD_NEW_NODE,
-      options: function() {
+      options: function () {
         return {
           nodeType: NodeTypes.MethodApiParameters,
           properties: {
@@ -436,7 +436,7 @@ export function addQueryMethodApi() {
       let operations = [];
       operations.push({
         operation: ADD_NEW_NODE,
-        options: function() {
+        options: function () {
           return {
             nodeType: NodeTypes.MethodApiParameters,
             properties: {
@@ -481,28 +481,32 @@ export function connectLifeCycleMethod(args) {
 export function addComponentEventTo(node, apiName) {
   return (dispatch, getState) => {
     graphOperation([
-      {
-        operation: ADD_NEW_NODE,
-        options: function(graph) {
-          return {
-            nodeType: NodeTypes.EventMethod,
-            properties: {
-              [NodeProperties.EventType]: apiName,
-              [NodeProperties.UIText]: `${apiName}`
-            },
-            links: [
-              {
-                target: node,
-                linkProperties: {
-                  properties: { ...LinkProperties.EventMethod }
-                }
-              }
-            ]
-          };
-        }
-      }
-    ])(dispatch, getState);
+      ComponentEventTo(node, apiName)
+    ]) (dispatch, getState);
   };
+}
+export function ComponentEventTo(node, apiName, callback) {
+  return {
+    operation: ADD_NEW_NODE,
+    options() {
+      return {
+        nodeType: NodeTypes.EventMethod,
+        callback,
+        properties: {
+          [NodeProperties.EventType]: apiName,
+          [NodeProperties.UIText]: `${apiName}`
+        },
+        links: [
+          {
+            target: node,
+            linkProperties: {
+              properties: { ...LinkProperties.EventMethod }
+            }
+          }
+        ]
+      };
+    }
+  }
 }
 export function GetTitleService(graph) {
   graph = GetCurrentGraph();
@@ -561,7 +565,7 @@ export function setupDefaultViewType(args) {
               let sibling = uuidv4();
               return {
                 operation: ADD_NEW_NODE,
-                options: function() {
+                options: function () {
                   return {
                     nodeType: NodeTypes.ViewType,
                     properties: {
@@ -607,13 +611,13 @@ export function setupDefaultViewType(args) {
           PerformGraphOperation([
             {
               operation: ADD_NEW_NODE,
-              options: function() {
+              options: function () {
                 return {
                   nodeType: NodeTypes.ViewType,
                   properties: {
                     [NodeProperties.UIText]: `[${
                       properties.viewType
-                    }] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
+                      }] ${GetNodeTitle(target)}:${GetNodeTitle(source)}`
                   },
                   links: [
                     {
@@ -770,7 +774,7 @@ export function attachMethodToMaestro(
       PerformGraphOperation([
         {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function(graph) {
+          options: function (graph) {
             return {
               source: options.maestro,
               target: methodNodeId,
@@ -786,7 +790,7 @@ export function attachMethodToMaestro(
     PerformGraphOperation([
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options: function (graph) {
           let state = getState();
           let _controller = NodesByType(state, NodeTypes.Controller).find(x => {
             return GraphMethods.existsLinkBetween(graph, {
@@ -822,7 +826,7 @@ export function attachMethodToMaestro(
       },
       {
         operation: CHANGE_NODE_PROPERTY,
-        options: function(graph) {
+        options: function (graph) {
           return {
             id: controller.id,
             value: "systemUser",
@@ -832,7 +836,7 @@ export function attachMethodToMaestro(
       },
       {
         operation: ADD_NEW_NODE,
-        options: function(graph) {
+        options: function (graph) {
           let state = getState();
 
           let _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
@@ -869,7 +873,7 @@ export function attachMethodToMaestro(
       },
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options: function (graph) {
           return {
             source: controller.id,
             target: maestro.id,
@@ -881,7 +885,7 @@ export function attachMethodToMaestro(
       },
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function(graph) {
+        options: function (graph) {
           return {
             source: maestro.id,
             target: methodNodeId,
@@ -1315,15 +1319,15 @@ export function GetDataChainCollections(options) {
   let graph = GetCurrentGraph();
   let temp = collection
     ? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
-        id: collection,
-        link: NodeConstants.LinkType.DataChainCollection,
-        direction: GraphMethods.TARGET
-      }).filter(
-        x =>
-          GetNodeProp(x, NodeProperties.NODEType) ===
-            NodeTypes.DataChainCollection &&
-          CollectionIsInLanguage(graph, x.id, language)
-      )
+      id: collection,
+      link: NodeConstants.LinkType.DataChainCollection,
+      direction: GraphMethods.TARGET
+    }).filter(
+      x =>
+        GetNodeProp(x, NodeProperties.NODEType) ===
+        NodeTypes.DataChainCollection &&
+        CollectionIsInLanguage(graph, x.id, language)
+    )
     : [];
 
   return NodesByType(null, NodeTypes.DataChainCollection)
@@ -1352,9 +1356,9 @@ export function GetDataChainCollections(options) {
       let _path = GetRelativeDataChainPath(dataChainCollection);
       return `export * as ${GetJSCodeName(dataChainCollection)} from './${
         collection ? "" : `datachains/`
-      }${[..._path, GetJSCodeName(dataChainCollection)]
-        .subset(_path.length - 1)
-        .join("/")}';`;
+        }${[..._path, GetJSCodeName(dataChainCollection)]
+          .subset(_path.length - 1)
+          .join("/")}';`;
     })
     .unique()
     .join(NodeConstants.NEW_LINE);
@@ -1456,12 +1460,12 @@ export function GenerateSimpleTest(node, val) {
   }
   let template = `it('${GetCodeName(node)} - should be able to handle a "${
     typeof val === "object" ? JSON.stringify(val) : val
-  }"', () => {
+    }"', () => {
     let error = undefined;
     try {
         DC.${GetCodeName(node, {
-          includeNameSpace: true
-        })}(${_value});
+      includeNameSpace: true
+    })}(${_value});
     }
     catch(e) {
         error = e;
@@ -1705,7 +1709,7 @@ export function GenerateCDDataChainMethod(id) {
       return `${lambda}`;
     default:
       throw `${GetNodeTitle(node)} ${
-        node.id
+      node.id
       } - ${functionType} is not a defined function type.`;
   }
 }
@@ -1747,8 +1751,8 @@ export function GenerateDataChainMethod(id) {
       }
       return `(id) => {
     let item = typeof(id) ==='object' ? id : GetItem(Models.${GetCodeName(
-      model
-    )}, id);
+        model
+      )}, id);
     ${lastpart}
 }`;
     case DataChainFunctionKeys.Model:
@@ -1872,14 +1876,14 @@ export function GenerateDataChainMethod(id) {
         let route = routes.${GetCodeName($screen)};
         ${insert}
         navigate.${
-          NavigateTypes[navigateMethod]
+        NavigateTypes[navigateMethod]
         }({ route })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:
       return `(a) => {
         navigate.${
-          NavigateTypes[navigateMethod]
+        NavigateTypes[navigateMethod]
         }({ route: routes[a] })(GetDispatch(), GetState());
         return a;
       }`;
@@ -1934,7 +1938,7 @@ export function GenerateDataChainMethod(id) {
       return `a => false`;
     default:
       throw `${GetNodeTitle(node)} ${
-        node.id
+      node.id
       } - ${functionType} is not a defined function type.`;
   }
 }
@@ -2621,7 +2625,7 @@ export function _attachToNavigateNode(currentId, action) {
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options: function (currentGraph) {
         return {
           nodeType: NodeTypes.NavigationAction,
           linkProperties: {
@@ -2875,7 +2879,7 @@ export function toggleHideByTypes(key) {
 }
 
 export function GUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0;
 
     var v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -2953,7 +2957,7 @@ export function $addComponentApiNodes(
   return [
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options: function (currentGraph) {
         return {
           nodeType: NodeTypes.ComponentApi,
           callback: nn => {
@@ -2977,7 +2981,7 @@ export function $addComponentApiNodes(
     },
     {
       operation: ADD_NEW_NODE,
-      options: function(currentGraph) {
+      options: function (currentGraph) {
         return {
           nodeType: NodeTypes.ComponentExternalApi,
           callback: nn => {
@@ -2998,7 +3002,7 @@ export function $addComponentApiNodes(
     },
     {
       operation: ADD_LINK_BETWEEN_NODES,
-      options: function() {
+      options: function () {
         return {
           source: componentInternalValue,
           target: componentExternalValue,
@@ -3010,17 +3014,17 @@ export function $addComponentApiNodes(
     },
     externalApiId
       ? {
-          operation: ADD_LINK_BETWEEN_NODES,
-          options: function() {
-            return {
-              target: externalApiId,
-              source: componentExternalValue,
-              properties: {
-                ...LinkProperties.ComponentExternalConnection
-              }
-            };
-          }
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: function () {
+          return {
+            target: externalApiId,
+            source: componentExternalValue,
+            properties: {
+              ...LinkProperties.ComponentExternalConnection
+            }
+          };
         }
+      }
       : null
   ].filter(x => x);
 }
@@ -3089,7 +3093,7 @@ export function NodesByType(state, nodeType, options = {}) {
             currentGraph.nodeLib[x] &&
             currentGraph.nodeLib[x].properties &&
             currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
-              nodeType)
+            nodeType)
       )
       .map(x => currentGraph.nodeLib[x]);
   }
@@ -3595,7 +3599,10 @@ export function GetNodesLinkTypes(id) {
 }
 export function addInstanceFunc(node, callback, viewPackages) {
   viewPackages = viewPackages || {};
-  return function() {
+  return function () {
+    if (typeof node === 'function') {
+      node = node();
+    }
     return {
       nodeType: NodeTypes.EventMethodInstance,
       parent: node.id,
@@ -3634,7 +3641,7 @@ export function selectAllConnected(id) {
       ...[...nodes, GetNodeById(id)].map(t => {
         return {
           operation: CHANGE_NODE_PROPERTY,
-          options: function() {
+          options: function () {
             return {
               prop: NodeProperties.Selected,
               value: true,
@@ -3659,7 +3666,7 @@ export function selectAllInViewPackage(id) {
       ...[...nodes].map(t => {
         return {
           operation: CHANGE_NODE_PROPERTY,
-          options: function() {
+          options: function () {
             return {
               prop: NodeProperties.Selected,
               value: true,
@@ -3681,7 +3688,7 @@ export function pinSelected() {
       nodes.map(t => {
         return {
           operation: CHANGE_NODE_PROPERTY,
-          options: function() {
+          options: function () {
             return {
               prop: NodeProperties.Pinned,
               value: true,
@@ -3723,7 +3730,7 @@ export function unPinSelected() {
       nodes.map(t => {
         return {
           operation: CHANGE_NODE_PROPERTY,
-          options: function() {
+          options: function () {
             return {
               prop: NodeProperties.Pinned,
               value: false,
@@ -4184,13 +4191,13 @@ export function graphOperation(operation, options) {
                     options,
                     callbackGroup: `group-${
                       currentLastGroup !==
-                      currentGraph.groups[currentGraph.groups.length - 1]
+                        currentGraph.groups[currentGraph.groups.length - 1]
                         ? currentGraph.groups[currentGraph.groups.length - 1]
                         : null
-                    }`,
+                      }`,
                     callback:
                       currentLastNode !==
-                      currentGraph.nodes[currentGraph.nodes.length - 1]
+                        currentGraph.nodes[currentGraph.nodes.length - 1]
                         ? currentGraph.nodes[currentGraph.nodes.length - 1]
                         : null
                   });
@@ -4234,7 +4241,7 @@ export const Colors = {
       enumerable: false,
       writable: true,
       configurable: true,
-      value: function() {
+      value: function () {
         var collection = this;
         return collection.map(node => {
           return {

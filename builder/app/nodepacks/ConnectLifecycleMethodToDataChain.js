@@ -1,6 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { LinkProperties } from "../actions/uiactions";
-export default function(args = {}) {
+export default function (args = {}) {
   // node0,node2
 
   if (!args.lifeCycleMethod) {
@@ -16,7 +16,7 @@ export default function(args = {}) {
   };
   let { viewPackages = {} } = args;
   let result = [
-    function(graph) {
+    function (graph) {
       if (typeof args.lifeCycleMethod === "function") {
         context.node0 = args.lifeCycleMethod(graph);
       }
@@ -34,6 +34,7 @@ export default function(args = {}) {
               properties: { ...LinkProperties.LifeCylceMethodInstance }
             },
             properties: {
+              ...viewPackages,
               text: "componentDidMount Instance",
               AutoDelete: {
                 properties: {
@@ -41,7 +42,7 @@ export default function(args = {}) {
                 }
               }
             },
-            callback: function(node, graph, group) {
+            callback: function (node, graph, group) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -50,7 +51,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "NEW_LINK",
@@ -71,7 +72,7 @@ export default function(args = {}) {
   let clearPinned = [
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options: function () {
         return {
           prop: "Pinned",
           id: context.node1,
@@ -81,7 +82,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options: function () {
         return {
           prop: "Pinned",
           id: context.node2,
@@ -93,7 +94,7 @@ export default function(args = {}) {
   return [
     ...result,
     ...clearPinned,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context);

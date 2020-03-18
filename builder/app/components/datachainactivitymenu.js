@@ -52,23 +52,23 @@ import genericpropertycontainer from "./genericpropertycontainer";
 
 class DataChainActvityMenu extends Component {
   getLambdaVariableTree() {
-    var { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const { state } = this.props;
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let lambdaVariables = null;
     if (UIA.GetNodeProp(currentNode, UIA.NodeProperties.CS)) {
-      let methods = GetNodesLinkedTo(null, {
+      const methods = GetNodesLinkedTo(null, {
         id: currentNode.id,
         link: LinkType.DataChainLink,
         componentType: NodeTypes.Method
       });
       if (methods.length) {
-        let functionType = UIA.GetNodeProp(
+        const functionType = UIA.GetNodeProp(
           methods[0],
           UIA.NodeProperties.FunctionType
         );
-        let { lambda } = MethodFunctions[functionType];
+        const { lambda } = MethodFunctions[functionType];
         if (lambda && lambda.default) {
-          let methodProps = UIA.GetMethodProps(methods[0]);
+          const methodProps = UIA.GetMethodProps(methods[0]);
           lambdaVariables = (
             <ButtonList
               active={true}
@@ -91,56 +91,57 @@ class DataChainActvityMenu extends Component {
     }
     return lambdaVariables;
   }
+
   render() {
-    var { state } = this.props;
-    var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.DataChain);
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    let dataChainFuncType = UIA.GetNodeProp(
+    const { state } = this.props;
+    const active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.DataChain);
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const dataChainFuncType = UIA.GetNodeProp(
       currentNode,
       NodeProperties.DataChainFunctionType
     );
-    let showModel = DataChainFunctions[dataChainFuncType]
+    const showModel = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.model
       : false;
-    let lambda = DataChainFunctions[dataChainFuncType]
+    const lambda = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.lambda
       : false;
     let inserts = [];
 
     if (lambda) {
-      let lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
+      const lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
       inserts = getReferenceInserts(lambdaText || "")
         .map(v => v.substr(2, v.length - 3))
         .unique(_insert => {
-          let temp = _insert.split("@");
-          let insert = temp.length > 1 ? temp[1] : temp[0];
-          let args = insert.split("~").filter(x => x);
-          let property = args[0];
+          const temp = _insert.split("@");
+          const insert = temp.length > 1 ? temp[1] : temp[0];
+          const args = insert.split("~").filter(x => x);
+          const property = args[0];
           if (args.length > 1) {
             return args[1];
           }
           return property || _insert;
         })
         .map(_insert => {
-          let temp = _insert.split("@");
-          let insert = temp.length > 1 ? temp[1] : temp[0];
-          let args = insert.split("~");
-          let model = args[0];
-          let property = args[1];
+          const temp = _insert.split("@");
+          const insert = temp.length > 1 ? temp[1] : temp[0];
+          const args = insert.split("~");
+          const model = args[0];
+          const property = args[1];
           let types = args.subset(1);
           if (!types.length) {
             types = [NodeTypes.Model];
           }
-          let value =
+          const value =
             UIA.GetNodeProp(
               currentNode,
               NodeProperties.LambdaInsertArguments
             ) || {};
-          let nodes = property
+          const nodes = property
             ? GetNodesLinkedTo(null, {
-                id: value[model],
-                link: LinkType.PropertyLink
-              })
+              id: value[model],
+              link: LinkType.PropertyLink
+            })
             : UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
           return (
             <SelectInputProperty
@@ -154,81 +155,81 @@ class DataChainActvityMenu extends Component {
           );
         });
     }
-    let showDataChainRef = DataChainFunctions[dataChainFuncType]
+    const showDataChainRef = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.dataref
       : false;
-    let showNumber = DataChainFunctions[dataChainFuncType]
+    const showNumber = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.number
       : false;
-    let showProperty = DataChainFunctions[dataChainFuncType]
+    const showProperty = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.property
       : false;
-    let showNode1 = DataChainFunctions[dataChainFuncType]
+    const showNode1 = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.node_1
       : false;
-    let showValue = DataChainFunctions[dataChainFuncType]
+    const showValue = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.value
       : false;
-    let showScreens = DataChainFunctions[dataChainFuncType]
+    const showScreens = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.screen
       : false;
-    let showMethods = DataChainFunctions[dataChainFuncType]
+    const showMethods = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.method
       : false;
-    let shownavigateMethod = DataChainFunctions[dataChainFuncType]
+    const shownavigateMethod = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.navigateMethod
       : false;
-    let showSelector = DataChainFunctions[dataChainFuncType]
+    const showSelector = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.selector
       : false;
-    let showSelectorProperty = DataChainFunctions[dataChainFuncType]
+    const showSelectorProperty = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.selectorProperty
       : false;
-    let showNode2 = DataChainFunctions[dataChainFuncType]
+    const showNode2 = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.node_2
       : false;
-    let stateKey = DataChainFunctions[dataChainFuncType]
+    const stateKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.stateKey
       : false;
-    let modelKey = DataChainFunctions[dataChainFuncType]
+    const modelKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.modelKey
       : false;
-    let viewModelKey = DataChainFunctions[dataChainFuncType]
+    const viewModelKey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.viewModelKey
       : false;
-    let listkey = DataChainFunctions[dataChainFuncType]
+    const listkey = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.list
       : false;
-    let dataChainReferences = DataChainFunctions[dataChainFuncType]
+    const dataChainReferences = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.datareferences
       : false;
-    let useNavigationParms = DataChainFunctions[dataChainFuncType]
+    const useNavigationParms = DataChainFunctions[dataChainFuncType]
       ? DataChainFunctions[dataChainFuncType].ui.useParams
       : false;
-    let datachainreferenceValues =
+    const datachainreferenceValues =
       UIA.GetNodeProp(currentNode, NodeProperties.DataChainReferences) || {};
-    let data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
-    let selector_nodes = UIA.NodesByType(
+    const data_chain_entry = UIA.GetDataChainEntryNodes().toNodeSelect();
+    const selector_nodes = UIA.NodesByType(
       state,
       NodeTypes.Selector
     ).toNodeSelect();
-    let selector_node_properties = Object.keys(SelectorPropertyKeys).map(v => ({
+    const selector_node_properties = Object.keys(SelectorPropertyKeys).map(v => ({
       title: v,
       value: SelectorPropertyKeys[v]
     }));
 
-    let node_inputs = UIA.NodesByType(state, NodeTypes.DataChain)
+    const node_inputs = UIA.NodesByType(state, NodeTypes.DataChain)
       .filter(x => {
         return (
           UIA.GetNodeProp(x, NodeProperties.GroupParent) ===
-            UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) &&
+          UIA.GetNodeProp(currentNode, NodeProperties.GroupParent) &&
           x !== currentNode
         );
       })
       .toNodeSelect();
-    let lists = UIA.NodesByType(state, NodeTypes.Lists).toNodeSelect();
-    let all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
-    let lambdaVariables = this.getLambdaVariableTree();
+    const lists = UIA.NodesByType(state, NodeTypes.Lists).toNodeSelect();
+    const all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
+    const lambdaVariables = this.getLambdaVariableTree();
 
     return (
       <TabPane active={active}>
@@ -267,7 +268,7 @@ class DataChainActvityMenu extends Component {
           />
           <SelectInput
             onChange={value => {
-              let id = currentNode.id;
+              const id = currentNode.id;
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.DataChainFunctionType,
                 id,
@@ -284,7 +285,7 @@ class DataChainActvityMenu extends Component {
           {showNumber ? (
             <TextInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 if (!isNaN(value)) {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.NumberParameter,
@@ -304,7 +305,7 @@ class DataChainActvityMenu extends Component {
             <TextInput
               textarea={true}
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.Lambda,
                   id,
@@ -320,7 +321,7 @@ class DataChainActvityMenu extends Component {
           {showModel ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:
                     currentNode.properties[UIA.NodeProperties.UIModelType],
@@ -345,7 +346,7 @@ class DataChainActvityMenu extends Component {
           {showProperty ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
                     currentNode,
@@ -374,7 +375,7 @@ class DataChainActvityMenu extends Component {
           {stateKey ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
                     currentNode,
@@ -403,7 +404,7 @@ class DataChainActvityMenu extends Component {
           {modelKey ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
                     currentNode,
@@ -430,7 +431,7 @@ class DataChainActvityMenu extends Component {
           {viewModelKey ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
                     currentNode,
@@ -459,11 +460,11 @@ class DataChainActvityMenu extends Component {
           {showDataChainRef ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   source:
                     currentNode.properties[
-                      UIA.NodeProperties.DataChainReference
+                    UIA.NodeProperties.DataChainReference
                     ],
                   target: id
                 });
@@ -489,7 +490,7 @@ class DataChainActvityMenu extends Component {
           {dataChainReferences ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 // this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                 //   source:
                 //     currentNode.properties[
@@ -498,12 +499,12 @@ class DataChainActvityMenu extends Component {
                 //   target: id
                 // });
 
-                let currentValue =
+                const currentValue =
                   UIA.GetNodeProp(
                     currentNode,
                     NodeProperties.DataChainReferences
                   ) || {};
-                let freeKey = "abcdefghijklmnopqrstuvwxyz"
+                const freeKey = "abcdefghijklmnopqrstuvwxyz"
                   .split("")
                   .find(v => !currentValue[v]);
                 currentValue[freeKey] = value;
@@ -561,7 +562,7 @@ class DataChainActvityMenu extends Component {
                   source: item.value,
                   target: currentNode.id
                 });
-                let currentValue =
+                const currentValue =
                   UIA.GetNodeProp(
                     currentNode,
                     NodeProperties.DataChainReference
@@ -663,7 +664,7 @@ class DataChainActvityMenu extends Component {
           {showNode2 ? (
             <SelectInput
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   source:
                     currentNode.properties[UIA.NodeProperties.ChainNodeInput2],

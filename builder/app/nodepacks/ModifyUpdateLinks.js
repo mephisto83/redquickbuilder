@@ -20,6 +20,7 @@ import {
   NodeProperties
 } from "../constants/nodetypes";
 import { ViewTypes } from "../constants/viewtypes";
+
 export default function(args = { name: "Replace Name" }) {
   // node2
 
