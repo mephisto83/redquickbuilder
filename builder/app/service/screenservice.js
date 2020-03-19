@@ -144,7 +144,7 @@ export function GetItemRender(node, imports, language) {
     let value = item;
     return  <${GetCodeName(
     listItemNode
-  )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  )} ${properties} value={value}  key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetFormRender(node, imports, language) {
@@ -160,7 +160,7 @@ export function GetFormRender(node, imports, language) {
     let value = item;
     return  <${GetCodeName(
     listItemNode
-  )} ${properties} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  )} ${properties} value={value} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetItemRenderImport(node) {
@@ -1167,12 +1167,8 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
       } else if (externalConnection || query) {
         if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {
           innerValue = `GetScreenParam('query')`;
-        } else {
-          if (options.listItem) {
+        } else if (options.listItem) {
             const listItemAttribute = GetJSCodeName(externalConnection);
-            // innerValue = ["viewModel", "selected"].some(
-            //   vv => vv === listItemAttribute
-            // )
             innerValue = !GetNodeProp(
               externalConnection,
               NodeProperties.AsLocalContext
@@ -1194,7 +1190,6 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
                 GetJSCodeName(externalConnection)}`;
             }
           }
-        }
       }
       if (!noSelector && selector) {
         const addiontionalParams =

@@ -482,7 +482,7 @@ export function addComponentEventTo(node, apiName) {
   return (dispatch, getState) => {
     graphOperation([
       ComponentEventTo(node, apiName)
-    ]) (dispatch, getState);
+    ])(dispatch, getState);
   };
 }
 export function ComponentEventTo(node, apiName, callback) {
@@ -3522,6 +3522,7 @@ export const ComponentApiKeys = {
   DATA: "data",
   Value: "value",
   Item: "item",
+  ViewModel: 'viewModel',
   Index: "index",
   Separators: "separators",
   Error: "error"

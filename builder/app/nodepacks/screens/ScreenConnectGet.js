@@ -9,7 +9,6 @@ import {
   ADD_NEW_NODE,
   ADD_LINK_BETWEEN_NODES,
   GetNodeTitle,
-  GetModelPropertyChildren,
   ComponentApiKeys,
   GetCodeName,
   GetComponentApiNode,
@@ -29,10 +28,8 @@ import AddLifeCylcleMethodInstance from "../AddLifeCylcleMethodInstance";
 import CreateNavigateToScreenDC from "../CreateNavigateToScreenDC";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
-import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import AppendValidations from "./AppendValidations";
 import {
-  FunctionTemplateKeys,
   TEMPLATE_PARAMETERS
 } from "../../constants/functiontypes";
 
@@ -105,7 +102,7 @@ export default function ScreenConnectGet(args = { method, node }) {
               inPackageNodes.map(inPackageNode => {
                 result.push({
                   operation: REMOVE_NODE,
-                  options: function(graph) {
+                  options: function() {
                     return {
                       id: inPackageNode.id
                     };
@@ -213,7 +210,7 @@ export default function ScreenConnectGet(args = { method, node }) {
             inPackageNodes.map(inPackageNode => {
               result.push({
                 operation: REMOVE_NODE,
-                options: function(graph) {
+                options: function() {
                   return {
                     id: inPackageNode.id
                   };
