@@ -1694,14 +1694,14 @@ export function getUpdateFunctionOption(
 ) {
   let addiontionalParams = "";
   if (methodId && methodInstanceCallId) {
-    const link_selector = GetLinkBetween(
+    const linkSelector = GetLinkBetween(
       methodId,
       methodInstanceCallId,
       GetCurrentGraph()
     );
-    if (link_selector) {
+    if (linkSelector) {
       const instanceUpdate = GetLinkProperty(
-        link_selector,
+        linkSelector,
         LinkPropertyKeys.InstanceUpdate
       );
       if (instanceUpdate) {

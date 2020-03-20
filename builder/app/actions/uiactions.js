@@ -3761,8 +3761,14 @@ export function setViewPackageStamp(viewPackage) {
   GraphMethods.setViewPackageStamp(viewPackage);
 }
 
-export function graphOperation(operation, options) {
+export function graphOperation(operation, options, stamp) {
   return (dispatch, getState) => {
+    if (stamp) {
+      const viewPackage = {
+        [NodeProperties.ViewPackage]: uuidv4()
+      };
+      setViewPackageStamp(viewPackage, stamp);
+    }
     var state = getState();
     let rootGraph = null;
     var currentGraph = Application(state, CURRENT_GRAPH);
@@ -4219,6 +4225,9 @@ export function graphOperation(operation, options) {
       rootGraph = currentGraph;
     }
     rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
+    if (stamp)
+      setViewPackageStamp(null, stamp);
+
     SaveGraph(rootGraph, dispatch);
   };
 }

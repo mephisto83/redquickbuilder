@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
 import { GetNodesLinkedTo } from "../../methods/graph_methods";
 import {
@@ -42,12 +44,12 @@ export default function ScreenConnectGet(args = { method, node }) {
     throw "no method";
   }
 
-  let graph = GetCurrentGraph();
-  let screen_options = GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph();
+  const screen_options = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
   });
-  let result = [];
+  const result = [];
   let { viewPackages } = args;
   viewPackages = {
     [NodeProperties.ViewPackage]: uuidv4(),
@@ -55,27 +57,27 @@ export default function ScreenConnectGet(args = { method, node }) {
   };
 
   screen_options.map(screen_option => {
-    let components = GetNodesLinkedTo(graph, {
+    const components = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.Component
     });
 
-    let internalComponentApis = GetNodesLinkedTo(graph, {
+    const internalComponentApis = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.ComponentInternalApi
     });
 
     components.map(component => {
-      let subcomponents = GetNodesLinkedTo(graph, {
+      const subcomponents = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.Component
       });
-      let buttonComponents = subcomponents.filter(x =>
+      const buttonComponents = subcomponents.filter(x =>
         GetNodeProp(x, NodeProperties.ExecuteButton)
       );
       if (buttonComponents && buttonComponents.length === 1) {
-        let subcomponent = buttonComponents[0];
-        let events = GetNodesLinkedTo(graph, {
+        const subcomponent = buttonComponents[0];
+        const events = GetNodesLinkedTo(graph, {
           id: subcomponent.id,
           link: LinkType.EventMethod
         }).filter(x =>
@@ -84,25 +86,84 @@ export default function ScreenConnectGet(args = { method, node }) {
           )
         );
 
-        events.map(evnt => {
-          let eventMethodInstances = GetNodesLinkedTo(graph, {
+        const _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+          id: navigateTo,
+          link: LinkType.ComponentExternalApi
+        }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+
+        const valueGetApi = GetNodesLinkedTo(graph, {
+          id: node,
+          link: LinkType.ComponentExternalApi
+        }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+        result.push(
+          _valueNavigateTargetApi
+            ? {
+              operation: UPDATE_NODE_PROPERTY,
+              options() {
+                return {
+                  id: _valueNavigateTargetApi.id,
+                  properties: {
+                    [NodeProperties.IsUrlParameter]: true
+                  }
+                };
+              }
+            }
+            : null)
+        result.push(
+          _valueNavigateTargetApi
+            ? {
+              operation: UPDATE_NODE_PROPERTY,
+              options() {
+                return {
+                  id: navigateTo,
+                  properties: {
+                    [NodeProperties.UIText]: GetNodeProp(navigateTo, NodeProperties.UIText)
+                  }
+                };
+              }
+            }
+            : null)
+        result.push(valueGetApi ? {
+          operation: UPDATE_NODE_PROPERTY,
+          options() {
+            return {
+              id: valueGetApi.id,
+              properties: {
+                [NodeProperties.IsUrlParameter]: true
+              }
+            };
+          }
+        } : null)
+        result.push(valueGetApi ? {
+          operation: UPDATE_NODE_PROPERTY,
+          options() {
+            return {
+              id: node,
+              properties: {
+                [NodeProperties.UIText]: GetNodeProp(node, NodeProperties.UIText)
+              }
+            };
+          }
+        } : null)
+        events.forEach(evnt => {
+          const eventMethodInstances = GetNodesLinkedTo(graph, {
             id: evnt.id,
             link: LinkType.EventMethodInstance
           });
-          eventMethodInstances.map(eventMethodInstance => {
-            let vp = GetNodeProp(
+          eventMethodInstances.forEach(eventMethodInstance => {
+            const vp = GetNodeProp(
               eventMethodInstance,
               NodeProperties.ViewPackage
             );
             if (vp) {
-              let inPackageNodes = GetNodesByProperties({
+              const inPackageNodes = GetNodesByProperties({
                 [NodeProperties.ViewPackage]: vp
               });
 
               inPackageNodes.map(inPackageNode => {
                 result.push({
                   operation: REMOVE_NODE,
-                  options: function() {
+                  options: function () {
                     return {
                       id: inPackageNode.id
                     };
@@ -114,10 +175,6 @@ export default function ScreenConnectGet(args = { method, node }) {
 
           let _instanceNode = null;
           let _navigateContext = null;
-          let _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
-            id: navigateTo,
-            link: LinkType.ComponentExternalApi
-          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
 
           result.push(
             ...[
@@ -154,20 +211,7 @@ export default function ScreenConnectGet(args = { method, node }) {
                   LinkProperties.ComponentApi
                 )
               };
-            },
-              _valueNavigateTargetApi
-                ? {
-                    operation: UPDATE_NODE_PROPERTY,
-                    options: function() {
-                      return {
-                        id: _valueNavigateTargetApi.id,
-                        properties: {
-                          [NodeProperties.IsUrlParameter]: true
-                        }
-                      };
-                    }
-                  }
-                : null
+            }
           );
         });
       }
@@ -181,7 +225,7 @@ export default function ScreenConnectGet(args = { method, node }) {
       );
     });
 
-    let lifeCylcleMethods = GetNodesLinkedTo(graph, {
+    const lifeCylcleMethods = GetNodesLinkedTo(graph, {
       id: screen_option.id,
       link: LinkType.LifeCylceMethod
     });
@@ -193,24 +237,24 @@ export default function ScreenConnectGet(args = { method, node }) {
           ComponentLifeCycleEvents.ComponentDidMount
       )
       .map(lifeCylcleMethod => {
-        let lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+        const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
           id: lifeCylcleMethod.id,
           link: LinkType.LifeCylceMethodInstance
         });
         lifeCylcleMethodInstances.map(lifeCylcleMethodInstance => {
-          let vp = GetNodeProp(
+          const vp = GetNodeProp(
             lifeCylcleMethodInstance,
             NodeProperties.ViewPackage
           );
           if (vp) {
-            let inPackageNodes = GetNodesByProperties({
+            const inPackageNodes = GetNodesByProperties({
               [NodeProperties.ViewPackage]: vp
             });
 
             inPackageNodes.map(inPackageNode => {
               result.push({
                 operation: REMOVE_NODE,
-                options: function() {
+                options: function () {
                   return {
                     id: inPackageNode.id
                   };
@@ -219,7 +263,7 @@ export default function ScreenConnectGet(args = { method, node }) {
             });
           }
         });
-        let apiEndpoints = {};
+        const apiEndpoints = {};
         let cycleInstance = null;
         result.push(
           ...AddLifeCylcleMethodInstance({
@@ -239,7 +283,7 @@ export default function ScreenConnectGet(args = { method, node }) {
                 callback: (context, graph) => {
                   if (context.apiEndPoints) {
                     context.apiEndPoints.filter(d => {
-                      let temp = GetNodesLinkedTo(graph, {
+                      const temp = GetNodesLinkedTo(graph, {
                         id: d.id,
                         link: LinkType.ComponentApiConnection
                       }).find(v => TEMPLATE_PARAMETERS[GetCodeName(v)]);
@@ -280,5 +324,5 @@ export default function ScreenConnectGet(args = { method, node }) {
       });
   });
 
-  return result;
+  return result.filter(x => x);
 }

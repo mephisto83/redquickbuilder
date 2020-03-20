@@ -2956,7 +2956,7 @@ export const CreateDefaultView = {
                                   ...LinkProperties.ComponentExternalConnection,
                                   ...(needsLoadToScreenState
                                     ? {
-                                        [LinkPropertyKeys.InstanceUpdate]: true
+                                        [LinkPropertyKeys.InstanceUpdate]: false
                                       }
                                     : {})
                                 },

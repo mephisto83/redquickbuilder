@@ -25,21 +25,21 @@ export default function(args = { name: "Replace Name" }) {
   // node2
 
   // name
-  let result = [];
+  const result = [];
 
-  let graph = GetCurrentGraph();
-  let eventMethods = NodesByType(null, NodeTypes.EventMethod);
+  const graph = GetCurrentGraph();
+  const eventMethods = NodesByType(null, NodeTypes.EventMethod);
   NodesByType(null, NodeTypes.ViewType)
     .filter(x => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Update)
-    .map(node => {
+    .forEach(node => {
       getNodeLinks(graph, node.id)
         .filter(
           x =>
             GetLinkProperty(x, LinkPropertyKeys.TYPE) ===
             LinkType.ComponentExternalApi
         )
-        .map(link => {
-          result.push(function() {
+        .forEach(link => {
+          result.push(() => {
             return [
               {
                 operation: UPDATE_LINK_PROPERTY,

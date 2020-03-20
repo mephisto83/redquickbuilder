@@ -1,3 +1,5 @@
+/* eslint-disable func-names */
+/* eslint-disable default-case */
 /* eslint-disable no-shadow */
 // @flow
 import React, { Component } from "react";
@@ -96,6 +98,7 @@ import ClearExecutor from "../nodepacks/ClearExecutor";
 import { ViewTypes } from "../constants/viewtypes";
 import SetupViewTypeForCreate from "../nodepacks/viewtype/SetupViewTypeForCreate";
 import SetupViewTypeForGetAll from "../nodepacks/viewtype/SetupViewTypeForGetAll";
+import { uuidv4 } from "../utils/array";
 
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -1720,12 +1723,24 @@ class ContextMenu extends Component {
                   [NodeProperties.NODEType]: NodeTypes.ClaimService
                 });
                 if (!claimService) {
+                  let claimServiceExecutor = null;
+
+
                   this.props.graphOperation(
-                    CreateStandardClaimService({
+                    [...CreateStandardClaimService({
                       modelName: UIA.GetNodeTitle(currentNode),
                       model: currentNode.id,
-                      user: UIA.GetNodeProp(currentNode, NodeProperties.UIUser)
-                    })
+                      user: UIA.GetNodeProp(currentNode, NodeProperties.UIUser),
+                      callback: (claimServiceContext) => {
+                        claimServiceExecutor = claimServiceContext.executor;
+                      }
+                    }), function (currentGraph) {
+                      const steps = AddCopyPropertiesToExecutor({
+                        currentNode: claimServiceExecutor,
+                        executor: UIA.GetNodeProp(claimServiceExecutor, NodeProperties.Executor, currentGraph)
+                      });
+                      return steps;
+                    }], null, 'standard-claim-service'
                   );
                 }
               }}
