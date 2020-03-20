@@ -21,7 +21,7 @@ import {
 } from "../constants/nodetypes";
 import { ViewTypes } from "../constants/viewtypes";
 
-export default function(args = { name: "Replace Name" }) {
+export default function (args = { name: "Replace Name" }) {
   // node2
 
   // name
@@ -54,19 +54,19 @@ export default function(args = { name: "Replace Name" }) {
         });
     });
   eventMethods.map(eventMethod => {
-    let components = GetNodesLinkedTo(graph, {
+    const components = GetNodesLinkedTo(graph, {
       id: eventMethod.id,
       link: LinkType.EventMethod,
       componentType: NodeTypes.ComponentNode
     }).filter(x => ComponentIsViewType(x, ViewTypes.Update, graph));
 
     if (components.length) {
-      let eventMethodInstances = GetNodesLinkedTo(graph, {
+      const eventMethodInstances = GetNodesLinkedTo(graph, {
         id: eventMethod.id,
         link: LinkType.EventMethodInstance
       });
-      eventMethodInstances.map(eventMethodInstance => {
-        let link = GetLinkBetween(
+      eventMethodInstances.forEach(eventMethodInstance => {
+        const link = GetLinkBetween(
           eventMethod.id,
           eventMethodInstance.id,
           graph
@@ -74,7 +74,7 @@ export default function(args = { name: "Replace Name" }) {
 
         // modify link
         if (link) {
-          result.push(function() {
+          result.push(() => {
             return [
               {
                 operation: UPDATE_LINK_PROPERTY,

@@ -1,3 +1,4 @@
+/* eslint-disable promise/catch-or-return */
 import { GetItem } from "./uiActions";
 const context = {};
 export function setParameters(params) {
@@ -57,25 +58,26 @@ function sendItems() {
         if (packageToSend && Object.keys(packageToSend).length) {
           return fetchServiceFunc(packageToSend);
         }
+        return null;
       })
       .catch(e => {
         console.log(e);
       })
       .then(() => {
-        modelStorage.presend = modelStorage.presend.filter(x => {
-          return !GetItem(x.modelType, x.id);
-        });
+        modelStorage.presend = modelStorage.presend.filter(x => !GetItem(x.modelType, x.id));
+        return null;
       })
       .then(() => {
         modelStorage.state = DEFAULT;
         fetchModel();
+        return null;
       });
   } else {
-    throw "no fetch service function set";
+    throw new Error("no fetch service function set");
   }
 }
 function collectItemsToSend() {
-  let tosend = modelStorage.pending.slice(0, modelStorage.maxRequested);
+  const tosend = modelStorage.pending.slice(0, modelStorage.maxRequested);
   modelStorage.pending = modelStorage.pending.slice(modelStorage.maxRequested);
   modelStorage.presend = tosend;
   modelStorage.state = READY_TO_SEND;

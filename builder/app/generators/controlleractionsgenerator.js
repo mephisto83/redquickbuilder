@@ -31,7 +31,7 @@ import { addNewLine } from "../utils/array";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 export default class ControllerActionGenerator {
   static GenerateService(options) {
-    let { state, language } = options;
+    const { state, language } = options;
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
@@ -39,27 +39,27 @@ export default class ControllerActionGenerator {
         break;
     }
     let temp = NodesByType(state, NodeTypes.Method);
-    let serviceTemplate = fs.readFileSync(
+    const serviceTemplate = fs.readFileSync(
       "./app/templates/screens/service.tpl",
       "utf8"
     );
-    let methodTemplate = `
+    const methodTemplate = `
 {{methodName}}: async (params) => {
     let { template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`);
 }`;
-    let postMethodTemplate = `
+    const postMethodTemplate = `
 {{methodName}}: async (params) => {
     let { body, template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`, body, {{options}});
 }`;
-    let endpoints = {};
-    let fetchServices = NodesByType(state, NodeTypes.FetchService);
+    const endpoints = {};
+    const fetchServices = NodesByType(state, NodeTypes.FetchService);
     let fetchServiceMethodImplementation = false;
     if (fetchServices.length) {
-      let fetchService = fetchServices[0];
+      const fetchService = fetchServices[0];
       endpoints[GetJSCodeName(fetchService)] = `api/fetchservice/${GetNodeProp(
         fetchService,
         NodeProperties.HttpRoute
@@ -77,9 +77,9 @@ export default class ControllerActionGenerator {
       ...temp.map(method => {
         let template_params = "";
         let template_params_def = "";
-        let maestroNode = GetMaestroNode(method.id);
+        const maestroNode = GetMaestroNode(method.id);
         if (maestroNode) {
-          let controllerNode = GetControllerNode(maestroNode.id);
+          const controllerNode = GetControllerNode(maestroNode.id);
           if (controllerNode) {
             if (GetNodeProp(method, NodeProperties.NoApiPrefix)) {
               endpoints[GetJSCodeName(method)] = `${GetNodeProp(
@@ -94,8 +94,8 @@ export default class ControllerActionGenerator {
                 NodeProperties.HttpRoute
               )}`;
             }
-            let methodType = GetNodeProp(method, NodeProperties.HttpMethod);
-            let functionType = GetNodeProp(method, NodeProperties.FunctionType);
+            const methodType = GetNodeProp(method, NodeProperties.HttpMethod);
+            const functionType = GetNodeProp(method, NodeProperties.FunctionType);
             let asForm = "";
             let collectCookies = "";
             let asText = "";
@@ -109,7 +109,7 @@ export default class ControllerActionGenerator {
             if (GetNodeProp(method, NodeProperties.AsText)) {
               asText = ` asText: true`;
             }
-            let options = [asForm, collectCookies, asText]
+            const options = [asForm, collectCookies, asText]
               .filter(x => x)
               .join();
             if (
@@ -119,7 +119,7 @@ export default class ControllerActionGenerator {
               MethodFunctions[functionType].parameters.parameters &&
               MethodFunctions[functionType].parameters.parameters.template
             ) {
-              let { modelId, parentId } = MethodFunctions[
+              const { modelId, parentId } = MethodFunctions[
                 functionType
               ].parameters.parameters.template;
               if (modelId) {
@@ -163,22 +163,23 @@ export default class ControllerActionGenerator {
       name: "controllerService"
     };
   }
+
   static GenerateFetchService(options) {
-    let { state, language } = options;
+    const { state, language } = options;
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
         fileEnd = ".ts";
         break;
     }
-    let fetchServices = NodesByType(state, NodeTypes.FetchService);
+    const fetchServices = NodesByType(state, NodeTypes.FetchService);
     if (fetchServices.length) {
-      let fetchService = fetchServices[0];
-      let datachain = GetNodesLinkedTo(GetCurrentGraph(), {
+      const fetchService = fetchServices[0];
+      const datachain = GetNodesLinkedTo(GetCurrentGraph(), {
         id: fetchService.id,
         link: LinkType.DataChainLink
       })[0];
-      let service = `
+      const service = `
 import { setFetchServiceFunction } from '../actions/redutils';
 import { GetState, GetDispatch } from '../actions/uiActions';
 import { ${GetCodeName(datachain)} } from '../actions/data-chain';
@@ -216,15 +217,16 @@ setFetchServiceFunction(function(body) {
       };
     }
   }
+
   static Generate(options) {
-    let { state, language } = options;
+    const { state, language } = options;
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
         fileEnd = ".ts";
         break;
     }
-    let temp = NodesByType(state, NodeTypes.Method);
+    const temp = NodesByType(state, NodeTypes.Method);
 
     const ControllerMethodTemplate = `export function {{methodName}}({{arguments}}){
     {{method_call}}
@@ -237,9 +239,9 @@ import service from '../util/controllerService';
 import * as Util from './util';
 {{body}}
         `;
-    let controllerActions = temp
+    const controllerActions = temp
       .map(node => {
-        let method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(
+        const method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(
           node
         )}, { ...parameters }, {
     loading: Models.${GetCodeName(
@@ -265,7 +267,7 @@ import * as Util from './util';
       })
       .join(NEW_LINE);
 
-    let temps = [
+    const temps = [
       {
         template: bindTemplate(controllerActionTemplate, {
           body: addNewLine(controllerActions, 1)
@@ -278,7 +280,7 @@ import * as Util from './util';
       ControllerActionGenerator.GenerateFetchService(options)
     ].filter(x => x);
 
-    let result = {};
+    const result = {};
     temps.map(t => {
       result[t.name] = t;
     });

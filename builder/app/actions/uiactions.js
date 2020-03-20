@@ -1758,6 +1758,9 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Model:
       return `(id) => {
     let item = GetItem(Models.${GetCodeName(model)}, id);
+    if(!item && id) {
+      fetchModel(Models.${GetCodeName(model)}, id);
+    }
     ${lastpart}
 }`;
     case DataChainFunctionKeys.Pass:
