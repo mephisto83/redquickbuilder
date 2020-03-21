@@ -46,6 +46,9 @@ class CurrentNodeProperties extends Component {
     if (!currentNode) {
       return <div />;
     }
+    let selectedLink = UIA.Visual(state, UIA.SELECTED_LINK) || {};
+    let currentLink = UIA.GetLink(selectedLink.id);
+    let linkProperties = currentLink ? currentLink.properties : {};
     let nodeProperties = currentNode.properties || {};
     return (
       <MainSideBar active={true} relative={true}>
@@ -89,6 +92,32 @@ class CurrentNodeProperties extends Component {
                   );
                 })}
             </TreeViewMenu>
+
+            <TreeViewMenu
+              open={UIA.Visual(state, "CURRENT_LINK_PROPERTIES")}
+              active={true}
+              title={Titles.LinkProperties}
+              innerStyle={{ maxHeight: 600, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("CURRENT_LINK_PROPERTIES");
+              }}
+            >
+              {Object.keys(linkProperties)
+                .sort()
+                .map(key => {
+                  return (
+                    <TreeViewMenu
+                      title={`${key}: ${linkProperties[key]}`}
+                      key={`link-props-${key}`}
+                      hideArrow
+                      onClick={() => {
+                      }}
+                      icon="fa fa-square-o"
+                    />
+                  );
+                })}
+            </TreeViewMenu>
+
           </SideBarMenu>
         </SideBar>
       </MainSideBar>

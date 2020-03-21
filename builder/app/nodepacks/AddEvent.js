@@ -45,6 +45,7 @@ export default function(args = {}) {
             },
             callback: function(node) {
               context.node4 = node.id;
+              context.eventTypeNode = node.id;
             }
           }
         }
@@ -79,6 +80,7 @@ export default function(args = {}) {
             callback: function(node, graph, group) {
               context.node5 = node.id;
               context.group1 = group;
+              context.eventTypeInstanceNode = node.id;
             }
           }
         }

@@ -1,3 +1,5 @@
+/* eslint-disable react/sort-comp */
+/* eslint-disable class-methods-use-this */
 import * as d3Zoom from "d3-zoom";
 import * as d3 from "d3";
 import * as Cola from "webcola";
@@ -41,6 +43,7 @@ export default class MindMap extends Component {
     this.mouseUp = this.mouseUp.bind(this);
     this.mouseMove = this.mouseMove.bind(this);
   }
+
   componentDidMount() {
     // Draw for the first time to initialize.
     this.draw(true);
@@ -51,13 +54,16 @@ export default class MindMap extends Component {
     window.addEventListener("mouseup", this.mouseUp);
     window.addEventListener("mousedown", this.mouseDown);
   }
+
   mouseDown(evt) {
     this.mouseStartEvent = evt;
   }
+
   mouseUp(evt) {
     this.mouseStartEvent = null;
     this.mouseMoved = null;
   }
+
   mouseMove(evt) {
     if (this.mouseStartEvent) {
       this.mouseMoveEvt = evt;
@@ -67,6 +73,7 @@ export default class MindMap extends Component {
       };
     }
   }
+
   componentWillUnmount() {
     window.removeEventListener("resize", this.draw);
     window.removeEventListener("mousemove", this.mouseMove);
@@ -77,6 +84,7 @@ export default class MindMap extends Component {
       domObj.innerHTML = "";
     }
   }
+
   calculateNodeTextSize(text, pad) {
     var div = document.querySelector("#secret-div-space");
     if (!div) {
@@ -99,6 +107,7 @@ export default class MindMap extends Component {
     div.innerHTML = text;
     return div.getBoundingClientRect();
   }
+
   draw(options = { once: false }) {
     var me = this;
     var domObj = document.querySelector(`#${this.state.id}`);
@@ -145,7 +154,7 @@ export default class MindMap extends Component {
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5L2,0")
         .attr("stroke-width", "0px")
-        .attr("fill", function(d) {
+        .attr("fill", function (d) {
           if (
             d &&
             d.properties &&
@@ -159,7 +168,7 @@ export default class MindMap extends Component {
         });
 
       var vis = outer.append("g");
-      outer.on("wheel", function(d) {
+      outer.on("wheel", function (d) {
         me.mapScale += d3.event.wheelDelta / (me.props.zoomFactor || 5000);
         redraw();
       });
@@ -183,16 +192,16 @@ export default class MindMap extends Component {
           )}deg)`
         );
       }
-      outer.on("mousemove", function(x, v) {
+      outer.on("mousemove", function (x, v) {
         if (me.panning) {
           redraw();
         }
       });
 
-      outer.on("mousedown", function(d) {
+      outer.on("mousedown", function (d) {
         me.panning = true;
       });
-      outer.on("mouseup", function(d) {
+      outer.on("mouseup", function (d) {
         me.panning = false;
 
         if (me.mouseMoved && me.mapTranslate) {
@@ -209,7 +218,7 @@ export default class MindMap extends Component {
 
     var graph = this.state.graph;
 
-    graph.nodes.forEach(function(v) {
+    graph.nodes.forEach(function (v) {
       if (me.props && me.props.minimizeTypes) {
         let propType = GetNodeProp(v, NodeProperties.NODEType);
         if (!v.selected && me.props.minimizeTypes[propType]) {
@@ -222,7 +231,7 @@ export default class MindMap extends Component {
       v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
       v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
     });
-    graph.groups.forEach(function(g) {
+    graph.groups.forEach(function (g) {
       g.padding = pad;
     });
 
@@ -240,7 +249,7 @@ export default class MindMap extends Component {
       .attr("rx", 8)
       .attr("ry", 8)
       .attr("class", "group")
-      .style("fill", function(d, i) {
+      .style("fill", function (d, i) {
         return Object.values(NodeTypeColors)[i] || color(i);
       })
       .call(force.drag);
@@ -254,7 +263,7 @@ export default class MindMap extends Component {
       .enter()
       .append("line")
       .attr("class", "link")
-      .style("stroke", function(d) {
+      .style("stroke", function (d) {
         if (d.selected) {
           return "#ff0000";
         }
@@ -276,7 +285,7 @@ export default class MindMap extends Component {
         }
         return "#000";
       })
-      .style("stroke-dasharray", function(d) {
+      .style("stroke-dasharray", function (d) {
         if (
           d &&
           d.properties &&
@@ -287,7 +296,7 @@ export default class MindMap extends Component {
         }
         return "";
       })
-      .style("d", function(d) {
+      .style("d", function (d) {
         if (
           d &&
           d.properties &&
@@ -298,7 +307,7 @@ export default class MindMap extends Component {
         }
         return "";
       })
-      .style("stroke-width", function(d) {
+      .style("stroke-width", function (d) {
         if (
           d &&
           d.properties &&
@@ -355,17 +364,17 @@ export default class MindMap extends Component {
 
     features
       .append("rect")
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return d.selected ? 5 : 0;
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return d.height - 10;
       })
       .attr("x", 3)
       .attr("y", 5)
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function(d) {
+      .style("fill", function (d) {
         if (d.selected && me.props.selectedColor) {
           return me.props.selectedColor;
         }
@@ -373,19 +382,19 @@ export default class MindMap extends Component {
       });
     features
       .append("rect")
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return d.marked ? 15 : 0;
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return 15;
       })
-      .attr("x", function(d) {
+      .attr("x", function (d) {
         return d.width - 5;
       })
       .attr("y", 5)
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function(d) {
+      .style("fill", function (d) {
         if (d.marked && me.props.markedColor) {
           return me.props.markedColor;
         }
@@ -406,13 +415,11 @@ export default class MindMap extends Component {
         }
         return "./css/svg/003-cupcake.svg";
       })
-      .attr("type", n => {
-        return "image/svg+xml";
-      })
-      .attr("width", function(d) {
+      .attr("type", n => "image/svg+xml")
+      .attr("width", function (d) {
         return iconSize;
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return iconSize;
       })
       .attr("x", 40)
@@ -421,16 +428,12 @@ export default class MindMap extends Component {
       .style("height", 40);
     var titles = topdiv
       .append("xhtml:div")
-      .style("width", x => {
-        return `${x.width - pad / 2}px`;
-      })
+      .style("width", x => `${x.width - pad / 2}px`)
       .style("white-space", "normal")
       .style("text-align", "start")
       //.style('word-break', 'break-all')
-      .style("height", x => {
-        return `${x.height - pad / 2}px`;
-      })
-      .text(function(d) {
+      .style("height", x => `${x.height - pad / 2}px`)
+      .text(function (d) {
         return `${getLabelText(d)}`;
       })
       .call(force.drag);
@@ -486,7 +489,7 @@ export default class MindMap extends Component {
 
     function tick() {
       if (me.$_nodes) {
-        me.$_nodes.each(function(d) {
+        me.$_nodes.each(function (d) {
           var bb = me.calculateNodeTextSize(getLabelText(d), pad);
           if (
             !d.selected &&
@@ -506,7 +509,7 @@ export default class MindMap extends Component {
 
       if (me.$_nodes) {
         me.$_nodes
-          .attr("width", function(d) {
+          .attr("width", function (d) {
             if (
               !d.selected &&
               d.properties &&
@@ -517,7 +520,7 @@ export default class MindMap extends Component {
             }
             return d.width;
           })
-          .attr("height", function(d) {
+          .attr("height", function (d) {
             if (
               !d.selected &&
               d.properties &&
@@ -528,7 +531,7 @@ export default class MindMap extends Component {
             }
             return d.height;
           })
-          .attr("x", function(d) {
+          .attr("x", function (d) {
             if (
               !d.selected &&
               d.properties &&
@@ -539,7 +542,7 @@ export default class MindMap extends Component {
             }
             return d.x - d.width / 2;
           })
-          .attr("y", function(d) {
+          .attr("y", function (d) {
             if (
               !d.selected &&
               d.properties &&
@@ -553,7 +556,7 @@ export default class MindMap extends Component {
       }
       // if (me.avoidOverlapss)
       group
-        .attr("x", function(d) {
+        .attr("x", function (d) {
           if (!d.bounds) {
             let min = d.leaves.minimum(x => x.x - x.width / 2);
             let max = d.leaves.maximum(x => x.x + x.width / 2);
@@ -562,7 +565,7 @@ export default class MindMap extends Component {
           }
           return d.bounds.x;
         })
-        .attr("y", function(d) {
+        .attr("y", function (d) {
           if (!d.bounds) {
             let min = d.leaves.minimum(x => x.y - x.height / 2);
             let max = d.leaves.maximum(x => x.y + x.height / 2);
@@ -571,7 +574,7 @@ export default class MindMap extends Component {
           }
           return d.bounds.y;
         })
-        .attr("width", function(d) {
+        .attr("width", function (d) {
           if (!d.bounds) {
             let min = d.leaves.minimum(x => x.x - x.width / 2);
             let max = d.leaves.maximum(x => x.x + x.width / 2);
@@ -579,7 +582,7 @@ export default class MindMap extends Component {
           }
           return d.bounds.width();
         })
-        .attr("height", function(d) {
+        .attr("height", function (d) {
           if (!d.bounds) {
             let min = d.leaves.minimum(x => x.y - x.height / 2);
             let max = d.leaves.maximum(x => x.y + x.height / 2);
@@ -588,7 +591,7 @@ export default class MindMap extends Component {
           return d.bounds.height();
         });
 
-      link.each(function(d) {
+      link.each(function (d) {
         //  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
         if (!me.avoidOverlaps) {
           d.route = Cola.makeEdgeBetween(
@@ -606,30 +609,30 @@ export default class MindMap extends Component {
       });
 
       link
-        .attr("x1", function(d) {
+        .attr("x1", function (d) {
           return d.route.sourceIntersection.x;
         })
-        .attr("y1", function(d) {
+        .attr("y1", function (d) {
           return d.route.sourceIntersection.y;
         })
-        .attr("x2", function(d) {
+        .attr("x2", function (d) {
           return d.route.arrowStart.x;
         })
-        .attr("y2", function(d) {
+        .attr("y2", function (d) {
           return d.route.arrowStart.y;
         });
 
-      features.attr("transform", function(d) {
+      features.attr("transform", function (d) {
         var y = d.y - d.height / 2;
         var x = d.x - d.width / 2;
         return `translate(${x},${y})`;
       });
 
       label
-        .attr("x", function(d) {
+        .attr("x", function (d) {
           return d.x - d.width / 2;
         })
-        .attr("y", function(d) {
+        .attr("y", function (d) {
           var innerbit = this.querySelector("div");
           var h = innerbit ? innerbit.getBoundingClientRect().height : 0;
 
@@ -645,6 +648,7 @@ export default class MindMap extends Component {
 
     force.start(null, null, null, null, !options.once);
   }
+
   buildNode(graph, cola, color) {
     var me = this;
     var node = this.$node.data(cola.nodes(), x => x.id || x.name);
@@ -652,15 +656,15 @@ export default class MindMap extends Component {
       .enter()
       .append("rect")
       .attr("class", "node")
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return d.width;
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return d.height;
       })
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function(d) {
+      .style("fill", function (d) {
         if (
           d &&
           d.properties &&
@@ -681,6 +685,7 @@ export default class MindMap extends Component {
     node.exit().remove();
     this.$_nodes = temp;
   }
+
   applyNodeVisualData(nn) {
     nn.width = 40;
     nn.height = 40;
@@ -688,6 +693,7 @@ export default class MindMap extends Component {
     nn.fixed = false;
     return nn;
   }
+
   componentWillReceiveProps(props, state) {
     if (props.graph) {
       var { graph } = props;
@@ -702,17 +708,29 @@ export default class MindMap extends Component {
       ) {
         var removedNodes = this.state.graph.nodes
           .relativeCompliment(graph.nodes, (x, y) => x.id === y)
-          .map(t => {
-            return this.state.graph.nodes.indexOf(t);
-          });
+          .map(t => this.state.graph.nodes.indexOf(t));
         this.state.graph.nodes.removeIndices(removedNodes);
         var newNodes = graph.nodes.relativeCompliment(
           this.state.graph.nodes,
-          (x, y) => {
-            return x === y.id;
-          }
+          (x, y) => x === y.id
         );
-        this.state.graph.nodes.map(v => (v.fixed = true));
+        let unanchored = {};
+        if (props.selectedNodes) {
+          props.selectedNodes.forEach(t => {
+            unanchored = {
+              ...unanchored,
+              ...GraphMethods.GetLinkedNodes(null, { id: t })
+            };
+          });
+        }
+        this.state.graph.nodes.forEach(v => {
+          if (!unanchored[v.id]) {
+            v.fixed = true;
+          }
+          else {
+            v.fixed = false;
+          }
+        });
 
         newNodes.map(nn => {
           this.state.graph.nodes.push(
@@ -728,7 +746,9 @@ export default class MindMap extends Component {
         }
         if (props.selectedNodes) {
           this.state.graph.nodes.map(nn => {
-            nn.selected = !!props.selectedNodes.find(t => t == nn.id);
+            nn.selected = !!props.selectedNodes.find(t => {
+              return t == nn.id
+            });
           });
         }
         this.state.graph.nodes.map(nn => {
@@ -754,9 +774,7 @@ export default class MindMap extends Component {
       ) {
         let removedLinks = this.state.graph.links
           .relativeCompliment(graph.links, (x, y) => x.id === y)
-          .map(t => {
-            return this.state.graph.links.indexOf(t);
-          });
+          .map(t => this.state.graph.links.indexOf(t));
         this.state.graph.links.removeIndices(removedLinks);
         let newLinks = graph.links.relativeCompliment(
           this.state.graph.links,
@@ -800,9 +818,7 @@ export default class MindMap extends Component {
         } else {
           removedGroups = this.state.graph.groups
             .relativeCompliment(graph_groups, (x, y) => x.id === y)
-            .map(t => {
-              return this.state.graph.groups.indexOf(t);
-            });
+            .map(t => this.state.graph.groups.indexOf(t));
         }
         this.state.graph.groups.removeIndices(removedGroups);
         if (!this.props.groupsDisabled) {
@@ -843,9 +859,11 @@ export default class MindMap extends Component {
       }
     }
   }
+
   shouldComponentUpdate() {
     return false;
   }
+
   render() {
     return (
       <div id={this.state.id} className="mindmap" style={{ minHeight: 946 }} />
@@ -902,7 +920,7 @@ function duplicateGroup(nn, nodes, groups) {
 }
 const throttle = (func, limit) => {
   let inThrottle;
-  return function() {
+  return function () {
     const args = arguments;
     const context = this;
     if (!inThrottle) {
@@ -925,32 +943,32 @@ function angle(cx, cy, ex, ey) {
   return theta;
 }
 
-var Vector = (function() {
+var Vector = (function () {
   function Vector(pX, pY, pZ) {
     this.setX(pX);
     this.setY(pY);
     this.setZ(pZ);
   }
-  Vector.prototype.getX = function() {
+  Vector.prototype.getX = function () {
     return this.mX;
   };
-  Vector.prototype.setX = function(pX) {
+  Vector.prototype.setX = function (pX) {
     this.mX = pX;
   };
-  Vector.prototype.getY = function() {
+  Vector.prototype.getY = function () {
     return this.mY;
   };
-  Vector.prototype.setY = function(pY) {
+  Vector.prototype.setY = function (pY) {
     this.mY = pY;
   };
-  Vector.prototype.getZ = function() {
+  Vector.prototype.getZ = function () {
     return this.mZ;
   };
-  Vector.prototype.setZ = function(pZ) {
+  Vector.prototype.setZ = function (pZ) {
     this.mZ = pZ;
   };
 
-  Vector.prototype.add = function(v) {
+  Vector.prototype.add = function (v) {
     return new Vector(
       this.getX() + v.getX(),
       this.getY() + v.getY(),
@@ -958,7 +976,7 @@ var Vector = (function() {
     );
   };
 
-  Vector.prototype.subtract = function(v) {
+  Vector.prototype.subtract = function (v) {
     return new Vector(
       this.getX() - v.getX(),
       this.getY() - v.getY(),
@@ -966,7 +984,7 @@ var Vector = (function() {
     );
   };
 
-  Vector.prototype.multiply = function(scalar) {
+  Vector.prototype.multiply = function (scalar) {
     return new Vector(
       this.getX() * scalar,
       this.getY() * scalar,
@@ -974,7 +992,7 @@ var Vector = (function() {
     );
   };
 
-  Vector.prototype.divide = function(scalar) {
+  Vector.prototype.divide = function (scalar) {
     return new Vector(
       this.getX() / scalar,
       this.getY() / scalar,
@@ -982,16 +1000,16 @@ var Vector = (function() {
     );
   };
 
-  Vector.prototype.magnitude = function() {
+  Vector.prototype.magnitude = function () {
     return Math.sqrt(
       this.getX() * this.getX() +
-        this.getY() * this.getY() +
-        this.getZ() * this.getZ()
+      this.getY() * this.getY() +
+      this.getZ() * this.getZ()
     );
   };
 
   //this is the vector I have tried for the normalisation
-  Vector.prototype.normalisedVector = function() {
+  Vector.prototype.normalisedVector = function () {
     var vec = new Vector(this.getX(), this.getY(), this.getZ());
     return vec.divide(this.magnitude());
   };

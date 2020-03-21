@@ -1,122 +1,122 @@
 
-  import { uuidv4 } from "../utils/array";
-  import { NodeProperties } from "../constants/nodetypes";
-  export default function(args = {}) {
-    // 
+import { uuidv4 } from "../utils/array";
+import { NodeProperties } from "../constants/nodetypes";
+export default function (args = {}) {
+  //
 
-      // 
-      
-    let context = {
-      ...args
-    };
-    let {
-      viewPackages
-    } = args;
-    viewPackages = {
-      [NodeProperties.ViewPackage]: uuidv4(),
-      ...(viewPackages||{})
-    };
-    let result = [
-      function(graph) {
+  //
+
+  let context = {
+    ...args
+  };
+  let {
+    viewPackages
+  } = args;
+  viewPackages = {
+    [NodeProperties.ViewPackage]: uuidv4(),
+    ...(viewPackages || {})
+  };
+  let result = [
+    function (graph) {
       return [{
 
         "operation": "NEW_NODE",
         "options": {
-            "callback": function(node) { context.node0 = node.id; }
+          "callback": function (node) { context.node0 = node.id; }
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_TEXT",
         "options": {
-            "id": context.node0,
-            "value": "Fetch Service"
+          "id": context.node0,
+          "value": "Fetch Service"
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
         "options": {
-            "prop": "nodeType",
-            "id": context.node0,
-            "value": "screen"
+          "prop": "nodeType",
+          "id": context.node0,
+          "value": "screen"
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
         "options": {
-            "prop": "nodeType",
-            "id": context.node0,
-            "value": "selector"
+          "prop": "nodeType",
+          "id": context.node0,
+          "value": "selector"
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
         "options": {
-            "prop": "nodeType",
-            "id": context.node0,
-            "value": "service-interface"
+          "prop": "nodeType",
+          "id": context.node0,
+          "value": "service-interface"
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
         "options": {
-            "prop": "nodeType",
-            "id": context.node0,
-            "value": "FetchService"
+          "prop": "nodeType",
+          "id": context.node0,
+          "value": "FetchService"
         }
-    }]
+      }]
     },
 
-    function(graph) {
+    function (graph) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
         "options": {
-            "prop": "Pinned",
-            "id": context.node0,
-            "value": true
+          "prop": "Pinned",
+          "id": context.node0,
+          "value": true
         }
+      }]
     }]
+    ;
+  let clearPinned = [];
+  let applyViewPackages = [{
+    operation: 'UPDATE_NODE_PROPERTY',
+    options: function () {
+      return {
+        id: context.node0,
+        properties: viewPackages
+      }
+    }
   }]
-;
-    let clearPinned = [];
-    let applyViewPackages = [{
-          operation: 'UPDATE_NODE_PROPERTY',
-          options : function() {
-            return {
-              id: context.node0,
-              properties: viewPackages
-            }
-          }
-        }]
-    return [
-      ...result,
-      ...clearPinned,
-      ...applyViewPackages,
-      function() {
-        if (context.callback) {
-          context.entry = context.node0;
-          context.callback(context);
-        }
-        return [];
-      }];
-  }
+  return [
+    ...result,
+    ...clearPinned,
+    ...applyViewPackages,
+    (graphh) => {
+      if (context.callback) {
+        context.entry = context.node0;
+        context.callback(context, graphh);
+      }
+      return [];
+    }];
+}

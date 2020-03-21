@@ -1,12 +1,13 @@
-import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
-import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, REMOVE_LINK_BETWEEN_NODES, GetNodeByProperties } from "../../actions/uiactions";
-import { LinkType, NodeProperties, NodeTypes, LinkProperties } from "../../constants/nodetypes";
+import { GetNodesLinkedTo, GetNodeLinkedTo, GetLinkBetween } from "../../methods/graph_methods";
+import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, REMOVE_LINK_BETWEEN_NODES, GetNodeByProperties, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
+import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys } from "../../constants/nodetypes";
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from "../../utils/array";
 import CreateModelPropertyGetterDC from "../CreateModelPropertyGetterDC";
 
 export default function SetupViewTypeForGetAll(args = {}) {
   const { node } = args;
+  const graph = GetCurrentGraph();
   const result = [];
   if (!node) {
     throw new Error('missing node');
@@ -55,11 +56,12 @@ export default function SetupViewTypeForGetAll(args = {}) {
     id: property.id,
     link: LinkType.PropertyLink
   });
-  const valueExternalNode = GetNodesLinkedTo(null, {
+  const externalNodes = GetNodesLinkedTo(null, {
     id: node,
     link: LinkType.ComponentExternalApi,
     componentType: NodeTypes.ComponentExternalApi
-  }).find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.Value);
+  });
+  const valueExternalNode = externalNodes.find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.Value);
 
 
   let modelKeyDC = null;
@@ -68,7 +70,31 @@ export default function SetupViewTypeForGetAll(args = {}) {
     link: LinkType.ComponentExternalApi,
     componentType: NodeTypes.ComponentExternalApi
   }).find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.ViewModel);
-
+  result.push(...externalNodes.map(externalNode => {
+    const link = GetLinkBetween(node, externalNode.id, graph);
+    if (link) {
+      return {
+        operation: UPDATE_LINK_PROPERTY,
+        options: {
+          prop: LinkPropertyKeys.InstanceUpdate,
+          value: false,
+          id: link.id
+        }
+      }
+    }
+    return null;
+  }))
+  result.push(...GetNodesLinkedTo(null, {
+    id: viewModelExternalNode.id,
+    link: LinkType.DataChainLink,
+    componentType: NodeTypes.DataChain
+  }).map(dc => ({
+    operation: REMOVE_LINK_BETWEEN_NODES,
+    options: {
+      target: dc.id,
+      source: viewModelExternalNode.id,
+    }
+  })));
 
   result.push(...CreateModelKeyDC({
     model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
@@ -90,6 +116,18 @@ export default function SetupViewTypeForGetAll(args = {}) {
       return false;
     }
   });
+  result.push(...GetNodesLinkedTo(null, {
+    id: valueExternalNode.id,
+    link: LinkType.DataChainLink,
+    componentType: NodeTypes.DataChain
+  }).map(dc => ({
+    operation: REMOVE_LINK_BETWEEN_NODES,
+    options: {
+      target: dc.id,
+      source: valueExternalNode.id,
+    }
+  })));
+
 
   let temp;
   result.push(
@@ -132,7 +170,7 @@ export default function SetupViewTypeForGetAll(args = {}) {
     })
   }
 
-  return result;
+  return result.filter(x => x);
 }
 SetupViewTypeForGetAll.title = 'Setup View Type For GetAll';
 SetupViewTypeForGetAll.description = `Setup view-type nodes for create. Sets the dataChain for viewmodel.`

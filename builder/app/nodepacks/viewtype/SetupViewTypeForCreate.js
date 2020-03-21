@@ -1,13 +1,14 @@
-import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
-import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, GetNodeByProperties } from "../../actions/uiactions";
-import { LinkType, NodeProperties, NodeTypes, LinkProperties } from "../../constants/nodetypes";
+import { GetNodesLinkedTo, GetNodeLinkedTo, GetLinkBetween } from "../../methods/graph_methods";
+import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, GetNodeByProperties, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
+import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys } from "../../constants/nodetypes";
 import AddEvent from "../AddEvent";
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from "../../utils/array";
 import CreateModelPropertyGetterDC from "../CreateModelPropertyGetterDC";
 
 export default function SetupViewTypeForCreate(args = {}) {
-  const { node, eventType, eventTypeHandler } = args;
+  const { node, eventType, eventTypeHandler, callback } = args;
+  const graph = GetCurrentGraph();
   const result = [];
   if (!node) {
     throw new Error('missing node');
@@ -54,6 +55,48 @@ export default function SetupViewTypeForCreate(args = {}) {
   }
 
 
+  const component = GetNodesLinkedTo(graph, {
+    id: node,
+    link: LinkType.DefaultViewType
+  }).find(v => GetNodeProp(v, NodeProperties.SharedComponent));
+  if (component) {
+    GetNodesLinkedTo(null, {
+      id: component.id,
+      link: LinkType.ListItem,
+      componentType: NodeTypes.ComponentNode
+    }).forEach(listItem => {
+      GetNodesLinkedTo(null, {
+        id: listItem.id,
+        link: LinkType.Component,
+        componentType: NodeTypes.ComponentNode
+      }).forEach(subcomponent => {
+        GetNodesLinkedTo(null, {
+          id: subcomponent.id,
+          link: LinkType.ComponentExternalApi,
+          componentType: NodeTypes.ComponentExternalApi
+        }).forEach(externalApi => {
+          GetNodesLinkedTo(null, {
+            id: externalApi.id,
+            link: LinkType.ComponentExternalConnection,
+            componentType: NodeTypes.ComponentApi
+          }).forEach(externalConnection => {
+            const link = GetLinkBetween(externalApi.id, externalConnection.id, graph);
+            if (link) {
+              result.push({
+                operation: UPDATE_LINK_PROPERTY,
+                options: {
+                  prop: LinkPropertyKeys.InstanceUpdate,
+                  value: false,
+                  id: link.id
+                }
+              });
+            }
+          });
+        });
+      });
+    });
+  }
+
   const modelType = GetNodesLinkedTo(null, {
     id: property.id,
     link: LinkType.PropertyLink
@@ -71,12 +114,26 @@ export default function SetupViewTypeForCreate(args = {}) {
 
 
   let modelKeyDC = null;
-  const viewModelExternalNode = GetNodesLinkedTo(null, {
+  const externalNodes = GetNodesLinkedTo(null, {
     id: node,
     link: LinkType.ComponentExternalApi,
     componentType: NodeTypes.ComponentExternalApi
-  }).find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.ViewModel);
-
+  })
+  const viewModelExternalNode = externalNodes.find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.ViewModel);
+  result.push(...externalNodes.map(externalNode => {
+    const link = GetLinkBetween(node, externalNode.id, graph);
+    if (link) {
+      return {
+        operation: UPDATE_LINK_PROPERTY,
+        options: {
+          prop: LinkPropertyKeys.InstanceUpdate,
+          value: false,
+          id: link.id
+        }
+      }
+    }
+    return null;
+  }))
   result.push(...CreateModelKeyDC({
     model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
     modelId: model.id,
@@ -148,7 +205,8 @@ export default function SetupViewTypeForCreate(args = {}) {
       eventTypeHandler: properties.length
         ? eventTypeHandler
         : false,
-      property: properties.length ? properties[0].id : null
+      property: properties.length ? properties[0].id : null,
+      callback
     })
   );
   return result;

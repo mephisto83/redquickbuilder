@@ -1,6 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function(args = {}) {
+export default function (args = {}) {
   //
 
   //
@@ -14,12 +14,12 @@ export default function(args = {}) {
     ...(viewPackages || {})
   };
   let result = [
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback: function(node) {
+            callback: function (node) {
               context.node0 = node.id;
             }
           }
@@ -27,7 +27,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -39,7 +39,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -52,7 +52,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -65,7 +65,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -78,7 +78,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -91,7 +91,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -108,7 +108,7 @@ export default function(args = {}) {
   let applyViewPackages = [
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options: function() {
+      options: function () {
         return {
           id: context.node0,
           properties: viewPackages
@@ -120,10 +120,10 @@ export default function(args = {}) {
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    function() {
+    (grapph) => {
       if (context.callback) {
         context.entry = context.node0;
-        context.callback(context);
+        context.callback(context, grapph);
       }
       return [];
     }

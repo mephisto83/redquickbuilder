@@ -1651,6 +1651,7 @@ export const CreateDefaultView = {
         case ViewTypes.Update:
           needsLoadToScreenState = true;
           break;
+        default: break;
       }
       switch (viewType) {
         case ViewTypes.Get:
@@ -1682,13 +1683,6 @@ export const CreateDefaultView = {
           break;
       }
       let dataSourceId;
-      const vmsIds = () => [
-        viewModelNodeDirtyId,
-        viewModelNodeFocusId,
-        viewModelNodeBlurId,
-        viewModelNodeFocusedId,
-        viewModelNodeId
-      ];
       const modelType = GetNodeProp(currentNode, NodeProperties.NODEType);
       const isModel = modelType === NodeTypes.Model;
 
@@ -1795,48 +1789,6 @@ export const CreateDefaultView = {
                 }
               })
               : []),
-            !isSharedComponent && isList
-              ? {
-                // The selector for a list screen
-                operation: ADD_NEW_NODE,
-                options(graph) {
-                  const $node = GetNodeByProperties(
-                    {
-                      [NodeProperties.UIText]: `${viewName} Screen View Model`,
-                      [NodeProperties.InstanceType]: InstanceTypes.AppState,
-                      [NodeProperties.Model]: pageViewModel.model,
-                      [NodeProperties.NODEType]: NodeTypes.ViewModel
-                    },
-                    graph
-                  );
-                  if ($node) {
-                    newItems.screenViewModel = $node.id;
-                    return false;
-                  }
-
-                  return {
-                    nodeType: NodeTypes.ViewModel,
-                    properties: {
-                      [NodeProperties.UIText]: `${viewName} Screen View Model`,
-                      [NodeProperties.InstanceType]: InstanceTypes.AppState,
-                      [NodeProperties.Pinned]: false,
-                      [NodeProperties.Model]: pageViewModel.model
-                    },
-                    links: [
-                      {
-                        target: pageViewModel.model,
-                        linkProperties: {
-                          properties: { ...LinkProperties.ViewModelLink }
-                        }
-                      }
-                    ],
-                    callback: res => {
-                      newItems.screenViewModel = res.id;
-                    }
-                  };
-                }
-              }
-              : false,
 
             {
               operation: ADD_NEW_NODE,
@@ -1865,43 +1817,6 @@ export const CreateDefaultView = {
                 };
               }
             },
-            !isSharedComponent && isList
-              ? {
-                // The selector for a list screen
-                operation: ADD_NEW_NODE,
-                options(graph) {
-                  const $node = GetNodeByProperties(
-                    {
-                      [NodeProperties.UIText]: `${viewName} Screen Selector`,
-                      [NodeProperties.NODEType]: NodeTypes.Selector
-                    },
-                    graph
-                  );
-                  if ($node) {
-                    newItems.screenSelector = $node.id;
-                    return false;
-                  }
-                  return {
-                    nodeType: NodeTypes.Selector,
-                    properties: {
-                      [NodeProperties.Pinned]: false,
-                      [NodeProperties.UIText]: `${viewName} Screen Selector`
-                    },
-                    links: [
-                      {
-                        target: newItems.screenViewModel,
-                        linkProperties: {
-                          properties: { ...LinkProperties.SelectorLink }
-                        }
-                      }
-                    ],
-                    callback: res => {
-                      newItems.screenSelector = res.id;
-                    }
-                  };
-                }
-              }
-              : false,
             !isSharedComponent && isList
               ? {
                 // The data chain for a list screen
@@ -1944,66 +1859,11 @@ export const CreateDefaultView = {
                         linkProperties: {
                           properties: { ...LinkProperties.DataChainLink }
                         }
-                      },
-                      {
-                        target: newItems.screenViewModel,
-                        linkProperties: {
-                          properties: { ...LinkProperties.DataChainLink }
-                        }
                       }
                     ],
                     callback: res => {
                       newItems.screenListDataChain = res.id;
                     }
-                  };
-                }
-              }
-              : false,
-
-            !isSharedComponent
-              ? {
-                operation: ADD_NEW_NODE,
-                options(graph) {
-                  const res = GetNodesByProperties(
-                    {
-                      [NodeProperties.Model]: currentNode.id,
-                      [NodeProperties.InstanceType]: useModelInstance
-                        ? InstanceTypes.ModelInstance
-                        : InstanceTypes.ScreenInstance,
-                      [NodeProperties.NODEType]: NodeTypes.ViewModel
-                    },
-                    graph
-                  );
-                  if (res && res.length) {
-                    viewModelNodeId = res[0].id;
-                    return false;
-                  }
-                  return {
-                    nodeType: NodeTypes.ViewModel,
-                    callback: viewModelNode => {
-                      viewModelNodeId = viewModelNode.id;
-                    },
-                    properties: {
-                      ...viewPackage,
-                      [NodeProperties.UIText]: `${viewName} VM ${
-                        useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance
-                        }`,
-                      [NodeProperties.Model]: currentNode.id,
-                      [NodeProperties.Pinned]: false,
-                      [NodeProperties.InstanceType]: useModelInstance
-                        ? InstanceTypes.ModelInstance
-                        : InstanceTypes.ScreenInstance
-                    },
-                    links: [
-                      {
-                        target: currentNode.id,
-                        linkProperties: {
-                          properties: { ...LinkProperties.ViewModelLink }
-                        }
-                      }
-                    ]
                   };
                 }
               }
@@ -3435,15 +3295,6 @@ export const CreateDefaultView = {
                 modelComponentSelectors.push(selectorNode.id);
                 return {
                   links: [
-                    ...vmsIds()
-                      .filter(x => x)
-                      .map(t => ({
-                        target: t,
-                        source: selectorNode.id,
-                        properties: {
-                          ...LinkProperties.SelectorLink
-                        }
-                      })),
                     {
                       source: selectorNode.id,
                       target: currentNode.id,
@@ -3465,16 +3316,6 @@ export const CreateDefaultView = {
                   // [NodeProperties.InstanceType]: useModelInstance
                 },
                 links: [
-                  ...vmsIds()
-                    .filter(x => x)
-                    .map(t => ({
-                      target: t,
-                      linkProperties: {
-                        properties: {
-                          ...LinkProperties.SelectorLink
-                        }
-                      }
-                    })),
                   {
                     target: currentNode.id,
                     linkProperties: {
@@ -3663,20 +3504,6 @@ export const CreateDefaultView = {
           {
             operation: ADD_NEW_NODE,
             options(graph) {
-              const viewModelInstanceNode = GetNodeByProperties(
-                {
-                  [NodeProperties.Model]: currentNode.id,
-                  [NodeProperties.InstanceType]: useModelInstance
-                    ? InstanceTypes.ModelInstance
-                    : InstanceTypes.ScreenInstance,
-                  [NodeProperties.NODEType]: NodeTypes.ViewModel
-                },
-                graph
-              );
-              if (!viewModelInstanceNode) {
-                skipAddingComplete = true;
-                return null;
-              }
               const node = GetNodesByProperties(
                 {
                   [NodeProperties.UIText]: `Get ${viewName}`,
@@ -3694,13 +3521,10 @@ export const CreateDefaultView = {
                 newItems.getObjectDataChain = node.id;
                 return null;
               }
-              if (!viewModelInstanceNode) {
-                skipAddingComplete = true;
-              }
               return {
                 nodeType: NodeTypes.DataChain,
-                callback: node => {
-                  newItems.getObjectDataChain = node.id;
+                callback: n => {
+                  newItems.getObjectDataChain = n.id;
                 },
                 properties: {
                   ...viewPackage,
@@ -3717,12 +3541,6 @@ export const CreateDefaultView = {
                 links: [
                   {
                     target: modelComponentSelectors[0],
-                    linkProperties: {
-                      properties: { ...LinkProperties.DataChainLink }
-                    }
-                  },
-                  {
-                    target: viewModelNodeId,
                     linkProperties: {
                       properties: { ...LinkProperties.DataChainLink }
                     }
@@ -3806,7 +3624,6 @@ export const CreateDefaultView = {
             modelComponentSelectors,
             skip,
             isSharedComponent,
-            viewModelNodeId,
             viewPackage,
             propertyDataChainAccesors,
             uiType,
@@ -3859,7 +3676,6 @@ export const CreateDefaultView = {
             modelComponentSelectors,
             useModelInstance,
             isSharedComponent,
-            viewModelNodeId,
             viewPackage,
             propertyDataChainAccesors,
             apiList,
@@ -3941,9 +3757,6 @@ export const CreateDefaultView = {
                       break;
                     case ON_CHANGE_TEXT:
                     case ON_CHANGE:
-                      cellProperties.componentApi[
-                        apiProperty
-                      ].model = viewModelNodeId;
                       cellProperties.componentApi[apiProperty].modelProperty =
                         modelProperties[propertyIndex].id;
                       break;
@@ -5108,56 +4921,6 @@ function addComponentEventApiNodes(args) {
         },
         {
           operation: ADD_LINK_BETWEEN_NODES,
-          options(graph) {
-            let viewModelNode = null;
-            let instanceType = null;
-            switch (apiName) {
-              case ComponentEvents.onFocus:
-                instanceType = useModelInstance
-                  ? InstanceTypes.ModelInstanceFocus
-                  : InstanceTypes.ScreenInstanceFocus;
-                break;
-              case ComponentEvents.onBlur:
-                instanceType = useModelInstance
-                  ? InstanceTypes.ModelInstanceBlur
-                  : InstanceTypes.ScreenInstanceBlur;
-                break;
-              case ComponentEvents.onChange:
-                instanceType = useModelInstance
-                  ? InstanceTypes.ModelInstance
-                  : InstanceTypes.ScreenInstance;
-                break;
-              case ComponentEvents.onChangeText:
-                instanceType = useModelInstance
-                  ? InstanceTypes.ModelInstance
-                  : InstanceTypes.ScreenInstance;
-                break;
-            }
-            const res = GetNodesByProperties(
-              {
-                [NodeProperties.Model]: currentNode.id,
-                [NodeProperties.InstanceType]: instanceType,
-                [NodeProperties.NODEType]: NodeTypes.ViewModel
-              },
-              graph
-            );
-            if (res && res.length) {
-              viewModelNode = res[0].id;
-            }
-            return {
-              source:
-                newItems.eventApis[childComponents[modelIndex]][
-                apiNameEventHandler
-                ],
-              target: viewModelNode,
-              properties: {
-                ...LinkProperties.ViewModelLink
-              }
-            };
-          }
-        },
-        {
-          operation: ADD_LINK_BETWEEN_NODES,
           options() {
             return {
               source:
@@ -5432,7 +5195,6 @@ function BuildPropertyDataChainAccessor(args) {
     viewPackage,
     currentNode,
     modelComponentSelectors,
-    viewModelNodeId,
     propertyDataChainAccesors,
     newItems,
     viewType } = args;
@@ -5459,12 +5221,6 @@ function BuildPropertyDataChainAccessor(args) {
       links = [
         {
           target: modelComponentSelectors[0],
-          linkProperties: {
-            properties: { ...LinkProperties.DataChainLink }
-          }
-        },
-        {
-          target: viewModelNodeId,
           linkProperties: {
             properties: { ...LinkProperties.DataChainLink }
           }

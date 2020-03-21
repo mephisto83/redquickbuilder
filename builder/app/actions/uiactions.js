@@ -1233,19 +1233,6 @@ export function GetDataChainArgs(id) {
   return [];
 }
 
-export function GetSelectorsNodes(id) {
-  let state = _getState();
-  let graph = GetRootGraph(state);
-  return GraphMethods.GetNodesLinkedTo(graph, {
-    id,
-    direction: GraphMethods.SOURCE
-  }).filter(x =>
-    [NodeTypes.Selector, NodeTypes.ViewModel].some(
-      v => v === GetNodeProp(x, NodeProperties.NODEType)
-    )
-  );
-}
-
 export function GenerateChainFunctions(options) {
   let { cs, language, collection } = options;
   let graph = GetCurrentGraph();

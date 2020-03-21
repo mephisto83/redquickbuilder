@@ -2370,6 +2370,16 @@ export function getNodeLinked(graph, options) {
 export function GetNodeLinkedTo(graph, options) {
   return GetNodesLinkedTo(graph, options)[0];
 }
+export function GetLinkedNodes(graph, options) {
+  const { id } = options;
+  graph = graph || GetCurrentGraph();
+  if (graph && graph.nodeLinks && id) {
+    let nodeLinks = graph.nodeLinks[id];
+    return { ...nodeLinks }
+  }
+
+  return {};
+}
 export function GetNodesLinkedTo(graph, options) {
   if (options) {
     graph = graph || GetCurrentGraph();

@@ -4,7 +4,6 @@ import {
   GetState,
   GetNodeProp,
   GetJSCodeName,
-  GetSelectorsNodes,
   GetNodeTitle,
   GetNodeCode,
   GetCodeName

@@ -59,24 +59,6 @@ export const ComponentEventStandardHandler = {
     }
   }}`
 };
-export const ComponentEventArgs = {
-  [ComponentEvents.onBlur]: {
-    [NodeTypes.Property]: true,
-    [NodeTypes.ViewModel]: true
-  },
-  [ComponentEvents.onFocus]: {
-    [NodeTypes.Property]: true,
-    [NodeTypes.ViewModel]: true
-  },
-  [ComponentEvents.onChange]: {
-    [NodeTypes.Property]: true,
-    [NodeTypes.ViewModel]: true
-  },
-  [ComponentEvents.onChangeText]: {
-    [NodeTypes.Property]: true,
-    [NodeTypes.ViewModel]: true
-  }
-};
 export const SCREEN_COMPONENT_EVENTS = [
   ComponentLifeCycleEvents.ComponentDidMount,
   ComponentLifeCycleEvents.ComponentWillUnmount

@@ -956,11 +956,12 @@ function WriteDescribedStateUpdates(parent) {
         if (selector) {
           const addiontionalParams = getUpdateFunctionOption(
             selector.id,
-            externalApiNode.id
+            externalApiNode.id,
+            `, { update: true }/*s => e*/`
           );
           innerValue = `S.${GetJSCodeName(
             selector
-          )}({{temp}}, this.state.viewModel${addiontionalParams})`;
+          )}({{temp}}, this.state.viewModel${addiontionalParams} /* state update */)`;
         } else {
           innerValue = "{{temp}}";
         }
@@ -1168,41 +1169,44 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {
           innerValue = `GetScreenParam('query')`;
         } else if (options.listItem) {
-            const listItemAttribute = GetJSCodeName(externalConnection);
-            innerValue = !GetNodeProp(
+          const listItemAttribute = GetJSCodeName(externalConnection);
+          innerValue = !GetNodeProp(
+            externalConnection,
+            NodeProperties.AsLocalContext
+          )
+            ? `this.state.${listItemAttribute}`
+            : listItemAttribute;
+        } else {
+          const defaulComponentValue =
+            GetNodeProp(
               externalConnection,
-              NodeProperties.AsLocalContext
-            )
-              ? `this.state.${listItemAttribute}`
-              : listItemAttribute;
+              NodeProperties.DefaultComponentApiValue
+            ) || "";
+          if (defaulComponentValue) {
+            // Create/Update case
+            innerValue = `ViewModelKeys.${defaulComponentValue}`;
           } else {
-            const defaulComponentValue =
-              GetNodeProp(
-                externalConnection,
-                NodeProperties.DefaultComponentApiValue
-              ) || "";
-            if (defaulComponentValue) {
-              // Create/Update case
-              innerValue = `ViewModelKeys.${defaulComponentValue}`;
-            } else {
-              // Get/GetAll/Delete
-              innerValue = `this.state.${stateKey ||
-                GetJSCodeName(externalConnection)}`;
-            }
+            // Get/GetAll/Delete
+            innerValue = `this.state.${stateKey ||
+              GetJSCodeName(externalConnection)}`;
           }
+        }
       }
+      let addiontionalParams;
       if (!noSelector && selector) {
-        const addiontionalParams =
+        addiontionalParams =
           componentExternalApi && externalConnection
             ? getUpdateFunctionOption(
               componentExternalApi.id,
-              externalConnection.id
+              externalConnection.id,
+              `, { update: true }/*c => e*/`
             )
             : "";
         if (isViewType) {
-          const addiontionalParams =
+          addiontionalParams =
             componentExternalApi && node
-              ? getUpdateFunctionOption(node.id, componentExternalApi.id)
+              ? getUpdateFunctionOption(node.id, componentExternalApi.id,
+                `, { update: true }/*n => c*/`)
               : "";
 
           innerValue = `S.${GetJSCodeName(
@@ -1584,7 +1588,8 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
         if (body_selector) {
           const addiontionalParams = getUpdateFunctionOption(
             methodInstanceSource ? methodInstanceSource.id : null,
-            methodInstanceCall ? methodInstanceCall.id : null
+            methodInstanceCall ? methodInstanceCall.id : null,
+            `, { update: true }/*m => mi*/`
           );
 
           innervalue = `S.${GetJSCodeName(
@@ -1694,18 +1699,18 @@ export function getUpdateFunctionOption(
 ) {
   let addiontionalParams = "";
   if (methodId && methodInstanceCallId) {
-    const linkSelector = GetLinkBetween(
+    const linkBetweenNodes = GetLinkBetween(
       methodId,
       methodInstanceCallId,
       GetCurrentGraph()
     );
-    if (linkSelector) {
+    if (linkBetweenNodes) {
       const instanceUpdate = GetLinkProperty(
-        linkSelector,
+        linkBetweenNodes,
         LinkPropertyKeys.InstanceUpdate
       );
       if (instanceUpdate) {
-        addiontionalParams = addParams || `, { update: true }`;
+        addiontionalParams = addParams || `, { update: true }/*getUpdateFunctionOption*/`;
       }
     }
   }

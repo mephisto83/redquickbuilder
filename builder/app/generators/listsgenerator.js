@@ -4,7 +4,6 @@ import {
   GetState,
   GetNodeProp,
   GetJSCodeName,
-  GetSelectorsNodes,
   GetCurrentGraph,
   GetCodeName
 } from "../actions/uiactions";

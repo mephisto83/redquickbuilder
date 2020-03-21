@@ -22,7 +22,7 @@ import {
   FunctionTemplateKeys
 } from "../constants/functiontypes";
 import CreatePropertiesForFetch from "./CreatePropertiesForFetch";
-export default function(args = {}) {
+export default function (args = {}) {
   //
   let result = [];
   let context = {
@@ -55,8 +55,8 @@ export default function(args = {}) {
   if (!fetchParameter) {
     result.push(
       ...CreateFetchParameters({
-        callback: context => {
-          fetchParameter = GetNodeById(context.entry, graph);
+        callback: (context, g) => {
+          fetchParameter = GetNodeById(context.entry, g);
         }
       })
     );
@@ -64,8 +64,8 @@ export default function(args = {}) {
   if (!fetchOutput) {
     result.push(
       ...CreateFetchOutput({
-        callback: context => {
-          fetchOutput = GetNodeById(context.entry, graph);
+        callback: (context, g) => {
+          fetchOutput = GetNodeById(context.entry, g);
         }
       })
     );
@@ -73,13 +73,13 @@ export default function(args = {}) {
   if (!fetchService) {
     result.push(
       ...CreateFetchService({
-        callback: context => {
-          fetchService = GetNodeById(context.entry, graph);
+        callback: (context, g) => {
+          fetchService = GetNodeById(context.entry, g);
         }
       })
     );
   }
-  result.push(function() {
+  result.push(function () {
     let fetchCompatibleMethods = NodesByType(null, NodeTypes.Method).filter(
       method => {
         let funcType = GetNodeProp(method, NodeProperties.FunctionType);
@@ -94,7 +94,7 @@ export default function(args = {}) {
     fetchCompatibleMethods.map(fetchMethod => {
       tempresult.push({
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function() {
+        options: function () {
           return {
             target: fetchMethod.id,
             source: fetchService.id,
@@ -130,7 +130,7 @@ export default function(args = {}) {
           },
           {
             operation: UPDATE_NODE_PROPERTY,
-            options: function() {
+            options: function () {
               return {
                 id: fetchMethod.id,
                 properties: { [NodeProperties.MethodProps]: methodProps }
@@ -139,7 +139,7 @@ export default function(args = {}) {
           },
           {
             operation: UPDATE_NODE_PROPERTY,
-            options: function() {
+            options: function () {
               return {
                 id: fetchParameter.id,
                 properties: { [NodeProperties.ExcludeFromController]: true }
@@ -155,7 +155,7 @@ export default function(args = {}) {
 
   result.push({
     operation: ADD_LINK_BETWEEN_NODES,
-    options: function() {
+    options: function () {
       return {
         target: fetchOutput.id,
         source: fetchService.id,
@@ -163,7 +163,7 @@ export default function(args = {}) {
       };
     }
   });
-  result.push(function() {
+  result.push(function () {
     return CreatePropertiesForFetch({
       id: fetchOutput.id
     });
