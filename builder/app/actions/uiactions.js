@@ -21,7 +21,7 @@ import { buildValidation } from "../service/validation_js_service";
 import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
 import { ViewTypes } from "../constants/viewtypes";
-var fs = require("fs");
+const fs = require("fs");
 export const VISUAL = "VISUAL";
 export const MINIMIZED = "MINIMIZED";
 export const HIDDEN = "HIDDEN";
@@ -63,13 +63,13 @@ export function GetScreenUrl(
   language = NodeConstants.UITypes.ElectronIO,
   overrideText = null
 ) {
-  let params = GetComponentExternalApiNodes(op.id)
+  const params = GetComponentExternalApiNodes(op.id)
     .filter(externaApiNodes => {
       return GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter);
     })
     .map(v => `:${GetCodeName(v)}`)
     .join("/");
-  let route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${
+  const route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${
     params ? `/${params}` : ""
     }`;
 
@@ -95,13 +95,13 @@ export function Get(state, section) {
   return null;
 }
 export function generateDataSeed(node) {
-  let dataSeed = _generateDataSeed(node);
+  const dataSeed = _generateDataSeed(node);
   return JSON.stringify(dataSeed, null, 4);
 }
 
 function _generateDataSeed(node) {
-  let state = _getState();
-  let properties = {};
+  const state = _getState();
+  const properties = {};
   GraphMethods.getPropertyNodes(GetRootGraph(state), node.id).map(t => {
     properties[t.id] = {
       name: GetCodeName(t),
@@ -116,7 +116,7 @@ function _generateDataSeed(node) {
       type: "Id"
     };
   });
-  let dataSeed = {
+  const dataSeed = {
     name: GetCodeName(node),
     properties
   };
@@ -150,7 +150,7 @@ export function CopyKey(key) {
   return `Copy ${key}`;
 }
 export function IsCurrentNodeA(state, type) {
-  var currentNode = Node(state, Visual(state, SELECTED_NODE));
+  const currentNode = Node(state, Visual(state, SELECTED_NODE));
   if (!Array.isArray(type)) {
     type = [type];
   }
@@ -182,7 +182,7 @@ export function GetNodePropDirty(node, prop, currentGraph) {
   return node && node.dirty && node.dirty[prop];
 }
 export function GetGroupProp(id, prop) {
-  let group = GraphMethods.GetGroup(GetCurrentGraph(_getState()), id);
+  const group = GraphMethods.GetGroup(GetCurrentGraph(_getState()), id);
   if (group) {
     return group && group.properties && group.properties[prop];
   }
@@ -196,7 +196,7 @@ export function GetSharedComponentFor(
   currentNodeId,
   isPluralComponent
 ) {
-  let graph = GetCurrentGraph(GetState());
+  const graph = GetCurrentGraph(GetState());
   let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
     id: modelProperty.id
   });
@@ -218,7 +218,7 @@ export function GetSharedComponentFor(
         type: NodeConstants.LinkType.DefaultViewType
       })
     ) {
-      let link = GraphMethods.findLink(graph, {
+      const link = GraphMethods.findLink(graph, {
         source: x.id,
         target: currentNodeId
       });
@@ -251,21 +251,21 @@ export function GetSharedComponentFor(
 export function getViewTypeEndpointsForDefaults(viewType, currentGraph, id) {
   currentGraph = currentGraph || GetCurrentGraph(_getState());
 
-  let currentNode = GetNodeById(id, currentGraph);
-  var connectto = GetNodesByProperties(
+  const currentNode = GetNodeById(id, currentGraph);
+  const connectto = GetNodesByProperties(
     {
       [NodeProperties.NODEType]: NodeTypes.ViewType,
       [NodeProperties.ViewType]: viewType
     },
     currentGraph
   ).filter(_x => {
-    let res = GraphMethods.existsLinkBetween(currentGraph, {
+    const res = GraphMethods.existsLinkBetween(currentGraph, {
       source: _x.id,
       type: NodeConstants.LinkType.DefaultViewType,
       target: currentNode.id
     });
     if (res) {
-      let link = GraphMethods.GetLinkBetween(
+      const link = GraphMethods.GetLinkBetween(
         _x.id,
         currentNode.id,
         currentGraph
@@ -285,7 +285,7 @@ export function getViewTypeEndpointsForDefaults(viewType, currentGraph, id) {
 }
 
 export function setSharedComponent(args) {
-  let {
+  const {
     properties,
     target,
     source,
@@ -294,8 +294,8 @@ export function setSharedComponent(args) {
     isPluralComponent
   } = args;
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetCurrentGraph(getState());
+    const state = getState();
+    const graph = GetCurrentGraph(getState());
     if (
       !GraphMethods.existsLinkBetween(graph, {
         target,
@@ -306,7 +306,7 @@ export function setSharedComponent(args) {
       GetNodeProp(target, NodeProperties.SharedComponent) &&
       GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode
     ) {
-      let connections = GraphMethods.GetConnectedNodesByType(
+      const connections = GraphMethods.GetConnectedNodesByType(
         state,
         source,
         NodeTypes.ComponentNode
@@ -343,10 +343,10 @@ export function setSharedComponent(args) {
   };
 }
 export function setComponentApiConnection(args) {
-  let { properties, target, source } = args;
+  const { properties, target, source } = args;
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetCurrentGraph(state);
+    const state = getState();
+    const graph = GetCurrentGraph(state);
     if (
       [
         NodeTypes.EventMethod,
@@ -363,7 +363,7 @@ export function setComponentApiConnection(args) {
           type: NodeConstants.LinkType.ComponentApiConnection
         })
       ) {
-        let connections = GraphMethods.GetConnectedNodesByType(
+        const connections = GraphMethods.GetConnectedNodesByType(
           state,
           source,
           GetNodeProp(target, NodeProperties.NODEType)
@@ -394,10 +394,10 @@ export function setComponentApiConnection(args) {
 
 export function addQueryMethodParameter() {
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetCurrentGraph(state);
-    var currentNode = Node(state, Visual(state, SELECTED_NODE));
-    let operations = [];
+    const state = getState();
+    const graph = GetCurrentGraph(state);
+    const currentNode = Node(state, Visual(state, SELECTED_NODE));
+    const operations = [];
     operations.push({
       operation: ADD_NEW_NODE,
       options: function () {
@@ -424,16 +424,16 @@ export function addQueryMethodParameter() {
 }
 export function addQueryMethodApi() {
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetCurrentGraph(state);
-    var currentNode = Node(state, Visual(state, SELECTED_NODE));
-    let queryObjects = GraphMethods.GetConnectedNodesByType(
+    const state = getState();
+    const graph = GetCurrentGraph(state);
+    const currentNode = Node(state, Visual(state, SELECTED_NODE));
+    const queryObjects = GraphMethods.GetConnectedNodesByType(
       state,
       currentNode.id,
       NodeTypes.MethodApiParameters
     ).filter(x => GetNodeProp(x, NodeProperties.QueryParameterObject));
     if (queryObjects.length === 0) {
-      let operations = [];
+      const operations = [];
       operations.push({
         operation: ADD_NEW_NODE,
         options: function () {
@@ -465,11 +465,11 @@ export function addQueryMethodApi() {
 }
 
 export function connectLifeCycleMethod(args) {
-  let { properties, target, source } = args;
+  const { properties, target, source } = args;
   return (dispatch, getState) => {
     setTimeout(() => {
-      let state = getState();
-      let graph = GetCurrentGraph(state);
+      const state = getState();
+      const graph = GetCurrentGraph(state);
       graphOperation(ConnectLifecycleMethod({ target, source, graph }))(
         dispatch,
         getState
@@ -514,8 +514,8 @@ export function GetTitleService(graph) {
   return NodesByType(GetState(), NodeTypes.TitleService).find(x => x);
 }
 export function AgentHasExecutor(model) {
-  var state = GetState();
-  var graphRoot = GetCurrentGraph();
+  const state = GetState();
+  const graphRoot = GetCurrentGraph();
   return NodesByType(state, NodeTypes.Executor).find(x =>
     GraphMethods.existsLinkBetween(graphRoot, {
       source: x.id,
@@ -524,9 +524,9 @@ export function AgentHasExecutor(model) {
   );
 }
 export function setupDefaultViewType(args) {
-  let { properties, target, source } = args;
+  const { properties, target, source } = args;
   return (dispatch, getState) => {
-    let graph = GetCurrentGraph(getState());
+    const graph = GetCurrentGraph(getState());
     let is_property_link = false;
     if (
       GraphMethods.existsLinkBetween(graph, {
@@ -535,19 +535,19 @@ export function setupDefaultViewType(args) {
         type: NodeConstants.LinkType.ModelTypeLink
       })
     ) {
-      let isUsedAsModelType = GetNodeProp(
+      const isUsedAsModelType = GetNodeProp(
         source,
         NodeProperties.UseModelAsType
       );
       if (isUsedAsModelType) {
-        let targetedTypeNode = GetNodeProp(source, NodeProperties.UIModelType);
+        const targetedTypeNode = GetNodeProp(source, NodeProperties.UIModelType);
         if (targetedTypeNode === target) {
           is_property_link = true;
         }
       }
     }
 
-    let right_link =
+    const right_link =
       is_property_link ||
       GraphMethods.existsLinkBetween(graph, {
         target,
@@ -555,14 +555,14 @@ export function setupDefaultViewType(args) {
         type: NodeConstants.LinkType.LogicalChildren
       });
     if (right_link) {
-      let useModelAsType = GetNodeProp(target, NodeProperties.UseModelAsType);
-      let illegalViewType = false; // useModelAsType ? ViewTypes.GetAll : ViewTypes.Get;
+      const useModelAsType = GetNodeProp(target, NodeProperties.UseModelAsType);
+      const illegalViewType = false; // useModelAsType ? ViewTypes.GetAll : ViewTypes.Get;
       if (properties.all) {
         PerformGraphOperation(
           Object.keys(ViewTypes)
             .filter(x => x !== illegalViewType)
             .map(viewType => {
-              let sibling = uuidv4();
+              const sibling = uuidv4();
               return {
                 operation: ADD_NEW_NODE,
                 options: function () {
@@ -643,7 +643,7 @@ export function setupDefaultViewType(args) {
   };
 }
 export function GetConditionNodes(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetConditionNodes(state, id);
 }
 export function IsAgent(node) {
@@ -653,13 +653,13 @@ export function GetLinkChainItem(options) {
   return GraphMethods.GetLinkChainItem(GetState(), options);
 }
 export function GetCodeName(node, options) {
-  let graph = GetCurrentGraph(GetState());
+  const graph = GetCurrentGraph(GetState());
   if (typeof node === "string") {
     node = GraphMethods.GetNode(graph, node);
   }
   if (options && options.includeNameSpace) {
     if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.DataChain) {
-      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+      const collections = GraphMethods.GetNodesLinkedTo(graph, {
         id: node.id,
         link: NodeConstants.LinkType.DataChainCollection,
         direction: GraphMethods.SOURCE
@@ -676,8 +676,8 @@ export function GetCodeName(node, options) {
 }
 
 export function GetRelativeDataChainPath(node) {
-  let graph = GetCurrentGraph();
-  let collections = GraphMethods.GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph();
+  const collections = GraphMethods.GetNodesLinkedTo(graph, {
     id: node.id,
     link: NodeConstants.LinkType.DataChainCollection,
     direction: GraphMethods.SOURCE
@@ -689,14 +689,14 @@ export function GetRelativeDataChainPath(node) {
 }
 
 export function computeNamespace(node) {
-  let graph = GetCurrentGraph(GetState());
-  let dc = GraphMethods.GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph(GetState());
+  const dc = GraphMethods.GetNodesLinkedTo(graph, {
     id: node.id,
     link: NodeConstants.LinkType.DataChainCollection,
     direction: GraphMethods.SOURCE
   });
   if (dc && dc.length) {
-    let namesp = computeNamespace(dc[0]);
+    const namesp = computeNamespace(dc[0]);
     if (namesp) {
       return `${namesp}.${GetJSCodeName(node)}`;
     }
@@ -705,7 +705,7 @@ export function computeNamespace(node) {
 }
 
 export function GetJSCodeName(node) {
-  var l = GetCodeName(node);
+  const l = GetCodeName(node);
   if (l) {
     return l.toJavascriptName();
   }
@@ -713,9 +713,9 @@ export function GetJSCodeName(node) {
 }
 
 export function GetModelPropertyChildren(id, options = {}) {
-  let { skipLogicalChildren } = options;
-  let property_nodes = GetModelPropertyNodes(id);
-  let logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
+  const { skipLogicalChildren } = options;
+  const property_nodes = GetModelPropertyNodes(id);
+  const logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
   let userModels = [];
   if (
     GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model ||
@@ -728,11 +728,11 @@ export function GetModelPropertyChildren(id, options = {}) {
   );
 }
 export function GetMethodParameters(methodId) {
-  let method = GetNodeById(methodId);
+  const method = GetNodeById(methodId);
   if (method) {
-    let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+    const methodType = GetNodeProp(method, NodeProperties.FunctionType);
     if (methodType && MethodFunctions[methodType]) {
-      let { parameters } = MethodFunctions[methodType];
+      const { parameters } = MethodFunctions[methodType];
       if (parameters) {
         return parameters;
       }
@@ -742,9 +742,9 @@ export function GetMethodParameters(methodId) {
 }
 export function updateMethodParameters(current, methodType, viewPackages) {
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetRootGraph(state);
-    let toRemove = [];
+    const state = getState();
+    const graph = GetRootGraph(state);
+    const toRemove = [];
     graphOperation(
       UpdateMethodParameters({
         methodType,
@@ -791,8 +791,8 @@ export function attachMethodToMaestro(
       {
         operation: ADD_NEW_NODE,
         options: function (graph) {
-          let state = getState();
-          let _controller = NodesByType(state, NodeTypes.Controller).find(x => {
+          const state = getState();
+          const _controller = NodesByType(state, NodeTypes.Controller).find(x => {
             return GraphMethods.existsLinkBetween(graph, {
               target: modelId,
               source: x.id,
@@ -837,9 +837,9 @@ export function attachMethodToMaestro(
       {
         operation: ADD_NEW_NODE,
         options: function (graph) {
-          let state = getState();
+          const state = getState();
 
-          let _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
+          const _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
             return GraphMethods.existsLinkBetween(graph, {
               target: modelId,
               source: x.id,
@@ -899,11 +899,11 @@ export function attachMethodToMaestro(
   };
 }
 export function GetMethodParametersFor(methodId, type) {
-  let method = GetNodeById(methodId);
+  const method = GetNodeById(methodId);
   if (method) {
-    let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+    const methodType = GetNodeProp(method, NodeProperties.FunctionType);
     if (methodType && MethodFunctions[methodType]) {
-      let { permission, validation } = MethodFunctions[methodType];
+      const { permission, validation } = MethodFunctions[methodType];
       switch (type) {
         case NodeTypes.Permission:
           return permission ? permission.params : null;
@@ -918,11 +918,11 @@ export function GetNodeById(node, graph) {
   return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
 export function GetNodesByProperties(props, graph, state) {
-  var currentGraph = graph || GetCurrentGraph(state || GetState());
+  const currentGraph = graph || GetCurrentGraph(state || GetState());
   if (currentGraph) {
     return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])].filter(
       x => {
-        for (var i in props) {
+        for (const i in props) {
           if (props[i] !== GetNodeProp(x, i)) {
             return false;
           }
@@ -945,38 +945,38 @@ export function GetMethodDefinition(id) {
   return MethodFunctions[GetMethodFunctionType(id)];
 }
 export function GetMethodFunctionType(id) {
-  let state = _getState();
-  var method = GraphMethods.GetMethodNode(state, id);
+  const state = _getState();
+  const method = GraphMethods.GetMethodNode(state, id);
 
   return GetNodeProp(method, NodeProperties.FunctionType);
 }
 export function GetMethodFunctionValidation(id) {
-  let state = _getState();
-  var method = GraphMethods.GetMethodNode(state, id);
+  const state = _getState();
+  const method = GraphMethods.GetMethodNode(state, id);
   return GetNodeProp(method, NodeProperties.MethodFunctionValidation);
 }
 export function GetPermissionNode(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetPermissionNode(state, id);
 }
 export function GetValidationNode(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetValidationNode(state, id);
 }
 export function GetDataSourceNode(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetDataSourceNode(state, id);
 }
 export function GetModelItemFilter(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetModelItemFilter(state, id);
 }
 export function GetPermissionsConditions(id) {
   return _getPermissionsConditions(_getState(), id);
 }
 export function GetServiceInterfaceMethodCalls(id) {
-  let state = GetState();
-  let graph = GetRootGraph(state);
+  const state = GetState();
+  const graph = GetRootGraph(state);
   return GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(
@@ -986,8 +986,8 @@ export function GetServiceInterfaceMethodCalls(id) {
   );
 }
 export function GetServiceInterfaceCalls(id) {
-  let state = GetState();
-  let graph = GetRootGraph(state);
+  const state = GetState();
+  const graph = GetRootGraph(state);
   return GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(
@@ -1007,24 +1007,24 @@ export function GetDataChainEntryNodes(cs) {
   return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
 export function GetLambdaDefinition(method) {
-  let functionType = GetNodeProp(method, NodeProperties.FunctionType);
-  let { lambda } = MethodFunctions[functionType];
+  const functionType = GetNodeProp(method, NodeProperties.FunctionType);
+  const { lambda } = MethodFunctions[functionType];
   return lambda;
 }
 export function GenerateDataChainArguments(id) {
-  let currentNode = GetNodeById(id);
+  const currentNode = GetNodeById(id);
   let _arguments = "";
   if (GetNodeProp(currentNode, NodeProperties.CS)) {
-    let methods = GraphMethods.GetNodesLinkedTo(null, {
+    const methods = GraphMethods.GetNodesLinkedTo(null, {
       id: currentNode.id,
       link: NodeConstants.LinkType.DataChainLink,
       componentType: NodeTypes.Method
     });
     if (methods.length) {
-      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
-      let { lambda } = MethodFunctions[functionType];
+      const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      const { lambda } = MethodFunctions[functionType];
       if (lambda && lambda.default) {
-        let methodProps = GetMethodProps(methods[0]);
+        const methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
           .filter(x => x !== "return")
           .map(key => {
@@ -1037,33 +1037,33 @@ export function GenerateDataChainArguments(id) {
   return _arguments;
 }
 export function GenerateCSChainFunction(id) {
-  let lastNodeName = GenerateCDDataChainMethod(id);
-  let arbiters = GetArbitersInCSDataChainMethod(id);
-  let outputType = GetOutputTypeInCSDataChainMethod(id);
-  let arbiterInterfaces = arbiters
+  const lastNodeName = GenerateCDDataChainMethod(id);
+  const arbiters = GetArbitersInCSDataChainMethod(id);
+  const outputType = GetOutputTypeInCSDataChainMethod(id);
+  const arbiterInterfaces = arbiters
     .map(arb => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
     .join(", ");
-  let arbiterSets = addNewLine(
+  const arbiterSets = addNewLine(
     arbiters
       .map(arb => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`)
       .join(NodeConstants.NEW_LINE)
   );
-  let arbiterProperties = arbiters
+  const arbiterProperties = arbiters
     .map(arb => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
     .join(NodeConstants.NEW_LINE);
-  let currentNode = GetNodeById(id);
+  const currentNode = GetNodeById(id);
   let _arguments = "";
   if (GetNodeProp(currentNode, NodeProperties.CS)) {
-    let methods = GraphMethods.GetNodesLinkedTo(null, {
+    const methods = GraphMethods.GetNodesLinkedTo(null, {
       id: currentNode.id,
       link: NodeConstants.LinkType.DataChainLink,
       componentType: NodeTypes.Method
     });
     if (methods.length) {
-      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
-      let { lambda } = MethodFunctions[functionType];
+      const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      const { lambda } = MethodFunctions[functionType];
       if (lambda && lambda.default) {
-        let methodProps = GetMethodProps(methods[0]);
+        const methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
           .filter(x => x !== "return")
           .map(key => {
@@ -1074,7 +1074,7 @@ export function GenerateCSChainFunction(id) {
       }
     }
   }
-  let method = `public class ${GetCodeName(id)}
+  const method = `public class ${GetCodeName(id)}
 {
 ${arbiterProperties}
     public ${GetCodeName(id)}(${arbiterInterfaces}) {
@@ -1088,31 +1088,31 @@ ${arbiterSets}
   return method;
 }
 export function GenerateChainFunction(id, cs) {
-  let chain = GetDataChainParts(id);
+  const chain = GetDataChainParts(id);
   let args = null;
-  let observables = [];
-  let setArgs = [];
-  let subscribes = [];
-  let setProcess = [];
-  let funcs = chain.map((c, index) => {
+  const observables = [];
+  const setArgs = [];
+  const subscribes = [];
+  const setProcess = [];
+  const funcs = chain.map((c, index) => {
     if (index === 0) {
       args = GetDataChainArgs(c);
     }
-    let temp = GenerateDataChainMethod(c);
+    const temp = GenerateDataChainMethod(c);
     observables.push(GenerateObservable(c, index));
     setArgs.push(GenerateArgs(c, chain));
     setProcess.push(GenerateSetProcess(c, chain));
     subscribes.push(GetSubscribes(c, chain));
     return temp;
   });
-  let index = chain.indexOf(id);
-  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
-  let lastLink = GetLastChainLink(chain);
-  let lastLinkindex = chain.indexOf(lastLink);
-  let lastNodeName = (
+  const index = chain.indexOf(id);
+  const nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
+  const lastLink = GetLastChainLink(chain);
+  const lastLinkindex = chain.indexOf(lastLink);
+  const lastNodeName = (
     GetJSCodeName(lastLink) || "node" + lastLinkindex
   ).toJavascriptName();
-  let method = `export function  ${GetCodeName(id)}(${args.join()}) {
+  const method = `export function  ${GetCodeName(id)}(${args.join()}) {
 ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
@@ -1125,25 +1125,25 @@ return ${lastNodeName}.value;
   return method;
 }
 export function GenerateSetProcess(id, parts) {
-  let index = parts.indexOf(id);
-  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
+  const index = parts.indexOf(id);
+  const nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
   return `${nodeName}.setProcess(${GenerateDataChainMethod(id)})`;
 }
 
 export function GetSubscribes(id, parts) {
-  let node = GetNodeById(id);
-  let index = parts.indexOf(id);
-  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const node = GetNodeById(id);
+  const index = parts.indexOf(id);
+  const nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   if (
     functionType &&
     DataChainFunctions[functionType] &&
     DataChainFunctions[functionType].merge
   ) {
     // pulls args from other nodes
-    let args = Object.keys(DataChainFunctions[functionType].ui).map(
+    const args = Object.keys(DataChainFunctions[functionType].ui).map(
       (key, kindex) => {
-        let temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
+        const temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
         return `${(
           GetJSCodeName(temp) || "node" + parts.indexOf(temp)
         ).toJavascriptName()}`;
@@ -1158,7 +1158,7 @@ export function GetSubscribes(id, parts) {
         .join("")}`;
     }
   } else {
-    let parent = GetNodeProp(node, NodeProperties.ChainParent);
+    const parent = GetNodeProp(node, NodeProperties.ChainParent);
     if (parent) {
       return `${GetJSCodeName(
         parent
@@ -1169,19 +1169,19 @@ export function GetSubscribes(id, parts) {
 }
 
 export function GenerateArgs(id, parts) {
-  let node = GetNodeById(id);
-  let index = parts.indexOf(id);
-  let nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const node = GetNodeById(id);
+  const index = parts.indexOf(id);
+  const nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   if (
     functionType &&
     DataChainFunctions[functionType] &&
     DataChainFunctions[functionType].merge
   ) {
     // pulls args from other nodes
-    let args = Object.keys(DataChainFunctions[functionType].ui).map(
+    const args = Object.keys(DataChainFunctions[functionType].ui).map(
       (key, kindex) => {
-        let temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
+        const temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
         return `['${(
           GetJSCodeName(temp) || "node" + parts.indexOf(temp)
         ).toJavascriptName()}']: ${kindex}`;
@@ -1190,7 +1190,7 @@ export function GenerateArgs(id, parts) {
 
     return `${nodeName}.setArgs({ ${args} })`;
   } else {
-    let parent = GetNodeProp(node, NodeProperties.ChainParent);
+    const parent = GetNodeProp(node, NodeProperties.ChainParent);
     if (parent) {
       return `${nodeName}.setArgs({ ['${GetJSCodeName(
         parent
@@ -1203,28 +1203,28 @@ export function GenerateArgs(id, parts) {
 }
 
 export function GetLastChainLink(parts) {
-  let lastLink = parts.find(id => {
+  const lastLink = parts.find(id => {
     return GetNodeProp(GetNodeById(id), NodeProperties.AsOutput);
   });
   return lastLink;
 }
 export function GenerateObservable(id, index) {
-  let nodeName = GetJSCodeName(id);
+  const nodeName = GetJSCodeName(id);
   return `let ${nodeName} = new RedObservable('${nodeName}');`;
 }
 
 export function GenerateDataChainFunc(id, chain, index) {
-  let nodeName = GetCodeName(id);
+  const nodeName = GetCodeName(id);
   //Should be able to capture the args throw the link between nodes.
   return `private async Task ${nodeName}(/*define args*/) {
     throw new NotImplementedException();
   }`;
 }
 export function GetDataChainArgs(id) {
-  let node = GetNodeById(id);
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const node = GetNodeById(id);
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   if (functionType && DataChainFunctions[functionType]) {
-    let { merge, ui } = DataChainFunctions[functionType];
+    const { merge, ui } = DataChainFunctions[functionType];
     if (merge) {
       return Object.keys(ui);
     }
@@ -1234,11 +1234,11 @@ export function GetDataChainArgs(id) {
 }
 
 export function GenerateChainFunctions(options) {
-  let { cs, language, collection } = options;
-  let graph = GetCurrentGraph();
-  let entryNodes = GetDataChainEntryNodes(cs)
+  const { cs, language, collection } = options;
+  const graph = GetCurrentGraph();
+  const entryNodes = GetDataChainEntryNodes(cs)
     .filter(x => {
-      let uiType = GetNodeProp(x, NodeProperties.UIType);
+      const uiType = GetNodeProp(x, NodeProperties.UIType);
       if (uiType) {
         return language === uiType;
       }
@@ -1246,7 +1246,7 @@ export function GenerateChainFunctions(options) {
     })
     .map(x => x.id)
     .filter(ct => {
-      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+      const collections = GraphMethods.GetNodesLinkedTo(graph, {
         id: ct,
         link: NodeConstants.LinkType.DataChainCollection
       });
@@ -1255,7 +1255,7 @@ export function GenerateChainFunctions(options) {
       }
       return !collections || !collections.length;
     });
-  let temp = entryNodes
+  const temp = entryNodes
     .map(v =>
       cs
         ? { node: v, class: GenerateCSChainFunction(v) }
@@ -1269,7 +1269,7 @@ export function GenerateChainFunctions(options) {
   return temp.join(NodeConstants.NEW_LINE);
 }
 export function CollectionIsInLanguage(graph, collection, language) {
-  let reference = GraphMethods.GetNodeLinkedTo(graph, {
+  const reference = GraphMethods.GetNodeLinkedTo(graph, {
     id: collection,
     link: NodeConstants.LinkType.DataChainCollectionReference
   });
@@ -1281,7 +1281,7 @@ export function CollectionIsInLanguage(graph, collection, language) {
     } else if (GetNodeProp(reference, NodeProperties.UIType)) {
       return false;
     } else {
-      let parent = GraphMethods.GetNodesLinkedTo(graph, {
+      const parent = GraphMethods.GetNodesLinkedTo(graph, {
         id: collection,
         link: NodeConstants.LinkType.DataChainCollection,
         direction: GraphMethods.TARGET
@@ -1302,9 +1302,9 @@ export function CollectionIsInLanguage(graph, collection, language) {
 }
 
 export function GetDataChainCollections(options) {
-  let { collection, language } = options;
-  let graph = GetCurrentGraph();
-  let temp = collection
+  const { collection, language } = options;
+  const graph = GetCurrentGraph();
+  const temp = collection
     ? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
       id: collection,
       link: NodeConstants.LinkType.DataChainCollection,
@@ -1320,7 +1320,7 @@ export function GetDataChainCollections(options) {
   return NodesByType(null, NodeTypes.DataChainCollection)
     .filter(x => {
       if (collection) {
-        let res = temp.some(v => v.id === x.id);
+        const res = temp.some(v => v.id === x.id);
         if (res) {
           return true;
         }
@@ -1340,7 +1340,7 @@ export function GetDataChainCollections(options) {
       );
     })
     .map(dataChainCollection => {
-      let _path = GetRelativeDataChainPath(dataChainCollection);
+      const _path = GetRelativeDataChainPath(dataChainCollection);
       return `export * as ${GetJSCodeName(dataChainCollection)} from './${
         collection ? "" : `datachains/`
         }${[..._path, GetJSCodeName(dataChainCollection)]
@@ -1391,12 +1391,12 @@ export function GetComponentInternalApiNode(api, parent, graph) {
 }
 
 export function GenerateChainFunctionSpecs(options) {
-  let { language, collection } = options;
-  let result = [];
-  let graph = GetCurrentGraph();
-  let entryNodes = GetDataChainEntryNodes()
+  const { language, collection } = options;
+  const result = [];
+  const graph = GetCurrentGraph();
+  const entryNodes = GetDataChainEntryNodes()
     .filter(x => {
-      let uiType = GetNodeProp(x, NodeProperties.UIType);
+      const uiType = GetNodeProp(x, NodeProperties.UIType);
       if (uiType) {
         return language === uiType;
       }
@@ -1404,7 +1404,7 @@ export function GenerateChainFunctionSpecs(options) {
     })
     .map(x => x.id)
     .filter(ct => {
-      let collections = GraphMethods.GetNodesLinkedTo(graph, {
+      const collections = GraphMethods.GetNodesLinkedTo(graph, {
         id: ct,
         link: NodeConstants.LinkType.DataChainCollection
       });
@@ -1414,7 +1414,7 @@ export function GenerateChainFunctionSpecs(options) {
       return !collections || !collections.length;
     });
 
-  let basicentryvalues = [
+  const basicentryvalues = [
     undefined,
     null,
     0,
@@ -1445,7 +1445,7 @@ export function GenerateSimpleTest(node, val) {
   } else if (val === null) {
     _value = "null";
   }
-  let template = `it('${GetCodeName(node)} - should be able to handle a "${
+  const template = `it('${GetCodeName(node)} - should be able to handle a "${
     typeof val === "object" ? JSON.stringify(val) : val
     }"', () => {
     let error = undefined;
@@ -1467,18 +1467,18 @@ export function GetDataChainNext(id, graph) {
   if (!graph) {
     throw "no graph found";
   }
-  let current = id;
-  let groupDaa = GetNodeProp(GetNodeById(current), NodeProperties.Groups);
+  const current = id;
+  const groupDaa = GetNodeProp(GetNodeById(current), NodeProperties.Groups);
 
   if (groupDaa && groupDaa.group) {
-    let group = GraphMethods.GetGroup(graph, groupDaa.group);
+    const group = GraphMethods.GetGroup(graph, groupDaa.group);
     if (group) {
-      let entryNode = GetGroupProp(
+      const entryNode = GetGroupProp(
         group.id,
         NodeConstants.GroupProperties.GroupEntryNode
       );
       if (entryNode === current) {
-        let exitNode = GetGroupProp(
+        const exitNode = GetGroupProp(
           group.id,
           NodeConstants.GroupProperties.ExternalExitNode
         );
@@ -1486,37 +1486,37 @@ export function GetDataChainNext(id, graph) {
       }
     }
   }
-  let next = GraphMethods.getNodesByLinkType(graph, {
+  const next = GraphMethods.getNodesByLinkType(graph, {
     id: current,
     type: NodeConstants.LinkType.DataChainLink,
     direction: GraphMethods.SOURCE
   })
     .filter(x => x.id !== current)
     .sort((a, b) => {
-      var a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
-      var b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
+      const a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
+      const b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
       return a_ - b_;
     })
     .unique(x => x.id)[0];
   return next;
 }
 export function GetDataChainNextId(id, graph) {
-  let next = GetDataChainNext(id, graph);
+  const next = GetDataChainNext(id, graph);
   return next && next.id;
 }
 export function GetDataChainParts(id, result) {
   result = result || [id];
   result.push(id);
   result = [...result].unique();
-  let node = GetNodeById(id);
-  let nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
+  const node = GetNodeById(id);
+  const nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
   let groups = Object.values(nodeGroup);
-  let current = id;
-  let dataChains = NodesByType(_getState(), NodeTypes.DataChain);
+  const current = id;
+  const dataChains = NodesByType(_getState(), NodeTypes.DataChain);
   let oldlength;
   do {
     oldlength = result.length;
-    let dc = dataChains.filter(x =>
+    const dc = dataChains.filter(x =>
       result.some(v => v === GetNodeProp(x, NodeProperties.ChainParent))
     );
     result.push(...dc.map(v => v.id));
@@ -1527,7 +1527,7 @@ export function GetDataChainParts(id, result) {
       ];
     });
     groups.map(g => {
-      let nodes = GetNodesInGroup(g);
+      const nodes = GetNodesInGroup(g);
       result.push(...nodes);
     });
     result = result.unique();
@@ -1539,14 +1539,14 @@ export function GetNodesInGroup(groupId) {
   return GraphMethods.GetNodesInGroup(GetCurrentGraph(_getState()), groupId);
 }
 export function GetDataChainFrom(id) {
-  let result = [id];
+  const result = [id];
   let current = id;
-  let graph = GetRootGraph(_getState());
+  const graph = GetRootGraph(_getState());
   if (!graph) {
     throw "no graph found";
   }
-  for (var i = 0; i < 10; i++) {
-    let next = GetDataChainNext(current);
+  for (let i = 0; i < 10; i++) {
+    const next = GetDataChainNext(current);
     current = null;
     if (next && next.id) {
       result.push(next.id);
@@ -1572,18 +1572,18 @@ export function IsEndOfDataChain(id) {
 }
 
 export function GetLambdaVariableNode(id, key) {
-  let currentNode = GetNodeById(id);
+  const currentNode = GetNodeById(id);
   if (GetNodeProp(currentNode, NodeProperties.CS)) {
-    let methods = GraphMethods.GetNodesLinkedTo(null, {
+    const methods = GraphMethods.GetNodesLinkedTo(null, {
       id: currentNode.id,
       link: NodeConstants.LinkType.DataChainLink,
       componentType: NodeTypes.Method
     });
     if (methods.length) {
-      let functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
-      let { lambda } = MethodFunctions[functionType];
+      const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
+      const { lambda } = MethodFunctions[functionType];
       if (lambda && lambda.default) {
-        let methodProps = GetMethodProps(methods[0]);
+        const methodProps = GetMethodProps(methods[0]);
 
         return GetNodeById(methodProps[key]);
       }
@@ -1593,23 +1593,23 @@ export function GetLambdaVariableNode(id, key) {
 }
 
 export function GetArbitersInCSDataChainMethod(id) {
-  let node = GetNodeById(id);
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
-  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+  const node = GetNodeById(id);
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const lambda = GetNodeProp(node, NodeProperties.Lambda);
 
-  let result = [];
+  const result = [];
   switch (functionType) {
     case DataChainFunctionKeys.Lambda:
       getReferenceInserts(lambda)
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(_insert => {
-          let temp = _insert.split("@");
-          let insert = temp.length > 1 ? temp[1] : temp[0];
+          const temp = _insert.split("@");
+          const insert = temp.length > 1 ? temp[1] : temp[0];
           if (temp.length > 1) {
             switch (temp[0]) {
               case "arbiter get":
-                let lambdaNode = GetLambdaVariableNode(id, insert);
+                const lambdaNode = GetLambdaVariableNode(id, insert);
                 if (lambdaNode) result.push(lambdaNode);
                 break;
               default:
@@ -1622,9 +1622,9 @@ export function GetArbitersInCSDataChainMethod(id) {
 }
 
 export function GetOutputTypeInCSDataChainMethod(id) {
-  let node = GetNodeById(id);
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
-  let lambda = GetNodeProp(node, NodeProperties.Lambda);
+  const node = GetNodeById(id);
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const lambda = GetNodeProp(node, NodeProperties.Lambda);
 
   let result = null;
   switch (functionType) {
@@ -1633,12 +1633,12 @@ export function GetOutputTypeInCSDataChainMethod(id) {
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(_insert => {
-          let temp = _insert.split("@");
-          let insert = temp.length > 1 ? temp[1] : temp[0];
+          const temp = _insert.split("@");
+          const insert = temp.length > 1 ? temp[1] : temp[0];
           if (temp.length > 1) {
             if (temp[0].indexOf("return") === 0) {
-              let vari = temp[0].split(" ").filter(x => x);
-              let lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
+              const vari = temp[0].split(" ").filter(x => x);
+              const lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
               if (lambdaNode) result = lambdaNode;
             }
           }
@@ -1647,10 +1647,10 @@ export function GetOutputTypeInCSDataChainMethod(id) {
   return result;
 }
 export function GenerateCDDataChainMethod(id) {
-  let node = GetNodeById(id);
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const node = GetNodeById(id);
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
-  let lambdaInsertArguments = GetNodeProp(
+  const lambdaInsertArguments = GetNodeProp(
     node,
     NodeProperties.LambdaInsertArguments
   );
@@ -1660,34 +1660,34 @@ export function GenerateCDDataChainMethod(id) {
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(_insert => {
-          let temp = _insert.split("@");
-          let insert = temp.length > 1 ? temp[1] : temp[0];
+          const temp = _insert.split("@");
+          const insert = temp.length > 1 ? temp[1] : temp[0];
           if (temp.length > 1) {
             let swap = temp[0];
-            let args = insert.split("~");
-            let model = args[0];
-            let property = args[1];
+            const args = insert.split("~");
+            const model = args[0];
+            const property = args[1];
 
             switch (temp[0]) {
               case "arbiter get":
-                let lambdaNode = GetLambdaVariableNode(id, insert);
+                const lambdaNode = GetLambdaVariableNode(id, insert);
                 swap = `await arbiter${GetCodeName(
                   lambdaNode
                 )}.Get<${GetCodeName(lambdaNode)}>`;
                 break;
               default:
                 if (property) {
-                  let lambdaNode = lambdaInsertArguments[property];
+                  const lambdaNode = lambdaInsertArguments[property];
                   swap = `${model}.${GetCodeName(lambdaNode)}`;
                 }
                 break;
             }
             lambda = lambda.replace(`#{${_insert}}`, swap);
           } else {
-            let args = insert.split("~");
-            let property = args[0];
-            let prop = lambdaInsertArguments[property];
-            let node = GetNodeById(prop);
+            const args = insert.split("~");
+            const property = args[0];
+            const prop = lambdaInsertArguments[property];
+            const node = GetNodeById(prop);
             lambda = bindReferenceTemplate(lambda, {
               [property]: GetCodeName(node)
             });
@@ -1701,32 +1701,32 @@ export function GenerateCDDataChainMethod(id) {
   }
 }
 export function GenerateDataChainMethod(id) {
-  let node = GetNodeById(id);
-  let model = GetNodeProp(node, NodeProperties.UIModelType);
-  let stateKey = GetNodeProp(node, NodeProperties.StateKey);
-  let modelKey = GetNodeProp(node, NodeProperties.ModelKey);
-  let viewModelKey = GetNodeProp(node, NodeProperties.ViewModelKey);
-  let numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
-  let property = GetNodeProp(node, NodeProperties.Property);
-  let functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
-  let func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
-  let funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
-  let selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
-  let nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
-  let nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
-  let navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
-  let methodMethod = GetNodeProp(node, NodeProperties.Method);
-  let $screen = GetNodeProp(node, NodeProperties.Screen);
-  let useNavigationParams = GetNodeProp(
+  const node = GetNodeById(id);
+  const model = GetNodeProp(node, NodeProperties.UIModelType);
+  const stateKey = GetNodeProp(node, NodeProperties.StateKey);
+  const modelKey = GetNodeProp(node, NodeProperties.ModelKey);
+  const viewModelKey = GetNodeProp(node, NodeProperties.ViewModelKey);
+  const numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
+  const property = GetNodeProp(node, NodeProperties.Property);
+  const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+  const func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
+  const funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
+  const selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
+  const nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
+  const nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
+  const navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
+  const methodMethod = GetNodeProp(node, NodeProperties.Method);
+  const $screen = GetNodeProp(node, NodeProperties.Screen);
+  const useNavigationParams = GetNodeProp(
     node,
     NodeProperties.UseNavigationParams
   );
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
-  let lambdaInsertArguments = GetNodeProp(
+  const lambdaInsertArguments = GetNodeProp(
     node,
     NodeProperties.LambdaInsertArguments
   );
-  let listReference = GetNodeProp(node, NodeProperties.List);
+  const listReference = GetNodeProp(node, NodeProperties.List);
   let lastpart = "return item;";
   switch (functionType) {
     case DataChainFunctionKeys.ModelProperty:
@@ -1811,11 +1811,11 @@ export function GenerateDataChainMethod(id) {
         .map(v => v.substr(2, v.length - 3))
         .unique()
         .map(insert => {
-          let args = insert.split("~");
-          let property = args.length > 1 ? args[1] : args[0];
-          let model = args[0];
-          let prop = lambdaInsertArguments[property];
-          let node = GetNodeById(prop);
+          const args = insert.split("~");
+          const property = args.length > 1 ? args[1] : args[0];
+          const model = args[0];
+          const prop = lambdaInsertArguments[property];
+          const node = GetNodeById(prop);
           let bindValue = GetCodeName(node);
           if (args.length > 1) {
             bindValue = bindValue.toLowerCase();
@@ -1941,30 +1941,30 @@ export function GetValidationsSortedByAgent() {
 }
 
 export function GetNodesSortedByAgent(type) {
-  let state = _getState();
-  let nodes = NodesByType(state, type);
+  const state = _getState();
+  const nodes = NodesByType(state, type);
 
   return nodes
     .filter(node => {
-      let methodNode = GraphMethods.GetMethodNode(state, node.id);
+      const methodNode = GraphMethods.GetMethodNode(state, node.id);
       return methodNode;
     })
     .groupBy(node => {
-      let methodNode = GraphMethods.GetMethodNode(state, node.id);
+      const methodNode = GraphMethods.GetMethodNode(state, node.id);
       return GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
     });
 }
 
 export function GetArbitersForNodeType(type) {
-  let state = _getState();
-  let permissions = NodesByType(state, type);
-  let models = [];
+  const state = _getState();
+  const permissions = NodesByType(state, type);
+  const models = [];
   permissions.map(permission => {
-    let methodNode = GraphMethods.GetMethodNode(state, permission.id);
-    let methodProps = GetMethodProps(methodNode);
+    const methodNode = GraphMethods.GetMethodNode(state, permission.id);
+    const methodProps = GetMethodProps(methodNode);
     Object.values(methodProps).map(id => {
-      let node = GetGraphNode(id);
-      let nodeType = GetNodeProp(node, NodeProperties.NODEType);
+      const node = GetGraphNode(id);
+      const nodeType = GetNodeProp(node, NodeProperties.NODEType);
       if ([NodeTypes.Model].some(v => v === nodeType)) {
         models.push(id);
       }
@@ -1974,13 +1974,13 @@ export function GetArbitersForNodeType(type) {
 }
 
 export function GetCustomServicesForNodeType(type) {
-  let state = _getState();
-  let permissions = NodesByType(state, type);
-  let models = [];
+  const state = _getState();
+  const permissions = NodesByType(state, type);
+  const models = [];
   permissions.map(permission => {
-    let methods = GetServiceInterfaceMethodCalls(permission.id);
+    const methods = GetServiceInterfaceMethodCalls(permission.id);
     methods.map(method => {
-      let services = GetServiceInterfaceCalls(method.id);
+      const services = GetServiceInterfaceCalls(method.id);
       models.push(...services.map(v => v.id));
     });
   });
@@ -2006,11 +2006,11 @@ export function GetArbitersForValidations() {
 }
 
 export function GetNameSpace() {
-  let state = _getState();
+  const state = _getState();
 
-  let graphRoot = GetRootGraph(state);
+  const graphRoot = GetRootGraph(state);
 
-  let namespace = graphRoot
+  const namespace = graphRoot
     ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
     : null;
 
@@ -2021,10 +2021,10 @@ export function GetArbiterPropertyDefinitions(
   tabs = 3,
   language = NodeConstants.ProgrammingLanguages.CSHARP
 ) {
-  let arbiters = GetArbitersForPermissions();
-  let template = `IRedArbiter<{{model}}> arbiter{{model}};`;
-  let tab = [].interpolate(0, tabs, () => `   `).join("");
-  let definitions = arbiters.map(arbiter => {
+  const arbiters = GetArbitersForPermissions();
+  const template = `IRedArbiter<{{model}}> arbiter{{model}};`;
+  const tab = [].interpolate(0, tabs, () => `   `).join("");
+  const definitions = arbiters.map(arbiter => {
     return (
       tab +
       bindTemplate(template, {
@@ -2039,10 +2039,10 @@ export function GetCustomServiceDefinitions(
   tabs = 3,
   language = NodeConstants.ProgrammingLanguages.CSHARP
 ) {
-  let services = GetCustomServicesForNodeType(type);
-  let template = `I{{model}} {{model_js}};`;
-  let tab = [].interpolate(0, tabs, () => `   `).join("");
-  let definitions = services.map(service => {
+  const services = GetCustomServicesForNodeType(type);
+  const template = `I{{model}} {{model_js}};`;
+  const tab = [].interpolate(0, tabs, () => `   `).join("");
+  const definitions = services.map(service => {
     return (
       tab +
       bindTemplate(template, {
@@ -2058,10 +2058,10 @@ export function GetArbiterPropertyImplementations(
   tabs = 4,
   language = NodeConstants.ProgrammingLanguages.CSHARP
 ) {
-  let arbiters = GetArbitersForPermissions();
-  let template = `arbiter{{model}} = RedStrapper.Resolve<IRedArbiter<{{model}}>>();`;
-  let tab = [].interpolate(0, tabs, () => `   `).join("");
-  let definitions = arbiters.map(arbiter => {
+  const arbiters = GetArbitersForPermissions();
+  const template = `arbiter{{model}} = RedStrapper.Resolve<IRedArbiter<{{model}}>>();`;
+  const tab = [].interpolate(0, tabs, () => `   `).join("");
+  const definitions = arbiters.map(arbiter => {
     return (
       tab +
       bindTemplate(template, {
@@ -2077,10 +2077,10 @@ export function GetCustomServiceImplementations(
   tabs = 4,
   language = NodeConstants.ProgrammingLanguages.CSHARP
 ) {
-  let services = GetCustomServicesForNodeType(type);
-  let template = `{{model_js}} = RedStrapper.Resolve<I{{model}}>();`;
-  let tab = [].interpolate(0, tabs, () => `   `).join("");
-  let definitions = services.map(service => {
+  const services = GetCustomServicesForNodeType(type);
+  const template = `{{model_js}} = RedStrapper.Resolve<I{{model}}>();`;
+  const tab = [].interpolate(0, tabs, () => `   `).join("");
+  const definitions = services.map(service => {
     return (
       tab +
       bindTemplate(template, {
@@ -2097,7 +2097,7 @@ export function GetCombinedCondition(
   language = NodeConstants.ProgrammingLanguages.CSHARP,
   options = {}
 ) {
-  let node = GetGraphNode(id);
+  const node = GetGraphNode(id);
   let conditions = [];
   let customMethods = [];
   let final_result = "res";
@@ -2137,11 +2137,11 @@ export function GetCombinedCondition(
       final_result = "result";
       break;
   }
-  let tabs = [].interpolate(0, tabcount, () => `    `).join("");
+  const tabs = [].interpolate(0, tabcount, () => `    `).join("");
   let clauses = [];
   conditions.map(condition => {
-    let selectedConditionSetup = GetSelectedConditionSetup(id, condition);
-    let res = GetConditionsClauses(
+    const selectedConditionSetup = GetSelectedConditionSetup(id, condition);
+    const res = GetConditionsClauses(
       id,
       selectedConditionSetup,
       language,
@@ -2150,7 +2150,7 @@ export function GetCombinedCondition(
     clauses = [...clauses, ...res.map(t => t.clause)];
   });
   customMethods.map(customMethod => {
-    let res = GetCustomMethodClauses(
+    const res = GetCustomMethodClauses(
       node,
       customMethod,
       methodNodeParameters,
@@ -2158,7 +2158,7 @@ export function GetCombinedCondition(
     );
     clauses = [...clauses, ...res.map(t => t.clause)];
   });
-  let finalClause =
+  const finalClause =
     clauses
       .map((_, index) => {
         return `res_` + index;
@@ -2183,10 +2183,10 @@ export function GetCustomMethodClauses(
   methodNodeParameters,
   language
 ) {
-  let result = [];
+  const result = [];
 
   if (methodNodeParameters) {
-    let serviceInterface = GetServiceInterfaceCalls(customMethod.id).find(
+    const serviceInterface = GetServiceInterfaceCalls(customMethod.id).find(
       x => x
     );
 
@@ -2212,10 +2212,10 @@ export function GetConditionsClauses(
   language,
   options = {}
 ) {
-  let result = [];
+  const result = [];
   if (clauseSetup) {
     Object.keys(clauseSetup).map(clauseKey => {
-      let { properties } = clauseSetup[clauseKey];
+      const { properties } = clauseSetup[clauseKey];
       if (properties) {
         Object.keys(properties)
           .filter(modelId => {
@@ -2225,12 +2225,12 @@ export function GetConditionsClauses(
             return true;
           })
           .map(modelId => {
-            let propertyName = GetCodeName(modelId);
-            let { validators } = properties[modelId];
+            const propertyName = GetCodeName(modelId);
+            const { validators } = properties[modelId];
             if (validators) {
               Object.keys(validators).map(validatorId => {
-                let validator = validators[validatorId];
-                let res = GetConditionClause(
+                const validator = validators[validatorId];
+                const res = GetConditionClause(
                   adjacentId,
                   clauseKey,
                   propertyName,
@@ -2260,8 +2260,8 @@ export function GetConditionClause(
   validator,
   language
 ) {
-  let method = GetNodesMethod(adjacentId);
-  let clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
+  const method = GetNodesMethod(adjacentId);
+  const clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
   let {
     type,
     template,
@@ -2272,10 +2272,10 @@ export function GetConditionClause(
     many2many,
     many2manyMethod
   } = validator;
-  let dataAccessor = "";
-  let nodeNodeId = GetMethodNodeProp(method, node);
+  const dataAccessor = "";
+  const nodeNodeId = GetMethodNodeProp(method, node);
   let conditionTemplate = "";
-  let condition = "";
+  const condition = "";
   let properties = {};
   if (
     NodeConstants.FilterUI &&
@@ -2338,7 +2338,7 @@ export function GetConditionClause(
       };
       break;
     case NodeConstants.ValidationRules.OneOf:
-      let listItems = GenerateConstantList(validator);
+      const listItems = GenerateConstantList(validator);
       properties = {
         agent: safeFormatTemplateProperty(clauseKey),
         agent_property: safeFormatTemplateProperty(propertyName),
@@ -2486,8 +2486,8 @@ export function GetConditionClause(
   });
 }
 function GenerateConstantList(validator) {
-  let node = GetGraphNode(validator.node);
-  let { enumeration } = validator;
+  const node = GetGraphNode(validator.node);
+  const { enumeration } = validator;
   switch (GetNodeProp(node, NodeProperties.NODEType)) {
     case NodeTypes.Enumeration:
       var enums = GetNodeProp(node, NodeProperties.Enumeration) || [];
@@ -2507,7 +2507,7 @@ function GenerateConstantList(validator) {
   }
 }
 export function GetConnectionClause(args) {
-  let { many2manyProperty, many2manyMethod } = args;
+  const { many2manyProperty, many2manyMethod } = args;
   switch (many2manyMethod) {
     case NodeConstants.FilterRules.EqualsTrue:
       return bindTemplate(
@@ -2531,9 +2531,9 @@ export function GetConnectionClause(args) {
 }
 
 export function GetSelectedConditionSetup(permissionId, condition) {
-  var method = GraphMethods.GetMethodNode(_getState(), permissionId);
+  const method = GraphMethods.GetMethodNode(_getState(), permissionId);
   if (method) {
-    let conditionSetup = GetConditionSetup(condition);
+    const conditionSetup = GetConditionSetup(condition);
     if (conditionSetup && conditionSetup.methods) {
       return conditionSetup.methods[
         GetNodeProp(method, NodeProperties.FunctionType)
@@ -2554,7 +2554,7 @@ export function _getValidationConditions(state, id) {
   return _getConditions(state, id);
 }
 export function _getConditions(state, id) {
-  let graph = GetRootGraph(state);
+  const graph = GetRootGraph(state);
   return GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(
@@ -2563,17 +2563,17 @@ export function _getConditions(state, id) {
 }
 
 export function GetComponentNodes() {
-  let state = GetState();
+  const state = GetState();
   return NodesByType(state, NodeTypes.ComponentNode);
 }
 export function GetComponentNodeProperties() {
-  let res = GetComponentNodes()
+  const res = GetComponentNodes()
     .map(node => {
-      let componentProperties = GetNodeProp(
+      const componentProperties = GetNodeProp(
         node,
         NodeProperties.ComponentProperties
       );
-      let componentPropertiesList =
+      const componentPropertiesList =
         GraphMethods.getComponentPropertyList(componentProperties) || [];
 
       return { id: node.id, componentPropertiesList };
@@ -2581,9 +2581,9 @@ export function GetComponentNodeProperties() {
     .filter(x => x.componentPropertiesList.length)
     .groupBy(x => x.id);
 
-  var result = [];
+  const result = [];
   Object.keys(res).map(v => {
-    let componentPropertiesList = [];
+    const componentPropertiesList = [];
     res[v]
       .map(b => componentPropertiesList.push(...b.componentPropertiesList))
       .unique(x => x.id);
@@ -2594,8 +2594,8 @@ export function GetComponentNodeProperties() {
   return result;
 }
 export function GetConnectedScreenOptions(id) {
-  let state = _getState();
-  let graph = GetRootGraph(state);
+  const state = _getState();
+  const graph = GetRootGraph(state);
   return GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(
@@ -2634,14 +2634,14 @@ export function _attachToNavigateNode(currentId, action) {
   ];
 }
 export function GetConnectedScreen(id) {
-  let state = _getState();
-  let graph = GetRootGraph(state);
+  const state = _getState();
+  const graph = GetRootGraph(state);
   return GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen);
 }
 export function GetModelPropertyNodes(refId) {
-  var state = _getState();
+  const state = _getState();
   return GraphMethods.GetLinkChain(state, {
     id: refId,
     links: [
@@ -2656,7 +2656,7 @@ export function GetModelPropertyNodes(refId) {
 }
 
 export function getTopComponent(graph, node) {
-  let parent = GraphMethods.GetNodesLinkedTo(graph, {
+  const parent = GraphMethods.GetNodesLinkedTo(graph, {
     id: node.id,
     link: NodeConstants.LinkType.Component,
     direction: TARGET
@@ -2671,7 +2671,7 @@ export function getTopComponent(graph, node) {
 }
 export function GetParentComponent(node, graph) {
   graph = graph || GetCurrentGraph();
-  let parent = GraphMethods.GetNodesLinkedTo(graph, {
+  const parent = GraphMethods.GetNodesLinkedTo(graph, {
     id: node.id,
     link: NodeConstants.LinkType.Component,
     direction: GraphMethods.TARGET
@@ -2682,13 +2682,13 @@ export function GetParentComponent(node, graph) {
 }
 export function ComponentIsViewType(component, viewType, graph) {
   graph = graph || GetCurrentGraph();
-  let currentType = GetNodeProp(component, NodeProperties.ViewType);
+  const currentType = GetNodeProp(component, NodeProperties.ViewType);
   if (currentType === viewType) {
     return true;
   } else if (currentType) {
     return false;
   } else {
-    let parent = GetParentComponent(component, graph);
+    const parent = GetParentComponent(component, graph);
     if (parent) {
       return ComponentIsViewType(parent, viewType, graph);
     }
@@ -2696,7 +2696,7 @@ export function ComponentIsViewType(component, viewType, graph) {
   return false;
 }
 export function GetUserReferenceNodes(refId) {
-  var state = _getState();
+  const state = _getState();
   return GraphMethods.GetLinkChain(state, {
     id: refId,
     links: [
@@ -2709,15 +2709,15 @@ export function GetUserReferenceNodes(refId) {
 }
 
 export function GetLogicalChildren(id) {
-  let currentNode = GraphMethods.GetNode(GetCurrentGraph(GetState()), id);
-  var hasLogicalChildren = GetNodeProp(
+  const currentNode = GraphMethods.GetNode(GetCurrentGraph(GetState()), id);
+  const hasLogicalChildren = GetNodeProp(
     currentNode,
     NodeProperties.HasLogicalChildren
   );
   if (hasLogicalChildren) {
     return (GetNodeProp(currentNode, NodeProperties.LogicalChildrenTypes) || [])
       .map(t => {
-        let node = GraphMethods.GetNode(GetCurrentGraph(_getState()), t);
+        const node = GraphMethods.GetNode(GetCurrentGraph(_getState()), t);
         return node;
       })
       .filter(x => x);
@@ -2738,7 +2738,7 @@ export function GetNodeCode(graph, id) {
 }
 
 export function GetMethodPropNode(graph, node, key) {
-  var methodProps = GetNodeProp(node, NodeProperties.MethodProps);
+  const methodProps = GetNodeProp(node, NodeProperties.MethodProps);
   if (methodProps) {
     return GraphMethods.GetNode(graph, methodProps[key] || null);
   }
@@ -2749,9 +2749,9 @@ export function GetMethodOptions(methodProps) {
   if (!methodProps) {
     return [];
   }
-  let state = _getState();
+  const state = _getState();
   return Object.keys(methodProps).map(t => {
-    var n = GraphMethods.GetNode(GetRootGraph(state), methodProps[t]);
+    const n = GraphMethods.GetNode(GetRootGraph(state), methodProps[t]);
     return {
       title: `${GetCodeName(n)} (${t})`,
       value: t
@@ -2764,7 +2764,7 @@ export function GetLinkProperty(link, prop) {
 }
 
 export function GetLink(linkId) {
-  let graph = GetCurrentGraph();
+  const graph = GetCurrentGraph();
 
   return GraphMethods.getLink(graph, {
     id: linkId
@@ -2779,7 +2779,7 @@ export function VisualEq(state, key, value) {
   return Visual(state, key) === value;
 }
 export function Node(state, nodeId) {
-  var currentGraph = GetCurrentGraph(state);
+  const currentGraph = GetCurrentGraph(state);
   if (currentGraph && currentGraph.nodeLib) {
     return currentGraph.nodeLib[nodeId];
   }
@@ -2791,8 +2791,8 @@ export function ModelNotConnectedToFunction(
   packageType,
   nodeType = NodeTypes.Method
 ) {
-  let connections = NodesByType(_getState(), nodeType).filter(x => {
-    let match =
+  const connections = NodesByType(_getState(), nodeType).filter(x => {
+    const match =
       GetNodeProp(x, NodeProperties.NodePackage) === modelId &&
       GetNodeProp(x, NodeProperties.NodePackageType) === packageType &&
       GetNodeProp(x, NodeProperties.NodePackageAgent) === agentId;
@@ -2805,7 +2805,7 @@ export function Application(state, key) {
   return GetC(state, APPLICATION, key);
 }
 export function GetVisualGraph(state) {
-  var currentGraph = GetCurrentGraph(state);
+  const currentGraph = GetCurrentGraph(state);
   return currentGraph ? GetC(state, VISUAL_GRAPH, currentGraph.id) : null;
 }
 export function SaveApplication(value, key, dispatch) {
@@ -2822,7 +2822,7 @@ export function SaveGraph(graph, dispatch) {
       updated: Date.now()
     }
   };
-  let visualGraph = GraphMethods.VisualProcess(graph);
+  const visualGraph = GraphMethods.VisualProcess(graph);
   if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
   dispatch(UIC(GRAPHS, graph.id, graph));
 }
@@ -2836,22 +2836,22 @@ export function UIC(section, item, value) {
 }
 export function toggleVisual(key) {
   return (dispatch, getState) => {
-    var state = getState();
+    const state = getState();
     dispatch(UIC(VISUAL, key, !GetC(state, VISUAL, key)));
   };
 }
 
 export function toggleMinimized(key) {
   return (dispatch, getState) => {
-    var state = getState();
+    const state = getState();
     dispatch(UIC(MINIMIZED, key, !GetC(state, MINIMIZED, key)));
   };
 }
 
 export function toggleHideByTypes(key) {
   return (dispatch, getState) => {
-    var state = getState();
-    let newvalue = !GetC(state, HIDDEN, key);
+    const state = getState();
+    const newvalue = !GetC(state, HIDDEN, key);
     dispatch(UIC(HIDDEN, key, newvalue));
     PerformGraphOperation(
       NodesByType(state, key).map(node => {
@@ -2870,21 +2870,21 @@ export function toggleHideByTypes(key) {
 
 export function GUID() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0;
+    const r = (Math.random() * 16) | 0;
 
-    var v = c == "x" ? r : (r & 0x3) | 0x8;
+    const v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
 export function setVisual(key, value) {
   return (dispatch, getState) => {
-    var state = getState();
+    const state = getState();
     dispatch(UIC(VISUAL, key, value));
   };
 }
 export function setApplication(key, value) {
   return (dispatch, getState) => {
-    var state = getState();
+    const state = getState();
     dispatch(UIC(APPLICATION, key, value));
   };
 }
@@ -2912,14 +2912,14 @@ export function GetNodeTitle(node) {
   return node.properties ? node.properties.text || node.id : node.id;
 }
 export function GetNodes(state) {
-  var currentGraph = GetCurrentGraph(state);
+  const currentGraph = GetCurrentGraph(state);
   if (currentGraph) {
     return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])];
   }
   return [];
 }
 export function CanChangeType(node) {
-  var nodeType = GetNodeProp(node, NodeProperties.NODEType);
+  const nodeType = GetNodeProp(node, NodeProperties.NODEType);
   switch (nodeType) {
     case NodeTypes.ReferenceNode:
       return false;
@@ -2928,7 +2928,7 @@ export function CanChangeType(node) {
   }
 }
 export function GetScreenNodes() {
-  var state = _getState();
+  const state = _getState();
   return NodesByType(state, NodeTypes.Screen);
 }
 
@@ -3019,7 +3019,7 @@ export function $addComponentApiNodes(
   ].filter(x => x);
 }
 export function GetScreenOptions() {
-  var state = _getState();
+  const state = _getState();
   return NodesByType(state, NodeTypes.ScreenOption);
 }
 export function GetModelNodes() {
@@ -3029,9 +3029,9 @@ export function GetConfigurationNodes() {
   return NodesByType(_getState(), NodeTypes.Configuration);
 }
 export function GetMaestroNode(id) {
-  let state = _getState();
-  let graph = GetRootGraph(state);
-  let nodes = GraphMethods.GetNodesLinkedTo(graph, {
+  const state = _getState();
+  const graph = GetRootGraph(state);
+  const nodes = GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Maestro);
   if (nodes && nodes.length) {
@@ -3040,9 +3040,9 @@ export function GetMaestroNode(id) {
   return null;
 }
 export function GetControllerNode(id) {
-  let state = _getState();
-  let graph = GetRootGraph(state);
-  let nodes = GraphMethods.GetNodesLinkedTo(graph, {
+  const state = _getState();
+  const graph = GetRootGraph(state);
+  const nodes = GraphMethods.GetNodesLinkedTo(graph, {
     id
   }).filter(
     x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Controller
@@ -3053,8 +3053,8 @@ export function GetControllerNode(id) {
   return null;
 }
 export function HasCurrentGraph(options = {}) {
-  let state = _getState();
-  var currentGraph = options.useRoot
+  const state = _getState();
+  const currentGraph = options.useRoot
     ? GetRootGraph(state)
     : GetCurrentGraph(state);
   return !!currentGraph;
@@ -3062,7 +3062,7 @@ export function HasCurrentGraph(options = {}) {
 export function NodesByType(state, nodeType, options = {}) {
   state = state || GetState();
 
-  var currentGraph = options.useRoot
+  const currentGraph = options.useRoot
     ? GetRootGraph(state)
     : GetCurrentGraph(state);
   if (currentGraph) {
@@ -3091,7 +3091,7 @@ export function NodesByType(state, nodeType, options = {}) {
 }
 
 export function GetNodeFromRoot(state, id) {
-  var graph = GetRootGraph(state);
+  const graph = GetRootGraph(state);
   if (graph) {
     return GraphMethods.GetNode(graph, id);
   }
@@ -3099,7 +3099,7 @@ export function GetNodeFromRoot(state, id) {
 }
 
 export function NodesConnectedTo(state, nodeId) {
-  var currentGraph = GetCurrentGraph(state);
+  const currentGraph = GetCurrentGraph(state);
   if (currentGraph) {
     return t => {
       if (currentGraph.linkLib[t.id]) {
@@ -3131,7 +3131,7 @@ export function setState() {
 }
 
 export function clearPinned() {
-  let state = _getState();
+  const state = _getState();
   _dispatch(
     graphOperation(
       GetNodes(state)
@@ -3150,7 +3150,7 @@ export function clearPinned() {
   );
 }
 export function clearMarked() {
-  let state = _getState();
+  const state = _getState();
   _dispatch(
     graphOperation(
       GetNodes(state)
@@ -3171,7 +3171,7 @@ export function clearMarked() {
 
 export function selectProperties(model) {
   return (dispatch, getState) => {
-    let state = getState();
+    const state = getState();
     graphOperation(
       GraphMethods.getPropertyNodes(GetRootGraph(state), model).map(t => {
         return {
@@ -3188,13 +3188,13 @@ export function selectProperties(model) {
 }
 export function togglePinnedConnectedNodesByLinkType(model, linkType) {
   return (dispatch, getState) => {
-    let state = getState();
-    let graph = GetRootGraph(state);
-    let nodes = GraphMethods.GetNodesLinkedTo(graph, {
+    const state = getState();
+    const graph = GetRootGraph(state);
+    const nodes = GraphMethods.GetNodesLinkedTo(graph, {
       id: model,
       link: linkType
     });
-    let pinned = nodes
+    const pinned = nodes
       .filter(x => x.id !== model)
       .some(v => GetNodeProp(v, NodeProperties.Pinned));
     graphOperation(
@@ -3212,8 +3212,8 @@ export function togglePinnedConnectedNodesByLinkType(model, linkType) {
   };
 }
 export function toggleNodeMark() {
-  let state = _getState();
-  let currentNode = Node(state, Visual(state, SELECTED_NODE));
+  const state = _getState();
+  const currentNode = Node(state, Visual(state, SELECTED_NODE));
   _dispatch(
     graphOperation(CHANGE_NODE_PROPERTY, {
       prop: NodeProperties.Selected,
@@ -3234,8 +3234,8 @@ export function removeCurrentNode() {
   );
 }
 export function togglePinned() {
-  let state = _getState();
-  let currentNode = Node(state, Visual(state, SELECTED_NODE));
+  const state = _getState();
+  const currentNode = Node(state, Visual(state, SELECTED_NODE));
   _dispatch(
     graphOperation(CHANGE_NODE_PROPERTY, {
       prop: NodeProperties.Pinned,
@@ -3245,7 +3245,7 @@ export function togglePinned() {
   );
 }
 export function GetGraphNode(id) {
-  let state = _getState();
+  const state = _getState();
   return GraphMethods.GetNode(GetRootGraph(state), id);
 }
 export function GetFunctionType(methodNode) {
@@ -3255,11 +3255,11 @@ export function GetMethodNode(id) {
   return GraphMethods.GetMethodNode(_getState(), id);
 }
 export function GetMethodNodeProp(methodNode, key) {
-  let methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps) || {};
+  const methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps) || {};
   if (typeof key === "string") return methodProps[key];
   if (!key) return null;
-  let { template } = key;
-  let temp = {};
+  const { template } = key;
+  const temp = {};
   Object.keys(methodProps).map(t => {
     temp[t] = GetCodeName(methodProps[t]);
   });
@@ -3269,13 +3269,13 @@ export function GetMethodProps(methodNode) {
   return GetNodeProp(methodNode, NodeProperties.MethodProps) || {};
 }
 export function GetMethodsProperties(id) {
-  let state = _getState();
-  var method = GraphMethods.GetMethodNode(state, id);
-  let methodProps = GetMethodProps(method);
+  const state = _getState();
+  const method = GraphMethods.GetMethodNode(state, id);
+  const methodProps = GetMethodProps(method);
   return methodProps;
 }
 export function GetMethodsProperty(id, prop) {
-  let methodProps = GetMethodsProperties(id);
+  const methodProps = GetMethodsProperties(id);
   if (methodProps) {
     return methodProps[prop];
   }
@@ -3288,19 +3288,19 @@ export function GetMethodFilterMetaParameters(id, all) {
   return GetMethod_MetaParameters(id, "filter");
 }
 function GetMethod_MetaParameters(id, key) {
-  let state = _getState();
-  var method = GraphMethods.GetMethodNode(state, id);
-  let methodProps = GetMethodProps(method);
-  let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+  const state = _getState();
+  const method = GraphMethods.GetMethodNode(state, id);
+  const methodProps = GetMethodProps(method);
+  const methodType = GetNodeProp(method, NodeProperties.FunctionType);
   if (methodType) {
-    let setup = MethodFunctions[methodType];
+    const setup = MethodFunctions[methodType];
     if (setup && setup[key] && setup[key].params && methodProps) {
       return setup[key].params
         .filter(x => typeof x === "object" || x.metaparameter)
         .map(x => {
-          let _x = x.key;
-          let nodeName = GetNodeTitle(methodProps[_x]);
-          let nodeClass = GetCodeName(methodProps[_x]);
+          const _x = x.key;
+          const nodeName = GetNodeTitle(methodProps[_x]);
+          const nodeClass = GetCodeName(methodProps[_x]);
           return {
             title: nodeName,
             value: _x,
@@ -3313,19 +3313,19 @@ function GetMethod_MetaParameters(id, key) {
   return [];
 }
 function GetMethod_Parameters(id, key, all) {
-  let state = _getState();
-  var method = GraphMethods.GetMethodNode(state, id);
-  let methodProps = GetMethodProps(method);
-  let methodType = GetNodeProp(method, NodeProperties.FunctionType);
+  const state = _getState();
+  const method = GraphMethods.GetMethodNode(state, id);
+  const methodProps = GetMethodProps(method);
+  const methodType = GetNodeProp(method, NodeProperties.FunctionType);
   if (methodType) {
-    let setup = MethodFunctions[methodType];
+    const setup = MethodFunctions[methodType];
     if (setup && setup[key] && setup[key].params && methodProps) {
       return setup[key].params
         .filter(x => all || typeof x === "string" || !x.metaparameter)
         .map(x => (!x.metaparameter ? x : x.metaparameter))
         .map(_x => {
-          let nodeName = GetNodeTitle(methodProps[_x]);
-          let nodeClass = GetCodeName(methodProps[_x]);
+          const nodeName = GetNodeTitle(methodProps[_x]);
+          const nodeClass = GetCodeName(methodProps[_x]);
           return {
             title: nodeName,
             value: _x,
@@ -3357,9 +3357,9 @@ export function GetPermissionMethod(permission) {
   return null;
 }
 export function GetPermissionMethodModel(permission) {
-  let method = permission ? GetPermissionMethod(permission) : null;
+  const method = permission ? GetPermissionMethod(permission) : null;
   if (method) {
-    let props = GetMethodProps(method);
+    const props = GetMethodProps(method);
 
     return props ? props[FunctionTemplateKeys.Model] : null;
   }
@@ -3383,9 +3383,9 @@ export function GetFunctionMethodKey(
   validation,
   templateKey = FunctionTemplateKeys.Model
 ) {
-  let method = validation ? GetValidatorMethod(validation) : null;
+  const method = validation ? GetValidatorMethod(validation) : null;
   if (method) {
-    let props = GetMethodProps(method);
+    const props = GetMethodProps(method);
 
     return props ? props[templateKey] : null;
   }
@@ -3403,7 +3403,7 @@ export function GetAppSettings(graph) {
   return null;
 }
 export function GetCurrentGraph(state) {
-  var scopedGraph = GetCurrentScopedGraph(state);
+  const scopedGraph = GetCurrentScopedGraph(state);
   return scopedGraph;
   // if (currentGraph) {
   //     currentGraph = Graphs(state, currentGraph);
@@ -3411,7 +3411,7 @@ export function GetCurrentGraph(state) {
   // return currentGraph;
 }
 export function GetRootGraph(state, dispatch) {
-  var currentGraph = Application(state, CURRENT_GRAPH);
+  let currentGraph = Application(state, CURRENT_GRAPH);
   if (currentGraph) {
     currentGraph = Graphs(state, currentGraph);
   } else if (dispatch) {
@@ -3422,17 +3422,17 @@ export function GetRootGraph(state, dispatch) {
   return currentGraph;
 }
 export function GetSubGraphs(state) {
-  var currentGraph = Application(state, CURRENT_GRAPH);
+  let currentGraph = Application(state, CURRENT_GRAPH);
   if (currentGraph) {
     currentGraph = Graphs(state, currentGraph);
-    let subgraphs = GraphMethods.getSubGraphs(currentGraph);
+    const subgraphs = GraphMethods.getSubGraphs(currentGraph);
     return subgraphs;
   }
   return null;
 }
 export function addNewSubGraph() {
   return (dispatch, getState) => {
-    var rootGraph = GetRootGraph(getState(), dispatch);
+    let rootGraph = GetRootGraph(getState(), dispatch);
     rootGraph = GraphMethods.addNewSubGraph(rootGraph);
     SaveGraph(rootGraph, dispatch);
   };
@@ -3440,7 +3440,7 @@ export function addNewSubGraph() {
 
 export function setRootGraph(key, value) {
   return (dispatch, getState) => {
-    var rootGraph = GetRootGraph(getState(), dispatch);
+    let rootGraph = GetRootGraph(getState(), dispatch);
     rootGraph = {
       ...rootGraph,
       ...{ [key]: value }
@@ -3450,7 +3450,7 @@ export function setRootGraph(key, value) {
 }
 export function setAppsettingsAssemblyPrefixes(prefixes) {
   return (dispatch, getState) => {
-    var rootGraph = GetRootGraph(getState(), dispatch);
+    const rootGraph = GetRootGraph(getState(), dispatch);
     rootGraph.appConfig.AppSettings.AssemblyPrefixes = ["RedQuick", prefixes]
       .unique(x => x)
       .join(";");
@@ -3459,8 +3459,8 @@ export function setAppsettingsAssemblyPrefixes(prefixes) {
 }
 export function GetCurrentScopedGraph(state, dispatch) {
   state = state || GetState();
-  var currentGraph = Application(state, CURRENT_GRAPH);
-  let scope = Application(state, GRAPH_SCOPE) || [];
+  let currentGraph = Application(state, CURRENT_GRAPH);
+  const scope = Application(state, GRAPH_SCOPE) || [];
   if (!currentGraph) {
     if (dispatch) {
       currentGraph = GraphMethods.createGraph();
@@ -3487,9 +3487,9 @@ export function newNode() {
   setVisual(SELECTED_TAB, DEFAULT_TAB)(_dispatch, _getState);
 }
 export function GetSelectedSubgraph(state) {
-  var root = GetRootGraph(state);
+  const root = GetRootGraph(state);
   if (root) {
-    var scope = Application(state, GRAPH_SCOPE);
+    const scope = Application(state, GRAPH_SCOPE);
     if (scope && scope.length) {
       return GraphMethods.getSubGraph(root, scope);
     }
@@ -3512,13 +3512,13 @@ export function GetViewTypeModel(node) {
 }
 
 export function BuildPackage(model, _package) {
-  let { id } = model;
-  let methodFunctionDefinition = MethodFunctions[_package.methodType];
+  const { id } = model;
+  const methodFunctionDefinition = MethodFunctions[_package.methodType];
   if (methodFunctionDefinition) {
-    let { constraints } = methodFunctionDefinition;
+    const { constraints } = methodFunctionDefinition;
 
     Object.keys(constraints).values(_const => {
-      let { key } = _const;
+      const { key } = _const;
     });
   }
 }
@@ -3651,14 +3651,14 @@ export function addInstanceFunc(node, callback, viewPackages, option = {}) {
 export function executeGraphOperations(operations) {
   return (dispatch, getState) => {
     operations.map(t => {
-      var { node, method, options } = t;
+      const { node, method, options } = t;
       method.method({ model: node, dispatch, getState, ...options });
     });
   };
 }
 export function selectAllConnected(id) {
   return (dispatch, getState) => {
-    let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {
+    const nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {
       id
     });
     graphOperation([
@@ -3679,8 +3679,8 @@ export function selectAllConnected(id) {
 }
 export function selectAllInViewPackage(id) {
   return (dispatch, getState) => {
-    let node = GetNodeById(id);
-    let nodes = GetNodesByProperties({
+    const node = GetNodeById(id);
+    const nodes = GetNodesByProperties({
       [NodeProperties.ViewPackage]: GetNodeProp(
         node,
         NodeProperties.ViewPackage
@@ -3705,7 +3705,7 @@ export function selectAllInViewPackage(id) {
 
 export function pinSelected() {
   return (dispatch, getState) => {
-    let nodes = GetNodesByProperties({
+    const nodes = GetNodesByProperties({
       [NodeProperties.Selected]: true
     });
     graphOperation(
@@ -3726,8 +3726,8 @@ export function pinSelected() {
 }
 export function addAllOfType(args) {
   return (dispatch, getState) => {
-    let { properties, target, source } = args;
-    let nodes = NodesByType(
+    const { properties, target, source } = args;
+    const nodes = NodesByType(
       getState(),
       GetNodeProp(target, NodeProperties.NODEType)
     );
@@ -3747,7 +3747,7 @@ export function addAllOfType(args) {
 }
 export function unPinSelected() {
   return (dispatch, getState) => {
-    let nodes = GetNodesByProperties({
+    const nodes = GetNodesByProperties({
       [NodeProperties.Selected]: true
     });
     graphOperation(
@@ -3792,10 +3792,10 @@ export function graphOperation(operation, options, stamp) {
       };
       setViewPackageStamp(viewPackage, stamp);
     }
-    var state = getState();
+    const state = getState();
     let rootGraph = null;
-    var currentGraph = Application(state, CURRENT_GRAPH);
-    let scope = Application(state, GRAPH_SCOPE) || [];
+    let currentGraph = Application(state, CURRENT_GRAPH);
+    const scope = Application(state, GRAPH_SCOPE) || [];
     if (!currentGraph) {
       currentGraph = GraphMethods.createGraph();
       SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
@@ -3807,7 +3807,7 @@ export function graphOperation(operation, options, stamp) {
         currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
       }
     }
-    var operations = operation;
+    let operations = operation;
     if (!Array.isArray(operation)) {
       operations = [{ operation: operation, options }];
     }
@@ -3832,11 +3832,11 @@ export function graphOperation(operation, options, stamp) {
                 options = options(currentGraph);
               }
               if (options) {
-                let currentLastNode =
+                const currentLastNode =
                   currentGraph.nodes && currentGraph.nodes.length
                     ? currentGraph.nodes[currentGraph.nodes.length - 1]
                     : null;
-                let currentLastGroup =
+                const currentLastGroup =
                   currentGraph.groups && currentGraph.groups.length
                     ? currentGraph.groups[currentGraph.groups.length - 1]
                     : null;
@@ -3887,7 +3887,7 @@ export function graphOperation(operation, options, stamp) {
                     );
                     break;
                   case CONNECT_TO_TITLE_SERVICE:
-                    let titleService = GetTitleService(currentGraph);
+                    const titleService = GetTitleService(currentGraph);
                     if (titleService) {
                       currentGraph = GraphMethods.addLinkBetweenNodes(
                         currentGraph,
@@ -4275,7 +4275,7 @@ export const Colors = {
       writable: true,
       configurable: true,
       value: function () {
-        var collection = this;
+        const collection = this;
         return collection.map(node => {
           return {
             value: node.id,

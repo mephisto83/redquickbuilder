@@ -23,29 +23,30 @@ export default function AppendValidations({
   method
 }) {
   if (!subcomponents) {
-    throw "no subcomponents";
+    throw new Error("no subcomponents");
   }
-  subcomponents = subcomponents.filter(
+  const nonExecuteSubComponents = subcomponents.filter(
     x => !GetNodeProp(x, NodeProperties.ExecuteButton)
   );
-  let result = [];
+  const result = [];
 
-  if (subcomponents.length) {
-    subcomponents.map(subcomponent => {
-      let componentType = GetNodeProp(
+  if (nonExecuteSubComponents.length) {
+    nonExecuteSubComponents.map(subcomponent => {
+      const componentType = GetNodeProp(
         subcomponent,
         NodeProperties.ComponentType
       );
+      let externalValidationApi;
       switch (componentType) {
         case ComponentTypeKeys.Button:
           break;
         default:
-          let externalValidationApi = GetNodesLinkedTo(null, {
+          externalValidationApi = GetNodesLinkedTo(null, {
             id: subcomponent.id,
             link: LinkType.ComponentExternalApi
           }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
           if (externalValidationApi) {
-            let modelId = GetNodeProp(screen_option, NodeProperties.Model);
+            const modelId = GetNodeProp(screen_option, NodeProperties.Model);
             let propertyId = GetNodeProp(subcomponent, NodeProperties.Property);
             propertyId =
               propertyId ||
@@ -82,7 +83,7 @@ export default function AppendValidations({
               }),
               {
                 operation: ADD_LINK_BETWEEN_NODES,
-                options: function() {
+                options() {
                   return {
                     target: validatorNode,
                     source: externalValidationApi.id,
