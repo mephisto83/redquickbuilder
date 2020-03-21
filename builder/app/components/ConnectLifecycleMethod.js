@@ -6,7 +6,6 @@ import {
 import {
   GetNodeProp,
   REMOVE_NODE,
-  GetCurrentGraph,
   GetState,
   ADD_LINK_BETWEEN_NODES,
   ADD_NEW_NODE,
@@ -116,7 +115,7 @@ export default function (args = {}) {
       });
     });
 
-  let result = [
+  const result = [
     ...apiConnectors,
     {
       operation: ADD_LINK_BETWEEN_NODES,

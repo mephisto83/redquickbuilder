@@ -1,5 +1,5 @@
-import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
-import { GetCurrentGraph, GetNodeProp, ADD_NEW_NODE, addInstanceFunc, GetNodeById } from "../../actions/uiactions";
+import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetCurrentGraph, GetNodeProp, ADD_NEW_NODE, addInstanceFunc } from "../../actions/uiactions";
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from "../../constants/nodetypes";
 import { SCREEN_COMPONENT_EVENTS, ComponentLifeCycleEvents } from '../../constants/componenttypes';
 
@@ -9,23 +9,12 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
   const { node, viewPackages } = args;
   let lifeCycleMethod = null;
   let lifeCycleInstance = null;
-  let skip = false;
   const component = GetNodesLinkedTo(currentGraph, {
     id: node,
     link: LinkType.DefaultViewType
   }).find(v => GetNodeProp(v, NodeProperties.SharedComponent));
   if (component) {
-    result.push((graph) => {
-      lifeCycleMethod = GetNodeLinkedTo(graph, {
-        id: component.id,
-        link: LinkType.LifeCylceMethod,
-        componentType: NodeTypes.LifeCylceMethod
-      });
-      if (lifeCycleMethod) {
-        skip = true;
-        return null;
-      }
-
+    result.push(() => {
       return SCREEN_COMPONENT_EVENTS.map(t => ({
         operation: ADD_NEW_NODE,
         options() {
@@ -59,7 +48,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
       if (lifeCycleMethod) {
         const temp = addInstanceFunc(lifeCycleMethod, (lci) => {
           lifeCycleInstance = lci;
-        }, viewPackages);
+        }, viewPackages, { lifeCycle: true });
         return {
           operation: ADD_NEW_NODE,
           options: temp
@@ -71,7 +60,6 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
         args.callback({
           lifeCycleMethod,
           component,
-          skip,
           lifeCycleInstance
         })
       }

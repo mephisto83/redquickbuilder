@@ -970,6 +970,9 @@ export function setViewPackageStamp(viewPackageStamp, key) {
       _view_package_key = !_viewPackageStamp ? null : key;
     }
 }
+export function isStamped() {
+  return !!_view_package_key;
+}
 export function addNewNodeOfType(graph, options, nodeType, callback) {
   let { parent, linkProperties, groupProperties } = options;
   if (!callback) {
@@ -1303,7 +1306,7 @@ function NodesByType(graph, nodeType, options = {}) {
             currentGraph.nodeLib[x] &&
             currentGraph.nodeLib[x].properties &&
             currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
-              nodeType)
+            nodeType)
       )
       .map(x => currentGraph.nodeLib[x]);
   }
@@ -1374,7 +1377,7 @@ export function constraintSideEffects(graph) {
                 //Should be able to find the singular model that is connected to the functionNode and children, if it exists.
                 let constraintModelKey =
                   functionConstraintRequiredClasses[j][
-                    INTERNAL_TEMPLATE_REQUIREMENTS.MODEL
+                  INTERNAL_TEMPLATE_REQUIREMENTS.MODEL
                   ];
                 if (constraintModelKey) {
                   var constraint_nodes = getNodesFunctionsConnected(graph, {
@@ -1590,7 +1593,7 @@ export function applyFunctionConstraints(graph, options) {
       if (graph.nodesGroups[id]) {
         for (let i in graph.nodesGroups[id]) {
           switch (
-            GetGroupProperty(graph.groupLib[i], GroupProperties.FunctionGroup)
+          GetGroupProperty(graph.groupLib[i], GroupProperties.FunctionGroup)
           ) {
             case FunctionGroups.Core:
               core_group = graph.groupLib[i];
@@ -1710,7 +1713,7 @@ export function applyFunctionConstraints(graph, options) {
           constraint.key &&
           functionConstraints.constraints[constraint.key] &&
           functionConstraints.constraints[constraint.key][
-            FunctionConstraintKeys.IsInputVariable
+          FunctionConstraintKeys.IsInputVariable
           ]
         ) {
           graph = addLeaf(graph, { leaf: new_node.id, id: internal_group.id });
@@ -2535,11 +2538,11 @@ export function findLinkInstance(graph, options) {
   let link =
     graph && graph.links
       ? graph.links.find(
-          x =>
-            graph.linkLib[x] &&
-            graph.linkLib[x].source === source &&
-            graph.linkLib[x].target == target
-        )
+        x =>
+          graph.linkLib[x] &&
+          graph.linkLib[x].source === source &&
+          graph.linkLib[x].target == target
+      )
       : null;
   return link;
 }
@@ -3190,7 +3193,7 @@ export function VisualProcess(graph) {
     if (graph.nodesGroups[t]) {
       let t_importance =
         GroupImportanceOrder[
-          GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)
+        GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)
         ] || 1000;
       var sortedGroups = Object.keys(graph.nodesGroups[t])
         .filter(nodeGroupKey => {

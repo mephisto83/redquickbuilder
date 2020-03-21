@@ -3615,11 +3615,30 @@ export function executeGraphOperation(model, op, args = {}) {
 export function GetNodesLinkTypes(id) {
   return GraphMethods.getNodesLinkTypes(GetCurrentGraph(GetState()), { id });
 }
-export function addInstanceFunc(node, callback, viewPackages) {
+export function addInstanceFunc(node, callback, viewPackages, option = {}) {
   viewPackages = viewPackages || {};
   return function () {
     if (typeof node === 'function') {
       node = node();
+    }
+    if (option.lifeCycle) {
+      return {
+        nodeType: NodeTypes.LifeCylceMethodInstance,
+        parent: node.id,
+        linkProperties: {
+          properties: LinkProperties.LifeCylceMethodInstance
+        },
+        callback,
+        groupProperties: {},
+        properties: {
+          [NodeProperties.UIText]: `${GetNodeTitle(node)} Instance`,
+          [NodeProperties.AutoDelete]: {
+            properties: {
+              [NodeProperties.NODEType]: NodeTypes.ComponentApiConnector
+            }
+          }
+        }
+      }
     }
     return {
       nodeType: NodeTypes.EventMethodInstance,

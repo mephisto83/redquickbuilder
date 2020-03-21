@@ -97,7 +97,8 @@ import {
 import * as Titles from "../components/titles";
 import {
   createComponentApi,
-  addComponentApi} from "../methods/component_api_methods";
+  addComponentApi
+} from "../methods/component_api_methods";
 import {
   DataChainFunctionKeys,
   SplitDataCommand,
@@ -202,7 +203,7 @@ export const GetSpecificModels = {
                                 parent: methodNode.id,
                                 nodeType:
                                   constraint.key ===
-                                  FunctionTemplateKeys.Permission
+                                    FunctionTemplateKeys.Permission
                                     ? NodeTypes.Permission
                                     : NodeTypes.ModelFilter,
                                 groupProperties: {},
@@ -214,10 +215,10 @@ export const GetSpecificModels = {
                                     methodNode
                                   )} ${
                                     constraint.key ===
-                                    FunctionTemplateKeys.Permission
+                                      FunctionTemplateKeys.Permission
                                       ? NodeTypes.Permission
                                       : NodeTypes.ModelFilter
-                                  }`
+                                    }`
                                 },
                                 linkProperties: {
                                   properties: {
@@ -418,7 +419,7 @@ export const GetAllModels = {
 export const CreateLoginModels = {
   type: "Build Login",
   methodType: "Login Models",
-  method: args => {
+  method: (args = {}) => {
     // let currentGraph = GetCurrentGraph(GetStateFunc()());
     // currentGraph = newNode(currentGraph);
     const nodePackageType = "login-models";
@@ -447,7 +448,7 @@ export const CreateLoginModels = {
           }
         }
       },
-      function() {
+      function () {
         return [
           { propName: "User Name" },
           { propName: "Password" },
@@ -492,7 +493,7 @@ export const CreateLoginModels = {
           }
         }
       },
-      function() {
+      function () {
         return [
           { propName: "User Name" },
           { propName: "Email", propType: NodePropertyTypes.EMAIL },
@@ -561,14 +562,13 @@ export const CreateLoginModels = {
           };
         }
       },
-      function(graph) {
+      function (graph) {
         newStuff.graph = graph;
         return [];
       }
     ])(GetDispatchFunc(), GetStateFunc());
     const regsterResult = CreateAgentFunction({
       viewPackage,
-      nodePackageType,
       model: GetNodeById(newStuff.registerModel, newStuff.graph),
       agent: {},
       maestro: newStuff.maestro,
@@ -583,7 +583,6 @@ export const CreateLoginModels = {
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
     const loginResult = CreateAgentFunction({
       viewPackage,
-      nodePackageType,
       model: GetNodeById(newStuff.loginModel, newStuff.graph),
       agent: {},
       maestro: newStuff.maestro,
@@ -879,7 +878,7 @@ export function CreatePagingSkipDataChains() {
         return temp.options;
       }
     },
-    function(graph) {
+    function (graph) {
       if (skipResult) {
         return false;
       }
@@ -921,7 +920,7 @@ export function CreatePagingSkipDataChains() {
         };
       }
     },
-    function(graph) {
+    function (graph) {
       if (skipResult) {
         return false;
       }
@@ -1039,7 +1038,7 @@ export function CreatePagingTakeDataChains() {
         return temp.options;
       }
     },
-    function(graph) {
+    function (graph) {
       if (skipTake) {
         return false;
       }
@@ -1148,28 +1147,28 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
     },
     options && options.isList
       ? {
-          operation: ADD_NEW_NODE,
-          options() {
-            if (skip) {
-              return false;
-            }
-            return {
-              nodeType: NodeTypes.Property,
-              callback: skipModel => {
-                result.list = skipModel.id;
-              },
-              parent: pageModelId,
-              groupProperties: {},
-              linkProperties: {
-                properties: { ...LinkProperties.PropertyLink }
-              },
-              properties: {
-                [NodeProperties.Pinned]: false,
-                [NodeProperties.UIText]: Titles.List
-              }
-            };
+        operation: ADD_NEW_NODE,
+        options() {
+          if (skip) {
+            return false;
           }
+          return {
+            nodeType: NodeTypes.Property,
+            callback: skipModel => {
+              result.list = skipModel.id;
+            },
+            parent: pageModelId,
+            groupProperties: {},
+            linkProperties: {
+              properties: { ...LinkProperties.PropertyLink }
+            },
+            properties: {
+              [NodeProperties.Pinned]: false,
+              [NodeProperties.UIText]: Titles.List
+            }
+          };
         }
+      }
       : false
   ])(GetDispatchFunc(), GetStateFunc());
 
@@ -1184,7 +1183,7 @@ export function createViewPagingDataChain(
 ) {
   let skip = false;
   const skipOrTake = skipChain ? "Skip" : "Take";
-  return function() {
+  return function () {
     return [
       {
         // The data chain for a list screen
@@ -1305,15 +1304,15 @@ export function createViewPagingDataChain(
             graph
           )
             ? {
-                id: getGroup(
-                  GetNodeProp(
-                    newItems.viewModelListRefNode,
-                    NodeProperties.GroupParent,
-                    graph
-                  ),
+              id: getGroup(
+                GetNodeProp(
+                  newItems.viewModelListRefNode,
+                  NodeProperties.GroupParent,
                   graph
-                ).id
-              }
+                ),
+                graph
+              ).id
+            }
             : null;
           const model = GetNodeByProperties(
             {
@@ -1396,15 +1395,15 @@ export function createViewPagingDataChain(
             graph
           )
             ? {
-                id: getGroup(
-                  GetNodeProp(
-                    newItems.pagingRefNode,
-                    NodeProperties.GroupParent,
-                    graph
-                  ),
+              id: getGroup(
+                GetNodeProp(
+                  newItems.pagingRefNode,
+                  NodeProperties.GroupParent,
                   graph
-                ).id
-              }
+                ),
+                graph
+              ).id
+            }
             : null;
           return {
             parent: newItems.pagingRefNode,
@@ -1603,15 +1602,18 @@ export const CreateDefaultView = {
     const default_View_method = (args = {}) => {
       let {
         viewName,
+        isList,
+      } = args;
+      const {
         viewType,
         isDefaultComponent,
         uiType = UITypes.ReactNative,
         isSharedComponent,
         isPluralComponent,
-        isList,
         model,
         chosenChildren = []
       } = args;
+
       const state = GetState();
       const currentNode = model || Node(state, Visual(state, SELECTED_NODE));
       let screenNodeId = null;
@@ -1716,124 +1718,124 @@ export const CreateDefaultView = {
           [
             !isSharedComponent
               ? {
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    const res = GetNodesByProperties(
-                      {
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.UIText]: `${viewName} Form`,
-                        [NodeProperties.ViewType]: viewType,
-                        [NodeProperties.Model]: currentNode.id
-                      },
-                      graph
-                    ).find(x => x);
-                    if (res) {
-                      screenNodeId = res.id;
-                      newItems.screenNodeId = res.id;
-                      method_result.screenNodeId = screenNodeId;
-                      return false;
-                    }
-                    return {
-                      nodeType: NodeTypes.Screen,
-                      callback: screenNode => {
-                        screenNodeId = screenNode.id;
-                        newItems.screenNodeId = screenNode.id;
-                      },
-                      properties: {
-                        ...viewPackage,
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.ViewType]: viewType,
-                        [NodeProperties.UIText]: `${viewName} Form`,
-                        [NodeProperties.Model]: currentNode.id
-                      }
-                    };
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  const res = GetNodesByProperties(
+                    {
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance,
+                      [NodeProperties.UIText]: `${viewName} Form`,
+                      [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.Model]: currentNode.id
+                    },
+                    graph
+                  ).find(x => x);
+                  if (res) {
+                    screenNodeId = res.id;
+                    newItems.screenNodeId = res.id;
+                    method_result.screenNodeId = screenNodeId;
+                    return false;
                   }
+                  return {
+                    nodeType: NodeTypes.Screen,
+                    callback: screenNode => {
+                      screenNodeId = screenNode.id;
+                      newItems.screenNodeId = screenNode.id;
+                    },
+                    properties: {
+                      ...viewPackage,
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance,
+                      [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.UIText]: `${viewName} Form`,
+                      [NodeProperties.Model]: currentNode.id
+                    }
+                  };
                 }
+              }
               : false,
             !isSharedComponent
-              ? function(graph) {
-                  return addComponentApiToForm({
-                    newItems,
-                    text: "value",
-                    parent: newItems.screenNodeId,
-                    graph,
-                    isSingular: true
-                  });
-                }
+              ? function (graph) {
+                return addComponentApiToForm({
+                  newItems,
+                  text: "value",
+                  parent: newItems.screenNodeId,
+                  graph,
+                  isSingular: true
+                });
+              }
               : null,
             !isSharedComponent
-              ? function(graph) {
-                  return addComponentApiToForm({
-                    newItems,
-                    text: ApiNodeKeys.ViewModel,
-                    parent: newItems.screenNodeId,
-                    graph,
-                    isSingular: true,
-                    internalProperties: {
-                      [NodeProperties.DefaultComponentApiValue]: useModelInstance
-                        ? false
-                        : GetCodeName(newItems.screenNodeId)
-                    }
-                  });
-                }
+              ? function (graph) {
+                return addComponentApiToForm({
+                  newItems,
+                  text: ApiNodeKeys.ViewModel,
+                  parent: newItems.screenNodeId,
+                  graph,
+                  isSingular: true,
+                  internalProperties: {
+                    [NodeProperties.DefaultComponentApiValue]: useModelInstance
+                      ? false
+                      : GetCodeName(newItems.screenNodeId)
+                  }
+                });
+              }
               : null,
             //Adding load data chain
             ...((needsLoadToScreenState && false)
               ? LoadModel({
-                  model_view_name: `${viewName} Load ${GetNodeTitle(
-                    currentNode
-                  )}`,
-                  model_item: `Models.${GetCodeName(currentNode)}`,
-                  callback: context => {
-                    newItems.dataChainForLoading = context.entry;
-                  }
-                })
+                model_view_name: `${viewName} Load ${GetNodeTitle(
+                  currentNode
+                )}`,
+                model_item: `Models.${GetCodeName(currentNode)}`,
+                callback: context => {
+                  newItems.dataChainForLoading = context.entry;
+                }
+              })
               : []),
             !isSharedComponent && isList
               ? {
-                  // The selector for a list screen
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    const $node = GetNodeByProperties(
-                      {
-                        [NodeProperties.UIText]: `${viewName} Screen View Model`,
-                        [NodeProperties.InstanceType]: InstanceTypes.AppState,
-                        [NodeProperties.Model]: pageViewModel.model,
-                        [NodeProperties.NODEType]: NodeTypes.ViewModel
-                      },
-                      graph
-                    );
-                    if ($node) {
-                      newItems.screenViewModel = $node.id;
-                      return false;
-                    }
-
-                    return {
-                      nodeType: NodeTypes.ViewModel,
-                      properties: {
-                        [NodeProperties.UIText]: `${viewName} Screen View Model`,
-                        [NodeProperties.InstanceType]: InstanceTypes.AppState,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.Model]: pageViewModel.model
-                      },
-                      links: [
-                        {
-                          target: pageViewModel.model,
-                          linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                          }
-                        }
-                      ],
-                      callback: res => {
-                        newItems.screenViewModel = res.id;
-                      }
-                    };
+                // The selector for a list screen
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  const $node = GetNodeByProperties(
+                    {
+                      [NodeProperties.UIText]: `${viewName} Screen View Model`,
+                      [NodeProperties.InstanceType]: InstanceTypes.AppState,
+                      [NodeProperties.Model]: pageViewModel.model,
+                      [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    },
+                    graph
+                  );
+                  if ($node) {
+                    newItems.screenViewModel = $node.id;
+                    return false;
                   }
+
+                  return {
+                    nodeType: NodeTypes.ViewModel,
+                    properties: {
+                      [NodeProperties.UIText]: `${viewName} Screen View Model`,
+                      [NodeProperties.InstanceType]: InstanceTypes.AppState,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.Model]: pageViewModel.model
+                    },
+                    links: [
+                      {
+                        target: pageViewModel.model,
+                        linkProperties: {
+                          properties: { ...LinkProperties.ViewModelLink }
+                        }
+                      }
+                    ],
+                    callback: res => {
+                      newItems.screenViewModel = res.id;
+                    }
+                  };
                 }
+              }
               : false,
 
             {
@@ -1865,431 +1867,431 @@ export const CreateDefaultView = {
             },
             !isSharedComponent && isList
               ? {
-                  // The selector for a list screen
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    const $node = GetNodeByProperties(
-                      {
-                        [NodeProperties.UIText]: `${viewName} Screen Selector`,
-                        [NodeProperties.NODEType]: NodeTypes.Selector
-                      },
-                      graph
-                    );
-                    if ($node) {
-                      newItems.screenSelector = $node.id;
-                      return false;
-                    }
-                    return {
-                      nodeType: NodeTypes.Selector,
-                      properties: {
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.UIText]: `${viewName} Screen Selector`
-                      },
-                      links: [
-                        {
-                          target: newItems.screenViewModel,
-                          linkProperties: {
-                            properties: { ...LinkProperties.SelectorLink }
-                          }
-                        }
-                      ],
-                      callback: res => {
-                        newItems.screenSelector = res.id;
-                      }
-                    };
+                // The selector for a list screen
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  const $node = GetNodeByProperties(
+                    {
+                      [NodeProperties.UIText]: `${viewName} Screen Selector`,
+                      [NodeProperties.NODEType]: NodeTypes.Selector
+                    },
+                    graph
+                  );
+                  if ($node) {
+                    newItems.screenSelector = $node.id;
+                    return false;
                   }
+                  return {
+                    nodeType: NodeTypes.Selector,
+                    properties: {
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.UIText]: `${viewName} Screen Selector`
+                    },
+                    links: [
+                      {
+                        target: newItems.screenViewModel,
+                        linkProperties: {
+                          properties: { ...LinkProperties.SelectorLink }
+                        }
+                      }
+                    ],
+                    callback: res => {
+                      newItems.screenSelector = res.id;
+                    }
+                  };
                 }
+              }
               : false,
             !isSharedComponent && isList
               ? {
-                  // The data chain for a list screen
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    const $node = GetNodeByProperties(
-                      {
-                        [NodeProperties.UIText]: `${viewName} Screen DC`,
-                        [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Selector,
-                        [NodeProperties.Selector]: newItems.screenSelector,
-                        [NodeProperties.EntryPoint]: true,
-                        [NodeProperties.SelectorProperty]:
-                          SelectorPropertyKeys.Object
-                      },
-                      graph
-                    );
-                    if ($node) {
-                      newItems.screenListDataChain = $node.id;
-                      newItems.screenListDataChainAlreadyMade = true;
-                      return false;
-                    }
-
-                    return {
-                      nodeType: NodeTypes.DataChain,
-                      properties: {
-                        [NodeProperties.UIText]: `${viewName} Screen DC`,
-                        [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Selector,
-                        [NodeProperties.Selector]: newItems.screenSelector,
-                        [NodeProperties.EntryPoint]: true,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.AsOutput]: true,
-                        [NodeProperties.SelectorProperty]:
-                          SelectorPropertyKeys.Object
-                      },
-                      links: [
-                        {
-                          target: newItems.screenSelector,
-                          linkProperties: {
-                            properties: { ...LinkProperties.DataChainLink }
-                          }
-                        },
-                        {
-                          target: newItems.screenViewModel,
-                          linkProperties: {
-                            properties: { ...LinkProperties.DataChainLink }
-                          }
-                        }
-                      ],
-                      callback: res => {
-                        newItems.screenListDataChain = res.id;
-                      }
-                    };
+                // The data chain for a list screen
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  const $node = GetNodeByProperties(
+                    {
+                      [NodeProperties.UIText]: `${viewName} Screen DC`,
+                      [NodeProperties.DataChainFunctionType]:
+                        DataChainFunctionKeys.Selector,
+                      [NodeProperties.Selector]: newItems.screenSelector,
+                      [NodeProperties.EntryPoint]: true,
+                      [NodeProperties.SelectorProperty]:
+                        SelectorPropertyKeys.Object
+                    },
+                    graph
+                  );
+                  if ($node) {
+                    newItems.screenListDataChain = $node.id;
+                    newItems.screenListDataChainAlreadyMade = true;
+                    return false;
                   }
+
+                  return {
+                    nodeType: NodeTypes.DataChain,
+                    properties: {
+                      [NodeProperties.UIText]: `${viewName} Screen DC`,
+                      [NodeProperties.DataChainFunctionType]:
+                        DataChainFunctionKeys.Selector,
+                      [NodeProperties.Selector]: newItems.screenSelector,
+                      [NodeProperties.EntryPoint]: true,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.AsOutput]: true,
+                      [NodeProperties.SelectorProperty]:
+                        SelectorPropertyKeys.Object
+                    },
+                    links: [
+                      {
+                        target: newItems.screenSelector,
+                        linkProperties: {
+                          properties: { ...LinkProperties.DataChainLink }
+                        }
+                      },
+                      {
+                        target: newItems.screenViewModel,
+                        linkProperties: {
+                          properties: { ...LinkProperties.DataChainLink }
+                        }
+                      }
+                    ],
+                    callback: res => {
+                      newItems.screenListDataChain = res.id;
+                    }
+                  };
                 }
+              }
               : false,
 
             !isSharedComponent
               ? {
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    const res = GetNodesByProperties(
-                      {
-                        [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.InstanceType]: useModelInstance
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  const res = GetNodesByProperties(
+                    {
+                      [NodeProperties.Model]: currentNode.id,
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance,
+                      [NodeProperties.NODEType]: NodeTypes.ViewModel
+                    },
+                    graph
+                  );
+                  if (res && res.length) {
+                    viewModelNodeId = res[0].id;
+                    return false;
+                  }
+                  return {
+                    nodeType: NodeTypes.ViewModel,
+                    callback: viewModelNode => {
+                      viewModelNodeId = viewModelNode.id;
+                    },
+                    properties: {
+                      ...viewPackage,
+                      [NodeProperties.UIText]: `${viewName} VM ${
+                        useModelInstance
                           ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.NODEType]: NodeTypes.ViewModel
-                      },
-                      graph
-                    );
-                    if (res && res.length) {
-                      viewModelNodeId = res[0].id;
-                      return false;
-                    }
-                    return {
-                      nodeType: NodeTypes.ViewModel,
-                      callback: viewModelNode => {
-                        viewModelNodeId = viewModelNode.id;
-                      },
-                      properties: {
-                        ...viewPackage,
-                        [NodeProperties.UIText]: `${viewName} VM ${
-                          useModelInstance
-                            ? InstanceTypes.ModelInstance
-                            : InstanceTypes.ScreenInstance
+                          : InstanceTypes.ScreenInstance
                         }`,
-                        [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance
-                      },
-                      links: [
-                        {
-                          target: currentNode.id,
-                          linkProperties: {
-                            properties: { ...LinkProperties.ViewModelLink }
-                          }
+                      [NodeProperties.Model]: currentNode.id,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance
+                    },
+                    links: [
+                      {
+                        target: currentNode.id,
+                        linkProperties: {
+                          properties: { ...LinkProperties.ViewModelLink }
                         }
-                      ]
-                    };
-                  }
+                      }
+                    ]
+                  };
                 }
+              }
               : false,
             !isSharedComponent
               ? {
-                  operation: NEW_SCREEN_OPTIONS,
-                  options() {
-                    let formLayout = CreateLayout();
-                    formLayout = SetCellsLayout(formLayout, 1);
-                    const rootCellId = GetFirstCell(formLayout);
-                    const cellProperties = GetCellProperties(
-                      formLayout,
-                      rootCellId
-                    );
-                    cellProperties.style = {
-                      ...cellProperties.style,
-                      flexDirection: "column"
-                    };
+                operation: NEW_SCREEN_OPTIONS,
+                options() {
+                  let formLayout = CreateLayout();
+                  formLayout = SetCellsLayout(formLayout, 1);
+                  const rootCellId = GetFirstCell(formLayout);
+                  const cellProperties = GetCellProperties(
+                    formLayout,
+                    rootCellId
+                  );
+                  cellProperties.style = {
+                    ...cellProperties.style,
+                    flexDirection: "column"
+                  };
 
-                    let componentProps = null;
+                  let componentProps = null;
 
-                    if (useModelInstance) {
-                      componentProps = createComponentApi();
-                      GENERAL_COMPONENT_API.map(x => {
-                        componentProps = addComponentApi(componentProps, {
-                          modelProp: x.property
-                        });
+                  if (useModelInstance) {
+                    componentProps = createComponentApi();
+                    GENERAL_COMPONENT_API.map(x => {
+                      componentProps = addComponentApi(componentProps, {
+                        modelProp: x.property
                       });
-                      GENERAL_COMPONENT_API.map(t => {
-                        const apiProperty = t.property;
-                        (function() {
-                          const rootCellId = GetFirstCell(formLayout);
-                          const cellProperties = GetCellProperties(
-                            formLayout,
-                            rootCellId
-                          );
-                          cellProperties.componentApi =
-                            cellProperties.componentApi || {};
-                          cellProperties.componentApi[apiProperty] = {
-                            instanceType: InstanceTypes.ApiProperty,
-                            apiProperty
-                          };
-                        })();
-                      });
-                    }
-                    return {
-                      callback: screenOptionNode => {
-                        screenNodeOptionId = screenOptionNode.id;
-                        newItems.screenNodeOptionId = screenNodeOptionId;
-                      },
-                      parent: screenNodeId,
-                      properties: {
-                        ...viewPackage,
-                        [NodeProperties.UIText]: `${viewName} ${uiType} Form`,
-                        [NodeProperties.UIType]: uiType,
-                        [NodeProperties.ComponentType]:
-                          ComponentTypes[uiType].Generic.key,
-                        [NodeProperties.ComponentApi]: componentProps,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.Layout]: formLayout,
-                        [NodeProperties.Model]: currentNode.id,
-                        [NodeProperties.ViewType]: viewType,
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance
-                      },
-                      groupProperties: {},
-                      linkProperties: {
-                        properties: { ...LinkProperties.ScreenOptionsLink }
-                      }
-                    };
+                    });
+                    GENERAL_COMPONENT_API.map(t => {
+                      const apiProperty = t.property;
+                      (function () {
+                        const rootCellId = GetFirstCell(formLayout);
+                        const cellProperties = GetCellProperties(
+                          formLayout,
+                          rootCellId
+                        );
+                        cellProperties.componentApi =
+                          cellProperties.componentApi || {};
+                        cellProperties.componentApi[apiProperty] = {
+                          instanceType: InstanceTypes.ApiProperty,
+                          apiProperty
+                        };
+                      })();
+                    });
                   }
+                  return {
+                    callback: screenOptionNode => {
+                      screenNodeOptionId = screenOptionNode.id;
+                      newItems.screenNodeOptionId = screenNodeOptionId;
+                    },
+                    parent: screenNodeId,
+                    properties: {
+                      ...viewPackage,
+                      [NodeProperties.UIText]: `${viewName} ${uiType} Form`,
+                      [NodeProperties.UIType]: uiType,
+                      [NodeProperties.ComponentType]:
+                        ComponentTypes[uiType].Generic.key,
+                      [NodeProperties.ComponentApi]: componentProps,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.Layout]: formLayout,
+                      [NodeProperties.Model]: currentNode.id,
+                      [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance
+                    },
+                    groupProperties: {},
+                    linkProperties: {
+                      properties: { ...LinkProperties.ScreenOptionsLink }
+                    }
+                  };
                 }
+              }
               : false,
             !isSharedComponent
-              ? function() {
-                  return addComponentApiToForm({
-                    newItems,
-                    text: "value",
-                    parent: newItems.screenNodeOptionId
-                  });
-                }
+              ? function () {
+                return addComponentApiToForm({
+                  newItems,
+                  text: "value",
+                  parent: newItems.screenNodeOptionId
+                });
+              }
               : null,
             !isSharedComponent
-              ? function() {
-                  return addComponentApiToForm({
-                    newItems,
-                    text: ApiNodeKeys.ViewModel,
-                    parent: newItems.screenNodeOptionId
-                  });
-                }
+              ? function () {
+                return addComponentApiToForm({
+                  newItems,
+                  text: ApiNodeKeys.ViewModel,
+                  parent: newItems.screenNodeOptionId
+                });
+              }
               : null,
             !isSharedComponent
-              ? function() {
-                  return connectComponentToExternalApi({
-                    newItems,
-                    parent: newItems.screenNodeId,
-                    key: "value",
-                    properties: LinkProperties.ComponentExternalConnection,
-                    child: newItems.screenNodeOptionId
-                  });
-                }
+              ? function () {
+                return connectComponentToExternalApi({
+                  newItems,
+                  parent: newItems.screenNodeId,
+                  key: "value",
+                  properties: LinkProperties.ComponentExternalConnection,
+                  child: newItems.screenNodeOptionId
+                });
+              }
               : null,
             !isSharedComponent
-              ? function() {
-                  return connectComponentToExternalApi({
-                    newItems,
-                    parent: newItems.screenNodeId,
-                    properties: LinkProperties.ComponentExternalConnection,
-                    key: ApiNodeKeys.ViewModel,
-                    child: newItems.screenNodeOptionId
-                  });
-                }
+              ? function () {
+                return connectComponentToExternalApi({
+                  newItems,
+                  parent: newItems.screenNodeId,
+                  properties: LinkProperties.ComponentExternalConnection,
+                  key: ApiNodeKeys.ViewModel,
+                  child: newItems.screenNodeOptionId
+                });
+              }
               : null,
             ...(!isSharedComponent
               ? SCREEN_COMPONENT_EVENTS.map(t => {
-                  return {
-                    operation: ADD_NEW_NODE,
-                    options() {
-                      return {
-                        nodeType: NodeTypes.LifeCylceMethod,
-                        properties: {
-                          ...viewPackage,
-                          [NodeProperties.InstanceType]: useModelInstance
-                            ? InstanceTypes.ModelInstance
-                            : InstanceTypes.ScreenInstance,
-                          [NodeProperties.EventType]: t,
-                          [NodeProperties.Pinned]: false,
-                          [NodeProperties.UIText]: `${t}`
-                        },
-                        links: [
-                          {
-                            target: newItems.screenNodeOptionId,
-                            linkProperties: {
-                              properties: { ...LinkProperties.LifeCylceMethod }
-                            }
+                return {
+                  operation: ADD_NEW_NODE,
+                  options() {
+                    return {
+                      nodeType: NodeTypes.LifeCylceMethod,
+                      properties: {
+                        ...viewPackage,
+                        [NodeProperties.InstanceType]: useModelInstance
+                          ? InstanceTypes.ModelInstance
+                          : InstanceTypes.ScreenInstance,
+                        [NodeProperties.EventType]: t,
+                        [NodeProperties.Pinned]: false,
+                        [NodeProperties.UIText]: `${t}`
+                      },
+                      links: [
+                        {
+                          target: newItems.screenNodeOptionId,
+                          linkProperties: {
+                            properties: { ...LinkProperties.LifeCylceMethod }
                           }
-                        ],
-                        callback: screenNode => {
-                          screenComponentEvents.push(screenNode.id);
                         }
-                      };
-                    }
-                  };
-                })
+                      ],
+                      callback: screenNode => {
+                        screenComponentEvents.push(screenNode.id);
+                      }
+                    };
+                  }
+                };
+              })
               : []),
 
             ...((needsLoadToScreenState && false)
               ? ConnectLifecycleMethodToDataChain({
-                  lifeCycleMethod: graph => {
-                    const sce = screenComponentEvents.find(
-                      x =>
-                        GetNodeProp(x, NodeProperties.EventType, graph) ===
-                        ComponentLifeCycleEvents.ComponentDidMount
-                    );
-                    return sce;
-                  },
-                  dataChain: () => newItems.dataChainForLoading
-                })
+                lifeCycleMethod: graph => {
+                  const sce = screenComponentEvents.find(
+                    x =>
+                      GetNodeProp(x, NodeProperties.EventType, graph) ===
+                      ComponentLifeCycleEvents.ComponentDidMount
+                  );
+                  return sce;
+                },
+                dataChain: () => newItems.dataChainForLoading
+              })
               : []),
             !isSharedComponent && isList
               ? createViewPagingDataChain(newItems, viewName, viewPackage, true)
               : false,
             !isSharedComponent && isList
               ? createViewPagingDataChain(
-                  newItems,
-                  viewName,
-                  viewPackage,
-                  false
-                )
+                newItems,
+                viewName,
+                viewPackage,
+                false
+              )
               : false,
 
             isList
               ? {
-                  operation: NEW_COMPONENT_NODE,
-                  options(currentGraph) {
-                    listLayout = CreateLayout();
-                    listLayout = SetCellsLayout(listLayout, 1);
-                    const rootCellId = GetFirstCell(listLayout);
-                    const cellProperties = GetCellProperties(
-                      listLayout,
-                      rootCellId
-                    );
-                    cellProperties.style = {
-                      ...cellProperties.style,
-                      flexDirection: "column"
-                    };
-                    const componentProps = null;
+                operation: NEW_COMPONENT_NODE,
+                options(currentGraph) {
+                  listLayout = CreateLayout();
+                  listLayout = SetCellsLayout(listLayout, 1);
+                  const rootCellId = GetFirstCell(listLayout);
+                  const cellProperties = GetCellProperties(
+                    listLayout,
+                    rootCellId
+                  );
+                  cellProperties.style = {
+                    ...cellProperties.style,
+                    flexDirection: "column"
+                  };
+                  const componentProps = null;
 
-                    let connectto = [];
-                    if (isDefaultComponent) {
-                      connectto = getViewTypeEndpointsForDefaults(
-                        viewType,
-                        currentGraph,
-                        currentNode.id
-                      );
-                    }
-                    return {
-                      callback: listComponent => {
-                        listComponentId = listComponent.id;
-                        newItems.listComponentId = listComponentId;
-                        connectto.map(ct => {
-                          createListConnections.push(
-                            function() {
-                              return setSharedComponent({
-                                properties: {
-                                  ...LinkProperties.DefaultViewType,
-                                  viewType,
-                                  uiType,
-                                  isPluralComponent
-                                },
+                  let connectto = [];
+                  if (isDefaultComponent) {
+                    connectto = getViewTypeEndpointsForDefaults(
+                      viewType,
+                      currentGraph,
+                      currentNode.id
+                    );
+                  }
+                  return {
+                    callback: listComponent => {
+                      listComponentId = listComponent.id;
+                      newItems.listComponentId = listComponentId;
+                      connectto.map(ct => {
+                        createListConnections.push(
+                          function () {
+                            return setSharedComponent({
+                              properties: {
+                                ...LinkProperties.DefaultViewType,
                                 viewType,
                                 uiType,
-                                isPluralComponent,
-                                source: ct.id,
-                                target: listComponentId
-                              })(GetDispatchFunc(), GetStateFunc());
-                            },
-                            function() {
-                              PerformGraphOperation([
-                                ...[
-                                  "value",
-                                  ApiNodeKeys.ViewModel,
-                                  "label",
-                                  "placeholder",
-                                  "error",
-                                  "success"
-                                ].map(
-                                  v =>
-                                    function() {
-                                      const graph = GetCurrentGraph(
-                                        GetStateFunc()()
-                                      );
-                                      return addComponentApiToForm({
-                                        newItems,
-                                        text: v,
-                                        parent: ct.id,
-                                        isSingular: true,
-                                        graph
-                                      });
-                                    }
-                                )
-                              ])(GetDispatchFunc(), GetStateFunc());
-                            }
-                          );
-                        });
-                      },
-                      parent: screenNodeOptionId,
-                      properties: {
-                        ...viewPackage,
-                        [NodeProperties.UIText]: `${viewName} ${multi_item_component}`,
-                        [NodeProperties.UIType]: uiType,
-                        [NodeProperties.ViewType]: viewType,
-                        [NodeProperties.IsPluralComponent]: isPluralComponent,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.SharedComponent]: isSharedComponent,
-                        [NodeProperties.ComponentType]: multi_item_component,
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.Layout]: listLayout,
-                        [NodeProperties.ComponentApi]: componentProps
-                      },
-                      groupProperties: {},
-                      linkProperties: {
-                        properties: { ...LinkProperties.ComponentLink }
-                      }
-                    };
-                  }
+                                isPluralComponent
+                              },
+                              viewType,
+                              uiType,
+                              isPluralComponent,
+                              source: ct.id,
+                              target: listComponentId
+                            })(GetDispatchFunc(), GetStateFunc());
+                          },
+                          function () {
+                            PerformGraphOperation([
+                              ...[
+                                "value",
+                                ApiNodeKeys.ViewModel,
+                                "label",
+                                "placeholder",
+                                "error",
+                                "success"
+                              ].map(
+                                v =>
+                                  function () {
+                                    const graph = GetCurrentGraph(
+                                      GetStateFunc()()
+                                    );
+                                    return addComponentApiToForm({
+                                      newItems,
+                                      text: v,
+                                      parent: ct.id,
+                                      isSingular: true,
+                                      graph
+                                    });
+                                  }
+                              )
+                            ])(GetDispatchFunc(), GetStateFunc());
+                          }
+                        );
+                      });
+                    },
+                    parent: screenNodeOptionId,
+                    properties: {
+                      ...viewPackage,
+                      [NodeProperties.UIText]: `${viewName} ${multi_item_component}`,
+                      [NodeProperties.UIType]: uiType,
+                      [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.IsPluralComponent]: isPluralComponent,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.SharedComponent]: isSharedComponent,
+                      [NodeProperties.ComponentType]: multi_item_component,
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance,
+                      [NodeProperties.Layout]: listLayout,
+                      [NodeProperties.ComponentApi]: componentProps
+                    },
+                    groupProperties: {},
+                    linkProperties: {
+                      properties: { ...LinkProperties.ComponentLink }
+                    }
+                  };
                 }
+              }
               : false,
             isList
-              ? function() {
-                  return addListItemComponentApi(
-                    newItems,
-                    ApiNodeKeys.ViewModel,
-                    false,
-                    (v, _i) => {
-                      newItems.componentItemListViewModel = _i;
-                    },
-                    newItems.listComponentId,
-                    { useAsValue: false }
-                  );
-                }
+              ? function () {
+                return addListItemComponentApi(
+                  newItems,
+                  ApiNodeKeys.ViewModel,
+                  false,
+                  (v, _i) => {
+                    newItems.componentItemListViewModel = _i;
+                  },
+                  newItems.listComponentId,
+                  { useAsValue: false }
+                );
+              }
               : null,
             ...["index", "separators", "value"].map(text => {
-              return function() {
+              return function () {
                 if (!isList) {
                   return [];
                 }
@@ -2307,116 +2309,116 @@ export const CreateDefaultView = {
             }),
             isList
               ? {
-                  operation: ADD_NEW_NODE,
-                  options() {
-                    return {
-                      nodeType: NodeTypes.ComponentApi,
-                      callback: nn => {
-                        newItems.listComponentInternalApi = nn.id;
-                      },
-                      parent: newItems.listComponentId,
-                      linkProperties: {
-                        properties: { ...LinkProperties.ComponentInternalApi }
-                      },
-                      groupProperties: {},
-                      properties: {
-                        [NodeProperties.UIText]: `item`,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.UseAsValue]: true
-                      }
-                    };
-                  }
+                operation: ADD_NEW_NODE,
+                options() {
+                  return {
+                    nodeType: NodeTypes.ComponentApi,
+                    callback: nn => {
+                      newItems.listComponentInternalApi = nn.id;
+                    },
+                    parent: newItems.listComponentId,
+                    linkProperties: {
+                      properties: { ...LinkProperties.ComponentInternalApi }
+                    },
+                    groupProperties: {},
+                    properties: {
+                      [NodeProperties.UIText]: `item`,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.UseAsValue]: true
+                    }
+                  };
                 }
+              }
               : null,
             isList
               ? {
-                  operation: ADD_NEW_NODE,
-                  options() {
-                    return {
-                      nodeType: NodeTypes.ComponentExternalApi,
-                      callback: nn => {
-                        newItems.listComponentExternalApi = nn.id;
-                      },
-                      parent: newItems.listComponentId,
-                      linkProperties: {
-                        properties: { ...LinkProperties.ComponentExternalApi }
-                      },
-                      groupProperties: {},
-                      properties: {
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.UIText]: `value`
-                      }
-                    };
-                  }
+                operation: ADD_NEW_NODE,
+                options() {
+                  return {
+                    nodeType: NodeTypes.ComponentExternalApi,
+                    callback: nn => {
+                      newItems.listComponentExternalApi = nn.id;
+                    },
+                    parent: newItems.listComponentId,
+                    linkProperties: {
+                      properties: { ...LinkProperties.ComponentExternalApi }
+                    },
+                    groupProperties: {},
+                    properties: {
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.UIText]: `value`
+                    }
+                  };
                 }
+              }
               : null,
             isList
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    return {
-                      source: newItems.listComponentInternalApi,
-                      target: newItems.listComponentExternalApi,
-                      properties: {
-                        ...LinkProperties.ComponentInternalConnection
-                      }
-                    };
-                  }
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  return {
+                    source: newItems.listComponentInternalApi,
+                    target: newItems.listComponentExternalApi,
+                    properties: {
+                      ...LinkProperties.ComponentInternalConnection
+                    }
+                  };
                 }
+              }
               : null,
             isList && !isSharedComponent
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    return {
-                      source: newItems.listComponentExternalApi,
-                      target: getApiConnectors(
-                        newItems,
-                        newItems.screenNodeOptionId,
-                        "value"
-                      ).internalId,
-                      properties: {
-                        ...LinkProperties.ComponentExternalConnection
-                      }
-                    };
-                  }
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  return {
+                    source: newItems.listComponentExternalApi,
+                    target: getApiConnectors(
+                      newItems,
+                      newItems.screenNodeOptionId,
+                      "value"
+                    ).internalId,
+                    properties: {
+                      ...LinkProperties.ComponentExternalConnection
+                    }
+                  };
                 }
+              }
               : null,
             isList
               ? {
-                  operation: NEW_DATA_SOURCE,
-                  options(currentGraph) {
+                operation: NEW_DATA_SOURCE,
+                options(currentGraph) {
 
-                    return {
-                      parent: listComponentId,
-                      callback: dataSource => {
-                        dataSourceId = dataSource.id;
-                      },
-                      groupProperties: {},
-                      properties: {
-                        [NodeProperties.InstanceType]: useModelInstance
-                          ? InstanceTypes.ModelInstance
-                          : InstanceTypes.ScreenInstance,
-                        [NodeProperties.UIType]: GetNodeProp(
-                          listComponentId,
-                          NodeProperties.UIType,
-                          currentGraph
-                        ),
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.UIText]: `${GetNodeTitle(
-                          currentNode
-                        )} Data Source ${GetNodeProp(
-                          listComponentId,
-                          NodeProperties.UIType,
-                          currentGraph
-                        )}`
-                      },
-                      linkProperties: {
-                        properties: { ...LinkProperties.DataSourceLink }
-                      }
-                    };
-                  }
+                  return {
+                    parent: listComponentId,
+                    callback: dataSource => {
+                      dataSourceId = dataSource.id;
+                    },
+                    groupProperties: {},
+                    properties: {
+                      [NodeProperties.InstanceType]: useModelInstance
+                        ? InstanceTypes.ModelInstance
+                        : InstanceTypes.ScreenInstance,
+                      [NodeProperties.UIType]: GetNodeProp(
+                        listComponentId,
+                        NodeProperties.UIType,
+                        currentGraph
+                      ),
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.UIText]: `${GetNodeTitle(
+                        currentNode
+                      )} Data Source ${GetNodeProp(
+                        listComponentId,
+                        NodeProperties.UIType,
+                        currentGraph
+                      )}`
+                    },
+                    linkProperties: {
+                      properties: { ...LinkProperties.DataSourceLink }
+                    }
+                  };
                 }
+              }
               : false,
             {
               operation: NEW_COMPONENT_NODE,
@@ -2446,7 +2448,7 @@ export const CreateDefaultView = {
                     screenComponentId = screenComponent.id;
                     newItems.screenComponentId = screenComponentId;
                     connectto.map(ct => {
-                      createConnections.push(function() {
+                      createConnections.push(function () {
                         return setSharedComponent({
                           properties: {
                             ...LinkProperties.DefaultViewType,
@@ -2490,7 +2492,7 @@ export const CreateDefaultView = {
               }
             },
 
-            function() {
+            function () {
               return addListItemComponentApi(
                 newItems,
                 ApiNodeKeys.ViewModel,
@@ -2503,27 +2505,27 @@ export const CreateDefaultView = {
               );
             },
             isList
-              ? function() {
-                  if (!isList) {
-                    return [];
-                  }
-                  return {
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options() {
-                      return {
-                        target: newItems.componentItemListViewModel.internalId,
-                        source: newItems.componentViewModelApiIds.externalId,
-                        properties: {
-                          ...LinkProperties.ComponentExternalConnection
-                        }
-                      };
-                    }
-                  };
+              ? function () {
+                if (!isList) {
+                  return [];
                 }
+                return {
+                  operation: ADD_LINK_BETWEEN_NODES,
+                  options() {
+                    return {
+                      target: newItems.componentItemListViewModel.internalId,
+                      source: newItems.componentViewModelApiIds.externalId,
+                      properties: {
+                        ...LinkProperties.ComponentExternalConnection
+                      }
+                    };
+                  }
+                };
+              }
               : null,
 
             ...["index", "separators"].map(text => {
-              return function() {
+              return function () {
                 if (!isList) {
                   return [];
                 }
@@ -2542,7 +2544,7 @@ export const CreateDefaultView = {
             }),
 
             ...["index", "separators"].map(text => {
-              return function() {
+              return function () {
                 if (!isList) {
                   return [];
                 }
@@ -2632,102 +2634,102 @@ export const CreateDefaultView = {
             },
             !isSharedComponent
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    if (screenNodeOptionId || listComponentId) {
-                      return {
-                        source: getApiConnectors(
-                          newItems,
-                          newItems.screenComponentId,
-                          "value"
-                        ).externalId,
-                        target: getApiConnectors(
-                          newItems,
-                          isList ? listComponentId : screenNodeOptionId,
-                          "value"
-                        ).internalId,
-                        properties: {
-                          ...LinkProperties.ComponentExternalConnection
-                        }
-                      };
-                    }
-                  }
-                }
-              : false,
-            !isSharedComponent
-              ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    if (screenNodeOptionId || listComponentId) {
-                      return {
-                        source: getApiConnectors(
-                          newItems,
-                          newItems.screenComponentId,
-                          ApiNodeKeys.ViewModel
-                        ).externalId,
-                        target: getApiConnectors(
-                          newItems,
-                          isList ? listComponentId : screenNodeOptionId,
-                          ApiNodeKeys.ViewModel
-                        ).internalId,
-                        properties: {
-                          ...LinkProperties.ComponentExternalConnection
-                        }
-                      };
-                    }
-                  }
-                }
-              : null,
-            !isSharedComponent
-              ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options(currentGraph) {
-                    const formLayout = GetNodeProp(
-                      screenNodeOptionId,
-                      NodeProperties.Layout,
-                      currentGraph
-                    );
-                    const rootCellId = GetFirstCell(formLayout);
-                    const cellProperties = GetCellProperties(
-                      formLayout,
-                      rootCellId
-                    );
-                    cellProperties.children[rootCellId] = isList
-                      ? listComponentId
-                      : screenComponentId;
-
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  if (screenNodeOptionId || listComponentId) {
                     return {
-                      prop: NodeProperties.Layout,
-                      value: formLayout,
-                      id: screenNodeOptionId
+                      source: getApiConnectors(
+                        newItems,
+                        newItems.screenComponentId,
+                        "value"
+                      ).externalId,
+                      target: getApiConnectors(
+                        newItems,
+                        isList ? listComponentId : screenNodeOptionId,
+                        "value"
+                      ).internalId,
+                      properties: {
+                        ...LinkProperties.ComponentExternalConnection
+                      }
                     };
                   }
                 }
+              }
+              : false,
+            !isSharedComponent
+              ? {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  if (screenNodeOptionId || listComponentId) {
+                    return {
+                      source: getApiConnectors(
+                        newItems,
+                        newItems.screenComponentId,
+                        ApiNodeKeys.ViewModel
+                      ).externalId,
+                      target: getApiConnectors(
+                        newItems,
+                        isList ? listComponentId : screenNodeOptionId,
+                        ApiNodeKeys.ViewModel
+                      ).internalId,
+                      properties: {
+                        ...LinkProperties.ComponentExternalConnection
+                      }
+                    };
+                  }
+                }
+              }
+              : null,
+            !isSharedComponent
+              ? {
+                operation: CHANGE_NODE_PROPERTY,
+                options(currentGraph) {
+                  const formLayout = GetNodeProp(
+                    screenNodeOptionId,
+                    NodeProperties.Layout,
+                    currentGraph
+                  );
+                  const rootCellId = GetFirstCell(formLayout);
+                  const cellProperties = GetCellProperties(
+                    formLayout,
+                    rootCellId
+                  );
+                  cellProperties.children[rootCellId] = isList
+                    ? listComponentId
+                    : screenComponentId;
+
+                  return {
+                    prop: NodeProperties.Layout,
+                    value: formLayout,
+                    id: screenNodeOptionId
+                  };
+                }
+              }
               : false,
 
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options(currentGraph) {
-                    const formLayout = GetNodeProp(
-                      listComponentId,
-                      NodeProperties.Layout,
-                      currentGraph
-                    );
-                    const rootCellId = GetFirstCell(formLayout);
-                    const cellProperties = GetCellProperties(
-                      formLayout,
-                      rootCellId
-                    );
-                    cellProperties.children[rootCellId] = screenComponentId;
+                operation: CHANGE_NODE_PROPERTY,
+                options(currentGraph) {
+                  const formLayout = GetNodeProp(
+                    listComponentId,
+                    NodeProperties.Layout,
+                    currentGraph
+                  );
+                  const rootCellId = GetFirstCell(formLayout);
+                  const cellProperties = GetCellProperties(
+                    formLayout,
+                    rootCellId
+                  );
+                  cellProperties.children[rootCellId] = screenComponentId;
 
-                    return {
-                      prop: NodeProperties.Layout,
-                      value: formLayout,
-                      id: listComponentId
-                    };
-                  }
+                  return {
+                    prop: NodeProperties.Layout,
+                    value: formLayout,
+                    id: listComponentId
+                  };
                 }
+              }
               : false,
             ...modelProperties
               .map((modelProperty, modelIndex) => {
@@ -2765,7 +2767,7 @@ export const CreateDefaultView = {
                       "success"
                     ].map(
                       v =>
-                        function() {
+                        function () {
                           const graph = GetCurrentGraph(GetStateFunc()());
                           return addComponentApiToForm({
                             newItems,
@@ -2827,14 +2829,14 @@ export const CreateDefaultView = {
                     }
                   },
 
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
                       modelIndex
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
@@ -2842,7 +2844,7 @@ export const CreateDefaultView = {
                       "label"
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
@@ -2850,7 +2852,7 @@ export const CreateDefaultView = {
                       "placeholder"
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
@@ -2858,7 +2860,7 @@ export const CreateDefaultView = {
                       "error"
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
@@ -2866,7 +2868,7 @@ export const CreateDefaultView = {
                       "success"
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentApiNodes(
                       newItems,
                       childComponents,
@@ -2875,7 +2877,7 @@ export const CreateDefaultView = {
                       newItems.componentViewModelApiIds.internalId
                     );
                   },
-                  function() {
+                  function () {
                     return addComponentEventApiNodes({
                       newItems,
                       childComponents,
@@ -2897,7 +2899,7 @@ export const CreateDefaultView = {
                     "success"
                   ]
                     .map(v => {
-                      return function(graph) {
+                      return function (graph) {
                         let connectto = [];
                         if (isDefaultComponent) {
                           connectto = getViewTypeEndpointsForDefaults(
@@ -2925,48 +2927,48 @@ export const CreateDefaultView = {
                     .filter(x => x && isSharedComponent && isDefaultComponent),
 
                   isSharedComponent && isDefaultComponent
-                    ? function(graph) {
-                        let connectto = [];
-                        if (isDefaultComponent) {
-                          connectto = getViewTypeEndpointsForDefaults(
-                            viewType,
-                            graph,
-                            currentNode.id
-                          );
-                        }
-
-                        const shared_to_component_commands = [];
-                        connectto.map(ct => {
-                          const temp = GetNodesLinkedTo(graph, {
-                            id: ct.id,
-                            link: LinkType.ComponentInternalApi
-                          }).filter(
-                            x =>
-                              GetNodeProp(x, NodeProperties.NODEType) ===
-                              NodeTypes.ComponentApi
-                          );
-                          // && GetNodeProp(x, NodeProperties.UIText) === text
-                          temp.map(t => {
-                            shared_to_component_commands.push(
-                              ...connectComponentToExternalApi({
-                                newItems,
-                                parent: ct.id,
-                                key: GetNodeProp(t, NodeProperties.UIText),
-                                properties: {
-                                  ...LinkProperties.ComponentExternalConnection,
-                                  ...(needsLoadToScreenState
-                                    ? {
-                                        [LinkPropertyKeys.InstanceUpdate]: false
-                                      }
-                                    : {})
-                                },
-                                child: childComponents[modelIndex]
-                              })
-                            );
-                          });
-                        });
-                        return shared_to_component_commands;
+                    ? function (graph) {
+                      let connectto = [];
+                      if (isDefaultComponent) {
+                        connectto = getViewTypeEndpointsForDefaults(
+                          viewType,
+                          graph,
+                          currentNode.id
+                        );
                       }
+
+                      const shared_to_component_commands = [];
+                      connectto.map(ct => {
+                        const temp = GetNodesLinkedTo(graph, {
+                          id: ct.id,
+                          link: LinkType.ComponentInternalApi
+                        }).filter(
+                          x =>
+                            GetNodeProp(x, NodeProperties.NODEType) ===
+                            NodeTypes.ComponentApi
+                        );
+                        // && GetNodeProp(x, NodeProperties.UIText) === text
+                        temp.map(t => {
+                          shared_to_component_commands.push(
+                            ...connectComponentToExternalApi({
+                              newItems,
+                              parent: ct.id,
+                              key: GetNodeProp(t, NodeProperties.UIText),
+                              properties: {
+                                ...LinkProperties.ComponentExternalConnection,
+                                ...(needsLoadToScreenState
+                                  ? {
+                                    [LinkPropertyKeys.InstanceUpdate]: false
+                                  }
+                                  : {})
+                              },
+                              child: childComponents[modelIndex]
+                            })
+                          );
+                        });
+                      });
+                      return shared_to_component_commands;
+                    }
                     : null
                 ].filter(x => x);
               })
@@ -3011,7 +3013,7 @@ export const CreateDefaultView = {
                     ...viewPackage,
                     [NodeProperties.UIText]: `${
                       Titles.Execute
-                    } Button ${viewName} Component`,
+                      } Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
@@ -3043,7 +3045,7 @@ export const CreateDefaultView = {
                     ...viewPackage,
                     [NodeProperties.UIText]: `${
                       Titles.Cancel
-                    } Button ${viewName} Component`,
+                      } Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.Label]: `${viewName} ${Titles.Cancel}`,
@@ -3133,21 +3135,21 @@ export const CreateDefaultView = {
                     ...LinkProperties.ComponentExternalConnection,
                     ...(needsLoadToScreenState
                       ? {
-                          [LinkPropertyKeys.InstanceUpdate]: true
-                        }
+                        [LinkPropertyKeys.InstanceUpdate]: true
+                      }
                       : {})
                   }
                 };
               }
             },
-            function() {
+            function () {
               return addComponentApiToForm({
                 newItems,
                 text: ApiNodeKeys.ViewModel,
                 parent: newItems.button
               });
             },
-            function() {
+            function () {
               return connectComponentToExternalApi({
                 newItems,
                 parent: newItems.screenComponentId,
@@ -3156,8 +3158,8 @@ export const CreateDefaultView = {
                   ...LinkProperties.ComponentExternalConnection,
                   ...(needsLoadToScreenState
                     ? {
-                        [LinkPropertyKeys.InstanceUpdate]: true
-                      }
+                      [LinkPropertyKeys.InstanceUpdate]: true
+                    }
                     : {})
                 },
                 child: newItems.button
@@ -3251,7 +3253,7 @@ export const CreateDefaultView = {
                   );
                   if (!sharedComponent) {
                     switch (
-                      GetNodeProp(modelProperty, NodeProperties.NODEType)
+                    GetNodeProp(modelProperty, NodeProperties.NODEType)
                     ) {
                       case NodeTypes.Model:
                         return {};
@@ -3456,7 +3458,7 @@ export const CreateDefaultView = {
                   ...viewPackage,
                   [NodeProperties.UIText]: `${GetNodeTitle(currentNode)}${
                     useModelInstance ? " Instance" : ""
-                  }`,
+                    }`,
                   [NodeProperties.Model]: currentNode.id,
                   [NodeProperties.Pinned]: false
                   // [NodeProperties.IsShared]: isSharedComponent,
@@ -3498,161 +3500,161 @@ export const CreateDefaultView = {
           [
             isList
               ? {
-                  operation: ADD_NEW_NODE,
-                  options() {
-                    const node = GetNodesByProperties({
+                operation: ADD_NEW_NODE,
+                options() {
+                  const node = GetNodesByProperties({
+                    [NodeProperties.EntryPoint]: true,
+                    [NodeProperties.DataChainFunctionType]:
+                      DataChainFunctionKeys.Models,
+                    [NodeProperties.UIModelType]: currentNode.id
+                  }).find(x => x);
+                  if (node) {
+                    listDataChainId = node.id;
+                    skipModelDataChainListParts = true;
+                    return null;
+                  }
+
+                  return {
+                    callback: dataChain => {
+                      listDataChainId = dataChain.id;
+                    },
+                    nodeType: NodeTypes.DataChain,
+                    properties: {
+                      ...viewPackage,
+                      [NodeProperties.UIText]: `Get ${viewName} Objects`,
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.DataChainFunctionType]:
                         DataChainFunctionKeys.Models,
-                      [NodeProperties.UIModelType]: currentNode.id
-                    }).find(x => x);
-                    if (node) {
-                      listDataChainId = node.id;
-                      skipModelDataChainListParts = true;
-                      return null;
-                    }
-
-                    return {
-                      callback: dataChain => {
-                        listDataChainId = dataChain.id;
-                      },
-                      nodeType: NodeTypes.DataChain,
-                      properties: {
-                        ...viewPackage,
-                        [NodeProperties.UIText]: `Get ${viewName} Objects`,
-                        [NodeProperties.EntryPoint]: true,
-                        [NodeProperties.DataChainFunctionType]:
-                          DataChainFunctionKeys.Models,
-                        [NodeProperties.UIModelType]: currentNode.id,
-                        [NodeProperties.Pinned]: false,
-                        [NodeProperties.InstanceType]: useModelInstance
-                      },
-                      links: [
-                        {
-                          target: currentNode.id,
-                          linkProperties: {
-                            properties: {
-                              ...LinkProperties.ModelTypeLink
-                            }
+                      [NodeProperties.UIModelType]: currentNode.id,
+                      [NodeProperties.Pinned]: false,
+                      [NodeProperties.InstanceType]: useModelInstance
+                    },
+                    links: [
+                      {
+                        target: currentNode.id,
+                        linkProperties: {
+                          properties: {
+                            ...LinkProperties.ModelTypeLink
                           }
                         }
-                      ]
-                    };
-                  }
+                      }
+                    ]
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: ADD_NEW_NODE,
-                  options(graph) {
-                    if (skipModelDataChainListParts) {
-                      return null;
-                    }
-                    const temp = SplitDataCommand(
-                      GetNodeById(listDataChainId, graph),
-                      (split, graph, groupId) => {
-                        listDataChainExitId = split.id;
-                        newItems.listDataChainExitId = listDataChainExitId;
-                        newItems.listDataChainExitGroupId = groupId;
-                      },
-                      viewPackage
-                    );
-                    return temp.options;
+                operation: ADD_NEW_NODE,
+                options(graph) {
+                  if (skipModelDataChainListParts) {
+                    return null;
                   }
+                  const temp = SplitDataCommand(
+                    GetNodeById(listDataChainId, graph),
+                    (split, graph, groupId) => {
+                      listDataChainExitId = split.id;
+                      newItems.listDataChainExitId = listDataChainExitId;
+                      newItems.listDataChainExitGroupId = groupId;
+                    },
+                    viewPackage
+                  );
+                  return temp.options;
                 }
+              }
               : false,
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options() {
-                    if (skipModelDataChainListParts) {
-                      return null;
-                    }
-                    return {
-                      prop: NodeProperties.DataChainFunctionType,
-                      id: listDataChainExitId,
-                      value: DataChainFunctionKeys.Pass
-                    };
+                operation: CHANGE_NODE_PROPERTY,
+                options() {
+                  if (skipModelDataChainListParts) {
+                    return null;
                   }
+                  return {
+                    prop: NodeProperties.DataChainFunctionType,
+                    id: listDataChainExitId,
+                    value: DataChainFunctionKeys.Pass
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options() {
-                    if (skipModelDataChainListParts) {
-                      return null;
-                    }
-                    return {
-                      prop: NodeProperties.UIText,
-                      id: listDataChainExitId,
-                      value: `${GetNodeTitle(currentNode)}s DC Complete`
-                    };
+                operation: CHANGE_NODE_PROPERTY,
+                options() {
+                  if (skipModelDataChainListParts) {
+                    return null;
                   }
+                  return {
+                    prop: NodeProperties.UIText,
+                    id: listDataChainExitId,
+                    value: `${GetNodeTitle(currentNode)}s DC Complete`
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options() {
-                    if (skipModelDataChainListParts) {
-                      return null;
-                    }
-                    return {
-                      prop: NodeProperties.AsOutput,
-                      id: listDataChainExitId,
-                      value: true
-                    };
+                operation: CHANGE_NODE_PROPERTY,
+                options() {
+                  if (skipModelDataChainListParts) {
+                    return null;
                   }
+                  return {
+                    prop: NodeProperties.AsOutput,
+                    id: listDataChainExitId,
+                    value: true
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options() {
-                    return {
-                      prop: NodeProperties.DataChain,
-                      id: dataSourceId,
-                      value: listDataChainId
-                    };
-                  }
+                operation: CHANGE_NODE_PROPERTY,
+                options() {
+                  return {
+                    prop: NodeProperties.DataChain,
+                    id: dataSourceId,
+                    value: listDataChainId
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    return {
-                      target: listDataChainId,
-                      source: dataSourceId,
-                      properties: { ...LinkProperties.DataChainLink }
-                    };
-                  }
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  return {
+                    target: listDataChainId,
+                    source: dataSourceId,
+                    properties: { ...LinkProperties.DataChainLink }
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: CHANGE_NODE_PROPERTY,
-                  options() {
-                    return {
-                      prop: NodeProperties.UIModelType,
-                      id: dataSourceId,
-                      value: currentNode.id
-                    };
-                  }
+                operation: CHANGE_NODE_PROPERTY,
+                options() {
+                  return {
+                    prop: NodeProperties.UIModelType,
+                    id: dataSourceId,
+                    value: currentNode.id
+                  };
                 }
+              }
               : false,
             isList
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options() {
-                    return {
-                      target: currentNode.id,
-                      source: dataSourceId,
-                      properties: { ...LinkProperties.ModelTypeLink }
-                    };
-                  }
+                operation: ADD_LINK_BETWEEN_NODES,
+                options() {
+                  return {
+                    target: currentNode.id,
+                    source: dataSourceId,
+                    properties: { ...LinkProperties.ModelTypeLink }
+                  };
                 }
+              }
               : false
           ].filter(x => x)
         )(GetDispatchFunc(), GetStateFunc());
@@ -3743,7 +3745,7 @@ export const CreateDefaultView = {
               }
               const temp = AddChainCommand(
                 GetNodeById(newItems.getObjectDataChain, graph),
-                () => {},
+                () => { },
                 graph,
                 {
                   ...viewPackage,
@@ -3954,8 +3956,8 @@ export const CreateDefaultView = {
                       cellProperties.componentApi[apiProperty].handlerType =
                         HandlerTypes.Focus;
                       break;
-                      default:
-                        break;
+                    default:
+                      break;
                   }
                   if (cellProperties.componentApi[apiProperty].modelProperty) {
                     datachainLink.push({
@@ -4084,14 +4086,14 @@ export const CreateDefaultView = {
                   modelView_DataChain = entry;
                 }
               }),
-              function(graph) {
+              function (graph) {
                 const externalNode = GetNodesLinkedTo(graph, {
                   id: screenNodeId,
                   link: LinkType.ComponentExternalApi
                 }).find(
                   x =>
                     GetNodeProp(x, NodeProperties.NODEType) ===
-                      NodeTypes.ComponentExternalApi &&
+                    NodeTypes.ComponentExternalApi &&
                     GetNodeTitle(x) === ApiNodeKeys.ViewModel
                 );
                 return [
@@ -4277,7 +4279,7 @@ function CreateFunction(option) {
                                   parent: methodNode.id,
                                   nodeType:
                                     constraint.key ===
-                                    FunctionTemplateKeys.Permission
+                                      FunctionTemplateKeys.Permission
                                       ? NodeTypes.Permission
                                       : NodeTypes.ModelFilter,
                                   groupProperties: {},
@@ -4288,10 +4290,10 @@ function CreateFunction(option) {
                                       methodNode
                                     )} ${
                                       constraint.key ===
-                                      FunctionTemplateKeys.Permission
+                                        FunctionTemplateKeys.Permission
                                         ? NodeTypes.Permission
                                         : NodeTypes.ModelFilter
-                                    }`
+                                      }`
                                   },
                                   linkProperties: {
                                     properties: {
@@ -4547,7 +4549,7 @@ export function CreateAgentFunction(option) {
             };
           }
         },
-        function() {
+        function () {
           const { methodNode } = new_nodes;
           const { constraints } = MethodFunctions[functionType];
           let commands = [
@@ -4583,9 +4585,9 @@ export function CreateAgentFunction(option) {
                   methodProps[constraint.key] = option.user
                     ? option.user.id
                     : GetNodeProp(
-                        GetNodeById(agent.id),
-                        NodeProperties.UIUser
-                      ) || GetUsers()[0].id;
+                      GetNodeById(agent.id),
+                      NodeProperties.UIUser
+                    ) || GetUsers()[0].id;
                   commands.push({
                     operation: ADD_LINK_BETWEEN_NODES,
                     options() {
@@ -4758,7 +4760,7 @@ export function CreateAgentFunction(option) {
                               constraint.key === FunctionTemplateKeys.Permission
                                 ? NodeTypes.Permission
                                 : NodeTypes.ModelFilter
-                            }`
+                              }`
                           },
                           linkProperties: {
                             properties: { ...LinkProperties.FunctionOperator }
@@ -4871,7 +4873,7 @@ export function CreateAgentFunction(option) {
       PerformGraphOperation([
         {
           operation: NO_OP,
-          options() {}
+          options() { }
         }
       ]);
     }
@@ -4931,54 +4933,54 @@ function addListItemComponentApi(
     noExternal
       ? null
       : {
-          operation: ADD_NEW_NODE,
-          options() {
-            return {
-              nodeType: NodeTypes.ComponentExternalApi,
-              callback: nn => {
-                externalId = nn.id;
-              },
-              parent,
-              linkProperties: {
-                properties: { ...LinkProperties.ComponentExternalApi }
-              },
-              groupProperties: {},
-              properties: {
-                [NodeProperties.Pinned]: false,
-                [NodeProperties.UIText]: text
-              }
-            };
-          }
-        },
+        operation: ADD_NEW_NODE,
+        options() {
+          return {
+            nodeType: NodeTypes.ComponentExternalApi,
+            callback: nn => {
+              externalId = nn.id;
+            },
+            parent,
+            linkProperties: {
+              properties: { ...LinkProperties.ComponentExternalApi }
+            },
+            groupProperties: {},
+            properties: {
+              [NodeProperties.Pinned]: false,
+              [NodeProperties.UIText]: text
+            }
+          };
+        }
+      },
     noExternal
       ? null
       : {
-          operation: ADD_LINK_BETWEEN_NODES,
-          options() {
-            if (keyfunc) {
-              keyfunc(text, {
-                internalId,
-                externalId
-              });
-            }
-            setApiConnectors(
-              newItems,
-              parent,
-              {
-                internalId,
-                externalId
-              },
-              text
-            );
-            return {
-              source: internalId,
-              target: externalId,
-              properties: {
-                ...LinkProperties.ComponentInternalConnection
-              }
-            };
+        operation: ADD_LINK_BETWEEN_NODES,
+        options() {
+          if (keyfunc) {
+            keyfunc(text, {
+              internalId,
+              externalId
+            });
           }
+          setApiConnectors(
+            newItems,
+            parent,
+            {
+              internalId,
+              externalId
+            },
+            text
+          );
+          return {
+            source: internalId,
+            target: externalId,
+            properties: {
+              ...LinkProperties.ComponentInternalConnection
+            }
+          };
         }
+      }
   ].filter(x => x);
 }
 function addComponentEventApiNodes(args) {
@@ -5088,7 +5090,7 @@ function addComponentEventApiNodes(args) {
               },
               parent:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameInstance
+                apiNameInstance
                 ],
               linkProperties: {
                 properties: {
@@ -5145,7 +5147,7 @@ function addComponentEventApiNodes(args) {
             return {
               source:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameEventHandler
+                apiNameEventHandler
                 ],
               target: viewModelNode,
               properties: {
@@ -5160,7 +5162,7 @@ function addComponentEventApiNodes(args) {
             return {
               source:
                 newItems.eventApis[childComponents[modelIndex]][
-                  apiNameEventHandler
+                apiNameEventHandler
                 ],
               target: modelProperty.id,
               properties: {
@@ -5433,7 +5435,7 @@ function BuildPropertyDataChainAccessor(args) {
     viewModelNodeId,
     propertyDataChainAccesors,
     newItems,
-    viewType  } = args;
+    viewType } = args;
   let skip = false;
   let propDataChainNodeId = null;
   let entryNodeProperties = null;
@@ -5542,100 +5544,100 @@ function BuildPropertyDataChainAccessor(args) {
       skipDataChainStep
         ? false
         : {
-            operation: ADD_NEW_NODE,
-            options() {
-              if (skip) {
-                return {};
-              }
-              return {
-                parent: propDataChainNodeId,
-                nodeType: NodeTypes.DataChain,
-                groupProperties: {
-                  [GroupProperties.ExternalEntryNode]: GetNodeProp(
-                    GetNodeById(propDataChainNodeId),
-                    NodeProperties.ChainParent
-                  ),
-                  [GroupProperties.GroupEntryNode]: propDataChainNodeId,
-                  [GroupProperties.GroupExitNode]: propDataChainNodeId,
-                  [GroupProperties.ExternalExitNode]: GetDataChainNextId(
-                    propDataChainNodeId
-                  )
-                },
-                properties: {
-                  ...viewPackage,
-                  [NodeProperties.UIText]: `Get ${GetNodeTitle(modelProperty)}`,
-                  [NodeProperties.ChainParent]: propDataChainNodeId,
-                  [NodeProperties.AsOutput]: true,
-                  [NodeProperties.DataChainFunctionType]:
-                    DataChainFunctionKeys.Property,
-                  [NodeProperties.Pinned]: false,
-                  [NodeProperties.UIModelType]: currentNode.id,
-                  [NodeProperties.Property]: modelProperty.id
-                },
-                linkProperties: {
-                  properties: { ...LinkProperties.DataChainLink }
-                },
-                links: [
-                  {
-                    target: currentNode.id,
-                    linkProperties: {
-                      properties: { ...LinkProperties.ModelTypeLink }
-                    }
-                  },
-                  {
-                    target: modelProperty.id,
-                    linkProperties: {
-                      properties: { ...LinkProperties.PropertyLink }
-                    }
-                  }
-                ],
-                callback: () => {}
-              };
+          operation: ADD_NEW_NODE,
+          options() {
+            if (skip) {
+              return {};
             }
-          },
+            return {
+              parent: propDataChainNodeId,
+              nodeType: NodeTypes.DataChain,
+              groupProperties: {
+                [GroupProperties.ExternalEntryNode]: GetNodeProp(
+                  GetNodeById(propDataChainNodeId),
+                  NodeProperties.ChainParent
+                ),
+                [GroupProperties.GroupEntryNode]: propDataChainNodeId,
+                [GroupProperties.GroupExitNode]: propDataChainNodeId,
+                [GroupProperties.ExternalExitNode]: GetDataChainNextId(
+                  propDataChainNodeId
+                )
+              },
+              properties: {
+                ...viewPackage,
+                [NodeProperties.UIText]: `Get ${GetNodeTitle(modelProperty)}`,
+                [NodeProperties.ChainParent]: propDataChainNodeId,
+                [NodeProperties.AsOutput]: true,
+                [NodeProperties.DataChainFunctionType]:
+                  DataChainFunctionKeys.Property,
+                [NodeProperties.Pinned]: false,
+                [NodeProperties.UIModelType]: currentNode.id,
+                [NodeProperties.Property]: modelProperty.id
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.DataChainLink }
+              },
+              links: [
+                {
+                  target: currentNode.id,
+                  linkProperties: {
+                    properties: { ...LinkProperties.ModelTypeLink }
+                  }
+                },
+                {
+                  target: modelProperty.id,
+                  linkProperties: {
+                    properties: { ...LinkProperties.PropertyLink }
+                  }
+                }
+              ],
+              callback: () => { }
+            };
+          }
+        },
       addcomplete
         ? {
-            operation: ADD_NEW_NODE,
-            options(graph) {
-              if (skip) {
-                return false;
-              }
-              const groupProperties = GetNodeProp(
-                propDataChainNodeId,
-                NodeProperties.GroupParent,
-                graph
-              )
-                ? {
-                    id: getGroup(
-                      GetNodeProp(
-                        propDataChainNodeId,
-                        NodeProperties.GroupParent,
-                        graph
-                      ),
-                      graph
-                    ).id
-                  }
-                : null;
-              return {
-                parent: propDataChainNodeId,
-                nodeType: NodeTypes.DataChain,
-                groupProperties,
-                properties: {
-                  [NodeProperties.Pinned]: false,
-                  [NodeProperties.ChainParent]: propDataChainNodeId,
-                  [NodeProperties.DataChainFunctionType]:
-                    DataChainFunctionKeys.Pass,
-                  [NodeProperties.UIText]: `Get ${viewName} ${viewType} Object => ${GetNodeTitle(
-                    modelProperty
-                  )} Output`,
-                  [NodeProperties.AsOutput]: true
-                },
-                linkProperties: {
-                  properties: { ...LinkProperties.DataChainLink }
-                }
-              };
+          operation: ADD_NEW_NODE,
+          options(graph) {
+            if (skip) {
+              return false;
             }
+            const groupProperties = GetNodeProp(
+              propDataChainNodeId,
+              NodeProperties.GroupParent,
+              graph
+            )
+              ? {
+                id: getGroup(
+                  GetNodeProp(
+                    propDataChainNodeId,
+                    NodeProperties.GroupParent,
+                    graph
+                  ),
+                  graph
+                ).id
+              }
+              : null;
+            return {
+              parent: propDataChainNodeId,
+              nodeType: NodeTypes.DataChain,
+              groupProperties,
+              properties: {
+                [NodeProperties.Pinned]: false,
+                [NodeProperties.ChainParent]: propDataChainNodeId,
+                [NodeProperties.DataChainFunctionType]:
+                  DataChainFunctionKeys.Pass,
+                [NodeProperties.UIText]: `Get ${viewName} ${viewType} Object => ${GetNodeTitle(
+                  modelProperty
+                )} Output`,
+                [NodeProperties.AsOutput]: true
+              },
+              linkProperties: {
+                properties: { ...LinkProperties.DataChainLink }
+              }
+            };
           }
+        }
         : false
     ].filter(x => x)
   )(GetDispatchFunc(), GetStateFunc());
@@ -5824,7 +5826,7 @@ function addComponentApiToForm(args) {
             }).find(
               x =>
                 GetNodeProp(x, NodeProperties.NODEType) ===
-                  NodeTypes.ComponentApi &&
+                NodeTypes.ComponentApi &&
                 GetNodeProp(x, NodeProperties.UIText) === text
             );
             if (temp) {
@@ -5863,7 +5865,7 @@ function addComponentApiToForm(args) {
           }).find(
             x =>
               GetNodeProp(x, NodeProperties.NODEType) ===
-                NodeTypes.ComponentApi &&
+              NodeTypes.ComponentApi &&
               GetNodeProp(x, NodeProperties.UIText) === text
           );
           if (temp) {

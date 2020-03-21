@@ -302,6 +302,7 @@ export const NodeProperties = {
   BeforeStyle: "::before",
   GridAreas: "GridAreas",
   AfterStyle: "::after",
+  LastViewPackage: 'LastViewPackage',
   MediaQuery: "MediaQuery",
   UseMediaQuery: "UseMediaQuery",
   UseValue: "UseValue",
@@ -1537,13 +1538,13 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `new List<string> { "${_.uuidv4()}"}`;
       },
-      long: function() {
+      long: function () {
         return `new List<string> { "${_.uuidv4()}asdf" }`;
       },
-      $empty: function() {
+      $empty: function () {
         return `new List<string>()`;
       }
     }
@@ -1555,27 +1556,27 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"${[]
           .interpolate(0, 9, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      long: function() {
+      long: function () {
         return `"${[]
           .interpolate(0, 12, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      short: function() {
+      short: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      invalid: function() {
+      invalid: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("a")}"`;
       },
-      empty: function() {
+      empty: function () {
         return `"${[]
           .interpolate(0, 0, e => Math.floor(Math.random() * 10))
           .join("")}"`;
@@ -1589,27 +1590,27 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"${[]
           .interpolate(0, 5, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      long: function() {
+      long: function () {
         return `"${[]
           .interpolate(0, 12, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      short: function() {
+      short: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      invalid: function() {
+      invalid: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("a")}"`;
       },
-      empty: function() {
+      empty: function () {
         return `"${[]
           .interpolate(0, 0, e => Math.floor(Math.random() * 10))
           .join("")}"`;
@@ -1623,32 +1624,32 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $true: function() {
+      $true: function () {
         return `"${[]
           .interpolate(0, 5, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      long: function() {
+      long: function () {
         return `"${[]
           .interpolate(0, 12, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      short: function() {
+      short: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `"${[]
           .interpolate(0, 0, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      invalid: function() {
+      invalid: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("a")}"`;
       },
-      invalid2: function() {
+      invalid2: function () {
         return `"${[].interpolate(0, 5, e => "a").join("")}"`;
       }
     }
@@ -1659,10 +1660,10 @@ export const ValidationCases = {
       value: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `Date.UtcNow().AddDays(1)`;
       },
-      false: function() {
+      false: function () {
         return `Date.UtcNow().AddDays(-1)`;
       }
     }
@@ -1674,10 +1675,10 @@ export const ValidationCases = {
       value: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `Date.UtcNow().AddDays(-1)`;
       },
-      false: function() {
+      false: function () {
         return `Date.UtcNow().AddDays(1)`;
       }
     }
@@ -1688,13 +1689,13 @@ export const ValidationCases = {
       content: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"asdf@asdf.com"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@asdfdd@asdf@.com"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1705,13 +1706,13 @@ export const ValidationCases = {
       content: true
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"asadf@asdf.com"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@afsdfdd@asdf@.com"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `""`;
       }
     }
@@ -1723,32 +1724,32 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $true: function() {
+      $true: function () {
         return `"${[]
           .interpolate(0, 16, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      long: function() {
+      long: function () {
         return `"${[]
           .interpolate(0, 23, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      short: function() {
+      short: function () {
         return `"${[]
           .interpolate(0, 3, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `"${[]
           .interpolate(0, 0, e => Math.floor(Math.random() * 10))
           .join("")}"`;
       },
-      invalid: function() {
+      invalid: function () {
         return `"${[]
           .interpolate(0, 16, e => Math.floor(Math.random() * 10))
           .join("a")}"`;
       },
-      invalid2: function() {
+      invalid2: function () {
         return `"${[].interpolate(0, 16, e => "a").join("")}"`;
       }
     }
@@ -1759,13 +1760,13 @@ export const ValidationCases = {
       content: [ValidationRules.UrlEmpty]
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"http://yahoo.com"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@afsdfdd@asdf@.com"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1776,13 +1777,13 @@ export const ValidationCases = {
       content: [ValidationRules.Any]
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"http://yahoo.com"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@afsdfdd@asdf@.com"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `""`;
       }
     }
@@ -1794,10 +1795,10 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      false: function() {
+      false: function () {
         return `"asdf"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `""`;
       }
     }
@@ -1809,10 +1810,10 @@ export const ValidationCases = {
       length: true
     },
     cases: {
-      $false: function() {
+      $false: function () {
         return `"asdf"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1823,13 +1824,13 @@ export const ValidationCases = {
     },
     types: [NodePropertyTypes.STRING],
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"1234"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@ afsdfdd@asdf@.com"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1840,13 +1841,13 @@ export const ValidationCases = {
     },
     types: [NodePropertyTypes.STRING],
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"1234.34"`;
       },
-      false: function() {
+      false: function () {
         return `"12QW"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1858,10 +1859,10 @@ export const ValidationCases = {
     },
     types: [NodePropertyTypes.STRING],
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"httas21df.!@#$ #$%^^&*^&*()aom"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1872,13 +1873,13 @@ export const ValidationCases = {
     },
     types: [NodePropertyTypes.STRING],
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"httas21dfaom"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@ afsdfdd@asdf@.com"`;
       },
-      $empty: function() {
+      $empty: function () {
         return `""`;
       }
     }
@@ -1889,13 +1890,13 @@ export const ValidationCases = {
       content: [ValidationRules.AlphaOnlyWithSpaces]
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"httasdfaom"`;
       },
-      false: function() {
+      false: function () {
         return `"asdf@ afsdfdd@asdf12f@.com"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1906,13 +1907,13 @@ export const ValidationCases = {
       content: [ValidationRules.AlphaNumericPuncLike]
     },
     cases: {
-      $true: function(e) {
+      $true: function (e) {
         return `"httas dfaom"`;
       },
-      $false: function() {
+      $false: function () {
         return `"asdf@ afsdfdd@asdf12f@.com"`;
       },
-      empty: function() {
+      empty: function () {
         return `""`;
       }
     }
@@ -1923,10 +1924,10 @@ export const ValidationCases = {
       value: [ValidationRules.Any]
     },
     cases: {
-      $true: function() {
+      $true: function () {
         return "true";
       },
-      false: function() {
+      false: function () {
         return "false";
       }
     }
@@ -1937,10 +1938,10 @@ export const ValidationCases = {
       value: [ValidationRules.Any]
     },
     cases: {
-      true: function() {
+      true: function () {
         return "true";
       },
-      $false: function() {
+      $false: function () {
         return "false";
       }
     }
@@ -1953,28 +1954,28 @@ export const ValidationCases = {
     ],
     vectors: {
       value: {
-        [ValidationRules.GreaterThan]: function(self, b) {
+        [ValidationRules.GreaterThan]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.GreaterThanOrEqualTo]: function(self, b) {
+        [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.EqualTo]: function(self, b) {
+        [ValidationRules.EqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.LessThan]: function(self, b) {
+        [ValidationRules.LessThan]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         },
-        [ValidationRules.LessThanOrEqualTo]: function(self, b) {
+        [ValidationRules.LessThanOrEqualTo]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         }
       }
     },
     cases: {
-      $greater: function() {
+      $greater: function () {
         return " >= ";
       },
-      notgreater: function() {
+      notgreater: function () {
         return " >= ";
       }
     }
@@ -1987,28 +1988,28 @@ export const ValidationCases = {
     ],
     vectors: {
       value: {
-        [ValidationRules.GreaterThan]: function(self, b) {
+        [ValidationRules.GreaterThan]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.GreaterThanOrEqualTo]: function(self, b) {
+        [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.EqualTo]: function(self, b) {
+        [ValidationRules.EqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.LessThan]: function(self, b) {
+        [ValidationRules.LessThan]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         },
-        [ValidationRules.LessThanOrEqualTo]: function(self, b) {
+        [ValidationRules.LessThanOrEqualTo]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         }
       }
     },
     cases: {
-      $greater: function() {
+      $greater: function () {
         return " > ";
       },
-      notgreater: function() {
+      notgreater: function () {
         return " > ";
       }
     }
@@ -2021,28 +2022,28 @@ export const ValidationCases = {
     ],
     vectors: {
       value: {
-        [ValidationRules.GreaterThan]: function(self, b) {
+        [ValidationRules.GreaterThan]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.GreaterThanOrEqualTo]: function(self, b) {
+        [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.EqualTo]: function(self, b) {
+        [ValidationRules.EqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.LessThan]: function(self, b) {
+        [ValidationRules.LessThan]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         },
-        [ValidationRules.LessThanOrEqualTo]: function(self, b) {
+        [ValidationRules.LessThanOrEqualTo]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         }
       }
     },
     cases: {
-      $less: function() {
+      $less: function () {
         return " < ";
       },
-      notless: function() {
+      notless: function () {
         return " < ";
       }
     }
@@ -2055,28 +2056,28 @@ export const ValidationCases = {
     ],
     vectors: {
       value: {
-        [ValidationRules.GreaterThan]: function(self, b) {
+        [ValidationRules.GreaterThan]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.GreaterThanOrEqualTo]: function(self, b) {
+        [ValidationRules.GreaterThanOrEqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.EqualTo]: function(self, b) {
+        [ValidationRules.EqualTo]: function (self, b) {
           // based on a parameter, determining which validation is most restrictive should be possible.
         },
-        [ValidationRules.LessThan]: function(self, b) {
+        [ValidationRules.LessThan]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         },
-        [ValidationRules.LessThanOrEqualTo]: function(self, b) {
+        [ValidationRules.LessThanOrEqualTo]: function (self, b) {
           // based on a parameter, determine if there are any possible success cases.
         }
       }
     },
     cases: {
-      $equal_to: function() {
+      $equal_to: function () {
         return " = ";
       },
-      not_equal: function() {
+      not_equal: function () {
         return " = ";
       }
     }

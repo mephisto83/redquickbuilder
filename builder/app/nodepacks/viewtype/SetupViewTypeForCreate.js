@@ -77,76 +77,51 @@ export default function SetupViewTypeForCreate(args = {}) {
     componentType: NodeTypes.ComponentExternalApi
   }).find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.ViewModel);
 
-  let existingDatachain = null;
-  if (viewModelExternalNode) {
-    existingDatachain = GetNodeLinkedTo(null, {
-      id: viewModelExternalNode.id,
-      link: LinkType.DataChainLink
-    })
-  }
-  if (!existingDatachain) {
-    result.push(...CreateModelKeyDC({
-      model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
-      modelId: model.id,
-      viewPackages,
-      callback: modelKeyContext => {
-        modelKeyDC = modelKeyContext.entry;
-      }
-    }), {
-      operation: ADD_LINK_BETWEEN_NODES,
-      options() {
-        if (viewModelExternalNode) {
-          return {
-            target: modelKeyDC,
-            source: viewModelExternalNode.id,
-            properties: { ...LinkProperties.DataChainLink }
-          }
-        }
-        return false;
-      }
-    });
-  }
-  else {
-    result.push({
-      operation: 'UPDATE_NODE_PROPERTY',
-      options() {
+  result.push(...CreateModelKeyDC({
+    model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
+    modelId: model.id,
+    viewPackages,
+    callback: modelKeyContext => {
+      modelKeyDC = modelKeyContext.entry;
+    }
+  }), {
+    operation: ADD_LINK_BETWEEN_NODES,
+    options() {
+      if (viewModelExternalNode) {
         return {
-          id: existingDatachain.id,
-          properties: {
-            [NodeProperties.ModelKey]: model.id
-          }
+          target: modelKeyDC,
+          source: viewModelExternalNode.id,
+          properties: { ...LinkProperties.DataChainLink }
         }
       }
-    })
-  }
+      return false;
+    }
+  });
 
   let temp;
-  const modelPropertyDataChain = GetNodeLinkedTo(null, {
-    id: valueExternalNode.id,
-    link: LinkType.DataChainLink
-  });
-  if (!modelPropertyDataChain) {
-    result.push(
-      ...CreateModelPropertyGetterDC({
-        model: propertyModel.id,
-        property: property.id,
-        propertyName: `${GetNodeTitle(node)}${GetNodeTitle(property.id)}`,
-        modelName: GetNodeTitle(propertyModel),
-        callback: context => {
-          temp = context.entry;
-        }
-      }),
-      {
-        operation: ADD_LINK_BETWEEN_NODES,
-        options() {
-          return {
-            source: valueExternalNode.id,
-            target: temp,
-            properties: { ...LinkProperties.DataChainLink }
-          };
-        }
-      })
-  }
+
+  result.push(
+    ...CreateModelPropertyGetterDC({
+      model: propertyModel.id,
+      property: property.id,
+      viewPackages,
+      propertyName: `${GetNodeTitle(node)}${GetNodeTitle(property.id)}`,
+      modelName: GetNodeTitle(propertyModel),
+      callback: context => {
+        temp = context.entry;
+      }
+    }),
+    {
+      operation: ADD_LINK_BETWEEN_NODES,
+      options() {
+        return {
+          source: valueExternalNode.id,
+          target: temp,
+          properties: { ...LinkProperties.DataChainLink }
+        };
+      }
+    })
+
   const selector = GetNodeByProperties({
     [NodeProperties.NODEType]: NodeTypes.Selector,
     [NodeProperties.Model]: modelType.id
@@ -165,25 +140,17 @@ export default function SetupViewTypeForCreate(args = {}) {
     })
   }
 
-  const existingEventMethod = GetNodeLinkedTo(null, {
-    id: node,
-    link: LinkType.EventMethod,
-    componentType: NodeTypes.EventMethod
-  });
-
-  if (!existingEventMethod) {
-    result.push(
-      ...AddEvent({
-        component: node,
-        viewPackages,
-        eventType,
-        eventTypeHandler: properties.length
-          ? eventTypeHandler
-          : false,
-        property: properties.length ? properties[0].id : null
-      })
-    );
-  }
+  result.push(
+    ...AddEvent({
+      component: node,
+      viewPackages,
+      eventType,
+      eventTypeHandler: properties.length
+        ? eventTypeHandler
+        : false,
+      property: properties.length ? properties[0].id : null
+    })
+  );
   return result;
 }
 SetupViewTypeForCreate.title = 'Setup View Type For Create';

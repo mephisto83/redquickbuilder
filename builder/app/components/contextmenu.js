@@ -2469,33 +2469,6 @@ class ContextMenu extends Component {
                 }}
               />
             </TreeViewMenu>
-            <TreeViewMenu
-              title={SetupViewTypeForCreate.title}
-              description={SetupViewTypeForCreate.description}
-              onClick={() => {
-                this.props.graphOperation(
-                  SetupViewTypeForCreate({
-                    node: currentNode.id,
-                    eventType: 'onChange',
-                    eventTypeHandler: true
-                  })
-                );
-              }}
-            />
-            <TreeViewMenu
-              hideArrow
-              title={SetupViewTypeForGetAll.title}
-              description={SetupViewTypeForGetAll.description}
-              onClick={() => {
-                this.props.graphOperation(
-                  SetupViewTypeForGetAll({
-                    node: currentNode.id,
-                    eventType: 'onChange',
-                    eventTypeHandler: true
-                  })
-                );
-              }}
-            />
 
           </TreeViewMenu>
         ];
@@ -2522,6 +2495,7 @@ class ContextMenu extends Component {
             return [this.getGenericComponentApiMenu(currentNode)];
         }
         break;
+      default: break;
     }
     return [];
   }
