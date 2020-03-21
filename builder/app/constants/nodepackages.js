@@ -1,3 +1,5 @@
+/* eslint-disable compat/compat */
+/* eslint-disable no-new */
 /* eslint-disable no-constant-condition */
 /* eslint-disable camelcase */
 /* eslint-disable func-names */
@@ -4055,7 +4057,8 @@ function CreateFunction(option) {
                     new Promise(resolve => {
                       const { constraints } = MethodFunctions[functionType];
                       let commands = [];
-                      Object.values(constraints).map(constraint => {
+                      Object.values(constraints).forEach(constraint => {
+                        let perOrModelNode = null;
                         switch (constraint.key) {
                           case FunctionTemplateKeys.Model:
                           case FunctionTemplateKeys.Agent:
@@ -4084,7 +4087,6 @@ function CreateFunction(option) {
                             break;
                           case FunctionTemplateKeys.Permission:
                           case FunctionTemplateKeys.ModelFilter:
-                            let perOrModelNode = null;
                             PerformGraphOperation([
                               {
                                 operation: ADD_NEW_NODE,
@@ -4172,6 +4174,7 @@ function CreateFunction(option) {
                               ];
                             }
                             break;
+                          default: break;
                         }
                         commands = [
                           ...commands,
@@ -4378,9 +4381,11 @@ export function CreateAgentFunction(option) {
             }
           ];
           Object.values(constraints).map(constraint => {
+            let validator = null;
+            let perOrModelNode = null;
+            let executor = null;
             switch (constraint.key) {
               case FunctionTemplateKeys.Model:
-              case FunctionTemplateKeys.ModelOutput:
               case FunctionTemplateKeys.Agent:
               case FunctionTemplateKeys.Parent:
               case FunctionTemplateKeys.User:
@@ -4420,7 +4425,6 @@ export function CreateAgentFunction(option) {
                 }
                 break;
               case FunctionTemplateKeys.Validator:
-                let validator = null;
                 commands.push(
                   ...[
                     {
@@ -4484,7 +4488,6 @@ export function CreateAgentFunction(option) {
                 );
                 break;
               case FunctionTemplateKeys.Executor:
-                let executor = null;
 
                 commands.push(
                   ...[
@@ -4551,7 +4554,6 @@ export function CreateAgentFunction(option) {
                 break;
               case FunctionTemplateKeys.Permission:
               case FunctionTemplateKeys.ModelFilter:
-                let perOrModelNode = null;
                 commands.push(
                   ...[
                     {
@@ -4640,6 +4642,7 @@ export function CreateAgentFunction(option) {
                   ];
                 }
                 break;
+              default: break;
             }
             commands = [
               ...commands,
