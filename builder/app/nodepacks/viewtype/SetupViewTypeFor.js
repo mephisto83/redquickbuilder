@@ -23,7 +23,6 @@ export default function SetupViewTypeFor(args = {}) {
     case Methods.Create:
       result.push(...SetupViewTypeForCreate(context));
 
-      result.push(...AttachGetAllOnComponentDidMount(context))
       break;
     case Methods.Get:
     case Methods.GetAll:
@@ -31,5 +30,8 @@ export default function SetupViewTypeFor(args = {}) {
       break;
     default: break;
   }
+
+  result.push(...AttachGetAllOnComponentDidMount(context));
+
   return result;
 }

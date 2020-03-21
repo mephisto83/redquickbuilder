@@ -22,21 +22,25 @@ export default function AttachGetAllOnComponentDidMount(args = {}) {
       didMountContext = didMountContextArgs;
     }
   }), (graph) => {
-    return ConnectLifecycleMethod({
-      target: functionToLoadModels,
-      source: didMountContext.lifeCycleInstance.id,
-      graph
-    })
+    if (!didMountContext.skip) {
+      return ConnectLifecycleMethod({
+        target: functionToLoadModels,
+        source: didMountContext.lifeCycleInstance.id,
+        graph
+      })
+    }
+    return []
   }, () => {
-      const newLocal = {
-        operation: ADD_LINK_BETWEEN_NODES,
-        options() {
-          return {
-            target: storeModelArrayDC,
-            properties: { ...LinkProperties.DataChainLink }
-          };
-        }
-      };
+    const newLocal = {
+      operation: ADD_LINK_BETWEEN_NODES,
+      options() {
+        return {
+          target: storeModelArrayDC,
+          source: didMountContext.lifeCycleInstance.id,
+          properties: { ...LinkProperties.DataChainLink }
+        };
+      }
+    };
     return [newLocal];
   });
   return result;

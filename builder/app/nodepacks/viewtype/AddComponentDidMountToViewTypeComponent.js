@@ -9,6 +9,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
   const { node, viewPackages } = args;
   let lifeCycleMethod = null;
   let lifeCycleInstance = null;
+  let skip = false;
   const component = GetNodesLinkedTo(currentGraph, {
     id: node,
     link: LinkType.DefaultViewType
@@ -21,6 +22,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
         componentType: NodeTypes.LifeCylceMethod
       });
       if (lifeCycleMethod) {
+        skip = true;
         return null;
       }
 
@@ -69,6 +71,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
         args.callback({
           lifeCycleMethod,
           component,
+          skip,
           lifeCycleInstance
         })
       }
