@@ -3510,6 +3510,20 @@ export function GetSelectedSubgraph(state) {
   return null;
 }
 
+export function GetViewTypeModel(node) {
+
+  const models = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+    id: node,
+    link: NodeConstants.LinkType.DefaultViewType
+  }).filter(
+    x =>
+      GetNodeProp(x, NodeProperties.NODEType) ===
+      NodeTypes.Model
+  );
+
+  return models[0] || null
+}
+
 export function BuildPackage(model, _package) {
   let { id } = model;
   let methodFunctionDefinition = MethodFunctions[_package.methodType];
@@ -3805,7 +3819,7 @@ export function graphOperation(operation, options, stamp) {
             .filter(x => x)
             .map(op => {
               if (typeof op === "function") {
-                op();
+                op = op() || {};
               }
               let { operation, options } = op;
               if (typeof options === "function") {

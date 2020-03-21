@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable func-names */
 /* eslint-disable default-case */
 /* eslint-disable no-shadow */
@@ -99,6 +100,7 @@ import { ViewTypes } from "../constants/viewtypes";
 import SetupViewTypeForCreate from "../nodepacks/viewtype/SetupViewTypeForCreate";
 import SetupViewTypeForGetAll from "../nodepacks/viewtype/SetupViewTypeForGetAll";
 import { uuidv4 } from "../utils/array";
+import SetupViewTypeFor from "../nodepacks/viewtype/SetupViewTypeFor";
 
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -2316,6 +2318,7 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ViewType:
+        let viewTypeModel = UIA.GetViewTypeModel(currentNode.id);
         return [
           <TreeViewMenu
             open={UIA.Visual(state, currentNodeType)}
@@ -2404,7 +2407,69 @@ class ContextMenu extends Component {
               }}
             />
             <TreeViewMenu
-              hideArrow
+              open={UIA.Visual(state, `setup view type`)}
+              active
+              title={Titles.SetupViewType}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual(`setup view type`);
+              }}>
+
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.LoadModelsOnComponentMount}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Method
+                  )
+                    .filter(
+                      x =>
+                        (
+                          MethodFunctions[
+                          UIA.GetNodeProp(x, NodeProperties.FunctionType)
+                          ] || {}
+                        ).method === Methods.GetAll
+                    )
+                    .filter(x => {
+                      if (viewTypeModel) {
+                        const modelOutput =
+                          UIA.GetMethodNodeProp(
+                            x,
+                            FunctionTemplateKeys.ModelOutput
+                          ) ||
+                          UIA.GetMethodNodeProp(
+                            x,
+                            FunctionTemplateKeys.Model
+                          );
+                        return viewTypeModel && modelOutput === viewTypeModel.id;
+                      }
+                      return false;
+                    })
+                    .toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      functionToLoadModels: value
+                    });
+                  }}
+                  value={this.state.functionToLoadModels}
+                />
+              </TreeViewItemContainer>
+              <TreeViewMenu
+                title={Titles.Execute}
+                description="Setup ViewType"
+                onClick={() => {
+                  this.props.graphOperation(
+                    SetupViewTypeFor({
+                      node: currentNode.id,
+                      functionToLoadModels: this.state.functionToLoadModels,
+                      eventType: 'onChange',
+                      eventTypeHandler: true
+                    })
+                  );
+                }}
+              />
+            </TreeViewMenu>
+            <TreeViewMenu
               title={SetupViewTypeForCreate.title}
               description={SetupViewTypeForCreate.description}
               onClick={() => {

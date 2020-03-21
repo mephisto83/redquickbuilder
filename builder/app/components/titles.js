@@ -24,6 +24,7 @@ export const Rows = "Row Count";
 export const Navigation = "Navigation";
 export const UseHttps = "Use Https";
 export const Parameter = "Parameter";
+export const SetupViewType = 'Setup View Type';
 export const Parameters = "Parameters";
 export const ServerSideSetup = "Service Side Setup";
 export const Theme = "Theme";
