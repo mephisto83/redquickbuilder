@@ -3,9 +3,9 @@ import * as _ from './array';
 export function MinLengthAttribute(min, equal) {
   return createValidationAttribute(val => {
     if (equal) {
-      return val >= min;
+      return `${val}`.length >= min;
     }
-    return val > min;
+    return `${val}`.length > min;
   });
 }
 
@@ -121,18 +121,18 @@ export function Is18YearsPlusAttribute() {
 }
 export function CreditCardValidation() {
   return createValidationAttribute(val => CredCardValidations.find(j => {
-      return (
-        j.startsWith.find(t => x.startsWith(t)) &&
-        j.lengths.find(t => x.length == t)
-      );
-    }));
+    return (
+      j.startsWith.find(t => x.startsWith(t)) &&
+      j.lengths.find(t => x.length == t)
+    );
+  }));
 }
 
 export function GetCardType(x) {
   return CredCardValidations.find(j => (
-      j.startsWith.find(t => x.startsWith(t)) &&
-      j.lengths.find(t => x.length === t)
-    ));
+    j.startsWith.find(t => x.startsWith(t)) &&
+    j.lengths.find(t => x.length === t)
+  ));
 }
 
 const CredCardValidations = [
@@ -310,7 +310,7 @@ export function alphanumericLike(val) {
     .toString()
     .split("")
     .find(t => {
-      t =`${t}`.toLowerCase();
+      t = `${t}`.toLowerCase();
       return "abcdefghijk lmnopqrstuvwxyz,.;'0123456789".indexOf(t) === -1;
     });
 }
@@ -319,7 +319,7 @@ export function alphanumeric(val) {
     .toString()
     .split("")
     .find(t => {
-      t =`${t}`.toLowerCase();
+      t = `${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz0123456789".indexOf(t) === -1;
     });
 }
@@ -328,7 +328,7 @@ export function alpha(val) {
     .toString()
     .split("")
     .find(t => {
-      t =`${t}`.toLowerCase();
+      t = `${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz".indexOf(t) === -1;
     });
 }
@@ -338,7 +338,7 @@ export function alphawithspaces(val) {
     .toString()
     .split("")
     .find(t => {
-      t =`${t}`.toLowerCase();
+      t = `${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz  ".indexOf(t) === -1;
     });
 }
