@@ -1,4 +1,5 @@
 import * as _ from './array';
+
 export function MinLengthAttribute(min, equal) {
   return createValidationAttribute(val => {
     if (equal) {
@@ -11,9 +12,9 @@ export function MinLengthAttribute(min, equal) {
 export function MaxLengthAttribute(max, equal) {
   return createValidationAttribute(val => {
     if (equal) {
-      return val.length <= max;
+      return `${val}`.length <= max;
     }
-    return val.length < max;
+    return `${val}`.length < max;
   });
 }
 
@@ -57,7 +58,7 @@ export function MinAttribute(min, equal) {
 
 function ValidateEmail(mail) {
   if (
-    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(myForm.emailAddr.value)
+    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)
   ) {
     return true;
   }
@@ -70,9 +71,7 @@ const urlpattern = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z
 const ssnPattern = /^[0-9]{3}\-?[0-9]{2}\-?[0-9]{4}$/;
 
 export function SSNAttribute() {
-  return createValidationAttribute(val => {
-    return ssnPattern.test(val);
-  });
+  return createValidationAttribute(val => ssnPattern.test(val));
 }
 export function SSNEmptyAttribute() {
   return createValidationAttribute(val => {
@@ -82,7 +81,7 @@ export function SSNEmptyAttribute() {
 }
 export function IsValidDateAttribute() {
   return createValidationAttribute(val => {
-    let date = typeof val === "string" ? Date.parse(val) : val;
+    const date = typeof val === "string" ? Date.parse(val) : val;
     return date.getTime() === date.getTime();
   });
 }
@@ -90,16 +89,14 @@ function isValidDate(val) {
   if (!val && val !== 0) {
     return true;
   }
-  let date = typeof val === "string" ? Date.parse(val) : val;
+  const date = typeof val === "string" ? Date.parse(val) : val;
   return date.getTime() === date.getTime();
 }
 export function IsValidDateOrEmptyAttribute() {
-  return createValidationAttribute(val => {
-    return isValidDate(val);
-  });
+  return createValidationAttribute(val => isValidDate(val));
 }
 export function PastDateAttribute(_pastDate) {
-  let pastDate = Date.parse(_pastDate);
+  const pastDate = Date.parse(_pastDate);
   return createValidationAttribute(val => {
     if (isValidDate(val)) {
       return val.getTime() > pastDate.getTime();
@@ -109,11 +106,10 @@ export function PastDateAttribute(_pastDate) {
   });
 }
 export function Is18YearsPlusAttribute() {
-  let nowDate = new Date(Date.now());
   return createValidationAttribute(val => {
     if (isValidDate(val)) {
       try {
-        var date = new Date(Date.parse(val));
+        const date = new Date(Date.parse(val));
         return Date.now() - date.getTime() > 5.676e11;
       } catch (e) {
         return false;
@@ -124,23 +120,19 @@ export function Is18YearsPlusAttribute() {
   });
 }
 export function CreditCardValidation() {
-  return createValidationAttribute(val => {
-    return CredCardValidations.find(j => {
+  return createValidationAttribute(val => CredCardValidations.find(j => {
       return (
         j.startsWith.find(t => x.startsWith(t)) &&
         j.lengths.find(t => x.length == t)
       );
-    });
-  });
+    }));
 }
 
 export function GetCardType(x) {
-  return CredCardValidations.find(j => {
-    return (
+  return CredCardValidations.find(j => (
       j.startsWith.find(t => x.startsWith(t)) &&
-      j.lengths.find(t => x.length == t)
-    );
-  });
+      j.lengths.find(t => x.length === t)
+    ));
 }
 
 const CredCardValidations = [
@@ -203,8 +195,8 @@ const CredCardValidations = [
   }
 ];
 
-export function BeforeNowAttribute(_pastDate) {
-  let nowDate = new Date(Date.now());
+export function BeforeNowAttribute() {
+  const nowDate = new Date(Date.now());
   return createValidationAttribute(val => {
     if (isValidDate(val)) {
       return val.getTime() < nowDate.getTime();
@@ -215,9 +207,7 @@ export function BeforeNowAttribute(_pastDate) {
 }
 
 export function UrlAttribute() {
-  return createValidationAttribute(val => {
-    return urlpattern.test(val);
-  });
+  return createValidationAttribute(val => urlpattern.test(val));
 }
 export function UrlEmptyAttribute() {
   return createValidationAttribute(val => {
@@ -227,9 +217,7 @@ export function UrlEmptyAttribute() {
 }
 
 export function EmailAttribute() {
-  return createValidationAttribute(val => {
-    return ValidateEmail(val);
-  });
+  return createValidationAttribute(val => ValidateEmail(val));
 }
 export function EmailEmptyAttribute() {
   return createValidationAttribute(val => {
@@ -266,7 +254,7 @@ function createValidationAttribute(test, defaultOptions = {}) {
         ...defaultOptions,
         ...(options || {})
       };
-      let { errors, success } = results;
+      const { errors, success } = results;
       return {
         isOk: val => {
           if (test(val)) {
@@ -322,7 +310,7 @@ export function alphanumericLike(val) {
     .toString()
     .split("")
     .find(t => {
-      t = t.toLowerCase();
+      t =`${t}`.toLowerCase();
       return "abcdefghijk lmnopqrstuvwxyz,.;'0123456789".indexOf(t) === -1;
     });
 }
@@ -331,7 +319,7 @@ export function alphanumeric(val) {
     .toString()
     .split("")
     .find(t => {
-      t = t.toLowerCase();
+      t =`${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz0123456789".indexOf(t) === -1;
     });
 }
@@ -340,7 +328,7 @@ export function alpha(val) {
     .toString()
     .split("")
     .find(t => {
-      t = t.toLowerCase();
+      t =`${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz".indexOf(t) === -1;
     });
 }
@@ -350,7 +338,7 @@ export function alphawithspaces(val) {
     .toString()
     .split("")
     .find(t => {
-      t = t.toLowerCase();
+      t =`${t}`.toLowerCase();
       return "abcdefghijklmnopqrstuvwxyz  ".indexOf(t) === -1;
     });
 }

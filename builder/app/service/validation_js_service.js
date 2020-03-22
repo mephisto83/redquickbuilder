@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable prefer-const */
 import {
   GetValidationNode,
   GetCombinedCondition,
@@ -9,17 +11,18 @@ import { ProgrammingLanguages, NodeProperties } from "../constants/nodetypes";
 export function buildValidation(args = { methodMethod }) {
   let { methodMethod, id } = args;
   if (methodMethod) {
-    let dataChain = GetNodeById(id);
-    let property = GetNodeProp(dataChain, NodeProperties.Property);
-    let validationNode = GetValidationNode(methodMethod);
+    const dataChain = GetNodeById(id);
+    const property = GetNodeProp(dataChain, NodeProperties.Property);
+    const validationNode = GetValidationNode(methodMethod);
     let conditions = null;
     if (validationNode) {
       conditions = GetCombinedCondition(
         validationNode.id,
         ProgrammingLanguages.JavaScript,
-        { filter: { property } }
+        { filter: { property }, finalResult: 'valid' }
       );
     }
+
     return `context => {
       let result = {
         errors: [],
@@ -27,10 +30,12 @@ export function buildValidation(args = { methodMethod }) {
         success: [],
         valid: true
       };
-      let { object, property } = context;
-      let model = object;
+      let { object, property } = (context || {});
+      let model = object || {};
+      let valid = false;
 
       ${conditions || ""};
+      result.value = valid;
 
       return result;
     }`;

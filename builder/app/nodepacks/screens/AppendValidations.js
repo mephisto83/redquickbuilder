@@ -61,9 +61,9 @@ export default function AppendValidations({
               propertyId = GetModelPropertyChildren(modelId).find(
                 v => GetNodeTitle(v) === GetNodeTitle(subcomponent)
               );
-              if (propertyId) {
-                propertyId = propertyId.id;
-              }
+            }
+            if (propertyId && propertyId.id) {
+              propertyId = propertyId.id;
             }
             if (!GetNodeById(propertyId)) {
               return;

@@ -5450,34 +5450,37 @@ function setupPropertyApi(args) {
         let _context = null;
         switch (apiProperty) {
           case ApiProperty.Success:
-            return [
-              ...AttributeSuccess({
-                model: currentNode.id,
-                property: modelProperty.id,
-                propertyName: GetNodeTitle(modelProperty),
-                viewName,
-                uiType,
-                callback: context => {
-                  _context = context;
-                  apiDataChainLists[apiProperty] = _context.entry;
-                }
-              })
-            ];
+            return [];
+            // return [
+            //   ...AttributeSuccess({
+            //     model: currentNode.id,
+            //     property: modelProperty.id,
+            //     propertyName: GetNodeTitle(modelProperty),
+            //     viewName,
+            //     uiType,
+            //     callback: context => {
+            //       _context = context;
+            //       apiDataChainLists[apiProperty] = _context.entry;
+            //     }
+            //   })
+            // ];
           case ApiProperty.Error:
-            return [
-              ...AttributeError({
-                model: currentNode.id,
-                property: modelProperty.id,
-                propertyName: `${viewName} ${GetNodeTitle(
-                  modelProperty
-                )} ${uiType}`,
-                viewName,
-                callback: context => {
-                  _context = context;
-                  apiDataChainLists[apiProperty] = _context.entry;
-                }
-              })
-            ];
+            return [];
+            // return [
+            //   ...AttributeError({
+            //     model: currentNode.id,
+            //     property: modelProperty.id,
+            //     propertyName: `${viewName} ${GetNodeTitle(
+            //       modelProperty
+            //     )} ${uiType}`,
+            //     viewName,
+            //     callback: context => {
+            //       _context = context;
+            //       apiDataChainLists[apiProperty] = _context.entry;
+            //     }
+            //   })
+            // ];
+          default: break;
         }
         return [
           ...CreateSelectorToDataChainSelectorDC({

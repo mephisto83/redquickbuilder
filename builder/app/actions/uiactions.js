@@ -2100,7 +2100,7 @@ export function GetCombinedCondition(
   const node = GetGraphNode(id);
   let conditions = [];
   let customMethods = [];
-  let final_result = "res";
+  let finalResult = "res";
   let tabcount = 0;
   let methodNodeParameters = null;
   let ft = null;
@@ -2117,7 +2117,7 @@ export function GetCombinedCondition(
           typeof t === "string" ? t : t.key
         );
       }
-      final_result = "result";
+      finalResult = "result";
       tabcount = 3;
       break;
     case NodeTypes.ModelItemFilter:
@@ -2134,8 +2134,9 @@ export function GetCombinedCondition(
         );
       }
       tabcount = 3;
-      final_result = "result";
+      finalResult = "result";
       break;
+    default: break;
   }
   const tabs = [].interpolate(0, tabcount, () => `    `).join("");
   let clauses = [];
@@ -2164,7 +2165,10 @@ export function GetCombinedCondition(
         return `res_` + index;
       })
       .join(" && ") || "true";
-  clauses.push(`${final_result} = ${finalClause};`);
+  if (options.finalResult) {
+    finalResult = options.finalResult;
+  }
+  clauses.push(`${finalResult} = ${finalClause};`);
   return clauses
     .map((clause, index) => {
       return (
