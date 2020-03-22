@@ -874,6 +874,7 @@ class ContextMenu extends Component {
         />
       </TreeViewMenu>
     );
+    const viewTypeModel = currentNode ? UIA.GetViewTypeModel(currentNode.id) : null;
     switch (currentNodeType) {
       case NodeTypes.DataChainCollection:
         return [
@@ -1121,6 +1122,7 @@ class ContextMenu extends Component {
               </TreeViewMenu>
             ];
         }
+        break;
       case NodeTypes.DataChain:
         // DataChain_SelectPropertyValue
         return [
@@ -2318,7 +2320,6 @@ class ContextMenu extends Component {
           </TreeViewMenu>
         ];
       case NodeTypes.ViewType:
-        let viewTypeModel = UIA.GetViewTypeModel(currentNode.id);
         return [
           <TreeViewMenu
             open={UIA.Visual(state, currentNodeType)}
@@ -2454,6 +2455,45 @@ class ContextMenu extends Component {
                   value={this.state.functionToLoadModels}
                 />
               </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.MethodThatValidationComesFrom}
+                  options={UIA.NodesByType(
+                    this.props.state,
+                    NodeTypes.Method
+                  )
+                    .filter(
+                      x => [Methods.Create, Methods.Update].some(meth => meth ===
+                        (
+                          MethodFunctions[
+                          UIA.GetNodeProp(x, NodeProperties.FunctionType)
+                          ] || {}
+                        ).method)
+                    )
+                    .filter(x => {
+                      if (viewTypeModel) {
+                        const modelOutput =
+                          UIA.GetMethodNodeProp(
+                            x,
+                            FunctionTemplateKeys.ModelOutput
+                          ) ||
+                          UIA.GetMethodNodeProp(
+                            x,
+                            FunctionTemplateKeys.Model
+                          );
+                        return viewTypeModel && modelOutput === viewTypeModel.id;
+                      }
+                      return false;
+                    })
+                    .toNodeSelect()}
+                  onChange={value => {
+                    this.setState({
+                      validationMethod: value
+                    });
+                  }}
+                  value={this.state.validationMethod}
+                />
+              </TreeViewItemContainer>
               <TreeViewMenu
                 title={Titles.Execute}
                 description="Setup ViewType"
@@ -2461,6 +2501,7 @@ class ContextMenu extends Component {
                   this.props.graphOperation(
                     SetupViewTypeFor({
                       node: currentNode.id,
+                      validationMethod: this.state.validationMethod,
                       functionToLoadModels: this.state.functionToLoadModels,
                       eventType: 'onChange',
                       eventTypeHandler: true

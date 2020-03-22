@@ -19,6 +19,7 @@ export const EventType = "Event Type";
 export const UIParameters = "UI Parameters";
 export const IsFetchOutput = "Is Fetch Output";
 export const GridAreas = "Grid Areas";
+export const MethodThatValidationComesFrom='Method validation source';
 export const LoadModelsOnComponentMount = 'Load Models On Component Mount';
 export const GridRow = "GridRow";
 export const Rows = "Row Count";

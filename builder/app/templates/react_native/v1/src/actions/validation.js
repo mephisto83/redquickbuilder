@@ -6,36 +6,41 @@ export function MinLengthAttribute(min, equal) {
       return `${val}`.length >= min;
     }
     return `${val}`.length > min;
-  });
+  }, createDefaultError(`Needs to be at least ${min} long.`));
 }
-
+function createDefaultError(text) {
+  return {
+    fail: { title: text },
+    success: { title: '' }
+  }
+}
 export function MaxLengthAttribute(max, equal) {
   return createValidationAttribute(val => {
     if (equal) {
       return `${val}`.length <= max;
     }
     return `${val}`.length < max;
-  });
+  }, createDefaultError(`Needs to be less ${max} long.`));
 }
 
 export function AlphaOnlyAttribute() {
-  return createValidationAttribute(alpha);
+  return createValidationAttribute(alpha, createDefaultError(`Only alphabet letters.`));
 }
 
 export function AlphaNumericLikeAttribute() {
-  return createValidationAttribute(alphanumericLike);
+  return createValidationAttribute(alphanumericLike, createDefaultError(`Only alphanumeric characters.`));
 }
 
 export function AlphaOnlyWithSpacesAttribute() {
-  return createValidationAttribute(alphawithspaces);
+  return createValidationAttribute(alphawithspaces, createDefaultError(`Only alphanumeric characters and spaces.`));
 }
 
 export function IsNullAttribute() {
-  return createValidationAttribute(a => a === null || a === undefined);
+  return createValidationAttribute(a => a === null || a === undefined, createDefaultError(`This value cannot be set.`));
 }
 
 export function IsNotNullAttribute() {
-  return createValidationAttribute(a => a !== null && a !== undefined);
+  return createValidationAttribute(a => a !== null && a !== undefined, createDefaultError(`This value must be set.`));
 }
 
 export function MaxAttribute(max, equal) {
@@ -44,7 +49,7 @@ export function MaxAttribute(max, equal) {
       return val <= max;
     }
     return val < max;
-  });
+  }, createDefaultError(equal ? `This value must be less than or equal to ${max}.` : `This value must be less than ${max}.`));
 }
 
 export function MinAttribute(min, equal) {
@@ -53,7 +58,7 @@ export function MinAttribute(min, equal) {
       return val >= min;
     }
     return val > min;
-  });
+  }, createDefaultError(equal ? `This value must be greater than or equal to ${min}.` : `This value must be greater than ${min}.`));
 }
 
 function ValidateEmail(mail) {
@@ -71,19 +76,19 @@ const urlpattern = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z
 const ssnPattern = /^[0-9]{3}\-?[0-9]{2}\-?[0-9]{4}$/;
 
 export function SSNAttribute() {
-  return createValidationAttribute(val => ssnPattern.test(val));
+  return createValidationAttribute(val => ssnPattern.test(val), createDefaultError(`Isn't a valid Social Security Number.`));
 }
 export function SSNEmptyAttribute() {
   return createValidationAttribute(val => {
     if (val) return ssnPattern.test(val);
     return true;
-  });
+  }, createDefaultError(`Isn't a valid Social Security Number.`));
 }
 export function IsValidDateAttribute() {
   return createValidationAttribute(val => {
     const date = typeof val === "string" ? Date.parse(val) : val;
     return date.getTime() === date.getTime();
-  });
+  }, createDefaultError(`Isn't a valid date.`));
 }
 function isValidDate(val) {
   if (!val && val !== 0) {
@@ -93,7 +98,7 @@ function isValidDate(val) {
   return date.getTime() === date.getTime();
 }
 export function IsValidDateOrEmptyAttribute() {
-  return createValidationAttribute(val => isValidDate(val));
+  return createValidationAttribute(val => isValidDate(val), createDefaultError(`Isn't a valid date.`));
 }
 export function PastDateAttribute(_pastDate) {
   const pastDate = Date.parse(_pastDate);
@@ -103,7 +108,7 @@ export function PastDateAttribute(_pastDate) {
     }
 
     return false;
-  });
+  }, createDefaultError(_pastDate ? `It must be past ${(new Date(_pastDate)).toLocaleDateString()}.` : null));
 }
 export function Is18YearsPlusAttribute() {
   return createValidationAttribute(val => {
@@ -117,7 +122,7 @@ export function Is18YearsPlusAttribute() {
     }
 
     return false;
-  });
+  }, createDefaultError(`Has to be over 18.`));
 }
 export function CreditCardValidation() {
   return createValidationAttribute(val => CredCardValidations.find(j => {
@@ -125,7 +130,7 @@ export function CreditCardValidation() {
       j.startsWith.find(t => x.startsWith(t)) &&
       j.lengths.find(t => x.length == t)
     );
-  }));
+  }), createDefaultError(`It isn't recognized as a valid credit card number.`));
 }
 
 export function GetCardType(x) {
@@ -203,27 +208,27 @@ export function BeforeNowAttribute() {
     }
 
     return false;
-  });
+  }, createDefaultError(`It needs to be in the past.`));
 }
 
 export function UrlAttribute() {
-  return createValidationAttribute(val => urlpattern.test(val));
+  return createValidationAttribute(val => urlpattern.test(val), createDefaultError(`This isn't a valid url.`));
 }
 export function UrlEmptyAttribute() {
   return createValidationAttribute(val => {
     if (val) return urlpattern.test(val);
     return true;
-  });
+  }, createDefaultError(`This isn't a valid url.`));
 }
 
 export function EmailAttribute() {
-  return createValidationAttribute(val => ValidateEmail(val));
+  return createValidationAttribute(val => ValidateEmail(val), createDefaultError(`This isn't a valid email address.`));
 }
 export function EmailEmptyAttribute() {
   return createValidationAttribute(val => {
     if (val) return ValidateEmail(val);
     return true;
-  });
+  }, createDefaultError(`This isn't a valid email address.`));
 }
 
 export function ZipAttribute() {
@@ -244,13 +249,13 @@ function zipefunc(allowNull) {
       );
     }
     return allowNull || false;
-  });
+  }, createDefaultError(`This isn't a valid zip code.`));
 }
 function createValidationAttribute(test, defaultOptions = {}) {
   return {
     results: (results, options = {}) => {
       options = {
-        ...{ fail: "test failed", success: "test succeeded" },
+        ...{ fail: { title: "test failed" }, success: { title: "test succeeded" } },
         ...defaultOptions,
         ...(options || {})
       };

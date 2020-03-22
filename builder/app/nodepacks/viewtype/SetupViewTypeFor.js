@@ -6,6 +6,7 @@ import SetupViewTypeForGetAll from "./SetupViewTypeForGetAll";
 import AttachGetAllOnComponentDidMount from "./AttachGetAllOnComponentDidMount";
 import { setViewPackageStamp, GetLinkBetween } from "../../methods/graph_methods";
 import RemoveAllViewPackage from "../RemoveAllViewPackage";
+import AppendViewTypeValidation from "./AppendViewTypeValidation";
 
 export default function SetupViewTypeFor(args = {}) {
   const {
@@ -69,6 +70,7 @@ export default function SetupViewTypeFor(args = {}) {
       }
     }
   })
+  result.push(...AppendViewTypeValidation({ method: args.validationMethod, ...args }));
   result.push(() => {
     setViewPackageStamp(null, 'setup-view-type-for');
     return [];

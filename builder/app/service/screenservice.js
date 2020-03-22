@@ -1125,14 +1125,14 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         externalConnection = componentExternalApi;
         switch (GetNodeTitle(externalConnection)) {
           case "label":
-          case "error":
-          case "success":
           case "placeholder":
+          case "success":
             return;
           case "viewModel":
             noSelector = true;
             noDataChain = false;
             break;
+          case "error":
           default:
             stateKey = "value";
             break;
