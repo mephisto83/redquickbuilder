@@ -4,20 +4,25 @@ import {
   ComponentApiKeys,
   GetModelPropertyChildren,
   ADD_LINK_BETWEEN_NODES,
-  GetNodeById
+  GetNodeById,
+  $addComponentApiNodes,
+  GetNodeByProperties
 } from "../../actions/uiactions";
 import {
   NodeProperties,
   LinkType,
   LinkProperties,
-  LinkPropertyKeys
+  LinkPropertyKeys,
+  NodeTypes
 } from "../../constants/nodetypes";
 import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import { ComponentTypeKeys } from "../../constants/componenttypes";
+import CreateValidatorForObject from "../CreateValidatorForObject";
 
 export default function AppendValidations({
   subcomponents,
+  component,
   screen_option,
   viewPackages,
   method
@@ -28,10 +33,21 @@ export default function AppendValidations({
   const nonExecuteSubComponents = subcomponents.filter(
     x => !GetNodeProp(x, NodeProperties.ExecuteButton)
   );
+  const executeButtons = subcomponents.filter(x => GetNodeProp(x, NodeProperties.ExecuteButton));
+  const componentInternalValueApi = GetNodesLinkedTo(null, {
+    id: component.id,
+    link: LinkType.ComponentInternalApi,
+    componentType: NodeTypes.ComponentApi
+  }).find(componentApi => GetNodeTitle(componentApi) === ComponentApiKeys.Value);
   const result = [];
+  const modelType = GetNodeProp(screen_option, NodeProperties.Model);
+  const selector = modelType ? GetNodeByProperties({
+    [NodeProperties.NODEType]: NodeTypes.Selector,
+    [NodeProperties.Model]: modelType
+  }) : null;
 
   if (nonExecuteSubComponents.length) {
-    nonExecuteSubComponents.map(subcomponent => {
+    nonExecuteSubComponents.forEach(subcomponent => {
       const componentType = GetNodeProp(
         subcomponent,
         NodeProperties.ComponentType
@@ -97,6 +113,80 @@ export default function AppendValidations({
       }
     });
   }
+  if (executeButtons.length) {
+    executeButtons.forEach(button => {
+      const componentType = GetNodeProp(
+        button,
+        NodeProperties.ComponentType
+      );
+      let externalValidationApi;
+      switch (componentType) {
+        default:
+          result.push((ggraph) => {
+            const res = [];
+            externalValidationApi = GetNodesLinkedTo(ggraph, {
+              id: button.id,
+              link: LinkType.ComponentExternalApi
+            }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+            if (!externalValidationApi) {
+              res.push(...$addComponentApiNodes(button.id, ComponentApiKeys.Error, null, viewPackages))
+            }
+            return res;
+          })
+          result.push((ggraph) => {
+            externalValidationApi = GetNodesLinkedTo(ggraph, {
+              id: button.id,
+              link: LinkType.ComponentExternalApi
+            }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+            if (externalValidationApi) {
+              const modelId = GetNodeProp(screen_option, NodeProperties.Model);
+              let validatorNode = null;
 
+              return [
+                ...CreateValidatorForObject({
+                  model: GetNodeTitle(modelId),
+                  modelId,
+                  method,
+                  viewPackages,
+                  callback: context => {
+                    validatorNode = context.entry;
+                  }
+                }),
+                {
+                  operation: ADD_LINK_BETWEEN_NODES,
+                  options() {
+                    return {
+                      target: validatorNode,
+                      source: externalValidationApi.id,
+                      properties: { ...LinkProperties.DataChainLink }
+                    };
+                  }
+                }, {
+                  operation: ADD_LINK_BETWEEN_NODES,
+                  options() {
+                    return {
+                      target: componentInternalValueApi.id,
+                      source: externalValidationApi.id,
+                      properties: { ...LinkProperties.ComponentExternalConnection }
+                    }
+                  }
+                },
+                selector ? ({
+                  operation: ADD_LINK_BETWEEN_NODES,
+                  options() {
+                    return {
+                      source: externalValidationApi.id,
+                      target: selector.id,
+                      properties: { ...LinkProperties.SelectorLink }
+                    };
+                  }
+                }) : null]
+            }
+            return []
+          });
+          break;
+      }
+    });
+  }
   return result;
 }

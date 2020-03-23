@@ -107,7 +107,7 @@ export default function AppendViewTypeValidation(args) {
                   properties: { ...LinkProperties.SelectorLink }
                 };
               }
-            }) : nulll]
+            }) : null]
           }
         });
         break;

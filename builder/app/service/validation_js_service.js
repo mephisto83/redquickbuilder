@@ -35,7 +35,7 @@ export function buildValidation(args = { methodMethod }) {
       let valid = false;
 
       ${conditions || ""};
-      result.value = valid;
+      result.valid = valid;
 
       return result;
     }`;

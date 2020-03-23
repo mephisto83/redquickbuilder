@@ -283,7 +283,7 @@ export function processRecording(str) {
         .map(insert => {
           let temp = insert.substr(2, insert.length - 3);
           return `if(!args.${temp}){
-          throw 'missing ${temp} argument';
+          throw new Error('missing ${temp} argument');
         }`;
         })
         .join("")}

@@ -209,6 +209,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
         result.push(
           ...AppendValidations({
             subcomponents,
+            component,
             screen_option,
             method,
             viewPackages
