@@ -98,11 +98,12 @@ const BUTTON_DEFAULT_API = [
   "small",
   "active"
 ].map(x => ({ property: x }));
+const LOCAL_STATE_PROPERTY = ['error'].map(x => ({ property: x }));
 const LABEL_DEFAULT_API = ["data"].map(x => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES = {};
 const DEFAULT_BUTTON_API_PROPERTIES = {};
 
-BUTTON_DEFAULT_API.map(x => {
+BUTTON_DEFAULT_API.forEach(x => {
   DEFAULT_BUTTON_API_PROPERTIES[x.property] = {
     nodeProperty: x.property,
     parameterConfig: true,
@@ -110,7 +111,16 @@ BUTTON_DEFAULT_API.map(x => {
     ui: true
   };
 });
-INPUT_DEFAULT_API.map(x => {
+LOCAL_STATE_PROPERTY.forEach(x => {
+  DEFAULT_BUTTON_API_PROPERTIES[x.property] = {
+    nodeProperty: x.property,
+    parameterConfig: true,
+    isHandler: false,
+    ui: true,
+    localStateProperty: true
+  };
+});
+INPUT_DEFAULT_API.forEach(x => {
   DEFAULT_INPUT_API_PROPERTIES[x.property] = {
     nodeProperty: x.property,
     parameterConfig: true,

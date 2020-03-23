@@ -175,7 +175,7 @@ export function GetItemRenderImport(node) {
 }
 
 function getCssClassName(css, id) {
-  var res = id;
+  let res = id;
   if (css[id] && css[id].parent) {
     res = `${getCssClassName(css, css[id].parent)} .${res}`;
   } else {
@@ -522,7 +522,11 @@ export function bindComponent(node, componentBindingDefinition) {
     const { properties } = componentBindingDefinition;
     const bindProps = {};
     Object.keys(properties).map(key => {
-      if (properties[key] && properties[key].nodeProperty) {
+
+      if (properties[key] && properties[key].localStateProperty) {
+        bindProps[key] = `${key}={this.state.${key}}`;
+      }
+      else if (properties[key] && properties[key].nodeProperty) {
         bindProps[key] = GetNodeProp(node, properties[key].nodeProperty);
         if (properties[key].parameterConfig) {
           const parameterConfig = GetNodeProp(node, properties[key].nodeProperty);
@@ -537,7 +541,7 @@ export function bindComponent(node, componentBindingDefinition) {
       }
       if (!bindProps[key]) bindProps[key] = "";
     });
-    var cevents =
+    let cevents =
       componentBindingDefinition.eventApi || Object.keys(ComponentEvents);
     const eventHandlers = cevents
       .map(t => getMethodInstancesForEvntType(node, ComponentEvents[t]))
@@ -1311,7 +1315,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
   const uiType = GetNodeProp(node, NodeProperties.UIType);
   if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
     const { events } = ComponentTypes[uiType][componentType];
-    for (var _event in events) {
+    for (let _event in events) {
       switch (_event) {
         case ComponentEvents.onChange:
           result.push(ComponentEventStandardHandler[_event]);
@@ -1323,11 +1327,11 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
   return NEW_LINE + result.join(NEW_LINE);
 }
 export function writeApiProperties(apiConfig) {
-  var result = "";
-  var res = [];
+  let result = "";
+  let res = [];
 
   if (apiConfig) {
-    for (var i in apiConfig) {
+    for (let i in apiConfig) {
       let property = null;
       const {
         instanceType,
@@ -1846,7 +1850,7 @@ export function GenerateComponentImport(node, parentNode, language) {
 }
 
 export function GetScreens() {
-  var screens = GetScreenNodes();
+  let screens = GetScreenNodes();
   return screens;
 }
 function GenerateElectronIORoutes(screens) {
@@ -1917,7 +1921,7 @@ function GenerateElectronIORoutes(screens) {
   };
 }
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
-  var screens = GetScreens();
+  let screens = GetScreens();
   let template = fs.readFileSync("./app/templates/screens/screen.tpl", "utf8");
   const moreresults = [];
   let fileEnding = ".js";

@@ -96,12 +96,12 @@ export default class Input extends React.Component {
 
 Input.propTypes = {
 	inputType: function(v) {
-		return true;
+		return null;
 	},
 	error: function(v) {
-		return typeof v === 'object';
+		return null;
 	},
 	data: function(v) {
-		return Array.isArray(v);
+		return null;
 	}
 };

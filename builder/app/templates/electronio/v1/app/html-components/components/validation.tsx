@@ -64,6 +64,6 @@ export default class Validation extends React.Component {
 
 Validation.propTypes = {
 	data: function(v) {
-		return typeof v === 'object';
+		return null;
 	}
 };
