@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable prefer-destructuring */
-import { GetModelPropertyChildren, UPDATE_NODE_PROPERTY, ADD_LINK_BETWEEN_NODES, NO_OP, ADD_TO_GROUP, GetNodeTitle } from "../../actions/uiactions";
+import { GetModelPropertyChildren, UPDATE_NODE_PROPERTY, ADD_LINK_BETWEEN_NODES, NO_OP, ADD_TO_GROUP, GetNodeTitle, GetNodeProp } from "../../actions/uiactions";
 import ClearScreenInstanceLocalStateProperty from "../partial/ClearScreenInstanceLocalStateProperty";
 import { NodeProperties, LinkProperties } from "../../constants/nodetypes";
 import ClearScreenInstanceUpdateLocalStateProperty from "../partial/ClearScreenInstanceUpdateLocalStateProperty";
@@ -8,7 +8,7 @@ import ClearScreenInstanceUpdateLocalStateProperty from "../partial/ClearScreenI
 export default function ClearScreenInstance(args) {
   const { viewPackages, model, update, title } = args;
   const func = update ? ClearScreenInstanceUpdateLocalStateProperty : ClearScreenInstanceLocalStateProperty;
-  const modelProperties = GetModelPropertyChildren(model, { skipLogicalChildren: true });
+  const modelProperties = GetModelPropertyChildren(model, { skipLogicalChildren: true }).filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
 
   const result = [];
   let lastChain = null;

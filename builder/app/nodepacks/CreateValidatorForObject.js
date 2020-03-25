@@ -203,7 +203,7 @@ export default function (args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node1,
-          "value": "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {}\n  if(dirty) {\n      //#{model}\n      if(Object.keys(dirty).some(key => dirty[key]))\n {//updated \n        return { ...x  };\n      }\n  }\n    // only dirty fields, will be validatated.\n return null;\n}"
+          "value": "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {}\n  if(dirty) {\n      //#{model}\n      if(Object.keys(dirty).some(key => dirty[key]))\n {//updated \n        return { ...x, validated: true  };\n      }\n  }\n    // only dirty fields, will be validatated.\n return { valid: false, validated:false };\n}"
         }
       }]
     },

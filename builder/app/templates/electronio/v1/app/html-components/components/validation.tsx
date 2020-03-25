@@ -20,32 +20,34 @@ export default class Validation extends React.Component {
 					return {};
 				}
 			}
-    }
+		}
 		return { display: 'none' };
 	}
 	getValidation() {
 		let { data } = this.props;
 		let result = [];
 		if (data && data.success && data.errors) {
-			const { errors, success } = data;
-			if (errors.length) {
-				result.push(
-					...errors.filter((error) => error.title).map((error, index) => {
+			const { errors, success, validated } = data;
+			if (validated) {
+				if (errors.length) {
+					result.push(
+						...errors.filter((error) => error.title).map((error, index) => {
+							return (
+								<li key={`error${index}`}>
+									<span>{error.title}</span>
+								</li>
+							);
+						})
+					);
+				} else if (success) {
+					result = success.filter((success) => success.title).map((suc, index) => {
 						return (
-							<li key={`error${index}`}>
-								<span>{error.title}</span>
+							<li key={`success ${index}`}>
+								<span>{suc.title}</span>
 							</li>
 						);
-					})
-				);
-			} else if (success) {
-				result = success.filter((success) => success.title).map((suc, index) => {
-					return (
-						<li key={`success ${index}`}>
-							<span>{suc.title}</span>
-						</li>
-					);
-				});
+					});
+				}
 			}
 		}
 		return result;

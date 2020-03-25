@@ -30,13 +30,13 @@ export function buildValidation(args = { methodMethod }) {
         success: [],
         valid: true
       };
-      let { object, property } = (context || {});
+      let { object, property, validated } = (context || {});
       let model = object || {};
       let valid = false;
 
       ${conditions || ""};
       result.valid = valid;
-
+      result.validated = validated;
       return result;
     }`;
   }

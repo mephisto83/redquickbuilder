@@ -13,7 +13,7 @@ export default class Button extends React.Component {
 	getAttributes() {
 		const res = { disabled: 'disabled' };
 		if (this.props.error) {
-			const { errors, valid } = this.props.error;
+			const { errors, valid, validated } = this.props.error;
 
 			if (valid) {
 				if (errors.length === 0) {
