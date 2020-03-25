@@ -755,7 +755,10 @@ export const LinkType = {
   ComponentInternalApi: "component-internal-api",
   ViewModelLink: "view-model-link",
   Component: "component",
+  DataChainInputLink: "DataChainInputLink",
   DataChainLink: "data-chain-link",
+  PreDataChainLink: 'PreDataChainLink',
+  CallDataChainLink: 'CallDataChainLink',
   QueryLink: "query-link",
   SelectorLink: "selector-link",
   SelectorInputLink: "selector-input-link",
@@ -922,6 +925,7 @@ export const LinkPropertyKeys = {
   TYPE: "type",
   CONSTRAINTS: "constraints",
   VALID_CONSTRAINTS: "valid-constraints",
+  BeforeCall: 'BeforeCall',
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
   ComponentTag: "ComponentTag",
@@ -1065,6 +1069,15 @@ export const LinkProperties = {
   },
   DataChainLink: {
     type: LinkType.DataChainLink
+  },
+  DataChainInputLink: {
+    type: LinkType.DataChainInputLink
+  },
+  PreDataChainLink: {
+    type: LinkType.PreDataChainLink
+  },
+  CallDataChainLink: {
+    type: LinkType.CallDataChainLink
   },
   ListItem: {
     type: LinkType.ListItem

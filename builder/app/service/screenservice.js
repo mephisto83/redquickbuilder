@@ -18,7 +18,8 @@ import {
   GetCurrentGraph,
   GetNodeByProperties,
   GetNodes,
-  GetLinkProperty
+  GetLinkProperty,
+  GetDataChainArgs
 } from "../actions/uiactions";
 import fs from "fs";
 import path from "path";
@@ -69,7 +70,8 @@ import {
   getNodesLinkedTo,
   getNodesLinkedFrom,
   GetLinkBetween,
-  existsLinkBetween
+  existsLinkBetween,
+  GetNodeLinkedTo
 } from "../methods/graph_methods";
 import { HandlerType } from "../components/titles";
 import { addNewLine } from "../utils/array";
@@ -498,8 +500,8 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         GetCodeName(node) || ""
       ).toJavascriptName()}${ending}`,
       name:
-        (relativePath || "./src/components/") +
-        `${(GetCodeName(node) || "").toJavascriptName()}${ending}`
+        `${relativePath || "./src/components/"
+        }${(GetCodeName(node) || "").toJavascriptName()}${ending}`
     },
     cssFile
       ? {
@@ -509,8 +511,8 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
           GetCodeName(node) || ""
         ).toJavascriptName()}.css`,
         name:
-          (relativePath || "./src/components/") +
-          `${(GetCodeName(node) || "").toJavascriptName()}.css`
+          `${relativePath || "./src/components/"
+          }${(GetCodeName(node) || "").toJavascriptName()}.css`
       }
       : null,
     ...results
@@ -799,8 +801,8 @@ export function GenerateRNComponents(
             GetCodeName(node) || ""
           ).toJavascriptName()}${fileEnding}`,
           name:
-            (relative || "./src/components") +
-            `/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
+            `${relative || "./src/components"
+            }/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
           template
         });
         break;
@@ -1530,7 +1532,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
     type: LinkType.NavigationMethod,
     direction: SOURCE
   }).find(x => x);
-  const dataChain = getNodesByLinkType(graph, {
+  let dataChain = getNodesByLinkType(graph, {
     id: methodInstanceCall.id,
     type: LinkType.DataChainLink,
     direction: SOURCE
@@ -1560,12 +1562,18 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
       direction: TARGET
     }).find(x => GetNodeProp(x, NodeProperties.TemplateParameter));
 
-    const dataChain = GetNodesLinkedTo(graph, {
+    dataChain = GetNodeLinkedTo(graph, {
       id: methodInstanceCall.id,
-      link: LinkType.DataChainLink
-    }).find(x => {
-      return GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChain;
+      link: LinkType.DataChainLink,
+      componentType: NodeTypes.DataChain
     });
+
+    const preDataChain = GetNodeLinkedTo(graph, {
+      id: methodInstanceCall.id,
+      link: LinkType.PreDataChainLink,
+      componentType: NodeTypes.DataChain
+    });
+
     const methodInstanceSource = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
       link: LinkType.EventMethodInstance
@@ -1638,7 +1646,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
         })
         .filter(temp => temp);
       parts.push(
-        `template: {${addNewLine(queryParameterValues.join(", " + NEW_LINE))}}`
+        `template: {${addNewLine(queryParameterValues.join(`, ${NEW_LINE}`))}}`
       );
     }
     if (queryObject) {
@@ -1662,7 +1670,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
         })
         .filter(temp => temp);
       parts.push(
-        `query: {${addNewLine(queryParameterValues.join(", " + NEW_LINE))}}`
+        `query: {${addNewLine(queryParameterValues.join(`, ${NEW_LINE}`))}}`
       );
     }
     if (callback) {
@@ -1671,13 +1679,17 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
     let dataChainInput = "";
     if (dataChain) {
       dataChainInput =
-        (parts.length ? "," : "") +
-        `dataChain: DC.${GetCodeName(dataChain, {
+        `${parts.length ? "," : ""
+        }dataChain: DC.${GetCodeName(dataChain, {
           includeNameSpace: true
         })}`;
     }
+    let preDataChainInput = '';
+    if (preDataChain) {
+      preDataChainInput = `${parts.length ? ',' : ''}preChain: DC.${GetCodeName(preDataChain, { includeNameSpace: true })}`;
+    }
     const query = parts.join();
-    return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}});`;
+    return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}${preDataChainInput}});`;
   } else if (navigationMethod) {
     return `this.props.${GetNodeProp(
       navigationMethod,
@@ -1734,9 +1746,9 @@ export function GetComponentDidUpdate(parent, options = {}) {
     `componentDidUpdate(prevProps) {
         this.captureValues(prevProps);
       }
-      ` +
-    (!isScreen ? componentDidMount : "") +
-    `
+      ${
+    !isScreen ? componentDidMount : ""
+    }
       captureValues(prevProps){
         ${describedApi}
       }`;
@@ -1782,12 +1794,23 @@ export function GetComponentDidMount(screenOption, options = {}) {
     })
     .filter(x => x)
     .join(NEW_LINE);
+  const chainInvocations = (methodInstances || []).map(mi => {
+    const chains = GetNodesLinkedTo(null, {
+      id: mi.id,
+      link: LinkType.CallDataChainLink
+    });
 
+    return chains.map(chain => {
+      const input = GetDataChainInputArgs(chain.id);
+      return `DC.${GetCodeName(chain, { includeNameSpace: true })}(${input});`
+    }).join(NEW_LINE)
+  })
   const componentDidMount = `componentDidMount(value) {
         ${options.skipSetGetState ? "" : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? "" : outOfBandCall}
         ${invocations}
+        ${chainInvocations}
 {{handles}}
 }
 `;
@@ -1810,7 +1833,32 @@ export function GetComponentDidMount(screenOption, options = {}) {
     1
   );
 }
+export function GetDataChainInputArgs(id) {
+  const inputs = GetNodesLinkedTo(null, {
+    id,
+    link: LinkType.DataChainInputLink
+  });
 
+  let res = '';
+  if (inputs && inputs.length) {
+    res = [];
+    inputs.forEach(input => {
+      const nodeType = GetNodeProp(input, NodeProperties.NODEType);
+      switch (nodeType) {
+        case NodeTypes.ComponentApi:
+          res.push(`${GetJSCodeName(input)}: this.state.${GetJSCodeName(input)}`)
+          break;
+        case NodeTypes.ComponentExternalApi:
+          res.push(`${GetJSCodeName(input)}: this.props.${GetJSCodeName(input)}`)
+          break;
+      }
+    });
+
+    res = res.join(', ');
+    res = `{${res}}`;
+  }
+  return res;
+}
 export function GenerateImport(node, parentNode, language) {
   node = ConvertViewTypeToComponentNode(node, language);
 

@@ -1058,8 +1058,9 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
 
   return graph;
 }
+
 export function updateNodeGroup(graph, options) {
-  var { id, groupProperties, parent, callback } = options;
+  var { id, groupProperties, parent, callback, groupCallback } = options;
   var group = null;
   if (groupProperties && groupProperties.id) {
     group = getGroup(graph, groupProperties.id);
@@ -1119,6 +1120,9 @@ export function updateNodeGroup(graph, options) {
       if (callback) {
         callback(group.id);
       }
+    }
+    if (groupCallback && group) {
+      groupCallback(group.id)
     }
   }
 

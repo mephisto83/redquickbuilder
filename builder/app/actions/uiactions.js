@@ -1,3 +1,5 @@
+/* eslint-disable default-case */
+/* eslint-disable func-names */
 import * as GraphMethods from "../methods/graph_methods";
 import * as NodeConstants from "../constants/nodetypes";
 import * as Titles from "../components/titles";
@@ -3552,6 +3554,7 @@ export const NEW_PROPERTY_NODE = "NEW_PROPERTY_NODE";
 export const NEW_PERMISSION_NODE = "NEW_PERMISSION_NODE";
 export const NEW_ATTRIBUTE_NODE = "NEW_ATTRIBUTE_NODE";
 export const ADD_LINK_BETWEEN_NODES = "ADD_LINK_BETWEEN_NODES";
+export const ADD_TO_GROUP = 'ADD_TO_GROUP';
 export const ESTABLISH_SCOPE = "ESTABLISH_SCOPE";
 export const ADD_LINKS_BETWEEN_NODES = "ADD_LINKS_BETWEEN_NODES";
 export const UPDATE_NODE_DIRTY = "UPDATE_NODE_DIRTY";
@@ -3893,6 +3896,12 @@ export function graphOperation(operation, options, stamp) {
                           options
                         );
                         break;
+                      case ADD_TO_GROUP:
+                        currentGraph = GraphMethods.updateNodeGroup(
+                          currentGraph,
+                          options
+                        );
+                        break;
                       case ADD_LINKS_BETWEEN_NODES:
                         currentGraph = GraphMethods.addLinksBetweenNodes(
                           currentGraph,
@@ -4226,6 +4235,7 @@ export function graphOperation(operation, options, stamp) {
                         break;
                       case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
                         break;
+                      default: break;
                     }
 
                     if (recording && Visual(state, RECORDING)) {

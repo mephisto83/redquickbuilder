@@ -48,13 +48,16 @@ export const titleService = TitleService;
 
 ///Lots of stuff to add here,
 // better error handling
-export function simple(func, param, states, callback, error) {
+export function simple(func, param, states, callback, error, precall) {
   return (dispatch, getState) => {
     var state = getState();
     var loading = states.loading;
     var objectType = states.objectType;
     if (!Visual(state, loading)) {
       dispatch(UIActions.UIV(loading, true));
+      if (precall) {
+        precall(param, dispatch, getState)
+      }
       return func(param).then(res => {
         if (callback) {
           callback(res, dispatch, getState);

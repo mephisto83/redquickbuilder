@@ -29,7 +29,8 @@ import {
   GetNode,
   GetLinkChain,
   GetLinkChainItem,
-  createExecutor
+  createExecutor,
+  GetLinkBetween
 } from "../methods/graph_methods";
 import SideBarMenu from "./sidebarmenu";
 import {
@@ -47,7 +48,8 @@ class CurrentNodeProperties extends Component {
       return <div />;
     }
     let selectedLink = UIA.Visual(state, UIA.SELECTED_LINK) || {};
-    let currentLink = UIA.GetLink(selectedLink.id);
+
+    let currentLink = selectedLink ? GetLinkBetween(selectedLink.source, selectedLink.target, UIA.GetCurrentGraph()) : null;
     let linkProperties = currentLink ? currentLink.properties : {};
     let nodeProperties = currentNode.properties || {};
     return (
@@ -107,7 +109,7 @@ class CurrentNodeProperties extends Component {
                 .map(key => {
                   return (
                     <TreeViewMenu
-                      title={`${key}: ${linkProperties[key]}`}
+                      title={`${key}: ${JSON.stringify(linkProperties[key])}`}
                       key={`link-props-${key}`}
                       hideArrow
                       onClick={() => {

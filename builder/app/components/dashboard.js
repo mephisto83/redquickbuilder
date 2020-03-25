@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { platform } from 'os';
+import { currentId } from 'async_hooks';
 import routes from '../constants/routes';
 import { UIConnect } from '../utils/utils';
-const { clipboard } = require('electron')
 import DashboardLogo from './dashboardlogo';
 import Header from './header';
 import DashboardNavBar from './dashboardnavbar';
@@ -96,15 +97,16 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
-import { platform } from 'os';
 import { DataChainContextMethods } from '../constants/datachain';
-import { currentId } from 'async_hooks';
 import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
+
+const { clipboard } = require('electron')
+
 const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
@@ -117,45 +119,46 @@ class Dashboard extends Component {
     this.props.setVisual(UIA.NODE_COST, 5);
     this.props.setVisual(UIA.NODE_CONNECTION_COST, 1.5);
   }
+
   minified() {
-    var { state } = this.props;
+    const { state } = this.props;
     return UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU) ? 'sidebar-collapse' : '';
   }
+
   nodeSelectionMenuItems() {
-    var result = [];
-    var { state } = this.props;
+    const result = [];
+    const { state } = this.props;
     if (UIA.Visual(state, UIA.SELECTED_NODE)) {
-      var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+      const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
       switch (UIA.GetNodeProp(currentNode, NodeProperties.NODEType)) {
         case NodeTypes.DataChain:
-          result.push(...this.getDataChainContext());
+          return this.getDataChainContext();
+        case NodeTypes.Controller:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.MaestroLink,
+                nodeTypes: [NodeTypes.Maestro]
+              });
+            },
+            icon: 'fa  fa-music',
+            title: Titles.AddMaestros
+          }
+          );
           return result;
-          case NodeTypes.Controller:
-            result.push({
-                onClick: () => {
-                  this.props.setVisual(CONNECTING_NODE, {
-                    ...LinkProperties.MaestroLink,
-                    nodeTypes: [NodeTypes.Maestro]
-                  });
-                },
-                icon: 'fa  fa-music',
-                title: Titles.AddMaestros
-              }
-            );
-            return result;
-            case NodeTypes.Maestro:
-              result.push({
-                  onClick: () => {
-                    this.props.setVisual(CONNECTING_NODE, {
-                      ...LinkProperties.FunctionLink,
-                      nodeTypes: [NodeTypes.Method]
-                    });
-                  },
-                  icon: 'fa  fa-music',
-                  title: Titles.AddFunction
-                }
-              );
-              return result;
+        case NodeTypes.Maestro:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.FunctionLink,
+                nodeTypes: [NodeTypes.Method]
+              });
+            },
+            icon: 'fa  fa-music',
+            title: Titles.AddFunction
+          }
+          );
+          return result;
         case NodeTypes.Selector:
           result.push(...this.getSelectorContext())
           return result;
@@ -189,7 +192,7 @@ class Dashboard extends Component {
             },
             icon: 'fa fa-gears',
             title: Titles.ClaimServiceRegistrationCalls
-          },{
+          }, {
             onClick: () => {
 
               this.props.setVisual(CONNECTING_NODE, {
@@ -225,6 +228,7 @@ class Dashboard extends Component {
             icon: 'fa fa-chain',
             title: Titles.DataChain
           })
+          break;
         case NodeTypes.Action:
           result.push({
             onClick: () => {
@@ -299,7 +303,7 @@ class Dashboard extends Component {
             },
             icon: 'fa  fa-list',
             title: 'Add to list'
-          },{
+          }, {
             onClick: () => {
               this.props.setVisual(CONNECTING_NODE, {
                 ...LinkProperties.Lists,
@@ -320,7 +324,7 @@ class Dashboard extends Component {
             },
             icon: 'fa fa-bicycle',
             title: Titles.AddMethod
-          },{
+          }, {
             onClick: () => {
               this.props.setVisual(CONNECTING_NODE, {
                 ...LinkProperties.FetchServiceOuput,
@@ -330,20 +334,20 @@ class Dashboard extends Component {
             },
             icon: 'fa fa-plug',
             title: Titles.SetFetchServiceOutput
-          },{
+          }, {
             onClick: () => {
               this.props.setVisual(CONNECTING_NODE, {
                 ...LinkProperties.FetchSserviceAgent,
                 singleLink: true,
                 nodeTypes: [NodeTypes.Model],
-                properties:{
-                  [NodeProperties.IsAgent]:true
+                properties: {
+                  [NodeProperties.IsAgent]: true
                 }
               });
             },
             icon: 'fa  fa-user-secret',
             title: Titles.SetFetchSericeAgent
-          },{
+          }, {
             onClick: () => {
               this.props.setVisual(CONNECTING_NODE, {
                 ...LinkProperties.DataChainLink,
@@ -406,7 +410,7 @@ class Dashboard extends Component {
             icon: 'fa  fa-font',
             title: Titles.TitleService
           });
-          let graph = UIA.GetCurrentGraph(UIA.GetState())
+          const graph = UIA.GetCurrentGraph(UIA.GetState())
           if (GetNodesLinkedTo(graph, {
             id: currentNode.id,
             link: LinkType.ComponentExternalApi
@@ -474,7 +478,7 @@ class Dashboard extends Component {
               // });
               this.props.graphOperation([{
                 operation: UIA.ADD_NEW_NODE,
-                options: function () {
+                options() {
                   return {
                     nodeType: NodeTypes.ComponentApi,
                     parent: currentNode.id,
@@ -495,6 +499,7 @@ class Dashboard extends Component {
             title: `${Titles.AddComponentApi}`
           });
           break;
+        default: break;
       }
       result.push({
         onClick: () => {
@@ -506,8 +511,9 @@ class Dashboard extends Component {
     }
     return result;
   }
+
   getSelectorContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -517,7 +523,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-font',
       title: `${Titles.Selector}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.SelectorInputLink,
@@ -528,8 +534,9 @@ class Dashboard extends Component {
     })
     return result;
   }
+
   getViewTypeContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -543,8 +550,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getPermissionContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -558,8 +566,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getExecutorContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -573,8 +582,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getComponentApiContextMenu() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -586,7 +596,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-genderless',
       title: `${Titles.InternalApiConnection}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.ComponentApiConnection
@@ -598,13 +608,14 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getEventMethods() {
-    let result = [];
-    let { state } = this.props;
+    const result = [];
+    const { state } = this.props;
     result.push({
       onClick: () => {
 
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
         this.props.graphOperation([{
           operation: UIA.ADD_NEW_NODE,
@@ -618,21 +629,22 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getLifeCylcleMethods() {
-    let result = [];
-    let { state } = this.props;
+    const result = [];
+    const { state } = this.props;
     result.push({
       onClick: () => {
 
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+        const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
         this.props.graphOperation([{
           operation: UIA.ADD_NEW_NODE,
-          options: function () {
+          options() {
             return {
               nodeType: NodeTypes.LifeCylceMethodInstance,
               parent: currentNode.id,
-              linkProperties:{
+              linkProperties: {
                 properties: LinkProperties.LifeCylceMethodInstance
               },
               groupProperties: {},
@@ -655,8 +667,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getLifeCylcleInstanceMethods() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -666,7 +679,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-list-ol',
       title: `${Titles.ConnectLifeCylceMethods}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.ComponentApi,
@@ -676,7 +689,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-genderless',
       title: `${Titles.InternalApiConnection}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.DataChainLink,
@@ -686,12 +699,33 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-chain',
       title: `${Titles.ConnectToDataChainResponseHandler}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.PreDataChainLink,
+          singleLink: true,
+          nodeTypes: [NodeTypes.DataChain]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${Titles.ConnectToDataChainPrecallHandler}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.CallDataChainLink,
+          singleLink: true,
+          nodeTypes: [NodeTypes.DataChain]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${Titles.ConnectToDataChainCaller}`
     });
 
     return result;
   }
+
   getEventInstanceMethods(currentNode) {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -730,7 +764,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-chain',
       title: `${Titles.DataChain}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.ComponentApi,
@@ -751,8 +785,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getValidatorContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -766,11 +801,12 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getComponentContext() {
-    let result = [];
-    let { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    let me = this;
+    const result = [];
+    const { state } = this.props;
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const me = this;
     result.push({
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
@@ -784,7 +820,7 @@ class Dashboard extends Component {
       onClick: () => {
         this.props.graphOperation([{
           operation: UIA.ADD_NEW_NODE,
-          options: function () {
+          options() {
             return {
               nodeType: NodeTypes.ComponentApi,
               parent: currentNode.id,
@@ -807,7 +843,7 @@ class Dashboard extends Component {
       onClick: () => {
         this.props.graphOperation([{
           operation: UIA.ADD_NEW_NODE,
-          options: function () {
+          options() {
             return {
               nodeType: NodeTypes.ComponentExternalApi,
               parent: currentNode.id,
@@ -845,12 +881,13 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-chain',
       title: `${Titles.DataChain}`
-    },)
+    })
 
     return result;
   }
+
   getModelContext() {
-    let result = [];
+    const result = [];
 
     result.push({
       onClick: () => {
@@ -911,8 +948,9 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getDataChainContext() {
-    let result = [];
+    const result = [];
     result.push({
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
@@ -943,13 +981,22 @@ class Dashboard extends Component {
     }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
+          ...LinkProperties.DataChainInputLink,
+          nodeTypes: [NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi]
+        });
+      },
+      icon: 'fa fa-chain',
+      title: `${Titles.DataChainInput}`
+    }, {
+      onClick: () => {
+        this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.DataChainLink,
           context: 'InsertDataChain',
         });
       },
       icon: 'fa fa-yc',
       title: `${Titles.Insert}`
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.Style,
@@ -958,7 +1005,7 @@ class Dashboard extends Component {
       },
       icon: 'fa fa-css3',
       title: 'Modify Style'
-    },{
+    }, {
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
           ...LinkProperties.SelectorLink,
@@ -971,12 +1018,13 @@ class Dashboard extends Component {
 
     return result;
   }
+
   getCost() {
-    var { state } = this.props;
+    const { state } = this.props;
     let cost = 0;
-    let graph = UIA.GetCurrentGraph(state);
-    let node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
-    let node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
+    const graph = UIA.GetCurrentGraph(state);
+    const node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
+    const node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
 
 
     if (graph) {
@@ -984,37 +1032,38 @@ class Dashboard extends Component {
     }
     return this.formatMoney(cost, 2, '.', ',');
   }
+
   formatMoney(number, decPlaces, decSep, thouSep) {
     decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
       decSep = typeof decSep === "undefined" ? "." : decSep;
     thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-    var sign = number < 0 ? "-" : "";
-    var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+    const sign = number < 0 ? "-" : "";
+    const i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
     var j = (j = i.length) > 3 ? j % 3 : 0;
 
     return sign +
       (j ? i.substr(0, j) + thouSep : "") +
-      i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+      i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, `$1${thouSep}`) +
       (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
   }
 
 
   render() {
-    var { state } = this.props;
-    let cost = this.getCost()
-    var selected_node_bb = UIA.Visual(state, UIA.SELECTED_NODE_BB);
-    var menu_left = 0;
-    var menu_top = 0;
+    const { state } = this.props;
+    const cost = this.getCost()
+    const selected_node_bb = UIA.Visual(state, UIA.SELECTED_NODE_BB);
+    let menu_left = 0;
+    let menu_top = 0;
     if (selected_node_bb) {
       menu_left = selected_node_bb.right;
       menu_top = selected_node_bb.top;
     }
-    var nodeSelectionMenuItems = this.nodeSelectionMenuItems();
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    let graph = UIA.GetCurrentGraph(state);
-    let rootGraph = UIA.GetRootGraph(state);
-    let vgraph = UIA.GetVisualGraph(state);
-    let main_content = UIA.Visual(state, MAIN_CONTENT);
+    const nodeSelectionMenuItems = this.nodeSelectionMenuItems();
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const graph = UIA.GetCurrentGraph(state);
+    const rootGraph = UIA.GetRootGraph(state);
+    const vgraph = UIA.GetVisualGraph(state);
+    const main_content = UIA.Visual(state, MAIN_CONTENT);
     let version = '0.0.0';
     let workspace = null;
     if (rootGraph) {
@@ -1049,7 +1098,7 @@ class Dashboard extends Component {
                 <SidebarToggle />
 
                 <NavBarMenu>
-                  {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon={'fa fa-cube'} onClick={() => {
+                  {UIA.Visual(state, UIA.SELECTED_LINK) ? <NavBarButton icon="fa fa-cube" onClick={() => {
                     this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, UIA.Visual(state, UIA.SELECTED_LINK));
                     this.props.setVisual(UIA.SELECTED_LINK, null);
                   }} /> : null}
@@ -1057,19 +1106,19 @@ class Dashboard extends Component {
                   {/* <NavBarButton icon={'fa fa-asterisk'} onClick={() => {
 										clipboard.writeText(UIA.generateDataSeeds());
 									}} /> */}
-                  <NavBarButton icon={'fa fa-asterisk'} onClick={() => {
+                  <NavBarButton icon="fa fa-asterisk" onClick={() => {
                     this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                       source: currentNode.id,
                       target: currentNode.id
                     })
                   }} />
-                  <NavBarButton icon={'fa fa-plus'} onClick={() => {
+                  <NavBarButton icon="fa fa-plus" onClick={() => {
                     this.props.graphOperation(UIA.NEW_NODE, {});
                     this.props.setVisual(SIDE_PANEL_OPEN, true);
                     this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
                   }} />
 
-                  <NavBarButton icon={'fa fa-minus'} onClick={() => {
+                  <NavBarButton icon="fa fa-minus" onClick={() => {
                     this.props.graphOperation(UIA.REMOVE_NODE, { id: UIA.Visual(state, UIA.SELECTED_NODE) });
                     this.props.setVisual(SIDE_PANEL_OPEN, false);
                     this.props.setVisual(SELECTED_TAB, DEFAULT_TAB)
@@ -1079,79 +1128,77 @@ class Dashboard extends Component {
                   }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15}>
-                  <NavBarButton icon={'fa fa-remove'} title={Titles.ClearPinned} onClick={() => {
-                    this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => {
-                      return {
-                        operation: UIA.CHANGE_NODE_PROPERTY,
-                        options: {
-                          prop: UIA.NodeProperties.Pinned,
-                          id: node.id,
-                          value: false
-                        }
+                  <NavBarButton icon="fa fa-remove" title={Titles.ClearPinned} onClick={() => {
+                    this.props.graphOperation(UIA.GetNodes(state).filter(x => UIA.GetNodeProp(x, NodeProperties.Pinned)).map(node => ({
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Pinned,
+                        id: node.id,
+                        value: false
                       }
-                    }));
+                    })));
                   }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
+                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === MIND_MAP || !main_content} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                   }} /> : null}
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
+                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                   }} /> : null}
 
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
-                  <NavBarButton title={Titles.New} icon={'fa fa-plus'} onClick={() => {
+                  <NavBarButton title={Titles.New} icon="fa fa-plus" onClick={() => {
                     this.props.newRedQuickBuilderGraph();
                   }} />
-                  <NavBarButton title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
+                  <NavBarButton title={Titles.Open} icon="fa fa-folder-open" onClick={() => {
                     this.props.openRedQuickBuilderGraph();
                   }} />
-                  <NavBarButton title={`${Titles.Record} ${UIA.GetRecording().length}`} icon={UIA.Visual(state, UIA.RECORDING) ? 'fa fa-pause':'fa fa-play'} onClick={() => {
+                  <NavBarButton title={`${Titles.Record} ${UIA.GetRecording().length}`} icon={UIA.Visual(state, UIA.RECORDING) ? 'fa fa-pause' : 'fa fa-play'} onClick={() => {
                     this.props.toggleVisual(UIA.RECORDING);
                   }} />
-                  <NavBarButton title={`${Titles.Save} ${Titles.Record}`} icon={'fa fa-save'} onClick={() => {
-                     var recording  = UIA.GetRecording();
-                     this.props.saveRecording(recording);
+                  <NavBarButton title={`${Titles.Save} ${Titles.Record}`} icon="fa fa-save" onClick={() => {
+                    const recording = UIA.GetRecording();
+                    this.props.saveRecording(recording);
                   }} />
-                  {UIA.GetRecording().length?<NavBarButton title={`${Titles.Record} ${UIA.GetRecording().length}`} icon={'fa fa-stop'} onClick={() => {
-                  this.props.setVisual(UIA.RECORDING, false);
-                  this.props.clearRecording()
-                  }} />:null}
-                  {rootGraph ? <NavBarButton title={Titles.SaveAs} icon={'fa fa-cloud-upload'} onClick={() => {
+                  {UIA.GetRecording().length ? <NavBarButton title={`${Titles.Record} ${UIA.GetRecording().length}`} icon="fa fa-stop" onClick={() => {
+                    this.props.setVisual(UIA.RECORDING, false);
+                    this.props.clearRecording()
+                  }} /> : null}
+                  {rootGraph ? <NavBarButton title={Titles.SaveAs} icon="fa fa-cloud-upload" onClick={() => {
                     this.props.saveGraphToFile();
                   }} /> : null}
-                  {rootGraph && rootGraph.graphFile ? <NavBarButton title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                  {rootGraph && rootGraph.graphFile ? <NavBarButton title={Titles.Save} icon="fa fa-save" onClick={() => {
                     this.props.saveGraph();
                   }} /> : null}
-                  {rootGraph ? <NavBarButton title={Titles.Scaffold} icon={'fa fa-building'} onClick={() => {
+                  {rootGraph ? <NavBarButton title={Titles.Scaffold} icon="fa fa-building" onClick={() => {
                     if (confirm("Are you sure you want to scaffold the project"))
                       this.props.scaffoldProject();
                   }} /> : null}
-                  {rootGraph ? <NavBarButton title={Titles.PublishFiles} icon={'fa fa-building-o'} onClick={() => {
+                  {rootGraph ? <NavBarButton title={Titles.PublishFiles} icon="fa fa-building-o" onClick={() => {
                     this.props.scaffoldProject({ filesOnly: true });
                   }} /> : null}
-                  {rootGraph ? <NavBarButton title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                  {rootGraph ? <NavBarButton title={Titles.SetWorkingDirectory} icon="fa fa-folder-open" onClick={() => {
                     this.props.setWorkingDirectory();
                   }} /> : null}
                   {rootGraph ? <NavBarButton title={version} /> : null}
-                  {workspace ? <NavBarButton title={workspace} icon={'fa fa-cog'} /> : null}
+                  {workspace ? <NavBarButton title={workspace} icon="fa fa-cog" /> : null}
                 </NavBarMenu>
               </DashboardNavBar>
             </Header>
-            <MainSideBar overflow={true}>
+            <MainSideBar overflow>
               <SideBarMenu>
                 <SideBarHeader title={Titles.MainNavigation} onClick={() => {
                   this.props.toggleVisual('MAIN_NAV');
                 }} />
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow={true} title={Titles.MindMap} icon={'fa fa-map'} onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow={true} title={Titles.CodeView} icon={'fa fa-code'} onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow={true} title={Titles.Layout} icon={'fa fa-code'} onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                 }} /> : null}
 
@@ -1165,30 +1212,30 @@ class Dashboard extends Component {
                   toggle={() => {
                     this.props.toggleVisual(VC.ApplicationMenu)
                   }}>
-                  <TreeViewMenu hideArrow={true} title={Titles.New} icon={'fa fa-plus'} onClick={() => {
+                  <TreeViewMenu hideArrow title={Titles.New} icon="fa fa-plus" onClick={() => {
                     this.props.newRedQuickBuilderGraph();
                   }} />
-                  <TreeViewMenu hideArrow={true} title={Titles.Open} icon={'fa fa-folder-open'} onClick={() => {
+                  <TreeViewMenu hideArrow title={Titles.Open} icon="fa fa-folder-open" onClick={() => {
                     this.props.openRedQuickBuilderGraph();
                   }} />
-                  {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.SaveAs} icon={'fa fa-cloud-upload'} onClick={() => {
+                  {rootGraph ? <TreeViewMenu hideArrow title={Titles.SaveAs} icon="fa fa-cloud-upload" onClick={() => {
                     this.props.saveGraphToFile();
                   }} /> : null}
-                  {rootGraph && rootGraph.fileName ? <TreeViewMenu hideArrow={true} title={Titles.Save} icon={'fa fa-save'} onClick={() => {
+                  {rootGraph && rootGraph.fileName ? <TreeViewMenu hideArrow title={Titles.Save} icon="fa fa-save" onClick={() => {
                     this.props.saveGraph();
                   }} /> : null}
-                  {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.Scaffold} icon={'fa fa-building'} onClick={() => {
+                  {rootGraph ? <TreeViewMenu hideArrow title={Titles.Scaffold} icon="fa fa-building" onClick={() => {
                     if (confirm("Are you sure you want to scaffold the project"))
                       this.props.scaffoldProject();
                   }} /> : null}
-                  {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.PublishFiles} icon={'fa fa-building-o'} onClick={() => {
+                  {rootGraph ? <TreeViewMenu hideArrow title={Titles.PublishFiles} icon="fa fa-building-o" onClick={() => {
                     this.props.scaffoldProject({ filesOnly: true });
                   }} /> : null}
-                  {rootGraph ? <TreeViewMenu hideArrow={true} title={Titles.SetWorkingDirectory} icon={'fa fa-folder-open'} onClick={() => {
+                  {rootGraph ? <TreeViewMenu hideArrow title={Titles.SetWorkingDirectory} icon="fa fa-folder-open" onClick={() => {
                     this.props.setWorkingDirectory();
                   }} /> : null}
-                  {rootGraph ? <TreeViewMenu title={version} hideArrow={true} /> : null}
-                  {workspace ? <TreeViewMenu hideArrow={true} title={workspace} icon={'fa fa-cog'} /> : null}
+                  {rootGraph ? <TreeViewMenu title={version} hideArrow /> : null}
+                  {workspace ? <TreeViewMenu hideArrow title={workspace} icon="fa fa-cog" /> : null}
                   <SectionEdit />
                 </TreeViewMenu>
                 <TreeViewMenu
@@ -1219,13 +1266,13 @@ class Dashboard extends Component {
             <Content>
               <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
-            {main_content === MIND_MAP||true ? ( <MindMap
+              {main_content === MIND_MAP || true ? (<MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {
                   if (UIA.Visual(state, CONNECTING_NODE)) {
-                    let selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
+                    const selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
                     console.log(`selectedId:${selectedId} => nodeId:${nodeId}`)
-                    let properties = UIA.Visual(state, CONNECTING_NODE);
+                    const properties = UIA.Visual(state, CONNECTING_NODE);
                     if (properties === true) {
                       this.props.graphOperation(UIA.NEW_LINK, {
                         target: nodeId,
@@ -1289,12 +1336,12 @@ class Dashboard extends Component {
                       });
                       this.props.SelectedNode(null);
                     }
-                    else if(properties && properties.allOfType){
-                        this.props.addAllOfType({
-                          properties,
-                          target: nodeId,
-                          source: selectedId
-                        })
+                    else if (properties && properties.allOfType) {
+                      this.props.addAllOfType({
+                        properties,
+                        target: nodeId,
+                        source: selectedId
+                      })
                     }
                     else if (properties && properties.autoConnectViewType) {
                       let connectto = [];
@@ -1318,69 +1365,63 @@ class Dashboard extends Component {
                     else if (properties && properties.context) {
                       switch (properties.type) {
                         case LinkType.DataChainLink:
-                          let func = DataChainContextMethods[properties.context].bind(this);
+                          const func = DataChainContextMethods[properties.context].bind(this);
                           func(currentNode, nodeId);
                           break;
                       }
                     }
                     else {
-                      let targetNodeType = UIA.GetNodeProp(nodeId, NodeProperties.NODEType);
+                      const targetNodeType = UIA.GetNodeProp(nodeId, NodeProperties.NODEType);
                       if (properties.nodeTypes && properties.nodeTypes.length && !properties.nodeTypes.some(t => targetNodeType === t)) {
 
                       }
                       else {
-                        let skip =false;
-                        if(properties&&properties.properties && Object.keys(properties.properties).map(key=>{
-                          return UIA.GetNodeProp(nodeId, key) !== properties.properties[key];
-                        }).find(x=>x)) {
-                          skip =true;
+                        let skip = false;
+                        if (properties && properties.properties && Object.keys(properties.properties).map(key => UIA.GetNodeProp(nodeId, key) !== properties.properties[key]).find(x => x)) {
+                          skip = true;
                         }
-                        if(skip){}
+                        if (skip) { }
                         else
-                        if (properties.singleLink) {
+                          if (properties.singleLink) {
 
-                          this.props.graphOperation([...getNodesByLinkType(graph, {
-                            type: properties.type,
-                            direction: SOURCE,
-                            id: selectedId
-                          }).map(rm => {
-                            return {
+                            this.props.graphOperation([...getNodesByLinkType(graph, {
+                              type: properties.type,
+                              direction: SOURCE,
+                              id: selectedId
+                            }).map(rm => ({
                               operation: UIA.REMOVE_LINK_BETWEEN_NODES,
                               options: {
                                 target: rm.id,
                                 source: selectedId
                               }
-                            }
-                          }), {
-                            operation: UIA.NEW_LINK,
-                            options: {
+                            })), {
+                              operation: UIA.NEW_LINK,
+                              options: {
+                                target: nodeId,
+                                source: selectedId,
+                                properties
+                              }
+                            }])
+                          }
+                          else {
+                            this.props.graphOperation(UIA.NEW_LINK, {
                               target: nodeId,
                               source: selectedId,
                               properties
-                            }
-                          }])
-                        }
-                        else {
-                          this.props.graphOperation(UIA.NEW_LINK, {
-                            target: nodeId,
-                            source: selectedId,
-                            properties
-                          });
-                        }
+                            });
+                          }
                       }
                     }
                     this.props.setVisual(CONNECTING_NODE, false);
                     this.props.setVisual(UIA.SELECTED_NODE, null);
                   }
+                  else if ([UIA.Visual(state, UIA.SELECTED_NODE)].indexOf(nodeId) === -1) {
+                    this.props.SelectedNode(nodeId);
+                    this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
+                    this.props.setVisual(SIDE_PANEL_OPEN, true);
+                  }
                   else {
-                    if ([UIA.Visual(state, UIA.SELECTED_NODE)].indexOf(nodeId) === -1) {
-                      this.props.SelectedNode(nodeId);
-                      this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
-                      this.props.setVisual(SIDE_PANEL_OPEN, true);
-                    }
-                    else {
-                      this.props.SelectedNode(null);
-                    }
+                    this.props.SelectedNode(null);
                   }
                 }}
                 onLinkClick={(linkId, boundingBox) => {
@@ -1395,9 +1436,9 @@ class Dashboard extends Component {
                 selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter(x => x)}
                 selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter(x => x)}
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
-                graph={vgraph || graph}></MindMap>
-                ):null}             </Content>
-            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{overflowY:'auto','maxHeight':'100vh','height':'100vh'}} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+                graph={vgraph || graph} />
+              ) : null}             </Content>
+            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{ overflowY: 'auto', 'maxHeight': '100vh', 'height': '100vh' }} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab
                   icon="fa fa-cog"
@@ -1411,18 +1452,18 @@ class Dashboard extends Component {
                   this.props.setVisual(SELECTED_TAB, SCOPE_TAB)
                 }} />
                 <SideBarTab
-                  icon={'fa fa-institution'}
+                  icon="fa fa-institution"
                   active={UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU)} onClick={() => {
                     this.props.setVisual(SELECTED_TAB, QUICK_MENU)
                   }} />
               </SideBarTabs>
               {currentNode && !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (
-                <SideMenuContainer active={true} tab={DEFAULT_TAB} key={"node-properties"} title={Titles.NodeProperties}>
+                <SideMenuContainer active tab={DEFAULT_TAB} key="node-properties" title={Titles.NodeProperties}>
                   <FormControl>
                     <SideBarMenu>
                       <SideBarHeader onClick={() => {
                         clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE))
-                      }} title={UIA.Visual(state, UIA.SELECTED_NODE)}></SideBarHeader>
+                      }} title={UIA.Visual(state, UIA.SELECTED_NODE)} />
                     </SideBarMenu>
                     <ChoiceListItemActivityMenu />
                     {/* <ConditionActivityMenu /> */}
@@ -1436,12 +1477,10 @@ class Dashboard extends Component {
                     {NotSelectableNodeTypes[currentNode.properties ? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) : null] ? null : (<SelectInput
                       disabled={!UIA.CanChangeType(currentNode)}
                       label={Titles.NodeType}
-                      options={Object.keys(UIA.NodeTypes).filter(x => !NotSelectableNodeTypes[UIA.NodeTypes[x]]).sort((a, b) => a.localeCompare(b)).map(x => {
-                        return {
-                          value: UIA.NodeTypes[x],
-                          title: x
-                        }
-                      })}
+                      options={Object.keys(UIA.NodeTypes).filter(x => !NotSelectableNodeTypes[UIA.NodeTypes[x]]).sort((a, b) => a.localeCompare(b)).map(x => ({
+                        value: UIA.NodeTypes[x],
+                        title: x
+                      }))}
                       onChange={(value) => {
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, { prop: UIA.NodeProperties.NODEType, id: currentNode.id, value })
                       }}
@@ -1467,50 +1506,50 @@ class Dashboard extends Component {
                           value
                         });
                       }} />
-                      <CheckBox
-                        label={Titles.Selected}
-                        title={Titles.SelectedShortCut}
-                        value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
-                        onChange={(value) => {
-                          this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.Selected,
-                            id: currentNode.id,
-                            value
-                          });
-                        }} />
-                        {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentExternalApi?( <CheckBox
-                           label={Titles.IsUrlParameter}
-                           title={Titles.IsUrlParameter}
-                           value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
-                           onChange={(value) => {
-                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                               prop: UIA.NodeProperties.IsUrlParameter,
-                               id: currentNode.id,
-                               value
-                             });
-                           }} />):null}
-                           {UIA.GetNodeProp(currentNode,NodeProperties.NODEType)===UIA.NodeTypes.ComponentApi?( <CheckBox
-                              label={Titles.AsLocalContext}
-                              title={`${Titles.AsLocalContext}, usually for listitem.`}
-                              value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
-                              onChange={(value) => {
-                                this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                                  prop: UIA.NodeProperties.AsLocalContext,
-                                  id: currentNode.id,
-                                  value
-                                });
-                              }} />):null}
+                    <CheckBox
+                      label={Titles.Selected}
+                      title={Titles.SelectedShortCut}
+                      value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+                      onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.Selected,
+                          id: currentNode.id,
+                          value
+                        });
+                      }} />
+                    {UIA.GetNodeProp(currentNode, NodeProperties.NODEType) === UIA.NodeTypes.ComponentExternalApi ? (<CheckBox
+                      label={Titles.IsUrlParameter}
+                      title={Titles.IsUrlParameter}
+                      value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
+                      onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.IsUrlParameter,
+                          id: currentNode.id,
+                          value
+                        });
+                      }} />) : null}
+                    {UIA.GetNodeProp(currentNode, NodeProperties.NODEType) === UIA.NodeTypes.ComponentApi ? (<CheckBox
+                      label={Titles.AsLocalContext}
+                      title={`${Titles.AsLocalContext}, usually for listitem.`}
+                      value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
+                      onChange={(value) => {
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.AsLocalContext,
+                          id: currentNode.id,
+                          value
+                        });
+                      }} />) : null}
                   </FormControl>
                 </SideMenuContainer>) : null}
 
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
-                <ConditionFilterMenu methodDefinitionKey={'validation'} />) : null}
+                <ConditionFilterMenu methodDefinitionKey="validation" />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
-                <ConditionFilterMenu methodDefinitionKey={'permission'} />) : null}
+                <ConditionFilterMenu methodDefinitionKey="permission" />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
-                <ConditionFilterMenu methodDefinitionKey={'filter'} />) : null}
+                <ConditionFilterMenu methodDefinitionKey="filter" />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
-                <ConditionFilterMenu view={'datasource'} />) : null}
+                <ConditionFilterMenu view="datasource" />) : null}
               <CommonActivityMenu />
               <ModelActivityMenu />
               {UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (<SideBarContent>
@@ -1571,8 +1610,7 @@ class Dashboard extends Component {
                   modelKey={NodeProperties.Condition}
                   nodeType={NodeTypes.Condition}
                   nodeProp={NodeProperties.Condition} />) : null}
-              {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent>
-              </SideBarContent>) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<SideBarContent />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<DataChainOperator />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ServiceIntefaceMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<StyleMenu />) : null}
@@ -1580,7 +1618,7 @@ class Dashboard extends Component {
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<NavigationParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<QuickMethods />) : null}
-              {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? ( <CurrentNodeProperties />) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<CurrentNodeProperties />) : null}
             </SideBar>
           </div>
         </div >

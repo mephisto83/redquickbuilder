@@ -20,7 +20,7 @@ export default class Validation extends React.Component {
 					return {};
 				}
 			}
-		}
+    }
 		return { display: 'none' };
 	}
 	getValidation() {

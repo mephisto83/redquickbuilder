@@ -19,7 +19,7 @@ export const EventType = "Event Type";
 export const UIParameters = "UI Parameters";
 export const IsFetchOutput = "Is Fetch Output";
 export const GridAreas = "Grid Areas";
-export const MethodThatValidationComesFrom='Method validation source';
+export const MethodThatValidationComesFrom = 'Method validation source';
 export const LoadModelsOnComponentMount = 'Load Models On Component Mount';
 export const GridRow = "GridRow";
 export const Rows = "Row Count";
@@ -163,6 +163,9 @@ export const UseAsDefault = "Use as default";
 export const ConnectLifeCylceMethods = "Connect Lifecylce Method To Api Method";
 export const ConnectToDataChainResponseHandler =
   "Connect to DataChain response handler";
+export const ConnectToDataChainPrecallHandler =
+  "Connect to DataChain precall handler";
+export const ConnectToDataChainCaller = 'Datachain Call';
 export const ConnectEventMethods = "ConnectEventMethods";
 export const PermissionServiceMethod = "Permission Service Method";
 export const AddComponentApi = "Add Component Api";
@@ -206,6 +209,7 @@ export const DataChainCollection = "Data Chain Collection";
 export const FileMenu = "File Menu";
 export const Code = "Code";
 export const MainNavigation = "Main Navigation";
+export const DataChainInput = 'Data Chain Input';
 export const AddParameter = "Add parameter";
 export const AddParameterDescription =
   "Parameters are the required things need for the function to execute successfully";

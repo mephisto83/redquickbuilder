@@ -292,21 +292,22 @@ class ContextMenu extends Component {
           case LinkType.ComponentExternalConnection:
           case LinkType.EventMethodInstance:
           case LinkType.ComponentExternalApi:
+          default:
             let skip = false;
-            if (LinkType.ComponentExternalApi === linkType) {
-              if (
-                ![NodeTypes.ViewType].some(
-                  v =>
-                    v === UIA.GetNodeProp(link.source, NodeProperties.NODEType)
-                ) &&
-                ![NodeTypes.ViewType].some(
-                  v =>
-                    v === UIA.GetNodeProp(link.target, NodeProperties.NODEType)
-                )
-              ) {
-                skip = true;
-              }
-            }
+            // if (LinkType.ComponentExternalApi === linkType) {
+            //   if (
+            //     ![NodeTypes.ViewType].some(
+            //       v =>
+            //         v === UIA.GetNodeProp(link.source, NodeProperties.NODEType)
+            //     ) &&
+            //     ![NodeTypes.ViewType].some(
+            //       v =>
+            //         v === UIA.GetNodeProp(link.target, NodeProperties.NODEType)
+            //     )
+            //   ) {
+            //     skip = true;
+            //   }
+            // }
             if (!skip)
               result.push(
                 <TreeViewMenu

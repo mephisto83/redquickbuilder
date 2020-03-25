@@ -24,6 +24,7 @@ export default function AppendValidations({
   subcomponents,
   component,
   screen_option,
+  InstanceUpdate = true,
   viewPackages,
   method
 }) {
@@ -167,7 +168,10 @@ export default function AppendValidations({
                     return {
                       target: componentInternalValueApi.id,
                       source: externalValidationApi.id,
-                      properties: { ...LinkProperties.ComponentExternalConnection }
+                      properties: {
+                        ...LinkProperties.ComponentExternalConnection,
+                        [LinkPropertyKeys.InstanceUpdate]: InstanceUpdate
+                      }
                     }
                   }
                 },

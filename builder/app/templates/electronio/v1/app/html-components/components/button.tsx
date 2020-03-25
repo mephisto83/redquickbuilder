@@ -20,7 +20,7 @@ export default class Button extends React.Component {
 					delete res.disabled;
 				}
 			}
-		} else if (this.props.error === undefined) {
+		} else if (this.props.error === undefined || this.props.error === null) {
 			delete res.disabled;
 		}
 

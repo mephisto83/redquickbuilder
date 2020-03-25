@@ -258,6 +258,11 @@ import * as Util from './util';
     else {
         console.low('missing data chain');
     }
+}, null, (result) => {
+  var { preChain } = (parameters || {});
+  if (preChain) {
+      return preChain();
+  }
 })(dispatch, getState);`;
         return bindTemplate(ControllerMethodTemplate, {
           methodName: GetJSCodeName(node),

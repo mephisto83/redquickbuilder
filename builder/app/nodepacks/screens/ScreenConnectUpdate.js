@@ -1,4 +1,4 @@
-import { GetNodesLinkedTo, getLinkInstance } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, getLinkInstance, GetNodeLinkedTo } from "../../methods/graph_methods";
 import {
   GetCurrentGraph,
   GetNodeProp,
@@ -14,7 +14,8 @@ import {
   GetNodeById,
   GetCodeName,
   ADD_LINK_BETWEEN_NODES,
-  ComponentEventTo
+  ComponentEventTo,
+  GetComponentExternalApiNode
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -36,6 +37,7 @@ import AppendValidations from "./AppendValidations";
 import AppendPostMethod from "./AppendPostMethod";
 import GetModelObjectFromSelector from "../GetModelObjectFromSelector";
 import LoadModel from "../LoadModel";
+import ClearScreenInstance from "../datachain/ClearScreenInstance";
 
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method } = args;
@@ -340,12 +342,83 @@ export default function ScreenConnectUpdate(args = { method, node }) {
         ...AppendValidations({
           subcomponents,
           component,
+          InstanceUpdate: true,
           screen_option: screenOptionInstance,
           method,
           viewPackages
         })
       );
+
+      const screenOption = screenOptionInstance;
+      let clearScreenContext = null;
+      let componentDidMountInstance = null;
+      let componentDidMount = null;
+      result.push(
+        ...ClearScreenInstance({
+          viewPackages,
+          title: `Clear ${GetNodeTitle(node)} State`,
+          model: GetNodeProp(node, NodeProperties.Model),
+          callback: (temp) => {
+            clearScreenContext = temp;
+          }
+        }), (gg) => {
+          componentDidMount = GetNodesLinkedTo(gg, {
+            id: screenOption.id,
+            link: LinkType.LifeCylceMethod,
+            componentType: NodeTypes.LifeCylceMethod
+          }).find(v => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount);
+          if (componentDidMount) {
+            componentDidMountInstance = GetNodeLinkedTo(gg, {
+              id: componentDidMount.id,
+              link: LinkType.LifeCylceMethodInstance,
+              componentType: NodeTypes.LifeCylceMethodInstance
+            });
+            if (!componentDidMountInstance) {
+              return addInstanceFunc(
+                componentDidMount,
+                instanceNode => {
+                  componentDidMountInstance = instanceNode;
+                },
+                viewPackages,
+                { lifecycle: true }
+              )()
+            }
+          }
+        },
+        () => ({
+          operation: ADD_LINK_BETWEEN_NODES,
+          options() {
+            return {
+              target: clearScreenContext.entry,
+              source: componentDidMountInstance.id,
+              properties: { ...LinkProperties.CallDataChainLink }
+            }
+          }
+        }),
+        () => ({
+          operation: ADD_LINK_BETWEEN_NODES,
+          options(gg) {
+            const viewModelExternalApiNode = GetComponentExternalApiNode(ComponentApiKeys.ViewModel, screenOption.id, gg);
+            return {
+              source: clearScreenContext.entry,
+              target: viewModelExternalApiNode.id,
+              properties: { ...LinkProperties.CallDataChainLink }
+            }
+          }
+        }),
+        () => ({
+          operation: ADD_LINK_BETWEEN_NODES,
+          options(gg) {
+            const valueExternalApiNode = GetComponentExternalApiNode(ComponentApiKeys.Value, screenOption.id, gg);
+            return {
+              source: clearScreenContext.entry,
+              target: valueExternalApiNode.id,
+              properties: { ...LinkProperties.CallDataChainLink }
+            }
+          }
+        }))
     });
+
   });
   result = [...result, ...ModifyUpdateLinks()].filter(x => x);
   return result;

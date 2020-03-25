@@ -1,4 +1,4 @@
-import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, GetNodeLinkedTo } from "../../methods/graph_methods";
 import {
   GetCurrentGraph,
   GetNodeProp,
@@ -7,32 +7,36 @@ import {
   ADD_NEW_NODE,
   addInstanceFunc,
   GetNodeTitle,
-  GetNodeById
+  GetNodeById,
+  ADD_LINK_BETWEEN_NODES,
+  ComponentApiKeys,
+  GetComponentExternalApiNode
 } from "../../actions/uiactions";
-import { LinkType, NodeProperties } from "../../constants/nodetypes";
+import { LinkType, NodeProperties, LinkProperties, NodeTypes } from "../../constants/nodetypes";
 import {
-  ComponentEvents
+  ComponentEvents, ComponentLifeCycleEvents
 } from "../../constants/componenttypes";
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { uuidv4 } from "../../utils/array";
 import AppendValidations from "./AppendValidations";
 import AppendPostMethod from "./AppendPostMethod";
 import GetModelObjectFromSelector from "../GetModelObjectFromSelector";
+import ClearScreenInstance from "../datachain/ClearScreenInstance";
 
 export default function ScreenConnectCreate(args = { method, node }) {
   let { node, method } = args;
   if (!node) {
-    throw "no node";
+    throw new Error("no node");
   }
   if (!method) {
-    throw "no method";
+    throw new Error("no method");
   }
-  let graph = GetCurrentGraph();
-  let screen_options = GetNodesLinkedTo(graph, {
+  const graph = GetCurrentGraph();
+  const screen_options = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
   });
-  let result = [];
+  const result = [];
   let { viewPackages } = args;
   viewPackages = {
     [NodeProperties.ViewPackage]: uuidv4(),
@@ -139,11 +143,83 @@ export default function ScreenConnectCreate(args = { method, node }) {
           subcomponents,
           component,
           screen_option: screenOption,
+          InstanceUpdate: false,
           method,
           viewPackages
         })
       );
     });
+
+    let clearScreenContext = null;
+    let componentDidMountInstance = null;
+    let componentDidMount = null;
+    result.push(
+      ...ClearScreenInstance({
+        viewPackages,
+        title: `Clear ${GetNodeTitle(node)} State`,
+        model: GetNodeProp(node, NodeProperties.Model),
+        callback: (temp) => {
+          clearScreenContext = temp;
+        }
+      }), (gg) => {
+        componentDidMount = GetNodesLinkedTo(gg, {
+          id: screenOption.id,
+          link: LinkType.LifeCylceMethod,
+          componentType: NodeTypes.LifeCylceMethod
+        }).find(v => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount);
+        if (componentDidMount) {
+          componentDidMountInstance = GetNodeLinkedTo(gg, {
+            id: componentDidMount.id,
+            link: LinkType.LifeCylceMethodInstance,
+            componentType: NodeTypes.LifeCylceMethodInstance
+          });
+          if (!componentDidMountInstance) {
+            return {
+              operation: ADD_NEW_NODE,
+              options: addInstanceFunc(
+                componentDidMount,
+                instanceNode => {
+                  componentDidMountInstance = instanceNode;
+                },
+                viewPackages,
+                { lifecycle: true }
+              )
+            }
+          }
+        }
+      },
+      () => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options() {
+          return {
+            target: clearScreenContext.entry,
+            source: componentDidMountInstance.id,
+            properties: { ...LinkProperties.CallDataChainLink }
+          }
+        }
+      }),
+      () => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options(gg) {
+          const viewModelExternalApiNode = GetComponentExternalApiNode(ComponentApiKeys.ViewModel, screenOption.id, gg);
+          return {
+            source: clearScreenContext.entry,
+            target: viewModelExternalApiNode.id,
+            properties: { ...LinkProperties.DataChainInputLink }
+          }
+        }
+      }),
+      () => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options(gg) {
+          const valueExternalApiNode = GetComponentExternalApiNode(ComponentApiKeys.Value, screenOption.id, gg);
+          return {
+            source: clearScreenContext.entry,
+            target: valueExternalApiNode.id,
+            properties: { ...LinkProperties.DataChainInputLink }
+          }
+        }
+      }))
   });
 
   return result;

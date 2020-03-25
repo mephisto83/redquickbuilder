@@ -21,7 +21,7 @@ import {
   SOURCE
 } from "../methods/graph_methods";
 import { NodeType } from "../components/titles";
-export default function(args = {}) {
+export default function (args = {}) {
   let result = [];
   let graph = GetCurrentGraph();
   let screens = NodesByType(null, NodeTypes.Screen);
@@ -47,7 +47,7 @@ export default function(args = {}) {
     ) {
       result.push({
         operation: ADD_NEW_NODE,
-        options: function() {
+        options: function () {
           return {
             nodeType: NodeTypes.DataChainCollection,
             linkProperties: {
@@ -69,7 +69,7 @@ export default function(args = {}) {
     }
 
     screenoptions.map(screenoption => {
-      result.push(function(graph) {
+      result.push(function (graph) {
         let add_screenoption_reference = !GetNodesLinkedTo(graph, {
           id: screenoption.id,
           link: LinkType.DataChainCollectionReference
@@ -90,38 +90,38 @@ export default function(args = {}) {
         return [
           add_screenoption_reference
             ? {
-                operation: ADD_NEW_NODE,
-                options: function(graph) {
-                  return {
-                    nodeType: NodeTypes.DataChainCollection,
-                    linkProperties: {
-                      properties: {
-                        ...LinkProperties.DataChainCollectionReference
-                      }
-                    },
-                    parent: screenoption.id,
+              operation: ADD_NEW_NODE,
+              options: function (graph) {
+                return {
+                  nodeType: NodeTypes.DataChainCollection,
+                  linkProperties: {
                     properties: {
-                      [NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
-                      [NodeProperties.Pinned]: false
-                    },
-                    callback: node => {
-                      temp = node;
+                      ...LinkProperties.DataChainCollectionReference
                     }
-                  };
-                }
+                  },
+                  parent: screenoption.id,
+                  properties: {
+                    [NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
+                    [NodeProperties.Pinned]: false
+                  },
+                  callback: node => {
+                    temp = node;
+                  }
+                };
               }
+            }
             : false,
           collectionReference && add_screenoption_reference
             ? {
-                operation: ADD_LINK_BETWEEN_NODES,
-                options: function() {
-                  return {
-                    source: temp.id,
-                    target: collectionReference.id,
-                    properties: { ...LinkProperties.DataChainCollection }
-                  };
-                }
+              operation: ADD_LINK_BETWEEN_NODES,
+              options: function () {
+                return {
+                  source: temp.id,
+                  target: collectionReference.id,
+                  properties: { ...LinkProperties.DataChainCollection }
+                };
               }
+            }
             : null
         ];
       });
@@ -140,7 +140,7 @@ export default function(args = {}) {
           return null;
         }
 
-        result.push(function(graph) {
+        result.push(function (graph) {
           let screenoption = GetNodesLinkedTo(graph, {
             id: component.id,
             link: LinkType.Component
@@ -159,7 +159,7 @@ export default function(args = {}) {
           return [
             {
               operation: ADD_NEW_NODE,
-              options: function(graph) {
+              options: function (graph) {
                 return {
                   nodeType: NodeTypes.DataChainCollection,
                   linkProperties: {
@@ -180,15 +180,15 @@ export default function(args = {}) {
             },
             collectionReference
               ? {
-                  operation: ADD_LINK_BETWEEN_NODES,
-                  options: function() {
-                    return {
-                      source: temp.id,
-                      target: collectionReference.id,
-                      properties: { ...LinkProperties.DataChainCollection }
-                    };
-                  }
+                operation: ADD_LINK_BETWEEN_NODES,
+                options: function () {
+                  return {
+                    source: temp.id,
+                    target: collectionReference.id,
+                    properties: { ...LinkProperties.DataChainCollection }
+                  };
                 }
+              }
               : null
           ];
         });
@@ -203,7 +203,7 @@ export default function(args = {}) {
             id: lifeCycleMethod.id,
             link: LinkType.LifeCylceMethodInstance
           }).map(lifecylceInstanceMethod => {
-            let chains = GetNodesLinkedTo(graph, {
+            let chains = [...GetNodesLinkedTo(graph, {
               id: lifecylceInstanceMethod.id,
               link: LinkType.DataChainLink
             }).filter(chain => {
@@ -214,7 +214,29 @@ export default function(args = {}) {
                   GetNodeProp(x, NodeProperties.NODEType) !==
                   NodeTypes.DataChain
               ).length;
-            });
+            }), ...GetNodesLinkedTo(graph, {
+              id: lifecylceInstanceMethod.id,
+              link: LinkType.PreDataChainLink
+            }).filter(chain => {
+              return GetNodesLinkedTo(graph, {
+                id: chain.id
+              }).filter(
+                x =>
+                  GetNodeProp(x, NodeProperties.NODEType) !==
+                  NodeTypes.DataChain
+              ).length;
+            }), ...GetNodesLinkedTo(graph, {
+              id: lifecylceInstanceMethod.id,
+              link: LinkType.CallDataChainLink
+            }).filter(chain => {
+              return GetNodesLinkedTo(graph, {
+                id: chain.id
+              }).filter(
+                x =>
+                  GetNodeProp(x, NodeProperties.NODEType) !==
+                  NodeTypes.DataChain
+              ).length;
+            })];
             return chains;
           });
           return res;
@@ -223,7 +245,7 @@ export default function(args = {}) {
         .map(chain => {
           result.push({
             operation: ADD_LINK_BETWEEN_NODES,
-            options: function(graph) {
+            options: function (graph) {
               let screenOptionCollectionReference;
               if (screenoption) {
                 screenOptionCollectionReference = GetNodeLinkedTo(graph, {
@@ -250,7 +272,7 @@ export default function(args = {}) {
   if (!sharedReferenceCollection) {
     result.push({
       operation: ADD_NEW_NODE,
-      options: function() {
+      options: function () {
         return {
           nodeType: NodeTypes.DataChainCollection,
           properties: {
@@ -285,7 +307,7 @@ export default function(args = {}) {
       return 0;
     })
     .map(component => {
-      result.push(function(graph) {
+      result.push(function (graph) {
         let externalApiDataChains = getComponentExternalApiDataChains(
           graph,
           component
@@ -301,7 +323,7 @@ export default function(args = {}) {
         if (!reference) {
           steps.push({
             operation: ADD_NEW_NODE,
-            options: function(graph) {
+            options: function (graph) {
               let parentReference = getParentCollectionReference(
                 graph,
                 component
@@ -351,7 +373,7 @@ export default function(args = {}) {
           ].map(dc => {
             return {
               operation: ADD_LINK_BETWEEN_NODES,
-              options: function(graph) {
+              options: function (graph) {
                 reference =
                   reference || getCollectionReference(graph, component);
                 return {
@@ -386,7 +408,7 @@ export default function(args = {}) {
       ...[...screen_data_chains].map(dc => {
         return {
           operation: ADD_LINK_BETWEEN_NODES,
-          options: function(graph) {
+          options: function (graph) {
             reference = reference || getCollectionReference(graph, screen);
             return {
               target: reference.id,

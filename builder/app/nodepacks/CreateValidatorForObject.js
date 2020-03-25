@@ -1,18 +1,20 @@
+/* eslint-disable no-unused-vars */
 
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
+
 export default function (args = {}) {
   // node2,node4
 
   // model, model, model
   if (!args.model) {
-    throw 'missing model argument';
+    throw new Error('missing model argument');
   } if (!args.method) {
-    throw 'missing model argument';
+    throw new Error('missing method argument');
   } if (!args.modelId) {
-    throw 'missing model argument';
+    throw new Error('missing model argument');
   }
-  let context = {
+  const context = {
     ...args,
     node2: args.modelId,
     node4: args.method
@@ -24,7 +26,7 @@ export default function (args = {}) {
     [NodeProperties.ViewPackage]: uuidv4(),
     ...(viewPackages || {})
   };
-  let result = [
+  const result = [
     function (graph) {
       return [{
 
@@ -41,7 +43,7 @@ export default function (args = {}) {
         "operation": "CHANGE_NODE_TEXT",
         "options": {
           "id": context.node0,
-          "value": "Validate " + args.model + ""
+          "value": `Validate ${args.model}`
         }
       }]
     },
@@ -52,7 +54,7 @@ export default function (args = {}) {
         "operation": "CHANGE_NODE_TEXT",
         "options": {
           "id": context.node0,
-          "value": "Validate " + args.model + " Object"
+          "value": `Validate ${args.model} Object`
         }
       }]
     },
@@ -128,7 +130,7 @@ export default function (args = {}) {
           },
           "links": [],
           "callback": function (node, graph, group) {
-          context.node1 = node.id;
+            context.node1 = node.id;
             context.group0 = group;
           }
         }
@@ -265,7 +267,7 @@ export default function (args = {}) {
             }
           },
           "callback": function (node, graph, group) {
-          context.node3 = node.id;
+            context.node3 = node.id;
 
           }
         }
@@ -364,7 +366,7 @@ export default function (args = {}) {
         "operation": "CHANGE_NODE_TEXT",
         "options": {
           "id": context.node3,
-          "value": "validation " + args.model + ""
+          "value": `validation ${args.model}`
         }
       }]
     },
@@ -381,9 +383,9 @@ export default function (args = {}) {
       }]
     }]
     ;
-  let clearPinned = [{
+  const clearPinned = [{
     operation: 'CHANGE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node1,
@@ -393,7 +395,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node2,
@@ -403,7 +405,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node3,
@@ -413,7 +415,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node4,
@@ -421,9 +423,9 @@ export default function (args = {}) {
       }
     }
   }];
-  let applyViewPackages = [{
+  const applyViewPackages = [{
     operation: 'UPDATE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         id: context.node0,
         properties: viewPackages
@@ -431,7 +433,7 @@ export default function (args = {}) {
     }
   }, {
     operation: 'UPDATE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         id: context.node1,
         properties: viewPackages
@@ -439,7 +441,7 @@ export default function (args = {}) {
     }
   }, {
     operation: 'UPDATE_NODE_PROPERTY',
-    options: function () {
+    options() {
       return {
         id: context.node3,
         properties: viewPackages
