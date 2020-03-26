@@ -47,7 +47,7 @@ class CurrentNodeProperties extends Component {
     if (!currentNode) {
       return <div />;
     }
-    let selectedLink = UIA.Visual(state, UIA.SELECTED_LINK) || {};
+    let selectedLink = UIA.Visual(state, UIA.SELECTED_LINK);
 
     let currentLink = selectedLink ? GetLinkBetween(selectedLink.source, selectedLink.target, UIA.GetCurrentGraph()) : null;
     let linkProperties = currentLink ? currentLink.properties : {};

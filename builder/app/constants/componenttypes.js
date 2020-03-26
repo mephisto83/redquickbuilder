@@ -10,15 +10,28 @@ import {
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 import { bindTemplate } from "./functiontypes";
 
+export const StyleTags = {
+  "style": "style",
+  "style_input": " style_input",
+  "style_label": "style_label",
+  "style_item": "style_item"
+}
+
 export const ComponentTags = {
+  Self: "Self",
   MainMenu: "MainMenu",
   Main: "Main",
   SideContainer: "SideContainer",
   Header: "Header",
   TopMenu: "TopMenu",
   LeftContainer: "LeftContainer",
+  MainContent: "MainContent",
+  SecondaryContent: "SecondaryContent",
   RightContainer: "RightContainer",
   SecondaryMain: "SecondaryMain",
+  MainButton: "MainButton",
+  CancelButton: "CancelButton",
+  SecondaryButton: "SecondaryButton",
   Bottom: "Bottom",
   ListItem: "ListItem",
   Footer: "Footer"
@@ -120,6 +133,10 @@ LOCAL_STATE_PROPERTY.forEach(x => {
     localStateProperty: true
   };
 });
+DEFAULT_BUTTON_API_PROPERTIES.style_button = {
+  'style': 'style'
+};
+
 INPUT_DEFAULT_API.forEach(x => {
   DEFAULT_INPUT_API_PROPERTIES[x.property] = {
     nodeProperty: x.property,
@@ -128,6 +145,11 @@ INPUT_DEFAULT_API.forEach(x => {
     ui: true
   };
 });
+['style_label', 'style_item', 'style_input'].map(x => ({ property: x })).forEach(x => {
+  DEFAULT_INPUT_API_PROPERTIES[x.property] = {
+    'style': 'style'
+  };
+})
 export const ComponentTypeKeys = {
   SingleSelect: "SingleSelect",
   List: "List",
@@ -223,11 +245,9 @@ export const ComponentTypes = {
           ui: true,
           nodeProperty: "data",
           nodeTypes: [NodeTypes.DataChain],
-          nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint);
-          },
+          nodeFilter: item => GetNodeProp(item, NodeProperties.EntryPoint),
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, "data"), {
+            const func = GetCodeName(GetNodeProp(node, "data"), {
               includeNameSpace: true
             });
             if (func) {
@@ -442,9 +462,7 @@ export const ComponentTypes = {
           ui: true,
           nodeProperty: ComponentApiKeys.DATA,
           nodeTypes: [NodeTypes.DataChain],
-          nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint);
-          },
+          nodeFilter: item => GetNodeProp(item, NodeProperties.EntryPoint),
           template: node => {
             const func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
               includeNameSpace: true
@@ -474,11 +492,9 @@ export const ComponentTypes = {
           ui: true,
           nodeProperty: "data",
           nodeTypes: [NodeTypes.DataChain],
-          nodeFilter: item => {
-            return GetNodeProp(item, NodeProperties.EntryPoint);
-          },
+          nodeFilter: item => GetNodeProp(item, NodeProperties.EntryPoint),
           template: node => {
-            let func = GetCodeName(GetNodeProp(node, "data"), {
+            const func = GetCodeName(GetNodeProp(node, "data"), {
               includeNameSpace: true
             });
             if (func) {
@@ -616,9 +632,9 @@ export const InstanceTypeSelectorFunction = {
 };
 
 export function GetListItemNode(id) {
-  let state = GetState();
-  let graph = GetRootGraph(state);
-  let nodes = GetNodesLinkedTo(graph, {
+  const state = GetState();
+  const graph = GetRootGraph(state);
+  const nodes = GetNodesLinkedTo(graph, {
     id
   }).filter(
     x =>
@@ -633,9 +649,9 @@ export function GetListItemNode(id) {
 }
 
 export function GetFormItemNode(id) {
-  let state = GetState();
-  let graph = GetRootGraph(state);
-  let nodes = GetNodesLinkedTo(graph, {
+  const state = GetState();
+  const graph = GetRootGraph(state);
+  const nodes = GetNodesLinkedTo(graph, {
     id,
     link: LinkType.Component,
     properties: { [LinkPropertyKeys.AsForm]: true }

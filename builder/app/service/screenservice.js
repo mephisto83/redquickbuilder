@@ -1,6 +1,8 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-param-reassign */
 /* eslint-disable default-case */
+import fs from "fs";
+import path from "path";
 import {
   GetScreenNodes,
   GetCodeName,
@@ -21,8 +23,6 @@ import {
   GetLinkProperty,
   GetDataChainArgs
 } from "../actions/uiactions";
-import fs from "fs";
-import path from "path";
 import { bindTemplate } from "../constants/functiontypes";
 import {
   NodeProperties,
@@ -34,7 +34,8 @@ import {
   NodePropertiesDirtyChain,
   LinkPropertyKeys,
   MediaQueries,
-  StyleNodeProperties
+  StyleNodeProperties,
+  LinkProperties
 } from "../constants/nodetypes";
 import {
   buildLayoutTree,
@@ -55,7 +56,8 @@ import {
   ComponentEvents,
   ComponentEventStandardHandler,
   GetFormItemNode,
-  ComponentTypeKeys
+  ComponentTypeKeys,
+  ComponentTags
 } from "../constants/componenttypes";
 import {
   getComponentProperty,
@@ -229,19 +231,15 @@ export function GetStylesFor(node, tag) {
       id: x.id,
       link: LinkType.Style
     });
-    return connectedStyleNodes.some(x => {
-      return styleNodes.some(node => node.id === x.id);
-    });
+    return connectedStyleNodes.some(x => styleNodes.some(node => node.id === x.id));
   });
 
   return styleNodes.map(styleNode => {
     const dataChainTest = dataChainsConnectedToStyle
-      .filter(dc => {
-        return existsLinkBetween(graph, {
-          source: dc.id,
-          target: styleNode.id
-        });
-      })
+      .filter(dc => existsLinkBetween(graph, {
+        source: dc.id,
+        target: styleNode.id
+      }))
       .map(dc => {
         const selector = GetNodesLinkedTo(graph, {
           id: dc.id,
@@ -289,9 +287,7 @@ export function buildStyle(node) {
       const style = GetNodeProp(styleNode, NodeProperties.Style);
       const styleSelectors = StyleNodeProperties.filter(x =>
         GetNodeProp(styleNode, x)
-      ).map(styleProp => {
-        return styleProp;
-      });
+      ).map(styleProp => styleProp);
       const areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
       const gridRowCount = parseInt(
         GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1,
@@ -312,16 +308,12 @@ export function buildStyle(node) {
       }
       const styleName = GetJSCodeName(styleNode);
       const stylesSelectorsName = styleSelectors
-        .map(styleSelector => {
-          return `${styleName}${styleSelector}`;
-        })
+        .map(styleSelector => `${styleName}${styleSelector}`)
         .join();
       const stylesheet = `${mediaquery_start}
     .${stylesSelectorsName || styleName} {
       ${Object.keys(styleObj)
-          .map(s => {
-            return `${StyleLib.js[s]}: ${styleObj[s]};`;
-          })
+          .map(s => `${StyleLib.js[s]}: ${styleObj[s]};`)
           .join(NEW_LINE)}
     }
     ${mediaquery_end}`;
@@ -402,9 +394,9 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     const form_render = GetFormRender(node, extraimports, language);
     const apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(fs.readFileSync(template, "utf8"), {
-      item_render: item_render,
+      item_render,
       form_render,
-      data: data,
+      data,
       apiProperties
     });
   }
@@ -441,7 +433,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         css,
         `.${(GetCodeName(node) || "").toJavascriptName()}`
       );
-      cssFile = cssFile + styleRules;
+      cssFile += styleRules;
 
       cssImport = `import styles from './${(
         GetCodeName(node) || ""
@@ -519,13 +511,48 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
   ].filter(x => x);
 }
 export function bindComponent(node, componentBindingDefinition) {
+
+
   if (componentBindingDefinition && componentBindingDefinition.template) {
     const template = fs.readFileSync(componentBindingDefinition.template, "utf8");
     const { properties } = componentBindingDefinition;
+    const graph = GetCurrentGraph();
     const bindProps = {};
-    Object.keys(properties).map(key => {
 
-      if (properties[key] && properties[key].localStateProperty) {
+    Object.keys(properties).map(key => {
+      if (properties[key] && properties[key].style) {
+        const styles = [];
+        const nodeId = (typeof node === 'string') ? node : node.id;
+        // const dataChainStyleLinks = GetNodesLinkedTo(graph, {
+        //   id: node.id,
+        //   link: LinkType.DataChainStyleLink
+        // });
+        const styleNodes = GetNodesLinkedTo(graph, {
+          id: nodeId,
+          link: LinkType.Style,
+          properties: {
+            [LinkPropertyKeys.ComponentTag]: ComponentTags.Self
+          }
+        });
+
+        styleNodes.forEach(styleNode => {
+          // const styleNodeDataChain = GetNodesLinkedTo(graph, {
+          //   id: styleNode.id,
+          //   link: LinkType.DataChainStyleLink
+          // }).find(v => dataChainStyleLinks.find(f => v.id === f.id));
+          // if (styleNodeDataChain) {
+          //   styles.push(`$\{ DC.${GetCodeName(styleNodeDataChain, { includeNameSpace: true })} ? styles['${GetJSCodeName(styleNode)}'] : '' }`)
+          // }
+          // else {
+          // }
+          styles.push(`$\{styles['${GetJSCodeName(styleNode)}']}`)
+        });
+
+        if (styles.length) {
+          bindProps[key] = (`className={\`${styles.join(' ')}\`}`);
+        }
+      }
+      else if (properties[key] && properties[key].localStateProperty) {
         bindProps[key] = `${key}={this.state.${key}}`;
       }
       else if (properties[key] && properties[key].nodeProperty) {
@@ -541,16 +568,18 @@ export function bindComponent(node, componentBindingDefinition) {
           bindProps[key] = GetDefaultComponentValue(node, key);
         }
       }
+
       if (!bindProps[key]) bindProps[key] = "";
     });
-    let cevents =
+
+
+    const cevents =
       componentBindingDefinition.eventApi || Object.keys(ComponentEvents);
     const eventHandlers = cevents
       .map(t => getMethodInstancesForEvntType(node, ComponentEvents[t]))
       .map((methodInstances, i) => {
         const invocations = methodInstances
           .map(methodInstanceCall => {
-            if (!methodInstanceCall) debugger;
             let invocationDependsOnState = null;
             const temp = getMethodInvocation(methodInstanceCall, args => {
               const { statePropertiesThatCauseInvocation } = args;
@@ -564,12 +593,13 @@ export function bindComponent(node, componentBindingDefinition) {
           .filter(x => x)
           .join(NEW_LINE);
         return `${ComponentEvents[cevents[i]]}={(value)=> {
+        //  warning
 ${invocations}
     }}`;
       });
 
     if (eventHandlers && eventHandlers.length) {
-      bindProps["events"] = eventHandlers.join(NEW_LINE);
+      bindProps.events = eventHandlers.join(NEW_LINE);
     }
     return bindTemplate(template, bindProps);
   }
@@ -777,11 +807,28 @@ export function GenerateRNComponents(
             }
           }
         }
+        const css = {};
+        let cssFile = '';
+        let cssImport = '';
         const component_did_update = GetComponentDidUpdate(node);
+        switch (language) {
+          case UITypes.ElectronIO:
+            const styleRules = buildStyle(node);
+            cssFile = constructCssFile(
+              css,
+              `.${(GetCodeName(node) || "").toJavascriptName()}`
+            );
+            cssFile += styleRules;
 
+            cssImport = `import styles from './${(
+              GetCodeName(node) || ""
+            ).toJavascriptName()}.css'`;
+            break;
+          default: break;
+        }
         template = bindTemplate(template, {
           name: GetCodeName(node),
-          imports: "",
+          imports: [cssImport].join(NEW_LINE),
           component_did_update,
           screen_options: "",
           elements: elements || GetDefaultElement()
@@ -795,27 +842,35 @@ export function GenerateRNComponents(
             )
             .join("")
         });
-        result.push({
+        result.push(cssFile
+          ? {
+            template: cssFile,
+            relative: relative || "./src/components",
+            relativeFilePath: `./${(
+              GetCodeName(node) || ""
+            ).toJavascriptName()}.css`,
+            name:
+              `${relative || "./src/components/"
+              }${(GetCodeName(node) || "").toJavascriptName()}.css`
+          }
+          : null, {
           relative: relative || "./src/components",
-          relativeFilePath: `./${(
-            GetCodeName(node) || ""
-          ).toJavascriptName()}${fileEnding}`,
+          relativeFilePath: `./${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
           name:
-            `${relative || "./src/components"
-            }/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
+            `${relative || "./src/components"}/${(GetCodeName(node) || "").toJavascriptName()}${fileEnding}`,
           template
         });
         break;
     }
-    return result;
-  } else {
-    const src = GenerateRNScreenOptionSource(
-      node,
-      relative || "./src/components",
-      language
-    );
-    if (src) result.push(...src);
+    return result.filter(x => x);
   }
+  const src = GenerateRNScreenOptionSource(
+    node,
+    relative || "./src/components",
+    language
+  );
+  if (src) result.push(...src);
+
 
   const components = GetNodeComponents(layoutObj).filter(
     x => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent)
@@ -1094,6 +1149,7 @@ function GetDefaultComponentValue(node, key) {
     .join(NEW_LINE);
   return result;
 }
+
 function WriteDescribedApiProperties(node, options = { listItem: false }) {
   let result = "";
   if (typeof node === "string") {
@@ -1219,7 +1275,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             selector
           )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
         } else {
-          //TODO: this might be able to go away;
+          // TODO: this might be able to go away;
           innerValue = `S.${GetJSCodeName(
             selector
           )}(${innerValue}, this.state.viewModel${addiontionalParams})`;
@@ -1317,7 +1373,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
   const uiType = GetNodeProp(node, NodeProperties.UIType);
   if (ComponentTypes[uiType] && ComponentTypes[uiType][componentType]) {
     const { events } = ComponentTypes[uiType][componentType];
-    for (let _event in events) {
+    for (const _event in events) {
       switch (_event) {
         case ComponentEvents.onChange:
           result.push(ComponentEventStandardHandler[_event]);
@@ -1325,15 +1381,16 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
       }
     }
   }
+
   result.push(...res);
   return NEW_LINE + result.join(NEW_LINE);
 }
 export function writeApiProperties(apiConfig) {
   let result = "";
-  let res = [];
+  const res = [];
 
   if (apiConfig) {
-    for (let i in apiConfig) {
+    for (const i in apiConfig) {
       let property = null;
       const {
         instanceType,
@@ -1577,9 +1634,7 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
     const methodInstanceSource = GetNodesLinkedTo(graph, {
       id: methodInstanceCall.id,
       link: LinkType.EventMethodInstance
-    }).find(x => {
-      return GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.EventMethod;
-    });
+    }).find(x => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.EventMethod);
     let body_input = null;
     if (body) {
       const body_param = getNodesByLinkType(graph, {
@@ -1634,16 +1689,14 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
       }).filter(x => GetNodeProp(x, NodeProperties.TemplateParameter));
 
       const queryParameterValues = templateParameters
-        .map(queryParameter => {
-          return extractApiJsCode({
-            node: queryParameter,
-            options,
-            graph,
-            callback: list => {
-              statePropertiesThatCauseInvocation.push(...list);
-            }
-          });
-        })
+        .map(queryParameter => extractApiJsCode({
+          node: queryParameter,
+          options,
+          graph,
+          callback: list => {
+            statePropertiesThatCauseInvocation.push(...list);
+          }
+        }))
         .filter(temp => temp);
       parts.push(
         `template: {${addNewLine(queryParameterValues.join(`, ${NEW_LINE}`))}}`
@@ -1657,17 +1710,15 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
       }).filter(x => GetNodeProp(x, NodeProperties.QueryParameterParam));
 
       const queryParameterValues = queryParameters
-        .map(queryParameter => {
-          return extractApiJsCode({
-            node: queryParameter,
-            graph,
-            options,
-            internalApiConnection,
-            callback: list => {
-              statePropertiesThatCauseInvocation.push(...list);
-            }
-          });
-        })
+        .map(queryParameter => extractApiJsCode({
+          node: queryParameter,
+          graph,
+          options,
+          internalApiConnection,
+          callback: list => {
+            statePropertiesThatCauseInvocation.push(...list);
+          }
+        }))
         .filter(temp => temp);
       parts.push(
         `query: {${addNewLine(queryParameterValues.join(`, ${NEW_LINE}`))}}`
@@ -1690,13 +1741,13 @@ export function getMethodInvocation(methodInstanceCall, callback = () => { }, op
     }
     const query = parts.join();
     return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}${preDataChainInput}});`;
-  } else if (navigationMethod) {
+  } if (navigationMethod) {
     return `this.props.${GetNodeProp(
       navigationMethod,
       NodeProperties.NavigationAction
     )}();`;
-  } else if (dataChain) {
-    //Buttons need to use this.state.value, so a new property for datachains should exist.
+  } if (dataChain) {
+    // Buttons need to use this.state.value, so a new property for datachains should exist.
     if (internalApiConnection) {
       return `DC.${GetCodeName(dataChain, {
         includeNameSpace: true
@@ -1898,7 +1949,7 @@ export function GenerateComponentImport(node, parentNode, language) {
 }
 
 export function GetScreens() {
-  let screens = GetScreenNodes();
+  const screens = GetScreenNodes();
   return screens;
 }
 function GenerateElectronIORoutes(screens) {
@@ -1969,7 +2020,7 @@ function GenerateElectronIORoutes(screens) {
   };
 }
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
-  let screens = GetScreens();
+  const screens = GetScreens();
   let template = fs.readFileSync("./app/templates/screens/screen.tpl", "utf8");
   const moreresults = [];
   let fileEnding = ".js";
@@ -2066,27 +2117,20 @@ function extractApiJsCode(args = { node, graph }) {
       return GetNodesLinkedTo(null, {
         id: item.id,
         link: LinkType.ComponentApiConnector
-      }).find(instanceEvent => {
-        return [...GetNodesLinkedTo(null, {
-          id: instanceEvent.id,
-          link: LinkType.LifeCylceMethodInstance
-        }), ...GetNodesLinkedTo(null, {
-          id: instanceEvent.id,
-          link: LinkType.EventMethodInstance
-        })].find(lifeCycleMethod => {
-          return (screenOption && existsLinkBetween(graph, {
-            source: lifeCycleMethod.id,
-            target: screenOption.id
-          })) || (component && existsLinkBetween(graph, {
-            source: lifeCycleMethod.id,
-            target: component.id
-          }))
-        })
-      });
-    }).filter(x => {
-
-      return x;
-    }).find(x_temp => x_temp);
+      }).find(instanceEvent => [...GetNodesLinkedTo(null, {
+        id: instanceEvent.id,
+        link: LinkType.LifeCylceMethodInstance
+      }), ...GetNodesLinkedTo(null, {
+        id: instanceEvent.id,
+        link: LinkType.EventMethodInstance
+      })].find(lifeCycleMethod => (screenOption && existsLinkBetween(graph, {
+        source: lifeCycleMethod.id,
+        target: screenOption.id
+      })) || (component && existsLinkBetween(graph, {
+        source: lifeCycleMethod.id,
+        target: component.id
+      }))));
+    }).filter(x => x).find(x_temp => x_temp);
 
     if (param) {
       const internalApiConnection = getNodesByLinkType(graph, {
@@ -2112,13 +2156,13 @@ function extractApiJsCode(args = { node, graph }) {
         return `${GetJSCodeName(queryParameter)}: DC.${GetCodeName(value, {
           includeNameSpace: true
         })}(${input_})`;
-      } else if (internalApiConnection) {
+      } if (internalApiConnection) {
         requiredChanges.push(GetJSCodeName(internalApiConnection));
         const input_ = `this.state.${GetJSCodeName(internalApiConnection)}`;
         return `${GetJSCodeName(queryParameter)}:  ${input_}`;
       }
-      else {
-      }
+
+
     }
   };
   const result = temp(node);

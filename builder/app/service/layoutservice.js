@@ -88,9 +88,9 @@ export function GetRNModelInstances(id) {
         )
           return `let ${
             cellProperties.cellModel[cell]
-          } = Get${instanceType}(${instanceType}.${GetCodeName(id)}, const_${
+            } = Get${instanceType}(${instanceType}.${GetCodeName(id)}, const_${
             cellProperties.cellModel[cell]
-          }) || {};`; // CreateDefault${GetCodeName(id)}()
+            }) || {};`; // CreateDefault${GetCodeName(id)}()
       }
     })
     .filter(x => x)
@@ -237,14 +237,14 @@ export function createSection(args) {
   let cellModelProperty = properties[item].cellModelProperty || {};
   let tree = Object.keys(currentRoot).length
     ? buildLayoutTree({
-        layoutObj,
-        currentRoot,
-        language,
-        imports,
-        node,
-        section,
-        css
-      })
+      layoutObj,
+      currentRoot,
+      language,
+      imports,
+      node,
+      section,
+      css
+    })
     : [];
   if (children && children[item]) {
     if (!imports.some(v => v === children[item])) imports.push(children[item]);
@@ -271,13 +271,15 @@ export function createSection(args) {
     }
   });
   css[section] = { style: { ..._style } };
+  let control = "View";
+  let className = "";
+  let tagBasedStyles = "";
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
       if (Object.keys(_style).length < 2 || cellRoot[item]) {
-        return tree.tightenPs();
+        // return tree.tightenPs();
       }
-      let control = "View";
       switch (GetNodeProp(node, NodeProperties.ComponentType)) {
         case "Form":
           control = GetNodeProp(node, NodeProperties.ComponentType);
@@ -293,8 +295,6 @@ export function createSection(args) {
       if (layoutProperties && layoutProperties.componentType) {
         control = layoutProperties.componentType;
       }
-      let className = "";
-      let tagBasedStyles = "";
       if (UITypes.ReactNative !== language) {
         if (
           layoutProperties &&
@@ -317,5 +317,6 @@ export function createSection(args) {
 ${addNewLine(tree.tightenPs())}
 </${control}>
             `;
+    default: break;
   }
 }

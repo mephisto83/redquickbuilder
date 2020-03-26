@@ -802,7 +802,8 @@ export const LinkType = {
     "permission-property-dependency-many-to-many", //There is a link between a permision and a property in a many to many situnation.
   Style: "Style",
   DataChainCollection: "DataChainCollection",
-  DataChainCollectionReference: "DataChainCollectionReference"
+  DataChainCollectionReference: "DataChainCollectionReference",
+  DataChainStyleLink: 'DataChainStyleLink'
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -929,6 +930,7 @@ export const LinkPropertyKeys = {
   FUNCTION_ID: "function-id",
   InstanceUpdate: "InstanceUpdate",
   ComponentTag: "ComponentTag",
+  ComponentStyle: 'ComponentStyle',
   ComponentProperty: "ComponentProperty",
   ViewType: "viewType",
   AsForm: "AsForm"
@@ -949,6 +951,9 @@ export const LinkProperties = {
   },
   DataChainCollectionReference: {
     type: LinkType.DataChainCollectionReference
+  },
+  DataChainStyleLink: {
+    type: LinkType.DataChainStyleLink
   },
   LifeCylceMethodInstance: {
     type: LinkType.LifeCylceMethodInstance

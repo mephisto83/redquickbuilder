@@ -1,6 +1,6 @@
-<Item {{inlineLabel}} {{floatingLabel}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
-    <Label>{{{label}}}</Label>
-    <Input value={{{value}}} success={{{success}}} error={{{error}}} placeholder={{{placeholder}}}
+<Item {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
+    <Label {{style_label}}>{{{label}}}</Label>
+    <Input value={{{value}}}  {{style_input}} success={{{success}}} error={{{error}}} placeholder={{{placeholder}}}
         onBlur={()=>{
             if(this.props.onBlur) {
                 this.props.onBlur();

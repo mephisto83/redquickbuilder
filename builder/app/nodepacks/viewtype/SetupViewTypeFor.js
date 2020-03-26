@@ -7,6 +7,7 @@ import AttachGetAllOnComponentDidMount from "./AttachGetAllOnComponentDidMount";
 import { setViewPackageStamp, GetLinkBetween } from "../../methods/graph_methods";
 import RemoveAllViewPackage from "../RemoveAllViewPackage";
 import AppendViewTypeValidation from "./AppendViewTypeValidation";
+import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
 export default function SetupViewTypeFor(args = {}) {
   const {
@@ -74,6 +75,9 @@ export default function SetupViewTypeFor(args = {}) {
   result.push(() => {
     setViewPackageStamp(null, 'setup-view-type-for');
     return [];
+  })
+  result.push(() => {
+    return CollectionDataChainsIntoCollections();
   })
   return result;
 }

@@ -1,3 +1,6 @@
+/* eslint-disable react/sort-comp */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 // @flow
 import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
@@ -39,31 +42,33 @@ class LayoutView extends Component {
     super(props);
     this.state = {};
   }
+
   active() {
     return !!this.props.active;
   }
-  getComponentApi(cellChildren) {
-    let { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
 
-    let selectedCell = this.state.selectedCell;
+  getComponentApi(cellChildren) {
+    const { state } = this.props;
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
+
+    const selectedCell = this.state.selectedCell;
     if (cellChildren && cellChildren[selectedCell]) {
-      let childComponent = cellChildren[selectedCell];
-      let componentApi = UIA.GetNodeProp(
+      const childComponent = cellChildren[selectedCell];
+      const componentApi = UIA.GetNodeProp(
         UIA.GetNodeById(childComponent),
         NodeProperties.ComponentApi
       );
       if (componentApi) {
-        let selectedComponentApiProperty = this.state.componentApi
+        const selectedComponentApiProperty = this.state.componentApi
           ? this.state.componentApi[selectedCell]
           : null;
-        let cellProperties = GetCellProperties(
+        const cellProperties = GetCellProperties(
           nodeLayout,
           this.state.selectedCell
         );
         cellProperties.componentApi = cellProperties.componentApi || {};
-        let {
+        const {
           instanceType,
           model,
           selector,
@@ -71,9 +76,9 @@ class LayoutView extends Component {
           dataChain,
           modelProperty
         } = cellProperties.componentApi[selectedComponentApiProperty] || {};
-        let model_obj = UIA.GetNodeById(model);
-        let temp_model = UIA.GetNodeProp(model_obj, UIA.NodeProperties.Model);
-        let properties = GetNodesLinkedTo(UIA.GetRootGraph(state), {
+        const model_obj = UIA.GetNodeById(model);
+        const temp_model = UIA.GetNodeProp(model_obj, UIA.NodeProperties.Model);
+        const properties = GetNodesLinkedTo(UIA.GetRootGraph(state), {
           id: temp_model,
           direction: SOURCE
         }).toNodeSelect();
@@ -104,9 +109,9 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty];
-                let old = temp.handlerType;
+                const old = temp.handlerType;
                 temp.handlerType = value;
 
                 this.props.graphOperation([
@@ -134,7 +139,7 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty];
                 temp.instanceType = value;
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -158,10 +163,10 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let old = temp.selector;
+                const old = temp.selector;
                 temp.selector = value;
 
                 this.props.graphOperation([
@@ -208,10 +213,10 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let old = temp.model;
+                const old = temp.model;
                 temp.model = value;
 
                 this.props.graphOperation([
@@ -253,10 +258,10 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let old = temp.modelProperty;
+                const old = temp.modelProperty;
                 temp.modelProperty = val;
 
                 this.props.graphOperation([
@@ -299,10 +304,10 @@ class LayoutView extends Component {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let temp =
+                const temp =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
-                let id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: temp.dataChain,
                   source: id,
@@ -339,11 +344,12 @@ class LayoutView extends Component {
 
     return null;
   }
-  render() {
-    var { state } = this.props;
-    let active = this.active();
 
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+  render() {
+    const { state } = this.props;
+    const active = this.active();
+
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let componentNodes = currentNode
       ? GetConnectedNodesByType(
           state,
@@ -370,8 +376,8 @@ class LayoutView extends Component {
         state
       )
     ];
-    let namespace = "namespace";
-    let nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
+    const namespace = "namespace";
+    const nodeLayout = UIA.GetNodeProp(currentNode, NodeProperties.Layout);
     let cellProperties;
     let cellStyle = null;
     let cellChildren = null;
@@ -405,11 +411,11 @@ class LayoutView extends Component {
         FindLayoutRoot(this.state.selectedCell, nodeLayout.layout) ||
         nodeLayout.layout;
     }
-    let componentProperties = UIA.GetNodeProp(
+    const componentProperties = UIA.GetNodeProp(
       currentNode,
       UIA.NodeProperties.ComponentProperties
     );
-    let componentPropertiesList = getComponentPropertyList(componentProperties);
+    const componentPropertiesList = getComponentPropertyList(componentProperties);
     return (
       <TopViewer active={active}>
         <section className="content">
@@ -455,7 +461,7 @@ class LayoutView extends Component {
                   <i className="fa fa-angle-right" />
                 </button>
               </div>
-              <Box primary={true} maxheight={350} title={Titles.Layout}>
+              <Box primary maxheight={350} title={Titles.Layout}>
                 {this.state.selectedCell ? (
                   <button
                     onClick={() => {
@@ -502,7 +508,7 @@ class LayoutView extends Component {
                   <SelectInput
                     options={componentNodes.toNodeSelect()}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       cellChildren[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
@@ -518,9 +524,9 @@ class LayoutView extends Component {
                 cellProperties.name &&
                 this.state.selectedCell ? (
                   <TextInput
-                    immediate={true}
+                    immediate
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       if (!cellProperties.name !== "object") {
                         cellProperties.name = {};
                       }
@@ -543,7 +549,7 @@ class LayoutView extends Component {
                       value: t
                     }))}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       cellStyle.flexDirection = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
@@ -563,7 +569,7 @@ class LayoutView extends Component {
                       value: t
                     }))}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       if (!parseInt(val)) cellStyle.flex = null;
                       else cellStyle.flex = parseInt(val);
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -585,7 +591,7 @@ class LayoutView extends Component {
                       "space-between"
                     ].map(t => ({ title: t, value: t }))}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
 
                       cellStyle.justifyContent = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -594,7 +600,7 @@ class LayoutView extends Component {
                         value: layout
                       });
                     }}
-                    label={"justify-content"}
+                    label="justify-content"
                     value={cellStyle.justifyContent}
                   />
                 ) : null}
@@ -607,7 +613,7 @@ class LayoutView extends Component {
                       "stretch"
                     ].map(t => ({ title: t, value: t }))}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
 
                       cellStyle.alignItems = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -616,15 +622,15 @@ class LayoutView extends Component {
                         value: layout
                       });
                     }}
-                    label={"align-items"}
+                    label="align-items"
                     value={cellStyle.alignItems}
                   />
                 ) : null}
                 {cellStyle ? (
                   <TextInput
-                    immediate={true}
+                    immediate
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       let percentage = 0;
                       if ((val || "").indexOf("%") !== -1) {
                         percentage = "%";
@@ -643,9 +649,9 @@ class LayoutView extends Component {
                 ) : null}
                 {cellStyle ? (
                   <TextInput
-                    immediate={true}
+                    immediate
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       let percentage = 0;
                       if ((val || "").indexOf("%") !== -1) {
                         percentage = "%";
@@ -670,7 +676,7 @@ class LayoutView extends Component {
                   <CheckBox
                     label={Titles.UseAsRoot}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       cellRoot[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
@@ -689,7 +695,7 @@ class LayoutView extends Component {
                   <SelectInput
                     options={componentPropertiesList}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       cellModel[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
@@ -714,7 +720,7 @@ class LayoutView extends Component {
                       direction: SOURCE
                     }).toNodeSelect()}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       cellModelProperty[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
@@ -735,7 +741,7 @@ class LayoutView extends Component {
                       value: t
                     }))}
                     onChange={val => {
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
 
                       cellProperties.properties.componentType = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -765,7 +771,7 @@ class LayoutView extends Component {
                       title: x
                     }))}
                     onClick={item => {
-                      let layout =
+                      const layout =
                         UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||
                         CreateLayout();
 
@@ -776,7 +782,7 @@ class LayoutView extends Component {
                           v => v === item.value
                         )
                       ) {
-                        let index = cellProperties.properties.tags.findIndex(
+                        const index = cellProperties.properties.tags.findIndex(
                           v => v === item.value
                         );
                         cellProperties.properties.tags.splice(index, 1);
@@ -796,7 +802,7 @@ class LayoutView extends Component {
                 <FormControl>
                   <TextInput
                     value={this.state.filter}
-                    immediate={true}
+                    immediate
                     onChange={value => {
                       this.setState({ filter: value });
                     }}
@@ -807,7 +813,7 @@ class LayoutView extends Component {
                 {cellStyle
                   ? this.selectedStyle(value => {
                       cellStyle[this.state.selectedStyleKey] = value;
-                      let layout = nodeLayout || CreateLayout();
+                      const layout = nodeLayout || CreateLayout();
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                         prop: UIA.NodeProperties.Layout,
                         id: currentNode.id,
@@ -835,6 +841,7 @@ class LayoutView extends Component {
       </TopViewer>
     );
   }
+
   selectedStyle(callback, value) {
     if (this.state.selectedStyleKey) {
       switch (this.state.selectedStyleKey) {
@@ -844,7 +851,7 @@ class LayoutView extends Component {
               <TextInput
                 value={value}
                 label={this.state.selectedStyleKey}
-                immediate={true}
+                immediate
                 onChange={callback}
                 placeholder={Titles.Filter}
               />
@@ -854,18 +861,18 @@ class LayoutView extends Component {
     }
     return null;
   }
+
   getStyleSelect() {
     if (this.state.filter) {
       return (
         <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
           {Object.keys(StyleLib.js)
             .filter(x => x.indexOf(this.state.filter) !== -1)
-            .map(key => {
-              return (
+            .map(key => (
                 <li
-                  className={"treeview"}
+                  className="treeview"
                   style={{ padding: 3, cursor: "pointer" }}
-                  label={"Style"}
+                  label="Style"
                   key={key}
                   onClick={() => {
                     this.setState({ selectedStyleKey: key, filter: "" });
@@ -873,21 +880,20 @@ class LayoutView extends Component {
                 >
                   {key}
                 </li>
-              );
-            })}
+              ))}
         </ul>
       );
     }
     return [];
   }
+
   getCurrentStyling(currentStyle) {
     if (currentStyle) {
       return (
         <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
-          {Object.keys(currentStyle).map(key => {
-            return (
+          {Object.keys(currentStyle).map(key => (
               <li
-                className={"treeview"}
+                className="treeview"
                 style={{ padding: 3, cursor: "pointer" }}
                 key={key}
                 onClick={() => {
@@ -896,8 +902,7 @@ class LayoutView extends Component {
               >
                 [{key}]: {currentStyle[key]}
               </li>
-            );
-          })}
+            ))}
         </ul>
       );
     }

@@ -32,7 +32,7 @@ export function buildValidation(args = { methodMethod }) {
       };
       let { object, property, validated } = (context || {});
       let model = object || {};
-      let valid = false;
+      let valid = true;
 
       ${conditions || ""};
       result.valid = valid;

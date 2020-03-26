@@ -76,7 +76,7 @@ export default function (args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node0,
-          "value": "params => {\n   let { value, viewModel } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState(); \n// #{model}\n  \n dispatch(clearScreenInstance(viewModel, '#{model~prop}', { update: true, value})); \n\t\n\n   return params;\n}"
+          "value": "params => {\n   let { value, viewModel } = (params || {});\n   let dispatch = GetDispatch();\n   let getState = GetState(); \n// #{model}\n  \n dispatch(clearScreenInstance(viewModel, '#{model~prop}', { update: true, value})); \n\t\n\n   return params;\n}"
         }
       }]
     },

@@ -69,7 +69,8 @@ import {
   SCREEN_COMPONENT_EVENTS,
   ComponentEvents,
   ComponentTags,
-  ComponentTypeKeys
+  ComponentTypeKeys,
+  StyleTags
 } from "../constants/componenttypes";
 import AddComponent from "../nodepacks/AddComponent";
 import DataChain_SelectPropertyValue from "../nodepacks/DataChain_SelectPropertyValue";
@@ -283,6 +284,34 @@ class ContextMenu extends Component {
                     value={UIA.GetLinkProperty(
                       link,
                       LinkPropertyKeys.ComponentTag
+                    )}
+                  />
+                </TreeViewItemContainer>
+                <TreeViewItemContainer>
+                  <SelectInput
+                    options={Object.keys(StyleTags).map(x => ({
+                      id: x,
+                      value: x,
+                      title: x
+                    }))}
+                    label={Titles.LinkType}
+                    onChange={value => {
+                      this.props.graphOperation([
+                        {
+                          operation: UIA.UPDATE_LINK_PROPERTY,
+                          options() {
+                            return {
+                              id: link.id,
+                              prop: LinkPropertyKeys.ComponentStyle,
+                              value
+                            };
+                          }
+                        }
+                      ]);
+                    }}
+                    value={UIA.GetLinkProperty(
+                      link,
+                      LinkPropertyKeys.ComponentStyle
                     )}
                   />
                 </TreeViewItemContainer>
@@ -1115,6 +1144,9 @@ class ContextMenu extends Component {
                               node: currentNode.id
                             });
                         }
+                        commands.push(function () {
+                          return CollectionDataChainsIntoCollections();
+                        })
                         this.props.graphOperation([...commands]);
                       }}
                     />
@@ -2885,7 +2917,7 @@ class ContextMenu extends Component {
     const menuitems = this.getMenuMode(menuMode);
     const defaultMenus = this.getDefaultMenu();
     return (
-      <Draggable handle=".draggable-header">
+      <Draggable handle=".draggable-header,.draggable-footer">
         <div
           className="context-menu modal-dialog modal-info"
           style={{
@@ -2922,7 +2954,7 @@ class ContextMenu extends Component {
                 {menuitems}
               </GenericPropertyContainer>
             </div>
-            <div className="modal-footer">
+            <div className="modal-footer draggable-footer">
               <button
                 type="button"
                 onClick={() => {

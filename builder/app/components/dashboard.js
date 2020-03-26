@@ -248,6 +248,15 @@ class Dashboard extends Component {
             title: Titles.AddQueryMethodApi
           }, {
             onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.Style,
+                nodeTypes: [NodeTypes.Style]
+              });
+            },
+            icon: 'fa fa-css3',
+            title: 'Style'
+          }, {
+            onClick: () => {
               // this.props.setVisual(CONNECTING_NODE, {
               // 	autoConnectViewType: currentNode.id
               // });
