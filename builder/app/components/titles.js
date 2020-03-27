@@ -172,8 +172,10 @@ export const AddComponentApi = "Add Component Api";
 export const AddComponentExtApi = "Add Component External Api";
 export const ExecutorServiceMethod = "Executor Service Method";
 export const ComponentApiConnection = "Connect Component Api";
+export const Details = 'Details';
 export const NavigateTo = "Navigate To";
 export const ValidatorServiceMethod = "Validator Service Method";
+export const Themes = 'Themes';
 export const PermissionDependsOnProperties =
   "Properties permissions depend on.";
 export const ViewPackage = "View Package";

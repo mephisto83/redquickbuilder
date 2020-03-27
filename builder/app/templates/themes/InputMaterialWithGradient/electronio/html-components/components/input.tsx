@@ -1,10 +1,12 @@
 import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
+import * as style from './input.css';
+
 export default class Input extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = { $name: `input-${Date.now()}` };
 	}
 	label() {
 		return InputFunctions.label(this);
@@ -31,18 +33,23 @@ export default class Input extends React.Component {
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
 		return (
-			<div class="form__group field">
+			<div class={`${style.form__group} ${style.field}`}>
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
-					className={'form-control'}
+					className={`${style.form__field}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}
 					value={InputFunctions.value(this)}
 					onKeyPress={handleKeyPress}
 					onChange={InputFunctions.onChange(this)}
 					placeholder={InputFunctions.placeholder(this)}
+					required
+					name={this.state.$name}
 				/>
+				<label class={`${style.form__label}`} for={this.state.$name}>
+					{InputFunctions.placeholder(this)}
+				</label>
 				<Validation data={this.props.error} />
 			</div>
 		);

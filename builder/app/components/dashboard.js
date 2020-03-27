@@ -75,6 +75,7 @@ import ModelFilterMenu from './modelfiltermenu';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import DataChainOperator from './datachainoperator';
+import ThemeProperties from './themeproperties';
 import CurrentNodeProperties from './currentnodeproperties';
 import Slider from './slider';
 import SideMenuContainer from './sidemenucontainer';
@@ -1628,6 +1629,7 @@ class Dashboard extends Component {
               {UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? (<MethodParameterMenu />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<QuickMethods />) : null}
               {UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? (<CurrentNodeProperties />) : null}
+              {UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? (<ThemeProperties />) : null}
             </SideBar>
           </div>
         </div >

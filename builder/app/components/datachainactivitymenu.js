@@ -4,40 +4,22 @@ import { UIConnect } from "../utils/utils";
 import TextInput from "./textinput";
 import SelectInput from "./selectinput";
 import FormControl from "./formcontrol";
-import MainSideBar from "./mainsidebar";
 import * as UIA from "../actions/uiactions";
 import TabPane from "./tabpane";
-import SideBar from "./sidebar";
-import TreeViewMenu from "./treeviewmenu";
 import * as Titles from "./titles";
 import SelectInputProperty from "./selectinputproperty";
 import CheckBox from "./checkbox";
-import ControlSideBarMenu, {
-  ControlSideBarMenuItem
-} from "./controlsidebarmenu";
 import {
   NodeProperties,
   NodeTypes,
-  LinkEvents,
   LinkType,
-  LinkProperties,
   SelectorPropertyKeys,
   NavigateTypes
 } from "../constants/nodetypes";
 import {
-  addValidatator,
-  TARGET,
-  createEventProp,
-  GetNode,
-  GetLinkChain,
-  GetLinkChainItem,
-  createExecutor,
   GetNodesLinkedTo
 } from "../methods/graph_methods";
-import SideBarMenu from "./sidebarmenu";
 import {
-  FunctionTypes,
-  FunctionTemplateKeys,
   MethodFunctions
 } from "../constants/functiontypes";
 import {
@@ -48,7 +30,6 @@ import ButtonList from "./buttonlist";
 
 import { getReferenceInserts } from "../utils/utilservice";
 import CheckBoxProperty from "./checkboxproperty";
-import genericpropertycontainer from "./genericpropertycontainer";
 
 class DataChainActvityMenu extends Component {
   getLambdaVariableTree() {
@@ -228,7 +209,6 @@ class DataChainActvityMenu extends Component {
       })
       .toNodeSelect();
     const lists = UIA.NodesByType(state, NodeTypes.Lists).toNodeSelect();
-    const all_inputs = UIA.NodesByType(state, NodeTypes.DataChain).toNodeSelect();
     const lambdaVariables = this.getLambdaVariableTree();
 
     return (

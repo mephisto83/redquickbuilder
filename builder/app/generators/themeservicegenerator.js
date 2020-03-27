@@ -4,53 +4,45 @@ import {
   NodeProperties,
   NodesByType,
   NodeTypes,
-  GetRootGraph,
-  GetNodeTitle,
-  GetState
-} from "../actions/uiactions";
-import {
-  LinkType,
-  NodePropertyTypesByLanguage,
-  ProgrammingLanguages,
-  NEW_LINE,
-  ConstantsDeclaration,
-  MakeConstant,
-  NameSpace,
-  STANDARD_CONTROLLER_USING,
-  ValidationCases,
-  STANDARD_TEST_USING,
-  Methods,
-  ExecutorRules
-} from "../constants/nodetypes";
-import fs from "fs";
-import { bindTemplate } from "../constants/functiontypes";
-import { NodeType } from "../components/titles";
-import NamespaceGenerator from "./namespacegenerator";
-import { enumerate } from "../utils/utils";
-import { GenerateServiceInterface } from "../service/customservice";
+  GetRootGraph} from "../actions/uiactions";
 import { Themes } from "../constants/themes";
 
-const RETURN_GET_CLASS =
-  "./app/templates/models/exceptions/exceptions_class.tpl";
-const TEST_CLASS = "./app/templates/tests/tests.tpl";
 
 export default class ThemeServiceGenerator {
   static Generate(options) {
-    var { state, key ,language} = options;
-    let graphRoot = GetRootGraph(state);
-    let theme = graphRoot ? graphRoot[GraphMethods.GraphKeys.THEME] : null;
-    let result = {};
+    const { state, language } = options;
+    const graphRoot = GetRootGraph(state);
+    const theme = graphRoot ? graphRoot[GraphMethods.GraphKeys.THEME] : null;
+    let res = {};
 
     if (theme) {
       if (Themes[theme]) {
-        if(Themes[theme][language]){
-          result = {
+        if (Themes[theme][language]) {
+          res = {
             ...Themes[theme][language]
           }
         }
       }
     }
 
+    const result = [res];
+    NodesByType(state, NodeTypes.Theme).sort((a, b) => (GetNodeProp(a, NodeProperties.Priority) || 0) - (GetNodeProp(b, NodeProperties.Priority) || 0)).forEach(node => {
+      const themes = GetNodeProp(node, NodeProperties.Themes);
+      if (themes) {
+        Object.keys(themes).forEach(themme => {
+          if (themes[themme]) {
+            if (Themes[themme]) {
+              if (Themes[themme][language]) {
+                res = {
+                  ...Themes[themme][language]
+                }
+                result.push(res);
+              }
+            }
+          }
+        });
+      }
+    })
     return result;
   }
 }

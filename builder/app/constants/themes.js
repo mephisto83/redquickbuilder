@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { UITypes } from "./nodetypes";
 
 export const Themes = {
@@ -8,5 +9,14 @@ export const Themes = {
       relative: "./app",
       themerelative: "./app/theme"
     }
+  },
+  InputMaterialWithGradient: {
+    [UITypes.ElectronIO]: {
+      location: './app/templates/themes/InputMaterialWithGradient/electronio/',
+      theme: './app/templates/themes/InputMaterialWithGradient/theme/',
+      relative: "./app",
+      themerelative: "./app/theme"
+    }
   }
 };
+

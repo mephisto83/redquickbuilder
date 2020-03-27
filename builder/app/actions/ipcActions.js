@@ -1,11 +1,27 @@
-import { HandlerEvents } from "../ipc/handler-events";
+/* eslint-disable promise/catch-or-return */
+/* eslint-disable array-callback-return */
+/* eslint-disable promise/always-return */
+/* eslint-disable promise/param-names */
+/* eslint-disable compat/compat */
+import fs from "fs";
+import path from "path";
+import { writeFileSync } from "fs";
+import { platform } from "os";
 import {
-  GraphKeys,
-  getNodesByLinkType,
-  TARGET,
-  SOURCE,
-  GetNodesLinkedTo
-} from "../methods/graph_methods";
+  GeneratedTypes,
+  NodeTypes,
+  ReactNativeTypes,
+  UITypes,
+  LinkType,
+  NEW_LINE,
+  NodeAttributePropertyTypes
+} from "../constants/nodetypes";
+import Generator from "../generators/generator";
+import {
+  bindTemplate,
+  FunctionTemplateKeys
+} from "../constants/functiontypes";
+import { uuidv4 } from "../utils/array";
 import {
   GetRootGraph,
   NodesByType,
@@ -22,32 +38,15 @@ import {
   toggleNodeMark,
   setInComponentMode,
   GetModelPropertyChildren,
-  GetMethodsProperties,
   GetMethodProps,
   GetMaestroNode,
   GetControllerNode
 } from "./uiactions";
-import fs from "fs";
-const { ipcRenderer } = require("electron");
-import path from "path";
 import {
-  GeneratedTypes,
-  NodeTypes,
-  ReactNativeTypes,
-  UITypes,
-  LinkType,
-  NEW_LINE,
-  NodeAttributePropertyTypes
-} from "../constants/nodetypes";
-import Generator from "../generators/generator";
-import { fstat, writeFileSync } from "fs";
-import {
-  bindTemplate,
-  FunctionTemplateKeys,
-  ReturnTypes
-} from "../constants/functiontypes";
-import { uuidv4 } from "../utils/array";
-import { platform } from "os";
+  GraphKeys,
+  GetNodesLinkedTo
+} from "../methods/graph_methods";
+import { HandlerEvents } from "../ipc/handler-events";
 import {
   saveCurrentGraph,
   openGraph,
@@ -58,10 +57,12 @@ import {
 } from "./remoteActions";
 import ThemeServiceGenerator from "../generators/themeservicegenerator";
 
+const { ipcRenderer } = require("electron");
+
 const hub = {};
 ipcRenderer.on("message-reply", (event, arg) => {
   console.log(arg); // prints "pong"
-  let reply = JSON.parse(arg);
+  const reply = JSON.parse(arg);
   if (hub[reply.id]) {
     hub[reply.id].resolve(reply.msg);
   }
@@ -117,6 +118,8 @@ ipcRenderer.on("commands", (event, arg) => {
     case "4":
       setRightMenuTab(arg.args);
       break;
+    default:
+      break;
   }
 });
 
@@ -128,14 +131,12 @@ function message(msg, body) {
   };
 }
 function send(mess, body) {
-  var m = message(mess, body);
+  const m = message(mess, body);
   hub[m.id] = {};
-  let result = Promise.resolve().then(() => {
-    return new Promise((resolve, fail) => {
-      hub[m.id].resolve = resolve;
-      hub[m.id].fail = fail;
-    });
-  });
+  const result = Promise.resolve().then(() => new Promise((resolve, fail) => {
+    hub[m.id].resolve = resolve;
+    hub[m.id].fail = fail;
+  }));
   ipcRenderer.send("message", JSON.stringify(m));
   return result;
 }
@@ -144,12 +145,12 @@ export function publishFiles() {
 }
 
 export function scaffoldProject(options = {}) {
-  var { filesOnly } = options;
+  const { filesOnly } = options;
   return (dispatch, getState) => {
-    var state = getState();
-    let root = GetRootGraph(state);
-    let solutionName = root.title.split(" ").join(".");
-    let workspace = root.workspaces
+    const state = getState();
+    const root = GetRootGraph(state);
+    const solutionName = root.title.split(" ").join(".");
+    const workspace = root.workspaces
       ? root.workspaces[platform()] || root.workspace
       : root.workspace;
     ensureDirectory(path.join(workspace));
@@ -157,30 +158,26 @@ export function scaffoldProject(options = {}) {
     (filesOnly
       ? Promise.resolve()
       : send(HandlerEvents.scaffold.message, {
+        solutionName,
+        appName: root[GraphKeys.PROJECTNAME] || "",
+        workspace: path.join(workspace, root.title, "netcore")
+      })
+    )
+      .then(() => filesOnly
+        ? Promise.resolve()
+        : send(HandlerEvents.reactnative.message, {
           solutionName,
           appName: root[GraphKeys.PROJECTNAME] || "",
-          workspace: path.join(workspace, root.title, "netcore")
-        })
-    )
+          workspace: path.join(workspace, root.title, "reactnative")
+        }))
+      .then(() => filesOnly
+        ? Promise.resolve()
+        : send(HandlerEvents.electron.message, {
+          solutionName,
+          appName: root[GraphKeys.PROJECTNAME] || "",
+          workspace: path.join(workspace, root.title, "electronio")
+        }))
       .then(() => {
-        return filesOnly
-          ? Promise.resolve()
-          : send(HandlerEvents.reactnative.message, {
-              solutionName,
-              appName: root[GraphKeys.PROJECTNAME] || "",
-              workspace: path.join(workspace, root.title, "reactnative")
-            });
-      })
-      .then(() => {
-        return filesOnly
-          ? Promise.resolve()
-          : send(HandlerEvents.electron.message, {
-              solutionName,
-              appName: root[GraphKeys.PROJECTNAME] || "",
-              workspace: path.join(workspace, root.title, "electronio")
-            });
-      })
-      .then(res => {
         console.log("Finished Scaffolding.");
         generateFiles(
           path.join(workspace, root.title, "netcore"),
@@ -213,19 +210,19 @@ export function scaffoldProject(options = {}) {
         );
       })
       .then(() => {
-        let namespace = root ? root[GraphKeys.NAMESPACE] : null;
-        let server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
-        let graph = root;
-        let userNode = NodesByType(state, NodeTypes.Model).find(x =>
+        const namespace = root ? root[GraphKeys.NAMESPACE] : null;
+        const server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
+        const graph = root;
+        const userNode = NodesByType(state, NodeTypes.Model).find(x =>
           GetNodeProp(x, NodeProperties.IsUser)
         );
-        let logicalParents = GetNodesLinkedTo(graph, {
+        const logicalParents = GetNodesLinkedTo(graph, {
           id: userNode.id,
           link: LinkType.UserLink
         }).filter(x => x.id !== userNode.id);
-        let logicalChildren = GetLogicalChildren(userNode.id);
+        const logicalChildren = GetLogicalChildren(userNode.id);
         if (server_side_setup) {
-          let children = [
+          const children = [
             ...logicalChildren,
             ...logicalParents,
             ...GetModelPropertyChildren(userNode.id).filter(
@@ -237,14 +234,12 @@ export function scaffoldProject(options = {}) {
             .unique(x => x.id)
             .filter(x => GetCodeName(x) !== "Id")
             .filter(x => GetCodeName(x) !== "UserName")
-            .map(child => {
-              return `
+            .map(child => `
             if (!string.IsNullOrEmpty(user.${GetCodeName(child.id)}))
                 result.Add(new Claim("${GetCodeName(
-                  child.id
-                )}", user.${GetCodeName(child.id)}));
-            `;
-            })
+              child.id
+            )}", user.${GetCodeName(child.id)}));
+            `)
             .join("");
           generateFolderStructure(
             path.join(
@@ -294,32 +289,29 @@ export function scaffoldProject(options = {}) {
             )
           );
           let more_interfaces = "";
-          let interface_implementations = [];
-          let user_update_implementation = [];
-          let post_registrations = [];
+          const interface_implementations = [];
+          const user_update_implementation = [];
+          const post_registrations = [];
           let claim_service_interfaces = "";
           let user_node = null;
-          let template_name = "ICreateAgents";
-          let interfaceFunctions = NodesByType(state, NodeTypes.ClaimService)
+          const template_name = "ICreateAgents";
+          const interfaceFunctions = NodesByType(state, NodeTypes.ClaimService)
             .map(claimService => {
-              let authMethods = GetNodesLinkedTo(graph, {
+              const authMethods = GetNodesLinkedTo(graph, {
                 id: claimService.id,
                 link: LinkType.ClaimServiceAuthorizationMethod
               });
-              let userUpdateMethods = GetNodesLinkedTo(graph, {
+              const userUpdateMethods = GetNodesLinkedTo(graph, {
                 id: claimService.id,
                 link: LinkType.ClaimServiceUpdateUserMethod
               });
               userUpdateMethods.map(method => {
-                let parameters = GetMethodProps(method);
+                const parameters = GetMethodProps(method);
                 if (parameters && parameters[FunctionTemplateKeys.Model]) {
-                  let model = GetCodeName(
-                    parameters[FunctionTemplateKeys.Model]
-                  );
-                  let user = GetCodeName(parameters[FunctionTemplateKeys.User]);
-                  let maestro = GetMaestroNode(method.id);
+                  const user = GetCodeName(parameters[FunctionTemplateKeys.User]);
+                  const maestro = GetMaestroNode(method.id);
                   if (maestro) {
-                    let controller = GetControllerNode(maestro.id);
+                    const controller = GetControllerNode(maestro.id);
                     if (controller) {
                       user_node = user;
                       user_update_implementation.push(`
@@ -332,25 +324,25 @@ export function scaffoldProject(options = {}) {
               });
               return authMethods
                 .map(method => {
-                  let parameters = GetMethodProps(method);
+                  const parameters = GetMethodProps(method);
                   if (parameters && parameters[FunctionTemplateKeys.Model]) {
-                    let model = GetCodeName(
+                    const model = GetCodeName(
                       parameters[FunctionTemplateKeys.Model]
                     );
-                    let user = GetCodeName(
+                    const user = GetCodeName(
                       parameters[FunctionTemplateKeys.User]
                     );
-                    let maestro = GetMaestroNode(method.id);
+                    const maestro = GetMaestroNode(method.id);
                     if (maestro) {
-                      let controller = GetControllerNode(maestro.id);
+                      const controller = GetControllerNode(maestro.id);
                       if (controller) {
                         user_node = user;
                         interface_implementations.push(`
                     public async Task<${model}> Create(${user} user, ${model} model)
                     {
                       var maestro = RedStrapper.Resolve<I${GetCodeName(
-                        maestro
-                      )}>();
+                          maestro
+                        )}>();
                       return await maestro.${GetCodeName(method)}(user, model);
                     }`);
                         post_registrations.push(`
@@ -360,7 +352,7 @@ export function scaffoldProject(options = {}) {
                     user.${model}  = ${model.toLowerCase()}.Id;`);
                         return `Task<${model}> Create(${user} ${
                           FunctionTemplateKeys.User
-                        }, ${model} ${FunctionTemplateKeys.Model});`;
+                          }, ${model} ${FunctionTemplateKeys.Model});`;
                       }
                     }
                   }
@@ -393,7 +385,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 }`;
             more_interfaces = `, ${template_name}`;
           }
-          let props = [
+          const props = [
             ...logicalParents,
             ...GetModelPropertyChildren(userNode.id).filter(
               x =>
@@ -401,16 +393,12 @@ ${interfaceFunctions.join(NEW_LINE)}
                 NodeAttributePropertyTypes.STRING
             )
           ]
-            .map(prop => {
-              return GetCodeName(prop);
-            })
+            .map(prop => GetCodeName(prop))
             .unique()
-            .map(v => {
-              return `if (claim.Type == "${v}")
+            .map(v => `if (claim.Type == "${v}")
               {
                 result.${v} = claim.Value;
-              }`;
-            })
+              }`)
             .join(NEW_LINE);
 
           generateFolderStructure(
@@ -450,8 +438,8 @@ ${interfaceFunctions.join(NEW_LINE)}
       })
       .then(() => {
         console.log("Write react-native files");
-        let appName = root[GraphKeys.PROJECTNAME];
-        let version = "v1";
+        const appName = root[GraphKeys.PROJECTNAME];
+        const version = "v1";
         if (appName) {
           return generateFolderStructure(
             path.join(`./app/templates/react_native/${version}`),
@@ -459,14 +447,26 @@ ${interfaceFunctions.join(NEW_LINE)}
             null,
             path.join(workspace, root.title, "reactnative", appName)
           );
-        } else {
-          console.warn("No app name given");
         }
+        console.warn("No app name given");
+
+      })
+      .then(() => {
+        console.log("Clear electron theme");
+        return clearElectronIOTheme(
+          path.join(
+            workspace,
+            root.title,
+            "electronio",
+            root[GraphKeys.PROJECTNAME]
+          ),
+          state
+        );
       })
       .then(() => {
         console.log("Write electron files");
-        let appName = root[GraphKeys.PROJECTNAME];
-        let version = "v1";
+        const appName = root[GraphKeys.PROJECTNAME];
+        const version = "v1";
         if (appName) {
           return generateFolderStructure(
             path.join(`./app/templates/electronio/${version}`),
@@ -474,9 +474,9 @@ ${interfaceFunctions.join(NEW_LINE)}
             null,
             path.join(workspace, root.title, "electronio", appName)
           );
-        } else {
-          console.warn("No app name given");
         }
+        console.warn("No app name given");
+
       })
       .then(() => {
         console.log("Write electron theme");
@@ -493,33 +493,33 @@ ${interfaceFunctions.join(NEW_LINE)}
   };
 }
 function generateFolderStructure(dir, lib, relative, target_dir) {
-  let directories = fs.readdirSync(dir);
+  const directories = fs.readdirSync(dir);
   relative = relative || dir;
   directories.map(item => {
-    let dirPath = path.join(dir, item);
+    const dirPath = path.join(dir, item);
     if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
-      let reldir = dir.substr(relative.length);
+      const reldir = dir.substr(relative.length);
       ensureDirectory(path.join(target_dir, reldir, item));
       generateFolderStructure(dirPath, lib, relative, target_dir);
     } else if (fs.existsSync(dirPath)) {
       let file = fs.readFileSync(dirPath, "utf8");
-      let reldir = dir.substr(relative.length);
+      const reldir = dir.substr(relative.length);
       file = bindTemplate(file, lib);
       fs.writeFileSync(path.join(target_dir, reldir, item), file, "utf8");
     }
   });
 }
 function generateReactNative(workspace, state) {
-  let code_types = [...Object.values(ReactNativeTypes)];
+  const code_types = [...Object.values(ReactNativeTypes)];
 
   code_types.map(code_type => {
-    let temp = Generator.generate({
+    const temp = Generator.generate({
       type: code_type,
       language: UITypes.ReactNative,
       state
     });
 
-    for (var fileName in temp) {
+    for (const fileName in temp) {
       ensureDirectory(path.join(workspace, temp[fileName].relative));
       writeFileSync(
         path.join(
@@ -533,17 +533,17 @@ function generateReactNative(workspace, state) {
   });
 }
 function generateElectronIO(workspace, state) {
-  let code_types = [...Object.values(ReactNativeTypes)];
+  const code_types = [...Object.values(ReactNativeTypes)];
 
   code_types.map(code_type => {
-    let temp = Generator.generate({
+    const temp = Generator.generate({
       type: code_type,
       language: UITypes.ElectronIO,
       state
     });
 
-    for (var fileName in temp) {
-      var relative = temp[fileName].relative;
+    for (const fileName in temp) {
+      let relative = temp[fileName].relative;
       relative = relative.replace("src", "app");
       ensureDirectory(path.join(workspace, relative));
       console.log(
@@ -556,31 +556,49 @@ function generateElectronIO(workspace, state) {
     }
   });
 }
-function generateElectronIOTheme(workspace, state) {
-  let result = ThemeServiceGenerator.Generate({
+function clearElectronIOTheme(workspace, state) {
+  const results = ThemeServiceGenerator.Generate({
     state,
     language: UITypes.ElectronIO
   });
+  const toClear = [];
+  results.forEach(result => {
+    if (result.theme) {
+      toClear.push(path.join(workspace, result.themerelative || result.relative))
+    }
+  });
+  toClear.forEach(dir => {
+    deleteAll(dir);
+  });
 
-  if (result.location) {
-    generateFolderStructure(
-      path.join(`${result.location}`),
-      {},
-      null,
-      path.join(workspace, result.relative)
-    );
-  }
-  if (result.theme) {
-    generateFolderStructure(
-      path.join(`${result.theme}`),
-      {},
-      null,
-      path.join(workspace, result.themerelative || result.relative)
-    );
-  }
+}
+function generateElectronIOTheme(workspace, state) {
+  const results = ThemeServiceGenerator.Generate({
+    state,
+    language: UITypes.ElectronIO
+  });
+  results.forEach(result => {
+
+    if (result.location) {
+      generateFolderStructure(
+        path.join(`${result.location}`),
+        {},
+        null,
+        path.join(workspace, result.relative)
+      );
+    }
+    if (result.theme) {
+      generateFolderStructure(
+        path.join(`${result.theme}`),
+        {},
+        null,
+        path.join(workspace, result.themerelative || result.relative)
+      );
+    }
+  })
 }
 function generateFiles(workspace, solutionName, state) {
-  var code_types = [
+  const code_types = [
     NodeTypes.Controller,
     NodeTypes.Model,
     NodeTypes.ExtensionType,
@@ -588,14 +606,14 @@ function generateFiles(workspace, solutionName, state) {
     NodeTypes.FetchService,
     ...Object.values(GeneratedTypes)
   ];
-  let root = GetRootGraph(state);
+  const root = GetRootGraph(state);
   code_types.map(code_type => {
-    var temp = Generator.generate({
+    const temp = Generator.generate({
       type: code_type,
       state
     });
-    let area = CodeTypeToArea[code_type];
-    for (var fileName in temp) {
+    const area = CodeTypeToArea[code_type];
+    for (const fileName in temp) {
       ensureDirectory(path.join(workspace, solutionName + area));
       if (temp[fileName].template) {
         writeFileSync(
@@ -608,22 +626,22 @@ function generateFiles(workspace, solutionName, state) {
         );
       }
       if (temp[fileName].interface) {
-        ensureDirectory(path.join(workspace, solutionName + ".Interfaces"));
+        ensureDirectory(path.join(workspace, `${solutionName}.Interfaces`));
         writeFileSync(
           path.join(
             workspace,
-            solutionName + ".Interfaces",
+            `${solutionName}.Interfaces`,
             `${temp[fileName].iname || fileName}.cs`
           ),
           temp[fileName].interface
         );
       }
       if (temp[fileName].test) {
-        ensureDirectory(path.join(workspace, solutionName + ".Tests"));
+        ensureDirectory(path.join(workspace, `${solutionName}.Tests`));
         writeFileSync(
           path.join(
             workspace,
-            solutionName + ".Tests",
+            `${solutionName}.Tests`,
             `${temp[fileName].tname || fileName}.cs`
           ),
           temp[fileName].test
@@ -632,14 +650,14 @@ function generateFiles(workspace, solutionName, state) {
     }
   });
   if (root) {
-    ensureDirectory(path.join(workspace, solutionName + ".Tests"));
+    ensureDirectory(path.join(workspace, `${solutionName}.Tests`));
     writeFileSync(
-      path.join(workspace, solutionName + ".Tests", `appsettings.json`),
+      path.join(workspace, `${solutionName}.Tests`, `appsettings.json`),
       JSON.stringify(root.appConfig, null, 4)
     );
-    ensureDirectory(path.join(workspace, solutionName + ".Web"));
+    ensureDirectory(path.join(workspace, `${solutionName}.Web`));
     writeFileSync(
-      path.join(workspace, solutionName + ".Web", `appsettings.json`),
+      path.join(workspace, `${solutionName}.Web`, `appsettings.json`),
       JSON.stringify(root.appConfig, null, 4)
     );
   }
@@ -647,28 +665,26 @@ function generateFiles(workspace, solutionName, state) {
 function CreateRegistrations(nodes, namefunc = null, interfacefunc = null) {
   namefunc =
     namefunc ||
-    function(v) {
+    function (v) {
       return GetCodeName(v);
     };
   interfacefunc =
     interfacefunc ||
-    function(v) {
+    function (v) {
       return `I${GetCodeName(v)}`;
     };
   return nodes
-    .map(v => {
-      return `builder.RegisterType<${namefunc(v)}>().As<${interfacefunc(
-        v
-      )}>();`;
-    })
+    .map(v => `builder.RegisterType<${namefunc(v)}>().As<${interfacefunc(
+      v
+    )}>();`)
     .join(NEW_LINE);
 }
 function ensureDirectory(dir) {
   if (!fs.existsSync(dir)) {
-    console.log("doesnt exist : " + dir);
+    console.log(`doesnt exist : ${dir}`);
   } else {
   }
-  let _dir_parts = dir.split(path.sep);
+  const _dir_parts = dir.split(path.sep);
   _dir_parts.map((_, i) => {
     if (i > 1 || _dir_parts.length - 1 === i) {
       let tempDir = path.join(..._dir_parts.subset(0, i + 1));
@@ -681,7 +697,6 @@ function ensureDirectory(dir) {
     }
   });
 }
-
 const CodeTypeToArea = {
   [NodeTypes.Controller]: path.join(".Web", "Controllers"),
   [NodeTypes.Model]: ".Models",
@@ -698,8 +713,25 @@ const CodeTypeToArea = {
   [GeneratedTypes.Constants]: ".Models",
   [GeneratedTypes.Permissions]: ".Controllers",
   [GeneratedTypes.Validators]: ".Controllers",
-  [GeneratedTypes.CSDataChain]:".Controllers",
+  [GeneratedTypes.CSDataChain]: ".Controllers",
   [GeneratedTypes.ModelItemFilter]: ".Controllers",
   [GeneratedTypes.StreamProcess]: ".Controllers",
   [GeneratedTypes.StreamProcessOrchestration]: ".Controllers"
 };
+
+
+function deleteAll(directory) {
+  if (fs.existsSync(directory) && fs.lstatSync(directory).isDirectory()) {
+    const files = fs.readdirSync(directory);
+    files.forEach(file => {
+      const dirPath = path.join(directory, file);
+      if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+        deleteAll(dirPath);
+      }
+      else {
+        fs.unlinkSync(path.join(directory, file));
+      }
+    })
+    fs.rmdirSync(directory);
+  }
+}

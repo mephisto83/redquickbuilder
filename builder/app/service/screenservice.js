@@ -437,7 +437,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
 
       cssImport = `import styles from './${(
         GetCodeName(node) || ""
-      ).toJavascriptName()}.css'`;
+      ).toJavascriptName()}.scss'`;
       break;
     case UITypes.ReactNative:
     default:
@@ -501,10 +501,10 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
         relative: relativePath || "./src/components",
         relativeFilePath: `./${(
           GetCodeName(node) || ""
-        ).toJavascriptName()}.css`,
+        ).toJavascriptName()}.scss`,
         name:
           `${relativePath || "./src/components/"
-          }${(GetCodeName(node) || "").toJavascriptName()}.css`
+          }${(GetCodeName(node) || "").toJavascriptName()}.scss`
       }
       : null,
     ...results
@@ -822,7 +822,7 @@ export function GenerateRNComponents(
 
             cssImport = `import styles from './${(
               GetCodeName(node) || ""
-            ).toJavascriptName()}.css'`;
+            ).toJavascriptName()}.scss'`;
             break;
           default: break;
         }
@@ -848,10 +848,10 @@ export function GenerateRNComponents(
             relative: relative || "./src/components",
             relativeFilePath: `./${(
               GetCodeName(node) || ""
-            ).toJavascriptName()}.css`,
+            ).toJavascriptName()}.scss`,
             name:
               `${relative || "./src/components/"
-              }${(GetCodeName(node) || "").toJavascriptName()}.css`
+              }${(GetCodeName(node) || "").toJavascriptName()}.scss`
           }
           : null, {
           relative: relative || "./src/components",

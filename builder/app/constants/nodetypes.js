@@ -67,6 +67,7 @@ export const NodeTypes = {
   ViewModel: "view-model",
   FetchService: "FetchService",
   Style: "Style",
+  Theme: 'Theme',
   DataChainCollection: "DataChainCollection"
 };
 export const NodeTypeIcons = {};
@@ -298,6 +299,7 @@ export const NodeProperties = {
   HoverStyle: ":hover",
   AsLocalContext: "AsLocalContext",
   ActiveStyle: ":active",
+  Themes: 'Themes',
   SharedReferenceCollection: "SharedReferenceCollection",
   BeforeStyle: "::before",
   GridAreas: "GridAreas",
