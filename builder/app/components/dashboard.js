@@ -98,9 +98,10 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
+import ThemeView from './themeview';
 import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
@@ -1211,6 +1212,9 @@ class Dashboard extends Component {
                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                 }} /> : null}
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa fa-code" onClick={() => {
+                  this.props.setVisual(MAIN_CONTENT, THEME_VIEW);
+                }} /> : null}
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                 <SideBarHeader title={Titles.FileMenu} />
@@ -1276,6 +1280,7 @@ class Dashboard extends Component {
             <Content>
               <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
+              <ThemeView active={UIA.Visual(state, MAIN_CONTENT) === THEME_VIEW} />
               {main_content === MIND_MAP || true ? (<MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {

@@ -102,7 +102,7 @@ export default class TextInput extends Component {
       <div className={this.props.inputgroup ? "input-group" : "form-group"}>
         {this.props.inputgroup ? null : <label>{this.label()}</label>}
         <input
-          type="text"
+          type={this.inputType || "text"}
           disabled={this.disabled()}
           className={"form-control"}
           onBlur={() => {

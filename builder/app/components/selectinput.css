@@ -1,0 +1,18 @@
+label[color] {
+  position: relative;
+}
+
+label[color]::after {
+  --size: 20px;
+  --space: -25px;
+	content: '';
+	pointer-events: none;
+	height: var(--size);
+	position: absolute;
+	width: var(--size);
+	top: 0px;
+	right: var(--space);
+	background-color: var(--color);
+  color: var(--color);
+  border: solid 1px #313131;
+}

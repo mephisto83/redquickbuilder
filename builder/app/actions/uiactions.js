@@ -4279,6 +4279,14 @@ export function graphOperation(operation, options, stamp) {
   };
 }
 
+export function updateGraph(property, value) {
+  return (dispatch) => {
+    let graph = GetCurrentGraph();
+    graph = GraphMethods.updateGraphProperty({ ...graph }, { prop: property, value })
+    SaveGraph(graph, dispatch);
+  }
+}
+
 let recording = [];
 export function GetRecording() {
   return recording;

@@ -249,6 +249,7 @@ export const MAIN_CONTENT = "MAIN_CONTENT";
 export const MIND_MAP = "MIND_MAP";
 export const CODE_VIEW = "CODE_VIEW";
 export const LAYOUT_VIEW = "LAYOUT_VIEW";
+export const THEME_VIEW = "THEME_VIEW";
 
 export const GeneratedDataTypes = {
   FirstName: "First Name",
