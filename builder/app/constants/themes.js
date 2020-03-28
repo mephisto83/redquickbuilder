@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { UITypes } from "./nodetypes";
+import { StyleLib } from "./styles";
 
 export const Themes = {
   ContactFrom_v4: {
@@ -20,7 +21,11 @@ export const Themes = {
   }
 };
 
-export const FormTypes = {
+export const SectioningRoot = {
+  Body: 'Body'
+}
+// Text Content
+export const ContentSectioning = {
   H1: 'H1',
   H2: 'H2',
   H3: 'H3',
@@ -31,25 +36,133 @@ export const FormTypes = {
   P: 'P',
   Span: 'Span',
   Label: 'Label',
-  Button: 'Button'
+  Button: 'Button',
+  A: 'A',
+  HR: 'Hr',
+  IMG: 'Img',
+  DIV: 'Div',
+  Address: 'Address',
+  Article: 'Article',
+  Aside: 'Aside',
+  Footer: 'Footer',
+  Header: 'Header',
+  Hgroup: 'Hgroup',
+  Main: 'Main',
+  Nav: 'Nav',
+  Section: 'Section',
+}
+export const TextContent = {
+  Blockquote: 'Blockquote',
+  DD: 'DD',
+  DL: 'DL',
+  DT: 'DT',
+  FIGCAPTION: 'FIGCAPTION',
+  FIGURE: 'FIGURE',
+  LI: 'LI',
+  OL: 'OL',
+  PRE: 'PRE',
+  UL: 'UL'
+}
+
+export const InlineTextSemantics = {
+  Abbr: 'Abbr',
+  B: 'B',
+  BDI: 'BDI',
+  BDO: 'BDO',
+  BR: 'BR',
+  CITE: 'CITE',
+  CODE: 'CODE',
+  DATA: 'DATA',
+  DFN: 'DFN',
+  EM: 'EM',
+  I: 'I',
+  KBD: 'KBD',
+  MARK: 'MARK',
+  Q: 'Q',
+  RB: 'RB',
+  RP: 'RP',
+  RTC: 'RTC',
+
+}
+
+export const ImageMultiMedia = {
+  AREA: 'AREA',
+  IMG: 'IMG',
+  AUDIO: 'AUDIO',
+  MAP: 'MAP',
+  TRACK: 'TRACK',
+  VIDEO: 'VIDEO'
+};
+
+export const EmbeddedContent = {
+  EMBED: 'EMBED',
+  IFRAME: 'IFRAME',
+  SOURCE: 'SOURCE',
+  PARAM: 'PARAM',
+  OBJECT: 'OBJECT',
+  PICTURE: 'PICTURE',
+}
+export const DemarcatingEdits = {
+  DEL: 'DEL',
+  INS: 'INS'
+}
+export const TableContent = {
+  CAPTION: 'CAPTION',
+  COL: 'COL',
+  COLGROUP: 'COLGROUP',
+  TABLE: 'TABLE',
+  TD: 'TD',
+  TBODY: 'TBODY',
+  TFOOT: 'TFOOT',
+  TH: 'TH',
+  THEAD: 'THEAD',
+  TR: 'TR'
+}
+export const InteractiveTypes = {
+
+  Details: 'Details',
+  Summary: 'Summary'
 }
 
 export const SpaceThemePropertyKeys = {
-  Padding: 'Padding',
-  Margin: 'Margin'
+
 }
 
 export const FormThemePropertyKeys = {
-  FontFamily: 'FontFamily',
-  FontSource: 'FontSource',
-  FontSize: 'FontSize',
-  FontStyle: 'FontStyle',
-  FontVariant: 'FontVariant',
-  FontWeight: 'FontWeight',
-  LineHeight: 'LineHeight',
-  Color: 'Color'
 }
 
+const cssProperties = Object.keys({ ...StyleLib.css }).map(v => {
+  if (typeof v === 'object') {
+    return v;
+
+  }
+  return {
+    placeholder: v,
+    label: v,
+    key: v
+  }
+});
+export const HTMLElementGroups = [
+  {
+    name: 'Sectioning Root',
+    type: SectioningRoot, cssProperties
+  },
+  {
+    name: 'ContentSectioning',
+    type: ContentSectioning, cssProperties
+  },
+  {
+    name: 'TextContent', type: TextContent, cssProperties
+  },
+  {
+    name: 'InlineTextSemantics', type: InlineTextSemantics, cssProperties
+  },
+  { name: 'ImageMultiMedia', type: ImageMultiMedia, cssProperties },
+  { name: 'EmbeddedContent', type: EmbeddedContent, cssProperties },
+  { name: 'TableContent', type: TableContent, cssProperties },
+  { name: 'InteractiveTypes', type: InteractiveTypes, cssProperties },
+  { name: 'DemarcatingEdits', type: DemarcatingEdits, cssProperties }
+];
 export const MediaSize = {
   Desktop: 'Desktop',
   Tablet: 'Tablet',
@@ -65,4 +178,16 @@ export const ThemeColors = {
   black: 'black',
   white: 'white',
   grey: 'grey'
+}
+
+export const ColorUses = {
+  inputFieldPrimary: 'inputFieldPrimary',
+  inputFieldSecondary: 'inputFieldSecondary',
+  inputFieldGray: 'inputFieldGray',
+  inputFieldWhite: 'inputFieldWhite'
+}
+
+export const OtherUses = {
+  inputFieldFontFamily: 'inputFieldFontFamily',
+  inputFontSize: 'inputFontSize'
 }

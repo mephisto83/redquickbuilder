@@ -1,0 +1,13 @@
+.typeahead {
+  position: relative;
+}
+.typeaheadContainer {
+	position: absolute;
+	z-index: 10;
+	max-height: 150px;
+	overflow: hidden;
+  overflow-y: auto;
+  top: 60px;
+  width: 100%;
+  background-color: #ffffff;
+}

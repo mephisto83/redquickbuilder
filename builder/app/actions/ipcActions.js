@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable array-callback-return */
 /* eslint-disable promise/always-return */
@@ -595,7 +596,7 @@ function generateElectronIOTheme(workspace, state) {
         path.join(workspace, result.themerelative || result.relative)
       );
     }
-  })
+  });
 }
 function generateFiles(workspace, solutionName, state) {
   const code_types = [

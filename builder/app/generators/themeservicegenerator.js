@@ -4,10 +4,57 @@ import {
   NodeProperties,
   NodesByType,
   NodeTypes,
-  GetRootGraph} from "../actions/uiactions";
+  GetRootGraph,
+  GetCurrentGraph
+} from "../actions/uiactions";
 import { Themes } from "../constants/themes";
+import { NEW_LINE } from "../constants/nodetypes";
 
+function GenerateGlobalCss(options) {
+  const { state } = options;
+  const graph = GetCurrentGraph(state);
+  const result = {};
+  let theme = '';
+  if (graph) {
+    const {
+      themeColors = {},
+      themeColorUses = {},
+      themeOtherUses = {},
+      themeFonts = { fonts: [] },
+      themeVariables = { variables: [] }
+    } = graph;
 
+    let themecolors = '';
+    if (themeColors) {
+      Object.keys(themeColors).forEach(v => {
+        themecolors += `--${v}: ${themeColors[v]};${NEW_LINE}`;
+      });
+    }
+    let themevariables = '';
+    if (themeVariables && themeVariables.variables) {
+      themeVariables.variables.forEach(vari => {
+        const { variable, variableValue } = vari;
+        themevariables += `--${variable}: ${variableValue};${NEW_LINE}`;
+      })
+    }
+    let themecoloruse = '';
+    if (themeColorUses) {
+      Object.keys(themeColorUses).forEach(colorUse => {
+        themecoloruse += `--${colorUse}: --${themeColorUses[colorUse]};${NEW_LINE}`;
+      });
+    }
+    const roottag = `* {
+      ${themecolors}
+      ${themevariables}
+      ${themecoloruse}
+    }`;
+
+    theme += roottag;
+  }
+  result.global = { theme }
+
+  return result;
+}
 export default class ThemeServiceGenerator {
   static Generate(options) {
     const { state, language } = options;
@@ -24,6 +71,7 @@ export default class ThemeServiceGenerator {
         }
       }
     }
+    GenerateGlobalCss(options);
 
     const result = [res];
     NodesByType(state, NodeTypes.Theme).sort((a, b) => (GetNodeProp(a, NodeProperties.Priority) || 0) - (GetNodeProp(b, NodeProperties.Priority) || 0)).forEach(node => {

@@ -55,6 +55,7 @@ export default class TextInput extends Component {
             disabled={this.disabled()}
             className={"form-control"}
             onBlur={() => {
+              if (this.props.onBlur) { this.props.onBlur() }
               if (!this.immediate()) {
                 if (this.props.onChange) {
                   if (this.state.value !== this.props.value)
@@ -64,11 +65,15 @@ export default class TextInput extends Component {
               this.setState({ focused: false });
             }}
             onFocus={() => {
+              if (this.props.onFocus) { this.props.onFocus() }
               this.setState({ focused: true });
             }}
             value={this.value()}
             onKeyPress={handleKeyPress}
             onChange={v => {
+              if (this.props.onChangeText) {
+                this.props.onChangeText(v.target.value);
+              }
               if (this.immediate()) {
                 if (this.props.onChange) {
                   this.props.onChange(v.target.value);
@@ -106,6 +111,7 @@ export default class TextInput extends Component {
           disabled={this.disabled()}
           className={"form-control"}
           onBlur={() => {
+            if (this.props.onBlur) { this.props.onBlur() }
             if (!this.immediate()) {
               if (this.props.onChange) {
                 if (this.state.value !== this.props.value)
@@ -115,11 +121,15 @@ export default class TextInput extends Component {
             this.setState({ focused: false });
           }}
           onFocus={() => {
+            if (this.props.onFocus) { this.props.onFocus() }
             this.setState({ focused: true });
           }}
           value={this.value()}
           onKeyPress={handleKeyPress}
           onChange={v => {
+            if (this.props.onChangeText) {
+              this.props.onChangeText(v.target.value);
+            }
             if (this.immediate()) {
               if (this.props.onChange) {
                 this.props.onChange(v.target.value);

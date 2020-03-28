@@ -1,12 +1,11 @@
+/* eslint-disable no-case-declarations */
 import ControllerGenerator from "./controllergenerator";
-import * as Titles from "../components/titles";
 import {
   NodeTypes,
   GeneratedTypes,
   Methods,
   GeneratedConstants,
   NodeProperties,
-  ConstantsDeclaration,
   MakeConstant,
   ReactNativeTypes
 } from "../constants/nodetypes";
@@ -20,12 +19,10 @@ import StreamProcessGenerator from "./streamprocessgenerator";
 import { NodesByType, GetNodeProp } from "../actions/uiactions";
 import StreamProcessOrchestrationGenerator from "./streamprocessorchestrationgenerator";
 import ChangeResponseGenerator from "./changeresponsegenerator";
-import ValidationRuleGenerator from "./validationrulegenerator";
 import ExecutorGenerator from "./executiongenerator";
 import ModelReturnGenerator from "./modelreturngenerator";
 import ModelExceptionGenerator from "./modelexceptiongenerator";
 import ModelItemFilter from "./modelitemfiltergenerator";
-import ThemeService from "./themeservicegenerator";
 import CustomService from "./customservicegenerator";
 import ModelGetGenerator from "./modelgetgenerators";
 import ReactNativeScreens from "./screengenerator";
@@ -38,13 +35,13 @@ import ReactNativeSelectorFunctions from "./selectorgenerator";
 import ReactNativeLists from "./listsgenerator";
 import ValidatorGenerator from "./validatorgenerator";
 import FetchServiceGenerator from "./fetchservicegenerator";
+
 export default class Generator {
   static generate(options) {
-    var { state, type, key, language } = options;
+    const { state, type, key, language } = options;
     switch (type) {
       case NodeTypes.Controller:
-        let temp = ControllerGenerator.Generate({ state, key, language });
-        return temp;
+        return ControllerGenerator.Generate({ state, key, language });
       case NodeTypes.FetchService:
         return FetchServiceGenerator.Generate({ state, key, language });
       case NodeTypes.Model:
@@ -58,19 +55,19 @@ export default class Generator {
       case GeneratedTypes.ChangeResponse:
         return ChangeResponseGenerator.Generate({ state, key, language });
       case GeneratedTypes.Constants:
-        //Add enumerations here.
-        let models = NodesByType(state, NodeTypes.Model)
+        // Add enumerations here.
+        const models = NodesByType(state, NodeTypes.Model)
           .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
           .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
-        let functions = NodesByType(state, [
+        const functions = NodesByType(state, [
           NodeTypes.Function,
           NodeTypes.Method
         ]);
-        let enumerations = NodesByType(state, NodeTypes.Enumeration).map(
+        const enumerations = NodesByType(state, NodeTypes.Enumeration).map(
           node => {
-            var enums = GetNodeProp(node, NodeProperties.Enumeration);
-            var larg = {};
-            enums.map(t => {
+            const enums = GetNodeProp(node, NodeProperties.Enumeration);
+            const larg = {};
+            enums.forEach(t => {
               larg[MakeConstant(t.value || t)] = t.value;
             });
             return {
@@ -79,14 +76,14 @@ export default class Generator {
             };
           }
         );
-        let streamTypes = {};
-        models.map(t => {
+        const streamTypes = {};
+        models.forEach(t => {
           streamTypes[
             GetNodeProp(t, NodeProperties.CodeName).toUpperCase()
           ] = GetNodeProp(t, NodeProperties.CodeName).toUpperCase();
         });
-        let functionsTypes = {};
-        functions.map(t => {
+        const functionsTypes = {};
+        functions.forEach(t => {
           functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(
             t,
             NodeProperties.CodeName
@@ -155,6 +152,9 @@ export default class Generator {
         return ReactNativeSelectorFunctions.Generate({ state, key, language });
       case ReactNativeTypes.Lists:
         return ReactNativeLists.Generate({ state, key, language });
+      default:
+        console.log('unhandled generator case');
+        break;
     }
   }
 }

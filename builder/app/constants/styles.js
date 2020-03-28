@@ -105,9 +105,23 @@ export const StyleLib = {
     width: "width",
     "z-index": "zIndex"
   },
-  js: {}
+  js: {},
+  css: {}
 };
+(function () {
 
-Object.keys(StyleLib.style).map(v => {
-  StyleLib.js[StyleLib.style[v]] = v;
-});
+  Object.keys(StyleLib.style).forEach(v => {
+    StyleLib.js[StyleLib.style[v]] = v;
+    let type = null;
+    if (v.toLowerCase().indexOf('color') !== -1) {
+      type = 'color'
+    }
+    StyleLib.css[StyleLib.style[v]] = {
+      placeholder: v,
+      label: v,
+      key: v,
+      type
+    };
+  });
+
+})();
