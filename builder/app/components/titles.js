@@ -24,6 +24,7 @@ export const LoadModelsOnComponentMount = 'Load Models On Component Mount';
 export const GridRow = "GridRow";
 export const Rows = "Row Count";
 export const Navigation = "Navigation";
+export const SpaceTheme = 'Space Theme';
 export const LinkProperties = 'Link Properties';
 export const UseHttps = "Use Https";
 export const Parameter = "Parameter";

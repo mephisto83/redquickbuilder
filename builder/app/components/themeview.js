@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
 import TopViewer from "./topviewer";
-import { ThemeColors, FormTypes, MediaSize, FormThemePropertyKeys } from "../constants/themes";
+import { ThemeColors, FormTypes, MediaSize, FormThemePropertyKeys, SpaceThemePropertyKeys } from "../constants/themes";
 import { GetCurrentGraph } from "../actions/uiactions";
 import TextInput from "./textinput";
 import ColorInput from './colorinput';
@@ -14,6 +14,7 @@ import Box from "./box";
 import FormControl from "./formcontrol";
 import * as Titles from './titles';
 import SelectInput from "./selectinput";
+import { ComponentTags } from "../constants/componenttypes";
 
 class ThemeView extends Component {
   constructor(props) {
@@ -23,6 +24,70 @@ class ThemeView extends Component {
 
   active() {
     return !!this.props.active;
+  }
+
+  getSpaceFields(formType, mediaSize, formTheme, themeColors = {}) {
+    // ComponentTags
+    if (formType && mediaSize) {
+      return [{
+        placeholder: SpaceThemePropertyKeys.Padding,
+        label: SpaceThemePropertyKeys.Padding,
+        key: SpaceThemePropertyKeys.Padding
+      }, {
+        placeholder: SpaceThemePropertyKeys.Margin,
+        label: SpaceThemePropertyKeys.Margin,
+        key: SpaceThemePropertyKeys.Margin
+      }].map(field => {
+        const { placeholder, label, key, type } = field;
+        const onChange = value => {
+          if (!formTheme[formType]) {
+            formTheme[formType] = {};
+          }
+
+          if (!formTheme[formType][mediaSize]) {
+            formTheme[formType][mediaSize] = {};
+          }
+
+          if (!formTheme[formType][mediaSize][key]) {
+            formTheme[formType][mediaSize][key] = {};
+          }
+
+
+          formTheme[formType][mediaSize][key] = value;
+
+          Object.keys(MediaSize).forEach(ms => {
+            if (!formTheme[formType][ms]) {
+              formTheme[formType][ms] = {};
+            }
+            formTheme[formType][ms][key] = formTheme[formType][ms][key] || value;
+          })
+
+          this.props.updateGraph('spaceTheme', formTheme)
+
+        };
+        const fieldValue = formTheme[formType] && formTheme[formType][mediaSize] ?
+          formTheme[formType][mediaSize][key] : null;
+        if (type === 'color') {
+          return (<SelectInput
+            key={`field-color-${key}`}
+            value={fieldValue}
+            label={label}
+            title={label}
+            color={themeColors ? themeColors[fieldValue] : null}
+            onChange={onChange}
+            options={Object.keys(ThemeColors).map(d => ({ title: d, value: d }))} />)
+        }
+        return (
+          <TextInput key={`field-${key}`} value={fieldValue}
+            label={label}
+            title={label}
+            onChange={onChange}
+            placeholder={placeholder}
+          />);
+
+      })
+    }
+    return [];
   }
 
   getFormFields(formType, mediaSize, formTheme, themeColors = {}) {
@@ -115,7 +180,7 @@ class ThemeView extends Component {
     if (!graph) {
       return <div />;
     }
-    let { formTheme = {} } = graph;
+    const { formTheme = {}, spaceTheme = {} } = graph;
     const { themeColors = {} } = graph;
 
     const colors = Object.keys(ThemeColors).map(color => {
@@ -201,7 +266,29 @@ class ThemeView extends Component {
                 </FormControl>
               </Box>
             </div>
-            <div className="col-md-6" />
+            <div className="col-md-2" >
+              <Box maxheight={500} title={Titles.SpaceTheme}>
+                <FormControl>
+                  <SelectInput
+                    options={Object.keys(ComponentTags).map(v => ({ title: v, value: v, id: v }))}
+                    label={Titles.Parents}
+                    onChange={(value) => {
+                      this.setState({ componentTag: value })
+                    }}
+                    value={this.state.componentTag} />
+                  <SelectInput
+                    options={Object.keys(MediaSize).map(v => ({ title: v, value: v, id: v }))}
+                    label={Titles.Parents}
+                    onChange={(value) => {
+                      this.setState({ mediaSize: value })
+                    }}
+                    value={this.state.mediaSize} />
+
+                  {this.getSpaceFields(this.state.componentTag, this.state.mediaSize, spaceTheme, themeColors)}
+                </FormControl>
+              </Box>
+            </div>
+            <div className="col-md-4" />
           </div>
         </section>
       </TopViewer>

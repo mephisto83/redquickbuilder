@@ -34,6 +34,11 @@ export const FormTypes = {
   Button: 'Button'
 }
 
+export const SpaceThemePropertyKeys = {
+  Padding: 'Padding',
+  Margin: 'Margin'
+}
+
 export const FormThemePropertyKeys = {
   FontFamily: 'FontFamily',
   FontSource: 'FontSource',
