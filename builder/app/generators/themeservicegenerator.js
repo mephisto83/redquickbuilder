@@ -70,7 +70,7 @@ function GenerateGlobalCss(options) {
     if (spaceTheme) {
       Object.keys(spaceTheme).forEach(space => {
         Object.keys(spaceTheme[space]).forEach(mediaSize => {
-          Object.keys(spaceTheme[space][mediaSize]).forEach(key => {
+          Object.keys(spaceTheme[space][mediaSize]).filter(x => x.indexOf(':') === -1).forEach(key => {
             let val = spaceTheme[space][mediaSize][key];
             if (val) {
               if (val.indexOf('--') === 0) {
@@ -119,7 +119,8 @@ function GenerateGlobalCss(options) {
       ${themevariables}
       ${themecoloruse}
       ${cssvariables}
-    }`;
+    }
+`;
 
     theme += styleLinks;
     theme += roottag;

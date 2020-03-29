@@ -357,6 +357,18 @@ class ThemeView extends Component {
                       this.setState({ [key]: value })
                     }}
                     value={this.state[key]} />))}
+                  <button className="btn btn-default btn-flat" onClick={() => {
+                    const temp = {
+                      // 'themeColors': {},
+                      // 'themeColorUses': {},
+                      'themeOtherUses': {},
+                      // 'themeFonts': { fonts: [] },
+                      // 'themeVariables': { variables: [] }
+                    };
+                    Object.keys(temp).map(v => {
+                      this.props.updateGraph(v, temp[v]);
+                    });
+                  }} >Clear</button>
                 </FormControl>
               </Box>
             </div>
