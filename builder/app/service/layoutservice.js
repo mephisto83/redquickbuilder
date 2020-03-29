@@ -273,6 +273,7 @@ export function createSection(args) {
   css[section] = { style: { ..._style } };
   let control = "View";
   let className = "";
+  let tagclasses = '';
   let tagBasedStyles = "";
   switch (language) {
     case UITypes.ReactNative:
@@ -301,14 +302,14 @@ export function createSection(args) {
           layoutProperties.tags &&
           Object.keys(layoutProperties.tags).length
         ) {
-
+          tagclasses = layoutProperties.tags.join(' ');
           tagBasedStyles = layoutProperties.tags
             .map(tag => {
               return GetStylesFor(node, tag).join(' ');
             })
             .filter(x => x).join(' ');
         }
-        className = `className={\`$\{styles.${section}} ${tagBasedStyles} \`}`;
+        className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;
       } else {
         className = `style={${JSON.stringify({ ..._style }, null, 4)}}`;
       }

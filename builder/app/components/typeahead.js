@@ -37,12 +37,12 @@ export default class Typeahead extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    // if (!this.immediate()) {
-    //   if (!this.state.focused)
-    //     if (this.state.value !== prevProps.value) {
-    //       this.setState({ value: this.props.value });
-    //     }
-    // }
+    if (!this.immediate()) {
+      if (!this.state.focus)
+        if (this.state.value !== this.props.value) {
+          this.setState({ value: this.props.value });
+        }
+    }
   }
 
   render() {
@@ -60,6 +60,12 @@ export default class Typeahead extends Component {
           }}
           onBlur={() => {
             this.setState({ focus: false })
+            if (!this.immediate()) {
+              if (this.props.onChange) {
+                if (this.state.value !== this.props.value)
+                  this.props.onChange(this.state.value || "");
+              }
+            }
           }}
           onChange={(value) => {
             if (this.immediate()) {

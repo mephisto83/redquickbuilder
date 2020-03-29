@@ -32,7 +32,7 @@ import { MediaQueries } from "../constants/nodetypes";
 class ThemeView extends Component {
   constructor(props) {
     super(props);
-    this.state = { quickColor: '' };
+    this.state = { quickColor: '', bindAll: true, mediaSize: MediaQueries["Extra devices"] };
   }
 
   active() {
@@ -134,16 +134,17 @@ class ThemeView extends Component {
     return selector;
   }
 
-  getSpaceFields(formType, mediaSize, formTheme, themeColors = {}) {
+  getSpaceFields(formType, mediaSize, formTheme, themeColors = {}, themeVariables, filterFunc) {
     // ComponentTags
     if (formType && mediaSize) {
-      return Object.values(StyleLib.css).map(field => {
+      return Object.values(StyleLib.css).filter(v => filterFunc(`${v.label}`)).map(field => {
         const { placeholder, key, type } = field;
         let { label } = field;
-        label = `${label}${this.getAttrSelector()}`;
-        const onChange = (append, value) => {
-          append = append || '';
-          value = `${append}${value}`;
+        label = `${label}`;
+        formType = `${formType}${this.getAttrSelector()}`;
+
+        const onChange = (value) => {
+          value = `${value || ''}`;
 
           if (!formTheme[formType]) {
             formTheme[formType] = {};
@@ -186,6 +187,24 @@ class ThemeView extends Component {
             color={themeColors ? themeColors[`${fieldValue}`.split('--').join('')] : null}
             onChange={onChange}
             options={Object.keys(ThemeColors).map(d => ({ title: d, value: `--${d}` }))} />)
+        }
+
+        const use = key;
+        const variableNameParts = `${label.split(':')[0]}`.split('-').map(v => v.toLowerCase());
+        if (!variableNameParts.some(v => use.toLowerCase().indexOf(v) === -1)) {
+          return (<Typeahead
+            key={`field-font-family-${use}`}
+            value={fieldValue}
+            label={use}
+            title={use}
+            onChange={onChange}
+            options={themeVariables.variables
+              .filter(t => !variableNameParts.some(v => t.variable.toLowerCase().indexOf(v) === -1))
+              .map(d => ({
+                title: d.variable,
+                value: d.variable
+              }))} />)
+
         }
         return (
           <TextInput key={`field-${key}`} value={fieldValue}
@@ -501,24 +520,21 @@ class ThemeView extends Component {
               </Box>
             </div>
             <div className="col-md-2" >
-              <Box maxheight={500} title={Titles.SpaceTheme}>
+              <Box maxheight={500} title={Titles.SpaceTheme} onSearch={(search) => {
+                this.setState({
+                  spaceSearch: search
+                });
+              }}>
                 <FormControl>
                   <SelectInput
                     options={Object.keys(ComponentTags).map(v => ({ title: v, value: v, id: v }))}
-                    label={Titles.Parents}
+                    label={'Spaces'}
                     onChange={(value) => {
                       this.setState({ componentTag: value })
                     }}
                     value={this.state.componentTag} />
-                  <SelectInput
-                    options={Object.keys(MediaQueries).map(v => ({ title: v, value: v, id: v }))}
-                    label={Titles.Parents}
-                    onChange={(value) => {
-                      this.setState({ mediaSize: value })
-                    }}
-                    value={this.state.mediaSize} />
 
-                  {this.getSpaceFields(this.state.componentTag, this.state.mediaSize, spaceTheme, themeColors)}
+                  {this.getSpaceFields(this.state.componentTag, this.state.mediaSize, spaceTheme, themeColors, themeVariables, f => this.state.spaceSearch && f.toLowerCase().indexOf(this.state.spaceSearch.toLowerCase()) !== -1)}
                 </FormControl>
               </Box>
             </div>

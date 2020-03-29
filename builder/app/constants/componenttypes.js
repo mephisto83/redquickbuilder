@@ -28,6 +28,7 @@ export const ComponentTags = {
   MainContent: "MainContent",
   SecondaryContent: "SecondaryContent",
   RightContainer: "RightContainer",
+  Form: "Form",
   SecondaryMain: "SecondaryMain",
   MainButton: "MainButton",
   CancelButton: "CancelButton",
