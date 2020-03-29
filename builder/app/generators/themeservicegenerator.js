@@ -20,6 +20,7 @@ function GenerateGlobalCss(options) {
       themeColors = {},
       themeColorUses = {},
       themeOtherUses = {},
+      themeGridPlacements = { grids: [] },
       themeFonts = { fonts: [] },
       spaceTheme = {},
       themeVariables = { variables: [] }
@@ -110,6 +111,41 @@ function GenerateGlobalCss(options) {
       }
       return '';
     }).filter(x => x).join(NEW_LINE);
+
+    const gridPlacementRules = Object.keys(MediaQueries).map(mq => {
+      const gpRules = themeGridPlacements.grids.map(gridSetup => {
+        const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
+        if (mediaSizes[mq]) {
+          const rowCount = gridTemplateColumns.split(' ').filter(x => x).length;
+          const columnCount = gridTemplateRows.split(' ').filter(x => x).length;
+          const areas = [].interpolate(0, rowCount, row => {
+            const rowArea = [];
+            [].interpolate(0, columnCount, col => {
+              let area = gridPlacement[row * columnCount + col];
+              if (!area) {
+                area = '.';
+              }
+              rowArea.push(area);
+            });
+            return `"${rowArea.join(' ')}"${NEW_LINE}`;
+          });
+          return `
+        .${name} {
+          grid-template-columns: ${gridTemplateColumns};
+          grid-template-rows: ${gridTemplateRows};
+          grid-template-areas:
+${areas.join(NEW_LINE)}
+        };
+`;
+        }
+      }).filter(x => x);
+      return `
+      ${MediaQueries[mq]} {
+        ${gpRules}
+      }
+    `;
+    }).join(NEW_LINE);
+
     const styleLinks = `
       ${fontLinks}
     `;
@@ -125,6 +161,7 @@ function GenerateGlobalCss(options) {
     theme += styleLinks;
     theme += roottag;
     theme += cssRules;
+    theme += gridPlacementRules;
   }
   result = {
     theme,

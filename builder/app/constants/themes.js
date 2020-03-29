@@ -22,7 +22,9 @@ export const Themes = {
 };
 
 export const SectioningRoot = {
-  Body: 'Body'
+  Body: 'Body',
+  Container: 'Container',
+  Content: 'Content'
 }
 // Text Content
 export const ContentSectioning = {

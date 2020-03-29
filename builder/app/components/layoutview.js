@@ -97,36 +97,36 @@ class LayoutView extends Component {
             }}
           />,
           selectedComponentApiProperty &&
-          instanceType === InstanceTypes.ScreenInstance ? (
-            <SelectInput
-              label={Titles.HandlerType}
-              value={handlerType}
-              options={Object.keys(HandlerTypes).map(t => ({
-                title: t,
-                value: HandlerTypes[t]
-              }))}
-              onChange={value => {
-                cellProperties.componentApi[selectedComponentApiProperty] =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const temp =
-                  cellProperties.componentApi[selectedComponentApiProperty];
-                const old = temp.handlerType;
-                temp.handlerType = value;
+            instanceType === InstanceTypes.ScreenInstance ? (
+              <SelectInput
+                label={Titles.HandlerType}
+                value={handlerType}
+                options={Object.keys(HandlerTypes).map(t => ({
+                  title: t,
+                  value: HandlerTypes[t]
+                }))}
+                onChange={value => {
+                  cellProperties.componentApi[selectedComponentApiProperty] =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const temp =
+                    cellProperties.componentApi[selectedComponentApiProperty];
+                  const old = temp.handlerType;
+                  temp.handlerType = value;
 
-                this.props.graphOperation([
-                  {
-                    operation: UIA.CHANGE_NODE_PROPERTY,
-                    options: {
-                      prop: UIA.NodeProperties.Layout,
-                      id: currentNode.id,
-                      value: nodeLayout
+                  this.props.graphOperation([
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: nodeLayout
+                      }
                     }
-                  }
-                ]);
-              }}
-            />
-          ) : null,
+                  ]);
+                }}
+              />
+            ) : null,
           selectedComponentApiProperty ? (
             <SelectInput
               label={Titles.InstanceType}
@@ -151,152 +151,152 @@ class LayoutView extends Component {
             />
           ) : null,
           selectedComponentApiProperty &&
-          instanceType === InstanceTypes.Selector ? (
-            <SelectInput
-              label={Titles.Selector}
-              value={selector}
-              options={UIA.NodesByType(
-                state,
-                NodeTypes.Selector
-              ).toNodeSelect()}
-              onChange={value => {
-                cellProperties.componentApi[selectedComponentApiProperty] =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const temp =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const old = temp.selector;
-                temp.selector = value;
+            instanceType === InstanceTypes.Selector ? (
+              <SelectInput
+                label={Titles.Selector}
+                value={selector}
+                options={UIA.NodesByType(
+                  state,
+                  NodeTypes.Selector
+                ).toNodeSelect()}
+                onChange={value => {
+                  cellProperties.componentApi[selectedComponentApiProperty] =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const temp =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const old = temp.selector;
+                  temp.selector = value;
 
-                this.props.graphOperation([
-                  {
-                    operation: REMOVE_LINK_BETWEEN_NODES,
-                    options: {
-                      target: old,
-                      source: currentNode.id
-                    }
-                  },
-                  {
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options: {
-                      target: value,
-                      source: currentNode.id,
-                      properties: {
-                        ...UIA.LinkProperties.ComponentApi,
-                        selector: true
+                  this.props.graphOperation([
+                    {
+                      operation: REMOVE_LINK_BETWEEN_NODES,
+                      options: {
+                        target: old,
+                        source: currentNode.id
+                      }
+                    },
+                    {
+                      operation: ADD_LINK_BETWEEN_NODES,
+                      options: {
+                        target: value,
+                        source: currentNode.id,
+                        properties: {
+                          ...UIA.LinkProperties.ComponentApi,
+                          selector: true
+                        }
+                      }
+                    },
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: nodeLayout
                       }
                     }
-                  },
-                  {
-                    operation: UIA.CHANGE_NODE_PROPERTY,
-                    options: {
-                      prop: UIA.NodeProperties.Layout,
-                      id: currentNode.id,
-                      value: nodeLayout
-                    }
-                  }
-                ]);
-              }}
-            />
-          ) : null,
+                  ]);
+                }}
+              />
+            ) : null,
           selectedComponentApiProperty &&
-          instanceType === InstanceTypes.ScreenInstance ? (
-            <SelectInput
-              label={Titles.Models}
-              value={model}
-              options={UIA.NodesByType(
-                state,
-                NodeTypes.ViewModel
-              ).toNodeSelect()}
-              onChange={value => {
-                cellProperties.componentApi[selectedComponentApiProperty] =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const temp =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const old = temp.model;
-                temp.model = value;
+            instanceType === InstanceTypes.ScreenInstance ? (
+              <SelectInput
+                label={Titles.Models}
+                value={model}
+                options={UIA.NodesByType(
+                  state,
+                  NodeTypes.ViewModel
+                ).toNodeSelect()}
+                onChange={value => {
+                  cellProperties.componentApi[selectedComponentApiProperty] =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const temp =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const old = temp.model;
+                  temp.model = value;
 
-                this.props.graphOperation([
-                  {
-                    operation: REMOVE_LINK_BETWEEN_NODES,
-                    options: {
-                      target: old,
-                      source: currentNode.id
-                    }
-                  },
-                  {
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options: {
-                      target: value,
-                      source: currentNode.id,
-                      properties: {
-                        ...UIA.LinkProperties.ComponentApi,
-                        model: true
+                  this.props.graphOperation([
+                    {
+                      operation: REMOVE_LINK_BETWEEN_NODES,
+                      options: {
+                        target: old,
+                        source: currentNode.id
+                      }
+                    },
+                    {
+                      operation: ADD_LINK_BETWEEN_NODES,
+                      options: {
+                        target: value,
+                        source: currentNode.id,
+                        properties: {
+                          ...UIA.LinkProperties.ComponentApi,
+                          model: true
+                        }
+                      }
+                    },
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: nodeLayout
                       }
                     }
-                  },
-                  {
-                    operation: UIA.CHANGE_NODE_PROPERTY,
-                    options: {
-                      prop: UIA.NodeProperties.Layout,
-                      id: currentNode.id,
-                      value: nodeLayout
-                    }
-                  }
-                ]);
-              }}
-            />
-          ) : null,
+                  ]);
+                }}
+              />
+            ) : null,
           selectedComponentApiProperty &&
-          instanceType === InstanceTypes.ScreenInstance ? (
-            <SelectInput
-              options={properties}
-              onChange={val => {
-                cellProperties.componentApi[selectedComponentApiProperty] =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const temp =
-                  cellProperties.componentApi[selectedComponentApiProperty] ||
-                  {};
-                const old = temp.modelProperty;
-                temp.modelProperty = val;
+            instanceType === InstanceTypes.ScreenInstance ? (
+              <SelectInput
+                options={properties}
+                onChange={val => {
+                  cellProperties.componentApi[selectedComponentApiProperty] =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const temp =
+                    cellProperties.componentApi[selectedComponentApiProperty] ||
+                    {};
+                  const old = temp.modelProperty;
+                  temp.modelProperty = val;
 
-                this.props.graphOperation([
-                  {
-                    operation: REMOVE_LINK_BETWEEN_NODES,
-                    options: {
-                      target: old,
-                      source: currentNode.id
-                    }
-                  },
-                  {
-                    operation: ADD_LINK_BETWEEN_NODES,
-                    options: {
-                      target: value,
-                      source: currentNode.id,
-                      properties: {
-                        ...UIA.LinkProperties.ComponentApi,
-                        modelProperty: true
+                  this.props.graphOperation([
+                    {
+                      operation: REMOVE_LINK_BETWEEN_NODES,
+                      options: {
+                        target: old,
+                        source: currentNode.id
+                      }
+                    },
+                    {
+                      operation: ADD_LINK_BETWEEN_NODES,
+                      options: {
+                        target: value,
+                        source: currentNode.id,
+                        properties: {
+                          ...UIA.LinkProperties.ComponentApi,
+                          modelProperty: true
+                        }
+                      }
+                    },
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Layout,
+                        id: currentNode.id,
+                        value: nodeLayout
                       }
                     }
-                  },
-                  {
-                    operation: UIA.CHANGE_NODE_PROPERTY,
-                    options: {
-                      prop: UIA.NodeProperties.Layout,
-                      id: currentNode.id,
-                      value: nodeLayout
-                    }
-                  }
-                ]);
-              }}
-              label={Titles.Property}
-              value={modelProperty}
-            />
-          ) : null,
+                  ]);
+                }}
+                label={Titles.Property}
+                value={modelProperty}
+              />
+            ) : null,
           selectedComponentApiProperty ? (
             <SelectInput
               options={UIA.GetDataChainEntryNodes().toNodeSelect()}
@@ -352,11 +352,11 @@ class LayoutView extends Component {
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let componentNodes = currentNode
       ? GetConnectedNodesByType(
-          state,
-          currentNode.id,
-          NodeTypes.ComponentNode,
-          SOURCE
-        )
+        state,
+        currentNode.id,
+        NodeTypes.ComponentNode,
+        SOURCE
+      )
       : [];
     componentNodes = [
       ...componentNodes,
@@ -416,6 +416,31 @@ class LayoutView extends Component {
       UIA.NodeProperties.ComponentProperties
     );
     const componentPropertiesList = getComponentPropertyList(componentProperties);
+    const onUpdateComponentTags = item => {
+      const layout =
+        UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||
+        CreateLayout();
+
+      cellProperties.properties.tags =
+        cellProperties.properties.tags || [];
+      if (
+        cellProperties.properties.tags.find(
+          v => v === item.value
+        )
+      ) {
+        const index = cellProperties.properties.tags.findIndex(
+          v => v === item.value
+        );
+        cellProperties.properties.tags.splice(index, 1);
+      } else {
+        cellProperties.properties.tags.push(item.value);
+      }
+      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+        prop: UIA.NodeProperties.Layout,
+        id: currentNode.id,
+        value: layout
+      });
+    }
     return (
       <TopViewer active={active}>
         <section className="content">
@@ -521,27 +546,27 @@ class LayoutView extends Component {
                   />
                 ) : null}
                 {cellProperties &&
-                cellProperties.name &&
-                this.state.selectedCell ? (
-                  <TextInput
-                    immediate
-                    onChange={val => {
-                      const layout = nodeLayout || CreateLayout();
-                      if (!cellProperties.name !== "object") {
-                        cellProperties.name = {};
-                      }
+                  cellProperties.name &&
+                  this.state.selectedCell ? (
+                    <TextInput
+                      immediate
+                      onChange={val => {
+                        const layout = nodeLayout || CreateLayout();
+                        if (!cellProperties.name !== "object") {
+                          cellProperties.name = {};
+                        }
 
-                      cellProperties.name[this.state.selectedCell] = val;
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }}
-                    label={Titles.Name}
-                    value={cellProperties.name[this.state.selectedCell]}
-                  />
-                ) : null}
+                        cellProperties.name[this.state.selectedCell] = val;
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.Layout,
+                          id: currentNode.id,
+                          value: layout
+                        });
+                      }}
+                      label={Titles.Name}
+                      value={cellProperties.name[this.state.selectedCell]}
+                    />
+                  ) : null}
                 {cellStyle ? (
                   <SelectInput
                     options={["column", "row"].map(t => ({
@@ -689,49 +714,49 @@ class LayoutView extends Component {
                 ) : null}
 
                 {cellChildren &&
-                cellChildren[this.state.selectedCell] &&
-                componentPropertiesList &&
-                componentPropertiesList.length ? (
-                  <SelectInput
-                    options={componentPropertiesList}
-                    onChange={val => {
-                      const layout = nodeLayout || CreateLayout();
-                      cellModel[this.state.selectedCell] = val;
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }}
-                    label={Titles.Models}
-                    value={cellModel[this.state.selectedCell]}
-                  />
-                ) : null}
+                  cellChildren[this.state.selectedCell] &&
+                  componentPropertiesList &&
+                  componentPropertiesList.length ? (
+                    <SelectInput
+                      options={componentPropertiesList}
+                      onChange={val => {
+                        const layout = nodeLayout || CreateLayout();
+                        cellModel[this.state.selectedCell] = val;
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.Layout,
+                          id: currentNode.id,
+                          value: layout
+                        });
+                      }}
+                      label={Titles.Models}
+                      value={cellModel[this.state.selectedCell]}
+                    />
+                  ) : null}
                 {cellModel &&
-                cellModel[this.state.selectedCell] &&
-                componentPropertiesList &&
-                componentPropertiesList.length ? (
-                  <SelectInput
-                    options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
-                      id: getComponentProperty(
-                        componentProperties,
-                        cellModel[this.state.selectedCell]
-                      ),
-                      direction: SOURCE
-                    }).toNodeSelect()}
-                    onChange={val => {
-                      const layout = nodeLayout || CreateLayout();
-                      cellModelProperty[this.state.selectedCell] = val;
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }}
-                    label={Titles.Property}
-                    value={cellModelProperty[this.state.selectedCell]}
-                  />
-                ) : null}
+                  cellModel[this.state.selectedCell] &&
+                  componentPropertiesList &&
+                  componentPropertiesList.length ? (
+                    <SelectInput
+                      options={GetNodesLinkedTo(UIA.GetRootGraph(state), {
+                        id: getComponentProperty(
+                          componentProperties,
+                          cellModel[this.state.selectedCell]
+                        ),
+                        direction: SOURCE
+                      }).toNodeSelect()}
+                      onChange={val => {
+                        const layout = nodeLayout || CreateLayout();
+                        cellModelProperty[this.state.selectedCell] = val;
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                          prop: UIA.NodeProperties.Layout,
+                          id: currentNode.id,
+                          value: layout
+                        });
+                      }}
+                      label={Titles.Property}
+                      value={cellModelProperty[this.state.selectedCell]}
+                    />
+                  ) : null}
               </Box>
               <Box maxheight={350} title={Titles.Properties}>
                 {cellProperties && cellProperties.properties ? (
@@ -755,6 +780,22 @@ class LayoutView extends Component {
                   />
                 ) : null}
                 {cellProperties && cellProperties.properties ? (
+                  <TextInput
+                    label={Titles.ComponentTag}
+                    title={Titles.ComponentTag}
+                    inputgroup
+                    immediate
+                    value={this.state.componentTag}
+                    onChange={value => {
+                      this.setState({
+                        componentTag: value
+                      })
+                    }} onClick={() => {
+                      const { componentTag } = this.state;
+                      onUpdateComponentTags({ id: componentTag, value: componentTag, title: componentTag });
+                    }} />
+                ) : null}
+                {cellProperties && cellProperties.properties ? (
                   <ButtonList
                     active
                     isSelected={item => {
@@ -765,36 +806,12 @@ class LayoutView extends Component {
                       }
                       return false;
                     }}
-                    items={Object.keys(ComponentTags).map(x => ({
+                    items={[...(cellProperties.properties.tags || []), ...Object.keys(ComponentTags)].unique().map(x => ({
                       id: x,
                       value: x,
                       title: x
                     }))}
-                    onClick={item => {
-                      const layout =
-                        UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||
-                        CreateLayout();
-
-                      cellProperties.properties.tags =
-                        cellProperties.properties.tags || [];
-                      if (
-                        cellProperties.properties.tags.find(
-                          v => v === item.value
-                        )
-                      ) {
-                        const index = cellProperties.properties.tags.findIndex(
-                          v => v === item.value
-                        );
-                        cellProperties.properties.tags.splice(index, 1);
-                      } else {
-                        cellProperties.properties.tags.push(item.value);
-                      }
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }}
+                    onClick={onUpdateComponentTags}
                   />
                 ) : null}
               </Box>
@@ -812,14 +829,14 @@ class LayoutView extends Component {
                 {this.getStyleSelect()}
                 {cellStyle
                   ? this.selectedStyle(value => {
-                      cellStyle[this.state.selectedStyleKey] = value;
-                      const layout = nodeLayout || CreateLayout();
-                      this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                        prop: UIA.NodeProperties.Layout,
-                        id: currentNode.id,
-                        value: layout
-                      });
-                    }, cellStyle[this.state.selectedStyleKey])
+                    cellStyle[this.state.selectedStyleKey] = value;
+                    const layout = nodeLayout || CreateLayout();
+                    this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                      prop: UIA.NodeProperties.Layout,
+                      id: currentNode.id,
+                      value: layout
+                    });
+                  }, cellStyle[this.state.selectedStyleKey])
                   : null}
                 {cellStyle ? this.getCurrentStyling(cellStyle) : null}
               </Box>
@@ -869,18 +886,18 @@ class LayoutView extends Component {
           {Object.keys(StyleLib.js)
             .filter(x => x.indexOf(this.state.filter) !== -1)
             .map(key => (
-                <li
-                  className="treeview"
-                  style={{ padding: 3, cursor: "pointer" }}
-                  label="Style"
-                  key={key}
-                  onClick={() => {
-                    this.setState({ selectedStyleKey: key, filter: "" });
-                  }}
-                >
-                  {key}
-                </li>
-              ))}
+              <li
+                className="treeview"
+                style={{ padding: 3, cursor: "pointer" }}
+                label="Style"
+                key={key}
+                onClick={() => {
+                  this.setState({ selectedStyleKey: key, filter: "" });
+                }}
+              >
+                {key}
+              </li>
+            ))}
         </ul>
       );
     }
@@ -892,17 +909,17 @@ class LayoutView extends Component {
       return (
         <ul style={{ padding: 2, maxHeight: 200, overflowY: "auto" }}>
           {Object.keys(currentStyle).map(key => (
-              <li
-                className="treeview"
-                style={{ padding: 3, cursor: "pointer" }}
-                key={key}
-                onClick={() => {
-                  this.setState({ selectedStyleKey: key, filter: "" });
-                }}
-              >
-                [{key}]: {currentStyle[key]}
-              </li>
-            ))}
+            <li
+              className="treeview"
+              style={{ padding: 3, cursor: "pointer" }}
+              key={key}
+              onClick={() => {
+                this.setState({ selectedStyleKey: key, filter: "" });
+              }}
+            >
+              [{key}]: {currentStyle[key]}
+            </li>
+          ))}
         </ul>
       );
     }

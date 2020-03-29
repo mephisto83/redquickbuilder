@@ -19,6 +19,7 @@ export const StyleTags = {
 
 export const ComponentTags = {
   Self: "Self",
+  Container: "Container",
   MainMenu: "MainMenu",
   Main: "Main",
   SideContainer: "SideContainer",

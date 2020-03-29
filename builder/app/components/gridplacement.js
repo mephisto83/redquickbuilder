@@ -14,24 +14,25 @@ class GridPlacement extends Component {
     super(props);
     this.state = {};
   }
+
   render() {
-    let currentNode = this.props.node;
-    let tags =
+    const currentNode = this.props.node;
+    const tags =
       UIA.GetNodeProp(
         currentNode,
         this.props.property || NodeProperties.GridAreas
       ) || [];
-    let cellStyle = UIA.GetNodeProp(currentNode, NodeProperties.Style) || {};
-    if (cellStyle && !cellStyle["gridTemplateColumns"]) {
+    const cellStyle = UIA.GetNodeProp(currentNode, NodeProperties.Style) || {};
+    if (cellStyle && !cellStyle.gridTemplateColumns) {
       return <div />;
     }
-    let gridColumns = cellStyle["gridTemplateColumns"];
-    let gridRowCount = parseInt(
+    const gridColumns = cellStyle.gridTemplateColumns;
+    const gridRowCount = parseInt(
       UIA.GetNodeProp(currentNode, NodeProperties.GridRowCount) || 1,
       10
     );
-    let columns = gridColumns.split(" ").filter(x => x);
-    let square = {
+    const columns = gridColumns.split(" ").filter(x => x);
+    const square = {
       display: "flex",
       flex: 1,
       height: 24,
@@ -39,7 +40,7 @@ class GridPlacement extends Component {
       ...(this.state.currentSection ? { cursor: "pointer" } : {})
     };
 
-    let gridplacement =
+    const gridplacement =
       UIA.GetNodeProp(currentNode, NodeProperties.GridPlacement) ||
       [].interpolate(0, 100, t => "");
 
@@ -55,9 +56,9 @@ class GridPlacement extends Component {
           }}
         />
         <div style={{ paddingBottom: 5 }}>
-          <div className={"btn-group"}>
+          <div className="btn-group">
             <button
-              className={"btn btn-default bg-olive btn-flat"}
+              className="btn btn-default bg-olive btn-flat"
               onClick={() => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop:
@@ -68,21 +69,19 @@ class GridPlacement extends Component {
                 });
               }}
             >
-              <i className={"fa  fa-times"} />
+              <i className="fa  fa-times" />
             </button>
           </div>
         </div>
         <div style={{ display: "flex", flex: "1", flexDirection: "column" }}>
-          {[].interpolate(0, gridRowCount, row => {
-            return (
+          {[].interpolate(0, gridRowCount, row => (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "row"
                 }}
               >
-                {columns.map((_, col) => {
-                  return (
+                {columns.map((_, col) => (
                     <div
                       title={gridplacement[row * columns.length + col]}
                       style={{
@@ -116,11 +115,9 @@ class GridPlacement extends Component {
                         }
                       }}
                     />
-                  );
-                })}{" "}
+                  ))}{" "}
               </div>
-            );
-          })}
+            ))}
         </div>
       </div>
     );

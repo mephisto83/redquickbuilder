@@ -30,7 +30,7 @@ export default class TextInput extends Component {
   componentDidUpdate(prevProps) {
     if (!this.immediate()) {
       if (!this.state.focused)
-        if (this.state.value !== prevProps.value) {
+        if (this.state.value !== this.props.value) {
           this.setState({ value: this.props.value });
         }
     }

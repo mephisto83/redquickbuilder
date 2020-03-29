@@ -58,7 +58,7 @@ export default class Box extends Component {
             {this.title()}
           </h3>
         </div>
-        {this.props.onSearch ? (<div className="box-header">
+        {this.props.onSearch && !this.state.open ? (<div className="box-header">
           <TextInput slim placeholder={'search'} immediate value={this.state.search} onChange={val => {
             this.setState({ search: val })
             this.props.onSearch(val);
