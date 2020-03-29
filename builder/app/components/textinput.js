@@ -105,7 +105,7 @@ export default class TextInput extends Component {
     }
     return (
       <div className={this.props.inputgroup ? "input-group" : "form-group"}>
-        {this.props.inputgroup ? null : <label>{this.label()}</label>}
+        {this.props.inputgroup || this.props.slim ? null : <label>{this.label()}</label>}
         <input
           type={this.inputType || "text"}
           disabled={this.disabled()}

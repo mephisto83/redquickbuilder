@@ -534,17 +534,17 @@ function generateReactNative(workspace, state) {
   });
 }
 function generateElectronIO(workspace, state) {
-  const code_types = [...Object.values(ReactNativeTypes)];
+  const codeTypes = [...Object.values(ReactNativeTypes)];
 
-  code_types.map(code_type => {
+  codeTypes.map(codeType => {
     const temp = Generator.generate({
-      type: code_type,
+      type: codeType,
       language: UITypes.ElectronIO,
       state
     });
 
-    for (const fileName in temp) {
-      let relative = temp[fileName].relative;
+    Object.keys(temp).map(fileName => {
+      let { relative } = temp[fileName];
       relative = relative.replace("src", "app");
       ensureDirectory(path.join(workspace, relative));
       console.log(
@@ -554,7 +554,7 @@ function generateElectronIO(workspace, state) {
         path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
         temp[fileName].template
       );
-    }
+    });
   });
 }
 function clearElectronIOTheme(workspace, state) {
@@ -563,7 +563,7 @@ function clearElectronIOTheme(workspace, state) {
     language: UITypes.ElectronIO
   });
   const toClear = [];
-  results.forEach(result => {
+  results.filter(x => !x.userDefined).forEach(result => {
     if (result.theme) {
       toClear.push(path.join(workspace, result.themerelative || result.relative))
     }
@@ -579,22 +579,32 @@ function generateElectronIOTheme(workspace, state) {
     language: UITypes.ElectronIO
   });
   results.forEach(result => {
-
-    if (result.location) {
-      generateFolderStructure(
-        path.join(`${result.location}`),
-        {},
-        null,
-        path.join(workspace, result.relative)
+    if (result.userDefined) {
+      writeFileSync(
+        path.join(
+          workspace,
+          result.relative
+        ),
+        result.theme
       );
     }
-    if (result.theme) {
-      generateFolderStructure(
-        path.join(`${result.theme}`),
-        {},
-        null,
-        path.join(workspace, result.themerelative || result.relative)
-      );
+    else {
+      if (result.location) {
+        generateFolderStructure(
+          path.join(`${result.location}`),
+          {},
+          null,
+          path.join(workspace, result.relative)
+        );
+      }
+      if (result.theme) {
+        generateFolderStructure(
+          path.join(`${result.theme}`),
+          {},
+          null,
+          path.join(workspace, result.themerelative || result.relative)
+        );
+      }
     }
   });
 }

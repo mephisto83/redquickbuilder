@@ -86,6 +86,7 @@ export const StyleLib = {
     overflow: "overflow",
     padding: "padding",
     "padding-bottom": "paddingBottom",
+    "box-shadow": "boxShadow",
     "padding-left": "paddingLeft",
     "padding-right": "paddingRight",
     "padding-top": "paddingTop",
@@ -103,6 +104,7 @@ export const StyleLib = {
     "vertical-align": "verticalAlign",
     visibility: "visibility",
     width: "width",
+    transition: 'transition',
     "z-index": "zIndex"
   },
   js: {},

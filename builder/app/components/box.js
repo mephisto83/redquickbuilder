@@ -1,30 +1,37 @@
 // @flow
 import React, { Component } from "react";
+import TextInput from "./textinput";
 
 export default class Box extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
+
   label() {
     return this.props.label || "{label}";
   }
+
   value() {
     return this.props.value || "";
   }
+
   title() {
     return this.props.title || "{title}";
   }
+
   primary() {
     return this.props.primary ? "box-primary" : "";
   }
+
   backgroundColor() {
     return this.props.backgroundColor ? this.props.backgroundColor : "";
   }
+
   render() {
-    var style = {};
-    var styleAll = {};
-    var maxStyle = {};
+    const style = {};
+    const styleAll = {};
+    const maxStyle = {};
     if (this.props.maxheight) {
       style.maxHeight = `${this.props.maxheight}px`;
       style.overflowY = "auto";
@@ -51,6 +58,12 @@ export default class Box extends Component {
             {this.title()}
           </h3>
         </div>
+        {this.props.onSearch ? (<div className="box-header">
+          <TextInput slim placeholder={'search'} immediate value={this.state.search} onChange={val => {
+            this.setState({ search: val })
+            this.props.onSearch(val);
+          }} />
+        </div>) : null}
         <div className="box-body" style={{ ...styleAll, ...style }}>
           {this.state.open ? null : this.props.children}
         </div>

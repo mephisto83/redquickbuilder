@@ -131,6 +131,22 @@ export const SpaceThemePropertyKeys = {
 export const FormThemePropertyKeys = {
 }
 
+export const CssPseudoSelectors = {
+  [":active"]: ":active",
+  ["::before"]: "::before",
+  ["::after"]: "::after",
+  [":checked"]: ":checked",
+  [":disabled"]: ":disabled",
+  [":empty"]: ":empty",
+  [":hover"]: ":hover",
+  [":enabled"]: ":enabled",
+  [":first-child"]: ":first-child",
+  [':required']: ':required',
+  [":last-child"]: ":last-child",
+  [":focus"]: ":focus",
+  [":read-only"]: ":read-only",
+}
+
 const cssProperties = Object.keys({ ...StyleLib.css }).map(v => {
   if (typeof v === 'object') {
     return v;
