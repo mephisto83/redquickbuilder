@@ -1,22 +1,12 @@
 // @flow
 import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
-import ControlSideBarMenu, {
-  ControlSideBarMenuItem,
-  ControlSideBarMenuHeader
-} from "./controlsidebarmenu";
 import * as UIA from "../actions/uiactions";
-import TabPane from "./tabpane";
 import * as Titles from "./titles";
-import FormControl from "./formcontrol";
 import CheckBox from "./checkbox";
-import SelectInput from "./selectinput";
 import ButtonList from "./buttonlist";
 import TextBox from "./textinput";
-import SideMenuContainer from "./sidemenucontainer";
-import { NodeTypes, NodeProperties, UITypes } from "../constants/nodetypes";
-import { GetNode, GetAllChildren } from "../methods/graph_methods";
-import { clipboard } from "electron";
+import { UITypes } from "../constants/nodetypes";
 import {
   GetSpecificModels,
   GetAllModels,
@@ -26,25 +16,23 @@ import {
   CreateAgentFunction
 } from "../constants/nodepackages";
 import TreeViewMenu from "./treeviewmenu";
-import { PARAMETER_TAB } from "./dashboard";
 import SideBar from "./sidebar";
 import SideBarMenu from "./sidebarmenu";
 import MainSideBar from "./mainsidebar";
 import {
-  FunctionTypes,
   MethodFunctions,
   HTTP_METHODS
 } from "../constants/functiontypes";
 import BatchMenu from "./batchmenu";
 import AgentBasedMethods from "./agentbasedmethods";
-import HomeView from "../nodepacks/HomeView";
 import GetProjectUrlsDataChain from "../nodepacks/GetProjectUrlsDataChain";
 import temppack from "../nodepacks/temppack";
 import CreateDashboard_1 from "../nodepacks/CreateDashboard_1";
 import CreateConfiguration from "../nodepacks/CreateConfiguration";
-import CreateFetchParameters from "../nodepacks/CreateFetchParameters";
 import CreateFetchServiceIdempotently from "../nodepacks/CreateFetchServiceIdempotently";
 import { ViewTypes } from "../constants/viewtypes";
+import CreateViewTypes from "../nodepacks/batch/CreateViewTypes";
+import BuildAll from "../nodepacks/batch/buildAll";
 
 class QuickMethods extends Component<any, any, any> {
   constructor(props) {
@@ -53,40 +41,37 @@ class QuickMethods extends Component<any, any, any> {
       selectedMethods: {}
     };
   }
-  render() {
-    var { state } = this.props;
-    let sharedcontrolkey = "View Package Shared Control";
-    let use_as_default = "Use As Default Shared Component";
-    let use_as_plural = "Create Components for 1 to Many Relationships";
 
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+  render() {
+    const { state } = this.props;
+    const sharedcontrolkey = "View Package Shared Control";
+    const use_as_default = "Use As Default Shared Component";
+    const use_as_plural = "Create Components for 1 to Many Relationships";
+
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     function getChosenChildren() {
-      let chosenChildren = UIA.GetModelPropertyChildren(currentNode.id)
-        .filter(child => {
-          return UIA.Visual(state, UIA.ChoseModel(child.id));
-        })
+      const chosenChildren = UIA.GetModelPropertyChildren(currentNode.id)
+        .filter(child => UIA.Visual(state, UIA.ChoseModel(child.id)))
         .map(x => x.id);
       return chosenChildren;
     }
-    let defaultParameters = function(title) {
-      return {
-        viewName: UIA.Visual(state, "View Package Title"),
-        isSharedComponent: UIA.Visual(state, sharedcontrolkey),
-        isDefaultComponent:
-          UIA.Visual(state, sharedcontrolkey) &&
-          UIA.Visual(state, use_as_default),
-        isPluralComponent:
-          UIA.Visual(state, sharedcontrolkey) &&
-          UIA.Visual(state, use_as_plural),
-        uiTypes: {
-          [UITypes.ReactNative]: UIA.Visual(state, UITypes.ReactNative),
-          [UITypes.ElectronIO]: UIA.Visual(state, UITypes.ElectronIO),
-          [UITypes.VR]: UIA.Visual(state, UITypes.VR),
-          [UITypes.Web]: UIA.Visual(state, UITypes.Web)
-        },
-        chosenChildren: getChosenChildren()
-      };
-    };
+    const defaultParameters = () => ({
+      viewName: UIA.Visual(state, "View Package Title"),
+      isSharedComponent: UIA.Visual(state, sharedcontrolkey),
+      isDefaultComponent:
+        UIA.Visual(state, sharedcontrolkey) &&
+        UIA.Visual(state, use_as_default),
+      isPluralComponent:
+        UIA.Visual(state, sharedcontrolkey) &&
+        UIA.Visual(state, use_as_plural),
+      uiTypes: {
+        [UITypes.ReactNative]: UIA.Visual(state, UITypes.ReactNative),
+        [UITypes.ElectronIO]: UIA.Visual(state, UITypes.ElectronIO),
+        [UITypes.VR]: UIA.Visual(state, UITypes.VR),
+        [UITypes.Web]: UIA.Visual(state, UITypes.Web)
+      },
+      chosenChildren: getChosenChildren()
+    });
     return (
       <MainSideBar relative>
         <SideBar relative style={{ paddingTop: 0 }}>
@@ -98,7 +83,7 @@ class QuickMethods extends Component<any, any, any> {
               toggle={() => {
                 this.props.toggleVisual(Titles.QuickMethods);
               }}
-              icon={"fa fa-tag"}
+              icon="fa fa-tag"
             >
               <TreeViewMenu
                 title={Titles.UIParameters}
@@ -107,13 +92,13 @@ class QuickMethods extends Component<any, any, any> {
                 toggle={() => {
                   this.props.toggleVisual(Titles.UIParameters);
                 }}
-                icon={"fa fa-tag"}
+                icon="fa fa-tag"
               >
                 <BatchMenu />
                 <TreeViewMenu
-                  hideArrow
-                  title={"Create Model by Agent"}
-                  icon={"fa fa-plus"}
+
+                  title="Create Model by Agent"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.executeGraphOperation(currentNode, {
                       type: UIA.Visual(state, UIA.BATCH_FUNCTION_NAME),
@@ -154,23 +139,23 @@ class QuickMethods extends Component<any, any, any> {
                 toggle={() => {
                   this.props.toggleVisual(Titles.AgentBaseMethods);
                 }}
-                icon={"fa fa-tag"}
+                icon="fa fa-tag"
               >
                 <AgentBasedMethods />
               </TreeViewMenu>
               <TreeViewMenu
-                title={"More Commands"}
+                title="More Commands"
                 open={UIA.Visual(state, "More Commands")}
                 active
                 toggle={() => {
                   this.props.toggleVisual("More Commands");
                 }}
-                icon={"fa fa-tag"}
+                icon="fa fa-tag"
               >
                 <TreeViewMenu
-                  hideArrow
+
                   title={GetSpecificModels.type}
-                  icon={"fa fa-plus"}
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.executeGraphOperation(
                       currentNode,
@@ -179,59 +164,59 @@ class QuickMethods extends Component<any, any, any> {
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
-                  title={"Get Project Urls Data Chain"}
-                  icon={"fa fa-plus"}
+
+                  title="Get Project Urls Data Chain"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.graphOperation(GetProjectUrlsDataChain());
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
-                  title={"Test Command"}
-                  icon={"fa fa-plus"}
+
+                  title="Test Command"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.graphOperation(temppack());
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
+
                   title={GetAllModels.type}
-                  icon={"fa fa-plus"}
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.executeGraphOperation(currentNode, GetAllModels);
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
-                  title={"Create Dashboard 1"}
-                  icon={"fa fa-plus"}
+
+                  title="Create Dashboard 1"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.graphOperation(CreateDashboard_1());
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
-                  title={"Create Fetch Service"}
-                  icon={"fa fa-plus"}
+
+                  title="Create Fetch Service"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.graphOperation(CreateFetchServiceIdempotently());
                   }}
                 />
 
                 <TreeViewMenu
-                  hideArrow
-                  title={"Create Configuration"}
-                  icon={"fa fa-plus"}
+
+                  title="Create Configuration"
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.graphOperation(CreateConfiguration());
                   }}
                 />
 
                 <TreeViewMenu
-                  hideArrow
+
                   title={CreateLoginModels.type}
-                  icon={"fa fa-plus"}
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.executeGraphOperation(
                       currentNode,
@@ -244,11 +229,26 @@ class QuickMethods extends Component<any, any, any> {
                   }}
                 />
                 <TreeViewMenu
-                  hideArrow
+
                   title={AddAgentUser.type}
-                  icon={"fa fa-plus"}
+                  icon="fa fa-plus"
                   onClick={() => {
                     this.props.executeGraphOperation(currentNode, AddAgentUser);
+                  }}
+                />
+                <TreeViewMenu
+                  title={CreateViewTypes.title}
+                  icon="fa fa-plus"
+                  onClick={() => {
+                    this.props.graphOperation(CreateViewTypes());
+                  }}
+                />
+                <TreeViewMenu
+                  title={BuildAll.title}
+                  icon="fa fa-plus"
+                  onClick={() => {
+                    this.props.setState();
+                    this.props.graphOperation(BuildAll());
                   }}
                 />
               </TreeViewMenu>
@@ -259,7 +259,7 @@ class QuickMethods extends Component<any, any, any> {
                 toggle={() => {
                   this.props.toggleVisual(CreateDefaultView.type);
                 }}
-                icon={"fa fa-tag"}
+                icon="fa fa-tag"
               >
                 {/* <TextBox label={'View Package'} value={this.props.Visual(state, 'View Package Title')} onChange={(val) => {
                                     this.props.setVisual('View Package Title', val);
@@ -322,13 +322,13 @@ class QuickMethods extends Component<any, any, any> {
                       `${Titles.NodeProperties} quick method`
                     );
                   }}
-                  icon={"fa fa-tag"}
+                  icon="fa fa-tag"
                 >
                   {UIA.GetModelPropertyChildren(
                     currentNode ? currentNode.id : null
-                  ).map(child => {
+                  ).map(child =>
                     // Could use something besides a VISUAL for this.
-                    return (
+                    (
                       <CheckBox
                         label={UIA.GetNodeTitle(child)}
                         key={child.id}
@@ -337,16 +337,14 @@ class QuickMethods extends Component<any, any, any> {
                           this.props.setVisual(UIA.ChoseModel(child.id), value);
                         }}
                       />
-                    );
-                  })}
+                    )
+                  )}
                 </TreeViewMenu>
                 <div style={{ paddingRight: 10 }}>
                   <h4>Methods</h4>
                   <ButtonList
                     active
-                    isSelected={item => {
-                      return this.state.selectedMethods[item.value];
-                    }}
+                    isSelected={item => this.state.selectedMethods[item.value]}
                     items={Object.keys(ViewTypes).map(x => ({
                       id: x,
                       value: x,
@@ -367,28 +365,10 @@ class QuickMethods extends Component<any, any, any> {
                     type="button"
                     className="btn btn-block btn-success btn-sm"
                     onClick={() => {
-                      var operations = [];
-                      let viewName =
+                      const operations = [];
+                      const viewName =
                         `${UIA.Visual(state, "View Package Title") || ""}` ||
                         UIA.GetNodeTitle(currentNode);
-                      let res = [
-                        ViewTypes.Create,
-                        ViewTypes.Update,
-                        ViewTypes.Delete,
-                        ViewTypes.Get
-                      ]
-                        .filter(x => this.state.selectedMethods[x])
-                        .map(t => {
-                          operations.push({
-                            node: currentNode,
-                            method: CreateDefaultView,
-                            options: {
-                              ...defaultParameters(),
-                              viewName: `${viewName} ${t}`,
-                              viewType: t
-                            }
-                          });
-                        });
                       if (this.state.selectedMethods[ViewTypes.GetAll]) {
                         operations.push({
                           node: currentNode,

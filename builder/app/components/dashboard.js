@@ -484,9 +484,6 @@ class Dashboard extends Component {
             title: Titles.ChildLink
           }, {
             onClick: () => {
-              // this.props.setVisual(CONNECTING_NODE, {
-              // 	autoConnectViewType: currentNode.id
-              // });
               this.props.graphOperation([{
                 operation: UIA.ADD_NEW_NODE,
                 options() {
@@ -817,7 +814,6 @@ class Dashboard extends Component {
     const result = [];
     const { state } = this.props;
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    const me = this;
     result.push({
       onClick: () => {
         this.props.setVisual(CONNECTING_NODE, {
@@ -1383,6 +1379,7 @@ class Dashboard extends Component {
                           const func = DataChainContextMethods[properties.context].bind(this);
                           func(currentNode, nodeId);
                           break;
+                        default: break;
                       }
                     }
                     else {
