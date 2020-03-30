@@ -18,18 +18,18 @@ import { InstanceTypes } from "../constants/componenttypes";
 import { addNewLine } from "../utils/array";
 
 export function GetPropertyConsts(id, language = UITypes.ReactNative) {
-  let node = GetNodeById(id);
-  let layout = GetNodeProp(node, NodeProperties.Layout);
-  let components = GetNodeComponents(layout);
+  const node = GetNodeById(id);
+  const layout = GetNodeProp(node, NodeProperties.Layout);
+  const components = GetNodeComponents(layout);
   return components.map(ConvertViewTypeToComponentNode).unique();
 }
 
 export function GetModelConsts(id, language = UITypes.ReactNative) {
-  let node = GetNodeById(id);
-  let layout = GetNodeProp(node, NodeProperties.Layout);
+  const node = GetNodeById(id);
+  const layout = GetNodeProp(node, NodeProperties.Layout);
   return GetNodeComponentsKeys(layout)
     .map(cell => {
-      let cellProperties = GetCellProperties(layout, cell);
+      const cellProperties = GetCellProperties(layout, cell);
 
       if (cellProperties && cellProperties.cellModel) {
         return cellProperties.cellModel[cell];
@@ -41,12 +41,12 @@ export function GetModelConsts(id, language = UITypes.ReactNative) {
 }
 
 export function GetModelPropertyConsts(id, language = UITypes.ReactNative) {
-  let node = GetNodeById(id);
-  let layout = GetNodeProp(node, NodeProperties.Layout);
+  const node = GetNodeById(id);
+  const layout = GetNodeProp(node, NodeProperties.Layout);
   return GetNodeComponentsKeys(layout)
     .map(cell => {
-      //console.log(cell);
-      let cellProperties = GetCellProperties(layout, cell);
+      // console.log(cell);
+      const cellProperties = GetCellProperties(layout, cell);
       // console.log(cellProperties);
 
       if (cellProperties && cellProperties.cellModelProperty) {
@@ -59,16 +59,16 @@ export function GetModelPropertyConsts(id, language = UITypes.ReactNative) {
 }
 
 export function GetRNModelInstances(id) {
-  let node = GetNodeById(id);
-  let layout = GetNodeProp(node, NodeProperties.Layout);
-  let componentProperties = GetNodeProp(
+  const node = GetNodeById(id);
+  const layout = GetNodeProp(node, NodeProperties.Layout);
+  const componentProperties = GetNodeProp(
     node,
     NodeProperties.ComponentProperties
   );
   return GetNodeComponentsKeys(layout)
     .map(cell => {
       // console.log(componentProperties);
-      let cellProperties = GetCellProperties(layout, cell);
+      const cellProperties = GetCellProperties(layout, cell);
       // console.log(cellProperties);
       // let loginModel = GetScreenInstance(state, ScreenInstances.LoginForm, const_loginModel) || CreateDefaultLoginModel();
       if (
@@ -76,7 +76,7 @@ export function GetRNModelInstances(id) {
         cellProperties.cellModel &&
         cellProperties.cellModel[cell]
       ) {
-        let instanceType = getComponentProperty(
+        const instanceType = getComponentProperty(
           componentProperties,
           cellProperties.cellModel[cell],
           "instanceTypes"
@@ -98,24 +98,18 @@ export function GetRNModelInstances(id) {
 }
 
 export function GetRNConsts(id) {
-  let prop_consts = []; // GetPropertyConsts(id);
-  let model_consts = []; // GetModelConsts(id);
-  let model_propconsts = []; //GetModelPropertyConsts(id);
+  const prop_consts = []; // GetPropertyConsts(id);
+  const model_consts = []; // GetModelConsts(id);
+  const model_propconsts = []; // GetModelPropertyConsts(id);
 
   return [
-    ...prop_consts.map(x => {
-      return `const const_${(GetCodeName(x) || "").toJavascriptName()} = '${(
-        GetCodeName(x) || ""
-      ).toJavascriptName()}';`;
-    }),
-    ...model_consts.map(x => {
-      return GetRNModelConst(x);
-    }),
-    ...model_propconsts.map(x => {
-      return `const const_${(GetCodeName(x) || "").toJavascriptName()} = '${(
-        GetCodeName(x) || ""
-      ).toJavascriptName()}';`;
-    })
+    ...prop_consts.map(x => `const const_${(GetCodeName(x) || "").toJavascriptName()} = '${(
+      GetCodeName(x) || ""
+    ).toJavascriptName()}';`),
+    ...model_consts.map(x => GetRNModelConst(x)),
+    ...model_propconsts.map(x => `const const_${(GetCodeName(x) || "").toJavascriptName()} = '${(
+      GetCodeName(x) || ""
+    ).toJavascriptName()}';`)
   ];
 }
 
@@ -133,7 +127,7 @@ export function GetNodeComponents(layoutObj, item, currentRoot) {
   if (!layoutObj) {
     return imports;
   }
-  let { layout, properties } = layoutObj;
+  const { layout, properties } = layoutObj;
   if (!currentRoot) {
     currentRoot = layout;
   }
@@ -144,7 +138,7 @@ export function GetNodeComponents(layoutObj, item, currentRoot) {
       ...GetNodeComponents(layoutObj, item, currentRoot[item])
     ];
     if (properties[item]) {
-      let children = properties[item].children || {};
+      const children = properties[item].children || {};
       if (children[item]) imports.push(children[item]);
     }
   });
@@ -157,7 +151,7 @@ export function GetNodeComponentsKeys(layoutObj, item, currentRoot) {
     return imports;
   }
 
-  let { layout, properties } = layoutObj;
+  const { layout, properties } = layoutObj;
   if (!currentRoot) {
     currentRoot = layout;
   }
@@ -168,7 +162,7 @@ export function GetNodeComponentsKeys(layoutObj, item, currentRoot) {
       ...GetNodeComponentsKeys(layoutObj, item, currentRoot[item])
     ];
     if (properties[item]) {
-      let children = properties[item].children || {};
+      const children = properties[item].children || {};
       if (children[item]) imports.push(item);
     }
   });
@@ -186,8 +180,8 @@ export function buildLayoutTree(args) {
     css,
     section = "section"
   } = args;
-  let result = [];
-  let { layout, properties } = layoutObj;
+  const result = [];
+  const { layout, properties } = layoutObj;
   if (!currentRoot) {
     currentRoot = layout;
   }
@@ -217,7 +211,7 @@ export function buildLayoutTree(args) {
   return result;
 }
 export function createSection(args) {
-  let {
+  const {
     layoutObj,
     item,
     currentRoot,
@@ -228,13 +222,13 @@ export function createSection(args) {
     section,
     css
   } = args;
-  let { properties } = layoutObj;
-  let style = properties[item].style || {};
-  let children = properties[item].children || {};
-  let cellModel = properties[item].cellModel || {};
-  let cellRoot = (properties[item].cellRoot = {});
-  let layoutProperties = properties[item].properties || {};
-  let cellModelProperty = properties[item].cellModelProperty || {};
+  const { properties } = layoutObj;
+  const style = properties[item].style || {};
+  const children = properties[item].children || {};
+  const cellModel = properties[item].cellModel || {};
+  const cellRoot = (properties[item].cellRoot = {});
+  const layoutProperties = properties[item].properties || {};
+  const cellModelProperty = properties[item].cellModelProperty || {};
   let tree = Object.keys(currentRoot).length
     ? buildLayoutTree({
       layoutObj,
@@ -261,7 +255,7 @@ export function createSection(args) {
     ];
   }
 
-  let _style = { ...style };
+  const _style = { ...style };
   ["borderStyle", "borderWidth", "borderColor"].map(t => {
     delete _style[t];
   });
@@ -270,6 +264,9 @@ export function createSection(args) {
       delete _style[t];
     }
   });
+  if (layoutProperties && layoutProperties.tags && layoutProperties.tags.length) {
+    _style.gridArea = layoutProperties.tags[0];
+  }
   css[section] = { style: { ..._style } };
   let control = "View";
   let className = "";
@@ -286,10 +283,10 @@ export function createSection(args) {
           control = GetNodeProp(node, NodeProperties.ComponentType);
           break;
         default:
-          let nodeType = GetNodeProp(node, NodeProperties.NODEType);
-          let isScreenOption = nodeType === NodeTypes.ScreenOption;
+          const nodeType = GetNodeProp(node, NodeProperties.NODEType);
+          const isScreenOption = nodeType === NodeTypes.ScreenOption;
           if (isScreenOption) {
-            control = "Content";
+            control = "div";
           }
           break;
       }
@@ -304,9 +301,7 @@ export function createSection(args) {
         ) {
           tagclasses = layoutProperties.tags.join(' ');
           tagBasedStyles = layoutProperties.tags
-            .map(tag => {
-              return GetStylesFor(node, tag).join(' ');
-            })
+            .map(tag => GetStylesFor(node, tag).join(' '))
             .filter(x => x).join(' ');
         }
         className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;

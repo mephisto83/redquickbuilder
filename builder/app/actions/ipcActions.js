@@ -4,7 +4,7 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/param-names */
 /* eslint-disable compat/compat */
-import fs from "fs";
+import fs, { readFileSync } from "fs";
 import path from "path";
 import { writeFileSync } from "fs";
 import { platform } from "os";
@@ -573,6 +573,16 @@ function clearElectronIOTheme(workspace, state) {
   });
 
 }
+function handleLinkStyles(result, workspace) {
+  const appHtml = readFileSync(path.join(workspace, './app/app.html'), 'utf8');
+  const linkInsert = '<!--link-insert>';
+  const linkInsertEnd = '<!--link-insert-end>';
+  if (appHtml.indexOf(linkInsert) !== -1) {
+    const inserHtml = `${linkInsert}${result.styleLink}${linkInsertEnd}</head>`;
+    appHtml.replace('</head>', inserHtml);
+    writeFileSync(path.join(workspace, './app/app.html'), 'utf8');
+  }
+}
 function generateElectronIOTheme(workspace, state) {
   const results = ThemeServiceGenerator.Generate({
     state,
@@ -587,6 +597,7 @@ function generateElectronIOTheme(workspace, state) {
         ),
         result.theme
       );
+      handleLinkStyles(result, workspace);
     }
     else {
       if (result.location) {

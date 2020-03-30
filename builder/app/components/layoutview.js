@@ -36,6 +36,7 @@ import {
 } from "../constants/componenttypes";
 import FormControl from "./formcontrol";
 import { StyleLib } from "../constants/styles";
+import Typeahead from "./typeahead";
 
 class LayoutView extends Component {
   constructor(props) {
@@ -760,7 +761,7 @@ class LayoutView extends Component {
               </Box>
               <Box maxheight={350} title={Titles.Properties}>
                 {cellProperties && cellProperties.properties ? (
-                  <SelectInput
+                  <Typeahead
                     options={["Content", "Container", "View"].map(t => ({
                       title: t,
                       value: t

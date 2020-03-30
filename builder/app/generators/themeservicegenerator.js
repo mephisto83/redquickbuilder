@@ -15,6 +15,7 @@ function GenerateGlobalCss(options) {
   const graph = GetCurrentGraph(state);
   let result = {};
   let theme = '';
+  let fontStyleLink = '';
   if (graph) {
     const {
       themeColors = {},
@@ -62,8 +63,13 @@ function GenerateGlobalCss(options) {
     let fontCssDef = '';
     if (themeFonts) {
       themeFonts.fonts.forEach(fontInfo => {
-        const { font, fontCssVar, fontCss } = fontInfo;
+        const { font, fontCssVar, fontCss, fontName } = fontInfo;
         fontLinks += ` @import url('${font}');${NEW_LINE}`;
+        fontStyleLink += `<link href="'${font}'" rel="stylesheet">${NEW_LINE}`;
+        fontLinks += `@font-face {
+          font-family: "${fontName}";
+          src: url(${font});
+        }${NEW_LINE}`
         fontCssDef += `${fontCssVar}: ${fontCss};${NEW_LINE}`;
       });
     }
@@ -116,13 +122,13 @@ function GenerateGlobalCss(options) {
       const gpRules = themeGridPlacements.grids.map(gridSetup => {
         const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
         if (mediaSizes[mq]) {
-          const rowCount = gridTemplateColumns.split(' ').filter(x => x).length;
-          const columnCount = gridTemplateRows.split(' ').filter(x => x).length;
+          const columnCount = gridTemplateColumns.split(' ').filter(x => x).length;
+          const rowCount = gridTemplateRows.split(' ').filter(x => x).length;
           const areas = [].interpolate(0, rowCount, row => {
             const rowArea = [];
             [].interpolate(0, columnCount, col => {
               let area = gridPlacement[row * columnCount + col];
-              if (!area) {
+              if (!area || !area.trim()) {
                 area = '.';
               }
               rowArea.push(area);
@@ -131,6 +137,7 @@ function GenerateGlobalCss(options) {
           });
           return `
         .${name} {
+          display: grid !important;
           grid-template-columns: ${gridTemplateColumns};
           grid-template-rows: ${gridTemplateRows};
           grid-template-areas:
@@ -138,7 +145,7 @@ ${areas.join(NEW_LINE)}
         };
 `;
         }
-      }).filter(x => x);
+      }).filter(x => x).join(NEW_LINE);
       return `
       ${MediaQueries[mq]} {
         ${gpRules}
@@ -166,7 +173,8 @@ ${areas.join(NEW_LINE)}
   result = {
     theme,
     userDefined: true,
-    relative: "./app/app.global.css"
+    relative: "./app/app.global.css",
+    styleLink: fontStyleLink
   };
 
   return result;

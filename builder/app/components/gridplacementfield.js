@@ -28,7 +28,7 @@ export default class GridPlacementField extends Component {
     const currentNode = this.props.node;
     const tags = this.props.tags || [];
     const gridSetup = this.props.gridSetup || {};
-    const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement } = gridSetup;
+    const { gridTemplateColumns = "", gridTemplateRows = "", name = "", mediaSizes = {}, gridPlacement } = gridSetup;
     const gridRowCount = gridTemplateRows ? gridTemplateRows.split(' ').filter(x => x).length || 1 : 1;
     const columns = gridTemplateColumns.split(" ").filter(x => x);
     const square = {
@@ -45,6 +45,16 @@ export default class GridPlacementField extends Component {
     return (
       <div className="row">
         <div className="col-md-3">
+          <TextInput
+            label={Titles.Name}
+            title={Titles.Name}
+            value={name}
+            onChange={value => {
+              this.props.onChange({
+                ...gridSetup,
+                name: value
+              })
+            }} />
           <TextInput
             label={Titles.GridTemplateColumns}
             title={Titles.GridTemplateColumns}

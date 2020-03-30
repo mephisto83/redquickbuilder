@@ -403,6 +403,15 @@ class ThemeView extends Component {
                   <Box maxheight={350} title={Titles.Fonts}>
                     <FormControl>
                       <TextInput
+                        value={this.state.fontName}
+                        label={`${Titles.Font} ${Titles.Name}`}
+                        title={`${Titles.Font} ${Titles.Name}`}
+                        immediate
+                        onChange={(value) => {
+                          this.setState({ fontName: value })
+                        }} />
+
+                      <TextInput
                         value={this.state.font}
                         label={Titles.Font}
                         title={Titles.Font}
@@ -437,13 +446,14 @@ class ThemeView extends Component {
                           />
                         </div>
                       </div>
-                      {this.state.font && this.state.fontCss && this.state.fontCssVar ? <button onClick={() => {
+                      {this.state.font && this.state.fontCss && this.state.fontName && this.state.fontCssVar ? <button onClick={() => {
                         if (this.state.font && this.state.fontCss && this.state.fontCssVar) {
                           themeFonts.fonts = [{
                             font: this.state.font,
                             fontCss: this.state.fontCss,
-                            fontCssVar: this.state.fontCssVar
-                          }, ...themeFonts.fonts].unique(v => v.font);
+                            fontCssVar: this.state.fontCssVar,
+                            fontName: this.state.fontName
+                          }, ...themeFonts.fonts].unique(v => v.font + v.fontName);
                           this.props.updateGraph('themeFonts', { ...themeFonts });
                           this.setState({ font: '' })
                         }
@@ -451,14 +461,27 @@ class ThemeView extends Component {
                       <ButtonList
                         active
                         items={themeFonts.fonts.map(v => ({ title: v.font, id: v.font, ...v }))}
-                        renderItem={(item) => (<div>
-                          <h4 style={{ margin: 0 }}>{item.font}</h4>
-                          <h5 style={{ margin: 0 }}>{item.fontCss}</h5>
-                          <h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
+                        renderItem={(item) => (<div className="col-md-12" style={{
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <div className="col-md-10" >
+                            <h5 style={{ margin: 0 }}>{item.font}</h5>
+                            <h5 style={{ margin: 0 }}>{item.fontCss}</h5>
+                            <h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
+                            <h6 style={{ margin: 0 }}>{item.fontName}</h6>
+                          </div>
+                          <div className="col-md-2">
+                            <button className="btn btn-default btn-flat" onClick={() => {
+                              themeFonts.fonts = themeFonts.fonts.filter(x => x.font !== item.id);
+                              this.props.updateGraph('themeFonts', { ...themeFonts })
+                            }}><i className="fa fa-times" /></button>
+                          </div>
                         </div>)}
                         onClick={item => {
-                          themeFonts.fonts = themeFonts.fonts.filter(x => x.font !== item.id);
-                          this.props.updateGraph('themeFonts', { ...themeFonts })
+                          this.setState({
+                            ...item
+                          })
                         }}
                       />
                     </FormControl>
@@ -499,13 +522,22 @@ class ThemeView extends Component {
                       <ButtonList
                         active
                         items={themeVariables.variables.map(v => ({ title: v.variable, id: v.variable, ...v }))}
-                        renderItem={(item) => (<div>
-                          <h4 style={{ margin: 0 }}>{item.variable}</h4>
-                          <h6 style={{ margin: 0 }}>{item.variableValue}</h6>
+                        renderItem={(item) => (<div className="col-md-12" style={{
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <div className="col-md-10" >
+                            <h5 style={{ margin: 0 }}>{item.variable}</h5>
+                            <h6 style={{ margin: 0 }}>{item.variableValue}</h6>
+                          </div>
+                          <div className="col-md-2">
+                            <button className="btn btn-default btn-flat" onClick={() => {
+                              themeVariables.variables = themeVariables.variables.filter(x => x.variable !== item.id);
+                              this.props.updateGraph('themeVariables', { ...themeVariables })
+                            }}><i className="fa fa-times" /></button>
+                          </div>
                         </div>)}
-                        onClick={item => {
-                          themeVariables.variables = themeVariables.variables.filter(x => x.variable !== item.id);
-                          this.props.updateGraph('themeVariables', { ...themeVariables })
+                        onClick={() => {
                         }}
                       />
                     </FormControl>
@@ -544,7 +576,7 @@ class ThemeView extends Component {
                 <FormControl>
                   <SelectInput
                     options={Object.keys(ComponentTags).map(v => ({ title: v, value: v, id: v }))}
-                    label={'Spaces'}
+                    label="Spaces"
                     onChange={(value) => {
                       this.setState({ componentTag: value })
                     }}
@@ -563,7 +595,7 @@ class ThemeView extends Component {
                 <FormControl>
                   <SelectInput
                     options={HTMLElementGroups.map(v => ({ title: v.name, value: v.name, id: v.name }))}
-                    label={'Section Types'}
+                    label="Section Types"
                     onChange={(value) => {
                       this.setState({ sectionType: value })
                     }}
@@ -633,7 +665,7 @@ class ThemeView extends Component {
                           ...themeGridPlacements,
                           grids: themeGridPlacements.grids
                         });
-                      }}><i className={"fa fa-times"} /></button>
+                      }}><i className="fa fa-times" /></button>
                     </div>
                   </div>)}
                   onClick={item => {
