@@ -1706,10 +1706,10 @@ export const CreateDefaultView = {
           CreatePagingSkipDataChains();
           CreatePagingTakeDataChains();
         }
-        let pageViewModel = null;
-        if (!isSharedComponent) {
-          pageViewModel = CreateScreenModel(viewName);
-        }
+        // let pageViewModel = null;
+        // if (!isSharedComponent) {
+        //   pageViewModel = CreateScreenModel(viewName);
+        // }
         PerformGraphOperation(
           [
             !isSharedComponent

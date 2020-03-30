@@ -716,7 +716,7 @@ export function GetJSCodeName(node) {
 
 export function GetModelPropertyChildren(id, options = {}) {
   const { skipLogicalChildren } = options;
-  const property_nodes = GetModelPropertyNodes(id);
+  const propertyNodes = GetModelPropertyNodes(id);
   const logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
   let userModels = [];
   if (
@@ -725,7 +725,7 @@ export function GetModelPropertyChildren(id, options = {}) {
   ) {
     userModels = GetUserReferenceNodes(id);
   }
-  return [...userModels, ...property_nodes, ...logicalChildren].filter(
+  return [...userModels, ...propertyNodes, ...logicalChildren].filter(
     x => x.id !== id
   );
 }
