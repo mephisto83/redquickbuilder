@@ -369,6 +369,24 @@ class QuickMethods extends Component<any, any, any> {
                       const viewName =
                         `${UIA.Visual(state, "View Package Title") || ""}` ||
                         UIA.GetNodeTitle(currentNode);
+                      [
+                        ViewTypes.Create,
+                        ViewTypes.Update,
+                        ViewTypes.Delete,
+                        ViewTypes.Get
+                      ]
+                        .filter(x => this.state.selectedMethods[x])
+                        .map(t => {
+                          operations.push({
+                            node: currentNode,
+                            method: CreateDefaultView,
+                            options: {
+                              ...defaultParameters(),
+                              viewName: `${viewName} ${t}`,
+                              viewType: t
+                            }
+                          });
+                        });
                       if (this.state.selectedMethods[ViewTypes.GetAll]) {
                         operations.push({
                           node: currentNode,

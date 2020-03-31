@@ -11,12 +11,16 @@ export default function BuildAll() {
 
   result.push(...CreateViewTypes());
 
-  result.push(...AddAgentMethods());
-
-  result.push(...CreateComponentAll());
 
   result.push(() => {
-    setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+    setTimeout(() => {
+
+      AddAgentMethods();
+
+      CreateComponentAll();
+      setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+
+    }, 1000);
     return {
       operation: NO_OP,
       options() {

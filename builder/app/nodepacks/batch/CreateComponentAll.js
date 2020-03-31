@@ -1,21 +1,22 @@
 import { UITypes, NodeProperties, NodeTypes } from "../../constants/nodetypes";
 import { ViewTypes } from "../../constants/viewtypes";
-import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType } from "../../actions/uiactions";
+import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType, GetNodeById } from "../../actions/uiactions";
 import { CreateDefaultView } from '../../constants/nodepackages';
 
 export default function CreateComponentAll() {
   const result = [];
   const models = NodesByType(null, NodeTypes.Model)
+    .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
     .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
-  models.forEach(v => {
-    result.push(...CreateComponentModel({ model: v.id }));
-  });
   models.forEach(v => {
     result.push(...CreateComponentModel({
       model: v.id,
       isSharedComponent: true,
       isDefaultComponent: true
     }));
+  });
+  models.forEach(v => {
+    result.push(...CreateComponentModel({ model: v.id }));
   });
   return result;
 }
@@ -35,11 +36,11 @@ export function CreateComponentModel(args = {}) {
   const operations = [];
   const result = [];
   viewTypes.forEach(viewType => {
-    const viewName = `${args.isSharedComponent ? 'Component View' : 'Screen'} ${GetNodeTitle(model)} ${viewType}`;
+    const viewName = `${args.isSharedComponent ? 'Shared' : ''} ${GetNodeTitle(model)} ${viewType}`;
     const properties = GetModelPropertyChildren(model)
       .filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
     operations.push({
-      node: model,
+      node: GetNodeById(model),
       method: CreateDefaultView,
       options: {
         ...defaultParameters({
@@ -50,10 +51,10 @@ export function CreateComponentModel(args = {}) {
           viewName
         }),
         viewType,
-        isList: viewType === ViewTypes.GetAll
-      },
-      chosenChildren: properties
-        .map(v => v.id)
+        isList: viewType === ViewTypes.GetAll,
+        chosenChildren: properties
+          .map(v => v.id)
+      }
     });
   })
   if (operations.length) {
@@ -66,9 +67,6 @@ export function CreateComponentModel(args = {}) {
 
 function defaultParameters(args = {}) {
   const {
-    isDefaultComponent = false,
-    isPluralComponent = false,
-    isSharedComponent = false,
     viewName = null,
     uiTypes = {
       [UITypes.ReactNative]: false,
@@ -78,10 +76,8 @@ function defaultParameters(args = {}) {
     }, chosenChildren = []
   } = args;
   return {
+    ...args,
     viewName,
-    isSharedComponent,
-    isDefaultComponent,
-    isPluralComponent,
     uiTypes,
     chosenChildren
   }

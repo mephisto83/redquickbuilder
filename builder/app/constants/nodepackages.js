@@ -90,7 +90,6 @@ import {
   SHARED_COMPONENT_API,
   GENERAL_COMPONENT_API,
   SCREEN_COMPONENT_EVENTS,
-  ComponentEvents,
   PropertyApiList,
   ApiProperty,
   ComponentApiTypes,
@@ -112,8 +111,6 @@ import PostAuthenticate from "../nodepacks/PostAuthenticate";
 import HomeView from "../nodepacks/HomeView";
 import AddNavigateBackHandler from "../nodepacks/AddNavigateBackHandler";
 import CreateSelectorToDataChainSelectorDC from "../nodepacks/CreateSelectorToDataChainSelectorDC";
-import AttributeSuccess from "../nodepacks/AttributeSuccess";
-import AttributeError from "../nodepacks/AttributeError";
 import ConnectListViewModelToExternalViewModel from "../nodepacks/ConnectListViewModelToExternalViewModel";
 import LoadModel from "../nodepacks/LoadModel";
 import ConnectLifecycleMethodToDataChain from "../nodepacks/ConnectLifecycleMethodToDataChain";
@@ -1606,17 +1603,20 @@ export const CreateDefaultView = {
         viewName,
         isList,
       } = args;
+      let { model } = args;
       const {
         viewType,
         isDefaultComponent,
         uiType = UITypes.ReactNative,
         isSharedComponent,
         isPluralComponent,
-        model,
         chosenChildren = []
       } = args;
 
       const state = GetState();
+      if (typeof model === 'string') {
+        model = GetNodeById(model);
+      }
       const currentNode = model || Node(state, Visual(state, SELECTED_NODE));
       let screenNodeId = null;
       let screenComponentId = null;
@@ -1626,11 +1626,8 @@ export const CreateDefaultView = {
       const modelComponentSelectors = [];
       let layout = null;
       let listLayout = null;
-      const viewModelNodeDirtyId = null;
       const viewModelNodeFocusId = null;
       const viewModelNodeBlurId = null;
-      const viewModelNodeFocusedId = null;
-      let viewModelNodeId = null;
       const createConnections = [];
       const createListConnections = [];
       viewName = viewName || GetNodeTitle(currentNode);
@@ -1706,10 +1703,10 @@ export const CreateDefaultView = {
           CreatePagingSkipDataChains();
           CreatePagingTakeDataChains();
         }
-        // let pageViewModel = null;
-        // if (!isSharedComponent) {
-        //   pageViewModel = CreateScreenModel(viewName);
-        // }
+        let pageViewModel = null;
+        if (!isSharedComponent) {
+          pageViewModel = CreateScreenModel(viewName);
+        }
         PerformGraphOperation(
           [
             !isSharedComponent
@@ -3661,7 +3658,6 @@ export const CreateDefaultView = {
 
           const compNodeId = childComponents[propertyIndex];
 
-          const compNode = GetNodeById(compNodeId);
 
           const rootCellId = GetFirstCell(layout);
           const children = GetChildren(layout, rootCellId);
@@ -5451,35 +5447,35 @@ function setupPropertyApi(args) {
         switch (apiProperty) {
           case ApiProperty.Success:
             return [];
-            // return [
-            //   ...AttributeSuccess({
-            //     model: currentNode.id,
-            //     property: modelProperty.id,
-            //     propertyName: GetNodeTitle(modelProperty),
-            //     viewName,
-            //     uiType,
-            //     callback: context => {
-            //       _context = context;
-            //       apiDataChainLists[apiProperty] = _context.entry;
-            //     }
-            //   })
-            // ];
+          // return [
+          //   ...AttributeSuccess({
+          //     model: currentNode.id,
+          //     property: modelProperty.id,
+          //     propertyName: GetNodeTitle(modelProperty),
+          //     viewName,
+          //     uiType,
+          //     callback: context => {
+          //       _context = context;
+          //       apiDataChainLists[apiProperty] = _context.entry;
+          //     }
+          //   })
+          // ];
           case ApiProperty.Error:
             return [];
-            // return [
-            //   ...AttributeError({
-            //     model: currentNode.id,
-            //     property: modelProperty.id,
-            //     propertyName: `${viewName} ${GetNodeTitle(
-            //       modelProperty
-            //     )} ${uiType}`,
-            //     viewName,
-            //     callback: context => {
-            //       _context = context;
-            //       apiDataChainLists[apiProperty] = _context.entry;
-            //     }
-            //   })
-            // ];
+          // return [
+          //   ...AttributeError({
+          //     model: currentNode.id,
+          //     property: modelProperty.id,
+          //     propertyName: `${viewName} ${GetNodeTitle(
+          //       modelProperty
+          //     )} ${uiType}`,
+          //     viewName,
+          //     callback: context => {
+          //       _context = context;
+          //       apiDataChainLists[apiProperty] = _context.entry;
+          //     }
+          //   })
+          // ];
           default: break;
         }
         return [
