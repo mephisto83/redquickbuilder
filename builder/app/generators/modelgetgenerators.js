@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 import * as GraphMethods from '../methods/graph_methods';
 import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph } from '../actions/uiactions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NEW_LINE, ConstantsDeclaration, MakeConstant, NameSpace, STANDARD_CONTROLLER_USING, ValidationCases, STANDARD_TEST_USING, Methods, ExecutorRules } from '../constants/nodetypes';
@@ -16,36 +18,39 @@ const TEST_CLASS = './app/templates/tests/tests.tpl';
 
 export default class ModelGetGenerator {
     static enumerateValidationTestVectors(validation_test_vectors) {
-        var vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
+        const vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
 
-        var enumeration = ModelGetGenerator.EnumerateCases(vects);
+        const enumeration = ModelGetGenerator.EnumerateCases(vects);
         return enumeration;
     }
+
     static EnumerateCases(vects, j = 0) {
         return enumerate(vects, j);
     }
+
     static Tabs(c) {
         let res = '';
-        for (var i = 0; i < c; i++) {
+        for (let i = 0; i < c; i++) {
             res += `    `;
         }
         return res;
     }
-    static Generate(options) {
-        var { state, key } = options;
-        let graphRoot = GetRootGraph(state);
-        let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
-        let graph = GetRootGraph(state);
-        let result = {};
 
-        let _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf8');
-        let _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf8');
-        let _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
-        let _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
-        let allmodels = NodesByType(state, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
+    static Generate(options) {
+        const { state, key } = options;
+        const graphRoot = GetRootGraph(state);
+        const namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+        const graph = GetRootGraph(state);
+        const result = {};
+
+        const _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf8');
+        const _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf8');
+        const _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
+        const _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
+        const allmodels = NodesByType(state, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
         .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
         allmodels.filter(x => !GetNodeProp(x, NodeProperties.IsCompositeInput)).map(agent => {
-            var methods = allmodels.filter(x => x.id !== agent.id)
+            const methods = allmodels.filter(x => x.id !== agent.id)
                 .filter(x => {
                     if (GetNodeProp(agent, NodeProperties.HasLogicalChildren) && (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []).some(v => v === x.id)) {
                         if (!GetNodeProp(agent, NodeProperties.ManyToManyNexus))
@@ -62,20 +67,20 @@ export default class ModelGetGenerator {
                 });
 
             if (GetNodeProp(agent, NodeProperties.ManyToManyNexus)) {
-                var childrenTypes = (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []);
+                const childrenTypes = (GetNodeProp(agent, NodeProperties.LogicalChildrenTypes) || []);
                 if (childrenTypes && childrenTypes.length) {
-                    let namesAreUnique = childrenTypes.map(t => GetNodeProp(GraphMethods.GetNode(graph, t), NodeProperties.CodeName)).unique(x => x).length === childrenTypes.length;
+                    const namesAreUnique = childrenTypes.map(t => GetNodeProp(GraphMethods.GetNode(graph, t), NodeProperties.CodeName)).unique(x => x).length === childrenTypes.length;
                     childrenTypes.map(ct => {
                         methods.push(bindTemplate(_get_method_many_to_many_get_child, {
                             model: GetNodeProp(GraphMethods.GetNode(graph, ct), NodeProperties.CodeName),
                             many_to_many: GetNodeProp(agent, NodeProperties.CodeName)
                         }));
                     })
-                    enumerate([].interpolate(0, childrenTypes.length, function () {
+                    enumerate([].interpolate(0, childrenTypes.length, () => {
                         return childrenTypes.length + 1;
                     })).filter(x => x.length === x.unique(t => t).length)
-                        .map(model => {
-                            let params = model.subset(0, model.length).map((t, index) => {
+                        .forEach(model => {
+                            const params = model.subset(0, model.length).map((t, index) => {
                                 if (childrenTypes.length === t) {
                                     return false;
                                 }
@@ -100,7 +105,7 @@ export default class ModelGetGenerator {
                                             paramName = GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName).toLowerCase();
                                         }
 
-                                        return bindTemplate(`item != null && ${paramName} != null && item.{{_type}} == ${paramName}.Id`, {
+                                        return bindTemplate(`item != null && ${paramName} != null && ${paramName}.{{_type}}.Any(v => v == item.Id)`, {
                                             _type: GetNodeProp(GraphMethods.GetNode(graph, childrenTypes[t]), NodeProperties.CodeName)
                                         })
                                     }).filter(x => x).join(' && '),//
@@ -110,7 +115,7 @@ export default class ModelGetGenerator {
                         });
                 }
             }
-            let templateRes = bindTemplate(_get_class, {
+            const templateRes = bindTemplate(_get_class, {
                 agent_type: GetNodeProp(agent, NodeProperties.CodeName),
                 functions: methods.unique(x => x).join(NEW_LINE)
             });

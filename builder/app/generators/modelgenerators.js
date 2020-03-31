@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import * as GraphMethods from "../methods/graph_methods";
 import {
   GetNodeProp,
@@ -8,7 +9,9 @@ import {
   NEW_LINK,
   GetCurrentGraph,
   GetCodeName,
-  GetModelPropertyChildren
+  GetModelPropertyChildren,
+  GetLinkProperty,
+  GetNodeType
 } from "../actions/uiactions";
 import {
   LinkType,
@@ -19,7 +22,9 @@ import {
   NameSpace,
   NodeTypes,
   STANDARD_CONTROLLER_USING,
-  NEW_LINE
+  NEW_LINE,
+  LinkProperties,
+  LinkPropertyKeys
 } from "../constants/nodetypes";
 import fs from "fs";
 import { bindTemplate } from "../constants/functiontypes";
@@ -30,14 +35,14 @@ const MODEL_STATIC_TEMPLATES = "./app/templates/models/model_statics.tpl";
 const MODEL_ATTRIBUTE_TEMPLATE = "./app/templates/models/model_attributes.tpl";
 export default class ModelGenerator {
   static Generate(options) {
-    var { state, key } = options;
-    let graphRoot = GetRootGraph(state);
-    let models = NodesByType(state, NodeTypes.Model)
+    const { state } = options;
+    const graphRoot = GetRootGraph(state);
+    const models = NodesByType(state, NodeTypes.Model)
       .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController))
       .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
-    let result = {};
+    const result = {};
     models.map(model => {
-      var res = ModelGenerator.GenerateModel({
+      const res = ModelGenerator.GenerateModel({
         graph: graphRoot,
         nodeId: model.id,
         state
@@ -47,17 +52,17 @@ export default class ModelGenerator {
 
     return result;
   }
+
   static GenerateModel(options) {
-    var { state, graph, nodeId } = options;
-    var key = nodeId;
-    var usings = [];
-    var templateSwapDictionary = {};
-    let graphRoot = GetRootGraph(state);
-    let namespace = graphRoot
+    const { state, graph, nodeId } = options;
+    const usings = [];
+    const templateSwapDictionary = {};
+    const graphRoot = GetRootGraph(state);
+    const namespace = graphRoot
       ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
       : null;
 
-    var node = GraphMethods.GetNode(graph, nodeId);
+    const node = GraphMethods.GetNode(graph, nodeId);
     if (!node) {
       return null;
     }
@@ -87,25 +92,27 @@ export default class ModelGenerator {
         }`;
     }
     templateSwapDictionary.attributes = "";
-    var connectedProperties = GraphMethods.getNodesByLinkType(graph, {
-      id: node.id,
-      type: LinkType.PropertyLink,
-      direction: GraphMethods.SOURCE
-    });
-    let logicalParents = GraphMethods.getNodesByLinkType(graph, {
-      id: node.id,
-      type: LinkType.LogicalChildren,
-      direction: GraphMethods.TARGET
-    }).filter(x => x.id !== node.id);
+    let connectedProperties = GetModelPropertyChildren(node.id); //Get all properties including link to other models
+    //  GraphMethods.getNodesByLinkType(graph, {
+    //   id: node.id,
+    //   type: LinkType.PropertyLink,
+    //   direction: GraphMethods.SOURCE
+    // });
+    const logicalParents = [];// No more having parents referencing back.
+    //  GraphMethods.getNodesByLinkType(graph, {
+    //   id: node.id,
+    //   type: LinkType.LogicalChildren,
+    //   direction: GraphMethods.TARGET
+    // }).filter(x => x.id !== node.id);
     connectedProperties = [...connectedProperties, ...logicalParents];
-    let propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, "utf8");
-    let attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, "utf8");
-    let staticFunctionTemplate = fs.readFileSync(
+    const propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, "utf8");
+    const attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, "utf8");
+    const staticFunctionTemplate = fs.readFileSync(
       MODEL_STATIC_TEMPLATES,
       "utf8"
     );
 
-    let validatorFunctions = GraphMethods.getNodesByLinkType(graph, {
+    const validatorFunctions = GraphMethods.getNodesByLinkType(graph, {
       id: nodeId,
       type: LinkType.ValidatorModel,
       direction: GraphMethods.TARGET
@@ -115,18 +122,18 @@ export default class ModelGenerator {
       .join("");
     templateSwapDictionary.attributes = validatorFunctions;
 
-    let staticFunctions = [];
-    let properties = connectedProperties
+    const staticFunctions = [];
+    const properties = connectedProperties
       .filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
       .filter(x => x.id !== nodeId)
       .map(propNode => {
-        var connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
+        const connectedAttributes = GraphMethods.getNodesByLinkType(graph, {
           id: propNode.id,
           type: LinkType.AttributeLink,
           direction: GraphMethods.SOURCE
         });
-        let property_instance_template = propertyTemplate;
-        let np =
+        let propertyInstanceTemplate = propertyTemplate;
+        const np =
           GetNodeProp(propNode, NodeProperties.UIAttributeType) ||
           NodePropertyTypes.STRING;
         if (Usings[ProgrammingLanguages.CSHARP][np]) {
@@ -138,8 +145,9 @@ export default class ModelGenerator {
         }
         let propType =
           NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][np];
+
         if (GetNodeProp(propNode, NodeProperties.IsTypeList)) {
-          let types = GraphMethods.GetNodesLinkedTo(graph, {
+          const types = GraphMethods.GetNodesLinkedTo(graph, {
             id: propNode.id,
             link: LinkType.ModelTypeLink
           });
@@ -152,7 +160,26 @@ export default class ModelGenerator {
         } else if (
           GetNodeProp(propNode, NodeProperties.NODEType) === NodeTypes.Model
         ) {
-          propType = "string";
+          let propLink = GraphMethods.GetLinkBetween(nodeId, propNode.id, graph);
+          if (propLink) {
+            switch (GetLinkProperty(propLink, LinkPropertyKeys.TYPE)) {
+              case LinkType.UserLink:
+                throw new Error('unhandled');
+              default:
+                propType = "IList<string>"; // changed from string => ilist<string> cause we are keeping references with the model.
+                break;
+            }
+          }
+          else {
+            propLink = GraphMethods.GetLinkBetween(propNode.id, nodeId, graph);
+            switch (GetLinkProperty(propLink, LinkPropertyKeys.TYPE)) {
+              case LinkType.UserLink:
+                propType = 'string';
+                return false;
+              default:
+                throw new Error('unhandled');
+            }
+          }
         }
         if (GetNodeProp(propNode, NodeProperties.UseModelAsType)) {
           if (GetNodeProp(propNode, NodeProperties.IsReferenceList)) {
@@ -160,43 +187,43 @@ export default class ModelGenerator {
           }
         }
 
-        let propSwapDictionary = {
+        const propSwapDictionary = {
           model: GetNodeProp(node, NodeProperties.CodeName),
           property_type: propType,
           property: GetNodeProp(propNode, NodeProperties.CodeName),
           attributes: connectedAttributes
             .map(attr => {
-              var options_lists = GraphMethods.getNodesByLinkType(graph, {
+              const optionLists = GraphMethods.getNodesByLinkType(graph, {
                 id: attr.id,
                 type: LinkType.Option,
                 direction: GraphMethods.SOURCE
               });
-              let options_list = [];
-              options_lists.map(ol => {
-                var ols = GraphMethods.getNodesByLinkType(graph, {
+              let optionsList = [];
+              optionLists.map(ol => {
+                const ols = GraphMethods.getNodesByLinkType(graph, {
                   id: ol.id,
                   type: LinkType.OptionItem,
                   direction: GraphMethods.SOURCE
                 });
                 ols.map(_ols => {
                   if (GetNodeProp(_ols, NodeProperties.UseCustomUIOption)) {
-                    options_list.push(
+                    optionsList.push(
                       GetNodeProp(_ols, NodeProperties.UIOptionTypeCustom)
                     );
                   } else {
-                    options_list.push(
+                    optionsList.push(
                       GetNodeProp(_ols, NodeProperties.UIOptionType)
                     );
                   }
                 });
               });
-              options_list = options_list.unique().map(t => `UIAttribute.${t}`);
+              optionsList = optionsList.unique().map(t => `UIAttribute.${t}`);
 
-              var ReverseRules = {};
-              Object.keys(ValidationRules).map(_key => {
-                ReverseRules[ValidationRules[_key]] = _key;
+              const ReverseRules = {};
+              Object.keys(ValidationRules).forEach(ruleKey => {
+                ReverseRules[ValidationRules[ruleKey]] = ruleKey;
               });
-              var validations = [];
+              const validations = [];
               if (GetNodeProp(attr, NodeProperties.UseUIValidations)) {
                 GraphMethods.getNodesByLinkType(graph, {
                   id: attr.id,
@@ -210,56 +237,55 @@ export default class ModelGenerator {
                   }).map(vnodeItem => {
                     validations.push(
                       `ValidationRules.${
-                        ReverseRules[
-                          GetNodeProp(
-                            vnodeItem,
-                            NodeProperties.UIValidationType
-                          )
-                        ]
+                      ReverseRules[
+                      GetNodeProp(
+                        vnodeItem,
+                        NodeProperties.UIValidationType
+                      )
+                      ]
                       }`
                     );
                   });
                 });
               }
-              let choice_name = null;
+              let choiceName = null;
               if (GetNodeProp(attr, NodeProperties.UIExtensionList)) {
                 GraphMethods.getNodesByLinkType(graph, {
                   id: attr.id,
                   type: LinkType.Extension,
                   direction: GraphMethods.SOURCE
                 }).map(vnode => {
-                  choice_name = GetNodeProp(vnode, NodeProperties.CodeName);
+                  choiceName = GetNodeProp(vnode, NodeProperties.CodeName);
                 });
               }
 
-              let options =
-                options_list && options_list.length
+              const options2 =
+                optionsList && optionsList.length
                   ? bindTemplate(
-                      `Options = new string[] { {{options_list}} },`,
-                      {
-                        options_list: options_list.map(t => `${t}`).join(", ")
-                      }
-                    )
+                    `Options = new string[] { {{options_list}} },`,
+                    {
+                      options_list: optionsList.map(t => `${t}`).join(", ")
+                    }
+                  )
                   : "";
 
-              let validation_rules =
+              const validationRules =
                 validations && validations.length
                   ? bindTemplate(
-                      `ValidationRules = new string[] { {{validation_list}} },`,
-                      {
-                        validation_list: validations.map(t => `${t}`).join(", ")
-                      }
-                    )
+                    `ValidationRules = new string[] { {{validation_list}} },`,
+                    {
+                      validation_list: validations.map(t => `${t}`).join(", ")
+                    }
+                  )
                   : "";
 
-              let choice_type_list = [];
-              let choice_type = choice_name
+              const choiceType = choiceName
                 ? bindTemplate("ChoiceType = {{choice_type}}.Name,", {
-                    choice_type: choice_name
-                  })
+                  choice_type: choiceName
+                })
                 : "";
 
-              let attributeSwapDictionary = {
+              const attributeSwapDictionary = {
                 property: GetNodeProp(propNode, NodeProperties.CodeName),
                 property_type: GetNodeProp(
                   propNode,
@@ -271,34 +297,33 @@ export default class ModelGenerator {
                 singular: GetNodeProp(propNode, NodeProperties.UISingular)
                   ? "true"
                   : "false",
-                options,
-                choice_type,
-                validation_rules
+                options: options2,
+                choice_type: choiceType,
+                validation_rules: validationRules
               };
-              if (attr && attr.uiValidationType) {
-              }
+
               return bindTemplate(attributeTemplate, attributeSwapDictionary);
             })
             .filter(x => x)
             .join("\r\n")
         };
 
-        property_instance_template = bindTemplate(
-          property_instance_template,
+        propertyInstanceTemplate = bindTemplate(
+          propertyInstanceTemplate,
           propSwapDictionary
         );
-        return property_instance_template;
-      });
+        return propertyInstanceTemplate;
+      }).filter(x => x);
     if (
       GetNodeProp(node, NodeProperties.HasLogicalChildren) &&
       GetNodeProp(node, NodeProperties.ManyToManyNexus)
     ) {
       (GetNodeProp(node, NodeProperties.LogicalChildrenTypes) || []).map(t => {
-        let propNode = GraphMethods.GetNode(GetCurrentGraph(state), t);
-        let propSwapDictionary = {
+        const propNode = GraphMethods.GetNode(GetCurrentGraph(state), t);
+        const propSwapDictionary = {
           property_type:
             NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][
-              NodePropertyTypes.STRING
+            NodePropertyTypes.STRING
             ],
           property: GetNodeProp(propNode, NodeProperties.CodeName),
           attributes: ""
@@ -308,15 +333,21 @@ export default class ModelGenerator {
       });
     }
 
-    let staticDic = {
+    const staticDic = {
       model: GetNodeProp(node, NodeProperties.CodeName)
     };
 
-    let _properties = GetModelPropertyChildren(node.id, {
-      skipLogicalChildren: true
+    const _properties = GetModelPropertyChildren(node.id, {
+      skipLogicalChildren: false // now we are switching to references being held with the object.
     })
       .map(v => {
-        let propType = GetNodeProp(v, NodeProperties.UIAttributeType);
+        const propType = GetNodeProp(v, NodeProperties.UIAttributeType);
+        const nodeType = GetNodeType(v);
+        if (nodeType === NodeTypes.Model) {
+          return `if(a.${GetCodeName(v)} == null || a.${GetCodeName(v)}.Count == 0) {
+            model.${GetCodeName(v)} = b.${GetCodeName(v)};
+          }`;
+        }
         switch (propType) {
           case NodePropertyTypes.STRING:
             return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
@@ -339,7 +370,9 @@ export default class ModelGenerator {
             return `if(a.${GetCodeName(v)} == 0){
                   model.${GetCodeName(v)} = b.${GetCodeName(v)};
                 }`;
+          default: break;
         }
+        return null;
       })
       .filter(x => x)
       .join(NEW_LINE);
@@ -348,24 +381,24 @@ export default class ModelGenerator {
     staticFunctions.push(bindTemplate(staticFunctionTemplate, staticDic));
 
     if (GetNodeProp(node, NodeProperties.IsUser)) {
-      var agenNodes = NodesByType(state, NodeTypes.Model).filter(
+      const agenNodes = NodesByType(state, NodeTypes.Model).filter(
         x => x.id !== node.id && GetNodeProp(x, NodeProperties.IsAgent)
       );
       agenNodes.map(agent => {
-        let property_instance_template = propertyTemplate;
-        let propSwapDictionary = {
+        let propertyInstanceTemplate = propertyTemplate;
+        const propSwapDictionary = {
           property_type:
             NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][
-              NodePropertyTypes.STRING
+            NodePropertyTypes.STRING
             ],
           property: GetNodeProp(agent, NodeProperties.CodeName),
           attributes: ""
         };
-        property_instance_template = bindTemplate(
-          property_instance_template,
+        propertyInstanceTemplate = bindTemplate(
+          propertyInstanceTemplate,
           propSwapDictionary
         );
-        properties.push(property_instance_template);
+        properties.push(propertyInstanceTemplate);
       });
     }
     templateSwapDictionary.properties = properties.join("");
@@ -376,7 +409,7 @@ export default class ModelGenerator {
     let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, "utf8");
     modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
-    var result = {
+    const result = {
       id: GetNodeProp(node, NodeProperties.CodeName),
       name: GetNodeProp(node, NodeProperties.CodeName),
       template: NamespaceGenerator.Generate({
@@ -392,11 +425,12 @@ export default class ModelGenerator {
     };
     return result;
   }
+
   static tabs(c) {
     let res = "";
-    var TAB = "\t";
-    for (var i = 0; i < c; i++) {
-      res = res + TAB;
+    const TAB = "\t";
+    for (let i = 0; i < c; i++) {
+      res += TAB;
     }
     return res;
   }

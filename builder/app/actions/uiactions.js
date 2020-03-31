@@ -176,6 +176,9 @@ export function GetNodeProp(node, prop, currentGraph) {
   }
   return node && node.properties && node.properties[prop];
 }
+export function GetNodeType(node, graph) {
+  return GetNodeProp(node, NodeProperties.NODEType, graph)
+}
 
 export function GetNodePropDirty(node, prop, currentGraph) {
   if (typeof node === "string") {
@@ -735,7 +738,7 @@ export function GetModelPropertyChildren(id, options = {}) {
   }
   return [...userModels, ...propertyNodes, ...logicalChildren].filter(
     x => x.id !== id
-  );
+  ).unique(v => v.id);
 }
 export function GetMethodParameters(methodId) {
   const method = GetNodeById(methodId);

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import * as GraphMethods from "../methods/graph_methods";
 import {
   GetNodeProp,
@@ -43,57 +44,57 @@ const PROPERTY_TABS = 6;
 export default class ChangeParameterGenerator {
   static Tabs(c) {
     let res = "";
-    for (var i = 0; i < c; i++) {
+    for (let i = 0; i < c; i++) {
       res += TAB;
     }
     return res;
   }
+
   static Generate(options) {
-    var { state, key } = options;
-    let models = NodesByType(state, NodeTypes.Model)
+    let { state, key } = options;
+    const models = NodesByType(state, NodeTypes.Model)
       .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
       .filter(x => !GetNodeProp(x, NodeProperties.ExcludeFromController));
-    let afterEffects = NodesByType(state, NodeTypes.AfterEffect);
-    let agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
-    let graphRoot = GetRootGraph(state);
-    let namespace = graphRoot
+    const afterEffects = NodesByType(state, NodeTypes.AfterEffect);
+    const agents = models.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
+    const graphRoot = GetRootGraph(state);
+    const namespace = graphRoot
       ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
       : null;
 
-    let _testClass = fs.readFileSync(TEST_CLASS, "utf8");
-    let _streamProcessChangeClassExtension = fs.readFileSync(
+    const _testClass = fs.readFileSync(TEST_CLASS, "utf8");
+    const _streamProcessChangeClassExtension = fs.readFileSync(
       STREAM_PROCESS_CHANGE_CLASS_EXTENSION,
       "utf8"
     );
-    let _streamProcessChangeClassConstructors = fs.readFileSync(
+    const _streamProcessChangeClassConstructors = fs.readFileSync(
       STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR,
       "utf8"
     );
-    let _streamProcessChangeClassConstrictorsTest = fs.readFileSync(
+    const _streamProcessChangeClassConstrictorsTest = fs.readFileSync(
       STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS,
       "utf8"
     );
-    let result = {};
+    const result = {};
     models.map(model => {
       agents.map(agent => {
         let streamProcessChangeClassExtension = _streamProcessChangeClassExtension;
         let testClass = _testClass;
-        let properties = "";
-        let statics = "";
-        let constructors = [];
-        let tests = [];
-        let updates_with = [];
-        let staticFunctionTemplate = fs.readFileSync(
+
+        const constructors = [];
+        const tests = [];
+        const updates_with = [];
+        const staticFunctionTemplate = fs.readFileSync(
           MODEL_STATIC_TEMPLATES,
           "utf8"
         );
         afterEffects
           .filter(afterEffect => {
-            let functionType = GetNodeProp(
+            const functionType = GetNodeProp(
               afterEffect,
               NodeProperties.AfterMethod
             );
-            let setup = GetNodeProp(
+            const setup = GetNodeProp(
               afterEffect,
               NodeProperties.AfterMethodSetup
             );
@@ -102,9 +103,9 @@ export default class ChangeParameterGenerator {
               functionType &&
               setup[functionType][FunctionTemplateKeys.ModelOutput]
             ) {
-              var method = GraphMethods.GetMethodNode(state, afterEffect.id);
+              let method = GraphMethods.GetMethodNode(state, afterEffect.id);
               if (method) {
-                var valid =
+                let valid =
                   GetMethodNodeProp(
                     method,
                     setup[functionType][FunctionTemplateKeys.Agent]
@@ -119,20 +120,20 @@ export default class ChangeParameterGenerator {
             return false;
           })
           .filter(afterEffect => {
-            let functionType = GetNodeProp(
+            const functionType = GetNodeProp(
               afterEffect,
               NodeProperties.AfterMethod
             );
-            let setup = GetNodeProp(
+            const setup = GetNodeProp(
               afterEffect,
               NodeProperties.AfterMethodSetup
             );
             if (AFTER_EFFECTS[functionType] && AFTER_EFFECTS[functionType]) {
-              let methodNode = GraphMethods.GetMethodNode(
+              const methodNode = GraphMethods.GetMethodNode(
                 state,
                 afterEffect.id
               );
-              let stream_process_change_parameter =
+              const stream_process_change_parameter =
                 AFTER_EFFECTS[functionType][
                   MethodTemplateKeys.stream_process_change_parameter
                 ];
@@ -163,7 +164,7 @@ export default class ChangeParameterGenerator {
                 constructors.push(spcp_template);
               }
 
-              let update_with =
+              const update_with =
                 AFTER_EFFECTS[functionType][MethodTemplateKeys.update_with];
               if (update_with) {
                 let spcp_template = fs.readFileSync(update_with, "utf8");
@@ -212,7 +213,7 @@ export default class ChangeParameterGenerator {
             tests.push(streamProcessChangeClassConstrictorsTest);
           });
 
-        let staticDic = {
+        const staticDic = {
           property_set_merge: "",
           model: `${GetNodeProp(
             model,
@@ -238,7 +239,7 @@ export default class ChangeParameterGenerator {
           tests: tests.unique(x => x).join("")
         });
 
-        let change_param_name = `${GetNodeProp(
+        const change_param_name = `${GetNodeProp(
           model,
           NodeProperties.CodeName
         )}ChangeBy${GetNodeProp(agent, NodeProperties.CodeName)}`;
