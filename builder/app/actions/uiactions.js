@@ -196,13 +196,21 @@ export function GetSharedComponentFor(
   viewType,
   modelProperty,
   currentNodeId,
-  isPluralComponent
+  isSharedProperty
 ) {
   const graph = GetCurrentGraph(GetState());
   let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
     id: modelProperty.id
   });
 
+  let isPluralComponent;
+  const propertyNode = GetNodeById(modelProperty.id);
+  if (propertyNode && GetNodeProp(propertyNode, NodeProperties.NODEType) === NodeTypes.Model) {
+    isPluralComponent = true;
+  }
+  if (isSharedProperty) {
+    viewType = isPluralComponent ? ViewTypes.GetAll : ViewTypes.Get;
+  }
   viewTypeNodes = viewTypeNodes.filter(x => {
     let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 

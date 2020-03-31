@@ -70,7 +70,7 @@ class CurrentNodeProperties extends Component {
                 .map(key => {
                   return (
                     <TreeViewMenu
-                      title={`${key}: ${nodeProperties[key]}`}
+                      title={`${key}: ${JSON.stringify(nodeProperties[key])}`}
                       key={`component-props-${key}`}
                       hideArrow={true}
                       onClick={() => {

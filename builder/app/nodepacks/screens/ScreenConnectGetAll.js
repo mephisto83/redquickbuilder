@@ -39,7 +39,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
   }
 
   const graph = GetCurrentGraph();
-  const screen_options = GetNodesLinkedTo(graph, {
+  const screenOptions = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
   });
@@ -50,13 +50,13 @@ export default function ScreenConnectGetAll(args = { method, node }) {
     ...(viewPackages || {})
   };
 
-  screen_options.map(screen_option => {
+  screenOptions.forEach(screenOption => {
     const components = GetNodesLinkedTo(graph, {
-      id: screen_option.id,
+      id: screenOption.id,
       link: LinkType.Component
     });
 
-    components.map(component => {
+    components.forEach(component => {
       const internalComponentApi = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.ComponentInternalApi
@@ -76,7 +76,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
             ComponentApiKeys.Separators
           ].some(v => v === GetNodeTitle(x))
         )
-        .map(internal => {
+        .forEach(internal => {
           result.push(() => {
             return [
               {
@@ -210,7 +210,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           ...AppendValidations({
             subcomponents,
             component,
-            screen_option,
+            screen_option: screenOption,
             method,
             viewPackages
           })
@@ -219,7 +219,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
     });
 
     const lifeCylcleMethods = GetNodesLinkedTo(graph, {
-      id: screen_option.id,
+      id: screenOption.id,
       link: LinkType.LifeCylceMethod
     });
 

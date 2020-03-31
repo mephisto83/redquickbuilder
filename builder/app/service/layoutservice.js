@@ -21,7 +21,7 @@ export function GetPropertyConsts(id, language = UITypes.ReactNative) {
   const node = GetNodeById(id);
   const layout = GetNodeProp(node, NodeProperties.Layout);
   const components = GetNodeComponents(layout);
-  return components.map(ConvertViewTypeToComponentNode).unique();
+  return components.map(v => ConvertViewTypeToComponentNode(v, language)).unique();
 }
 
 export function GetModelConsts(id, language = UITypes.ReactNative) {
@@ -36,7 +36,7 @@ export function GetModelConsts(id, language = UITypes.ReactNative) {
       }
     })
     .filter(x => x)
-    .map(ConvertViewTypeToComponentNode)
+    .map(v => ConvertViewTypeToComponentNode(v, language))
     .unique();
 }
 
@@ -54,7 +54,7 @@ export function GetModelPropertyConsts(id, language = UITypes.ReactNative) {
       }
     })
     .filter(x => x)
-    .map(ConvertViewTypeToComponentNode)
+    .map(v => ConvertViewTypeToComponentNode(v, language))
     .unique();
 }
 

@@ -1,4 +1,4 @@
-import { NodesByType, GetNodeProp, GetNodeTitle, GetState, executeGraphOperations, GetDispatchFunc } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, GetNodeTitle, GetState, executeGraphOperations, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from "../../constants/functiontypes";
 import { CreateAgentFunction } from "../../constants/nodepackages";
@@ -26,7 +26,7 @@ export default function AddAgentMethods() {
             method: CreateAgentFunction({
               nodePackageType: functionName,
               methodType: MethodFunctions[functionType].method,
-              model: model.id,
+              model,
               agent,
               httpMethod: HTTP_METHODS.POST, //might not be used
               functionType,
@@ -39,7 +39,7 @@ export default function AddAgentMethods() {
     });
   });
 
-  executeGraphOperations(result)(GetDispatchFunc(), GetState);
+  executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
 
   return [];
 }

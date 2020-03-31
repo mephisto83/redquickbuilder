@@ -1604,18 +1604,25 @@ export const CreateDefaultView = {
         isList,
       } = args;
       let { model } = args;
+      let {
+        isPluralComponent = false } = args;
       const {
         viewType,
         isDefaultComponent,
         uiType = UITypes.ReactNative,
         isSharedComponent,
-        isPluralComponent,
+        connectedModel,
         chosenChildren = []
       } = args;
 
       const state = GetState();
       if (typeof model === 'string') {
         model = GetNodeById(model);
+      }
+      if (connectedModel) {
+        if (GetNodeProp(connectedModel, NodeProperties.NODEType) === NodeTypes.Model) {
+          isPluralComponent = true;
+        }
       }
       const currentNode = model || Node(state, Visual(state, SELECTED_NODE));
       let screenNodeId = null;
@@ -1703,10 +1710,10 @@ export const CreateDefaultView = {
           CreatePagingSkipDataChains();
           CreatePagingTakeDataChains();
         }
-        let pageViewModel = null;
-        if (!isSharedComponent) {
-          pageViewModel = CreateScreenModel(viewName);
-        }
+        // let pageViewModel = null;
+        // if (!isSharedComponent) {
+        //   pageViewModel = CreateScreenModel(viewName);
+        // }
         PerformGraphOperation(
           [
             !isSharedComponent
@@ -2067,7 +2074,7 @@ export const CreateDefaultView = {
                       newItems.listComponentId = listComponentId;
                       connectto.map(ct => {
                         createListConnections.push(
-                          function () {
+                          () => {
                             return setSharedComponent({
                               properties: {
                                 ...LinkProperties.DefaultViewType,
@@ -2082,7 +2089,7 @@ export const CreateDefaultView = {
                               target: listComponentId
                             })(GetDispatchFunc(), GetStateFunc());
                           },
-                          function () {
+                          () => {
                             PerformGraphOperation([
                               ...[
                                 "value",
@@ -2596,7 +2603,7 @@ export const CreateDefaultView = {
                   viewType,
                   modelProperty,
                   currentNode.id,
-                  isPluralComponent
+                  isSharedComponent
                 );
                 if (!sharedComponent) {
                   switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -2613,6 +2620,7 @@ export const CreateDefaultView = {
                         return {};
                       }
                       break;
+                    default: break;
                   }
                 } else {
                   childComponents[modelIndex] = sharedComponent;
@@ -2840,7 +2848,7 @@ export const CreateDefaultView = {
                     viewType,
                     modelProperty,
                     currentNode.id,
-                    isPluralComponent
+                    isSharedComponent
                   );
                   if (
                     screenComponentId &&
@@ -3108,7 +3116,7 @@ export const CreateDefaultView = {
                     viewType,
                     modelProperty,
                     currentNode.id,
-                    isPluralComponent
+                    isSharedComponent
                   );
                   if (!sharedComponent) {
                     switch (
@@ -3132,7 +3140,7 @@ export const CreateDefaultView = {
                               viewType,
                               modelProperty,
                               _ui_model_type,
-                              isPluralComponent
+                              isSharedComponent
                             );
                           }
                           if (!sharedComponent) {
@@ -3165,7 +3173,7 @@ export const CreateDefaultView = {
                 viewType,
                 modelProperty,
                 currentNode.id,
-                isPluralComponent
+                isSharedComponent
               );
               if (!sharedComponent) {
                 switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -3577,7 +3585,7 @@ export const CreateDefaultView = {
           }
         ])(GetDispatchFunc(), GetStateFunc());
 
-        modelProperties.map((modelProperty, propertyIndex) => {
+        modelProperties.forEach((modelProperty, propertyIndex) => {
           let propDataChainNodeId = null;
           let skip = false;
           let _ui_model_type = false;
@@ -3608,12 +3616,13 @@ export const CreateDefaultView = {
                       viewType,
                       modelProperty,
                       _ui_model_type,
-                      isPluralComponent
+                      isSharedComponent
                     );
                   }
                 }
               }
               break;
+            default: break;
           }
 
           const buildPropertyResult = BuildPropertyDataChainAccessor({

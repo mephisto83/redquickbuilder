@@ -1,6 +1,6 @@
 import { NodesByType, GetLogicalChildren, getViewTypeEndpointsForDefaults, GetNodeProp, GetNodeTitle, ADD_NEW_NODE, GetCurrentGraph } from "../../actions/uiactions";
 import { NodeTypes, LinkType, NodeProperties, LinkProperties } from "../../constants/nodetypes";
-import { GetNodesLinkedTo, existsLinkBetween } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, existsLinkBetween, GetLinkBetween } from "../../methods/graph_methods";
 import { ViewTypes } from "../../constants/viewtypes";
 import { uuidv4 } from "../../utils/array";
 
@@ -36,6 +36,7 @@ export default function CreateViewTypes() {
             viewType
           },
           target: isProperty ? model.id : child.id,
+          isPluralComponent: GetNodeProp(child, NodeProperties.NODEType) === NodeTypes.Model,
           source: isProperty ? child.id : model.id,
           viewCurrentType: viewType
         }))
@@ -68,7 +69,7 @@ CreateViewTypes.title = 'Create View Type Connections';
 
 
 export function setupDefaultViewType(args) {
-  const { properties, target, source, viewCurrentType } = args;
+  const { properties, target, source, viewCurrentType, isPluralComponent } = args;
   const result = [];
   const graph = GetCurrentGraph();
   let isPropertyLink = false;
@@ -109,8 +110,9 @@ export function setupDefaultViewType(args) {
             return {
               nodeType: NodeTypes.ViewType,
               properties: {
+                [NodeProperties.IsPluralComponent]: isPluralComponent,
                 [NodeProperties.ViewType]: viewType,
-                [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)} => ${GetNodeTitle(source)}`
+                [NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)} => ${GetNodeTitle(source)} ${isPluralComponent ? 'Plural' : ''}`
               },
               ...(useModelAsType ? { parent: target, groupProperties: {} } : {}),
               links: [

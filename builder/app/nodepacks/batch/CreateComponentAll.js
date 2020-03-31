@@ -1,19 +1,37 @@
-import { UITypes, NodeProperties, NodeTypes } from "../../constants/nodetypes";
+import { UITypes, NodeProperties, NodeTypes, LinkType } from "../../constants/nodetypes";
 import { ViewTypes } from "../../constants/viewtypes";
-import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType, GetNodeById } from "../../actions/uiactions";
+import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType, GetNodeById, GetViewTypeModel } from "../../actions/uiactions";
 import { CreateDefaultView } from '../../constants/nodepackages';
+import { GetNodesLinkedTo } from "../../methods/graph_methods";
 
 export default function CreateComponentAll() {
   const result = [];
   const models = NodesByType(null, NodeTypes.Model)
     .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
     .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
+  const properties = NodesByType(null, NodeTypes.Property);
   models.forEach(v => {
-    result.push(...CreateComponentModel({
-      model: v.id,
-      isSharedComponent: true,
-      isDefaultComponent: true
-    }));
+    const defaultViewTypes = GetNodesLinkedTo(null, {
+      id: v.id,
+      componentType: NodeTypes.ViewType,
+      link: LinkType.DefaultViewType
+    });
+
+    [...properties, ...models].filter(x => x.id !== v.id).forEach(w => {
+      const defaultViewTypesOther = GetNodesLinkedTo(null, {
+        id: w.id,
+        componentType: NodeTypes.ViewType,
+        link: LinkType.DefaultViewType
+      });
+      const intersections = defaultViewTypes.intersection(defaultViewTypesOther, (x, y) => y.id === x.id)
+      if (intersections && intersections.length)
+        result.push(...CreateComponentModel({
+          model: v.id,
+          connectedModel: w.id,
+          isSharedComponent: true,
+          isDefaultComponent: true
+        }));
+    })
   });
   models.forEach(v => {
     result.push(...CreateComponentModel({ model: v.id }));
@@ -24,6 +42,7 @@ export default function CreateComponentAll() {
 export function CreateComponentModel(args = {}) {
   const {
     model,
+    connectedModel,
     viewTypes = [
       ViewTypes.Create,
       ViewTypes.Update,
@@ -47,6 +66,7 @@ export function CreateComponentModel(args = {}) {
           isDefaultComponent: args.isDefaultComponent,
           isPluralComponent: args.isPluralComponent,
           isSharedComponent: args.isSharedComponent,
+          connectedModel,
           ...defaultArgs,
           viewName
         }),
