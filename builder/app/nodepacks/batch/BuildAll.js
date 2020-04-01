@@ -60,9 +60,10 @@ export default function BuildAll() {
 
     graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
 
-    ConnectScreens();
 
     CreateClaimService();
+
+    ConnectScreens();
 
     SetupViewTypes();
 

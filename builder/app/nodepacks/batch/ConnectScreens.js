@@ -9,7 +9,9 @@ import ScreenConnectUpdate from "../screens/ScreenConnectUpdate";
 import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
 export default function ConnectScreens() {
-  const screens = NodesByType(null, NodeTypes.Screen).filter(x => GetNodeProp(x, NodeProperties.NodePackage) !== "login-models");
+  const screens = NodesByType(null, NodeTypes.Screen).filter(x => !["login-models", "Authenticate"].some(v =>
+    v === GetNodeProp(x, NodeProperties.NodePackage) ||
+    v === GetNodeProp(x, NodeProperties.ViewPackageTitle)));
   screens.forEach(screen => {
     const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 
