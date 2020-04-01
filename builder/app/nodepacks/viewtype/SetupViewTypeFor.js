@@ -1,7 +1,7 @@
 import { NodeProperties, Methods, LinkPropertyKeys, UITypes, NodeTypes } from "../../constants/nodetypes";
 import { uuidv4 } from "../../utils/array";
 import { GetNodeProp, UPDATE_NODE_PROPERTY, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
-import SetupViewTypeForCreate from "./SetupViewTypeForCreate";
+import SetupViewTypeForCreate, { GetViewTypeModelType } from "./SetupViewTypeForCreate";
 import SetupViewTypeForGetAll from "./SetupViewTypeForGetAll";
 import AttachGetAllOnComponentDidMount from "./AttachGetAllOnComponentDidMount";
 import { setViewPackageStamp, GetLinkBetween, GetNodesLinkedTo } from "../../methods/graph_methods";
@@ -82,7 +82,9 @@ export default function SetupViewTypeFor(args = {}) {
       }
     }
   })
-  result.push(...AppendViewTypeValidation({ method: args.validationMethod, ...args }));
+
+  const { model, property } = GetViewTypeModelType(node);
+  result.push(...AppendViewTypeValidation({ model, property, method: args.validationMethod, ...args }));
   result.push(() => {
     setViewPackageStamp(null, 'setup-view-type-for');
     return [];

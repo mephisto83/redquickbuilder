@@ -1,4 +1,4 @@
-import { GetNodesLinkedTo, GetNodeLinkedTo, GetLinkBetween } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, GetNodeLinkedTo, GetLinkBetween, existsLinkBetween } from "../../methods/graph_methods";
 import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, GetNodeByProperties, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
 import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys, UITypes } from "../../constants/nodetypes";
 import AddEvent from "../AddEvent";
@@ -27,32 +27,9 @@ export default function SetupViewTypeForCreate(args = {}) {
     ...(viewPackages || {})
   };
 
-  const properties = GetNodesLinkedTo(GetCurrentGraph(), {
-    id: node,
-    link: LinkType.DefaultViewType
-  }).filter(
-    x =>
-      GetNodeProp(x, NodeProperties.NODEType) ===
-      NodeTypes.Property
-  );
-  const models = GetNodesLinkedTo(GetCurrentGraph(), {
-    id: node,
-    link: LinkType.DefaultViewType
-  }).filter(
-    x =>
-      GetNodeProp(x, NodeProperties.NODEType) ===
-      NodeTypes.Model
-  );
-  if (!models || models.length > 1) {
-    console.warn('too many models connected to view-type for this function')
-    return result;
-  }
-  const model = models[0];
-  const property = properties[0];
-  if (!property) {
-    console.warn('no property');
-    return result;
-  }
+  const { model, property } = GetViewTypeModelType(node);
+
+  const properties = [property];
 
 
   const component = GetNodesLinkedTo(graph, {
@@ -213,3 +190,73 @@ export default function SetupViewTypeForCreate(args = {}) {
 }
 SetupViewTypeForCreate.title = 'Setup View Type For Create';
 SetupViewTypeForCreate.description = `Setup view-type nodes for create. Adds an onChange event, and sets the dataChain for viewmodel.`
+
+
+
+export function GetViewTypeModelType(node) {
+  const graph = GetCurrentGraph();
+
+  const properties = GetNodesLinkedTo(graph, {
+    id: node,
+    link: LinkType.DefaultViewType,
+    componentType: NodeTypes.Property
+  });
+  const models = GetNodesLinkedTo(graph, {
+    id: node,
+    link: LinkType.DefaultViewType
+  }).filter(
+    x =>
+      GetNodeProp(x, NodeProperties.NODEType) ===
+      NodeTypes.Model
+  );
+
+  let model = models[0];
+
+  let property = properties[0];
+  let modelType = null;
+  if (!property) {
+    console.warn('no property');
+    const modelOptions = GetNodesLinkedTo(graph, {
+      id: node,
+      link: LinkType.DefaultViewType,
+      componentType: NodeTypes.Model
+    });
+    if (modelOptions.length === 2) {
+      if (existsLinkBetween(graph, {
+        id: node,
+        link: LinkType.LogicalChildren,
+        source: modelOptions[0].id,
+        target: modelOptions[1].id
+      })) {
+        [property, model] = modelOptions;
+      }
+      else if (existsLinkBetween(graph, {
+        id: node,
+        link: LinkType.LogicalChildren,
+        source: modelOptions[1].id,
+        target: modelOptions[0].id
+      })) {
+        [model, property] = modelOptions;
+        modelType = property;
+      }
+      else {
+        throw new Error('unhandled: the defaultviewtype should have two models that are connected to each other in a child/parent relationship')
+      }
+    }
+    else {
+      throw new Error(`an incorrect number of models is connected to the viewtype ${modelOptions.length}`);
+    }
+  }
+  else {
+    modelType = GetNodeLinkedTo(graph, {
+      id: property.id,
+      link: LinkType.PropertyLink,
+      componentType: NodeTypes.Model
+    })
+  }
+  return {
+    model,
+    property,
+    modelType
+  }
+}

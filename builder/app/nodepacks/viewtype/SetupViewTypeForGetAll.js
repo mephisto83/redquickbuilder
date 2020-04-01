@@ -4,6 +4,7 @@ import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys }
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from "../../utils/array";
 import CreateModelPropertyGetterDC from "../CreateModelPropertyGetterDC";
+import { GetViewTypeModelType } from "./SetupViewTypeForCreate";
 
 export default function SetupViewTypeForGetAll(args = {}) {
   const { node } = args;
@@ -20,32 +21,9 @@ export default function SetupViewTypeForGetAll(args = {}) {
     ...(viewPackages || {})
   };
 
-  const properties = GetNodesLinkedTo(GetCurrentGraph(), {
-    id: node,
-    link: LinkType.DefaultViewType
-  }).filter(
-    x =>
-      GetNodeProp(x, NodeProperties.NODEType) ===
-      NodeTypes.Property
-  );
-  const property = properties[0];
-  if (!property) {
-    console.warn('no property');
-    return result;
-  }
-  const models = GetNodesLinkedTo(GetCurrentGraph(), {
-    id: node,
-    link: LinkType.DefaultViewType
-  }).filter(
-    x =>
-      GetNodeProp(x, NodeProperties.NODEType) ===
-      NodeTypes.Model
-  );
-  if (!models || models.length > 1) {
-    console.warn('too many models connected to view-type for this function')
-    return result;
-  }
-  const model = models[0];
+
+
+  const { model, property } = GetViewTypeModelType(node);
 
   const modelType = GetNodesLinkedTo(null, {
     id: property.id,
