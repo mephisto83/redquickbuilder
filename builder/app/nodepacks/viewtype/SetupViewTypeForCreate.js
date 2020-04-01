@@ -1,13 +1,13 @@
 import { GetNodesLinkedTo, GetNodeLinkedTo, GetLinkBetween } from "../../methods/graph_methods";
 import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, ComponentApiKeys, GetNodeByProperties, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
-import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys } from "../../constants/nodetypes";
+import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys, UITypes } from "../../constants/nodetypes";
 import AddEvent from "../AddEvent";
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from "../../utils/array";
 import CreateModelPropertyGetterDC from "../CreateModelPropertyGetterDC";
 
 export default function SetupViewTypeForCreate(args = {}) {
-  const { node, eventType, eventTypeHandler, callback } = args;
+  const { node, eventType, eventTypeHandler, callback, uiType = UITypes.ElectronIO } = args;
   const graph = GetCurrentGraph();
   const result = [];
   if (!node) {
@@ -58,7 +58,7 @@ export default function SetupViewTypeForCreate(args = {}) {
   const component = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.DefaultViewType
-  }).find(v => GetNodeProp(v, NodeProperties.SharedComponent));
+  }).filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType).find(v => GetNodeProp(v, NodeProperties.SharedComponent));
   if (component) {
     GetNodesLinkedTo(null, {
       id: component.id,

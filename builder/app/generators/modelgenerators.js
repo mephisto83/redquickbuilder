@@ -344,6 +344,12 @@ export default class ModelGenerator {
         const propType = GetNodeProp(v, NodeProperties.UIAttributeType);
         const nodeType = GetNodeType(v);
         if (nodeType === NodeTypes.Model) {
+          const modelLink = GraphMethods.GetLinkBetween(v.id, node.id, graph) || GraphMethods.GetLinkBetween(node.id, v.id, graph);
+          if (GetLinkProperty(modelLink, LinkPropertyKeys.TYPE) === LinkType.UserLink) {
+            return `if(a.${GetCodeName(v)} == null) {
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+          }
           return `if(a.${GetCodeName(v)} == null || a.${GetCodeName(v)}.Count == 0) {
             model.${GetCodeName(v)} = b.${GetCodeName(v)};
           }`;

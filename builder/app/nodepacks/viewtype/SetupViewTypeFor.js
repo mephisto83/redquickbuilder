@@ -1,17 +1,20 @@
-import { NodeProperties, Methods, LinkPropertyKeys } from "../../constants/nodetypes";
+import { NodeProperties, Methods, LinkPropertyKeys, UITypes, NodeTypes } from "../../constants/nodetypes";
 import { uuidv4 } from "../../utils/array";
 import { GetNodeProp, UPDATE_NODE_PROPERTY, UPDATE_LINK_PROPERTY } from "../../actions/uiactions";
 import SetupViewTypeForCreate from "./SetupViewTypeForCreate";
 import SetupViewTypeForGetAll from "./SetupViewTypeForGetAll";
 import AttachGetAllOnComponentDidMount from "./AttachGetAllOnComponentDidMount";
-import { setViewPackageStamp, GetLinkBetween } from "../../methods/graph_methods";
+import { setViewPackageStamp, GetLinkBetween, GetNodesLinkedTo } from "../../methods/graph_methods";
 import RemoveAllViewPackage from "../RemoveAllViewPackage";
 import AppendViewTypeValidation from "./AppendViewTypeValidation";
 import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
 export default function SetupViewTypeFor(args = {}) {
   const {
-    node } = args;
+    skipClear = false,
+    node,
+    uiType = UITypes.ElectronIO
+  } = args;
   let {
     viewPackages
   } = args;
@@ -19,10 +22,18 @@ export default function SetupViewTypeFor(args = {}) {
     [NodeProperties.ViewPackage]: uuidv4(),
     ...(viewPackages || {})
   };
-  const context = { viewPackages, ...args }
+  const component = GetNodesLinkedTo(null, {
+    id: node,
+    componentType: NodeTypes.ComponentNode
+  }).find(v => GetNodeProp(v, NodeProperties.UIType) === uiType);
+  if (!component) {
+    console.warn('no component found for ' + uiType);
+    return [];
+  }
+  const context = { uiType, viewPackages, ...args }
   const result = [];
   const lastViewPackage = GetNodeProp(node, NodeProperties.LastViewPackage);
-  if (lastViewPackage) {
+  if (lastViewPackage && !skipClear) {
     result.push(...RemoveAllViewPackage({ view: lastViewPackage }))
   }
   setViewPackageStamp(viewPackages, 'setup-view-type-for');

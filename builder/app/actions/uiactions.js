@@ -3474,6 +3474,9 @@ export function setAppsettingsAssemblyPrefixes(prefixes) {
     rootGraph.appConfig.AppSettings.AssemblyPrefixes = ["RedQuick", prefixes]
       .unique(x => x)
       .join(";");
+    rootGraph.appConfig.AppSettings.DatabaseId = [prefixes]
+      .unique(x => x)
+      .join(";");
     SaveGraph(rootGraph, dispatch);
   };
 }

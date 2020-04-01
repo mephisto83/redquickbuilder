@@ -630,6 +630,17 @@ export function createValidatorProperty() {
     validators: {}
   };
 }
+export function hasValidator(validator, options) {
+  if (validator && validator.properties && validator.properties[options.id]) {
+    if (options.validator && validator.properties[options.id].validators) {
+      const { validators } = validator.properties[options.id];
+      return Object.keys(validators).some(id => validators[id].type === options.validatorArgs.type)
+    }
+  }
+
+  return false;
+
+}
 export function addValidatator(validator, options) {
   validator.properties[options.id] =
     validator.properties[options.id] || createValidatorProperty();

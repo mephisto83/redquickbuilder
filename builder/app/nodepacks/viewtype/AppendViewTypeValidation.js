@@ -1,4 +1,4 @@
-import { LinkType, NodeTypes, NodeProperties, LinkPropertyKeys, LinkProperties } from "../../constants/nodetypes";
+import { LinkType, NodeTypes, NodeProperties, LinkPropertyKeys, LinkProperties, UITypes } from "../../constants/nodetypes";
 import { GetNodeLinkedTo, GetNodesLinkedTo } from "../../methods/graph_methods";
 import {
   GetCurrentGraph, GetNodeProp, GetNodeById, GetNodeTitle, ComponentApiKeys,
@@ -9,14 +9,14 @@ import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import GetModelPropertyForViewType from "./GetModelPropertyForViewType";
 
 export default function AppendViewTypeValidation(args) {
-  const { node, viewPackages, method } = args;
+  const { node, viewPackages, method, uiType = UITypes.ElectronIO } = args;
   const startGraph = GetCurrentGraph();
   const result = [];
-  const component = GetNodeLinkedTo(startGraph, {
+  const component = GetNodesLinkedTo(startGraph, {
     id: node,
     link: LinkType.DefaultViewType,
     componentType: NodeTypes.ComponentNode
-  });
+  }).filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType);
   const { model, property, modelType } = GetModelPropertyForViewType({ node });
   if (!component) {
     console.warn('no component');

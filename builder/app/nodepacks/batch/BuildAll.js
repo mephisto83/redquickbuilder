@@ -2,21 +2,76 @@ import CreateViewTypes from "./CreateViewTypes";
 import AddAgentMethods from "./AddAgentMethods";
 import CreateComponentAll from "./CreateComponentAll";
 import { setFlag, Flags } from "../../methods/graph_methods";
-import { NO_OP, GetDispatchFunc, GetStateFunc, graphOperation } from "../../actions/uiactions";
+import { GetDispatchFunc, GetStateFunc, graphOperation, executeGraphOperation } from "../../actions/uiactions";
+import SelectAllOnModelFilters from "./SelectAllOnModelFilters";
+import AddFiltersToGetAll from "../method/AddFiltersToGetAll";
+import HaveAllPropertiesOnExecutors from "./HaveAllPropertiesOnExecutors";
+import AddCopyCommandToExecutors from "./AddCopyCommandToExecutors";
+import CreateDashboard from "../CreateDashboard_1";
+import { AuthorizedDashboard } from "../../components/titles";
+import { CreateLoginModels } from "../../constants/nodepackages";
+import { UITypes } from "../../constants/nodetypes";
+import AddChainToNavigateNextScreens from "./AddChainToNavigateNextScreens";
+import CreateConfiguration from "../CreateConfiguration";
+import CreateFetchServiceIdempotently from "../CreateFetchServiceIdempotently";
+import ConnectScreens from "./ConnectScreens";
+import CreateClaimService from "./CreateClaimService";
+import SetupViewTypes from "./SetupViewTypes";
 
 export default function BuildAll() {
 
   const result = [];
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
+  try {
+    result.push(...CreateViewTypes());
 
-  result.push(...CreateViewTypes());
+    graphOperation(result)(GetDispatchFunc(), GetStateFunc())
 
-  graphOperation(result)(GetDispatchFunc(), GetStateFunc())
+    AddAgentMethods();
 
-  AddAgentMethods();
+    CreateComponentAll();
 
-  CreateComponentAll();
+    graphOperation(SelectAllOnModelFilters())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(AddFiltersToGetAll())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(HaveAllPropertiesOnExecutors())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(AddCopyCommandToExecutors())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(CreateDashboard({
+      name: AuthorizedDashboard
+    }))(GetDispatchFunc(), GetStateFunc());
+
+    executeGraphOperation(
+      null,
+      CreateLoginModels,
+      {
+        [UITypes.ElectronIO]: true,
+        [UITypes.ReactNative]: true
+      }
+    )(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(AddChainToNavigateNextScreens())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
+
+    ConnectScreens();
+
+    CreateClaimService();
+
+    SetupViewTypes();
+
+  } catch (e) {
+    console.log(e);
+  }
+
   setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+
   return [];
 }
 

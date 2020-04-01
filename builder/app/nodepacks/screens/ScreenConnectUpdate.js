@@ -41,15 +41,18 @@ import ClearScreenInstance from "../datachain/ClearScreenInstance";
 
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method } = args;
-  const { componentDidMountMethod } = args;
+  const { componentDidMountMethods } = args;
   if (!node) {
     throw new Error("no node");
   }
   if (!method) {
     throw new Error("no method");
   }
-  if (!componentDidMountMethod) {
-    throw new Error("no componentDidMountMethod");
+  if (!componentDidMountMethods) {
+    throw new Error("no componentDidMountMethods");
+  }
+  if (!Array.isArray(componentDidMountMethods)) {
+    componentDidMountMethods = [componentDidMountMethods];
   }
   const graph = GetCurrentGraph();
   const screenOptions = GetNodesLinkedTo(graph, {
@@ -129,63 +132,66 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             });
           }
         });
-        let dataChainForLoading = null;
-        let cycleInstance = null;
-        result.push(
-          ...AddLifeCylcleMethodInstance({
-            node: lifeCylcleMethod.id,
-            viewPackages,
-            callback: _cycleInstance => {
-              cycleInstance = _cycleInstance;
-            }
-          }),
-          (currentGraph) => {
-            if (cycleInstance) {
-              return ConnectLifecycleMethod({
-                connectToParameter: !valueScreenOptionNavigateTargetApi ? null : (ae) => {
-                  switch (GetNodeProp(ae, NodeProperties.UIText)) {
-                    case 'modelId':
-                      return {
-                        target: valueScreenOptionNavigateTargetApi.id,
-                        linkProperties: {
-                          properties: {
-                            ...LinkProperties.ComponentApi
-                          }
-                        }
-                      };
-                    default: return false;
-                  }
-                },
-                target: componentDidMountMethod,
-                source: cycleInstance.id,
-                graph: currentGraph,
-                viewPackages
-              });
-            }
-            return [];
-          },
-          ...LoadModel({
-            viewPackages,
-            model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
-            model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
-            callback: context => {
-              dataChainForLoading = context.entry;
-            }
-          }),
+        componentDidMountMethods.forEach(componentDidMountMethod => {
 
-          {
-            operation: ADD_LINK_BETWEEN_NODES,
-            options() {
-              return {
-                target: dataChainForLoading,
-                source: cycleInstance.id,
-                properties: {
-                  ...LinkProperties.DataChainLink
+          let dataChainForLoading = null;
+          let cycleInstance = null;
+          result.push(
+            ...AddLifeCylcleMethodInstance({
+              node: lifeCylcleMethod.id,
+              viewPackages,
+              callback: _cycleInstance => {
+                cycleInstance = _cycleInstance;
+              }
+            }),
+            (currentGraph) => {
+              if (cycleInstance) {
+                return ConnectLifecycleMethod({
+                  connectToParameter: !valueScreenOptionNavigateTargetApi ? null : (ae) => {
+                    switch (GetNodeProp(ae, NodeProperties.UIText)) {
+                      case 'modelId':
+                        return {
+                          target: valueScreenOptionNavigateTargetApi.id,
+                          linkProperties: {
+                            properties: {
+                              ...LinkProperties.ComponentApi
+                            }
+                          }
+                        };
+                      default: return false;
+                    }
+                  },
+                  target: componentDidMountMethod,
+                  source: cycleInstance.id,
+                  graph: currentGraph,
+                  viewPackages
+                });
+              }
+              return [];
+            },
+            ...LoadModel({
+              viewPackages,
+              model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
+              model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
+              callback: context => {
+                dataChainForLoading = context.entry;
+              }
+            }),
+
+            {
+              operation: ADD_LINK_BETWEEN_NODES,
+              options() {
+                return {
+                  target: dataChainForLoading,
+                  source: cycleInstance.id,
+                  properties: {
+                    ...LinkProperties.DataChainLink
+                  }
                 }
               }
             }
-          }
-        );
+          );
+        });
       });
 
     const components = GetNodesLinkedTo(graph, {
