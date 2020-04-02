@@ -2721,7 +2721,7 @@ export function removeLink(graph, link, options = {}) {
 
       // If only the type is on the property
     }
-    if (update_link && Object.keys(update_link.properties).length > 1) {
+    if (update_link && update_link.properties && Object.keys(update_link.properties).length > 1) {
       return { ...graph };
     }
   }

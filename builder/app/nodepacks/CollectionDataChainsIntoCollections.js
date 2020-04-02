@@ -3,7 +3,8 @@ import {
   NodeProperties,
   NodeTypes,
   LinkType,
-  LinkProperties
+  LinkProperties,
+  UITypes
 } from "../constants/nodetypes";
 import {
   NodesByType,
@@ -22,10 +23,10 @@ import {
 } from "../methods/graph_methods";
 import { NodeType } from "../components/titles";
 export default function (args = {}) {
-  let result = [];
-  let graph = GetCurrentGraph();
-  let screens = NodesByType(null, NodeTypes.Screen);
-  let screenWithoutDataChainCollection = screens;
+  const result = [];
+  const graph = GetCurrentGraph();
+  const screens = NodesByType(null, NodeTypes.Screen);
+  const screenWithoutDataChainCollection = screens;
   // .filter(screen => {
   //   return !GetNodesLinkedTo(graph, {
   //     id: screen.id,
@@ -34,8 +35,8 @@ export default function (args = {}) {
   // });
 
   screenWithoutDataChainCollection.map(screen => {
-    let temp = {};
-    let screenoptions = GetNodesLinkedTo(graph, {
+    const temp = {};
+    const screenoptions = GetNodesLinkedTo(graph, {
       id: screen.id,
       link: LinkType.ScreenOptions
     });
@@ -47,7 +48,7 @@ export default function (args = {}) {
     ) {
       result.push({
         operation: ADD_NEW_NODE,
-        options: function () {
+        options() {
           return {
             nodeType: NodeTypes.DataChainCollection,
             linkProperties: {
@@ -69,16 +70,17 @@ export default function (args = {}) {
     }
 
     screenoptions.map(screenoption => {
-      result.push(function (graph) {
-        let add_screenoption_reference = !GetNodesLinkedTo(graph, {
+      result.push((graph) => {
+        const add_screenoption_reference = !GetNodesLinkedTo(graph, {
           id: screenoption.id,
           link: LinkType.DataChainCollectionReference
         }).length;
 
-        let screen = GetNodeLinkedTo(graph, {
+        const screen = GetNodeLinkedTo(graph, {
           id: screenoption.id,
           link: LinkType.ScreenOptions
         });
+
         let collectionReference;
         if (screen) {
           collectionReference = GetNodeLinkedTo(graph, {
@@ -91,7 +93,7 @@ export default function (args = {}) {
           add_screenoption_reference
             ? {
               operation: ADD_NEW_NODE,
-              options: function (graph) {
+              options(graph) {
                 return {
                   nodeType: NodeTypes.DataChainCollection,
                   linkProperties: {
@@ -114,7 +116,7 @@ export default function (args = {}) {
           collectionReference && add_screenoption_reference
             ? {
               operation: ADD_LINK_BETWEEN_NODES,
-              options: function () {
+              options() {
                 return {
                   source: temp.id,
                   target: collectionReference.id,
@@ -126,13 +128,13 @@ export default function (args = {}) {
         ];
       });
 
-      let components = GetNodesLinkedTo(graph, {
+      const components = GetNodesLinkedTo(graph, {
         id: screenoption.id,
         link: LinkType.Component
       });
 
       components.map(component => {
-        let nodes_linked = GetNodesLinkedTo(graph, {
+        const nodes_linked = GetNodesLinkedTo(graph, {
           id: component.id,
           link: LinkType.DataChainCollectionReference
         });
@@ -140,8 +142,8 @@ export default function (args = {}) {
           return null;
         }
 
-        result.push(function (graph) {
-          let screenoption = GetNodesLinkedTo(graph, {
+        result.push((graph) => {
+          const screenoption = GetNodesLinkedTo(graph, {
             id: component.id,
             link: LinkType.Component
           }).filter(
@@ -155,11 +157,11 @@ export default function (args = {}) {
               link: LinkType.DataChainCollectionReference
             });
           }
-          let temp;
+          let subtemp;
           return [
             {
               operation: ADD_NEW_NODE,
-              options: function (graph) {
+              options() {
                 return {
                   nodeType: NodeTypes.DataChainCollection,
                   linkProperties: {
@@ -173,7 +175,7 @@ export default function (args = {}) {
                     [NodeProperties.Pinned]: false
                   },
                   callback: node => {
-                    temp = node;
+                    subtemp = node;
                   }
                 };
               }
@@ -181,9 +183,9 @@ export default function (args = {}) {
             collectionReference
               ? {
                 operation: ADD_LINK_BETWEEN_NODES,
-                options: function () {
+                options() {
                   return {
-                    source: temp.id,
+                    source: subtemp.id,
                     target: collectionReference.id,
                     properties: { ...LinkProperties.DataChainCollection }
                   };
@@ -199,11 +201,11 @@ export default function (args = {}) {
         link: LinkType.LifeCylceMethod
       })
         .map(lifeCycleMethod => {
-          let res = GetNodesLinkedTo(graph, {
+          const res = GetNodesLinkedTo(graph, {
             id: lifeCycleMethod.id,
             link: LinkType.LifeCylceMethodInstance
           }).map(lifecylceInstanceMethod => {
-            let chains = [...GetNodesLinkedTo(graph, {
+            const chains = [...GetNodesLinkedTo(graph, {
               id: lifecylceInstanceMethod.id,
               link: LinkType.DataChainLink
             }).filter(chain => {
@@ -242,13 +244,13 @@ export default function (args = {}) {
           return res;
         })
         .flatten()
-        .map(chain => {
+        .forEach(chain => {
           result.push({
             operation: ADD_LINK_BETWEEN_NODES,
-            options: function (graph) {
+            options(ggraph) {
               let screenOptionCollectionReference;
               if (screenoption) {
-                screenOptionCollectionReference = GetNodeLinkedTo(graph, {
+                screenOptionCollectionReference = GetNodeLinkedTo(ggraph, {
                   id: screenoption.id,
                   link: LinkType.DataChainCollectionReference
                 });
@@ -263,164 +265,172 @@ export default function (args = {}) {
         });
     });
   });
-  let sharedReferenceCollection = GetNodeByProperties(
-    {
-      [NodeProperties.SharedReferenceCollection]: true
-    },
-    graph
-  );
-  if (!sharedReferenceCollection) {
-    result.push({
-      operation: ADD_NEW_NODE,
-      options: function () {
-        return {
-          nodeType: NodeTypes.DataChainCollection,
-          properties: {
-            [NodeProperties.UIText]: `Shared Components`,
-            [NodeProperties.Pinned]: false,
-            [NodeProperties.SharedReferenceCollection]: true
-          },
-          callback: node => {
-            sharedReferenceCollection = node;
-          }
-        };
-      }
-    });
-  }
-  let componentNodes = NodesByType(null, NodeTypes.ComponentNode);
-  let topComponents = componentNodes
-    .map(d => getTopComponent(graph, d))
-    .filter(x => GetNodeProp(x, NodeProperties.SharedComponent))
-    .unique();
+  [UITypes.ElectronIO, UITypes.ReactNative].forEach(uiType => {
 
-  componentNodes
-    .sort((a, b) => {
-      let a_lineage = getComponentLineage(graph, a);
-      let b_lineage = getComponentLineage(graph, b);
-      let intersects = a_lineage.intersection(b_lineage);
-      if (intersects.length === 0) {
-        return a_lineage.length - b_lineage.length;
-      }
-      if (a_lineage.length !== b_lineage.length) {
-        return a_lineage.length - b_lineage.length;
-      }
-      return 0;
-    })
-    .map(component => {
-      result.push(function (graph) {
-        let externalApiDataChains = getComponentExternalApiDataChains(
-          graph,
-          component
-        );
-        let internalApiDataChains = getComponentInternalApiDataChains(
-          graph,
-          component
-        );
-        let eventApiDataChains = getComponentEventDataChains(graph, component);
-        let reference = null;
-        let steps = [];
-        reference = getCollectionReference(graph, component);
-        if (!reference) {
-          steps.push({
-            operation: ADD_NEW_NODE,
-            options: function (graph) {
-              let parentReference = getParentCollectionReference(
-                graph,
-                component
-              );
-              if (true || parentReference) {
-                return {
-                  nodeType: NodeTypes.DataChainCollection,
-                  properties: {
-                    [NodeProperties.UIText]: `${GetNodeTitle(component)}`,
-                    [NodeProperties.Pinned]: false
-                  },
-                  links: [
-                    {
-                      target: (parentReference || sharedReferenceCollection).id,
-                      linkProperties: {
-                        properties: {
-                          ...LinkProperties.DataChainCollection
-                        }
-                      }
+    let sharedReferenceCollection = GetNodeByProperties({
+      [NodeProperties.SharedReferenceCollection]: true,
+      [NodeProperties.UIType]: uiType
+    },
+      graph
+    );
+    if (!sharedReferenceCollection) {
+      result.push({
+        operation: ADD_NEW_NODE,
+        options() {
+          return {
+            nodeType: NodeTypes.DataChainCollection,
+            properties: {
+              [NodeProperties.UIText]: `Shared Components ${uiType}`,
+              [NodeProperties.Pinned]: false,
+              [NodeProperties.UIType]: uiType,
+              [NodeProperties.SharedReferenceCollection]: true
+            },
+            callback: node => {
+              sharedReferenceCollection = node;
+            }
+          };
+        }
+      });
+    }
+    const componentNodes = NodesByType(null, NodeTypes.ComponentNode).filter(x => {
+      return GetNodeProp(x, NodeProperties.UIType) === uiType;
+    });
+    componentNodes
+      .map(d => getTopComponent(graph, d))
+      .filter(x => GetNodeProp(x, NodeProperties.SharedComponent))
+      .unique();
+
+    componentNodes
+      .sort((a, b) => {
+        const a_lineage = getComponentLineage(graph, a);
+        const b_lineage = getComponentLineage(graph, b);
+        const intersects = a_lineage.intersection(b_lineage);
+        if (intersects.length === 0) {
+          return a_lineage.length - b_lineage.length;
+        }
+        if (a_lineage.length !== b_lineage.length) {
+          return a_lineage.length - b_lineage.length;
+        }
+        return 0;
+      })
+      .forEach(component => {
+        result.push(function (graph) {
+          const externalApiDataChains = getComponentExternalApiDataChains(
+            graph,
+            component
+          );
+          const internalApiDataChains = getComponentInternalApiDataChains(
+            graph,
+            component
+          );
+          const eventApiDataChains = getComponentEventDataChains(graph, component);
+          let reference = null;
+          const steps = [];
+          reference = getCollectionReference(graph, component);
+          if (!reference) {
+            steps.push({
+              operation: ADD_NEW_NODE,
+              options(graph) {
+                const parentReference = getParentCollectionReference(
+                  graph,
+                  component
+                );
+                if (true || parentReference) {
+                  return {
+                    nodeType: NodeTypes.DataChainCollection,
+                    properties: {
+                      [NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+                      [NodeProperties.Pinned]: false
                     },
-                    {
-                      linkProperties: {
-                        properties: {
-                          ...LinkProperties.DataChainCollectionReference
+                    links: [
+                      {
+                        target: (parentReference || sharedReferenceCollection).id,
+                        linkProperties: {
+                          properties: {
+                            ...LinkProperties.DataChainCollection
+                          }
                         }
                       },
-                      target: component.id
+                      {
+                        linkProperties: {
+                          properties: {
+                            ...LinkProperties.DataChainCollectionReference
+                          }
+                        },
+                        target: component.id
+                      }
+                    ].filter(x => x),
+                    callback: node => {
+                      reference = node;
                     }
-                  ].filter(x => x),
-                  callback: node => {
-                    reference = node;
-                  }
-                };
-              } else {
-                console.log(component.id);
-                //  throw "parent should have a reference before getting here";
+                  };
+                } else {
+                  console.log(component.id);
+                  //  throw "parent should have a reference before getting here";
+                }
               }
-            }
-          });
-        }
-        return [
-          ...steps,
-          ...[
-            ...externalApiDataChains,
-            ...internalApiDataChains,
-            ...eventApiDataChains
-          ].map(dc => {
-            return {
-              operation: ADD_LINK_BETWEEN_NODES,
-              options: function (graph) {
-                reference =
-                  reference || getCollectionReference(graph, component);
-                return {
-                  target: reference.id,
-                  source: dc.id,
-                  properties: { ...LinkProperties.DataChainCollection }
-                };
-              }
-            };
-          })
-        ];
-      });
-    });
-  screens.map(screen => {
-    let screen_data_chains = [];
-    let externalApiDataChains = getComponentExternalApiDataChains(
-      graph,
-      screen
-    );
-    let internalApiDataChains = getComponentInternalApiDataChains(
-      graph,
-      screen
-    );
-    let eventApiDataChains = getComponentEventDataChains(graph, screen);
-    screen_data_chains.push(
-      ...externalApiDataChains,
-      ...internalApiDataChains,
-      ...eventApiDataChains
-    );
-    let reference = null;
-    result.push(
-      ...[...screen_data_chains].map(dc => {
-        return {
-          operation: ADD_LINK_BETWEEN_NODES,
-          options: function (graph) {
-            reference = reference || getCollectionReference(graph, screen);
-            return {
-              target: reference.id,
-              source: dc.id,
-              properties: { ...LinkProperties.DataChainCollection }
-            };
+            });
           }
-        };
-      })
-    );
+          return [
+            ...steps,
+            ...[
+              ...externalApiDataChains,
+              ...internalApiDataChains,
+              ...eventApiDataChains
+            ].map(dc => {
+              return {
+                operation: ADD_LINK_BETWEEN_NODES,
+                options(graph) {
+                  reference =
+                    reference || getCollectionReference(graph, component);
+                  return {
+                    target: reference.id,
+                    source: dc.id,
+                    properties: { ...LinkProperties.DataChainCollection }
+                  };
+                }
+              };
+            })
+          ];
+        });
+      });
+    screens.forEach(screen => {
+      const screen_data_chains = [];
+      const externalApiDataChains = getComponentExternalApiDataChains(
+        graph,
+        screen
+      );
+      const internalApiDataChains = getComponentInternalApiDataChains(
+        graph,
+        screen
+      );
+      const eventApiDataChains = getComponentEventDataChains(graph, screen);
+      screen_data_chains.push(
+        ...externalApiDataChains,
+        ...internalApiDataChains,
+        ...eventApiDataChains
+      );
+      let reference = null;
+      result.push(
+        ...[...screen_data_chains].map(dc => {
+          return {
+            operation: ADD_LINK_BETWEEN_NODES,
+            options(graph) {
+              reference = reference || getCollectionReference(graph, screen);
+              return {
+                target: reference.id,
+                source: dc.id,
+                properties: { ...LinkProperties.DataChainCollection }
+              };
+            }
+          };
+        })
+      );
+    });
+
   });
   return result.filter(x => x);
+
 }
 function getComponentLineage(graph, node) {
   let parent = GetNodesLinkedTo(graph, {
@@ -501,14 +511,14 @@ function getParentComponent(graph, node) {
   return parent;
 }
 function getTopComponent(graph, node) {
-  let parent = getParentComponent(graph, node);
+  const parent = getParentComponent(graph, node);
   if (parent) {
     return getTopComponent(graph, parent);
   }
   return node;
 }
 function getComponentExternalApiDataChains(graph, node) {
-  let result = [];
+  const result = [];
   GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.ComponentExternalApi,
@@ -526,7 +536,7 @@ function getComponentExternalApiDataChains(graph, node) {
 }
 
 function getComponentInternalApiDataChains(graph, node) {
-  let result = [];
+  const result = [];
   GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.ComponentInternalApi,
@@ -544,13 +554,13 @@ function getComponentInternalApiDataChains(graph, node) {
 }
 
 function getComponentEventDataChains(graph, node) {
-  let result = [];
+  const result = [];
   GetNodesLinkedTo(graph, {
     id: node.id,
     link: LinkType.EventMethod,
     componentType: NodeTypes.EventMethod
   }).map(res => {
-    let instances = GetNodesLinkedTo(graph, {
+    const instances = GetNodesLinkedTo(graph, {
       id: res.id,
       link: LinkType.EventMethodInstance,
       componentType: NodeTypes.EventMethodInstance

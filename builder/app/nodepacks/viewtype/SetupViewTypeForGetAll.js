@@ -3,8 +3,8 @@ import { GetCurrentGraph, GetNodeProp, GetNodeTitle, ADD_LINK_BETWEEN_NODES, Com
 import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys } from "../../constants/nodetypes";
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from "../../utils/array";
+import { GetViewTypeModelType } from './SetupViewTypeForCreate';
 import CreateModelPropertyGetterDC from "../CreateModelPropertyGetterDC";
-import { GetViewTypeModelType } from "./SetupViewTypeForCreate";
 
 export default function SetupViewTypeForGetAll(args = {}) {
   const { node } = args;
@@ -23,12 +23,7 @@ export default function SetupViewTypeForGetAll(args = {}) {
 
 
 
-  const { model, property } = GetViewTypeModelType(node);
-
-  const modelType = GetNodesLinkedTo(null, {
-    id: property.id,
-    link: LinkType.PropertyLink
-  }).find(v => GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.Model);
+  const { model, property, modelType } = GetViewTypeModelType(node);
 
   const propertyModel = GetNodeLinkedTo(null, {
     id: property.id,

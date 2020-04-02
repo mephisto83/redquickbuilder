@@ -832,9 +832,9 @@ export function attachMethodToMaestro(
                 controller = _controller;
               }
             };
-          } else {
-            controller = _controller;
           }
+          controller = _controller;
+
         }
       },
       {
@@ -879,9 +879,9 @@ export function attachMethodToMaestro(
                 maestro = _maestro;
               }
             };
-          } else {
-            maestro = _maestro;
           }
+          maestro = _maestro;
+
         }
       },
       {
@@ -1202,16 +1202,16 @@ export function GenerateArgs(id, parts) {
     );
 
     return `${nodeName}.setArgs({ ${args} })`;
-  } else {
-    const parent = GetNodeProp(node, NodeProperties.ChainParent);
-    if (parent) {
-      return `${nodeName}.setArgs({ ['${GetJSCodeName(
-        parent
-      ).toJavascriptName()}']: 0 })`;
-    } else {
-      return `${nodeName}.setArgs({ $id: 0 })`;
-    }
   }
+  const parent = GetNodeProp(node, NodeProperties.ChainParent);
+  if (parent) {
+    return `${nodeName}.setArgs({ ['${GetJSCodeName(
+      parent
+    ).toJavascriptName()}']: 0 })`;
+  }
+  return `${nodeName}.setArgs({ $id: 0 })`;
+
+
   return "";
 }
 
@@ -1289,24 +1289,24 @@ export function CollectionIsInLanguage(graph, collection, language) {
   if (reference) {
     if (GetNodeProp(reference, NodeProperties.NODEType) === NodeTypes.Screen) {
       return true;
-    } else if (GetNodeProp(reference, NodeProperties.UIType) === language) {
+    } if (GetNodeProp(reference, NodeProperties.UIType) === language) {
       return true;
-    } else if (GetNodeProp(reference, NodeProperties.UIType)) {
+    } if (GetNodeProp(reference, NodeProperties.UIType)) {
       return false;
-    } else {
-      const parent = GraphMethods.GetNodesLinkedTo(graph, {
-        id: collection,
-        link: NodeConstants.LinkType.DataChainCollection,
-        direction: GraphMethods.TARGET
-      }).filter(
-        x =>
-          GetNodeProp(x, NodeProperties.NODEType) ===
-          NodeTypes.DataChainCollection
-      )[0];
-      if (parent) {
-        return CollectionIsInLanguage(graph, parent.id, language);
-      }
     }
+    const parent = GraphMethods.GetNodesLinkedTo(graph, {
+      id: collection,
+      link: NodeConstants.LinkType.DataChainCollection,
+      direction: GraphMethods.TARGET
+    }).filter(
+      x =>
+        GetNodeProp(x, NodeProperties.NODEType) ===
+        NodeTypes.DataChainCollection
+    )[0];
+    if (parent) {
+      return CollectionIsInLanguage(graph, parent.id, language);
+    }
+
   } else {
     return true;
   }
@@ -2555,9 +2555,9 @@ export function GetSelectedConditionSetup(permissionId, condition) {
       return conditionSetup.methods[
         GetNodeProp(method, NodeProperties.FunctionType)
       ];
-    } else {
-      // console.warn('condition is improperly formed');
     }
+    // console.warn('condition is improperly formed');
+
   } else {
     // console.warn('no method node found');
   }
@@ -2702,14 +2702,14 @@ export function ComponentIsViewType(component, viewType, graph) {
   const currentType = GetNodeProp(component, NodeProperties.ViewType);
   if (currentType === viewType) {
     return true;
-  } else if (currentType) {
+  } if (currentType) {
     return false;
-  } else {
-    const parent = GetParentComponent(component, graph);
-    if (parent) {
-      return ComponentIsViewType(parent, viewType, graph);
-    }
   }
+  const parent = GetParentComponent(component, graph);
+  if (parent) {
+    return ComponentIsViewType(parent, viewType, graph);
+  }
+
   return false;
 }
 export function GetUserReferenceNodes(refId) {

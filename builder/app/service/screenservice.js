@@ -199,8 +199,10 @@ export function constructCssFile(css, clsName) {
           if (!isNaN(value)) {
             // value = `${value}px`;
           }
-          return `${temp.toLowerCase()}: ${value};`;
+          if (![undefined, null, ''].some(v => value === v))
+            return `${temp.toLowerCase()}: ${value};`;
         })
+        .filter(x => x)
         .join(NEW_LINE);
       return `${getCssClassName(css, v)} {
       ${props}
@@ -918,8 +920,7 @@ export function GenerateCss(id, language) {
 }
 export function ConvertViewTypeToComponentNode(
   node,
-  language,
-  isPluralComponent
+  language
 ) {
   let wasstring = false;
   if (typeof node === "string") {
@@ -931,20 +932,22 @@ export function ConvertViewTypeToComponentNode(
     case NodeTypes.ViewType:
       const temp = GetNodesLinkedTo(GetCurrentGraph(GetState()), {
         id: node.id,
-        link: LinkType.DefaultViewType
+        link: LinkType.DefaultViewType,
+        componentType: NodeTypes.ComponentNode
       })
-        .filter(x =>
-          [NodeTypes.ComponentNode].some(
-            v => v === GetNodeProp(x, NodeProperties.NODEType)
-          )
-        )
-        .filter(x => GetNodeProp(x, NodeProperties.UIType) === language)
+        .filter(x => {
+          let temp = GetNodeProp(x, NodeProperties.UIType) === language
+          return temp;
+        })
         .filter(
           x =>
             !!GetNodeProp(x, NodeProperties.IsPluralComponent) ===
-            !!isPluralComponent
+            !!GetNodeProp(node, NodeProperties.IsPluralComponent)
         )
         .find(x => x);
+      if (!temp) {
+        var asdf = 1;
+      }
       node = temp || node;
       break;
     default: break;

@@ -19,6 +19,8 @@ export const StyleTags = {
 
 export const ComponentTags = {
   Self: "Self",
+  "main-screen": "main-screen",
+  "main-screen-container": "main-screen-container",
   Container: "Container",
   MainMenu: "MainMenu",
   Main: "Main",

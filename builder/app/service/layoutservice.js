@@ -255,8 +255,10 @@ export function createSection(args) {
     ];
   }
 
-  const _style = { ...style };
-  ["borderStyle", "borderWidth", "borderColor"].map(t => {
+  const _style = {
+    ...style
+  };
+  ["borderStyle", "borderWidth", "borderColor", ...(language === UITypes.ReactNative ? [] : ['display', 'flex'])].forEach(t => {
     delete _style[t];
   });
   Object.keys(_style).map(t => {

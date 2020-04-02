@@ -89,7 +89,7 @@ function defaultParameters(args = {}) {
   const {
     viewName = null,
     uiTypes = {
-      [UITypes.ReactNative]: false,
+      [UITypes.ReactNative]: true,
       [UITypes.ElectronIO]: true,
       [UITypes.VR]: false,
       [UITypes.Web]: false

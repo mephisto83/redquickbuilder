@@ -27,7 +27,7 @@ export default function SetupViewTypeForCreate(args = {}) {
     ...(viewPackages || {})
   };
 
-  const { model, property } = GetViewTypeModelType(node);
+  const { model, property, modelType } = GetViewTypeModelType(node);
 
   const properties = [property];
 
@@ -73,11 +73,6 @@ export default function SetupViewTypeForCreate(args = {}) {
       });
     });
   }
-
-  const modelType = GetNodesLinkedTo(null, {
-    id: property.id,
-    link: LinkType.PropertyLink
-  }).find(v => GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.Model);
 
   const propertyModel = GetNodeLinkedTo(null, {
     id: property.id,
