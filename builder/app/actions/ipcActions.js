@@ -574,15 +574,24 @@ function clearElectronIOTheme(workspace, state) {
 
 }
 function handleLinkStyles(result, workspace) {
-  const appHtml = readFileSync(path.join(workspace, './app/app.html'), 'utf8');
-  const linkInsert = '<!--link-insert>';
-  const linkInsertEnd = '<!--link-insert-end>';
-  if (appHtml.indexOf(linkInsert) !== -1) {
-    const inserHtml = `${linkInsert}${result.styleLink}${linkInsertEnd}</head>`;
-    appHtml.replace('</head>', inserHtml);
-    writeFileSync(path.join(workspace, './app/app.html'), 'utf8');
+  let appHtml = readFileSync(path.join(workspace, './app/app.html'), 'utf8');
+  const linkInsert = '<!-- link-insert -->';
+  const linkInsertEnd = '<!-- link-insert-end -->';
+  let inserHtml = `${linkInsert}${result.styleLink}${linkInsertEnd}</head>`;
+  if (appHtml.indexOf(linkInsert) === -1) {
+    appHtml = appHtml.replace('</head>', inserHtml);
   }
+  else {
+    inserHtml = `${linkInsert}${result.styleLink}${linkInsertEnd}`;
+    const start = appHtml.indexOf(linkInsert)
+    const end = appHtml.indexOf(linkInsertEnd) + linkInsertEnd.length;
+    if (start !== -1 && end !== (linkInsertEnd.length - 1)) {
+      appHtml = appHtml.slice(0, start) + inserHtml + appHtml.slice(end)
+    }
+  }
+  writeFileSync(path.join(workspace, './app/app.html'), appHtml, 'utf8');
 }
+
 function generateElectronIOTheme(workspace, state) {
   const results = ThemeServiceGenerator.Generate({
     state,

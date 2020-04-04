@@ -1,6 +1,8 @@
+/* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { LinkProperties, NodeProperties } from "../constants/nodetypes";
-export default function(args = {}) {
+
+export default function (args = {}) {
   // node0
 
   //
@@ -13,7 +15,7 @@ export default function(args = {}) {
   if (args.eventTypeHandler && !args.property) {
     throw "missing property";
   }
-  let context = {
+  const context = {
     ...args,
     node0: args.component
   };
@@ -24,8 +26,8 @@ export default function(args = {}) {
     ...(viewPackages || {})
   };
 
-  let result = [
-    function(graph) {
+  const result = [
+    function () {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -43,7 +45,7 @@ export default function(args = {}) {
                 EventMethod: {}
               }
             },
-            callback: function(node) {
+            callback(node) {
               context.node4 = node.id;
               context.eventTypeNode = node.id;
             }
@@ -52,7 +54,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -67,7 +69,7 @@ export default function(args = {}) {
               }
             },
             properties: {
-              text: context.eventType + " Instance",
+              text: `${context.eventType} Instance`,
               EventType: context.eventType,
               Pinned: false,
               ...viewPackages,
@@ -77,7 +79,7 @@ export default function(args = {}) {
                 }
               }
             },
-            callback: function(node, graph, group) {
+            callback(node, graph, group) {
               context.node5 = node.id;
               context.group1 = group;
               context.eventTypeInstanceNode = node.id;
@@ -87,83 +89,83 @@ export default function(args = {}) {
       ];
     },
     context.eventTypeHandler
-      ? function(graph) {
-          return [
-            {
-              operation: "ADD_NEW_NODE",
-              options: {
-                nodeType: "EventHandler",
-                parent: context.node5,
-                ...viewPackages,
-                groupProperties: {},
-                linkProperties: {
-                  properties: {
-                    type: "EventHandler",
-                    EventMethodInstance: {}
-                  }
-                },
+      ? function () {
+        return [
+          {
+            operation: "ADD_NEW_NODE",
+            options: {
+              nodeType: "EventHandler",
+              parent: context.node5,
+              ...viewPackages,
+              groupProperties: {},
+              linkProperties: {
                 properties: {
-                  text: context.eventType + " Handler",
-                  Pinned: false,
-                  EventType: context.eventType,
-                  AutoDelete: {
-                    properties: {
-                      nodeType: "component-api-connector"
-                    }
-                  }
-                },
-                callback: function(node, graph, group) {
-                  context.node5 = node.id;
-                  context.group1 = group;
+                  type: "EventHandler",
+                  EventMethodInstance: {}
                 }
+              },
+              properties: {
+                text: `${context.eventType} Handler`,
+                Pinned: false,
+                EventType: context.eventType,
+                AutoDelete: {
+                  properties: {
+                    nodeType: "component-api-connector"
+                  }
+                }
+              },
+              callback(node, graph, group) {
+                context.node5 = node.id;
+                context.group1 = group;
               }
             }
-          ];
-        }
+          }
+        ];
+      }
       : null,
     context.eventTypeHandler && context.property
-      ? function(graph) {
-          return [
-            {
-              operation: "ADD_LINK_BETWEEN_NODES",
-              options: {
-                source: context.node5,
-                target: context.property,
-                properties: { ...LinkProperties.PropertyLink }
-              }
+      ? function () {
+        return [
+          {
+            operation: "ADD_LINK_BETWEEN_NODES",
+            options: {
+              source: context.node5,
+              target: context.property,
+              properties: { ...LinkProperties.PropertyLink }
             }
-          ];
-        }
+          }
+        ];
+      }
       : null
   ].filter(x => x);
-  let clearPinned = !args.clearPinned
+  const clearPinned = !args.clearPinned
     ? []
     : [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node4,
-              value: false
-            };
-          }
-        },
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node5,
-              value: false
-            };
-          }
+      {
+        operation: "CHANGE_NODE_PROPERTY",
+        options() {
+          return {
+            prop: "Pinned",
+            id: context.node4,
+            value: false
+          };
         }
-      ];
+      },
+      {
+        operation: "CHANGE_NODE_PROPERTY",
+        options() {
+          return {
+            prop: "Pinned",
+            id: context.node5,
+            value: false
+          };
+        }
+      }
+    ];
   return [
     ...result,
     ...clearPinned,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context);

@@ -172,9 +172,6 @@ export function GetAllChildren(root) {
 }
 export const DefaultCellProperties = {
   style: {
-    display: "flex",
-    flex: 1,
-    height: "100%",
     borderStyle: "solid",
     borderWidth: 1
   },
@@ -1019,7 +1016,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
     });
   }
   if (options.links) {
-    options.links.map(link => {
+    options.links.filter(x => x).map(link => {
       if (typeof link === "function") {
         link = link(graph);
         link = link.find(x => x);

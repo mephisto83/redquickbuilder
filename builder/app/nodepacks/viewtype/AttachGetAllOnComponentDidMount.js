@@ -14,6 +14,7 @@ export default function AttachGetAllOnComponentDidMount(args = {}) {
   result.push(...StoreModelArrayStandard({
     model,
     viewPackages,
+    modelText: `${GetNodeTitle(model)} State`,
     state_key: `${GetNodeTitle(model)} State`,
     callback: (storeModelArrayContext) => {
       storeModelArrayDC = storeModelArrayContext.entry;

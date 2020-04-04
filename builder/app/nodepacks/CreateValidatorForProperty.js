@@ -1,6 +1,7 @@
+/* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function(args = {}) {
+export default function (args = {}) {
   // node2,node3,node5
 
   //
@@ -8,7 +9,7 @@ export default function(args = {}) {
     throw "missing model";
   }
   if (!args.modelText) {
-    throw "missing modelText";
+    throw new Error("missing modelText");
   }
   let model = args.modelText;
   if (!args.property) {
@@ -17,9 +18,13 @@ export default function(args = {}) {
   if (!args.propertyText) {
     throw "missing propertyText";
   }
+  if (!args.methodType) {
+    args.methodType = 'Method Type';
+  }
+  let methodType = args.methodType;
   let property = args.propertyText;
   if (!args.method) {
-    throw "missing method";
+    throw "missing method  for create validator for property";
   }
   let context = {
     ...args,
@@ -33,12 +38,12 @@ export default function(args = {}) {
     ...(viewPackages || {})
   };
   let result = [
-    function(graph) {
+    function () {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback: function(node) {
+            callback (node) {
               context.node0 = node.id;
             }
           }
@@ -46,7 +51,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -59,7 +64,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -72,19 +77,19 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node0,
-            value: `Validate ${model} ${property}`
+            value: `Validate ${methodType} ${model} ${property}`
           }
         }
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -97,7 +102,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -110,7 +115,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -132,7 +137,7 @@ export default function(args = {}) {
               }
             },
             links: [],
-            callback: function(node, graph, group) {
+            callback (node, group) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -141,7 +146,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -154,7 +159,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -166,7 +171,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -179,7 +184,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -192,7 +197,7 @@ export default function(args = {}) {
         }
       ];
     },
-    function(graph) {
+    function () {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -203,7 +208,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -219,7 +224,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -235,7 +240,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -250,7 +255,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -266,7 +271,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -282,7 +287,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -301,7 +306,7 @@ export default function(args = {}) {
                 "data-chain-link": {}
               }
             },
-            callback: function(node, graph, group) {
+            callback (node) {
               context.node4 = node.id;
             }
           }
@@ -309,7 +314,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -322,7 +327,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -335,7 +340,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -347,7 +352,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -360,7 +365,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -371,7 +376,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -384,7 +389,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -400,7 +405,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -416,7 +421,7 @@ export default function(args = {}) {
   let clearPinned = [
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           prop: "Pinned",
           id: context.node1,
@@ -426,7 +431,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           prop: "Pinned",
           id: context.node2,
@@ -436,7 +441,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           prop: "Pinned",
           id: context.node3,
@@ -446,7 +451,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           prop: "Pinned",
           id: context.node4,
@@ -456,7 +461,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           prop: "Pinned",
           id: context.node5,
@@ -468,7 +473,7 @@ export default function(args = {}) {
   let applyViewPackages = [
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           id: context.node0,
           properties: viewPackages
@@ -477,7 +482,7 @@ export default function(args = {}) {
     },
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           id: context.node1,
           properties: viewPackages
@@ -486,7 +491,7 @@ export default function(args = {}) {
     },
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options: function() {
+      options () {
         return {
           id: context.node4,
           properties: viewPackages
@@ -498,7 +503,7 @@ export default function(args = {}) {
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context);

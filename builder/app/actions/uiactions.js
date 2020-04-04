@@ -1282,6 +1282,13 @@ export function GenerateChainFunctions(options) {
   return temp.join(NodeConstants.NEW_LINE);
 }
 export function CollectionIsInLanguage(graph, collection, language) {
+  const uiTypeOfCollection = GetNodeProp(collection, NodeProperties.UIType);
+  if (uiTypeOfCollection && uiTypeOfCollection === language) {
+    return true;
+  }
+  if (uiTypeOfCollection) {
+    return false;
+  }
   const reference = GraphMethods.GetNodeLinkedTo(graph, {
     id: collection,
     link: NodeConstants.LinkType.DataChainCollectionReference
@@ -1346,10 +1353,10 @@ export function GetDataChainCollections(options) {
           link: NodeConstants.LinkType.DataChainCollection,
           direction: GraphMethods.SOURCE
         }).filter(
-          x =>
-            GetNodeProp(x, NodeProperties.NODEType) ===
+          dcc =>
+            GetNodeProp(dcc, NodeProperties.NODEType) ===
             NodeTypes.DataChainCollection
-        ).length === 0
+        ).length === 0 && CollectionIsInLanguage(graph, x.id, language)
       );
     })
     .map(dataChainCollection => {
@@ -1939,11 +1946,31 @@ export function GenerateDataChainMethod(id) {
         return buildValidation({ methodMethod, id });
       }
       return `a => false`;
+    case DataChainFunctionKeys.ModelMethodMenu:
+      return buildModelMethodMenu();
     default:
       throw `${GetNodeTitle(node)} ${
       node.id
       } - ${functionType} is not a defined function type.`;
   }
+}
+
+function buildModelMethodMenu() {
+  const listPages = NodesByType(null, NodeTypes.Screen).filter(x => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll);
+  const underPages = NodesByType(null, NodeTypes.Screen).filter(x => [ViewTypes.Create, ViewTypes.GetAll].some(v => v === GetNodeProp(x, NodeProperties.ViewType)));
+
+  const screens = listPages.map(v => `{ name: 'top-${GetCodeName(v)}' }`);
+  const subscreens = underPages.map(v => {
+    const tpage = listPages.find(vt => GetNodeProp(vt, NodeProperties.Model) === GetNodeProp(v, NodeProperties.Model));
+    const temp = `{ name: '${GetCodeName(v)}', parent: 'top-${GetCodeName(tpage)}' }`;
+    return temp;
+  });
+
+  return ` () => {
+    let toppages = [${screens.join()}].map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.name), parent: null }));
+    let underpages = [${subscreens.join()}].filter(v =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.name), parent: v.parent }));
+    return [...toppages, ...underpages]
+}`;
 }
 export function GetPermissionsSortedByAgent() {
   return GetNodesSortedByAgent(NodeTypes.Permission);
@@ -3429,6 +3456,25 @@ export function GetCurrentGraph(state) {
   //     currentGraph = Graphs(state, currentGraph);
   // }
   // return currentGraph;
+}
+export function GetCurrentTheme(state) {
+  const graph = GetCurrentGraph(state);
+  const {
+    themeColors = {},
+    themeColorUses = {},
+    themeOtherUses = {},
+    themeGridPlacements = { grids: [] },
+    themeFonts = { fonts: [] },
+    themeVariables = { variables: [] }
+  } = graph;
+  return {
+    themeColors,
+    themeColorUses,
+    themeOtherUses,
+    themeGridPlacements,
+    themeFonts,
+    themeVariables
+  };
 }
 export function GetRootGraph(state, dispatch) {
   let currentGraph = Application(state, CURRENT_GRAPH);

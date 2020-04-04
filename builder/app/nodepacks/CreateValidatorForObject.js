@@ -14,6 +14,11 @@ export default function (args = {}) {
   } if (!args.modelId) {
     throw new Error('missing model argument');
   }
+  if (!args.methodType) {
+    args.methodType = 'Method Type';
+  }
+  let methodType = args.methodType;
+
   const context = {
     ...args,
     node2: args.modelId,
@@ -43,7 +48,7 @@ export default function (args = {}) {
         "operation": "CHANGE_NODE_TEXT",
         "options": {
           "id": context.node0,
-          "value": `Validate ${args.model}`
+          "value": `Validate ${methodType} ${args.model}`
         }
       }]
     },

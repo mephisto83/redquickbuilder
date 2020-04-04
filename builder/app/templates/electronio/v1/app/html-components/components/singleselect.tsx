@@ -18,7 +18,7 @@ export default class SingleSelect extends React.Component {
 		delete props.children;
 		return (
 			<div>
-				<Validation data={this.props.error}/>
+				<Validation data={this.props.error} />
 				<ul className={`${this.props.className} list-group`}>
 					{(this.props.data || [])
 						.map((item, index) => {

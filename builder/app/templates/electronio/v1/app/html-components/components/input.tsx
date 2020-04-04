@@ -31,7 +31,7 @@ export default class Input extends React.Component {
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
 		return (
-			<div class="form__group field">
+			<div className="form__group field">
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}

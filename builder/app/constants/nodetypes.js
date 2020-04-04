@@ -249,6 +249,7 @@ export const MAIN_CONTENT = "MAIN_CONTENT";
 export const MIND_MAP = "MIND_MAP";
 export const CODE_VIEW = "CODE_VIEW";
 export const LAYOUT_VIEW = "LAYOUT_VIEW";
+export const TRANSLATION_VIEW = 'TRANSLATION_VIEW';
 export const THEME_VIEW = "THEME_VIEW";
 
 export const GeneratedDataTypes = {
@@ -1378,6 +1379,17 @@ export const ProgrammingLanguages = {
   CSHARP: "csharp",
   JavaScript: "java-script"
 };
+export const Languages = {
+  [`US-English`]: 'US-English',
+  [`NB-Norsk`]: 'NB-Norsk',
+  [`FR-Francais`]: 'FR-Francais'
+};
+export const LanguagesCode = {
+  [`US-English`]: 'en',
+  [`NB-Norsk`]: 'nb',
+  [`FR-Francais`]: 'fr'
+};
+
 export const NodePropertyTypesByLanguage = {
   [ProgrammingLanguages.CSHARP]: {
     [NodePropertyTypes.DATETIME]: "DateTime",

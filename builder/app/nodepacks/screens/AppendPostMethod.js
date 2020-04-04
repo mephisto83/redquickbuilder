@@ -11,7 +11,7 @@ export default function AppendPostMethod(
   args = { method, handler, viewPackages }
 ) {
   if (!args.method) {
-    throw "missing method";
+    throw "missing method for appending a post method";
   }
   if (!args.handler) {
     throw "missing handler";

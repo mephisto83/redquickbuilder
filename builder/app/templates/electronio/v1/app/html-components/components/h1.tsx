@@ -15,6 +15,6 @@ export default class H1 extends React.Component {
       ...this.props
     };
     delete props.children;
-    return <h2 {...props}>{this.props.children}</h2>;
+    return <h1 {...props}>{this.props.children}</h1>;
   }
 }

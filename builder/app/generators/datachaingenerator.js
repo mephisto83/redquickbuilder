@@ -220,7 +220,7 @@ import {
 import * as navigate from '../${rel}actions/navigationActions';
 import * as $service from '../${rel}util/service';
 import routes from '../${rel}constants/routes';
-
+import { titleService} from '../${rel}actions/util';
 import * as RedLists from '../${rel}actions/lists';
 import * as StateKeys from '../${rel}state_keys';
 import * as ModelKeys from '../${rel}model_keys';
@@ -229,12 +229,20 @@ import * as Models from '../${rel}model_keys';
 import RedObservable from '../${rel}actions/observable';
 import RedGraph from '../${rel}actions/redgraph';
 import { useParameters, fetchModel } from '../${rel}actions/redutils';
+
 ${collections}
 
 ${funcs}`;
 };
 
 export function CollectionIsInLanguage(graph, collection, language) {
+  const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
+  if (itsUiType && itsUiType === language) {
+    return true;
+  }
+  if (itsUiType) {
+    return false
+  }
   const reference = GetNodeLinkedTo(graph, {
     id: collection,
     link: LinkType.DataChainCollectionReference

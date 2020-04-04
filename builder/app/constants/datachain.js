@@ -75,6 +75,7 @@ export const DataChainFunctionKeys = {
   ViewModelKey: "ViewModelKey",
   Lambda: "Lambda",
   MethodBaseValidation: "MethodBaseValidation",
+  ModelMethodMenu: 'ModelMethodMenu',
   Validation: "Validation",
   NavigateTo: "Navigate To",
   GetModelIds: "Get Model Ids", // Get an array of model ids from an array
@@ -534,7 +535,7 @@ export const DataChainFunctions = {
   }
 };
 export function connectNodeChain(prop, reverse) {
-  return function(currentNode, value) {
+  return function (currentNode, value) {
     var id = currentNode.id;
     this.props.graphOperation(
       connectNodeChainCommands(
@@ -577,7 +578,7 @@ export function connectNodeChainCommands(prop, id, value, source, reverse) {
 }
 
 export function snipNodeFromInbetween() {
-  return function(currentNode) {
+  return function (currentNode) {
     let graph = GetCurrentGraph(GetState());
     let links = getNodeLinks(graph, currentNode.id);
     if (links.length === 2) {
@@ -622,7 +623,7 @@ export function snipNodeFromInbetween() {
   };
 }
 export function insertNodeInbetween(_callback, graph) {
-  return function(currentNode, value) {
+  return function (currentNode, value) {
     graph = graph || GetCurrentGraph(GetState());
     let me = this;
     let link = GetLinkBetween(currentNode.id, value, graph);
@@ -641,8 +642,8 @@ export function insertNodeInbetween(_callback, graph) {
         parent: source.id,
         groupProperties: groupParent
           ? {
-              id: groupParent
-            }
+            id: groupParent
+          }
           : {},
         linkProperties: { properties: { ...LinkProperties.DataChainLink } },
         properties: {
@@ -710,14 +711,14 @@ export function InsertNodeInbetween(
     result.push(
       {
         operation: ADD_NEW_NODE,
-        options: function() {
+        options: function () {
           return {
             nodeType: NodeTypes.DataChain,
             parent: source.id,
             groupProperties: groupParent
               ? {
-                  id: groupParent
-                }
+                id: groupParent
+              }
               : {},
             linkProperties: { properties: { ...LinkProperties.DataChainLink } },
             properties: {
@@ -743,7 +744,7 @@ export function InsertNodeInbetween(
       },
       {
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function() {
+        options: function () {
           return {
             source: link.source,
             target: targetNode.id,
@@ -753,7 +754,7 @@ export function InsertNodeInbetween(
       },
       {
         operation: CHANGE_NODE_PROPERTY,
-        options: function() {
+        options: function () {
           return {
             id: link.target,
             value: targetNode.id,
@@ -766,7 +767,7 @@ export function InsertNodeInbetween(
   return result;
 }
 export function connectChain() {
-  return function(currentNode, value) {
+  return function (currentNode, value) {
     var id = currentNode.id;
     this.props.graphOperation(ConnectChainCommand(id, value));
   };
@@ -800,11 +801,11 @@ export function AddChainCommand(
 ) {
   let groupProperties = GetNodeProp(currentNode, NodeProperties.GroupParent)
     ? {
-        id: getGroup(
-          GetNodeProp(currentNode, NodeProperties.GroupParent),
-          graph
-        ).id
-      }
+      id: getGroup(
+        GetNodeProp(currentNode, NodeProperties.GroupParent),
+        graph
+      ).id
+    }
     : null;
   return {
     operation: ADD_NEW_NODE,
@@ -873,7 +874,7 @@ export const DataChainContextMethods = {
   StandardLink: connectChain(),
   InsertDataChain: insertNodeInbetween(),
   SnipDataChain: snipNodeFromInbetween(),
-  SplitDataChain: function(currentNode) {
+  SplitDataChain: function (currentNode) {
     let id = currentNode.id;
     let { state } = this.props;
     this.props.graphOperation([SplitDataCommand(currentNode)]);

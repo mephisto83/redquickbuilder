@@ -77,11 +77,13 @@ export default function AppendViewTypeValidation(args) {
               return;
             }
             let validatorNode = null;
+            const methodType = GetNodeProp(method, NodeProperties.MethodType);
             return [...CreateValidatorForProperty({
               modelText: GetNodeTitle(modelId),
               propertyText: GetNodeTitle(propertyId),
               model: modelId,
               property: propertyId,
+              methodType,
               method,
               viewPackages,
               callback: context => {

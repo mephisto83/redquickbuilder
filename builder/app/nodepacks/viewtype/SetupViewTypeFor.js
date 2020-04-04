@@ -44,7 +44,8 @@ export default function SetupViewTypeFor(args = {}) {
     case Methods.Update:
     case Methods.Create:
       result.push(...SetupViewTypeForCreate({
-        ...context, callback: (setviewContext) => {
+        ...context,
+        callback: (setviewContext) => {
           createUpdateContext = setviewContext;
         }
       }));

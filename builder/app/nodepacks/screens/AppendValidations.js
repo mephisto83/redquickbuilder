@@ -24,6 +24,7 @@ export default function AppendValidations({
   subcomponents,
   component,
   screen_option,
+  methodType = '',
   InstanceUpdate = true,
   viewPackages,
   method
@@ -86,6 +87,7 @@ export default function AppendValidations({
               return;
             }
             let validatorNode = null;
+            const methodType = GetNodeProp(method, NodeProperties.MethodType);
             result.push(
               ...CreateValidatorForProperty({
                 modelText: GetNodeTitle(modelId),
@@ -93,6 +95,7 @@ export default function AppendValidations({
                 model: modelId,
                 property: propertyId,
                 method,
+                methodType,
                 viewPackages,
                 callback: context => {
                   validatorNode = context.entry;
@@ -142,12 +145,13 @@ export default function AppendValidations({
             if (externalValidationApi) {
               const modelId = GetNodeProp(screen_option, NodeProperties.Model);
               let validatorNode = null;
-
+              const methodType = GetNodeProp(method, NodeProperties.MethodType);
               return [
                 ...CreateValidatorForObject({
                   model: GetNodeTitle(modelId),
                   modelId,
                   method,
+                  methodType,
                   viewPackages,
                   callback: context => {
                     validatorNode = context.entry;

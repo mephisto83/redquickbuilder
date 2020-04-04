@@ -18,6 +18,14 @@ export const Themes = {
       relative: "./app",
       themerelative: "./app/theme"
     }
+  },
+  BlueprintMultiLevelMenu: {
+    [UITypes.ElectronIO]: {
+      location: './app/templates/themes/BlueprintMultiLevelMenu/electronio/',
+      theme: './app/templates/themes/BlueprintMultiLevelMenu/theme/',
+      relative: "./app",
+      themerelative: "./app/theme"
+    }
   }
 };
 
@@ -202,10 +210,16 @@ export const ColorUses = {
   inputFieldPrimary: 'inputFieldPrimary',
   inputFieldSecondary: 'inputFieldSecondary',
   inputFieldGray: 'inputFieldGray',
-  inputFieldWhite: 'inputFieldWhite'
+  navItemLinkDisabledColor: 'navItemLinkDisabledColor',
+  menuNavLinkBackgroundColor: "menuNavLinkBackgroundColor",
+  inputFieldWhite: 'inputFieldWhite',
+  navItemLinkColor:'navItemLinkColor'
 }
 
 export const OtherUses = {
   inputFieldFontFamily: 'inputFieldFontFamily',
-  inputFontSize: 'inputFontSize'
+  inputFontSize: 'inputFontSize',
+  menuTransition: 'menuTransition',
+  menuNavLinkBoxShadowX: 'menuNavLinkBoxShadowX',
+  menuNavLinkBoxShadowY: 'menuNavLinkBoxShadowY'
 }

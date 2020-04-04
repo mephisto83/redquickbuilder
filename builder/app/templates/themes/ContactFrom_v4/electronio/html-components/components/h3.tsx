@@ -14,6 +14,6 @@ export default class H3 extends React.Component {
       ...this.props
     };
     delete props.children;
-    return <span {...props} className={'contact100-form-title'}>{this.props.children}</span>;
+    return <h3 {...props} className={'contact100-form-title'}>{this.props.children}</h3>;
   }
 }

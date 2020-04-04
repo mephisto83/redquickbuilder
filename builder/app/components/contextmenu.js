@@ -103,6 +103,9 @@ import SetupViewTypeForGetAll from "../nodepacks/viewtype/SetupViewTypeForGetAll
 import { uuidv4 } from "../utils/array";
 import SetupViewTypeFor from "../nodepacks/viewtype/SetupViewTypeFor";
 import GridHeaderMainMenuMain from "../nodepacks/layouts/GridHeaderMainMenuMain";
+import AddMenuToComponent from "../nodepacks/AddMenuToComponent";
+import { MenuTreeOptions } from "../constants/menu";
+import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from "../nodepacks/batch/SetupViewTypes";
 
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -1846,6 +1849,56 @@ class ContextMenu extends Component {
                 );
               }}
             />
+            <TreeViewMenu
+              open={UIA.Visual(state, "Add Menu")}
+              active
+              title={Titles.AddMenu}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual("Add Menu");
+              }}
+            >
+              <TreeViewItemContainer>
+                <SelectInput
+                  label={Titles.OptionsType}
+                  options={Object.keys(MenuTreeOptions).map(v => ({ title: v, value: v, id: v }))}
+                  onChange={value => {
+                    this.setState({
+                      menuTreeOption: value
+                    });
+                  }}
+                  value={this.state.menuTreeOption}
+                />
+              </TreeViewItemContainer>
+              <TreeViewItemContainer>
+                <TextInput
+                  label={Titles.Name}
+                  onChange={value => {
+                    this.setState({
+                      menuName: value
+                    });
+                  }}
+                  value={this.state.menuName}
+                />
+              </TreeViewItemContainer>
+              {this.state.menuName && MenuTreeOptions[this.state.menuTreeOption] ? (<TreeViewMenu
+                title={Titles.AddMenu}
+                onClick={() => {
+                  if (this.state.menuName && MenuTreeOptions[this.state.menuTreeOption]) {
+                    this.props.graphOperation(
+                      AddMenuToComponent({
+                        menu_name: this.state.menuName,
+                        uiType: UIA.GetNodeProp(currentNode, NodeProperties.UIType),
+                        navigate_function: MenuTreeOptions[this.state.menuTreeOption].navigate_function(),
+                        menuGeneration: MenuTreeOptions[this.state.menuTreeOption].menuGeneration(),
+                        buildMethod: MenuTreeOptions[this.state.menuTreeOption].buildMethod,
+                        component: currentNode.id
+                      })
+                    );
+                  }
+                }}
+              />) : null}
+            </TreeViewMenu>
           </TreeViewMenu>,
           layoutoptions()
         ];
@@ -2465,33 +2518,7 @@ class ContextMenu extends Component {
               <TreeViewItemContainer>
                 <SelectInput
                   label={Titles.LoadModelsOnComponentMount}
-                  options={UIA.NodesByType(
-                    this.props.state,
-                    NodeTypes.Method
-                  )
-                    .filter(
-                      x =>
-                        (
-                          MethodFunctions[
-                          UIA.GetNodeProp(x, NodeProperties.FunctionType)
-                          ] || {}
-                        ).method === Methods.GetAll
-                    )
-                    .filter(x => {
-                      if (viewTypeModel) {
-                        const modelOutput =
-                          UIA.GetMethodNodeProp(
-                            x,
-                            FunctionTemplateKeys.ModelOutput
-                          ) ||
-                          UIA.GetMethodNodeProp(
-                            x,
-                            FunctionTemplateKeys.Model
-                          );
-                        return viewTypeModel && modelOutput === viewTypeModel.id;
-                      }
-                      return false;
-                    })
+                  options={GetFunctionToLoadModels(currentNode)
                     .toNodeSelect()}
                   onChange={value => {
                     this.setState({
@@ -2504,33 +2531,7 @@ class ContextMenu extends Component {
               <TreeViewItemContainer>
                 <SelectInput
                   label={Titles.MethodThatValidationComesFrom}
-                  options={UIA.NodesByType(
-                    this.props.state,
-                    NodeTypes.Method
-                  )
-                    .filter(
-                      x => [Methods.Create, Methods.Update].some(meth => meth ===
-                        (
-                          MethodFunctions[
-                          UIA.GetNodeProp(x, NodeProperties.FunctionType)
-                          ] || {}
-                        ).method)
-                    )
-                    .filter(x => {
-                      if (viewTypeModel) {
-                        const modelOutput =
-                          UIA.GetMethodNodeProp(
-                            x,
-                            FunctionTemplateKeys.ModelOutput
-                          ) ||
-                          UIA.GetMethodNodeProp(
-                            x,
-                            FunctionTemplateKeys.Model
-                          );
-                        return viewTypeModel && modelOutput === viewTypeModel.id;
-                      }
-                      return false;
-                    })
+                  options={GetValidationMethodForViewTypes(currentNode)
                     .toNodeSelect()}
                   onChange={value => {
                     this.setState({

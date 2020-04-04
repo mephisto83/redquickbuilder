@@ -98,10 +98,11 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW, TRANSLATION_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import ThemeView from './themeview';
+import TranslationView from './translationview';
 import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
@@ -1191,6 +1192,13 @@ class Dashboard extends Component {
                   }} /> : null}
                   {rootGraph ? <NavBarButton title={version} /> : null}
                   {workspace ? <NavBarButton title={workspace} icon="fa fa-cog" /> : null}
+                  {rootGraph ? <NavBarButton title={Titles.SaveThemeAs} icon="fa fa-paint-brush" secondaryicon="fa fa-save fa-x1" onClick={() => {
+                    const theme = UIA.GetCurrentTheme();
+                    this.props.saveTheme(theme)
+                  }} /> : null}
+                  {rootGraph ? <NavBarButton title={Titles.SelectThemeFromFile} icon="fa fa-paint-brush" secondaryicon="fa fa-folder-open-o" onClick={() => {
+                    this.props.openRedQuickBuilderTheme()
+                  }} /> : null}
                 </NavBarMenu>
               </DashboardNavBar>
             </Header>
@@ -1208,8 +1216,11 @@ class Dashboard extends Component {
                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa fa-code" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa-paint-brush" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, THEME_VIEW);
+                }} /> : null}
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === TRANSLATION_VIEW} hideArrow title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
+                  this.props.setVisual(MAIN_CONTENT, TRANSLATION_VIEW);
                 }} /> : null}
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
@@ -1277,6 +1288,7 @@ class Dashboard extends Component {
               <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
               <ThemeView active={UIA.Visual(state, MAIN_CONTENT) === THEME_VIEW} />
+              <TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
               {main_content === MIND_MAP || true ? (<MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {

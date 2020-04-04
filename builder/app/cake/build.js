@@ -120,6 +120,15 @@ function createElectronIo() {
       })
     })
     .then(() => {
+      console.log('installing fontawesome')
+      console.log(path.join(localDir, appName))
+      return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
+        shell: true,
+        cwd: path.join(localDir, appName)
+      })
+    })
+
+    .then(() => {
       const packagejsonfilepath = path.join(localDir, appName, 'package.json')
       const packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath))
       const devScript = packageJson.scripts.dev

@@ -15,7 +15,8 @@ import {
   LinkType,
   NodeProperties,
   LinkProperties,
-  NodeTypes
+  NodeTypes,
+  Methods
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
@@ -210,6 +211,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
           ...AppendValidations({
             subcomponents,
             component,
+            methodType: Methods.Update,
             screen_option: screenOption,
             method,
             viewPackages

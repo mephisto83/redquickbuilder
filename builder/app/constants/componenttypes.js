@@ -202,8 +202,32 @@ export const ComponentTypes = {
         }
       }
     },
-    H1: {},
-    H2: {},
+    H1: {
+      template: "./app/templates/components/h1.tpl",
+      properties: {
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
+        label: {
+          nodeProperty: NodeProperties.Label,
+          template: true
+        }
+      }
+    },
+    H2: {
+      template: "./app/templates/components/h2.tpl",
+      properties: {
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
+        label: {
+          nodeProperty: NodeProperties.Label,
+          template: true
+        }
+      }
+    },
     H3: {
       template: "./app/templates/components/h3.tpl",
       properties: {

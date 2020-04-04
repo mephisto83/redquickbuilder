@@ -29,7 +29,7 @@ export default class GridPlacementField extends Component {
     const tags = this.props.tags || [];
     const gridSetup = this.props.gridSetup || {};
     const { gridTemplateColumns = "", gridTemplateRows = "", name = "", mediaSizes = {}, gridPlacement } = gridSetup;
-    const gridRowCount = gridTemplateRows ? gridTemplateRows.split(' ').filter(x => x).length || 1 : 1;
+    const gridRowCount = gridTemplateRows ? gridTemplateRows.split(' - ').join('-').split(' ').filter(x => x).length || 1 : 1;
     const columns = gridTemplateColumns.split(" ").filter(x => x);
     const square = {
       display: "flex",

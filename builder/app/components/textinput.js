@@ -62,6 +62,9 @@ export default class TextInput extends Component {
                     this.props.onChange(this.state.value || "");
                 }
               }
+              if (this.props.onChanged) {
+                this.props.onChanged(this.state.value || "");
+              }
               this.setState({ focused: false });
             }}
             onFocus={() => {
@@ -117,6 +120,9 @@ export default class TextInput extends Component {
                 if (this.state.value !== this.props.value)
                   this.props.onChange(this.state.value || "");
               }
+            }
+            if (this.props.onChanged) {
+              this.props.onChanged(this.props.value || "");
             }
             this.setState({ focused: false });
           }}

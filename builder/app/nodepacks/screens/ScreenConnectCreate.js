@@ -12,7 +12,7 @@ import {
   ComponentApiKeys,
   GetComponentExternalApiNode
 } from "../../actions/uiactions";
-import { LinkType, NodeProperties, LinkProperties, NodeTypes } from "../../constants/nodetypes";
+import { LinkType, NodeProperties, LinkProperties, NodeTypes, Methods } from "../../constants/nodetypes";
 import {
   ComponentEvents, ComponentLifeCycleEvents
 } from "../../constants/componenttypes";
@@ -142,6 +142,7 @@ export default function ScreenConnectCreate(args = { method, node }) {
         ...AppendValidations({
           subcomponents,
           component,
+          methodType: Methods.Create,
           screen_option: screenOption,
           InstanceUpdate: false,
           method,

@@ -74,10 +74,10 @@ export default function SetupViewTypeForCreate(args = {}) {
     });
   }
 
-  const propertyModel = GetNodeLinkedTo(null, {
+  const propertyModel = modelType; /* GetNodeLinkedTo(null, {
     id: property.id,
     link: LinkType.PropertyLink
-  });
+  }); */
   const valueExternalNode = GetNodesLinkedTo(null, {
     id: node,
     link: LinkType.ComponentExternalApi,

@@ -46,7 +46,10 @@ export const SelectTargetScreen = '[Select Target Screen]';
 export const SetupViewType = 'Setup View Type';
 export const Parameters = "Parameters";
 export const ServerSideSetup = "Service Side Setup";
+export const Titles = 'Titles';
 export const Theme = "Theme";
+export const Languages = 'Languages';
+export const OnlyUntranslated = 'Only Untranslated';
 export const Properties = "Properties";
 export const Key = "Key";
 export const EventHandlerActivityMenu = "Event Handlers";
@@ -406,6 +409,7 @@ export const Get_Agent_Value__IListObject = "Get Objects for an Agent";
 export const Can_Execute_Agent_Parent_In_Valid_List =
   "Can Execute Agent Parent In Valid List";
 export const AddButtonToComponent = "Add Button";
+export const AddMenu = 'AddMenu';
 export const AddTitleToComponent = "Add Title";
 export const Get_Object_Agent_Value__Object = "Get Object by Agent";
 export const Update_Object_Agent_Value__Object = "Update Object by Agent";
@@ -472,7 +476,8 @@ export const PropertyGeneratedType = "Generated Type";
 export const ManyToManyNexus = "Many to many";
 export const ManyToManyExists = "Many to many item must exists";
 export const ManyToManyNexusModel = "Many to Many model";
-
+export const SaveThemeAs = 'Save theme as';
+export const SelectThemeFromFile = 'Select theme from file';
 export const ManyToManyNexusDescription =
   "This property will be a quick access for many to many relationships.";
 

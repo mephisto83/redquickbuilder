@@ -23,7 +23,8 @@ import {
   LinkPropertyKeys,
   LinkProperties,
   UITypes,
-  NodeTypes
+  NodeTypes,
+  Methods
 } from "../../constants/nodetypes";
 import {
   ComponentLifeCycleEvents,
@@ -349,6 +350,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
           subcomponents,
           component,
           InstanceUpdate: true,
+          methodType: Methods.Update,
           screen_option: screenOptionInstance,
           method,
           viewPackages

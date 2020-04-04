@@ -5,7 +5,8 @@ import {
   NodesByType,
   NodeTypes,
   GetRootGraph,
-  GetCurrentGraph
+  GetCurrentGraph,
+  GetAppSettings
 } from "../actions/uiactions";
 import { Themes, HTMLElementGroups } from "../constants/themes";
 import { NEW_LINE, MediaQueries } from "../constants/nodetypes";
@@ -92,63 +93,94 @@ function GenerateGlobalCss(options) {
         })
       })
     }
-    const cssRules = Object.keys(MediaQueries).map(mq => {
-      if (spaceThemeRules[mq]) {
-        const spaceRules = Object.keys(spaceThemeRules[mq]).map(key => {
-          let res;
-          if (HTMLElementGroups.some(v => v.type[`${key}`.split(':')[0]])) {
-            res = ` ${key.toLowerCase()} {
-              ${spaceThemeRules[mq][key]}
-            }`;
-          }
-          else {
-            res = ` .${key} {
-              ${spaceThemeRules[mq][key]}
-            }`;
-          }
 
-          return res;
-        }).join(NEW_LINE);
-        return `
-          ${MediaQueries[mq]} {
-            ${spaceRules}
-          }
-        `;
-      }
-      return '';
-    }).filter(x => x).join(NEW_LINE);
 
     const gridPlacementRules = Object.keys(MediaQueries).map(mq => {
-      const gpRules = themeGridPlacements.grids.map(gridSetup => {
-        const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
-        if (mediaSizes[mq]) {
-          const columnCount = gridTemplateColumns.split(' ').filter(x => x).length;
-          const rowCount = gridTemplateRows.split(' ').filter(x => x).length;
-          const areas = [].interpolate(0, rowCount, row => {
-            const rowArea = [];
-            [].interpolate(0, columnCount, col => {
-              let area = gridPlacement[row * columnCount + col];
-              if (!area || !area.trim()) {
-                area = '.';
+      const selectors = [];
+      const htmlselector = []
+      themeGridPlacements.grids.map(gridSetup => {
+        const { name } = gridSetup;
+        if (name) {
+          selectors.push(name)
+        }
+      });
+
+      if (spaceThemeRules[mq]) {
+        Object.keys((spaceThemeRules[mq] || {})).forEach(key => {
+          if (HTMLElementGroups.some(v => v.type[`${key}`.split(':')[0]])) {
+            selectors.push(key.toLowerCase());
+            htmlselector.push(key.toLowerCase());
+          }
+          else {
+            selectors.push(key);
+          }
+
+        })
+      }
+      const allrules = selectors.map(selector => {
+        let selectorRule = '';
+        if (spaceThemeRules[mq]) {
+          selectorRule += Object.keys(spaceThemeRules[mq]).map(key => {
+            let res = false;
+
+            if (HTMLElementGroups.some(v => v.type[`${key}`.split(':')[0]])) {
+              if (selector === key.toLowerCase()) {
+                res = `
+              ${spaceThemeRules[mq][key]}
+            `;
               }
-              rowArea.push(area);
-            });
-            return `"${rowArea.join(' ')}"${NEW_LINE}`;
-          });
-          return `
-        .${name} {
-          display: grid !important;
+            }
+            else if (selector === key) {
+              res = `
+              ${spaceThemeRules[mq][key]}
+            `;
+            }
+
+            return res;
+          }).filter(x => x).join(NEW_LINE);
+        }
+        selectorRule += themeGridPlacements.grids.map(gridSetup => {
+          const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
+          if (selector === name) {
+            if (mediaSizes[mq]) {
+              const columnCount = gridTemplateColumns.split(' - ').join('-').split(' ').filter(x => x).length;
+              const rowCount = gridTemplateRows.split(' - ').join('-').split(' ').filter(x => x).length;
+              const areas = [].interpolate(0, rowCount, row => {
+                const rowArea = [];
+                [].interpolate(0, columnCount, col => {
+                  let area = gridPlacement[row * columnCount + col];
+                  if (!area || !area.trim()) {
+                    area = '.';
+                  }
+                  rowArea.push(area);
+                });
+                return `"${rowArea.join(' ')}"${NEW_LINE}`;
+              });
+              return `
+          display: grid;
           grid-template-columns: ${gridTemplateColumns};
           grid-template-rows: ${gridTemplateRows};
           grid-template-areas:
 ${areas.join(NEW_LINE)}
-        };
 `;
+            }
+          }
+        }).filter(x => x).join(NEW_LINE);
+        if (selectorRule) {
+          if (htmlselector.indexOf(selector) !== -1) {
+            return `${selector} {
+              ${selectorRule}
+            }`;
+          }
+          return `.${selector} {
+            ${selectorRule}
+          }`;
         }
       }).filter(x => x).join(NEW_LINE);
+
       return `
       ${MediaQueries[mq]} {
-        ${gpRules}
+        ${allrules}
       }
     `;
     }).join(NEW_LINE);
@@ -167,8 +199,13 @@ ${areas.join(NEW_LINE)}
 
     theme += styleLinks;
     theme += roottag;
-    theme += cssRules;
     theme += gridPlacementRules;
+  }
+  const appSettings = GetAppSettings(graph);
+  if (appSettings) {
+    fontStyleLink += `
+    <script src="https://kit.fontawesome.com/84589ad5a6.js" crossorigin="anonymous"></script>
+  `;
   }
   result = {
     theme,
