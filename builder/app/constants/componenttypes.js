@@ -185,7 +185,54 @@ export const ComponentTypes = {
     },
     Card: {},
     CardItem: {},
-    CheckBox: {},
+    CheckBox: {
+      template: "./app/templates/components/checkbox.tpl",
+      defaultApi: INPUT_DEFAULT_API,
+      eventApi: [
+        ComponentEvents.onBlur,
+        ComponentEvents.onFocus,
+        ComponentEvents.onChangeText
+      ],
+      properties: {
+        item_attributes: {
+          nodeProperty: NodeProperties.TextType,
+          template: "{{value}}",
+          options: [
+            "fixedLabel",
+            "inlineLabel",
+            "floatingLabel",
+            "stackedLabel",
+            "regular",
+            "rounded",
+            "success",
+            "error",
+            "disabled"
+          ],
+          ui: true
+        },
+        ...DEFAULT_INPUT_API_PROPERTIES,
+        value: {
+          nodeProperty: NodeProperties.value,
+          template: true
+        },
+        label: {
+          nodeProperty: NodeProperties.Label,
+          template: true
+        },
+        placeholder: {
+          nodeProperty: NodeProperties.Placeholder,
+          template: true
+        },
+        error: {
+          nodeProperty: NodeProperties.Error,
+          template: true
+        },
+        success: {
+          nodeProperty: NodeProperties.Success,
+          template: true
+        }
+      }
+    },
     Container: {},
     Content: {},
     Fab: {},

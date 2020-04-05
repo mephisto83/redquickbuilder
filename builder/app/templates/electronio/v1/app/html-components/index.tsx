@@ -26,6 +26,7 @@ import Menu from './components/menu';
 import H1 from './components/h1';
 import MultiViewList from './components/multiviewlist';
 import SingleSelect from './components/singleselect';
+import CheckBox from './components/checkbox';
 import Form from './components/form';
 export {
   Content,
@@ -48,6 +49,7 @@ export {
   Body,
   Icon,
   Text,
+  CheckBox,
   View,
   StyleProvider,
   Input,

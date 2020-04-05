@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/sort-comp */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -16,7 +17,7 @@ import {
   OtherUses,
   CssPseudoSelectors
 } from "../constants/themes";
-import { GetCurrentGraph, GUID } from "../actions/uiactions";
+import { GetCurrentGraph, GUID, VisualEq } from "../actions/uiactions";
 import TextInput from "./textinput";
 import ColorInput from './colorinput';
 import Box from "./box";
@@ -29,6 +30,12 @@ import ButtonList from "./buttonlist";
 import Typeahead from "./typeahead";
 import { MediaQueries } from "../constants/nodetypes";
 import GridPlacementField from "./gridplacementfield";
+import TabContainer from "./tabcontainer";
+import Tabs from "./tabs";
+import TabContent from "./tabcontent";
+import TabPane from "./tabpane";
+import Tab from "./tab";
+const THEME_VIEW_TAB = 'theme-view-tab';
 
 class ThemeView extends Component {
   constructor(props) {
@@ -226,7 +233,7 @@ class ThemeView extends Component {
     if (!graph) {
       return <div />;
     }
-
+    const { state } = this.props;
     const { spaceTheme = {} } = graph;
     const {
       themeColors = {},
@@ -397,295 +404,338 @@ class ThemeView extends Component {
                 </FormControl>
               </Box>
             </div>
-            <div className="col-md-4">
-              <div className="row">
-                <div className="col-md-12" >
-                  <Box maxheight={350} title={Titles.Fonts}>
-                    <FormControl>
-                      <TextInput
-                        value={this.state.fontName}
-                        label={`${Titles.Font} ${Titles.Name}`}
-                        title={`${Titles.Font} ${Titles.Name}`}
-                        immediate
-                        onChange={(value) => {
-                          this.setState({ fontName: value })
-                        }} />
+            <div className="col-md-10">
+              <TabContainer>
+                <Tabs>
+                  <Tab
+                    active={VisualEq(state, THEME_VIEW_TAB, 'Variables')}
+                    title={'Variables'}
+                    onClick={() => {
+                      this.props.setVisual(THEME_VIEW_TAB, 'Variables');
+                    }}
+                  />
+                  <Tab
+                    active={VisualEq(state, THEME_VIEW_TAB, 'Grid Placement')}
+                    title={'Grid Placement'}
+                    onClick={() => {
+                      this.props.setVisual(THEME_VIEW_TAB, 'Grid Placement');
+                    }}
+                  />
+                  <Tab
+                    active={VisualEq(state, THEME_VIEW_TAB, 'Others')}
+                    title={'Others'}
+                    onClick={() => {
+                      this.props.setVisual(THEME_VIEW_TAB, 'Others');
+                    }}
+                  />
+                </Tabs>
+              </TabContainer>
+              <TabContent>
+                <TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Variables')}>
+                  <div className="col-md-12">
+                    <div className="row">
+                      <div className="col-md-6" >
+                        <Box maxheight={350} title={Titles.Fonts}>
+                          <FormControl>
+                            <TextInput
+                              value={this.state.fontName}
+                              label={`${Titles.Font} ${Titles.Name}`}
+                              title={`${Titles.Font} ${Titles.Name}`}
+                              immediate
+                              onChange={(value) => {
+                                this.setState({ fontName: value })
+                              }} />
 
-                      <TextInput
-                        value={this.state.font}
-                        label={Titles.Font}
-                        title={Titles.Font}
-                        immediate
-                        onChange={(value) => {
-                          this.setState({ font: value })
-                        }} />
+                            <TextInput
+                              value={this.state.font}
+                              label={Titles.Font}
+                              title={Titles.Font}
+                              immediate
+                              onChange={(value) => {
+                                this.setState({ font: value })
+                              }} />
 
-                      <div className="row">
-                        <div className="col-md-6"><TextInput
-                          value={this.state.fontCss}
-                          label={Titles.FontCss}
-                          title={Titles.FontCss}
+                            <div className="row">
+                              <div className="col-md-6"><TextInput
+                                value={this.state.fontCss}
+                                label={Titles.FontCss}
+                                title={Titles.FontCss}
+                                immediate
+                                onChange={(value) => {
+                                  this.setState({ fontCss: value })
+                                }}
+                              />
+                              </div>
+                              <div className="col-md-6">
+                                <TextInput
+                                  value={this.state.fontCssVar}
+                                  label={Titles.FontCssVar}
+                                  immediate
+                                  title={Titles.FontCssVar}
+                                  onChange={(value) => {
+                                    if (value && value.indexOf('--') === -1) {
+                                      value = `--${value}`;
+                                    }
+                                    this.setState({ fontCssVar: value })
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            {this.state.font && this.state.fontCss && this.state.fontName && this.state.fontCssVar ? <button className="btn btn-primary" onClick={(event) => {
+                              if (this.state.font && this.state.fontCss && this.state.fontCssVar) {
+                                themeFonts.fonts = [{
+                                  font: this.state.font,
+                                  fontCss: this.state.fontCss,
+                                  fontCssVar: this.state.fontCssVar,
+                                  fontName: this.state.fontName
+                                }, ...themeFonts.fonts].unique(v => v.font + v.fontName);
+                                this.props.updateGraph('themeFonts', { ...themeFonts });
+                                this.setState({ font: '' })
+                              }
+                              event.stopPropagation();
+                              return false;
+                            }} >Ok</button> : null}
+                            <ButtonList
+                              active
+                              items={themeFonts.fonts.map(v => ({ title: v.font, id: v.font, ...v }))}
+                              renderItem={(item) => (<div className="col-md-12" style={{
+                                display: 'flex',
+                                alignItems: 'center'
+                              }}>
+                                <div className="col-md-10" >
+                                  <h5 style={{ margin: 0 }}>{item.font}</h5>
+                                  <h5 style={{ margin: 0 }}>{item.fontCss}</h5>
+                                  <h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
+                                  <h6 style={{ margin: 0 }}>{item.fontName}</h6>
+                                </div>
+                                <div className="col-md-2">
+                                  <button className="btn btn-default btn-flat" onClick={() => {
+                                    themeFonts.fonts = themeFonts.fonts.filter(x => x.font !== item.id);
+                                    this.props.updateGraph('themeFonts', { ...themeFonts })
+                                  }}><i className="fa fa-times" /></button>
+                                </div>
+                              </div>)}
+                              onClick={item => {
+                                this.setState({
+                                  ...item
+                                })
+                              }}
+                            />
+                          </FormControl>
+                        </Box>
+                      </div>
+                      <div className="col-md-6">
+                        <Box maxheight={350} title="Variables">
+                          <FormControl>
+                            <TextInput
+                              value={this.state.variable}
+                              label={Titles.Variable}
+                              title={Titles.Variable}
+                              immediate
+                              onChange={(value) => {
+                                if (value && value.indexOf('--') === -1) {
+                                  value = `--${value}`;
+                                }
+                                this.setState({ variable: value })
+                              }} />
+                            <TextInput
+                              value={this.state.variableValue}
+                              label={Titles.Value}
+                              title={Titles.Value}
+                              immediate
+                              onChange={(value) => {
+                                this.setState({ variableValue: value })
+                              }}
+                            />
+                            {this.state.variable && this.state.variableValue ? <button className={"btn btn-primary"} onClick={(event) => {
+                              if (this.state.variable && this.state.variableValue) {
+                                themeVariables.variables = [{
+                                  variable: this.state.variable,
+                                  variableValue: this.state.variableValue
+                                }, ...themeVariables.variables].unique(v => v.variable);
+                                this.props.updateGraph('themeVariables', { ...themeVariables });
+                              }
+                              event.stopPropagation();
+                              return false;
+                            }} >Ok</button> : null}
+                            <ButtonList
+                              active
+                              items={themeVariables.variables.map(v => ({ title: v.variable, id: v.variable, ...v }))}
+                              renderItem={(item) => (<div className="col-md-12" style={{
+                                display: 'flex',
+                                alignItems: 'center'
+                              }}>
+                                <div className="col-md-10" >
+                                  <h5 style={{ margin: 0 }}>{item.variable}</h5>
+                                  <h6 style={{ margin: 0 }}>{item.variableValue}</h6>
+                                </div>
+                                <div className="col-md-2">
+                                  <button className="btn btn-default btn-flat" onClick={() => {
+                                    themeVariables.variables = themeVariables.variables.filter(x => x.variable !== item.id);
+                                    this.props.updateGraph('themeVariables', { ...themeVariables })
+                                  }}><i className="fa fa-times" /></button>
+                                </div>
+                              </div>)}
+                              onClick={() => {
+                              }}
+                            />
+                          </FormControl>
+
+                        </Box>
+                      </div>
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Grid Placement')}>
+                  <div className="row">
+                    <div className="col-md-3">
+                      <Box title={`${Titles.GridPlacement}`}>
+                        <TextInput
+                          value={this.state.gridGroup}
+                          label={`${Titles.GridPlacement} ${Titles.Name}`}
                           immediate
+                          inputgroup
+                          title={`${Titles.GridPlacement} ${Titles.Name}`}
                           onChange={(value) => {
-                            this.setState({ fontCss: value })
+                            this.setState({ gridGroup: value })
+                          }}
+                          onClick={() => {
+                            let { gridGroup } = this.state
+                            if (gridGroup && gridGroup.trim()) {
+                              gridGroup = gridGroup.trim();
+                              this.props.updateGraph('themeGridPlacements', {
+                                grids: [{
+                                  id: GUID(),
+                                  name: gridGroup,
+                                  gridTemplateColumns: "",
+                                  gridTemplateRows: "",
+                                  gridPlacement: null
+                                }, ...themeGridPlacements.grids]
+                              });
+                            }
                           }}
                         />
-                        </div>
-                        <div className="col-md-6">
-                          <TextInput
-                            value={this.state.fontCssVar}
-                            label={Titles.FontCssVar}
-                            immediate
-                            title={Titles.FontCssVar}
-                            onChange={(value) => {
-                              if (value && value.indexOf('--') === -1) {
-                                value = `--${value}`;
-                              }
-                              this.setState({ fontCssVar: value })
-                            }}
-                          />
-                        </div>
-                      </div>
-                      {this.state.font && this.state.fontCss && this.state.fontName && this.state.fontCssVar ? <button onClick={() => {
-                        if (this.state.font && this.state.fontCss && this.state.fontCssVar) {
-                          themeFonts.fonts = [{
-                            font: this.state.font,
-                            fontCss: this.state.fontCss,
-                            fontCssVar: this.state.fontCssVar,
-                            fontName: this.state.fontName
-                          }, ...themeFonts.fonts].unique(v => v.font + v.fontName);
-                          this.props.updateGraph('themeFonts', { ...themeFonts });
-                          this.setState({ font: '' })
-                        }
-                      }} >Ok</button> : null}
-                      <ButtonList
-                        active
-                        items={themeFonts.fonts.map(v => ({ title: v.font, id: v.font, ...v }))}
-                        renderItem={(item) => (<div className="col-md-12" style={{
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}>
-                          <div className="col-md-10" >
-                            <h5 style={{ margin: 0 }}>{item.font}</h5>
-                            <h5 style={{ margin: 0 }}>{item.fontCss}</h5>
-                            <h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
-                            <h6 style={{ margin: 0 }}>{item.fontName}</h6>
-                          </div>
-                          <div className="col-md-2">
-                            <button className="btn btn-default btn-flat" onClick={() => {
-                              themeFonts.fonts = themeFonts.fonts.filter(x => x.font !== item.id);
-                              this.props.updateGraph('themeFonts', { ...themeFonts })
-                            }}><i className="fa fa-times" /></button>
-                          </div>
-                        </div>)}
-                        onClick={item => {
-                          this.setState({
-                            ...item
-                          })
-                        }}
-                      />
-                    </FormControl>
-                  </Box>
-                </div>
-                <div className="col-md-12">
-                  <Box maxheight={350} title="Variables">
-                    <FormControl>
-                      <TextInput
-                        value={this.state.variable}
-                        label={Titles.Variable}
-                        title={Titles.Variable}
-                        immediate
-                        onChange={(value) => {
-                          if (value && value.indexOf('--') === -1) {
-                            value = `--${value}`;
-                          }
-                          this.setState({ variable: value })
-                        }} />
-                      <TextInput
-                        value={this.state.variableValue}
-                        label={Titles.Value}
-                        title={Titles.Value}
-                        immediate
-                        onChange={(value) => {
-                          this.setState({ variableValue: value })
-                        }}
-                      />
-                      {this.state.variable && this.state.variableValue ? <button onClick={() => {
-                        if (this.state.variable && this.state.variableValue) {
-                          themeVariables.variables = [{
-                            variable: this.state.variable,
-                            variableValue: this.state.variableValue
-                          }, ...themeVariables.variables].unique(v => v.variable);
-                          this.props.updateGraph('themeVariables', { ...themeVariables });
-                        }
-                      }} >Ok</button> : null}
-                      <ButtonList
-                        active
-                        items={themeVariables.variables.map(v => ({ title: v.variable, id: v.variable, ...v }))}
-                        renderItem={(item) => (<div className="col-md-12" style={{
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}>
-                          <div className="col-md-10" >
-                            <h5 style={{ margin: 0 }}>{item.variable}</h5>
-                            <h6 style={{ margin: 0 }}>{item.variableValue}</h6>
-                          </div>
-                          <div className="col-md-2">
-                            <button className="btn btn-default btn-flat" onClick={() => {
-                              themeVariables.variables = themeVariables.variables.filter(x => x.variable !== item.id);
-                              this.props.updateGraph('themeVariables', { ...themeVariables })
-                            }}><i className="fa fa-times" /></button>
-                          </div>
-                        </div>)}
-                        onClick={() => {
-                        }}
-                      />
-                    </FormControl>
-
-                  </Box>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-2" >
-              <Box maxheight={500} title={Titles.Style}>
-                <FormControl>
-                  {colors}
-                </FormControl>
-              </Box>
-            </div>
-            <div className="col-md-2" >
-              <Box maxheight={500} title={Titles.ColorUse}>
-                <FormControl>
-                  {colorUses}
-                </FormControl>
-              </Box>
-            </div>
-            <div className="col-md-2" >
-              <Box maxheight={500} title={Titles.OtherUses}>
-                <FormControl>
-                  {otherUses}
-                </FormControl>
-              </Box>
-            </div>
-            <div className="col-md-2" >
-              <Box maxheight={500} title={Titles.SpaceTheme} onSearch={(search) => {
-                this.setState({
-                  spaceSearch: search
-                });
-              }}>
-                <FormControl>
-                  <SelectInput
-                    options={Object.keys(ComponentTags).map(v => ({ title: v, value: v, id: v }))}
-                    label="Spaces"
-                    onChange={(value) => {
-                      this.setState({ componentTag: value })
-                    }}
-                    value={this.state.componentTag} />
-
-                  {this.getSpaceFields(this.state.componentTag, this.state.mediaSize, spaceTheme, themeColors, themeVariables, f => this.state.spaceSearch && f.toLowerCase().indexOf(this.state.spaceSearch.toLowerCase()) !== -1)}
-                </FormControl>
-              </Box>
-            </div>
-            <div className="col-md-2" >
-              <Box maxheight={500} title={this.state.sectionType || 'Search'} onSearch={(search) => {
-                this.setState({
-                  [`search-${this.state.sectionType || 'search'}`]: search
-                });
-              }}>
-                <FormControl>
-                  <SelectInput
-                    options={HTMLElementGroups.map(v => ({ title: v.name, value: v.name, id: v.name }))}
-                    label="Section Types"
-                    onChange={(value) => {
-                      this.setState({ sectionType: value })
-                    }}
-                    value={this.state.sectionType} />
-                  {this.state.sectionType ? <SelectInput
-                    options={sectionTypeOptions}
-                    label={this.state.sectionType}
-                    onChange={(value) => {
-                      this.setState({ [this.state.sectionType]: value })
-                    }}
-                    value={this.state[this.state.sectionType]} /> : null}
-                  {this.getEditBoxes(this.state[this.state.sectionType],
-                    this.state.mediaSize,
-                    spaceTheme,
-                    themeColors,
-                    HTMLElementGroups.find(f => f.name === this.state.sectionType),
-                    themeVariables, f => this.state[`search-${this.state.sectionType}`] && f.toLowerCase().indexOf(`${this.state[`search-${this.state.sectionType}`]}`.toLowerCase()) !== -1)}
-                </FormControl>
-              </Box>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-2">
-              <Box title={`${Titles.GridPlacement}`}>
-                <TextInput
-                  value={this.state.gridGroup}
-                  label={`${Titles.GridPlacement} ${Titles.Name}`}
-                  immediate
-                  inputgroup
-                  title={`${Titles.GridPlacement} ${Titles.Name}`}
-                  onChange={(value) => {
-                    this.setState({ gridGroup: value })
-                  }}
-                  onClick={() => {
-                    let { gridGroup } = this.state
-                    if (gridGroup && gridGroup.trim()) {
-                      gridGroup = gridGroup.trim();
-                      this.props.updateGraph('themeGridPlacements', {
-                        grids: [{
-                          id: GUID(),
-                          name: gridGroup,
-                          gridTemplateColumns: "",
-                          gridTemplateRows: "",
-                          gridPlacement: null
-                        }, ...themeGridPlacements.grids]
-                      });
-                    }
-                  }}
-                />
-                <ButtonList
-                  active
-                  items={themeGridPlacements.grids.map(v => ({ title: v.name, ...v }))}
-                  isSelected={(v) => v.id === this.state.currentGrid}
-                  renderItem={(item) => (<div className="col-md-12" style={{
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <div className="col-md-10" >
-                      <h4 style={{ margin: 0 }}>{item.name}</h4>
-                      <h5 style={{ margin: 0 }}>{item.gridTemplateColumns}</h5>
-                      <h6 style={{ margin: 0 }}>{item.gridTemplateRows}</h6>
+                        <ButtonList
+                          active
+                          items={themeGridPlacements.grids.map(v => ({ title: v.name, ...v }))}
+                          isSelected={(v) => v.id === this.state.currentGrid}
+                          renderItem={(item) => (<div className="col-md-12" style={{
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}>
+                            <div className="col-md-10" >
+                              <h4 style={{ margin: 0 }}>{item.name}</h4>
+                              <h5 style={{ margin: 0 }}>{item.gridTemplateColumns}</h5>
+                              <h6 style={{ margin: 0 }}>{item.gridTemplateRows}</h6>
+                            </div>
+                            <div className="col-md-2">
+                              <button className="btn btn-default btn-flat" onClick={() => {
+                                themeGridPlacements.grids = themeGridPlacements.grids.filter(x => x.id !== item.id);
+                                this.props.updateGraph('themeGridPlacements', {
+                                  ...themeGridPlacements,
+                                  grids: themeGridPlacements.grids
+                                });
+                              }}><i className="fa fa-times" /></button>
+                            </div>
+                          </div>)}
+                          onClick={item => {
+                            this.setState({ currentGrid: item.id })
+                          }}
+                        />
+                      </Box>
                     </div>
-                    <div className="col-md-2">
-                      <button className="btn btn-default btn-flat" onClick={() => {
-                        themeGridPlacements.grids = themeGridPlacements.grids.filter(x => x.id !== item.id);
-                        this.props.updateGraph('themeGridPlacements', {
-                          ...themeGridPlacements,
-                          grids: themeGridPlacements.grids
+                    <div className="col-md-9">
+                      <Box title={Titles.GridPlacement}>
+                        <GridPlacementField
+                          squareHeight={100}
+                          gridSetup={themeGridPlacements.grids.find(x => x.id === this.state.currentGrid)}
+                          onChange={(setup) => {
+                            this.props.updateGraph('themeGridPlacements', {
+                              ...themeGridPlacements,
+                              grids: [setup, ...themeGridPlacements.grids.filter(x => x.id !== setup.id)]
+                            });
+                          }} tags={Object.keys(ComponentTags)} />
+                      </Box>
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Others')}>
+                  <div className="row">
+                    <div className="col-md-2" >
+                      <Box maxheight={500} title={Titles.Style}>
+                        <FormControl>
+                          {colors}
+                        </FormControl>
+                      </Box>
+                    </div>
+                    <div className="col-md-2" >
+                      <Box maxheight={500} title={Titles.ColorUse}>
+                        <FormControl>
+                          {colorUses}
+                        </FormControl>
+                      </Box>
+                    </div>
+                    <div className="col-md-2" >
+                      <Box maxheight={500} title={Titles.OtherUses}>
+                        <FormControl>
+                          {otherUses}
+                        </FormControl>
+                      </Box>
+                    </div>
+                    <div className="col-md-2" >
+                      <Box maxheight={500} title={Titles.SpaceTheme} onSearch={(search) => {
+                        this.setState({
+                          spaceSearch: search
                         });
-                      }}><i className="fa fa-times" /></button>
+                      }}>
+                        <FormControl>
+                          <Typeahead
+                            options={Object.keys(ComponentTags).map(v => ({ title: v, value: v, id: v }))}
+                            label="Spaces"
+                            onChange={(value) => {
+                              this.setState({ componentTag: value })
+                            }}
+                            value={this.state.componentTag} />
+
+                          {this.getSpaceFields(this.state.componentTag, this.state.mediaSize, spaceTheme, themeColors, themeVariables, f => this.state.spaceSearch && f.toLowerCase().indexOf(this.state.spaceSearch.toLowerCase()) !== -1)}
+                          <div style={{ height: 300 }}></div>
+                        </FormControl>
+                      </Box>
                     </div>
-                  </div>)}
-                  onClick={item => {
-                    this.setState({ currentGrid: item.id })
-                  }}
-                />
-              </Box>
-            </div>
-            <div className="col-md-10">
-              <Box title={Titles.GridPlacement}>
-                <GridPlacementField
-                  squareHeight={100}
-                  gridSetup={themeGridPlacements.grids.find(x => x.id === this.state.currentGrid)}
-                  onChange={(setup) => {
-                    this.props.updateGraph('themeGridPlacements', {
-                      ...themeGridPlacements,
-                      grids: [setup, ...themeGridPlacements.grids.filter(x => x.id !== setup.id)]
-                    });
-                  }} tags={Object.keys(ComponentTags)} />
-              </Box>
+                    <div className="col-md-2" >
+                      <Box maxheight={500} title={this.state.sectionType || 'Search'} onSearch={(search) => {
+                        this.setState({
+                          [`search-${this.state.sectionType || 'search'}`]: search
+                        });
+                      }}>
+                        <FormControl>
+                          <SelectInput
+                            options={HTMLElementGroups.map(v => ({ title: v.name, value: v.name, id: v.name }))}
+                            label="Section Types"
+                            onChange={(value) => {
+                              this.setState({ sectionType: value })
+                            }}
+                            value={this.state.sectionType} />
+                          {this.state.sectionType ? <SelectInput
+                            options={sectionTypeOptions}
+                            label={this.state.sectionType}
+                            onChange={(value) => {
+                              this.setState({ [this.state.sectionType]: value })
+                            }}
+                            value={this.state[this.state.sectionType]} /> : null}
+                          {this.getEditBoxes(this.state[this.state.sectionType],
+                            this.state.mediaSize,
+                            spaceTheme,
+                            themeColors,
+                            HTMLElementGroups.find(f => f.name === this.state.sectionType),
+                            themeVariables, f => this.state[`search-${this.state.sectionType}`] && f.toLowerCase().indexOf(`${this.state[`search-${this.state.sectionType}`]}`.toLowerCase()) !== -1)}
+                        </FormControl>
+                      </Box>
+                    </div>
+                  </div>
+
+                </TabPane>
+              </TabContent>
             </div>
           </div>
         </section>

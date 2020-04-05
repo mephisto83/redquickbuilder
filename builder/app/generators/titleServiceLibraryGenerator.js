@@ -1,4 +1,4 @@
-import { GetCurrentGraph, GetNodeTitle } from "../actions/uiactions";
+import { GetCurrentGraph, GetNodeTitle, NodeProperties, GetNodeProp } from "../actions/uiactions";
 import { UITypes, Languages } from "../constants/nodetypes";
 
 export default class TitleServiceLibraryGenerator {
@@ -26,7 +26,7 @@ export default class TitleServiceLibraryGenerator {
       Object.keys(languageTitles.titles).map(v => {
         const temp = languageTitles.titles[v];
         const {
-          title = GetNodeTitle(temp.id),
+          title = GetNodeProp(temp.id, NodeProperties.Label),
           id = temp.id,
           properties = {}
         } = temp;

@@ -68,7 +68,7 @@ class TranslationView extends Component {
       NodeTypes.Screen,
       NodeTypes.ScreenOption].filter(x => !this.state[x]))
       .filter(x => this.state.OnlyUntranslated ? !languageTitles.titles[x.id] : true)
-      .filter(x => this.state.titleSearch && `${GetNodeTitle(x)}`.toLowerCase().indexOf(this.state.titleSearch.toLowerCase()) !== -1);
+      .filter(x => this.state.titleSearch && `${GetNodeProp(x, NodeProperties.Label)} ${x.id} ${GetNodeTitle(x)}`.toLowerCase().indexOf(this.state.titleSearch.toLowerCase()) !== -1);
     return (
       <TopViewer active={active} >
         <section className="content">

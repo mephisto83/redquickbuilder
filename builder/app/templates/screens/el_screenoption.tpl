@@ -14,6 +14,7 @@ import {
   Button, Left, Right, Body, Icon,
   SingleSelect,
   Text, View, Form, Item,
+  CheckBox,
   Input, Label, List, Thumbnail,
   Menu
 }  from '{{relative_depth}}html-components';
