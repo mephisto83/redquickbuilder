@@ -25,7 +25,6 @@ export default class GridPlacementField extends Component {
   }
 
   render() {
-    const currentNode = this.props.node;
     const tags = this.props.tags || [];
     const gridSetup = this.props.gridSetup || {};
     const { gridTemplateColumns = "", gridTemplateRows = "", name = "", mediaSizes = {}, gridPlacement } = gridSetup;
@@ -98,6 +97,9 @@ export default class GridPlacementField extends Component {
                   <div
                     title={gridplacement[row * columns.length + col]}
                     style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                       ...square,
                       ...(gridplacement[row * columns.length + col] ===
                         this.state.currentSection

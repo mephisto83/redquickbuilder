@@ -30,14 +30,17 @@ export default class Input extends React.Component {
 		InputFunctions.componentDidUpdate(this, prevProps);
 	}
 
+	cssClasses() {
+		return '';
+	}
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
 		return (
-			<div class={`${style.form__group} ${style.field}`}>
+			<div className={`${style.form__group} ${style.field}`}>
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
-					className={`${style.form__field}`}
+					className={`${style.form__field} ${this.cssClasses()}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}
 					value={InputFunctions.value(this)}
@@ -47,7 +50,7 @@ export default class Input extends React.Component {
 					required
 					name={this.state.$name}
 				/>
-				<label class={`${style.form__label}`} for={this.state.$name}>
+				<label className={`${style.form__label}`} for={this.state.$name}>
 					{InputFunctions.placeholder(this)}
 				</label>
 				<Validation data={this.props.error} />

@@ -595,8 +595,11 @@ export const ComponentTypes = {
     }
   }
 };
+ComponentTypes[UITypes.ReactNative].Password = { ...ComponentTypes[UITypes.ReactNative].Input };
 
-ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
+ComponentTypes[UITypes.ReactNative].Password.template = "./app/templates/components/password.tpl";
+
+  ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
 Object.keys(ComponentTypes.ReactNative).map(key => {
   if (ComponentTypes.ReactNative[key]) {
     ComponentTypes.ReactNative[key].library =

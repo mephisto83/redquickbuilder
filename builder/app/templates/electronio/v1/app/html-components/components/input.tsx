@@ -27,7 +27,9 @@ export default class Input extends React.Component {
 	componentDidUpdate(prevProps) {
 		InputFunctions.componentDidUpdate(this, prevProps);
 	}
-
+	cssClasses() {
+		return '';
+	}
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
 		return (
@@ -35,7 +37,7 @@ export default class Input extends React.Component {
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
-					className={'form-control'}
+					className={`form-control ${this.cssClasses()}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}
 					value={InputFunctions.value(this)}

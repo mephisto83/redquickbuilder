@@ -27,6 +27,146 @@
     "themeGridPlacements": {
         "grids": [
             {
+                "id": "88756de0-9ad1-48d6-9b2b-17c072fc3de8",
+                "name": "Authentication",
+                "gridTemplateColumns": "150px 2fr",
+                "gridTemplateRows": "1fr 1fr 1fr 1fr",
+                "gridPlacement": [
+                    "UserName",
+                    "UserName",
+                    "Password",
+                    "Password",
+                    "RememberMe",
+                    "RememberMe",
+                    "ButtonContainer"
+                ],
+                "mediaSizes": {
+                    "Extra small devices": true,
+                    "Small devices": true,
+                    "Media devices": true,
+                    "Large devices": true,
+                    "Extra devices": true
+                }
+            },
+            {
+                "id": "43518082-4c5e-4e27-98e9-9304f0363826",
+                "name": "ButtonContainer",
+                "gridTemplateColumns": "1fr 1fr",
+                "gridTemplateRows": "1fr",
+                "gridPlacement": [
+                    "MainButton",
+                    "SecondaryButton"
+                ],
+                "mediaSizes": {
+                    "Extra small devices": true,
+                    "Small devices": true,
+                    "Media devices": true,
+                    "Large devices": true,
+                    "Extra devices": true
+                }
+            },
+            {
+                "id": "c72f32ce-6bea-45d0-8848-c5158ba06543",
+                "name": "Register",
+                "gridTemplateColumns": "1fr 1fr 1fr 1fr",
+                "gridTemplateRows": "1fr 1fr 1fr 1fr 1fr",
+                "gridPlacement": [
+                    "UserName",
+                    "UserName",
+                    "UserName",
+                    "UserName",
+                    "Email",
+                    "Email",
+                    "Email",
+                    "Email",
+                    "Password",
+                    "Password",
+                    "Password",
+                    "Password",
+                    "ConfirmPassword",
+                    "ConfirmPassword",
+                    "ConfirmPassword",
+                    "ConfirmPassword",
+                    "ButtonContainer",
+                    ""
+                ],
+                "mediaSizes": {
+                    "Media devices": true,
+                    "Large devices": true,
+                    "Extra devices": true
+                }
+            },
+            {
+                "id": "abab0c96-8eaf-4d40-87ec-bda959eb6b07",
+                "name": "Register",
+                "gridTemplateColumns": "1fr 1fr",
+                "gridTemplateRows": "1fr 1fr 1fr 1fr 1fr",
+                "gridPlacement": [
+                    "UserName",
+                    "UserName",
+                    "Email",
+                    "Email",
+                    "Password",
+                    "Password",
+                    "ConfirmPassword",
+                    "ConfirmPassword",
+                    "MainButton",
+                    "SecondaryButton"
+                ],
+                "mediaSizes": {
+                    "Extra devices": false,
+                    "Large devices": false,
+                    "Media devices": false,
+                    "Small devices": true,
+                    "Extra small devices": true
+                }
+            },
+            {
+                "id": "f0a7e186-f7a8-4099-a260-4578b1624c9e",
+                "name": "ListItem",
+                "gridTemplateColumns": "1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr",
+                "gridTemplateRows": "1fr 1fr 1fr",
+                "gridPlacement": [
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "MainContent",
+                    "SecondaryContent",
+                    "SecondaryContent",
+                    "SecondaryContent",
+                    "SecondaryContent",
+                    "SecondaryContent",
+                    "SecondaryContent",
+                    "DetailContent",
+                    "DetailContent",
+                    "DetailContent",
+                    "DetailContent",
+                    "MainButton",
+                    "SecondaryButton",
+                    "SecondaryButton",
+                    "SecondaryButton",
+                    "SecondaryButton",
+                    "SecondaryButton",
+                    "DetailContent",
+                    "DetailContent",
+                    "DetailContent",
+                    "DetailContent"
+                ],
+                "mediaSizes": {
+                    "Extra devices": true,
+                    "Large devices": true,
+                    "Media devices": true,
+                    "Small devices": true,
+                    "Extra small devices": true
+                }
+            },
+            {
                 "id": "64cf8796-e182-4b12-91d4-2722b2974035",
                 "name": "main-screen",
                 "gridTemplateColumns": "1fr 600 1fr",

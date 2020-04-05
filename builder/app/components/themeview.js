@@ -339,7 +339,7 @@ class ThemeView extends Component {
       <TopViewer active={active} >
         <section className="content">
           <div className="row">
-            <div className="col-md-2">
+            <div className="col-md-1">
               <Box maxheight={600} title={Titles.Style}>
                 <FormControl>
                   <SelectInput
@@ -404,7 +404,7 @@ class ThemeView extends Component {
                 </FormControl>
               </Box>
             </div>
-            <div className="col-md-10">
+            <div className="col-md-11">
               <TabContainer>
                 <Tabs>
                   <Tab
@@ -668,7 +668,7 @@ class ThemeView extends Component {
                         </FormControl>
                       </Box>
                     </div>
-                    <div className="col-md-2" >
+                    <div className="col-md-3" >
                       <Box maxheight={500} title={Titles.ColorUse}>
                         <FormControl>
                           {colorUses}

@@ -92,6 +92,7 @@ class TranslationView extends Component {
                     NodeTypes.ScreenOption].map(nodeType => {
                       return (<CheckBox
                         label={`Exclude ${nodeType}`}
+                        key={`node-type-${nodeType}`}
                         onChange={(value) => {
                           this.setState({ [nodeType]: value })
                         }}

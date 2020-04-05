@@ -1,3 +1,8 @@
 .asdkflajsd {
-  position: relative;
+	position: relative;
+}
+
+.treeview-menu > li {
+	margin: 0;
+	padding-right: 5px;
 }

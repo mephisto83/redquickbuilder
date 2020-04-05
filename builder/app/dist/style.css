@@ -1,2 +1,2 @@
-.asdkflajsd{position:relative}
+label[color]{position:relative}label[color]:after{--size:20px;--space:-25px;content:"";pointer-events:none;height:var(--size);position:absolute;width:var(--size);top:0;right:var(--space);background-color:var(--color);color:var(--color);border:1px solid #313131}.typeahead__typeahead__2A0HM{position:relative}.typeahead__typeaheadContainer__3ebTA{position:absolute;z-index:10;max-height:150px;overflow:hidden;overflow-y:auto;top:60px;width:100%;background-color:#fff}.asdkflajsd{position:relative}.treeview-menu>li{margin:0;padding-right:5px}
 /*# sourceMappingURL=style.css.map */

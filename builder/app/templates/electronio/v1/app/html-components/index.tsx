@@ -28,6 +28,7 @@ import MultiViewList from './components/multiviewlist';
 import SingleSelect from './components/singleselect';
 import CheckBox from './components/checkbox';
 import Form from './components/form';
+import PasswordField from './components/password';
 export {
   Content,
   Container,
@@ -43,6 +44,7 @@ export {
   Form,
   H3,
   H2,
+  PasswordField,
   H1,
   Left,
   Right,

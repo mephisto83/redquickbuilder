@@ -16,6 +16,7 @@ import { SingleSelect, Container, ListItem,
   Right, Body, Icon, Text,
   View, Form, Item,
   CheckBox,
+  PasswordField,
 Input, Label, List, Thumbnail } from 'native-base';
 import { NavigationActions } from 'react-navigation';
 {{imports}}

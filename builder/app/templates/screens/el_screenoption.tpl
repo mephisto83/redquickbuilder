@@ -15,6 +15,7 @@ import {
   SingleSelect,
   Text, View, Form, Item,
   CheckBox,
+  PasswordField,
   Input, Label, List, Thumbnail,
   Menu
 }  from '{{relative_depth}}html-components';

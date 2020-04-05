@@ -1,3 +1,5 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/sort-comp */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
@@ -490,7 +492,7 @@ class LayoutView extends Component {
               <Box primary maxheight={350} title={Titles.Layout}>
                 {this.state.selectedCell ? (
                   <button
-                    onClick={() => {
+                    onClick={(event) => {
                       let layout =
                         UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||
                         CreateLayout();
@@ -504,13 +506,15 @@ class LayoutView extends Component {
                         value: layout
                       });
                       this.setState({ selectedCell: null });
+                      event.stopPropagation();
+                      return null;
                     }}
                   >
                     Remove Selected
                   </button>
                 ) : null}
                 <SelectInput
-                  options={[].interpolate(1, 12, t => ({ title: t, value: t }))}
+                  options={[].interpolate(1, 20, t => ({ title: t, value: t }))}
                   onChange={val => {
                     let layout =
                       UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||

@@ -2,7 +2,7 @@ label[color] {
   position: relative;
 }
 
-label[color]::after {
+label[color]::before {
   --size: 20px;
   --space: -25px;
 	content: '';

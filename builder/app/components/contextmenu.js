@@ -40,6 +40,7 @@ import ThreeColumn from "../nodepacks/ThreeColumn";
 import UpdateUserExecutor from "../nodepacks/UpdateUserExecutor";
 import { MethodFunctions } from "../constants/functiontypes";
 import StoreModelArrayStandard from "../nodepacks/StoreModelArrayStandard";
+import LayoutOptions from './layoutoptions';
 import {
   FunctionTemplateKeys,
   MethodTemplateKeys
@@ -60,6 +61,7 @@ import CreateStandardClaimService from "../nodepacks/CreateStandardClaimService"
 import GetModelViewModelForList from "../nodepacks/GetModelViewModelForList";
 import AddButtonToComponent from "../nodepacks/AddButtonToComponent";
 import GetScreenValueParameter from "../nodepacks/GetScreenValueParameter";
+import AddComponentMenu from './addcomponentmenu';
 import ConnectDataChainToCompontApiConnector from "../nodepacks/ConnectDataChainToCompontApiConnector";
 import CreateNavigateToScreenDC from "../nodepacks/CreateNavigateToScreenDC";
 import TextInput from "./textinput";
@@ -106,6 +108,9 @@ import GridHeaderMainMenuMain from "../nodepacks/layouts/GridHeaderMainMenuMain"
 import AddMenuToComponent from "../nodepacks/AddMenuToComponent";
 import { MenuTreeOptions } from "../constants/menu";
 import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from "../nodepacks/batch/SetupViewTypes";
+import ListItemGrid from "../nodepacks/layouts/ListItemGrid";
+import FunctionExecutor from "./functionexecutor";
+import { SecondaryOptions } from "../constants/visual";
 
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -326,7 +331,7 @@ class ContextMenu extends Component {
           case LinkType.EventMethodInstance:
           case LinkType.ComponentExternalApi:
           default:
-            let skip = false;
+            const skip = false;
             // if (LinkType.ComponentExternalApi === linkType) {
             //   if (
             //     ![NodeTypes.ViewType].some(
@@ -856,69 +861,11 @@ class ContextMenu extends Component {
         open={UIA.Visual(state, "ScreenOptionOperations")}
         active
         title={Titles.Layout}
-        innerStyle={{ maxHeight: 300, overflowY: "auto" }}
-        toggle={() => {
-          this.props.toggleVisual("ScreenOptionOperations");
+        innerStyle={{ maxHeight: 600, overflowY: "auto" }}
+        onClick={() => {
+          this.setState({ secondaryMenu: SecondaryOptions.LayoutOptions })
         }}
-      >
-        <TreeViewMenu
-          title="Set Tiny Tweaks Layout"
-          onClick={() => {
-            this.props.graphOperation(
-              TinyTweaks({ component: currentNode.id })
-            );
-          }}
-        />
-        <TreeViewMenu open={UIA.Visual(state, "grid-layout-options")}
-          active
-          title={`Grid ${Titles.Layout}`}
-          innerStyle={{ maxHeight: 300, overflowY: "auto" }}
-          toggle={() => {
-            this.props.toggleVisual("grid-layout-options");
-          }}>
-          <TreeViewMenu title="Header MainMenu Main" onClick={() => {
-            this.props.graphOperation(GridHeaderMainMenuMain({
-              component: currentNode.id
-            }));
-          }} />
-        </TreeViewMenu>
-        <TreeViewMenu
-          title="Basic Application Layout"
-
-          onClick={() => {
-            this.props.graphOperation(
-              BasicApplicationLayout({ component: currentNode.id })
-            );
-          }}
-        />
-        <TreeViewMenu
-          title="Basic Double Side Column"
-
-          onClick={() => {
-            this.props.graphOperation(
-              BasicDoubleSideColumn({ component: currentNode.id })
-            );
-          }}
-        />
-        <TreeViewMenu
-          title="Four Column"
-
-          onClick={() => {
-            this.props.graphOperation(
-              FourColumn({ component: currentNode.id })
-            );
-          }}
-        />
-        <TreeViewMenu
-          title="Three Column"
-
-          onClick={() => {
-            this.props.graphOperation(
-              ThreeColumn({ component: currentNode.id })
-            );
-          }}
-        />
-      </TreeViewMenu>
+      />
     );
     const viewTypeModel = currentNode ? UIA.GetViewTypeModel(currentNode.id) : null;
     switch (currentNodeType) {
@@ -1160,9 +1107,7 @@ class ContextMenu extends Component {
                               node: currentNode.id
                             });
                         }
-                        commands.push(function () {
-                          return CollectionDataChainsIntoCollections();
-                        })
+                        commands.push(() => CollectionDataChainsIntoCollections())
                         this.props.graphOperation([...commands]);
                       }}
                     />
@@ -2166,44 +2111,7 @@ class ContextMenu extends Component {
                 />
               ) : null}
             </TreeViewMenu>
-            <TreeViewMenu
-              open={UIA.Visual(state, "Adding Component")}
-              active
-              title={Titles.AddComponentNew}
-              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
-              toggle={() => {
-                this.props.toggleVisual("Adding Component");
-              }}
-            >
-              <TreeViewItemContainer>
-                <SelectInput
-                  options={Object.keys(ComponentTypes.ReactNative).map(v => ({
-                    title: v,
-                    id: v,
-                    value: v
-                  }))}
-                  label={Titles.ComponentType}
-                  onChange={value => {
-                    this.setState({ componentType: value });
-                  }}
-                  value={this.state.componentType}
-                />
-              </TreeViewItemContainer>
-              {this.state.componentType ? (
-                <TreeViewMenu
-                  title={`${Titles.Add} ${this.state.componentType}`}
-
-                  onClick={() => {
-                    this.props.graphOperation(
-                      AddComponent({
-                        component: currentNode.id,
-                        componentType: this.state.componentType
-                      })
-                    );
-                  }}
-                />
-              ) : null}
-            </TreeViewMenu>
+            <AddComponentMenu />
             <TreeViewMenu
               open={UIA.Visual(state, "Reattach Component")}
               active
@@ -2917,6 +2825,22 @@ class ContextMenu extends Component {
     );
   }
 
+  setSecondaryMenu(menu) {
+    this.setState({ secondaryMenu: menu })
+  }
+
+  getDoubleWideContent() {
+    const { state } = this.props;
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    if (currentNode) {
+      switch (this.state.secondaryMenu) {
+        case SecondaryOptions.LayoutOptions:
+          return <LayoutOptions />;
+      }
+    }
+    return null;
+  }
+
   render() {
     const { state } = this.props;
     const exit = () => {
@@ -2937,7 +2861,7 @@ class ContextMenu extends Component {
           style={{
             zIndex: 1000,
             position: "fixed",
-            width: 250,
+            width: this.state.secondaryMenu ? 500 : 250,
             display,
             top: 250,
             left: 500
@@ -2958,15 +2882,29 @@ class ContextMenu extends Component {
               </button>
             </div>
             <div className="modal-body" style={{ padding: 0 }}>
-              <GenericPropertyContainer
-                active
-                title="asdf"
-                subTitle="afaf"
-                nodeType={nodeType}
-              >
-                {defaultMenus}
-                {menuitems}
-              </GenericPropertyContainer>
+              <div className={this.state.secondaryMenu ? "" : "row"} style={this.state.secondaryMenu ? { display: 'flex' } : {}} >
+                <div className={this.state.secondaryMenu ? "" : "col-md-12"} style={this.state.secondaryMenu ? { width: '50%' } : {}}>
+                  <GenericPropertyContainer
+                    active
+                    title="asdf"
+                    subTitle="afaf"
+                    nodeType={nodeType}
+                  >
+                    {defaultMenus}
+                    {menuitems}
+                  </GenericPropertyContainer>
+                </div>
+                {this.state.secondaryMenu ? (<div style={{ width: '50%' }}>
+                  <GenericPropertyContainer
+                    active
+                    title="asdf"
+                    subTitle="afaf"
+                    nodeType={nodeType}
+                  >
+                    {this.getDoubleWideContent()}
+                  </GenericPropertyContainer>
+                </div>) : null}
+              </div>
             </div>
             <div className="modal-footer draggable-footer">
               <button
