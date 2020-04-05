@@ -211,9 +211,10 @@ export const ColorUses = {
   inputFieldSecondary: 'inputFieldSecondary',
   inputFieldGray: 'inputFieldGray',
   navItemLinkDisabledColor: 'navItemLinkDisabledColor',
+  menuActiveTextColor: 'menuActiveTextColor',
   menuNavLinkBackgroundColor: "menuNavLinkBackgroundColor",
   inputFieldWhite: 'inputFieldWhite',
-  navItemLinkColor:'navItemLinkColor'
+  navItemLinkColor: 'navItemLinkColor'
 }
 
 export const OtherUses = {

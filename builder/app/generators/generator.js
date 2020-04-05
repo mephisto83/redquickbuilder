@@ -35,6 +35,7 @@ import ReactNativeSelectorFunctions from "./selectorgenerator";
 import ReactNativeLists from "./listsgenerator";
 import ValidatorGenerator from "./validatorgenerator";
 import FetchServiceGenerator from "./fetchservicegenerator";
+import TitleServiceLibraryGenerator from './titleServiceLibraryGenerator';
 
 export default class Generator {
   static generate(options) {
@@ -152,6 +153,8 @@ export default class Generator {
         return ReactNativeSelectorFunctions.Generate({ state, key, language });
       case ReactNativeTypes.Lists:
         return ReactNativeLists.Generate({ state, key, language });
+      case ReactNativeTypes.TitleService:
+        return TitleServiceLibraryGenerator.Generate({ state, key, language });
       default:
         console.log('unhandled generator case');
         break;

@@ -66,7 +66,7 @@ class TranslationView extends Component {
       NodeTypes.Model,
       NodeTypes.ComponentNode,
       NodeTypes.Screen,
-      NodeTypes.ScreenOption])
+      NodeTypes.ScreenOption].filter(x => !this.state[x]))
       .filter(x => this.state.OnlyUntranslated ? !languageTitles.titles[x.id] : true)
       .filter(x => this.state.titleSearch && `${GetNodeTitle(x)}`.toLowerCase().indexOf(this.state.titleSearch.toLowerCase()) !== -1);
     return (
@@ -84,7 +84,19 @@ class TranslationView extends Component {
                   onChange={(value) => {
                     this.setState({ OnlyUntranslated: value })
                   }}
-                  value={this.state.OnlyUntranslated} />
+                  value={this.state.OnlyUntranslated} />{
+                  [
+                    NodeTypes.Model,
+                    NodeTypes.ComponentNode,
+                    NodeTypes.Screen,
+                    NodeTypes.ScreenOption].map(nodeType => {
+                      return (<CheckBox
+                        label={`Exclude ${nodeType}`}
+                        onChange={(value) => {
+                          this.setState({ [nodeType]: value })
+                        }}
+                        value={this.state[nodeType]} />)
+                    })}
                 <ButtonList
                   active
                   items={nodesForTranslation.map(v => (

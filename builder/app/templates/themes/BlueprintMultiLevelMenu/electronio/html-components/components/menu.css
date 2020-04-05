@@ -121,6 +121,11 @@ ul {
 	cursor: default;
 }
 
+.nav-sidebar > .nav-item > .nav-link.active > .icon-active,
+.nav-sidebar > .nav-item > .nav-link.active > p {
+	color: var(--menuActiveTextColor)
+}
+
 .nav-sidebar .nav-link p {
 	display: inline-block;
 	margin: 0;

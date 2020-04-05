@@ -106,6 +106,7 @@ export const ReactNativeTypes = {
   Navigation: "navigation",
   Keys: "keys",
   ControllerActions: "controller-actions",
+  TitleService: 'title-service',
   Configuration: "configuration",
   Selectors: "selectors",
   DataChainFunctions: "data-chain",

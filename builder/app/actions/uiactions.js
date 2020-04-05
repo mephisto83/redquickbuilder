@@ -1959,16 +1959,16 @@ function buildModelMethodMenu() {
   const listPages = NodesByType(null, NodeTypes.Screen).filter(x => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll);
   const underPages = NodesByType(null, NodeTypes.Screen).filter(x => [ViewTypes.Create, ViewTypes.GetAll].some(v => v === GetNodeProp(x, NodeProperties.ViewType)));
 
-  const screens = listPages.map(v => `{ name: 'top-${GetCodeName(v)}' }`);
+  const screens = listPages.map(v => `{ title: '${GetNodeTitle(v)}', name: 'top-${GetCodeName(v)}' }`);
   const subscreens = underPages.map(v => {
     const tpage = listPages.find(vt => GetNodeProp(vt, NodeProperties.Model) === GetNodeProp(v, NodeProperties.Model));
-    const temp = `{ name: '${GetCodeName(v)}', parent: 'top-${GetCodeName(tpage)}' }`;
+    const temp = `{title: '${GetNodeTitle(v)}',  name: '${GetCodeName(v)}', parent: 'top-${GetCodeName(tpage)}' }`;
     return temp;
   });
 
   return ` () => {
-    let toppages = [${screens.join()}].map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.name), parent: null }));
-    let underpages = [${subscreens.join()}].filter(v =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.name), parent: v.parent }));
+    let toppages = [${screens.join()}].map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: null }));
+    let underpages = [${subscreens.join()}].filter(v =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: v.parent }));
     return [...toppages, ...underpages]
 }`;
 }
