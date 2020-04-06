@@ -863,7 +863,7 @@ class ContextMenu extends Component {
         title={Titles.Layout}
         innerStyle={{ maxHeight: 600, overflowY: "auto" }}
         onClick={() => {
-          this.setState({ secondaryMenu: SecondaryOptions.LayoutOptions })
+          this.setState({ secondaryMenu: this.state.secondaryMenu === SecondaryOptions.LayoutOptions ? null : SecondaryOptions.LayoutOptions })
         }}
       />
     );
@@ -1794,6 +1794,8 @@ class ContextMenu extends Component {
                 );
               }}
             />
+
+            <AddComponentMenu />
             <TreeViewMenu
               open={UIA.Visual(state, "Add Menu")}
               active

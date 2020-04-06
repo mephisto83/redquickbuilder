@@ -1,9 +1,8 @@
+/* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
 
 
 import React from 'react';
-import Validation from './validation';
-import InputFunctions from './inputfunctions';
 import TreeViewMenu from './treeviewmenu';
 import { Visual, Node, SELECTED_NODE } from '../actions/uiactions';
 import * as Titles from './titles';
@@ -11,7 +10,7 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
 import { ComponentTypes } from '../constants/componenttypes';
 import AddComponent from '../nodepacks/AddComponent';
-import { redConnect } from '../templates/electronio/v1/app/actions/util';
+import { UIConnect } from '../utils/utils';
  class AddComponentMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -20,7 +19,7 @@ import { redConnect } from '../templates/electronio/v1/app/actions/util';
   }
 
   render() {
-    const { state, node } = this.props;
+    const { state } = this.props;
     const currentNode = Node(state, Visual(state, SELECTED_NODE));
 
     return (
@@ -67,15 +66,15 @@ import { redConnect } from '../templates/electronio/v1/app/actions/util';
 }
 
 AddComponentMenu.propTypes = {
-  graphOperation: function (v) {
+  graphOperation: function () {
     return null;
   },
-  toggleVisual: function (v) {
+  toggleVisual: function () {
     return null;
   },
-  node: function (v) {
+  node: function () {
     return null;
   }
 };
 
-export default redConnect(AddComponentMenu)
+export default UIConnect(AddComponentMenu);

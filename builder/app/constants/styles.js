@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 export const StyleLib = {
   style: {
     background: "background",
@@ -5,6 +6,9 @@ export const StyleLib = {
     "background-color": "backgroundColor",
     "background-image": "backgroundImage",
     "background-position": "backgroundPosition",
+    "background-size": "backgroundSize",
+    "background-position-x": "backgroundPositionX",
+    "background-position-y": "backgroundPositionY",
     "background-repeat": "backgroundRepeat",
     border: "border",
     "border-bottom": "borderBottom",
@@ -21,7 +25,7 @@ export const StyleLib = {
     cursor: "pointer",
     "border-right-color": "borderRightColor",
     "border-right-style": "borderRightStyle",
-    "border-right-width": "borderRightWidth",
+    "border-right-wstyles.jidth": "borderRightWidth",
     "border-style": "borderStyle",
     "border-top": "borderTop",
     "border-top-color": "borderTopColor",
@@ -100,6 +104,10 @@ export const StyleLib = {
     "text-decoration": "textDecoration",
     "text-indent": "textIndent",
     "text-transform": "textTransform",
+    "min-width": "minWidth",
+    "max-width": "maxWidth",
+    "min-height": "minHeight",
+    "max-height": "maxHeight",
     top: "top",
     "vertical-align": "verticalAlign",
     visibility: "visibility",

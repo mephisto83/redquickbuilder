@@ -27,6 +27,46 @@
     "themeGridPlacements": {
         "grids": [
             {
+                "id": "410f7ffe-4859-4b7f-93fc-353edc1377be",
+                "name": "main-screen-alternate-container",
+                "gridTemplateColumns": "258px 1fr 1fr",
+                "gridTemplateRows": "150px auto",
+                "gridPlacement": [
+                    "Header",
+                    "Header",
+                    "Header",
+                    "MainMenu",
+                    "Main",
+                    "Main"
+                ],
+                "mediaSizes": {
+                    "Extra small devices": true,
+                    "Small devices": true,
+                    "Media devices": true,
+                    "Extra devices": true,
+                    "Large devices": true
+                }
+            },
+            {
+                "id": "9b5fee88-7eab-401b-99fc-acf534c4280a",
+                "name": "main-screen-alternate",
+                "gridTemplateColumns": "1fr 200px 800px 1fr",
+                "gridTemplateRows": "calc(100vh - 21px)",
+                "gridPlacement": [
+                    "",
+                    "main-screen-alternate-container",
+                    "main-screen-alternate-container",
+                    ""
+                ],
+                "mediaSizes": {
+                    "Extra devices": true,
+                    "Large devices": true,
+                    "Media devices": true,
+                    "Small devices": true,
+                    "Extra small devices": true
+                }
+            },
+            {
                 "id": "88756de0-9ad1-48d6-9b2b-17c072fc3de8",
                 "name": "Authentication",
                 "gridTemplateColumns": "150px 2fr",
@@ -252,6 +292,10 @@
     },
     "themeVariables": {
         "variables": [
+            {
+                "variable": "--big-button-padding",
+                "variableValue": "30px"
+            },
             {
                 "variable": "--button-border",
                 "variableValue": "none"
