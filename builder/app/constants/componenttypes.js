@@ -163,8 +163,9 @@ export const ComponentTypeKeys = {
   Button: "Button",
   ListItem: "ListItem",
   MultiSelectList: "MultiSelectList",
-  Menu:'Menu',
+  Menu: 'Menu',
   Text: "Text",
+  H1: 'H1',
   InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
 export const ComponentTypes = {
@@ -253,7 +254,7 @@ export const ComponentTypes = {
         }
       }
     },
-    H1: {
+    [ComponentTypeKeys.H1]: {
       template: "./app/templates/components/h1.tpl",
       properties: {
         value: {

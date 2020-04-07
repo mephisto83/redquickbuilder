@@ -29,28 +29,51 @@ export default function (args = {}) {
   const result = [
     function () {
       return [
-        {
+        args.reverse ? {
           operation: "ADD_NEW_NODE",
           options: {
             nodeType: "EventMethod",
-            parent: context.node0,
             properties: {
               ...viewPackages,
               EventType: context.eventType,
               text: context.eventType
             },
-            linkProperties: {
-              properties: {
-                type: "EventMethod",
-                EventMethod: {}
-              }
-            },
+            links: [{
+              linkProperties: {
+                properties: {
+                  type: "EventMethod",
+                  EventMethod: {}
+                }
+              },
+              target: context.node0
+            }],
             callback(node) {
               context.node4 = node.id;
               context.eventTypeNode = node.id;
             }
           }
-        }
+        } : {
+            operation: "ADD_NEW_NODE",
+            options: {
+              nodeType: "EventMethod",
+              parent: context.node0,
+              properties: {
+                ...viewPackages,
+                EventType: context.eventType,
+                text: context.eventType
+              },
+              linkProperties: {
+                properties: {
+                  type: "EventMethod",
+                  EventMethod: {}
+                }
+              },
+              callback(node) {
+                context.node4 = node.id;
+                context.eventTypeNode = node.id;
+              }
+            }
+          }
       ];
     },
 

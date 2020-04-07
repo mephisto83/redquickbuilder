@@ -17,6 +17,7 @@ import CreateFetchServiceIdempotently from "../CreateFetchServiceIdempotently";
 import ConnectScreens from "./ConnectScreens";
 import CreateClaimService from "./CreateClaimService";
 import SetupViewTypes from "./SetupViewTypes";
+import AddComponentsToScreenOptions from "./AddComponentsToScreenOptions";
 
 export default function BuildAll() {
 
@@ -67,6 +68,9 @@ export default function BuildAll() {
     graphOperation(HaveAllPropertiesOnExecutors())(GetDispatchFunc(), GetStateFunc());
 
     graphOperation(AddCopyCommandToExecutors())(GetDispatchFunc(), GetStateFunc());
+
+
+    AddComponentsToScreenOptions();
 
   } catch (e) {
     console.log(e);

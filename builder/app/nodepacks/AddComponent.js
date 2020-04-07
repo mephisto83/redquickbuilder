@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils/array";
-export default function(args = {}) {
+export default function (args = {}) {
   // node0
 
   //
@@ -13,7 +13,7 @@ export default function(args = {}) {
   };
   let { viewPackages = {} } = args;
   let result = [
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "NEW_COMPONENT_NODE",
@@ -30,7 +30,7 @@ export default function(args = {}) {
                 component: {}
               }
             },
-            callback: function(node, graph, group) {
+            callback: function (node, graph, group) {
               context.node1 = node.id;
             }
           }
@@ -38,7 +38,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -51,19 +51,19 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node1,
-            value: args.componentType || "Button"
+            value: args.componentName || args.componentType || "Button"
           }
         }
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -82,7 +82,7 @@ export default function(args = {}) {
               Pinned: false,
               UseAsValue: true
             },
-            callback: function(node, graph, group) {
+            callback: function (node, graph, group) {
               context.node2 = node.id;
               context.group0 = group;
             }
@@ -91,7 +91,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -109,7 +109,7 @@ export default function(args = {}) {
               text: "label",
               Pinned: false
             },
-            callback: function(node, graph, group) {
+            callback: function (node, graph, group) {
               context.node3 = node.id;
             }
           }
@@ -117,7 +117,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -133,7 +133,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -146,7 +146,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function (graph) {
       return [
         {
           operation: "CONNECT_TO_TITLE_SERVICE",
@@ -160,41 +160,41 @@ export default function(args = {}) {
   let clearPinned = !args.clearPinned
     ? []
     : [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node1,
-              value: false
-            };
-          }
-        },
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node2,
-              value: false
-            };
-          }
-        },
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: function() {
-            return {
-              prop: "Pinned",
-              id: context.node3,
-              value: false
-            };
-          }
+      {
+        operation: "CHANGE_NODE_PROPERTY",
+        options: function () {
+          return {
+            prop: "Pinned",
+            id: context.node1,
+            value: false
+          };
         }
-      ];
+      },
+      {
+        operation: "CHANGE_NODE_PROPERTY",
+        options: function () {
+          return {
+            prop: "Pinned",
+            id: context.node2,
+            value: false
+          };
+        }
+      },
+      {
+        operation: "CHANGE_NODE_PROPERTY",
+        options: function () {
+          return {
+            prop: "Pinned",
+            id: context.node3,
+            value: false
+          };
+        }
+      }
+    ];
   return [
     ...result,
     ...clearPinned,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node1;
         context.callback(context);

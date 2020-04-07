@@ -41,6 +41,7 @@ export default function AddMenuComponent(args = {}) {
   result.push(...AddComponent({
     component: args.component,
     viewPackages,
+    componentName: args.componentName,
     componentType: ComponentTypeKeys.Menu,
     callback: (menuContext) => {
       context.menu = menuContext.entry;
@@ -49,6 +50,7 @@ export default function AddMenuComponent(args = {}) {
     component: context.menu,
     eventType: args.eventType,
     eventTypeHandler: false,
+    reverse: true,
     viewPackages,
     skipProperty: false,
     callback: (eventContext) => {
@@ -134,7 +136,13 @@ export default function AddMenuComponent(args = {}) {
           properties: { ...LinkProperties.DataChainLink }
         }
       }
-    ]);
+    ], () => {
+      if (args.callback) {
+        context.entry = context.menu;
+        args.callback(context);
+      }
+      return [];
+    });
 
   return result;
 }

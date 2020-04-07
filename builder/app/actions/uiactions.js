@@ -1321,6 +1321,28 @@ export function CollectionIsInLanguage(graph, collection, language) {
   return true;
 }
 
+export function GetDefaults(args) {
+
+  const { node, targetFunction } = args;
+  const defaults = {};
+  if (targetFunction && targetFunction.callingArguments) {
+    const layout = GetNodeProp(node, NodeProperties.Layout);
+
+    if (layout) {
+      targetFunction.callingArguments.forEach(d => {
+        const cellId = GraphMethods.GetCellIdByTag(layout, d.field.upperCaseFirst());
+        if (cellId) {
+          const children = GraphMethods.GetChild(layout, cellId);
+          if (children) {
+            defaults[d.field] = children
+          }
+        }
+      });
+    }
+  }
+  return defaults;
+}
+
 export function GetDataChainCollections(options) {
   const { collection, language } = options;
   const graph = GetCurrentGraph();

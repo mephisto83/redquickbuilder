@@ -1835,7 +1835,7 @@ class ContextMenu extends Component {
                 onClick={() => {
                   if (this.state.menuName && MenuTreeOptions[this.state.menuTreeOption]) {
                     this.props.graphOperation(
-                      AddMenuComponent({
+                      AddMenuToComponent({
                         menu_name: this.state.menuName,
                         uiType: UIA.GetNodeProp(currentNode, NodeProperties.UIType),
                         navigate_function: MenuTreeOptions[this.state.menuTreeOption].navigate_function(),
