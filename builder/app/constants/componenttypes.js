@@ -27,7 +27,10 @@ export const ComponentTags = {
   SideContainer: "SideContainer",
   Header: "Header",
   TopMenu: "TopMenu",
+  Field: 'Field',
   LeftContainer: "LeftContainer",
+  Screen: 'Screen',
+  List: 'List',
   MainContent: "MainContent",
   SecondaryContent: "SecondaryContent",
   RightContainer: "RightContainer",
@@ -160,6 +163,7 @@ export const ComponentTypeKeys = {
   Button: "Button",
   ListItem: "ListItem",
   MultiSelectList: "MultiSelectList",
+  Menu:'Menu',
   Text: "Text",
   InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
@@ -448,6 +452,9 @@ export const ComponentTypes = {
       layout: true,
       specialLayout: true,
       eventApi: ["onEndReachedThreshold", "onEndReached"],
+      events: {
+        [ComponentEvents.onChange]: true
+      },
       template: "./app/templates/components/multiselectlist.tpl",
       datasource: true,
       properties: {
@@ -599,7 +606,7 @@ ComponentTypes[UITypes.ReactNative].Password = { ...ComponentTypes[UITypes.React
 
 ComponentTypes[UITypes.ReactNative].Password.template = "./app/templates/components/password.tpl";
 
-  ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
+ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
 Object.keys(ComponentTypes.ReactNative).map(key => {
   if (ComponentTypes.ReactNative[key]) {
     ComponentTypes.ReactNative[key].library =

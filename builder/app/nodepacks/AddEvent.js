@@ -12,7 +12,7 @@ export default function (args = {}) {
   if (!args.eventType) {
     throw "missing eventType";
   }
-  if (args.eventTypeHandler && !args.property) {
+  if (args.eventTypeHandler && !args.skipProperty && !args.property) {
     throw "missing property";
   }
   const context = {

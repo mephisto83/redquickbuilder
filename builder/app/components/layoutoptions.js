@@ -113,11 +113,7 @@ class LayoutOptions extends Component {
             );
           }}
         />
-        <TreeViewMenu title="Header MainMenu Main" onClick={() => {
-          this.props.graphOperation(GridHeaderMainMenuMain({
-            component: currentNode.id
-          }));
-        }} />
+        <FunctionExecutor node={currentNode} title={GridHeaderMainMenuMain.title} targetFunction={GridHeaderMainMenuMain} />
         <FunctionExecutor node={currentNode} title={ListItemGrid.title} targetFunction={ListItemGrid} />
 
       </TreeViewMenu>

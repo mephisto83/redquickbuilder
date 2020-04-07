@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { isBuffer } from "util";
 import * as Titles from "../components/titles";
 import {
@@ -146,9 +147,8 @@ export function FindLayoutRoot(id, root) {
     return res;
   });
   return res;
-
-  return false;
 }
+
 export function FindLayoutRootParent(id, root, parent) {
   if (root[id]) {
     return root || parent;
@@ -159,9 +159,8 @@ export function FindLayoutRootParent(id, root, parent) {
     return res;
   });
   return res;
-
-  return false;
 }
+
 export function GetAllChildren(root) {
   let result = Object.keys(root || {});
   result.map(t => {
@@ -200,21 +199,17 @@ export function ReorderCellLayout(setup, id, dir = -1) {
   if (setup && setup.layout) {
     const parent = FindLayoutRootParent(id, setup.layout);
     if (parent) {
-      //     let kids = GetAllChildren(parent[id]);
-      //     // kids.map(t => {
-      //     //     delete setup.properties[t];
-      //     // });
-
-      //     delete parent[id];
-      //     delete setup.properties[id];
-      // }
       const layout = parent;
       const keys = Object.keys(layout);
       if (keys.some(v => v === id)) {
         const id_index = keys.indexOf(id);
         if (id_index === 0 && dir === -1) {
-        } else if (id_index === keys.length - 1 && dir === 1) {
-        } else {
+          // do nothing
+        }
+        else if (id_index === keys.length - 1 && dir === 1) {
+          // keep doing nothing
+        }
+        else {
           const temp = keys[id_index];
           keys[id_index] = keys[id_index + dir];
           keys[id_index + dir] = temp;
@@ -228,10 +223,17 @@ export function ReorderCellLayout(setup, id, dir = -1) {
   }
   return setup;
 }
+
 export function GetChildren(setup, parentId) {
   const parent = FindLayoutRootParent(parentId, setup.layout);
 
   return Object.keys(parent[parentId]);
+}
+export function GetChild(setup, parentId) {
+  if (setup && setup.properties && setup.properties[parentId] && setup.properties[parentId].children) {
+    return setup.properties[parentId].children[parentId];
+  }
+  return null;
 }
 export function GetFirstCell(setup) {
   const keys = setup ? Object.keys(setup.layout) : [];
@@ -272,6 +274,30 @@ export function SetCellsLayout(
   }
 
   return setup;
+}
+export function SortCells(setup, parentId, sortFunction) {
+
+  const layout = FindLayoutRoot(parentId, setup.layout);
+  const keys = Object.keys(layout);
+  const temp_layout = { ...layout };
+  keys.forEach(k => delete layout[k]);
+  keys.sort(sortFunction).forEach(k => {
+    layout[k] = temp_layout[k];
+  });
+
+}
+export function GetCellIdByTag(setup, tag) {
+  if (setup && setup.properties) {
+    return Object.keys(setup.properties).find(v => {
+      const { properties } = setup.properties[v];
+      if (properties && properties.tags) {
+        return properties.tags.indexOf(tag) !== -1;
+      }
+      return false;
+    })
+  }
+
+  return null;
 }
 
 export function incrementBuild(graph) {
@@ -2034,7 +2060,7 @@ function findLinkWithConstraint(nodeId, graph, targetConstraint) {
     .map(link => graph.linkLib[link]);
 }
 export function getNodeLinks(graph, id, direction) {
-  if (graph && graph.nodeConnections) {
+  if (graph && graph.nodeConnections && graph.nodeConnections[id]) {
     return Object.keys(graph.nodeConnections[id])
       .filter(x => {
         if (direction) {

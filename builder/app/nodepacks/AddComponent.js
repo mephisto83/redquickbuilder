@@ -196,7 +196,7 @@ export default function(args = {}) {
     ...clearPinned,
     function() {
       if (context.callback) {
-        context.entry = context.node0;
+        context.entry = context.node1;
         context.callback(context);
       }
       return [];

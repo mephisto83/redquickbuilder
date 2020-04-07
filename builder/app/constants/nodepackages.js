@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable compat/compat */
 /* eslint-disable no-new */
 /* eslint-disable no-constant-condition */
@@ -63,7 +64,8 @@ import {
   GetComponentExternalApiNode,
   GetComponentInternalApiNode,
   ADD_LINKS_BETWEEN_NODES,
-  NO_OP
+  NO_OP,
+  addComponentTags
 } from "../actions/uiactions";
 import {
   CreateLayout,
@@ -92,7 +94,8 @@ import {
   PropertyApiList,
   ApiProperty,
   ComponentApiTypes,
-  ComponentLifeCycleEvents
+  ComponentLifeCycleEvents,
+  ComponentTags
 } from "./componenttypes";
 import * as Titles from "../components/titles";
 import {
@@ -620,7 +623,6 @@ export const CreateLoginModels = {
         [UITypes.Web]: args[UITypes.Web] || false
       },
       chosenChildren,
-      viewName: `${viewName}`,
       viewType: ViewTypes.Create
     });
     const authenticateScreen = method_results.screenNodeId;
@@ -1905,6 +1907,8 @@ export const CreateDefaultView = {
                     flexDirection: "column"
                   };
 
+                  addComponentTags(ComponentTags.Main, cellProperties);
+
                   let componentProps = null;
 
                   if (useModelInstance) {
@@ -2314,8 +2318,15 @@ export const CreateDefaultView = {
                 };
                 const propertyCount = modelProperties.length + 2;
                 const componentProps = null;
+                if (isList) {
+                  addComponentTags(ComponentTags.List, cellProperties);
+                }
+                else {
+                  addComponentTags(ComponentTags.Form, cellProperties);
+                }
 
                 layout = SetCellsLayout(layout, propertyCount, rootCellId);
+
                 let connectto = [];
                 if (isDefaultComponent && !isList) {
                   connectto = getViewTypeEndpointsForDefaults(
@@ -2329,7 +2340,7 @@ export const CreateDefaultView = {
                     screenComponentId = screenComponent.id;
                     newItems.screenComponentId = screenComponentId;
                     connectto.map(ct => {
-                      createConnections.push(function () {
+                      createConnections.push(() => {
                         return setSharedComponent({
                           properties: {
                             ...LinkProperties.DefaultViewType,
@@ -2898,7 +2909,9 @@ export const CreateDefaultView = {
                       } Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
-                    [NodeProperties.Label]: `${viewName} ${Titles.Execute}`,
+                    [NodeProperties.Label]: `${
+                      Titles.Execute
+                      } Button ${viewName} Component`,
                     [NodeProperties.ExecuteButton]: true,
                     [NodeProperties.ComponentType]:
                       ComponentTypes[uiType].Button.key,
@@ -2930,7 +2943,9 @@ export const CreateDefaultView = {
                       } Button ${viewName} Component`,
                     [NodeProperties.UIType]: uiType,
                     [NodeProperties.Pinned]: false,
-                    [NodeProperties.Label]: `${viewName} ${Titles.Cancel}`,
+                    [NodeProperties.Label]: `${
+                      Titles.Cancel
+                      } Button ${viewName} Component`,
                     [NodeProperties.ComponentType]:
                       ComponentTypes[uiType].Button.key,
                     [NodeProperties.InstanceType]: useModelInstance
@@ -3097,6 +3112,7 @@ export const CreateDefaultView = {
                   childComponents[executeButtonComponent];
                 cellProperties.style.flex = null;
                 cellProperties.style.height = null;
+                addComponentTags(ComponentTags.MainButton, cellProperties);
                 return {
                   prop: NodeProperties.Layout,
                   id: screenComponentId,
@@ -3116,6 +3132,8 @@ export const CreateDefaultView = {
                   childComponents[executeButtonComponent];
                 cellProperties.style.flex = null;
                 cellProperties.style.height = null;
+                addComponentTags(ComponentTags.SecondaryButton, cellProperties);
+                addComponentTags(ComponentTags.CancelButton, cellProperties);
                 return {
                   prop: NodeProperties.Layout,
                   id: screenComponentId,
@@ -3164,6 +3182,7 @@ export const CreateDefaultView = {
                           }
                         }
                         break;
+                      default: break;
                     }
                   }
 
@@ -3175,6 +3194,8 @@ export const CreateDefaultView = {
                     sharedComponent || childComponents[modelIndex];
                   cellProperties.style.flex = null;
                   cellProperties.style.height = null;
+                  addComponentTags(ComponentTags.Field, cellProperties);
+
                   return {
                     prop: NodeProperties.Layout,
                     id: screenComponentId,

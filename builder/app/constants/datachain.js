@@ -84,6 +84,9 @@ export const DataChainFunctionKeys = {
   NewRedGraph: "New Red Graph",
   AddUrlsToGraph: "Add Urls to Graph"
 };
+export const DataChainTypeNames = {
+  NavigateToRoute: 'NavigateToRoute'
+}
 export const DataChainFunctions = {
   [DataChainFunctionKeys.Not]: {
     ui: {},

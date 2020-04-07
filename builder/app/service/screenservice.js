@@ -1,3 +1,6 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-param-reassign */
 /* eslint-disable default-case */
@@ -1357,6 +1360,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
               case ComponentEvents.onChange:
                 method_call = `this.props.update${screenOrModel}Instance(this.state.viewModel, '${modelProperty}', arg.nativeEvent.${useValue}${addiontionalParams})`;
                 break;
+              default: break;
             }
             return method_call;
           });
@@ -1381,6 +1385,8 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
         case ComponentEvents.onChange:
           result.push(ComponentEventStandardHandler[_event]);
           break;
+        default:
+        break;
       }
     }
   }

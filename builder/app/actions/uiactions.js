@@ -1482,6 +1482,38 @@ export function GenerateSimpleTest(node, val) {
 })`;
   return template;
 }
+
+export function updateComponentTags(itemValue, cellProperties) {
+
+  if (cellProperties && cellProperties.properties) {
+    cellProperties.properties.tags =
+      cellProperties.properties.tags || [];
+    if (
+      cellProperties.properties.tags.find(
+        v => v === itemValue
+      )
+    ) {
+      const index = cellProperties.properties.tags.findIndex(
+        v => v === itemValue
+      );
+      cellProperties.properties.tags.splice(index, 1);
+    } else {
+      cellProperties.properties.tags.push(itemValue);
+    }
+  }
+}
+export function addComponentTags(itemValue, cellProperties) {
+
+  cellProperties.properties = cellProperties.properties || {};
+  cellProperties.properties.tags =
+    cellProperties.properties.tags || [];
+  if (!cellProperties.properties.tags.find(v => v === itemValue)
+  ) {
+    cellProperties.properties.tags.push(itemValue);
+  }
+
+}
+
 export function GetDataChainNext(id, graph) {
   graph = graph || GetRootGraph(_getState());
   if (!graph) {
@@ -2985,7 +3017,8 @@ export function $addComponentApiNodes(
   parent,
   apiName = "value",
   externalApiId,
-  viewPackages = {}
+  viewPackages = {},
+  callback
 ) {
   let componentInternalValue = null;
   let componentExternalValue = null;
@@ -3022,6 +3055,9 @@ export function $addComponentApiNodes(
           nodeType: NodeTypes.ComponentExternalApi,
           callback: nn => {
             componentExternalValue = nn.id;
+            if (callback) {
+              callback({ externalApi: componentExternalValue })
+            }
           },
           parent,
           linkProperties: {
@@ -4379,3 +4415,20 @@ export const Colors = {
     });
   }
 })(Array.prototype);
+
+(str => {
+  if (!str.upperCaseFirst) {
+    Object.defineProperty(str, 'upperCaseFirst', {
+      enumerable: false,
+      writable: true,
+      configurable: true,
+      value() {
+        const collection = this;
+        if (collection) {
+          return `${collection[0].toUpperCase()}${collection.split('').subset(1).join('')}`;
+        }
+        return this;
+      }
+    })
+  }
+})(String.prototype);

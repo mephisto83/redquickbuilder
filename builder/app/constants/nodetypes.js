@@ -291,6 +291,7 @@ export const MediaQueries = {
 export const SelectorType = {
   InternalProperties: "InternalProperties"
 };
+
 export const NodeProperties = {
   ViewPackage: "view-package",
   IsFetchOutput: "IsFetchOutput",
@@ -299,6 +300,7 @@ export const NodeProperties = {
   StateKey: "StateKey",
   GridPlacement: "GridPlacement",
   GridRowCount: "GridRowCount",
+  DataChainTypeName: 'DataChainTypeName',
   HoverStyle: ":hover",
   AsLocalContext: "AsLocalContext",
   ActiveStyle: ":active",

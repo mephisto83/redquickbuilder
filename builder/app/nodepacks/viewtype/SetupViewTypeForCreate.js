@@ -223,7 +223,7 @@ export function GetViewTypeModelType(node) {
         source: modelOptions[0].id,
         target: modelOptions[1].id
       })) {
-        [property, model] = modelOptions;
+        [model, property] = modelOptions;
       }
       else if (existsLinkBetween(graph, {
         id: node,
@@ -231,7 +231,7 @@ export function GetViewTypeModelType(node) {
         source: modelOptions[1].id,
         target: modelOptions[0].id
       })) {
-        [model, property] = modelOptions;
+        [property, model] = modelOptions;
         modelType = property;
       }
       else {

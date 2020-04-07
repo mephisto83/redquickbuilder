@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable func-names */
 /* eslint-disable default-case */
@@ -111,6 +112,7 @@ import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from "../nod
 import ListItemGrid from "../nodepacks/layouts/ListItemGrid";
 import FunctionExecutor from "./functionexecutor";
 import { SecondaryOptions } from "../constants/visual";
+import AddMenuComponent from "../nodepacks/layouts/AddMenuComponent";
 
 const DATA_SOURCE = "DATA_SOURCE";
 class ContextMenu extends Component {
@@ -1833,7 +1835,7 @@ class ContextMenu extends Component {
                 onClick={() => {
                   if (this.state.menuName && MenuTreeOptions[this.state.menuTreeOption]) {
                     this.props.graphOperation(
-                      AddMenuToComponent({
+                      AddMenuComponent({
                         menu_name: this.state.menuName,
                         uiType: UIA.GetNodeProp(currentNode, NodeProperties.UIType),
                         navigate_function: MenuTreeOptions[this.state.menuTreeOption].navigate_function(),

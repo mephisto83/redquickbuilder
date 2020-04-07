@@ -35,9 +35,6 @@ export default function BuildAll() {
 
     graphOperation(AddFiltersToGetAll())(GetDispatchFunc(), GetStateFunc());
 
-    graphOperation(HaveAllPropertiesOnExecutors())(GetDispatchFunc(), GetStateFunc());
-
-    graphOperation(AddCopyCommandToExecutors())(GetDispatchFunc(), GetStateFunc());
 
     graphOperation(CreateDashboard({
       name: AuthorizedDashboard
@@ -66,6 +63,10 @@ export default function BuildAll() {
     ConnectScreens();
 
     SetupViewTypes();
+
+    graphOperation(HaveAllPropertiesOnExecutors())(GetDispatchFunc(), GetStateFunc());
+
+    graphOperation(AddCopyCommandToExecutors())(GetDispatchFunc(), GetStateFunc());
 
   } catch (e) {
     console.log(e);
