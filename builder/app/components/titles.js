@@ -49,6 +49,7 @@ export const ServerSideSetup = "Service Side Setup";
 export const Titles = 'Titles';
 export const Theme = "Theme";
 export const Languages = 'Languages';
+export const Progress = 'Progress';
 export const OnlyUntranslated = 'Only Untranslated';
 export const Properties = "Properties";
 export const Key = "Key";

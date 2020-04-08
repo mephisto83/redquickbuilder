@@ -1,14 +1,14 @@
-import { NodesByType, GetLogicalChildren, getViewTypeEndpointsForDefaults, GetNodeProp, GetNodeTitle, ADD_NEW_NODE, GetCurrentGraph } from "../../actions/uiactions";
+import { NodesByType, GetLogicalChildren, GetNodeProp, GetNodeTitle, ADD_NEW_NODE, GetCurrentGraph } from "../../actions/uiactions";
 import { NodeTypes, LinkType, NodeProperties, LinkProperties } from "../../constants/nodetypes";
-import { GetNodesLinkedTo, existsLinkBetween, GetLinkBetween } from "../../methods/graph_methods";
+import { GetNodesLinkedTo, existsLinkBetween } from "../../methods/graph_methods";
 import { ViewTypes } from "../../constants/viewtypes";
 import { uuidv4 } from "../../utils/array";
 
-export default function CreateViewTypes() {
+export default async function CreateViewTypes(progress) {
   const models = NodesByType(null, NodeTypes.Model);
   const result = [];
-
-  models.forEach(model => {
+  const createViewTypes = {};
+  await models.forEachAsync(async (model, index) => {
     const modelChildren = GetLogicalChildren(model.id);
     const modelProperties = GetNodesLinkedTo(null, {
       id: model.id,
@@ -30,18 +30,24 @@ export default function CreateViewTypes() {
       const commonViewTypes = childModelLinkedNodes.intersection(modelLinkedNodes, (x, y) => y.id === x.id);
       const isProperty = GetNodeProp(child, NodeProperties.UseModelAsType);
       Object.keys(ViewTypes).filter(x => !commonViewTypes.some(cvt => GetNodeProp(cvt, NodeProperties.ViewType) === x)).forEach(viewType => {
-        result.push(...setupDefaultViewType({
-          properties: {
-            ...LinkProperties.DefaultViewType,
-            viewType
-          },
-          target: isProperty ? model.id : child.id,
-          isPluralComponent: GetNodeProp(child, NodeProperties.NODEType) === NodeTypes.Model,
-          source: isProperty ? child.id : model.id,
-          viewCurrentType: viewType
-        }))
+        if (!createViewTypes[`${isProperty ? model.id : child.id} ${isProperty ? child.id : model.id} ${viewType}`]) {
+          createViewTypes[`${isProperty ? model.id : child.id} ${isProperty ? child.id : model.id} ${viewType}`] = true;
+          result.push(...setupDefaultViewType({
+            properties: {
+              ...LinkProperties.DefaultViewType,
+              viewType
+            },
+            target: isProperty ? model.id : child.id,
+            isPluralComponent: GetNodeProp(child, NodeProperties.NODEType) === NodeTypes.Model,
+            source: isProperty ? child.id : model.id,
+            viewCurrentType: viewType
+          }))
+        }
       });
-    })
+    });
+    if (progress) {
+      await progress(index / models.length)
+    }
   });
 
   return result;

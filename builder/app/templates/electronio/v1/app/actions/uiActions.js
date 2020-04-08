@@ -27,6 +27,7 @@ export const SCREEN_INSTANCE_FOCUSED = "SCREEN_INSTANCE_FOCUSED";
 export const SCREEN_INSTANCE_ON_FOCUS = "SCREEN_INSTANCE_ON_FOCUS";
 
 export const VISUAL = "VISUAL";
+export const BuildAllProgress = 'BuildAllProgress';
 let _getState;
 let _dispatch;
 export function GetItems(modelType) {
@@ -624,7 +625,7 @@ export function updateScreenInstance(model, id, value, options = {}) {
   };
 }
 
-export function updateScreenInstanceObject(model, instance,  value) {
+export function updateScreenInstanceObject(model, instance, value) {
   return (dispatch, getState) => {
     dispatch(Batch(UISMIO(SCREEN_INSTANCE, model, instance, value)));
   };

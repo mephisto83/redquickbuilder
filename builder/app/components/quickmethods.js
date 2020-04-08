@@ -248,7 +248,12 @@ class QuickMethods extends Component<any, any, any> {
                   icon="fa fa-plus"
                   onClick={() => {
                     this.props.setState();
-                    this.props.graphOperation(BuildAll());
+                    if (!this.state.buildingAll) {
+                      this.setState({ buildingAll: true })
+                      BuildAll(() => {
+                        this.setState({ buildingAll: false })
+                      });
+                    }
                   }}
                 />
               </TreeViewMenu>

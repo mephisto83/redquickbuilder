@@ -1,11 +1,10 @@
-import { NodesByType, GetNodeProp, GetNodeTitle, GetState, executeGraphOperations, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, GetNodeTitle, executeGraphOperations, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from "../../constants/functiontypes";
 import { CreateAgentFunction } from "../../constants/nodepackages";
-import { GetDispatch } from "../../templates/electronio/v1/app/actions/uiActions";
 
-export default function AddAgentMethods() {
-  const result = [];
+export default async function AddAgentMethods(progresFunc) {
+
   const agents = NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
   const models = NodesByType(null, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.IsAgent));
   const functionTypes = [
@@ -15,12 +14,12 @@ export default function AddAgentMethods() {
     FunctionTypes.Get_Agent_Value__IListObject,
     FunctionTypes.Get_Object_Agent_Value__Object
   ];
-  agents.forEach(agent => {
-    models.forEach(model => {
-      functionTypes.forEach(functionType => {
+  await agents.forEachAsync(async (agent, aindex) => {
+    await models.forEachAsync(async (model, mindex) => {
+      await functionTypes.forEachAsync(async (functionType, findex) => {
 
         const functionName = MethodFunctions[functionType].titleTemplate(GetNodeTitle(model), GetNodeTitle(agent));
-
+        const result = [];
         result.push({
           method: {
             method: CreateAgentFunction({
@@ -35,11 +34,12 @@ export default function AddAgentMethods() {
           },
           methodType: functionType
         });
+        executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
+        await progresFunc(((aindex * models.length * functionTypes.length) + mindex * functionTypes.length + findex) / (agents.length * models.length * functionTypes.length))
       });
     });
   });
 
-  executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
 
   return [];
 }

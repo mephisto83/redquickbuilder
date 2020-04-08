@@ -2,40 +2,57 @@ import { UITypes, NodeProperties, NodeTypes, LinkType } from "../../constants/no
 import { ViewTypes } from "../../constants/viewtypes";
 import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType, GetNodeById, GetViewTypeModel } from "../../actions/uiactions";
 import { CreateDefaultView } from '../../constants/nodepackages';
-import { GetNodesLinkedTo } from "../../methods/graph_methods";
+import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 
-export default function CreateComponentAll() {
+export default async function CreateComponentAll(progressFunc) {
   const result = [];
   const models = NodesByType(null, NodeTypes.Model)
     .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
     .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
-  const properties = NodesByType(null, NodeTypes.Property);
-  models.forEach(v => {
-    const defaultViewTypes = GetNodesLinkedTo(null, {
-      id: v.id,
-      componentType: NodeTypes.ViewType,
-      link: LinkType.DefaultViewType
-    });
+  // await models.forEachAsync(async (v, mindex) => {
+  //   const defaultViewTypes = GetNodesLinkedTo(null, {
+  //     id: v.id,
+  //     componentType: NodeTypes.ViewType,
+  //     link: LinkType.DefaultViewType
+  //   });
 
-    [...properties, ...models].filter(x => x.id !== v.id).forEach(w => {
-      const defaultViewTypesOther = GetNodesLinkedTo(null, {
-        id: w.id,
-        componentType: NodeTypes.ViewType,
-        link: LinkType.DefaultViewType
-      });
-      const intersections = defaultViewTypes.intersection(defaultViewTypesOther, (x, y) => y.id === x.id)
-      if (intersections && intersections.length)
-        result.push(...CreateComponentModel({
-          model: v.id,
-          connectedModel: w.id,
-          isSharedComponent: true,
-          isDefaultComponent: true
-        }));
-    })
+  //   await [...properties, ...models].filter(x => x.id !== v.id).forEachAsync(async (w, windex) => {
+  //     const defaultViewTypesOther = GetNodesLinkedTo(null, {
+  //       id: w.id,
+  //       componentType: NodeTypes.ViewType,
+  //       link: LinkType.DefaultViewType
+  //     });
+  //     const intersections = defaultViewTypes.intersection(defaultViewTypesOther, (x, y) => y.id === x.id)
+  //     if (intersections && intersections.length) {
+  //       CreateComponentModel({
+  //         model: v.id,
+  //         connectedModel: w.id,
+  //         isSharedComponent: true,
+  //         isDefaultComponent: true
+  //       });
+  //     }
+  //   });
+  //   await progressFunc((mindex) / (models.length * 2))
+  // });
+  const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
+  await defaultViewTypes.forEachAsync(async (viewType, mindex) => {
+    const { model, property } = GetViewTypeModelType(viewType.id);
+
+    CreateComponentModel({
+      model: model.id,
+      viewTypes: [GetNodeProp(viewType, NodeProperties.ViewType)],
+      connectedModel: property.id,
+      isSharedComponent: true,
+      isDefaultComponent: true
+    });
+    await progressFunc((mindex) / (defaultViewTypes.length + models.length))
   });
-  models.forEach(v => {
-    result.push(...CreateComponentModel({ model: v.id }));
+
+  await models.forEachAsync(async (v, mindex) => {
+    CreateComponentModel({ model: v.id });
+    await progressFunc((mindex + defaultViewTypes.length) / (defaultViewTypes.length + models.length))
   });
+
   return result;
 }
 

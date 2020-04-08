@@ -98,11 +98,12 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW, TRANSLATION_VIEW } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW, TRANSLATION_VIEW, PROGRESS_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import ThemeView from './themeview';
 import TranslationView from './translationview';
+import ProgressView from './progressview';
 import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
@@ -1222,6 +1223,9 @@ class Dashboard extends Component {
                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === TRANSLATION_VIEW} hideArrow title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, TRANSLATION_VIEW);
                 }} /> : null}
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === PROGRESS_VIEW} hideArrow title={Titles.Progress} icon="fa  fa-industry" onClick={() => {
+                  this.props.setVisual(MAIN_CONTENT, PROGRESS_VIEW);
+                }} /> : null}
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                 <SideBarHeader title={Titles.FileMenu} />
@@ -1289,6 +1293,7 @@ class Dashboard extends Component {
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
               <ThemeView active={UIA.Visual(state, MAIN_CONTENT) === THEME_VIEW} />
               <TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
+              <ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW } />
               {main_content === MIND_MAP || true ? (<MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {
