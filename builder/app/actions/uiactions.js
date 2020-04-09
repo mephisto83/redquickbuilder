@@ -933,7 +933,14 @@ export function GetNodeById(node, graph) {
 export function GetNodesByProperties(props, graph, state) {
   const currentGraph = graph || GetCurrentGraph(state || GetState());
   if (currentGraph) {
-    return [...currentGraph.nodes.map(t => currentGraph.nodeLib[t])].filter(
+    let nodeSubset = null;
+    if (props && props[NodeProperties.NODEType]) {
+      nodeSubset = NodesByType(state, props[NodeProperties.NODEType]);
+    }
+    else {
+      nodeSubset = currentGraph.nodes;
+    }
+    return [...nodeSubset.map(t => currentGraph.nodeLib[t])].filter(
       x => {
         for (const i in props) {
           if (props[i] !== GetNodeProp(x, i)) {
@@ -2914,16 +2921,21 @@ export function Graphs(state, key) {
 }
 
 export function SaveGraph(graph, dispatch) {
-  graph = {
-    ...graph,
-    ...{
-      updated: Date.now()
-    }
-  };
+  // graph = {
+  //   ...graph,
+  //   ...{
+  //     updated: Date.now()
+  //   }
+  // };
+  graph.updated = Date.now();
+
   const visualGraph = GraphMethods.VisualProcess(graph);
   if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
-  dispatch(UIC(GRAPHS, graph.id, graph));
+  if (!GraphMethods.Paused()) {
+    dispatch(UIC(GRAPHS, graph.id, graph));
+  }
 }
+
 export function UIC(section, item, value) {
   return {
     type: UI_UPDATE,
@@ -3174,27 +3186,37 @@ export function NodesByType(state, nodeType, options = {}) {
     if (!Array.isArray(nodeType)) {
       nodeType = [nodeType];
     }
-    return currentGraph.nodes
-      .filter(
-        x =>
-          (currentGraph.nodeLib &&
-            currentGraph.nodeLib[x] &&
-            currentGraph.nodeLib[x].properties &&
-            nodeType.indexOf(
-              currentGraph.nodeLib[x].properties[NodeProperties.NODEType]
-            ) !== -1) ||
-          (!options.excludeRefs &&
-            currentGraph.nodeLib &&
-            currentGraph.nodeLib[x] &&
-            currentGraph.nodeLib[x].properties &&
-            currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
-            nodeType)
-      )
-      .map(x => currentGraph.nodeLib[x]);
+    return GraphMethods.NodesByType(currentGraph, nodeType, options);
+    // GetAppCacheNodeTypes()
+    // return currentGraph.nodes
+    //   .filter(
+    //     x =>
+    //       (currentGraph.nodeLib &&
+    //         currentGraph.nodeLib[x] &&
+    //         currentGraph.nodeLib[x].properties &&
+    //         nodeType.indexOf(
+    //           currentGraph.nodeLib[x].properties[NodeProperties.NODEType]
+    //         ) !== -1) ||
+    //       (!options.excludeRefs &&
+    //         currentGraph.nodeLib &&
+    //         currentGraph.nodeLib[x] &&
+    //         currentGraph.nodeLib[x].properties &&
+    //         currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
+    //         nodeType)
+    //   )
+    //   .map(x => currentGraph.nodeLib[x]);
   }
   return [];
 }
-
+export function Setup() {
+  return (dispatch, getState) => {
+    $setupCache();
+  }
+}
+function $setupCache() {
+  const graph = GetCurrentGraph();
+  GraphMethods.setupCache(graph);
+}
 export function GetNodeFromRoot(state, id) {
   const graph = GetRootGraph(state);
   if (graph) {
@@ -3940,8 +3962,10 @@ export function graphOperation(operation, options, stamp) {
       operations = [{ operation, options }];
     }
     operations
-      .filter(x => x)
       .forEach(_op => {
+        if (!_op) {
+          return;
+        }
         if (typeof _op === "function") {
           _op = _op(currentGraph);
         }
@@ -3950,8 +3974,10 @@ export function graphOperation(operation, options, stamp) {
         }
         if (_op)
           _op
-            .filter(x => x)
             .forEach(opSecondLevel => {
+              if (!opSecondLevel) {
+                return;
+              }
               if (typeof opSecondLevel === "function") {
                 opSecondLevel = opSecondLevel() || {};
               }
@@ -3959,8 +3985,11 @@ export function graphOperation(operation, options, stamp) {
               if (!Array.isArray(opSecondLevel)) {
                 deepOp = [opSecondLevel];
               }
-              deepOp.filter(x => x)
+              deepOp
                 .forEach(op => {
+                  if (!op) {
+                    return;
+                  }
                   let { operation, options } = op;
                   if (typeof options === "function") {
                     options = options(currentGraph);
@@ -4375,8 +4404,8 @@ export function graphOperation(operation, options, stamp) {
                     }
                   }
 
-                  currentGraph = GraphMethods.applyConstraints(currentGraph);
-                  currentGraph = GraphMethods.constraintSideEffects(currentGraph);
+                  // currentGraph = GraphMethods.applyConstraints(currentGraph);
+                  // currentGraph = GraphMethods.constraintSideEffects(currentGraph);
                 });
             });
       });
@@ -4389,7 +4418,7 @@ export function graphOperation(operation, options, stamp) {
     } else {
       rootGraph = currentGraph;
     }
-    rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
+    // rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
     if (stamp)
       setViewPackageStamp(null, stamp);
 

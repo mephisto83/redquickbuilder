@@ -74,7 +74,7 @@ class QuickMethods extends Component<any, any, any> {
     });
     return (
       <MainSideBar relative>
-        <SideBar relative style={{ paddingTop: 0 }}>
+        <SideBar open relative style={{ paddingTop: 0 }}>
           <SideBarMenu>
             <TreeViewMenu
               title={Titles.QuickMethods}

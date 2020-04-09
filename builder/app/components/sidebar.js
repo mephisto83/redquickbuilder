@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from "react";
 import { RelativeMenuCss } from "../constants/visual";
+import { Paused } from "../methods/graph_methods";
 
 export default class SideBar extends Component {
   open() {
@@ -23,7 +24,7 @@ export default class SideBar extends Component {
         }}
         className={`control-sidebar control-sidebar-dark ${this.open()} ${this.extraWidth()}`}
       >
-        {this.props.children}
+        {!Paused() ? this.props.children : null}
       </aside>
     );
   }

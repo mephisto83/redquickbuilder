@@ -4,7 +4,7 @@
 import CreateViewTypes from "./CreateViewTypes";
 import AddAgentMethods from "./AddAgentMethods";
 import CreateComponentAll from "./CreateComponentAll";
-import { setFlag, Flags } from "../../methods/graph_methods";
+import { setFlag, Flags, SetPause } from "../../methods/graph_methods";
 import { GetDispatchFunc, GetStateFunc, graphOperation, executeGraphOperation, setVisual } from "../../actions/uiactions";
 import SelectAllOnModelFilters from "./SelectAllOnModelFilters";
 import AddFiltersToGetAll from "../method/AddFiltersToGetAll";
@@ -80,6 +80,7 @@ export default async function BuildAll(callback) {
   const Setup_View_Types = 'Setup_View_Types';
   const Setup_Executors = 'Setup Executors';
   const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
+  SetPause(true);
   setVisual(MAIN_CONTENT, PROGRESS_VIEW)(GetDispatchFunc(), GetStateFunc());
   await pause();
   const buildAllProgress = [
@@ -198,6 +199,7 @@ export default async function BuildAll(callback) {
   if (callback) {
     callback();
   }
+  SetPause(false);
 
   return [];
 }

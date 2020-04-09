@@ -847,6 +847,7 @@ export function CreatePagingSkipDataChains() {
         const model = GetNodeByProperties(
           {
             [NodeProperties.IsDataChainPagingSkip]: true,
+            [NodeProperties.NODEType]: NodeTypes.DataChain,
             [NodeProperties.EntryPoint]: true
           },
           graph
@@ -1006,7 +1007,8 @@ export function CreatePagingTakeDataChains() {
         const model = GetNodeByProperties(
           {
             [NodeProperties.IsDataChainPagingTake]: true,
-            [NodeProperties.EntryPoint]: true
+            [NodeProperties.EntryPoint]: true,
+            [NodeProperties.NODEType]: NodeTypes.DataChain
           },
           graph
         );
@@ -1134,7 +1136,8 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
         const $node = GetNodeByProperties(
           {
             [NodeProperties.ExcludeFromController]: true,
-            [NodeProperties.UIText]: viewModel + " Model",
+            [NodeProperties.UIText]: `${viewModel} Model`,
+            [NodeProperties.NODEType]: NodeTypes.Model,
             [NodeProperties.IsViewModel]: true
           },
           graph
@@ -1155,7 +1158,7 @@ export function CreateScreenModel(viewModel, options = { isList: true }) {
           properties: {
             [NodeProperties.Pinned]: false,
             [NodeProperties.ExcludeFromController]: true,
-            [NodeProperties.UIText]: viewModel + " Model",
+            [NodeProperties.UIText]: `${viewModel} Model`,
             [NodeProperties.IsViewModel]: true
           }
         };
@@ -1215,6 +1218,7 @@ export function createViewPagingDataChain(
               [NodeProperties.QueryParameterType]: skipChain
                 ? QUERY_PARAMETER_KEYS.Skip
                 : QUERY_PARAMETER_KEYS.Take,
+              [NodeProperties.NODEType]: NodeTypes.DataChain,
               [NodeProperties.Model]: newItems.currentNode,
               [NodeProperties.PagingSkip]: skipChain,
               [NodeProperties.IsPaging]: true,
@@ -1264,6 +1268,7 @@ export function createViewPagingDataChain(
             {
               [NodeProperties.DataChainFunctionType]:
                 DataChainFunctionKeys.ReferenceDataChain,
+              [NodeProperties.NODEType]: NodeTypes.DataChain,
               [NodeProperties.UIText]: `${viewName} ${skipOrTake} VM Ref`,
               [NodeProperties.DataChainReference]: newItems.screenListDataChain
             },
@@ -1345,6 +1350,7 @@ export function createViewPagingDataChain(
               [NodeProperties.UIText]: `${viewName} ${skipOrTake} Paging Ref`,
               [NodeProperties.DataChainFunctionType]:
                 DataChainFunctionKeys.ReferenceDataChain,
+              [NodeProperties.NODEType]: NodeTypes.DataChain,
               [NodeProperties.DataChainReference]: model ? model.id : null,
               [NodeProperties.ChainParent]: newItems.viewModelListRefNode
             },
@@ -1387,6 +1393,7 @@ export function createViewPagingDataChain(
               [skipChain
                 ? NodeProperties.IsDataChainPagingSkip
                 : NodeProperties.IsDataChainPagingTake]: true,
+              [NodeProperties.NODEType]: NodeTypes.DataChain,
               [NodeProperties.EntryPoint]: true
             },
             graph
@@ -1744,6 +1751,7 @@ export const CreateDefaultView = {
                         : InstanceTypes.ScreenInstance,
                       [NodeProperties.UIText]: `${viewName} Form`,
                       [NodeProperties.ViewType]: viewType,
+                      [NodeProperties.NODEType]: NodeTypes.Screen,
                       [NodeProperties.Model]: currentNode.id
                     },
                     graph
@@ -1851,6 +1859,7 @@ export const CreateDefaultView = {
                       [NodeProperties.DataChainFunctionType]:
                         DataChainFunctionKeys.Selector,
                       [NodeProperties.Selector]: newItems.screenSelector,
+                      [NodeProperties.NODEType]: NodeTypes.DataChain,
                       [NodeProperties.EntryPoint]: true,
                       [NodeProperties.SelectorProperty]:
                         SelectorPropertyKeys.Object
@@ -2185,7 +2194,7 @@ export const CreateDefaultView = {
                   text,
                   true,
                   (v, _i) => {
-                    newItems["list" + v] = _i;
+                    newItems[`list${v}`] = _i;
                   },
                   newItems.listComponentId,
                   { useAsValue: false }
@@ -2427,7 +2436,7 @@ export const CreateDefaultView = {
                     text,
                     false,
                     (v, _i) => {
-                      newItems["listItem" + v] = _i;
+                      newItems[`listItem${v}`] = _i;
                     },
                     newItems.screenComponentId
                   )
@@ -2444,8 +2453,8 @@ export const CreateDefaultView = {
                   operation: ADD_LINK_BETWEEN_NODES,
                   options() {
                     return {
-                      target: newItems["list" + text].internalId,
-                      source: newItems["listItem" + text].externalId,
+                      target: newItems[`list${text}`].internalId,
+                      source: newItems[`listItem${text}`].externalId,
                       properties: {
                         ...LinkProperties.ComponentExternalConnection
                       }

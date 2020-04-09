@@ -104,7 +104,7 @@ import LayoutView from './layoutview';
 import ThemeView from './themeview';
 import TranslationView from './translationview';
 import ProgressView from './progressview';
-import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
+import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo, Paused } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
@@ -1467,7 +1467,7 @@ class Dashboard extends Component {
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
                 graph={vgraph || graph} />
               ) : null}             </Content>
-            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)} style={{ overflowY: 'auto', 'maxHeight': '100vh', 'height': '100vh' }} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)&& !Paused()} style={{ overflowY: 'auto', 'maxHeight': '100vh', 'height': '100vh' }} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab
                   icon="fa fa-cog"

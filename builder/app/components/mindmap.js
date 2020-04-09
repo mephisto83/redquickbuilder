@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/sort-comp */
 /* eslint-disable class-methods-use-this */
 import * as d3Zoom from "d3-zoom";
@@ -17,6 +18,8 @@ import {
 
 const MIN_DIMENSIONAL_SIZE = 20;
 let iconSize = 30;
+let mapSelectedNodes = null;
+let version;
 export default class MindMap extends Component {
   constructor() {
     super();
@@ -695,167 +698,182 @@ export default class MindMap extends Component {
   }
 
   componentWillReceiveProps(props, state) {
+    if (GraphMethods.Paused()) {
+      return;
+    }
     if (props.graph) {
-      var { graph } = props;
-      var draw = true;
-      // d3.event.stopPropagation();
-      this.$force.stop();
-      if (
-        graph.nodes &&
-        this.state &&
-        this.state.graph &&
-        this.state.graph.nodes
-      ) {
-        var removedNodes = this.state.graph.nodes
-          .relativeCompliment(graph.nodes, (x, y) => x.id === y)
-          .map(t => this.state.graph.nodes.indexOf(t));
-        this.state.graph.nodes.removeIndices(removedNodes);
-        var newNodes = graph.nodes.relativeCompliment(
-          this.state.graph.nodes,
-          (x, y) => x === y.id
-        );
-        let unanchored = {};
-        if (props.selectedNodes) {
-          props.selectedNodes.forEach(t => {
-            unanchored = {
-              ...unanchored,
-              ...GraphMethods.GetLinkedNodes(null, { id: t })
-            };
-          });
+      const graphVersion = GraphMethods.GetAppCacheVersion();
+      if (graphVersion === version) {
+        if (mapSelectedNodes && props.selectedNodes.length === mapSelectedNodes.length) {
+          if ([...props.selectedNodes, ...mapSelectedNodes].unique().length === mapSelectedNodes.length) {
+            return;
+          }
         }
-        this.state.graph.nodes.forEach(v => {
-          if (!unanchored[v.id]) {
-            v.fixed = true;
-          }
-          else {
-            v.fixed = false;
-          }
-        });
-
-        newNodes.map(nn => {
-          this.state.graph.nodes.push(
-            this.applyNodeVisualData(
-              GraphMethods.duplicateNode(graph.nodeLib[nn])
-            )
+      }
+      version = graphVersion;
+      mapSelectedNodes = props.selectedNodes;
+      if (props.graph) {
+        var { graph } = props;
+        var draw = true;
+        // d3.event.stopPropagation();
+        this.$force.stop();
+        if (
+          graph.nodes &&
+          this.state &&
+          this.state.graph &&
+          this.state.graph.nodes
+        ) {
+          var removedNodes = this.state.graph.nodes
+            .relativeCompliment(graph.nodes, (x, y) => x.id === y)
+            .map(t => this.state.graph.nodes.indexOf(t));
+          this.state.graph.nodes.removeIndices(removedNodes);
+          var newNodes = graph.nodes.relativeCompliment(
+            this.state.graph.nodes,
+            (x, y) => x === y.id
           );
-        });
-        if (props.markedNodes) {
-          this.state.graph.nodes.map(nn => {
-            nn.marked = !!props.markedNodes.find(t => t == nn.id);
-          });
-        }
-        if (props.selectedNodes) {
-          this.state.graph.nodes.map(nn => {
-            nn.selected = !!props.selectedNodes.find(t => {
-              return t == nn.id
+          let unanchored = {};
+          if (props.selectedNodes) {
+            props.selectedNodes.forEach(t => {
+              unanchored = {
+                ...unanchored,
+                ...GraphMethods.GetLinkedNodes(null, { id: t })
+              };
             });
-          });
-        }
-        this.state.graph.nodes.map(nn => {
-          var nl = graph.nodeLib[nn.id];
-          if (nl && nl.properties) {
-            nn.properties = { ...nl.properties };
           }
-          // if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
-          //   if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
-          //   else {
-          //     nn.fixed = false;
-          //   }
-          // }
-        });
+          this.state.graph.nodes.forEach(v => {
+            if (!unanchored[v.id]) {
+              v.fixed = true;
+            }
+            else {
+              v.fixed = false;
+            }
+          });
 
-        draw = draw || newNodes.length || removedNodes.length;
-      }
-      if (
-        graph.links &&
-        this.state &&
-        this.state.graph &&
-        this.state.graph.links
-      ) {
-        let removedLinks = this.state.graph.links
-          .relativeCompliment(graph.links, (x, y) => x.id === y)
-          .map(t => this.state.graph.links.indexOf(t));
-        this.state.graph.links.removeIndices(removedLinks);
-        let newLinks = graph.links.relativeCompliment(
-          this.state.graph.links,
-          (x, y) => x === y.id
-        );
-        newLinks.map(nn => {
-          this.state.graph.links.push(
-            duplicateLink(graph.linkLib[nn], this.state.graph.nodes)
+          newNodes.map(nn => {
+            this.state.graph.nodes.push(
+              this.applyNodeVisualData(
+                GraphMethods.duplicateNode(graph.nodeLib[nn])
+              )
+            );
+          });
+          if (props.markedNodes) {
+            this.state.graph.nodes.map(nn => {
+              nn.marked = !!props.markedNodes.find(t => t == nn.id);
+            });
+          }
+          if (props.selectedNodes) {
+            this.state.graph.nodes.map(nn => {
+              nn.selected = !!props.selectedNodes.find(t => {
+                return t == nn.id
+              });
+            });
+          }
+          this.state.graph.nodes.map(nn => {
+            var nl = graph.nodeLib[nn.id];
+            if (nl && nl.properties) {
+              nn.properties = { ...nl.properties };
+            }
+            // if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
+            //   if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
+            //   else {
+            //     nn.fixed = false;
+            //   }
+            // }
+          });
+
+          draw = draw || newNodes.length || removedNodes.length;
+        }
+        if (
+          graph.links &&
+          this.state &&
+          this.state.graph &&
+          this.state.graph.links
+        ) {
+          let removedLinks = this.state.graph.links
+            .relativeCompliment(graph.links, (x, y) => x.id === y)
+            .map(t => this.state.graph.links.indexOf(t));
+          this.state.graph.links.removeIndices(removedLinks);
+          let newLinks = graph.links.relativeCompliment(
+            this.state.graph.links,
+            (x, y) => x === y.id
           );
-        });
-        if (props.selectedLinks) {
+          newLinks.map(nn => {
+            this.state.graph.links.push(
+              duplicateLink(graph.linkLib[nn], this.state.graph.nodes)
+            );
+          });
+          if (props.selectedLinks) {
+            this.state.graph.links.map(nn => {
+              nn.selected = !!props.selectedLinks.find(t => t.id === nn.id);
+            });
+          }
           this.state.graph.links.map(nn => {
-            nn.selected = !!props.selectedLinks.find(t => t.id === nn.id);
+            let nl = graph.linkLib[nn.id];
+            if (nl && nl.properties) {
+              nn.properties = { ...nl.properties };
+            }
           });
+          draw = draw || newLinks.length || removedLinks.length;
         }
-        this.state.graph.links.map(nn => {
-          let nl = graph.linkLib[nn.id];
-          if (nl && nl.properties) {
-            nn.properties = { ...nl.properties };
-          }
-        });
-        draw = draw || newLinks.length || removedLinks.length;
-      }
 
-      if (
-        graph.groups &&
-        this.state &&
-        this.state.graph &&
-        this.state.graph.groups
-      ) {
-        let graph_groups = graph.groups.filter(
-          x => graph.groupLib[x].leaves || graph.groupLib[x].groups
-        );
-        let removedGroups = null;
-        if (this.props.groupsDisabled) {
-          removedGroups = [].interpolate(
-            0,
-            this.state.graph.groups.length,
-            x => x
+        if (
+          graph.groups &&
+          this.state &&
+          this.state.graph &&
+          this.state.graph.groups
+        ) {
+          let graph_groups = graph.groups.filter(
+            x => graph.groupLib[x].leaves || graph.groupLib[x].groups
           );
-        } else {
-          removedGroups = this.state.graph.groups
-            .relativeCompliment(graph_groups, (x, y) => x.id === y)
-            .map(t => this.state.graph.groups.indexOf(t));
-        }
-        this.state.graph.groups.removeIndices(removedGroups);
-        if (!this.props.groupsDisabled) {
-          let newGroups = graph_groups
-            .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
-            .filter(
-              x =>
-                graph.groupLib[x] &&
-                (graph.groupLib[x].leaves || graph.groupLib[x].groups)
+          let removedGroups = null;
+          if (this.props.groupsDisabled) {
+            removedGroups = [].interpolate(
+              0,
+              this.state.graph.groups.length,
+              x => x
             );
-          newGroups.map(nn => {
-            this.state.graph.groups.push(
-              duplicateGroup(graph.groupLib[nn], this.state.graph.nodes)
-            );
-          });
+          } else {
+            removedGroups = this.state.graph.groups
+              .relativeCompliment(graph_groups, (x, y) => x.id === y)
+              .map(t => this.state.graph.groups.indexOf(t));
+          }
+          this.state.graph.groups.removeIndices(removedGroups);
+          if (!this.props.groupsDisabled) {
+            let newGroups = graph_groups
+              .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
+              .filter(
+                x =>
+                  graph.groupLib[x] &&
+                  (graph.groupLib[x].leaves || graph.groupLib[x].groups)
+              );
+            newGroups.map(nn => {
+              this.state.graph.groups.push(
+                duplicateGroup(graph.groupLib[nn], this.state.graph.nodes)
+              );
+            });
 
-          graph_groups.forEach(group => {
-            let g = this.state.graph.groups.find(x => x.id === group);
-            applyGroup(
-              g,
-              graph.groupLib[group],
-              this.state.graph.groups,
-              this.state.graph.nodes,
-              this.props.groupsDisabled
-            );
-            // (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
+            graph_groups.forEach(group => {
+              let g = this.state.graph.groups.find(x => x.id === group);
+              applyGroup(
+                g,
+                graph.groupLib[group],
+                this.state.graph.groups,
+                this.state.graph.nodes,
+                this.props.groupsDisabled
+              );
+              // (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
+            });
+          }
+
+          // this.state.graph.groups.map(group => {
+          //     var _group = graph.groupLib[group.id];
+          // })
+        }
+        if (draw) {
+          this.draw({
+            once: !(this.state.graph.nodes && this.state.graph.nodes.length)
           });
         }
-
-        // this.state.graph.groups.map(group => {
-        //     var _group = graph.groupLib[group.id];
-        // })
-      }
-      if (draw) {
-        this.draw({
-          once: !(this.state.graph.nodes && this.state.graph.nodes.length)
-        });
       }
     }
   }

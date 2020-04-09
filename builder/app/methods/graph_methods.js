@@ -1,3 +1,8 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
 import { isBuffer } from "util";
 import * as Titles from "../components/titles";
@@ -63,6 +68,7 @@ export function createGraph() {
     nodes: [],
     nodeLinks: {}, // A library of nodes, and each nodes that it connects.
     nodeConnections: {}, // A library of nodes, and each nodes links
+    nodeLinkIds: {},
     linkLib: {},
     links: [],
     graphs: {},
@@ -753,6 +759,11 @@ export function removeNode(graph, options = {}) {
       direction: TARGET,
       type: LinkType.Exist
     });
+    updateCache({
+      prop: NodeProperties.NODEType,
+      id,
+      previous: GetNodeProp(id, NodeProperties.NODEType, graph)
+    });
 
     graph = incrementBuild(graph);
     // links
@@ -771,7 +782,7 @@ export function removeNode(graph, options = {}) {
     }
     delete graph.nodeLib[id];
     graph.nodeLib = { ...graph.nodeLib };
-    graph.nodes = [...graph.nodes.filter(x => x !== id)];
+    graph.nodes = graph.nodes.filter(x => x !== id);
     if (existNodes) {
       existNodes.map(en => {
         graph = removeNode(graph, { id: en.id });
@@ -900,15 +911,131 @@ export function clearLinks(graph, options) {
 
 export function addNode(graph, node, options) {
   graph.nodeLib[node.id] = node;
-  graph.nodeLib = { ...graph.nodeLib };
-  graph.nodes = [...graph.nodes, node.id];
-  graph = { ...graph };
+  // graph.nodeLib = { ...graph.nodeLib };
+  // graph.nodes = [...graph.nodes, node.id];
+  graph.nodes.push(node.id);
+  // graph = { ...graph };
   graph = incrementBuild(graph);
   if (options && options.callback) {
     options.callback(node);
   }
   return graph;
 }
+const AppCache = {
+  Links: {},
+  Nodes: {},
+  Pinned: {},
+  Selected: {},
+  Version: 0,
+  Paused: false
+};
+export function GetAppCache() {
+  return AppCache;
+}
+export function GetAppCacheVersion() {
+  return AppCache.Version;
+}
+export function Paused() {
+  return AppCache.Paused;
+}
+export function SetPause(value = true) {
+  AppCache.Paused = value;
+}
+export function setupCache(graph) {
+  AppCache.Links = {};
+  AppCache.Nodes = {};
+  AppCache.Pinned = {};
+  AppCache.Selected = {};
+  AppCache.Version = 0;
+  const { Nodes, Links, Pinned, Selected } = AppCache;
+
+  if (graph && graph.nodeLib) {
+
+    Object.keys(graph.nodeLib).forEach(key => {
+      const node = GetNode(graph, key);
+      const nodeType = GetNodeProp(node, NodeProperties.NODEType);
+      Nodes[nodeType] = Nodes[nodeType] || {};
+      Nodes[nodeType][key] = true;
+      const selected = GetNodeProp(node, NodeProperties.Selected);
+      if (selected) {
+        Selected[key] = true;
+      }
+      const pinned = GetNodeProp(node, NodeProperties.Pinned);
+      if (pinned) {
+        Pinned[key] = true;
+      }
+      AppCache.Version++;
+    })
+  }
+  if (graph && graph.linkLib) {
+    const addNodeLinkIds = !graph.nodeLinkIds || !Object.keys(graph.nodeLinkIds).length;
+    if (addNodeLinkIds) {
+      graph.nodeLinkIds = {}
+    }
+    Object.keys(graph.linkLib).forEach(key => {
+      const linkType = GetLinkProperty(getLink(graph, { id: key }), LinkPropertyKeys.TYPE);
+      if (linkType) {
+        Links[linkType] = Nodes[linkType] || {};
+        Links[linkType][key] = true;
+        AppCache.Version++;
+      }
+      const { source, target } = graph.linkLib[key];
+      graph.nodeLinkIds[source] = graph.nodeLinkIds[source] || {};
+      graph.nodeLinkIds[source][target] = key;
+    });
+
+  }
+}
+export function removeCacheLink(id, type) {
+  if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
+    delete AppCache.Links[type][id]
+  }
+}
+export function updateCache(options, link) {
+  const { previous, value, id, prop } = options;
+  if (link) {
+    if (AppCache.Links && link.properties) {
+      AppCache.Links[link.properties.type] = AppCache.Links[link.properties.type] || {};
+      AppCache.Links[link.properties.type][id] = true;
+    }
+  }
+  else if (AppCache.Nodes) {
+    switch (prop) {
+      case NodeProperties.NODEType:
+        if (previous) {
+          if (AppCache.Nodes[previous]) {
+            delete AppCache.Nodes[previous][id];
+          }
+        }
+        if (value) {
+          AppCache.Nodes[value] = AppCache.Nodes[value] || {};
+          AppCache.Nodes[value][id] = false;
+        }
+        AppCache.Version++;
+        break;
+      case NodeProperties.Pinned:
+        if (value) {
+          AppCache.Pinned[id] = true;
+        }
+        else {
+          delete AppCache.Pinned[id];
+        }
+        AppCache.Version++;
+        break;
+      case NodeProperties.Selected:
+        if (value) {
+          AppCache.Pinned[id] = true;
+        }
+        else {
+          delete AppCache.Pinned[id];
+        }
+        AppCache.Version++;
+        break;
+      default: break;
+    }
+  }
+}
+
 export function addGroup(graph, group) {
   graph.groupLib[group.id] = group;
   graph.groupLib = { ...graph.groupLib };
@@ -1339,12 +1466,28 @@ function applyValidationNodeRules(graph, node) {
   return graph;
 }
 
-function NodesByType(graph, nodeType, options = {}) {
+export function NodesByType(graph, nodeType, options = {}) {
   const currentGraph = graph;
   if (currentGraph) {
     if (!Array.isArray(nodeType)) {
       nodeType = [nodeType];
     }
+    if (AppCache && AppCache.Nodes) {
+      const temp = [];
+      nodeType.forEach(nt => {
+        if (AppCache && AppCache.Nodes && AppCache.Nodes[nt]) {
+          temp.push(...Object.keys(AppCache.Nodes[nt]))
+        }
+      })
+      const res = [];
+      temp.forEach(x => {
+        if (currentGraph.nodeLib[x]) {
+          res.push(currentGraph.nodeLib[x]);
+        }
+      });
+      return res;
+    }
+
     return currentGraph.nodes
       .filter(
         x =>
@@ -2074,6 +2217,12 @@ export function getNodeLinks(graph, id, direction) {
 }
 export function findLink(graph, options) {
   const { target, source } = options;
+  if (graph.nodeLinks && graph.nodeLinks[target] && graph.nodeLinks[target][source]) {
+    const linkId = graph.nodeLinks[target][source];
+    if (linkId && graph.linkLib[linkId]) {
+      return graph.linkLib[linkId];
+    }
+  }
   const res = graph.links.find(link => (
     graph.linkLib &&
     graph.linkLib[link] &&
@@ -2441,6 +2590,7 @@ export function GetNodesLinkedTo(graph, options) {
 
 export const SOURCE = "SOURCE";
 export const TARGET = "TARGET";
+const fast = true;
 export function addLink(graph, options, link) {
   const { target, source } = options;
   if (target && source && target !== source) {
@@ -2449,41 +2599,82 @@ export function addLink(graph, options, link) {
         graph.linkLib[link.id] = link;
         graph.linkLib = { ...graph.linkLib };
         graph.links = [...graph.links, link.id];
-
+        updateCache(options, link);
         // Keeps track of the links for each node.
-        graph.nodeConnections[link.source] = {
-          ...(graph.nodeConnections[link.source] || {}),
-          ...{
-            [link.id]: SOURCE
+        if (fast) {
+          if (!graph.nodeConnections[link.source]) {
+            graph.nodeConnections[link.source] = {};
           }
-        };
+          graph.nodeConnections[link.source][link.id] = SOURCE;
 
-        // Keeps track of the links for each node.
-        graph.nodeConnections[link.target] = {
-          ...(graph.nodeConnections[link.target] || {}),
-          ...{
-            [link.id]: TARGET
-          }
-        };
+        } else {
+          graph.nodeConnections[link.source] = {
+            ...(graph.nodeConnections[link.source] || {}),
+            ...{
+              [link.id]: SOURCE
+            }
+          };
+        }
 
-        // Keeps track of the number of links between nodes.
-        graph.nodeLinks[link.source] = {
-          ...(graph.nodeLinks[link.source] || {}),
-          ...{
-            [link.target]: graph.nodeLinks[link.source]
-              ? (graph.nodeLinks[link.source][link.target] || 0) + 1
-              : 1
+        if (fast) {
+          if (!graph.nodeConnections[link.target]) {
+            graph.nodeConnections[link.target] = {};
           }
-        };
-        // Keeps track of the number of links between nodes.
-        graph.nodeLinks[link.target] = {
-          ...graph.nodeLinks[link.target],
-          ...{
-            [link.source]: graph.nodeLinks[link.target]
-              ? (graph.nodeLinks[link.target][link.source] || 0) + 1
-              : 1
+          graph.nodeConnections[link.target][link.id] = TARGET
+        }
+        else {
+          // Keeps track of the links for each node.
+          graph.nodeConnections[link.target] = {
+            ...(graph.nodeConnections[link.target] || {}),
+            ...{
+              [link.id]: TARGET
+            }
+          };
+        }
+
+        if (fast) {
+          if (!graph.nodeLinks[link.source]) {
+            graph.nodeLinks[link.source] = {};
           }
-        };
+          graph.nodeLinks[link.source][link.target] = graph.nodeLinks[link.source]
+            ? (graph.nodeLinks[link.source][link.target] || 0) + 1
+            : 1;
+        }
+        else {
+          // Keeps track of the number of links between nodes.
+          graph.nodeLinks[link.source] = {
+            ...(graph.nodeLinks[link.source] || {}),
+            ...{
+              [link.target]: graph.nodeLinks[link.source]
+                ? (graph.nodeLinks[link.source][link.target] || 0) + 1
+                : 1
+            }
+          };
+        }
+        if (!graph.nodeLinkIds[link.source]) {
+          graph.nodeLinkIds[link.source] = {};
+        }
+        graph.nodeLinkIds[link.source][link.target] = link.id;
+
+        if (fast) {
+          if (!graph.nodeLinks[link.target]) {
+            graph.nodeLinks[link.target] = {};
+          }
+          graph.nodeLinks[link.target][link.source] = graph.nodeLinks[link.target]
+            ? (graph.nodeLinks[link.target][link.source] || 0) + 1
+            : 1;
+        }
+        else {
+          // Keeps track of the number of links between nodes.
+          graph.nodeLinks[link.target] = {
+            ...graph.nodeLinks[link.target],
+            ...{
+              [link.source]: graph.nodeLinks[link.target]
+                ? (graph.nodeLinks[link.target][link.source] || 0) + 1
+                : 1
+            }
+          };
+        }
       } else {
         const oldLink = findLink(graph, { target, source });
         if (oldLink) {
@@ -2496,8 +2687,10 @@ export function addLink(graph, options, link) {
           };
         }
       }
-      graph.nodeLinks = { ...graph.nodeLinks };
-      graph = { ...graph };
+      if (!fast) {
+        graph.nodeLinks = { ...graph.nodeLinks };
+        graph = { ...graph };
+      }
     }
     graph = incrementMinor(graph);
   }
@@ -2520,30 +2713,61 @@ export function addLinkBetweenNodes(graph, options) {
   }
   return graph;
 }
+function compareLinkProp(properties, link) {
+  for (const i in properties) {
+    if (
+      !link.properties ||
+      link.properties[i] !== properties[i]
+    ) {
+      if (typeof link.properties[i] === "object") {
+        return (
+          JSON.stringify(link.properties) ===
+          JSON.stringify(properties)
+        );
+      }
+      return false;
+    }
+  }
+  return true;
+}
 export function findLinkInstance(graph, options) {
   const { target, source, properties } = options;
   if (properties) {
+    if (target && source) {
+      const linkObject = findLink(graph, { target, source });
+      if (linkObject && linkObject.properties) {
+        if (!compareLinkProp(properties, linkObject)) {
+          return false;
+        }
+        return linkObject.id;
+      }
+
+    }
     const link = graph.links.find(x => {
       if (
         graph.linkLib[x].source === source &&
-        graph.linkLib[x].target == target
+        graph.linkLib[x].target === target
       ) {
-        for (const i in properties) {
-          if (
-            !graph.linkLib[x].properties ||
-            graph.linkLib[x].properties[i] !== properties[i]
-          ) {
-            if (typeof graph.linkLib[x].properties[i] === "object") {
-              return (
-                JSON.stringify(graph.linkLib[x].properties) ===
-                JSON.stringify(properties)
-              );
-            }
-            return false;
-          }
+        // for (const i in properties) {
+        //   if (
+        //     !graph.linkLib[x].properties ||
+        //     graph.linkLib[x].properties[i] !== properties[i]
+        //   ) {
+        //     if (typeof graph.linkLib[x].properties[i] === "object") {
+        //       return (
+        //         JSON.stringify(graph.linkLib[x].properties) ===
+        //         JSON.stringify(properties)
+        //       );
+        //     }
+        //     return false;
+        //   }
+        if (!compareLinkProp(properties, graph.linkLib[x])) {
+          return false;
         }
+
         return true;
       }
+      return false;
     });
     return link;
   }
@@ -2756,7 +2980,17 @@ export function removeLink(graph, link, options = {}) {
         graph = executeEvents(graph, del_link, LinkEvents.Remove);
       }
     }
+    if (graph.linkLib[link] && graph.linkLib[link].properties) {
+      removeCacheLink(link, graph.linkLib[link].properties.type);
+    }
+    if (graph.linkLib[link]) {
+      const { source, target } = graph.linkLib[link];
+      if (source && target && graph.nodeLinkIds[source] && graph.nodeLinkIds[source][target]) {
+        delete graph.nodeLinkIds[source][target];
+      }
+    }
     delete graph.linkLib[link];
+
     graph.linkLib = { ...graph.linkLib };
     graph.nodeLinks[del_link.source] = {
       ...graph.nodeLinks[del_link.source],
@@ -2882,6 +3116,13 @@ export function updateNodeProperty(graph, options) {
         value = false;
       }
     }
+    updateCache({
+      prop,
+      id,
+      value,
+      previous: graph.nodeLib[id] && graph.nodeLib[id].properties && graph.nodeLib[id].properties[prop] ? graph.nodeLib[id].properties[prop] : null
+    })
+
     if (NodePropertiesDirtyChain[prop]) {
       const temps = NodePropertiesDirtyChain[prop];
       temps.forEach(temp => {
@@ -3192,6 +3433,9 @@ export function FilterGraph(graph) {
   return filteredGraph;
 }
 export function VisualProcess(graph) {
+  if (Paused()) {
+    return null;
+  }
   const vgraph = createGraph();
   vgraph.id = graph.id;
   graph = SetVisible(graph);

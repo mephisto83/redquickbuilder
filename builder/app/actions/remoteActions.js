@@ -4,7 +4,8 @@ import {
   createGraph,
   updateWorkSpace,
   updateGraphTitle,
-  updateGraphProperty
+  updateGraphProperty,
+  setupCache
 } from "../methods/graph_methods";
 import {
   SaveApplication,
@@ -101,6 +102,7 @@ export function openRedQuickBuilderGraph() {
               opened_graph = { ...default_graph, ...opened_graph };
               SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
               SaveGraph(opened_graph, dispatch);
+              setupCache(opened_graph);
             }
           } catch (e) {
             console.log(e);

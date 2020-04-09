@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from "react";
+import { clipboard } from "electron";
 import { UIConnect } from "../utils/utils";
 import ControlSideBarMenu, {
   ControlSideBarMenuItem,
@@ -20,7 +21,6 @@ import {
   NodePropertyTypes
 } from "../constants/nodetypes";
 import { GetNode, getNodeLinks } from "../methods/graph_methods";
-import { clipboard } from "electron";
 import {
   GetSpecificModels,
   GetAllModels,
@@ -32,28 +32,26 @@ import { PARAMETER_TAB } from "./dashboard";
 
 class ModelActivityMenu extends Component {
   render() {
-    var { state } = this.props;
-    var active = UIA.IsCurrentNodeA(state, [UIA.NodeTypes.Model]);
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    var is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
-    var is_parent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsParent);
-    var many_to_many_enabled = UIA.GetNodeProp(
+    const { state } = this.props;
+    const active = UIA.IsCurrentNodeA(state, [UIA.NodeTypes.Model]);
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
+    const is_parent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsParent);
+    const many_to_many_enabled = UIA.GetNodeProp(
       currentNode,
       UIA.NodeProperties.ManyToManyNexus
     );
-    var permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(
-      node => {
-        return {
+    const permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(
+      node => ({
           value: node.id,
           title: UIA.GetNodeTitle(node)
-        };
-      }
+        })
     );
     return (
       <SideMenuContainer
         active={active}
         tab={PARAMETER_TAB}
-        visual={"model-activities"}
+        visual="model-activities"
         title={Titles.ModelActivityMenu}
       >
         <TabPane active={active}>
@@ -78,15 +76,13 @@ class ModelActivityMenu extends Component {
                 <SelectInput
                   label={Titles.UserModel}
                   options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(
-                    node => {
-                      return {
+                    node => ({
                         value: node.id,
                         title: UIA.GetNodeTitle(node)
-                      };
-                    }
+                      })
                   )}
                   onChange={value => {
-                    var id = currentNode.id;
+                    const id = currentNode.id;
                     this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                       target: currentNode.properties[UIA.NodeProperties.UIUser],
                       source: id,
@@ -196,16 +192,14 @@ class ModelActivityMenu extends Component {
               />
               {many_to_many_enabled ? (
                 <SelectInput
-                  options={UIA.NodesByType(state, NodeTypes.Model).map(x => {
-                    return {
+                  options={UIA.NodesByType(state, NodeTypes.Model).map(x => ({
                       value: x.id,
                       title: UIA.GetNodeTitle(x)
-                    };
-                  })}
+                    }))}
                   label={Titles.ManyToManyNexusModel}
                   onChange={value => {
-                    let id = currentNode.id;
-                    var types =
+                    const id = currentNode.id;
+                    const types =
                       UIA.GetNodeProp(
                         currentNode,
                         UIA.NodeProperties.ManyToManyNexusTypes
@@ -229,7 +223,7 @@ class ModelActivityMenu extends Component {
                       }
                     ]);
                   }}
-                  value={""}
+                  value=""
                 />
               ) : null}
               {/* ok
@@ -287,7 +281,7 @@ class ModelActivityMenu extends Component {
                   }
                 });
               }}
-              icon={"fa fa-puzzle-piece"}
+              icon="fa fa-puzzle-piece"
               title={Titles.SetDefaultProperties}
               description={Titles.SetDefaultPropertiesDescription}
             />
@@ -304,7 +298,7 @@ class ModelActivityMenu extends Component {
                   }
                 });
               }}
-              icon={"fa fa-puzzle-piece"}
+              icon="fa fa-puzzle-piece"
               title={Titles.AddProperty}
               description={Titles.AddPropertyDescription}
             />
@@ -312,7 +306,7 @@ class ModelActivityMenu extends Component {
               onClick={() => {
                 clipboard.writeText(UIA.generateDataSeed(currentNode));
               }}
-              icon={"fa fa-puzzle-piece"}
+              icon="fa fa-puzzle-piece"
               title={Titles.CreateObjectDataSeed}
               description={Titles.CreateObjectDataSeed}
             />
@@ -323,12 +317,12 @@ class ModelActivityMenu extends Component {
               toggle={() => {
                 this.props.toggleVisual(Titles.QuickMethods);
               }}
-              icon={"fa fa-tag"}
+              icon="fa fa-tag"
             >
               <TreeViewMenu
-                hideArrow={true}
+                hideArrow
                 title={GetSpecificModels.type}
-                icon={"fa fa-plus"}
+                icon="fa fa-plus"
                 onClick={() => {
                   this.props.executeGraphOperation(
                     currentNode,
@@ -337,17 +331,17 @@ class ModelActivityMenu extends Component {
                 }}
               />
               <TreeViewMenu
-                hideArrow={true}
+                hideArrow
                 title={GetAllModels.type}
-                icon={"fa fa-plus"}
+                icon="fa fa-plus"
                 onClick={() => {
                   this.props.executeGraphOperation(currentNode, GetAllModels);
                 }}
               />
               <TreeViewMenu
-                hideArrow={true}
+                hideArrow
                 title={CreateLoginModels.type}
-                icon={"fa fa-plus"}
+                icon="fa fa-plus"
                 onClick={() => {
                   this.props.executeGraphOperation(
                     currentNode,
@@ -362,7 +356,7 @@ class ModelActivityMenu extends Component {
               label={Titles.PermissionType}
               options={permission_nodes}
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                   target: value,
                   source: id,
@@ -398,14 +392,12 @@ class ModelActivityMenu extends Component {
           {is_parent ? (
             <SelectInput
               label={Titles.ParentTo}
-              options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => {
-                return {
+              options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => ({
                   value: node.id,
                   title: UIA.GetNodeTitle(node)
-                };
-              })}
+                }))}
               onChange={value => {
-                var id = currentNode.id;
+                const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:
                     currentNode.properties[UIA.NodeProperties.UIChoiceNode],
@@ -441,7 +433,7 @@ class ModelActivityMenu extends Component {
                     }
                   });
                 }}
-                icon={"fa fa-puzzle-piece"}
+                icon="fa fa-puzzle-piece"
                 title={Titles.AddPermission}
                 description={Titles.AddPermissionDescription}
               />
