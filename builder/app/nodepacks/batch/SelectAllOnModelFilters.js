@@ -1,28 +1,24 @@
-import { NodesByType, GetNodeProp, GetModelPropertyChildren, CHANGE_NODE_PROPERTY } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, GetModelPropertyChildren, CHANGE_NODE_PROPERTY, graphOperation, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
 import { NodeTypes } from "../../constants/nodetypes";
 import { NodeProperties } from "../../components/titles";
 
-export default function SelectAllOnModelFilters() {
+export default async function SelectAllOnModelFilters(progresFunc) {
   const filters = NodesByType(null, NodeTypes.ModelFilter);
-  return filters.map(filter => {
+  await filters.forEachAsync(async (filter, index, length) => {
     const model = GetNodeProp(filter, NodeProperties.FilterModel);
     const propnodes = GetModelPropertyChildren(model);
-    const fprops =
-      GetNodeProp(
-        filter,
-        NodeProperties.FilterPropreties
-      ) || {};
-    propnodes.map(node => {
+    const fprops = GetNodeProp(filter, NodeProperties.FilterPropreties) || {};
+    propnodes.forEach(node => {
       fprops[node.id] = true;
     });
-    return {
-      operation:
-        CHANGE_NODE_PROPERTY,
+    graphOperation([{
+      operation: CHANGE_NODE_PROPERTY,
       options: {
         prop: NodeProperties.FilterPropreties,
         id: filter.id,
         value: fprops
       }
-    };
+    }])(GetDispatchFunc(), GetStateFunc());
+    await progresFunc(index / length);
   });
 }

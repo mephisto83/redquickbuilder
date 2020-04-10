@@ -1,19 +1,20 @@
-import { NodesByType, GetNodeProp } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, graphOperation, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import AddCopyPropertiesToExecutor from "../AddCopyPropertiesToExecutor";
 
-export default function AddCopyCommandToExecutors() {
+export default async function AddCopyCommandToExecutors(progresFunc) {
 
   const executors = NodesByType(null, NodeTypes.Executor);
-  const result = [];
 
-  executors.forEach(executor => {
+  await executors.forEachAsync(async (executor, index, total) => {
+    const result = [];
     const steps = AddCopyPropertiesToExecutor({
       currentNode: executor,
       executor: GetNodeProp(executor, NodeProperties.Executor)
     });
     result.push(...steps);
+    graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+    await progresFunc(index / total);
   });
 
-  return result;
 }

@@ -926,6 +926,7 @@ const AppCache = {
   Nodes: {},
   Pinned: {},
   Selected: {},
+  ViewPackages: {},
   Version: 0,
   Paused: false
 };
@@ -946,8 +947,13 @@ export function setupCache(graph) {
   AppCache.Nodes = {};
   AppCache.Pinned = {};
   AppCache.Selected = {};
+  AppCache.ViewPackages = {};
   AppCache.Version = 0;
-  const { Nodes, Links, Pinned, Selected } = AppCache;
+  const { Nodes, Links, Pinned, Selected, ViewPackages } = AppCache;
+
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
 
   if (graph && graph.nodeLib) {
 
@@ -963,6 +969,17 @@ export function setupCache(graph) {
       const pinned = GetNodeProp(node, NodeProperties.Pinned);
       if (pinned) {
         Pinned[key] = true;
+      }
+      const vp = GetNodeProp(node, NodeProperties.ViewPackage);
+      if (vp) {
+        if (ViewPackages[vp]) {
+          ViewPackages[vp] = {
+            [node.id]: true
+          };
+        }
+        else {
+          ViewPackages[vp][node.id] = true;
+        }
       }
       AppCache.Version++;
     })
@@ -1013,6 +1030,18 @@ export function updateCache(options, link) {
         }
         AppCache.Version++;
         break;
+      case NodeProperties.ViewPackage:
+        if (previous) {
+          if (AppCache.ViewPackages[previous]) {
+            delete AppCache.ViewPackages[previous][id];
+          }
+        }
+        if (value) {
+          AppCache.ViewPackages[value] = AppCache.ViewPackages[value] || {};
+          AppCache.ViewPackages[value][id] = false;
+        }
+        AppCache.Version++;
+        break;
       case NodeProperties.Pinned:
         if (value) {
           AppCache.Pinned[id] = true;
@@ -1040,6 +1069,9 @@ export function addGroup(graph, group) {
   graph.groupLib[group.id] = group;
   graph.groupLib = { ...graph.groupLib };
   graph.groups = [...graph.groups, group.id].unique(x => x);
+  if (fast) {
+    return graph
+  }
   graph = { ...graph };
   return graph;
 }
@@ -1146,6 +1178,10 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
   if (!callback) {
     callback = options.callback;
   }
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    console.error(`${graph.links.length} !== ${Object.keys(graph.linkLib).length}`)
+    throw new Error('invalid grid links');
+  }
   const node = createNode(nodeType);
   if (options.node) {
     updateNode(node, options);
@@ -1161,18 +1197,27 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
     }
   }
   graph = addNode(graph, node);
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
   if (parent) {
     graph = newLink(graph, {
       source: parent,
       target: node.id,
       properties: linkProperties ? linkProperties.properties : null
     });
+    if (graph.links.length !== Object.keys(graph.linkLib).length) {
+      throw new Error('invalid grid links');
+    }
   }
   if (options.links) {
     options.links.filter(x => x).map(link => {
       if (typeof link === "function") {
         link = link(graph);
         link = link.find(x => x);
+      }
+      if (graph.links.length !== Object.keys(graph.linkLib).length) {
+        throw new Error('invalid grid links');
       }
       graph = newLink(graph, {
         source: node.id,
@@ -1464,6 +1509,32 @@ function applyValidationNodeRules(graph, node) {
     });
   }
   return graph;
+}
+
+export function NodesByViewPackage(graph, viewPackage) {
+  const currentGraph = graph;
+  if (currentGraph) {
+    if (!Array.isArray(viewPackage)) {
+      viewPackage = [viewPackage];
+    }
+    if (AppCache && AppCache.Nodes) {
+      const temp = [];
+      viewPackage.forEach(nt => {
+        if (AppCache && AppCache.ViewPackages && AppCache.ViewPackages[nt]) {
+          temp.push(...Object.keys(AppCache.ViewPackages[nt]))
+        }
+      })
+      const res = [];
+      temp.forEach(x => {
+        if (currentGraph.nodeLib[x]) {
+          res.push(currentGraph.nodeLib[x]);
+        }
+      });
+      return res;
+    }
+  }
+
+  return [];
 }
 
 export function NodesByType(graph, nodeType, options = {}) {
@@ -2593,11 +2664,17 @@ export const TARGET = "TARGET";
 const fast = true;
 export function addLink(graph, options, link) {
   const { target, source } = options;
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
+
   if (target && source && target !== source) {
     if (graph.nodeLib[target] && graph.nodeLib[source]) {
       if (noSameLink(graph, { target, source })) {
         graph.linkLib[link.id] = link;
-        graph.linkLib = { ...graph.linkLib };
+        if (!fast) {
+          graph.linkLib = { ...graph.linkLib };
+        }
         graph.links = [...graph.links, link.id];
         updateCache(options, link);
         // Keeps track of the links for each node.
@@ -2694,6 +2771,11 @@ export function addLink(graph, options, link) {
     }
     graph = incrementMinor(graph);
   }
+
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
+
   return graph;
 }
 export function addLinksBetweenNodes(graph, options) {
@@ -2957,6 +3039,11 @@ export function createEventProp(type, options = {}) {
   return res;
 }
 export function removeLink(graph, link, options = {}) {
+
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
+
   if (link && options.linkType) {
     const update_link = graph.linkLib[link];
     if (
@@ -2969,11 +3056,17 @@ export function removeLink(graph, link, options = {}) {
       // If only the type is on the property
     }
     if (update_link && update_link.properties && Object.keys(update_link.properties).length > 1) {
+      if (graph.links.length !== Object.keys(graph.linkLib).length) {
+        throw new Error('invalid grid links');
+      }
+      if (fast) {
+        return graph
+      }
       return { ...graph };
     }
   }
   if (link) {
-    graph.links = [...graph.links.filter(x => x !== link)];
+    graph.links = graph.links.filter(x => x !== link);
     const del_link = graph.linkLib[link];
     if (del_link.properties) {
       if (del_link.properties.on && del_link.properties.on[LinkEvents.Remove]) {
@@ -3049,6 +3142,12 @@ export function removeLink(graph, link, options = {}) {
       delete graph.nodeConnections[del_link.target];
     }
     graph = incrementMinor(graph);
+  }
+  if (graph.links.length !== Object.keys(graph.linkLib).length) {
+    throw new Error('invalid grid links');
+  }
+  if (fast) {
+    return graph
   }
   return { ...graph };
 }
@@ -3134,20 +3233,36 @@ export function updateNodeProperty(graph, options) {
         }
       });
     }
-    graph.nodeLib[id] = {
-      ...graph.nodeLib[id],
-      ...{
-        dirty: {
-          [prop]: true,
-          ...(graph.nodeLib[id].dirty || {})
-        },
-        properties: {
-          ...(graph.nodeLib[id].properties || {}),
-          [prop]: value,
-          ...additionalChange
-        }
+    if (fast) {
+      if (!graph.nodeLib[id]) {
+        graph.nodeLib[id] = {};
       }
-    };
+      if (!graph.nodeLib[id].dirty) {
+        graph.nodeLib[id].dirty = {};
+      }
+      if (!graph.nodeLib[id].properties) {
+        graph.nodeLib[id].properties = {};
+      }
+      graph.nodeLib[id].dirty[prop] = true
+      graph.nodeLib[id].properties[prop] = value;
+      Object.assign(graph.nodeLib[id].properties, (additionalChange || {}));
+    }
+    else {
+      graph.nodeLib[id] = {
+        ...graph.nodeLib[id],
+        ...{
+          dirty: {
+            [prop]: true,
+            ...(graph.nodeLib[id].dirty || {})
+          },
+          properties: {
+            ...(graph.nodeLib[id].properties || {}),
+            [prop]: value,
+            ...additionalChange
+          }
+        }
+      };
+    }
     if (prop === NodeProperties.Selected) {
       graph.selected = graph.selected ? graph.selected + (value ? 1 : -1) : 0;
       if (value) {
@@ -3156,23 +3271,42 @@ export function updateNodeProperty(graph, options) {
           id
         ].unique();
       } else {
-        graph.markedSelectedNodeIds = [
-          ...(graph.markedSelectedNodeIds || [])
-        ].filter(x => x !== id);
+        graph.markedSelectedNodeIds = (graph.markedSelectedNodeIds || []).filter(x => x !== id);
       }
     }
     if (prop === NodeProperties.NODEType && value === NodeTypes.Function) {
-      graph.functionNodes = { ...graph.functionNodes, ...{ [id]: true } };
-    } else if (graph.functionNodes[id] && prop === NodeProperties.NODEType) {
+      if (fast) {
+        if (!graph.functionNodes) {
+          graph.functionNodes = {};
+        }
+        graph.functionNodes[id] = true;
+      }
+      else {
+        graph.functionNodes = { ...graph.functionNodes, ...{ [id]: true } };
+      }
+    }
+    else if (graph.functionNodes[id] && prop === NodeProperties.NODEType) {
       delete graph.functionNodes[id];
-      graph.functionNodes = { ...graph.functionNodes };
+      if (!fast) {
+        graph.functionNodes = { ...graph.functionNodes };
+      }
     }
 
     if (prop === NodeProperties.NODEType && value === NodeTypes.ClassNode) {
-      graph.classNodes = { ...graph.classNodes, ...{ [id]: true } };
+      if (fast) {
+        if (!graph.classNodes) {
+          graph.classNodes = {};
+        }
+        graph.classNodes[id] = true;
+      }
+      else {
+        graph.classNodes = { ...graph.classNodes, ...{ [id]: true } };
+      }
     } else if (graph.classNodes[id] && prop === NodeProperties.NODEType) {
       delete graph.classNodes[id];
-      graph.classNodes = { ...graph.classNodes };
+      if (!fast) {
+        graph.classNodes = { ...graph.classNodes };
+      }
     }
   }
   return graph;
@@ -3181,15 +3315,24 @@ export function updateNodeProperty(graph, options) {
 export function updateLinkProperty(graph, options) {
   const { id, value, prop } = options;
   if (id && prop && graph.linkLib && graph.linkLib[id]) {
-    graph.linkLib[id] = {
-      ...graph.linkLib[id],
-      ...{
-        properties: {
-          ...(graph.linkLib[id].properties || {}),
-          [prop]: value
+    if (fast) {
+      if (!graph.linkLib[id]) { graph.linkLib[id] = {} }
+
+      if (!graph.linkLib[id].properties) { graph.linkLib[id].properties = {}; }
+
+      graph.linkLib[id].properties[prop] = value;
+    }
+    else {
+      graph.linkLib[id] = {
+        ...graph.linkLib[id],
+        ...{
+          properties: {
+            ...(graph.linkLib[id].properties || {}),
+            [prop]: value
+          }
         }
-      }
-    };
+      };
+    }
   }
   return graph;
 }
@@ -3197,15 +3340,26 @@ export function updateLinkProperty(graph, options) {
 export function updateGroupProperty(graph, options) {
   const { id, value, prop } = options;
   if (id && prop && graph.groupLib && graph.groupLib[id]) {
-    graph.groupLib[id] = {
-      ...graph.groupLib[id],
-      ...{
-        properties: {
-          ...(graph.groupLib[id].properties || {}),
-          [prop]: value
-        }
+    if (fast) {
+      if (!graph.groupLib[id]) {
+        graph.groupLib[id] = {};
       }
-    };
+      if (!graph.groupLib[id].properties) {
+        graph.groupLib[id].properties = {};
+      }
+      graph.groupLib[id].properties[prop] = value;
+    }
+    else {
+      graph.groupLib[id] = {
+        ...graph.groupLib[id],
+        ...{
+          properties: {
+            ...(graph.groupLib[id].properties || {}),
+            [prop]: value
+          }
+        }
+      };
+    }
   }
   return graph;
 }
@@ -3261,7 +3415,7 @@ export function duplicateLink(nn, nodes) {
 }
 
 function GetNodesInsideGroup(graph, t, seenGroups = {}) {
-  let res = [...Object.keys(graph.groupsNodes[t])];
+  let res = Object.keys(graph.groupsNodes[t]);
   for (const i in graph.childGroups[t]) {
     if (!seenGroups[i]) {
       seenGroups = {

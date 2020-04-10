@@ -8,11 +8,11 @@ import ScreenConnectCreate from "../screens/ScreenConnectCreate";
 import ScreenConnectUpdate from "../screens/ScreenConnectUpdate";
 import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
-export default function ConnectScreens() {
+export default async function ConnectScreens(progresFunc) {
   const screens = NodesByType(null, NodeTypes.Screen).filter(x => !["login-models", "Authenticate", "Register"].some(v =>
     v === GetNodeProp(x, NodeProperties.NodePackage) ||
     v === GetNodeProp(x, NodeProperties.ViewPackageTitle)));
-  screens.forEach(screen => {
+  await screens.forEachAsync(async (screen, index, total) => {
     const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 
     const methods = GetPossibleMethods(screen);
@@ -57,6 +57,7 @@ export default function ConnectScreens() {
 
       graphOperation([...commands])(GetDispatchFunc(), GetStateFunc());;
     }
+    await progresFunc(index / total);
   });
 }
 
@@ -79,6 +80,7 @@ export function GetPossibleNavigateScreens(screen) {
       return true;
     });
 }
+
 export function GetPossibleComponentDidMount(screen) {
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
   return NodesByType(null, NodeTypes.Method)
@@ -103,6 +105,7 @@ export function GetPossibleComponentDidMount(screen) {
       return true;
     })
 }
+
 export function GetPossibleMethods(screen) {
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);

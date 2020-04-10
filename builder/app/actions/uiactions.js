@@ -937,10 +937,13 @@ export function GetNodesByProperties(props, graph, state) {
     if (props && props[NodeProperties.NODEType]) {
       nodeSubset = NodesByType(state, props[NodeProperties.NODEType]);
     }
-    else {
-      nodeSubset = currentGraph.nodes;
+    else if (props && props[NodeProperties.ViewPackage]) {
+      nodeSubset = NodesByViewPackage(state, props[NodeProperties.NODEType]);
     }
-    return [...nodeSubset.map(t => currentGraph.nodeLib[t])].filter(
+    else {
+      nodeSubset = currentGraph.nodes.map(t => currentGraph.nodeLib[t]);
+    }
+    return nodeSubset.filter(
       x => {
         for (const i in props) {
           if (props[i] !== GetNodeProp(x, i)) {
@@ -2987,6 +2990,10 @@ export function GUID() {
   });
 }
 export function setVisual(key, value) {
+  if (key === SELECTED_NODE || key === SELECTED_NODE_BB)
+    if (GraphMethods.Paused()) {
+      return () => { };
+    }
   return (dispatch, getState) => {
     const state = getState();
     dispatch(UIC(VISUAL, key, value));
@@ -3176,6 +3183,16 @@ export function HasCurrentGraph(options = {}) {
     : GetCurrentGraph(state);
   return !!currentGraph;
 }
+
+export function NodesByViewPackage(state, packageId) {
+  state = state || GetState();
+  const currentGraph = GetCurrentGraph(state);
+  if (currentGraph) {
+    return GraphMethods.NodesByViewPackage(currentGraph, packageId);
+  }
+  return [];
+}
+
 export function NodesByType(state, nodeType, options = {}) {
   state = state || GetState();
 
@@ -3752,6 +3769,7 @@ export function executeGraphOperation(model, op, args = {}) {
 export function GetNodesLinkTypes(id) {
   return GraphMethods.getNodesLinkTypes(GetCurrentGraph(GetState()), { id });
 }
+
 export function addInstanceFunc(node, callback, viewPackages, option = {}) {
   viewPackages = viewPackages || {};
   return function () {

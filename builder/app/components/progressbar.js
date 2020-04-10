@@ -12,14 +12,15 @@ export default class ProgressBar extends Component {
     if (steps) {
       let allDone = true;
       steps.map((step) => {
-        const { name, complete, activate, progress } = step;
+        const { name, complete, activate, progress, estimateRemaining } = step;
         let percentage = progress ? progress.toFixed() : '0.00';
+        const timeLeft = estimateRemaining ? `${((estimateRemaining / 1000)).toFixed()} s` : '';
         if (complete) {
           percentage = '100';
         }
         allDone = allDone && complete;
         result.push(<li title={`${name}`} className={`${activate ? styles.active : ''} ${complete ? styles.completed : ''}`}>
-          <span className={`${styles.bubble}`} />{name} {percentage}%
+          <span className={`${styles.bubble}`} />{name} <div>{percentage}% </div><div>{timeLeft}</div>
           <progress value={complete ? 100 : (activate ? (progress || 1) : 0)} min={0} max={100} />
         </li>);
       });

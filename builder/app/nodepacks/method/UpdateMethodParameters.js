@@ -26,15 +26,15 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
     throw "no method";
   }
 
-  let graph = GetCurrentGraph();
-  let result = [];
+  const graph = GetCurrentGraph();
+  const result = [];
   let { viewPackages } = args;
   viewPackages = {
     [NodeProperties.ViewPackage]: uuidv4(),
     ...(viewPackages || {})
   };
 
-  let toRemove = [];
+  const toRemove = [];
   GetNodesLinkedTo(graph, {
     id: current
   })
@@ -46,7 +46,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
     })
     .map(t => {
       toRemove.push(t.id);
-      let viewPackageId = GetNodeProp(t, NodeProperties.ViewPackage);
+      const viewPackageId = GetNodeProp(t, NodeProperties.ViewPackage);
       if (viewPackageId)
         GetNodesByProperties({
           [NodeProperties.ViewPackage]: viewPackageId
@@ -71,23 +71,23 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
     ...toRemove.map(v => {
       return {
         operation: REMOVE_NODE,
-        options: function() {
+        options() {
           return { id: v };
         }
       };
     })
   );
   if (MethodFunctions[methodType]) {
-    let { parameters } = MethodFunctions[methodType];
-    let newGroupId = uuidv4();
+    const { parameters } = MethodFunctions[methodType];
+    const newGroupId = uuidv4();
     if (parameters) {
-      let { body } = parameters;
-      let params = parameters.parameters;
-      let operations = [
+      const { body } = parameters;
+      const params = parameters.parameters;
+      const operations = [
         body
           ? {
               operation: ADD_NEW_NODE,
-              options: function() {
+              options() {
                 return {
                   nodeType: NodeTypes.MethodApiParameters,
                   properties: {
@@ -112,13 +112,13 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
           : false
       ].filter(x => x);
       if (params) {
-        let { query, template } = params;
+        const { query, template } = params;
         if (query) {
           let queryNodeId = null;
           operations.push(
             {
               operation: ADD_NEW_NODE,
-              options: function() {
+              options() {
                 return {
                   nodeType: NodeTypes.MethodApiParameters,
                   properties: {
@@ -126,7 +126,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
                     [NodeProperties.UIText]: "Query",
                     [NodeProperties.QueryParameterObject]: true
                   },
-                  callback: function(queryNode) {
+                  callback(queryNode) {
                     queryNodeId = queryNode.id;
                   },
                   links: [
@@ -147,7 +147,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
             ...Object.keys(query).map(q => {
               return {
                 operation: ADD_NEW_NODE,
-                options: function() {
+                options() {
                   return {
                     nodeType: NodeTypes.MethodApiParameters,
                     groupProperties: {},
@@ -175,7 +175,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
           operations.push(
             {
               operation: ADD_NEW_NODE,
-              options: function() {
+              options() {
                 return {
                   nodeType: NodeTypes.MethodApiParameters,
                   properties: {
@@ -183,7 +183,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
                     [NodeProperties.UIText]: "TemplateParameters",
                     [NodeProperties.TemplateParameter]: true
                   },
-                  callback: function(queryNode) {
+                  callback(queryNode) {
                     templateParameterId = queryNode.id;
                   },
                   links: [
@@ -204,7 +204,7 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
             ...Object.keys(template).map(q => {
               return {
                 operation: ADD_NEW_NODE,
-                options: function() {
+                options() {
                   return {
                     nodeType: NodeTypes.MethodApiParameters,
                     groupProperties: {},

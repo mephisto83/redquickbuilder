@@ -41,15 +41,26 @@ function complete(array, name) {
   item.activate = false;
   item.complete = true;
 }
-function setProgress(array, name, progress) {
+function setProgress(array, name, progress, estimateRemaining) {
   const item = array.find(v => v.name === name);
-  item.progress = progress * 100;
+  item.progress = progress * 50;
+  item.estimateRemaining = estimateRemaining;
 }
 async function run(array, name, func) {
 
   activate(array, name);
+  const times = [Date.now()];
   await func(async (progressValue) => {
-    setProgress(array, name, progressValue);
+    times.push(Date.now());
+    let totalTime = 0;
+    times.forEach((item, index) => {
+      if (index) {
+        totalTime += times[index] - times[index - 1];
+      }
+    });
+    const A = 1 - progressValue;
+    const estimation = (totalTime * A / progressValue);
+    setProgress(array, name, progressValue, estimation);
     setVisual(
       BuildAllProgress,
       [...array]
@@ -78,8 +89,10 @@ export default async function BuildAll(callback) {
   const Create_Claim_Service = 'Create Claim Service';
   const Connect_Screens = 'Connect_Screens';
   const Setup_View_Types = 'Setup_View_Types';
-  const Setup_Executors = 'Setup Executors';
+  const Setup_Executors = 'Setup Executors'
+  const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
   const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
+  const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
   SetPause(true);
   setVisual(MAIN_CONTENT, PROGRESS_VIEW)(GetDispatchFunc(), GetStateFunc());
   await pause();
@@ -98,7 +111,9 @@ export default async function BuildAll(callback) {
     { name: Connect_Screens },
     { name: Setup_View_Types },
     { name: Setup_Executors },
-    { name: Add_Component_To_Screen_Options }];
+    { name: Have_All_Properties_On_Executors },
+    { name: Add_Component_To_Screen_Options },
+    { name: Add_Copy_Command_To_Executors }];
 
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
   try {
@@ -117,18 +132,19 @@ export default async function BuildAll(callback) {
 
 
     await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
-      graphOperation(SelectAllOnModelFilters(progresFunc))(GetDispatchFunc(), GetStateFunc());
+      await SelectAllOnModelFilters(progresFunc);
     });
 
 
     await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc) => {
-      graphOperation(AddFiltersToGetAll())(GetDispatchFunc(), GetStateFunc());
+      await AddFiltersToGetAll(progresFunc);
     });
 
 
     await run(buildAllProgress, Create_Dashboard, async (progresFunc) => {
       graphOperation(CreateDashboard({
-        name: AuthorizedDashboard
+        name: AuthorizedDashboard,
+        progresFunc
       }))(GetDispatchFunc(), GetStateFunc());
     });
 
@@ -146,7 +162,7 @@ export default async function BuildAll(callback) {
 
 
     await run(buildAllProgress, Add_Chain_To_Navigate_Next_Screens, async (progresFunc) => {
-      graphOperation(AddChainToNavigateNextScreens())(GetDispatchFunc(), GetStateFunc());
+      await AddChainToNavigateNextScreens(progresFunc);
     });
 
 
@@ -157,8 +173,9 @@ export default async function BuildAll(callback) {
 
     await run(buildAllProgress, Create_Fetch_Service, async (progresFunc) => {
       graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
-
+      await progresFunc(1 / 2);
       graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
+      await progresFunc(2 / 2);
     });
 
 
@@ -169,25 +186,27 @@ export default async function BuildAll(callback) {
 
 
     await run(buildAllProgress, Connect_Screens, async (progresFunc) => {
-      ConnectScreens();
+      await ConnectScreens(progresFunc);
     });
 
 
 
     await run(buildAllProgress, Setup_View_Types, async (progresFunc) => {
-      SetupViewTypes();
+      await SetupViewTypes(progresFunc);
     });
 
 
-    await run(buildAllProgress, Setup_Executors, async (progresFunc) => {
-      graphOperation(HaveAllPropertiesOnExecutors())(GetDispatchFunc(), GetStateFunc());
+    await run(buildAllProgress, Have_All_Properties_On_Executors, async (progresFunc) => {
+      await HaveAllPropertiesOnExecutors(progresFunc);
+    });
 
-      graphOperation(AddCopyCommandToExecutors())(GetDispatchFunc(), GetStateFunc())
+    await run(buildAllProgress, Add_Copy_Command_To_Executors, async (progresFunc) => {
+      await AddCopyCommandToExecutors(progresFunc);
     });
     ;
 
     await run(buildAllProgress, Add_Component_To_Screen_Options, async (progresFunc) => {
-      AddComponentsToScreenOptions();
+      await AddComponentsToScreenOptions(progresFunc);
     });
 
 

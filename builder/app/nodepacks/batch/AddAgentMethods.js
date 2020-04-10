@@ -18,6 +18,7 @@ export default async function AddAgentMethods(progresFunc) {
     await models.forEachAsync(async (model, mindex) => {
       await functionTypes.forEachAsync(async (functionType, findex) => {
 
+        const start = Date.now();
         const functionName = MethodFunctions[functionType].titleTemplate(GetNodeTitle(model), GetNodeTitle(agent));
         const result = [];
         result.push({
@@ -35,7 +36,9 @@ export default async function AddAgentMethods(progresFunc) {
           methodType: functionType
         });
         executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
-        await progresFunc(((aindex * models.length * functionTypes.length) + mindex * functionTypes.length + findex) / (agents.length * models.length * functionTypes.length))
+        const total = Date.now() - start;
+        const progress = ((aindex * models.length * functionTypes.length) + mindex * functionTypes.length + findex) / (agents.length * models.length * functionTypes.length);
+        await progresFunc(progress, total * models.length * functionTypes.length * functionTypes.length * (1 - progress))
       });
     });
   });

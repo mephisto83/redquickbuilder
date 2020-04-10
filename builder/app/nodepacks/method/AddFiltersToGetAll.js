@@ -4,7 +4,10 @@ import {
   GetNodeTitle,
   NEW_MODEL_ITEM_FILTER,
   GetMethodNodeProp,
-  UPDATE_NODE_PROPERTY
+  UPDATE_NODE_PROPERTY,
+  graphOperation,
+  GetDispatchFunc,
+  GetStateFunc
 } from "../../actions/uiactions";
 import {
   MethodFunctions,
@@ -19,58 +22,51 @@ import {
 } from "../../constants/nodetypes";
 import { GetNodeLinkedTo } from "../../methods/graph_methods";
 
-export default function AddFiltersToGetAll() {
-  let methods = NodesByType(null, NodeTypes.Method);
-  let result = [];
-  methods
-    .filter(
-      x =>
-        (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {})
-          .method === Methods.GetAll
-    )
-    .filter(x => {
-      return !GetNodeLinkedTo(null, {
+export default function AddFiltersToGetAll(progresFunc) {
+  const methods = NodesByType(null, NodeTypes.Method).filter(
+    x => (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {}).method === Methods.GetAll)
+    .filter(x => !GetNodeLinkedTo(null, {
         id: x.id,
         link: LinkType.ModelItemFilter
-      });
-    })
-    .map(method => {
-      let _node = null;
-      let methodProps =
-        GetMethodNodeProp(method, FunctionTemplateKeys.Agent) ||
-        GetMethodNodeProp(method, FunctionTemplateKeys.User) ||
-        "";
-      result.push(
-        {
-          operation: NEW_MODEL_ITEM_FILTER,
-          options: {
-            parent: method.id,
-            groupProperties: {},
-            linkProperties: {
-              properties: { ...LinkProperties.ModelItemFilter }
-            },
-            callback: node => {
-              _node = node;
+      }));
+
+  methods.forEachAsync(async (method, index, length) => {
+    const result = [];
+    let nodeInstance = null;
+    result.push(
+      {
+        operation: NEW_MODEL_ITEM_FILTER,
+        options: {
+          parent: method.id,
+          groupProperties: {},
+          linkProperties: {
+            properties: { ...LinkProperties.ModelItemFilter }
+          },
+          callback: node => {
+            nodeInstance = node;
+          }
+        }
+      },
+      () => ({
+        operation: UPDATE_NODE_PROPERTY,
+        options() {
+          return {
+            id: nodeInstance.id,
+            properties: {
+              [NodeProperties.UIText]: `${GetNodeTitle(
+                method
+              )} Filter`
             }
           }
-        },
-        function() {
-          return {
-            operation: UPDATE_NODE_PROPERTY,
-            options: {
-              id: _node.id,
-              properties: {
-                [NodeProperties.UIText]: `${GetNodeTitle(
-                  method
-                )} Filter`
-              }
-            }
-          };
         }
-      );
-    });
+      })
+    );
 
-  return result;
+    graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+
+    await progresFunc(index / length);
+  });
+
 }
 
 AddFiltersToGetAll.title = "Add Filters to GetALL methods";

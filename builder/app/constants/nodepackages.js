@@ -122,6 +122,8 @@ import AppendGetIdsToDataChain from "../nodepacks/AppendGetIdsToDataChain";
 import GetModelViewModelForUpdate from "../nodepacks/GetModelViewModelForUpdate";
 import { ViewTypes } from "./viewtypes";
 import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
+import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
+import AttachMethodToMaestro from "../nodepacks/method/AttachMethodToMaestro";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -3952,10 +3954,12 @@ export const CreateDefaultView = {
                 }
               }),
               function (graph) {
-                const externalNode = GetNodesLinkedTo(graph, {
+                const temp = GetNodesLinkedTo(graph, {
                   id: screenNodeId,
                   link: LinkType.ComponentExternalApi
-                }).find(
+                });
+                const tisdfg = GetNodeById(screenNodeId, graph);
+                const externalNode = temp.find(
                   x =>
                     GetNodeProp(x, NodeProperties.NODEType) ===
                     NodeTypes.ComponentExternalApi &&
@@ -4366,19 +4370,19 @@ export function CreateAgentFunction(option) {
   } = option;
 
   if (!nodePackageType) {
-    throw "missing node package type";
+    throw new Error("missing node package type");
   }
   if (!methodType) {
-    throw "missing method type";
+    throw new Error("missing method type");
   }
   if (!httpMethod) {
-    throw "missing http method";
+    throw new Error("missing http method");
   }
   if (!functionType) {
-    throw "function type missing";
+    throw new Error("function type missing");
   }
   if (!functionName) {
-    throw "function name is missing";
+    throw new Error("function name is missing");
   }
   return args => {
     const { dispatch, getState } = args;
@@ -4436,7 +4440,7 @@ export function CreateAgentFunction(option) {
               }
             }
           ];
-          Object.values(constraints).map(constraint => {
+          Object.values(constraints).forEach(constraint => {
             let validator = null;
             let perOrModelNode = null;
             let executor = null;
@@ -4727,27 +4731,48 @@ export function CreateAgentFunction(option) {
             ];
           });
           return commands;
+        },
+        function () {
+          return UpdateMethodParameters({
+            methodType: functionType,
+            current: new_nodes.methodNode.id,
+            viewPackages: viewPackage
+          })
+        },
+        function () {
+          return AttachMethodToMaestro({
+            methodNodeId: new_nodes.methodNode.id,
+            modelId: model.id,
+            options: option,
+            viewPackage
+          })
         }
       ];
-      PerformGraphOperation(outer_commands)(dispatch, getState);
 
-      updateMethodParameters(
-        new_nodes.methodNode.id,
-        functionType,
-        viewPackage
-      )(dispatch, getState);
-      attachMethodToMaestro(new_nodes.methodNode.id, model.id, option)(
-        dispatch,
-        getState,
-        null,
-        viewPackage
-      );
-      PerformGraphOperation([
-        {
-          operation: NO_OP,
-          options() { }
-        }
-      ]);
+      // updateMethodParameters(
+      //   new_nodes.methodNode.id,
+      //   functionType,
+      //   viewPackage
+      // )(dispatch, getState);
+      outer_commands.push({
+        operation: NO_OP,
+        options() { }
+      });
+
+      PerformGraphOperation(outer_commands)(dispatch, getState);
+      // attachMethodToMaestro(new_nodes.methodNode.id, model.id, option)(
+      //   dispatch,
+      //   getState,
+      //   null,
+      //   viewPackage
+      // );
+
+      // PerformGraphOperation([
+      //   {
+      //     operation: NO_OP,
+      //     options() { }
+      //   }
+      // ]);
     }
 
     setViewPackageStamp(null, "CreateAgentFunction");

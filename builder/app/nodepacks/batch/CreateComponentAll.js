@@ -35,9 +35,9 @@ export default async function CreateComponentAll(progressFunc) {
   //   await progressFunc((mindex) / (models.length * 2))
   // });
   const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
-  await defaultViewTypes.forEachAsync(async (viewType, mindex) => {
+  await defaultViewTypes.forEachAsync(async (viewType, mindex, lengths) => {
     const { model, property } = GetViewTypeModelType(viewType.id);
-
+    const start = Date.now();
     CreateComponentModel({
       model: model.id,
       viewTypes: [GetNodeProp(viewType, NodeProperties.ViewType)],
@@ -45,12 +45,15 @@ export default async function CreateComponentAll(progressFunc) {
       isSharedComponent: true,
       isDefaultComponent: true
     });
-    await progressFunc((mindex) / (defaultViewTypes.length + models.length))
+    const total = Date.now() - start;
+    await progressFunc((mindex) / (defaultViewTypes.length + models.length), total * (lengths - mindex))
   });
 
-  await models.forEachAsync(async (v, mindex) => {
+  await models.forEachAsync(async (v, mindex, lengths) => {
+    const start = Date.now();
     CreateComponentModel({ model: v.id });
-    await progressFunc((mindex + defaultViewTypes.length) / (defaultViewTypes.length + models.length))
+    const total = Date.now() - start;
+    await progressFunc((mindex + defaultViewTypes.length) / (defaultViewTypes.length + models.length), total * (lengths - mindex))
   });
 
   return result;

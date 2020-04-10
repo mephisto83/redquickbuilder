@@ -3,10 +3,10 @@ import { NodeTypes, UITypes, NodeProperties, Methods } from "../../constants/nod
 import SetupViewTypeFor from "../viewtype/SetupViewTypeFor";
 import { MethodFunctions, FunctionTemplateKeys } from "../../constants/functiontypes";
 
-export default function SetupViewTypes() {
+export default async function SetupViewTypes(progressFunc) {
   const viewTypes = NodesByType(null, NodeTypes.ViewType);
-  const result = [];
-  viewTypes.filter(x => GetNodeProp(x, NodeProperties.ViewType) !== Methods.Delete).forEach(node => {
+  await viewTypes.filter(x => GetNodeProp(x, NodeProperties.ViewType) !== Methods.Delete).forEachAsync(async (node, index, length) => {
+    const result = [];
     const validationMethod = GetValidationMethodForViewType(node);
     const functionToLoadModels = GetFunctionToLoadModel(node);
     [UITypes.ElectronIO, UITypes.ReactNative].forEach(uiType => {
@@ -25,8 +25,9 @@ export default function SetupViewTypes() {
         skipClear: true
       }));
     })
+    graphOperation([...result])(GetDispatchFunc(), GetStateFunc())
+    await progressFunc(index / length);
   })
-  graphOperation([...result])(GetDispatchFunc(), GetStateFunc())
 }
 
 

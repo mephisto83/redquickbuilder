@@ -6,10 +6,10 @@ import AddMenuComponent from "../layouts/AddMenuComponent";
 import { MenuTreeOptions, MenuTreeOptionKeys } from "../../constants/menu";
 import GridHeaderMainMenuMain from "../layouts/GridHeaderMainMenuMain";
 
-export default function AddComponentsToScreenOptions() {
+export default async function AddComponentsToScreenOptions(progresFunc) {
   const screenOptions = NodesByType(null, NodeTypes.ScreenOption);
   const menuTreeOption = MenuTreeOptionKeys.ModelMethodMenu;
-  screenOptions.filter(x => {
+  await screenOptions.filter(x => {
     if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Register') {
       return false;
     }
@@ -20,7 +20,7 @@ export default function AddComponentsToScreenOptions() {
       return false;
     }
     return true;
-  }).forEach((screenOption) => {
+  }).forEachAsync(async (screenOption, index, total) => {
     const context = {
       title: null,
       menu: null
@@ -59,5 +59,6 @@ export default function AddComponentsToScreenOptions() {
       header: context.title
     }))(GetDispatchFunc(), GetStateFunc());
 
+    await progresFunc(index / total);
   })
 }
