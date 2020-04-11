@@ -41,10 +41,11 @@ function complete(array, name) {
   item.activate = false;
   item.complete = true;
 }
-function setProgress(array, name, progress, estimateRemaining) {
+function setProgress(array, name, progress, estimateRemaining, totalTime) {
   const item = array.find(v => v.name === name);
   item.progress = progress * 50;
   item.estimateRemaining = estimateRemaining;
+  item.totalTime = totalTime;
 }
 async function run(array, name, func) {
 
@@ -60,7 +61,7 @@ async function run(array, name, func) {
     });
     const A = 1 - progressValue;
     const estimation = (totalTime * A / progressValue);
-    setProgress(array, name, progressValue, estimation);
+    setProgress(array, name, progressValue, estimation, totalTime);
     setVisual(
       BuildAllProgress,
       [...array]
@@ -89,7 +90,6 @@ export default async function BuildAll(callback) {
   const Create_Claim_Service = 'Create Claim Service';
   const Connect_Screens = 'Connect_Screens';
   const Setup_View_Types = 'Setup_View_Types';
-  const Setup_Executors = 'Setup Executors'
   const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
   const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
   const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
@@ -110,10 +110,10 @@ export default async function BuildAll(callback) {
     { name: Create_Claim_Service },
     { name: Connect_Screens },
     { name: Setup_View_Types },
-    { name: Setup_Executors },
     { name: Have_All_Properties_On_Executors },
-    { name: Add_Component_To_Screen_Options },
-    { name: Add_Copy_Command_To_Executors }];
+    { name: Add_Copy_Command_To_Executors },
+    { name: Add_Component_To_Screen_Options }
+  ];
 
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
   try {

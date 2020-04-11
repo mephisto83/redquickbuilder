@@ -251,7 +251,6 @@ class QuickMethods extends Component<any, any, any> {
                     if (!this.state.buildingAll) {
                       this.setState({ buildingAll: true })
                       BuildAll(() => {
-                        this.setState({ buildingAll: false })
                       });
                     }
                   }}

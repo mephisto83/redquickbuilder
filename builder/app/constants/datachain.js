@@ -28,6 +28,9 @@ import {
   getNodesGroups,
   getNodeLinks
 } from "../methods/graph_methods";
+export const DataChainName = {
+  GetObject: 'GetObject'
+}
 export const DataChainFunctionKeys = {
   ModelProperty: "Model - Property",
   Required: "Required",

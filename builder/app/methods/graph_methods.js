@@ -422,21 +422,31 @@ export function GetNodesInGroup(graph, group) {
 export function addLeaf(graph, ops) {
   const { leaf, id } = ops;
   let leaves = graph.groupLib[id].leaves || [];
-  leaves = [...leaves, leaf].unique(x => x);
-
+  if (fast) {
+    if (leaves.indexOf(leaf) === -1) {
+      leaves.push(leaf);
+    }
+  }
+  else {
+    leaves = [...leaves, leaf].unique(x => x);
+  }
   // Groups => nodes
   graph.groupsNodes[id] = graph.groupsNodes[id] || {};
   graph.groupsNodes[id][leaf] = true;
-  graph.groupsNodes = {
-    ...graph.groupsNodes
-  };
+  if (!fast) {
+    graph.groupsNodes = {
+      ...graph.groupsNodes
+    };
+  }
 
   // Nodes => groups
   graph.nodesGroups[leaf] = graph.nodesGroups[leaf] || {};
   graph.nodesGroups[leaf][id] = true;
-  graph.nodesGroups = {
-    ...graph.nodesGroups
-  };
+  if (!fast) {
+    graph.nodesGroups = {
+      ...graph.nodesGroups
+    };
+  }
 
   graph.groupLib[id].leaves = leaves;
   return graph;
@@ -446,7 +456,7 @@ export function removeLeaf(graph, ops) {
   const group = graph.groupLib[id];
   if (group) {
     let leaves = group.leaves || [];
-    leaves = [...leaves.filter(t => t !== leaf)];
+    leaves = leaves.filter(t => t !== leaf);
     graph.groupLib[id].leaves = leaves;
   }
   if (graph.groupsNodes[id]) {
@@ -455,12 +465,14 @@ export function removeLeaf(graph, ops) {
     }
     if (Object.keys(graph.groupsNodes[id]).length === 0) {
       delete graph.groupsNodes[id];
-      graph.groups = [...graph.groups.filter(x => x !== id)];
+      graph.groups = graph.groups.filter(x => x !== id);
       delete graph.groupLib[id];
     }
-    graph.groupsNodes = {
-      ...graph.groupsNodes
-    };
+    if (!fast) {
+      graph.groupsNodes = {
+        ...graph.groupsNodes
+      };
+    }
   }
 
   if (graph.nodesGroups[leaf]) {
@@ -470,9 +482,11 @@ export function removeLeaf(graph, ops) {
     if (Object.keys(graph.nodesGroups[leaf]).length === 0) {
       delete graph.nodesGroups[leaf];
     }
-    graph.nodesGroups = {
-      ...graph.nodesGroups
-    };
+    if (!fast) {
+      graph.nodesGroups = {
+        ...graph.nodesGroups
+      };
+    }
   }
 
   return graph;
@@ -482,11 +496,18 @@ export function addGroupToGroup(graph, ops) {
   const { groupId, id } = ops;
   const group = graph.groupLib[id];
   const groups = group.groups || [];
-
-  group.groups = [...groups, groupId].unique(x => x);
+  if (fast) {
+    if (group.groups.indexOf(groupId) === -1) {
+      group.groups.push(groupId);
+    }
+  }
+  else {
+    group.groups = [...groups, groupId].unique(x => x);
+  }
   graph.groupLib[id] = group;
-  graph.groupLib = { ...graph.groupLib };
-
+  if (!fast) {
+    graph.groupLib = { ...graph.groupLib };
+  }
   // Groups need to know who contains them,
   graph.childGroups[id] = graph.childGroups[id] || {};
   graph.childGroups[id][groupId] = true;
@@ -501,9 +522,11 @@ export function removeGroupFromGroup(graph, ops) {
   const group = graph.groupLib[id];
 
   if (group && group.groups) {
-    group.groups = [...group.groups.filter(x => x !== groupId)];
+    group.groups = group.groups.filter(x => x !== groupId);
   }
-  graph.groupLib[id] = { ...group };
+  if (!fast) {
+    graph.groupLib[id] = { ...group };
+  }
   if (graph.childGroups) {
     if (graph.childGroups[id]) {
       delete graph.childGroups[id][groupId];
@@ -747,12 +770,12 @@ export function removeNode(graph, options = {}) {
   if (autoDelete) {
     GetNodesLinkedTo(graph, { id })
       .filter(x => MatchesProperties(autoDelete.properties, x))
-      .map(t => {
+      .forEach(t => {
         idsToDelete.push(t.id);
       });
   }
 
-  idsToDelete.map(id => {
+  idsToDelete.forEach(id => {
     const existNodes = getNodesByLinkType(graph, {
       exist: true,
       id,
@@ -928,7 +951,9 @@ const AppCache = {
   Selected: {},
   ViewPackages: {},
   Version: 0,
-  Paused: false
+  Paused: false,
+  Properties: {},
+  PropertyKeys: []
 };
 export function GetAppCache() {
   return AppCache;
@@ -948,6 +973,8 @@ export function setupCache(graph) {
   AppCache.Pinned = {};
   AppCache.Selected = {};
   AppCache.ViewPackages = {};
+  AppCache.Properties = {};
+  AppCache.PropertyKeys = [];
   AppCache.Version = 0;
   const { Nodes, Links, Pinned, Selected, ViewPackages } = AppCache;
 
@@ -981,8 +1008,20 @@ export function setupCache(graph) {
           ViewPackages[vp][node.id] = true;
         }
       }
+      if (AppCache.Properties) {
+        const { properties } = node;
+        if (properties) {
+          Object.keys(properties).forEach(prop => {
+            const propValue = GetNodeProp(node, prop);
+            AppCache.Properties[prop] = AppCache.Properties[prop] || {};
+            AppCache.Properties[prop][propValue] = AppCache.Properties[prop][GetNodeProp(node, prop)] || {};
+            AppCache.Properties[prop][propValue][node.id] = true;
+          });
+        }
+      }
       AppCache.Version++;
     })
+    recyclePropertyKeys();
   }
   if (graph && graph.linkLib) {
     const addNodeLinkIds = !graph.nodeLinkIds || !Object.keys(graph.nodeLinkIds).length;
@@ -1003,6 +1042,57 @@ export function setupCache(graph) {
 
   }
 }
+function recyclePropertyKeys() {
+  AppCache.PropertyKeys = Object.keys(AppCache.Properties).sort((a, b) => {
+    return Object.keys(AppCache.Properties[a]).length - Object.keys(AppCache.Properties[b]).length;
+  });
+}
+const runtimeState = {
+  lastLropertyKeyRecycle: 0,
+  recycleEveryProperty: 300
+};
+
+export function GetNodesByProperties(props, graph) {
+  const orderedLookupProp = Object.keys(props).sort((a, b) => {
+    return AppCache.PropertyKeys.indexOf(a) - AppCache.PropertyKeys.indexOf(b);
+  });
+  if (runtimeState.lastLropertyKeyRecycle > runtimeState.recycleEveryProperty) {
+    recyclePropertyKeys();
+    runtimeState.lastLropertyKeyRecycle = 0;
+  }
+
+  runtimeState.lastLropertyKeyRecycle++;
+
+  let subset = null;
+  orderedLookupProp.forEach(key => {
+    if (subset && subset.length === 0) {
+      return;
+    }
+    const val = props[key];
+    let set;
+    if (AppCache.Properties[key] && AppCache.Properties[key][val]) {
+      set = Object.keys(AppCache.Properties[key][val]);
+    }
+    else {
+      set = [];
+    }
+    if (!subset && set) {
+      subset = set;
+    }
+    else if (subset && set) {
+      if (subset.length > set.length) {
+        subset = set.intersection(subset, (a, b) => a === b);
+      }
+      else {
+        subset = subset.intersection(set, (a, b) => a === b);
+      }
+    }
+  })
+  if (!subset) {
+    return [];
+  }
+  return subset.map(item => graph.nodeLib[item]);
+}
 export function removeCacheLink(id, type) {
   if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
     delete AppCache.Links[type][id]
@@ -1017,6 +1107,23 @@ export function updateCache(options, link) {
     }
   }
   else if (AppCache.Nodes) {
+    if (!AppCache.Properties[prop]) {
+      AppCache.Properties[prop] = {};
+    }
+    if (previous) {
+      if (!AppCache.Properties[prop][previous]) {
+        AppCache.Properties[prop][previous] = {};
+      }
+      AppCache.Properties[prop][previous][id] = false;
+    }
+
+    if (value !== undefined) {
+      if (!AppCache.Properties[prop][value]) {
+        AppCache.Properties[prop][value] = {};
+      }
+      AppCache.Properties[prop][value][id] = true;
+    }
+
     switch (prop) {
       case NodeProperties.NODEType:
         if (previous) {
@@ -1067,8 +1174,17 @@ export function updateCache(options, link) {
 
 export function addGroup(graph, group) {
   graph.groupLib[group.id] = group;
-  graph.groupLib = { ...graph.groupLib };
-  graph.groups = [...graph.groups, group.id].unique(x => x);
+  if (!fast) {
+    graph.groupLib = { ...graph.groupLib };
+  }
+  if (fast) {
+    if (graph.groups.indexOf(group.id) === -1) {
+      graph.groups.push(group.id);
+    }
+  }
+  else {
+    graph.groups = [...graph.groups, group.id].unique(x => x);
+  }
   if (fast) {
     return graph
   }
@@ -1349,10 +1465,10 @@ export function updateNodeGroup(graph, options) {
   return graph;
 }
 function getGroupAncenstors(graph, id) {
-  let result = [];
+  const result = [];
   if (graph.parentGroup[id]) {
     for (const i in graph.parentGroup[id]) {
-      result = [...result, ...getGroupAncenstors(graph, i)];
+      result.push(...getGroupAncenstors(graph, i));
     }
   }
   return result;
@@ -1374,7 +1490,7 @@ export function GetNode(graph, id) {
 }
 
 export function GetChildComponentAncestors(state, id) {
-  let result = [];
+  const result = [];
 
   const graph = GetRootGraph(state);
   const ancestors = GetNodesLinkedTo(graph, {
@@ -1387,15 +1503,15 @@ export function GetChildComponentAncestors(state, id) {
         case NodeTypes.ScreenOption:
         case NodeTypes.ComponentNode:
           return true;
+        default: return false;
       }
-      return false;
     })
     .map(t => t.id);
 
-  result = [...result, ...ancestors].unique();
-  ancestors.map(t => {
+  result.push(...ancestors);
+  ancestors.forEach(t => {
     const temp = GetChildComponentAncestors(state, t);
-    result = [...result, ...temp];
+    result.push(...temp);
   });
   return result.unique();
 }
@@ -1427,10 +1543,15 @@ export function updateClientMethod(methodParams, key, param, mparam, value) {
   methodParams[key].parameters = methodParams[key].parameters || {};
   methodParams[key].parameters[param] =
     methodParams[key].parameters[param] || {};
-  methodParams[key].parameters[param] = {
-    ...methodParams[key].parameters[param],
-    [mparam]: value
-  };
+  if (fast) {
+    methodParams[key].parameters[param][mparam] = value;
+  }
+  else {
+    methodParams[key].parameters[param] = {
+      ...methodParams[key].parameters[param],
+      [mparam]: value
+    };
+  }
 
   return methodParams;
 }
@@ -1496,18 +1617,18 @@ export function applyConstraints(graph) {
 }
 
 function applyValidationNodeRules(graph, node) {
-  const validator = GetNodeProp(node, NodeProperties.Validator);
-  if (validator) {
-    const nodesLinks = getNodesLinkedTo(graph, { id: node.id });
-    const validatorProperties = getValidatorProperties(validator);
-    Object.keys(validatorProperties).map(property => {
-      if (graph.nodeLinks[property] && graph.nodeLinks[property][node.id]) {
-        // link between nodes exists.
-      } else {
-        // link between nodes exists.
-      }
-    });
-  }
+  // const validator = GetNodeProp(node, NodeProperties.Validator);
+  // if (validator) {
+  //   // const nodesLinks = getNodesLinkedTo(graph, { id: node.id });
+  //   const validatorProperties = getValidatorProperties(validator);
+  //   Object.keys(validatorProperties).map(property => {
+  //     if (graph.nodeLinks[property] && graph.nodeLinks[property][node.id]) {
+  //       // link between nodes exists.
+  //     } else {
+  //       // link between nodes exists.
+  //     }
+  //   });
+  // }
   return graph;
 }
 
@@ -1585,7 +1706,7 @@ export function existsLinkBetween(graph, options) {
   if (link) {
     if (
       properties &&
-      Object.key(properties).some(prop => GetLinkProperty(link, prop) !== properties[prop])
+      Object.keys(properties).some(prop => GetLinkProperty(link, prop) !== properties[prop])
     ) {
       return false;
     }
@@ -2288,21 +2409,21 @@ export function getNodeLinks(graph, id, direction) {
 }
 export function findLink(graph, options) {
   const { target, source } = options;
-  if (graph.nodeLinks && graph.nodeLinks[target] && graph.nodeLinks[target][source]) {
-    const linkId = graph.nodeLinks[target][source];
+  if (graph.nodeLinkIds && graph.nodeLinkIds[source] && graph.nodeLinkIds[source][target]) {
+    const linkId = graph.nodeLinkIds[source][target];
     if (linkId && graph.linkLib[linkId]) {
       return graph.linkLib[linkId];
     }
   }
-  const res = graph.links.find(link => (
-    graph.linkLib &&
-    graph.linkLib[link] &&
-    graph.linkLib[link].target === target &&
-    graph.linkLib[link].source === source
-  ));
-  if (res) {
-    return graph.linkLib[res];
-  }
+  // const res = graph.links.find(link => (
+  //   graph.linkLib &&
+  //   graph.linkLib[link] &&
+  //   graph.linkLib[link].target === target &&
+  //   graph.linkLib[link].source === source
+  // ));
+  // if (res) {
+  //   return graph.linkLib[res];
+  // }
   return null;
 }
 export function newLink(graph, options) {
@@ -2359,7 +2480,8 @@ export function matchObject(obj1, obj2) {
 }
 export function GetLinkByNodes(graph, options) {
   const { source, target } = options;
-  return Object.values(graph.linkLib).find(t => t.source === source && t.target === target);
+  return [findLink(graph, { target, source })]
+  // return Object.values(graph.linkLib).find(t => t.source === source && t.target === target);
 }
 export function GetLinkChainItem(state, options) {
   const chains = GetLinkChain(state, options);
@@ -2674,8 +2796,12 @@ export function addLink(graph, options, link) {
         graph.linkLib[link.id] = link;
         if (!fast) {
           graph.linkLib = { ...graph.linkLib };
+          graph.links = [...graph.links, link.id];
         }
-        graph.links = [...graph.links, link.id];
+        else if (graph.links.indexOf(link.id) === -1) {
+          graph.links.push(link.id);
+        }
+
         updateCache(options, link);
         // Keeps track of the links for each node.
         if (fast) {
@@ -3365,10 +3491,11 @@ export function updateGroupProperty(graph, options) {
 }
 
 function noSameLink(graph, ops) {
-  return !graph.links.some(x => {
-    const temp = graph.linkLib[x];
-    return temp && temp.source === ops.source && temp.target === ops.target;
-  });
+  return !findLink(graph, ops);
+  // return !graph.links.some(x => {
+  //   const temp = graph.linkLib[x];
+  //   return temp && temp.source === ops.source && temp.target === ops.target;
+  // });
 }
 function createGroup() {
   return {

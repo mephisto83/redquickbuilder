@@ -22,15 +22,15 @@ import {
 } from "../../constants/nodetypes";
 import { GetNodeLinkedTo } from "../../methods/graph_methods";
 
-export default function AddFiltersToGetAll(progresFunc) {
+export default async function AddFiltersToGetAll(progresFunc) {
   const methods = NodesByType(null, NodeTypes.Method).filter(
     x => (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {}).method === Methods.GetAll)
     .filter(x => !GetNodeLinkedTo(null, {
-        id: x.id,
-        link: LinkType.ModelItemFilter
-      }));
+      id: x.id,
+      link: LinkType.ModelItemFilter
+    }));
 
-  methods.forEachAsync(async (method, index, length) => {
+  await methods.forEachAsync(async (method, index, length) => {
     const result = [];
     let nodeInstance = null;
     result.push(

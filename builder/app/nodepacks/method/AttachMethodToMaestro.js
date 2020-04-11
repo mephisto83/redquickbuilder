@@ -49,8 +49,10 @@ export default function AttachMethodToMaestro(args) {
             links: [
               {
                 target: modelId,
-                properties: {
-                  ...LinkProperties.ModelTypeLink
+                linkProperties: {
+                  properties: {
+                    ...LinkProperties.ModelTypeLink
+                  }
                 }
               }
             ],
@@ -92,8 +94,10 @@ export default function AttachMethodToMaestro(args) {
             links: [
               {
                 target: modelId,
-                properties: {
-                  ...LinkProperties.ModelTypeLink
+                linkProperties: {
+                  properties: {
+                    ...LinkProperties.ModelTypeLink
+                  }
                 }
               }
             ],

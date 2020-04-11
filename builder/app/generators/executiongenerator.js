@@ -23,386 +23,393 @@ const EXECUTOR_METHODS = './app/templates/executor/executor_methods.tpl';
 const EXECUTOR_METHODS_INTERFACE = './app/templates/executor/executor_methods_interface.tpl';
 
 export default class ExecutorGenerator {
-    static enumerateValidationTestVectors(validation_test_vectors) {
-        var vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
+  static enumerateValidationTestVectors(validation_test_vectors) {
+    const vects = validation_test_vectors.map(x => Object.keys(x.values.cases).length);
 
-        var enumeration = ExecutorGenerator.EnumerateCases(vects);
-        return enumeration;
+    const enumeration = ExecutorGenerator.EnumerateCases(vects);
+    return enumeration;
+  }
+
+  static GetParameters(executor_node) {
+    const graph = GetCurrentGraph(GetState());
+    const methodNode = GetMethodNode(executor_node.id);
+    const agent = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
+    const model = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model);
+    const modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
+    const modelNode = GraphMethods.GetNode(graph, model);
+    const agentNode = GraphMethods.GetNode(graph, agent);
+
+    // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
+
+    let agent_parameter = GetCodeName(agentNode);
+    agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
+
+    let data_parameter = GetCodeName(modelNode);
+    data_parameter = data_parameter ? `${data_parameter} data` : false;
+
+    let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
+    change_parameter = change_parameter ? `${change_parameter} change` : false;
+
+    const parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
+    return parameters;
+  }
+
+  static GetOutput(executor_node) {
+    const methodNode = GetMethodNode(executor_node.id);
+    const modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
+    return modelOutput
+  }
+
+  static EnumerateCases(vects, j = 0) {
+    return enumerate(vects, j);
+  }
+
+  static Tabs(c) {
+    let res = '';
+    for (let i = 0; i < c; i++) {
+      res += `    `;
     }
-    static GetParameters(executor_node) {
-        let graph = GetCurrentGraph(GetState());
-        let methodNode = GetMethodNode(executor_node.id);
-        var agent = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Agent);
-        var model = GetMethodNodeProp(methodNode, FunctionTemplateKeys.Model);
-        var modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
-        var modelNode = GraphMethods.GetNode(graph, model);
-        var agentNode = GraphMethods.GetNode(graph, agent);
+    return res;
+  }
 
-        // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
+  static Generate(options) {
+    const { state, key } = options;
+    const graphRoot = GetRootGraph(state);
+    const namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+    const graph = GetRootGraph(state);
+    const result = {};
 
-        let agent_parameter = GetCodeName(agentNode);
-        agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
+    const executor_nodes = NodesByType(state, NodeTypes.Executor);
+    const _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf8');
+    const _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf8');
+    const _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf8');
+    const _executor_methods_composite_input = fs.readFileSync(EXECUTOR_METHOD_COMPOSITE_INPUT, 'utf8');
+    const _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf8');
+    const _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf8');
+    const _executor_create_composite_input = fs.readFileSync(EXECUTOR_CREATE_COMPOSITE_INPUT, 'utf8');
+    const _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf8');
+    const _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf8');
+    const _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
+    const _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
+    const _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf8');
+    const _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
+    const agentFunctionDic = {};
+    const agentFunctionInterfaceDic = {};
+    const executor_entry_methods = [];
+    const agentModelDic = {};
+    const agmCombos = [];
+    const allmodels = NodesByType(state, NodeTypes.Model);
+    const allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
+    const allfunctions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
 
-        let data_parameter = GetCodeName(modelNode);
-        data_parameter = data_parameter ? `${data_parameter} data` : false;
+    allfunctions.map(fun => {
+      const methodProps = GetMethodProps(fun);
+      let model_output;
+      if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
+        model_output = GetCodeName(methodProps[FunctionTemplateKeys.CompositeInput])
+      }
+      const agent = methodProps[FunctionTemplateKeys.Agent];
+      const model = methodProps[FunctionTemplateKeys.Model];
 
-        let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
-        change_parameter = change_parameter ? `${change_parameter} change` : false;
+      agmCombos.push({
+        agentId: agent,
+        agent: GetCodeName(agent),
+        model: model_output || GetCodeName(model),
+        model_output: GetCodeName(model),
+        function: GetCodeName(fun),
+        method: GetNodeProp(fun, NodeProperties.MethodType)
+      });
+    });
 
-        let parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
-        return parameters;
-    }
-    static GetOutput(executor_node) {
-        let methodNode = GetMethodNode(executor_node.id);
-        var modelOutput = GetMethodNodeProp(methodNode, FunctionTemplateKeys.ModelOutput);
-        return modelOutput
-    }
-    static EnumerateCases(vects, j = 0) {
-        return enumerate(vects, j);
-    }
-    static Tabs(c) {
-        let res = '';
-        for (var i = 0; i < c; i++) {
-            res += `    `;
-        }
-        return res;
-    }
-    static Generate(options) {
-        var { state, key } = options;
-        let graphRoot = GetRootGraph(state);
-        let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
-        let graph = GetRootGraph(state);
-        let result = {};
+    executor_nodes.map(executor_node => {
+      const agent = GetNodeProp(executor_node, NodeProperties.ExecutorAgent);
+      const model = GetNodeProp(executor_node, NodeProperties.ExecutorModel);
+      const modelOutput = GetNodeProp(executor_node, NodeProperties.ExecutorModelOutput);
+      const modelOutputNode = GraphMethods.GetNode(graph, modelOutput);
+      const modelNode = GraphMethods.GetNode(graph, model);
+      const agentNode = GraphMethods.GetNode(graph, agent);
+      const funct = GetNodeProp(executor_node, NodeProperties.ExecutorFunction);
+      const functNode = GraphMethods.GetNode(graph, funct);
+      const functType = GetNodeProp(executor_node, NodeProperties.ExecutorFunctionType);
+      const functionNode = GraphMethods.GetNode(graph, funct);
+      const executor = GetNodeProp(executor_node, NodeProperties.Executor);
+      const executorProperties = GraphMethods.getValidatorProperties(executor);
+      const validation_test_vectors = [];
+      const amdid = GetNodeProp(agentNode, NodeProperties.CodeName) + GetNodeProp(modelNode, NodeProperties.CodeName) + GetNodeProp(functionNode, NodeProperties.MethodType);
+      agentModelDic[amdid] = agentModelDic[amdid] || [];
 
-        let executor_nodes = NodesByType(state, NodeTypes.Executor);
-        let _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf8');
-        let _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf8');
-        let _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf8');
-        let _executor_methods_composite_input = fs.readFileSync(EXECUTOR_METHOD_COMPOSITE_INPUT, 'utf8');
-        let _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf8');
-        let _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf8');
-        let _executor_create_composite_input = fs.readFileSync(EXECUTOR_CREATE_COMPOSITE_INPUT, 'utf8');
-        let _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf8');
-        let _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf8');
-        let _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
-        let _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
-        let _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf8');
-        let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
-        let agentFunctionDic = {};
-        let agentFunctionInterfaceDic = {};
-        let executor_entry_methods = [];
-        let agentModelDic = {};
-        let agmCombos = [];
-        let allmodels = NodesByType(state, NodeTypes.Model);
-        let allagents = allmodels.filter(x => GetNodeProp(x, NodeProperties.IsAgent));
-        let allfunctions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
+      agentModelDic[amdid].push({
+        agent: GetCodeName(agentNode),
+        model: GetCodeName(modelNode),
+        model_output: GetCodeName(modelOutputNode),
+        functType,
+        funct: GetCodeName(functNode)
+      })
+      const methodProps = GetMethodProps(functNode);
+      const propertyValidationStatements = Object.keys(executorProperties || {}).map(property => {
+        const propertyNode = GraphMethods.GetNode(graph, property);
+        const validatorPs = executorProperties[property];
 
-        allfunctions.map(fun => {
-            let methodProps = GetMethodProps(fun);
-            let model_output;
-            if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
-                model_output = GetCodeName(methodProps[FunctionTemplateKeys.CompositeInput])
-            }
-            let agent = methodProps[FunctionTemplateKeys.Agent];
-            let model = methodProps[FunctionTemplateKeys.Model];
-
-            agmCombos.push({
-                agentId: agent,
-                agent: GetCodeName(agent),
-                model: model_output || GetCodeName(model),
-                model_output: GetCodeName(model),
-                function: GetCodeName(fun),
-                method: GetNodeProp(fun, NodeProperties.MethodType)
-            });
-        });
-
-        executor_nodes.map(executor_node => {
-            var agent = GetNodeProp(executor_node, NodeProperties.ExecutorAgent);
-            var model = GetNodeProp(executor_node, NodeProperties.ExecutorModel);
-            var modelOutput = GetNodeProp(executor_node, NodeProperties.ExecutorModelOutput);
-            var modelOutputNode = GraphMethods.GetNode(graph, modelOutput);
-            var modelNode = GraphMethods.GetNode(graph, model);
-            var agentNode = GraphMethods.GetNode(graph, agent);
-            var funct = GetNodeProp(executor_node, NodeProperties.ExecutorFunction);
-            var functNode = GraphMethods.GetNode(graph, funct);
-            var functType = GetNodeProp(executor_node, NodeProperties.ExecutorFunctionType);
-            var functionNode = GraphMethods.GetNode(graph, funct);
-            var executor = GetNodeProp(executor_node, NodeProperties.Executor);
-            let executorProperties = GraphMethods.getValidatorProperties(executor);
-            var validation_test_vectors = [];
-            let amdid = GetNodeProp(agentNode, NodeProperties.CodeName) + GetNodeProp(modelNode, NodeProperties.CodeName) + GetNodeProp(functionNode, NodeProperties.MethodType);
-            agentModelDic[amdid] = agentModelDic[amdid] || [];
-
-            agentModelDic[amdid].push({
-                agent: GetCodeName(agentNode),
-                model: GetCodeName(modelNode),
-                model_output: GetCodeName(modelOutputNode),
-                functType,
-                funct: GetCodeName(functNode)
-            })
-            let methodProps = GetMethodProps(functNode);
-            let propertyValidationStatements = Object.keys(executorProperties || {}).map(property => {
-                let propertyNode = GraphMethods.GetNode(graph, property);
-                let validatorPs = executorProperties[property];
-
-                let properties = Object.keys(validatorPs.validators).map(vld => {
-                    let validators = validatorPs.validators[vld];
-                    let node = GraphMethods.GetNode(graph, validators.node);
-                    let attribute_type_arguments = '';
-                    if (node) {
-                        switch (GetNodeProp(node, NodeProperties.NODEType)) {
-                            case NodeTypes.ExtensionType:
-                                if (validators && validators.extension) {
-                                    let temp = { '_ _': '"_____"' };
-                                    attribute_type_arguments = Object.keys(validators.extension).map(ext => {
-                                        if (validators.extension[ext]) {
-                                            temp[`${ext}`] = `${GetNodeProp(node, NodeProperties.CodeName)}.${MakeConstant(ext)}`;
-                                            return temp[`${ext}`];
-                                        }
-                                    }).filter(x => x);
-                                    attribute_type_arguments = temp.filter(x => x).unique(x => x).join();
-                                    validation_test_vectors.push({
-                                        property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                                        values: { cases: temp }
-                                    });
-                                    attribute_type_arguments = `new List<string> () {
+        const properties = Object.keys(validatorPs.validators).map(vld => {
+          const validators = validatorPs.validators[vld];
+          const node = GraphMethods.GetNode(graph, validators.node);
+          let attribute_type_arguments = '';
+          if (node) {
+            switch (GetNodeProp(node, NodeProperties.NODEType)) {
+              case NodeTypes.ExtensionType:
+                if (validators && validators.extension) {
+                  const temp = { '_ _': '"_____"' };
+                  attribute_type_arguments = Object.keys(validators.extension).map(ext => {
+                    if (validators.extension[ext]) {
+                      temp[`${ext}`] = `${GetNodeProp(node, NodeProperties.CodeName)}.${MakeConstant(ext)}`;
+                      return temp[`${ext}`];
+                    }
+                  }).filter(x => x);
+                  attribute_type_arguments = temp.filter(x => x).unique(x => x).join();
+                  validation_test_vectors.push({
+                    property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+                    values: { cases: temp }
+                  });
+                  attribute_type_arguments = `new List<string> () {
                 ${attribute_type_arguments}
             }`;
-                                }
-                                break;
-                            case NodeTypes.Enumeration:
-                                break;
-                        }
-                    }
-                    if (ValidationCases[validators.type]) {
-                        validation_test_vectors.push({
-                            property: GetNodeProp(propertyNode, NodeProperties.CodeName),
-                            values: ValidationCases[validators.type]
-                        });
-                    }
-                    let template = `result{{model_property}} = data{{model_property}};`;
-                    let templateBindings = {};
-                    switch (validators.type) {
-                        case ExecutorRules.AgentReference:
-                            template = `result{{model_property}} = agent.Id;`
-                            break;
-                        case ExecutorRules.ParentReference:
-                            template = `result{{model_property}} = data{{model_property}};`
-                            break;
-                        case ExecutorRules.Copy:
-                            break;
-                        case ExecutorRules.AddModelReference:
-                            template = fs.readFileSync(`app/templates/executor/snippets/add-model-reference.tpl`, 'utf8');
-
-                            let { references } = validators;
-                            if (references) {
-                                let methodNode = GraphMethods.GetMethodNode(state, executor_node.id);
-                                if (methodNode) {
-                                    let methodProps = GetMethodProps(methodNode);
-                                    Object.keys(references).map(ref_key => {
-                                        templateBindings[ref_key] = GetCodeName(methodProps[references[ref_key]]);
-                                    })
-                                }
-                            }
-                            break;
-                        default:
-                            throw 'not handle [execution generator]';
-                    }
-                    var templateRes = bindTemplate(template, {
-                        attribute_type: validators.code[ProgrammingLanguages.CSHARP],
-                        attribute_type_arguments,
-                        model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`,
-                        ...({ ...templateBindings })
-                    });
-                    return ExecutorGenerator.Tabs(4) + templateRes + NEW_LINE
-                }).unique(x => x).join('');
-
-
-                return properties;
-            }).unique(x => x).join('');
-            let template = '{{not-defined template}}';
-            let execution_method = _executor_methods;
-            switch (functType) {
-                case Methods.Create:
-                    template = _executor_create;
-                    if (methodProps[FunctionTemplateKeys.CompositeInput]) {
-                        execution_method = _executor_methods_composite_input;
-                        template = _executor_create_composite_input;
-                    }
-                    break;
-                case Methods.Update:
-                    template = _executor_update;
-                    break;
-                case Methods.Get:
-                case Methods.GetAll:
-                    template = _executor_get;
-                    break;
+                }
+                break;
+              case NodeTypes.Enumeration:
+                break;
+              default: break;
             }
-            var templateRes = bindTemplate(template, {
-                property_sets: propertyValidationStatements,
-                model: `${GetCodeName(modelNode)}`,
-                model_output: GetCodeName(modelOutputNode)
+          }
+          if (ValidationCases[validators.type]) {
+            validation_test_vectors.push({
+              property: GetNodeProp(propertyNode, NodeProperties.CodeName),
+              values: ValidationCases[validators.type]
             });
+          }
+          let template = `result{{model_property}} = data{{model_property}};`;
+          const templateBindings = {};
+          switch (validators.type) {
+            case ExecutorRules.AgentReference:
+              template = `result{{model_property}} = agent.Id;`
+              break;
+            case ExecutorRules.ParentReference:
+              template = `result{{model_property}} = data{{model_property}};`
+              break;
+            case ExecutorRules.Copy:
+              break;
+            case ExecutorRules.AddModelReference:
+              template = fs.readFileSync(`app/templates/executor/snippets/add-model-reference.tpl`, 'utf8');
 
-            // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
+              const { references } = validators;
+              if (references) {
+                const methodNode = GraphMethods.GetMethodNode(state, executor_node.id);
+                if (methodNode) {
+                  const methodProps = GetMethodProps(methodNode);
+                  Object.keys(references).map(ref_key => {
+                    templateBindings[ref_key] = GetCodeName(methodProps[references[ref_key]]);
+                  })
+                }
+              }
+              break;
+            default:
+              throw 'not handle [execution generator]';
+          }
+          const templateRes = bindTemplate(template, {
+            attribute_type: validators.code[ProgrammingLanguages.CSHARP],
+            attribute_type_arguments,
+            model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`,
+            ...({ ...templateBindings })
+          });
+          return ExecutorGenerator.Tabs(4) + templateRes + NEW_LINE
+        }).unique(x => x).join('');
 
-            let agent_parameter = GetCodeName(agentNode);
-            agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
 
-            let data_parameter = GetCodeName(modelNode);
-            data_parameter = data_parameter ? `${data_parameter} data` : false;
+        return properties;
+      }).unique(x => x).join('');
+      let template = '{{not-defined template}}';
+      let execution_method = _executor_methods;
+      switch (functType) {
+        case Methods.Create:
+          template = _executor_create;
+          if (methodProps[FunctionTemplateKeys.CompositeInput]) {
+            execution_method = _executor_methods_composite_input;
+            template = _executor_create_composite_input;
+          }
+          break;
+        case Methods.Update:
+          template = _executor_update;
+          break;
+        case Methods.Get:
+        case Methods.GetAll:
+          template = _executor_get;
+          break;
+        default: break;
+      }
+      var templateRes = bindTemplate(template, {
+        property_sets: propertyValidationStatements,
+        model: `${GetCodeName(modelNode)}`,
+        model_output: GetCodeName(modelOutputNode)
+      });
 
-            let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
-            change_parameter = change_parameter ? `${change_parameter} change` : false;
+      // var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
-            let parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
+      let agent_parameter = GetCodeName(agentNode);
+      agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
 
-            var templateRes = bindTemplate(execution_method, {
-                model: GetCodeName(modelNode),
-                model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
-                method_name: GetCodeName(functionNode),
-                parameters,
-                data: GetCodeName(modelNode),
-                agent: GetCodeName(agentNode),
-                change: `${GetCodeName(modelNode)}Change`,
-                method_guts: templateRes,
-            });
+      let data_parameter = GetCodeName(modelNode);
+      data_parameter = data_parameter ? `${data_parameter} data` : false;
 
-            var templateResInterface = bindTemplate(_executor_methods_interface, {
-                model: GetCodeName(modelNode),
-                model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
-                method_name: GetCodeName(functionNode),
-                parameters,
-                data: GetCodeName(modelNode),
-                agent: GetCodeName(agentNode),
-                change: `${GetCodeName(modelNode)}Change`,
-                method_guts: templateRes,
-            });
+      let change_parameter = !agent_parameter ? false : `${GetNodeProp(modelNode, NodeProperties.CodeName)}ChangeBy${GetNodeProp(agentNode, NodeProperties.CodeName)}`;
+      change_parameter = change_parameter ? `${change_parameter} change` : false;
 
-            // var testTemplate = bindTemplate(_testClass, {
-            //     name: GetNodeProp(node, NodeProperties.CodeName),
-            //     tests: testProps.join(NEW_LINE)
-            // });
-            agentFunctionInterfaceDic[agent] = agentFunctionInterfaceDic[agent] || [];
-            agentFunctionDic[agent] = agentFunctionDic[agent] || [];
-            agentFunctionDic[agent].push(templateRes)
-            agentFunctionInterfaceDic[agent].push(templateResInterface)
+      const parameters = [data_parameter, agent_parameter, change_parameter].filter(x => x).join(', ');
 
+      var templateRes = bindTemplate(execution_method, {
+        model: GetCodeName(modelNode),
+        model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
+        method_name: GetCodeName(functionNode),
+        parameters,
+        data: GetCodeName(modelNode),
+        agent: GetCodeName(agentNode),
+        change: `${GetCodeName(modelNode)}Change`,
+        method_guts: templateRes,
+      });
+
+      const templateResInterface = bindTemplate(_executor_methods_interface, {
+        model: GetCodeName(modelNode),
+        model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
+        method_name: GetCodeName(functionNode),
+        parameters,
+        data: GetCodeName(modelNode),
+        agent: GetCodeName(agentNode),
+        change: `${GetCodeName(modelNode)}Change`,
+        method_guts: templateRes,
+      });
+
+      // var testTemplate = bindTemplate(_testClass, {
+      //     name: GetNodeProp(node, NodeProperties.CodeName),
+      //     tests: testProps.join(NEW_LINE)
+      // });
+      agentFunctionInterfaceDic[agent] = agentFunctionInterfaceDic[agent] || [];
+      agentFunctionDic[agent] = agentFunctionDic[agent] || [];
+      agentFunctionDic[agent].push(templateRes)
+      agentFunctionInterfaceDic[agent].push(templateResInterface)
+
+    });
+    let lastCase;
+    const static_methods = agmCombos.map(amd => {
+      const {
+        agent,
+        agentId,
+        model,
+        model_output,
+        method,
+      } = amd;
+      const cases = (agentModelDic[agent + model + amd.method] || []).map(_cases => {
+        const {
+          agent,
+          model,
+          functType,
+          funct
+        } = _cases;
+        if (amd.agent !== agent) { ''; }
+
+        const _case = bindTemplate(_exe_case, {
+          agent,
+          model,
+          func_name: funct
         });
-        let lastCase;
-        let static_methods = agmCombos.map(amd => {
-            var {
-                agent,
-                agentId,
-                model,
-                model_output,
-                method,
-            } = amd;
-            let cases = (agentModelDic[agent + model + amd.method] || []).map(_cases => {
-                var {
-                    agent,
-                    model,
-                    functType,
-                    funct
-                } = _cases;
-                if (amd.agent !== agent) { ''; }
+        return _case + NEW_LINE;
+      }).unique(x => x).join('');
+      return {
+        template: bindTemplate(_exe_method, {
+          agent,
+          model,
+          cases,
+          change: `${model}`,
+          model_output: model_output || model,
+          method
+        }) + NEW_LINE,
+        agent: agentId
+      }
+    });
+    const static_methods_interface = agmCombos.map(amd => {
+      const {
+        agent,
+        model,
+        method,
+        agentId,
+        model_output
+      } = amd;
+      return {
+        template: bindTemplate(_exe_method_interface, {
+          agent,
+          model,
+          model_output: model_output || model,
+          change: `${model}`,
+          method
+        }) + NEW_LINE,
+        agent: agentId
+      }
+    });
+    Object.keys(agentFunctionDic).map(agent => {
 
-                let _case = bindTemplate(_exe_case, {
-                    agent,
-                    model,
-                    func_name: funct
-                });
-                return _case + NEW_LINE;
-            }).unique(x => x).join('');
-            return {
-                template: bindTemplate(_exe_method, {
-                    agent,
-                    model,
-                    cases,
-                    change: `${model}`,
-                    model_output: model_output || model,
-                    method
-                }) + NEW_LINE,
-                agent: agentId
-            }
-        });
-        let static_methods_interface = agmCombos.map(amd => {
-            var {
-                agent,
-                model,
-                method,
-                agentId,
-                model_output
-            } = amd;
-            return {
-                template: bindTemplate(_exe_method_interface, {
-                    agent,
-                    model,
-                    model_output: model_output || model,
-                    change: `${model}`,
-                    method
-                }) + NEW_LINE,
-                agent: agentId
-            }
-        });
-        Object.keys(agentFunctionDic).map(agent => {
+      const node = GraphMethods.GetNode(graph, agent);
+      const templateRes = bindTemplate(_executor_class, {
+        model: GetNodeProp(node, NodeProperties.CodeName),
+        methods: agentFunctionDic[agent].join(''),
+        staticentry: static_methods.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
+      });
 
-            var node = GraphMethods.GetNode(graph, agent);
-            let templateRes = bindTemplate(_executor_class, {
-                model: GetNodeProp(node, NodeProperties.CodeName),
-                methods: agentFunctionDic[agent].join(''),
-                staticentry: static_methods.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
-            });
+      const templateInterfaceRes = bindTemplate(_executor_class_interface, {
+        model: GetNodeProp(node, NodeProperties.CodeName),
+        methods: agentFunctionInterfaceDic[agent].unique(x => x).join(''),
+        staticentry: static_methods_interface.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
 
-            let templateInterfaceRes = bindTemplate(_executor_class_interface, {
-                model: GetNodeProp(node, NodeProperties.CodeName),
-                methods: agentFunctionInterfaceDic[agent].unique(x => x).join(''),
-                staticentry: static_methods_interface.unique(x => x.template).filter(x => x.agent === agent).map(x => x.template).join('')
-
-            })
+      })
 
 
 
-            result[GetNodeProp(node, NodeProperties.CodeName)] = {
-                id: GetNodeProp(node, NodeProperties.CodeName),
-                name: `${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
-                tname: `${GetNodeProp(node, NodeProperties.CodeName)}ExecutorTests`,
-                iname: `I${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
-                template: NamespaceGenerator.Generate({
-                    template: templateRes,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Interface}`,
-                        `${namespace}${NameSpace.Constants}`],
-                    namespace,
-                    space: NameSpace.Executors
-                }),
-                interface: NamespaceGenerator.Generate({
-                    template: templateInterfaceRes,
-                    usings: [
-                        ...STANDARD_CONTROLLER_USING,
-                        `${namespace}${NameSpace.Model}`,
-                        `${namespace}${NameSpace.Parameters}`,
-                        `${namespace}${NameSpace.Constants}`],
-                    namespace,
-                    space: NameSpace.Interface
-                }),
-                // test: NamespaceGenerator.Generate({
-                //     template: testTemplate,
-                //     usings: [
-                //         ...STANDARD_CONTROLLER_USING,
-                //         ...STANDARD_TEST_USING,
-                //         `${namespace}${NameSpace.Executors}`,
-                //         `${namespace}${NameSpace.Model}`,
-                //         `${namespace}${NameSpace.Constants}`],
-                //     namespace,
-                //     space: NameSpace.Tests
-                // }),
-            };
-        })
+      result[GetNodeProp(node, NodeProperties.CodeName)] = {
+        id: GetNodeProp(node, NodeProperties.CodeName),
+        name: `${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+        tname: `${GetNodeProp(node, NodeProperties.CodeName)}ExecutorTests`,
+        iname: `I${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+        template: NamespaceGenerator.Generate({
+          template: templateRes,
+          usings: [
+            ...STANDARD_CONTROLLER_USING,
+            `${namespace}${NameSpace.Model}`,
+            `${namespace}${NameSpace.Parameters}`,
+            `${namespace}${NameSpace.Interface}`,
+            `${namespace}${NameSpace.Constants}`],
+          namespace,
+          space: NameSpace.Executors
+        }),
+        interface: NamespaceGenerator.Generate({
+          template: templateInterfaceRes,
+          usings: [
+            ...STANDARD_CONTROLLER_USING,
+            `${namespace}${NameSpace.Model}`,
+            `${namespace}${NameSpace.Parameters}`,
+            `${namespace}${NameSpace.Constants}`],
+          namespace,
+          space: NameSpace.Interface
+        }),
+        // test: NamespaceGenerator.Generate({
+        //     template: testTemplate,
+        //     usings: [
+        //         ...STANDARD_CONTROLLER_USING,
+        //         ...STANDARD_TEST_USING,
+        //         `${namespace}${NameSpace.Executors}`,
+        //         `${namespace}${NameSpace.Model}`,
+        //         `${namespace}${NameSpace.Constants}`],
+        //     namespace,
+        //     space: NameSpace.Tests
+        // }),
+      };
+    })
 
-        return result;
-    }
+    return result;
+  }
 }

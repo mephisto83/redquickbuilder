@@ -5,6 +5,10 @@
 .progressbar {
 	counter-reset: step;
 }
+.totalTimeUsed {
+  font-size: 23px;
+  color: #010101;
+}
 .progressbar li {
 	list-style-type: none;
 	width: 25%;

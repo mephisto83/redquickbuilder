@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
@@ -120,8 +121,8 @@ class Dashboard extends Component {
   componentDidMount() {
     this.props.setState();
     this.props.setRemoteState();
-    this.props.setVisual(UIA.NODE_COST, 5);
-    this.props.setVisual(UIA.NODE_CONNECTION_COST, 1.5);
+    this.props.setVisual(UIA.NODE_COST, 2);
+    this.props.setVisual(UIA.NODE_CONNECTION_COST, .5);
   }
 
   minified() {
@@ -1039,40 +1040,30 @@ class Dashboard extends Component {
     if (graph) {
       cost = Object.keys(graph.linkLib || {}).length * node_cost + Object.keys(graph.nodeLib || {}).length * node_connection_cost;
     }
-    return this.formatMoney(cost, 2, '.', ',');
+    return Dashboard.formatMoney(cost, 2, '.', ',');
   }
 
-  formatMoney(number, decPlaces, decSep, thouSep) {
-    decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-      decSep = typeof decSep === "undefined" ? "." : decSep;
-    thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-    const sign = number < 0 ? "-" : "";
-    const i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-    var j = (j = i.length) > 3 ? j % 3 : 0;
-
-    return sign +
-      (j ? i.substr(0, j) + thouSep : "") +
-      i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, `$1${thouSep}`) +
-      (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+  static formatMoney(number) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(number)
   }
 
 
   render() {
     const { state } = this.props;
     const cost = this.getCost()
-    const selected_node_bb = UIA.Visual(state, UIA.SELECTED_NODE_BB);
-    let menu_left = 0;
-    let menu_top = 0;
-    if (selected_node_bb) {
-      menu_left = selected_node_bb.right;
-      menu_top = selected_node_bb.top;
+    const selectedNodeBB = UIA.Visual(state, UIA.SELECTED_NODE_BB);
+    let menuLeft = 0;
+    let menuTop = 0;
+    if (selectedNodeBB) {
+      menuLeft = selectedNodeBB.right;
+      menuTop = selectedNodeBB.top;
     }
     const nodeSelectionMenuItems = this.nodeSelectionMenuItems();
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     const graph = UIA.GetCurrentGraph(state);
     const rootGraph = UIA.GetRootGraph(state);
     const vgraph = UIA.GetVisualGraph(state);
-    const main_content = UIA.Visual(state, MAIN_CONTENT);
+    const mainContent = UIA.Visual(state, MAIN_CONTENT);
     let version = '0.0.0';
     let workspace = null;
     if (rootGraph) {
@@ -1092,12 +1083,12 @@ class Dashboard extends Component {
           <GooMenuSVG />
           <GooMenu
             visible={UIA.Visual(state, UIA.SELECTED_NODE)}
-            left={menu_left - 20}
+            left={menuLeft - 20}
             open={UIA.Visual(state, NODE_MENU)}
             onToggle={() => {
               this.props.toggleVisual(NODE_MENU);
             }}
-            top={menu_top + 30}
+            top={menuTop + 30}
             menuItems={nodeSelectionMenuItems}
           />
           <div data-tid="container">
@@ -1149,10 +1140,10 @@ class Dashboard extends Component {
                   }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === MIND_MAP || !main_content} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
+                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={mainContent === MIND_MAP || !mainContent} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                   }} /> : null}
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={main_content === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
+                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                   }} /> : null}
 
@@ -1208,27 +1199,27 @@ class Dashboard extends Component {
                 <SideBarHeader title={Titles.MainNavigation} onClick={() => {
                   this.props.toggleVisual('MAIN_NAV');
                 }} />
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === MIND_MAP || !main_content} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === MIND_MAP || !mainContent} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa-paint-brush" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa-paint-brush" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, THEME_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === TRANSLATION_VIEW} hideArrow title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === TRANSLATION_VIEW} hideArrow title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, TRANSLATION_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={main_content === PROGRESS_VIEW} hideArrow title={Titles.Progress} icon="fa  fa-industry" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === PROGRESS_VIEW} hideArrow title={Titles.Progress} icon="fa  fa-industry" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, PROGRESS_VIEW);
                 }} /> : null}
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
-                <SideBarHeader title={Titles.FileMenu} />
+                <SideBarHeader title={<h4>{cost}</h4>} onClick={() => { }} />
 
                 <TreeViewMenu
                   open={UIA.Visual(state, VC.ApplicationMenu)}
@@ -1283,7 +1274,6 @@ class Dashboard extends Component {
                 </TreeViewMenu>
                 <SectionList />
                 <NodeManagement />
-                <SideBarHeader title={`$ ${cost}`} onClick={() => { }} />
                 {/* <MaestroDetailsMenu /> */}
                 <ControllerDetailsMenu />
               </SideBarMenu>
@@ -1293,8 +1283,8 @@ class Dashboard extends Component {
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
               <ThemeView active={UIA.Visual(state, MAIN_CONTENT) === THEME_VIEW} />
               <TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
-              <ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW } />
-              {main_content === MIND_MAP || true ? (<MindMap
+              <ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
+              {mainContent === MIND_MAP || true ? (<MindMap
                 linkDistance={UIA.Visual(state, LINK_DISTANCE)}
                 onNodeClick={(nodeId, boundingBox) => {
                   if (UIA.Visual(state, CONNECTING_NODE)) {
@@ -1467,7 +1457,7 @@ class Dashboard extends Component {
                 markedNodes={graph ? graph.markedSelectedNodeIds : []}
                 graph={vgraph || graph} />
               ) : null}             </Content>
-            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN)&& !Paused()} style={{ overflowY: 'auto', 'maxHeight': '100vh', 'height': '100vh' }} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+            <SideBar open={UIA.Visual(state, SIDE_PANEL_OPEN) && !Paused()} style={{ overflowY: 'auto', 'maxHeight': '100vh', 'height': '100vh' }} extraWide={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
               <SideBarTabs>
                 <SideBarTab
                   icon="fa fa-cog"

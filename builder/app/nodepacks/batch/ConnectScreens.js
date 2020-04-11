@@ -9,6 +9,7 @@ import ScreenConnectUpdate from "../screens/ScreenConnectUpdate";
 import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
 export default async function ConnectScreens(progresFunc) {
+  const allscreens = NodesByType(null, NodeTypes.Screen);
   const screens = NodesByType(null, NodeTypes.Screen).filter(x => !["login-models", "Authenticate", "Register"].some(v =>
     v === GetNodeProp(x, NodeProperties.NodePackage) ||
     v === GetNodeProp(x, NodeProperties.ViewPackageTitle)));
@@ -17,7 +18,7 @@ export default async function ConnectScreens(progresFunc) {
 
     const methods = GetPossibleMethods(screen);
 
-    const navigateToScreens = GetPossibleNavigateScreens(screen);
+    const navigateToScreens = GetPossibleNavigateScreens(screen, allscreens);
 
     const componentsDidMounts = GetPossibleComponentDidMount(screen);
 
@@ -61,8 +62,8 @@ export default async function ConnectScreens(progresFunc) {
   });
 }
 
-export function GetPossibleNavigateScreens(screen) {
-  const screens = NodesByType(null, NodeTypes.Screen);
+export function GetPossibleNavigateScreens(screen, allscreens) {
+  const screens = allscreens || NodesByType(null, NodeTypes.Screen);
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
 

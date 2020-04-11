@@ -50,7 +50,7 @@ export default class Input extends React.Component {
 					required
 					name={this.state.$name}
 				/>
-				<label className={`${style.form__label}`} for={this.state.$name}>
+				<label className={`${style.form__label}`} htmlFor={this.state.$name}>
 					{InputFunctions.placeholder(this)}
 				</label>
 				<Validation data={this.props.error} />

@@ -10,7 +10,8 @@ import {
   GetNodeById,
   ADD_LINK_BETWEEN_NODES,
   ComponentApiKeys,
-  GetComponentExternalApiNode
+  GetComponentExternalApiNode,
+  ScreenOptionFilter
 } from "../../actions/uiactions";
 import { LinkType, NodeProperties, LinkProperties, NodeTypes, Methods } from "../../constants/nodetypes";
 import {
@@ -32,10 +33,11 @@ export default function ScreenConnectCreate(args = { method, node }) {
     throw new Error("no method");
   }
   const graph = GetCurrentGraph();
-  const screen_options = GetNodesLinkedTo(graph, {
+  const screenOptions = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
-  });
+  }).filter(ScreenOptionFilter);
+
   const result = [];
   let { viewPackages } = args;
   viewPackages = {
@@ -43,12 +45,12 @@ export default function ScreenConnectCreate(args = { method, node }) {
     ...(viewPackages || {})
   };
 
-  screen_options.map(screenOption => {
+  screenOptions.forEach(screenOption => {
     const components = GetNodesLinkedTo(graph, {
       id: screenOption.id,
       link: LinkType.Component
     });
-    components.map(component => {
+    components.forEach(component => {
       const subcomponents = GetNodesLinkedTo(graph, {
         id: component.id,
         link: LinkType.Component
@@ -69,19 +71,19 @@ export default function ScreenConnectCreate(args = { method, node }) {
             v => v === GetNodeProp(x, NodeProperties.EventType)
           )
         );
-        onEvents.forEach(x => {
+        onEvents.forEach(evntNode => {
           const t = GetNodesLinkedTo(graph, {
-            id: x.id,
+            id: evntNode.id,
             link: LinkType.EventMethodInstance
           });
           if (t && t.length) {
-            t.map(instance => {
+            t.forEach(instance => {
               const vp = GetNodeProp(instance, NodeProperties.ViewPackage);
               if (vp) {
                 const inPackageNodes = GetNodesByProperties({
                   [NodeProperties.ViewPackage]: vp
                 });
-                inPackageNodes.map(inPackageNode => {
+                inPackageNodes.forEach(inPackageNode => {
                   result.push({
                     operation: REMOVE_NODE,
                     options: function options() {
@@ -92,7 +94,6 @@ export default function ScreenConnectCreate(args = { method, node }) {
                   });
                 });
               }
-              return null;
             });
           }
           let instanceTempNode = null;
@@ -102,7 +103,7 @@ export default function ScreenConnectCreate(args = { method, node }) {
               {
                 operation: ADD_NEW_NODE,
                 options: addInstanceFunc(
-                  x,
+                  evntNode,
                   instanceNode => {
                     instanceTempNode = instanceNode;
                   },

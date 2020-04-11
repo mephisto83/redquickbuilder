@@ -1,4 +1,4 @@
-import { NodesByType, graphOperation, GetDispatchFunc, GetStateFunc, GetNodeTitle, NodeProperties, GetNodeProp, GetDefaults } from "../../actions/uiactions";
+import { NodesByType, graphOperation, GetDispatchFunc, GetStateFunc, GetNodeTitle, NodeProperties, GetNodeProp, GetDefaults, ScreenOptionFilter } from "../../actions/uiactions";
 import { NodeTypes } from "../../constants/nodetypes";
 import AddComponent from "../AddComponent";
 import { ComponentTypeKeys } from "../../constants/componenttypes";
@@ -9,18 +9,7 @@ import GridHeaderMainMenuMain from "../layouts/GridHeaderMainMenuMain";
 export default async function AddComponentsToScreenOptions(progresFunc) {
   const screenOptions = NodesByType(null, NodeTypes.ScreenOption);
   const menuTreeOption = MenuTreeOptionKeys.ModelMethodMenu;
-  await screenOptions.filter(x => {
-    if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Register') {
-      return false;
-    }
-    if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Authenticate') {
-      return false;
-    }
-    if (GetNodeProp(x, NodeProperties.ValueName) === 'HomeViewContainer') {
-      return false;
-    }
-    return true;
-  }).forEachAsync(async (screenOption, index, total) => {
+  await screenOptions.filter(ScreenOptionFilter).forEachAsync(async (screenOption, index, total) => {
     const context = {
       title: null,
       menu: null

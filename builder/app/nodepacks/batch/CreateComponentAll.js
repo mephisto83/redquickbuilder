@@ -1,6 +1,15 @@
-import { UITypes, NodeProperties, NodeTypes, LinkType } from "../../constants/nodetypes";
+import { UITypes, NodeProperties, NodeTypes } from "../../constants/nodetypes";
 import { ViewTypes } from "../../constants/viewtypes";
-import { GetNodeTitle, GetModelPropertyChildren, GetNodeProp, GetDispatchFunc, GetStateFunc, executeGraphOperations, NodesByType, GetNodeById, GetViewTypeModel } from "../../actions/uiactions";
+import {
+  GetNodeTitle,
+  GetModelPropertyChildren,
+  GetNodeProp,
+  GetDispatchFunc,
+  GetStateFunc,
+  executeGraphOperations,
+  NodesByType,
+  GetNodeById
+} from "../../actions/uiactions";
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 
@@ -35,9 +44,9 @@ export default async function CreateComponentAll(progressFunc) {
   //   await progressFunc((mindex) / (models.length * 2))
   // });
   const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
-  await defaultViewTypes.forEachAsync(async (viewType, mindex, lengths) => {
+  await defaultViewTypes.forEachAsync(async (viewType, mindex) => {
     const { model, property } = GetViewTypeModelType(viewType.id);
-    const start = Date.now();
+
     CreateComponentModel({
       model: model.id,
       viewTypes: [GetNodeProp(viewType, NodeProperties.ViewType)],
@@ -45,15 +54,14 @@ export default async function CreateComponentAll(progressFunc) {
       isSharedComponent: true,
       isDefaultComponent: true
     });
-    const total = Date.now() - start;
-    await progressFunc((mindex) / (defaultViewTypes.length + models.length), total * (lengths - mindex))
+
+    await progressFunc((mindex) / (defaultViewTypes.length + models.length))
   });
 
-  await models.forEachAsync(async (v, mindex, lengths) => {
-    const start = Date.now();
+  await models.forEachAsync(async (v, mindex) => {
     CreateComponentModel({ model: v.id });
-    const total = Date.now() - start;
-    await progressFunc((mindex + defaultViewTypes.length) / (defaultViewTypes.length + models.length), total * (lengths - mindex))
+
+    await progressFunc((mindex + defaultViewTypes.length) / (defaultViewTypes.length + models.length))
   });
 
   return result;

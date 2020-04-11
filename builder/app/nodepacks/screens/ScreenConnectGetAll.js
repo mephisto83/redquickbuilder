@@ -9,7 +9,8 @@ import {
   ADD_LINK_BETWEEN_NODES,
   GetNodeTitle,
   UPDATE_NODE_PROPERTY,
-  ComponentApiKeys
+  ComponentApiKeys,
+  ScreenOptionFilter
 } from "../../actions/uiactions";
 import {
   LinkType,
@@ -43,7 +44,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
   const screenOptions = GetNodesLinkedTo(graph, {
     id: node,
     link: LinkType.ScreenOptions
-  });
+  }).filter(ScreenOptionFilter);
   const result = [];
   let { viewPackages } = args;
   viewPackages = {

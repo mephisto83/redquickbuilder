@@ -692,9 +692,11 @@ export default function (args = {}) {
                 return [
                   {
                     target: context.node1,
-                    properties: {
-                      type: "model-type-link",
-                      "model-type-link": {}
+                    linkProperties: {
+                      properties: {
+                        type: "model-type-link",
+                        "model-type-link": {}
+                      }
                     }
                   }
                 ];
@@ -735,9 +737,11 @@ export default function (args = {}) {
                 return [
                   {
                     target: context.node1,
-                    properties: {
-                      type: "model-type-link",
-                      "model-type-link": {}
+                    linkProperties: {
+                      properties: {
+                        type: "model-type-link",
+                        "model-type-link": {}
+                      }
                     }
                   }
                 ];
@@ -1421,9 +1425,11 @@ export default function (args = {}) {
                 return [
                   {
                     target: context.node2,
-                    properties: {
-                      type: "model-type-link",
-                      "model-type-link": {}
+                    linkProperties: {
+                      properties: {
+                        type: "model-type-link",
+                        "model-type-link": {}
+                      }
                     }
                   }
                 ];
@@ -1464,9 +1470,11 @@ export default function (args = {}) {
                 return [
                   {
                     target: context.node2,
-                    properties: {
-                      type: "model-type-link",
-                      "model-type-link": {}
+                    linkProperties: {
+                      properties: {
+                        type: "model-type-link",
+                        "model-type-link": {}
+                      }
                     }
                   }
                 ];

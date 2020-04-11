@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
-export default function (args = {}) {
+export default function LoadModel(args = {}) {
   //
   if (!args.model_view_name) {
     throw "missing model_view_name argument";

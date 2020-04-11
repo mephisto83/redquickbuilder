@@ -97,14 +97,27 @@ export function Get(state, section) {
   return null;
 }
 export function generateDataSeed(node) {
-  const dataSeed = _generateDataSeed(node);
+  const dataSeed = $generateDataSeed(node);
   return JSON.stringify(dataSeed, null, 4);
 }
 
-function _generateDataSeed(node) {
+export function ScreenOptionFilter(x) {
+  if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Register') {
+    return false;
+  }
+  if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Authenticate') {
+    return false;
+  }
+  if (GetNodeProp(x, NodeProperties.ValueName) === 'HomeViewContainer') {
+    return false;
+  }
+  return true;
+}
+
+function $generateDataSeed(node) {
   const state = _getState();
   const properties = {};
-  GraphMethods.getPropertyNodes(GetRootGraph(state), node.id).map(t => {
+  GraphMethods.getPropertyNodes(GetRootGraph(state), node.id).forEach(t => {
     properties[t.id] = {
       name: GetCodeName(t),
       jsName: GetCodeName(t).toJavascriptName(),
@@ -127,7 +140,7 @@ function _generateDataSeed(node) {
 
 export function generateDataSeeds() {
   return JSON.stringify(
-    NodesByType(_getState(), NodeTypes.Model).map(t => _generateDataSeed(t))
+    NodesByType(_getState(), NodeTypes.Model).map(t => $generateDataSeed(t))
   );
 }
 export function Visual(state, key) {
@@ -354,6 +367,61 @@ export function setSharedComponent(args) {
       ])(dispatch, getState);
     }
   };
+}
+
+export function SetSharedComponent(args) {
+  const {
+    properties,
+    target,
+    source,
+    viewType,
+    uiType,
+    isPluralComponent,
+    graph
+  } = args;
+  if (
+    !GraphMethods.existsLinkBetween(graph, {
+      target,
+      source,
+      type: NodeConstants.LinkType.SharedComponent,
+      properties: { viewType }
+    }) &&
+    GetNodeProp(target, NodeProperties.SharedComponent) &&
+    GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode
+  ) {
+    const connections = GraphMethods.GetConnectedNodesByType(
+      GetState(),
+      source,
+      NodeTypes.ComponentNode
+    )
+      .filter(x => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+      .filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType)
+      .filter(
+        x =>
+          GetNodeProp(x, NodeProperties.IsPluralComponent) ===
+          isPluralComponent
+      )
+      .map(x => ({
+        operation: REMOVE_LINK_BETWEEN_NODES,
+        options: {
+          source,
+          target: x.id
+        }
+      }));
+
+    return ([
+      ...connections,
+      {
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: {
+          source,
+          target,
+          properties: { ...properties }
+        }
+      }
+    ]);
+  }
+  return null;
 }
 export function setComponentApiConnection(args) {
   const { properties, target, source } = args;
@@ -823,8 +891,10 @@ export function attachMethodToMaestro(
               links: [
                 {
                   target: modelId,
-                  properties: {
-                    ...LinkProperties.ModelTypeLink
+                  linkProperties: {
+                    properties: {
+                      ...LinkProperties.ModelTypeLink
+                    }
                   }
                 }
               ],
@@ -870,8 +940,10 @@ export function attachMethodToMaestro(
               links: [
                 {
                   target: modelId,
-                  properties: {
-                    ...LinkProperties.ModelTypeLink
+                  linkProperties: {
+                    properties: {
+                      ...LinkProperties.ModelTypeLink
+                    }
                   }
                 }
               ],
@@ -933,26 +1005,27 @@ export function GetNodeById(node, graph) {
 export function GetNodesByProperties(props, graph, state) {
   const currentGraph = graph || GetCurrentGraph(state || GetState());
   if (currentGraph) {
-    let nodeSubset = null;
-    if (props && props[NodeProperties.NODEType]) {
-      nodeSubset = NodesByType(state, props[NodeProperties.NODEType]);
-    }
-    else if (props && props[NodeProperties.ViewPackage]) {
-      nodeSubset = NodesByViewPackage(state, props[NodeProperties.NODEType]);
-    }
-    else {
-      nodeSubset = currentGraph.nodes.map(t => currentGraph.nodeLib[t]);
-    }
-    return nodeSubset.filter(
-      x => {
-        for (const i in props) {
-          if (props[i] !== GetNodeProp(x, i)) {
-            return false;
-          }
-        }
-        return true;
-      }
-    );
+    const nodeSubset = GraphMethods.GetNodesByProperties(props, currentGraph);
+    // if (props && props[NodeProperties.NODEType]) {
+    //   nodeSubset = NodesByType(state, props[NodeProperties.NODEType]);
+    // }
+    // else if (props && props[NodeProperties.ViewPackage]) {
+    //   nodeSubset = NodesByViewPackage(state, props[NodeProperties.NODEType]);
+    // }
+    // else {
+    //   nodeSubset = currentGraph.nodes.map(t => currentGraph.nodeLib[t]);
+    // }
+    // return nodeSubset.filter(
+    //   x => {
+    //     for (const i in props) {
+    //       if (props[i] !== GetNodeProp(x, i)) {
+    //         return false;
+    //       }
+    //     }
+    //     return true;
+    //   }
+    // );
+    return nodeSubset;
   }
   return [];
 }
@@ -3012,7 +3085,9 @@ export const CONTEXT_MENU_VISIBLE = "CONTEXT_MENU_VISIBLE";
 export const CONTEXT_MENU_MODE = "CONTEXT_MENU_MODE";
 export function SelectedNode(nodeId) {
   return (dispatch, getState) => {
-    dispatch(UIC(VISUAL, SELECTED_NODE, nodeId));
+    if (!GraphMethods.Paused()) {
+      dispatch(UIC(VISUAL, SELECTED_NODE, nodeId));
+    }
   };
 }
 export function toggleDashboardMinMax() {
@@ -3781,7 +3856,7 @@ export function addInstanceFunc(node, callback, viewPackages, option = {}) {
         nodeType: NodeTypes.LifeCylceMethodInstance,
         parent: node.id,
         linkProperties: {
-          properties: LinkProperties.LifeCylceMethodInstance
+          properties: { ...LinkProperties.LifeCylceMethodInstance }
         },
         callback,
         groupProperties: {},
