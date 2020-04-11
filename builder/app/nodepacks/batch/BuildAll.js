@@ -111,8 +111,8 @@ export default async function BuildAll(callback) {
     { name: Connect_Screens },
     { name: Setup_View_Types },
     { name: Have_All_Properties_On_Executors },
-    { name: Add_Copy_Command_To_Executors },
-    { name: Add_Component_To_Screen_Options }
+  { name: Add_Copy_Command_To_Executors },
+  { name: Add_Component_To_Screen_Options }
   ];
 
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
@@ -131,14 +131,14 @@ export default async function BuildAll(callback) {
     });
 
 
-    await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
-      await SelectAllOnModelFilters(progresFunc);
-    });
-
-
     await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc) => {
       await AddFiltersToGetAll(progresFunc);
     });
+
+
+      await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
+        await SelectAllOnModelFilters(progresFunc);
+      });
 
 
     await run(buildAllProgress, Create_Dashboard, async (progresFunc) => {

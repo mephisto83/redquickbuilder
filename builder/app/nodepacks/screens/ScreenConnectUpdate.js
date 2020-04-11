@@ -411,7 +411,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             return {
               source: clearScreenContext.entry,
               target: viewModelExternalApiNode.id,
-              properties: { ...LinkProperties.CallDataChainLink }
+              properties: { ...LinkProperties.DataChainInputLink }
             }
           }
         }),
@@ -422,7 +422,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
             return {
               source: clearScreenContext.entry,
               target: valueExternalApiNode.id,
-              properties: { ...LinkProperties.CallDataChainLink }
+              properties: { ...LinkProperties.DataChainInputLink }
             }
           }
         }))

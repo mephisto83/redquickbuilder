@@ -47,7 +47,9 @@ export default class Menu extends Component {
 	getIcon(child, index) {
 		let isActive = this.isActive(child, index);
 		let isParent = this.isParent(child, index);
-		return `${styles['nav-icon']} ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive ? styles['icon-active'] : ''}`;
+		return `${styles['nav-icon']} ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive
+			? styles['icon-active']
+			: ''}`;
 	}
 	renderItem(child, index) {
 		let id = RedGraph.getId(child);
@@ -58,6 +60,7 @@ export default class Menu extends Component {
 		let { titleService } = this.props;
 		return (
 			<li
+				key={`li-${index}`}
 				className={`${styles['nav-item']}
         ${openMenu === id ? styles['menu-opn'] : ''}
         ${children && children.length ? styles['has-treeview'] : ''} menu-drop-down`}

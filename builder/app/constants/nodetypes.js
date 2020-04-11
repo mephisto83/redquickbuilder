@@ -304,6 +304,7 @@ export const NodeProperties = {
   DataChainTypeName: 'DataChainTypeName',
   HoverStyle: ":hover",
   AsLocalContext: "AsLocalContext",
+  DataChainName: 'DataChainName',
   ActiveStyle: ":active",
   Themes: 'Themes',
   SharedReferenceCollection: "SharedReferenceCollection",
