@@ -30,16 +30,17 @@ export default class Menu extends Component {
 		let id = RedGraph.getId(child);
 		let title = RedGraph.getTitle(this.props.value, id);
 		let children = RedGraph.getChildren(this.props.value, id);
+		let { titleService } = this.props;
 		let submenu = null;
 		if (children.length) {
 			return (
-				<div className={`${styles.dropdown} menu-drop-down`}>
+				<div key={`menu-${index}`} className={`${styles.dropdown} menu-drop-down`}>
 					<button className={`${styles.dropbtn} menu-drop-down-button`}>
 						{titleService ? titleService.getTitle(title) : title}
 						<i className="fa fa-caret-down" />
 					</button>
 					<Menu
-						value={this.props.value}
+            value={this.props.value}
 						id={id}
 						onClick={(id) => {
 							if (this.props.onClick) {
@@ -53,7 +54,7 @@ export default class Menu extends Component {
 		return (
 			<a
 				className={`${styles.menuDropDownMenu} menu-drop-down-button`}
-				key={index}
+        key={`menu-leaf-${index}`}
 				onClick={() => {
 					if (this.props.onClick) {
 						this.props.onClick(id);
