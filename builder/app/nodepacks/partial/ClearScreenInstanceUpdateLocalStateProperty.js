@@ -2,7 +2,7 @@
 
 import { uuidv4 } from "../../utils/array";
 import { NodeProperties } from "../../constants/nodetypes";
-import { GetNodeTitle } from "../../actions/uiactions";
+import { GetNodeTitle, GetCodeName } from "../../actions/uiactions";
 
 export default function (args = {}) {
   // node1,node2
@@ -10,6 +10,9 @@ export default function (args = {}) {
   // propertyName
   if (!args.propertyName) {
     throw new Error('missing propertyName argument');
+  }
+  if (!args.screen) {
+    throw new Error('missing screen');
   }
   const context = {
     ...args,
@@ -40,7 +43,7 @@ export default function (args = {}) {
         "operation": "CHANGE_NODE_TEXT",
         "options": {
           "id": context.node0,
-          "value": `clear local ${  args.propertyName  }`
+          "value": `clear local ${args.propertyName}`
         }
       }]
     },
@@ -76,7 +79,7 @@ export default function (args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node0,
-          "value": "params => {\n   let { value, viewModel } = (params || {});\n   let dispatch = GetDispatch();\n   let getState = GetState(); \n// #{model}\n  \n dispatch(clearScreenInstance(viewModel, '#{model~prop}', { update: true, value})); \n\t\n\n   return params;\n}"
+          "value": `params => {\n   let { value, viewModel = ViewModelKeys.${GetCodeName(context.screen)} } = (params || {});\n   let dispatch = GetDispatch();\n   let getState = GetState(); \n// #{model}\n  \n dispatch(clearScreenInstance(viewModel, '#{model~prop}', { update: true, value})); \n\t\n\n   return params;\n}`
         }
       }]
     },
@@ -179,7 +182,7 @@ export default function (args = {}) {
     ;
   const clearPinned = [{
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node1,
@@ -189,7 +192,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node2,
@@ -199,7 +202,7 @@ export default function (args = {}) {
   }];
   const applyViewPackages = [{
     operation: 'UPDATE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         id: context.node0,
         properties: viewPackages

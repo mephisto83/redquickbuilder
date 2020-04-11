@@ -1,15 +1,16 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
-import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
+import { UPDATE_NODE_PROPERTY, GetNodeCode, GetCodeName } from "../actions/uiactions";
 export default function LoadModel(args = {}) {
   //
   if (!args.model_view_name) {
-    throw "missing model_view_name argument";
+    throw new Error("missing model_view_name argument");
   }
 
   if (!args.model_item) {
-    throw "missing model_item argument";
+    throw new Error("missing model_item argument");
   }
+
   // model_view_name, model_item
 
   let context = {
@@ -262,7 +263,7 @@ export default function LoadModel(args = {}) {
             prop: "Lambda",
             id: context.node2,
             value:
-              "params => {\n   let { value, viewModel } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, " +
+              "params => {\n   let { value, viewModel " + (screen ? `= ViewModelKeys.${GetCodeName(context.screen)}` : '') + " } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, " +
               args.model_item +
               ", value);\n   if(currentItem) {\n\tdispatch(clearScreenInstance(viewModel, currentItem?currentItem.id:null, currentItem)); \n\tdispatch(updateScreenInstanceObject(viewModel,currentItem?currentItem.id:null, { ...currentItem }));\n   }\n\n   return params;\n}"
           }

@@ -43,7 +43,7 @@ import ClearScreenInstance from "../datachain/ClearScreenInstance";
 
 export default function ScreenConnectUpdate(args = { method, node }) {
   let { node, method } = args;
-  const { componentDidMountMethods } = args;
+  let { componentDidMountMethods } = args;
   if (!node) {
     throw new Error("no node");
   }
@@ -172,6 +172,7 @@ export default function ScreenConnectUpdate(args = { method, node }) {
               return [];
             },
             ...LoadModel({
+              screen: node,
               viewPackages,
               model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
               model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
@@ -365,6 +366,8 @@ export default function ScreenConnectUpdate(args = { method, node }) {
       result.push(
         ...ClearScreenInstance({
           viewPackages,
+          update: true,
+          screen: node,
           title: `Clear ${GetNodeTitle(node)} State`,
           model: GetNodeProp(node, NodeProperties.Model),
           callback: (temp) => {

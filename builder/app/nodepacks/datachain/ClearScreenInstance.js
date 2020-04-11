@@ -6,7 +6,7 @@ import { NodeProperties, LinkProperties } from "../../constants/nodetypes";
 import ClearScreenInstanceUpdateLocalStateProperty from "../partial/ClearScreenInstanceUpdateLocalStateProperty";
 
 export default function ClearScreenInstance(args) {
-  const { viewPackages, model, update, title } = args;
+  const { screen, viewPackages, model, update, title } = args;
   const func = update ? ClearScreenInstanceUpdateLocalStateProperty : ClearScreenInstanceLocalStateProperty;
   const modelProperties = GetModelPropertyChildren(model, { skipLogicalChildren: true }).filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
 
@@ -18,6 +18,7 @@ export default function ClearScreenInstance(args) {
     let modelPropertyContext = null;
     result.push(...func({
       viewPackages,
+      screen,
       model,
       property: modelProperty.id,
       callback: (temp) => {

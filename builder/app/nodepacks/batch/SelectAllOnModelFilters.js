@@ -1,6 +1,5 @@
 import { NodesByType, GetNodeProp, GetModelPropertyChildren, CHANGE_NODE_PROPERTY, graphOperation, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
-import { NodeTypes } from "../../constants/nodetypes";
-import { NodeProperties } from "../../components/titles";
+import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 
 export default async function SelectAllOnModelFilters(progresFunc) {
   const filters = NodesByType(null, NodeTypes.ModelFilter);
