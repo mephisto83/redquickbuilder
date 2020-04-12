@@ -22,6 +22,7 @@ import CreateClaimService from "./CreateClaimService";
 import SetupViewTypes from "./SetupViewTypes";
 import AddComponentsToScreenOptions from "./AddComponentsToScreenOptions";
 import { BuildAllProgress } from "../../templates/electronio/v1/app/actions/uiActions";
+import ApplyLoginValidations from "./ApplyLoginValidations";
 
 export async function pause() {
   return new Promise((res) => {
@@ -111,8 +112,8 @@ export default async function BuildAll(callback) {
     { name: Connect_Screens },
     { name: Setup_View_Types },
     { name: Have_All_Properties_On_Executors },
-  { name: Add_Copy_Command_To_Executors },
-  { name: Add_Component_To_Screen_Options }
+    { name: Add_Copy_Command_To_Executors },
+    { name: Add_Component_To_Screen_Options }
   ];
 
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
@@ -136,9 +137,9 @@ export default async function BuildAll(callback) {
     });
 
 
-      await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
-        await SelectAllOnModelFilters(progresFunc);
-      });
+    await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
+      await SelectAllOnModelFilters(progresFunc);
+    });
 
 
     await run(buildAllProgress, Create_Dashboard, async (progresFunc) => {
@@ -150,6 +151,7 @@ export default async function BuildAll(callback) {
 
 
     await run(buildAllProgress, Create_Login_Models, async (progresFunc) => {
+      await progresFunc(1 / 10);
       executeGraphOperation(
         null,
         CreateLoginModels,
@@ -158,6 +160,9 @@ export default async function BuildAll(callback) {
           [UITypes.ReactNative]: true
         }
       )(GetDispatchFunc(), GetStateFunc());
+      await progresFunc(2 / 10);
+
+      await ApplyLoginValidations(progresFunc);
     });
 
 

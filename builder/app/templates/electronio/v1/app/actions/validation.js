@@ -23,6 +23,12 @@ export function MaxLengthAttribute(max, equal) {
   }, createDefaultError(`Needs to be less ${max} long.`));
 }
 
+export function EqualsModelProperty(propName) {
+  return createValidationAttribute((val, object) => {
+    return object && val === object[propName];
+  }, createDefaultError(`${propName} needs to match.`));
+}
+
 export function AlphaOnlyAttribute() {
   return createValidationAttribute(alpha, createDefaultError(`Only alphabet letters.`));
 }
@@ -67,7 +73,7 @@ function ValidateEmail(mail) {
   ) {
     return true;
   }
-  alert("You have entered an invalid email address!");
+
   return false;
 }
 
@@ -261,8 +267,8 @@ function createValidationAttribute(test, defaultOptions = {}) {
       };
       const { errors, success } = results;
       return {
-        isOk: val => {
-          if (test(val)) {
+        isOk: (val, b, c, d, e, f, g, h, i) => {
+          if (test(val, b, c, d, e, f, g, h, i)) {
             if (success) {
               success.push(options.success);
             }

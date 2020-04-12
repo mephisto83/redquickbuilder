@@ -162,8 +162,11 @@ export const ComponentTypeKeys = {
   List: "List",
   Button: "Button",
   ListItem: "ListItem",
+  Password: 'Password',
   MultiSelectList: "MultiSelectList",
+  CheckBox: 'CheckBox',
   Menu: 'Menu',
+  Input: 'Input',
   Text: "Text",
   H1: 'H1',
   InfiniteList: "InfiniteList" // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
@@ -190,7 +193,7 @@ export const ComponentTypes = {
     },
     Card: {},
     CardItem: {},
-    CheckBox: {
+    [ComponentTypeKeys.CheckBox]: {
       template: "./app/templates/components/checkbox.tpl",
       defaultApi: INPUT_DEFAULT_API,
       eventApi: [
@@ -341,7 +344,7 @@ export const ComponentTypes = {
         }
       }
     },
-    Input: {
+    [ComponentTypeKeys.Input]: {
       template: "./app/templates/components/input.tpl",
       defaultApi: INPUT_DEFAULT_API,
       eventApi: [
@@ -603,9 +606,9 @@ export const ComponentTypes = {
     }
   }
 };
-ComponentTypes[UITypes.ReactNative].Password = { ...ComponentTypes[UITypes.ReactNative].Input };
+ComponentTypes[UITypes.ReactNative][ComponentTypeKeys.Password] = { ...ComponentTypes[UITypes.ReactNative].Input };
 
-ComponentTypes[UITypes.ReactNative].Password.template = "./app/templates/components/password.tpl";
+ComponentTypes[UITypes.ReactNative][ComponentTypeKeys.Password].template = "./app/templates/components/password.tpl";
 
 ComponentTypes[UITypes.ElectronIO] = { ...ComponentTypes.ReactNative };
 Object.keys(ComponentTypes.ReactNative).map(key => {

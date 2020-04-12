@@ -548,6 +548,8 @@ class ThemeView extends Component {
                               }}
                             />
                             {this.state.variable && this.state.variableValue ? <button className={"btn btn-primary"} onClick={(event) => {
+                              event.stopPropagation();
+                              event.preventDefault();
                               if (this.state.variable && this.state.variableValue) {
                                 themeVariables.variables = [{
                                   variable: this.state.variable,
@@ -555,7 +557,6 @@ class ThemeView extends Component {
                                 }, ...themeVariables.variables].unique(v => v.variable);
                                 this.props.updateGraph('themeVariables', { ...themeVariables });
                               }
-                              event.stopPropagation();
                               return false;
                             }} >Ok</button> : null}
                             <ButtonList

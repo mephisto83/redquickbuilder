@@ -1,32 +1,31 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function (args = {}) {
+
+export default function CreateValidatorForProperty(args = {}) {
   // node2,node3,node5
 
   //
   if (!args.model) {
-    throw "missing model";
+    throw new Error("missing model");
   }
   if (!args.modelText) {
     throw new Error("missing modelText");
   }
-  let model = args.modelText;
+  const model = args.modelText;
   if (!args.property) {
-    throw "missing property";
+    throw new Error("missing property");
   }
   if (!args.propertyText) {
-    throw "missing propertyText";
+    throw new Error("missing propertyText");
   }
-  if (!args.methodType) {
-    args.methodType = 'Method Type';
-  }
-  let methodType = args.methodType;
-  let property = args.propertyText;
+
+  const { methodType = 'Method Type' } = args;
+  const property = args.propertyText;
   if (!args.method) {
-    throw "missing method  for create validator for property";
+    throw new Error("missing method  for create validator for property");
   }
-  let context = {
+  const context = {
     ...args,
     node2: args.model,
     node3: args.property,
@@ -37,13 +36,13 @@ export default function (args = {}) {
     [NodeProperties.ViewPackage]: uuidv4(),
     ...(viewPackages || {})
   };
-  let result = [
+  const result = [
     function () {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback (node) {
+            callback(node) {
               context.node0 = node.id;
             }
           }
@@ -137,7 +136,7 @@ export default function (args = {}) {
               }
             },
             links: [],
-            callback (node, group) {
+            callback(node, group) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -306,7 +305,7 @@ export default function (args = {}) {
                 "data-chain-link": {}
               }
             },
-            callback (node) {
+            callback(node) {
               context.node4 = node.id;
             }
           }
@@ -359,7 +358,7 @@ export default function (args = {}) {
           options: {
             prop: "DataChainFunctionType",
             id: context.node4,
-            value: "MethodBaseValidation"
+            value: context.validationMethodType || "MethodBaseValidation"
           }
         }
       ];
@@ -418,10 +417,10 @@ export default function (args = {}) {
       ];
     }
   ];
-  let clearPinned = [
+  const clearPinned = [
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           prop: "Pinned",
           id: context.node1,
@@ -431,7 +430,7 @@ export default function (args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           prop: "Pinned",
           id: context.node2,
@@ -441,7 +440,7 @@ export default function (args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           prop: "Pinned",
           id: context.node3,
@@ -451,7 +450,7 @@ export default function (args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           prop: "Pinned",
           id: context.node4,
@@ -461,7 +460,7 @@ export default function (args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           prop: "Pinned",
           id: context.node5,
@@ -470,10 +469,10 @@ export default function (args = {}) {
       }
     }
   ];
-  let applyViewPackages = [
+  const applyViewPackages = [
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           id: context.node0,
           properties: viewPackages
@@ -482,7 +481,7 @@ export default function (args = {}) {
     },
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           id: context.node1,
           properties: viewPackages
@@ -491,7 +490,7 @@ export default function (args = {}) {
     },
     {
       operation: "UPDATE_NODE_PROPERTY",
-      options () {
+      options() {
         return {
           id: context.node4,
           properties: viewPackages

@@ -999,7 +999,7 @@ export function setupCache(graph) {
       }
       const vp = GetNodeProp(node, NodeProperties.ViewPackage);
       if (vp) {
-        if (ViewPackages[vp]) {
+        if (!ViewPackages[vp]) {
           ViewPackages[vp] = {
             [node.id]: true
           };

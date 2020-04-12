@@ -66,7 +66,7 @@ function GenerateGlobalCss(options) {
       themeFonts.fonts.forEach(fontInfo => {
         const { font, fontCssVar, fontCss, fontName } = fontInfo;
         fontLinks += ` @import url('${font}');${NEW_LINE}`;
-        fontStyleLink += `<link href="'${font}'" rel="stylesheet">${NEW_LINE}`;
+        fontStyleLink += `<link href="${font}" rel="stylesheet">${NEW_LINE}`;
         fontLinks += `@font-face {
           font-family: "${fontName}";
           src: url(${font});
@@ -140,7 +140,7 @@ function GenerateGlobalCss(options) {
           }).filter(x => x).join(NEW_LINE);
         }
         selectorRule += themeGridPlacements.grids.map(gridSetup => {
-          const { gridTemplateColumns = "", gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
+          const { gridTemplateColumns = "", gridTemplateColumnGap = '', gridTemplateRowGap = '', gridTemplateRows = "", mediaSizes = {}, gridPlacement, name = "unknown" } = gridSetup;
           if (selector === name) {
             if (mediaSizes[mq]) {
               const columnCount = gridTemplateColumns.split(' - ').join('-').split(' ').filter(x => x).length;
@@ -156,12 +156,30 @@ function GenerateGlobalCss(options) {
                 });
                 return `"${rowArea.join(' ')}"${NEW_LINE}`;
               });
+              let gap = '';
+              if (gridTemplateRowGap) {
+                let rowGap = gridTemplateRowGap;
+                if (gridTemplateRowGap.indexOf('--') === 0) {
+                  rowGap = `var(${rowGap})`;
+                }
+                gap += `grid-row-gap: ${rowGap};
+                `
+              }
+              if (gridTemplateColumnGap) {
+                let colGap = gridTemplateColumnGap;
+                if (gridTemplateColumnGap.indexOf('--') === 0) {
+                  colGap = `var(${colGap})`;
+                }
+                gap += `grid-column-gap: ${colGap};
+                `
+              }
               return `
           display: grid;
           grid-template-columns: ${gridTemplateColumns};
           grid-template-rows: ${gridTemplateRows};
+          ${gap}
           grid-template-areas:
-${areas.join(NEW_LINE)}
+${areas.join(NEW_LINE)};
 `;
             }
           }

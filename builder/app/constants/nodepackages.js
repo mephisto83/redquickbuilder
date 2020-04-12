@@ -66,7 +66,8 @@ import {
   ADD_LINKS_BETWEEN_NODES,
   NO_OP,
   addComponentTags,
-  SetSharedComponent
+  SetSharedComponent,
+  ValidationPropName
 } from "../actions/uiactions";
 import {
   CreateLayout,
@@ -96,7 +97,8 @@ import {
   ApiProperty,
   ComponentApiTypes,
   ComponentLifeCycleEvents,
-  ComponentTags
+  ComponentTags,
+  ComponentTypeKeys
 } from "./componenttypes";
 import * as Titles from "../components/titles";
 import {
@@ -463,10 +465,10 @@ export const CreateLoginModels = {
       function () {
         return [
           { propName: "User Name" },
-          { propName: "Password" },
-          { propName: "Remember Me" }
+          { propName: "Password", componentType: ComponentTypeKeys.Password },
+          { propName: "Remember Me", componentType: ComponentTypeKeys.CheckBox }
         ].map(v => {
-          const { propName } = v;
+          const { propName, componentType = ComponentTypeKeys.Input } = v;
           return {
             operation: ADD_NEW_NODE,
             options: {
@@ -479,6 +481,7 @@ export const CreateLoginModels = {
               properties: {
                 ...viewPackage,
                 [NodeProperties.Pinned]: false,
+                [NodeProperties.ComponentType]: componentType,
                 [NodeProperties.UIAttributeType]: NodePropertyTypes.STRING,
                 [NodeProperties.UIText]: propName
               }
@@ -507,12 +510,12 @@ export const CreateLoginModels = {
       },
       function () {
         return [
-          { propName: "User Name" },
-          { propName: "Email", propType: NodePropertyTypes.EMAIL },
-          { propName: "Password" },
-          { propName: "Confirm Password" }
+          { propName: "User Name", validationProp: ValidationPropName.UserName },
+          { propName: "Email", propType: NodePropertyTypes.EMAIL, validationProp: ValidationPropName.Email },
+          { propName: "Password", componentType: ComponentTypeKeys.Password, validationProp: ValidationPropName.Password },
+          { propName: "Confirm Password", componentType: ComponentTypeKeys.Password, validationProp: ValidationPropName.PasswordConfirm }
         ].map(v => {
-          const { propName, propType } = v;
+          const { propName, propType, validationProp, componentType = ComponentTypeKeys.Input } = v;
           return {
             operation: ADD_NEW_NODE,
             options: {
@@ -528,7 +531,9 @@ export const CreateLoginModels = {
                   propType || NodePropertyTypes.STRING,
                 [NodeProperties.Pinned]: false,
                 [NodeProperties.NodePackageType]: nodePackageType,
-                [NodeProperties.UIText]: propName
+                [NodeProperties.UIText]: propName,
+                [NodeProperties.ComponentType]: componentType,
+                [NodeProperties.ValidationPropertyName]: validationProp
               }
             }
           };
@@ -2709,7 +2714,7 @@ export const CreateDefaultView = {
                 {
                   operation: NEW_COMPONENT_NODE,
                   options() {
-                    const componentTypeToUse = viewComponentType;
+                    const componentTypeToUse = GetNodeProp(modelProperty.id, NodeProperties.ComponentType) || viewComponentType;
 
                     // Check if the property has a default view to use for different types of situations
 

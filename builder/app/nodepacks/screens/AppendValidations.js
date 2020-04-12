@@ -24,7 +24,6 @@ export default function AppendValidations({
   subcomponents,
   component,
   screen_option,
-  methodType = '',
   InstanceUpdate = true,
   viewPackages,
   method

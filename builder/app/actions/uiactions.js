@@ -53,6 +53,13 @@ export const BATCH_FUNCTION_NAME = "BATCH_FUNCTION_NAME";
 export const RECORDING = "RECORDING";
 export const BATCH_FUNCTION_TYPE = "BATCH_FUNCTION_TYPE";
 
+
+export const ValidationPropName = {
+  Email: 'email',
+  UserName: 'userName',
+  Password: 'password',
+  PasswordConfirm: 'passwordConfirm'
+}
 // export const ViewTypes = {
 //   Update: "Update",
 //   Delete: "Delete",
@@ -1975,7 +1982,7 @@ export function GenerateDataChainMethod(id) {
           const node = GetNodeById(prop);
           let bindValue = GetCodeName(node);
           if (args.length > 1) {
-            bindValue = bindValue.toLowerCase();
+            bindValue = GetJSCodeName(node);//bindValue.toLowerCase();
           }
           lambda = bindReferenceTemplate(lambda, {
             [insert]: bindValue
@@ -2303,6 +2310,13 @@ export function GetCombinedCondition(
     case NodeTypes.Validator:
       conditions = GetValidationsConditions(id);
       methodNode = GetNodesMethod(id);
+      if (!methodNode) {
+
+        methodNode = GraphMethods.GetNodeLinkedTo(null, {
+          id,
+          link: NodeConstants.LinkType.Validator
+        });
+      }
       ft =
         MethodFunctions[GetNodeProp(methodNode, NodeProperties.FunctionType)];
       if (ft && ft.validation && ft.validation.params) {
@@ -2474,10 +2488,12 @@ export function GetConditionClause(
   ) {
     templatejs = NodeConstants.FilterUI[type].templatejs;
   }
+  let isjavascript = false;
   if (template) {
     switch (language) {
       case NodeConstants.ProgrammingLanguages.JavaScript:
         conditionTemplate = fs.readFileSync(templatejs, "utf8");
+        isjavascript = true;
         break;
       default:
         conditionTemplate = fs.readFileSync(template, "utf8");
@@ -2498,9 +2514,9 @@ export function GetConditionClause(
     case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
       properties = {
         agent: safeFormatTemplateProperty(clauseKey),
-        agent_property: safeFormatTemplateProperty(propertyName),
+        agent_property: isjavascript ? safeFormatTemplateProperty(propertyName).toJavascriptName() : safeFormatTemplateProperty(propertyName),
         model: node,
-        model_property: GetCodeName(nodeProperty)
+        model_property: isjavascript ? GetJSCodeName(nodeProperty) : GetCodeName(nodeProperty)
       };
       break;
     case NodeConstants.FilterRules.Many2ManyPropertyIsTrue:

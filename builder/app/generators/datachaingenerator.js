@@ -203,6 +203,7 @@ import {
     alphanumeric,
     alpha,
     MinLengthAttribute,
+    EqualsModelProperty,
     MaxLengthAttribute,
     AlphaOnlyAttribute,
     AlphaNumericLikeAttribute,

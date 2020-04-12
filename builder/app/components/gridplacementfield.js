@@ -27,7 +27,15 @@ export default class GridPlacementField extends Component {
   render() {
     const tags = this.props.tags || [];
     const gridSetup = this.props.gridSetup || {};
-    const { gridTemplateColumns = "", gridTemplateRows = "", name = "", mediaSizes = {}, gridPlacement } = gridSetup;
+    const {
+      gridTemplateColumns = "",
+      gridTemplateRows = "",
+      gridTemplateRowGap = '',
+      gridTemplateColumnGap = '',
+      name = "",
+      mediaSizes = {},
+      gridPlacement
+    } = gridSetup;
     const gridRowCount = gridTemplateRows ? gridTemplateRows.split(' - ').join('-').split(' ').filter(x => x).length || 1 : 1;
     const columns = gridTemplateColumns.split(" ").filter(x => x);
     const square = {
@@ -74,6 +82,26 @@ export default class GridPlacementField extends Component {
                 gridTemplateRows: value
               })
             }} />
+          <TextInput
+            label={Titles.GridColumnGap}
+            title={Titles.GridColumnGap}
+            value={gridTemplateColumnGap}
+            onChange={value => {
+              this.props.onChange({
+                ...gridSetup,
+                gridTemplateColumnGap: value
+              })
+            }} />
+            <TextInput
+              label={Titles.GridRowGap}
+              title={Titles.GridRowGap}
+              value={gridTemplateRowGap}
+              onChange={value => {
+                this.props.onChange({
+                  ...gridSetup,
+                  gridTemplateRowGap: value
+                })
+              }} />
           <Typeahead
             label={Titles.GridAreas}
             title={Titles.GridAreas}
