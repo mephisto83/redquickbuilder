@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable compat/compat */
 /* eslint-disable no-new */
@@ -67,7 +68,8 @@ import {
   NO_OP,
   addComponentTags,
   SetSharedComponent,
-  ValidationPropName
+  ValidationPropName,
+  $addComponentApiNodes
 } from "../actions/uiactions";
 import {
   CreateLayout,
@@ -129,6 +131,7 @@ import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
 import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import AttachMethodToMaestro from "../nodepacks/method/AttachMethodToMaestro";
 import CreateGetObjectDataChain from "../nodepacks/CreateGetObjectDataChain";
+import AddEvent from "../nodepacks/AddEvent";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -455,6 +458,22 @@ export const CreateLoginModels = {
             ...viewPackage,
             [NodeProperties.ExcludeFromController]: true,
             [NodeProperties.Pinned]: false,
+            [NodeProperties.UIText]: `Red Anonymous Register Login Model`
+          },
+          callback: newNode => {
+            newStuff.anonymousRegisterLoginModel = newNode.id;
+          }
+        }
+      },
+      {
+        operation: ADD_NEW_NODE,
+        options: {
+          nodeType: NodeTypes.Model,
+          // groupProperties: {},
+          properties: {
+            ...viewPackage,
+            [NodeProperties.ExcludeFromController]: true,
+            [NodeProperties.Pinned]: false,
             [NodeProperties.UIText]: `Red Login Model`
           },
           callback: newNode => {
@@ -598,6 +617,23 @@ export const CreateLoginModels = {
       functionType: FunctionTypes.Register,
       functionName: `Register`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+
+    const anonymousRegisterLogin = CreateAgentFunction({
+      viewPackage,
+      model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
+      agent: {},
+      maestro: newStuff.maestro,
+      nodePackageType: "register-login-anonymous-user",
+      methodType: Methods.Create,
+      modelNotRequired: true,
+      user: NodesByType(GetState(), NodeTypes.Model).find(x =>
+        GetNodeProp(x, NodeProperties.IsUser)
+      ),
+      httpMethod: HTTP_METHODS.POST,
+      functionType: FunctionTypes.AnonymousRegisterLogin,
+      functionName: `AnonymousRegisterLogin`
+    })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+
     const loginResult = CreateAgentFunction({
       viewPackage,
       model: GetNodeById(newStuff.loginModel, newStuff.graph),
@@ -680,6 +716,30 @@ export const CreateLoginModels = {
       method_results,
       targetMethod: regsterResult.methodNode.id
     });
+
+    const anonymous_method_results = CreateDefaultView.method({
+      viewName: 'Anonymous Guest',
+      dispatch: GetDispatchFunc(),
+      getState: GetStateFunc(),
+      model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
+      isSharedComponent: false,
+      isDefaultComponent: false,
+      isPluralComponent: false,
+      uiTypes: {
+        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
+        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
+        [UITypes.VR]: args[UITypes.VR] || false,
+        [UITypes.Web]: args[UITypes.Web] || false
+      },
+      chosenChildren: [],
+      viewType: ViewTypes.Create
+    });
+    addInstanceEventsToForms({
+      anonymous_method_results,
+      targetMethod: anonymousRegisterLogin.methodNode.id
+    });
+    const anonymousScreen = anonymous_method_results.screenNodeId;
+
     const registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
       PerformGraphOperation([
@@ -698,12 +758,44 @@ export const CreateLoginModels = {
     const titleService = GetNodeByProperties({
       [NodeProperties.NODEType]: NodeTypes.TitleService
     });
+    let anonymousButton;
+    let eventTypeInstanceNode;
     PerformGraphOperation(
-      HomeView({
+      [...HomeView({
         titleService: titleService.id,
         registerForm: registerScreen,
-        authenticateForm: authenticateScreen
-      })
+        authenticateForm: authenticateScreen,
+        anonymousForm: anonymousScreen,
+        callback(homeViewContext) {
+          anonymousButton = homeViewContext.anonymousButton;
+        }
+      }), () => {
+        return $addComponentApiNodes(anonymousButton, 'label')
+      }, () => {
+        return AddEvent({
+          component: anonymousButton,
+          eventType: 'onClick',
+          eventTypeHandler: false,
+          callback(eventInstanceContext) {
+            eventTypeInstanceNode = eventInstanceContext.eventTypeInstanceNode;
+          }
+        })
+      },
+      function () {
+        return [
+          {
+            operation: "ADD_LINK_BETWEEN_NODES",
+            options: {
+              target: anonymousScreen,
+              source: eventTypeInstanceNode,
+              properties: {
+                type: "MethodCall",
+                MethodCall: {}
+              }
+            }
+          }
+        ];
+      }]
     )(GetDispatchFunc(), GetStateFunc());
     setViewPackageStamp(null, "create-login-models");
   }
@@ -4399,6 +4491,7 @@ export function CreateAgentFunction(option) {
     functionType,
     functionName,
     viewPackage,
+    modelNotRequired = false,
     model,
     agent
   } = option;
@@ -4433,7 +4526,7 @@ export function CreateAgentFunction(option) {
       [NodeProperties.ViewPackage]: uuidv4()
     };
     setViewPackageStamp(_viewPackage, "CreateAgentFunction");
-    if (ModelNotConnectedToFunction(agent.id, model.id, nodePackageType)) {
+    if (modelNotRequired || ModelNotConnectedToFunction(agent.id, model.id, nodePackageType)) {
       const outer_commands = [
         {
           operation: ADD_NEW_NODE,
@@ -4442,7 +4535,7 @@ export function CreateAgentFunction(option) {
               nodeType: NodeTypes.Method,
               groupProperties: {},
               properties: {
-                [NodeProperties.NodePackage]: model.id,
+                [NodeProperties.NodePackage]: modelNotRequired ? model.id : null,
                 [NodeProperties.NodePackageType]: nodePackageType,
                 [NodeProperties.NodePackageAgent]: agent.id,
                 [NodeProperties.FunctionType]: functionType,
@@ -4463,7 +4556,7 @@ export function CreateAgentFunction(option) {
           const { methodNode } = new_nodes;
           const { constraints } = MethodFunctions[functionType];
           let commands = [
-            {
+            modelNotRequired ? null : {
               operation: ADD_DEFAULT_PROPERTIES,
               options: {
                 parent: model.id,
@@ -4473,7 +4566,7 @@ export function CreateAgentFunction(option) {
                 }
               }
             }
-          ];
+          ].filter(x => x);
           Object.values(constraints).forEach(constraint => {
             let validator = null;
             let perOrModelNode = null;
@@ -4514,226 +4607,231 @@ export function CreateAgentFunction(option) {
                   });
                 } else if (constraint.key === FunctionTemplateKeys.Parent) {
                   methodProps[constraint.key] = parent.id;
-                } else {
+                } else if (!modelNotRequired) {
                   methodProps[constraint.key] = model.id;
                 }
                 break;
               case FunctionTemplateKeys.Validator:
-                commands.push(
-                  ...[
-                    {
-                      operation: ADD_NEW_NODE,
-                      options() {
-                        return {
-                          parent: methodNode.id,
-                          nodeType: NodeTypes.Validator,
-                          groupProperties: {},
-                          properties: {
-                            [NodeProperties.NodePackage]: model.id,
-                            [NodeProperties.Collapsed]: true,
-                            [NodeProperties.NodePackageType]: nodePackageType,
-                            [NodeProperties.UIText]: `${GetNodeTitle(
-                              methodNode
-                            )} Validator`,
-                            [NodeProperties.ValidatorModel]: model.id,
-                            [NodeProperties.ValidatorAgent]: agent.id,
-                            [NodeProperties.ValidatorFunction]: methodNode.id
-                          },
-                          callback: _node => {
-                            methodProps[constraint.key] = _node.id;
-                            validator = _node;
-                          }
-                        };
+                if (!modelNotRequired) {
+                  commands.push(
+                    ...[
+                      {
+                        operation: ADD_NEW_NODE,
+                        options() {
+                          return {
+                            parent: methodNode.id,
+                            nodeType: NodeTypes.Validator,
+                            groupProperties: {},
+                            properties: {
+                              [NodeProperties.NodePackage]: model.id,
+                              [NodeProperties.Collapsed]: true,
+                              [NodeProperties.NodePackageType]: nodePackageType,
+                              [NodeProperties.UIText]: `${GetNodeTitle(
+                                methodNode
+                              )} Validator`,
+                              [NodeProperties.ValidatorModel]: model.id,
+                              [NodeProperties.ValidatorAgent]: agent.id,
+                              [NodeProperties.ValidatorFunction]: methodNode.id
+                            },
+                            callback: _node => {
+                              methodProps[constraint.key] = _node.id;
+                              validator = _node;
+                            }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: model.id,
+                            source: validator.id,
+                            properties: { ...LinkProperties.ValidatorModelLink }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: agent.id,
+                            source: validator.id,
+                            properties: { ...LinkProperties.ValidatorAgentLink }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: methodNode.id,
+                            source: validator.id,
+                            properties: {
+                              ...LinkProperties.ValidatorFunctionLink
+                            }
+                          };
+                        }
                       }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: model.id,
-                          source: validator.id,
-                          properties: { ...LinkProperties.ValidatorModelLink }
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: agent.id,
-                          source: validator.id,
-                          properties: { ...LinkProperties.ValidatorAgentLink }
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: methodNode.id,
-                          source: validator.id,
-                          properties: {
-                            ...LinkProperties.ValidatorFunctionLink
-                          }
-                        };
-                      }
-                    }
-                  ]
-                );
+                    ]
+                  );
+                }
                 break;
               case FunctionTemplateKeys.Executor:
-
-                commands.push(
-                  ...[
-                    {
-                      operation: ADD_NEW_NODE,
-                      options() {
-                        return {
-                          parent: methodNode.id,
-                          nodeType: NodeTypes.Executor,
-                          groupProperties: {},
-                          properties: {
-                            [NodeProperties.NodePackage]: model.id,
-                            [NodeProperties.NodePackageType]: nodePackageType,
-                            [NodeProperties.ExecutorFunctionType]: methodType,
-                            [NodeProperties.UIText]: `${GetNodeTitle(
-                              methodNode
-                            )} Executor`,
-                            [NodeProperties.ExecutorModel]: model.id,
-                            [NodeProperties.ExecutorModelOutput]: model.id,
-                            [NodeProperties.ExecutorFunction]: methodNode.id,
-                            [NodeProperties.ExecutorAgent]: agent.id
-                          },
-                          callback: _node => {
-                            methodProps[constraint.key] = _node.id;
-                            executor = _node;
-                          }
-                        };
+                if (!modelNotRequired) {
+                  commands.push(
+                    ...[
+                      {
+                        operation: ADD_NEW_NODE,
+                        options() {
+                          return {
+                            parent: methodNode.id,
+                            nodeType: NodeTypes.Executor,
+                            groupProperties: {},
+                            properties: {
+                              [NodeProperties.NodePackage]: model.id,
+                              [NodeProperties.NodePackageType]: nodePackageType,
+                              [NodeProperties.ExecutorFunctionType]: methodType,
+                              [NodeProperties.UIText]: `${GetNodeTitle(
+                                methodNode
+                              )} Executor`,
+                              [NodeProperties.ExecutorModel]: model.id,
+                              [NodeProperties.ExecutorModelOutput]: model.id,
+                              [NodeProperties.ExecutorFunction]: methodNode.id,
+                              [NodeProperties.ExecutorAgent]: agent.id
+                            },
+                            callback: _node => {
+                              methodProps[constraint.key] = _node.id;
+                              executor = _node;
+                            }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: model.id,
+                            source: executor.id,
+                            properties: { ...LinkProperties.ExecutorModelLink }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: agent.id,
+                            source: executor.id,
+                            properties: { ...LinkProperties.ExecutorAgentLink }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: methodNode.id,
+                            source: executor.id,
+                            properties: {
+                              ...LinkProperties.ExecutorFunctionLink
+                            }
+                          };
+                        }
                       }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: model.id,
-                          source: executor.id,
-                          properties: { ...LinkProperties.ExecutorModelLink }
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: agent.id,
-                          source: executor.id,
-                          properties: { ...LinkProperties.ExecutorAgentLink }
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: methodNode.id,
-                          source: executor.id,
-                          properties: {
-                            ...LinkProperties.ExecutorFunctionLink
-                          }
-                        };
-                      }
-                    }
-                  ]
-                );
+                    ]
+                  );
+                }
                 break;
               case FunctionTemplateKeys.Permission:
               case FunctionTemplateKeys.ModelFilter:
-                commands.push(
-                  ...[
-                    {
-                      operation: ADD_NEW_NODE,
-                      options() {
-                        return {
-                          parent: methodNode.id,
-                          nodeType:
-                            constraint.key === FunctionTemplateKeys.Permission
-                              ? NodeTypes.Permission
-                              : NodeTypes.ModelFilter,
-                          groupProperties: {},
-                          properties: {
-                            [NodeProperties.NodePackage]: model.id,
-                            [NodeProperties.NodePackageType]: nodePackageType,
-                            [NodeProperties.UIText]: `${GetNodeTitle(
-                              methodNode
-                            )} ${
+                if (!modelNotRequired) {
+                  commands.push(
+                    ...[
+                      {
+                        operation: ADD_NEW_NODE,
+                        options() {
+                          return {
+                            parent: methodNode.id,
+                            nodeType:
                               constraint.key === FunctionTemplateKeys.Permission
                                 ? NodeTypes.Permission
-                                : NodeTypes.ModelFilter
-                              }`
-                          },
-                          linkProperties: {
-                            properties: { ...LinkProperties.FunctionOperator }
-                          },
-                          callback: newNode => {
-                            methodProps = {
-                              ...methodProps,
-                              ...(GetNodeProp(
-                                GetNodeById(methodNode.id),
-                                NodeProperties.MethodProps
-                              ) || {})
-                            };
-                            methodProps[constraint.key] = newNode.id;
-                            perOrModelNode = newNode;
-                          }
-                        };
+                                : NodeTypes.ModelFilter,
+                            groupProperties: {},
+                            properties: {
+                              [NodeProperties.NodePackage]: model.id,
+                              [NodeProperties.NodePackageType]: nodePackageType,
+                              [NodeProperties.UIText]: `${GetNodeTitle(
+                                methodNode
+                              )} ${
+                                constraint.key === FunctionTemplateKeys.Permission
+                                  ? NodeTypes.Permission
+                                  : NodeTypes.ModelFilter
+                                }`
+                            },
+                            linkProperties: {
+                              properties: { ...LinkProperties.FunctionOperator }
+                            },
+                            callback: newNode => {
+                              methodProps = {
+                                ...methodProps,
+                                ...(GetNodeProp(
+                                  GetNodeById(methodNode.id),
+                                  NodeProperties.MethodProps
+                                ) || {})
+                              };
+                              methodProps[constraint.key] = newNode.id;
+                              perOrModelNode = newNode;
+                            }
+                          };
+                        }
                       }
-                    }
-                  ]
-                );
-                if (constraint.key === FunctionTemplateKeys.ModelFilter) {
-                  commands = [
-                    ...commands,
-                    {
-                      operation: CHANGE_NODE_PROPERTY,
-                      options() {
-                        return {
-                          prop: NodeProperties.FilterAgent,
-                          id: perOrModelNode.id,
-                          value: agent.id
-                        };
+                    ]
+                  );
+                  if (constraint.key === FunctionTemplateKeys.ModelFilter) {
+                    commands = [
+                      ...commands,
+                      {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options() {
+                          return {
+                            prop: NodeProperties.FilterAgent,
+                            id: perOrModelNode.id,
+                            value: agent.id
+                          };
+                        }
+                      },
+                      {
+                        operation: CHANGE_NODE_PROPERTY,
+                        options() {
+                          return {
+                            prop: NodeProperties.FilterModel,
+                            id: perOrModelNode.id,
+                            value: model.id
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: model.id,
+                            source: perOrModelNode.id,
+                            properties: { ...LinkProperties.ModelTypeLink }
+                          };
+                        }
+                      },
+                      {
+                        operation: ADD_LINK_BETWEEN_NODES,
+                        options() {
+                          return {
+                            target: agent.id,
+                            source: perOrModelNode.id,
+                            properties: { ...LinkProperties.AgentTypeLink }
+                          };
+                        }
                       }
-                    },
-                    {
-                      operation: CHANGE_NODE_PROPERTY,
-                      options() {
-                        return {
-                          prop: NodeProperties.FilterModel,
-                          id: perOrModelNode.id,
-                          value: model.id
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: model.id,
-                          source: perOrModelNode.id,
-                          properties: { ...LinkProperties.ModelTypeLink }
-                        };
-                      }
-                    },
-                    {
-                      operation: ADD_LINK_BETWEEN_NODES,
-                      options() {
-                        return {
-                          target: agent.id,
-                          source: perOrModelNode.id,
-                          properties: { ...LinkProperties.AgentTypeLink }
-                        };
-                      }
-                    }
-                  ];
+                    ];
+                  }
                 }
                 break;
               default: break;
@@ -4773,7 +4871,7 @@ export function CreateAgentFunction(option) {
             viewPackages: viewPackage
           })
         },
-        function () {
+        modelNotRequired ? null : function () {
           return AttachMethodToMaestro({
             methodNodeId: new_nodes.methodNode.id,
             modelId: model.id,
@@ -4781,7 +4879,7 @@ export function CreateAgentFunction(option) {
             viewPackage
           })
         }
-      ];
+      ].filter(x => x);
 
       // updateMethodParameters(
       //   new_nodes.methodNode.id,

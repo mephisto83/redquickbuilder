@@ -115,6 +115,9 @@ export function ScreenOptionFilter(x) {
   if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Authenticate') {
     return false;
   }
+  if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Anonymous Guest') {
+    return false;
+  }
   if (GetNodeProp(x, NodeProperties.ValueName) === 'HomeViewContainer') {
     return false;
   }

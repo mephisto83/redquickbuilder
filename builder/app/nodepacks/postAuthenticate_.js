@@ -1,14 +1,15 @@
+/* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
-export default function(args = {}) {
+
+export default function (args = {}) {
   // node0,node1,node2
 
   //
 
   let context = null;
 
-  let { viewPackages = {} } = args;
-  let result = [
-    function() {
+  const result = [
+    function () {
       context = {
         ...args,
         node0: uuidv4(),
@@ -17,7 +18,7 @@ export default function(args = {}) {
       };
       return [];
     },
-    function(graph) {
+    function () {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -33,7 +34,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -51,7 +52,7 @@ export default function(args = {}) {
               ChainParent: context.node1
             },
             links: [
-              function(graph) {
+              function () {
                 return [
                   {
                     target: context.node2,
@@ -65,7 +66,7 @@ export default function(args = {}) {
                 ];
               }
             ],
-            callback: function(node, graph, group) {
+            callback(node) {
               context.node3 = node.id;
             }
           }
@@ -73,7 +74,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -89,7 +90,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -102,7 +103,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -115,7 +116,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -127,10 +128,10 @@ export default function(args = {}) {
       ];
     }
   ];
-  let clearPinned = [
+  const clearPinned = [
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node1,
@@ -140,7 +141,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node2,
@@ -150,7 +151,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node3,
@@ -163,7 +164,7 @@ export default function(args = {}) {
   return [
     ...result,
     ...clearPinned,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context);

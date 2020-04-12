@@ -437,6 +437,7 @@ export const AddDataChainCollection = "Add Data Chain Collection Parent";
 export const SelectAll = "Select All";
 export const CreateComponents = "Create Components";
 export const Register = "Register";
+export const AnonymousRegisterLogin = 'Anonymous Register and Login';
 export const AsPlural = "As Plural";
 export const AddFunction = "Add function";
 export const MaestroDetails = "Maestro Details";

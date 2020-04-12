@@ -74,7 +74,8 @@ export const FunctionTypes = {
   Can_Execute_Agent_Parent_In_Valid_List:
     "Can_Execute_Agent_Parent_In_Valid_List",
   Login: "Login",
-  Register: "Register"
+  Register: "Register",
+  AnonymousRegisterLogin: 'AnonymousRegisterLogin'
   // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 };
 
@@ -659,7 +660,7 @@ const VALIDATION_DEFAULTS = {
       changeparameter: true,
       template: `{{${FunctionTemplateKeys.Model}}}ChangeBy{{${
         FunctionTemplateKeys.Agent
-      }}}`
+        }}}`
     }
   ]
 };
@@ -700,7 +701,7 @@ export const GET_QUERY_PARAMETERS = {
 export const MethodFunctions = {
   [FunctionTypes.Create_Object__Object]: {
     title: Titles.Create_Object__Object,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -742,7 +743,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_With_User]: {
     title: Titles.Update_Object_With_User,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -776,7 +777,7 @@ export const MethodFunctions = {
   [FunctionTypes.Get_Objects_From_List_Of_Ids]: {
     title: Titles.GetObjectsFromLIstOfIds,
     description: "Gets objects from a list of Ids",
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t}s With IdList by ${a}`;
     },
     template: fs.readFileSync(
@@ -828,7 +829,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Object_With_User]: {
     title: Titles.Create_Object_With_User,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -861,7 +862,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
     title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -891,7 +892,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
     title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -918,7 +919,7 @@ export const MethodFunctions = {
           changeparameter: true,
           template: `{{${FunctionTemplateKeys.CompositeInput}}}ChangeBy{{${
             FunctionTemplateKeys.Agent
-          }}}`
+            }}}`
         }
       ]
     },
@@ -936,7 +937,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_Object_Agent_Value__IListObject]: {
     title: Titles.Create_Object_Agent_Value__IListObject,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a} and Return List of ${t}`;
     },
     template: fs.readFileSync(
@@ -985,7 +986,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__IListObject]: {
     title: Titles.Update_Object_Agent_Value__IListObject,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1012,7 +1013,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__Object]: {
     title: Titles.Update_Object_Agent_Value__Object,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1044,7 +1045,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Object_Agent_Value__Object_With_Object]: {
     title: Titles.Update_Object_Agent_Value__Object_With_Object,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1081,7 +1082,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
     title: Titles.Delete_Object_Agent_Value__IListObject,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Delete ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1108,7 +1109,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Delete_M2M_By_Reference]: {
     title: FunctionTypes.Delete_M2M_By_Reference,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Delete ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1150,7 +1151,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Object_Agent_Value__IListObject]: {
     title: Titles.Get_Object_Agent_Value__IListObject,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t}s by ${a}`;
     },
     template: fs.readFileSync(
@@ -1188,7 +1189,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Agent_Value__IListObject]: {
     title: Titles.Get_Agent_Value__IListObject,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t}s List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1232,9 +1233,6 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Login]: {
     title: Titles.Login,
-    // template: fs.readFileSync('./app/templates/standard/get_agent_listobject.tpl', 'utf8'),
-    // interface: fs.readFileSync('./app/templates/standard/get_agent_listobject_interface.tpl', 'utf8'),
-    // controller: fs.readFileSync('./app/templates/standard/get_agent_listobjects_controller.tpl', 'utf8'),
     constraints: {
       ...COMMON_CONSTRAINTS_ANONYMOUS
     },
@@ -1271,9 +1269,28 @@ export const MethodFunctions = {
     method: Methods.Create,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
   },
+  [FunctionTypes.AnonymousRegisterLogin]: {
+    title: Titles.AnonymousRegisterLogin,
+    constraints: {
+      ...COMMON_CONSTRAINTS_ANONYMOUS
+    },
+    output: {
+      ...COMMON_OUTPUT.LIST
+    },
+    permission: false,
+    validation: false,
+    filter: false,
+    parameters: {
+      body: {},
+      parameters: false
+    },
+    isList: false,
+    method: Methods.Create,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
   [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1307,7 +1324,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Update_Parent$Child_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1335,7 +1352,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Get_Parent$Child_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t} List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1418,7 +1435,7 @@ export const MethodFunctions = {
 
   [FunctionTypes.Get_Object_Agent_Value__IListObject_By_Specific]: {
     title: Titles.Get_Object_Agent_Value__IListObject_By_Specific,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t} List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1482,7 +1499,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_Object_Agent_Value__Object]: {
     title: Titles.Get_Object_Agent_Value__Object,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1536,7 +1553,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Get_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Get_ManyToMany_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Get ${t} List by ${a}`;
     },
     template: fs.readFileSync(
@@ -1568,7 +1585,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Create_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Create_ManyToMany_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Create ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1596,7 +1613,7 @@ export const MethodFunctions = {
   },
   [FunctionTypes.Update_ManyToMany_Agent_Value__IListChild]: {
     title: Titles.Update_ManyToMany_Agent_Value__IListChild,
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Update ${t} by ${a}`;
     },
     template: fs.readFileSync(
@@ -1628,7 +1645,7 @@ export const MethodFunctions = {
       "./app/templates/can_execute/can_execute_childparent_valid_list.tpl",
       "utf8"
     ),
-    titleTemplate: function(t, a) {
+    titleTemplate: function (t, a) {
       return `Can Execute ${t} by ${a}`;
     },
     permission: {
@@ -1803,7 +1820,7 @@ export function bindTemplate(templateString, data) {
     var hasTemplate;
     try {
       hasTemplate = regex.test(templateString);
-    } catch (e) {}
+    } catch (e) { }
     data = { ...data };
     let dataKeyes = Object.keys(data);
     dataKeyes.map(t => {
@@ -1845,7 +1862,7 @@ export function bindReferenceTemplate(templateString, data) {
     var hasTemplate;
     try {
       hasTemplate = regex.test(templateString);
-    } catch (e) {}
+    } catch (e) { }
     Object.keys(data).map(t => {
       if (!data[t + "#lower"]) {
         data[t + "#lower"] = `${data[t]}`.toLowerCase();

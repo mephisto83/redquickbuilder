@@ -1,4 +1,4 @@
-import { NodesByType, GetNodeProp, GetMethodNodeProp, GetStateFunc, GetDispatchFunc, graphOperation } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, GetMethodNodeProp, GetStateFunc, GetDispatchFunc, graphOperation, ScreenOptionFilter } from "../../actions/uiactions";
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import { MethodFunctions, FunctionTemplateKeys } from "../../constants/functiontypes";
 import { ViewTypes } from "../../constants/viewtypes";
@@ -10,9 +10,7 @@ import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoColl
 
 export default async function ConnectScreens(progresFunc) {
   const allscreens = NodesByType(null, NodeTypes.Screen);
-  const screens = NodesByType(null, NodeTypes.Screen).filter(x => !["login-models", "Authenticate", "Register"].some(v =>
-    v === GetNodeProp(x, NodeProperties.NodePackage) ||
-    v === GetNodeProp(x, NodeProperties.ViewPackageTitle)));
+  const screens = NodesByType(null, NodeTypes.Screen).filter(ScreenOptionFilter);
   await screens.forEachAsync(async (screen, index, total) => {
     const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 

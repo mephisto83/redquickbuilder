@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using RedQuickCore.Identity;
 using RedQuickCore.Interfaces;
+using RedQuickCore.Data;
 using {{namespace}}.Models;
 
 namespace {{namespace}}.Web.Controllers
@@ -48,9 +49,25 @@ namespace {{namespace}}.Web.Controllers
         [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
-        public override async Task<string> Authenticate([FromBody] RedLoginModel obj, string returnUrl = null)
+        public override async Task<AuthenticationResult> Authenticate([FromBody] RedLoginModel obj, string returnUrl = null)
         {
             return await base.Authenticate(obj);
+        }
+
+        [AllowAnonymous]
+        [Route("authenticateuser")]
+        [HttpPost]
+        public override async Task<AuthenticationResult> AuthenticateUser([FromBody] RedLoginModel obj, string returnUrl = null)
+        {
+            return await base.AuthenticateUser(obj);
+        }
+
+        [AllowAnonymous]
+        [Route("authenticateanonym")]
+        [HttpPost]
+        public virtual async Task<AuthenticationResult> AnonymousRegisterAndAuthenticate(string returnUrl)
+        {
+            return await base.AnonymousRegisterAndAuthenticate(returnUrl);
         }
 
         [AllowAnonymous]

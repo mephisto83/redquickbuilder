@@ -1,6 +1,7 @@
+/* eslint-disable func-names */
 export default function(args = {}) {
   // node0
-  let context = {
+  const context = {
     node2: args.screen,
     name: args.name,
     node3: args.clickInstance,
@@ -9,12 +10,12 @@ export default function(args = {}) {
   };
 
   return [
-    function(graph) {
+    function() {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback: function(node) {
+            callback(node) {
               context.node0 = node.id;
             }
           }
@@ -22,7 +23,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -34,7 +35,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -47,7 +48,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -60,7 +61,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -73,7 +74,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -95,7 +96,7 @@ export default function(args = {}) {
               }
             },
             links: [],
-            callback: function(node) {
+            callback(node) {
               context.node1 = node.id;
             }
           }
@@ -103,7 +104,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -116,7 +117,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -129,7 +130,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -140,7 +141,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -153,7 +154,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -169,7 +170,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -181,7 +182,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -194,7 +195,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -206,7 +207,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -219,7 +220,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -233,7 +234,7 @@ export default function(args = {}) {
     },
 
     context.node3
-      ? function(graph) {
+      ? function() {
           return [
             {
               operation: "NEW_LINK",
@@ -253,7 +254,7 @@ export default function(args = {}) {
       : false,
 
     context.node5
-      ? function(graph) {
+      ? function() {
           return [
             {
               operation: "NEW_LINK",
@@ -276,10 +277,10 @@ export default function(args = {}) {
         if (x !== 2) {
           return {
             operation: "CHANGE_NODE_PROPERTY",
-            options: function() {
+            options() {
               return {
                 prop: "Pinned",
-                id: context["node" + x],
+                id: context[`node${  x}`],
                 value: false
               };
             }

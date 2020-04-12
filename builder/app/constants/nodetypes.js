@@ -1318,6 +1318,7 @@ export const ValidationRules = {
   AlphaOnlyWithSpaces: "alphaonlywithspaces",
   NotEmpty: "notempty",
   MaxLength: "maxlength",
+  EqualsModelProperty: "equals-model-property",
   MinLength: "minLength",
   MaxLengthEqual: "maxlengthEqual",
   MinLengthEqual: "minLengthEqual",
