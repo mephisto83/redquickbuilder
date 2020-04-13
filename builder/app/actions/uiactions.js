@@ -2082,7 +2082,7 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.StoreCredResults:
       return `(creds) => {
         let dispatch = GetDispatch();
-        if(creds) {
+        if(creds && dispatch) {
              dispatch(
                  Batch(
                      UIC(APP_STATE, UIKeys.HAS_CREDENTIALS, !!creds),
@@ -2094,7 +2094,11 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.HasPreviousCredentials:
       return `() => {
         let getState = GetState();
-        return GetC(getState(), APP_STATE, UIKeys.HAS_CREDENTIALS);
+        if(getState) {
+          return GetC(getState(), APP_STATE, UIKeys.HAS_CREDENTIALS);
+        }
+
+        return false;
       }`;
     case DataChainFunctionKeys.LoadUserCredentialsFromLocalStore:
       return `(a) => {
@@ -4147,7 +4151,7 @@ export function graphOperation(operation, options, stamp) {
                 return;
               }
               if (typeof opSecondLevel === "function") {
-                opSecondLevel = opSecondLevel() || {};
+                opSecondLevel = opSecondLevel(currentGraph) || {};
               }
               let deepOp = opSecondLevel;
               if (!Array.isArray(opSecondLevel)) {

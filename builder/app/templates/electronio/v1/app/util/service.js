@@ -11,7 +11,7 @@ import * as Globals from "./globals";
 //   require("isomorphic-fetch");
 // }
 var accessToken = "";
-const credentials = {};
+let credentials = {};
 const CREDENTIALS = '$CREDENTIALS$';
 var getEndpoint = (baseDomain, path) => {
   var endpoint = baseDomain + path;
@@ -32,7 +32,7 @@ export function setBearerAccessToken(access_token) {
 
 let storagePromise = Promise.resolve();
 export function setUserNameAndPasswordForAnonymousUser(username, password) {
-
+  credentials = {};
   credentials.userName = username;
   credentials.password = password;
   credentials.isAnonymous = true;
