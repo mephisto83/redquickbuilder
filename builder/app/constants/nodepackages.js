@@ -137,6 +137,7 @@ import ForgotLogin from "../nodepacks/screens/ForgotLogin";
 import ChangeUserPassword from "../nodepacks/screens/ChangeUserPassword";
 import AddEventsToNavigateToScreen from "../nodepacks/AddEventsToNavigateToScreen";
 import HomeViewCredentialLoading from "../nodepacks/HomeViewCredentialLoading";
+import HomeViewContinueAsButtonStyle from "../nodepacks/HomeViewContinueAsButtonStyle";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -796,6 +797,7 @@ export const CreateLoginModels = {
               homeViewScreenOption = homeViewContext.screenOption;
             }
           }),
+          function () { return HomeViewContinueAsButtonStyle({ component: continueAsButton }) },
           function () { return HomeViewCredentialLoading({ component: homeViewScreenOption }) },
           function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: anonymousButton, screen: anonymousScreen }) },
           function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: continueAsButton, screen: continueAsResult.screenNodeId }) },

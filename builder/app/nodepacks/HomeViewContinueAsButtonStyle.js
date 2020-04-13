@@ -4,15 +4,17 @@ import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
 import { GetLinkBetween } from "../methods/graph_methods";
 
-export default function (args = {}) {
+export default function HomeViewContinueAsButtonStyle(args = {}) {
   // node1,node4
-
+  if (!args.component) {
+    throw new Error('missing component');
+  }
   //
 
   const context = {
     ...args,
-    node1: uuidv4(),
-    node4: uuidv4()
+    node1: args.component,
+    node4: null
   };
   let {
     viewPackages
@@ -336,7 +338,7 @@ export default function (args = {}) {
     ;
   const clearPinned = [{
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node1,
@@ -346,7 +348,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node2,
@@ -356,7 +358,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node3,
@@ -366,7 +368,7 @@ export default function (args = {}) {
   },
   {
     operation: 'CHANGE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         prop: 'Pinned',
         id: context.node4,
@@ -376,7 +378,7 @@ export default function (args = {}) {
   }];
   const applyViewPackages = [{
     operation: 'UPDATE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         id: context.node0,
         properties: viewPackages
@@ -384,7 +386,7 @@ export default function (args = {}) {
     }
   }, {
     operation: 'UPDATE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         id: context.node2,
         properties: viewPackages
@@ -392,7 +394,7 @@ export default function (args = {}) {
     }
   }, {
     operation: 'UPDATE_NODE_PROPERTY',
-    options () {
+    options() {
       return {
         id: context.node3,
         properties: viewPackages
