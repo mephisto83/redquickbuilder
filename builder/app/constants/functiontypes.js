@@ -75,7 +75,10 @@ export const FunctionTypes = {
     "Can_Execute_Agent_Parent_In_Valid_List",
   Login: "Login",
   Register: "Register",
-  AnonymousRegisterLogin: 'AnonymousRegisterLogin'
+  AnonymousRegisterLogin: 'AnonymousRegisterLogin',
+  CheckUserLoginStatus: 'CheckUserLoginStatus',
+  ForgotLogin: 'ForgotLogin',
+  ChangeUserPassword: 'ChangeUserPassword'
   // IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 };
 
@@ -1281,6 +1284,44 @@ export const MethodFunctions = {
     validation: false,
     filter: false,
     parameters: {
+      body: false,
+      parameters: false
+    },
+    isList: false,
+    method: Methods.Create,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
+  [FunctionTypes.CheckUserLoginStatus]: {
+    title: Titles.CheckUserLoginStatus,
+    constraints: {
+      ...COMMON_CONSTRAINTS_ANONYMOUS
+    },
+    output: {
+      ...COMMON_OUTPUT.LIST
+    },
+    permission: false,
+    validation: false,
+    filter: false,
+    parameters: {
+      body: false,
+      parameters: false
+    },
+    isList: false,
+    method: Methods.Create,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
+  [FunctionTypes.ChangeUserPassword]: {
+    title: Titles.ChangeUserPassword,
+    constraints: {
+      ...COMMON_CONSTRAINTS_ANONYMOUS
+    },
+    output: {
+      ...COMMON_OUTPUT.LIST
+    },
+    permission: false,
+    validation: false,
+    filter: false,
+    parameters: {
       body: {},
       parameters: false
     },
@@ -1288,6 +1329,26 @@ export const MethodFunctions = {
     method: Methods.Create,
     template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
   },
+  [FunctionTypes.ForgotLogin]: {
+    title: Titles.ForgotLogin,
+    constraints: {
+      ...COMMON_CONSTRAINTS_ANONYMOUS
+    },
+    output: {
+      ...COMMON_OUTPUT.LIST
+    },
+    permission: false,
+    validation: false,
+    filter: false,
+    parameters: {
+      body: {},
+      parameters: false
+    },
+    isList: false,
+    method: Methods.Create,
+    template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
+
   [FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
     title: Titles.Create_Parent$Child_Agent_Value__IListChild,
     titleTemplate: function (t, a) {

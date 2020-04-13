@@ -187,6 +187,7 @@ let dcTemplate = (collections, funcs, rel = "") => {
     GetState, UIC,
     GetItems,UI_MODELS,
     GetK, updateScreenInstance,
+    UIKeys,
     clearScreenInstance
 
   } from '../${rel}actions/uiActions';
@@ -230,6 +231,7 @@ import * as Models from '../${rel}model_keys';
 import RedObservable from '../${rel}actions/observable';
 import RedGraph from '../${rel}actions/redgraph';
 import { useParameters, fetchModel } from '../${rel}actions/redutils';
+import * as DC from './${rel}/data-chain';
 
 ${collections}
 

@@ -1095,7 +1095,8 @@ export function GetNodesByProperties(props, graph) {
 }
 export function removeCacheLink(id, type) {
   if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
-    delete AppCache.Links[type][id]
+    delete AppCache.Links[type][id];
+    AppCache.Version++;
   }
 }
 export function updateCache(options, link) {
@@ -1105,6 +1106,7 @@ export function updateCache(options, link) {
       AppCache.Links[link.properties.type] = AppCache.Links[link.properties.type] || {};
       AppCache.Links[link.properties.type][id] = true;
     }
+    AppCache.Version++;
   }
   else if (AppCache.Nodes) {
     if (!AppCache.Properties[prop]) {

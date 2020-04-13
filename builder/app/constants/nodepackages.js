@@ -132,6 +132,11 @@ import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import AttachMethodToMaestro from "../nodepacks/method/AttachMethodToMaestro";
 import CreateGetObjectDataChain from "../nodepacks/CreateGetObjectDataChain";
 import AddEvent from "../nodepacks/AddEvent";
+import ContinueAsScreen from "../nodepacks/screens/ContinueAs";
+import ForgotLogin from "../nodepacks/screens/ForgotLogin";
+import ChangeUserPassword from "../nodepacks/screens/ChangeUserPassword";
+import AddEventsToNavigateToScreen from "../nodepacks/AddEventsToNavigateToScreen";
+import HomeViewCredentialLoading from "../nodepacks/HomeViewCredentialLoading";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -447,6 +452,12 @@ export const CreateLoginModels = {
       [NodeProperties.NodePackageType]: nodePackageType
     };
     const newStuff = {};
+    const uiTypeConfig = {
+      [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
+      [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
+      [UITypes.VR]: args[UITypes.VR] || false,
+      [UITypes.Web]: args[UITypes.Web] || false
+    };
     setViewPackageStamp(viewPackage, "create-login-models");
     PerformGraphOperation([
       {
@@ -631,7 +642,7 @@ export const CreateLoginModels = {
       ),
       httpMethod: HTTP_METHODS.POST,
       functionType: FunctionTypes.AnonymousRegisterLogin,
-      functionName: `AnonymousRegisterLogin`
+      functionName: `Anonymous Register and Authenticate`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
     const loginResult = CreateAgentFunction({
@@ -646,7 +657,7 @@ export const CreateLoginModels = {
       ),
       httpMethod: HTTP_METHODS.POST,
       functionType: FunctionTypes.Login,
-      functionName: `Authenticate`
+      functionName: `Authenticate User`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
     let viewName = "Authenticate";
     args = args || {};
@@ -662,12 +673,7 @@ export const CreateLoginModels = {
       isSharedComponent: false,
       isDefaultComponent: false,
       isPluralComponent: false,
-      uiTypes: {
-        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
-        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
-        [UITypes.VR]: args[UITypes.VR] || false,
-        [UITypes.Web]: args[UITypes.Web] || false
-      },
+      uiTypes: uiTypeConfig,
       chosenChildren,
       viewType: ViewTypes.Create
     });
@@ -702,12 +708,7 @@ export const CreateLoginModels = {
       isSharedComponent: false,
       isDefaultComponent: false,
       isPluralComponent: false,
-      uiTypes: {
-        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
-        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
-        [UITypes.VR]: args[UITypes.VR] || false,
-        [UITypes.Web]: args[UITypes.Web] || false
-      },
+      uiTypes: uiTypeConfig,
       chosenChildren,
       viewName: `${viewName}`,
       viewType: ViewTypes.Create
@@ -717,6 +718,10 @@ export const CreateLoginModels = {
       targetMethod: regsterResult.methodNode.id
     });
 
+    const continueAsResult = ContinueAsScreen({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const forgotLogin = ForgotLogin({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const changeUserPassword = ChangeUserPassword({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+
     const anonymous_method_results = CreateDefaultView.method({
       viewName: 'Anonymous Guest',
       dispatch: GetDispatchFunc(),
@@ -725,19 +730,29 @@ export const CreateLoginModels = {
       isSharedComponent: false,
       isDefaultComponent: false,
       isPluralComponent: false,
-      uiTypes: {
-        [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
-        [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
-        [UITypes.VR]: args[UITypes.VR] || false,
-        [UITypes.Web]: args[UITypes.Web] || false
-      },
+      uiTypes: uiTypeConfig,
       chosenChildren: [],
       viewType: ViewTypes.Create
     });
     addInstanceEventsToForms({
-      anonymous_method_results,
+      method_results: anonymous_method_results,
       targetMethod: anonymousRegisterLogin.methodNode.id
     });
+    if (anonymous_method_results.instanceFunc) {
+      PerformGraphOperation([
+        ...PostAuthenticate({
+          screen: null,
+          functionName: "Post Authenticate ReactNative",
+          pressInstance: anonymous_method_results.instanceFunc.onPress
+        }),
+        ...PostAuthenticate({
+          screen: null,
+          functionName: "Post Authenticate ElectronIo",
+          clickInstance: anonymous_method_results.instanceFunc.onClick
+        })
+      ])(GetDispatchFunc(), GetStateFunc());
+    }
+
     const anonymousScreen = anonymous_method_results.screenNodeId;
 
     const registerScreen = method_results.screenNodeId;
@@ -758,45 +773,37 @@ export const CreateLoginModels = {
     const titleService = GetNodeByProperties({
       [NodeProperties.NODEType]: NodeTypes.TitleService
     });
-    let anonymousButton;
-    let eventTypeInstanceNode;
-    PerformGraphOperation(
-      [...HomeView({
-        titleService: titleService.id,
-        registerForm: registerScreen,
-        authenticateForm: authenticateScreen,
-        anonymousForm: anonymousScreen,
-        callback(homeViewContext) {
-          anonymousButton = homeViewContext.anonymousButton;
-        }
-      }), () => {
-        return $addComponentApiNodes(anonymousButton, 'label')
-      }, () => {
-        return AddEvent({
-          component: anonymousButton,
-          eventType: 'onClick',
-          eventTypeHandler: false,
-          callback(eventInstanceContext) {
-            eventTypeInstanceNode = eventInstanceContext.eventTypeInstanceNode;
-          }
-        })
-      },
-      function () {
-        return [
-          {
-            operation: "ADD_LINK_BETWEEN_NODES",
-            options: {
-              target: anonymousScreen,
-              source: eventTypeInstanceNode,
-              properties: {
-                type: "MethodCall",
-                MethodCall: {}
-              }
+
+    Object.keys(uiTypeConfig).forEach(uiType => {
+      if (uiTypeConfig[uiType]) {
+        let anonymousButton;
+        let continueAsButton;
+        let forgotLoginButton;
+        let homeViewScreenOption;
+        PerformGraphOperation(
+          [...HomeView({
+            titleService: titleService.id,
+            registerForm: registerScreen,
+            authenticateForm: authenticateScreen,
+            anonymousForm: anonymousScreen,
+            continueAsForm: continueAsResult.screenNodeId,
+            forgotForm: forgotLogin.screenNodeId,
+            uiType,
+            callback(homeViewContext) {
+              anonymousButton = homeViewContext.anonymousButton;
+              continueAsButton = homeViewContext.continueAsButton;
+              forgotLoginButton = homeViewContext.forgotLoginButton;
+              homeViewScreenOption = homeViewContext.screenOption;
             }
-          }
-        ];
-      }]
-    )(GetDispatchFunc(), GetStateFunc());
+          }),
+          function () { return HomeViewCredentialLoading({ component: homeViewScreenOption }) },
+          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: anonymousButton, screen: anonymousScreen }) },
+          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: continueAsButton, screen: continueAsResult.screenNodeId }) },
+          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: forgotLoginButton, screen: forgotLogin.screenNodeId }) }
+          ]
+        )(GetDispatchFunc(), GetStateFunc());
+      }
+    })
     setViewPackageStamp(null, "create-login-models");
   }
 };
@@ -830,7 +837,7 @@ function addTitleService(args) {
     }
   };
 }
-function addInstanceEventsToForms(args) {
+export function addInstanceEventsToForms(args) {
   const { method_results, targetMethod } = args;
   let createDataChainCallback = null;
   if (method_results && method_results.formButton) {

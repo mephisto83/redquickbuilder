@@ -5,7 +5,7 @@ import CreateViewTypes from "./CreateViewTypes";
 import AddAgentMethods from "./AddAgentMethods";
 import CreateComponentAll from "./CreateComponentAll";
 import { setFlag, Flags, SetPause } from "../../methods/graph_methods";
-import { GetDispatchFunc, GetStateFunc, graphOperation, executeGraphOperation, setVisual } from "../../actions/uiactions";
+import { GetDispatchFunc, GetStateFunc, graphOperation, executeGraphOperation, setVisual, BuildAllProgress } from "../../actions/uiactions";
 import SelectAllOnModelFilters from "./SelectAllOnModelFilters";
 import AddFiltersToGetAll from "../method/AddFiltersToGetAll";
 import HaveAllPropertiesOnExecutors from "./HaveAllPropertiesOnExecutors";
@@ -21,7 +21,6 @@ import ConnectScreens from "./ConnectScreens";
 import CreateClaimService from "./CreateClaimService";
 import SetupViewTypes from "./SetupViewTypes";
 import AddComponentsToScreenOptions from "./AddComponentsToScreenOptions";
-import { BuildAllProgress } from "../../templates/electronio/v1/app/actions/uiActions";
 import ApplyLoginValidations from "./ApplyLoginValidations";
 
 export async function pause() {

@@ -1,7 +1,7 @@
 "use strict";
 
 import { endPoints } from "./endPoints";
-
+import * as localStore from './storage';
 import * as Globals from "./globals";
 
 //require('es6-promise').polyfill();
@@ -11,6 +11,8 @@ import * as Globals from "./globals";
 //   require("isomorphic-fetch");
 // }
 var accessToken = "";
+const credentials = {};
+const CREDENTIALS = '$CREDENTIALS$';
 var getEndpoint = (baseDomain, path) => {
   var endpoint = baseDomain + path;
   if (baseDomain.endsWith("/") && path.startsWith("/")) {
@@ -21,9 +23,47 @@ var getEndpoint = (baseDomain, path) => {
 
   return endpoint;
 };
+
 export function setBearerAccessToken(access_token) {
   accessToken = access_token;
+  credentials.accessToken = accessToken;
+  updateStoredCredentials();
 }
+
+let storagePromise = Promise.resolve();
+export function setUserNameAndPasswordForAnonymousUser(username, password) {
+
+  credentials.userName = username;
+  credentials.password = password;
+  credentials.isAnonymous = true;
+  updateStoredCredentials();
+}
+
+export function updateStoredCredentials() {
+  storagePromise = storagePromise.then(() => {
+    return localStore.setItem(CREDENTIALS, JSON.stringify(credentials));
+  }).catch(e => console.warn(e));
+}
+
+export async function loadCredentials(callback) {
+  try {
+    var creds = await localStore.getItem(CREDENTIALS);
+    credentials = creds;
+    if (callback) {
+      callback(credentials);
+    }
+    return credentials;
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  if (callback) {
+    callback(null);
+  }
+  return null;
+}
+
+
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 export function createRedService(domain, wsdomain, _forceBase) {
   var forceBase = false;
@@ -40,29 +80,29 @@ export function createRedService(domain, wsdomain, _forceBase) {
     receivedMessageHandler,
     onUnauthorizedHandler;
   var service = {
-    setDomain: function(domain) {
+    setDomain: function (domain) {
       baseDomain = domain;
     },
-    onReceiveMessage: function(receiveMessageHandler) {
+    onReceiveMessage: function (receiveMessageHandler) {
       receivedMessageHandler = receiveMessageHandler;
     },
-    onUnauthorized: function(handler) {
+    onUnauthorized: function (handler) {
       onUnauthorizedHandler = handler;
     },
-    setWSDomain: function(domain) {
+    setWSDomain: function (domain) {
       wsbaseDomain = domain;
     },
-    setUserAccessToken: function(access_token) {
+    setUserAccessToken: function (access_token) {
       accessToken = access_token;
       service.r.connect();
     },
-    setBearerAccessToken: function(access_token) {
+    setBearerAccessToken: function (access_token) {
       accessToken = access_token;
     },
-    getAccessToken: function() {
+    getAccessToken: function () {
       return accessToken;
     },
-    call: function(endpoint, method, body, options = {}) {
+    call: function (endpoint, method, body, options = {}) {
       console.log(`calling at ${new Date().toTimeString()} ${endpoint}`);
       let fetchPromise = null;
       if (options && options.asForm) {
@@ -97,7 +137,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
       }
       let receivedHeaders = {};
       return fetchPromise
-        .then(function(response) {
+        .then(function (response) {
           //setTimeout(() => null, 0);  // workaround for issue-6679
           if (response.status === 401) {
             throw {
@@ -116,12 +156,12 @@ export function createRedService(domain, wsdomain, _forceBase) {
             });
           }
           if (options && options.asText) {
-            return response.text().then(function(txt) {
+            return response.text().then(function (txt) {
               console.log(`called at ${new Date().toTimeString()} ${endpoint}`);
               return txt;
             });
           }
-          return response.json().then(function(json) {
+          return response.json().then(function (json) {
             console.log(`called at ${new Date().toTimeString()} ${endpoint}`);
             return json;
           });
@@ -143,7 +183,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
           return Promise.reject(e);
         });
     },
-    delete: function(path) {
+    delete: function (path) {
       return Globals.getDefaultURL().then(_baseDomain => {
         var endpoint = getEndpoint(
           forceBase ? baseDomain || _baseDomain : _baseDomain,
@@ -152,7 +192,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
         return service.call(endpoint, "DELETE");
       });
     },
-    put: function(path, body) {
+    put: function (path, body) {
       return Globals.getDefaultURL().then(_baseDomain => {
         var endpoint = getEndpoint(
           forceBase ? baseDomain || _baseDomain : _baseDomain,
@@ -161,7 +201,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
         return service.call(endpoint, "PUT", body);
       });
     },
-    post: function(path, body, options = {}) {
+    post: function (path, body, options = {}) {
       return Globals.getDefaultURL().then(_baseDomain => {
         var endpoint = getEndpoint(
           forceBase ? baseDomain || _baseDomain : _baseDomain,
@@ -170,7 +210,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
         return service.call(endpoint, "POST", body, options);
       });
     },
-    patch: function(path, body) {
+    patch: function (path, body) {
       return Globals.getDefaultURL().then(_baseDomain => {
         var endpoint = getEndpoint(
           forceBase ? baseDomain || _baseDomain : _baseDomain,
@@ -179,7 +219,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
         return service.call(endpoint, "PATCH", body);
       });
     },
-    get: function(path) {
+    get: function (path) {
       return Globals.getDefaultURL().then(_baseDomain => {
         var endpoint = getEndpoint(
           forceBase ? baseDomain || _baseDomain : _baseDomain,
@@ -195,7 +235,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
           console.log("Web socket closed");
         }
       },
-      connect: function(handler, onopen, onclose, onerror) {
+      connect: function (handler, onopen, onclose, onerror) {
         receivedMessageHandler = handler || receivedMessageHandler;
         var promise = Promise.resolve();
         var oncatch = e => {
@@ -203,7 +243,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
             return e.message
               .json()
               .then(c => UIA.log(c))
-              .catch(() => {});
+              .catch(() => { });
           }
           UIA.log(e);
         };
@@ -251,7 +291,7 @@ export function createRedService(domain, wsdomain, _forceBase) {
                     if (onclose) {
                       onclose(e);
                     }
-                    setTimeout(function() {
+                    setTimeout(function () {
                       resolve();
                       promise = promise.then(() => {
                         return connectToService().catch(oncatch);

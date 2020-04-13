@@ -14,7 +14,8 @@ export const StyleTags = {
   "style": "style",
   "style_input": " style_input",
   "style_label": "style_label",
-  "style_item": "style_item"
+  "style_item": "style_item",
+  "style_button":"style_button"
 }
 
 export const ComponentTags = {
@@ -141,6 +142,9 @@ LOCAL_STATE_PROPERTY.forEach(x => {
   };
 });
 DEFAULT_BUTTON_API_PROPERTIES.style_button = {
+  'style': 'style'
+};
+DEFAULT_BUTTON_API_PROPERTIES.style = {
   'style': 'style'
 };
 

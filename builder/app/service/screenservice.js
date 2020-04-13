@@ -380,9 +380,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
       : GetDefaultElement();
   } else {
     extraimports.push(
-      `import * as Models from '${getRelativePathPrefix(
-        relativePath
-      )}model_keys.js';`
+      `import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`
     );
     if (layoutObj) {
       buildLayoutTree({
@@ -395,12 +393,12 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
       }).join(NEW_LINE);
     }
     const data = GetItemData(node);
-    const item_render = GetItemRender(node, extraimports, language);
-    const form_render = GetFormRender(node, extraimports, language);
+    const itemRender = GetItemRender(node, extraimports, language);
+    const formReader = GetFormRender(node, extraimports, language);
     const apiProperties = WriteDescribedApiProperties(node);
     layoutSrc = bindTemplate(fs.readFileSync(template, "utf8"), {
-      item_render,
-      form_render,
+      item_render: itemRender,
+      form_render: formReader,
       data,
       apiProperties
     });
@@ -541,16 +539,33 @@ export function bindComponent(node, componentBindingDefinition) {
         });
 
         styleNodes.forEach(styleNode => {
-          // const styleNodeDataChain = GetNodesLinkedTo(graph, {
-          //   id: styleNode.id,
-          //   link: LinkType.DataChainStyleLink
-          // }).find(v => dataChainStyleLinks.find(f => v.id === f.id));
-          // if (styleNodeDataChain) {
-          //   styles.push(`$\{ DC.${GetCodeName(styleNodeDataChain, { includeNameSpace: true })} ? styles['${GetJSCodeName(styleNode)}'] : '' }`)
-          // }
-          // else {
-          // }
-          styles.push(`$\{styles['${GetJSCodeName(styleNode)}']}`)
+          const styleNodeDataChain = GetNodeLinkedTo(graph, {
+            id: styleNode.id,
+            link: LinkType.DataChainStyleLink
+          });
+          if (styleNodeDataChain) {
+            let args = '';
+            const styleArguments = GetNodesLinkedTo(graph, {
+              id: styleNode.id,
+              link: LinkType.StyleArgument
+            });
+            if (styleArguments && styleArguments.length) {
+              args = styleArguments.map(styleArg => {
+                const nodeType = GetNodeProp(styleArg, NodeProperties.NODEType);
+                switch (nodeType) {
+                  case NodeTypes.ComponentExternalApi:
+                    return `${GetJSCodeName(styleArg)}: this.props.${GetJSCodeName(styleArg)}`;
+                  case NodeTypes.ComponentApi:
+                    return `${GetJSCodeName(styleArg)}: this.state.${GetJSCodeName(styleArg)}`;
+                  default: return false;
+                }
+              }).filter(x => x).join();
+            }
+            styles.push(`\${ DC.${GetCodeName(styleNodeDataChain, { includeNameSpace: true })}(${args}) ? styles['${GetJSCodeName(styleNode)}'] : '' }`)
+          }
+          else {
+            styles.push(`$\{styles['${GetJSCodeName(styleNode)}']}`)
+          }
         });
 
         if (styles.length) {
@@ -1386,7 +1401,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
           result.push(ComponentEventStandardHandler[_event]);
           break;
         default:
-        break;
+          break;
       }
     }
   }

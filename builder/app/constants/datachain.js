@@ -64,6 +64,9 @@ export const DataChainFunctionKeys = {
   Filter: "Filter", //Filters an array.
   Pass: "Pass",
   SetBearerAccessToken: "SetBearerAccessToken",
+  HasPreviousCredentials: 'HasPreviousCredentials',
+  StoreCredResults: 'StoreCredResults',
+  LoadUserCredentialsFromLocalStore: 'LoadUserCredentialsFromLocalStore',
   ReferenceDataChain: "Data Chain Ref.",
   Merge: "Merge",
   Map: "Map",
@@ -394,6 +397,30 @@ export const DataChainFunctions = {
       [NodeProperties.NODEType]: true
     },
     value: "SetBearerAccessToken"
+  },
+  [DataChainFunctionKeys.StoreCredResults]: {
+    ui: {},
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.StoreCredResults
+  },
+  [DataChainFunctionKeys.HasPreviousCredentials]: {
+    ui: {
+    },
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.LoadUserCredentialsFromLocalStore
+  },
+  [DataChainFunctionKeys.LoadUserCredentialsFromLocalStore]: {
+    ui: {
+      dataref: NodeProperties.DataChainReference
+    },
+    filter: {
+      [NodeProperties.NODEType]: true
+    },
+    value: DataChainFunctionKeys.LoadUserCredentialsFromLocalStore
   },
   [DataChainFunctionKeys.ReferenceDataChain]: {
     ui: {

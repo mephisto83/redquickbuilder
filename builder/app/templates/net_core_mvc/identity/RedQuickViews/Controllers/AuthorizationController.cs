@@ -11,6 +11,8 @@ using RedQuickCore.Identity;
 using RedQuickCore.Interfaces;
 using RedQuickCore.Data;
 using {{namespace}}.Models;
+using RedQuick.Util;
+using {{namespace}}.Controllers;
 
 namespace {{namespace}}.Web.Controllers
 {
@@ -38,6 +40,34 @@ namespace {{namespace}}.Web.Controllers
             return {{namespace}}.Models.User.Create(model);
         }
 
+        User _controllerUser;
+        public User controllerUser
+        {
+            get
+            {
+                if (_controllerUser == null)
+                {
+                    var claimService = RedStrapper.Resolve<ICreateUser>();
+                    var claims = ((System.Security.Claims.ClaimsIdentity)(User.Identity)).Claims;
+                    _controllerUser = claimService.Create(claims);
+                }
+                return _controllerUser;
+            }
+
+            set
+            {
+                _controllerUser = value;
+            }
+        }
+
+        [AllowAnonymous]
+        [Route("check/user/login/status")]
+        [HttpPost]
+        public async Task<AuthenticationResult> CheckUserLoginStatus(RedRegisterViewModel model, string returnUrl = null)
+        {
+            return AuthenticationResult.UserStatus(_controllerUser);
+        }
+
         [AllowAnonymous]
         [Route("register")]
         [HttpPost]
@@ -49,13 +79,13 @@ namespace {{namespace}}.Web.Controllers
         [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
-        public override async Task<AuthenticationResult> Authenticate([FromBody] RedLoginModel obj, string returnUrl = null)
+        public override async Task<string> Authenticate([FromBody] RedLoginModel obj, string returnUrl = null)
         {
             return await base.Authenticate(obj);
         }
 
         [AllowAnonymous]
-        [Route("authenticateuser")]
+        [Route("authenticate/user")]
         [HttpPost]
         public override async Task<AuthenticationResult> AuthenticateUser([FromBody] RedLoginModel obj, string returnUrl = null)
         {
@@ -63,9 +93,9 @@ namespace {{namespace}}.Web.Controllers
         }
 
         [AllowAnonymous]
-        [Route("authenticateanonym")]
+        [Route("anonymous/register/and/authenticate")]
         [HttpPost]
-        public virtual async Task<AuthenticationResult> AnonymousRegisterAndAuthenticate(string returnUrl)
+        public override async Task<AuthenticationResult> AnonymousRegisterAndAuthenticate(string returnUrl)
         {
             return await base.AnonymousRegisterAndAuthenticate(returnUrl);
         }
@@ -73,9 +103,24 @@ namespace {{namespace}}.Web.Controllers
         [AllowAnonymous]
         [Route("registerandauthenticate")]
         [HttpPost]
-        public override Task<string> RegisterAndAuthenticate([FromBody] RedRegisterViewModel model, string returnUrl = null)
+        public override async Task<AuthenticationResult> RegisterAndAuthenticate([FromBody] RedRegisterViewModel model, string returnUrl = null)
         {
-            return base.RegisterAndAuthenticate(model, returnUrl);
+            return await base.RegisterAndAuthenticate(model, returnUrl);
+        }
+
+        [AllowAnonymous]
+        [Route("forgot/login")]
+        [HttpPost]
+        public override async Task<AuthenticationResult> ForgotPassword(RedForgotPasswordViewModel model)
+        {
+            return await base.ForgotPassword(model);
+        }
+
+        [Route("change/user/password")]
+        [HttpPost]
+        public override async Task<AuthenticationResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            return await base.ChangePassword(model);
         }
     }
 }

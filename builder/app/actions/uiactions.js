@@ -46,6 +46,7 @@ export const OptionsTypes = NodeConstants.OptionsTypes;
 export const NODE_COST = "NODE_COST";
 export const NODE_CONNECTION_COST = "NODE_CONNECTION_COST";
 
+export const BuildAllProgress = 'BuildAllProgress';
 export const BATCH_MODEL = "BATCH_MODEL";
 export const BATCH_AGENT = "BATCH_AGENT";
 export const BATCH_PARENT = "BATCH_PARENT";
@@ -118,6 +119,19 @@ export function ScreenOptionFilter(x) {
   if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Anonymous Guest') {
     return false;
   }
+  if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Forgot Login') {
+    return false;
+  }
+
+  if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Continue As') {
+    return false;
+  }
+
+  if (['Change User Password', 'Continue As', 'Forgot Login', 'Anonymous Guest', 'Authenticate', 'Register']
+    .some(v => v === GetNodeProp(x, NodeProperties.ViewPackageTitle))) {
+    return false;
+  }
+
   if (GetNodeProp(x, NodeProperties.ValueName) === 'HomeViewContainer') {
     return false;
   }
@@ -1876,7 +1890,7 @@ export function GenerateDataChainMethod(id) {
   const numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
   const property = GetNodeProp(node, NodeProperties.Property);
   const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
-  const func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference));
+  const func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference), { includeNameSpace: true });
   const funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
   const selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
   const nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
@@ -1996,7 +2010,7 @@ export function GenerateDataChainMethod(id) {
       return `() => {
         ${Object.keys(funcs || {})
           .map(key => {
-            return `let ${key} = ${GetCodeName(funcs[key])}();`;
+            return `let ${key} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`;
           })
           .join(NodeConstants.NEW_LINE)}
         ${lambda}
@@ -2020,7 +2034,7 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Property:
       return `(a) => a ? a.${GetJSCodeName(property) || property} : null`;
     case DataChainFunctionKeys.ReferenceDataChain:
-      return `(a) => ${func}(a)`;
+      return `(a) => DC.${func}(a)`;
     case DataChainFunctionKeys.Navigate:
       let insert = "";
       if (useNavigationParams) {
@@ -2046,7 +2060,49 @@ export function GenerateDataChainMethod(id) {
       }`;
     case DataChainFunctionKeys.SetBearerAccessToken:
       return `(a) => {
-        $service.setBearerAccessToken(a);
+        if(a && a.error) {
+          console.error('An error occurred during the authentication process');
+          if(a.errorMessage) {
+            console.error(a.errorMessage);
+          }
+        }
+        if(a && a.accessToken) {
+          $service.setBearerAccessToken(a.accessToken);
+          if(a && a.userName && a.password) {
+            // Anonymous users
+            $service.setUserNameAndPasswordForAnonymousUser(a.userName, a.password);
+          }
+        }
+        if(typeof a === 'string') {
+          $service.setBearerAccessToken(a);
+        }
+
+        return a;
+     }`;
+    case DataChainFunctionKeys.StoreCredResults:
+      return `(creds) => {
+        let dispatch = GetDispatch();
+        if(creds) {
+             dispatch(
+                 Batch(
+                     UIC(APP_STATE, UIKeys.HAS_CREDENTIALS, !!creds),
+                     UIC(APP_STATE, UIKeys.CREDENTIALS, creds)
+                 )
+             );
+         }
+     }`;
+    case DataChainFunctionKeys.HasPreviousCredentials:
+      return `() => {
+        let getState = GetState();
+        return GetC(getState(), APP_STATE, UIKeys.HAS_CREDENTIALS);
+      }`;
+    case DataChainFunctionKeys.LoadUserCredentialsFromLocalStore:
+      return `(a) => {
+
+        $service.loadCredentials((credentials) => {
+          DC.${func}(credentials)
+        });
+
         return a;
      }`;
     case DataChainFunctionKeys.Equals:

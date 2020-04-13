@@ -812,7 +812,8 @@ export const LinkType = {
   Style: "Style",
   DataChainCollection: "DataChainCollection",
   DataChainCollectionReference: "DataChainCollectionReference",
-  DataChainStyleLink: 'DataChainStyleLink'
+  DataChainStyleLink: 'DataChainStyleLink',
+  StyleArgument: 'StyleArgument'
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -823,6 +824,9 @@ export const LinkStyles = {
   [LinkType.ComponentInternalConnection]: {
     stroke: NodeTypeColors[NodeTypes.ComponentApi],
     type: LinkType.ComponentInternalConnection
+  },
+  [LinkType.StyleArgument]: {
+    type: LinkType.StyleArgument
   },
   [LinkType.DefaultViewType]: {
     type: LinkType.DefaultViewType
@@ -963,6 +967,9 @@ export const LinkProperties = {
   },
   DataChainStyleLink: {
     type: LinkType.DataChainStyleLink
+  },
+  StyleArgument: {
+    type: LinkType.StyleArgument
   },
   LifeCylceMethodInstance: {
     type: LinkType.LifeCylceMethodInstance

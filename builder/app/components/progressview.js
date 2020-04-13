@@ -21,7 +21,7 @@ import {
   OtherUses,
   CssPseudoSelectors
 } from "../constants/themes";
-import { GetCurrentGraph, GUID, GetNodes, GetNodeTitle, NodesByType, NodeProperties, GetNodeProp } from "../actions/uiactions";
+import { GetCurrentGraph, GUID, GetNodes, GetNodeTitle, NodesByType, NodeProperties, GetNodeProp, BuildAllProgress, Visual } from "../actions/uiactions";
 import TextInput from "./textinput";
 import ColorInput from './colorinput';
 import Box from "./box";
@@ -36,7 +36,6 @@ import { MediaQueries, Languages, NodeTypes } from "../constants/nodetypes";
 import translationservice from '../service/translationservice';
 import GridPlacementField from "./gridplacementfield";
 import ProgressBar from "./progressbar";
-import { Visual, BuildAllProgress } from "../templates/electronio/v1/app/actions/uiActions";
 
 class ProgressView extends Component {
   constructor(props) {

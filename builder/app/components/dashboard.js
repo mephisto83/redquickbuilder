@@ -305,6 +305,28 @@ class Dashboard extends Component {
               },
               icon: 'fa fa-css3',
               title: Titles.Style
+            },
+            {
+              onClick: () => {
+                this.props.setVisual(CONNECTING_NODE, {
+                  ...LinkProperties.DataChainStyleLink,
+                  singleLink: true,
+                  nodeTypes: [NodeTypes.DataChain]
+                });
+              },
+              icon: 'fa fa-chain',
+              title: Titles.DataChain
+            },
+            {
+              onClick: () => {
+                this.props.setVisual(CONNECTING_NODE, {
+                  ...LinkProperties.StyleArgument,
+                  singleLink: false,
+                  nodeTypes: [NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi]
+                });
+              },
+              icon: 'fa fa-th-large',
+              title: Titles.DataChain
             }
           ]
         case NodeTypes.Lists:
@@ -1140,7 +1162,7 @@ class Dashboard extends Component {
                   }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={mainContent === MIND_MAP || !mainContent} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
+                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                   }} /> : null}
                   {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {

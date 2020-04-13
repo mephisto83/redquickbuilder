@@ -1,3 +1,4 @@
+import fs from "fs";
 import * as GraphMethods from "../methods/graph_methods";
 import {
   GetNodeProp,
@@ -20,7 +21,6 @@ import {
   STANDARD_TEST_USING,
   Methods
 } from "../constants/nodetypes";
-import fs from "fs";
 import {
   bindTemplate,
   FunctionTypes,
@@ -52,103 +52,104 @@ const PROPERTY_TABS = 6;
 export default class MaestroGenerator {
   static Tabs(c) {
     let res = "";
-    for (var i = 0; i < c; i++) {
+    for (let i = 0; i < c; i++) {
       res += TAB;
     }
     return res;
   }
+
   static Generate(options) {
-    var { state, key } = options;
-    let graphRoot = GetRootGraph(state);
-    let namespace = graphRoot
+    const { state, key } = options;
+    const graphRoot = GetRootGraph(state);
+    const namespace = graphRoot
       ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
       : null;
 
-    let maestros = NodesByType(state, NodeTypes.Maestro).filter(
+    const maestros = NodesByType(state, NodeTypes.Maestro).filter(
       x => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
     );
 
-    let _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, "utf8");
-    let _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(
+    const _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, "utf8");
+    const _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(
       MAESTRO_INTERFACE_TEMPLATE,
       "utf8"
     );
-    let _testClass = fs.readFileSync(TEST_CLASS, "utf8");
-    let testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, "utf8");
-    let testFunctionGetSameParentTemplate = fs.readFileSync(
+    const _testClass = fs.readFileSync(TEST_CLASS, "utf8");
+    const testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, "utf8");
+    const testFunctionGetSameParentTemplate = fs.readFileSync(
       MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS,
       "utf8"
     );
 
-    let testFunctionGetTemplate = fs.readFileSync(
+    const testFunctionGetTemplate = fs.readFileSync(
       MAESTRO_FUNCTION_GET_TESTS,
       "utf8"
     );
-    let root = GetRootGraph(state);
-    let graph = GetCurrentGraph(state);
-    let result = {};
+    const root = GetRootGraph(state);
+    const graph = GetCurrentGraph(state);
+    const result = {};
     maestros.map(maestro => {
       let maestroTemplateClass = _maestroTemplateClass;
       let functions = "";
       let functionsInterface = "";
-      let statics = "";
-      let codeName = `${GetNodeProp(maestro, NodeProperties.CodeName)}`;
+      const statics = "";
+      const codeName = `${GetNodeProp(maestro, NodeProperties.CodeName)}`;
 
       let maestro_functions = [];
-      let tempfunctions = GraphMethods.getNodesByLinkType(root, {
+      const tempfunctions = GraphMethods.getNodesByLinkType(root, {
         id: maestro.id,
         type: LinkType.FunctionLink,
         direction: GraphMethods.SOURCE
       });
       let arbiters = [];
       let permissions = [];
-      let maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
+      const maestroName = GetNodeProp(maestro, NodeProperties.CodeName);
       maestro_functions = tempfunctions;
       let permissionValidationCases = [];
       if (maestro_functions.length) {
         maestro_functions
           .filter(x => !GetNodeProp(x, NodeProperties.NotIncludedInController))
           .map(maestro_function => {
-            let function_type = GetNodeProp(
+            const function_type = GetNodeProp(
               maestro_function,
               NodeProperties.FunctionType
             );
-            var ft = MethodFunctions[function_type];
+            const ft = MethodFunctions[function_type];
             if (ft) {
               let tempFunction = ft.template;
               let interfaceFunction = ft.interface;
-              let testFunction = ft.test;
+              const testFunction = ft.test;
               let value_type = "";
               let parent_type = "";
               if (ft.parentGet) {
                 value_type = "string";
               }
-              let functionName = `${GetNodeProp(
+              const functionName = `${GetNodeProp(
                 maestro_function,
                 NodeProperties.CodeName
               )}`;
-              let httpMethod = `${GetNodeProp(
+              const httpMethod = `${GetNodeProp(
                 maestro_function,
                 NodeProperties.HttpMethod
               )}`;
-              let httpRoute = `${GetNodeProp(
+              const httpRoute = `${GetNodeProp(
                 maestro_function,
                 NodeProperties.HttpRoute
               )}`;
               let datachainoptions = { "lambda.default": "" };
-              let dataChainNodes = GraphMethods.GetNodesLinkedTo(null, {
+              const dataChainNodes = GraphMethods.GetNodesLinkedTo(null, {
                 id: maestro_function.id,
                 link: LinkType.DataChainLink,
                 direction: GraphMethods.SOURCE
               });
               dataChainNodes.map(dataChainNode => {
-                let lambda = GetLambdaDefinition(maestro_function);
+                const lambda = GetLambdaDefinition(maestro_function);
                 if (lambda) {
                   if (dataChainNode) {
-                    let dataChainArgs = GenerateDataChainArguments(
+                    const dataChainArgs = GenerateDataChainArguments(
                       dataChainNode.id
                     );
-                    let link = GraphMethods.GetLinkBetween(
+                    const link = GraphMethods.GetLinkBetween(
                       maestro_function.id,
                       dataChainNode.id,
                       GetCurrentGraph()
@@ -187,9 +188,9 @@ export default class MaestroGenerator {
               let connectingNode = null;
               let parent_setup = "";
               let modelNode = null;
-              let parent = null;
+              const parent = null;
               let model_output = null;
-              let methodProps = GetNodeProp(
+              const methodProps = GetNodeProp(
                 maestro_function,
                 NodeProperties.MethodProps
               );
@@ -246,7 +247,7 @@ export default class MaestroGenerator {
                   graphRoot,
                   methodProps[FunctionTemplateKeys.ManyToManyModel]
                 );
-                var modelItemFilters = GraphMethods.GetLinkChain(state, {
+                const modelItemFilters = GraphMethods.GetLinkChain(state, {
                   id: maestro_function.id,
                   links: [
                     {
@@ -255,7 +256,7 @@ export default class MaestroGenerator {
                     }
                   ]
                 });
-                var out_predicate = {};
+                const out_predicate = {};
                 predicates = ModelItemFilterGenerator.predicates(
                   modelItemFilters,
                   out_predicate
@@ -270,24 +271,24 @@ export default class MaestroGenerator {
                 }
               }
 
-              let agent = agentTypeNode
+              const agent = agentTypeNode
                 ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`
                 : `{maestro_generator_mising_agentTypeNode}`;
-              let model_type = modelNode
+              const model_type = modelNode
                 ? GetNodeProp(modelNode, NodeProperties.CodeName)
                 : `{maestro_generator_mising_model}`;
-              let agent_type = agentTypeNode
+              const agent_type = agentTypeNode
                 ? `${GetNodeProp(agentTypeNode, NodeProperties.CodeName)}`
                 : `{maestro_generator_mising_agentTypeNode}`;
-              let methodType = GetNodeProp(
+              const methodType = GetNodeProp(
                 maestro_function,
                 NodeProperties.MethodType
               );
-              let connect_type = connectingNode
+              const connect_type = connectingNode
                 ? GetCodeName(connectingNode)
                 : "{maestro_connection_type_missing}";
               if (parentNode) arbiters.push(parent_type);
-              let manyNodes =
+              const manyNodes =
                 GraphMethods.GetManyToManyNodes(
                   graphRoot,
                   [
@@ -296,9 +297,7 @@ export default class MaestroGenerator {
                   ].filter(x => x)
                 ) || [];
               arbiters.push(
-                ...manyNodes.map(manyNode => {
-                  return GetNodeProp(manyNode, NodeProperties.CodeName);
-                })
+                ...manyNodes.map(manyNode => GetNodeProp(manyNode, NodeProperties.CodeName))
               );
               arbiters.push(agent_type, model_type);
               permissions.push({ agent_type, model_type });
@@ -323,13 +322,13 @@ export default class MaestroGenerator {
                   : `{maestro_generator_mising_model}`;
               }
 
-              let bindOptions = {
+              const bindOptions = {
                 ...datachainoptions,
                 function_name: functionName,
-                agent_type: agent_type,
+                agent_type,
                 "agent_type#lower": `${agent_type}`.toLowerCase(),
                 parent_type,
-                agent: agent,
+                agent,
                 "composite-input": GetCodeName(compositeInput) || "",
                 model_input: GetCodeName(compositeInput) || model_type,
                 value_type,
@@ -376,22 +375,22 @@ export default class MaestroGenerator {
               functions += jNL + tempFunction;
               functionsInterface += jNL + interfaceFunction;
 
-              var cases = PermissionGenerator.EnumeratePermissionCases(
+              const cases = PermissionGenerator.EnumeratePermissionCases(
                 graph,
                 permissionNode,
                 methodType,
                 agentTypeNode,
                 modelNode
               );
-              let validators = StreamProcessOrchestrationGenerator.EnumerateFunctionValidators(
+              const validators = StreamProcessOrchestrationGenerator.EnumerateFunctionValidators(
                 state,
                 maestro_function
               );
               if (validators && cases) {
                 validators.map(validator => {
                   cases.map(_case => {
-                    let pvc = {};
-                    let pvc2 = {};
+                    const pvc = {};
+                    const pvc2 = {};
                     if (validator && validator.agent && _case.agentProperties) {
                       var temp = [
                         ...validator.agent.propertyInformation.map(
@@ -487,7 +486,7 @@ export default class MaestroGenerator {
 
                 permissionValidationCases = permissionValidationCases.map(
                   (pvc, index) => {
-                    //Generate tests.
+                    // Generate tests.
                     let templ = testFunctionTemplate;
                     switch (ft.method) {
                       case Methods.Get:
@@ -543,44 +542,44 @@ export default class MaestroGenerator {
       }
       arbiters = arbiters.unique();
       permissions = permissions.unique(x => `${x.agent_type}`);
-      var injectedServices = arbiters.map(
+      const injectedServices = arbiters.map(
         x => `IRedArbiter<${x}> _arbiter${x}`
       );
-      var injectedPermissionServices = permissions.map(
+      const injectedPermissionServices = permissions.map(
         x =>
           `IPermissions${
             x.agent_type
           } _${x.agent_type.toLowerCase()}Permissions`
       );
-      var set_properties = arbiters.map(
-        x => jNL + MaestroGenerator.Tabs(4) + `arbiter${x} = _arbiter${x};`
+      const set_properties = arbiters.map(
+        x => `${jNL + MaestroGenerator.Tabs(4)  }arbiter${x} = _arbiter${x};`
       );
-      var set_permissions = permissions.map(
+      const set_permissions = permissions.map(
         x =>
-          jNL +
-          MaestroGenerator.Tabs(4) +
-          `${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`
+          `${jNL +
+          MaestroGenerator.Tabs(4)
+          }${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`
       );
-      var properties = arbiters.map(
+      const properties = arbiters.map(
         x =>
-          jNL +
-          MaestroGenerator.Tabs(3) +
-          `private readonly IRedArbiter<${x}> arbiter${x};`
+          `${jNL +
+          MaestroGenerator.Tabs(3)
+          }private readonly IRedArbiter<${x}> arbiter${x};`
       );
-      var permissions_properties = permissions.map(
+      const permissions_properties = permissions.map(
         x =>
-          jNL +
-          MaestroGenerator.Tabs(3) +
-          `private readonly IPermissions${
+          `${jNL +
+          MaestroGenerator.Tabs(3)
+          }private readonly IPermissions${
             x.agent_type
           } ${x.agent_type.toLowerCase()}Permissions;`
       );
-      let testTemplate = bindTemplate(_testClass, {
+      const testTemplate = bindTemplate(_testClass, {
         name: codeName,
         tests: permissionValidationCases.join(NEW_LINE)
       });
       maestroTemplateClass = bindTemplate(maestroTemplateClass, {
-        codeName: codeName,
+        codeName,
         set_properties: [...set_properties, ...set_permissions].join(jNL),
         properties: [...permissions_properties, ...properties].join(" "),
         injected_services: [...injectedServices, ...injectedPermissionServices]
@@ -589,10 +588,10 @@ export default class MaestroGenerator {
         "codeName#alllower": codeName.toLowerCase(),
         functions
       });
-      let maestro_interface_template = bindTemplate(
+      const maestro_interface_template = bindTemplate(
         _MAESTRO_INTERFACE_TEMPLATE,
         {
-          codeName: codeName,
+          codeName,
           set_properties: [...set_properties, ...set_permissions].join(jNL),
           properties: [...permissions_properties, ...properties].join(" "),
           injected_services: [

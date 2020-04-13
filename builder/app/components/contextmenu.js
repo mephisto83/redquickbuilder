@@ -1797,6 +1797,42 @@ class ContextMenu extends Component {
               }}
             />
 
+            <TreeViewMenu
+              title={Titles.AddLifeCylceEvents}
+
+              onClick={() => {
+                this.props.graphOperation(
+                  SCREEN_COMPONENT_EVENTS.filter(x => !GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+                    id: currentNode.id,
+                    link: LinkType.LifeCylceMethod
+                  }).find(
+                    _y => UIA.GetNodeProp(_y, NodeProperties.Event) === x
+                  )).map(t => ({
+                    operation: UIA.ADD_NEW_NODE,
+                    options() {
+                      return {
+                        nodeType: NodeTypes.LifeCylceMethod,
+                        properties: {
+                          [NodeProperties.EventType]: t,
+                          [NodeProperties.Pinned]: false,
+                          [NodeProperties.UIText]: `${t}`
+                        },
+                        links: [
+                          {
+                            target: currentNode.id,
+                            linkProperties: {
+                              properties: {
+                                ...LinkProperties.LifeCylceMethod
+                              }
+                            }
+                          }
+                        ]
+                      };
+                    }
+                  }))
+                );
+              }}
+            />
             <AddComponentMenu />
             <TreeViewMenu
               open={UIA.Visual(state, "Add Menu")}

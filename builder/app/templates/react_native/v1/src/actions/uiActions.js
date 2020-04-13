@@ -27,6 +27,12 @@ export const SCREEN_INSTANCE_FOCUSED = "SCREEN_INSTANCE_FOCUSED";
 export const SCREEN_INSTANCE_ON_FOCUS = "SCREEN_INSTANCE_ON_FOCUS";
 
 export const VISUAL = "VISUAL";
+
+export const UIKeys = {
+  HAS_CREDENTIALS: 'HAS_CREDENTIALS',
+  CREDENTIALS: 'CREDENTIALS'
+}
+
 let _getState;
 let _dispatch;
 export function GetItems(modelType) {

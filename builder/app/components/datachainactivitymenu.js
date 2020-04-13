@@ -30,6 +30,7 @@ import ButtonList from "./buttonlist";
 
 import { getReferenceInserts } from "../utils/utilservice";
 import CheckBoxProperty from "./checkboxproperty";
+import Typeahead from "./typeahead";
 
 class DataChainActvityMenu extends Component {
   getLambdaVariableTree() {
@@ -438,7 +439,7 @@ class DataChainActvityMenu extends Component {
             />
           ) : null}
           {showDataChainRef ? (
-            <SelectInput
+            <Typeahead
               onChange={value => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {

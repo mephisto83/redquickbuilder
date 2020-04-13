@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
-import { NodeProperties } from "../constants/nodetypes";
-import { NO_OP } from "../actions/uiactions";
+import { NodeProperties, UITypes } from "../constants/nodetypes";
+import { NO_OP, GetNodeByProperties } from "../actions/uiactions";
 
 export default function (args = {}) {
   // node3,node6,node7,node8,node11,node16,node19
@@ -14,71 +14,84 @@ export default function (args = {}) {
     node16: args.registerForm,
     node19: args.authenticateForm,
     node20: uuidv4(),
+    node23: uuidv4(),
+    node25: uuidv4(),
     ...args
   };
-
+  const uiType = args.uiType || UITypes.ElectronIO;
   return [
-    function () {
+    function (graph) {
+      const homeScreen = GetNodeByProperties({
+        [NodeProperties.UIText]: 'Home View'
+      }, graph);
+      if (homeScreen) {
+        context.node0 = homeScreen.id;
+        return [];
+      }
       return [
-        {
-          operation: "NEW_NODE",
-          options: {
-            callback(node) {
-              context.node0 = node.id;
+        function () {
+          return [
+            {
+              operation: "NEW_NODE",
+              options: {
+                callback(node) {
+                  context.node0 = node.id;
+                }
+              }
             }
-          }
-        }
-      ];
-    },
+          ];
+        },
 
-    function () {
-      return [
-        {
-          operation: "CHANGE_NODE_TEXT",
-          options: {
-            id: context.node0,
-            value: "Home View "
-          }
-        }
-      ];
-    },
-    function () {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            id: context.node0,
-            value: "/",
-            prop: "HttpRoute"
-          }
-        }
-      ];
-    },
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_TEXT",
+              options: {
+                id: context.node0,
+                value: "Home View"
+              }
+            }
+          ];
+        },
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                id: context.node0,
+                value: "/",
+                prop: "HttpRoute"
+              }
+            }
+          ];
+        },
 
-    function () {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "nodeType",
-            id: context.node0,
-            value: "screen"
-          }
-        }
-      ];
-    },
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                prop: "nodeType",
+                id: context.node0,
+                value: "screen"
+              }
+            }
+          ];
+        },
 
-    function () {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Pinned",
-            id: context.node0,
-            value: true
-          }
-        }
-      ];
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                prop: "Pinned",
+                id: context.node0,
+                value: true
+              }
+            }
+          ];
+        },
+      ]
     },
 
     function () {
@@ -96,6 +109,7 @@ export default function (args = {}) {
             },
             callback(node) {
               context.node1 = node.id;
+              context.screenOption = node.id;
             }
           }
         }
@@ -109,7 +123,7 @@ export default function (args = {}) {
           options: {
             prop: "UIType",
             id: context.node1,
-            value: "ElectronIO"
+            value: uiType
           }
         }
       ];
@@ -121,7 +135,7 @@ export default function (args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node1,
-            value: "Home View Container"
+            value: "Home ViewContainer"
           }
         }
       ];
@@ -148,12 +162,12 @@ export default function (args = {}) {
             parent: context.node1,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: uiType
             },
             linkProperties: {
               properties: {
                 type: "component",
-                stroke: "#B7245C",
+
                 component: {}
               }
             },
@@ -171,7 +185,7 @@ export default function (args = {}) {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node2,
-            value: "Home View Component"
+            value: "Home ViewComponent"
           }
         }
       ];
@@ -268,12 +282,12 @@ export default function (args = {}) {
             parent: context.node2,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: uiType
             },
             linkProperties: {
               properties: {
                 type: "component",
-                stroke: "#B7245C",
+
                 component: {}
               }
             },
@@ -356,12 +370,12 @@ export default function (args = {}) {
             parent: context.node2,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: uiType
             },
             linkProperties: {
               properties: {
                 type: "component",
-                stroke: "#B7245C",
+
                 component: {}
               }
             },
@@ -373,7 +387,7 @@ export default function (args = {}) {
       ];
     },
     function () {
-      // node21
+      // node21 anonymous button
       return [
         {
           operation: "NEW_COMPONENT_NODE",
@@ -381,19 +395,73 @@ export default function (args = {}) {
             parent: context.node2,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO",
+              UIType: uiType,
               "component-type": 'Button',
               [NodeProperties.UIText]: 'Guest'
             },
             linkProperties: {
               properties: {
                 type: "component",
-                stroke: "#B7245C",
+
                 component: {}
               }
             },
             callback(node) {
               context.node21 = node.id;
+            }
+          }
+        }
+      ];
+    },
+    function () {
+      // node22 continu as button
+      return [
+        {
+          operation: "NEW_COMPONENT_NODE",
+          options: {
+            parent: context.node2,
+            groupProperties: {},
+            properties: {
+              UIType: uiType,
+              "component-type": 'Button',
+              [NodeProperties.UIText]: 'Continue As ...'
+            },
+            linkProperties: {
+              properties: {
+                type: "component",
+
+                component: {}
+              }
+            },
+            callback(node) {
+              context.node22 = node.id;
+            }
+          }
+        }
+      ];
+    },
+    function () {
+      // node24 continu as button
+      return [
+        {
+          operation: "NEW_COMPONENT_NODE",
+          options: {
+            parent: context.node2,
+            groupProperties: {},
+            properties: {
+              UIType: uiType,
+              "component-type": 'Button',
+              [NodeProperties.UIText]: 'Forgot Password ...'
+            },
+            linkProperties: {
+              properties: {
+                type: "component",
+
+                component: {}
+              }
+            },
+            callback(node) {
+              context.node24 = node.id;
             }
           }
         }
@@ -510,17 +578,15 @@ export default function (args = {}) {
                 [context.node6]: {
                   [context.node7]: {},
                   [context.node8]: {},
-                  [context.node20]: {}
+                  [context.node20]: {},
+                  [context.node23]: {},
+                  [context.node25]: {}
                 }
               },
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
-                    borderStyle: "solid",
-                    borderWidth: 1
+
                   },
                   children: {},
                   cellModel: {},
@@ -530,13 +596,7 @@ export default function (args = {}) {
                 },
                 [context.node7]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
-                    borderStyle: "solid",
-                    borderWidth: 1,
-                    justifyContent: "center",
-                    alignItems: "center"
+
                   },
                   children: {
                     [context.node7]: context.node4
@@ -548,13 +608,7 @@ export default function (args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
-                    borderStyle: "solid",
-                    borderWidth: 1,
-                    justifyContent: "center",
-                    alignItems: "center"
+
                   },
                   children: {
                     [context.node8]: context.node5
@@ -566,16 +620,34 @@ export default function (args = {}) {
                 },
                 [context.node20]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
-                    borderStyle: "solid",
-                    borderWidth: 1,
-                    justifyContent: "center",
-                    alignItems: "center"
+
                   },
                   children: {
                     [context.node20]: context.node21
+                  },
+                  cellModel: {},
+                  cellModelProperty: {},
+                  cellRoot: {},
+                  cellEvents: {}
+                },
+                [context.node23]: {
+                  style: {
+
+                  },
+                  children: {
+                    [context.node23]: context.node22
+                  },
+                  cellModel: {},
+                  cellModelProperty: {},
+                  cellRoot: {},
+                  cellEvents: {}
+                },
+                [context.node25]: {
+                  style: {
+
+                  },
+                  children: {
+                    [context.node25]: context.node24
                   },
                   cellModel: {},
                   cellModelProperty: {},
@@ -996,6 +1068,8 @@ export default function (args = {}) {
           if (args.callback) {
             args.callback({
               anonymousButton: context.node21,
+              continueAsButton: context.node22,
+              forgotLoginButton: context.node24,
               ...context
             })
           }
