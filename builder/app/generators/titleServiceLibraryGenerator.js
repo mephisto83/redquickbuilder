@@ -9,6 +9,7 @@ export default class TitleServiceLibraryGenerator {
     let fileEnding;
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         fileEnding = '.ts';
         break;
       default:

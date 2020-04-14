@@ -73,6 +73,7 @@ export default class DataChainGenerator {
     let fileEnding = ".js";
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         fileEnding = ".ts";
         break;
       default: break;
@@ -149,6 +150,7 @@ export default class DataChainGenerator {
     ].filter(x => x);
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         tests = GenerateChainFunctionSpecs(options);
         temps.push({
           relative: "./test",

@@ -120,7 +120,7 @@ function defaultParameters(args = {}) {
       [UITypes.ReactNative]: true,
       [UITypes.ElectronIO]: true,
       [UITypes.VR]: false,
-      [UITypes.Web]: false
+      [UITypes.ReactWeb]: true
     }, chosenChildren = []
   } = args;
   return {

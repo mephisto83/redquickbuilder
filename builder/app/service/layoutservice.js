@@ -277,6 +277,7 @@ export function createSection(args) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       if (Object.keys(_style).length < 2 || cellRoot[item]) {
         // return tree.tightenPs();
       }

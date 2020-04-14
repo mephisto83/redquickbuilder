@@ -68,7 +68,7 @@ class QuickMethods extends Component<any, any, any> {
         [UITypes.ReactNative]: UIA.Visual(state, UITypes.ReactNative),
         [UITypes.ElectronIO]: UIA.Visual(state, UITypes.ElectronIO),
         [UITypes.VR]: UIA.Visual(state, UITypes.VR),
-        [UITypes.Web]: UIA.Visual(state, UITypes.Web)
+        [UITypes.ReactWeb]: UIA.Visual(state, UITypes.ReactWeb)
       },
       chosenChildren: getChosenChildren()
     });
@@ -223,6 +223,7 @@ class QuickMethods extends Component<any, any, any> {
                       CreateLoginModels,
                       {
                         [UITypes.ElectronIO]: true,
+                        [UITypes.ReactWeb]: true,
                         [UITypes.ReactNative]: true
                       }
                     );
@@ -287,6 +288,13 @@ class QuickMethods extends Component<any, any, any> {
                   value={UIA.Visual(state, UITypes.ElectronIO)}
                   onChange={value => {
                     this.props.setVisual(UITypes.ElectronIO, value);
+                  }}
+                />
+                <CheckBox
+                  label={UITypes.ReactWeb}
+                  value={UIA.Visual(state, UITypes.ReactWeb)}
+                  onChange={value => {
+                    this.props.setVisual(UITypes.ReactWeb, value);
                   }}
                 />
                 <CheckBox

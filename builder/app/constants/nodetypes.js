@@ -162,6 +162,7 @@ export const NotSelectableNodeTypes = {
   [NodeTypes.PermissionDependency]: true,
   [NodeTypes.Condition]: true
 };
+
 export const NodeTypeColors = {
   [ColorStates.Error]: "#FF0000",
   [NodeTypes.Concept]: "#DD4B39",
@@ -413,6 +414,7 @@ export const NodeProperties = {
   HttpMethod: "HttpMethod",
   ExcludeFromController: "ExcludeFromController",
   IsAgent: "isAgent",
+  CancelButton: 'CancelButton',
   IsCompositeInput: "IsCompositeInput",
   IsParent: "isParent", //This is a program setting. Just for allowing us to hide and show the model picker.
   IsUser: "IsUser", //User is the object directly associated with a IdentityProvider.
@@ -1309,7 +1311,7 @@ export const ValidationVector = {
 };
 export const UITypes = {
   ReactNative: "ReactNative",
-  Web: "Web",
+  ReactWeb: "ReactWeb",
   VR: "VR",
   AR: "AR",
   ElectronIO: "ElectronIO"
@@ -2613,3 +2615,9 @@ export const ValidationUI = {
 Object.keys(ValidationUI).map(t => {
   ValidationUI[t].type = t;
 });
+
+export const UITypeColors = {
+  [UITypes.ElectronIO]: '#662C91',
+  [UITypes.ReactNative]: '#FF7F11',
+  [UITypes.ReactWeb]: '#21897E'
+}

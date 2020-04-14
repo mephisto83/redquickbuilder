@@ -2696,8 +2696,8 @@ class ContextMenu extends Component {
             />
           </TreeViewMenu>
         );
-        break;
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         return (
           <TreeViewMenu
             open
@@ -2714,7 +2714,6 @@ class ContextMenu extends Component {
             />
           </TreeViewMenu>
         );
-        break;
     }
   }
 

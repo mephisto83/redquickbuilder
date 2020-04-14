@@ -36,7 +36,8 @@ export function GenerateNavigation(options) {
     result[t.name] = t;
   });
 
-  if (language === UITypes.ElectronIO) {
+  if (language === UITypes.ElectronIO ||
+    language === UITypes.ReactWeb) {
     GenerateRoutes(language).map(t => {
       result[t.name] = t;
     });
@@ -108,7 +109,10 @@ export function GenerateRoutes(language) {
     routes = {
       ...routes,
       [GetCodeName(op)]: (
-        (language === UITypes.ElectronIO ? "/" : "") +
+        ((
+          language === UITypes.ElectronIO ||
+          language === UITypes.ReactWeb
+        ) ? "/" : "") +
         GetNodeProp(op, NodeProperties.HttpRoute)
       )
         .split("//")

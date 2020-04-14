@@ -156,6 +156,7 @@ export default async function BuildAll(callback) {
         CreateLoginModels,
         {
           [UITypes.ElectronIO]: true,
+          [UITypes.ReactWeb]: true,
           [UITypes.ReactNative]: true
         }
       )(GetDispatchFunc(), GetStateFunc());

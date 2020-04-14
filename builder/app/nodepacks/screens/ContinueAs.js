@@ -18,7 +18,7 @@ export default function ContinueAsScreen(args) {
           ...viewPackage,
           [NodeProperties.ExcludeFromController]: true,
           [NodeProperties.Pinned]: false,
-          [NodeProperties.UIText]: `Red Check Login Model`
+          [NodeProperties.UIText]: `Red Continue As Login Model`
         },
         callback: newNode => {
           newStuff.anonymousRegisterLoginModel = newNode.id;
@@ -55,7 +55,7 @@ export default function ContinueAsScreen(args) {
       [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
       [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
       [UITypes.VR]: args[UITypes.VR] || false,
-      [UITypes.Web]: args[UITypes.Web] || false
+      [UITypes.ReactWeb]: args[UITypes.ReactWeb] || false
     },
     chosenChildren: [],
     viewType: ViewTypes.Create

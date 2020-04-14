@@ -59,7 +59,7 @@ import {
 import ThemeServiceGenerator from "../generators/themeservicegenerator";
 
 const { ipcRenderer } = require("electron");
-
+const REACTWEB = "reactweb";
 const hub = {};
 ipcRenderer.on("message-reply", (event, arg) => {
   console.log(arg); // prints "pong"
@@ -173,6 +173,13 @@ export function scaffoldProject(options = {}) {
         }))
       .then(() => filesOnly
         ? Promise.resolve()
+        : send(HandlerEvents.reactweb.message, {
+          solutionName,
+          appName: root[GraphKeys.PROJECTNAME] || "",
+          workspace: path.join(workspace, root.title, "reactweb")
+        }))
+      .then(() => filesOnly
+        ? Promise.resolve()
         : send(HandlerEvents.electron.message, {
           solutionName,
           appName: root[GraphKeys.PROJECTNAME] || "",
@@ -205,6 +212,18 @@ export function scaffoldProject(options = {}) {
             workspace,
             root.title,
             "electronio",
+            root[GraphKeys.PROJECTNAME]
+          ),
+          state
+        );
+      })
+      .then(() => {
+        console.log("generate react web files");
+        generateReactWeb(
+          path.join(
+            workspace,
+            root.title,
+            REACTWEB,
             root[GraphKeys.PROJECTNAME]
           ),
           state
@@ -465,6 +484,17 @@ ${interfaceFunctions.join(NEW_LINE)}
         );
       })
       .then(() => {
+        console.log('Create react web theme');
+        return clearReactWebTheme(
+          path.join(
+            workspace,
+            root.title,
+            REACTWEB,
+            root[GraphKeys.PROJECTNAME]
+          ),
+        )
+      })
+      .then(() => {
         console.log("Write electron files");
         const appName = root[GraphKeys.PROJECTNAME];
         const version = "v1";
@@ -480,8 +510,34 @@ ${interfaceFunctions.join(NEW_LINE)}
 
       })
       .then(() => {
+        console.log("Write reactweb files");
+        const appName = root[GraphKeys.PROJECTNAME];
+        const version = "v1";
+        if (appName) {
+          return generateFolderStructure(
+            path.join(`./app/templates/reactweb/${version}`),
+            {},
+            null,
+            path.join(workspace, root.title, "reactweb", appName)
+          );
+        }
+        console.warn("No app name given");
+
+      })
+      .then(() => {
         console.log("Write electron theme");
         return generateElectronIOTheme(
+          path.join(
+            workspace,
+            root.title,
+            "electronio",
+            root[GraphKeys.PROJECTNAME]
+          ),
+          state
+        );
+      })
+      .then(() => {
+        return generateReactWebTheme(
           path.join(
             workspace,
             root.title,
@@ -557,10 +613,53 @@ function generateElectronIO(workspace, state) {
     });
   });
 }
+
+function generateReactWeb(workspace, state) {
+  const codeTypes = [...Object.values(ReactNativeTypes)];
+
+  codeTypes.map(codeType => {
+    const temp = Generator.generate({
+      type: codeType,
+      language: UITypes.ReactWeb,
+      state
+    });
+
+    Object.keys(temp).map(fileName => {
+      let { relative } = temp[fileName];
+       relative = relative.replace("app", "src");
+      let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+      ensureDirectory(dirname);
+      console.log(
+        path.join(workspace, relative, `${temp[fileName].relativeFilePath}`)
+      );
+      writeFileSync(
+        path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+        temp[fileName].template
+      );
+    });
+  });
+}
+
 function clearElectronIOTheme(workspace, state) {
   const results = ThemeServiceGenerator.Generate({
     state,
     language: UITypes.ElectronIO
+  });
+  const toClear = [];
+  results.filter(x => !x.userDefined).forEach(result => {
+    if (result.theme) {
+      toClear.push(path.join(workspace, result.themerelative || result.relative))
+    }
+  });
+  toClear.forEach(dir => {
+    deleteAll(dir);
+  });
+
+}
+function clearReactWebTheme(workspace, state) {
+  const results = ThemeServiceGenerator.Generate({
+    state,
+    language: UITypes.ReactWeb
   });
   const toClear = [];
   results.filter(x => !x.userDefined).forEach(result => {
@@ -596,6 +695,42 @@ function generateElectronIOTheme(workspace, state) {
   const results = ThemeServiceGenerator.Generate({
     state,
     language: UITypes.ElectronIO
+  });
+  results.forEach(result => {
+    if (result.userDefined) {
+      writeFileSync(
+        path.join(
+          workspace,
+          result.relative
+        ),
+        result.theme
+      );
+      handleLinkStyles(result, workspace);
+    }
+    else {
+      if (result.location) {
+        generateFolderStructure(
+          path.join(`${result.location}`),
+          {},
+          null,
+          path.join(workspace, result.relative)
+        );
+      }
+      if (result.theme) {
+        generateFolderStructure(
+          path.join(`${result.theme}`),
+          {},
+          null,
+          path.join(workspace, result.themerelative || result.relative)
+        );
+      }
+    }
+  });
+}
+function generateReactWebTheme(workspace, state) {
+  const results = ThemeServiceGenerator.Generate({
+    state,
+    language: UITypes.ReactWeb
   });
   results.forEach(result => {
     if (result.userDefined) {

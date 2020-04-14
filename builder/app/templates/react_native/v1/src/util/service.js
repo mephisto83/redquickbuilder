@@ -27,12 +27,13 @@ var getEndpoint = (baseDomain, path) => {
 let storagePromise = Promise.resolve();
 export function setBearerAccessToken(access_token) {
   accessToken = access_token;
+  credentials = credentials || {};
   credentials.accessToken = accessToken;
   updateStoredCredentials()
 }
 
 export function setUserNameAndPasswordForAnonymousUser(username, password) {
-  credentials = {};
+  credentials = credentials || {};
   credentials.userName = username;
   credentials.password = password;
   credentials.isAnonymous = true;

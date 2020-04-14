@@ -1,5 +1,8 @@
+/* eslint-disable compat/compat */
+/* eslint-disable promise/param-names */
 /* eslint-disable promise/always-return */
-'use strict'
+
+
 
 const fs = require('fs')
 const cheerio = require('cheerio')
@@ -7,13 +10,12 @@ const cheerio = require('cheerio')
 const path = require('path')
 const child_process = require('child_process')
 
-const exec = child_process.exec
 
 const spawn = child_process.spawn
 
 function executeSpawnCmd(cmd, args, options) {
   console.log('execute spawn cmd')
-  return new Promise(function (resolve, fail) {
+  return new Promise(((resolve, fail) => {
     console.log(cmd)
     console.log(args)
     options = { shell: false, ...(options || {}) }
@@ -26,20 +28,20 @@ function executeSpawnCmd(cmd, args, options) {
     options._kill = function () {
       child.kill()
     }
-    child.stdout.on('data', function (data) {
+    child.stdout.on('data', () => {
       // console.log('stdout: ' + data);
     })
 
-    child.stderr.on('data', function (data) {
+    child.stderr.on('data', (data) => {
       console.log(`stderr: ${data}`)
     })
-    child.on('error', function (err) {
+    child.on('error', (err) => {
       console.log(err)
       child.stdin.pause()
       child.kill()
       fail()
     })
-    child.on('exit', function (code) {
+    child.on('exit', (code) => {
       console.log(`child process exited with code ${code}`)
       child.stdin.pause()
       child.kill()
@@ -50,7 +52,7 @@ function executeSpawnCmd(cmd, args, options) {
       }
       resolve()
     })
-  })
+  }))
 }
 
 let command = null
@@ -66,8 +68,69 @@ const appSettingsCopySettings = `
   <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 </Content>
 </ItemGroup>
-`
-function createElectronIo() {
+`;
+
+function createReactWeb() {
+  let build = fs.readFileSync('./workspace.json', 'utf8')
+  build = JSON.parse(build)
+  const { appName } = build
+  const localDir = path.join(build.workspace)
+  console.log(localDir)
+  return Promise.resolve()
+    .then(() => {
+      if (fs.existsSync(`./${appName}`)) {
+        return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
+          shell: true,
+          cwd: localDir
+        })
+      }
+    })
+    .then(() => {
+      console.log('cloding creat react app')
+      return executeSpawnCmd(
+        'npx',
+        [
+          'create-react-app',
+          appName,
+          '--template',
+          'typescript'
+        ],
+        {
+          shell: true,
+          cwd: localDir
+        }
+      )
+    })
+    .then(() => {
+      console.log('cloding creat react app')
+      return executeSpawnCmd(
+        'yarn',
+        [
+          'add',
+          'react-redux'
+        ],
+        {
+          shell: true,
+          cwd: path.join(localDir, appName)
+        }
+      )
+    })
+    ///yarn add react-redux
+    .then(() => {
+      console.log('installing fontawesome')
+      console.log(path.join(localDir, appName))
+      return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
+        shell: true,
+        cwd: path.join(localDir, appName)
+      })
+    })
+    .catch(e => {
+      console.log(e)
+      console.log('SOMETHING WENT WRONG - react web')
+      throw e
+    })
+}
+function createElectronIO() {
   let build = fs.readFileSync('./workspace.json', 'utf8')
   build = JSON.parse(build)
   const { appName } = build
@@ -517,7 +580,7 @@ function createWorkSpace() {
       projects.map(project => {
         promise = promise.then(() => executeSpawnCmd(
           'dotnet',
-          ['add', project, 'package', 'RedQuick'],//, '-s', source
+          ['add', project, 'package', 'RedQuick'],// , '-s', source
           {}
         ))
         promise = promise.then(() => executeSpawnCmd(
@@ -596,7 +659,10 @@ switch (command) {
     createReactNative()
     break
   case 'createElectronIo':
-    createElectronIo()
+    createElectronIO()
     break
+  case 'createReactWeb':
+    createReactWeb();
+    break;
   default: break;
 }

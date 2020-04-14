@@ -9,7 +9,11 @@ export default async function SetupViewTypes(progressFunc) {
     const result = [];
     const validationMethod = GetValidationMethodForViewType(node);
     const functionToLoadModels = GetFunctionToLoadModel(node);
-    [UITypes.ElectronIO, UITypes.ReactNative].forEach(uiType => {
+    [
+      UITypes.ElectronIO,
+      UITypes.ReactWeb,
+      UITypes.ReactNative
+    ].forEach(uiType => {
       result.push(...SetupViewTypeFor({
         validationMethod: validationMethod ? validationMethod.id : null,
         functionToLoadModels: functionToLoadModels ? functionToLoadModels.id : null,

@@ -4,20 +4,21 @@
 import * as d3Zoom from "d3-zoom";
 import * as d3 from "d3";
 import * as Cola from "webcola";
+import React, { Component } from "react";
 import * as GraphMethods from "../methods/graph_methods";
 // @flow
-import React, { Component } from "react";
 import { NodeTypeColors, GetNodeProp } from "../actions/uiactions";
 import {
   LinkStyles,
   LinkType,
   LinkPropertyKeys,
   GetNodeTypeIcon,
-  NodeProperties
+  NodeProperties,
+  UITypeColors
 } from "../constants/nodetypes";
 
 const MIN_DIMENSIONAL_SIZE = 20;
-let iconSize = 30;
+const iconSize = 30;
 let mapSelectedNodes = null;
 let version;
 export default class MindMap extends Component {
@@ -82,14 +83,14 @@ export default class MindMap extends Component {
     window.removeEventListener("mousemove", this.mouseMove);
     window.removeEventListener("mousedown", this.mouseUp);
     window.removeEventListener("mouseup", this.mouseDown);
-    var domObj = document.querySelector(`#${this.state.id}`);
+    const domObj = document.querySelector(`#${this.state.id}`);
     if (domObj) {
       domObj.innerHTML = "";
     }
   }
 
   calculateNodeTextSize(text, pad) {
-    var div = document.querySelector("#secret-div-space");
+    let div = document.querySelector("#secret-div-space");
     if (!div) {
       div = document.createElement("div");
       div.id = "secret-div-space";
@@ -101,8 +102,8 @@ export default class MindMap extends Component {
       div.style.maxWidth =
         (text || "").split(" ").length > 1 ? `200px` : "300px";
       div.style.top = "-10000px";
-      div.style.padding = pad * 2 + "px";
-      let statenode = document.querySelector(`#${this.state.id}`);
+      div.style.padding = `${pad * 2}px`;
+      const statenode = document.querySelector(`#${this.state.id}`);
       if (statenode) {
         statenode.appendChild(div);
       }
@@ -112,38 +113,40 @@ export default class MindMap extends Component {
   }
 
   draw(options = { once: false }) {
-    var me = this;
-    var domObj = document.querySelector(`#${this.state.id}`);
+    const me = this;
+    const domObj = document.querySelector(`#${this.state.id}`);
 
     domObj.innerHTML = "";
-    var bb = domObj.getBoundingClientRect();
-    var force = Cola.d3adaptor(d3);
-    var width = bb.width - 10; // 960;
-    var height = bb.height - 10; // 800;
-    var color = d3.scaleOrdinal(
+    const bb = domObj.getBoundingClientRect();
+    const force = Cola.d3adaptor(d3);
+    const width = bb.width - 10; // 960;
+    const height = bb.height - 10; // 800;
+    const color = d3.scaleOrdinal(
       Object.values(NodeTypeColors) || d3.schemeCategory10
     );
     me.avoidOverlaps = true;
-    var margin = 6,
-      pad = 12;
+    const margin = 6;
+
+
+    const pad = 12;
     force
       .linkDistance(this.props.linkDistance || 280)
-      //.symmetricDiffLinkLengths(this.props.linkDistance || 280)
+      // .symmetricDiffLinkLengths(this.props.linkDistance || 280)
       .avoidOverlaps(me.avoidOverlaps)
       .convergenceThreshold(0.01)
       .handleDisconnected(false)
       .size([width, height]);
 
-    var svg = makeSVG();
+    const svg = makeSVG();
     function makeSVG() {
-      let body = d3.select(`#${me.state.id}`);
-      var outer = body
+      const body = d3.select(`#${me.state.id}`);
+      const outer = body
         .append("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("pointer-events", "all");
       // define arrow markers for graph links
-      var centerGuid = body.append("div");
+      const centerGuid = body.append("div");
 
       outer
         .append("svg:defs")
@@ -157,7 +160,7 @@ export default class MindMap extends Component {
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5L2,0")
         .attr("stroke-width", "0px")
-        .attr("fill", function (d) {
+        .attr("fill", (d) => {
           if (
             d &&
             d.properties &&
@@ -170,14 +173,14 @@ export default class MindMap extends Component {
           return "#ff0000";
         });
 
-      var vis = outer.append("g");
-      outer.on("wheel", function (d) {
+      const vis = outer.append("g");
+      outer.on("wheel", (d) => {
         me.mapScale += d3.event.wheelDelta / (me.props.zoomFactor || 5000);
         redraw();
       });
       function redraw() {
-        var { x = 0, y = 0 } = me.mouseMoved || {};
-        let ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
+        const { x = 0, y = 0 } = me.mouseMoved || {};
+        const ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
         vis.attr(
           "transform",
           ` scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me
@@ -195,16 +198,16 @@ export default class MindMap extends Component {
           )}deg)`
         );
       }
-      outer.on("mousemove", function (x, v) {
+      outer.on("mousemove", (x, v) => {
         if (me.panning) {
           redraw();
         }
       });
 
-      outer.on("mousedown", function (d) {
+      outer.on("mousedown", (d) => {
         me.panning = true;
       });
-      outer.on("mouseup", function (d) {
+      outer.on("mouseup", (d) => {
         me.panning = false;
 
         if (me.mouseMoved && me.mapTranslate) {
@@ -219,22 +222,22 @@ export default class MindMap extends Component {
       return vis;
     }
 
-    var graph = this.state.graph;
+    const graph = this.state.graph;
 
-    graph.nodes.forEach(function (v) {
+    graph.nodes.forEach((v) => {
       if (me.props && me.props.minimizeTypes) {
-        let propType = GetNodeProp(v, NodeProperties.NODEType);
+        const propType = GetNodeProp(v, NodeProperties.NODEType);
         if (!v.selected && me.props.minimizeTypes[propType]) {
           v.width = MIN_DIMENSIONAL_SIZE;
           v.height = MIN_DIMENSIONAL_SIZE;
           return;
         }
       }
-      var bb = me.calculateNodeTextSize(getLabelText(v), pad);
+      const bb = me.calculateNodeTextSize(getLabelText(v), pad);
       v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
       v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
     });
-    graph.groups.forEach(function (g) {
+    graph.groups.forEach((g) => {
       g.padding = pad;
     });
 
@@ -244,7 +247,7 @@ export default class MindMap extends Component {
       .links(graph.links)
       .on("tick", tick);
 
-    var group = svg
+    const group = svg
       .selectAll(".group")
       .data(graph.groups)
       .enter()
@@ -252,21 +255,19 @@ export default class MindMap extends Component {
       .attr("rx", 8)
       .attr("ry", 8)
       .attr("class", "group")
-      .style("fill", function (d, i) {
-        return Object.values(NodeTypeColors)[i] || color(i);
-      })
+      .style("fill", (d, i) => Object.values(NodeTypeColors)[i] || color(i))
       .call(force.drag);
 
-    var node = svg.selectAll(".node");
+    const node = svg.selectAll(".node");
     this.$node = node;
     this.buildNode(graph, force, color);
-    var link = svg
+    const link = svg
       .selectAll(".link")
       .data(graph.links)
       .enter()
       .append("line")
       .attr("class", "link")
-      .style("stroke", function (d) {
+      .style("stroke", (d) => {
         if (d.selected) {
           return "#ff0000";
         }
@@ -277,7 +278,7 @@ export default class MindMap extends Component {
           !d.properties[LinkPropertyKeys.VALID_CONSTRAINTS]
         ) {
           return LinkStyles[LinkType.ErrorLink].stroke;
-        } else if (
+        } if (
           d &&
           d.properties &&
           d.properties.type &&
@@ -288,7 +289,7 @@ export default class MindMap extends Component {
         }
         return "#000";
       })
-      .style("stroke-dasharray", function (d) {
+      .style("stroke-dasharray", (d) => {
         if (
           d &&
           d.properties &&
@@ -299,7 +300,7 @@ export default class MindMap extends Component {
         }
         return "";
       })
-      .style("d", function (d) {
+      .style("d", (d) => {
         if (
           d &&
           d.properties &&
@@ -310,7 +311,7 @@ export default class MindMap extends Component {
         }
         return "";
       })
-      .style("stroke-width", function (d) {
+      .style("stroke-width", (d) => {
         if (
           d &&
           d.properties &&
@@ -346,7 +347,7 @@ export default class MindMap extends Component {
         );
       }
     });
-    var label = svg
+    const label = svg
       .selectAll(".label")
       .data(graph.nodes)
       .enter()
@@ -358,7 +359,7 @@ export default class MindMap extends Component {
       }
     });
 
-    var features = svg
+    const features = svg
       .selectAll(".features")
       .data(graph.nodes)
       .enter()
@@ -367,17 +368,13 @@ export default class MindMap extends Component {
 
     features
       .append("rect")
-      .attr("width", function (d) {
-        return d.selected ? 5 : 0;
-      })
-      .attr("height", function (d) {
-        return d.height - 10;
-      })
+      .attr("width", (d) => d.selected ? 5 : 0)
+      .attr("height", (d) => d.height - 10)
       .attr("x", 3)
       .attr("y", 5)
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function (d) {
+      .style("fill", (d) => {
         if (d.selected && me.props.selectedColor) {
           return me.props.selectedColor;
         }
@@ -385,25 +382,19 @@ export default class MindMap extends Component {
       });
     features
       .append("rect")
-      .attr("width", function (d) {
-        return d.marked ? 15 : 0;
-      })
-      .attr("height", function (d) {
-        return 15;
-      })
-      .attr("x", function (d) {
-        return d.width - 5;
-      })
+      .attr("width", (d) => d.marked ? 15 : 0)
+      .attr("height", (d) => 15)
+      .attr("x", (d) => d.width - 5)
       .attr("y", 5)
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function (d) {
+      .style("fill", (d) => {
         if (d.marked && me.props.markedColor) {
           return me.props.markedColor;
         }
         return color(graph.groups.length);
       });
-    var topdiv = label.append("xhtml:div").style("pointer-events", "none");
+    const topdiv = label.append("xhtml:div").style("pointer-events", "none");
 
     topdiv
       .append("xhtml:object")
@@ -419,26 +410,20 @@ export default class MindMap extends Component {
         return "./css/svg/003-cupcake.svg";
       })
       .attr("type", n => "image/svg+xml")
-      .attr("width", function (d) {
-        return iconSize;
-      })
-      .attr("height", function (d) {
-        return iconSize;
-      })
+      .attr("width", (d) => iconSize)
+      .attr("height", (d) => iconSize)
       .attr("x", 40)
       .attr("y", 40)
       .style("width", 40)
       .style("height", 40);
-    var titles = topdiv
+    const titles = topdiv
       .append("xhtml:div")
       .style("width", x => `${x.width - pad / 2}px`)
       .style("white-space", "normal")
       .style("text-align", "start")
-      //.style('word-break', 'break-all')
+      // .style('word-break', 'break-all')
       .style("height", x => `${x.height - pad / 2}px`)
-      .text(function (d) {
-        return `${getLabelText(d)}`;
-      })
+      .text((d) => `${getLabelText(d)}`)
       .call(force.drag);
 
     this.$force = force;
@@ -460,7 +445,7 @@ export default class MindMap extends Component {
       return d && d.properties ? d.properties.text || d.name : d.name;
     }
     function createRectangle(source) {
-      var temp = {
+      const temp = {
         x: source.x - source.width / 2,
         y: source.y - source.height / 2,
         X: source.x + source.width / 2,
@@ -470,7 +455,7 @@ export default class MindMap extends Component {
       return new Cola.Rectangle(temp.x, temp.X, temp.y, temp.Y);
     }
     function rotate(source, degree = Math.PI / 2) {
-      var { innerBounds, x, y } = source;
+      let { innerBounds, x, y } = source;
       if (!innerBounds) {
         innerBounds = {
           x: source.x - source.width / 2,
@@ -479,8 +464,8 @@ export default class MindMap extends Component {
           Y: source.y + source.height / 2
         };
       }
-      var rise = innerBounds.y - innerBounds.Y;
-      var run = innerBounds.x - innerBounds.X;
+      const rise = innerBounds.y - innerBounds.Y;
+      const run = innerBounds.x - innerBounds.X;
 
       return Object.assign(innerBounds, {
         x: 1 + innerBounds.x,
@@ -492,8 +477,8 @@ export default class MindMap extends Component {
 
     function tick() {
       if (me.$_nodes) {
-        me.$_nodes.each(function (d) {
-          var bb = me.calculateNodeTextSize(getLabelText(d), pad);
+        me.$_nodes.each((d) => {
+          const bb = me.calculateNodeTextSize(getLabelText(d), pad);
           if (
             !d.selected &&
             d.properties &&
@@ -512,7 +497,7 @@ export default class MindMap extends Component {
 
       if (me.$_nodes) {
         me.$_nodes
-          .attr("width", function (d) {
+          .attr("width", (d) => {
             if (
               !d.selected &&
               d.properties &&
@@ -523,7 +508,7 @@ export default class MindMap extends Component {
             }
             return d.width;
           })
-          .attr("height", function (d) {
+          .attr("height", (d) => {
             if (
               !d.selected &&
               d.properties &&
@@ -534,7 +519,7 @@ export default class MindMap extends Component {
             }
             return d.height;
           })
-          .attr("x", function (d) {
+          .attr("x", (d) => {
             if (
               !d.selected &&
               d.properties &&
@@ -545,7 +530,7 @@ export default class MindMap extends Component {
             }
             return d.x - d.width / 2;
           })
-          .attr("y", function (d) {
+          .attr("y", (d) => {
             if (
               !d.selected &&
               d.properties &&
@@ -559,42 +544,42 @@ export default class MindMap extends Component {
       }
       // if (me.avoidOverlapss)
       group
-        .attr("x", function (d) {
+        .attr("x", (d) => {
           if (!d.bounds) {
-            let min = d.leaves.minimum(x => x.x - x.width / 2);
-            let max = d.leaves.maximum(x => x.x + x.width / 2);
-            let width = max - min;
+            const min = d.leaves.minimum(x => x.x - x.width / 2);
+            const max = d.leaves.maximum(x => x.x + x.width / 2);
+            const width = max - min;
             return d.leaves.summation(x => x.x) / d.leaves.length - width / 2;
           }
           return d.bounds.x;
         })
-        .attr("y", function (d) {
+        .attr("y", (d) => {
           if (!d.bounds) {
-            let min = d.leaves.minimum(x => x.y - x.height / 2);
-            let max = d.leaves.maximum(x => x.y + x.height / 2);
-            let height = max - min;
+            const min = d.leaves.minimum(x => x.y - x.height / 2);
+            const max = d.leaves.maximum(x => x.y + x.height / 2);
+            const height = max - min;
             return d.leaves.summation(x => x.y) / d.leaves.length - height / 2;
           }
           return d.bounds.y;
         })
-        .attr("width", function (d) {
+        .attr("width", (d) => {
           if (!d.bounds) {
-            let min = d.leaves.minimum(x => x.x - x.width / 2);
-            let max = d.leaves.maximum(x => x.x + x.width / 2);
+            const min = d.leaves.minimum(x => x.x - x.width / 2);
+            const max = d.leaves.maximum(x => x.x + x.width / 2);
             return max - min;
           }
           return d.bounds.width();
         })
-        .attr("height", function (d) {
+        .attr("height", (d) => {
           if (!d.bounds) {
-            let min = d.leaves.minimum(x => x.y - x.height / 2);
-            let max = d.leaves.maximum(x => x.y + x.height / 2);
+            const min = d.leaves.minimum(x => x.y - x.height / 2);
+            const max = d.leaves.maximum(x => x.y + x.height / 2);
             return max - min;
           }
           return d.bounds.height();
         });
 
-      link.each(function (d) {
+      link.each((d) => {
         //  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
         if (!me.avoidOverlaps) {
           d.route = Cola.makeEdgeBetween(
@@ -612,70 +597,56 @@ export default class MindMap extends Component {
       });
 
       link
-        .attr("x1", function (d) {
-          return d.route.sourceIntersection.x;
-        })
-        .attr("y1", function (d) {
-          return d.route.sourceIntersection.y;
-        })
-        .attr("x2", function (d) {
-          return d.route.arrowStart.x;
-        })
-        .attr("y2", function (d) {
-          return d.route.arrowStart.y;
-        });
+        .attr("x1", (d) => d.route.sourceIntersection.x)
+        .attr("y1", (d) => d.route.sourceIntersection.y)
+        .attr("x2", (d) => d.route.arrowStart.x)
+        .attr("y2", (d) => d.route.arrowStart.y);
 
-      features.attr("transform", function (d) {
-        var y = d.y - d.height / 2;
-        var x = d.x - d.width / 2;
+      features.attr("transform", (d) => {
+        const y = d.y - d.height / 2;
+        const x = d.x - d.width / 2;
         return `translate(${x},${y})`;
       });
 
       label
-        .attr("x", function (d) {
-          return d.x - d.width / 2;
-        })
+        .attr("x", (d) => d.x - d.width / 2)
         .attr("y", function (d) {
-          var innerbit = this.querySelector("div");
-          var h = innerbit ? innerbit.getBoundingClientRect().height : 0;
+          const innerbit = this.querySelector("div");
+          const h = innerbit ? innerbit.getBoundingClientRect().height : 0;
 
           return d.y + h / 2 - d.height + -pad / 2 - iconSize;
         });
     }
-    let initialUnconstrainedIterations = 100;
-    let initialUserConstraintIterations = 15;
-    let initialAllConstraintsIterations = 20;
-    let gridSnapIterations = null;
-    let keepRunning = true;
-    let centerGraph = true;
+    const initialUnconstrainedIterations = 100;
+    const initialUserConstraintIterations = 15;
+    const initialAllConstraintsIterations = 20;
+    const gridSnapIterations = null;
+    const keepRunning = true;
 
     force.start(null, null, null, null, !options.once);
   }
 
   buildNode(graph, cola, color) {
-    var me = this;
-    var node = this.$node.data(cola.nodes(), x => x.id || x.name);
-    var temp = node
+    const me = this;
+    const node = this.$node.data(cola.nodes(), x => x.id || x.name);
+    const temp = node
       .enter()
       .append("rect")
       .attr("class", "node")
-      .attr("width", function (d) {
-        return d.width;
-      })
-      .attr("height", function (d) {
-        return d.height;
-      })
+      .attr("width", (d) => d.width)
+      .attr("height", (d) => d.height)
       .attr("rx", 5)
       .attr("ry", 5)
-      .style("fill", function (d) {
+      .style("fill", (d) => {
         if (
           d &&
           d.properties &&
-          d.properties.nodeType &&
-          NodeTypeColors[d.properties.nodeType]
+          d.properties.nodeType
         ) {
-          return NodeTypeColors[d.properties.nodeType];
+          const uiType = d.id ? GetNodeProp(d.id, NodeProperties.UIType) : null;
+          return UITypeColors[uiType] || NodeTypeColors[d.properties.nodeType] || '#ff0000';
         }
+
         return color(graph.groups.length);
       })
       .on("click", (d, index, els) => {
@@ -713,8 +684,8 @@ export default class MindMap extends Component {
       version = graphVersion;
       mapSelectedNodes = props.selectedNodes;
       if (props.graph) {
-        var { graph } = props;
-        var draw = true;
+        const { graph } = props;
+        let draw = true;
         // d3.event.stopPropagation();
         this.$force.stop();
         if (
@@ -723,11 +694,11 @@ export default class MindMap extends Component {
           this.state.graph &&
           this.state.graph.nodes
         ) {
-          var removedNodes = this.state.graph.nodes
+          const removedNodes = this.state.graph.nodes
             .relativeCompliment(graph.nodes, (x, y) => x.id === y)
             .map(t => this.state.graph.nodes.indexOf(t));
           this.state.graph.nodes.removeIndices(removedNodes);
-          var newNodes = graph.nodes.relativeCompliment(
+          const newNodes = graph.nodes.relativeCompliment(
             this.state.graph.nodes,
             (x, y) => x === y.id
           );
@@ -763,13 +734,11 @@ export default class MindMap extends Component {
           }
           if (props.selectedNodes) {
             this.state.graph.nodes.map(nn => {
-              nn.selected = !!props.selectedNodes.find(t => {
-                return t == nn.id
-              });
+              nn.selected = !!props.selectedNodes.find(t => t == nn.id);
             });
           }
           this.state.graph.nodes.map(nn => {
-            var nl = graph.nodeLib[nn.id];
+            const nl = graph.nodeLib[nn.id];
             if (nl && nl.properties) {
               nn.properties = { ...nl.properties };
             }
@@ -789,11 +758,11 @@ export default class MindMap extends Component {
           this.state.graph &&
           this.state.graph.links
         ) {
-          let removedLinks = this.state.graph.links
+          const removedLinks = this.state.graph.links
             .relativeCompliment(graph.links, (x, y) => x.id === y)
             .map(t => this.state.graph.links.indexOf(t));
           this.state.graph.links.removeIndices(removedLinks);
-          let newLinks = graph.links.relativeCompliment(
+          const newLinks = graph.links.relativeCompliment(
             this.state.graph.links,
             (x, y) => x === y.id
           );
@@ -808,7 +777,7 @@ export default class MindMap extends Component {
             });
           }
           this.state.graph.links.map(nn => {
-            let nl = graph.linkLib[nn.id];
+            const nl = graph.linkLib[nn.id];
             if (nl && nl.properties) {
               nn.properties = { ...nl.properties };
             }
@@ -822,7 +791,7 @@ export default class MindMap extends Component {
           this.state.graph &&
           this.state.graph.groups
         ) {
-          let graph_groups = graph.groups.filter(
+          const graph_groups = graph.groups.filter(
             x => graph.groupLib[x].leaves || graph.groupLib[x].groups
           );
           let removedGroups = null;
@@ -839,7 +808,7 @@ export default class MindMap extends Component {
           }
           this.state.graph.groups.removeIndices(removedGroups);
           if (!this.props.groupsDisabled) {
-            let newGroups = graph_groups
+            const newGroups = graph_groups
               .relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
               .filter(
                 x =>
@@ -853,7 +822,7 @@ export default class MindMap extends Component {
             });
 
             graph_groups.forEach(group => {
-              let g = this.state.graph.groups.find(x => x.id === group);
+              const g = this.state.graph.groups.find(x => x.id === group);
               applyGroup(
                 g,
                 graph.groupLib[group],
@@ -929,7 +898,7 @@ function applyGroup(mindmapgroup, _group, groups, nodes) {
   }
 }
 function duplicateGroup(nn, nodes, groups) {
-  let temp = {
+  const temp = {
     ...nn
   };
   delete temp.leaves;
@@ -954,9 +923,9 @@ function angle(cx, cy, ex, ey) {
   vect1 = vect1.normalisedVector();
   ex = vect1.getX();
   ey = vect1.getY();
-  var dy = ey - cy;
-  var dx = ex - cx;
-  var theta = Math.atan2(dy, dx); // range (-PI, PI]
+  const dy = ey - cy;
+  const dx = ex - cx;
+  let theta = Math.atan2(dy, dx); // range (-PI, PI]
   theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
   return theta;
 }
@@ -1026,9 +995,9 @@ var Vector = (function () {
     );
   };
 
-  //this is the vector I have tried for the normalisation
+  // this is the vector I have tried for the normalisation
   Vector.prototype.normalisedVector = function () {
-    var vec = new Vector(this.getX(), this.getY(), this.getZ());
+    const vec = new Vector(this.getX(), this.getY(), this.getZ());
     return vec.divide(this.magnitude());
   };
   return Vector;

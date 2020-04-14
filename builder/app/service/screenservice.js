@@ -104,6 +104,7 @@ export function GenerateScreenMarkup(id, language) {
     let template = null;
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         template = fs.readFileSync(
           "./app/templates/screens/el_screen.tpl",
           "utf8"
@@ -134,6 +135,7 @@ export function GenerateScreenOptionSource(node, parent, language) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       return GenerateRNScreenOptionSource(node, null, language);
   }
 }
@@ -426,6 +428,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
   let ending = ".js";
   switch (language) {
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       ending = ".tsx";
       templateStr = fs.readFileSync(
         "./app/templates/screens/el_screenoption.tpl",
@@ -772,6 +775,7 @@ export function GenerateRNComponents(
   let fileEnding = ".js";
   switch (language) {
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       fileEnding = ".tsx";
       break;
   }
@@ -787,6 +791,7 @@ export function GenerateRNComponents(
         let template = null;
         switch (language) {
           case UITypes.ElectronIO:
+          case UITypes.ReactWeb:
             template = fs.readFileSync(
               "./app/templates/screens/el_screenoption.tpl",
               "utf8"
@@ -833,6 +838,7 @@ export function GenerateRNComponents(
         const component_did_update = GetComponentDidUpdate(node);
         switch (language) {
           case UITypes.ElectronIO:
+          case UITypes.ReactWeb:
             const styleRules = buildStyle(node);
             cssFile = constructCssFile(
               css,
@@ -913,6 +919,7 @@ export function GenerateCss(id, language) {
     let template = null;
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         template = fs.readFileSync(
           "./app/templates/screens/el_screen.tpl",
           "utf8"
@@ -984,6 +991,7 @@ export function GenerateMarkupTag(node, language, parent) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       let describedApi = "";
       if (node && parent) {
         if (viewTypeNode) {
@@ -1579,11 +1587,9 @@ export function getMethodInstancesForEvntType(node, evtType) {
     node = GetNodeById(node);
   }
   const graph = GetCurrentGraph(GetState());
-  const methods = getNodesByLinkType(graph, {
+  const methods = GetNodesLinkedTo(graph, {
     id: node.id,
-    type: LinkType.EventMethod,
-    direction: TARGET,
-    exist: true
+    link: LinkType.EventMethod
   }).filter(x => GetNodeProp(x, NodeProperties.EventType) === evtType);
   const methodInstances = [];
   methods.map(method => {
@@ -1940,6 +1946,7 @@ export function GenerateImport(node, parentNode, language) {
   switch (language) {
     case UITypes.ReactNative:
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       if (node) {
         if (GetNodeProp(node, NodeProperties.SharedComponent)) {
           return `import ${GetCodeName(node)} from '../shared/${(
@@ -1959,6 +1966,7 @@ export function GenerateComponentImport(node, parentNode, language) {
   switch (language) {
     case UITypes.ElectronIO:
     case UITypes.ReactNative:
+    case UITypes.ReactWeb:
       if (node) {
         if (GetNodeProp(node, NodeProperties.SharedComponent)) {
           return `import ${GetCodeName(node)} from '{{relative_depth}}shared/${(
@@ -2050,6 +2058,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
   let fileEnding = ".js";
   switch (language) {
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       fileEnding = ".tsx";
       break;
   }
@@ -2090,6 +2099,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
     .filter(x => x);
   switch (language) {
     case UITypes.ElectronIO:
+    case UITypes.ReactWeb:
       moreresults.push(GenerateElectronIORoutes(screens));
       break;
   }

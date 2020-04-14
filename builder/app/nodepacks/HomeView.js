@@ -408,6 +408,7 @@ export default function (args = {}) {
             },
             callback(node) {
               context.node21 = node.id;
+              context.guestButton = node.id;
             }
           }
         }

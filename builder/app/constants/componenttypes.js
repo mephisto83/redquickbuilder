@@ -661,6 +661,8 @@ ComponentTypes[UITypes.ElectronIO].Menu = {
     }
   }
 };
+ComponentTypes[UITypes.ReactWeb] = { ...ComponentTypes.ElectronIO };
+
 export const HandlerTypes = {
   Blur: "blur",
   Change: "change",

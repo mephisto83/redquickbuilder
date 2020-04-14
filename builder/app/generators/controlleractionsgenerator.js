@@ -35,6 +35,7 @@ export default class ControllerActionGenerator {
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         fileEnd = ".ts";
         break;
     }
@@ -169,6 +170,7 @@ export default class ControllerActionGenerator {
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         fileEnd = ".ts";
         break;
     }
@@ -223,6 +225,7 @@ setFetchServiceFunction(function(body) {
     let fileEnd = ".js";
     switch (language) {
       case UITypes.ElectronIO:
+      case UITypes.ReactWeb:
         fileEnd = ".ts";
         break;
     }
@@ -245,11 +248,11 @@ import * as Util from './util';
           node
         )}, { ...parameters }, {
     loading: Models.${GetCodeName(
-      GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
-    ) || Titles.Unknown},
+          GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
+        ) || Titles.Unknown},
     objectType: Models.${GetCodeName(
-      GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
-    ) || Titles.Unknown}
+          GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
+        ) || Titles.Unknown}
 }, (result) => {
     var { dataChain } = (parameters || {});
     if (dataChain) {

@@ -2044,6 +2044,9 @@ export function GenerateDataChainMethod(id) {
         })`;
       }
       return `(a) => {
+        if(a && typeof a === 'object' && !a.success && a.hasOwnProperty('success')) {
+          return a;
+        }
         let route = routes.${GetCodeName($screen)};
         ${insert}
         navigate.${
@@ -2072,13 +2075,15 @@ export function GenerateDataChainMethod(id) {
             // Anonymous users
             $service.setUserNameAndPasswordForAnonymousUser(a.userName, a.password);
           }
+          return  { success : true, value : a };
         }
         if(typeof a === 'string') {
           $service.setBearerAccessToken(a);
+          return  { success : true, value : a };
         }
 
-        return a;
-     }`;
+        return  { success : false, value : a };
+    }`;
     case DataChainFunctionKeys.StoreCredResults:
       return `(creds) => {
         let dispatch = GetDispatch();
@@ -2451,6 +2456,7 @@ export function GetCustomMethodClauses(
     if (serviceInterface) {
       switch (language) {
         case NodeConstants.UITypes.ElectronIO:
+        case NodeConstants.UITypes.ReactWeb:
           break;
         default:
           result.push({

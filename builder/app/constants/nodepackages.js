@@ -138,6 +138,8 @@ import ChangeUserPassword from "../nodepacks/screens/ChangeUserPassword";
 import AddEventsToNavigateToScreen from "../nodepacks/AddEventsToNavigateToScreen";
 import HomeViewCredentialLoading from "../nodepacks/HomeViewCredentialLoading";
 import HomeViewContinueAsButtonStyle from "../nodepacks/HomeViewContinueAsButtonStyle";
+import Anonymous from "../nodepacks/screens/Anonymous";
+import AnonymousGuest from "../nodepacks/screens/AnonymousGuest";
 
 export const GetSpecificModels = {
   type: "get-specific-models",
@@ -457,7 +459,7 @@ export const CreateLoginModels = {
       [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
       [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
       [UITypes.VR]: args[UITypes.VR] || false,
-      [UITypes.Web]: args[UITypes.Web] || false
+      [UITypes.ReactWeb]: args[UITypes.ReactWeb] || false
     };
     setViewPackageStamp(viewPackage, "create-login-models");
     PerformGraphOperation([
@@ -630,21 +632,20 @@ export const CreateLoginModels = {
       functionName: `Register`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
-    const anonymousRegisterLogin = CreateAgentFunction({
-      viewPackage,
-      model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
-      agent: {},
-      maestro: newStuff.maestro,
-      nodePackageType: "register-login-anonymous-user",
-      methodType: Methods.Create,
-      modelNotRequired: true,
-      user: NodesByType(GetState(), NodeTypes.Model).find(x =>
-        GetNodeProp(x, NodeProperties.IsUser)
-      ),
-      httpMethod: HTTP_METHODS.POST,
-      functionType: FunctionTypes.AnonymousRegisterLogin,
-      functionName: `Anonymous Register and Authenticate`
-    })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+    // const anonymousRegisterLogin = CreateAgentFunction({
+    //   viewPackage,
+    //   model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
+    //   agent: {},
+    //   maestro: newStuff.maestro,
+    //   nodePackageType: "register-login-anonymous-user",
+    //   methodType: Methods.Create,
+    //   user: NodesByType(GetState(), NodeTypes.Model).find(x =>
+    //     GetNodeProp(x, NodeProperties.IsUser)
+    //   ),
+    //   httpMethod: HTTP_METHODS.POST,
+    //   functionType: FunctionTypes.AnonymousRegisterLogin,
+    //   functionName: `Anonymous Register and Authenticate`
+    // })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
     const loginResult = CreateAgentFunction({
       viewPackage,
@@ -722,23 +723,24 @@ export const CreateLoginModels = {
     const continueAsResult = ContinueAsScreen({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
     const forgotLogin = ForgotLogin({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
     const changeUserPassword = ChangeUserPassword({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const anonymous_method_results = AnonymousGuest({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
 
-    const anonymous_method_results = CreateDefaultView.method({
-      viewName: 'Anonymous Guest',
-      dispatch: GetDispatchFunc(),
-      getState: GetStateFunc(),
-      model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
-      isSharedComponent: false,
-      isDefaultComponent: false,
-      isPluralComponent: false,
-      uiTypes: uiTypeConfig,
-      chosenChildren: [],
-      viewType: ViewTypes.Create
-    });
-    addInstanceEventsToForms({
-      method_results: anonymous_method_results,
-      targetMethod: anonymousRegisterLogin.methodNode.id
-    });
+    // const anonymous_method_results = CreateDefaultView.method({
+    //   viewName: 'Anonymous Guest',
+    //   dispatch: GetDispatchFunc(),
+    //   getState: GetStateFunc(),
+    //   model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
+    //   isSharedComponent: false,
+    //   isDefaultComponent: false,
+    //   isPluralComponent: false,
+    //   uiTypes: uiTypeConfig,
+    //   chosenChildren: [],
+    //   viewType: ViewTypes.Create
+    // });
+    // addInstanceEventsToForms({
+    //   method_results: anonymous_method_results,
+    //   targetMethod: anonymousRegisterLogin.methodNode.id
+    // });
     if (anonymous_method_results.instanceFunc) {
       PerformGraphOperation([
         ...PostAuthenticate({
@@ -798,6 +800,7 @@ export const CreateLoginModels = {
             }
           }),
           function () { return HomeViewContinueAsButtonStyle({ component: continueAsButton }) },
+          function () { return Anonymous({ screen: anonymousScreen, uiType }) },
           function () { return HomeViewCredentialLoading({ component: homeViewScreenOption }) },
           function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: anonymousButton, screen: anonymousScreen }) },
           function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: continueAsButton, screen: continueAsResult.screenNodeId }) },
@@ -3079,6 +3082,7 @@ export const CreateDefaultView = {
                     } Button ${viewName} Component`,
                   [NodeProperties.UIType]: uiType,
                   [NodeProperties.Pinned]: false,
+                  [NodeProperties.CancelButton]: true,
                   [NodeProperties.Label]: `${
                     Titles.Cancel
                     } Button ${viewName} Component`,

@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 export const HandlerEvents = {
     scaffold: {
         message: 'scaffold-project',
@@ -6,6 +7,10 @@ export const HandlerEvents = {
     reactnative: {
         message: 'react-project',
         reply: 'react-project-reply'
+    },
+    reactweb: {
+        message: 'reactweb-project',
+        reply: 'reactweb-project-reply'
     },
     electron: {
         message: 'electron-project',

@@ -1162,13 +1162,12 @@ class Dashboard extends Component {
                   }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
+                  <NavBarButton active hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, MIND_MAP);
-                  }} /> : null}
-                  {UIA.Visual(state, 'MAIN_NAV') ? <NavBarButton active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
+                  }} />
+                  <NavBarButton active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                     this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
-                  }} /> : null}
-
+                  }} />
                 </NavBarMenu>
                 <NavBarMenu paddingRight={15} style={{ float: 'left' }}>
                   <NavBarButton title={Titles.New} icon="fa fa-plus" onClick={() => {

@@ -265,7 +265,11 @@ export default function (args = {}) {
         });
     });
   });
-  [UITypes.ElectronIO, UITypes.ReactNative].forEach(uiType => {
+  [
+    UITypes.ElectronIO,
+    UITypes.ReactNative,
+    UITypes.ReactWeb
+  ].forEach(uiType => {
 
     let sharedReferenceCollection = GetNodeByProperties({
       [NodeProperties.SharedReferenceCollection]: true,

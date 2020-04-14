@@ -82,7 +82,7 @@ export default function ChangeUserPassword(args) {
       [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
       [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
       [UITypes.VR]: args[UITypes.VR] || false,
-      [UITypes.Web]: args[UITypes.Web] || false
+      [UITypes.ReactWeb]: args[UITypes.ReactWeb] || false
     },
     chosenChildren: [],
     viewType: ViewTypes.Create
