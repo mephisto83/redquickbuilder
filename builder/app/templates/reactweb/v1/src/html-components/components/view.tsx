@@ -4,8 +4,8 @@ import StyleProvider from './styleprovider';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class ListItem extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+export default class View extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};

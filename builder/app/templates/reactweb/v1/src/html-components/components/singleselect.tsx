@@ -6,7 +6,7 @@ import Validation from './validation';
 let navigationInstance;
 
 export default class SingleSelect extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -50,18 +50,3 @@ export default class SingleSelect extends React.Component<{ [index: string]: any
 		);
 	}
 }
-
-SingleSelect.propTypes = {
-	renderItem: function(v: any) {
-		return typeof v === 'function';
-	},
-	keyExtractor: function(v: any) {
-		return typeof v === 'function';
-	},
-	onClick: function(v: any) {
-		return typeof v === 'function';
-	},
-	data: function(v: any) {
-		return Array.isArray(v);
-	}
-};

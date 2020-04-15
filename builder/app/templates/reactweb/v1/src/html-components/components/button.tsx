@@ -4,13 +4,13 @@ import StyleProvider from './styleprovider';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class Button extends React.Component<{ [index: string]: any }> {
-	constructor(props) {
+export default class Button extends React.Component<any, any> {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
 	}
-	getAttributes() {
+	getAttributes(): any {
 		const res = { disabled: 'disabled' };
 		if (this.props.error) {
 			const { errors, valid, validated } = this.props.error;

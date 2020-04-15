@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 let navigationInstance;
 
 export default class MultiSelectList extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -47,15 +47,3 @@ export default class MultiSelectList extends React.Component<{ [index: string]: 
 		);
 	}
 }
-
-MultiSelectList.propTypes = {
-	renderItem: function(v: any) {
-		return typeof v === 'function';
-	},
-	keyExtractor: function(v: any) {
-		return typeof v === 'function';
-	},
-	data: function(v: any) {
-		return Array.isArray(v);
-	}
-};

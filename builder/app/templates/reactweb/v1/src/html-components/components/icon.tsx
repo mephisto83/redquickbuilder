@@ -5,20 +5,20 @@ import StyleProvider from './styleprovider';
 let navigationInstance;
 
 export default class Icon extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props: any) {
+		super(props);
 
-        this.state = {};
-    }
-    render() {
-        var props = {
-            ...this.props
-        };
-        delete props.children
-        return (
-            <StyleProvider>
-                <i {...props}>{this.props.children}</i>
-            </StyleProvider>
-        );
-    }
+		this.state = {};
+	}
+	render() {
+		var props = {
+			...this.props
+		};
+		delete props.children;
+		return (
+			<StyleProvider>
+				<i {...props}>{this.props.children}</i>
+			</StyleProvider>
+		);
+	}
 }

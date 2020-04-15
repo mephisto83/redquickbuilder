@@ -1,8 +1,8 @@
 import * as React from 'react';
 import StyleProvider from './styleprovider';
 
-export default class Content extends React.Component {
-	constructor(props) {
+export default class Content extends React.Component<any, any> {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -11,12 +11,12 @@ export default class Content extends React.Component {
 		var props = {
 			...this.props
 		};
-
+		let { className } = props;
 		delete props.children;
 		return (
-			<content {...props} className={`${props.className || ''} Content`}>
+			<div {...props} className={`${props.className || ''} Content`}>
 				{this.props.children}
-			</content>
+			</div>
 		);
 	}
 }

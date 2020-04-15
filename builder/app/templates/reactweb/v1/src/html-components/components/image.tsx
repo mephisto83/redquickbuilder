@@ -5,20 +5,20 @@ import StyleProvider from './styleprovider';
 let navigationInstance;
 
 export default class Image extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props: any) {
+		super(props);
 
-        this.state = {};
-    }
-    render() {
-        var props = {
-            ...this.props
-        };
-        delete props.children
-        return (
-            <StyleProvider>
-                <img {...props} />
-            </StyleProvider>
-        );
-    }
+		this.state = {};
+	}
+	render() {
+		var props = {
+			...this.props
+		};
+		delete props.children;
+		return (
+			<StyleProvider>
+				<img {...props} />
+			</StyleProvider>
+		);
+	}
 }

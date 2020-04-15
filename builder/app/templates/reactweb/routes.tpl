@@ -4,8 +4,6 @@ import routes from './constants/routes';
 import * as DC from './actions/data-chain';
 import App from './containers/App';
 import { setParameters } from './actions/redutils';
-import HomePage from './containers/HomePage';
-import CounterPage from './containers/CounterPage';
 import * as fetchservice from './util/fetchService';
 {{route_imports}}
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-export default class Input extends Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+export default class Label extends Component<{ [index: string]: any }, { [index: string]: any }> {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}

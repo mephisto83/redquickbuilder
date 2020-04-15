@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 let navigationInstance;
 
 export default class Validation extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -31,7 +31,7 @@ export default class Validation extends React.Component<{ [index: string]: any }
 			if (validated) {
 				if (errors.length) {
 					result.push(
-						...errors.filter((error) => error.title).map((error, index) => {
+						...errors.filter((error: any) => error.title).map((error: any, index: any) => {
 							return (
 								<li key={`error${index}`}>
 									<span>{error.title}</span>
@@ -40,7 +40,7 @@ export default class Validation extends React.Component<{ [index: string]: any }
 						})
 					);
 				} else if (success) {
-					result = success.filter((success) => success.title).map((suc, index) => {
+					result = success.filter((success: any) => success.title).map((suc: any, index: any) => {
 						return (
 							<li key={`success ${index}`}>
 								<span>{suc.title}</span>
@@ -63,9 +63,3 @@ export default class Validation extends React.Component<{ [index: string]: any }
 		);
 	}
 }
-
-Validation.propTypes = {
-	data: function(v) {
-		return null;
-	}
-};

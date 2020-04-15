@@ -4,8 +4,8 @@ import StyleProvider from './styleprovider';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class Body extends React.Component<{ [index: string]: any }> {
-	constructor(props) {
+export default class Body extends React.Component<any, any> {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};

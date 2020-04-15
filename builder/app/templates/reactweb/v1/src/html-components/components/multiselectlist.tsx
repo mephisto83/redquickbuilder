@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 let navigationInstance;
 
 export default class MultiSelectList extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -19,7 +19,7 @@ export default class MultiSelectList extends React.Component<{ [index: string]: 
 		return (
 			<ul className={'list-group'}>
 				{(this.props.data || [])
-					.map((item, index) => {
+					.map((item: any, index: any) => {
 						if (this.props.renderItem) {
 							let key = this.props.keyExtractor(item);
 							let res = this.props.renderItem({ item, index, key });
@@ -48,23 +48,8 @@ export default class MultiSelectList extends React.Component<{ [index: string]: 
 							);
 						}
 					})
-					.filter((x) => x)}
+					.filter((x: any) => x)}
 			</ul>
 		);
 	}
 }
-
-MultiSelectList.propTypes = {
-	renderItem: function(v: any) {
-		return typeof v === 'function';
-	},
-	keyExtractor: function(v: any) {
-		return typeof v === 'function';
-	},
-	onClick: function(v: any) {
-		return typeof v === 'function';
-	},
-	data: function(v: any) {
-		return Array.isArray(v);
-	}
-};

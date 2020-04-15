@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import RedGraph from '../../actions/redgraph';
-import styles from './menu.css';
+import './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
 export default class Menu extends Component<{ [index: string]: any }, { [index: string]: any }> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}
@@ -14,19 +14,19 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 		if (this.props.id) {
 			children = RedGraph.getChildren(this.props.value, this.props.id);
 			return (
-				<div className={`${styles['dropdown-content']} menu-drop-down-content`}>
+				<div className={`${'dropdown-content'} menu-drop-down-content`}>
 					{children.map((child, index) => this.renderItem(child, index))}
 				</div>
 			);
 		}
 		children = RedGraph.getChildren(this.props.value, null);
 		return (
-			<div className={`${styles.topnav} menu-drop-down-content`}>
+			<div className={`topnav  menu-drop-down-content`}>
 				{children.map((child, index) => this.renderItem(child, index))}
 			</div>
 		);
 	}
-	renderItem(child, index) {
+	renderItem(child: any, index: number) {
 		let id = RedGraph.getId(child);
 		let title = RedGraph.getTitle(this.props.value, id);
 		let children = RedGraph.getChildren(this.props.value, id);
@@ -34,15 +34,15 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 		let submenu = null;
 		if (children.length) {
 			return (
-				<div key={`menu-${index}`} className={`${styles.dropdown} menu-drop-down`}>
-					<button className={`${styles.dropbtn} menu-drop-down-button`}>
+				<div key={`menu-${index}`} className={`dropdown  menu-drop-down`}>
+					<button className={` dropbtn  menu-drop-down-button`}>
 						{titleService ? titleService.getTitle(title) : title}
 						<i className="fa fa-caret-down" />
 					</button>
 					<Menu
 						value={this.props.value}
 						id={id}
-						onClick={(id) => {
+						onClick={(id: any) => {
 							if (this.props.onClick) {
 								this.props.onClick(id);
 							}
@@ -53,7 +53,7 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 		}
 		return (
 			<a
-				className={`${styles.menuDropDownMenu} menu-drop-down-button`}
+				className={` menuDropDownMenu  menu-drop-down-button`}
 				key={`menu-leaf-${index}`}
 				onClick={() => {
 					if (this.props.onClick) {

@@ -2,9 +2,11 @@ import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
 export default class Input extends React.Component<{ [index: string]: any }> {
-	constructor(props) {
+	inputType: string;
+	constructor(props: any) {
 		super(props);
 		this.state = {};
+		this.inputType = '';
 	}
 	label() {
 		return InputFunctions.label(this);
@@ -18,13 +20,13 @@ export default class Input extends React.Component<{ [index: string]: any }> {
 	placeholder() {
 		return InputFunctions.placeholder(this);
 	}
-	disabled() {
+	disabled(): any {
 		return InputFunctions.disabled(this);
 	}
 	componentDidMount() {
 		InputFunctions.componentDidMount(this);
 	}
-	componentDidUpdate(prevProps) {
+	componentDidUpdate(prevProps: any) {
 		InputFunctions.componentDidUpdate(this, prevProps);
 	}
 	cssClasses() {
@@ -50,15 +52,3 @@ export default class Input extends React.Component<{ [index: string]: any }> {
 		);
 	}
 }
-
-Input.propTypes = {
-	inputType: function(v) {
-		return null;
-	},
-	error: function(v) {
-		return null;
-	},
-	data: function(v) {
-		return null;
-	}
-};

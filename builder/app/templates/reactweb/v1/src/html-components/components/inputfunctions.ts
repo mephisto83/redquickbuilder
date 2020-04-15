@@ -1,30 +1,30 @@
 export default class InputFunctions {
-	static immediate(arg0) {
+	static immediate(arg0: any) {
 		return arg0.props.immediate || true;
 	}
 
-	static value(arg0) {
+	static value(arg0: any) {
 		if (arg0.immediate()) {
 			return arg0.props.value || '';
 		}
 		return arg0.state.value || '';
 	}
 
-	static placeholder(arg0) {
+	static placeholder(arg0: any) {
 		return arg0.props.placeholder || '';
 	}
 
-	static disabled(arg0) {
+	static disabled(arg0: any) {
 		return arg0.props.disabled ? 'disabled' : '';
 	}
 
-	static componentDidMount(arg0) {
+	static componentDidMount(arg0: any) {
 		if (!arg0.immediate()) {
 			arg0.setState({ value: arg0.props.value });
 		}
 	}
 
-	static componentDidUpdate(arg0, prevProps: any) {
+	static componentDidUpdate(arg0: any, prevProps: any) {
 		if (!arg0.immediate()) {
 			if (!arg0.state.focused)
 				if (arg0.state.value !== prevProps.value) {
@@ -33,8 +33,8 @@ export default class InputFunctions {
 		}
 	}
 
-	static handleKeyPress(arg0) {
-		return (event) => {
+	static handleKeyPress(arg0: any) {
+		return (event: { key: string }) => {
 			if (!arg0.immediate()) {
 				if (event.key === 'Enter') {
 					if (arg0.props.onChange) {
@@ -45,7 +45,7 @@ export default class InputFunctions {
 		};
 	}
 
-	static onBlur(arg0) {
+	static onBlur(arg0: any) {
 		return () => {
 			if (!arg0.immediate()) {
 				if (arg0.props.onChange) {
@@ -59,7 +59,7 @@ export default class InputFunctions {
 		};
 	}
 
-	static onFocus(arg0) {
+	static onFocus(arg0: any) {
 		return () => {
 			arg0.setState({ focused: true });
 			if (arg0.props.onFocus) {
@@ -68,8 +68,8 @@ export default class InputFunctions {
 		};
 	}
 
-	static onChange(arg0) {
-		return (v) => {
+	static onChange(arg0: any) {
+		return (v: { target: { checked: any; value: any } }) => {
 			if (arg0.immediate()) {
 				if (arg0.props.onChange) {
 					arg0.props.onChange(v);
@@ -92,7 +92,7 @@ export default class InputFunctions {
 		};
 	}
 
-	static label(arg0) {
+	static label(arg0: any) {
 		return arg0.props.label || '{label}';
 	}
 }
