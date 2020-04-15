@@ -175,7 +175,7 @@ export default function (args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: "x => x  !== undefined || x!== null  ? [x] : []"
+            value: "(x: any) => x  !== undefined || x!== null  ? [x] : []"
           }
         }
       ];

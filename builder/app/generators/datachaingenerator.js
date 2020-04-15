@@ -136,10 +136,10 @@ export default class DataChainGenerator {
         name: "array"
       },
       {
-        template: readFileSync("./app/utils/redgraph.js", "utf8"),
+        template: readFileSync("./app/utils/redgraph.ts", "utf8"),
         relative: "./src/actions",
         relativeFilePath: `./redgraph${fileEnding}`,
-        name: "redgraph.js"
+        name: "redgraph.ts"
       },
       // Specific for web sites
       // Need an alternative for ReactNative
@@ -235,7 +235,7 @@ import { titleService} from '../${rel}actions/util';
 import * as RedLists from '../${rel}actions/lists';
 import StateKeys from '../${rel}state_keys';
 import ModelKeys from '../${rel}model_keys';
-import * as ViewModelKeys from '../${rel}viewmodel_keys';
+import ViewModelKeys from '../${rel}viewmodel_keys';
 import Models from '../${rel}model_keys';
 import RedObservable from '../${rel}actions/observable';
 import RedGraph from '../${rel}actions/redgraph';

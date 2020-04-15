@@ -6,7 +6,7 @@ import { setParameters } from '../actions/redutils';
 import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiActions';
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
-import * as ViewModelKeys from '../viewmodel_keys';
+import ViewModelKeys from '../viewmodel_keys';
 import { useParams } from "react-router-dom";
 import {
   MultiSelectList, MultiViewList, Container,

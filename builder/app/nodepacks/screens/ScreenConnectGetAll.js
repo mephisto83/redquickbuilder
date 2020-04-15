@@ -155,7 +155,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
 
             let _instanceNode = null;
             let _navigateContext = null;
-            const lambdaFunc = "v => ({ value: v })";
+            const lambdaFunc = "(v: any) => ({ value: v })";
 
             result.push(
               ...[

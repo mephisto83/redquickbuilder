@@ -282,7 +282,7 @@ export default function (args = { state_key: "StateKeyReplace" }) {
           options: {
             prop: "Lambda",
             id: context.node3,
-            value: "x => x ? x.id : null"
+            value: "(x: any) => x ? x.id : null"
           }
         }
       ];

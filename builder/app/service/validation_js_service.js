@@ -23,12 +23,13 @@ export function buildValidation(args = { methodMethod }) {
       );
     }
 
-    return `context => {
+    return `(context: any) => {
       let result = {
         errors: [],
         warnings: [],
         success: [],
-        valid: true
+        valid: true,
+        validated: false
       };
       let { object, property, validated } = (context || {});
       let model = object || {};

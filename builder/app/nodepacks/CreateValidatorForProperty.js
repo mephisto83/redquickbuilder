@@ -191,7 +191,7 @@ export default function CreateValidatorForProperty(args = {}) {
             prop: "Lambda",
             id: context.node1,
             value:
-              "x => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {};\n  if(dirty && blur) {\n      //#{model}\n      // #{model~property}\n           if( dirty.#{model~property} && blur.#{model~property} ) \n {//updated \n        return { ...x, property: '#{model~property}', validated: true };\n      }\n  }\n    // only dirty fields, will be validatated.\n return { valid: false, validated: false };\n}"
+              "(x: any) => {\n let { object, dirty, focus, blur, focused } = x;\n  let result = {};\n  if(dirty && blur) {\n      //#{model}\n      // #{model~property}\n           if( dirty.#{model~property} && blur.#{model~property} ) \n {//updated \n        return { ...x, property: '#{model~property}', validated: true };\n      }\n  }\n    // only dirty fields, will be validatated.\n return { valid: false, validated: false };\n}"
           }
         }
       ];

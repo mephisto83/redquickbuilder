@@ -1,6 +1,6 @@
 // define a class
 export default class RedObservable {
-	observers: never[];
+	observers: any[];
 	id: any;
 	state: { [k: string]: any };
 	value: undefined;

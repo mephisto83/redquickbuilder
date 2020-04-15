@@ -171,7 +171,7 @@ export default function LoadModel(args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: "x => retrieveParameters()"
+            value: "() => retrieveParameters()"
           }
         }
       ];
@@ -263,7 +263,7 @@ export default function LoadModel(args = {}) {
             prop: "Lambda",
             id: context.node2,
             value:
-              "params => {\n   let { value, viewModel " + (screen ? `= ViewModelKeys.${GetCodeName(context.screen)}` : '') + " } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, " +
+              "(params: any) => {\n   let { value, viewModel " + (screen ? `= ViewModelKeys.${GetCodeName(context.screen)}` : '') + " } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, " +
               args.model_item +
               ", value);\n   if(currentItem) {\n\tdispatch(clearScreenInstance(viewModel, currentItem?currentItem.id:null, currentItem)); \n\tdispatch(updateScreenInstanceObject(viewModel,currentItem?currentItem.id:null, { ...currentItem }));\n   }\n\n   return params;\n}"
           }

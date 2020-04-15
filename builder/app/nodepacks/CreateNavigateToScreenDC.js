@@ -184,7 +184,7 @@ export default function(args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: context.lambda || "x => ({ value: x})"
+            value: context.lambda || "(x: any) => ({ value: x})"
           }
         }
       ];
