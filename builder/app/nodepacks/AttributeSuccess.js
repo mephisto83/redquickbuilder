@@ -163,7 +163,7 @@ export default function(args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: "x => x ? x.object : null"
+            value: "(x: any) => x ? x.object : null"
           }
         }
       ];

@@ -1,45 +1,45 @@
-import { InstanceTypeSelectorFunction } from "../constants/componenttypes";
 import {
   NodesByType,
-  GetState,
-  GetNodeProp,
-  GetJSCodeName,
   GetCurrentGraph,
   GetCodeName
 } from "../actions/uiactions";
-import { NodeTypes, NEW_LINE, NodeProperties } from "../constants/nodetypes";
-import { addNewLine } from "../utils/array";
+import { NodeTypes, NEW_LINE, UITypes } from "../constants/nodetypes";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 
 export default class ListsGenerator {
   static Generate(options) {
-    let { state } = options;
-    let lists = NodesByType(state, NodeTypes.Lists);
-    let graph = GetCurrentGraph(state);
+    const { state, language } = options;
+    const lists = NodesByType(state, NodeTypes.Lists);
+    const graph = GetCurrentGraph(state);
+    let fileEnding = '.ts';
+    if (language === UITypes.ReactNative) {
+      fileEnding = '.js';
+    }
     let template = lists
       .map(list => {
-        let connected = GetNodesLinkedTo(graph, {
+        const connected = GetNodesLinkedTo(graph, {
           id: list.id
-        }).map(v => {
-          return GetCodeName(v);
-        });
+        }).map(v => GetCodeName(v));
         return `export const ${GetCodeName(list)} = ${JSON.stringify(
           connected
         )};`;
       })
       .join(NEW_LINE);
-    let temps = [
+    if (!template) {
+      template = 'export default {};'
+    }
+    const temps = [
       {
-        template: template,
+        template,
         relative: "./src/actions",
-        relativeFilePath: `./lists.js`,
+        relativeFilePath: `./lists${fileEnding}`,
         name: "lists"
       }
     ];
 
-    let result = {};
+    const result = {};
 
-    temps.map(t => {
+    temps.forEach(t => {
       result[t.name] = t;
     });
 

@@ -80,7 +80,9 @@ export default class DataChainGenerator {
     }
     const graph = GetCurrentGraph(state);
     const funcs = GenerateChainFunctions(options);
-    const collections = GetDataChainCollections(options)
+    const collections = GetDataChainCollections(options).split(NEW_LINE).sort((a, b) => {
+      return `${b}`.localeCompare(a);
+    }).join(NEW_LINE);
     let tests = null;
     const collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
     const temps = [
@@ -122,7 +124,7 @@ export default class DataChainGenerator {
         name: "data-chain"
       },
       {
-        template: readFileSync("./app/utils/observable.js", "utf8"),
+        template: readFileSync("./app/utils/observable.ts", "utf8"),
         relative: "./src/actions",
         relativeFilePath: `./observable${fileEnding}`,
         name: "observable"
@@ -178,6 +180,9 @@ export default class DataChainGenerator {
 
 let dcTemplate = (collections, funcs, rel = "") => {
   if (!funcs || !funcs.trim()) {
+    if (!collections) {
+      return `export default {}`;
+    }
     return `${collections}`;
   }
   return `import {
@@ -228,13 +233,13 @@ import * as $service from '../${rel}util/service';
 import routes from '../${rel}constants/routes';
 import { titleService} from '../${rel}actions/util';
 import * as RedLists from '../${rel}actions/lists';
-import * as StateKeys from '../${rel}state_keys';
+import StateKeys from '../${rel}state_keys';
 import ModelKeys from '../${rel}model_keys';
 import * as ViewModelKeys from '../${rel}viewmodel_keys';
 import Models from '../${rel}model_keys';
 import RedObservable from '../${rel}actions/observable';
 import RedGraph from '../${rel}actions/redgraph';
-import { useParameters, fetchModel } from '../${rel}actions/redutils';
+import { retrieveParameters, fetchModel } from '../${rel}actions/redutils';
 import * as DC from './${rel}data-chain';
 
 ${collections}

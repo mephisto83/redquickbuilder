@@ -272,7 +272,7 @@ export default function MenuDataSource(args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node11,
-          "value": "array => {\n    let graph = RedGraph.create();\n\n    array.map(item => {\n        RedGraph.addNode(graph, item, null);\n    }).forEach(item => {\n        if (item && item.parent) {\n            RedGraph.addLink(graph, item.parent, item.id)\n        }\n    });\n    return graph;\n}"
+          "value": "(array: any) => {\n    let graph = RedGraph.create();\n\n    array.map((item: any) => {\n        RedGraph.addNode(graph, item, null);\n    }).forEach((item: any) => {\n        if (item && item.parent) {\n            RedGraph.addLink(graph, item.parent, item.id)\n        }\n    });\n    return graph;\n}"
         }
       }]
     },

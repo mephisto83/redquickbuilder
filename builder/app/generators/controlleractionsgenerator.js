@@ -1,3 +1,4 @@
+import fs from "fs";
 import {
   GetConfigurationNodes,
   GetNodeProp,
@@ -17,7 +18,6 @@ import {
   LinkType,
   UITypes
 } from "../constants/nodetypes";
-import fs from "fs";
 import * as Titles from "../components/titles";
 import {
   bindTemplate,
@@ -29,6 +29,7 @@ import {
 import ControllerGenerator from "./controllergenerator";
 import { addNewLine } from "../utils/array";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
+
 export default class ControllerActionGenerator {
   static GenerateService(options) {
     const { state, language } = options;
@@ -38,6 +39,7 @@ export default class ControllerActionGenerator {
       case UITypes.ReactWeb:
         fileEnd = ".ts";
         break;
+      default: break;
     }
     let temp = NodesByType(state, NodeTypes.Method);
     const serviceTemplate = fs.readFileSync(
@@ -153,7 +155,7 @@ export default class ControllerActionGenerator {
       })
     ]
       .filter(x => x)
-      .join("," + NEW_LINE);
+      .join(`,${NEW_LINE}`);
     return {
       template: bindTemplate(serviceTemplate, {
         service_methods: addNewLine(temp, 1),
@@ -204,7 +206,7 @@ setFetchServiceFunction(function(body) {
           if (dataChain) {
             return dataChain(result);
           } else {
-            console.low("missing data chain");
+            console.log("missing data chain");
           }
         }
       ))(dispatch, getState);
@@ -223,11 +225,16 @@ setFetchServiceFunction(function(body) {
   static Generate(options) {
     const { state, language } = options;
     let fileEnd = ".js";
+    let anytypes = '';
+    let functiontypes = '';
     switch (language) {
       case UITypes.ElectronIO:
       case UITypes.ReactWeb:
         fileEnd = ".ts";
+        anytypes = ':any';
+        functiontypes = ': Function';
         break;
+      default: break;
     }
     const temp = NodesByType(state, NodeTypes.Method);
 
@@ -236,31 +243,30 @@ setFetchServiceFunction(function(body) {
 }
         `;
     const controllerActionTemplate = `import Models from '../model_keys';
-import * as StateKeys from '../state_keys';
+import StateKeys from '../state_keys';
 import service from '../util/controllerService';
 import * as Util from './util';
 {{body}}
         `;
     const controllerActions = temp
       .map(node => {
-        const method_call = `return (dispatch, getState) => Util.simple(service.${GetJSCodeName(
+        const loadingTypeModel = GetCodeName(
+          GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput) || GetMethodNodeProp(node, FunctionTemplateKeys.Model)
+        );
+        const method_call = `return (dispatch${functiontypes}, getState${functiontypes}) => Util.simple(service.${GetJSCodeName(
           node
         )}, { ...parameters }, {
-    loading: Models.${GetCodeName(
-          GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
-        ) || Titles.Unknown},
-    objectType: Models.${GetCodeName(
-          GetMethodNodeProp(node, FunctionTemplateKeys.ModelOutput)
-        ) || Titles.Unknown}
-}, (result) => {
+    loading: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'},
+    objectType: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'}
+}, (result${anytypes}) => {
     var { dataChain } = (parameters || {});
     if (dataChain) {
         return dataChain(result);
     }
     else {
-        console.low('missing data chain');
+        console.log('missing data chain');
     }
-}, null, (result) => {
+}, null, (result${anytypes}) => {
   var { preChain } = (parameters || {});
   if (preChain) {
       return preChain();
@@ -269,7 +275,7 @@ import * as Util from './util';
         return bindTemplate(ControllerMethodTemplate, {
           methodName: GetJSCodeName(node),
           method_call: addNewLine(method_call, 1),
-          arguments: "parameters"
+          arguments: `parameters${anytypes}`
         });
       })
       .join(NEW_LINE);

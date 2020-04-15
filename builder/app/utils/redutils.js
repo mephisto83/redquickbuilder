@@ -3,7 +3,7 @@ const context = {};
 export function setParameters(params) {
   context.params = params;
 }
-export function useParameters() {
+export function retrieveParameters() {
   return {
     ...(context.params || {})
   };

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { render } from 'react-dom';
 import { AppContainer as ReactHotAppContainer } from 'react-hot-loader';
-import Root from './containers/Root';
+import Root from './containers/root';
 import { configureStore, history } from './store/configureStore';
 import { createStore, applyMiddleware } from 'redux';
 import { buildReducers } from './reducers/index';

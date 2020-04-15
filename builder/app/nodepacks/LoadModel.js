@@ -171,7 +171,7 @@ export default function LoadModel(args = {}) {
           options: {
             prop: "Lambda",
             id: context.node1,
-            value: "x => useParameters()"
+            value: "x => retrieveParameters()"
           }
         }
       ];

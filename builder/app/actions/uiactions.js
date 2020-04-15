@@ -74,9 +74,7 @@ export function GetScreenUrl(
   overrideText = null
 ) {
   const params = GetComponentExternalApiNodes(op.id)
-    .filter(externaApiNodes => {
-      return GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter);
-    })
+    .filter(externaApiNodes => GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter))
     .map(v => `:${GetCodeName(v)}`)
     .join("/");
   const route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${
@@ -368,15 +366,13 @@ export function setSharedComponent(args) {
             GetNodeProp(x, NodeProperties.IsPluralComponent) ===
             isPluralComponent
         )
-        .map(x => {
-          return {
-            operation: REMOVE_LINK_BETWEEN_NODES,
-            options: {
-              source,
-              target: x.id
-            }
-          };
-        });
+        .map(x => ({
+          operation: REMOVE_LINK_BETWEEN_NODES,
+          options: {
+            source,
+            target: x.id
+          }
+        }));
 
       PerformGraphOperation([
         ...connections,
@@ -472,15 +468,13 @@ export function setComponentApiConnection(args) {
           state,
           source,
           GetNodeProp(target, NodeProperties.NODEType)
-        ).map(x => {
-          return {
-            operation: REMOVE_LINK_BETWEEN_NODES,
-            options: {
-              source,
-              target: x.id
-            }
-          };
-        });
+        ).map(x => ({
+          operation: REMOVE_LINK_BETWEEN_NODES,
+          options: {
+            source,
+            target: x.id
+          }
+        }));
         PerformGraphOperation([
           ...connections,
           {
@@ -897,13 +891,11 @@ export function attachMethodToMaestro(
         operation: ADD_NEW_NODE,
         options(graph) {
           const state = getState();
-          const _controller = NodesByType(state, NodeTypes.Controller).find(x => {
-            return GraphMethods.existsLinkBetween(graph, {
-              target: modelId,
-              source: x.id,
-              link: NodeConstants.LinkType.ModelTypeLink
-            });
-          });
+          const _controller = NodesByType(state, NodeTypes.Controller).find(x => GraphMethods.existsLinkBetween(graph, {
+            target: modelId,
+            source: x.id,
+            link: NodeConstants.LinkType.ModelTypeLink
+          }));
 
           if (!_controller) {
             return {
@@ -946,13 +938,11 @@ export function attachMethodToMaestro(
         options(graph) {
           const state = getState();
 
-          const _maestro = NodesByType(state, NodeTypes.Maestro).find(x => {
-            return GraphMethods.existsLinkBetween(graph, {
-              target: modelId,
-              source: x.id,
-              link: NodeConstants.LinkType.ModelTypeLink
-            });
-          });
+          const _maestro = NodesByType(state, NodeTypes.Maestro).find(x => GraphMethods.existsLinkBetween(graph, {
+            target: modelId,
+            source: x.id,
+            link: NodeConstants.LinkType.ModelTypeLink
+          }));
 
           if (!_maestro) {
             return {
@@ -1147,9 +1137,7 @@ export function GenerateDataChainArguments(id) {
         const methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
           .filter(x => x !== "return")
-          .map(key => {
-            return `${key.split(".").join("")}:${key} `;
-          })
+          .map(key => `${key.split(".").join("")}:${key} `)
           .join(", ");
       }
     }
@@ -1186,10 +1174,8 @@ export function GenerateCSChainFunction(id) {
         const methodProps = GetMethodProps(methods[0]);
         _arguments = Object.keys(lambda.default)
           .filter(x => x !== "return")
-          .map(key => {
-            return `${GetCodeName(methodProps[lambda.default[key]]) ||
-              lambda.default[key]} ${key.split(".").join("")}`;
-          })
+          .map(key => `${GetCodeName(methodProps[lambda.default[key]]) ||
+            lambda.default[key]} ${key.split(".").join("")}`)
           .join(", ");
       }
     }
@@ -1207,10 +1193,15 @@ ${arbiterSets}
 
   return method;
 }
-export function GenerateChainFunction(id, cs) {
+export function GenerateChainFunction(id, options) {
   const chain = GetDataChainParts(id);
   let args = null;
   const observables = [];
+  const { language } = options;
+  let anyType = ': any';
+  if (language === NodeConstants.UITypes.ReactNative) {
+    anyType = '';
+  }
   const setArgs = [];
   const subscribes = [];
   const setProcess = [];
@@ -1218,10 +1209,10 @@ export function GenerateChainFunction(id, cs) {
     if (index === 0) {
       args = GetDataChainArgs(c);
     }
-    const temp = GenerateDataChainMethod(c);
+    const temp = GenerateDataChainMethod(c, options);
     observables.push(GenerateObservable(c, index));
     setArgs.push(GenerateArgs(c, chain));
-    setProcess.push(GenerateSetProcess(c, chain));
+    setProcess.push(GenerateSetProcess(c, chain, options));
     subscribes.push(GetSubscribes(c, chain));
     return temp;
   });
@@ -1232,7 +1223,7 @@ export function GenerateChainFunction(id, cs) {
   const lastNodeName = (
     GetJSCodeName(lastLink) || "node" + lastLinkindex
   ).toJavascriptName();
-  const method = `export function  ${GetCodeName(id)}(${args.join()}) {
+  const method = `export function  ${GetCodeName(id)}(${args.map(v => `${v}${anyType}`).join()}) {
 ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
@@ -1244,10 +1235,10 @@ return ${lastNodeName}.value;
 
   return method;
 }
-export function GenerateSetProcess(id, parts) {
+export function GenerateSetProcess(id, parts, options) {
   const index = parts.indexOf(id);
   const nodeName = (GetJSCodeName(id) || "node" + index).toJavascriptName();
-  return `${nodeName}.setProcess(${GenerateDataChainMethod(id)})`;
+  return `${nodeName}.setProcess(${GenerateDataChainMethod(id, options)})`;
 }
 
 export function GetSubscribes(id, parts) {
@@ -1323,9 +1314,7 @@ export function GenerateArgs(id, parts) {
 }
 
 export function GetLastChainLink(parts) {
-  const lastLink = parts.find(id => {
-    return GetNodeProp(GetNodeById(id), NodeProperties.AsOutput);
-  });
+  const lastLink = parts.find(id => GetNodeProp(GetNodeById(id), NodeProperties.AsOutput));
   return lastLink;
 }
 export function GenerateObservable(id, index) {
@@ -1379,7 +1368,7 @@ export function GenerateChainFunctions(options) {
     .map(v =>
       cs
         ? { node: v, class: GenerateCSChainFunction(v) }
-        : GenerateChainFunction(v)
+        : GenerateChainFunction(v, options)
     )
     .unique(x => x);
   // sorry this is bad.
@@ -1489,13 +1478,18 @@ export function GetDataChainCollections(options) {
       );
     })
     .map(dataChainCollection => {
-      const _path = GetRelativeDataChainPath(dataChainCollection);
-      return `export * from './${
+      const dccPath = GetRelativeDataChainPath(dataChainCollection);
+      return [
+        `export const ${GetJSCodeName(dataChainCollection)} = $${GetJSCodeName(dataChainCollection)};`,
+        `import * as $${GetJSCodeName(dataChainCollection)} from './${
         collection ? "" : `datachains/`
-        }${[..._path, GetJSCodeName(dataChainCollection)]
-          .subset(_path.length - 1)
-          .join("/")}';`;
+        }${[...dccPath, GetJSCodeName(dataChainCollection)]
+          .subset(dccPath.length - 1)
+          .join("/")}';`
+      ];
     })
+    .flatten()
+    .sort((a, b) => `${b}`.localeCompare(a))
     .unique()
     .join(NodeConstants.NEW_LINE);
 }
@@ -1881,7 +1875,7 @@ export function GenerateCDDataChainMethod(id) {
       } - ${functionType} is not a defined function type.`;
   }
 }
-export function GenerateDataChainMethod(id) {
+export function GenerateDataChainMethod(id, options) {
   const node = GetNodeById(id);
   const model = GetNodeProp(node, NodeProperties.UIModelType);
   const stateKey = GetNodeProp(node, NodeProperties.StateKey);
@@ -1902,6 +1896,7 @@ export function GenerateDataChainMethod(id) {
     node,
     NodeProperties.UseNavigationParams
   );
+  const { language } = options;
   let lambda = GetNodeProp(node, NodeProperties.Lambda);
   const lambdaInsertArguments = GetNodeProp(
     node,
@@ -1909,6 +1904,10 @@ export function GenerateDataChainMethod(id) {
   );
   const listReference = GetNodeProp(node, NodeProperties.List);
   let lastpart = "return item;";
+  let anyType = ': any';
+  if (language === NodeConstants.UITypes.ReactNative) {
+    anyType = '';
+  }
   switch (functionType) {
     case DataChainFunctionKeys.ModelProperty:
       if (property) {
@@ -1917,14 +1916,14 @@ export function GenerateDataChainMethod(id) {
     }
     return null;`;
       }
-      return `(id) => {
+      return `(id${anyType}) => {
     let item = typeof(id) ==='object' ? id : GetItem(Models.${GetCodeName(
         model
       )}, id);
     ${lastpart}
 }`;
     case DataChainFunctionKeys.Model:
-      return `(id) => {
+      return `(id${anyType}) => {
     let item = GetItem(Models.${GetCodeName(model)}, id);
     if(!item && id) {
       fetchModel(Models.${GetCodeName(model)}, id);
@@ -1932,7 +1931,7 @@ export function GenerateDataChainMethod(id) {
     ${lastpart}
 }`;
     case DataChainFunctionKeys.Pass:
-      return `(arg) => {
+      return `(arg${anyType}) => {
     return arg;
 }`;
     case DataChainFunctionKeys.NewRedGraph:
@@ -1946,7 +1945,7 @@ export function GenerateDataChainMethod(id) {
         return menuData;
       }`;
     case DataChainFunctionKeys.AddUrlsToGraph:
-      return `graph => {
+      return `(graph${anyType}) => {
         Object.keys(routes).map(route=>{
           RedGraph.addNode(graph, { title: route, id: route } , route);
           RedGraph.addLink(graph, null, route);
@@ -1954,28 +1953,28 @@ export function GenerateDataChainMethod(id) {
         return graph;
       }`;
     case DataChainFunctionKeys.StringConcat:
-      return `(node1, node2) => { return \`\${node1} \${node2}\` }`;
+      return `(node1${anyType}, node2${anyType}) => { return \`\${node1} \${node2}\` }`;
     case DataChainFunctionKeys.EmailValidation:
-      return `(value) => validateEmail(value)`;
+      return `(value${anyType}) => validateEmail(value)`;
     case DataChainFunctionKeys.AlphaNumericLike:
-      return `(value) => alphanumericLike(value)`;
+      return `(value${anyType}) => alphanumericLike(value)`;
     case DataChainFunctionKeys.AlphaNumeric:
-      return `(value) => alphanumeric(value)`;
+      return `(value${anyType}) => alphanumeric(value)`;
     case DataChainFunctionKeys.AlphaOnly:
-      return `(value) => alpha(value)`;
+      return `(value${anyType}) => alpha(value)`;
     case DataChainFunctionKeys.BooleanAnd:
-      return `(a, b) => a && b`;
+      return `(a${anyType}, b${anyType}) => a && b`;
     case DataChainFunctionKeys.BooleanOr:
-      return `(a, b) => a || b`;
+      return `(a${anyType}, b${anyType}) => a || b`;
     case DataChainFunctionKeys.IfTrue:
-      return `(a, b) => {
+      return `(a${anyType}, b${anyType}) => {
         if(a) {
           return b;
         }
         return undefined;
       }`;
     case DataChainFunctionKeys.IfThanElse:
-      return `(a) => {
+      return `(a${anyType}) => {
         if(a){
           return ${GetCodeName(nodeInput1)}(a);
         }
@@ -1984,9 +1983,9 @@ export function GenerateDataChainMethod(id) {
         }
       }`;
     case DataChainFunctionKeys.GreaterThanOrEqualTo:
-      return `(a) => greaterThanOrEqualTo(a, ${numberParameter})`;
+      return `(a${anyType}) => greaterThanOrEqualTo(a, ${numberParameter})`;
     case DataChainFunctionKeys.Map:
-      return `($a) => ($a || []).map(${lambda})`;
+      return `($a${anyType}) => ($a || []).map(${lambda})`;
     case DataChainFunctionKeys.Lambda:
       getReferenceInserts(lambda)
         .map(v => v.substr(2, v.length - 3))
@@ -2009,41 +2008,39 @@ export function GenerateDataChainMethod(id) {
     case DataChainFunctionKeys.Merge:
       return `() => {
         ${Object.keys(funcs || {})
-          .map(key => {
-            return `let ${key} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`;
-          })
+          .map(key => `let ${key}${anyType} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`)
           .join(NodeConstants.NEW_LINE)}
         ${lambda}
       }`;
     case DataChainFunctionKeys.ListReference:
-      return `(a) => RedLists.${GetCodeName(listReference)}`;
+      return `(a${anyType}) => RedLists.${GetCodeName(listReference)}`;
     case DataChainFunctionKeys.NumericalDefault:
-      return `(a) => numericalDefault(a, ${numberParameter})`;
+      return `(a${anyType}) => numericalDefault(a, ${numberParameter})`;
     case DataChainFunctionKeys.ArrayLength:
-      return `(a) => arrayLength(a)`;
+      return `(a${anyType}) => arrayLength(a)`;
     case DataChainFunctionKeys.LessThanOrEqualTo:
-      return `(a) => lessThanOrEqualTo(a, ${numberParameter})`;
+      return `(a${anyType}) => lessThanOrEqualTo(a, ${numberParameter})`;
     case DataChainFunctionKeys.MaxLength:
-      return `(a) => maxLength(a, ${numberParameter})`;
+      return `(a${anyType}) => maxLength(a, ${numberParameter})`;
     case DataChainFunctionKeys.MinLength:
-      return `(a) => minLength(a, ${numberParameter})`;
+      return `(a${anyType}) => minLength(a, ${numberParameter})`;
     case DataChainFunctionKeys.EqualsLength:
-      return `(a) => equalsLength(a, ${numberParameter})`;
+      return `(a${anyType}) => equalsLength(a, ${numberParameter})`;
     case DataChainFunctionKeys.GreaterThan:
-      return `(a) => greaterThan(a, ${numberParameter})`;
+      return `(a${anyType}) => greaterThan(a, ${numberParameter})`;
     case DataChainFunctionKeys.Property:
-      return `(a) => a ? a.${GetJSCodeName(property) || property} : null`;
+      return `(a${anyType}) => a ? a.${GetJSCodeName(property) || property} : null`;
     case DataChainFunctionKeys.ReferenceDataChain:
-      return `(a) => DC.${func}(a)`;
+      return `(a${anyType}) => DC.${func}(a)`;
     case DataChainFunctionKeys.Navigate:
       let insert = "";
       if (useNavigationParams) {
-        insert = `Object.keys(a).map(v=>{
+        insert = `Object.keys(a).map((v${anyType})=>{
           let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
           route = route.replace(regex, a[v]);
         })`;
       }
-      return `(a) => {
+      return `(a${anyType}) => {
         if(a && typeof a === 'object' && !a.success && a.hasOwnProperty('success')) {
           return a;
         }
@@ -2055,14 +2052,14 @@ export function GenerateDataChainMethod(id) {
         return a;
       }`;
     case DataChainFunctionKeys.NavigateTo:
-      return `(a) => {
+      return `(a${anyType}) => {
         navigate.${
         NavigateTypes[navigateMethod]
         }({ route: routes[a] })(GetDispatch(), GetState());
         return a;
       }`;
     case DataChainFunctionKeys.SetBearerAccessToken:
-      return `(a) => {
+      return `(a${anyType}) => {
         if(a && a.error) {
           console.error('An error occurred during the authentication process');
           if(a.errorMessage) {
@@ -2085,7 +2082,7 @@ export function GenerateDataChainMethod(id) {
         return  { success : false, value : a };
     }`;
     case DataChainFunctionKeys.StoreCredResults:
-      return `(creds) => {
+      return `(creds${anyType}) => {
         let dispatch = GetDispatch();
         if(creds && dispatch) {
              dispatch(
@@ -2106,68 +2103,73 @@ export function GenerateDataChainMethod(id) {
         return false;
       }`;
     case DataChainFunctionKeys.LoadUserCredentialsFromLocalStore:
-      return `(a) => {
+      return `(a${anyType}) => {
 
-        $service.loadCredentials((credentials) => {
+        $service.loadCredentials((credentials: any) => {
           DC.${func}(credentials)
         });
 
         return a;
      }`;
     case DataChainFunctionKeys.Equals:
-      return `(a, b) => a === b`;
+      return `(a${anyType}, b${anyType}) => a === b`;
     case DataChainFunctionKeys.Required:
-      return `(a) => a !== null && a !== undefined`;
+      return `(a${anyType}) => a !== null && a !== undefined`;
     case DataChainFunctionKeys.Not:
-      return `(a) => !!!a`;
+      return `(a${anyType}) => !!!a`;
     case DataChainFunctionKeys.GetModelIds:
-      return `(a) => {
+      return `(a${anyType}) => {
     if(a && a.map) {
-        return a.map(item => item.id);
+        return a.map((item: any) => item.id);
     }
     else {
         console.warn('"a" parameter was not an array');
     }
 }`;
     case DataChainFunctionKeys.SaveModelArrayToState:
-      return `(a) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(
+      return `(a${anyType}) => { let dispatch = GetDispatch(); dispatch(UIModels(Models.${GetCodeName(
         model
       )}, a)); return a; }`;
     case DataChainFunctionKeys.SaveModelIdsToState:
-      return `(a) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(
+      return `(a${anyType}) => { let dispatch = GetDispatch(); dispatch(UIC('Data', StateKeys.${GetCodeName(
         stateKey
       )}, a)); return a; }`;
     case DataChainFunctionKeys.GetStateKeyValue:
-      return `(a) =>  {
+      return `(a${anyType}) =>  {
         let stateFunc = GetState();
         return GetC(stateFunc(),'Data', StateKeys.${GetCodeName(stateKey)})}`;
     case DataChainFunctionKeys.StateKey:
-      return `(a) => StateKeys.${GetCodeName(stateKey)}`;
+      return `(a${anyType}) => StateKeys.${GetCodeName(stateKey)}`;
     case DataChainFunctionKeys.ModelKey:
-      return `(a) => ModelKeys.${GetCodeName(modelKey)}`;
+      return `(a${anyType}) => ModelKeys.${GetCodeName(modelKey)}`;
     case DataChainFunctionKeys.ViewModelKey:
-      return `(a) => ViewModelKeys.${GetCodeName(viewModelKey)}`;
+      return `(a${anyType}) => ViewModelKeys.${GetCodeName(viewModelKey)}`;
     case DataChainFunctionKeys.Selector:
-      return `(a) => a ? a.${selectorProp} : undefined`;
+      return `(a${anyType}) => a ? a.${selectorProp} : undefined`;
     case DataChainFunctionKeys.Models:
-      return `a => GetItems(Models.${GetCodeName(model)})`;
+      return `(a${anyType}) => GetItems(Models.${GetCodeName(model)})`;
     case DataChainFunctionKeys.Validation:
-      return `a => true/*TBI*/`;
+      return `(a${anyType}) => true/*TBI*/`;
     case DataChainFunctionKeys.MethodBaseValidation:
       if (methodMethod) {
         return buildValidation({ methodMethod, id });
       }
-      return `a => false`;
+      return `(a${anyType}) => false`;
     case DataChainFunctionKeys.ModelMethodMenu:
-      return buildModelMethodMenu();
+      return buildModelMethodMenu(options);
     default:
-      throw `${GetNodeTitle(node)} ${
-      node.id
-      } - ${functionType} is not a defined function type.`;
+      throw new Error(`${GetNodeTitle(node)} ${
+        node.id
+        } - ${functionType} is not a defined function type.`);
   }
 }
 
-function buildModelMethodMenu() {
+function buildModelMethodMenu(options) {
+  const { language } = options;
+  let anyType = ': any';
+  if (language === NodeConstants.UITypes.ReactNative) {
+    anyType = '';
+  }
   const listPages = NodesByType(null, NodeTypes.Screen).filter(x => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll);
   const underPages = NodesByType(null, NodeTypes.Screen).filter(x => [ViewTypes.Create, ViewTypes.GetAll].some(v => v === GetNodeProp(x, NodeProperties.ViewType)));
 
@@ -2179,8 +2181,8 @@ function buildModelMethodMenu() {
   });
 
   return ` () => {
-    let toppages = [${screens.join()}].map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: null }));
-    let underpages = [${subscreens.join()}].filter(v =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: v.parent }));
+    let toppages = [${screens.join()}].map((v${anyType}) => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: null }));
+    let underpages = [${subscreens.join()}].filter((v${anyType}) =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: v.parent }));
     return [...toppages, ...underpages]
 }`;
 }
@@ -2276,14 +2278,12 @@ export function GetArbiterPropertyDefinitions(
   const arbiters = GetArbitersForPermissions();
   const template = `IRedArbiter<{{model}}> arbiter{{model}};`;
   const tab = [].interpolate(0, tabs, () => `   `).join("");
-  const definitions = arbiters.map(arbiter => {
-    return (
-      tab +
-      bindTemplate(template, {
-        model: GetCodeName(arbiter)
-      })
-    );
-  });
+  const definitions = arbiters.map(arbiter => (
+    tab +
+    bindTemplate(template, {
+      model: GetCodeName(arbiter)
+    })
+  ));
   return definitions.join(NodeConstants.NEW_LINE);
 }
 export function GetCustomServiceDefinitions(
@@ -2294,15 +2294,13 @@ export function GetCustomServiceDefinitions(
   const services = GetCustomServicesForNodeType(type);
   const template = `I{{model}} {{model_js}};`;
   const tab = [].interpolate(0, tabs, () => `   `).join("");
-  const definitions = services.map(service => {
-    return (
-      tab +
-      bindTemplate(template, {
-        model: GetCodeName(service),
-        model_js: GetJSCodeName(service)
-      })
-    );
-  });
+  const definitions = services.map(service => (
+    tab +
+    bindTemplate(template, {
+      model: GetCodeName(service),
+      model_js: GetJSCodeName(service)
+    })
+  ));
   return definitions.join(NodeConstants.NEW_LINE);
 }
 
@@ -2313,14 +2311,12 @@ export function GetArbiterPropertyImplementations(
   const arbiters = GetArbitersForPermissions();
   const template = `arbiter{{model}} = RedStrapper.Resolve<IRedArbiter<{{model}}>>();`;
   const tab = [].interpolate(0, tabs, () => `   `).join("");
-  const definitions = arbiters.map(arbiter => {
-    return (
-      tab +
-      bindTemplate(template, {
-        model: GetCodeName(arbiter)
-      })
-    );
-  });
+  const definitions = arbiters.map(arbiter => (
+    tab +
+    bindTemplate(template, {
+      model: GetCodeName(arbiter)
+    })
+  ));
   return definitions.join(NodeConstants.NEW_LINE);
 }
 
@@ -2332,15 +2328,13 @@ export function GetCustomServiceImplementations(
   const services = GetCustomServicesForNodeType(type);
   const template = `{{model_js}} = RedStrapper.Resolve<I{{model}}>();`;
   const tab = [].interpolate(0, tabs, () => `   `).join("");
-  const definitions = services.map(service => {
-    return (
-      tab +
-      bindTemplate(template, {
-        model: GetCodeName(service),
-        model_js: GetJSCodeName(service)
-      })
-    );
-  });
+  const definitions = services.map(service => (
+    tab +
+    bindTemplate(template, {
+      model: GetCodeName(service),
+      model_js: GetJSCodeName(service)
+    })
+  ));
   return definitions.join(NodeConstants.NEW_LINE);
 }
 
@@ -2420,23 +2414,19 @@ export function GetCombinedCondition(
   });
   const finalClause =
     clauses
-      .map((_, index) => {
-        return `res_` + index;
-      })
+      .map((_, index) => `res_` + index)
       .join(" && ") || "true";
   if (options.finalResult) {
     finalResult = options.finalResult;
   }
   clauses.push(`${finalResult} = ${finalClause};`);
   return clauses
-    .map((clause, index) => {
-      return (
-        tabs +
-        bindTemplate(clause, {
-          result: `res_${index}`
-        })
-      );
-    })
+    .map((clause, index) => (
+      tabs +
+      bindTemplate(clause, {
+        result: `res_${index}`
+      })
+    ))
     .join(NodeConstants.NEW_LINE);
 }
 
@@ -2992,12 +2982,10 @@ export function GetLogicalChildren(id) {
 }
 
 export function GetMethodNodeSelectOptions(methodProps) {
-  return Object.keys(methodProps).map(val => {
-    return {
-      value: val,
-      title: `${GetCodeName(methodProps[val])} (${val})`
-    };
-  });
+  return Object.keys(methodProps).map(val => ({
+    value: val,
+    title: `${GetCodeName(methodProps[val])} (${val})`
+  }));
 }
 export function GetNodeCode(graph, id) {
   return GetCodeName(GraphMethods.GetNode(graph, id));
@@ -3125,16 +3113,14 @@ export function toggleHideByTypes(key) {
     const newvalue = !GetC(state, HIDDEN, key);
     dispatch(UIC(HIDDEN, key, newvalue));
     PerformGraphOperation(
-      NodesByType(state, key).map(node => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options: {
-            prop: NodeProperties.Pinned,
-            id: node.id,
-            value: newvalue
-          }
-        };
-      })
+      NodesByType(state, key).map(node => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options: {
+          prop: NodeProperties.Pinned,
+          id: node.id,
+          value: newvalue
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -3440,16 +3426,14 @@ export function clearPinned() {
     graphOperation(
       GetNodes(state)
         .filter(x => GetNodeProp(x, NodeProperties.Pinned))
-        .map(node => {
-          return {
-            operation: CHANGE_NODE_PROPERTY,
-            options: {
-              prop: NodeProperties.Pinned,
-              id: node.id,
-              value: false
-            }
-          };
-        })
+        .map(node => ({
+          operation: CHANGE_NODE_PROPERTY,
+          options: {
+            prop: NodeProperties.Pinned,
+            id: node.id,
+            value: false
+          }
+        }))
     )
   );
 }
@@ -3459,16 +3443,14 @@ export function clearMarked() {
     graphOperation(
       GetNodes(state)
         .filter(x => GetNodeProp(x, NodeProperties.Selected))
-        .map(node => {
-          return {
-            operation: CHANGE_NODE_PROPERTY,
-            options: {
-              prop: NodeProperties.Selected,
-              id: node.id,
-              value: false
-            }
-          };
-        })
+        .map(node => ({
+          operation: CHANGE_NODE_PROPERTY,
+          options: {
+            prop: NodeProperties.Selected,
+            id: node.id,
+            value: false
+          }
+        }))
     )
   );
 }
@@ -3477,16 +3459,14 @@ export function selectProperties(model) {
   return (dispatch, getState) => {
     const state = getState();
     graphOperation(
-      GraphMethods.getPropertyNodes(GetRootGraph(state), model).map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options: {
-            prop: NodeProperties.Pinned,
-            id: t.id,
-            value: true
-          }
-        };
-      })
+      GraphMethods.getPropertyNodes(GetRootGraph(state), model).map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options: {
+          prop: NodeProperties.Pinned,
+          id: t.id,
+          value: true
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -3502,16 +3482,14 @@ export function togglePinnedConnectedNodesByLinkType(model, linkType) {
       .filter(x => x.id !== model)
       .some(v => GetNodeProp(v, NodeProperties.Pinned));
     graphOperation(
-      nodes.map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options: {
-            prop: NodeProperties.Pinned,
-            id: t.id,
-            value: !pinned
-          }
-        };
-      })
+      nodes.map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options: {
+          prop: NodeProperties.Pinned,
+          id: t.id,
+          value: !pinned
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -3990,18 +3968,16 @@ export function selectAllConnected(id) {
       id
     });
     graphOperation([
-      ...[...nodes, GetNodeById(id)].map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options() {
-            return {
-              prop: NodeProperties.Selected,
-              value: true,
-              id: t.id
-            };
-          }
-        };
-      })
+      ...[...nodes, GetNodeById(id)].map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options() {
+          return {
+            prop: NodeProperties.Selected,
+            value: true,
+            id: t.id
+          };
+        }
+      }))
     ])(dispatch, getState);
   };
 }
@@ -4015,18 +3991,16 @@ export function selectAllInViewPackage(id) {
       )
     });
     graphOperation([
-      ...[...nodes].map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options() {
-            return {
-              prop: NodeProperties.Selected,
-              value: true,
-              id: t.id
-            };
-          }
-        };
-      })
+      ...[...nodes].map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options() {
+          return {
+            prop: NodeProperties.Selected,
+            value: true,
+            id: t.id
+          };
+        }
+      }))
     ])(dispatch, getState);
   };
 }
@@ -4037,18 +4011,16 @@ export function pinSelected() {
       [NodeProperties.Selected]: true
     });
     graphOperation(
-      nodes.map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options() {
-            return {
-              prop: NodeProperties.Pinned,
-              value: true,
-              id: t.id
-            };
-          }
-        };
-      })
+      nodes.map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options() {
+          return {
+            prop: NodeProperties.Pinned,
+            value: true,
+            id: t.id
+          };
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -4060,16 +4032,14 @@ export function addAllOfType(args) {
       GetNodeProp(target, NodeProperties.NODEType)
     );
     graphOperation(
-      nodes.map(v => {
-        return {
-          operation: ADD_LINK_BETWEEN_NODES,
-          options: {
-            target: v.id,
-            source,
-            properties
-          }
-        };
-      })
+      nodes.map(v => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options: {
+          target: v.id,
+          source,
+          properties
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -4079,18 +4049,16 @@ export function unPinSelected() {
       [NodeProperties.Selected]: true
     });
     graphOperation(
-      nodes.map(t => {
-        return {
-          operation: CHANGE_NODE_PROPERTY,
-          options() {
-            return {
-              prop: NodeProperties.Pinned,
-              value: false,
-              id: t.id
-            };
-          }
-        };
-      })
+      nodes.map(t => ({
+        operation: CHANGE_NODE_PROPERTY,
+        options() {
+          return {
+            prop: NodeProperties.Pinned,
+            value: false,
+            id: t.id
+          };
+        }
+      }))
     )(dispatch, getState);
   };
 }
@@ -4633,13 +4601,11 @@ export const Colors = {
       configurable: true,
       value() {
         const collection = this;
-        return collection.map(node => {
-          return {
-            value: node.id,
-            id: node.id,
-            title: GetNodeTitle(node)
-          };
-        });
+        return collection.map(node => ({
+          value: node.id,
+          id: node.id,
+          title: GetNodeTitle(node)
+        }));
       }
     });
   }

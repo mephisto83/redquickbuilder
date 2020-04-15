@@ -133,8 +133,8 @@ export function Is18YearsPlusAttribute() {
 export function CreditCardValidation() {
   return createValidationAttribute(val => CredCardValidations.find(j => {
     return (
-      j.startsWith.find(t => x.startsWith(t)) &&
-      j.lengths.find(t => x.length == t)
+      j.startsWith.find(t => val.startsWith(t)) &&
+      j.lengths.find(t => val.length == t)
     );
   }), createDefaultError(`It isn't recognized as a valid credit card number.`));
 }

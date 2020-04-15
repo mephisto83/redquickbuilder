@@ -13,7 +13,6 @@ import Icon from './components/icon';
 import Text from './components/text';
 import Input from './components/input';
 import View from './components/view';
-import StyleSheet from './components/stylesheet';
 import StyleProvider from './components/styleprovider';
 import FlatList from './components/flatlist';
 import MultiSelectList from './components/multiselectlist';
@@ -55,7 +54,6 @@ export {
   View,
   StyleProvider,
   Input,
-  StyleSheet,
   FlatList,
   MultiSelectList,
   MultiViewList,

@@ -1,3 +1,4 @@
+import fs from "fs";
 import {
   GetCodeName,
   GetNodeTitle,
@@ -11,15 +12,14 @@ import {
   GetComponentExternalApiNodes,
   GetScreenUrl
 } from "../actions/uiactions";
-import fs from "fs";
 import { bindTemplate } from "../constants/functiontypes";
 import { GetScreens, GetScreenOption } from "./screenservice";
 import { NEW_LINE, UITypes } from "../constants/nodetypes";
 import { EnableMenu } from "../components/titles";
 
 export function GenerateScreens(options) {
-  let temps = BindScreensToTemplate();
-  let result = {};
+  const temps = BindScreensToTemplate();
+  const result = {};
 
   temps.map(t => {
     result[t.name] = t;
@@ -28,9 +28,9 @@ export function GenerateScreens(options) {
   return result;
 }
 export function GenerateNavigation(options) {
-  let { language } = options;
-  let temps = GenerateNavigationRoot();
-  let result = {};
+  const { language } = options;
+  const temps = GenerateNavigationRoot();
+  const result = {};
 
   temps.map(t => {
     result[t.name] = t;
@@ -49,12 +49,12 @@ export function GenerateNavigation(options) {
 }
 
 export function GenerateNavigationActions(language) {
-  let options = GetScreenOptions().filter(
+  const options = GetScreenOptions().filter(
     x => GetNodeProp(x, NodeProperties.UIType) === language
   );
-  let navigationFunctions = options.map(op => {
-    let screen = GetConnectedScreen(op.id);
-    let template = `
+  const navigationFunctions = options.map(op => {
+    const screen = GetConnectedScreen(op.id);
+    const template = `
   export function ${GetJSCodeName(screen)}(params = {}) {
     return (dispatch, getState) => {
       dispatch(push(routes.${GetCodeName(screen)}));
@@ -63,8 +63,8 @@ export function GenerateNavigationActions(language) {
   `;
     return template;
   });
-  let template = `import { push, replace, go, goBack, goForward } from 'connected-react-router';
-import * as routes from '../constants/routes';
+  const template = `import { push, replace, go, goBack, goForward } from 'connected-react-router';
+import routes from '../constants/routes';
 export function GoBack(params = {}) {
   return (dispatch, getState) => {
     dispatch(goBack());
@@ -103,8 +103,16 @@ ${navigationFunctions.unique().join(NEW_LINE)}
 }
 
 export function GenerateRoutes(language) {
-  let options = GetScreens();
+  const options = GetScreens();
   let routes = {};
+  let fileEnding = '.js';
+  switch (language) {
+    case UITypes.ReactWeb:
+    case UITypes.ElectronIO:
+      fileEnding = '.ts';
+      break;
+    default: break;
+  }
   options.map(op => {
     routes = {
       ...routes,
@@ -121,15 +129,15 @@ export function GenerateRoutes(language) {
   });
   return [
     {
-      template: JSON.stringify(routes, null, 4),
+      template: `export default <{ [index: string]: string }>${JSON.stringify(routes, null, 4)}`,
       relative: "./src",
-      relativeFilePath: "constants/routes.json",
+      relativeFilePath: `constants/routes${fileEnding}`,
       name: "routes.json"
     }
   ];
 }
 export function GenerateNavigationRoot() {
-  let template = BindScreensToTemplate();
+  const template = BindScreensToTemplate();
   return [
     {
       template,
@@ -140,14 +148,14 @@ export function GenerateNavigationRoot() {
   ];
 }
 export function BindScreensToTemplate() {
-  var screens = GetScreens();
-  let template = fs.readFileSync(
+  const screens = GetScreens();
+  const template = fs.readFileSync(
     "./app/templates/navigation/navigation.tpl",
     "utf8"
   );
-  let import_template = `import {{name}} from './screens/{{namejs}}';`;
-  let import_property = `     {{name}} : { screen: {{name}} }`;
-  let add_drawer = `const {{name}} = createDrawerNavigator(
+  const import_template = `import {{name}} from './screens/{{namejs}}';`;
+  const import_property = `     {{name}} : { screen: {{name}} }`;
+  const add_drawer = `const {{name}} = createDrawerNavigator(
         {
           Home: { screen: _{{name}} }
         },
@@ -156,16 +164,14 @@ export function BindScreensToTemplate() {
           navigationOptions: _{{name}}.navigationOptions
         }
       );`;
-  let importStatements = screens
-    .sort((b, a) => {
-      return (
-        (GetNodeProp(a, NodeProperties.Priority) || 0) -
-        (GetNodeProp(b, NodeProperties.Priority) || 0)
-      );
-    })
+  const importStatements = screens
+    .sort((b, a) => (
+      (GetNodeProp(a, NodeProperties.Priority) || 0) -
+      (GetNodeProp(b, NodeProperties.Priority) || 0)
+    ))
     .map(screen => {
-      let screenOptions = GetConnectedScreenOptions(screen.id);
-      let reactNativeOptions = screenOptions.find(
+      const screenOptions = GetConnectedScreenOptions(screen.id);
+      const reactNativeOptions = screenOptions.find(
         x => GetNodeProp(x, NodeProperties.UIType) === UITypes.ReactNative
       );
       let temp_template = import_template;
@@ -178,10 +184,10 @@ export function BindScreensToTemplate() {
       });
     });
 
-  let combos = screens
+  const combos = screens
     .map(screen => {
-      let screenOptions = GetConnectedScreenOptions(screen.id);
-      let reactNativeOptions = screenOptions.find(
+      const screenOptions = GetConnectedScreenOptions(screen.id);
+      const reactNativeOptions = screenOptions.find(
         x => GetNodeProp(x, NodeProperties.UIType) === UITypes.ReactNative
       );
       if (GetNodeProp(reactNativeOptions, NodeProperties.EnabledMenu)) {
@@ -193,15 +199,13 @@ export function BindScreensToTemplate() {
     })
     .filter(x => x);
 
-  let properties = screens.map(screen => {
-    return bindTemplate(import_property, {
-      name: GetCodeName(screen)
-    });
-  });
+  const properties = screens.map(screen => bindTemplate(import_property, {
+    name: GetCodeName(screen)
+  }));
 
   return bindTemplate(template, {
     imports: importStatements.join(NEW_LINE),
     combos: combos.join(NEW_LINE),
-    properties: properties.join("," + NEW_LINE)
+    properties: properties.join(`,${NEW_LINE}`)
   });
 }

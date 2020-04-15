@@ -34,7 +34,6 @@ export default function ContinueAsScreen(args) {
     maestro,
     nodePackageType: "register-login-anonymous-user",
     methodType: Methods.Create,
-    modelNotRequired: true,
     user: NodesByType(GetState(), NodeTypes.Model).find(x =>
       GetNodeProp(x, NodeProperties.IsUser)
     ),

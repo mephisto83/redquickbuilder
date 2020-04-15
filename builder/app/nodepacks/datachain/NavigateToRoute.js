@@ -109,7 +109,7 @@ export default function NavigateToRoute(args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node0,
-          "value": "(id) => {\n  navigate.Go({ route: routes[id] })(GetDispatch(), GetState());\n}"
+          "value": "(id: string) => {\n  navigate.Go({ route: routes[id] })(GetDispatch(), GetState());\n}"
         }
       }]
     },

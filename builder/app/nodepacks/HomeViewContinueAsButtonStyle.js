@@ -275,7 +275,7 @@ export default function HomeViewContinueAsButtonStyle(args = {}) {
         "options": {
           "prop": "Lambda",
           "id": context.node3,
-          "value": "x => !x"
+          "value": "(x: any) => !x"
         }
       }]
     },

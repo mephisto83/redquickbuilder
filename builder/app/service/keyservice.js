@@ -41,12 +41,14 @@ export function GenerateModelKeys(options) {
     relativeFilePath: `./model_keys${fileEnding}`,
     name: 'model_keys'
   }, {
-    template: stateKeyTemplates.join(NEW_LINE),
+    template: `export default { ${stateKeyTemplates.join(`,${NEW_LINE}`)}
+  }`,
     relative: './src',
     relativeFilePath: `./state_keys${fileEnding}`,
     name: 'state_keys'
   }, {
-    template: viewModelKeys.join(NEW_LINE),
+    template: `export default { ${viewModelKeys.join(`,${NEW_LINE}`)}
+  }`,
     relative: './src',
     relativeFilePath: `./viewmodel_keys${fileEnding}`,
     name: 'viewmodel_keys'

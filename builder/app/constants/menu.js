@@ -3,7 +3,7 @@
 import { DataChainFunctionKeys } from "./datachain";
 
 // import { titleService } from "../templates/electronio/v1/app/actions/util"
-const standardNavigate = () => (`(id) => {
+const standardNavigate = () => (`(id: string) => {
   navigate.Go({ route: routes[id] })(GetDispatch(), GetState());
 }`);
 
@@ -14,7 +14,7 @@ export const MenuTreeOptionKeys = {
 export const MenuTreeOptions = {
   [MenuTreeOptionKeys.ScreenMenu]: {
     menuGeneration: () => (`() => {
-      return Object.keys(routes).filter(v => routes[v].indexOf(':') === -1).map(v => ({ id: v, title: titleService.get(v), parent: null }));
+      return Object.keys(routes).filter((v: any) => routes[v].indexOf(':') === -1).map(v => ({ id: v, title: titleService.get(v), parent: null }));
     }`),
     navigate_function: standardNavigate
   },
