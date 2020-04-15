@@ -7,19 +7,17 @@ import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiA
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
 import ViewModelKeys from '../viewmodel_keys';
-import { useParams } from "react-router-dom";
 import {
   MultiSelectList, MultiViewList, Container,
   ListItem, H3, H1, H2, Header, Title,
   Footer, FooterTab, Button, Left, Right,
   Body, Icon, Text, View, Menu
 } from '../html-components';
-import MenuItem from '../components/menuitem';
 {{imports}}
 // {{name}}
-let navigationInstance;
+let navigationInstance: any;
 class {{name}} extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {};

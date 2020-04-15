@@ -49,6 +49,7 @@ export default class FetchServiceGenerator {
     }
     return res;
   }
+
   static Generate(options) {
     var { state, key } = options;
     let graphRoot = GetRootGraph(state);
