@@ -18,7 +18,7 @@ class PropertyActivityMenu extends Component {
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Property);
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (currentNode) {
-            var show_dependent = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIDependsOn];;
+            var show_dependent = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIDependsOn];
             var use_model_as_type = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseModelAsType);
             var many_to_many_enabled = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus);
             var property_nodes = UIA.NodesByType(state, UIA.NodeTypes.Property).filter(x => {

@@ -37,12 +37,6 @@ export function redConnect(component) {
   return connect(mapStateToProps, mapDispatchToProps)(component);
 
 }
-export const asyncStorage = store => next => action => {
-  var result = next(action);
-  if (action.store)
-    debouncedStoreAsync(store, action);
-  return result;
-}
 
 export const titleService = TitleService;
 
@@ -79,11 +73,11 @@ export function simple(func, param, states, callback, error, precall) {
 export const _catch = (e) => {
   return Promise.resolve().then(() => {
     if (e && e.message && e.message.json) {
-      return e.message.json().then(c => { log(c); return c; });
+      return e.message.json().then(c => { console.log(c); return c; });
     }
     return Promise.reject(e);
   }).catch(() => {
-    log(e)
+    console.log(e)
     return e;
   })
 }

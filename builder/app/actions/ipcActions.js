@@ -541,7 +541,7 @@ ${interfaceFunctions.join(NEW_LINE)}
           path.join(
             workspace,
             root.title,
-            "electronio",
+            "reactweb",
             root[GraphKeys.PROJECTNAME]
           ),
           state
@@ -626,7 +626,7 @@ function generateReactWeb(workspace, state) {
 
     Object.keys(temp).map(fileName => {
       let { relative } = temp[fileName];
-       relative = relative.replace("app", "src");
+      relative = relative.replace("app", "src");
       let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
       ensureDirectory(dirname);
       console.log(
@@ -672,8 +672,8 @@ function clearReactWebTheme(workspace, state) {
   });
 
 }
-function handleLinkStyles(result, workspace) {
-  let appHtml = readFileSync(path.join(workspace, './app/app.html'), 'utf8');
+function handleLinkStyles(result, workspace, srcpath = `./app/app.html`) {
+  let appHtml = readFileSync(path.join(workspace, srcpath), 'utf8');
   const linkInsert = '<!-- link-insert -->';
   const linkInsertEnd = '<!-- link-insert-end -->';
   let inserHtml = `${linkInsert}${result.styleLink}${linkInsertEnd}</head>`;
@@ -688,7 +688,7 @@ function handleLinkStyles(result, workspace) {
       appHtml = appHtml.slice(0, start) + inserHtml + appHtml.slice(end)
     }
   }
-  writeFileSync(path.join(workspace, './app/app.html'), appHtml, 'utf8');
+  writeFileSync(path.join(workspace, srcpath), appHtml, 'utf8');
 }
 
 function generateElectronIOTheme(workspace, state) {
@@ -741,7 +741,7 @@ function generateReactWebTheme(workspace, state) {
         ),
         result.theme
       );
-      handleLinkStyles(result, workspace);
+      handleLinkStyles(result, workspace, './public/index.html');
     }
     else {
       if (result.location) {

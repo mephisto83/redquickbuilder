@@ -1,4 +1,4 @@
-import { https, http, http_, https_, wss } from '../configuration.js'
+import { https_, wss } from '../configuration.js'
 
 export const AsyncStorage = {
   setItem: (key, value) => {
@@ -9,9 +9,7 @@ export const AsyncStorage = {
   }
 }
 
-export const DEFAULT_URL = http || https
-/// export const DEFAULT_URL_ = 'https://herocarcare-v1.azurewebsites.net';
-export const DEFAULT_URL_ = http_ || https_
+export const DEFAULT_URL = https_
 export const WS_DEFAULT_URL = wss
 export const DEBUG_MODE = false
 export const setEnvironment = environment => {
@@ -81,7 +79,7 @@ export const getCurrentEnvironment = () => {
 var setDefaultUrlPromise = null
 export const getDefaultURL = add => {
   add = add || ''
-  return Promise.resolve(DEFAULT_URL_)
+  return Promise.resolve(DEFAULT_URL)
   // return new Promise((resolve, fail) => {
 
   //     if (setDefaultUrlPromise) {

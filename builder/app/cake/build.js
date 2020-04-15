@@ -102,20 +102,25 @@ function createReactWeb() {
       )
     })
     .then(() => {
-      console.log('cloding creat react app')
-      return executeSpawnCmd(
-        'yarn',
-        [
-          'add',
-          'react-redux'
-        ],
-        {
-          shell: true,
-          cwd: path.join(localDir, appName)
-        }
-      )
+      console.log('adding redux-logger');
+      let promise = Promise.resolve();
+      ['react-redux', 'connected-react-router', 'history', 'react-hot-loader', 'redux', 'react-router', 'redux-logger'].map(dependency => {
+        promise = promise.then(() => executeSpawnCmd(
+          'yarn',
+          [
+            'add',
+            dependency
+          ],
+          {
+            shell: true,
+            cwd: path.join(localDir, appName)
+          }
+        ));
+        return promise
+      })
+      return promise;
     })
-    ///yarn add react-redux
+    // /yarn add react-redux
     .then(() => {
       console.log('installing fontawesome')
       console.log(path.join(localDir, appName))

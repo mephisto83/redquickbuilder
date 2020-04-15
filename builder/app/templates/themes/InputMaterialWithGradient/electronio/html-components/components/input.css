@@ -36,7 +36,7 @@ div {
 	transition: 0.2s;
 	font-size: 1rem;
   color: #9b9b9b;
-  pointer-events: none;;
+  pointer-events: none;
 }
 .form__field:focus {
 	padding-bottom: 6px;

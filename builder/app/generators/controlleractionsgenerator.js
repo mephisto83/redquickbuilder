@@ -235,9 +235,8 @@ setFetchServiceFunction(function(body) {
     {{method_call}}
 }
         `;
-    const controllerActionTemplate = `import * as Models from '../model_keys';
+    const controllerActionTemplate = `import Models from '../model_keys';
 import * as StateKeys from '../state_keys';
-import * as ModelKeys from '../model_keys';
 import service from '../util/controllerService';
 import * as Util from './util';
 {{body}}

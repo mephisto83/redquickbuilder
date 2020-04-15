@@ -76,13 +76,13 @@ export function simple(func, param, states, callback, error) {
 
 export const _catch = (e) => {
   return Promise.resolve().then(() => {
-      if (e && e.message && e.message.json) {
-          return e.message.json().then(c => { log(c); return c; });
-      }
-      return Promise.reject(e);
+    if (e && e.message && e.message.json) {
+      return e.message.json().then(c => { console.log(c); return c; });
+    }
+    return Promise.reject(e);
   }).catch(() => {
-      log(e)
-      return e;
+    console.log(e)
+    return e;
   })
 }
 

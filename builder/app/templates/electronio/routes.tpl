@@ -6,7 +6,7 @@ import App from './containers/App';
 import { setParameters } from './actions/redutils';
 import HomePage from './containers/HomePage';
 import CounterPage from './containers/CounterPage';
-require('./util/fetchService')
+import * as fetchservice from './util/fetchService';
 {{route_imports}}
 
 export default () => (

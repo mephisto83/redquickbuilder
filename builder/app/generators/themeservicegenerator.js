@@ -9,10 +9,10 @@ import {
   GetAppSettings
 } from "../actions/uiactions";
 import { Themes, HTMLElementGroups } from "../constants/themes";
-import { NEW_LINE, MediaQueries } from "../constants/nodetypes";
+import { NEW_LINE, MediaQueries, UITypes } from "../constants/nodetypes";
 
 function GenerateGlobalCss(options) {
-  const { state } = options;
+  const { state, language } = options;
   const graph = GetCurrentGraph(state);
   let result = {};
   let theme = '';
@@ -225,10 +225,21 @@ ${areas.join(NEW_LINE)};
     <script src="https://kit.fontawesome.com/84589ad5a6.js" crossorigin="anonymous"></script>
   `;
   }
+  let srcpath = '';
+  switch (language) {
+    case UITypes.ElectronIO:
+      srcpath = 'app';
+      break;
+    case UITypes.ReactWeb:
+      srcpath = 'src';
+      break;
+    default: break;
+  }
+
   result = {
     theme,
     userDefined: true,
-    relative: "./app/app.global.css",
+    relative: `./${srcpath}/app.global.css`,
     styleLink: fontStyleLink
   };
 

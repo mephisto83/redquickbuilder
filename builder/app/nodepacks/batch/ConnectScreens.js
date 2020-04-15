@@ -54,7 +54,7 @@ export default async function ConnectScreens(progresFunc) {
       }
       commands.push(() => CollectionDataChainsIntoCollections());
 
-      graphOperation([...commands])(GetDispatchFunc(), GetStateFunc());;
+      graphOperation([...commands])(GetDispatchFunc(), GetStateFunc());
     }
     await progresFunc(index / total);
   });

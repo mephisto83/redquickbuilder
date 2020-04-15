@@ -1490,7 +1490,7 @@ export function GetDataChainCollections(options) {
     })
     .map(dataChainCollection => {
       const _path = GetRelativeDataChainPath(dataChainCollection);
-      return `export * as ${GetJSCodeName(dataChainCollection)} from './${
+      return `export * from './${
         collection ? "" : `datachains/`
         }${[..._path, GetJSCodeName(dataChainCollection)]
           .subset(_path.length - 1)

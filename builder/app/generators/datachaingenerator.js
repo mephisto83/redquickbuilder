@@ -229,13 +229,13 @@ import routes from '../${rel}constants/routes';
 import { titleService} from '../${rel}actions/util';
 import * as RedLists from '../${rel}actions/lists';
 import * as StateKeys from '../${rel}state_keys';
-import * as ModelKeys from '../${rel}model_keys';
+import ModelKeys from '../${rel}model_keys';
 import * as ViewModelKeys from '../${rel}viewmodel_keys';
-import * as Models from '../${rel}model_keys';
+import Models from '../${rel}model_keys';
 import RedObservable from '../${rel}actions/observable';
 import RedGraph from '../${rel}actions/redgraph';
 import { useParameters, fetchModel } from '../${rel}actions/redutils';
-import * as DC from './${rel}/data-chain';
+import * as DC from './${rel}data-chain';
 
 ${collections}
 

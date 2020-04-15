@@ -1,55 +1,61 @@
+/* eslint-disable import/prefer-default-export */
 import { bindTemplate } from "../constants/functiontypes";
 import { GetCodeName, GetModelNodes, GetRootGraph, NodesByType, GetNodeProp } from "../actions/uiactions";
-import { NEW_LINE, NodeTypes, NodeProperties } from "../constants/nodetypes";
+import { NEW_LINE, NodeTypes, NodeProperties, UITypes } from "../constants/nodetypes";
 import { GraphKeys } from "../methods/graph_methods";
 
 export function GenerateModelKeys(options) {
-    let { state, key } = options;
-    let models = GetModelNodes();
+  const { state, key, language } = options;
+  const models = GetModelNodes();
 
-    let template = `export const {{name}} = '{{name}}';`
+  const template = `{{name}}: '{{name}}'`
 
-    let templates = models.map(model => {
-        return bindTemplate(template, {
-            name: GetCodeName(model)
-        });
-    });
+  const templates = models.map(model => bindTemplate(template, {
+    name: GetCodeName(model)
+  }));
+  let fileEnding;
+  switch (language) {
+    case UITypes.ReactWeb:
+    case UITypes.ElectronIO:
+      fileEnding = '.ts';
+      break;
+    default:
+      fileEnding = '.js';
+      break;
+  }
 
-    let viewModelKeys = NodesByType(state, NodeTypes.ComponentApi)
-        .filter(x => GetNodeProp(x, NodeProperties.DefaultComponentApiValue))
-        .map(model => {
-            return bindTemplate(template, {
-                name: GetNodeProp(model, NodeProperties.DefaultComponentApiValue)
-            });
-        }).unique();
-    let stateKeys = NodesByType(state, NodeTypes.StateKey);
-    let stateKeyTemplates = stateKeys.map(model => {
-        return bindTemplate(template, {
-            name: GetCodeName(model)
-        });
-    }).unique();
+  const viewModelKeys = NodesByType(state, NodeTypes.ComponentApi)
+    .filter(x => GetNodeProp(x, NodeProperties.DefaultComponentApiValue))
+    .map(model => bindTemplate(template, {
+      name: GetNodeProp(model, NodeProperties.DefaultComponentApiValue)
+    })).unique();
+  const stateKeys = NodesByType(state, NodeTypes.StateKey);
+  const stateKeyTemplates = stateKeys.map(model => bindTemplate(template, {
+    name: GetCodeName(model)
+  })).unique();
 
-    return [{
-        template: templates.join(NEW_LINE),
-        relative: './src',
-        relativeFilePath: `./model_keys.js`,
-        name: 'model_keys'
-    }, {
-        template: stateKeyTemplates.join(NEW_LINE),
-        relative: './src',
-        relativeFilePath: `./state_keys.js`,
-        name: 'state_keys'
-    },{
-        template: viewModelKeys.join(NEW_LINE),
-        relative: './src',
-        relativeFilePath: `./viewmodel_keys.js`,
-        name: 'viewmodel_keys'
-    }, {
-        template: bindTemplate(`{
+  return [{
+    template: `export default { ${templates.join(`,${NEW_LINE}`)}
+  }`,
+    relative: './src',
+    relativeFilePath: `./model_keys${fileEnding}`,
+    name: 'model_keys'
+  }, {
+    template: stateKeyTemplates.join(NEW_LINE),
+    relative: './src',
+    relativeFilePath: `./state_keys${fileEnding}`,
+    name: 'state_keys'
+  }, {
+    template: viewModelKeys.join(NEW_LINE),
+    relative: './src',
+    relativeFilePath: `./viewmodel_keys${fileEnding}`,
+    name: 'viewmodel_keys'
+  }, {
+    template: bindTemplate(`{
         "appName": "{{appName}}"
     }`, { appName: GetRootGraph(state)[GraphKeys.PROJECTNAME] }),
-        relative: './',
-        relativeFilePath: `./app.json`,
-        name: 'app_json'
-    }];
+    relative: './',
+    relativeFilePath: `./app.json`,
+    name: 'app_json'
+  }];
 }

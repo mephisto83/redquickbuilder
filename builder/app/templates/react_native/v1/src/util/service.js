@@ -224,9 +224,9 @@ export function createRedService(domain, wsdomain, _forceBase) {
         var promise = Promise.resolve();
         var oncatch = e => {
           if (e && e.message && e.message.json) {
-            return e.message.json().then(c => UIA.log(c)).catch(() => { });
+            return e.message.json().then(c => console.log(c)).catch(() => { });
           }
-          UIA.log(e);
+          console.log(e);
         };
         function connectToService() {
           return Globals.getDefaultWS().then(wsbaseDomain => {

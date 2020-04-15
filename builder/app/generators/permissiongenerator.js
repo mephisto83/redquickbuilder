@@ -300,7 +300,7 @@ export default class PermissionGenerator {
                     var constList = PermissionGenerator.getReference(enumRef, NodeProperties.AllowedEnumValues);
                     var disAllowedConstList = PermissionGenerator.getReference(enumRef, NodeProperties.DisallowedEnumValues);
                     let enumInstance = PermissionGenerator._createConstantList(enumerationNodeName, constList);
-                    let enumNotAllowed = PermissionGenerator._createConstantList(enumerationNodeName, disAllowedConstList);;
+                    let enumNotAllowed = PermissionGenerator._createConstantList(enumerationNodeName, disAllowedConstList);
                     let nameEnum = PermissionGenerator.createInstanceEnumerationListName(conditionNode, enumerationNodeName, method);
                     let propertyEnum = PermissionGenerator.getReferencedNodeName(graph, enumRef, ConditionTypeParameters.Ref1Property);
 

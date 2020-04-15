@@ -1,4 +1,3 @@
-/* eslint-disable promise/catch-or-return */
 import { GetItem } from "./uiActions";
 const context = {};
 export function setParameters(params) {

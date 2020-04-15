@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Platform, StyleSheet, TouchableOpacity } from '../html-components';
 import { redConnect, titleService } from '../actions/util'
 import { Content, StyleProvider } from '../html-components';
 import {

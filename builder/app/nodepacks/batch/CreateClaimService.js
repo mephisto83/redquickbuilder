@@ -26,6 +26,6 @@ export default function CreateClaimService() {
         });
         return steps;
       }], null, 'standard-claim-service'
-    )(GetDispatchFunc(), GetStateFunc());;
+    )(GetDispatchFunc(), GetStateFunc());
   }
 }
