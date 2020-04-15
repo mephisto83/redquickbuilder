@@ -2031,7 +2031,7 @@ export function GetScreens() {
   const screens = GetScreenNodes();
   return screens;
 }
-function GenerateElectronIORoutes(screens) {
+function GenerateElectronIORoutes(screens, language) {
   const template = `<Route path={routes.{{route_name}}} render={({ match, history, location }: any) => {
     console.log(match.params);
     let {{{screenApiParams}}} = match.params;
@@ -2039,10 +2039,21 @@ function GenerateElectronIORoutes(screens) {
     setParameters({{{screenApiParams}}});
     return <{{component}} {{screenApi}} />}} />
   }`;
-  const routefile = fs.readFileSync(
-    "./app/templates/electronio/routes.tpl",
-    "utf8"
-  );
+  let routefile;
+  switch (language) {
+    case UITypes.ReactWeb:
+      routefile = fs.readFileSync(
+        "./app/templates/reactweb/routes.tpl",
+        "utf8"
+      );
+      break;
+    default:
+      routefile = fs.readFileSync(
+        "./app/templates/electronio/routes.tpl",
+        "utf8"
+      );
+      break;
+  }
   const import_ = `import {{name}} from './screens/{{jsname}}';`;
   const routes = [];
   const _screens = [];
@@ -2147,7 +2158,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
   switch (language) {
     case UITypes.ElectronIO:
     case UITypes.ReactWeb:
-      moreresults.push(GenerateElectronIORoutes(screens));
+      moreresults.push(GenerateElectronIORoutes(screens, language));
       break;
   }
   const all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);

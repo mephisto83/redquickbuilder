@@ -1,3 +1,4 @@
+import fs from "fs";
 import * as GraphMethods from "../methods/graph_methods";
 import {
   GetNodeProp,
@@ -22,7 +23,6 @@ import {
   Methods,
   NEW_LINE
 } from "../constants/nodetypes";
-import fs from "fs";
 import {
   bindTemplate,
   FunctionTypes,
@@ -44,48 +44,48 @@ const PROPERTY_TABS = 6;
 export default class FetchServiceGenerator {
   static Tabs(c) {
     let res = "";
-    for (var i = 0; i < c; i++) {
+    for (let i = 0; i < c; i++) {
       res += TAB;
     }
     return res;
   }
 
   static Generate(options) {
-    var { state, key } = options;
-    let graphRoot = GetRootGraph(state);
-    let namespace = graphRoot
+    const { state, key } = options;
+    const graphRoot = GetRootGraph(state);
+    const namespace = graphRoot
       ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
       : null;
-    let result = {};
-    let controllers = NodesByType(state, NodeTypes.FetchService);
+    const result = {};
+    const controllers = NodesByType(state, NodeTypes.FetchService);
     controllers.map(controller => {
-      let controllerUser = "controllerUser";
+      const controllerUser = "controllerUser";
       let controllerTemplateClass = fs.readFileSync(
         CONTROLLER_CLASS_TEMPLATE,
         "utf-8"
       );
-      let fetchServiceFunction = fs.readFileSync(
+      const fetchServiceFunction = fs.readFileSync(
         CONTROLLER_CLASS_FETCH_FUNCTION,
         "utf-8"
       );
-      let fetchServiceFunctionGetProperty = fs.readFileSync(
+      const fetchServiceFunctionGetProperty = fs.readFileSync(
         CONTROLLER_CLASS_FETCH_FUNCTION_Get_PROPERTY,
         "utf-8"
       );
-      let userNode = NodesByType(state, NodeTypes.Model).find(x =>
+      const userNode = NodesByType(state, NodeTypes.Model).find(x =>
         GetNodeProp(x, NodeProperties.IsUser)
       );
-      let outputType = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+      const outputType = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
         id: controller.id,
         link: LinkType.FetchServiceOuput
       })[0];
 
-      let methods = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+      const methods = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
         id: controller.id,
         link: LinkType.FetchService
       }).filter(x => {
-        let methodType = GetNodeProp(x, NodeProperties.FunctionType);
-        let functionType = MethodFunctions[methodType];
+        const methodType = GetNodeProp(x, NodeProperties.FunctionType);
+        const functionType = MethodFunctions[methodType];
         return functionType.isFetchCompatible;
       });
 
@@ -94,16 +94,16 @@ export default class FetchServiceGenerator {
       let controllers = [];
       set_outputs = methods
         .map(method => {
-          let methodProperties = GetNodeProp(
+          const methodProperties = GetNodeProp(
             method,
             NodeProperties.MethodProps
           );
-          let modelNode =
+          const modelNode =
             GetNodeById(methodProperties.model_output) ||
             GetNodeById(methodProperties.model);
-          let maestro = GetMaestroNode(method.id);
-          let controller = GetControllerNode(maestro.id);
-          let output_type = GetCodeName(modelNode);
+          const maestro = GetMaestroNode(method.id);
+          const controller = GetControllerNode(maestro.id);
+          const output_type = GetCodeName(modelNode);
           controllers.push(controller.id);
           return bindTemplate(fetchServiceFunctionGetProperty, {
             model_output: output_type,
@@ -115,20 +115,18 @@ export default class FetchServiceGenerator {
         .join(NEW_LINE);
       controllers = controllers
         .unique()
-        .map(v => {
-          return bindTemplate(
+        .map(v => bindTemplate(
             `var {{controller#lower}} = new {{controller}}();
             {{controller#lower}}.${GetNodeProp(v, NodeProperties.CodeUser)} = ${controllerUser};
             `,
             {
               controller: GetCodeName(v)
             }
-          );
-        })
+          ))
         .join(NEW_LINE);
-      let httpMethod = `${GetNodeProp(controller, NodeProperties.HttpMethod)}`;
-      let httpRoute = `${GetNodeProp(controller, NodeProperties.HttpRoute)}`;
-      let codeName = `${GetNodeProp(controller, NodeProperties.CodeName)}`;
+      const httpMethod = `${GetNodeProp(controller, NodeProperties.HttpMethod)}`;
+      const httpRoute = `${GetNodeProp(controller, NodeProperties.HttpRoute)}`;
+      const codeName = `${GetNodeProp(controller, NodeProperties.CodeName)}`;
 
       functions = bindTemplate(fetchServiceFunction, {
         output_type: GetCodeName(outputType),
@@ -139,7 +137,7 @@ export default class FetchServiceGenerator {
         controllers
       });
       controllerTemplateClass = bindTemplate(controllerTemplateClass, {
-        codeName: codeName,
+        codeName,
         "codeName#alllower": codeName.toLowerCase(),
         user_instance: controllerUser,
 

@@ -191,7 +191,7 @@ import * as Util from "../actions/util";
 import service from './controllerService';
 export const FETCH_CALL = 'FETCH_CALL';
 
-setFetchServiceFunction(function(body) {
+setFetchServiceFunction(function(body: any) {
   return Promise.resolve().then(() => {
       let dispatch = GetDispatch();
       let getState = GetState();
@@ -201,7 +201,7 @@ setFetchServiceFunction(function(body) {
         {
           loading: FETCH_CALL
         },
-        result => {
+        (result: any) => {
           let dataChain = ${GetCodeName(datachain)};
           if (dataChain) {
             return dataChain(result);

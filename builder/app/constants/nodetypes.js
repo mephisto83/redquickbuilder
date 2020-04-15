@@ -301,6 +301,7 @@ export const NodeProperties = {
   ViewModelKey: "ViewModelKey",
   StateKey: "StateKey",
   GridPlacement: "GridPlacement",
+  IsFetchDataChainStorage: "IsFetchDataChainStorage",
   GridRowCount: "GridRowCount",
   DataChainTypeName: 'DataChainTypeName',
   HoverStyle: ":hover",

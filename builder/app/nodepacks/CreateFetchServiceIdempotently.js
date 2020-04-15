@@ -3,10 +3,8 @@ import { NodeProperties, NodeTypes } from "../constants/nodetypes";
 import {
   GetCurrentGraph,
   GetNodeByProperties,
-  ADD_NEW_NODE,
   GetNodeById,
   NodesByType,
-  GetMethodPropNode,
   GetNodeProp,
   ADD_LINK_BETWEEN_NODES,
   LinkProperties,
@@ -22,10 +20,12 @@ import {
   FunctionTemplateKeys
 } from "../constants/functiontypes";
 import CreatePropertiesForFetch from "./CreatePropertiesForFetch";
+import StoreFetchResults from "./StoreFetchResults";
+
 export default function (args = {}) {
   //
-  let result = [];
-  let context = {
+  const result = [];
+  const context = {
     ...args
   };
 
@@ -35,7 +35,7 @@ export default function (args = {}) {
     ...(viewPackages || {})
   };
 
-  let graph = GetCurrentGraph();
+  const graph = GetCurrentGraph();
   let fetchParameter = GetNodeByProperties(
     {
       [NodeProperties.IsFetchParameter]: true
@@ -48,6 +48,11 @@ export default function (args = {}) {
     },
     graph
   );
+  let fetchStoreage = GetNodeByProperties(
+    {
+      [NodeProperties.IsFetchDataChainStorage]: true
+    }
+  )
   let fetchService = GetNodeByProperties({
     [NodeProperties.NODEType]: NodeTypes.FetchService
   });
@@ -55,8 +60,9 @@ export default function (args = {}) {
   if (!fetchParameter) {
     result.push(
       ...CreateFetchParameters({
-        callback: (context, g) => {
-          fetchParameter = GetNodeById(context.entry, g);
+        viewPackages,
+        callback: (inner, g) => {
+          fetchParameter = GetNodeById(inner.entry, g);
         }
       })
     );
@@ -64,8 +70,9 @@ export default function (args = {}) {
   if (!fetchOutput) {
     result.push(
       ...CreateFetchOutput({
-        callback: (context, g) => {
-          fetchOutput = GetNodeById(context.entry, g);
+        viewPackages,
+        callback: (inner, g) => {
+          fetchOutput = GetNodeById(inner.entry, g);
         }
       })
     );
@@ -73,28 +80,54 @@ export default function (args = {}) {
   if (!fetchService) {
     result.push(
       ...CreateFetchService({
-        callback: (context, g) => {
-          fetchService = GetNodeById(context.entry, g);
+        viewPackages,
+        callback: (inner, g) => {
+          fetchService = GetNodeById(inner.entry, g);
         }
       })
     );
   }
-  result.push(function () {
-    let fetchCompatibleMethods = NodesByType(null, NodeTypes.Method).filter(
+  if (!fetchStoreage) {
+    result.push(
+      ...StoreFetchResults({
+        viewPackages,
+        callback: (inner) => {
+          fetchStoreage = inner.entry;
+        }
+      }),
+      {
+        operation: UPDATE_NODE_PROPERTY,
+        options() {
+          return {
+            id: fetchStoreage,
+            properties: {
+              [NodeProperties.IsFetchDataChainStorage]: true
+            }
+          };
+        }
+      }
+    )
+  }
+  else {
+    fetchStoreage = fetchStoreage.id;
+  }
+
+  result.push(() => {
+    const fetchCompatibleMethods = NodesByType(null, NodeTypes.Method).filter(
       method => {
-        let funcType = GetNodeProp(method, NodeProperties.FunctionType);
-        let { isFetchCompatible } =
+        const funcType = GetNodeProp(method, NodeProperties.FunctionType);
+        const { isFetchCompatible } =
           funcType && MethodFunctions[funcType]
             ? MethodFunctions[funcType]
             : {};
         return isFetchCompatible;
       }
     );
-    let tempresult = [];
-    fetchCompatibleMethods.map(fetchMethod => {
+    const tempresult = [];
+    fetchCompatibleMethods.forEach(fetchMethod => {
       tempresult.push({
         operation: ADD_LINK_BETWEEN_NODES,
-        options: function () {
+        options() {
           return {
             target: fetchMethod.id,
             source: fetchService.id,
@@ -103,12 +136,12 @@ export default function (args = {}) {
         }
       });
 
-      let param = GetMethodNodeProp(
+      const param = GetMethodNodeProp(
         fetchMethod,
         FunctionTemplateKeys.FetchParameter
       );
       if (fetchParameter && param !== fetchParameter.id) {
-        let methodProps = {
+        const methodProps = {
           ...(GetNodeProp(fetchMethod, NodeProperties.MethodProps) || {})
         };
         methodProps[FunctionTemplateKeys.FetchParameter] = fetchParameter.id;
@@ -130,7 +163,7 @@ export default function (args = {}) {
           },
           {
             operation: UPDATE_NODE_PROPERTY,
-            options: function () {
+            options() {
               return {
                 id: fetchMethod.id,
                 properties: { [NodeProperties.MethodProps]: methodProps }
@@ -139,7 +172,7 @@ export default function (args = {}) {
           },
           {
             operation: UPDATE_NODE_PROPERTY,
-            options: function () {
+            options() {
               return {
                 id: fetchParameter.id,
                 properties: { [NodeProperties.ExcludeFromController]: true }
@@ -155,18 +188,26 @@ export default function (args = {}) {
 
   result.push({
     operation: ADD_LINK_BETWEEN_NODES,
-    options: function () {
+    options() {
       return {
         target: fetchOutput.id,
         source: fetchService.id,
         properties: { ...LinkProperties.FetchServiceOuput }
       };
     }
-  });
-  result.push(function () {
-    return CreatePropertiesForFetch({
-      id: fetchOutput.id
-    });
-  });
+  },
+    () => ({
+      operation: ADD_LINK_BETWEEN_NODES,
+      options() {
+        return {
+          target: fetchStoreage,
+          source: fetchService.id,
+          properties: { ...LinkProperties.DataChainLink }
+        }
+      }
+    }));
+  result.push(() => CreatePropertiesForFetch({
+    id: fetchOutput.id
+  }));
   return result;
 }
