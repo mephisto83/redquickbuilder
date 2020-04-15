@@ -149,11 +149,11 @@ export function GetItemRender(node, imports, language) {
   const properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
-  return `({item, index, separators, key})=>{
+  return `({item, index, separators, key}: any)=>{
     let value = item;
     return  <${GetCodeName(
     listItemNode
-  )} ${properties} value={value}  key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  )} ${properties}  key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetFormRender(node, imports, language) {
@@ -165,11 +165,11 @@ export function GetFormRender(node, imports, language) {
   const properties = WriteDescribedApiProperties(listItemNode, {
     listItem: true
   });
-  return `({item, index, separators, key})=>{
+  return `({item, index, separators, key}: any)=>{
     let value = item;
     return  <${GetCodeName(
     listItemNode
-  )} ${properties} value={value} key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
+  )} ${properties}  key={item && item.id !== undefined && item.id !== null  ? item.id : item}/>
   }`;
 }
 export function GetItemRenderImport(node) {
@@ -178,7 +178,7 @@ export function GetItemRenderImport(node) {
     listItem: true
   });
 
-  return `({item, index, separators, key})=> <${GetCodeName(
+  return `({item, index, separators, key}: any)=> <${GetCodeName(
     listItemNode
   )} ${properties} />`;
 }
@@ -215,7 +215,7 @@ export function constructCssFile(css, clsName) {
     })
     .join(NEW_LINE);
 
-  return rules;
+  return rules || '.no-rule-yet { display: block; }';
 }
 
 export function GetStylesFor(node, tag) {
@@ -426,15 +426,15 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
   let cssImport = null;
   let templateStr = null;
   let ending = ".js";
+  let styleRules = null;
   switch (language) {
     case UITypes.ElectronIO:
-    case UITypes.ReactWeb:
       ending = ".tsx";
       templateStr = fs.readFileSync(
         "./app/templates/screens/el_screenoption.tpl",
         "utf8"
       );
-      const styleRules = buildStyle(node);
+      styleRules = buildStyle(node);
       cssFile = constructCssFile(
         css,
         `.${(GetCodeName(node) || "").toJavascriptName()}`
@@ -442,6 +442,23 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
       cssFile += styleRules;
 
       cssImport = `import styles from './${(
+        GetCodeName(node) || ""
+      ).toJavascriptName()}.scss'`;
+      break;
+    case UITypes.ReactWeb:
+      ending = ".tsx";
+      templateStr = fs.readFileSync(
+        "./app/templates/screens/el_screenoption.tpl",
+        "utf8"
+      );
+      styleRules = buildStyle(node);
+      cssFile = constructCssFile(
+        css,
+        `.${(GetCodeName(node) || "").toJavascriptName()}`
+      );
+      cssFile += styleRules;
+
+      cssImport = `import './${(
         GetCodeName(node) || ""
       ).toJavascriptName()}.scss'`;
       break;
@@ -516,7 +533,7 @@ export function GenerateRNScreenOptionSource(node, relativePath, language) {
     ...results
   ].filter(x => x);
 }
-export function bindComponent(node, componentBindingDefinition) {
+export function bindComponent(node, componentBindingDefinition, language) {
 
 
   if (componentBindingDefinition && componentBindingDefinition.template) {
@@ -564,10 +581,28 @@ export function bindComponent(node, componentBindingDefinition) {
                 }
               }).filter(x => x).join();
             }
-            styles.push(`\${ DC.${GetCodeName(styleNodeDataChain, { includeNameSpace: true })}(${args}) ? styles['${GetJSCodeName(styleNode)}'] : '' }`)
+            let styleExpression = '';
+            switch (language) {
+              case UITypes.ReactWeb:
+                styleExpression = `'${GetJSCodeName(styleNode)}'`;
+                break;
+              default:
+                styleExpression = `styles['${GetJSCodeName(styleNode)}']`;
+                break;
+            }
+            styles.push(`\${ DC.${GetCodeName(styleNodeDataChain, { includeNameSpace: true })}(${args}) ? ${styleExpression} : '' }`)
           }
           else {
-            styles.push(`$\{styles['${GetJSCodeName(styleNode)}']}`)
+            let styleExpression = '';
+            switch (language) {
+              case UITypes.ReactWeb:
+                styleExpression = `'${GetJSCodeName(styleNode)}'`;
+                break;
+              default:
+                styleExpression = `styles['${GetJSCodeName(styleNode)}']`;
+                break;
+            }
+            styles.push(`${styleExpression}`)
           }
         });
 
@@ -615,7 +650,7 @@ export function bindComponent(node, componentBindingDefinition) {
           })
           .filter(x => x)
           .join(NEW_LINE);
-        return `${ComponentEvents[cevents[i]]}={(value)=> {
+        return `${ComponentEvents[cevents[i]]}={(value: any)=> {
         //  warning
 ${invocations}
     }}`;
@@ -813,7 +848,7 @@ export function GenerateRNComponents(
         ) {
           elements = bindComponent(
             node,
-            ComponentTypes[language][componentType]
+            ComponentTypes[language][componentType], language
           );
           if (
             ComponentTypes[language][componentType].properties &&
@@ -835,11 +870,11 @@ export function GenerateRNComponents(
         const css = {};
         let cssFile = '';
         let cssImport = '';
+        let styleRules = null;
         const component_did_update = GetComponentDidUpdate(node);
         switch (language) {
           case UITypes.ElectronIO:
-          case UITypes.ReactWeb:
-            const styleRules = buildStyle(node);
+            styleRules = buildStyle(node);
             cssFile = constructCssFile(
               css,
               `.${(GetCodeName(node) || "").toJavascriptName()}`
@@ -847,6 +882,18 @@ export function GenerateRNComponents(
             cssFile += styleRules;
 
             cssImport = `import styles from './${(
+              GetCodeName(node) || ""
+            ).toJavascriptName()}.scss'`;
+            break;
+          case UITypes.ReactWeb:
+            styleRules = buildStyle(node);
+            cssFile = constructCssFile(
+              css,
+              `.${(GetCodeName(node) || "").toJavascriptName()}`
+            );
+            cssFile += styleRules;
+
+            cssImport = `import './${(
               GetCodeName(node) || ""
             ).toJavascriptName()}.scss'`;
             break;
@@ -1391,7 +1438,7 @@ function WriteDescribedApiProperties(node, options = { listItem: false }) {
             return `${GetNodeProp(
               eventInstance,
               NodeProperties.EventType
-            )}={arg => {
+            )}={(arg: any) => {
                     ${method_calls.join(NEW_LINE)}
                 }}`;
           }
@@ -1824,13 +1871,13 @@ export function GetComponentDidUpdate(parent, options = {}) {
     skipSetGetState: true
   });
   const componentDidUpdate =
-    `componentDidUpdate(prevProps) {
+    `componentDidUpdate(prevProps: any) {
         this.captureValues(prevProps);
       }
       ${
     !isScreen ? componentDidMount : ""
     }
-      captureValues(prevProps){
+      captureValues(prevProps: any){
         ${describedApi}
       }`;
 
@@ -1886,7 +1933,7 @@ export function GetComponentDidMount(screenOption, options = {}) {
       return `DC.${GetCodeName(chain, { includeNameSpace: true })}(${input});`
     }).join(NEW_LINE)
   })
-  const componentDidMount = `componentDidMount(value) {
+  const componentDidMount = `componentDidMount() {
         ${options.skipSetGetState ? "" : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? "" : outOfBandCall}
@@ -1985,7 +2032,7 @@ export function GetScreens() {
   return screens;
 }
 function GenerateElectronIORoutes(screens) {
-  const template = `<Route path={routes.{{route_name}}} render={({ match, history, location }) => {
+  const template = `<Route path={routes.{{route_name}}} render={({ match, history, location }: any) => {
     console.log(match.params);
     let {{{screenApiParams}}} = match.params;
     {{overrides}}

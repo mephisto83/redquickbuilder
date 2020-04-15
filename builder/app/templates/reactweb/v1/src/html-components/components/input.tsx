@@ -1,7 +1,7 @@
 import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
-export default class Input extends React.Component {
+export default class Input extends React.Component<{ [index: string]: any }> {
 	constructor(props) {
 		super(props);
 		this.state = {};

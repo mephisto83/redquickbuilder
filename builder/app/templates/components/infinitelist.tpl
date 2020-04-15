@@ -3,5 +3,5 @@
     data={{{data}}}
     renderItem={{{item_render}}}
     renderForm={{{form_render}}}
-    keyExtractor={item => item}
+    keyExtractor={(item: any) => item}
 />

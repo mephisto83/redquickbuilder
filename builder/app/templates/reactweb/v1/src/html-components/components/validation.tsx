@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class Validation extends React.Component {
+export default class Validation extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
 	constructor(props) {
 		super(props);
 

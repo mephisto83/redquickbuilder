@@ -3,7 +3,7 @@ import RedGraph from '../../actions/redgraph';
 import styles from './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
-export default class Menu extends Component {
+export default class Menu extends Component<{ [index: string]: any }, { [index: string]: any }> {
 	constructor(props) {
 		super(props);
 		this.state = {};
@@ -40,7 +40,7 @@ export default class Menu extends Component {
 						<i className="fa fa-caret-down" />
 					</button>
 					<Menu
-            value={this.props.value}
+						value={this.props.value}
 						id={id}
 						onClick={(id) => {
 							if (this.props.onClick) {
@@ -54,7 +54,7 @@ export default class Menu extends Component {
 		return (
 			<a
 				className={`${styles.menuDropDownMenu} menu-drop-down-button`}
-        key={`menu-leaf-${index}`}
+				key={`menu-leaf-${index}`}
 				onClick={() => {
 					if (this.props.onClick) {
 						this.props.onClick(id);

@@ -6,7 +6,7 @@ import styles from './flatlist.css';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class FlatList extends React.Component {
+export default class FlatList extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
 	constructor(props) {
 		super(props);
 
@@ -34,13 +34,13 @@ export default class FlatList extends React.Component {
 }
 
 FlatList.propTypes = {
-	renderItem: function(v) {
+	renderItem: function(v: any) {
 		return typeof v === 'function';
 	},
-	keyExtractor: function(v) {
+	keyExtractor: function(v: any) {
 		return typeof v === 'function';
 	},
-	data: function(v) {
+	data: function(v: any) {
 		return Array.isArray(v);
 	}
 };

@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import styles from './flatlist.css';
 
 // ExecuteButtonWorkoutStationsComponent
-let navigationInstance;
+let navigationInstance: any;
 
 export default class FlatList extends React.Component {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};
@@ -20,27 +20,27 @@ export default class FlatList extends React.Component {
 		return (
 			<ul className={styles['flat-list']}>
 				{(this.props.data || [])
-					.map((item, index) => {
+					.map((item: any, index: any) => {
 						if (this.props.renderItem) {
 							let key = this.props.keyExtractor(item);
 							let res = this.props.renderItem({ item, index, key });
 							return res;
 						}
 					})
-					.filter((x) => x)}
+					.filter((x: any) => x)}
 			</ul>
 		);
 	}
 }
 
 FlatList.propTypes = {
-	renderItem: function(v) {
+	renderItem: function(v: any) {
 		return typeof v === 'function';
 	},
-	keyExtractor: function(v) {
+	keyExtractor: function(v: any) {
 		return typeof v === 'function';
 	},
-	data: function(v) {
+	data: function(v: any) {
 		return Array.isArray(v);
 	}
 };

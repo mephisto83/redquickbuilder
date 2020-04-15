@@ -2,5 +2,5 @@
     {{apiProperties}}
     data={{{data}}}
     renderItem={{{item_render}}}
-    keyExtractor={item => item}
+    keyExtractor={(item: any) => item}
 />

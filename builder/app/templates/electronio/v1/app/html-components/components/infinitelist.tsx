@@ -3,10 +3,10 @@ import StyleProvider from "./styleprovider";
 import PropTypes from "prop-types";
 
 // ExecuteButtonWorkoutStationsComponent
-let navigationInstance;
+let navigationInstance: any;
 
 export default class InfiniteList extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.state = {};
@@ -29,14 +29,14 @@ export default class InfiniteList extends React.Component {
           : null}
         <ul className={"list-group"}>
           {(this.props.data || [])
-            .map((item, index) => {
+            .map((item: any, index: any) => {
               if (this.props.renderItem) {
                 let res = this.props.renderItem({ item, index });
                 res.key = this.props.keyExtractor(item);
                 return res;
               }
             })
-            .filter(x => x)}
+            .filter((x: any) => x)}
         </ul>
       </div>
     );
@@ -44,13 +44,13 @@ export default class InfiniteList extends React.Component {
 }
 
 MultiSelectList.propTypes = {
-  renderItem: function(v) {
+  renderItem: function(v: any) {
     return typeof v === "function";
   },
-  keyExtractor: function(v) {
+  keyExtractor: function(v: any) {
     return typeof v === "function";
   },
-  data: function(v) {
+  data: function(v: any) {
     return Array.isArray(v);
   }
 };

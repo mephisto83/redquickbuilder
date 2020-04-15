@@ -1,5 +1,5 @@
 <FlatList
     data={{{data}}}
     renderItem={{{item_render}}}
-    keyExtractor={item => item && item.id ? item.id : item }
+    keyExtractor={(item: any) => item && item.id ? item.id : item }
 />

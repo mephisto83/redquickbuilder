@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { redConnect, titleService, fetchModelInstance, fetchModelInstanceChildren } from '../actions/util';
+import { redConnect, titleService } from '../actions/util';
 import * as DC from '../actions/data-chain';
 import * as S from '../actions/selector';
 import { setParameters } from '../actions/redutils';
@@ -18,7 +18,7 @@ import MenuItem from '../components/menuitem';
 {{imports}}
 // {{name}}
 let navigationInstance;
-class {{name}} extends React.Component {
+class {{name}} extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
     constructor(props) {
         super(props);
 

@@ -6,7 +6,7 @@
                 this.props.onBlur();
             }
         }}
-        onChangeText={(_text)=>{
+        onChangeText={(_text: any)=>{
             if(this.props.onChangeText) {
                 this.props.onChangeText(_text);
             }

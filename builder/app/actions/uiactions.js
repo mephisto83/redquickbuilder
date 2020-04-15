@@ -1337,7 +1337,7 @@ export function GetDataChainArgs(id) {
     if (merge) {
       return Object.keys(ui);
     }
-    return ["$id"];
+    return ["$id?"];
   }
   return [];
 }

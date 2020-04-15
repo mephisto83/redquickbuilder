@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FlatList, Image } from '{{relative_depth}}html-components';
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, navigate, GetScreenParam, fetchModelInstance, fetchModelInstanceChildren  } from '{{relative_depth}}actions/uiActions';
+import { GetItems, navigate, GetScreenParam  } from '{{relative_depth}}actions/uiActions';
 import * as DC from '{{relative_depth}}actions/data-chain';
 import * as S from '{{relative_depth}}actions/selector';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';
@@ -16,18 +16,21 @@ import {
   Text, View, Form, Item,
   CheckBox,
   PasswordField,
-  Input, Label, List, Thumbnail,
+  Input, Label,
   Menu
 }  from '{{relative_depth}}html-components';
 
 {{imports}}
 // {{name}}
 let navigationInstance;
-class {{name}} extends React.Component {
-    constructor(props){
+class {{name}} extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
+    constructor(props: any){
         super(props);
 
-        this.state = {};
+        this.state = {
+          value: null,
+          viewModel: null
+        };
     }
 {{component_did_update}}
     render() {

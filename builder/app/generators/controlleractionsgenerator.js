@@ -47,13 +47,13 @@ export default class ControllerActionGenerator {
       "utf8"
     );
     const methodTemplate = `
-{{methodName}}: async (params) => {
+{{methodName}}: async (params: any) => {
     let { template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`);
 }`;
     const postMethodTemplate = `
-{{methodName}}: async (params) => {
+{{methodName}}: async (params: any) => {
     let { body, template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`, body, {{options}});

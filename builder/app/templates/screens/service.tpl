@@ -3,7 +3,7 @@ import * as Globals from './globals';
 
 const endpoints = {{endpoints}};
 
-var _redservice;
+let _redservice: any;
 function redservice() {
     _redservice = _redservice || createRedService(Globals.DEFAULT_URL)
     return _redservice;

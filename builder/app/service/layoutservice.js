@@ -307,7 +307,12 @@ export function createSection(args) {
             .map(tag => GetStylesFor(node, tag).join(' '))
             .filter(x => x).join(' ');
         }
-        className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;
+        if (UITypes.ReactWeb === language) {
+          className = `className={\`${section} ${tagBasedStyles} ${tagclasses} \`}`;
+        }
+        else {
+          className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;
+        }
       } else {
         className = `style={${JSON.stringify({ ..._style }, null, 4)}}`;
       }

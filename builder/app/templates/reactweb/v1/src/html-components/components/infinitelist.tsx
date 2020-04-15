@@ -44,13 +44,13 @@ export default class InfiniteList extends React.Component {
 }
 
 MultiSelectList.propTypes = {
-  renderItem: function(v) {
+  renderItem: function(v: any) {
     return typeof v === "function";
   },
-  keyExtractor: function(v) {
+  keyExtractor: function(v: any) {
     return typeof v === "function";
   },
-  data: function(v) {
+  data: function(v: any) {
     return Array.isArray(v);
   }
 };
