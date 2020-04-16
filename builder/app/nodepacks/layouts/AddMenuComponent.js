@@ -24,7 +24,7 @@ export default function AddMenuComponent(args = {}) {
   }
   else if (!args.eventType) {
     args.eventType = GetNodeProp(args.component, NodeProperties.UIType) === UITypes.ReactNative ? 'onPress' : 'onClick';
-    args.uiType = GetNodeProp(args.component, NodeProperties.UIType);
+    args.uiType = args.uiType || GetNodeProp(args.component, NodeProperties.UIType);
   }
   if (!args.eventType) {
     throw new Error('missing eventType');
@@ -41,6 +41,7 @@ export default function AddMenuComponent(args = {}) {
   result.push(...AddComponent({
     component: args.component,
     viewPackages,
+    uiType: args.uiType,
     componentName: args.componentName,
     componentType: ComponentTypeKeys.Menu,
     callback: (menuContext) => {

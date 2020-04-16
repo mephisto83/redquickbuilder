@@ -181,7 +181,7 @@ export const NodeTypeColors = {
   [NodeTypes.OptionCustom]: "#403F4C",
   [NodeTypes.ExtensionTypeList]: "#2C2B3C",
   [NodeTypes.ExtensionType]: "#1B2432",
-  [NodeTypes.Method]: "#FE5F55",
+  [NodeTypes.Method]: "#BE95C4",
   [NodeTypes.Permission]: "#383F51",
   [NodeTypes.Function]: "#553D36",
   [NodeTypes.Parameter]: "#684A52",

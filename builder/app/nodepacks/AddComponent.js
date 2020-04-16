@@ -21,7 +21,7 @@ export default function (args = {}) {
             parent: context.node0,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: context.uiType || "ElectronIO"
             },
             linkProperties: {
               properties: {

@@ -3,7 +3,7 @@ import { uuidv4 } from "../../utils/array";
 import { NodeProperties } from "../../constants/nodetypes";
 
 GridHeaderMainMenuMain.title = 'Grid Header MainMenu';
-GridHeaderMainMenuMain.callingArguments = ['main', 'header', 'mainMenu'].map(v => ({ name: v, field: v, value: v, title: v }))
+GridHeaderMainMenuMain.callingArguments = ['main', 'mainSection', 'header', 'mainMenu'].map(v => ({ name: v, field: v, value: v, title: v }))
 export default function GridHeaderMainMenuMain(args = {}) {
   // node0,node1,node2,node3,node4,node5
 
@@ -139,8 +139,8 @@ export default function GridHeaderMainMenuMain(args = {}) {
                   "borderStyle": "solid",
                   "borderWidth": 1
                 },
-                "children": context.main ? {
-                  [context.node5]: context.main
+                "children": (context.main || context.mainSection) ? {
+                  [context.node5]: (context.main || context.mainSection)
                 } : {},
                 "name": {},
                 "cellModel": {},

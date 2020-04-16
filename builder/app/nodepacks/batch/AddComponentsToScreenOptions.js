@@ -21,6 +21,7 @@ export default async function AddComponentsToScreenOptions(progresFunc) {
 
     graphOperation(AddComponent({
       component: screenOption.id,
+      uiType: GetNodeProp(screenOption, NodeProperties.UIType),
       componentType: ComponentTypeKeys.H1,
       componentName: `${GetNodeTitle(screenOption)} Title`,
       callback: (titleContext) => {
