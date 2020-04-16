@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable compat/compat */
@@ -632,20 +633,6 @@ export const CreateLoginModels = {
       functionName: `Register`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
-    // const anonymousRegisterLogin = CreateAgentFunction({
-    //   viewPackage,
-    //   model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
-    //   agent: {},
-    //   maestro: newStuff.maestro,
-    //   nodePackageType: "register-login-anonymous-user",
-    //   methodType: Methods.Create,
-    //   user: NodesByType(GetState(), NodeTypes.Model).find(x =>
-    //     GetNodeProp(x, NodeProperties.IsUser)
-    //   ),
-    //   httpMethod: HTTP_METHODS.POST,
-    //   functionType: FunctionTypes.AnonymousRegisterLogin,
-    //   functionName: `Anonymous Register and Authenticate`
-    // })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
     const loginResult = CreateAgentFunction({
       viewPackage,
@@ -661,11 +648,11 @@ export const CreateLoginModels = {
       functionType: FunctionTypes.Login,
       functionName: `Authenticate User`
     })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
-    let viewName = "Authenticate";
     args = args || {};
     let chosenChildren = GetModelPropertyChildren(newStuff.loginModel).map(
       x => x.id
     );
+    let viewName = "Authenticate";
 
     let method_results = CreateDefaultView.method({
       viewName,
@@ -680,23 +667,33 @@ export const CreateLoginModels = {
       viewType: ViewTypes.Create
     });
     const authenticateScreen = method_results.screenNodeId;
-    addInstanceEventsToForms({
-      method_results,
-      targetMethod: loginResult.methodNode.id
-    });
+    Object.keys(uiTypeConfig).forEach(key => {
+      if (uiTypeConfig[key]) {
+        addInstanceEventsToForms({
+          method_results,
+          uiType: key,
+          targetMethod: loginResult.methodNode.id
+        });
+      }
+
+    })
     if (method_results.instanceFunc) {
-      PerformGraphOperation([
-        ...PostAuthenticate({
-          screen: null,
-          functionName: "Post Authenticate ReactNative",
-          pressInstance: method_results.instanceFunc.onPress
-        }),
-        ...PostAuthenticate({
-          screen: null,
-          functionName: "Post Authenticate ElectronIo",
-          clickInstance: method_results.instanceFunc.onClick
-        })
-      ])(GetDispatchFunc(), GetStateFunc());
+      Object.keys(uiTypeConfig).forEach(uiType => {
+        if (uiTypeConfig[uiType]) {
+          if (!method_results.uiTypes[uiType]) {
+            throw new Error('missing uiType in anonymous guest');
+          }
+
+          PerformGraphOperation([
+            ...PostAuthenticate({
+              screen: null,
+              uiType,
+              functionName: `Post Authenticate ${uiType}`,
+              pressInstance: uiType === UITypes.ReactNative ? method_results.uiTypes[uiType].instanceFunc.onPress : method_results.uiTypes[uiType].instanceFunc.onClick
+            })
+          ])(GetDispatchFunc(), GetStateFunc());
+        }
+      });
     }
     viewName = "Register";
     chosenChildren = GetModelPropertyChildren(newStuff.registerModel).map(
@@ -715,63 +712,41 @@ export const CreateLoginModels = {
       viewName: `${viewName}`,
       viewType: ViewTypes.Create
     });
-    addInstanceEventsToForms({
-      method_results,
-      targetMethod: regsterResult.methodNode.id
+    Object.keys(uiTypeConfig).forEach(key => {
+      if (uiTypeConfig[key]) {
+        addInstanceEventsToForms({
+          method_results,
+          uiType: key,
+          targetMethod: regsterResult.methodNode.id
+        });
+      }
     });
+    const continueAsResult = ContinueAsScreen({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const forgotLogin = ForgotLogin({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const changeUserPassword = ChangeUserPassword({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
+    const anonymous_method_results = AnonymousGuest({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
 
-    const continueAsResult = ContinueAsScreen({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
-    const forgotLogin = ForgotLogin({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
-    const changeUserPassword = ChangeUserPassword({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
-    const anonymous_method_results = AnonymousGuest({ ...args, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
-
-    // const anonymous_method_results = CreateDefaultView.method({
-    //   viewName: 'Anonymous Guest',
-    //   dispatch: GetDispatchFunc(),
-    //   getState: GetStateFunc(),
-    //   model: GetNodeById(newStuff.anonymousRegisterLoginModel, newStuff.graph),
-    //   isSharedComponent: false,
-    //   isDefaultComponent: false,
-    //   isPluralComponent: false,
-    //   uiTypes: uiTypeConfig,
-    //   chosenChildren: [],
-    //   viewType: ViewTypes.Create
-    // });
-    // addInstanceEventsToForms({
-    //   method_results: anonymous_method_results,
-    //   targetMethod: anonymousRegisterLogin.methodNode.id
-    // });
-    if (anonymous_method_results.instanceFunc) {
-      PerformGraphOperation([
-        ...PostAuthenticate({
-          screen: null,
-          functionName: "Post Authenticate ReactNative",
-          pressInstance: anonymous_method_results.instanceFunc.onPress
-        }),
-        ...PostAuthenticate({
-          screen: null,
-          functionName: "Post Authenticate ElectronIo",
-          clickInstance: anonymous_method_results.instanceFunc.onClick
-        })
-      ])(GetDispatchFunc(), GetStateFunc());
-    }
 
     const anonymousScreen = anonymous_method_results.screenNodeId;
 
     const registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
-      PerformGraphOperation([
-        ...PostRegister({
-          screen: authenticateScreen,
-          name: "Post Register ReactNative",
-          pressInstance: method_results.instanceFunc.onPress
-        }),
-        ...PostRegister({
-          screen: authenticateScreen,
-          name: "Post Register ElectronIO",
-          clickInstance: method_results.instanceFunc.onClick
-        })
-      ])(GetDispatchFunc(), GetStateFunc());
+      Object.keys(uiTypeConfig).forEach(uiType => {
+        if (uiTypeConfig[uiType]) {
+          if (!method_results.uiTypes[uiType]) {
+            throw new Error('missing uiType in anonymous guest');
+          }
+
+          PerformGraphOperation([
+            ...PostAuthenticate({
+              screen: null,
+              uiType,
+              functionName: `Post Authenticate ${uiType}`,
+              pressInstance: uiType === UITypes.ReactNative ? method_results.uiTypes[uiType].instanceFunc.onPress : method_results.uiTypes[uiType].instanceFunc.onClick
+            })
+          ])(GetDispatchFunc(), GetStateFunc());
+        }
+      });
     }
     const titleService = GetNodeByProperties({
       [NodeProperties.NODEType]: NodeTypes.TitleService
@@ -843,9 +818,12 @@ function addTitleService(args) {
   };
 }
 export function addInstanceEventsToForms(args) {
-  const { method_results, targetMethod } = args;
+  const { method_results, targetMethod, uiType } = args;
+  if (!uiType) {
+    throw new Error('no uiType set');
+  }
   let createDataChainCallback = null;
-  if (method_results && method_results.formButton) {
+  if (method_results && method_results.uiTypes && method_results.uiTypes[uiType].formButton) {
     PerformGraphOperation([
       {
         operation: CHANGE_NODE_PROPERTY,
@@ -853,26 +831,28 @@ export function addInstanceEventsToForms(args) {
           return {
             prop: NodeProperties.Pinned,
             value: false,
-            id: method_results.formButton
+            id: method_results.uiTypes[uiType].formButton
           };
         }
       }
     ])(GetDispatchFunc(), GetStateFunc());
-    if (method_results.formButtonApi) {
+    if (method_results.uiTypes[uiType].formButtonApi) {
       const context = { evts: {} };
       const getObjectDataChain = GetNodeByProperties({
         [NodeProperties.DataChainName]: DataChainName.GetObject
       });
+
       PerformGraphOperation([
-        ...Object.keys(method_results.formButtonApi).map(evt => {
+        ...Object.keys(method_results.uiTypes[uiType].formButtonApi).map(evt => {
 
           return {
             operation: ADD_NEW_NODE,
             options(graph) {
               const currentNode = GetNodeById(
-                method_results.formButtonApi[evt],
+                method_results.uiTypes[uiType].formButtonApi[evt],
                 graph
               );
+
               return addInstanceFunc(currentNode, instanceFuncNode => {
                 context.evts[evt] = {};
                 context.evts[evt].instanceFuncNode = instanceFuncNode;
@@ -891,7 +871,11 @@ export function addInstanceEventsToForms(args) {
 
             const { instanceFuncNode } = context.evts[evt];
             method_results.instanceFunc = method_results.instanceFunc || {};
+            method_results.uiTypes = method_results.uiTypes || {};
+            method_results.uiTypes[uiType] = method_results.uiTypes[uiType] || {};
+            method_results.uiTypes[uiType].instanceFunc = method_results.uiTypes[uiType].instanceFunc || {};
             method_results.instanceFunc[evt] = instanceFuncNode.id;
+            method_results.uiTypes[uiType].instanceFunc[evt] = instanceFuncNode.id;
 
             const source = instanceFuncNode.id;
             const target = targetMethod
@@ -1745,7 +1729,9 @@ export const CreateDefaultView = {
   type: "Create View - Form",
   methodType: "React Native Views",
   method(_args) {
-    const method_result = {};
+    const method_result = {
+      uiTypes: {}
+    };
     const default_View_method = (args = {}) => {
       let {
         viewName,
@@ -1892,6 +1878,9 @@ export const CreateDefaultView = {
                   screenNodeId = res.id;
                   newItems.screenNodeId = res.id;
                   method_result.screenNodeId = screenNodeId;
+                  method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+                  method_result.uiTypes[args.uiType].screenNodeId = screenNodeId;
+
                   return false;
                 }
                 return {
@@ -2048,7 +2037,7 @@ export const CreateDefaultView = {
                   flexDirection: "column"
                 };
 
-                addComponentTags(ComponentTags.Main, cellProperties);
+                addComponentTags(ComponentTags.MainSection, cellProperties);
 
                 let componentProps = null;
 
@@ -3065,6 +3054,8 @@ export const CreateDefaultView = {
                   childComponents.push(component.id);
                   newItems.button = component.id;
                   method_result.formButton = component.id;
+                  method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+                  method_result.uiTypes[args.uiType].formButton = component.id;
                 }
               };
             }
@@ -3099,6 +3090,9 @@ export const CreateDefaultView = {
                   childComponents.push(component.id);
                   newItems.cancelbutton = component.id;
                   method_result.cancelButton = component.id;
+                  method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+                  method_result.uiTypes[args.uiType].cancelButton = component.id;
+
                 }
               };
             }
@@ -3221,6 +3215,10 @@ export const CreateDefaultView = {
                     method_result.formButtonApi =
                       method_result.formButtonApi || {};
                     method_result.formButtonApi[t] = component.id;
+
+                    method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+                    method_result.uiTypes[args.uiType].formButtonApi = method_result.uiTypes[args.uiType].formButtonApi || {};
+                    method_result.uiTypes[args.uiType].formButtonApi[t] = component.id;
                   },
                   links: [
                     {

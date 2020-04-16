@@ -267,7 +267,7 @@ export function createSection(args) {
     }
   });
   if (layoutProperties && layoutProperties.tags && layoutProperties.tags.length) {
-    _style.gridArea = layoutProperties.tags[0];
+    // _style.gridArea = layoutProperties.tags[0];
   }
   css[section] = { style: { ..._style } };
   let control = "View";
@@ -308,7 +308,7 @@ export function createSection(args) {
             .filter(x => x).join(' ');
         }
         if (UITypes.ReactWeb === language) {
-          className = `className={\`${section} ${tagBasedStyles} ${tagclasses} \`}`;
+          className = `className={\`${tagBasedStyles} ${tagclasses} \`}`;
         }
         else {
           className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;

@@ -218,9 +218,7 @@ export default function (args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -253,9 +251,7 @@ export default function (args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -511,9 +507,7 @@ export default function (args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -525,9 +519,7 @@ export default function (args = {}) {
                 },
                 [context.node7]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     justifyContent: "center",
@@ -543,9 +535,7 @@ export default function (args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     justifyContent: "center",

@@ -48,7 +48,7 @@ export function updateStoredCredentials() {
 
 export async function loadCredentials(callback) {
   try {
-    var creds = await localStore.getItem(CREDENTIALS);
+    var creds = await localStore.getItemJson(CREDENTIALS);
     credentials = creds;
     if (callback) {
       callback(credentials);

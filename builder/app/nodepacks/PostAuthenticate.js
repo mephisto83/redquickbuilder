@@ -1,5 +1,6 @@
 /* eslint-disable func-names */
 import postAuthenticate_ from "./postAuthenticate_";
+import { NodeProperties } from "../constants/nodetypes";
 
 export default function(args = {}) {
   // node0
@@ -204,6 +205,19 @@ export default function(args = {}) {
             prop: "AsOutput",
             id: context.node1,
             value: true
+          }
+        }
+      ];
+    },
+
+    function() {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            prop: NodeProperties.UIType,
+            id: context.node1,
+            value: context.uiType
           }
         }
       ];

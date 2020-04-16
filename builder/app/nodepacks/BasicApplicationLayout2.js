@@ -59,7 +59,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"],
+                    tags: ["MainMenu", "MainHeader", "TopMenu"],
                     componentType: "View"
                   },
                   cellModelProperty: {},
@@ -116,7 +116,7 @@ export default function(args = {}) {
                   },
                   cellModel: {},
                   properties: {
-                    tags: ["Main"],
+                    tags: ["MainSection"],
                     componentType: "View"
                   },
                   cellModelProperty: {},

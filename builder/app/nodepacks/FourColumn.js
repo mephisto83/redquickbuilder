@@ -64,7 +64,7 @@ export default function(args = {}) {
                         "properties": {
                             "tags": [
                                 "MainMenu",
-                                "Header",
+                                "MainHeader",
                                 "TopMenu"
                             ]
                         },
@@ -123,7 +123,7 @@ export default function(args = {}) {
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},
@@ -227,7 +227,7 @@ export default function(args = {}) {
                         "properties": {
                             "tags": [
                                 "MainMenu",
-                                "Header",
+                                "MainHeader",
                                 "TopMenu"
                             ]
                         },
@@ -286,7 +286,7 @@ export default function(args = {}) {
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},
@@ -390,7 +390,7 @@ export default function(args = {}) {
                         "properties": {
                             "tags": [
                                 "MainMenu",
-                                "Header",
+                                "MainHeader",
                                 "TopMenu"
                             ]
                         },
@@ -449,7 +449,7 @@ export default function(args = {}) {
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},
@@ -553,7 +553,7 @@ export default function(args = {}) {
                         "properties": {
                             "tags": [
                                 "MainMenu",
-                                "Header",
+                                "MainHeader",
                                 "TopMenu"
                             ]
                         },
@@ -612,7 +612,7 @@ export default function(args = {}) {
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},
@@ -716,7 +716,7 @@ export default function(args = {}) {
                         "properties": {
                             "tags": [
                                 "MainMenu",
-                                "Header",
+                                "MainHeader",
                                 "TopMenu"
                             ]
                         },
@@ -775,7 +775,7 @@ export default function(args = {}) {
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},

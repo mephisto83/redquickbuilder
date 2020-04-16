@@ -31,9 +31,7 @@ export default function(args = {}) {
               properties: {
                 [context.node1]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -59,7 +57,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"],
+                    tags: ["MainMenu", "MainHeader", "TopMenu"],
                     componentType: "View"
                   },
                   cellModelProperty: {},
@@ -68,9 +66,7 @@ export default function(args = {}) {
                 },
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -105,9 +101,7 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -116,7 +110,7 @@ export default function(args = {}) {
                   },
                   cellModel: {},
                   properties: {
-                    tags: ["Main"],
+                    tags: ["MainSection"],
                     componentType: "View"
                   },
                   cellModelProperty: {},

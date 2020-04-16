@@ -4,8 +4,8 @@
   export default function(args = {}) {
     // node0,node1,node2,node3,node4,node5,node6,node7
 
-      // 
-      
+      //
+
     let context = {
       ...args,
 node0: uuidv4() ,
@@ -15,7 +15,7 @@ node3: uuidv4() ,
 node4: uuidv4() ,
 node5: uuidv4() ,
 node6: uuidv4() ,
-node7: uuidv4() 
+node7: uuidv4()
     };
     let {
       viewPackages
@@ -101,7 +101,7 @@ node7: uuidv4()
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Header"
+                                "MainHeader"
                             ]
                         },
                         "cellModelProperty": {},
@@ -143,7 +143,7 @@ node7: uuidv4()
                         "cellModel": {},
                         "properties": {
                             "tags": [
-                                "Main"
+                                "MainSection"
                             ]
                         },
                         "cellModelProperty": {},

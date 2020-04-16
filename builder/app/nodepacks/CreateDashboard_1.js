@@ -1,11 +1,13 @@
+/* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
-export default function(args = {}) {
+import { UPDATE_NODE_PROPERTY, GetNodeByProperties, NodeTypes } from "../actions/uiactions";
+
+export default function CreateDashboard_1(args = {}) {
   // node3,node4,node5,node6,node7,node8,node9,node10,node11,node12
 
   //
-  let context = {
+  const context = {
     ...args,
     node3: uuidv4(),
     node4: uuidv4(),
@@ -19,64 +21,75 @@ export default function(args = {}) {
     node12: uuidv4(),
     name: args.name || "Dashboard"
   };
-  let {
+  const {
     viewPackages = {
       [NodeProperties.ViewPackage]: uuidv4()
     }
   } = args;
-  let result = [
-    function(graph) {
+  const result = [
+    function createScreenIfNeeded(graph) {
+      const tempScreen = GetNodeByProperties({
+        [NodeProperties.UIText]: context.name,
+        [NodeProperties.NODEType]: NodeTypes.Screen,
+      }, graph);
+      if (tempScreen) {
+        context.node0 = tempScreen.id;
+        return [];
+      }
       return [
-        {
-          operation: "NEW_NODE",
-          options: {
-            callback: function(node) {
-              context.node0 = node.id;
+        function () {
+          return [
+            {
+              operation: "NEW_NODE",
+              options: {
+                callback(node) {
+                  context.node0 = node.id;
+                }
+              }
             }
-          }
-        }
-      ];
+          ];
+        },
+
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_TEXT",
+              options: {
+                id: context.node0,
+                value: `${context.name}`
+              }
+            }
+          ];
+        },
+
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                prop: "nodeType",
+                id: context.node0,
+                value: "screen"
+              }
+            }
+          ];
+        },
+
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                prop: "Pinned",
+                id: context.node0,
+                value: true
+              }
+            }
+          ];
+        }]
     },
 
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_TEXT",
-          options: {
-            id: context.node0,
-            value: "" + context.name + ""
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "nodeType",
-            id: context.node0,
-            value: "screen"
-          }
-        }
-      ];
-    },
-
-    function(graph) {
-      return [
-        {
-          operation: "CHANGE_NODE_PROPERTY",
-          options: {
-            prop: "Pinned",
-            id: context.node0,
-            value: true
-          }
-        }
-      ];
-    },
-
-    function(graph) {
+    function () {
       return [
         {
           operation: "NEW_SCREEN_OPTIONS",
@@ -89,7 +102,7 @@ export default function(args = {}) {
                 "screen-options": {}
               }
             },
-            callback: function(node, graph, group) {
+            callback(node, group) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -98,32 +111,32 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
           options: {
             prop: "UIType",
             id: context.node1,
-            value: "ElectronIO"
+            value: context.uiType || "ElectronIO"
           }
         }
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node1,
-            value: "" + context.name + " IO"
+            value: `${context.name} IO`
           }
         }
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "NEW_COMPONENT_NODE",
@@ -131,7 +144,7 @@ export default function(args = {}) {
             parent: context.node1,
             groupProperties: {},
             properties: {
-              UIType: "ElectronIO"
+              UIType: context.uiType || "ElectronIO"
             },
             linkProperties: {
               properties: {
@@ -140,7 +153,7 @@ export default function(args = {}) {
                 component: {}
               }
             },
-            callback: function(node, graph, group) {
+            callback(node, group) {
               context.node2 = node.id;
               context.group1 = group;
             }
@@ -149,7 +162,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -166,9 +179,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -199,16 +210,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -221,7 +230,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -238,9 +247,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -271,16 +278,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -293,7 +298,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -310,9 +315,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -343,16 +346,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -365,7 +366,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -382,9 +383,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -415,16 +414,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -437,7 +434,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -454,9 +451,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -487,16 +482,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -509,7 +502,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -526,9 +519,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -559,16 +550,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -581,7 +570,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -598,9 +587,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -631,16 +618,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -653,7 +638,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -670,9 +655,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -703,16 +686,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -725,7 +706,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -742,9 +723,7 @@ export default function(args = {}) {
               properties: {
                 [context.node3]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -775,16 +754,14 @@ export default function(args = {}) {
                 },
                 [context.node5]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -797,7 +774,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -819,9 +796,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -845,7 +820,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -853,9 +828,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -898,7 +871,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -947,7 +920,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -969,9 +942,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -995,7 +966,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1003,9 +974,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -1048,7 +1017,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1097,7 +1066,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1119,9 +1088,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -1145,7 +1112,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1153,9 +1120,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -1198,7 +1163,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1247,7 +1212,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1269,9 +1234,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -1295,7 +1258,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1303,9 +1266,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -1348,7 +1309,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1397,7 +1358,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1419,9 +1380,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -1447,7 +1406,7 @@ export default function(args = {}) {
                   },
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1455,9 +1414,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -1500,7 +1457,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1549,19 +1506,19 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
           options: {
             id: context.node2,
-            value: "" + context.name + " IO Title"
+            value: `${context.name} IO Title`
           }
         }
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1574,7 +1531,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function () {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1596,9 +1553,7 @@ export default function(args = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1,
                     flexDirection: "column"
@@ -1624,7 +1579,7 @@ export default function(args = {}) {
                   },
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1632,9 +1587,7 @@ export default function(args = {}) {
                 },
                 [context.node8]: {
                   style: {
-                    display: "flex",
-                    flex: 1,
-                    height: "100%",
+
                     borderStyle: "solid",
                     borderWidth: 1
                   },
@@ -1677,7 +1630,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1726,10 +1679,10 @@ export default function(args = {}) {
       ];
     }
   ];
-  let clearPinned = [
+  const clearPinned = [
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node1,
@@ -1739,7 +1692,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node2,
@@ -1749,7 +1702,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node3,
@@ -1759,7 +1712,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node4,
@@ -1769,7 +1722,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node5,
@@ -1779,7 +1732,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node6,
@@ -1789,7 +1742,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node7,
@@ -1799,7 +1752,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node8,
@@ -1809,7 +1762,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node9,
@@ -1819,7 +1772,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node10,
@@ -1829,7 +1782,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node11,
@@ -1839,7 +1792,7 @@ export default function(args = {}) {
     },
     {
       operation: "CHANGE_NODE_PROPERTY",
-      options: function() {
+      options() {
         return {
           prop: "Pinned",
           id: context.node12,
@@ -1848,24 +1801,22 @@ export default function(args = {}) {
       }
     }
   ];
-  let applyViewPackages = [
-    ...["node0", "node1", "node2"].map(v => {
-      return {
-        operation: UPDATE_NODE_PROPERTY,
-        options: function() {
-          return {
-            id: context[v],
-            properties: viewPackages
-          };
-        }
-      };
-    })
+  const applyViewPackages = [
+    ...["node0", "node1", "node2"].map(v => ({
+      operation: UPDATE_NODE_PROPERTY,
+      options() {
+        return {
+          id: context[v],
+          properties: viewPackages
+        };
+      }
+    }))
   ];
   return [
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    function() {
+    function () {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context);

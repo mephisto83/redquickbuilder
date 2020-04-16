@@ -5,7 +5,7 @@ import { ViewTypes } from "../../constants/viewtypes";
 import { HTTP_METHODS, FunctionTypes } from "../../constants/functiontypes";
 
 export default function ContinueAsScreen(args) {
-  const { viewPackage, graph, maestro } = args;
+  const { viewPackage, graph, maestro, uiTypeConfig } = args;
   const newStuff = {};
 
   PerformGraphOperation([
@@ -59,10 +59,15 @@ export default function ContinueAsScreen(args) {
     chosenChildren: [],
     viewType: ViewTypes.Create
   });
+  Object.keys(uiTypeConfig).forEach(uiType => {
+    if (uiTypeConfig[uiType]) {
 
-  addInstanceEventsToForms({
-    method_results: continueMethodResults,
-    targetMethod: anonymousRegisterLogin.methodNode.id
+      addInstanceEventsToForms({
+        uiType,
+        method_results: continueMethodResults,
+        targetMethod: anonymousRegisterLogin.methodNode.id
+      });
+    }
   });
 
   return {

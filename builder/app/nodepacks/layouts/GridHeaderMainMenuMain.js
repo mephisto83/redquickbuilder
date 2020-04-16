@@ -102,7 +102,7 @@ export default function GridHeaderMainMenuMain(args = {}) {
                 "cellModel": {},
                 "properties": {
                   "tags": [
-                    "Header"
+                    "MainHeader"
                   ]
                 },
                 "cellModelProperty": {},
@@ -146,7 +146,7 @@ export default function GridHeaderMainMenuMain(args = {}) {
                 "cellModel": {},
                 "properties": {
                   "tags": [
-                    "Main"
+                    "MainSection"
                   ]
                 },
                 "cellModelProperty": {},

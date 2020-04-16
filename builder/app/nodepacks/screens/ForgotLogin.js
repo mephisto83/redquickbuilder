@@ -6,7 +6,7 @@ import { HTTP_METHODS, FunctionTypes } from "../../constants/functiontypes";
 import { ComponentTypeKeys } from "../../constants/componenttypes";
 
 export default function ForgotLogin(args) {
-  const { viewPackage, maestro, graph } = args;
+  const { viewPackage, maestro, graph, uiTypeConfig } = args;
   const newStuff = {};
 
   PerformGraphOperation([
@@ -76,19 +76,19 @@ export default function ForgotLogin(args) {
     isSharedComponent: false,
     isDefaultComponent: false,
     isPluralComponent: false,
-    uiTypes: {
-      [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
-      [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
-      [UITypes.VR]: args[UITypes.VR] || false,
-      [UITypes.ReactWeb]: args[UITypes.ReactWeb] || false
-    },
+    uiTypes: uiTypeConfig,
     chosenChildren: [],
     viewType: ViewTypes.Create
   });
+  Object.keys(uiTypeConfig).forEach(uiType => {
+    if (uiTypeConfig[uiType]) {
 
-  addInstanceEventsToForms({
-    method_results: continueMethodResults,
-    targetMethod: anonymousRegisterLogin.methodNode.id
+      addInstanceEventsToForms({
+        uiType,
+        method_results: continueMethodResults,
+        targetMethod: anonymousRegisterLogin.methodNode.id
+      });
+    }
   });
 
   return {

@@ -64,7 +64,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -116,7 +116,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -175,7 +175,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -227,7 +227,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -286,7 +286,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -338,7 +338,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -397,7 +397,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -449,7 +449,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -508,7 +508,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -560,7 +560,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -619,7 +619,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -671,7 +671,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -730,7 +730,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -782,7 +782,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -841,7 +841,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -893,7 +893,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -952,7 +952,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1004,7 +1004,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1063,7 +1063,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1115,7 +1115,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1174,7 +1174,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1226,7 +1226,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1285,7 +1285,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1337,7 +1337,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1396,7 +1396,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1448,7 +1448,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1507,7 +1507,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1559,7 +1559,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1618,7 +1618,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1670,7 +1670,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1729,7 +1729,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1781,7 +1781,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1840,7 +1840,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1892,7 +1892,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -1951,7 +1951,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2003,7 +2003,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2062,7 +2062,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2114,7 +2114,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2173,7 +2173,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2225,7 +2225,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2284,7 +2284,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2336,7 +2336,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2395,7 +2395,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2447,7 +2447,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2507,7 +2507,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2559,7 +2559,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2635,7 +2635,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2687,7 +2687,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2763,7 +2763,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "Header", "TopMenu"]
+                    tags: ["MainMenu", "MainHeader", "TopMenu"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -2815,7 +2815,7 @@ export default function(args = {}) {
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["Main"]
+                    tags: ["MainSection"]
                   },
                   cellModelProperty: {},
                   cellRoot: {},

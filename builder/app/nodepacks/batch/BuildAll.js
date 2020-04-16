@@ -93,6 +93,11 @@ export default async function BuildAll(callback) {
   const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
   const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
   const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
+  const uiTypes = {
+    [UITypes.ElectronIO]: true,
+    [UITypes.ReactWeb]: true,
+    [UITypes.ReactNative]: true
+  };
   SetPause(true);
   setVisual(MAIN_CONTENT, PROGRESS_VIEW)(GetDispatchFunc(), GetStateFunc());
   await pause();
@@ -142,10 +147,16 @@ export default async function BuildAll(callback) {
 
 
     await run(buildAllProgress, Create_Dashboard, async (progresFunc) => {
-      graphOperation(CreateDashboard({
-        name: AuthorizedDashboard,
-        progresFunc
-      }))(GetDispatchFunc(), GetStateFunc());
+      const count = Object.keys(uiTypes).length;
+      await Object.keys(uiTypes).forEachAsync(async (uiType, uiIndex) => {
+
+        graphOperation(CreateDashboard({
+          name: AuthorizedDashboard,
+          uiType,
+
+        }))(GetDispatchFunc(), GetStateFunc());
+        await progresFunc(uiIndex / count);
+      })
     });
 
 
@@ -154,11 +165,7 @@ export default async function BuildAll(callback) {
       executeGraphOperation(
         null,
         CreateLoginModels,
-        {
-          [UITypes.ElectronIO]: true,
-          [UITypes.ReactWeb]: true,
-          [UITypes.ReactNative]: true
-        }
+        uiTypes
       )(GetDispatchFunc(), GetStateFunc());
       await progresFunc(2 / 10);
 

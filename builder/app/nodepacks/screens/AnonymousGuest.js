@@ -6,7 +6,7 @@ import { HTTP_METHODS, FunctionTypes } from "../../constants/functiontypes";
 import PostAuthenticate from "../PostAuthenticate";
 
 export default function AnonymousGuest(args) {
-  const { viewPackage, graph, maestro } = args;
+  const { viewPackage, graph, maestro, uiTypeConfig } = args;
   const newStuff = {};
 
   PerformGraphOperation([
@@ -50,34 +50,37 @@ export default function AnonymousGuest(args) {
     isSharedComponent: false,
     isDefaultComponent: false,
     isPluralComponent: false,
-    uiTypes: {
-      [UITypes.ReactNative]: args[UITypes.ReactNative] || false,
-      [UITypes.ElectronIO]: args[UITypes.ElectronIO] || false,
-      [UITypes.VR]: args[UITypes.VR] || false,
-      [UITypes.ReactWeb]: args[UITypes.ReactWeb] || false
-    },
+    uiTypes: uiTypeConfig,
     chosenChildren: [],
     viewType: ViewTypes.Create
   });
+  Object.keys(uiTypeConfig).forEach(key => {
+    if (uiTypeConfig[key]) {
 
-  addInstanceEventsToForms({
-    method_results: continueMethodResults,
-    targetMethod: anonymousRegisterLogin.methodNode.id
+      addInstanceEventsToForms({
+        method_results: continueMethodResults,
+        uiType: key,
+        targetMethod: anonymousRegisterLogin.methodNode.id
+      });
+    }
   });
 
   if (continueMethodResults.instanceFunc) {
-    PerformGraphOperation([
-      ...PostAuthenticate({
-        screen: null,
-        functionName: "Post Authenticate ReactNative",
-        pressInstance: continueMethodResults.instanceFunc.onPress
-      }),
-      ...PostAuthenticate({
-        screen: null,
-        functionName: "Post Authenticate ElectronIo",
-        clickInstance: continueMethodResults.instanceFunc.onClick
-      })
-    ])(GetDispatchFunc(), GetStateFunc());
+    Object.keys(uiTypeConfig).forEach(uiType => {
+      if (uiTypeConfig[uiType]) {
+        if (!continueMethodResults.uiTypes[uiType]) {
+          throw new Error('missing uiType in anonymous guest');
+        }
+        PerformGraphOperation([
+          ...PostAuthenticate({
+            screen: null,
+            uiType,
+            functionName: `Post Authenticate ${uiType}`,
+            pressInstance: uiType === UITypes.ReactNative ? continueMethodResults.uiTypes[uiType].instanceFunc.onPress : continueMethodResults.uiTypes[uiType].instanceFunc.onClick
+          })
+        ])(GetDispatchFunc(), GetStateFunc());
+      }
+    });
   }
 
   return {

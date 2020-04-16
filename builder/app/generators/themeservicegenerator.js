@@ -175,6 +175,7 @@ function GenerateGlobalCss(options) {
               }
               return `
           display: grid;
+          ${htmlselector.indexOf(selector) === -1 ? `grid-area: ${selector}` : ''};
           grid-template-columns: ${gridTemplateColumns};
           grid-template-rows: ${gridTemplateRows};
           ${gap}
@@ -224,6 +225,11 @@ ${areas.join(NEW_LINE)};
     fontStyleLink += `
     <script src="https://kit.fontawesome.com/84589ad5a6.js" crossorigin="anonymous"></script>
   `;
+  }
+  if (language === UITypes.ReactWeb) {
+    fontStyleLink += `
+      <link type="text/css" href="./app.global.css" rel="stylesheet"/>
+    `
   }
   let srcpath = '';
   switch (language) {

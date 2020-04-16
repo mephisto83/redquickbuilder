@@ -48,7 +48,7 @@ export function updateStoredCredentials() {
 
 export async function loadCredentials(callback) {
   try {
-    var creds = await localStore.getItem(CREDENTIALS);
+    var creds = await localStore.getItemJson(CREDENTIALS);
     credentials = creds;
     if (callback) {
       callback(credentials);
@@ -123,13 +123,16 @@ export function createRedService(domain, wsdomain, _forceBase) {
               "Content-Type": "multipart/form-data"
             }
           ),
+          credentials: 'include',
           method: method,
           body: formData
         });
       } else {
         fetchPromise = fetch(endpoint, {
           rejectUnauthorized: false,
+          credentials: 'omit',
           headers: Object.assign({}, headers, {
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
             Authorization: "Bearer " + service.getAccessToken()
           }),
           method: method,

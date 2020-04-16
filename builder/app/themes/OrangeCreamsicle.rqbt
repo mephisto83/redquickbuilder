@@ -30,12 +30,12 @@
                 "gridTemplateColumns": "258px 1fr 1fr",
                 "gridTemplateRows": "150px auto",
                 "gridPlacement": [
-                    "Header",
-                    "Header",
-                    "Header",
+                    "MainHeader",
+                    "MainHeader",
+                    "MainHeader",
                     "MainMenu",
-                    "Main",
-                    "Main"
+                    "MainSection",
+                    "MainSection"
                 ],
                 "mediaSizes": {
                     "Extra devices": true,
@@ -51,12 +51,12 @@
                 "gridTemplateColumns": "258px 1fr 1fr",
                 "gridTemplateRows": "150px auto",
                 "gridPlacement": [
-                    "Header",
-                    "Header",
-                    "Header",
+                    "MainHeader",
+                    "MainHeader",
+                    "MainHeader",
                     "MainMenu",
-                    "Main",
-                    "Main"
+                    "MainSection",
+                    "MainSection"
                 ],
                 "mediaSizes": {
                     "Large devices": false,

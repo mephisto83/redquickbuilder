@@ -16,3 +16,14 @@ export async function getItem(key) {
   }
   return null;
 }
+
+export async function getItemJson(key) {
+  try {
+    const res = await getItem(key);
+    return JSON.parse(res);
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  return null;
+}

@@ -27,6 +27,74 @@
     "themeGridPlacements": {
         "grids": [
             {
+                "id": "163e9e88-4fb3-45f5-83a0-dce7b9518f53",
+                "name": "main-screen-container",
+                "gridTemplateColumns": "258px 1fr 1fr",
+                "gridTemplateRows": "150px auto",
+                "gridPlacement": [
+                    "MainHeader",
+                    "MainHeader",
+                    "MainHeader",
+                    "MainMenu",
+                    "MainSection",
+                    "MainSection"
+                ],
+                "mediaSizes": {
+                    "Large devices": false,
+                    "Extra devices": false,
+                    "Extra small devices": true,
+                    "Small devices": true
+                },
+                "gridTemplateColumnGap": "--grid-colum-gap",
+                "gridTemplateRowGap": "--grid-colum-gap"
+            },
+            {
+                "id": "e3f130fa-c2bd-4032-bcd7-6492619676cc",
+                "name": "main-screen-container",
+                "gridTemplateColumns": "258px 1fr 1fr",
+                "gridTemplateRows": "150px auto",
+                "gridPlacement": [
+                    "MainHeader",
+                    "MainHeader",
+                    "MainHeader",
+                    "MainMenu",
+                    "MainSection",
+                    "MainSection"
+                ],
+                "mediaSizes": {
+                    "Extra devices": true,
+                    "Large devices": true,
+                    "Media devices": true,
+                    "Small devices": false,
+                    "Extra small devices": false
+                },
+                "gridTemplateColumnGap": "--grid-colum-gap",
+                "gridTemplateRowGap": "--grid-colum-gap"
+            },
+            {
+                "id": "410f7ffe-4859-4b7f-93fc-353edc1377be",
+                "name": "main-screen-alternate-container",
+                "gridTemplateColumns": "258px 1fr 1fr",
+                "gridTemplateRows": "150px auto",
+                "gridPlacement": [
+                    "MainHeader",
+                    "MainHeader",
+                    "MainHeader",
+                    "MainMenu",
+                    "MainSection",
+                    "MainSection"
+                ],
+                "mediaSizes": {
+                    "Extra small devices": true,
+                    "Small devices": true,
+                    "Media devices": true,
+                    "Extra devices": true,
+                    "Large devices": true
+                },
+                "gridTemplateColumnGap": "--grid-colum-gap",
+                "gridTemplateRowGap": "--grid-colum-gap"
+            },
+            {
                 "id": "9b5fee88-7eab-401b-99fc-acf534c4280a",
                 "name": "main-screen-alternate",
                 "gridTemplateColumns": "1fr 200px 800px 1fr",
@@ -182,51 +250,6 @@
                 "gridTemplateRowGap": "--grid-colum-gap"
             },
             {
-                "id": "e3f130fa-c2bd-4032-bcd7-6492619676cc",
-                "name": "main-screen-container",
-                "gridTemplateColumns": "258px 1fr 1fr",
-                "gridTemplateRows": "150px auto",
-                "gridPlacement": [
-                    "Header",
-                    "Header",
-                    "Header",
-                    "MainMenu",
-                    "Main",
-                    "Main"
-                ],
-                "mediaSizes": {
-                    "Extra devices": true,
-                    "Large devices": true,
-                    "Media devices": true,
-                    "Small devices": false,
-                    "Extra small devices": false
-                },
-                "gridTemplateColumnGap": "--grid-colum-gap",
-                "gridTemplateRowGap": "--grid-colum-gap"
-            },
-            {
-                "id": "163e9e88-4fb3-45f5-83a0-dce7b9518f53",
-                "name": "main-screen-container",
-                "gridTemplateColumns": "258px 1fr 1fr",
-                "gridTemplateRows": "150px auto",
-                "gridPlacement": [
-                    "Header",
-                    "Header",
-                    "Header",
-                    "MainMenu",
-                    "Main",
-                    "Main"
-                ],
-                "mediaSizes": {
-                    "Large devices": false,
-                    "Extra devices": false,
-                    "Extra small devices": true,
-                    "Small devices": true
-                },
-                "gridTemplateColumnGap": "--grid-colum-gap",
-                "gridTemplateRowGap": "--grid-colum-gap"
-            },
-            {
                 "id": "c72f32ce-6bea-45d0-8848-c5158ba06543",
                 "name": "Register",
                 "gridTemplateColumns": "1fr 1fr 1fr 1fr",
@@ -273,29 +296,6 @@
                     "Media devices": true,
                     "Small devices": true,
                     "Extra small devices": true
-                },
-                "gridTemplateColumnGap": "--grid-colum-gap",
-                "gridTemplateRowGap": "--grid-colum-gap"
-            },
-            {
-                "id": "410f7ffe-4859-4b7f-93fc-353edc1377be",
-                "name": "main-screen-alternate-container",
-                "gridTemplateColumns": "258px 1fr 1fr",
-                "gridTemplateRows": "150px auto",
-                "gridPlacement": [
-                    "Header",
-                    "Header",
-                    "Header",
-                    "MainMenu",
-                    "Main",
-                    "Main"
-                ],
-                "mediaSizes": {
-                    "Extra small devices": true,
-                    "Small devices": true,
-                    "Media devices": true,
-                    "Extra devices": true,
-                    "Large devices": true
                 },
                 "gridTemplateColumnGap": "--grid-colum-gap",
                 "gridTemplateRowGap": "--grid-colum-gap"
