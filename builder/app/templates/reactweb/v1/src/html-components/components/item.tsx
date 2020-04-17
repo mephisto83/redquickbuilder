@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-export default class Item extends Component<{ [index: string]: any }, { [index: string]: any }> {
+export default class Item extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};

@@ -3697,6 +3697,7 @@ export function GetCurrentTheme(state) {
   const {
     themeColors = {},
     themeColorUses = {},
+    spaceTheme = {},
     themeOtherUses = {},
     themeGridPlacements = { grids: [] },
     themeFonts = { fonts: [] },
@@ -3706,6 +3707,7 @@ export function GetCurrentTheme(state) {
     themeColors,
     themeColorUses,
     themeOtherUses,
+    spaceTheme,
     themeGridPlacements,
     themeFonts,
     themeVariables

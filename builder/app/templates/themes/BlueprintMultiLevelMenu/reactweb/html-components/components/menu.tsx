@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import RedGraph from '../../actions/redgraph';
-import styles from './menu.css';
+import './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
 export default class Menu extends Component<any, any> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}
@@ -15,43 +15,46 @@ export default class Menu extends Component<any, any> {
 			children = RedGraph.getChildren(this.props.value, this.props.id);
 			return (
 				<ul
-					style={{ display: this.props.open ? 'block' : '', '--item-count': children.length }}
-					className={`${styles.nav} ${styles['nav']} ${this.props.open ? styles['nav-open'] : ''} ${styles[
-						'nav-treeview'
-					]} ${styles['flex-column']}`}
+					style={{
+             display: this.props.open ? 'block' : '',
+             /*
+  // @ts-ignore */
+              '--item-count': children.length
+             }}
+					className={` nav nav  ${this.props.open ?  'nav-open' : ''} nav-treeview  flex-column `}
 				>
-					{children.map((child, index) => this.renderItem(child, index))}
+					{children.map((child: any, index: any) => this.renderItem(child, index))}
 				</ul>
 			);
 		}
 		children = RedGraph.getChildren(this.props.value, null);
 		return (
-			<nav className={`${styles['mt-2']}`}>
+			<nav className={` mt-2 `}>
 				<ul
-					className={`${styles.nav} ${styles['nav-pills']} ${styles['nav-sidebar']} ${styles['flex-column']}`}
+					className={` nav  nav-pills   nav-sidebar   flex-column `}
 				>
-					{children.map((child, index) => this.renderItem(child, index))}
+					{children.map((child: any, index: any) => this.renderItem(child, index))}
 				</ul>
 			</nav>
 		);
 	}
-	isParent(child, index) {
+	isParent(child: any, index: any) {
 		const id = RedGraph.getId(child);
 		const children = RedGraph.getChildren(this.props.value, id);
 		return children && children.length;
 	}
-	isActive(child, index) {
+	isActive(child: any, index: any) {
 		let id = RedGraph.getId(child);
 		return this.state.openMenu === id;
 	}
-	getIcon(child, index) {
+	getIcon(child: any, index: any) {
 		let isActive = this.isActive(child, index);
 		let isParent = this.isParent(child, index);
-		return `${styles['nav-icon']} ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive
-			? styles['icon-active']
+		return ` nav-icon  ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive
+			?  'icon-active'
 			: ''}`;
 	}
-	renderItem(child, index) {
+	renderItem(child: any, index: any) {
 		let id = RedGraph.getId(child);
 		let title = RedGraph.getTitle(this.props.value, id);
 		let children = RedGraph.getChildren(this.props.value, id);
@@ -61,9 +64,9 @@ export default class Menu extends Component<any, any> {
 		return (
 			<li
 				key={`li-${index}`}
-				className={`${styles['nav-item']}
-        ${openMenu === id ? styles['menu-opn'] : ''}
-        ${children && children.length ? styles['has-treeview'] : ''} menu-drop-down`}
+				className={` nav-item
+        ${openMenu === id ?  'menu-opn' : ''}
+        ${children && children.length ?  'has-treeview' : ''} menu-drop-down`}
 				onClick={() => {
 					if (this.props.toggleVisual) {
 						this.props.toggleVisual('menu-item-open', id);
@@ -78,9 +81,8 @@ export default class Menu extends Component<any, any> {
 				}}
 			>
 				<a
-					className={`${styles['nav-link']} ${this.isActive(child, index)
-						? styles['active']
-						: ''} menu-drop-down-button`}
+					className={` nav-link  ${this.isActive(child, index)
+						?  'active' 						: ''} menu-drop-down-button`}
 				>
 					<i className={`${this.getIcon(child, index)}`} />
 					<p>{titleService ? titleService.getTitle(title) : title}</p>
@@ -90,7 +92,7 @@ export default class Menu extends Component<any, any> {
 						open={this.state.openMenu === id}
 						value={this.props.value}
 						id={id}
-						onClick={(id) => {
+						onClick={(id: any) => {
 							if (this.props.onClick) {
 								this.props.onClick(id);
 							}

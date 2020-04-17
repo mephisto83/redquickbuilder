@@ -50,7 +50,12 @@ class ThemeView extends Component {
   getEditBoxes(formType, mediaSize, formTheme, themeColors, config, themeVariables, filterFunc) {
     // ComponentTags
     if (formType && mediaSize) {
-      return Object.values(StyleLib.css).filter(v => filterFunc(`${v.label}`)).map(field => {
+      return Object.values(StyleLib.css).filter(v => (
+        formTheme &&
+        formTheme[formType] &&
+        formTheme[formType][mediaSize] &&
+        formTheme[formType][mediaSize][v.label]
+      ) || filterFunc(`${v.label}`)).map(field => {
         const { placeholder, key, type } = field;
         let { label } = field;
         label = `${label}`;
@@ -145,7 +150,12 @@ class ThemeView extends Component {
   getSpaceFields(formType, mediaSize, formTheme, themeColors = {}, themeVariables, filterFunc) {
     // ComponentTags
     if (formType && mediaSize) {
-      return Object.values(StyleLib.css).filter(v => filterFunc(`${v.label}`)).map(field => {
+      return Object.values(StyleLib.css).filter(v => (
+        formTheme &&
+        formTheme[formType] &&
+        formTheme[formType][mediaSize] &&
+        formTheme[formType][mediaSize][v.label]
+      ) || filterFunc(`${v.label}`)).map(field => {
         const { placeholder, key, type } = field;
         let { label } = field;
         label = `${label}`;

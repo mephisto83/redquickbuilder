@@ -11,7 +11,7 @@ export const Themes = {
       themerelative: "./app/theme"
     },
     [UITypes.ReactWeb]: {
-      location: "./app/templates/themes/ContactFrom_v4/electronio/",
+      location: "./app/templates/themes/ContactFrom_v4/reactweb/",
       theme: "./app/templates/themes/ContactFrom_v4/theme/",
       relative: "./src",
       themerelative: "./app/theme"
@@ -25,7 +25,7 @@ export const Themes = {
       themerelative: "./app/theme"
     },
     [UITypes.ReactWeb]: {
-      location: './app/templates/themes/InputMaterialWithGradient/electronio/',
+      location: './app/templates/themes/InputMaterialWithGradient/reactweb/',
       theme: './app/templates/themes/InputMaterialWithGradient/theme/',
       relative: "./src",
       themerelative: "./app/theme"
@@ -39,7 +39,7 @@ export const Themes = {
       themerelative: "./app/theme"
     },
     [UITypes.ReactWeb]: {
-      location: './app/templates/themes/BlueprintMultiLevelMenu/electronio/',
+      location: './app/templates/themes/BlueprintMultiLevelMenu/reactweb/',
       theme: './app/templates/themes/BlueprintMultiLevelMenu/theme/',
       relative: "./src",
       themerelative: "./app/theme"

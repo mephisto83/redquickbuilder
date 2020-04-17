@@ -3,7 +3,7 @@ import Validation from './validation';
 import InputFunctions from './inputfunctions';
 import * as style from './input.css';
 
-export default class Input extends React.Component {
+export default class Input extends React.Component<any, any> {
 	constructor(props) {
 		super(props);
 		this.state = { $name: `input-${Date.now()}` };
