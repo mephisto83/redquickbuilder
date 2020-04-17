@@ -11,7 +11,7 @@ var {
 
 export function GUID() {
   var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    var r = Math.random() * 16 | 0, v = c == 'x'  r: (r & 0x3 | 0x8);
     return v.toString(16);
   });
   return guid;
@@ -47,33 +47,62 @@ export const asyncStorage = store => next => action => {
 
 export const titleService = TitleService;
 
+// Gets the function key parameters,
+// That means that a function has parameters, and we can use
+// those paramters to set the Visual to loading on a specific key
+export function getVisualFunctionKey(func, param, defaultKey) {
+  let key = defaultKey;
+  if (func && func.requirements) {
+    key = func.requirements(param);
+  }
+
+  return key || defaultKey;
+}
+//Checks if the function should fire based on the parameters
+export function shouldExecuteBasedOnParams(func, param) {
+  if (func && func.canSend) {
+    return func.canSend(param);
+  }
+  return true;
+}
+
 ///Lots of stuff to add here,
 // better error handling
-export function simple(func, param, states, callback, error) {
+export function simple(func, param, states, callback, error, precall) {
   return (dispatch, getState) => {
+    if (!shouldExecuteBasedOnParams(func, param)) {
+      return Promise.resolve();
+    }
+
     var state = getState();
     var loading = states.loading;
     var objectType = states.objectType;
-    if (!Visual(state, loading)) {
-      dispatch(UIActions.UIV(loading, true));
-      return func(param).then(res => {
-        if (callback) {
-          callback(res, dispatch, getState);
-        }
-        return res;
-      }).catch(catchAnd((e) => {
-        if (error) {
-          error(e, dispatch, getState);
-        }
-      })).then((res) => {
-        dispatch(UIActions.UIV(loading, false));
-        return res;
-      });
+    let visualKey = getVisualFunctionKey(func, param, loading);
+    if (!Visual(state, visualKey)) {
+      dispatch(UIActions.UIV(visualKey, true));
+      if (precall) {
+        precall(param, dispatch, getState);
+      }
+      return func(param)
+        .then((res) => {
+          if (callback) {
+            callback(res, dispatch, getState);
+          }
+          return res;
+        })
+        .catch((e) => {
+          if (error) {
+            error(e, dispatch, getState);
+          }
+        })
+        .then((res) => {
+          dispatch(UIActions.UIV(visualKey, false));
+          return res;
+        });
     }
     return Promise.resolve();
-  }
+  };
 }
-
 export const _catch = (e) => {
   return Promise.resolve().then(() => {
     if (e && e.message && e.message.json) {
@@ -99,11 +128,11 @@ export const catchAnd = (then) => {
       configurable: true,
       value: function (start, stop) {
         var collection = this;
-        stop = Math.min(collection.length, stop === undefined || stop === null ? collection.length : stop);
-        start = Math.min(collection.length, start === undefined || start === null ? collection.length : start);
-        start = start < 0 ? 0 : start;
-        stop = stop < 0 ? 0 : stop;
-        var result = this instanceof Float32Array ? new Float32Array(stop - start) : [];
+        stop = Math.min(collection.length, stop === undefined || stop === null  collection.length : stop);
+        start = Math.min(collection.length, start === undefined || start === null  collection.length : start);
+        start = start < 0  0 : start;
+        stop = stop < 0  0 : stop;
+        var result = this instanceof Float32Array  new Float32Array(stop - start) : [];
         for (var i = start; i < stop; i++) {
           if (this instanceof Float32Array) {
             result[i - start] = collection[i];

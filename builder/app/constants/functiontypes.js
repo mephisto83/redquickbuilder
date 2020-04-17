@@ -695,10 +695,14 @@ export const QUERY_PARAMETERS = {
   [QUERY_PARAMETER_KEYS.Sort]: true
 };
 export const TEMPLATE_PARAMETERS = {
-  [TEMPLATE_PARAMETER_KEYS.ModelId]: true
+  [TEMPLATE_PARAMETER_KEYS.ModelId]: {
+    isGuid: true
+  }
 };
 export const GET_QUERY_PARAMETERS = {
-  [QUERY_PARAMETER_KEYS.Id]: true
+  [QUERY_PARAMETER_KEYS.Id]: {
+    isGuid: true
+  }
 };
 
 export const MethodFunctions = {

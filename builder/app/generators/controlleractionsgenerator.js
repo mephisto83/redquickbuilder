@@ -34,10 +34,12 @@ export default class ControllerActionGenerator {
   static GenerateService(options) {
     const { state, language } = options;
     let fileEnd = ".js";
+    let useAny = false;
     switch (language) {
       case UITypes.ElectronIO:
       case UITypes.ReactWeb:
         fileEnd = ".ts";
+        useAny = true;
         break;
       default: break;
     }
@@ -47,13 +49,13 @@ export default class ControllerActionGenerator {
       "utf8"
     );
     const methodTemplate = `
-{{methodName}}: async (params: any) => {
+{{methodName}}: async (params${useAny ? ': any' : ''}) => {
     let { template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`);
 }`;
     const postMethodTemplate = `
-{{methodName}}: async (params: any) => {
+{{methodName}}: async (params${useAny ? ': any' : ''}) => {
     let { body, template, query } = params;
     {{template_params_def}}
     return redservice().{{methodType}}(\`\${endpoints.{{methodName}}}{{template_params}}\`, body, {{options}});
@@ -75,6 +77,7 @@ export default class ControllerActionGenerator {
         options: `{}`
       });
     }
+    let serviceRequirements = [];
     temp = [
       fetchServiceMethodImplementation,
       ...temp.map(method => {
@@ -84,13 +87,14 @@ export default class ControllerActionGenerator {
         if (maestroNode) {
           const controllerNode = GetControllerNode(maestroNode.id);
           if (controllerNode) {
+            let methodName = GetJSCodeName(method);
             if (GetNodeProp(method, NodeProperties.NoApiPrefix)) {
-              endpoints[GetJSCodeName(method)] = `${GetNodeProp(
+              endpoints[methodName] = `${GetNodeProp(
                 method,
                 NodeProperties.HttpRoute
               )}`;
             } else {
-              endpoints[GetJSCodeName(method)] = `api/${GetJSCodeName(
+              endpoints[methodName] = `api/${GetJSCodeName(
                 controllerNode
               ).toLowerCase()}/${GetNodeProp(
                 method,
@@ -125,10 +129,30 @@ export default class ControllerActionGenerator {
               const { modelId, parentId } = MethodFunctions[
                 functionType
               ].parameters.parameters.template;
+              let idKey = null;
               if (modelId) {
                 template_params = "/${modelId}";
+                idKey = 'modelId';
+
               } else if (parentId) {
                 template_params = "/${parentId}";
+                idKey = 'parentId';
+              }
+              if (idKey) {
+                serviceRequirements.push(`
+              (serviceImpl.${methodName} ${useAny ? 'as any' : ''}).requirements = function(params${useAny ? ': any' : ''}) {
+                if(params && params.template && params.template.${idKey} && isGuid(params.template.${idKey})) {
+                    return \`${methodType}-$\{params.template.${idKey}}\`;
+                }
+                return false;
+              };
+              (serviceImpl.${methodName} ${useAny ? 'as any' : ''}).canSend = function(params${useAny ? ': any' : ''}) {
+                if(params && params.template && params.template.${idKey} && isGuid(params.template.${idKey})) {
+                    return true;
+                }
+                return false;
+              };
+              `);
               }
             }
             if (template_params) {
@@ -156,10 +180,13 @@ export default class ControllerActionGenerator {
     ]
       .filter(x => x)
       .join(`,${NEW_LINE}`);
+    serviceRequirements = serviceRequirements.join(NEW_LINE);
     return {
       template: bindTemplate(serviceTemplate, {
         service_methods: addNewLine(temp, 1),
-        endpoints: JSON.stringify(endpoints, null, 4)
+        endpoints: JSON.stringify(endpoints, null, 4),
+        any: useAny ? ': any' : '',
+        serviceRequirements
       }),
       relative: "./src/util",
       relativeFilePath: `./controllerService${fileEnd}`,

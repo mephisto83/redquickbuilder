@@ -34,15 +34,39 @@ export function redConnect(component: any): any {
 
 export const titleService = TitleService;
 
+// Gets the function key parameters,
+// That means that a function has parameters, and we can use
+// those paramters to set the Visual to loading on a specific key
+export function getVisualFunctionKey(func?: any, param?: any, defaultKey?: any) {
+	let key = defaultKey;
+	if (func && func.requirements) {
+		key = func.requirements(param);
+	}
+
+	return key || defaultKey;
+}
+//Checks if the function should fire based on the parameters
+export function shouldExecuteBasedOnParams(func?: any, param?: any) {
+	if (func && func.canSend) {
+		return func.canSend(param);
+	}
+	return true;
+}
+
 ///Lots of stuff to add here,
 // better error handling
 export function simple(func?: any, param?: any, states?: any, callback?: any, error?: any, precall?: any) {
 	return (dispatch: any, getState: any) => {
+		if (!shouldExecuteBasedOnParams(func, param)) {
+			return Promise.resolve();
+    }
+
 		var state = getState();
 		var loading = states.loading;
 		var objectType = states.objectType;
-		if (!Visual(state, loading)) {
-			dispatch(UIActions.UIV(loading, true));
+		let visualKey = getVisualFunctionKey(func, param, loading);
+		if (!Visual(state, visualKey)) {
+			dispatch(UIActions.UIV(visualKey, true));
 			if (precall) {
 				precall(param, dispatch, getState);
 			}
@@ -59,7 +83,7 @@ export function simple(func?: any, param?: any, states?: any, callback?: any, er
 					}
 				})
 				.then((res: any) => {
-					dispatch(UIActions.UIV(loading, false));
+					dispatch(UIActions.UIV(visualKey, false));
 					return res;
 				});
 		}
