@@ -10,7 +10,7 @@ import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoColl
 
 export default async function ConnectScreens(progresFunc) {
   const allscreens = NodesByType(null, NodeTypes.Screen);
-  const screens = NodesByType(null, NodeTypes.Screen).filter(ScreenOptionFilter);
+  const screens = allscreens.filter(ScreenOptionFilter);
   await screens.forEachAsync(async (screen, index, total) => {
     const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 
@@ -52,12 +52,12 @@ export default async function ConnectScreens(progresFunc) {
           break;
         default: break;
       }
-      commands.push(() => CollectionDataChainsIntoCollections());
 
       graphOperation([...commands])(GetDispatchFunc(), GetStateFunc());
     }
     await progresFunc(index / total);
   });
+  graphOperation([() => CollectionDataChainsIntoCollections()])(GetDispatchFunc(), GetStateFunc());
 }
 
 export function GetPossibleNavigateScreens(screen, allscreens) {

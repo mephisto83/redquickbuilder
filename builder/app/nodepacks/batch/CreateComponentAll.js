@@ -8,17 +8,23 @@ import {
   GetStateFunc,
   executeGraphOperations,
   NodesByType,
-  GetNodeById
+  GetNodeById,
+  GetNodesByProperties
 } from "../../actions/uiactions";
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 
 export default async function CreateComponentAll(progressFunc) {
   const result = [];
-  const models = NodesByType(null, NodeTypes.Model)
-    .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
-    .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
-  // await models.forEachAsync(async (v, mindex) => {
+  const models = GetNodesByProperties({
+    [NodeProperties.NODEType]: NodeTypes.Model,
+    [NodeProperties.IsAgent]: (v) => v === 'true' || v === true,
+    [NodeProperties.IsViewModel]: v => v === 'true' || v === true
+  })
+  //  NodesByType(null, NodeTypes.Model)
+  //   .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
+  //   .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
+  // // await models.forEachAsync(async (v, mindex) => {
   //   const defaultViewTypes = GetNodesLinkedTo(null, {
   //     id: v.id,
   //     componentType: NodeTypes.ViewType,
@@ -49,6 +55,7 @@ export default async function CreateComponentAll(progressFunc) {
 
     CreateComponentModel({
       model: model.id,
+      viewTypeModelId: viewType.id,
       viewTypes: [GetNodeProp(viewType, NodeProperties.ViewType)],
       connectedModel: property.id,
       isSharedComponent: true,
@@ -94,6 +101,7 @@ export function CreateComponentModel(args = {}) {
           isDefaultComponent: args.isDefaultComponent,
           isPluralComponent: args.isPluralComponent,
           isSharedComponent: args.isSharedComponent,
+          viewTypeModelId: args.viewTypeModelId,
           connectedModel,
           ...defaultArgs,
           viewName

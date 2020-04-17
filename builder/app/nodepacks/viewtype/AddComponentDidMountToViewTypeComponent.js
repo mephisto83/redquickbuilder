@@ -66,5 +66,9 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
       return [];
     })
   }
+  else {
+    console.error(args);
+    throw new Error('component not found ')
+  }
   return result;
 }

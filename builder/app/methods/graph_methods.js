@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-nested-ternary */
@@ -35,7 +36,8 @@ import {
   GetCurrentGraph,
   GetRootGraph,
   GetNodeById,
-  GetNodes
+  GetNodes,
+  GetNodeByProperties
 } from "../actions/uiactions";
 import { uuidv4 } from "../utils/array";
 
@@ -89,14 +91,14 @@ export function createGraph() {
         "Local-AuthorizationKey":
           "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
         "Local-EndPointUrl": "https://localhost:8081",
-        use_local: "true",
+        use_local: true,
         "DeveloperMode": true,
         EndPointUrl: "",
         AuthorizationKey: "",
         DatabaseId: "red-db-001",
         "AllowedOrigins": "http://localhost:44338",
         AssemblyPrefixes: "Smash;RedQuick",
-        "Use-SingleCollection": "true",
+        "Use-SingleCollection": true,
         "storage-key": "UseDevelopmentStorage=true",
         "single-thread": true,
         ConfirmEmailController: "Account",
@@ -1072,28 +1074,39 @@ export function GetNodesByProperties(props, graph) {
     }
     const val = props[key];
     let set;
-    if (AppCache.Properties[key] && AppCache.Properties[key][val]) {
-      set = Object.keys(AppCache.Properties[key][val]);
+    if (typeof val === 'function') {
+      set = {};
+      if (AppCache.Properties[key]) {
+        Object.keys(AppCache.Properties[key]).filter(tempVal => val(tempVal)).forEach(tempVal => {
+          set = Object.assign(set, AppCache.Properties[key][tempVal]);
+        });
+      }
+    }
+    else if (AppCache.Properties[key] && AppCache.Properties[key][val]) {
+      set = {};
+      set = Object.assign(set, AppCache.Properties[key][val]);
     }
     else {
-      set = [];
+      set = {};
     }
     if (!subset && set) {
       subset = set;
     }
     else if (subset && set) {
-      if (subset.length > set.length) {
-        subset = set.intersection(subset, (a, b) => a === b);
-      }
-      else {
-        subset = subset.intersection(set, (a, b) => a === b);
-      }
+      const newset = {};
+      const setToUse = Object.keys(subset).length > Object.keys(set).length ? set : subset;
+      Object.keys(setToUse).forEach(setKey => {
+        if (set.hasOwnProperty(setKey) && subset.hasOwnProperty(setKey)) {
+          newset[setKey] = true;
+        }
+      })
+      subset = newset;
     }
   })
   if (!subset) {
     return [];
   }
-  return subset.map(item => graph.nodeLib[item]);
+  return Object.keys(subset).map(item => graph.nodeLib[item]);
 }
 export function removeCacheLink(id, type) {
   if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
@@ -2677,7 +2690,11 @@ export function getNodesByLinkType(graph, options) {
 }
 
 export function GetLinkBetween(a, b, graph) {
-  return getNodeLinks(graph, a, SOURCE).find(v => v.target === b);
+  return findLink(graph, {
+    source: a,
+    target: b
+  });
+  // return getNodeLinks(graph, a, SOURCE).find(v => v.target === b);
 }
 export function getNodeLinked(graph, options) {
   if (options) {

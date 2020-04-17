@@ -1736,6 +1736,7 @@ export const CreateDefaultView = {
       let {
         viewName,
         isList,
+        viewTypeModelId
       } = args;
       let { model } = args;
       let {
@@ -2211,11 +2212,16 @@ export const CreateDefaultView = {
 
                 let connectto = [];
                 if (isDefaultComponent) {
-                  connectto = getViewTypeEndpointsForDefaults(
-                    viewType,
-                    currentGraph,
-                    currentNode.id
-                  );
+                  if (viewTypeModelId) {
+                    connectto = [GetNodeById(viewTypeModelId, currentGraph)];
+                  }
+                  else {
+                    connectto = getViewTypeEndpointsForDefaults(
+                      viewType,
+                      currentGraph,
+                      currentNode.id
+                    );
+                  }
                 }
                 return {
                   callback: (listComponent, graph) => {
@@ -2237,30 +2243,30 @@ export const CreateDefaultView = {
                           source: ct.id,
                           target: listComponentId
                         }),
-                        () => ([
-                          ...[
-                            "value",
-                            ApiNodeKeys.ViewModel,
-                            "label",
-                            "placeholder",
-                            "error",
-                            "success"
-                          ].map(
-                            v =>
-                              function () {
-                                const graph = GetCurrentGraph(
-                                  GetStateFunc()()
-                                );
-                                return addComponentApiToForm({
-                                  newItems,
-                                  text: v,
-                                  parent: ct.id,
-                                  isSingular: true,
-                                  graph
-                                });
-                              }
-                          )
-                        ])
+                        //  () => ([
+                        ...[
+                          "value",
+                          ApiNodeKeys.ViewModel,
+                          "label",
+                          "placeholder",
+                          "error",
+                          "success"
+                        ].map(
+                          v =>
+                            function () {
+                              const graph = GetCurrentGraph(
+                                GetStateFunc()()
+                              );
+                              return addComponentApiToForm({
+                                newItems,
+                                text: v,
+                                parent: ct.id,
+                                isSingular: true,
+                                graph
+                              });
+                            }
+                        )
+                        // ])
                       );
                     });
                   },

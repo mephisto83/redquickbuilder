@@ -22,6 +22,7 @@ import {
   SOURCE
 } from "../methods/graph_methods";
 import { NodeType } from "../components/titles";
+
 export default function (args = {}) {
   const result = [];
   const graph = GetCurrentGraph();

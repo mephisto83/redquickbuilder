@@ -1,32 +1,44 @@
 import React, { Component } from "react";
+
 export default class TextInput extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
+
   label() {
     return this.props.label || "{label}";
   }
+
   immediate() {
     return this.props.immediate || false;
   }
+
   value() {
     if (this.immediate()) {
       return this.props.value || "";
     }
     return this.state.value || "";
   }
+
   placeholder() {
     return this.props.placeholder || "";
   }
+
   disabled() {
     return this.props.disabled ? "disabled" : "";
   }
+
+  light() {
+    return this.props.light ? { color: 'white' } : {};
+  }
+
   componentDidMount() {
     if (!this.immediate()) {
       this.setState({ value: this.props.value });
     }
   }
+
   componentDidUpdate(prevProps) {
     if (!this.immediate()) {
       if (!this.state.focused)
@@ -37,7 +49,7 @@ export default class TextInput extends Component {
   }
 
   render() {
-    var handleKeyPress = event => {
+    const handleKeyPress = event => {
       if (!this.immediate()) {
         if (event.key === "Enter") {
           if (this.props.onChange) {
@@ -53,7 +65,7 @@ export default class TextInput extends Component {
           <textarea
             type="text"
             disabled={this.disabled()}
-            className={"form-control"}
+            className="form-control"
             onBlur={() => {
               if (this.props.onBlur) { this.props.onBlur() }
               if (!this.immediate()) {
@@ -108,11 +120,11 @@ export default class TextInput extends Component {
     }
     return (
       <div className={this.props.inputgroup ? "input-group" : "form-group"}>
-        {this.props.inputgroup || this.props.slim ? null : <label>{this.label()}</label>}
+        {this.props.inputgroup || this.props.slim ? null : <label style={this.light()}>{this.label()}</label>}
         <input
           type={this.inputType || "text"}
           disabled={this.disabled()}
-          className={"form-control"}
+          className="form-control"
           onBlur={() => {
             if (this.props.onBlur) { this.props.onBlur() }
             if (!this.immediate()) {

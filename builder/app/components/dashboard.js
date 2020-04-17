@@ -105,7 +105,7 @@ import LayoutView from './layoutview';
 import ThemeView from './themeview';
 import TranslationView from './translationview';
 import ProgressView from './progressview';
-import { findLinkInstance, getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, TARGET, GetNodesLinkedTo, Paused } from '../methods/graph_methods';
+import { getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, GetNodesLinkedTo, Paused } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
@@ -121,8 +121,8 @@ class Dashboard extends Component {
   componentDidMount() {
     this.props.setState();
     this.props.setRemoteState();
-    this.props.setVisual(UIA.NODE_COST, 2);
-    this.props.setVisual(UIA.NODE_CONNECTION_COST, .5);
+    this.props.setVisual(UIA.NODE_COST, 1);
+    this.props.setVisual(UIA.NODE_CONNECTION_COST, .2);
   }
 
   minified() {
@@ -1060,7 +1060,7 @@ class Dashboard extends Component {
 
 
     if (graph) {
-      cost = Object.keys(graph.linkLib || {}).length * node_cost + Object.keys(graph.nodeLib || {}).length * node_connection_cost;
+      cost = (Object.keys(graph.linkLib || {}).length * node_connection_cost) + (Object.keys(graph.nodeLib || {}).length * node_cost);
     }
     return Dashboard.formatMoney(cost, 2, '.', ',');
   }

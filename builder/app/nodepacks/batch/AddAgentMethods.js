@@ -1,11 +1,15 @@
-import { NodesByType, GetNodeProp, GetNodeTitle, executeGraphOperations, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
+import { NodesByType, GetNodeProp, GetNodeTitle, executeGraphOperations, GetDispatchFunc, GetStateFunc, GetNodeByProperties, GetNodesByProperties } from "../../actions/uiactions";
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from "../../constants/functiontypes";
 import { CreateAgentFunction } from "../../constants/nodepackages";
 
 export default async function AddAgentMethods(progresFunc) {
 
-  const agents = NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
+  const agents = GetNodesByProperties({
+    [NodeProperties.NODEType]: NodeTypes.Model,
+    [NodeProperties.IsAgent]: v => v === 'true' || v === true,
+    [NodeProperties.UIText]: v => v !== 'User'
+  });//  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
   const models = NodesByType(null, NodeTypes.Model).filter(x => !GetNodeProp(x, NodeProperties.IsAgent));
   const functionTypes = [
     FunctionTypes.Create_Object__Object,

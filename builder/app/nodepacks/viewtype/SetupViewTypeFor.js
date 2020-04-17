@@ -70,7 +70,8 @@ export default function SetupViewTypeFor(args = {}) {
     case Methods.GetAll:
       result.push(...SetupViewTypeForGetAll(context));
       break;
-    default: break;
+    default:
+      throw new Error('no view type set');
   }
 
   result.push(...AttachGetAllOnComponentDidMount(context));

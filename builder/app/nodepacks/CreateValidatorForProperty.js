@@ -23,6 +23,7 @@ export default function CreateValidatorForProperty(args = {}) {
   const { methodType = 'Method Type' } = args;
   const property = args.propertyText;
   if (!args.method) {
+    console.error(args);
     throw new Error("missing method  for create validator for property");
   }
   const context = {

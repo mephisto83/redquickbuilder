@@ -6,13 +6,18 @@ import { LinkProperties } from "../../constants/nodetypes";
 
 export default function AttachGetAllOnComponentDidMount(args = {}) {
   const result = [];
-  const { node, functionToLoadModels, viewPackages } = args;
+  const { node, functionToLoadModels, viewPackages, uiType } = args;
   const model = GetViewTypeModel(node);
   let storeModelArrayDC = null;
   let didMountContext = null;
 
+  if (!model) {
+    throw new Error('execpted model missing?')
+  }
+
   result.push(...StoreModelArrayStandard({
     model,
+    uiType,
     viewPackages,
     modelText: `${GetNodeTitle(model)} State`,
     state_key: `${GetNodeTitle(model)} State`,

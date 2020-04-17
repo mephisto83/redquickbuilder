@@ -409,12 +409,13 @@ export function SetSharedComponent(args) {
     GetNodeProp(target, NodeProperties.SharedComponent) &&
     GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode
   ) {
-    const connections = GraphMethods.GetConnectedNodesByType(
+    const connectionsAll = GraphMethods.GetConnectedNodesByType(
       GetState(),
       source,
       NodeTypes.ComponentNode
-    )
-      .filter(x => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+    );
+
+    const connections = connectionsAll.filter(x => GetNodeProp(x, NodeProperties.ViewType) === viewType)
       .filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType)
       .filter(
         x =>
@@ -2242,14 +2243,22 @@ export function GetCustomServicesForNodeType(type) {
 }
 
 export function GetAgentNodes() {
-  return NodesByType(_getState(), NodeTypes.Model).filter(x =>
-    GetNodeProp(x, NodeProperties.IsAgent)
-  );
+  return GetNodesByProperties({
+    [NodeProperties.NODEType]: NodeTypes.Model,
+    [NodeProperties.IsAgent]: v => v === 'true' || v === true
+  })
+  // return NodesByType(_getState(), NodeTypes.Model).filter(x =>
+  //   GetNodeProp(x, NodeProperties.IsAgent)
+  // );
 }
 export function GetUsers() {
-  return NodesByType(_getState(), NodeTypes.Model).filter(x =>
-    GetNodeProp(x, NodeProperties.IsUser)
-  );
+  return GetNodesByProperties({
+    [NodeProperties.NODEType]: NodeTypes.Model,
+    [NodeProperties.IsUser]: v => v === 'true' || v === true
+  })
+  // return NodesByType(_getState(), NodeTypes.Model).filter(x =>
+  //   GetNodeProp(x, NodeProperties.IsUser)
+  // );
 }
 export function GetArbitersForPermissions() {
   return GetArbitersForNodeType(NodeTypes.Permission);
@@ -2770,7 +2779,7 @@ export function GetConnectionClause(args) {
         "_x => _x.{{connection_property}} == {{connection_value}}",
         {
           connection_property: GetCodeName(many2manyProperty),
-          connection_value: "true"
+          connection_value: true
         }
       );
     case NodeConstants.FilterRules.EqualsFalse:
@@ -2778,7 +2787,7 @@ export function GetConnectionClause(args) {
         "_x => _x.{{connection_property}} == {{connection_value}}",
         {
           connection_property: GetCodeName(many2manyProperty),
-          connection_value: "false"
+          connection_value: false
         }
       );
     default:
@@ -3045,13 +3054,21 @@ export function ModelNotConnectedToFunction(
   packageType,
   nodeType = NodeTypes.Method
 ) {
-  const connections = NodesByType(_getState(), nodeType).filter(x => {
-    const match =
-      GetNodeProp(x, NodeProperties.NodePackage) === modelId &&
-      GetNodeProp(x, NodeProperties.NodePackageType) === packageType &&
-      GetNodeProp(x, NodeProperties.NodePackageAgent) === agentId;
-    return match;
+
+  const connections = GetNodesByProperties({
+    [NodeProperties.NODEType]: nodeType,
+    [NodeProperties.NodePackage]: modelId,
+    [NodeProperties.NodePackageType]: packageType,
+    [NodeProperties.NodePackageAgent]: agentId
   }).length;
+
+  // const connections = NodesByType(_getState(), nodeType).filter(x => {
+  //   const match =
+  //     GetNodeProp(x, NodeProperties.NodePackage) === modelId &&
+  //     GetNodeProp(x, NodeProperties.NodePackageType) === packageType &&
+  //     GetNodeProp(x, NodeProperties.NodePackageAgent) === agentId;
+  //   return match;
+  // }).length;
 
   return !connections;
 }

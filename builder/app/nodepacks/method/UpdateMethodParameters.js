@@ -79,7 +79,6 @@ export default function UpdateMethodParameters(args = { methodType, current }) {
   );
   if (MethodFunctions[methodType]) {
     const { parameters } = MethodFunctions[methodType];
-    const newGroupId = uuidv4();
     if (parameters) {
       const { body } = parameters;
       const params = parameters.parameters;

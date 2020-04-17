@@ -103,6 +103,19 @@ export default function (args = { state_key: "StateKeyReplace" }) {
         {
           operation: "CHANGE_NODE_PROPERTY",
           options: {
+            prop: NodeProperties.UIType,
+            id: context.node0,
+            value: context.uiType
+          }
+        }
+      ];
+    },
+
+    function (graph) {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
             prop: "Pinned",
             id: context.node0,
             value: true

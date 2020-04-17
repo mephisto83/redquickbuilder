@@ -15,7 +15,7 @@ export const StyleTags = {
   "style_input": " style_input",
   "style_label": "style_label",
   "style_item": "style_item",
-  "style_button":"style_button"
+  "style_button": "style_button"
 }
 
 export const ComponentTags = {
@@ -306,19 +306,19 @@ export const ComponentTypes = {
         left: {
           nodeProperty: "HeaderLeft",
           template: "{{value}}",
-          options: ["true", "false"],
+          options: [true, false],
           ui: true
         },
         right: {
           nodeProperty: "HeaderRight",
           template: "{{value}}",
-          options: ["true", "false"],
+          options: [true, false],
           ui: true
         },
         title: {
           nodeProperty: "HeaderTitle",
           template: "{{value}}",
-          options: ["true", "false"],
+          options: [true, false],
           ui: true
         }
       }

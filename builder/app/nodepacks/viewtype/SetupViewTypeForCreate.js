@@ -78,11 +78,13 @@ export default function SetupViewTypeForCreate(args = {}) {
     id: property.id,
     link: LinkType.PropertyLink
   }); */
-  const valueExternalNode = GetNodesLinkedTo(null, {
+  const valueExternalNodes = GetNodesLinkedTo(null, {
     id: node,
     link: LinkType.ComponentExternalApi,
     componentType: NodeTypes.ComponentExternalApi
-  }).find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.Value);
+  });
+
+  const valueExternalNode = valueExternalNodes.find(v => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.Value);
 
 
   let modelKeyDC = null;

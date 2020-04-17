@@ -294,9 +294,7 @@ export default class ModelGenerator {
                   ? GetNodeProp(propNode, NodeProperties.UIModelType)
                   : GetNodeProp(propNode, NodeProperties.UIAttributeType),
                 ui_title: GetNodeProp(propNode, NodeProperties.UIName),
-                singular: GetNodeProp(propNode, NodeProperties.UISingular)
-                  ? "true"
-                  : "false",
+                singular: !!GetNodeProp(propNode, NodeProperties.UISingular),
                 options: options2,
                 choice_type: choiceType,
                 validation_rules: validationRules
