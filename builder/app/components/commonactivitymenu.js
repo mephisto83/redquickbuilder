@@ -9,13 +9,14 @@ import FormControl from './formcontrol';
 import TextBox from './textinput';
 import { ExcludeDefaultNode } from '../constants/nodetypes';
 import { PARAMETER_TAB } from './dashboard';
+
 class CommonActivityMenu extends Component {
   render() {
-    var { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-    var active = !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)];
+    const { state } = this.props;
+    const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+    const active = !ExcludeDefaultNode[UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)];
     return (
-      <SideMenuContainer active={active} tab={PARAMETER_TAB} visual={"common-activty+menu"} title={Titles.CommonProperties}>
+      <SideMenuContainer active={active} tab={PARAMETER_TAB} visual="common-activty+menu" title={Titles.CommonProperties}>
         <TabPane active={active}>
           {currentNode ? (<FormControl>
             <TextBox

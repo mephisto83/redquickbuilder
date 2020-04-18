@@ -20,6 +20,7 @@ import {
 const MIN_DIMENSIONAL_SIZE = 20;
 const iconSize = 30;
 let mapSelectedNodes = null;
+let mapSelectedLinks = null;
 let version;
 export default class MindMap extends Component {
   constructor() {
@@ -677,7 +678,11 @@ export default class MindMap extends Component {
       if (graphVersion === version) {
         if (mapSelectedNodes && props.selectedNodes.length === mapSelectedNodes.length) {
           if ([...props.selectedNodes, ...mapSelectedNodes].unique().length === mapSelectedNodes.length) {
-            return;
+            if (mapSelectedLinks && props.selectedLinks.length === mapSelectedLinks.length) {
+              if ([...props.selectedLinks, ...mapSelectedLinks].unique().length === mapSelectedLinks.length) {
+                return;
+              }
+            }
           }
         }
       }

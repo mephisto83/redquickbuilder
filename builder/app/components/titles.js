@@ -285,6 +285,8 @@ export const Permissions = {
   Getbyowner: "Get by owner",
   Update: "Update"
 };
+export const ModelAccess = 'Model Access';
+export const AgentAccess = 'Agent Access';
 export const ChoiceTypes = "Choice types";
 export const ChoiceListActions = "Choice Actions";
 export const AddChoice = "Add Choice";

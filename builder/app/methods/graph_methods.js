@@ -1106,7 +1106,7 @@ export function GetNodesByProperties(props, graph) {
   if (!subset) {
     return [];
   }
-  return Object.keys(subset).map(item => graph.nodeLib[item]);
+  return Object.keys(subset).map(item => graph.nodeLib[item]).filter(x => x);
 }
 export function removeCacheLink(id, type) {
   if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
@@ -1731,6 +1731,17 @@ export function existsLinkBetween(graph, options) {
   }
   return false;
 }
+
+export function existsLinksBetween(graph, options) {
+  const { source, target1, target2 } = options;
+  let link1 = findLink(graph, { source, target: target1.id });
+  link1 = GetLinkProperty(link1, LinkPropertyKeys.TYPE) === target1.link;
+  let link2 = findLink(graph, { source, target: target2.id });
+  link2 = GetLinkProperty(link2, LinkPropertyKeys.TYPE) === target2.link;
+
+  return !!link1 && !!link2;
+}
+
 export function updateReferenceNodes(root) {
   if (root && root.referenceNodes) {
     for (const scope in root.referenceNodes) {

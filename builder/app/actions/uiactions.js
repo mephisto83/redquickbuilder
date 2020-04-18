@@ -234,12 +234,14 @@ export function GetSharedComponentFor(
   viewType,
   modelProperty,
   currentNodeId,
-  isSharedProperty
+  isSharedProperty,
+  agentId
 ) {
   const graph = GetCurrentGraph(GetState());
   let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
     id: modelProperty.id
   });
+  viewTypeNodes = viewTypeNodes.filter(x => GetNodeProp(x, NodeProperties.Agent) === agentId);
 
   let isPluralComponent;
   const propertyNode = GetNodeById(modelProperty.id);
@@ -4093,6 +4095,19 @@ export function deleteAllSelected() {
       }))
     )(dispatch, getState);
   };
+}
+
+export function isAccessNode(agent, model, aa, graph) {
+  graph = graph || GetCurrentGraph();
+  return GraphMethods.existsLinkBetween(graph, {
+    source: agent.id,
+    target: aa.id,
+    link: NodeConstants.LinkType.AgentAccess
+  }) && GraphMethods.existsLinkBetween(graph, {
+    source: aa.id,
+    target: model.id,
+    link: NodeConstants.LinkType.ModelAccess
+  })
 }
 
 export function setViewPackageStamp(viewPackage) {

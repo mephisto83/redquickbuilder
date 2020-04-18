@@ -53,6 +53,7 @@ export const NodeTypes = {
   Method: "method", //NGRX like effect
   AfterEffect: "after-effect", // executes after a method finishes successfully.
   Action: "action", //NGRX like action
+  AgentAccessDescription: "AgentAccessDescription",// Describes what agents will have access to in general.
   Parameter: "parameter",
   ClaimService: "ClaimService",
   FunctionOutput: "function-output",
@@ -254,6 +255,7 @@ export const LAYOUT_VIEW = "LAYOUT_VIEW";
 export const TRANSLATION_VIEW = 'TRANSLATION_VIEW';
 export const PROGRESS_VIEW = 'PROGRESS_VIEW'
 export const THEME_VIEW = "THEME_VIEW";
+export const AGENT_ACCESS_VIEW = 'AGENT_ACCESS_VIEW';
 
 export const GeneratedDataTypes = {
   FirstName: "First Name",
@@ -502,7 +504,6 @@ export const NodeProperties = {
   ReferenceType: "referenceType", //Reference nodes will have this type.
 
   ComponentDidMountEvent: "component-did-mount",
-
   UIAttributeType: "uiAttributeType",
   PermissionValueType: "PermissionValueType",
   UseModelAsType: "useModelAsType",
@@ -526,6 +527,7 @@ export const NodeProperties = {
   ChainNodeInput2: "ChainNodeInput2",
   ScreenInstance: "ScreenInstance",
   Model: "Model",
+  Agent: 'Agent',
   Screen: "Screen",
   ChainNodeInput1: "ChainNodeInput1",
   List: "List",
@@ -711,6 +713,8 @@ export const LinkType = {
   StateKey: "StateKey",
   LifeCylceMethodInstance: "LifeCylceMethodInstance",
   ModelKey: "ModelKey",
+  AgentAccess: 'AgentAccess',
+  ModelAccess: 'ModelAccess',
   ViewModelKey: "ViewModelKey",
   LifeCylceMethod: "LifeCylceMethod",
   ComponentApiConnector: "Component Api Connector",
@@ -955,6 +959,12 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
   SharedComponent: {
     type: LinkType.SharedComponent
+  },
+  AgentAccess: {
+    type: LinkType.AgentAccess
+  },
+  ModelAccess: {
+    type: LinkType.ModelAccess
   },
   LambdaInsertArguments: {
     type: LinkType.LambdaInsertArguments

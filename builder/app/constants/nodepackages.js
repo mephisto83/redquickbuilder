@@ -787,6 +787,7 @@ export const CreateLoginModels = {
     setViewPackageStamp(null, "create-login-models");
   }
 };
+
 function addTitleService(args) {
   const { newItems } = args;
   return {
@@ -817,6 +818,7 @@ function addTitleService(args) {
     }
   };
 }
+
 export function addInstanceEventsToForms(args) {
   const { method_results, targetMethod, uiType } = args;
   if (!uiType) {
@@ -886,6 +888,7 @@ export function addInstanceEventsToForms(args) {
     }
   }
 }
+
 export const AddAgentUser = {
   type: "add-agent-user",
   methodType: "Add User Agent",
@@ -1104,6 +1107,7 @@ export function CreatePagingSkipDataChains() {
   ])(GetDispatchFunc(), GetStateFunc());
   return result;
 }
+
 export function CreatePagingTakeDataChains() {
   const result = {};
   let skipTake = false;
@@ -1233,6 +1237,7 @@ export function CreatePagingTakeDataChains() {
   ])(GetDispatchFunc(), GetStateFunc());
   return result;
 }
+
 export function CreateScreenModel(viewModel, options = { isList: true }) {
   const result = {};
   let pageModelId = null;
@@ -1557,6 +1562,7 @@ export function createViewPagingDataChain(
     ];
   };
 }
+
 export function CreatePagingModel() {
   let result = null;
   let pageModelId = null;
@@ -1725,6 +1731,7 @@ export function CreatePagingModel() {
 
   return result;
 }
+
 export const CreateDefaultView = {
   type: "Create View - Form",
   methodType: "React Native Views",
@@ -1735,7 +1742,9 @@ export const CreateDefaultView = {
     const default_View_method = (args = {}) => {
       let {
         viewName,
-        isList,
+        isList
+      } = args;
+      const {
         viewTypeModelId
       } = args;
       let { model } = args;
@@ -1745,6 +1754,7 @@ export const CreateDefaultView = {
         viewType,
         isDefaultComponent,
         uiType = UITypes.ReactNative,
+        agentId,
         isSharedComponent,
         connectedModel,
         chosenChildren = []
@@ -1871,7 +1881,8 @@ export const CreateDefaultView = {
                     [NodeProperties.UIText]: `${viewName} Form`,
                     [NodeProperties.ViewType]: viewType,
                     [NodeProperties.NODEType]: NodeTypes.Screen,
-                    [NodeProperties.Model]: currentNode.id
+                    [NodeProperties.Model]: currentNode.id,
+                    [NodeProperties.Agent]: agentId
                   },
                   graph
                 ).find(x => x);
@@ -1897,7 +1908,8 @@ export const CreateDefaultView = {
                       : InstanceTypes.ScreenInstance,
                     [NodeProperties.ViewType]: viewType,
                     [NodeProperties.UIText]: `${viewName} Form`,
-                    [NodeProperties.Model]: currentNode.id
+                    [NodeProperties.Model]: currentNode.id,
+                    [NodeProperties.Agent]: agentId
                   }
                 };
               }
@@ -1984,7 +1996,8 @@ export const CreateDefaultView = {
                     [NodeProperties.NODEType]: NodeTypes.DataChain,
                     [NodeProperties.EntryPoint]: true,
                     [NodeProperties.SelectorProperty]:
-                      SelectorPropertyKeys.Object
+                      SelectorPropertyKeys.Object,
+                    [NodeProperties.Agent]: agentId
                   },
                   graph
                 );
@@ -2005,7 +2018,8 @@ export const CreateDefaultView = {
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.AsOutput]: true,
                     [NodeProperties.SelectorProperty]:
-                      SelectorPropertyKeys.Object
+                      SelectorPropertyKeys.Object,
+                    [NodeProperties.Agent]: agentId
                   },
                   links: [
                     {
@@ -2085,7 +2099,8 @@ export const CreateDefaultView = {
                     [NodeProperties.ViewType]: viewType,
                     [NodeProperties.InstanceType]: useModelInstance
                       ? InstanceTypes.ModelInstance
-                      : InstanceTypes.ScreenInstance
+                      : InstanceTypes.ScreenInstance,
+                    [NodeProperties.Agent]: agentId
                   },
                   groupProperties: {},
                   linkProperties: {
@@ -2280,6 +2295,7 @@ export const CreateDefaultView = {
                     [NodeProperties.Pinned]: false,
                     [NodeProperties.SharedComponent]: isSharedComponent,
                     [NodeProperties.ComponentType]: multi_item_component,
+                    [NodeProperties.Agent]: agentId,
                     [NodeProperties.InstanceType]: useModelInstance
                       ? InstanceTypes.ModelInstance
                       : InstanceTypes.ScreenInstance,
@@ -2499,6 +2515,7 @@ export const CreateDefaultView = {
                   [NodeProperties.ViewType]: viewType,
                   [NodeProperties.SharedComponent]: isSharedComponent,
                   [NodeProperties.Pinned]: false,
+                  [NodeProperties.Agent]: agentId,
                   [NodeProperties.ComponentType]: isList
                     ? ComponentTypes[uiType].ListItem.key
                     : ComponentTypes[uiType].Form.key,
@@ -2763,7 +2780,8 @@ export const CreateDefaultView = {
                 viewType,
                 modelProperty,
                 currentNode.id,
-                isSharedComponent
+                isSharedComponent,
+                agentId
               );
               if (!sharedComponent) {
                 switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -2831,6 +2849,7 @@ export const CreateDefaultView = {
                           sharedComponent || componentTypeToUse,
                         [NodeProperties.UsingSharedComponent]: !!sharedComponent,
                         [NodeProperties.Pinned]: false,
+                        [NodeProperties.Agent]: agentId,
                         [NodeProperties.InstanceType]: useModelInstance
                           ? InstanceTypes.ModelInstance
                           : InstanceTypes.ScreenInstance
@@ -3008,7 +3027,8 @@ export const CreateDefaultView = {
                   viewType,
                   modelProperty,
                   currentNode.id,
-                  isSharedComponent
+                  isSharedComponent,
+                  agentId /* todo */
                 );
                 if (
                   screenComponentId &&
@@ -3038,12 +3058,13 @@ export const CreateDefaultView = {
                 groupProperties: {},
                 properties: {
                   ...viewPackage,
-                  [NodeProperties.UIText]: `${
+                  [NodeProperties.UIText]: `${GetNodeTitle(agentId)} ${
                     Titles.Execute
                     } Button ${viewName} Component`,
                   [NodeProperties.UIType]: uiType,
+                  [NodeProperties.Agent]: agentId,
                   [NodeProperties.Pinned]: false,
-                  [NodeProperties.Label]: `${
+                  [NodeProperties.Label]: `${GetNodeTitle(agentId)} ${
                     Titles.Execute
                     } Button ${viewName} Component`,
                   [NodeProperties.ExecuteButton]: true,
@@ -3074,15 +3095,16 @@ export const CreateDefaultView = {
                 groupProperties: {},
                 properties: {
                   ...viewPackage,
-                  [NodeProperties.UIText]: `${
+                  [NodeProperties.UIText]: `${GetNodeTitle(agentId)} ${
                     Titles.Cancel
                     } Button ${viewName} Component`,
                   [NodeProperties.UIType]: uiType,
                   [NodeProperties.Pinned]: false,
                   [NodeProperties.CancelButton]: true,
-                  [NodeProperties.Label]: `${
+                  [NodeProperties.Label]: `${GetNodeTitle(agentId)} ${
                     Titles.Cancel
                     } Button ${viewName} Component`,
+                  [NodeProperties.Agent]: agentId,
                   [NodeProperties.ComponentType]:
                     ComponentTypes[uiType].Button.key,
                   [NodeProperties.InstanceType]: useModelInstance
@@ -3293,7 +3315,8 @@ export const CreateDefaultView = {
                   viewType,
                   modelProperty,
                   currentNode.id,
-                  isSharedComponent
+                  isSharedComponent,
+                  agentId
                 );
                 if (!sharedComponent) {
                   switch (
@@ -3317,7 +3340,8 @@ export const CreateDefaultView = {
                             viewType,
                             modelProperty,
                             _ui_model_type,
-                            isSharedComponent
+                            isSharedComponent,
+                            agentId
                           );
                         }
                         if (!sharedComponent) {
@@ -3353,7 +3377,8 @@ export const CreateDefaultView = {
               viewType,
               modelProperty,
               currentNode.id,
-              isSharedComponent
+              isSharedComponent,
+              agentId
             );
             if (!sharedComponent) {
               switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -3788,7 +3813,8 @@ export const CreateDefaultView = {
                       viewType,
                       modelProperty,
                       _ui_model_type,
-                      isSharedComponent
+                      isSharedComponent,
+                      agentId
                     );
                   }
                 }
@@ -4125,9 +4151,6 @@ export const CreateDefaultView = {
           ])(GetDispatchFunc(), GetStateFunc());
         });
       }
-
-
-
       SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
     };
     const { uiTypes } = _args;
@@ -5029,6 +5052,7 @@ function addListItemComponentApi(
       }
   ].filter(x => x);
 }
+
 function addComponentEventApiNodes(args) {
   const {
     newItems,
@@ -5171,6 +5195,7 @@ function addComponentEventApiNodes(args) {
     })
     .flatten();
 }
+
 function addComponentApiNodes(
   newItems,
   childComponents,
@@ -5773,6 +5798,7 @@ function setupPropertyApi(args) {
       })
   ])(GetDispatchFunc(), GetStateFunc());
 }
+
 function connectComponentToExternalApi(args) {
   const { newItems, child, key, parent, properties } = args;
   const { externalId } = getApiConnectors(newItems, child, key);
@@ -5911,6 +5937,7 @@ function setApiConnectors(newItems, parent, api, key) {
   newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};
   newItems.apiConnectors[parent][key] = api;
 }
+
 function getApiConnectors(newItems, parent, key) {
   newItems.apiConnectors = newItems.apiConnectors || {};
   newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};

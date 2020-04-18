@@ -72,6 +72,7 @@ import { GooMenuSVG } from './goomenu';
 import ChoiceListItemActivityMenu from './choicelistitemactivitymenu';
 import GooMenu from './goomenu';
 import FormControl from './formcontrol';
+import AgentAccessProperties from './agentaccessproperties';
 import ModelFilterMenu from './modelfiltermenu';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
@@ -99,10 +100,11 @@ import PermissionDependencyActivityMenu from './permissionsdependentactivitymenu
 import GraphMenu from './graphmenu';
 import SectionList from './sectionlist';
 import EnumerationActivityMenu from './enumerationactivitymenu'
-import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW, TRANSLATION_VIEW, PROGRESS_VIEW } from '../constants/nodetypes';
+import SectionEdit from './sectionedit'; import { NotSelectableNodeTypes, NodeProperties, NodeTypes, LinkType, LinkProperties, ExcludeDefaultNode, FilterUI, MAIN_CONTENT, MIND_MAP, CODE_VIEW, LAYOUT_VIEW, LinkEvents, NavigateTypes, LinkPropertyKeys, THEME_VIEW, TRANSLATION_VIEW, PROGRESS_VIEW, AGENT_ACCESS_VIEW } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
 import ThemeView from './themeview';
+import AgentAccessView from './agentaccessview';
 import TranslationView from './translationview';
 import ProgressView from './progressview';
 import { getLinkInstance, createEventProp, getNodesByLinkType, SOURCE, GetNodesLinkedTo, Paused } from '../methods/graph_methods';
@@ -186,6 +188,30 @@ class Dashboard extends Component {
         case NodeTypes.Validator:
           result.push(...this.getValidatorContext());
           return result;
+        case NodeTypes.AgentAccessDescription:
+          result.push({
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.AgentAccess,
+                nodeTypes: [NodeTypes.Model],
+                properties: {
+                  [NodeProperties.IsAgent]: true
+                }
+              });
+            },
+            icon: 'fa fa-user',
+            title: Titles.AgentAccess
+          }, {
+            onClick: () => {
+              this.props.setVisual(CONNECTING_NODE, {
+                ...LinkProperties.ModelAccess,
+                nodeTypes: [NodeTypes.Model]
+              });
+            },
+            icon: 'fa  fa-object-ungroup',
+            title: Titles.ModelAccess
+          });
+          break;
         case NodeTypes.ClaimService:
           return [{
             onClick: () => {
@@ -1223,21 +1249,25 @@ class Dashboard extends Component {
                 {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === MIND_MAP || !mainContent} hideArrow title={Titles.MindMap} icon="fa fa-map" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, MIND_MAP);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === CODE_VIEW} hideArrow title={Titles.CodeView} icon="fa fa-code" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === CODE_VIEW} title={Titles.CodeView} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === LAYOUT_VIEW} hideArrow title={Titles.Layout} icon="fa fa-code" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === LAYOUT_VIEW} title={Titles.Layout} icon="fa fa-code" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === THEME_VIEW} hideArrow title={Titles.Theme} icon="fa-paint-brush" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === THEME_VIEW} title={Titles.Theme} icon="fa-paint-brush" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, THEME_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === TRANSLATION_VIEW} hideArrow title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === TRANSLATION_VIEW} title={Titles.Titles} icon="fa fa-sort-alpha-asc" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, TRANSLATION_VIEW);
                 }} /> : null}
-                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === PROGRESS_VIEW} hideArrow title={Titles.Progress} icon="fa  fa-industry" onClick={() => {
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === PROGRESS_VIEW} title={Titles.Progress} icon="fa  fa-industry" onClick={() => {
                   this.props.setVisual(MAIN_CONTENT, PROGRESS_VIEW);
                 }} /> : null}
+                {UIA.Visual(state, 'MAIN_NAV') ? <TreeViewMenu active={mainContent === AGENT_ACCESS_VIEW} title={Titles.AgentAccess} icon="fa   fa-user-secret" onClick={() => {
+                  this.props.setVisual(MAIN_CONTENT, AGENT_ACCESS_VIEW);
+                }} /> : null}
+
 
                 {hoveredLink && hoveredLink.properties ? <SideBarHeader title={hoveredLink.properties.type} /> : null}
                 <SideBarHeader title={<h4>{cost}</h4>} onClick={() => { }} />
@@ -1303,6 +1333,7 @@ class Dashboard extends Component {
               <CodeView active={UIA.Visual(state, MAIN_CONTENT) === CODE_VIEW} />
               <LayoutView active={UIA.Visual(state, MAIN_CONTENT) === LAYOUT_VIEW} />
               <ThemeView active={UIA.Visual(state, MAIN_CONTENT) === THEME_VIEW} />
+              <AgentAccessView active={UIA.Visual(state, MAIN_CONTENT) === AGENT_ACCESS_VIEW} />
               <TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
               <ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
               {mainContent === MIND_MAP || true ? (<MindMap

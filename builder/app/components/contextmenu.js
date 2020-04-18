@@ -35,6 +35,7 @@ import TreeViewMenu from "./treeviewmenu";
 import DataChainContextMenu from "./datachaincontextmenu";
 import TreeViewGroupButton from "./treeviewgroupbutton";
 import TreeViewButtonGroup from "./treeviewbuttongroup";
+import CheckBoxProperty from './checkboxproperty';
 import ViewTypeMenu from "./viewtypecontextmenu";
 import FourColumn from "../nodepacks/FourColumn";
 import ThreeColumn from "../nodepacks/ThreeColumn";
@@ -329,25 +330,39 @@ class ContextMenu extends Component {
               </TreeViewMenu>
             );
             break;
+          case LinkType.AgentAccess:
+            result.push(<TreeViewMenu
+              open={UIA.Visual(state, linkType)}
+              active
+              title={linkType}
+              key={`${linkType}${selectedLink.id}`}
+              innerStyle={{ maxHeight: 300, overflowY: "auto" }}
+              toggle={() => {
+                this.props.toggleVisual(linkType);
+              }}
+            >
+            <TreeViewItemContainer>
+              <CheckBoxProperty title={ViewTypes.Get} link={link} property={ViewTypes.Get} />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <CheckBoxProperty title={ViewTypes.GetAll} link={link} property={ViewTypes.GetAll} />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <CheckBoxProperty title={ViewTypes.Create} link={link} property={ViewTypes.Create} />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <CheckBoxProperty title={ViewTypes.Update} link={link} property={ViewTypes.Update} />
+            </TreeViewItemContainer>
+            <TreeViewItemContainer>
+              <CheckBoxProperty title={ViewTypes.Delete} link={link} property={ViewTypes.Delete} />
+            </TreeViewItemContainer>
+            </TreeViewMenu>);
+            break;
           case LinkType.ComponentExternalConnection:
           case LinkType.EventMethodInstance:
           case LinkType.ComponentExternalApi:
           default:
             const skip = false;
-            // if (LinkType.ComponentExternalApi === linkType) {
-            //   if (
-            //     ![NodeTypes.ViewType].some(
-            //       v =>
-            //         v === UIA.GetNodeProp(link.source, NodeProperties.NODEType)
-            //     ) &&
-            //     ![NodeTypes.ViewType].some(
-            //       v =>
-            //         v === UIA.GetNodeProp(link.target, NodeProperties.NODEType)
-            //     )
-            //   ) {
-            //     skip = true;
-            //   }
-            // }
             if (!skip)
               result.push(
                 <TreeViewMenu
