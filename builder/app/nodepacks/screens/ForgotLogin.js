@@ -91,7 +91,5 @@ export default function ForgotLogin(args) {
     }
   });
 
-  return {
-    screenNodeId: continueMethodResults.screenNodeId
-  }
+  return continueMethodResults;
 }

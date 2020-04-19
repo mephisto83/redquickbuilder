@@ -18,25 +18,9 @@ class AgentAccessProperties extends Component {
       <FormControl>
         <h3>Agent Access</h3>
         <CheckBoxProperty
-          title={ViewTypes.GetAll}
+          title={ViewTypes}
           node={currentNode}
           property={ViewTypes.GetAll} />
-        <CheckBoxProperty
-          title={ViewTypes.Get}
-          node={currentNode}
-          property={ViewTypes.Get} />
-        <CheckBoxProperty
-          title={ViewTypes.Create}
-          node={currentNode}
-          property={ViewTypes.Create} />
-        <CheckBoxProperty
-          title={ViewTypes.Update}
-          node={currentNode}
-          property={ViewTypes.Update} />
-        <CheckBoxProperty
-          title={ViewTypes.Delete}
-          node={currentNode}
-          property={ViewTypes.Delete} />
       </FormControl>
     );
   }

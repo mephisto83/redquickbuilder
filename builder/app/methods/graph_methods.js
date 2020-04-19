@@ -173,7 +173,7 @@ export function FindLayoutRootParent(id, root, parent) {
 
 export function GetAllChildren(root) {
   let result = Object.keys(root || {});
-  result.map(t => {
+  result.forEach(t => {
     const temp = GetAllChildren(root[t]);
     result = [...result, ...temp];
   });
@@ -195,7 +195,7 @@ export function RemoveCellLayout(setup, id) {
     const parent = FindLayoutRootParent(id, setup.layout);
     if (parent) {
       const kids = GetAllChildren(parent[id]);
-      kids.map(t => {
+      kids.forEach(t => {
         delete setup.properties[t];
       });
 
@@ -226,8 +226,8 @@ export function ReorderCellLayout(setup, id, dir = -1) {
         }
 
         const temp_layout = { ...layout };
-        keys.map(k => delete layout[k]);
-        keys.map(k => (layout[k] = temp_layout[k]));
+        keys.forEach(k => delete layout[k]);
+        keys.forEach(k => { (layout[k] = temp_layout[k]) });
       }
     }
   }
@@ -371,7 +371,7 @@ export function getSubGraphs(graph) {
 export function getSubGraph(graph, scopes) {
   let result = graph;
 
-  scopes.map(scope => {
+  scopes.forEach(scope => {
     result = graph.graphs[scope];
   });
 
@@ -381,7 +381,7 @@ export function getScopedGraph(graph, options) {
   const { scope } = options;
   if (scope && scope.length) {
     console.log(scope);
-    scope.map((s, i) => {
+    scope.forEach((s, i) => {
       graph = graph.graphs[s];
     });
   }
@@ -392,7 +392,7 @@ export function setScopedGraph(root, options) {
   const { scope, graph } = options;
   if (scope && scope.length) {
     let currentGraph = root;
-    scope.map((s, i) => {
+    scope.forEach((s, i) => {
       if (i === scope.length - 1) {
         currentGraph.graphs[s] = graph;
       } else {
@@ -811,7 +811,7 @@ export function removeNode(graph, options = {}) {
     graph.nodeLib = { ...graph.nodeLib };
     graph.nodes = graph.nodes.filter(x => x !== id);
     if (existNodes) {
-      existNodes.map(en => {
+      existNodes.forEach(en => {
         graph = removeNode(graph, { id: en.id });
       });
     }
@@ -903,14 +903,14 @@ export function removeNodeFromGroups(graph, options) {
   // nodesGroups
   if (graph.nodesGroups[id]) {
     groupsContainingNode = Object.keys(graph.nodesGroups[id]);
-    groupsContainingNode.map(group => {
+    groupsContainingNode.forEach(group => {
       graph = removeLeaf(graph, { leaf: id, id: group });
     });
   }
 
   // groupsNodes
   if (graph.groupsNodes) {
-    groupsContainingNode.map(group => {
+    groupsContainingNode.forEach(group => {
       if (graph.groupsNodes[group]) {
         if (graph.groupsNodes[group][id]) {
           delete graph.groupsNodes[group][id];
@@ -1236,7 +1236,7 @@ export function addDefaultProperties(graph, options) {
       }
     ]
   }).map(t => GetNodeProp(t, NodeProperties.UIText));
-  DEFAULT_PROPERTIES.filter(t => propertyNodes.indexOf(t.title) === -1).map(dp => {
+  DEFAULT_PROPERTIES.filter(t => propertyNodes.indexOf(t.title) === -1).forEach(dp => {
     graph = addNewNodeOfType(
       graph,
       options,
@@ -1344,7 +1344,7 @@ export function addNewNodeOfType(graph, options, nodeType, callback) {
     }
   }
   if (options.links) {
-    options.links.filter(x => x).map(link => {
+    options.links.filter(x => x).forEach(link => {
       if (typeof link === "function") {
         link = link(graph);
         link = link.find(x => x);
@@ -1438,7 +1438,7 @@ export function updateNodeGroup(graph, options) {
           id: gparentGroup.id,
           groupId: group.id
         });
-        ancestores.map(anc => {
+        ancestores.forEach(anc => {
           graph = addGroupToGroup(graph, {
             id: anc,
             groupId: group.id
@@ -1607,47 +1607,7 @@ export function GetGroup(graph, id) {
   }
   return null;
 }
-export function applyConstraints(graph) {
-  const functionNodes = graph.functionNodes;
-  if (functionNodes) {
-    for (const i in functionNodes) {
-      const node = GetNode(graph, i);
-      if (node) {
-        const functionType = GetNodeProp(node, NodeProperties.FunctionType);
-        if (functionType) {
-          const functionConstraintObject = Functions[functionType];
-          if (functionConstraintObject) {
-            graph = checkConstraints(graph, {
-              id: i,
-              functionConstraints: functionConstraintObject
-            });
-          }
-        }
-      }
-    }
-  }
-  const validationNodes = NodesByType(graph, NodeTypes.Validator);
-  validationNodes.map(x => {
-    graph = applyValidationNodeRules(graph, x);
-  });
-  return graph;
-}
 
-function applyValidationNodeRules(graph, node) {
-  // const validator = GetNodeProp(node, NodeProperties.Validator);
-  // if (validator) {
-  //   // const nodesLinks = getNodesLinkedTo(graph, { id: node.id });
-  //   const validatorProperties = getValidatorProperties(validator);
-  //   Object.keys(validatorProperties).map(property => {
-  //     if (graph.nodeLinks[property] && graph.nodeLinks[property][node.id]) {
-  //       // link between nodes exists.
-  //     } else {
-  //       // link between nodes exists.
-  //     }
-  //   });
-  // }
-  return graph;
-}
 
 export function NodesByViewPackage(graph, viewPackage) {
   const currentGraph = graph;
@@ -1764,198 +1724,9 @@ export function updateReferenceNodes(root) {
 
   return root;
 }
-export function constraintSideEffects(graph) {
-  const functionNodes = graph.functionNodes;
-
-  if (functionNodes) {
-    let classes_that_must_exist = [];
-    for (const i in functionNodes) {
-      var function_node = GetNode(graph, i);
-      if (function_node) {
-        const functionType = GetNodeProp(
-          function_node,
-          NodeProperties.FunctionType
-        );
-        if (functionType) {
-          const functionConstraintObject = Functions[functionType];
-          if (
-            functionConstraintObject &&
-            functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES]
-          ) {
-            const functionConstraintRequiredClasses =
-              functionConstraintObject[FUNCTION_REQUIREMENT_KEYS.CLASSES];
-            if (functionConstraintRequiredClasses) {
-              for (const j in functionConstraintRequiredClasses) {
-                // Get the model constraint key.
-                // Should be able to find the singular model that is connected to the functionNode and children, if it exists.
-                const constraintModelKey =
-                  functionConstraintRequiredClasses[j][
-                  INTERNAL_TEMPLATE_REQUIREMENTS.MODEL
-                  ];
-                if (constraintModelKey) {
-                  const constraint_nodes = getNodesFunctionsConnected(graph, {
-                    id: i,
-                    constraintKey: constraintModelKey
-                  });
-                  var nodes_one_step_down_the_line = [];
-                  constraint_nodes.map(cn => {
-                    const nextNodes = getNodesLinkedTo(graph, { id: cn.id });
-                    nodes_one_step_down_the_line.push(...nextNodes);
-                  });
-                  nodes_one_step_down_the_line.map(node => {
-                    classes_that_must_exist.push({
-                      nodeId: node.id,
-                      functionNode: function_node.id,
-                      key: constraintModelKey,
-                      class: j
-                    });
-                  });
-                }
-              }
-            }
-          }
-        }
-      }
-      classes_that_must_exist = [
-        ...classes_that_must_exist.unique(x => JSON.stringify(x))
-      ];
-      // Remove class nodes that are no longer cool.
-      Object.keys(graph.classNodes).map(i => {
-        if (
-          !classes_that_must_exist.find(cls => {
-            const _cnode = graph.nodeLib[i];
-            const res = GetNodeProp(
-              _cnode,
-              NodeProperties.ClassConstructionInformation
-            );
-            return matchObject(res, cls);
-          })
-        ) {
-          graph = removeNode(graph, { id: i });
-        } else {
-        }
-      });
-      // Could make this faster by using a dictionary
-      classes_that_must_exist.map(cls => {
-        const matching_nodes = Object.keys(graph.classNodes).filter(i => {
-          const _cnode = graph.nodeLib[i];
-          const res = GetNodeProp(
-            _cnode,
-            NodeProperties.ClassConstructionInformation
-          );
-          if (matchObject(res, cls)) {
-            return true;
-          }
-          return false;
-
-        });
-        if (matching_nodes.length === 0) {
-          // Create new classNodes
-          graph = addNewNodeOfType(
-            graph,
-            {
-              parent: cls.functionNode,
-              linkProperties: {
-                properties: { ...LinkProperties.RequiredClassLink }
-              }
-            },
-            NodeTypes.ClassNode,
-            new_node => {
-              graph = updateNodeProperty(graph, {
-                id: new_node.id,
-                prop: NodeProperties.UIText,
-                value: RequiredClassName(
-                  cls.class,
-                  GetNodeProp(
-                    GetNode(graph, cls.nodeId),
-                    NodeProperties.CodeName
-                  )
-                )
-              });
-              graph = updateNodeProperty(graph, {
-                id: new_node.id,
-                prop: NodeProperties.ClassConstructionInformation,
-                value: cls
-              });
-            }
-          );
-        } else if (matching_nodes.length === 1) {
-          const _cnode = graph.nodeLib[matching_nodes[0]];
-          // The existing classNodes can be updated with any new dependent values. e.g. Text/title
-          graph = updateNodeProperty(graph, {
-            id: _cnode.id,
-            prop: NodeProperties.UIText,
-            value: RequiredClassName(
-              cls.class,
-              GetNodeProp(GetNode(graph, cls.nodeId), NodeProperties.CodeName)
-            )
-          });
-        } else {
-          console.error("There should never be more than one");
-        }
-      });
-    }
-  }
-
-  return graph;
-}
 
 export function RequiredClassName(cls, node_name) {
   return `${node_name}${cls}`;
-}
-
-export function getNodesFunctionsConnected(graph, options) {
-  const { id, constraintKey } = options;
-  const result = [];
-
-  const links = getNodeLinksWithKey(graph, { id, key: constraintKey });
-
-  return links.map(link => graph.nodeLib[link.target]);
-}
-
-export function checkConstraints(graph, options) {
-  const { id, functionConstraints } = options;
-  if (graph.nodeConnections[id]) {
-    const node = graph.nodeLib[id];
-    Object.keys(graph.nodeConnections[id]).map(link => {
-      // check if link has a constraint attached.
-      const { properties } = graph.linkLib[link];
-      const _link = graph.linkLib[link];
-      if (properties) {
-        const { constraints } = properties;
-        if (constraints) {
-          Object.keys(FunctionTemplateKeys).map(ftk => {
-            const functionTemplateKey = FunctionTemplateKeys[ftk];
-            const constraintObj =
-              functionConstraints.constraints[functionTemplateKey];
-            if (
-              constraintObj &&
-              _link &&
-              _link.properties &&
-              _link.properties.constraints &&
-              _link.properties.constraints.key
-            ) {
-              if (_link.properties.constraints.key === constraintObj.key) {
-                const valid = FunctionMeetsConstraint.meets(
-                  constraintObj,
-                  constraints,
-                  _link,
-                  node,
-                  graph
-                );
-                graph = updateLinkProperty(graph, {
-                  id: _link.id,
-                  prop: LinkPropertyKeys.VALID_CONSTRAINTS,
-                  value: !!valid
-                });
-              }
-            }
-          });
-        }
-      }
-    });
-  }
-  return graph;
 }
 
 export function applyFunctionConstraints(graph, options) {
@@ -1965,7 +1736,7 @@ export function applyFunctionConstraints(graph, options) {
   if (functionConstraints) {
     if (functionConstraints.constraints) {
       if (graph.nodeConnections[id]) {
-        getNodeFunctionConstraintLinks(graph, { id }).map(link => {
+        getNodeFunctionConstraintLinks(graph, { id }).forEach(link => {
           const link_constraints = GetLinkProperty(
             link,
             LinkPropertyKeys.CONSTRAINTS
@@ -2082,7 +1853,7 @@ export function applyFunctionConstraints(graph, options) {
         );
       });
 
-      Object.keys(functionConstraints.constraints).map(constraint => {
+      Object.keys(functionConstraints.constraints).forEach(constraint => {
         // Create links to new nodes representing those constraints.
         if (constraintKeys.indexOf(constraint) === -1) {
           graph = addNewNodeOfType(
@@ -2114,7 +1885,7 @@ export function applyFunctionConstraints(graph, options) {
         id: node.id
       });
 
-      nodes_with_link.map(link => {
+      nodes_with_link.forEach(link => {
         const new_node = graph.nodeLib[link.target];
         const constraint = GetLinkProperty(link, LinkPropertyKeys.CONSTRAINTS);
         if (
@@ -2132,14 +1903,14 @@ export function applyFunctionConstraints(graph, options) {
       });
 
       if (graph.nodeConnections[id]) {
-        Object.keys(graph.nodeConnections[id]).map(link => {
+        Object.keys(graph.nodeConnections[id]).forEach(link => {
           // check if link has a constraint attached.
           const { properties } = graph.linkLib[link];
           const _link = graph.linkLib[link];
           if (properties) {
             const { constraints } = properties;
             if (constraints) {
-              Object.keys(FunctionTemplateKeys).map(ftk => {
+              Object.keys(FunctionTemplateKeys).forEach(ftk => {
                 const functionTemplateKey = FunctionTemplateKeys[ftk];
                 const constraintObj =
                   functionConstraints.constraints[functionTemplateKey];
@@ -2622,9 +2393,9 @@ export function GetLinkChainFromGraph(graph, options, nodeType) {
   const { id, links } = options;
   let ids = [id];
   let result = [];
-  links.map((op, il) => {
+  links.forEach((op, il) => {
     let newids = [];
-    ids.map(i => {
+    ids.forEach(i => {
       const newnodes = getNodesByLinkType(graph, {
         id: i,
         ...op
@@ -2939,7 +2710,7 @@ export function addLink(graph, options, link) {
 export function addLinksBetweenNodes(graph, options) {
   const { links } = options;
   if (links && links.length) {
-    links.map(link => {
+    links.forEach(link => {
       graph = addLinkBetweenNodes(graph, link);
     });
   }
@@ -3077,7 +2848,7 @@ export function executeRemoveEvents(graph, link) {
     link.properties.on &&
     link.properties.on[LinkEvents.Remove]
   ) {
-    link.properties.on[LinkEvents.Remove].map(args => {
+    link.properties.on[LinkEvents.Remove].forEach(args => {
       if (args.function && EventFunctions[args.function]) {
         graph = EventFunctions[args.function](graph, link, args.function, args);
       }
@@ -3604,14 +3375,14 @@ export const GroupImportanceOrder = {
 
 export function SetVisible(graph) {
   graph.visibleNodes = {};
-  graph.nodes.map(t => {
+  graph.nodes.forEach(t => {
     if (GetNodeProp(GetNode(graph, t), NodeProperties.Pinned)) {
       graph.visibleNodes[t] = true;
     }
   });
   if (graph.depth) {
     [].interpolate(0, graph.depth, x => {
-      Object.keys(graph.visibleNodes).map(t => {
+      Object.keys(graph.visibleNodes).forEach(t => {
         for (const h in graph.nodeLinks[t]) {
           if (x > 1 && !graph.visibleNodes[h]) {
             graph.visibleNodes[h] = 2;
@@ -3658,22 +3429,23 @@ export function FilterGraph(graph) {
       return false;
     })
   ];
-  Object.keys(graph.nodesGroups).map(nodeId => {
+  Object.keys(graph.nodesGroups).forEach(nodeId => {
     if (!graph.visibleNodes[nodeId]) {
       const temp = graph.nodesGroups[nodeId];
-      for (const i in temp) {
+      // for (const i in temp)
+      Object.keys(temp).forEach(i => {
         filteredGraph.groupsNodes[i] = { ...filteredGraph.groupsNodes[i] };
         delete filteredGraph.groupsNodes[i][nodeId];
         if (Object.keys(filteredGraph.groupsNodes[i]).length === 0) {
           delete filteredGraph.groupsNodes[i];
         }
-      }
+      });
       delete filteredGraph.nodesGroups[nodeId];
     }
   });
   Object.keys(filteredGraph.groupLib)
     .sort((b, a) => getDepth(a, graph) - getDepth(b, graph))
-    .map(group => {
+    .forEach(group => {
       if (filteredGraph.groupLib[group].leaves) {
         filteredGraph.groupLib[group] = { ...filteredGraph.groupLib[group] };
         filteredGraph.groupLib[group].leaves = [
@@ -3697,7 +3469,7 @@ export function FilterGraph(graph) {
         }
       }
     });
-  Object.keys(graph.childGroups).map(group => {
+  Object.keys(graph.childGroups).forEach(group => {
     if (!filteredGraph.groupsNodes[group]) {
       delete filteredGraph.childGroups[group];
     } else {
@@ -3711,7 +3483,7 @@ export function FilterGraph(graph) {
       }
     }
   });
-  Object.keys(graph.parentGroup).map(group => {
+  Object.keys(graph.parentGroup).forEach(group => {
     if (!filteredGraph.groupsNodes[group]) {
       delete filteredGraph.parentGroup[group];
     } else {
@@ -3725,7 +3497,7 @@ export function FilterGraph(graph) {
       }
     }
   });
-  Object.keys(graph.visibleNodes).map(nodeId => {
+  Object.keys(graph.visibleNodes).forEach(nodeId => {
     filteredGraph.nodeLib[nodeId] = graph.nodeLib[nodeId];
     filteredGraph.nodes.push(nodeId);
     filteredGraph.nodeConnections[nodeId] = {
@@ -3733,7 +3505,7 @@ export function FilterGraph(graph) {
     };
     filteredGraph.nodeLinks[nodeId] = { ...graph.nodeLinks[nodeId] };
 
-    Object.keys(graph.nodeLinks[nodeId] || {}).map(t => {
+    Object.keys(graph.nodeLinks[nodeId] || {}).forEach(t => {
       if (!filteredGraph.linkLib[t]) {
         filteredGraph.nodeLinks[nodeId] = {
           ...filteredGraph.nodeLinks[nodeId]
@@ -3758,7 +3530,7 @@ export function VisualProcess(graph) {
     GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed)
   );
   const collapsingGroups = {};
-  collapsedNodes.map(t => {
+  collapsedNodes.forEach(t => {
     if (graph.nodesGroups[t]) {
       const t_importance =
         GroupImportanceOrder[
@@ -3802,12 +3574,12 @@ export function VisualProcess(graph) {
     return true;
   });
   let disappearingNodes = {};
-  smallestsNonCrossingGroups.map(t => {
+  smallestsNonCrossingGroups.forEach(t => {
     const dt = {};
     let head = null;
     let mostimportant = 10000;
     const _nodes = GetNodesInsideGroup(graph, t);
-    _nodes.filter(t => {
+    _nodes.forEach(t => {
       const type = GetGroupProperty(graph.nodeLib[t], NodeProperties.NODEType);
       dt[t] = true;
       if (GroupImportanceOrder[type] < mostimportant) {
@@ -3816,15 +3588,16 @@ export function VisualProcess(graph) {
       }
     });
     delete dt[head];
-    for (const i in dt) {
+    Object.keys(dt).forEach(i => {
       dt[i] = head;
-    }
+    });
+
     disappearingNodes = { ...disappearingNodes, ...dt };
   });
 
   vgraph.nodes = [...graph.nodes.filter(x => !disappearingNodes[x])];
   vgraph.nodeLib = {};
-  vgraph.nodes.map(t => {
+  vgraph.nodes.forEach(t => {
     vgraph.nodeLib[t] = graph.nodeLib[t];
   });
   vgraph.links = graph.links
@@ -3863,7 +3636,7 @@ export function VisualProcess(graph) {
       const newgroup = createGroup();
       newgroup.id = `${oldgroup.id}`;
       if (oldgroup && oldgroup.leaves) {
-        oldgroup.leaves.map(leaf => {
+        oldgroup.leaves.forEach(leaf => {
           if (vgraph.nodeLib[leaf]) {
             newgroup.leaves.push(leaf);
           }
@@ -3877,7 +3650,7 @@ export function VisualProcess(graph) {
       return null;
     })
     .filter(x => x);
-  vgroups.map(group => {
+  vgroups.forEach(group => {
     vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter(
       og => {
         if (vgraph.groupLib[og]) {

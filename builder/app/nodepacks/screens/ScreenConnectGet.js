@@ -38,7 +38,8 @@ import {
 } from "../../constants/functiontypes";
 
 export default function ScreenConnectGet(args = { method, node }) {
-  let { node, method, navigateTo } = args;
+  let { node, method } = args;
+  const { navigateTo } = args;
   if (!node) {
     throw "no node";
   }
@@ -87,44 +88,45 @@ export default function ScreenConnectGet(args = { method, node }) {
             v => v === GetNodeProp(x, NodeProperties.EventType)
           )
         );
+        if (navigateTo) {
+          const _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+            id: navigateTo,
+            link: LinkType.ComponentExternalApi
+          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
 
-        const _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
-          id: navigateTo,
-          link: LinkType.ComponentExternalApi
-        }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
-
+          result.push(
+            _valueNavigateTargetApi
+              ? {
+                operation: UPDATE_NODE_PROPERTY,
+                options() {
+                  return {
+                    id: _valueNavigateTargetApi.id,
+                    properties: {
+                      [NodeProperties.IsUrlParameter]: true
+                    }
+                  };
+                }
+              }
+              : null)
+          result.push(
+            _valueNavigateTargetApi
+              ? {
+                operation: UPDATE_NODE_PROPERTY,
+                options() {
+                  return {
+                    id: navigateTo,
+                    properties: {
+                      [NodeProperties.UIText]: GetNodeProp(navigateTo, NodeProperties.UIText)
+                    }
+                  };
+                }
+              }
+              : null)
+        }
         const valueGetApi = GetNodesLinkedTo(graph, {
           id: node,
           link: LinkType.ComponentExternalApi
         }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
-        result.push(
-          _valueNavigateTargetApi
-            ? {
-              operation: UPDATE_NODE_PROPERTY,
-              options() {
-                return {
-                  id: _valueNavigateTargetApi.id,
-                  properties: {
-                    [NodeProperties.IsUrlParameter]: true
-                  }
-                };
-              }
-            }
-            : null)
-        result.push(
-          _valueNavigateTargetApi
-            ? {
-              operation: UPDATE_NODE_PROPERTY,
-              options() {
-                return {
-                  id: navigateTo,
-                  properties: {
-                    [NodeProperties.UIText]: GetNodeProp(navigateTo, NodeProperties.UIText)
-                  }
-                };
-              }
-            }
-            : null)
         result.push(valueGetApi ? {
           operation: UPDATE_NODE_PROPERTY,
           options() {
@@ -176,7 +178,6 @@ export default function ScreenConnectGet(args = { method, node }) {
           });
 
           let _instanceNode = null;
-          let _navigateContext = null;
 
           result.push(
             ...[
@@ -191,14 +192,11 @@ export default function ScreenConnectGet(args = { method, node }) {
                 )
               }
             ],
-            ...CreateNavigateToScreenDC({
+            ...(navigateTo ? CreateNavigateToScreenDC({
               screen: navigateTo,
               node: () => _instanceNode.id,
-              viewPackages,
-              callback: navigateContext => {
-                _navigateContext = navigateContext;
-              }
-            }),
+              viewPackages
+            }) : []),
             (currentGraph) => {
               const valueComponentApiNode = GetComponentApiNode(
                 ComponentApiKeys.Value,

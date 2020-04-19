@@ -13,7 +13,7 @@ export default class ProgressBar extends Component {
       result = `${(time / (1000)).toFixed(2)}s`;
       if (time > 60 * 1000) {
         result = time / 60000;
-        result = `${(time / (60 * 1000).toFixed(2))}m`;
+        result = `${((time / (60 * 1000)).toFixed(2))}m`;
         if (time > 60 * 1000 * 60) {
           result = `${(time / (60 * 1000 * 60)).toFixed(2)}h`;
         }

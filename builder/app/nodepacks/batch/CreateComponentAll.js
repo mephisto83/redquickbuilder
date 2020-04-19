@@ -21,43 +21,16 @@ import { findLink } from "../../methods/graph_methods";
 export default async function CreateComponentAll(progressFunc) {
   const result = [];
   const models = GetNodesByProperties({
-    [NodeProperties.NODEType]: NodeTypes.Model,
-    [NodeProperties.IsAgent]: (v) => !v,
-    [NodeProperties.IsViewModel]: v => !v
-  });
+    [NodeProperties.NODEType]: NodeTypes.Model
+  }).filter(v => !GetNodeProp(v, NodeProperties.IsViewModel));
   const agents = GetNodesByProperties({
     [NodeProperties.NODEType]: NodeTypes.Model,
     [NodeProperties.IsAgent]: (v) => v
-  });
-  //  NodesByType(null, NodeTypes.Model)
-  //   .filter(x => !GetNodeProp(x, NodeProperties.IsAgent))
-  //   .filter(x => !GetNodeProp(x, NodeProperties.IsViewModel));
-  // // await models.forEachAsync(async (v, mindex) => {
-  //   const defaultViewTypes = GetNodesLinkedTo(null, {
-  //     id: v.id,
-  //     componentType: NodeTypes.ViewType,
-  //     link: LinkType.DefaultViewType
-  //   });
+  }).filter(x => !GetNodeProp(x, NodeProperties.IsUser));
 
-  //   await [...properties, ...models].filter(x => x.id !== v.id).forEachAsync(async (w, windex) => {
-  //     const defaultViewTypesOther = GetNodesLinkedTo(null, {
-  //       id: w.id,
-  //       componentType: NodeTypes.ViewType,
-  //       link: LinkType.DefaultViewType
-  //     });
-  //     const intersections = defaultViewTypes.intersection(defaultViewTypesOther, (x, y) => y.id === x.id)
-  //     if (intersections && intersections.length) {
-  //       CreateComponentModel({
-  //         model: v.id,
-  //         connectedModel: w.id,
-  //         isSharedComponent: true,
-  //         isDefaultComponent: true
-  //       });
-  //     }
-  //   });
-  //   await progressFunc((mindex) / (models.length * 2))
-  // });
   await agents.forEachAsync(async (agent, agentIndex, agentCount) => {
+
+    await progressFunc((agentIndex + .25) / agentCount);
 
     const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
     await defaultViewTypes.forEachAsync(async (viewType, viewTypeIndex, viewTypeCount) => {
@@ -75,19 +48,17 @@ export default async function CreateComponentAll(progressFunc) {
       await progressFunc(((agentIndex * viewTypeIndex) + viewTypeIndex) / ((agentCount * viewTypeCount) + (agentCount * models.length)));
 
     });
+    await progressFunc((agentIndex + .5) / agentCount);
 
-    await models.forEachAsync(async (v, mindex, mcount) => {
+    await models.forEachAsync(async (v) => {
       CreateComponentModel({
         agentId: agent.id,
         model: v.id
       });
 
-      await progressFunc((
-        (agentIndex * defaultViewTypes.length) +
-        (agentIndex * mcount) + mindex
-      ) / ((agentCount * defaultViewTypes.length) + (agentCount * models.length)));
     });
 
+    await progressFunc((agentIndex + .75) / agentCount);
   });
 
   return result;
@@ -114,11 +85,11 @@ export function CreateComponentModel(args = {}) {
     const viewName = `${args.isSharedComponent ? 'Shared' : ''} ${GetNodeTitle(model)} ${viewType}`;
     const properties = GetModelPropertyChildren(model)
       .filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
-    const agentAcesses = agentAccesses.find(aa => isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa));
-    if (agentAcesses || args.isSharedComponent) {
-      const agentCreds = findLink(graph, { target: agentAcesses.id, source: args.agentId });
+    const agentAccess = agentAccesses.find(aa => isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa));
+    if (agentAccess || args.isSharedComponent) {
+      const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
 
-      if (args.isSharedComponent || GetLinkProperty(agentCreds, viewType)) {
+      if (args.isSharedComponent || (agentCreds && GetLinkProperty(agentCreds, viewType))) {
         operations.push({
           node: GetNodeById(model),
           method: CreateDefaultView,

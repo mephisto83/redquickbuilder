@@ -54,6 +54,7 @@ export default function AnonymousGuest(args) {
     chosenChildren: [],
     viewType: ViewTypes.Create
   });
+
   Object.keys(uiTypeConfig).forEach(key => {
     if (uiTypeConfig[key]) {
 
@@ -65,25 +66,24 @@ export default function AnonymousGuest(args) {
     }
   });
 
-  if (continueMethodResults.instanceFunc) {
-    Object.keys(uiTypeConfig).forEach(uiType => {
-      if (uiTypeConfig[uiType]) {
-        if (!continueMethodResults.uiTypes[uiType]) {
-          throw new Error('missing uiType in anonymous guest');
-        }
+  Object.keys(uiTypeConfig).forEach(uiType => {
+    if (uiTypeConfig[uiType]) {
+      if (!continueMethodResults.uiTypes[uiType]) {
+        throw new Error('missing uiType in anonymous guest');
+      }
+      const { instanceFunc } = continueMethodResults.uiTypes[uiType];
+      if (instanceFunc) {
         PerformGraphOperation([
           ...PostAuthenticate({
             screen: null,
             uiType,
             functionName: `Post Authenticate ${uiType}`,
-            pressInstance: uiType === UITypes.ReactNative ? continueMethodResults.uiTypes[uiType].instanceFunc.onPress : continueMethodResults.uiTypes[uiType].instanceFunc.onClick
+            pressInstance: uiType === UITypes.ReactNative ? instanceFunc.onPress : instanceFunc.onClick
           })
         ])(GetDispatchFunc(), GetStateFunc());
       }
-    });
-  }
+    }
+  });
 
-  return {
-    screenNodeId: continueMethodResults.screenNodeId
-  }
+  return continueMethodResults;
 }

@@ -16,6 +16,7 @@ export const AddServiceInterfaceMenu = "Add Interface Method";
 export const AddDefaults = "Add Defaults";
 export const Type = "Type";
 export const EventType = "Event Type";
+export const DefaultAgent = 'Default Agent Type';
 export const UIParameters = "UI Parameters";
 export const IsFetchOutput = "Is Fetch Output";
 export const PricePerConnection = 'Connection cost';

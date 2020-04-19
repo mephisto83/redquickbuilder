@@ -27,14 +27,14 @@ export default async function ConnectScreens(progresFunc) {
           commands = ScreenConnectGet({
             method: methods[0].id,
             node: screen.id,
-            navigateTo: navigateToScreens[0].id
+            navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
           });
           break;
         case ViewTypes.GetAll:
           commands = ScreenConnectGetAll({
             method: methods[0].id,
             node: screen.id,
-            navigateTo: navigateToScreens[0].id
+            navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
           });
           break;
         case ViewTypes.Create:
@@ -64,13 +64,22 @@ export function GetPossibleNavigateScreens(screen, allscreens) {
   const screens = allscreens || NodesByType(null, NodeTypes.Screen);
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
+  const agentId = GetNodeProp(screen, NodeProperties.Agent);
 
-  return screens.filter(x => {
+  return screens.filter(x => x.id !== screen.id).filter(x => {
     if (viewType === ViewTypes.Get) {
       return (GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Update);
     }
     return (GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Get);
   })
+    .filter(x => {
+      if (screenModel) {
+        const agent =
+          GetMethodNodeProp(x, FunctionTemplateKeys.Agent);
+        return agent === agentId;
+      }
+      return false;
+    })
     .filter(x => {
       if (screenModel) {
         const modelOutput = GetNodeProp(x, NodeProperties.Model);
@@ -108,8 +117,17 @@ export function GetPossibleComponentDidMount(screen) {
 export function GetPossibleMethods(screen) {
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
+  const agentId = GetNodeProp(screen, NodeProperties.Agent);
 
   return NodesByType(null, NodeTypes.Method)
+    .filter(x => {
+      if (screenModel) {
+        const agent =
+          GetMethodNodeProp(x, FunctionTemplateKeys.Agent);
+        return agent === agentId;
+      }
+      return false;
+    })
     .filter(
       x => {
         const functionType = MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {};

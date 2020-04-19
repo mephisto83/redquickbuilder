@@ -10,7 +10,7 @@ import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
 import TopViewer from "./topviewer";
 
-import { GetCurrentGraph, VisualEq, NodeProperties, GetLinkProperty, GetNodeTitle, GetNodeProp } from "../actions/uiactions";
+import { GetCurrentGraph, VisualEq, NodeProperties, GetLinkProperty, GetNodeTitle, GetNodeProp, isAccessNode } from "../actions/uiactions";
 import Box from "./box";
 import FormControl from "./formcontrol";
 import * as Titles from './titles';
@@ -77,6 +77,7 @@ class AgentAccessView extends Component {
                     value={this.state.bindAll} />
 
                   <button className="btn btn-default btn-flat" onClick={(evt) => {
+                    evt.stopPropagation()
                     const accessDescriptions = GetNodesByProperties({
                       [NodeProperties.NODEType]: NodeTypes.AgentAccessDescription
                     }, graph)
@@ -94,15 +95,7 @@ class AgentAccessView extends Component {
                         return GetNodesByProperties({
                           [NodeProperties.NODEType]: NodeTypes.Model
                         }, graph).map(model => {
-                          const accessDescription = agentAccessDescription.find(v => existsLinkBetween(graph, {
-                            source: v.id,
-                            target: model.id,
-                            link: LinkType.ModelAccess
-                          }) && existsLinkBetween(graph, {
-                            source: agent.id,
-                            target: v.id,
-                            link: LinkType.AgentAccess
-                          }));
+                          const accessDescription = agentAccessDescription.find(v => isAccessNode(agent, model, v));
                           if (accessDescription) {
                             const link = findLink(graph, {
                               source: agent.id,
@@ -127,14 +120,13 @@ class AgentAccessView extends Component {
                         })
                       })
                     });
-
-                    evt.stopPropagation();
+                    ;
                     return false;
                   }} >Load Agents</button>
 
                   <button className="btn btn-default btn-primary" onClick={(evt) => {
+                    evt.stopPropagation()
                     BuildAgentAccessWeb({ ...this.state })
-                    evt.stopPropagation();
                     return false;
                   }}>
                     Set

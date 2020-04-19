@@ -4102,11 +4102,11 @@ export function isAccessNode(agent, model, aa, graph) {
   return GraphMethods.existsLinkBetween(graph, {
     source: agent.id,
     target: aa.id,
-    link: NodeConstants.LinkType.AgentAccess
+    type: NodeConstants.LinkType.AgentAccess
   }) && GraphMethods.existsLinkBetween(graph, {
     source: aa.id,
     target: model.id,
-    link: NodeConstants.LinkType.ModelAccess
+    type: NodeConstants.LinkType.ModelAccess
   })
 }
 
@@ -4583,9 +4583,6 @@ export function graphOperation(operation, options, stamp) {
                       });
                     }
                   }
-
-                  // currentGraph = GraphMethods.applyConstraints(currentGraph);
-                  // currentGraph = GraphMethods.constraintSideEffects(currentGraph);
                 });
             });
       });

@@ -70,7 +70,5 @@ export default function ContinueAsScreen(args) {
     }
   });
 
-  return {
-    screenNodeId: continueMethodResults.screenNodeId
-  }
+  return continueMethodResults;
 }

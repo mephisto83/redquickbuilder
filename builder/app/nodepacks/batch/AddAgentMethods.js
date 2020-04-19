@@ -1,5 +1,5 @@
 import { NodesByType, GetNodeProp, GetNodeTitle, executeGraphOperations, GetDispatchFunc, GetStateFunc, GetNodeByProperties, GetNodesByProperties, GetCurrentGraph, GetLinkProperty, isAccessNode } from "../../actions/uiactions";
-import { NodeTypes, NodeProperties, LinkType } from "../../constants/nodetypes";
+import { NodeTypes, NodeProperties, LinkType, Methods } from "../../constants/nodetypes";
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from "../../constants/functiontypes";
 import { CreateAgentFunction } from "../../constants/nodepackages";
 import { existsLinksBetween, findLink, existsLinkBetween } from "../../methods/graph_methods";
@@ -33,6 +33,16 @@ export default async function AddAgentMethods(progresFunc) {
           const result = [];
 
           if (GetLinkProperty(agentCreds, MethodFunctions[functionType].method)) {
+            let httpMethod;
+            switch (MethodFunctions[functionType].method) {
+              case Methods.Create:
+              case Methods.Update:
+                httpMethod = HTTP_METHODS.POST;
+                break;
+              default:
+                httpMethod = HTTP_METHODS.GET;
+                break;
+            }
             result.push({
               method: {
                 method: CreateAgentFunction({
@@ -40,7 +50,7 @@ export default async function AddAgentMethods(progresFunc) {
                   methodType: MethodFunctions[functionType].method,
                   model,
                   agent,
-                  httpMethod: HTTP_METHODS.POST, //might not be used
+                  httpMethod, //might not be used
                   functionType,
                   functionName
                 })
@@ -49,9 +59,8 @@ export default async function AddAgentMethods(progresFunc) {
             });
             executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
           }
-          const total = Date.now() - start;
           const progress = ((aindex * models.length * functionTypes.length) + mindex * functionTypes.length + findex) / (agents.length * models.length * functionTypes.length);
-          await progresFunc(progress, total * models.length * functionTypes.length * functionTypes.length * (1 - progress))
+          await progresFunc(progress)
         });
       }
     });

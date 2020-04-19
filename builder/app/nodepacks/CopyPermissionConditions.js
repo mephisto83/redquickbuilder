@@ -8,45 +8,46 @@ import {
 } from "../constants/nodetypes";
 
 export default function CopyPermissionConditions(args = { permission }) {
-  let { permission, node } = args;
+  let { permission } = args;
+  const { node } = args;
 
-  let conditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+  const conditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
     id: permission,
     link: LinkType.Condition
   }).map(v => UIA.GetNodeProp(v, NodeProperties.Condition));
-  let method = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+  const method = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
     id: permission,
     link: LinkType.FunctionOperator
   }).find(x => x);
-  let currentConditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+  const currentConditions = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
     id: node,
     link: LinkType.Condition
   });
-  let currentNodeMethod = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+  const currentNodeMethod = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
     id: node,
     link: LinkType.FunctionOperator
   }).find(x => x);
-  let functionType = UIA.GetNodeProp(method, NodeProperties.FunctionType);
-  let currentNodeMethodFunctionType = UIA.GetNodeProp(
+  const functionType = UIA.GetNodeProp(method, NodeProperties.FunctionType);
+  const currentNodeMethodFunctionType = UIA.GetNodeProp(
     currentNodeMethod,
     NodeProperties.FunctionType
   );
-  let result = [];
-  currentConditions.map(cc => {
+  const result = [];
+  currentConditions.forEach(cc => {
     result.push({
       operation: UIA.REMOVE_NODE,
-      options: function() {
+      options() {
         return {
           id: cc.id
         };
       }
     });
   });
-  conditions.map(condition => {
+  conditions.forEach(condition => {
     result.push({
       operation: UIA.ADD_NEW_NODE,
-      options: function() {
-        let temp = JSON.parse(JSON.stringify(condition));
+      options() {
+        const temp = JSON.parse(JSON.stringify(condition));
         temp.methods[currentNodeMethodFunctionType] =
           temp.methods[functionType];
         if (functionType !== currentNodeMethodFunctionType)

@@ -721,13 +721,12 @@ export const CreateLoginModels = {
         });
       }
     });
+    const anonymous_method_results = AnonymousGuest({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
     const continueAsResult = ContinueAsScreen({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
     const forgotLogin = ForgotLogin({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
     const changeUserPassword = ChangeUserPassword({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
-    const anonymous_method_results = AnonymousGuest({ ...args, uiTypeConfig, maestro: newStuff.maestro, graph: newStuff.graph, viewPackage }, newStuff);
 
 
-    const anonymousScreen = anonymous_method_results.screenNodeId;
 
     const registerScreen = method_results.screenNodeId;
     if (method_results.instanceFunc) {
@@ -754,6 +753,10 @@ export const CreateLoginModels = {
 
     Object.keys(uiTypeConfig).forEach(uiType => {
       if (uiTypeConfig[uiType]) {
+        const anonymousScreen = anonymous_method_results.uiTypes[uiType].screenNodeId;
+        const continueAsScreen = continueAsResult.uiTypes[uiType].screenNodeId;
+        const forgotLoginScreen = forgotLogin.uiTypes[uiType].screenNodeId;
+
         let anonymousButton;
         let continueAsButton;
         let forgotLoginButton;
@@ -764,8 +767,8 @@ export const CreateLoginModels = {
             registerForm: registerScreen,
             authenticateForm: authenticateScreen,
             anonymousForm: anonymousScreen,
-            continueAsForm: continueAsResult.screenNodeId,
-            forgotForm: forgotLogin.screenNodeId,
+            continueAsForm: continueAsScreen,
+            forgotForm: forgotLoginScreen,
             uiType,
             callback(homeViewContext) {
               anonymousButton = homeViewContext.anonymousButton;
@@ -778,8 +781,8 @@ export const CreateLoginModels = {
           function () { return Anonymous({ screen: anonymousScreen, uiType }) },
           function () { return HomeViewCredentialLoading({ component: homeViewScreenOption }) },
           function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: anonymousButton, screen: anonymousScreen }) },
-          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: continueAsButton, screen: continueAsResult.screenNodeId }) },
-          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: forgotLoginButton, screen: forgotLogin.screenNodeId }) }
+          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: continueAsButton, screen: continueAsScreen }) },
+          function () { return AddEventsToNavigateToScreen({ titleService: titleService.id, uiType, component: forgotLoginButton, screen: forgotLoginScreen }) }
           ]
         )(GetDispatchFunc(), GetStateFunc());
       }
@@ -1878,7 +1881,7 @@ export const CreateDefaultView = {
                     [NodeProperties.InstanceType]: useModelInstance
                       ? InstanceTypes.ModelInstance
                       : InstanceTypes.ScreenInstance,
-                    [NodeProperties.UIText]: `${viewName} Form`,
+                    [NodeProperties.UIText]: `${viewName} ${GetNodeTitle(agentId)} Form`,
                     [NodeProperties.ViewType]: viewType,
                     [NodeProperties.NODEType]: NodeTypes.Screen,
                     [NodeProperties.Model]: currentNode.id,
@@ -1900,6 +1903,9 @@ export const CreateDefaultView = {
                   callback: screenNode => {
                     screenNodeId = screenNode.id;
                     newItems.screenNodeId = screenNode.id;
+                    method_result.screenNodeId = screenNodeId;
+                    method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+                    method_result.uiTypes[args.uiType].screenNodeId = screenNodeId;
                   },
                   properties: {
                     ...viewPackage,
@@ -1907,7 +1913,7 @@ export const CreateDefaultView = {
                       ? InstanceTypes.ModelInstance
                       : InstanceTypes.ScreenInstance,
                     [NodeProperties.ViewType]: viewType,
-                    [NodeProperties.UIText]: `${viewName} Form`,
+                    [NodeProperties.UIText]: `${viewName} ${GetNodeTitle(agentId)} Form`,
                     [NodeProperties.Model]: currentNode.id,
                     [NodeProperties.Agent]: agentId
                   }

@@ -32,7 +32,8 @@ import StoreModelArrayStandard from "../StoreModelArrayStandard";
 import AppendValidations from "./AppendValidations";
 
 export default function ScreenConnectGetAll(args = { method, node }) {
-  let { node, method, navigateTo } = args;
+  let { node, method } = args;
+  const { navigateTo } = args;
   if (!node) {
     throw "no node";
   }
@@ -113,10 +114,13 @@ export default function ScreenConnectGetAll(args = { method, node }) {
             id: subcomponent.id,
             link: LinkType.ComponentInternalApi
           }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
-          const valueNavigateTargetApiItems = GetNodesLinkedTo(graph, {
-            id: navigateTo,
-            link: LinkType.ComponentExternalApi
-          }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+          let valueNavigateTargetApiItems;
+          if (navigateTo) {
+            valueNavigateTargetApiItems = GetNodesLinkedTo(graph, {
+              id: navigateTo,
+              link: LinkType.ComponentExternalApi
+            }).find(x => GetNodeTitle(x) === ComponentApiKeys.Value);
+          }
           const events = GetNodesLinkedTo(graph, {
             id: subcomponent.id,
             link: LinkType.EventMethod
@@ -170,7 +174,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
                   )
                 }
               ],
-              ...CreateNavigateToScreenDC({
+              ...(navigateTo ? CreateNavigateToScreenDC({
                 screen: navigateTo,
                 node: () => _instanceNode.id,
                 lambda: lambdaFunc,
@@ -178,7 +182,7 @@ export default function ScreenConnectGetAll(args = { method, node }) {
                 callback: navigateContext => {
                   _navigateContext = navigateContext;
                 }
-              }),
+              }) : []),
               {
                 operation: ADD_LINK_BETWEEN_NODES,
                 options() {
@@ -193,16 +197,16 @@ export default function ScreenConnectGetAll(args = { method, node }) {
               },
               valueNavigateTargetApiItems
                 ? {
-                    operation: UPDATE_NODE_PROPERTY,
-                    options() {
-                      return {
-                        id: valueNavigateTargetApiItems.id,
-                        properties: {
-                          [NodeProperties.IsUrlParameter]: true
-                        }
-                      };
-                    }
+                  operation: UPDATE_NODE_PROPERTY,
+                  options() {
+                    return {
+                      id: valueNavigateTargetApiItems.id,
+                      properties: {
+                        [NodeProperties.IsUrlParameter]: true
+                      }
+                    };
                   }
+                }
                 : null
             );
           });

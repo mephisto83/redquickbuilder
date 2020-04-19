@@ -104,7 +104,7 @@ function createReactWeb() {
     .then(() => {
       console.log('adding redux-logger');
       let promise = Promise.resolve();
-      ['@types/react-router', 'react-router-dom', '@types/react-redux', 'typescript@3.8.3', 'node-sass', 'react-redux', 'connected-react-router', 'history', 'react-hot-loader', 'redux', 'react-router', 'redux-logger'].map(dependency => {
+      ['@types/react-router', 'react-router-dom', '@types/react-redux', 'typescript@3.8.3', 'node-sass', 'redux-thunk', 'react-redux', 'connected-react-router', 'history', 'react-hot-loader', 'redux', 'react-router', 'redux-logger'].map(dependency => {
         promise = promise.then(() => executeSpawnCmd(
           'yarn',
           [

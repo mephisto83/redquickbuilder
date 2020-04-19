@@ -430,6 +430,7 @@ export const NodeProperties = {
   QueryParameterObjectExtendible: "QueryParameterObjectExtendible",
   QueryParameterObject: "QueryParameterObject",
   QueryParameterParam: "QueryParameterParam",
+  DefaultAgent:'DefaultAgent',
   QueryParameterParamType: "QueryParameterParamType",
   TemplateParameter: "TemplateParameter",
   TemplateParameterType: "TemplateParameterType",

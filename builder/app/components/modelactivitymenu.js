@@ -43,9 +43,9 @@ class ModelActivityMenu extends Component {
     );
     const permission_nodes = UIA.NodesByType(state, UIA.NodeTypes.Permission).map(
       node => ({
-          value: node.id,
-          title: UIA.GetNodeTitle(node)
-        })
+        value: node.id,
+        title: UIA.GetNodeTitle(node)
+      })
     );
     return (
       <SideMenuContainer
@@ -72,14 +72,18 @@ class ModelActivityMenu extends Component {
                   });
                 }}
               />
+              {is_agent ? <CheckBoxProperty
+                title={Titles.DefaultAgent}
+                node={currentNode}
+                property={NodeProperties.DefaultAgent} /> : null}
               {is_agent ? (
                 <SelectInput
                   label={Titles.UserModel}
                   options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(
                     node => ({
-                        value: node.id,
-                        title: UIA.GetNodeTitle(node)
-                      })
+                      value: node.id,
+                      title: UIA.GetNodeTitle(node)
+                    })
                   )}
                   onChange={value => {
                     const id = currentNode.id;
@@ -193,9 +197,9 @@ class ModelActivityMenu extends Component {
               {many_to_many_enabled ? (
                 <SelectInput
                   options={UIA.NodesByType(state, NodeTypes.Model).map(x => ({
-                      value: x.id,
-                      title: UIA.GetNodeTitle(x)
-                    }))}
+                    value: x.id,
+                    title: UIA.GetNodeTitle(x)
+                  }))}
                   label={Titles.ManyToManyNexusModel}
                   onChange={value => {
                     const id = currentNode.id;
@@ -393,9 +397,9 @@ class ModelActivityMenu extends Component {
             <SelectInput
               label={Titles.ParentTo}
               options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => ({
-                  value: node.id,
-                  title: UIA.GetNodeTitle(node)
-                }))}
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+              }))}
               onChange={value => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {

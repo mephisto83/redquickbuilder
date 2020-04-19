@@ -131,21 +131,6 @@ export default async function BuildAll(callback) {
       await AddAgentMethods(progresFunc);
     });
 
-    await run(buildAllProgress, Create_Component_All, async (progresFunc) => {
-      await CreateComponentAll(progresFunc);
-    });
-
-
-    await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc) => {
-      await AddFiltersToGetAll(progresFunc);
-    });
-
-
-    await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
-      await SelectAllOnModelFilters(progresFunc);
-    });
-
-
     await run(buildAllProgress, Create_Dashboard, async (progresFunc) => {
       const count = Object.keys(uiTypes).length;
       await Object.keys(uiTypes).forEachAsync(async (uiType, uiIndex) => {
@@ -171,6 +156,22 @@ export default async function BuildAll(callback) {
 
       await ApplyLoginValidations(progresFunc);
     });
+
+
+    await run(buildAllProgress, Create_Component_All, async (progresFunc) => {
+      await CreateComponentAll(progresFunc);
+    });
+
+
+    await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc) => {
+      await AddFiltersToGetAll(progresFunc);
+    });
+
+
+    await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc) => {
+      await SelectAllOnModelFilters(progresFunc);
+    });
+
 
 
     await run(buildAllProgress, Add_Chain_To_Navigate_Next_Screens, async (progresFunc) => {
