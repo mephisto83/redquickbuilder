@@ -1881,7 +1881,7 @@ export const CreateDefaultView = {
                     [NodeProperties.InstanceType]: useModelInstance
                       ? InstanceTypes.ModelInstance
                       : InstanceTypes.ScreenInstance,
-                    [NodeProperties.UIText]: `${viewName} ${GetNodeTitle(agentId)} Form`,
+                    [NodeProperties.UIText]: `${viewName} ${agentId ? GetNodeTitle(agentId) : ''} Form`,
                     [NodeProperties.ViewType]: viewType,
                     [NodeProperties.NODEType]: NodeTypes.Screen,
                     [NodeProperties.Model]: currentNode.id,
@@ -1914,7 +1914,7 @@ export const CreateDefaultView = {
                       ? InstanceTypes.ModelInstance
                       : InstanceTypes.ScreenInstance,
                     [NodeProperties.ViewType]: viewType,
-                    [NodeProperties.UIText]: `${viewName} ${GetNodeTitle(agentId)} Form`,
+                    [NodeProperties.UIText]: `${viewName} ${agentId ? GetNodeTitle(agentId) : ''} Form`,
                     [NodeProperties.Model]: currentNode.id,
                     [NodeProperties.Agent]: agentId
                   }
