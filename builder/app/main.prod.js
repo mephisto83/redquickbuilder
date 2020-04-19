@@ -107,6 +107,7 @@ var external_electron_log_ = __webpack_require__("electron-log");
 var external_electron_log_default = /*#__PURE__*/__webpack_require__.n(external_electron_log_);
 
 // CONCATENATED MODULE: ./app/ipc/handler-events.js
+/* eslint-disable import/prefer-default-export */
 const HandlerEvents = {
   scaffold: {
     message: 'scaffold-project',
@@ -115,6 +116,10 @@ const HandlerEvents = {
   reactnative: {
     message: 'react-project',
     reply: 'react-project-reply'
+  },
+  reactweb: {
+    message: 'reactweb-project',
+    reply: 'reactweb-project-reply'
   },
   electron: {
     message: 'electron-project',
@@ -274,21 +279,28 @@ function handle(msg) {
       result = Promise.resolve().then(() => {
         return scaffoldProject(msg.body);
       });
-      console.log('handle scaffolding');
+      console.log('handle .net core scaffolding');
       break;
 
     case HandlerEvents.reactnative.message:
       result = Promise.resolve().then(() => {
         return scaffoldProject(msg.body, 'ReactNative');
       });
-      console.log('handle scaffolding');
+      console.log('handle react native scaffolding');
+      break;
+
+    case HandlerEvents.reactweb.message:
+      result = Promise.resolve().then(() => {
+        return scaffoldProject(msg.body, 'ReactWeb');
+      });
+      console.log('handle react web scaffolding');
       break;
 
     case HandlerEvents.electron.message:
       result = Promise.resolve().then(() => {
         return scaffoldProject(msg.body, 'ElectronIO');
       });
-      console.log('handle scaffolding');
+      console.log('handle electrion scaffolding');
 
     default:
       console.log('did nothing');
