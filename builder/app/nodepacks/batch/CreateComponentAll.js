@@ -100,11 +100,12 @@ export function CreateComponentModel(args = {}) {
               isSharedComponent: args.isSharedComponent,
               viewTypeModelId: args.viewTypeModelId,
               connectedModel,
+              agentId: args.agentId,
               ...defaultArgs,
               viewName
             }),
-            agentId: args.agentId,
             viewType,
+            agentId: args.agentId,
             isList: viewType === ViewTypes.GetAll,
             chosenChildren: properties
               .map(v => v.id)

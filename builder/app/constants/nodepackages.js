@@ -1898,6 +1898,7 @@ export const CreateDefaultView = {
 
                   return false;
                 }
+
                 return {
                   nodeType: NodeTypes.Screen,
                   callback: screenNode => {
