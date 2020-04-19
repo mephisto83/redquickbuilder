@@ -22,6 +22,7 @@ import CreateClaimService from "./CreateClaimService";
 import SetupViewTypes from "./SetupViewTypes";
 import AddComponentsToScreenOptions from "./AddComponentsToScreenOptions";
 import ApplyLoginValidations from "./ApplyLoginValidations";
+import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
 export async function pause() {
   return new Promise((res) => {
@@ -117,7 +118,8 @@ export default async function BuildAll(callback) {
     { name: Setup_View_Types },
     { name: Have_All_Properties_On_Executors },
     { name: Add_Copy_Command_To_Executors },
-    { name: Add_Component_To_Screen_Options }
+    { name: Add_Component_To_Screen_Options },
+    { name: 'CollectionDataChainsIntoCollections' }
   ];
 
   setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES)
@@ -222,6 +224,15 @@ export default async function BuildAll(callback) {
       await AddComponentsToScreenOptions(progresFunc);
     });
 
+
+    await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc) => {
+      const result = CollectionDataChainsIntoCollections(progresFunc);
+      await result.forEachAsync(async (item, index, total) => {
+        graphOperation([item])(GetDispatchFunc(), GetStateFunc());
+        await progresFunc(index / total);
+      });
+      await progresFunc(1);
+    });
 
   } catch (e) {
     console.log(e);

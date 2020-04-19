@@ -91,8 +91,5 @@ export default function SetupViewTypeFor(args = {}) {
     setViewPackageStamp(null, 'setup-view-type-for');
     return [];
   })
-  result.push(() => {
-    return CollectionDataChainsIntoCollections();
-  })
   return result;
 }

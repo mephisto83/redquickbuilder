@@ -6,7 +6,6 @@ import { MethodFunctions, FunctionTemplateKeys } from "../../constants/functiont
 export default async function SetupViewTypes(progressFunc) {
   const viewTypes = NodesByType(null, NodeTypes.ViewType);
   await viewTypes.filter(x => GetNodeProp(x, NodeProperties.ViewType) !== Methods.Delete).forEachAsync(async (node, index, length) => {
-    const result = [];
     const validationMethod = GetValidationMethodForViewType(node);
     const functionToLoadModels = GetFunctionToLoadModel(node);
     [
@@ -14,22 +13,14 @@ export default async function SetupViewTypes(progressFunc) {
       UITypes.ReactWeb,
       UITypes.ReactNative
     ].forEach(uiType => {
+      const result = [];
       result.push(...SetupViewTypeFor({
         validationMethod: validationMethod ? validationMethod.id : null,
         functionToLoadModels: functionToLoadModels ? functionToLoadModels.id : null,
         node: node.id, uiType, eventTypeHandler: true, eventType: 'onChange', skipClear: true
       }));
-      result.push(...SetupViewTypeFor({
-        node: node.id,
-        validationMethod: validationMethod ? validationMethod.id : null,
-        functionToLoadModels: functionToLoadModels ? functionToLoadModels.id : null,
-        uiType,
-        eventTypeHandler: true,
-        eventType: 'onChange',
-        skipClear: true
-      }));
+      graphOperation([...result])(GetDispatchFunc(), GetStateFunc())
     })
-    graphOperation([...result])(GetDispatchFunc(), GetStateFunc())
     await progressFunc(index / length);
   })
 }
