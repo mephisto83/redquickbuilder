@@ -197,7 +197,7 @@ export function saveGraphToFile() {
           ]
         }
       ).then(opts => {
-        let fileName = opts.filePaths.find(x => x);
+        let fileName = opts.filePath;
         if (fileName === undefined) {
           console.log("You didn't save the file");
           return;
@@ -238,7 +238,7 @@ export function saveRecording(recording) {
         ]
       }
     ).then(opts => {
-      let fileName = opts.filePaths.find(x => x)
+      let fileName = opts.filePath;
       if (fileName === undefined) {
         console.log("You didn't save the file");
         return;
@@ -276,7 +276,7 @@ export function saveTheme(theme) {
         ]
       }
     ).then(opts => {
-      let fileName = opts.filePaths.find(x => x)
+      let fileName = opts.filePath;
       if (fileName === undefined) {
         console.log("You didn't save the file");
         return;
@@ -369,7 +369,7 @@ export function setWorkingDirectory() {
 
         console.log(fileName);
         currentGraph = updateWorkSpace(currentGraph, {
-          workspace: fileName[0]
+          workspace: fileName
         });
         SaveGraph(currentGraph, dispatch);
       });
