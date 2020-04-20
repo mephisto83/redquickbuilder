@@ -11,16 +11,19 @@ import merge from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../internals/scripts/CheckNodeEnv';
+import DeleteSourceMaps from '../internals/scripts/DeleteSourceMaps';
 
 CheckNodeEnv('production');
+DeleteSourceMaps();
+
 export default merge.smart(baseConfig, {
-  devtool: 'source-map',
+  devtool: process.env.DEBUG_PROD === 'true' ? 'source-map' : 'none',
 
   mode: 'production',
 
-  target: 'electron-renderer',
+  target: 'electron-preload',
 
-  entry: path.join(__dirname, '..', 'app/index'),
+  entry: path.join(__dirname, '..', 'app/index.tsx'),
 
   output: {
     path: path.join(__dirname, '..', 'app/dist'),
@@ -58,8 +61,9 @@ export default merge.smart(baseConfig, {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
-              localIdentName: '[name]__[local]__[hash:base64:5]',
+              modules: {
+                localIdentName: '[name]__[local]__[hash:base64:5]'
+              },
               sourceMap: true
             }
           }
@@ -97,9 +101,10 @@ export default merge.smart(baseConfig, {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: {
+                localIdentName: '[name]__[local]__[hash:base64:5]'
+              },
               importLoaders: 1,
-              localIdentName: '[name]__[local]__[hash:base64:5]',
               sourceMap: true
             }
           },
@@ -172,11 +177,11 @@ export default merge.smart(baseConfig, {
     minimizer: process.env.E2E_BUILD
       ? []
       : [
-          // new TerserPlugin({
-          //   parallel: true,
-          //   sourceMap: false,
-          //   cache: true
-          // }),
+          new TerserPlugin({
+            parallel: true,
+            sourceMap: true,
+            cache: true
+          }),
           new OptimizeCSSAssetsPlugin({
             cssProcessorOptions: {
               map: {
@@ -199,7 +204,9 @@ export default merge.smart(baseConfig, {
      * development checks
      */
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      DEBUG_PROD: false,
+      E2E_BUILD: false
     }),
 
     new MiniCssExtractPlugin({

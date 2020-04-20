@@ -148,7 +148,7 @@ Here's the most notable changes since `v0.10.0`. Its been about a year since a r
 - **Migrated to `electron-builder@4`**
 - **Migrated to `webpack@2`**
 - **Migrated to `react-hot-loader@3`**
-- **Changed default live reload server PORT to `1212` from `3000`**
+- **Changed default live reload server PORT to `1231` from `3000`**
 
 #### Additions
 
