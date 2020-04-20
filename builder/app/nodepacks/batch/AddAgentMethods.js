@@ -25,7 +25,7 @@ export default async function AddAgentMethods(progresFunc) {
     await models.forEachAsync(async (model, mindex) => {
       const graph = GetCurrentGraph();
       const agentAcesses = agentAccesses.find(aa => isAccessNode(agent, model, aa, graph));
-      if (agentAcesses) {
+      if (agentAcesses || true) {
         const agentCreds = findLink(graph, { target: agentAcesses.id, source: agent.id });
         await functionTypes.forEachAsync(async (functionType, findex) => {
           const start = Date.now();
