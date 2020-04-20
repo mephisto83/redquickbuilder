@@ -25,7 +25,7 @@ import {
   SelectorPropertyKeys,
   ApiNodeKeys
 } from "./nodetypes";
-import PostRegister from "../nodepacks/PostRegister";
+
 import {
   ADD_NEW_NODE,
   GetAgentNodes,
@@ -50,15 +50,12 @@ import {
   GetModelPropertyChildren,
   GetDataChainNextId,
   GetNodesByProperties,
-  setSharedComponent,
   getViewTypeEndpointsForDefaults,
   NEW_DATA_SOURCE,
-  updateMethodParameters,
   GetNodeByProperties,
   getGroup,
   SelectedNode,
   GetCodeName,
-  attachMethodToMaestro,
   ADD_DEFAULT_PROPERTIES,
   GetSharedComponentFor,
   NodesByType,
@@ -69,8 +66,7 @@ import {
   NO_OP,
   addComponentTags,
   SetSharedComponent,
-  ValidationPropName,
-  $addComponentApiNodes
+  ValidationPropName
 } from "../actions/uiactions";
 import {
   CreateLayout,
@@ -132,7 +128,6 @@ import ConnectLifecycleMethod from "../components/ConnectLifecycleMethod";
 import UpdateMethodParameters from "../nodepacks/method/UpdateMethodParameters";
 import AttachMethodToMaestro from "../nodepacks/method/AttachMethodToMaestro";
 import CreateGetObjectDataChain from "../nodepacks/CreateGetObjectDataChain";
-import AddEvent from "../nodepacks/AddEvent";
 import ContinueAsScreen from "../nodepacks/screens/ContinueAs";
 import ForgotLogin from "../nodepacks/screens/ForgotLogin";
 import ChangeUserPassword from "../nodepacks/screens/ChangeUserPassword";
@@ -152,7 +147,7 @@ export const GetSpecificModels = {
     // graph = GraphMethods.addNewNodeOfType(graph, options, NodeTypes.Model);
     const agents = GetAgentNodes();
 
-    agents.map(agent => {
+    agents.forEach(agent => {
       let methodProps;
 
       if (

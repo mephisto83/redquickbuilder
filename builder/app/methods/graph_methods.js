@@ -571,7 +571,7 @@ export function clearGroup(graph, ops) {
       }
     }
   }
-  graph.groups = [...graph.groups.filter(x => x !== id)];
+  graph.groups = graph.groups.filter(x => x !== id);
   delete graph.groupLib[id];
   delete graph.childGroups[id];
   delete graph.groupsNodes[id];
@@ -3013,15 +3013,21 @@ export function removeLink(graph, link, options = {}) {
     }
     delete graph.linkLib[link];
 
-    graph.linkLib = { ...graph.linkLib };
-    graph.nodeLinks[del_link.source] = {
-      ...graph.nodeLinks[del_link.source],
-      ...{
-        [del_link.target]: graph.nodeLinks[del_link.source]
-          ? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
-          : 0
-      }
-    };
+    // graph.linkLib = { ...graph.linkLib };
+    // graph.nodeLinks[del_link.source] = {
+    //   ...graph.nodeLinks[del_link.source],
+    //   ...{
+    //     [del_link.target]: graph.nodeLinks[del_link.source]
+    //       ? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
+    //       : 0
+    //   }
+    // };
+    if (!graph.nodeLinks[del_link.source])
+      graph.nodeLinks[del_link.source] = {};
+    if (graph.nodeLinks[del_link.source][del_link.target]) {
+      graph.nodeLinks[del_link.source][del_link.target] = (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1;
+    }
+    else { graph.nodeLinks[del_link.source][del_link.target] = 0 }
     if (
       graph.nodeLinks[del_link.source] &&
       !graph.nodeLinks[del_link.source][del_link.target]
@@ -3031,14 +3037,17 @@ export function removeLink(graph, link, options = {}) {
         delete graph.nodeLinks[del_link.source];
       }
     }
-    graph.nodeLinks[del_link.target] = {
-      ...graph.nodeLinks[del_link.target],
-      ...{
-        [del_link.source]: graph.nodeLinks[del_link.target]
-          ? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
-          : 0
-      }
-    };
+    if (graph.nodeLinks[del_link.target]) {
+      graph.nodeLinks[del_link.target][del_link.source] = (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1;
+    }
+    // graph.nodeLinks[del_link.target] = {
+    //   ...graph.nodeLinks[del_link.target],
+    //   ...{
+    //     [del_link.source]: graph.nodeLinks[del_link.target]
+    //       ? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
+    //       : 0
+    //   }
+    // };
     if (
       graph.nodeLinks[del_link.target] &&
       !graph.nodeLinks[del_link.target][del_link.source]
