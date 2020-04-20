@@ -74,8 +74,10 @@ export function openRedQuickBuilderGraph() {
           { name: "Red Quick Builder", extensions: [RED_QUICK_FILE_EXT$] }
         ],
         properties: ["openFile"]
-      },
-      fileName => {
+      }).then((opts) => {
+        let filePaths = opts.filePaths;
+        console.log(opts.filePaths);
+        let fileName = filePaths.find(x => x);
         if (fileName === undefined) {
           console.log("You didn't save the file");
           return;
@@ -89,7 +91,7 @@ export function openRedQuickBuilderGraph() {
           fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
         }
         console.log(fileName);
-        fs.readFile(fileName, { encoding: "utf8" }, (err, res) => {
+        fs.readFile(fileName, { encoding: "utf8" }, (err: { message: any; }, res: string) => {
           if (err) {
             console.error(`An error ocurred updating the file${err.message}`);
             console.log(err);
@@ -109,8 +111,9 @@ export function openRedQuickBuilderGraph() {
           }
           console.warn("The file has been succesfully saved");
         });
-      }
-    );
+      }).catch(err => {
+        console.log(err)
+      });
   };
 }
 export function openRedQuickBuilderTheme() {
@@ -122,42 +125,42 @@ export function openRedQuickBuilderTheme() {
           { name: "Red Quick Builder", extensions: [RED_QUICK_FILE_THEME_EXT$] }
         ],
         properties: ["openFile"]
-      },
-      fileName => {
-        if (fileName === undefined) {
-          console.log("You didn't save the file");
+      }
+    ).then(opts => {
+      let fileName = opts.filePaths.find(x => x)
+      if (fileName === undefined) {
+        console.log("You didn't save the file");
+        return;
+      }
+
+      if (fileName.length && Array.isArray(fileName)) {
+        fileName = fileName[0];
+      }
+
+      if (!fileName.endsWith(RED_QUICK_FILE_THEME_EXT)) {
+        fileName = `${fileName}${RED_QUICK_FILE_THEME_EXT}`;
+      }
+      console.log(fileName);
+      fs.readFile(fileName, { encoding: "utf8" }, (err, res) => {
+        if (err) {
+          console.error(`An error ocurred updating the file${err.message}`);
+          console.log(err);
           return;
         }
-
-        if (fileName.length && Array.isArray(fileName)) {
-          fileName = fileName[0];
-        }
-
-        if (!fileName.endsWith(RED_QUICK_FILE_THEME_EXT)) {
-          fileName = `${fileName}${RED_QUICK_FILE_THEME_EXT}`;
-        }
-        console.log(fileName);
-        fs.readFile(fileName, { encoding: "utf8" }, (err, res) => {
-          if (err) {
-            console.error(`An error ocurred updating the file${err.message}`);
-            console.log(err);
-            return;
+        try {
+          const openedTheme = JSON.parse(res);
+          if (openedTheme) {
+            let defaultGraph = GetCurrentGraph();
+            defaultGraph = { ...defaultGraph, ...openedTheme };
+            SaveApplication(defaultGraph.id, CURRENT_GRAPH, dispatch);
+            SaveGraph(defaultGraph, dispatch);
           }
-          try {
-            const openedTheme = JSON.parse(res);
-            if (openedTheme) {
-              let defaultGraph = GetCurrentGraph();
-              defaultGraph = { ...defaultGraph, ...openedTheme };
-              SaveApplication(defaultGraph.id, CURRENT_GRAPH, dispatch);
-              SaveGraph(defaultGraph, dispatch);
-            }
-          } catch (e) {
-            console.log(e);
-          }
-          console.warn("The file has been succesfully saved");
-        });
-      }
-    );
+        } catch (e) {
+          console.log(e);
+        }
+        console.warn("The file has been succesfully saved");
+      });
+    });
   };
 }
 export function newRedQuickBuilderGraph() {
@@ -192,33 +195,33 @@ export function saveGraphToFile() {
           filters: [
             { name: "Red Quick Builder", extensions: [RED_QUICK_FILE_EXT$] }
           ]
-        },
-        fileName => {
-          if (fileName === undefined) {
-            console.log("You didn't save the file");
+        }
+      ).then(opts => {
+        let fileName = opts.filePaths.find(x => x);
+        if (fileName === undefined) {
+          console.log("You didn't save the file");
+          return;
+        }
+
+        if (!fileName.endsWith(RED_QUICK_FILE_EXT)) {
+          fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
+        }
+        console.log(fileName);
+
+        updateGraphProperty(currentGraph, {
+          prop: "graphFile",
+          value: fileName
+        });
+        fs.writeFile(fileName, content, err => {
+          if (err) {
+            console.error(`An error ocurred updating the file${err.message}`);
+            console.log(err);
             return;
           }
 
-          if (!fileName.endsWith(RED_QUICK_FILE_EXT)) {
-            fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
-          }
-          console.log(fileName);
-
-          updateGraphProperty(currentGraph, {
-            prop: "graphFile",
-            value: fileName
-          });
-          fs.writeFile(fileName, content, err => {
-            if (err) {
-              console.error(`An error ocurred updating the file${err.message}`);
-              console.log(err);
-              return;
-            }
-
-            console.warn("The file has been succesfully saved");
-          });
-        }
-      );
+          console.warn("The file has been succesfully saved");
+        });
+      });
     }
   };
 }
@@ -233,30 +236,30 @@ export function saveRecording(recording) {
             extensions: [RED_QUICK_FILE_RECORDING_EXT$]
           }
         ]
-      },
-      fileName => {
-        if (fileName === undefined) {
-          console.log("You didn't save the file");
+      }
+    ).then(opts => {
+      let fileName = opts.filePaths.find(x => x)
+      if (fileName === undefined) {
+        console.log("You didn't save the file");
+        return;
+      }
+
+      if (!fileName.endsWith(RED_QUICK_FILE_RECORDING_EXT)) {
+        fileName = `${fileName}${RED_QUICK_FILE_RECORDING_EXT}`;
+      }
+      console.log(fileName);
+      let content = JSON.stringify(recording, null, 4);
+      content = processRecording(content);
+      fs.writeFile(fileName, content, err => {
+        if (err) {
+          console.error(`An error ocurred updating the file${err.message}`);
+          console.log(err);
           return;
         }
 
-        if (!fileName.endsWith(RED_QUICK_FILE_RECORDING_EXT)) {
-          fileName = `${fileName}${RED_QUICK_FILE_RECORDING_EXT}`;
-        }
-        console.log(fileName);
-        let content = JSON.stringify(recording, null, 4);
-        content = processRecording(content);
-        fs.writeFile(fileName, content, err => {
-          if (err) {
-            console.error(`An error ocurred updating the file${err.message}`);
-            console.log(err);
-            return;
-          }
-
-          console.warn("The file has been succesfully saved");
-        });
-      }
-    );
+        console.warn("The file has been succesfully saved");
+      });
+    });
   };
 }
 
@@ -271,29 +274,29 @@ export function saveTheme(theme) {
             extensions: [RED_QUICK_FILE_THEME_EXT$]
           }
         ]
-      },
-      fileName => {
-        if (fileName === undefined) {
-          console.log("You didn't save the file");
+      }
+    ).then(opts => {
+      let fileName = opts.filePaths.find(x => x)
+      if (fileName === undefined) {
+        console.log("You didn't save the file");
+        return;
+      }
+
+      if (!fileName.endsWith(RED_QUICK_FILE_THEME_EXT)) {
+        fileName = `${fileName}${RED_QUICK_FILE_THEME_EXT}`;
+      }
+      console.log(fileName);
+      const content = JSON.stringify(theme, null, 4);
+      fs.writeFile(fileName, content, err => {
+        if (err) {
+          console.error(`An error ocurred updating the file${err.message}`);
+          console.log(err);
           return;
         }
 
-        if (!fileName.endsWith(RED_QUICK_FILE_THEME_EXT)) {
-          fileName = `${fileName}${RED_QUICK_FILE_THEME_EXT}`;
-        }
-        console.log(fileName);
-        const content = JSON.stringify(theme, null, 4);
-        fs.writeFile(fileName, content, err => {
-          if (err) {
-            console.error(`An error ocurred updating the file${err.message}`);
-            console.log(err);
-            return;
-          }
-
-          console.warn("The file has been succesfully saved");
-        });
-      }
-    );
+        console.warn("The file has been succesfully saved");
+      });
+    });
   };
 }
 let lastSavedDate = null;
@@ -356,20 +359,20 @@ export function setWorkingDirectory() {
         remote.getCurrentWindow(),
         {
           properties: ["openDirectory"]
-        },
-        fileName => {
-          if (fileName === undefined) {
-            console.log("You didn't save the file");
-            return;
-          }
-
-          console.log(fileName);
-          currentGraph = updateWorkSpace(currentGraph, {
-            workspace: fileName[0]
-          });
-          SaveGraph(currentGraph, dispatch);
         }
-      );
+      ).then(opts => {
+        let fileName = opts.filePaths.find(x => x);
+        if (fileName === undefined) {
+          console.log("You didn't save the file");
+          return;
+        }
+
+        console.log(fileName);
+        currentGraph = updateWorkSpace(currentGraph, {
+          workspace: fileName[0]
+        });
+        SaveGraph(currentGraph, dispatch);
+      });
     }
   };
 }
