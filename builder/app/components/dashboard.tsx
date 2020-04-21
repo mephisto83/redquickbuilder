@@ -1200,7 +1200,7 @@ class Dashboard extends Component {
                     this.props.newRedQuickBuilderGraph();
                   }} />
                   <NavBarButton title={Titles.Open} icon="fa fa-folder-open" onClick={() => {
-                    this.props.openRedQuickBuilderGraph();
+                    this.props.openRedQuickBuilderGraph(true);
                   }} />
                   <NavBarButton title={`${Titles.Record} ${UIA.GetRecording().length}`} icon={UIA.Visual(state, UIA.RECORDING) ? 'fa fa-pause' : 'fa fa-play'} onClick={() => {
                     this.props.toggleVisual(UIA.RECORDING);
@@ -1215,6 +1215,10 @@ class Dashboard extends Component {
                   }} /> : null}
                   {rootGraph ? <NavBarButton title={Titles.SaveAs} icon="fa fa-cloud-upload" onClick={() => {
                     this.props.saveGraphToFile();
+                  }} /> : null}
+
+                  {rootGraph ? <NavBarButton title={`${Titles.SaveAs} Pruned`} icon="fa fa-cloud-upload" onClick={() => {
+                    this.props.saveGraphToFile(true);
                   }} /> : null}
                   {rootGraph && rootGraph.graphFile ? <NavBarButton title={Titles.Save} icon="fa fa-save" onClick={() => {
                     this.props.saveGraph();

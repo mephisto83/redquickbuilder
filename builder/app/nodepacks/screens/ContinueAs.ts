@@ -4,9 +4,9 @@ import { UITypes, NodeProperties, NodeTypes, Methods } from "../../constants/nod
 import { ViewTypes } from "../../constants/viewtypes";
 import { HTTP_METHODS, FunctionTypes } from "../../constants/functiontypes";
 
-export default function ContinueAsScreen(args) {
+export default function ContinueAsScreen(args: any) {
   const { viewPackage, graph, maestro, uiTypeConfig } = args;
-  const newStuff = {};
+  const newStuff: any = {};
 
   PerformGraphOperation([
     {
@@ -20,7 +20,7 @@ export default function ContinueAsScreen(args) {
           [NodeProperties.Pinned]: false,
           [NodeProperties.UIText]: `Red Continue As Login Model`
         },
-        callback: newNode => {
+        callback: (newNode: any) => {
           newStuff.anonymousRegisterLoginModel = newNode.id;
         }
       }

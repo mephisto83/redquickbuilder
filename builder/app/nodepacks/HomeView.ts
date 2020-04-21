@@ -3,7 +3,7 @@ import { uuidv4 } from "../utils/array";
 import { NodeProperties, UITypes } from "../constants/nodetypes";
 import { NO_OP, GetNodeByProperties } from "../actions/uiactions";
 
-export default function (args = {}) {
+export default function (args: any = {}) {
   // node3,node6,node7,node8,node11,node16,node19
   const context = {
     node3: uuidv4(),
@@ -20,7 +20,7 @@ export default function (args = {}) {
   };
   const uiType = args.uiType || UITypes.ElectronIO;
   return [
-    function (graph) {
+    function (graph: any) {
       const homeScreen = GetNodeByProperties({
         [NodeProperties.UIText]: 'Home View'
       }, graph);

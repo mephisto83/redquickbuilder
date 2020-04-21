@@ -4,7 +4,7 @@ import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
 import { GetLinkBetween } from "../methods/graph_methods";
 
-export default function HomeViewContinueAsButtonStyle(args = {}) {
+export default function HomeViewContinueAsButtonStyle(args: any = {}) {
   // node1,node4
   if (!args.component) {
     throw new Error('missing component');
@@ -29,7 +29,7 @@ export default function HomeViewContinueAsButtonStyle(args = {}) {
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node0 = node.id; }
+          "callback": function (node: any) { context.node0 = node.id; }
         }
       }]
     },
@@ -150,7 +150,7 @@ export default function HomeViewContinueAsButtonStyle(args = {}) {
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node2 = node.id; }
+          "callback": function (node: any) { context.node2 = node.id; }
         }
       }]
     },
@@ -236,7 +236,7 @@ export default function HomeViewContinueAsButtonStyle(args = {}) {
             }
           },
           "links": [],
-          "callback": function (node, graph, group) {
+          "callback": function (node: any, graph: any, group: any) {
             context.node3 = node.id;
             context.group0 = group;
           }
@@ -322,7 +322,7 @@ export default function HomeViewContinueAsButtonStyle(args = {}) {
       }]
     },
 
-    function (graph) {
+    function (graph: any) {
       const link = GetLinkBetween(context.node0, context.node2, graph);
       context.node4 = link.id;
       return [{

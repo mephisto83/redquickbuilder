@@ -1,6 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { LinkProperties } from "../actions/uiactions";
-export default function (args = {}) {
+export default function (args: any = {}) {
   // node0,node2
 
   if (!args.lifeCycleMethod) {
@@ -16,7 +16,7 @@ export default function (args = {}) {
   };
   let { viewPackages = {} } = args;
   let result = [
-    function (graph) {
+    function (graph: any) {
       if (typeof args.lifeCycleMethod === "function") {
         context.node0 = args.lifeCycleMethod(graph);
       }
@@ -42,7 +42,7 @@ export default function (args = {}) {
                 }
               }
             },
-            callback: function (node, graph, group) {
+            callback: function (node: { id: any; }, graph: any, group: any) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -51,7 +51,7 @@ export default function (args = {}) {
       ];
     },
 
-    function (graph) {
+    function (graph: any) {
       return [
         {
           operation: "NEW_LINK",

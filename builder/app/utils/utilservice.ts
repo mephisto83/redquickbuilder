@@ -1,13 +1,13 @@
 import { NEW_LINE } from "../constants/nodetypes";
 
-export function calculateContrast(c1, c2) {
+export function calculateContrast(c1: any, c2: any) {
   let c1_ = relativeLuminance(c1);
   let c2_ = relativeLuminance(c2);
   let L1 = Math.max(c1_, c2_);
   let L2 = Math.min(c1_, c2_);
   return (L1 + 0.05) / (L2 + 0.05);
 }
-export function relativeLuminance(color) {
+export function relativeLuminance(color: any[]) {
   /**
      * relative luminance
 the relative brightness of any point in a colorspace, normalized to 0 for darkest black and 1 for lightest white
@@ -40,7 +40,7 @@ BsRGB = B8bit/255
   let Bs = parseInt(`${color[4]}${color[5]}`, 16) / 255;
   let r, g, b;
   let minv = 0.03928;
-  function calc(c) {
+  function calc(c: number) {
     let r;
     if (c <= minv) {
       r = c / 12.92;
@@ -61,7 +61,7 @@ export function getStringInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
   const regex = /\${[a-zA-Z0-9_]*}/gm;
   let m;
-  let result = [];
+  let result: string[] = [];
   while ((m = regex.exec(str)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === regex.lastIndex) {
@@ -83,7 +83,7 @@ export function getReferenceInserts(str = "") {
   const regex = /\#{[a-zA-Z0-9_@|\- ~]*}/gm;
 
   let m;
-  let result = [];
+  let result: string[] = [];
   let regexes = [regex];
   regexes.map(regex => {
     while ((m = regex.exec(str)) !== null) {
@@ -106,7 +106,7 @@ export function getReferenceInserts(str = "") {
 export function getGuids(str = "") {
   const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
   let m;
-  let result = [];
+  let result: string[] = [];
   while ((m = regex.exec(str)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === regex.lastIndex) {
@@ -127,7 +127,7 @@ export function getGuids(str = "") {
 export function getGroupGuids(str = "") {
   const regex = /group\-(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
   let m;
-  let result = [];
+  let result: any[] = [];
   while ((m = regex.exec(str)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === regex.lastIndex) {
@@ -145,25 +145,25 @@ export function getGroupGuids(str = "") {
   return result
     .map(v => getGuids(v))
     .flatten()
-    .filter(x => x);
+    .filter((x: any) => x);
 }
-export function getNodePropertyGuids(obj) {
+export function getNodePropertyGuids(obj: any) {
   let str = JSON.stringify(obj);
   let guids = getGuids(str).unique();
 
   return guids;
 }
-export function processRecording(str) {
+export function processRecording(str: string | undefined) {
   let guids = getGuids(str).unique();
   let groupGuids = getGroupGuids(str).unique();
   let nodeIndexes = {};
-  groupGuids.map((v, index) => {
+  groupGuids.map((v: any, index: number) => {
     nodeIndexes[guids.indexOf(v) - index] = index;
   });
-  guids = guids.filter(v => !groupGuids.some(t => v == t));
+  guids = guids.filter((v: any) => !groupGuids.some((t: any) => v == t));
   let commands = JSON.parse(str);
   let unaccountedGuids = [...guids];
-  commands.map(command => {
+  commands.map((command: { callback: any; options: { groupProperties: any; callbackg: any; callback: any; }; callbackGroup: any; }) => {
     if (command.callback) {
       if (command.options) {
         if (command.callbackGroup && command.options.groupProperties) {
@@ -183,7 +183,7 @@ export function processRecording(str) {
     delete command.callbackGroup;
   });
   str = JSON.stringify(commands, null, 4);
-  guids.map((guid, index) => {
+  guids.map((guid: any, index: string | number) => {
     var subregex = new RegExp(`"callback": "${guid}"`, "g");
     str = str.replace(
       subregex,
@@ -202,7 +202,7 @@ export function processRecording(str) {
     str = str.replace(subregex, `context.node${index}`);
   });
 
-  groupGuids.map((guid, index) => {
+  groupGuids.map((guid: any, index: any) => {
     var subregex = new RegExp(`"${guid}":`, "g");
     str = str.replace(subregex, `[context.group${index}]:`);
     subregex = new RegExp(`"${guid}"`, "g");
@@ -251,7 +251,7 @@ export function processRecording(str) {
   const regex = /context.groupundefined = group;/gm;
   str = str.replace(regex, "");
   let temp = guids
-    .map((x, index) => {
+    .map((x: any, index: any) => {
       return `{
       operation: 'CHANGE_NODE_PROPERTY',
       options: function() {
@@ -311,7 +311,7 @@ export function processRecording(str) {
     let result = ${str};
     let clearPinned = [${temp}];
     let applyViewPackages = [${guids
-      .map((guid, index) => {
+      .map((guid: any, index: any) => {
         if (unaccountedGuids.indexOf(guid) === -1) {
           return `{
           operation: 'UPDATE_NODE_PROPERTY',
@@ -325,7 +325,7 @@ export function processRecording(str) {
         }
         return false;
       })
-      .filter(x => x)
+      .filter((x: any) => x)
       .join()}]
     return [
       ...result,

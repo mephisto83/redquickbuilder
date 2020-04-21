@@ -1,4 +1,4 @@
-export default function(args = {}) {
+export default function(args: any = {}) {
   // node0,node1
 
   //
@@ -9,7 +9,7 @@ export default function(args = {}) {
   };
 
   let result = [
-    function(graph) {
+    function(graph: any) {
       return [
         {
           operation: "NEW_LINK",
