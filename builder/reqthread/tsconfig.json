@@ -37,6 +37,9 @@
     "../app/templates/**/*",
     "../app/store/**/*",
     "../app/templates/**/*",
+    "../app/main.prod.ts",
+    "../app/dist/renderer.prod.ts",
+    "../app/**/*.tsx"
   ],
   "include": [
       "src/**/*",

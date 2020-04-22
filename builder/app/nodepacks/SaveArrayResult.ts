@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils/array";
-export default function(args = {}) {
+export default function(args: any = {}) {
   // node1,node4
 
   //
@@ -9,14 +9,13 @@ export default function(args = {}) {
     node1: uuidv4(),
     node4: uuidv4()
   };
-  let { viewPackages = {} } = args;
   let result = [
-    function(graph) {
+    function() {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback: function(node) {
+            callback: function(node: { id: any; }) {
               context.node0 = node.id;
             }
           }
@@ -24,7 +23,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -36,7 +35,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -49,7 +48,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -62,7 +61,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -75,7 +74,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -88,7 +87,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -99,7 +98,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -112,7 +111,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -128,7 +127,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -141,7 +140,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -163,7 +162,7 @@ export default function(args = {}) {
               }
             },
             links: [],
-            callback: function(node, graph, group) {
+            callback: function(node: { id: any; }, graph: any, group: any) {
               context.node2 = node.id;
               context.group0 = group;
             }
@@ -172,7 +171,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -185,7 +184,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -198,7 +197,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -209,7 +208,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -222,7 +221,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -238,7 +237,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -251,7 +250,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -263,7 +262,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -276,7 +275,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -292,7 +291,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -305,7 +304,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -317,7 +316,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -336,7 +335,7 @@ export default function(args = {}) {
                 "data-chain-link": {}
               }
             },
-            callback: function(node, graph, group) {
+            callback: function(node: { id: any; }) {
               context.node3 = node.id;
             }
           }
@@ -344,7 +343,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -357,7 +356,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "REMOVE_LINK_BETWEEN_NODES",
@@ -368,7 +367,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -381,7 +380,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_LINK_BETWEEN_NODES",
@@ -397,7 +396,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -409,7 +408,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -422,7 +421,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -435,7 +434,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -454,7 +453,7 @@ export default function(args = {}) {
                 "data-chain-link": {}
               }
             },
-            callback: function(node, graph, group) {
+            callback: function(node: { id: any; }) {
               context.node5 = node.id;
             }
           }
@@ -462,7 +461,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -475,7 +474,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -488,7 +487,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",

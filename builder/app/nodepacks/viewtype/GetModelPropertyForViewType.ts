@@ -1,6 +1,6 @@
 import { GetViewTypeModelType } from "./SetupViewTypeForCreate";
 
-export default function GetModelPropertyForViewType(args = {}) {
+export default function GetModelPropertyForViewType(args: any = {}) {
   const { node } = args;
 
   return GetViewTypeModelType(node);

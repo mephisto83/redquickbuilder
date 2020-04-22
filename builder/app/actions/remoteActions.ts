@@ -35,7 +35,7 @@ export function openGraph() {
 	openRedQuickBuilderGraph()(_dispatch, _getState);
 }
 
-export function toggleContextMenu(mode) {
+export function toggleContextMenu(mode: string) {
 	if (mode) {
 		setVisual(CONTEXT_MENU_MODE, mode)(_dispatch, _getState);
 		setVisual(CONTEXT_MENU_VISIBLE, true)(_dispatch, _getState);
@@ -43,7 +43,7 @@ export function toggleContextMenu(mode) {
 		toggleVisual(CONTEXT_MENU_VISIBLE)(_dispatch, _getState);
 	}
 }
-export function toggleVisualKey(key) {
+export function toggleVisualKey(key: string) {
 	toggleVisual(key)(_dispatch, _getState);
 }
 const SELECTED_TAB = 'SELECTED_TAB';
@@ -51,7 +51,7 @@ const DEFAULT_TAB = 'DEFAULT_TAB';
 const PARAMETER_TAB = 'PARAMETER_TAB';
 const SCOPE_TAB = 'SCOPE_TAB';
 const QUICK_MENU = 'QUICK_MENU';
-export function setRightMenuTab(num) {
+export function setRightMenuTab(num: any) {
 	switch (num) {
 		case '1':
 			setVisual(SELECTED_TAB, DEFAULT_TAB)(_dispatch, _getState);
@@ -68,7 +68,7 @@ export function setRightMenuTab(num) {
 	}
 }
 export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
-	return (dispatch, getState) => {
+	return (dispatch: Function, getState: any) => {
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
 				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ],
@@ -77,7 +77,7 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
 			.then((opts) => {
 				let filePaths = opts.filePaths;
 				console.log(opts.filePaths);
-				let fileName = filePaths.find((x) => x);
+				let fileName: any = filePaths.find((x) => x);
 				if (fileName === undefined) {
 					console.log("You didn't save the file");
 					return;
@@ -121,14 +121,14 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
 	};
 }
 export function openRedQuickBuilderTheme() {
-	return (dispatch) => {
+	return (dispatch: Function) => {
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
 				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_THEME_EXT$ ] } ],
 				properties: [ 'openFile' ]
 			})
 			.then((opts) => {
-				let fileName = opts.filePaths.find((x) => x);
+				let fileName: any = opts.filePaths.find((x) => x);
 				if (fileName === undefined) {
 					console.log("You didn't save the file");
 					return;
@@ -142,7 +142,7 @@ export function openRedQuickBuilderTheme() {
 					fileName = `${fileName}${RED_QUICK_FILE_THEME_EXT}`;
 				}
 				console.log(fileName);
-				fs.readFile(fileName, { encoding: 'utf8' }, (err, res) => {
+				fs.readFile(fileName, { encoding: 'utf8' }, (err: { message: any }, res: string) => {
 					if (err) {
 						console.error(`An error ocurred updating the file${err.message}`);
 						console.log(err);
@@ -165,7 +165,7 @@ export function openRedQuickBuilderTheme() {
 	};
 }
 export function newRedQuickBuilderGraph() {
-	return (dispatch, getState) => {
+	return (dispatch: Function, getState: any) => {
 		const default_graph = createGraph();
 		const opened_graph = { ...default_graph };
 		SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
@@ -185,7 +185,7 @@ export const RED_QUICK_FILE_RECORDING_EXT$ = 'js';
 export const RED_QUICK_FILE_THEME_EXT = '.rqbt';
 export const RED_QUICK_FILE_THEME_EXT$ = 'rqbt';
 export function saveGraphToFile(pruneGraph?: boolean) {
-	return (dispatch, getState) => {
+	return (dispatch: any, getState: () => any) => {
 		const currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
 		if (currentGraph) {
@@ -214,7 +214,7 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 						prop: 'graphFile',
 						value: fileName
 					});
-					fs.writeFile(fileName, savecontent, (err) => {
+					fs.writeFile(fileName, savecontent, (err: { message: any }) => {
 						if (err) {
 							console.error(`An error ocurred updating the file${err.message}`);
 							console.log(err);
@@ -227,8 +227,8 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 		}
 	};
 }
-export function saveRecording(recording) {
-	return (dispatch, getState) => {
+export function saveRecording(recording: any) {
+	return (dispatch: any, getState: any) => {
 		dialog
 			.showSaveDialog(remote.getCurrentWindow(), {
 				filters: [
@@ -251,7 +251,7 @@ export function saveRecording(recording) {
 				console.log(fileName);
 				let content = JSON.stringify(recording, null, 4);
 				content = processRecording(content);
-				fs.writeFile(fileName, content, (err) => {
+				fs.writeFile(fileName, content, (err: { message: any }) => {
 					if (err) {
 						console.error(`An error ocurred updating the file${err.message}`);
 						console.log(err);
@@ -264,8 +264,8 @@ export function saveRecording(recording) {
 	};
 }
 
-export function saveTheme(theme) {
-	return (dispatch, getState) => {
+export function saveTheme(theme: any) {
+	return (dispatch: any, getState: any) => {
 		dialog
 			.showSaveDialog(remote.getCurrentWindow(), {
 				filters: [
@@ -287,7 +287,7 @@ export function saveTheme(theme) {
 				}
 				console.log(fileName);
 				const content = JSON.stringify(theme, null, 4);
-				fs.writeFile(fileName, content, (err) => {
+				fs.writeFile(fileName, content, (err: { message: any }) => {
 					if (err) {
 						console.error(`An error ocurred updating the file${err.message}`);
 						console.log(err);
@@ -299,9 +299,9 @@ export function saveTheme(theme) {
 			});
 	};
 }
-let lastSavedDate = null;
-export function saveGraph(graph) {
-	return (dispatch, getState) => {
+let lastSavedDate: null = null;
+export function saveGraph(graph: any) {
+	return (dispatch: any, getState: () => any) => {
 		const currentGraph = GetRootGraph(getState());
 		if (currentGraph && currentGraph.graphFile) {
 			if (fs.existsSync(currentGraph.graphFile)) {
@@ -315,9 +315,9 @@ export function saveGraph(graph) {
 						const files = fs.readdirSync(backupFolder);
 						const fileName = path.basename(currentGraph.graphFile);
 						let fileNumber = 0;
-						files.forEach(function(file) {
+						files.forEach(function(file: string) {
 							const split = file.split(`${fileName}.`);
-							let num = split[split.length - 1];
+							let num: any = split[split.length - 1];
 							if (!isNaN(num)) {
 								num = parseInt(num, 10);
 								if (num >= fileNumber) {
@@ -334,10 +334,10 @@ export function saveGraph(graph) {
 		}
 	};
 }
-let _dispatch = null;
-let _getState = null;
+let _dispatch: any = null;
+let _getState: any = null;
 export function setRemoteState() {
-	return (dispatch, getState) => {
+	return (dispatch: any, getState: any) => {
 		_dispatch = dispatch;
 		_getState = getState;
 	};
@@ -348,7 +348,7 @@ export function saveCurrentGraph() {
 }
 
 export function setWorkingDirectory() {
-	return (dispatch, getState) => {
+	return (dispatch: Function, getState: () => any) => {
 		let currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
 		if (currentGraph) {

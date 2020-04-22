@@ -3,9 +3,9 @@ import { NodeTypes, UITypes, NodeProperties, Methods } from "../../constants/nod
 import SetupViewTypeFor from "../viewtype/SetupViewTypeFor";
 import { MethodFunctions, FunctionTemplateKeys } from "../../constants/functiontypes";
 
-export default async function SetupViewTypes(progressFunc) {
+export default async function SetupViewTypes(progressFunc: any) {
   const viewTypes = NodesByType(null, NodeTypes.ViewType);
-  await viewTypes.filter(x => GetNodeProp(x, NodeProperties.ViewType) !== Methods.Delete).forEachAsync(async (node, index, length) => {
+  await viewTypes.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) !== Methods.Delete).forEachAsync(async (node: any, index: any, length: any) => {
     const validationMethod = GetValidationMethodForViewType(node);
     const functionToLoadModels = GetFunctionToLoadModel(node);
     [
@@ -26,14 +26,14 @@ export default async function SetupViewTypes(progressFunc) {
 }
 
 
-export function GetValidationMethodForViewTypes(node) {
+export function GetValidationMethodForViewTypes(node: any) {
   const viewTypeModel = node ? GetViewTypeModel(node.id) : null;
   const methodType = GetNodeProp(node, NodeProperties.ViewType);
   return NodesByType(null, NodeTypes.Method)
     .filter(
-      x => [methodType].some(meth => meth === (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {}).method)
+      (x: any) => [methodType].some(meth => meth === (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {}).method)
     )
-    .filter(x => {
+    .filter((x: any) => {
       if (viewTypeModel) {
         const modelOutput = GetMethodNodeProp(x, FunctionTemplateKeys.ModelOutput) || GetMethodNodeProp(x, FunctionTemplateKeys.Model);
         return viewTypeModel && modelOutput === viewTypeModel.id;
@@ -42,22 +42,22 @@ export function GetValidationMethodForViewTypes(node) {
     })
 }
 
-export function GetValidationMethodForViewType(node) {
-  return GetValidationMethodForViewTypes(node).find(x => x);
+export function GetValidationMethodForViewType(node: any) {
+  return GetValidationMethodForViewTypes(node).find((x: any) => x);
 }
 
-export function GetFunctionToLoadModels(node) {
+export function GetFunctionToLoadModels(node: any) {
   const viewTypeModel = node ? GetViewTypeModel(node.id) : null;
   return NodesByType(null, NodeTypes.Method)
-    .filter(x => {
+    .filter((x: any) => {
       const functionType = (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {})
       return functionType.method === Methods.GetAll
     })
-    .filter(x => {
+    .filter((x: any) => {
       const functionType = (MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {})
       return !functionType.isFetchCompatible
     })
-    .filter(x => {
+    .filter((x: any) => {
       if (viewTypeModel) {
         const modelOutput = GetMethodNodeProp(x, FunctionTemplateKeys.ModelOutput) || GetMethodNodeProp(x, FunctionTemplateKeys.Model);
         return viewTypeModel && modelOutput === viewTypeModel.id;
@@ -65,6 +65,6 @@ export function GetFunctionToLoadModels(node) {
       return false;
     });
 }
-export function GetFunctionToLoadModel(node) {
-  return GetFunctionToLoadModels(node).find(x => x);
+export function GetFunctionToLoadModel(node: any) {
+  return GetFunctionToLoadModels(node).find((x: any) => x);
 }

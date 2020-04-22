@@ -4,12 +4,12 @@ import AddComponentDidMountToViewTypeComponent from "./AddComponentDidMountToVie
 import ConnectLifecycleMethod from "../../components/ConnectLifecycleMethod";
 import { LinkProperties } from "../../constants/nodetypes";
 
-export default function AttachGetAllOnComponentDidMount(args = {}) {
+export default function AttachGetAllOnComponentDidMount(args : any= {}) {
   const result = [];
   const { node, functionToLoadModels, viewPackages, uiType } = args;
   const model = GetViewTypeModel(node);
-  let storeModelArrayDC = null;
-  let didMountContext = null;
+  let storeModelArrayDC: any = null;
+  let didMountContext: any = null;
 
   if (!model) {
     throw new Error('execpted model missing?')
@@ -21,14 +21,14 @@ export default function AttachGetAllOnComponentDidMount(args = {}) {
     viewPackages,
     modelText: `${GetNodeTitle(model)} State`,
     state_key: `${GetNodeTitle(model)} State`,
-    callback: (storeModelArrayContext) => {
+    callback: (storeModelArrayContext: any) => {
       storeModelArrayDC = storeModelArrayContext.entry;
     }
   }), ...AddComponentDidMountToViewTypeComponent({
-    ...args, callback: (didMountContextArgs) => {
+    ...args, callback: (didMountContextArgs: any) => {
       didMountContext = didMountContextArgs;
     }
-  }), (graph) => {
+  }), (graph: any) => {
     if (!didMountContext.skip) {
       return ConnectLifecycleMethod({
         target: functionToLoadModels,

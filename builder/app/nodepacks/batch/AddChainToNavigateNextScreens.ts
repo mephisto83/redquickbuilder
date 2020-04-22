@@ -3,7 +3,7 @@ import { NodeProperties, NodeTypes } from "../../constants/nodetypes";
 import { AuthorizedDashboard, SelectTargetScreen } from "../../components/titles";
 import AddChainToNavigateNextScreen from "./AddChainToNavigateNextScreen";
 
-export default async function AddChainToNavigateNextScreens(progresFunc) {
+export default async function AddChainToNavigateNextScreens(progresFunc:any) {
   const screen = GetNodeByProperties({
     [NodeProperties.UIText]: AuthorizedDashboard,
     [NodeProperties.NODEType]: NodeTypes.Screen
@@ -18,7 +18,7 @@ export default async function AddChainToNavigateNextScreens(progresFunc) {
   if (!dataChains || !dataChains.length) {
     throw new Error('No Target Screen Data chains found');
   }
-  await dataChains.forEachAsync(async (dataChain, index, length) => {
+  await dataChains.forEachAsync(async (dataChain:any, index:any, length:any) => {
     const result = [];
     const start = Date.now();
     result.push(...AddChainToNavigateNextScreen({ dataChain: dataChain.id, screen: screen.id }));

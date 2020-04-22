@@ -2,7 +2,7 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
 
-export default function CreateValidatorForProperty(args = {}) {
+export default function CreateValidatorForProperty(args: any = {}) {
   // node2,node3,node5
 
   //
@@ -43,7 +43,7 @@ export default function CreateValidatorForProperty(args = {}) {
         {
           operation: "NEW_NODE",
           options: {
-            callback(node) {
+            callback(node: { id: any; }) {
               context.node0 = node.id;
             }
           }
@@ -137,7 +137,7 @@ export default function CreateValidatorForProperty(args = {}) {
               }
             },
             links: [],
-            callback(node, group) {
+            callback(node: { id: any; }, group: any) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -306,7 +306,7 @@ export default function CreateValidatorForProperty(args = {}) {
                 "data-chain-link": {}
               }
             },
-            callback(node) {
+            callback(node: { id: any; }) {
               context.node4 = node.id;
             }
           }

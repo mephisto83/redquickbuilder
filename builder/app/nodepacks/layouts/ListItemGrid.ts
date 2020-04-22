@@ -39,7 +39,7 @@ export default function ListItemGrid(args:any = {}) {
     ...(viewPackages || {})
   };
   const result = [
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -225,7 +225,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -411,7 +411,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -597,7 +597,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -783,7 +783,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -969,7 +969,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -1155,7 +1155,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -1341,7 +1341,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -1527,7 +1527,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -1713,7 +1713,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -1899,7 +1899,7 @@ export default function ListItemGrid(args:any = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -2225,7 +2225,7 @@ export default function ListItemGrid(args:any = {}) {
       }
     }
   }];
-  const applyViewPackages = []
+  const applyViewPackages : any= []
   return [
     ...result,
     ...clearPinned,

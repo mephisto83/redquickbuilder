@@ -135,7 +135,7 @@ export default class DataChainGenerator {
 			// Specific for web sites
 			// Need an alternative for ReactNative
 			{
-				template: readFileSync('./app/utils/redutils.ts', 'utf8'),
+				template: readFileSync('./app/actions/redutils.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./redutils${fileEnding}`,
 				name: 'redutils.js'

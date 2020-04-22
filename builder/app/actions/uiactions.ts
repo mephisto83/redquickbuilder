@@ -45,6 +45,9 @@ export const BuildAllProgress = 'BuildAllProgress';
 export const BATCH_MODEL = 'BATCH_MODEL';
 export const BATCH_AGENT = 'BATCH_AGENT';
 export const BATCH_PARENT = 'BATCH_PARENT';
+export const GetItem = (a: any, b: any) => {
+	return `${a}${b}`;
+};
 export const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
 export const RECORDING = 'RECORDING';
 export const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
@@ -935,7 +938,7 @@ export function GetMethodParametersFor(methodId: string, type: any) {
 	}
 	return null;
 }
-export function GetNodeById(node: string, graph?: GraphMethods.Graph): GraphMethods.Node | null {
+export function GetNodeById(node: any , graph?: any ): any  {
 	return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
 export function GetNodesByProperties(props: { [x: string]: any }, graph?: GraphMethods.Graph, state?: any) {

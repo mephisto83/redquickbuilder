@@ -38,7 +38,7 @@ export default function ChangeUserPassword(args: any) {
 					[NodeProperties.Pinned]: false,
 					[NodeProperties.UIText]: `Change Password View Model`
 				},
-				callback: (newNode) => {
+				callback: (newNode: any ) => {
 					newStuff.functionModel = newNode.id;
 				}
 			}
@@ -88,7 +88,7 @@ export default function ChangeUserPassword(args: any) {
 		maestro,
 		nodePackageType: 'register-login-anonymous-user',
 		methodType: Methods.Create,
-		user: NodesByType(GetState(), NodeTypes.Model).find((x) => GetNodeProp(x, NodeProperties.IsUser)),
+		user: NodesByType(GetState(), NodeTypes.Model).find((x: any ) => GetNodeProp(x, NodeProperties.IsUser)),
 		httpMethod: HTTP_METHODS.POST,
 		functionType: FunctionTypes.ChangeUserPassword,
 		functionName: `Change User Password`

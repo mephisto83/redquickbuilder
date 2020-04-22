@@ -4,7 +4,7 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
 
-export default function (args = {}) {
+export default function (args: any = {}) {
   //
 
   // model
@@ -27,12 +27,12 @@ export default function (args = {}) {
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node0 = node.id; }
+          "callback": function (node: { id: any; }) { context.node0 = node.id; }
         }
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_TEXT",
@@ -43,7 +43,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -55,7 +55,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -67,7 +67,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -79,7 +79,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -91,7 +91,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -103,7 +103,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -115,7 +115,7 @@ export default function (args = {}) {
       }]
     }]
     ;
-  const clearPinned = [];
+  const clearPinned: any[] = [];
   const applyViewPackages = [{
     operation: 'UPDATE_NODE_PROPERTY',
     options() {
@@ -129,7 +129,7 @@ export default function (args = {}) {
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    function (graph) {
+    function (graph: any) {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context, graph);

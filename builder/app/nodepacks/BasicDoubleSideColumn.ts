@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils/array";
-export default function(args = {}) {
+export default function(args : any= {}) {
   // node0,node1,node2,node3,node4,node5,node6,node7,node8,node9,node10,node11
   let context = {
     node0: args.component,
@@ -18,7 +18,7 @@ export default function(args = {}) {
   };
 
   return [
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -129,7 +129,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -240,7 +240,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -351,7 +351,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -462,7 +462,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -573,7 +573,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -684,7 +684,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -795,7 +795,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -906,7 +906,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1017,7 +1017,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1128,7 +1128,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1239,7 +1239,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1350,7 +1350,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1461,7 +1461,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1572,7 +1572,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1683,7 +1683,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1794,7 +1794,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -1905,7 +1905,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2016,7 +2016,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2127,7 +2127,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2238,7 +2238,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2349,7 +2349,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2460,7 +2460,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2588,7 +2588,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -2716,7 +2716,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",

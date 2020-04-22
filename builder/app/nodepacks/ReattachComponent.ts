@@ -17,7 +17,7 @@ import {
   GetNodesLinkedTo,
   SOURCE
 } from "../methods/graph_methods";
-export default function(args = {}) {
+export default function(args : any= {}) {
   // node0
   let result = [];
   //
@@ -75,13 +75,13 @@ export default function(args = {}) {
   });
   let tocreate = parentInternalApis.relativeCompliment(
     baseInternalApisNodes,
-    (x, y) => {
+    (x: any, y: any) => {
       return GetCodeName(x) === GetCodeName(y);
     }
   );
   result.push(
     ...tocreate
-      .map(internalApi => {
+      .map((internalApi: { id: any; }) => {
         return $addComponentApiNodes(
           context.base,
           GetNodeTitle(internalApi),
@@ -95,15 +95,15 @@ export default function(args = {}) {
     link: LinkType.ComponentExternalApi,
     direction: SOURCE
   });
-  let previousLinked = {};
-  exteranlApiNodes.map(externalApiNode => {
+  let previousLinked : any= {};
+  exteranlApiNodes.map((externalApiNode: { id: any; }) => {
     let internalApiComponents = GetNodesLinkedTo(graph, {
       id: externalApiNode.id,
       link: LinkType.ComponentExternalConnection,
       direction: SOURCE
     });
-    internalApiComponents.map(internalApiComponent => {
-      let isThereAConnection = parentInternalApis.find(parentInternalApi =>
+    internalApiComponents.map((internalApiComponent: { id: any; }) => {
+      let isThereAConnection = parentInternalApis.find((parentInternalApi: { id: any; }) =>
         GetLinkBetween(externalApiNode.id, parentInternalApi.id, graph)
       );
       previousLinked[GetNodeTitle(externalApiNode)] =
@@ -124,18 +124,18 @@ export default function(args = {}) {
       });
     });
   });
-  result.push(function(graph) {
-    let res = [];
+  result.push(function(graph: any) {
+    let res: { operation: string; options: { target: any; source: any; properties: any; }; }[] = [];
     baseInternalApisNodes = GetNodesLinkedTo(graph, {
       id: context.base,
       link: LinkType.ComponentInternalApi
     });
     for (var i in previousLinked) {
       let baseInternalApiNode = baseInternalApisNodes.find(
-        v => GetNodeTitle(v) === i.id
+        (        v: any) => GetNodeTitle(v) === i
       );
       if (baseInternalApiNode) {
-        previousLinked[i].map(pl => {
+        previousLinked[i].map((pl: { id: any; properties: any; }) => {
           res.push({
             operation: ADD_LINK_BETWEEN_NODES,
             options: {

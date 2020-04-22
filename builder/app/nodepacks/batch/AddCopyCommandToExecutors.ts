@@ -2,11 +2,11 @@ import { NodesByType, GetNodeProp, graphOperation, GetDispatchFunc, GetStateFunc
 import { NodeTypes, NodeProperties } from "../../constants/nodetypes";
 import AddCopyPropertiesToExecutor from "../AddCopyPropertiesToExecutor";
 
-export default async function AddCopyCommandToExecutors(progresFunc) {
+export default async function AddCopyCommandToExecutors(progresFunc:any) {
 
   const executors = NodesByType(null, NodeTypes.Executor);
 
-  await executors.forEachAsync(async (executor, index, total) => {
+  await executors.forEachAsync(async (executor:any, index:any, total:any) => {
     const result = [];
     const steps = AddCopyPropertiesToExecutor({
       currentNode: executor,

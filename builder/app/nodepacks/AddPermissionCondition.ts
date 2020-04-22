@@ -1,6 +1,6 @@
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function(args = {}) {
+export default function(args: any = {}) {
   // node0,node2,node3
 
   //
@@ -17,7 +17,7 @@ export default function(args = {}) {
     ...(viewPackages || {})
   };
   let result = [
-    function(graph) {
+    function() {
       return [
         {
           operation: "NEW_CONDITION_NODE",
@@ -30,7 +30,7 @@ export default function(args = {}) {
                 condtion: {}
               }
             },
-            callback: function(node, graph, group) {
+            callback: function(node: any, graph: any, group: any) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -39,7 +39,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -82,7 +82,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -125,7 +125,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -168,7 +168,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -211,7 +211,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -254,7 +254,7 @@ export default function(args = {}) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",

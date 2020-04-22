@@ -219,7 +219,7 @@ export default async function BuildAll(callback?: Function) {
 			await AddComponentsToScreenOptions(progresFunc);
 		});
 
-		await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: {} | undefined) => {
+		await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: any) => {
 			const result = CollectionDataChainsIntoCollections(progresFunc);
 			await result.forEachAsync(async (item: any, index: number, total: number) => {
 				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());

@@ -8,7 +8,7 @@ import { ComponentTypeKeys } from "../../constants/componenttypes";
 import CreateValidatorForProperty from "../CreateValidatorForProperty";
 import GetModelPropertyForViewType from "./GetModelPropertyForViewType";
 
-export default function AppendViewTypeValidation(args) {
+export default function AppendViewTypeValidation(args: any) {
   const { node, viewPackages, method, uiType = UITypes.ElectronIO } = args;
   const startGraph = GetCurrentGraph();
   const result = [];
@@ -16,7 +16,7 @@ export default function AppendViewTypeValidation(args) {
     id: node,
     link: LinkType.DefaultViewType,
     componentType: NodeTypes.ComponentNode
-  }).filter(x => GetNodeProp(x, NodeProperties.UIType) === uiType);
+  }).filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType);
   const { model, property, modelType } = GetModelPropertyForViewType({ node });
   if (!component) {
     console.warn('no component');
@@ -30,28 +30,28 @@ export default function AppendViewTypeValidation(args) {
   if (component) {
     const componentType = GetNodeProp(component, NodeProperties.ComponentType);
 
-    let externalValidationApi;
+    let externalValidationApi: any;
     switch (componentType) {
       case ComponentTypeKeys.Button:
         break;
       default:
-        result.push((graph) => {
+        result.push((graph: any) => {
 
           externalValidationApi = GetNodesLinkedTo(graph, {
             id: node.id,
             link: LinkType.ComponentExternalApi
-          }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+          }).find((v: any) => GetNodeTitle(v) === ComponentApiKeys.Error);
           if (!externalValidationApi) {
             return $addComponentApiNodes(node, ComponentApiKeys.Error, null, viewPackages)
           }
           return [];
         });
-        result.push((graph) => {
+        result.push((graph: any) => {
 
           externalValidationApi = GetNodesLinkedTo(graph, {
             id: node,
             link: LinkType.ComponentExternalApi
-          }).find(v => GetNodeTitle(v) === ComponentApiKeys.Error);
+          }).find((v: any) => GetNodeTitle(v) === ComponentApiKeys.Error);
 
           if (externalValidationApi) {
             const modelId = model.id;
@@ -67,7 +67,7 @@ export default function AppendViewTypeValidation(args) {
               });
             if (!propertyId) {
               propertyId = GetModelPropertyChildren(modelId).find(
-                v => GetNodeTitle(v) === GetNodeTitle(node)
+                (                v: any) => GetNodeTitle(v) === GetNodeTitle(node)
               );
             }
             if (propertyId && propertyId.id) {
@@ -76,7 +76,7 @@ export default function AppendViewTypeValidation(args) {
             if (!GetNodeById(propertyId)) {
               return;
             }
-            let validatorNode = null;
+            let validatorNode: null = null;
             const methodType = GetNodeProp(method, NodeProperties.MethodType);
             return [...CreateValidatorForProperty({
               modelText: GetNodeTitle(modelId),
@@ -86,7 +86,7 @@ export default function AppendViewTypeValidation(args) {
               methodType,
               method,
               viewPackages,
-              callback: context => {
+              callback: (context: { entry: any; }) => {
                 validatorNode = context.entry;
               }
             }),

@@ -1,7 +1,7 @@
 
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function (args = {}) {
+export default function (args: any = {}) {
   //
 
   //
@@ -17,17 +17,17 @@ export default function (args = {}) {
     ...(viewPackages || {})
   };
   let result = [
-    function (graph) {
+    function () {
       return [{
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node0 = node.id; }
+          "callback": function (node: { id: any; }) { context.node0 = node.id; }
         }
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_TEXT",
@@ -38,7 +38,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -50,7 +50,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -62,7 +62,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -74,7 +74,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -86,7 +86,7 @@ export default function (args = {}) {
       }]
     },
 
-    function (graph) {
+    function () {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -98,7 +98,7 @@ export default function (args = {}) {
       }]
     }]
     ;
-  let clearPinned = [];
+  let clearPinned: any[] = [];
   let applyViewPackages = [{
     operation: 'UPDATE_NODE_PROPERTY',
     options: function () {
@@ -112,7 +112,7 @@ export default function (args = {}) {
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    (graphh) => {
+    (graphh: any) => {
       if (context.callback) {
         context.entry = context.node0;
         context.callback(context, graphh);

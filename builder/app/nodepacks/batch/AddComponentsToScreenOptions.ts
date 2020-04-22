@@ -6,10 +6,10 @@ import AddMenuComponent from "../layouts/AddMenuComponent";
 import { MenuTreeOptions, MenuTreeOptionKeys } from "../../constants/menu";
 import GridHeaderMainMenuMain from "../layouts/GridHeaderMainMenuMain";
 
-export default async function AddComponentsToScreenOptions(progresFunc) {
+export default async function AddComponentsToScreenOptions(progresFunc:any) {
   const screenOptions = NodesByType(null, NodeTypes.ScreenOption);
   const menuTreeOption = MenuTreeOptionKeys.ModelMethodMenu;
-  await screenOptions.filter(ScreenOptionFilter).forEachAsync(async (screenOption, index, total) => {
+  await screenOptions.filter(ScreenOptionFilter).forEachAsync(async (screenOption:any, index:any, total:any) => {
     const context = {
       title: null,
       menu: null
@@ -24,7 +24,7 @@ export default async function AddComponentsToScreenOptions(progresFunc) {
       uiType: GetNodeProp(screenOption, NodeProperties.UIType),
       componentType: ComponentTypeKeys.H1,
       componentName: `${GetNodeTitle(screenOption)} Title`,
-      callback: (titleContext) => {
+      callback: (titleContext:any) => {
         context.title = titleContext.entry;
       }
     }))(GetDispatchFunc(), GetStateFunc());
@@ -37,7 +37,7 @@ export default async function AddComponentsToScreenOptions(progresFunc) {
       navigate_function: MenuTreeOptions[menuTreeOption].navigate_function(),
       menuGeneration: MenuTreeOptions[menuTreeOption].menuGeneration(),
       buildMethod: MenuTreeOptions[menuTreeOption].buildMethod,
-      callback: (menuContext) => {
+      callback: (menuContext:any) => {
         context.menu = menuContext.entry;
       }
     }))(GetDispatchFunc(), GetStateFunc());

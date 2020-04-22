@@ -3,16 +3,16 @@ import { GetCurrentGraph, GetNodeProp, ADD_NEW_NODE, addInstanceFunc } from "../
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from "../../constants/nodetypes";
 import { SCREEN_COMPONENT_EVENTS, ComponentLifeCycleEvents } from '../../constants/componenttypes';
 
-export default function AddComponentDidMountToViewTypeComponent(args = {}) {
+export default function AddComponentDidMountToViewTypeComponent(args: any = {}) {
   const result = [];
   const currentGraph = GetCurrentGraph();
   const { node, viewPackages } = args;
-  let lifeCycleMethod = null;
-  let lifeCycleInstance = null;
+  let lifeCycleMethod: any = null;
+  let lifeCycleInstance : any= null;
   const component = GetNodesLinkedTo(currentGraph, {
     id: node,
     link: LinkType.DefaultViewType
-  }).find(v => GetNodeProp(v, NodeProperties.SharedComponent));
+  }).find((v: any) => GetNodeProp(v, NodeProperties.SharedComponent));
   if (component) {
     result.push(() => {
       return SCREEN_COMPONENT_EVENTS.map(t => ({
@@ -26,7 +26,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
               [NodeProperties.Pinned]: false,
               [NodeProperties.UIText]: `${t}`
             },
-            callback: (lifeCycle) => {
+            callback: (lifeCycle: any) => {
               if (t === ComponentLifeCycleEvents.ComponentDidMount) {
                 lifeCycleMethod = lifeCycle;
               }
@@ -46,7 +46,7 @@ export default function AddComponentDidMountToViewTypeComponent(args = {}) {
       }))
     }, () => {
       if (lifeCycleMethod) {
-        const temp = addInstanceFunc(lifeCycleMethod, (lci) => {
+        const temp = addInstanceFunc(lifeCycleMethod, (lci: any) => {
           lifeCycleInstance = lci;
         }, viewPackages, { lifeCycle: true });
         return {

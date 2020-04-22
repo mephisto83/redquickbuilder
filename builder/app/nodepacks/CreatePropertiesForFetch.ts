@@ -16,7 +16,7 @@ import {
 } from "../actions/uiactions";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
 
-export default function(args = {}) {
+export default function(args : any= {}) {
   let { id } = args;
 
   let fetchServices = GetNodesLinkedTo(GetCurrentGraph(), {
@@ -24,14 +24,14 @@ export default function(args = {}) {
     link: LinkType.FetchServiceOuput
   });
 
-  let result = [];
+  let result: any = [];
 
   if (fetchServices && fetchServices.length) {
     let fetchService = fetchServices[0];
     GetNodesLinkedTo(GetCurrentGraph(), {
       id,
       link: LinkType.PropertyLink
-    }).map(v => {
+    }).map((v: { id: any; }) => {
       result.push({
         operation: REMOVE_NODE,
         options: {
@@ -43,7 +43,7 @@ export default function(args = {}) {
       id: fetchService.id,
       link: LinkType.FetchService
     })
-      .map(model => {
+      .map((model: { id: any; }) => {
         let methodprops =
           GetNodeProp(model.id, NodeProperties.MethodProps) || {};
         return (
@@ -51,11 +51,11 @@ export default function(args = {}) {
           methodprops[FunctionTemplateKeys.Model]
         );
       })
-      .filter(x => x)
+      .filter((x: any) => x)
       .unique()
-      .map(v => GetNodeById(v));
+      .map((v: string) => GetNodeById(v));
 
-    models.map(model => {
+    models.map((model: { id: any; }) => {
       result.push({
         operation: ADD_NEW_NODE,
         options: function() {

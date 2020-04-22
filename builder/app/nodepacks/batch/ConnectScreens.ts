@@ -8,10 +8,10 @@ import ScreenConnectCreate from "../screens/ScreenConnectCreate";
 import ScreenConnectUpdate from "../screens/ScreenConnectUpdate";
 import CollectionDataChainsIntoCollections from "../CollectionDataChainsIntoCollections";
 
-export default async function ConnectScreens(progresFunc) {
+export default async function ConnectScreens(progresFunc: any) {
   const allscreens = NodesByType(null, NodeTypes.Screen);
   const screens = allscreens.filter(ScreenOptionFilter);
-  await screens.forEachAsync(async (screen, index, total) => {
+  await screens.forEachAsync(async (screen: any, index: any, total: any) => {
     const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 
     const methods = GetPossibleMethods(screen);
@@ -46,7 +46,7 @@ export default async function ConnectScreens(progresFunc) {
         case ViewTypes.Update:
           commands = ScreenConnectUpdate({
             method: methods[0].id,
-            componentDidMountMethods: componentsDidMounts.map(x => x.id),
+            componentDidMountMethods: componentsDidMounts.map((x: any) => x.id),
             node: screen.id
           });
           break;
@@ -60,19 +60,19 @@ export default async function ConnectScreens(progresFunc) {
   graphOperation([() => CollectionDataChainsIntoCollections()])(GetDispatchFunc(), GetStateFunc());
 }
 
-export function GetPossibleNavigateScreens(screen, allscreens) {
+export function GetPossibleNavigateScreens(screen: any, allscreens: any) {
   const screens = allscreens || NodesByType(null, NodeTypes.Screen);
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
   const agentId = GetNodeProp(screen, NodeProperties.Agent);
 
-  return screens.filter(x => x.id !== screen.id).filter(x => {
+  return screens.filter((x: { id: any; }) => x.id !== screen.id).filter((x: any) => {
     if (viewType === ViewTypes.Get) {
       return (GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Update);
     }
     return (GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.Get);
   })
-    .filter(x => {
+    .filter((x: any) => {
       if (screenModel) {
         const agent =
           GetMethodNodeProp(x, FunctionTemplateKeys.Agent);
@@ -80,7 +80,7 @@ export function GetPossibleNavigateScreens(screen, allscreens) {
       }
       return false;
     })
-    .filter(x => {
+    .filter((x: any) => {
       if (screenModel) {
         const modelOutput = GetNodeProp(x, NodeProperties.Model);
         return modelOutput === screenModel;
@@ -89,15 +89,15 @@ export function GetPossibleNavigateScreens(screen, allscreens) {
     });
 }
 
-export function GetPossibleComponentDidMount(screen) {
+export function GetPossibleComponentDidMount(screen: any) {
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
   return NodesByType(null, NodeTypes.Method)
     .filter(
-      x =>
+      (      x: any) =>
         (
           MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {}).method === ViewTypes.Get
     )
-    .filter(x => {
+    .filter((x: string | import("../../methods/graph_methods").Node) => {
       if (screenModel) {
         const modelOutput =
           GetMethodNodeProp(
@@ -114,13 +114,13 @@ export function GetPossibleComponentDidMount(screen) {
     })
 }
 
-export function GetPossibleMethods(screen) {
+export function GetPossibleMethods(screen: any) {
   const viewType = GetNodeProp(screen, NodeProperties.ViewType);
   const screenModel = GetNodeProp(screen, NodeProperties.Model);
   const agentId = GetNodeProp(screen, NodeProperties.Agent);
 
   return NodesByType(null, NodeTypes.Method)
-    .filter(x => {
+    .filter((x: string | import("../../methods/graph_methods").Node) => {
       if (screenModel) {
         const agent =
           GetMethodNodeProp(x, FunctionTemplateKeys.Agent);
@@ -129,12 +129,12 @@ export function GetPossibleMethods(screen) {
       return false;
     })
     .filter(
-      x => {
+      (      x: any) => {
         const functionType = MethodFunctions[GetNodeProp(x, NodeProperties.FunctionType)] || {};
         return functionType.method === viewType && !functionType.isFetchCompatible
       }
     )
-    .filter(x => {
+    .filter((x: string | import("../../methods/graph_methods").Node) => {
       if (screenModel) {
         const modelOutput =
           GetMethodNodeProp(x, FunctionTemplateKeys.ModelOutput) ||

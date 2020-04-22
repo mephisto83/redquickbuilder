@@ -9,7 +9,7 @@ export default function(args: any = {}) {
   };
 
   let result = [
-    function(graph: any) {
+    function() {
       return [
         {
           operation: "NEW_LINK",

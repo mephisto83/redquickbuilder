@@ -1,5 +1,4 @@
-import { uuidv4 } from "../utils/array";
-export default function(args = { name: "Replace Name" }) {
+export default function(args: any = { name: "Replace Name" }) {
   // node2
 
   // name
@@ -8,14 +7,13 @@ export default function(args = { name: "Replace Name" }) {
     ...args,
     node2: args.eventMethodInstance
   };
-  let { viewPackages = {} } = args;
   let result = [
-    function(graph) {
+    function() {
       return [
         {
           operation: "NEW_NODE",
           options: {
-            callback: function(node) {
+            callback: function(node: { id: any; }) {
               context.node0 = node.id;
             }
           }
@@ -23,7 +21,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -35,7 +33,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -48,7 +46,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -61,7 +59,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -74,7 +72,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -87,7 +85,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -104,7 +102,7 @@ export default function(args = { name: "Replace Name" }) {
                 "data-chain-link": {}
               }
             },
-            callback: function(node) {
+            callback: function(node: { id: any; }) {
               context.node1 = node.id;
             }
           }
@@ -112,7 +110,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -125,7 +123,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -138,7 +136,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_PROPERTY",
@@ -151,7 +149,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "CHANGE_NODE_TEXT",
@@ -163,7 +161,7 @@ export default function(args = { name: "Replace Name" }) {
       ];
     },
 
-    function(graph) {
+    function() {
       return [
         {
           operation: "NEW_LINK",

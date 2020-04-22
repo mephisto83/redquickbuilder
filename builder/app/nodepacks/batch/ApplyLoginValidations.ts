@@ -24,7 +24,7 @@ export default async function ApplyLoginValidations(progressFunc: any) {
 	if (!registerMethod) {
 		throw new Error('missing register method, required for adding validation');
 	}
-	const screens = NodesByType(null, NodeTypes.Screen).filter((x) =>
+	const screens = NodesByType(null, NodeTypes.Screen).filter((x: any) =>
 		[ 'Register' ].some(
 			(v) =>
 				v === GetNodeProp(x, NodeProperties.NodePackage) ||

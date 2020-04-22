@@ -3,7 +3,7 @@
 import { uuidv4 } from "../../utils/array";
 import { NodeProperties } from "../../constants/nodetypes";
 
-export default function MenuDataSource(args = {}) {
+export default function MenuDataSource(args: any = {}) {
   // node0,node1
 
   // menu_name, menu_name, index, menu_name, navigate_function
@@ -38,7 +38,7 @@ export default function MenuDataSource(args = {}) {
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node9 = node.id; }
+          "callback": function (node: { id: any; }) { context.node9 = node.id; }
         }
       }]
     },
@@ -136,7 +136,7 @@ export default function MenuDataSource(args = {}) {
             }
           },
           "links": [],
-          "callback": function (node, graph, group) {
+          "callback": function (node: { id: any; }, graph: any, group: any) {
             context.node10 = node.id;
             context.group2 = group;
           }
@@ -157,7 +157,7 @@ export default function MenuDataSource(args = {}) {
     },
 
 
-    function (graph) {
+    function (graph: any) {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -222,7 +222,7 @@ export default function MenuDataSource(args = {}) {
               "data-chain-link": {}
             }
           },
-          "callback": function (node) {
+          "callback": function (node: { id: any; }) {
             context.node11 = node.id;
 
           }
@@ -313,7 +313,7 @@ export default function MenuDataSource(args = {}) {
 
         "operation": "NEW_NODE",
         "options": {
-          "callback": function (node) { context.node12 = node.id; }
+          "callback": function (node: { id: any; }) { context.node12 = node.id; }
         }
       }]
     },

@@ -5,26 +5,26 @@ import ClearScreenInstanceLocalStateProperty from "../partial/ClearScreenInstanc
 import { NodeProperties, LinkProperties } from "../../constants/nodetypes";
 import ClearScreenInstanceUpdateLocalStateProperty from "../partial/ClearScreenInstanceUpdateLocalStateProperty";
 
-export default function ClearScreenInstance(args) {
+export default function ClearScreenInstance(args: any) {
   const { screen, viewPackages, model, update, title } = args;
   const func = update ? ClearScreenInstanceUpdateLocalStateProperty : ClearScreenInstanceLocalStateProperty;
-  const modelProperties = GetModelPropertyChildren(model, { skipLogicalChildren: true }).filter(x => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
+  const modelProperties = GetModelPropertyChildren(model, { skipLogicalChildren: true }).filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty));
 
   const result = [];
-  let lastChain = null;
-  let entry = null;
-  let groupId = null;
-  modelProperties.forEach((modelProperty, index) => {
-    let modelPropertyContext = null;
+  let lastChain: any = null;
+  let entry : any= null;
+  let groupId: any = null;
+  modelProperties.forEach((modelProperty: any, index: any) => {
+    let modelPropertyContext: any = null;
     result.push(...func({
       viewPackages,
       screen,
       model,
       property: modelProperty.id,
-      callback: (temp) => {
+      callback: (temp: any) => {
         modelPropertyContext = temp;
       }
-    }), (gg) => {
+    }), (gg: any) => {
       const res = [];
       if (index === modelProperties.length - 1) {
         res.push({
@@ -52,7 +52,7 @@ export default function ClearScreenInstance(args) {
           options: {
             parent: lastChain,
             id: modelPropertyContext.entry,
-            groupCallback: (temp) => {
+            groupCallback: (temp: any) => {
               groupId = temp;
             }
           }
@@ -89,7 +89,7 @@ export default function ClearScreenInstance(args) {
           id: modelPropertyContext.entry,
           properties: {
             [NodeProperties.EntryPoint]: true,
-            [NodeProperties.UIText]: title || GetNodeTitle(modelPropertyContext.entry, gg)
+            [NodeProperties.UIText]: title || GetNodeTitle(modelPropertyContext.entry)
           }
         }
       }]

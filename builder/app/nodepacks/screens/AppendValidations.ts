@@ -21,7 +21,7 @@ export default function AppendValidations({
 	InstanceUpdate = true,
 	viewPackages,
 	method
-}) {
+}: any ) {
 	if (!subcomponents) {
 		throw new Error('no subcomponents');
 	}
@@ -112,7 +112,7 @@ export default function AppendValidations({
 		});
 	}
 	if (executeButtons.length) {
-		executeButtons.forEach((button: string | Node) => {
+		executeButtons.forEach((button: any ) => {
 			const componentType = GetNodeProp(button, NodeProperties.ComponentType);
 			let externalValidationApi: { id: any };
 			switch (componentType) {

@@ -27,7 +27,7 @@ export default function AddCancelButtonEvent(args: any = {}) {
 			const cancelButton = GetNodesLinkedTo(null, {
 				id: topComponent.id,
 				componentType: NodeTypes.ComponentNode
-			}).find((x) => GetNodeProp(x, NodeProperties.CancelButton));
+			}).find((x: any ) => GetNodeProp(x, NodeProperties.CancelButton));
 
 			if (cancelButton) {
 				const eventMethod = GetNodeLinkedTo(null, {

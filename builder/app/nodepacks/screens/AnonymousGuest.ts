@@ -44,7 +44,7 @@ export default function AnonymousGuest(args: any) {
 		maestro,
 		nodePackageType: 'register-login-anonymous-user',
 		methodType: Methods.Create,
-		user: NodesByType(GetState(), NodeTypes.Model).find((x) => GetNodeProp(x, NodeProperties.IsUser)),
+		user: NodesByType(GetState(), NodeTypes.Model).find((x: any ) => GetNodeProp(x, NodeProperties.IsUser)),
 		httpMethod: HTTP_METHODS.POST,
 		functionType: FunctionTypes.AnonymousRegisterLogin,
 		functionName: `Anonymous Register and Authenticate`

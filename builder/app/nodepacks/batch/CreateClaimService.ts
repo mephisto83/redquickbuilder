@@ -8,18 +8,18 @@ export default function CreateClaimService() {
     [NodeProperties.NODEType]: NodeTypes.ClaimService
   });
   if (!claimService) {
-    let claimServiceExecutor = null;
-    const agent = NodesByType(null, NodeTypes.Model).find(x => GetNodeProp(x, NodeProperties.IsAgent) && !GetNodeProp(x, NodeProperties.IsUser))
+    let claimServiceExecutor : any= null;
+    const agent = NodesByType(null, NodeTypes.Model).find((x: any) => GetNodeProp(x, NodeProperties.IsAgent) && !GetNodeProp(x, NodeProperties.IsUser))
 
     graphOperation(
       [...CreateStandardClaimService({
         modelName: GetNodeTitle(agent),
         model: agent.id,
         user: GetNodeProp(agent, NodeProperties.UIUser),
-        callback: (claimServiceContext) => {
+        callback: (claimServiceContext: any) => {
           claimServiceExecutor = claimServiceContext.executor;
         }
-      }), (currentGraph) => {
+      }), (currentGraph: any) => {
         const steps = AddCopyPropertiesToExecutor({
           currentNode: claimServiceExecutor,
           executor: GetNodeProp(claimServiceExecutor, NodeProperties.Executor, currentGraph)

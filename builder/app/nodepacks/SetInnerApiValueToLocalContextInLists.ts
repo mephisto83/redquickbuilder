@@ -10,12 +10,12 @@ import {
   ComponentTypeKeys
 } from "../constants/componenttypes";
 
-let func = function() {
+let func: any = function() {
   // node0,node1
   //
-  let result = [];
+  let result: any = [];
 
-  let lists = NodesByType(null, NodeTypes.ComponentNode).filter(x =>
+  let lists = NodesByType(null, NodeTypes.ComponentNode).filter((x: any) =>
     [
       ComponentTypeKeys.List,
       ComponentTypeKeys.MultiSelectList,
@@ -24,7 +24,7 @@ let func = function() {
   );
 
   if (lists && lists.length) {
-    lists.map(list => {
+    lists.map((list: { id: any; }) => {
       let valueApiNode = GetComponentApiNode(ComponentApiTypes.Value, list.id);
       if (valueApiNode) {
         result.push({

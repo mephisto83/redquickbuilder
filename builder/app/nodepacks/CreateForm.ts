@@ -10,7 +10,7 @@ import { ComponentTypes, InstanceTypes } from "../constants/componenttypes";
 import SetupApiBetweenComponents from "./SetupApiBetweenComponents";
 import { ViewTypes } from "../constants/viewtypes";
 function createForm(
-  args = {
+  args : any= {
     model: null,
     component: null,
     viewName: null
@@ -56,15 +56,15 @@ function createForm(
   ].some(v => viewType === v);
 
   let properties = GetModelPropertyChildren(args.model).filter(
-    x => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
+    (x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
   );
-  let formComponent = null;
+  let formComponent: any = null;
   result.push({
     operation: NEW_COMPONENT_NODE,
-    options: function(currentGraph) {
+    options: function( ) {
 
       return {
-        callback: screenComponent => {
+        callback: (screenComponent: any) => {
           formComponent = screenComponent.id;
         },
         parent: context.component,
@@ -86,10 +86,10 @@ function createForm(
       };
     }
   });
-  properties.map(property => {
-    let componentProperty = null;
+  properties.map((property: any) => {
+    let componentProperty: any = null;
     result.push(
-      function(graph) {
+      function(graph: any) {
         return [
           ...CreateFormInput({
             modelProperty: property.id,
@@ -97,7 +97,7 @@ function createForm(
             viewType,
             viewPackages,
             graph,
-            callback: node => {
+            callback: (node: any) => {
               componentProperty = node;
             }
           })

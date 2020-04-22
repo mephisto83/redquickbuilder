@@ -15,13 +15,8 @@ export default function(args: any = {}) {
 		node0: args.dataChain,
 		node1: args.dataChainGroup
 	};
-	let {
-		viewPackages = {
-			[NodeProperties.ViewPackage]: uuidv4()
-		}
-	} = args;
 	let result = [
-		function(graph) {
+		function() {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -34,7 +29,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function(graph) {
+		function() {
 			return [
 				{
 					operation: 'ADD_NEW_NODE',
@@ -53,7 +48,7 @@ export default function(args: any = {}) {
 								'data-chain-link': {}
 							}
 						},
-						callback: function(node, graph, group) {
+						callback: function(node: { id: any; }) {
 							context.node2 = node.id;
 						}
 					}
@@ -61,7 +56,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function(graph) {
+		function() {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -74,7 +69,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function(graph) {
+		function() {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -87,7 +82,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function(graph) {
+		function() {
 			return [
 				{
 					operation: 'CHANGE_NODE_TEXT',

@@ -3,7 +3,7 @@ import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
 import { UPDATE_NODE_PROPERTY, GetNodeByProperties, NodeTypes } from "../actions/uiactions";
 
-export default function CreateDashboard_1(args = {}) {
+export default function CreateDashboard_1(args: any = {}) {
   // node3,node4,node5,node6,node7,node8,node9,node10,node11,node12
 
   //
@@ -27,7 +27,7 @@ export default function CreateDashboard_1(args = {}) {
     }
   } = args;
   const result = [
-    function createScreenIfNeeded(graph) {
+    function createScreenIfNeeded(graph: any) {
       const tempScreen = GetNodeByProperties({
         [NodeProperties.UIText]: context.name,
         [NodeProperties.NODEType]: NodeTypes.Screen,
@@ -42,7 +42,7 @@ export default function CreateDashboard_1(args = {}) {
             {
               operation: "NEW_NODE",
               options: {
-                callback(node) {
+                callback(node: any) {
                   context.node0 = node.id;
                 }
               }
@@ -102,7 +102,7 @@ export default function CreateDashboard_1(args = {}) {
                 "screen-options": {}
               }
             },
-            callback(node, group) {
+            callback(node: any, group: any) {
               context.node1 = node.id;
               context.group0 = group;
             }
@@ -153,7 +153,7 @@ export default function CreateDashboard_1(args = {}) {
                 component: {}
               }
             },
-            callback(node, group) {
+            callback(node: any, group: any) {
               context.node2 = node.id;
               context.group1 = group;
             }

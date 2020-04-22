@@ -4,17 +4,17 @@ import { GetNodesLinkedTo, existsLinkBetween } from "../../methods/graph_methods
 import { ViewTypes } from "../../constants/viewtypes";
 import { uuidv4 } from "../../utils/array";
 
-export default async function CreateViewTypes(progress) {
+export default async function CreateViewTypes(progress: any) {
   const models = NodesByType(null, NodeTypes.Model);
-  const result = [];
-  const createViewTypes = {};
-  await models.forEachAsync(async (model, index) => {
+  const result: any = [];
+  const createViewTypes: any = {};
+  await models.forEachAsync(async (model: any, index: any) => {
     const modelChildren = GetLogicalChildren(model.id);
     const modelProperties = GetNodesLinkedTo(null, {
       id: model.id,
       componentType: NodeTypes.Property,
       link: LinkType.ModelTypeLink
-    }).filter(x => GetNodeProp(x, NodeProperties.UseModelAsType))
+    }).filter((x: any) => GetNodeProp(x, NodeProperties.UseModelAsType))
     const modelLinkedNodes = GetNodesLinkedTo(null, {
       id: model.id,
       link: LinkType.DefaultViewType,
@@ -27,9 +27,9 @@ export default async function CreateViewTypes(progress) {
         link: LinkType.DefaultViewType,
         componentType: NodeTypes.ViewType
       });
-      const commonViewTypes = childModelLinkedNodes.intersection(modelLinkedNodes, (x, y) => y.id === x.id);
+      const commonViewTypes = childModelLinkedNodes.intersection(modelLinkedNodes, (x: any, y: any) => y.id === x.id);
       const isProperty = GetNodeProp(child, NodeProperties.UseModelAsType);
-      Object.keys(ViewTypes).filter(x => !commonViewTypes.some(cvt => GetNodeProp(cvt, NodeProperties.ViewType) === x)).forEach(viewType => {
+      Object.keys(ViewTypes).filter(x => !commonViewTypes.some((cvt: any) => GetNodeProp(cvt, NodeProperties.ViewType) === x)).forEach(viewType => {
         if (!createViewTypes[`${isProperty ? model.id : child.id} ${isProperty ? child.id : model.id} ${viewType}`]) {
           createViewTypes[`${isProperty ? model.id : child.id} ${isProperty ? child.id : model.id} ${viewType}`] = true;
           result.push(...setupDefaultViewType({
@@ -74,7 +74,7 @@ CreateViewTypes.title = 'Create View Type Connections';
 // }
 
 
-export function setupDefaultViewType(args) {
+export function setupDefaultViewType(args: any) {
   const { properties, target, source, viewCurrentType, isPluralComponent } = args;
   const result = [];
   const graph = GetCurrentGraph();
