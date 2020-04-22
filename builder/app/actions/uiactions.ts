@@ -3212,6 +3212,9 @@ export function GetStateFunc(): any {
 export function setTestGetState(func: Function) {
 	_getState = func;
 }
+export function setTestDispatch(func: Function) {
+	_dispatch = func;
+}
 export function setState() {
 	return (dispatch: Function, getState: Function) => {
 		_getState = getState;
@@ -3849,12 +3852,7 @@ export function deleteAllSelected() {
 	};
 }
 
-export function isAccessNode(
-	agent: GraphMethods.Node,
-	model: GraphMethods.Node,
-	aa: { id: any },
-	graph: GraphMethods.Graph | undefined
-) {
+export function isAccessNode(agent: any, model: any, aa: { id: any }, graph?: any): any {
 	graph = graph || GetCurrentGraph();
 	return (
 		GraphMethods.existsLinkBetween(graph, {

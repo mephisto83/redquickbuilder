@@ -27,4 +27,4 @@ export function getAgentTrees(folder: string): AgentDirectories {
 }
 
 const isDirectory = (source) => fs.lstatSync(source).isDirectory();
-const getDirectories = (source) => fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
+export const getDirectories = (source) => fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));

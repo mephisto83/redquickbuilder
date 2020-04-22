@@ -1,11 +1,11 @@
 
-  import { uuidv4 } from "../utils/array";
-  import { NodeProperties } from "../constants/nodetypes";
-  export default function(args = {}) {
+  import { uuidv4 } from "../../utils/array";
+  import { NodeProperties } from "../../constants/nodetypes";
+  export default function(args :any= {}) {
     // node0,node1,node2,node3,node4,node5
 
-      // 
-      
+      //
+
     let context = {
       ...args,
 node0: uuidv4() ,
@@ -13,7 +13,7 @@ node1: uuidv4() ,
 node2: uuidv4() ,
 node3: uuidv4() ,
 node4: uuidv4() ,
-node5: uuidv4() 
+node5: uuidv4()
     };
     let {
       viewPackages
@@ -23,7 +23,7 @@ node5: uuidv4()
       ...(viewPackages||{})
     };
     let result = [
-      function(graph) {
+      function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -116,7 +116,7 @@ node5: uuidv4()
     }]
     },
 
-    function(graph) {
+    function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -209,7 +209,7 @@ node5: uuidv4()
     }]
     },
 
-    function(graph) {
+    function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -302,7 +302,7 @@ node5: uuidv4()
     }]
     },
 
-    function(graph) {
+    function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -395,7 +395,7 @@ node5: uuidv4()
     }]
     },
 
-    function(graph) {
+    function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -488,7 +488,7 @@ node5: uuidv4()
     }]
     },
 
-    function(graph) {
+    function() {
       return [{
 
         "operation": "CHANGE_NODE_PROPERTY",
@@ -631,7 +631,7 @@ node5: uuidv4()
         }
       }
     }];
-    let applyViewPackages = []
+    let applyViewPackages:any = []
     return [
       ...result,
       ...clearPinned,
