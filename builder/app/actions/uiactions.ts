@@ -191,7 +191,7 @@ export function GetNodeProp(node: any, prop: string, currentGraph?: GraphMethods
 	}
 	return node && node.properties && node.properties[prop];
 }
-export function GetNodeType(node: any, graph: any) {
+export function GetNodeType(node: any, graph?: any) {
 	return GetNodeProp(node, NodeProperties.NODEType, graph);
 }
 
@@ -275,8 +275,8 @@ export function GetSharedComponentFor(
 export function getViewTypeEndpointsForDefaults(viewType: any, currentGraph: any, id: any) {
 	currentGraph = currentGraph || GetCurrentGraph(_getState());
 
-	const currentNode = GetNodeById(id, currentGraph);
-	const connectto = GetNodesByProperties(
+	const currentNode: any = GetNodeById(id, currentGraph);
+	const connectto: any = GetNodesByProperties(
 		{
 			[NodeProperties.NODEType]: NodeTypes.ViewType,
 			[NodeProperties.ViewType]: viewType
@@ -437,7 +437,7 @@ export function addQueryMethodParameter() {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
 		const graph = GetCurrentGraph(state);
-		const currentNode = Node(state, Visual(state, SELECTED_NODE));
+		const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
 		const operations = [];
 		operations.push({
 			operation: ADD_NEW_NODE,
@@ -1042,7 +1042,7 @@ export function GetLambdaDefinition(method: string | GraphMethods.Node | null) {
 	return lambda;
 }
 export function GenerateDataChainArguments(id: string) {
-	const currentNode = GetNodeById(id);
+	const currentNode: any = GetNodeById(id);
 	let _arguments = '';
 	if (GetNodeProp(currentNode, NodeProperties.CS)) {
 		const methods = GraphMethods.GetNodesLinkedTo(null, {
@@ -1054,7 +1054,7 @@ export function GenerateDataChainArguments(id: string) {
 			const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
 			const { lambda } = MethodFunctions[functionType];
 			if (lambda && lambda.default) {
-				const methodProps = GetMethodProps(methods[0]);
+				const methodProps: any = GetMethodProps(methods[0]);
 				_arguments = Object.keys(lambda.default)
 					.filter((x) => x !== 'return')
 					.map((key) => `${key.split('.').join('')}:${key} `)
@@ -1077,7 +1077,7 @@ export function GenerateCSChainFunction(id: string) {
 	const arbiterProperties = arbiters
 		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
 		.join(NodeConstants.NEW_LINE);
-	const currentNode = GetNodeById(id);
+	const currentNode: any = GetNodeById(id);
 	let _arguments = '';
 	if (GetNodeProp(currentNode, NodeProperties.CS)) {
 		const methods = GraphMethods.GetNodesLinkedTo(null, {
@@ -1117,7 +1117,7 @@ ${arbiterSets}
 }
 export function GenerateChainFunction(id: any, options: { language: any }) {
 	const chain = GetDataChainParts(id);
-	let args = null;
+	let args: any = null;
 	const observables: string[] = [];
 	const { language } = options;
 	let anyType = ': any';
@@ -1276,7 +1276,7 @@ export function CollectionIsInLanguage(
 	graph: GraphMethods.Graph,
 	collection: string | GraphMethods.Node,
 	language: any
-) {
+): any {
 	const uiTypeOfCollection = GetNodeProp(collection, NodeProperties.UIType);
 	if (uiTypeOfCollection && uiTypeOfCollection === language) {
 		return true;
@@ -1531,7 +1531,7 @@ export function GetDataChainNext(id: any, graph?: GraphMethods.Graph) {
 		type: NodeConstants.LinkType.DataChainLink,
 		direction: GraphMethods.SOURCE
 	})
-		.filter((x) => x.id !== current)
+		.filter((x: any) => x.id !== current)
 		.sort((a, b) => {
 			const a_ = GetNodeProp(a, NodeProperties.ChainParent) ? 1 : 0;
 			const b_ = GetNodeProp(b, NodeProperties.ChainParent) ? 1 : 0;
@@ -1609,7 +1609,7 @@ export function IsEndOfDataChain(id: any) {
 }
 
 export function GetLambdaVariableNode(id: string, key: string | number) {
-	const currentNode = GetNodeById(id);
+	const currentNode: any = GetNodeById(id);
 	if (GetNodeProp(currentNode, NodeProperties.CS)) {
 		const methods = GraphMethods.GetNodesLinkedTo(null, {
 			id: currentNode.id,
@@ -1678,7 +1678,7 @@ export function GetOutputTypeInCSDataChainMethod(id: string) {
 	return result;
 }
 export function GenerateCDDataChainMethod(id: string) {
-	const node = GetNodeById(id);
+	const node: any = GetNodeById(id);
 	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
 	let lambda = GetNodeProp(node, NodeProperties.Lambda);
 	const lambdaInsertArguments = GetNodeProp(node, NodeProperties.LambdaInsertArguments);
@@ -1722,23 +1722,23 @@ export function GenerateCDDataChainMethod(id: string) {
 	}
 }
 export function GenerateDataChainMethod(id: string, options: { language: any }) {
-	const node = GetNodeById(id);
-	const model = GetNodeProp(node, NodeProperties.UIModelType);
-	const stateKey = GetNodeProp(node, NodeProperties.StateKey);
-	const modelKey = GetNodeProp(node, NodeProperties.ModelKey);
-	const viewModelKey = GetNodeProp(node, NodeProperties.ViewModelKey);
-	const numberParameter = GetNodeProp(node, NodeProperties.NumberParameter);
-	const property = GetNodeProp(node, NodeProperties.Property);
-	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
-	const func = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference), { includeNameSpace: true });
-	const funcs = GetNodeProp(node, NodeProperties.DataChainReferences);
-	const selectorProp = GetNodeProp(node, NodeProperties.SelectorProperty);
-	const nodeInput1 = GetNodeProp(node, NodeProperties.ChainNodeInput1);
-	const nodeInput2 = GetNodeProp(node, NodeProperties.ChainNodeInput2);
-	const navigateMethod = GetNodeProp(node, NodeProperties.NavigationAction);
-	const methodMethod = GetNodeProp(node, NodeProperties.Method);
-	const $screen = GetNodeProp(node, NodeProperties.Screen);
-	const useNavigationParams = GetNodeProp(node, NodeProperties.UseNavigationParams);
+	const node: any = GetNodeById(id);
+	const model: any = GetNodeProp(node, NodeProperties.UIModelType);
+	const stateKey: any = GetNodeProp(node, NodeProperties.StateKey);
+	const modelKey: any = GetNodeProp(node, NodeProperties.ModelKey);
+	const viewModelKey: any = GetNodeProp(node, NodeProperties.ViewModelKey);
+	const numberParameter: any = GetNodeProp(node, NodeProperties.NumberParameter);
+	const property: any = GetNodeProp(node, NodeProperties.Property);
+	const functionType: any = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+	const func: any = GetCodeName(GetNodeProp(node, NodeProperties.DataChainReference), { includeNameSpace: true });
+	const funcs: any = GetNodeProp(node, NodeProperties.DataChainReferences);
+	const selectorProp: any = GetNodeProp(node, NodeProperties.SelectorProperty);
+	const nodeInput1: any = GetNodeProp(node, NodeProperties.ChainNodeInput1);
+	const nodeInput2: any = GetNodeProp(node, NodeProperties.ChainNodeInput2);
+	const navigateMethod: any = GetNodeProp(node, NodeProperties.NavigationAction);
+	const methodMethod: any = GetNodeProp(node, NodeProperties.Method);
+	const $screen: any = GetNodeProp(node, NodeProperties.Screen);
+	const useNavigationParams: any = GetNodeProp(node, NodeProperties.UseNavigationParams);
 	const { language } = options;
 	let lambda = GetNodeProp(node, NodeProperties.Lambda);
 	const lambdaInsertArguments = GetNodeProp(node, NodeProperties.LambdaInsertArguments);
@@ -1828,10 +1828,10 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((insert: string) => {
 				const args = insert.split('~');
 				const property = args.length > 1 ? args[1] : args[0];
-				const model = args[0];
-				const prop = lambdaInsertArguments[property];
-				const node = GetNodeById(prop);
-				let bindValue = GetCodeName(node);
+				const model: any = args[0];
+				const prop: any = lambdaInsertArguments[property];
+				const node: any = GetNodeById(prop);
+				let bindValue: any = GetCodeName(node);
 				if (args.length > 1) {
 					bindValue = GetJSCodeName(node); //bindValue.toLowerCase();
 				}
@@ -1995,7 +1995,7 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 
 function buildModelMethodMenu(options: { language: any }) {
 	const { language } = options;
-	let anyType = ': any';
+	let anyType: string = ': any';
 	if (language === NodeConstants.UITypes.ReactNative) {
 		anyType = '';
 	}
@@ -2809,7 +2809,7 @@ export function GetMethodOptions(methodProps: { [x: string]: string }) {
 	});
 }
 
-export function GetLinkProperty(link: GraphMethods.GraphLink, prop: string | undefined) {
+export function GetLinkProperty(link: GraphMethods.GraphLink, prop: any) {
 	return link && link.properties && link.properties[prop];
 }
 
@@ -3188,7 +3188,7 @@ export function GetNodeFromRoot(state: any, id: string) {
 }
 
 export function NodesConnectedTo(state: any, nodeId: string | number) {
-	const currentGraph = GetCurrentGraph(state);
+	const currentGraph: any = GetCurrentGraph(state);
 	if (currentGraph) {
 		return (t: { id: string | number }) => {
 			if (currentGraph.linkLib[t.id]) {
@@ -3206,7 +3206,7 @@ export function GetState() {
 export function GetDispatchFunc() {
 	return _dispatch;
 }
-export function GetStateFunc() {
+export function GetStateFunc(): any {
 	return _getState;
 }
 export function setTestGetState(func: Function) {
@@ -3254,7 +3254,7 @@ export function selectProperties(model: any) {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
 		graphOperation(
-			GraphMethods.getPropertyNodes(GetRootGraph(state), model).map((t) => ({
+			GraphMethods.getPropertyNodes(GetRootGraph(state), model).map((t: any) => ({
 				operation: CHANGE_NODE_PROPERTY,
 				options: {
 					prop: NodeProperties.Pinned,
@@ -3290,7 +3290,7 @@ export function togglePinnedConnectedNodesByLinkType(model: any, linkType: any) 
 }
 export function toggleNodeMark() {
 	const state = _getState();
-	const currentNode = Node(state, Visual(state, SELECTED_NODE));
+	const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
 	_dispatch(
 		graphOperation(CHANGE_NODE_PROPERTY, {
 			prop: NodeProperties.Selected,
@@ -3309,7 +3309,7 @@ export function removeCurrentNode() {
 }
 export function togglePinned() {
 	const state = _getState();
-	const currentNode = Node(state, Visual(state, SELECTED_NODE));
+	const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
 	_dispatch(
 		graphOperation(CHANGE_NODE_PROPERTY, {
 			prop: NodeProperties.Pinned,
@@ -3333,7 +3333,7 @@ export function GetMethodNodeProp(methodNode: string | GraphMethods.Node, key: s
 	if (typeof key === 'string') return methodProps[key];
 	if (!key) return null;
 	const { template } = key;
-	const temp = {};
+	const temp: any = {};
 	Object.keys(methodProps).map((t) => {
 		temp[t] = GetCodeName(methodProps[t]);
 	});
@@ -3355,10 +3355,10 @@ export function GetMethodsProperty(id: any, prop: string | number) {
 	}
 	return null;
 }
-export function GetMethodFilterParameters(id: string, all: boolean | undefined) {
+export function GetMethodFilterParameters(id: string, all?: boolean | undefined) {
 	return GetMethod_Parameters(id, 'filter', all);
 }
-export function GetMethodFilterMetaParameters(id: any, all: undefined) {
+export function GetMethodFilterMetaParameters(id: any) {
 	return GetMethod_MetaParameters(id, 'filter');
 }
 function GetMethod_MetaParameters(id: any, key: string) {
@@ -3523,7 +3523,7 @@ export function GetSubGraphs(state: any) {
 	return null;
 }
 export function addNewSubGraph() {
-	return (dispatch: Function | undefined, getState: Function) => {
+	return (dispatch: Function, getState: Function) => {
 		let rootGraph = GetRootGraph(getState(), dispatch);
 		rootGraph = GraphMethods.addNewSubGraph(rootGraph);
 		SaveGraph(rootGraph, dispatch);
@@ -3531,7 +3531,7 @@ export function addNewSubGraph() {
 }
 
 export function setRootGraph(key: any, value: any) {
-	return (dispatch: Function | undefined, getState: Function) => {
+	return (dispatch: Function, getState: Function) => {
 		let rootGraph = GetRootGraph(getState(), dispatch);
 		rootGraph = {
 			...rootGraph,
@@ -3541,7 +3541,7 @@ export function setRootGraph(key: any, value: any) {
 	};
 }
 export function setAppsettingsAssemblyPrefixes(prefixes: any) {
-	return (dispatch: Function | undefined, getState: Function) => {
+	return (dispatch: Function, getState: Function) => {
 		const rootGraph = GetRootGraph(getState(), dispatch);
 		rootGraph.appConfig.AppSettings.AssemblyPrefixes = [ 'RedQuick', prefixes ].unique((x: any) => x).join(';');
 		rootGraph.appConfig.AppSettings.DatabaseId = [ prefixes ].unique((x: any) => x).join(';');

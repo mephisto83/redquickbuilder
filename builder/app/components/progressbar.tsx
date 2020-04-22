@@ -46,7 +46,7 @@ export default class ProgressBar extends Component {
 						<span className={`bubble`} />
 						{name} <div>{percentage}% </div>
 						<div>{timeLeft}</div>
-						<div className={styles.totalTimeUsed}>{totalTimeUsed}</div>
+						<div className={'totalTimeUsed'}>{totalTimeUsed}</div>
 						<progress value={complete ? 100 : activate ? progress || 1 : 0} min={0} max={100} />
 					</li>
 				);

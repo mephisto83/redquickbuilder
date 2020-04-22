@@ -215,7 +215,7 @@ export const NodeTypeColors = {
 	[NodeTypes.DataChainCollection]: '#2191FB'
 };
 
-export const NavigateTypes = {
+export const NavigateTypes: any = {
 	Back: 'GoBack',
 	Replace: 'Replace',
 	Forward: 'GoForward',
@@ -286,7 +286,7 @@ export const SelectorPropertyKeys = {
 	Object: 'object',
 	Blur: 'blur'
 };
-export const MediaQueries = {
+export const MediaQueries: any = {
 	['Extra small devices']: '@media only screen and (max-width: 600px)',
 	['Small devices']: '@media only screen and (min-width: 600px)',
 	['Media devices']: '@media only screen and (min-width: 768px)',
@@ -1319,7 +1319,7 @@ export const UITypes = {
 	AR: 'AR',
 	ElectronIO: 'ElectronIO'
 };
-export const ValidationRules = {
+export const ValidationRules: any = {
 	CVV: 'cvv',
 	AlphaNumericLike: 'alphanumericlike',
 	AlphaNumericPuncLike: 'alphaNumericpunclike',

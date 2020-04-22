@@ -65,7 +65,7 @@ export const ComponentLifeCycleEvents = {
 	ComponentDidMount: 'componentDidMount',
 	ComponentWillUnmount: 'componentWillUnmount'
 };
-export const ComponentEvents = {
+export const ComponentEvents: any = {
 	onPress: 'onPress',
 	onClick: 'onClick',
 	onFocus: 'onFocus',

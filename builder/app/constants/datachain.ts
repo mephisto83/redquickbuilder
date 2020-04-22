@@ -84,7 +84,7 @@ export const DataChainFunctionKeys = {
 export const DataChainTypeNames = {
 	NavigateToRoute: 'NavigateToRoute'
 };
-export const DataChainFunctions = {
+export const DataChainFunctions: any = {
 	[DataChainFunctionKeys.Not]: {
 		ui: {},
 		filter: {

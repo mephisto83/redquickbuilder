@@ -1,191 +1,180 @@
 /* eslint-disable import/no-duplicates */
-import { readFileSync } from "fs";
+import { readFileSync } from 'fs';
 import {
-  GenerateChainFunctions,
-  GenerateChainFunctionSpecs,
-  GetDataChainCollections,
-  NodesByType,
-  GetJSCodeName,
-  GetNodeProp,
-  GetCurrentGraph,
-  GetRelativeDataChainPath,
-  GetRootGraph
-} from "../actions/uiactions";
+	GenerateChainFunctions,
+	GenerateChainFunctionSpecs,
+	GetDataChainCollections,
+	NodesByType,
+	GetJSCodeName,
+	GetNodeProp,
+	GetCurrentGraph,
+	GetRelativeDataChainPath,
+	GetRootGraph
+} from '../actions/uiactions';
 import {
-  UITypes,
-  NEW_LINE,
-  NodeTypes,
-  LinkType,
-  NodeProperties,
-  NameSpace,
-  STANDARD_CONTROLLER_USING
-} from "../constants/nodetypes";
-import { bindTemplate } from "../constants/functiontypes";
-import {
-  GetNodeLinkedTo,
-  TARGET,
-  GetNodesLinkedTo
-} from "../methods/graph_methods";
-import NamespaceGenerator from "./namespacegenerator";
-import * as GraphMethods from "../methods/graph_methods";
+	UITypes,
+	NEW_LINE,
+	NodeTypes,
+	LinkType,
+	NodeProperties,
+	NameSpace,
+	STANDARD_CONTROLLER_USING
+} from '../constants/nodetypes';
+import { bindTemplate } from '../constants/functiontypes';
+import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
+import NamespaceGenerator from './namespacegenerator';
+import * as GraphMethods from '../methods/graph_methods';
 
 export default class DataChainGenerator {
-  static GenerateCS(options) {
-    const { state, language } = options;
-    const result = {};
-    const graphRoot = GetRootGraph(state);
+	static GenerateCS(options: { state: any; key?: any; language: any }) {
+		const { state, language } = options;
+		const result: any = {};
+		const graphRoot: any = GetRootGraph(state);
 
-    const namespace = graphRoot
-      ? graphRoot[GraphMethods.GraphKeys.NAMESPACE]
-      : null;
+		const namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-    GenerateChainFunctions({
-      cs: true,
-      language
-    }).forEach(f => {
-      const dataChain = f.node;
+		GenerateChainFunctions({
+			cs: true,
+			language
+		}).forEach((f: { node: any; class: any }) => {
+			const dataChain = f.node;
 
-      result[GetNodeProp(dataChain, NodeProperties.CodeName)] = {
-        id: GetNodeProp(dataChain, NodeProperties.CodeName),
-        name: GetNodeProp(dataChain, NodeProperties.CodeName),
-        template: NamespaceGenerator.Generate({
-          template: f.class,
-          usings: [
-            ...STANDARD_CONTROLLER_USING,
-            `${namespace}${NameSpace.Model}`,
-            `${namespace}${NameSpace.Interface}`,
-            `${namespace}${NameSpace.StreamProcess}`,
-            `${namespace}${NameSpace.Constants}`,
-            `${namespace}${NameSpace.Permissions}`,
-            `${namespace}${NameSpace.Parameters}`
-          ],
-          namespace,
-          space: NameSpace.Controllers
-        })
-      };
-    });
+			result[GetNodeProp(dataChain, NodeProperties.CodeName)] = {
+				id: GetNodeProp(dataChain, NodeProperties.CodeName),
+				name: GetNodeProp(dataChain, NodeProperties.CodeName),
+				template: NamespaceGenerator.Generate({
+					template: f.class,
+					usings: [
+						...STANDARD_CONTROLLER_USING,
+						`${namespace}${NameSpace.Model}`,
+						`${namespace}${NameSpace.Interface}`,
+						`${namespace}${NameSpace.StreamProcess}`,
+						`${namespace}${NameSpace.Constants}`,
+						`${namespace}${NameSpace.Permissions}`,
+						`${namespace}${NameSpace.Parameters}`
+					],
+					namespace,
+					space: NameSpace.Controllers
+				})
+			};
+		});
 
-    return result;
-  }
+		return result;
+	}
 
-  static Generate(options) {
-    const { state, language } = options;
-    let fileEnding = ".js";
-    switch (language) {
-      case UITypes.ElectronIO:
-      case UITypes.ReactWeb:
-        fileEnding = ".ts";
-        break;
-      default: break;
-    }
-    const graph = GetCurrentGraph(state);
-    const funcs = GenerateChainFunctions(options);
-    const collections = GetDataChainCollections(options).split(NEW_LINE).sort((a, b) => {
-      return `${b}`.localeCompare(a);
-    }).join(NEW_LINE);
-    let tests = null;
-    const collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
-    const temps = [
-      ...collectionNodes.map(nc => {
-        const isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
-        const cfunc = isInLanguage
-          ? GenerateChainFunctions({ language, collection: nc.id })
-          : null;
-        const collectionsInLanguage = isInLanguage
-          ? GetDataChainCollections({
-            language,
-            collection: nc.id
-          })
-          : null;
-        if (!isInLanguage) {
-          return false;
-        }
-        const chainPath = GetRelativeDataChainPath(nc);
-        return {
-          template: dcTemplate(
-            collectionsInLanguage,
-            cfunc,
-            []
-              .interpolate(0, chainPath.length + 1)
-              .map(() => "../")
-              .join("")
-          ),
-          relative: `./src/actions/datachains/${chainPath.join("/")}${
-            chainPath.length ? "/" : ""
-            }`,
-          relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
-          name: `${chainPath.join("_")}${GetJSCodeName(nc)}`
-        };
-      }),
-      {
-        template: dcTemplate(collections, funcs),
-        relative: "./src/actions",
-        relativeFilePath: `./data-chain${fileEnding}`,
-        name: "data-chain"
-      },
-      {
-        template: readFileSync("./app/utils/observable.ts", "utf8"),
-        relative: "./src/actions",
-        relativeFilePath: `./observable${fileEnding}`,
-        name: "observable"
-      },
-      {
-        template: readFileSync("./app/utils/array.js", "utf8"),
-        relative: "./src/actions",
-        relativeFilePath: `./array${fileEnding}`,
-        name: "array"
-      },
-      {
-        template: readFileSync("./app/utils/redgraph.ts", "utf8"),
-        relative: "./src/actions",
-        relativeFilePath: `./redgraph${fileEnding}`,
-        name: "redgraph.ts"
-      },
-      // Specific for web sites
-      // Need an alternative for ReactNative
-      {
-        template: readFileSync("./app/utils/redutils.ts", "utf8"),
-        relative: "./src/actions",
-        relativeFilePath: `./redutils${fileEnding}`,
-        name: "redutils.js"
-      }
-    ].filter(x => x);
-    switch (language) {
-      case UITypes.ElectronIO:
-      case UITypes.ReactWeb:
-        tests = GenerateChainFunctionSpecs(options);
-        temps.push({
-          relative: "./test",
-          relativeFilePath: "./data-chain.spec.js",
-          name: "data-chain.spec.js",
-          template: bindTemplate(
-            readFileSync("./app/templates/electronio/spec.tpl", "utf8"),
-            {
-              tests: tests.join(NEW_LINE)
-            }
-          )
-        });
-        break;
-      default: break;
-    }
-    const result = {};
+	static Generate(options: any) {
+		const { state, language } = options;
+		let fileEnding = '.js';
+		switch (language) {
+			case UITypes.ElectronIO:
+			case UITypes.ReactWeb:
+				fileEnding = '.ts';
+				break;
+			default:
+				break;
+		}
+		const graph = GetCurrentGraph(state);
+		const funcs = GenerateChainFunctions(options);
+		const collections = GetDataChainCollections(options)
+			.split(NEW_LINE)
+			.sort((a: string, b: any) => {
+				return `${b}`.localeCompare(a);
+			})
+			.join(NEW_LINE);
+		let tests = null;
+		const collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
+		const temps = [
+			...collectionNodes.map((nc: any) => {
+				const isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
+				const cfunc = isInLanguage ? GenerateChainFunctions({ language, collection: nc.id }) : null;
+				const collectionsInLanguage = isInLanguage
+					? GetDataChainCollections({
+							language,
+							collection: nc.id
+						})
+					: null;
+				if (!isInLanguage) {
+					return false;
+				}
+				const chainPath = GetRelativeDataChainPath(nc);
+				return {
+					template: dcTemplate(
+						collectionsInLanguage,
+						cfunc,
+						[].interpolate(0, chainPath.length + 1).map(() => '../').join('')
+					),
+					relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
+					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
+					name: `${chainPath.join('_')}${GetJSCodeName(nc)}`
+				};
+			}),
+			{
+				template: dcTemplate(collections, funcs),
+				relative: './src/actions',
+				relativeFilePath: `./data-chain${fileEnding}`,
+				name: 'data-chain'
+			},
+			{
+				template: readFileSync('./app/utils/observable.ts', 'utf8'),
+				relative: './src/actions',
+				relativeFilePath: `./observable${fileEnding}`,
+				name: 'observable'
+			},
+			{
+				template: readFileSync('./app/utils/array.js', 'utf8'),
+				relative: './src/actions',
+				relativeFilePath: `./array${fileEnding}`,
+				name: 'array'
+			},
+			{
+				template: readFileSync('./app/utils/redgraph.ts', 'utf8'),
+				relative: './src/actions',
+				relativeFilePath: `./redgraph${fileEnding}`,
+				name: 'redgraph.ts'
+			},
+			// Specific for web sites
+			// Need an alternative for ReactNative
+			{
+				template: readFileSync('./app/utils/redutils.ts', 'utf8'),
+				relative: './src/actions',
+				relativeFilePath: `./redutils${fileEnding}`,
+				name: 'redutils.js'
+			}
+		].filter((x) => x);
+		switch (language) {
+			case UITypes.ElectronIO:
+			case UITypes.ReactWeb:
+				tests = GenerateChainFunctionSpecs(options);
+				temps.push({
+					relative: './test',
+					relativeFilePath: './data-chain.spec.js',
+					name: 'data-chain.spec.js',
+					template: bindTemplate(readFileSync('./app/templates/electronio/spec.tpl', 'utf8'), {
+						tests: tests.join(NEW_LINE)
+					})
+				});
+				break;
+			default:
+				break;
+		}
+		const result: any = {};
 
-    temps.map(t => {
-      result[t.name] = t;
-    });
+		temps.map((t) => {
+			result[t.name] = t;
+		});
 
-    return result;
-  }
+		return result;
+	}
 }
 
-let dcTemplate = (collections, funcs, rel = "") => {
-  if (!funcs || !funcs.trim()) {
-    if (!collections) {
-      return `export default {}`;
-    }
-    return `${collections}`;
-  }
-  return `import {
+let dcTemplate = (collections: any, funcs: string, rel = '') => {
+	if (!funcs || !funcs.trim()) {
+		if (!collections) {
+			return `export default {}`;
+		}
+		return `${collections}`;
+	}
+	return `import {
     GetC,
     updateScreenInstanceObject,
     GetItem,
@@ -247,42 +236,39 @@ ${collections}
 ${funcs}`;
 };
 
-export function CollectionIsInLanguage(graph, collection, language) {
-  const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
-  if (itsUiType && itsUiType === language) {
-    return true;
-  }
-  if (itsUiType) {
-    return false
-  }
-  const reference = GetNodeLinkedTo(graph, {
-    id: collection,
-    link: LinkType.DataChainCollectionReference
-  });
-  if (reference) {
-    if (GetNodeProp(reference, NodeProperties.NODEType) === NodeTypes.Screen) {
-      return true;
-    } if (GetNodeProp(reference, NodeProperties.UIType) === language) {
-      return true;
-    } if (GetNodeProp(reference, NodeProperties.UIType)) {
-      return false;
-    }
-    const parent = GetNodesLinkedTo(graph, {
-      id: collection,
-      link: LinkType.DataChainCollection,
-      direction: TARGET
-    }).filter(
-      x =>
-        GetNodeProp(x, NodeProperties.NODEType) ===
-        NodeTypes.DataChainCollection
-    )[0];
-    if (parent) {
-      return CollectionIsInLanguage(graph, parent.id, language);
-    }
+export function CollectionIsInLanguage(graph: GraphMethods.Graph, collection: any, language: any): any {
+	const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
+	if (itsUiType && itsUiType === language) {
+		return true;
+	}
+	if (itsUiType) {
+		return false;
+	}
+	const reference = GetNodeLinkedTo(graph, {
+		id: collection,
+		link: LinkType.DataChainCollectionReference
+	});
+	if (reference) {
+		if (GetNodeProp(reference, NodeProperties.NODEType) === NodeTypes.Screen) {
+			return true;
+		}
+		if (GetNodeProp(reference, NodeProperties.UIType) === language) {
+			return true;
+		}
+		if (GetNodeProp(reference, NodeProperties.UIType)) {
+			return false;
+		}
+		const parent = GetNodesLinkedTo(graph, {
+			id: collection,
+			link: LinkType.DataChainCollection,
+			direction: TARGET
+		}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection)[0];
+		if (parent) {
+			return CollectionIsInLanguage(graph, parent.id, language);
+		}
+	} else {
+		return true;
+	}
 
-  } else {
-    return true;
-  }
-
-  return false;
+	return false;
 }

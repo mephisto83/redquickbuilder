@@ -36,6 +36,6 @@
   "include": [
       "src/**/*",
       "../app/constants/**/*.ts",
-      "../app/actions/**/uiActions.ts"
+      "../app/actions/**/*.ts"
   ]
 }
