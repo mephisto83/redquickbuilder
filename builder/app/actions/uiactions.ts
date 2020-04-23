@@ -4,21 +4,15 @@ import * as GraphMethods from '../methods/graph_methods';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { NavigateTypes } from '../constants/nodetypes';
-import {
-	MethodFunctions,
-	bindTemplate,
-	bindReferenceTemplate,
-	FunctionTemplateKeys,
-	ReturnTypes
-} from '../constants/functiontypes';
+import { MethodFunctions, bindTemplate, bindReferenceTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4, addNewLine } from '../utils/array';
 import { getReferenceInserts } from '../utils/utilservice';
-import CreateDataChainGetBody from '../nodepacks/CreateDataChainGetBody';
 import { buildValidation } from '../service/validation_js_service';
 import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
+import { GraphLink } from '../methods/graph_types';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -65,7 +59,7 @@ export const ValidationPropName = {
 //   Get: "Get",
 //   GetAll: "GetAll"
 // };
-export function GetScreenUrl(op: any, language: any = NodeConstants.UITypes.ElectronIO, overrideText: any = null) {
+export function GetScreenUrl(op: any, overrideText: any = null) {
 	const params = GetComponentExternalApiNodes(op.id)
 		.filter((externaApiNodes: any) => GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter))
 		.map((v: any) => `:${GetCodeName(v)}`)
@@ -95,7 +89,7 @@ export function generateDataSeed(node: any) {
 	return JSON.stringify(dataSeed, null, 4);
 }
 
-export function ScreenOptionFilter(x: string | GraphMethods.Node) {
+export function ScreenOptionFilter(x: any) {
 	if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Register') {
 		return false;
 	}
@@ -188,15 +182,10 @@ export function Use(node: any, prop: any) {
 export function GetManyToManyNodes(ids: any) {
 	return GraphMethods.GetManyToManyNodes(GetCurrentGraph(_getState()), ids) || [];
 }
-export function GetNodeProp(node: any, prop: string, currentGraph?: GraphMethods.Graph) {
-	if (typeof node === 'string') {
-		node = GetNodeById(node, currentGraph) || node;
-	}
-	return node && node.properties && node.properties[prop];
-}
 export function GetNodeType(node: any, graph?: any) {
-	return GetNodeProp(node, NodeProperties.NODEType, graph);
+	return GraphMethods.GetNodeProp(node, NodeProperties.NODEType, graph);
 }
+export const GetNodeProp = GraphMethods.GetNodeProp;
 
 export function GetNodePropDirty(node: any, prop: any, currentGraph: any) {
 	if (typeof node === 'string') {
@@ -234,7 +223,7 @@ export function GetSharedComponentFor(
 	if (isSharedProperty) {
 		viewType = isPluralComponent ? ViewTypes.GetAll : ViewTypes.Get;
 	}
-	viewTypeNodes = viewTypeNodes.filter((x: string | GraphMethods.Node) => {
+	viewTypeNodes = viewTypeNodes.filter((x: any) => {
 		let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 
 		result = result && !!GetNodeProp(x, NodeProperties.IsPluralComponent) === !!isPluralComponent;
@@ -319,12 +308,9 @@ export function setSharedComponent(args: any) {
 			GetNodeProp(target, NodeProperties.NODEType) === NodeTypes.ComponentNode
 		) {
 			const connections = GraphMethods.GetConnectedNodesByType(state, source, NodeTypes.ComponentNode)
-				.filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
-				.filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.UIType) === uiType)
-				.filter(
-					(x: string | GraphMethods.Node) =>
-						GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent
-				)
+				.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+				.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
+				.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
 				.map((x: { id: any }) => ({
 					operation: REMOVE_LINK_BETWEEN_NODES,
 					options: {
@@ -439,7 +425,6 @@ export function setComponentApiConnection(args: { properties: any; target: any; 
 export function addQueryMethodParameter() {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
-		const graph = GetCurrentGraph(state);
 		const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
 		const operations = [];
 		operations.push({
@@ -469,13 +454,12 @@ export function addQueryMethodParameter() {
 export function addQueryMethodApi() {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
-		const graph = GetCurrentGraph(state);
 		const currentNode = Node(state, Visual(state, SELECTED_NODE));
 		const queryObjects = GraphMethods.GetConnectedNodesByType(
 			state,
 			currentNode ? currentNode.id : null,
 			NodeTypes.MethodApiParameters
-		).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.QueryParameterObject));
+		).filter((x: any) => GetNodeProp(x, NodeProperties.QueryParameterObject));
 		if (queryObjects.length === 0) {
 			const operations = [];
 			operations.push({
@@ -509,7 +493,7 @@ export function addQueryMethodApi() {
 }
 
 export function connectLifeCycleMethod(args: { properties: any; target: any; source: any }) {
-	const { properties, target, source } = args;
+	const { target, source } = args;
 	return (dispatch: any, getState: Function) => {
 		setTimeout(() => {
 			const state = getState();
@@ -547,9 +531,7 @@ export function ComponentEventTo(node: any, apiName: any, callback?: Function) {
 		}
 	};
 }
-export function GetTitleService(graph: GraphMethods.Graph) {
-	graph = GetCurrentGraph();
-
+export function GetTitleService() {
 	return NodesByType(GetState(), NodeTypes.TitleService).find((x: any) => x);
 }
 export function AgentHasExecutor(model: { id: any }) {
@@ -679,7 +661,7 @@ export function GetConditionNodes(id: any) {
 	const state = _getState();
 	return GraphMethods.GetConditionNodes(state, id);
 }
-export function IsAgent(node: string | GraphMethods.Node) {
+export function IsAgent(node: any) {
 	return GetNodeProp(node, NodeProperties.IsAgent);
 }
 export function GetLinkChainItem(options: any) {
@@ -734,7 +716,7 @@ export function computeNamespace(node: any) {
 	return `${GetJSCodeName(node)}`;
 }
 
-export function GetJSCodeName(node: GraphMethods.Node | string) {
+export function GetJSCodeName(node: any | string) {
 	const l = GetCodeName(node);
 	if (l) {
 		return l.toJavascriptName();
@@ -770,8 +752,6 @@ export function GetMethodParameters(methodId: string) {
 export function updateMethodParameters(current: any, methodType: any, viewPackages: any) {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
-		const graph = GetRootGraph(state);
-		const toRemove = [];
 		graphOperation(
 			UpdateMethodParameters({
 				methodType,
@@ -796,7 +776,7 @@ export function attachMethodToMaestro(methodNodeId: any, modelId: any, options: 
 			PerformGraphOperation([
 				{
 					operation: ADD_LINK_BETWEEN_NODES,
-					options(graph: any) {
+					options() {
 						return {
 							source: options.maestro,
 							target: methodNodeId,
@@ -849,7 +829,7 @@ export function attachMethodToMaestro(methodNodeId: any, modelId: any, options: 
 			},
 			{
 				operation: CHANGE_NODE_PROPERTY,
-				options(graph: any) {
+				options() {
 					return {
 						id: controller.id,
 						value: 'systemUser',
@@ -897,7 +877,7 @@ export function attachMethodToMaestro(methodNodeId: any, modelId: any, options: 
 			},
 			{
 				operation: ADD_LINK_BETWEEN_NODES,
-				options(graph: any) {
+				options() {
 					return {
 						source: controller.id,
 						target: maestro.id,
@@ -909,7 +889,7 @@ export function attachMethodToMaestro(methodNodeId: any, modelId: any, options: 
 			},
 			{
 				operation: ADD_LINK_BETWEEN_NODES,
-				options(graph: any) {
+				options() {
 					return {
 						source: maestro.id,
 						target: methodNodeId,
@@ -938,10 +918,10 @@ export function GetMethodParametersFor(methodId: string, type: any) {
 	}
 	return null;
 }
-export function GetNodeById(node: any , graph?: any ): any  {
+export function GetNodeById(node: any, graph?: any): any {
 	return GraphMethods.GetNode(graph || GetCurrentGraph(GetState()), node);
 }
-export function GetNodesByProperties(props: { [x: string]: any }, graph?: GraphMethods.Graph, state?: any) {
+export function GetNodesByProperties(props: { [x: string]: any }, graph?: any, state?: any) {
 	const currentGraph = graph || GetCurrentGraph(state || GetState());
 	if (currentGraph) {
 		const nodeSubset = GraphMethods.GetNodesByProperties(props, currentGraph);
@@ -1014,18 +994,14 @@ export function GetServiceInterfaceMethodCalls(id: any) {
 	const graph = GetRootGraph(state);
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter(
-		(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterfaceMethod
-	);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterfaceMethod);
 }
 export function GetServiceInterfaceCalls(id: any) {
 	const state = GetState();
 	const graph = GetRootGraph(state);
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter(
-		(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterface
-	);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ServiceInterface);
 }
 export function GetValidationsConditions(id: any) {
 	return _getValidationConditions(_getState(), id);
@@ -1033,13 +1009,13 @@ export function GetValidationsConditions(id: any) {
 export function GetModelItemConditions(id: any) {
 	return _getValidationConditions(_getState(), id);
 }
-export function GetConditionSetup(condition: string | GraphMethods.Node) {
+export function GetConditionSetup(condition: any) {
 	return GetNodeProp(condition, NodeProperties.Condition);
 }
 export function GetDataChainEntryNodes(cs?: any) {
 	return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
-export function GetLambdaDefinition(method: string | GraphMethods.Node | null) {
+export function GetLambdaDefinition(method: any | null) {
 	const functionType = GetNodeProp(method, NodeProperties.FunctionType);
 	const { lambda } = MethodFunctions[functionType];
 	return lambda;
@@ -1057,7 +1033,6 @@ export function GenerateDataChainArguments(id: string) {
 			const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
 			const { lambda } = MethodFunctions[functionType];
 			if (lambda && lambda.default) {
-				const methodProps: any = GetMethodProps(methods[0]);
 				_arguments = Object.keys(lambda.default)
 					.filter((x) => x !== 'return')
 					.map((key) => `${key.split('.').join('')}:${key} `)
@@ -1130,17 +1105,6 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
 	const setProcess: string[] = [];
-	const funcs = chain.map((c: any, index: number) => {
-		if (index === 0) {
-			args = GetDataChainArgs(c);
-		}
-		const temp = GenerateDataChainMethod(c, options);
-		observables.push(GenerateObservable(c, index));
-		setArgs.push(GenerateArgs(c, chain));
-		setProcess.push(GenerateSetProcess(c, chain, options));
-		subscribes.push(GetSubscribes(c, chain));
-		return temp;
-	});
 	const index = chain.indexOf(id);
 	const nodeName = (GetJSCodeName(id) || 'node' + index).toJavascriptName();
 	const lastLink = GetLastChainLink(chain);
@@ -1171,7 +1135,7 @@ export function GetSubscribes(id: any, parts: { indexOf: (arg0: any) => string }
 	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
 	if (functionType && DataChainFunctions[functionType] && DataChainFunctions[functionType].merge) {
 		// pulls args from other nodes
-		const args = Object.keys(DataChainFunctions[functionType].ui).map((key, kindex) => {
+		const args = Object.keys(DataChainFunctions[functionType].ui).map((key) => {
 			const temp = GetNodeProp(node, DataChainFunctions[functionType].ui[key]);
 			return `${(GetJSCodeName(temp) || 'node' + parts.indexOf(temp)).toJavascriptName()}`;
 		});
@@ -1219,12 +1183,12 @@ export function GetLastChainLink(parts: any[]) {
 	const lastLink = parts.find((id: string) => GetNodeProp(GetNodeById(id), NodeProperties.AsOutput));
 	return lastLink;
 }
-export function GenerateObservable(id: any, index: any) {
+export function GenerateObservable(id: any) {
 	const nodeName = GetJSCodeName(id);
 	return `let ${nodeName} = new RedObservable('${nodeName}');`;
 }
 
-export function GenerateDataChainFunc(id: any, chain: any, index: any) {
+export function GenerateDataChainFunc(id: any) {
 	const nodeName = GetCodeName(id);
 	//Should be able to capture the args throw the link between nodes.
 	return `private async Task ${nodeName}(/*define args*/) {
@@ -1248,7 +1212,7 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 	const { cs, language, collection } = options;
 	const graph = GetCurrentGraph();
 	const entryNodes = GetDataChainEntryNodes(cs)
-		.filter((x: string | GraphMethods.Node) => {
+		.filter((x: any) => {
 			const uiType = GetNodeProp(x, NodeProperties.UIType);
 			if (uiType) {
 				return language === uiType;
@@ -1275,11 +1239,7 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 	}
 	return temp.join(NodeConstants.NEW_LINE);
 }
-export function CollectionIsInLanguage(
-	graph: GraphMethods.Graph,
-	collection: string | GraphMethods.Node,
-	language: any
-): any {
+export function CollectionIsInLanguage(graph: any, collection: any, language: any): any {
 	const uiTypeOfCollection = GetNodeProp(collection, NodeProperties.UIType);
 	if (uiTypeOfCollection && uiTypeOfCollection === language) {
 		return true;
@@ -1305,9 +1265,7 @@ export function CollectionIsInLanguage(
 			id: collection,
 			link: NodeConstants.LinkType.DataChainCollection,
 			direction: GraphMethods.TARGET
-		}).filter(
-			(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection
-		)[0];
+		}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection)[0];
 		if (parent) {
 			return CollectionIsInLanguage(graph, parent.id, language);
 		}
@@ -1348,7 +1306,7 @@ export function GetDataChainCollections(options: { language: any; collection: an
 				link: NodeConstants.LinkType.DataChainCollection,
 				direction: GraphMethods.TARGET
 			}).filter(
-				(x: GraphMethods.Node) =>
+				(x: any) =>
 					GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection &&
 					CollectionIsInLanguage(graph, x.id, language)
 			)
@@ -1369,10 +1327,8 @@ export function GetDataChainCollections(options: { language: any; collection: an
 					id: x.id,
 					link: NodeConstants.LinkType.DataChainCollection,
 					direction: GraphMethods.SOURCE
-				}).filter(
-					(dcc: string | GraphMethods.Node) =>
-						GetNodeProp(dcc, NodeProperties.NODEType) === NodeTypes.DataChainCollection
-				).length === 0 && CollectionIsInLanguage(graph, x.id, language)
+				}).filter((dcc: any) => GetNodeProp(dcc, NodeProperties.NODEType) === NodeTypes.DataChainCollection)
+					.length === 0 && CollectionIsInLanguage(graph, x.id, language)
 			);
 		})
 		.map((dataChainCollection: any) => {
@@ -1437,7 +1393,7 @@ export function GenerateChainFunctionSpecs(options: { language: any; collection:
 	const result: string[] = [];
 	const graph = GetCurrentGraph();
 	const entryNodes = GetDataChainEntryNodes()
-		.filter((x: string | GraphMethods.Node) => {
+		.filter((x: any) => {
 			const uiType = GetNodeProp(x, NodeProperties.UIType);
 			if (uiType) {
 				return language === uiType;
@@ -1511,7 +1467,7 @@ export function addComponentTags(itemValue: string, cellProperties: { properties
 	}
 }
 
-export function GetDataChainNext(id: any, graph?: GraphMethods.Graph) {
+export function GetDataChainNext(id: any, graph?: any) {
 	graph = graph || GetRootGraph(_getState());
 	if (!graph) {
 		throw 'no graph found';
@@ -1554,16 +1510,15 @@ export function GetDataChainParts(id: any, result?: any) {
 	const node = GetNodeById(id);
 	const nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
 	let groups = Object.values(nodeGroup);
-	const current = id;
 	const dataChains = NodesByType(_getState(), NodeTypes.DataChain);
 	let oldlength;
 	do {
 		oldlength = result.length;
-		const dc = dataChains.filter((x: string | GraphMethods.Node) =>
+		const dc = dataChains.filter((x: any) =>
 			result.some((v: any) => v === GetNodeProp(x, NodeProperties.ChainParent))
 		);
 		result.push(...dc.map((v: { id: any }) => v.id));
-		dc.map((_dc: string | GraphMethods.Node) => {
+		dc.map((_dc: any) => {
 			groups = [ ...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {}) ];
 		});
 		groups.map((g) => {
@@ -1598,7 +1553,7 @@ export function GetDataChainFrom(id: any) {
 
 	return result;
 }
-export function getGroup(id: string, graph: GraphMethods.Graph) {
+export function getGroup(id: string, graph: any) {
 	// return graph.groupLib[id];
 	return GraphMethods.getGroup(graph || GetCurrentGraph(_getState()), id);
 }
@@ -1637,7 +1592,7 @@ export function GetArbitersInCSDataChainMethod(id: string) {
 	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
 	const lambda = GetNodeProp(node, NodeProperties.Lambda);
 
-	const result: GraphMethods.Node[] = [];
+	const result: any[] = [];
 	switch (functionType) {
 		case DataChainFunctionKeys.Lambda:
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((_insert: string) => {
@@ -1668,7 +1623,6 @@ export function GetOutputTypeInCSDataChainMethod(id: string) {
 		case DataChainFunctionKeys.Lambda:
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((_insert: string) => {
 				const temp = _insert.split('@');
-				const insert = temp.length > 1 ? temp[1] : temp[0];
 				if (temp.length > 1) {
 					if (temp[0].indexOf('return') === 0) {
 						const vari = temp[0].split(' ').filter((x: any) => x);
@@ -1831,7 +1785,6 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((insert: string) => {
 				const args = insert.split('~');
 				const property = args.length > 1 ? args[1] : args[0];
-				const model: any = args[0];
 				const prop: any = lambdaInsertArguments[property];
 				const node: any = GetNodeById(prop);
 				let bindValue: any = GetCodeName(node);
@@ -2003,17 +1956,16 @@ function buildModelMethodMenu(options: { language: any }) {
 		anyType = '';
 	}
 	const listPages = NodesByType(null, NodeTypes.Screen).filter(
-		(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll
+		(x: any) => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll
 	);
-	const underPages = NodesByType(null, NodeTypes.Screen).filter((x: string | GraphMethods.Node) =>
+	const underPages = NodesByType(null, NodeTypes.Screen).filter((x: any) =>
 		[ ViewTypes.Create, ViewTypes.GetAll ].some((v) => v === GetNodeProp(x, NodeProperties.ViewType))
 	);
 
 	const screens = listPages.map((v: any) => `{ title: '${GetNodeTitle(v)}', name: 'top-${GetCodeName(v)}' }`);
-	const subscreens = underPages.map((v: string | GraphMethods.Node) => {
+	const subscreens = underPages.map((v: any) => {
 		const tpage = listPages.find(
-			(vt: string | GraphMethods.Node) =>
-				GetNodeProp(vt, NodeProperties.Model) === GetNodeProp(v, NodeProperties.Model)
+			(vt: any) => GetNodeProp(vt, NodeProperties.Model) === GetNodeProp(v, NodeProperties.Model)
 		);
 		const temp = `{title: '${GetNodeTitle(v)}',  name: '${GetCodeName(v)}', parent: 'top-${GetCodeName(tpage)}' }`;
 		return temp;
@@ -2116,7 +2068,7 @@ export function GetNameSpace() {
 	return namespace;
 }
 
-export function GetArbiterPropertyDefinitions(tabs = 3, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+export function GetArbiterPropertyDefinitions(tabs = 3) {
 	const arbiters = GetArbitersForPermissions();
 	const template = `IRedArbiter<{{model}}> arbiter{{model}};`;
 	const tab = [].interpolate(0, tabs, () => `   `).join('');
@@ -2129,11 +2081,7 @@ export function GetArbiterPropertyDefinitions(tabs = 3, language = NodeConstants
 	);
 	return definitions.join(NodeConstants.NEW_LINE);
 }
-export function GetCustomServiceDefinitions(
-	type: string,
-	tabs = 3,
-	language = NodeConstants.ProgrammingLanguages.CSHARP
-) {
+export function GetCustomServiceDefinitions(type: string, tabs = 3) {
 	const services = GetCustomServicesForNodeType(type);
 	const template = `I{{model}} {{model_js}};`;
 	const tab = [].interpolate(0, tabs, () => `   `).join('');
@@ -2148,7 +2096,7 @@ export function GetCustomServiceDefinitions(
 	return definitions.join(NodeConstants.NEW_LINE);
 }
 
-export function GetArbiterPropertyImplementations(tabs = 4, language = NodeConstants.ProgrammingLanguages.CSHARP) {
+export function GetArbiterPropertyImplementations(tabs = 4) {
 	const arbiters = GetArbitersForPermissions();
 	const template = `arbiter{{model}} = RedStrapper.Resolve<IRedArbiter<{{model}}>>();`;
 	const tab = [].interpolate(0, tabs, () => `   `).join('');
@@ -2162,11 +2110,7 @@ export function GetArbiterPropertyImplementations(tabs = 4, language = NodeConst
 	return definitions.join(NodeConstants.NEW_LINE);
 }
 
-export function GetCustomServiceImplementations(
-	type: string,
-	tabs = 4,
-	language = NodeConstants.ProgrammingLanguages.CSHARP
-) {
+export function GetCustomServiceImplementations(type: string, tabs = 4) {
 	const services = GetCustomServicesForNodeType(type);
 	const template = `{{model_js}} = RedStrapper.Resolve<I{{model}}>();`;
 	const tab = [].interpolate(0, tabs, () => `   `).join('');
@@ -2236,7 +2180,7 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
 	});
 	customMethods.map((customMethod: any) => {
-		const res = GetCustomMethodClauses(node, customMethod, methodNodeParameters, language);
+		const res = GetCustomMethodClauses(customMethod, methodNodeParameters, language);
 		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
 	});
 	const finalClause = clauses.map((_, index) => `res_` + index).join(' && ') || 'true';
@@ -2255,12 +2199,7 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 		.join(NodeConstants.NEW_LINE);
 }
 
-export function GetCustomMethodClauses(
-	node: GraphMethods.Node | null,
-	customMethod: { id: any },
-	methodNodeParameters: any[],
-	language: string
-) {
+export function GetCustomMethodClauses(customMethod: { id: any }, methodNodeParameters: any[], language: string) {
 	const result = [];
 
 	if (methodNodeParameters) {
@@ -2350,10 +2289,8 @@ export function GetConditionClause(
 	const method = GetNodesMethod(adjacentId);
 	const clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
 	let { type, template, templatejs, node, nodeProperty, many2manyProperty, many2many, many2manyMethod } = validator;
-	const dataAccessor = '';
 	const nodeNodeId = GetMethodNodeProp(method, node);
 	let conditionTemplate = '';
-	const condition = '';
 	let properties = {};
 	if (NodeConstants.FilterUI && NodeConstants.FilterUI[type] && NodeConstants.FilterUI[type].template && !template) {
 		template = NodeConstants.FilterUI[type].template;
@@ -2623,7 +2560,7 @@ export function _getConditions(state: any, id: any) {
 	const graph = GetRootGraph(state);
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
 
 export function GetComponentNodes() {
@@ -2632,7 +2569,7 @@ export function GetComponentNodes() {
 }
 export function GetComponentNodeProperties() {
 	const res = GetComponentNodes()
-		.map((node: GraphMethods.Node) => {
+		.map((node: any) => {
 			const componentProperties = GetNodeProp(node, NodeProperties.ComponentProperties);
 			const componentPropertiesList = GraphMethods.getComponentPropertyList(componentProperties) || [];
 
@@ -2658,7 +2595,7 @@ export function GetConnectedScreenOptions(id: string) {
 	const graph = GetRootGraph(state);
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption);
 }
 export function attachToNavigateNode(currentId: any, action: any) {
 	return (dispatch: any, getState: any) => {
@@ -2670,7 +2607,7 @@ export function _attachToNavigateNode(currentId: any, action: any) {
 	return [
 		{
 			operation: ADD_NEW_NODE,
-			options(currentGraph: any) {
+			options() {
 				return {
 					nodeType: NodeTypes.NavigationAction,
 					linkProperties: {
@@ -2693,7 +2630,7 @@ export function GetConnectedScreen(id: any) {
 	const graph = GetRootGraph(state);
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).find((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen);
+	}).find((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen);
 }
 export function GetModelPropertyNodes(refId: any) {
 	const state = _getState();
@@ -2705,7 +2642,7 @@ export function GetModelPropertyNodes(refId: any) {
 				direction: GraphMethods.SOURCE
 			}
 		]
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Property);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Property);
 }
 
 export function getTopComponent(graph: any, node: { id: any }): any {
@@ -2713,31 +2650,23 @@ export function getTopComponent(graph: any, node: { id: any }): any {
 		id: node.id,
 		link: NodeConstants.LinkType.Component
 		//	direction: GraphMethods.TARGET
-	}).filter(
-		(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
-	)[0];
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
 
 	if (parent) {
 		return getTopComponent(graph, parent);
 	}
 	return node;
 }
-export function GetParentComponent(node: any, graph: GraphMethods.Graph) {
+export function GetParentComponent(node: any, graph: any) {
 	graph = graph || GetCurrentGraph();
 	const parent = GraphMethods.GetNodesLinkedTo(graph, {
 		id: node.id,
 		link: NodeConstants.LinkType.Component,
 		direction: GraphMethods.TARGET
-	}).filter(
-		(x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode
-	)[0];
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode)[0];
 	return parent;
 }
-export function ComponentIsViewType(
-	component: string | GraphMethods.Node,
-	viewType: string,
-	graph: GraphMethods.Graph
-): any {
+export function ComponentIsViewType(component: any, viewType: string, graph: any): any {
 	graph = graph || GetCurrentGraph();
 	const currentType = GetNodeProp(component, NodeProperties.ViewType);
 	if (currentType === viewType) {
@@ -2763,7 +2692,7 @@ export function GetUserReferenceNodes(refId: any) {
 				direction: GraphMethods.TARGET
 			}
 		]
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
 }
 
 export function GetLogicalChildren(id: string) {
@@ -2786,11 +2715,11 @@ export function GetMethodNodeSelectOptions(methodProps: { [x: string]: any }) {
 		title: `${GetCodeName(methodProps[val])} (${val})`
 	}));
 }
-export function GetNodeCode(graph: GraphMethods.Graph, id: string) {
+export function GetNodeCode(graph: any, id: string) {
 	return GetCodeName(GraphMethods.GetNode(graph, id));
 }
 
-export function GetMethodPropNode(graph: GraphMethods.Graph, node: string | GraphMethods.Node, key: string) {
+export function GetMethodPropNode(graph: any, node: any, key: string) {
 	const methodProps = GetNodeProp(node, NodeProperties.MethodProps);
 	if (methodProps) {
 		return GraphMethods.GetNode(graph, methodProps[key] || null);
@@ -2812,7 +2741,7 @@ export function GetMethodOptions(methodProps: { [x: string]: string }) {
 	});
 }
 
-export function GetLinkProperty(link: GraphMethods.GraphLink, prop: any) {
+export function GetLinkProperty(link: GraphLink, prop: any) {
 	return link && link.properties && link.properties[prop];
 }
 
@@ -2832,7 +2761,7 @@ export function VisualEq(state: any, key: string | null, value: string) {
 	return Visual(state, key) === value;
 }
 
-export function Node(state: any, nodeId: string): GraphMethods.Node | null {
+export function Node(state: any, nodeId: string): any | null {
 	const currentGraph = GetCurrentGraph(state);
 	if (currentGraph && currentGraph.nodeLib) {
 		return currentGraph.nodeLib[nodeId];
@@ -2877,7 +2806,7 @@ export function Graphs(state: any, key: any) {
 	return GetC(state, GRAPHS, key);
 }
 
-export function SaveGraph(graph: GraphMethods.Graph, dispatch: Function) {
+export function SaveGraph(graph: any, dispatch: Function) {
 	// graph = {
 	//   ...graph,
 	//   ...{
@@ -2947,13 +2876,11 @@ export function setVisual(key: string, value: any) {
 			return () => {};
 		}
 	return (dispatch: Function, getState: Function) => {
-		const state = getState();
 		dispatch(UIC(VISUAL, key, value));
 	};
 }
 export function setApplication(key: any, value: any) {
 	return (dispatch: Function, getState: Function) => {
-		const state = getState();
 		dispatch(UIC(APPLICATION, key, value));
 	};
 }
@@ -2963,7 +2890,7 @@ export const SELECTED_NODE = 'SELECTED_NODE';
 export const CONTEXT_MENU_VISIBLE = 'CONTEXT_MENU_VISIBLE';
 export const CONTEXT_MENU_MODE = 'CONTEXT_MENU_MODE';
 export function SelectedNode(nodeId: any) {
-	return (dispatch: Function, getState: Function) => {
+	return (dispatch: Function) => {
 		if (!GraphMethods.Paused()) {
 			dispatch(UIC(VISUAL, SELECTED_NODE, nodeId));
 		}
@@ -2985,7 +2912,7 @@ export function GetNodeTitle(node: any) {
 export function GetNodes(state: any) {
 	const currentGraph = GetCurrentGraph(state);
 	if (currentGraph) {
-		return [ ...currentGraph.nodes.map((t) => currentGraph.nodeLib[t]) ];
+		return [ ...currentGraph.nodes.map((t: any) => currentGraph.nodeLib[t]) ];
 	}
 	return [];
 }
@@ -3020,7 +2947,7 @@ export function $addComponentApiNodes(
 	return [
 		{
 			operation: ADD_NEW_NODE,
-			options(currentGraph: any) {
+			options() {
 				return {
 					nodeType: NodeTypes.ComponentApi,
 					callback: (nn: { id: any }) => {
@@ -3045,7 +2972,7 @@ export function $addComponentApiNodes(
 		},
 		{
 			operation: ADD_NEW_NODE,
-			options(currentGraph: any) {
+			options() {
 				return {
 					nodeType: NodeTypes.ComponentExternalApi,
 					callback: (nn: { id: any }) => {
@@ -3111,7 +3038,7 @@ export function GetMaestroNode(id: any) {
 	const graph = GetRootGraph(state);
 	const nodes = GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Maestro);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Maestro);
 	if (nodes && nodes.length) {
 		return nodes[0];
 	}
@@ -3122,7 +3049,7 @@ export function GetControllerNode(id: any) {
 	const graph = GetRootGraph(state);
 	const nodes = GraphMethods.GetNodesLinkedTo(graph, {
 		id
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Controller);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Controller);
 	if (nodes && nodes.length) {
 		return nodes[0];
 	}
@@ -3174,7 +3101,7 @@ export function NodesByType(state: null, nodeType: string | any[], options: any 
 	return [];
 }
 export function Setup() {
-	return (dispatch: any, getState: any) => {
+	return () => {
 		$setupCache();
 	};
 }
@@ -3281,7 +3208,7 @@ export function togglePinnedConnectedNodesByLinkType(model: any, linkType: any) 
 		});
 		const pinned = nodes
 			.filter((x: { id: any }) => x.id !== model)
-			.some((v: string | GraphMethods.Node) => GetNodeProp(v, NodeProperties.Pinned));
+			.some((v: any) => GetNodeProp(v, NodeProperties.Pinned));
 		graphOperation(
 			nodes.map((t: { id: any }) => ({
 				operation: CHANGE_NODE_PROPERTY,
@@ -3328,13 +3255,13 @@ export function GetGraphNode(id: string) {
 	const state = _getState();
 	return GraphMethods.GetNode(GetRootGraph(state), id);
 }
-export function GetFunctionType(methodNode: string | GraphMethods.Node) {
+export function GetFunctionType(methodNode: any) {
 	return GetNodeProp(methodNode, NodeProperties.FunctionType);
 }
 export function GetMethodNode(id: string) {
 	return GraphMethods.GetMethodNode(_getState(), id);
 }
-export function GetMethodNodeProp(methodNode: string | GraphMethods.Node, key: string) {
+export function GetMethodNodeProp(methodNode: any, key: string) {
 	const methodProps = GetNodeProp(methodNode, NodeProperties.MethodProps) || {};
 	if (typeof key === 'string') return methodProps[key];
 	if (!key) return null;
@@ -3345,7 +3272,7 @@ export function GetMethodNodeProp(methodNode: string | GraphMethods.Node, key: s
 	});
 	return bindTemplate(template, temp);
 }
-export function GetMethodProps(methodNode: string | GraphMethods.Node | null) {
+export function GetMethodProps(methodNode: any | null) {
 	return GetNodeProp(methodNode, NodeProperties.MethodProps) || {};
 }
 export function GetMethodsProperties(id: any) {
@@ -3423,7 +3350,7 @@ export function GetMethodPermissionParameters(id: any, all: boolean) {
 export function GetMethodValidationParameters(id: any, all: boolean) {
 	return GetMethod_Parameters(id, 'validation', all);
 }
-export function GetPermissionMethod(permission: GraphMethods.Node | null) {
+export function GetPermissionMethod(permission: any | null) {
 	if (permission)
 		return GetLinkChainItem({
 			id: permission.id,
@@ -3471,7 +3398,7 @@ export function GetFunctionMethodKey(validation: any, templateKey = FunctionTemp
 export function GetNodesMethod(id: string) {
 	return GetPermissionMethod(GetNodeById(id));
 }
-export function GetAppSettings(graph: GraphMethods.Graph) {
+export function GetAppSettings(graph: any) {
 	if (graph) {
 		if (graph.appConfig) {
 			return graph.appConfig.AppSettings;
@@ -3479,7 +3406,7 @@ export function GetAppSettings(graph: GraphMethods.Graph) {
 	}
 	return null;
 }
-export function GetCurrentGraph(state?: any): GraphMethods.Graph {
+export function GetCurrentGraph(state?: any): any {
 	const scopedGraph = GetCurrentScopedGraph(state);
 	return scopedGraph;
 	// if (currentGraph) {
@@ -3598,7 +3525,7 @@ export function GetViewTypeModel(node: string) {
 	const models = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
 		id: node,
 		link: NodeConstants.LinkType.DefaultViewType
-	}).filter((x: string | GraphMethods.Node) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
 
 	return models[0] || null;
 }
@@ -3693,7 +3620,7 @@ export function GetNodesLinkTypes(id: any) {
 	return GraphMethods.getNodesLinkTypes(GetCurrentGraph(GetState()), { id });
 }
 
-export function addInstanceFunc(node: GraphMethods.Node | any, callback: any, viewPackages?: any, option: any = {}) {
+export function addInstanceFunc(node: any | any, callback: any, viewPackages?: any, option: any = {}) {
 	viewPackages = viewPackages || {};
 	return function() {
 		if (typeof node === 'function') {
@@ -3976,7 +3903,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									currentGraph = GraphMethods.addLinksBetweenNodes(currentGraph, options);
 									break;
 								case CONNECT_TO_TITLE_SERVICE:
-									const titleService = GetTitleService(currentGraph);
+									const titleService = GetTitleService();
 									if (titleService) {
 										currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, {
 											source: options.id,
@@ -4317,7 +4244,7 @@ export function GetRecording() {
 	return recording;
 }
 export function clearRecording() {
-	return (dispatch: any, getState: any) => {
+	return () => {
 		recording = [];
 	};
 }
@@ -4341,7 +4268,7 @@ declare global {
 			configurable: true,
 			value() {
 				const collection = this;
-				return collection.map((node: GraphMethods.Node) => ({
+				return collection.map((node: any) => ({
 					value: node.id,
 					id: node.id,
 					title: GetNodeTitle(node)

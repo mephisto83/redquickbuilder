@@ -1,4 +1,5 @@
-import { Graph, SOURCE, TARGET } from './graph_methods';
+import { SOURCE, TARGET } from './graph_methods';
+import { Graph } from './graph_types';
 
 export default function unprune(graph: Graph) {
 	addNodeConnections(graph);
@@ -9,8 +10,8 @@ export default function unprune(graph: Graph) {
 	addNodes(graph);
 	addGroups(graph);
 	addGroupNodes(graph);
-  addChildGroups(graph);
-  return graph;
+	addChildGroups(graph);
+	return graph;
 }
 function addChildGroups(graph: Graph) {
 	graph.childGroups = {};

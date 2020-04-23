@@ -80,6 +80,9 @@ export default class ControllerGenerator {
 							var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
 							if (ft) {
 								let tempFunction = ft.controller || _controllerTemplateFunction;
+								if (fs.existsSync(tempFunction)) {
+									tempFunction = fs.readFileSync(tempFunction, 'utf8');
+								}
 								let parameters = '';
 								let parameter_route = '';
 								let parameter_values = '';

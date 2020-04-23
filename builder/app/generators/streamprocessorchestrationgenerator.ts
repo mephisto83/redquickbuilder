@@ -31,6 +31,7 @@ import NamespaceGenerator from './namespacegenerator';
 import PermissionGenerator from './permissiongenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
 import { enumerate } from '../utils/utils';
+import { Node } from '../methods/graph_types';
 
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/stream_process_orchestration.tpl';
 const STREAM_PROCESS_ORCHESTRATION_ROOT_TEMPLATE =
@@ -72,7 +73,7 @@ export default class StreamProcessOrchestrationGenerator {
 		let agents = [ agent ]; // models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
 		let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS, 'utf8');
 		models = models.filter((model: { id: any }) => {
-			return methods.find((method: string | GraphMethods.Node | null) => {
+			return methods.find((method: string | Node | null) => {
 				var props = GetMethodProps(method);
 				return (
 					props[FunctionTemplateKeys.Agent] === agent.id &&
@@ -252,7 +253,7 @@ ${modelexecution.join('')}
 		let agents = [ agent ]; //models.filter(model => GetNodeProp(model, NodeProperties.IsAgent));
 		let _streamAgentMethods = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_AGENT_METHODS_INTERFACE, 'utf8');
 		models = models.filter((model: { id: any }) => {
-			return methods.find((method: string | GraphMethods.Node | null) => {
+			return methods.find((method: string | Node | null) => {
 				var props = GetMethodProps(method);
 				return (
 					props[FunctionTemplateKeys.Agent] === agent.id &&
@@ -425,7 +426,7 @@ ${modelexecution.join('')}
 		let agent_process_orchestration_mocks = `           builder.RegisterType<{{agent_type}}StreamProcessOrchestration>().As<I{{agent_type}}StreamProcessOrchestration>();
 `;
 		let agent_process_orc_mocks = NodesByType(state, NodeTypes.Model)
-			.filter((x: string | GraphMethods.Node) => {
+			.filter((x: string | any) => {
 				var isAgent = IsAgent(x);
 				return isAgent;
 			})
@@ -519,7 +520,7 @@ ${modelexecution.join('')}
 			.join(NEW_LINE);
 		return res + NEW_LINE + func_Cases.unique().join(NEW_LINE);
 	}
-	static EnumerateFunctionValidators(state: any, func: GraphMethods.Node | null) {
+	static EnumerateFunctionValidators(state: any, func: any | null) {
 		let graph = GetRootGraph(state);
 		let methodProps = GetNodeProp(func, NodeProperties.MethodProps);
 		let validators = StreamProcessOrchestrationGenerator.GetFunctionValidators(state, func);

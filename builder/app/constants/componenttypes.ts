@@ -73,7 +73,7 @@ export const ComponentEvents: any = {
 	onChange: 'onChange',
 	onChangeText: 'onChangeText'
 };
-export const ComponentEventStandardHandler = {
+export const ComponentEventStandardHandler: any = {
 	[ComponentEvents.onChange]: `onChange={(evt)=>{
     if(this.props.onChange) {
       this.props.onChange(evt);
@@ -328,8 +328,8 @@ export const ComponentTypes: any = {
 					ui: true,
 					nodeProperty: 'data',
 					nodeTypes: [ NodeTypes.DataChain ],
-					nodeFilter: (item) => GetNodeProp(item, NodeProperties.EntryPoint),
-					template: (node) => {
+					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
+					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, 'data'), {
 							includeNameSpace: true
 						});
@@ -544,8 +544,8 @@ export const ComponentTypes: any = {
 					ui: true,
 					nodeProperty: ComponentApiKeys.DATA,
 					nodeTypes: [ NodeTypes.DataChain ],
-					nodeFilter: (item) => GetNodeProp(item, NodeProperties.EntryPoint),
-					template: (node) => {
+					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
+					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
 							includeNameSpace: true
 						});
@@ -571,8 +571,8 @@ export const ComponentTypes: any = {
 					ui: true,
 					nodeProperty: 'data',
 					nodeTypes: [ NodeTypes.DataChain ],
-					nodeFilter: (item) => GetNodeProp(item, NodeProperties.EntryPoint),
-					template: (node) => {
+					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
+					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, 'data'), {
 							includeNameSpace: true
 						});
@@ -712,13 +712,13 @@ export const InstanceTypeSelectorFunction = {
 	[InstanceTypes.ModelInstanceDirty]: 'GetModelInstanceDirtyObject'
 };
 
-export function GetListItemNode(id) {
+export function GetListItemNode(id: any) {
 	const state = GetState();
 	const graph = GetRootGraph(state);
 	const nodes = GetNodesLinkedTo(graph, {
 		id
 	}).filter(
-		(x) =>
+		(x: any) =>
 			GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentNode &&
 			GetNodeProp(x, NodeProperties.ComponentType) === ComponentTypes.ReactNative.ListItem.key
 	);
@@ -728,7 +728,7 @@ export function GetListItemNode(id) {
 	return null;
 }
 
-export function GetFormItemNode(id) {
+export function GetFormItemNode(id: any) {
 	const state = GetState();
 	const graph = GetRootGraph(state);
 	const nodes = GetNodesLinkedTo(graph, {

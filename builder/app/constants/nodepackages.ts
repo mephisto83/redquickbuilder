@@ -608,9 +608,7 @@ export const CreateLoginModels = {
 			maestro: newStuff.maestro,
 			nodePackageType: 'register-user',
 			methodType: Methods.Create,
-			user: NodesByType(GetState(), NodeTypes.Model).find((x: string | GraphMethods.Node) =>
-				GetNodeProp(x, NodeProperties.IsUser)
-			),
+			user: NodesByType(GetState(), NodeTypes.Model).find((x: any) => GetNodeProp(x, NodeProperties.IsUser)),
 			httpMethod: HTTP_METHODS.POST,
 			functionType: FunctionTypes.Register,
 			functionName: `Register`
@@ -623,9 +621,7 @@ export const CreateLoginModels = {
 			maestro: newStuff.maestro,
 			nodePackageType: 'login-user',
 			methodType: Methods.Create,
-			user: NodesByType(GetState(), NodeTypes.Model).find((x: string | GraphMethods.Node) =>
-				GetNodeProp(x, NodeProperties.IsUser)
-			),
+			user: NodesByType(GetState(), NodeTypes.Model).find((x: any) => GetNodeProp(x, NodeProperties.IsUser)),
 			httpMethod: HTTP_METHODS.POST,
 			functionType: FunctionTypes.Login,
 			functionName: `Authenticate User`
@@ -880,7 +876,7 @@ export function addInstanceEventsToForms(args: { method_results: any; uiType: an
 					...Object.keys(method_results.uiTypes[uiType].formButtonApi).map((evt) => {
 						return {
 							operation: ADD_NEW_NODE,
-							options(graph: GraphMethods.Graph) {
+							options(graph: any) {
 								const currentNode = GetNodeById(
 									method_results.uiTypes[uiType].formButtonApi[evt],
 									graph
@@ -1025,7 +1021,7 @@ export function CreatePagingSkipDataChains() {
 		},
 		{
 			operation: ADD_NEW_NODE,
-			options(graph: GraphMethods.Graph) {
+			options(graph: any) {
 				if (skipResult) {
 					return false;
 				}
@@ -1045,7 +1041,7 @@ export function CreatePagingSkipDataChains() {
 				return temp.options;
 			}
 		},
-		function(graph: GraphMethods.Graph) {
+		function(graph: any) {
 			if (skipResult) {
 				return false;
 			}
@@ -1087,7 +1083,7 @@ export function CreatePagingSkipDataChains() {
 				};
 			}
 		},
-		function(graph: GraphMethods.Graph) {
+		function(graph: any) {
 			if (skipResult) {
 				return false;
 			}
@@ -1186,7 +1182,7 @@ export function CreatePagingTakeDataChains() {
 		},
 		{
 			operation: ADD_NEW_NODE,
-			options(graph: GraphMethods.Graph) {
+			options(graph: any) {
 				if (skipTake) {
 					return false;
 				}
@@ -1207,7 +1203,7 @@ export function CreatePagingTakeDataChains() {
 				return temp.options;
 			}
 		},
-		function(graph: GraphMethods.Graph) {
+		function(graph: any) {
 			if (skipTake) {
 				return false;
 			}
@@ -1351,9 +1347,9 @@ export function createViewPagingDataChain(
 		currentNode: any;
 		pagingEntry: string;
 		screenListDataChain: any;
-		viewModelListRefNode: string | GraphMethods.Node;
+		viewModelListRefNode: any;
 		screenListDataChainAlreadyMade: any;
-		pagingRefNode: string | GraphMethods.Node;
+		pagingRefNode: any;
 	},
 	viewName: any,
 	viewPackage: {} | undefined,
@@ -1413,7 +1409,7 @@ export function createViewPagingDataChain(
 			},
 			{
 				operation: ADD_NEW_NODE,
-				options(graph: GraphMethods.Graph) {
+				options(graph: any) {
 					if (skip) {
 						return false;
 					}
@@ -1466,7 +1462,7 @@ export function createViewPagingDataChain(
 			},
 			{
 				operation: ADD_NEW_NODE,
-				options(graph: GraphMethods.Graph) {
+				options(graph: any) {
 					if (skip) {
 						return false;
 					}
@@ -1553,7 +1549,7 @@ export function createViewPagingDataChain(
 			},
 			{
 				operation: ADD_NEW_NODE,
-				options(graph: GraphMethods.Graph) {
+				options(graph: any) {
 					if (skip) {
 						return false;
 					}
@@ -1869,7 +1865,7 @@ export const CreateDefaultView = {
 					);
 				}
 				const modelProperties = modelChildren.filter(
-					(x: string | GraphMethods.Node) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
+					(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 				);
 				childComponents = modelProperties.map(() => null);
 				const screenComponentEvents: any[] = [];
@@ -1887,7 +1883,7 @@ export const CreateDefaultView = {
 						!isSharedComponent
 							? {
 									operation: ADD_NEW_NODE,
-									options(graph: GraphMethods.Graph) {
+									options(graph: any) {
 										const res = GetNodesByProperties(
 											{
 												[NodeProperties.InstanceType]: useModelInstance
@@ -2195,7 +2191,7 @@ export const CreateDefaultView = {
 
 						...(needsLoadToScreenState && false
 							? ConnectLifecycleMethodToDataChain({
-									lifeCycleMethod: (graph: GraphMethods.Graph) => {
+									lifeCycleMethod: (graph: any) => {
 										const sce = screenComponentEvents.find(
 											(x) =>
 												GetNodeProp(x, NodeProperties.EventType, graph) ===
@@ -2216,7 +2212,7 @@ export const CreateDefaultView = {
 						isList
 							? {
 									operation: NEW_COMPONENT_NODE,
-									options(currentGraph: GraphMethods.Graph) {
+									options(currentGraph: any) {
 										listLayout = CreateLayout();
 										listLayout = SetCellsLayout(listLayout, 1);
 										const rootCellId = GetFirstCell(listLayout);
@@ -2418,7 +2414,7 @@ export const CreateDefaultView = {
 						isList
 							? {
 									operation: NEW_DATA_SOURCE,
-									options(currentGraph: GraphMethods.Graph) {
+									options(currentGraph: any) {
 										return {
 											parent: listComponentId,
 											callback: (dataSource: { id: any }) => {
@@ -2706,7 +2702,7 @@ export const CreateDefaultView = {
 						!isSharedComponent
 							? {
 									operation: CHANGE_NODE_PROPERTY,
-									options(currentGraph: GraphMethods.Graph) {
+									options(currentGraph: any) {
 										const formLayout = GetNodeProp(
 											screenNodeOptionId,
 											NodeProperties.Layout,
@@ -2730,7 +2726,7 @@ export const CreateDefaultView = {
 						isList
 							? {
 									operation: CHANGE_NODE_PROPERTY,
-									options(currentGraph: GraphMethods.Graph) {
+									options(currentGraph: any) {
 										const formLayout = GetNodeProp(
 											listComponentId,
 											NodeProperties.Layout,
@@ -2749,7 +2745,7 @@ export const CreateDefaultView = {
 								}
 							: false,
 						...modelProperties
-							.map((modelProperty: GraphMethods.Node, modelIndex: string | number) => {
+							.map((modelProperty: any, modelIndex: string | number) => {
 								const sharedComponent = GetSharedComponentFor(
 									viewType,
 									modelProperty,
@@ -2900,7 +2896,7 @@ export const CreateDefaultView = {
 												}
 
 												const shared_to_component_commands: any[] = [];
-												connectto.map((ct) => {
+												connectto.map((ct: any) => {
 													shared_to_component_commands.push(
 														...addComponentApiToForm({
 															newItems,
@@ -2931,17 +2927,17 @@ export const CreateDefaultView = {
 													operation: string;
 													options(): { source: any; target: any; properties: any };
 												}[] = [];
-												connectto.map((ct) => {
+												connectto.map((ct: any) => {
 													const temp = GetNodesLinkedTo(graph, {
 														id: ct.id,
 														link: LinkType.ComponentInternalApi
 													}).filter(
-														(x: string | GraphMethods.Node) =>
+														(x: any) =>
 															GetNodeProp(x, NodeProperties.NODEType) ===
 															NodeTypes.ComponentApi
 													);
 													// && GetNodeProp(x, NodeProperties.UIText) === text
-													temp.map((t: string | GraphMethods.Node) => {
+													temp.map((t: any) => {
 														shared_to_component_commands.push(
 															...connectComponentToExternalApi({
 																newItems,
@@ -3250,68 +3246,65 @@ export const CreateDefaultView = {
 								};
 							}
 						},
-						...modelProperties.map(
-							(modelProperty: string | GraphMethods.Node, modelIndex: any) => {
-								return {
-									operation: CHANGE_NODE_PROPERTY,
-									options() {
-										let sharedComponent = GetSharedComponentFor(
-											viewType,
-											modelProperty,
-											currentNode.id,
-											isSharedComponent,
-											agentId
-										);
-										if (!sharedComponent) {
-											switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
-												case NodeTypes.Model:
-													return {};
-												case NodeTypes.Property:
-													if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
-														const _ui_model_type = GetNodeProp(
+						...modelProperties.map((modelProperty: any, modelIndex: any) => {
+							return {
+								operation: CHANGE_NODE_PROPERTY,
+								options() {
+									let sharedComponent = GetSharedComponentFor(
+										viewType,
+										modelProperty,
+										currentNode.id,
+										isSharedComponent,
+										agentId
+									);
+									if (!sharedComponent) {
+										switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
+											case NodeTypes.Model:
+												return {};
+											case NodeTypes.Property:
+												if (GetNodeProp(modelProperty, NodeProperties.UseModelAsType)) {
+													const _ui_model_type = GetNodeProp(
+														modelProperty,
+														NodeProperties.UIModelType
+													);
+													if (_ui_model_type) {
+														sharedComponent = GetSharedComponentFor(
+															viewType,
 															modelProperty,
-															NodeProperties.UIModelType
+															_ui_model_type,
+															isSharedComponent,
+															agentId
 														);
-														if (_ui_model_type) {
-															sharedComponent = GetSharedComponentFor(
-																viewType,
-																modelProperty,
-																_ui_model_type,
-																isSharedComponent,
-																agentId
-															);
-														}
-														if (!sharedComponent) {
-															// if the property is a model reference, it should be a shared component or something.
-															return {};
-														}
 													}
-													break;
-												default:
-													break;
-											}
+													if (!sharedComponent) {
+														// if the property is a model reference, it should be a shared component or something.
+														return {};
+													}
+												}
+												break;
+											default:
+												break;
 										}
-
-										const rootCellId = GetFirstCell(layout);
-										const children = GetChildren(layout, rootCellId);
-										const childId = children[modelIndex];
-										const cellProperties = GetCellProperties(layout, childId);
-										cellProperties.children[childId] =
-											sharedComponent || childComponents[modelIndex];
-										cellProperties.style.flex = null;
-										cellProperties.style.height = null;
-										addComponentTags(ComponentTags.Field, cellProperties);
-
-										return {
-											prop: NodeProperties.Layout,
-											id: screenComponentId,
-											value: layout
-										};
 									}
-								};
-							}
-						),
-						...modelProperties.map((modelProperty: GraphMethods.Node, modelIndex: string | number) => {
+
+									const rootCellId = GetFirstCell(layout);
+									const children = GetChildren(layout, rootCellId);
+									const childId = children[modelIndex];
+									const cellProperties = GetCellProperties(layout, childId);
+									cellProperties.children[childId] = sharedComponent || childComponents[modelIndex];
+									cellProperties.style.flex = null;
+									cellProperties.style.height = null;
+									addComponentTags(ComponentTags.Field, cellProperties);
+
+									return {
+										prop: NodeProperties.Layout,
+										id: screenComponentId,
+										value: layout
+									};
+								}
+							};
+						}),
+						...modelProperties.map((modelProperty: any, modelIndex: string | number) => {
 							const sharedComponent = GetSharedComponentFor(
 								viewType,
 								modelProperty,
@@ -3374,7 +3367,7 @@ export const CreateDefaultView = {
 						}),
 						{
 							operation: CHANGE_NODE_PROPERTY,
-							options(graph: GraphMethods.Graph) {
+							options(graph: any) {
 								let componentProps = createComponentApi();
 								const componentTypes = ComponentTypes[uiType];
 								const compNodeId = childComponents[childComponents.length - 1];
@@ -3395,7 +3388,7 @@ export const CreateDefaultView = {
 						},
 						{
 							operation: CHANGE_NODE_PROPERTY,
-							options(graph: GraphMethods.Graph) {
+							options(graph: any) {
 								let componentProps = createComponentApi();
 								const componentTypes = ComponentTypes[uiType];
 								const compNodeId = childComponents[childComponents.length - 2];
@@ -3521,7 +3514,7 @@ export const CreateDefaultView = {
 						isList
 							? {
 									operation: ADD_NEW_NODE,
-									options(graph: GraphMethods.Graph) {
+									options(graph: any) {
 										if (skipModelDataChainListParts) {
 											return null;
 										}
@@ -3635,7 +3628,7 @@ export const CreateDefaultView = {
 					...[
 						{
 							operation: ADD_NEW_NODE,
-							options(graph: GraphMethods.Graph) {
+							options(graph: any) {
 								const node = GetNodesByProperties(
 									{
 										[NodeProperties.UIText]: `Get ${viewName}`,
@@ -3686,7 +3679,7 @@ export const CreateDefaultView = {
 						},
 						{
 							operation: ADD_NEW_NODE,
-							options(graph: GraphMethods.Graph) {
+							options(graph: any) {
 								if (skipAddingComplete) {
 									return false;
 								}
@@ -3707,7 +3700,7 @@ export const CreateDefaultView = {
 					]
 				])(GetDispatchFunc(), GetStateFunc());
 
-				modelProperties.forEach((modelProperty: string | GraphMethods.Node, propertyIndex: any) => {
+				modelProperties.forEach((modelProperty: any, propertyIndex: any) => {
 					let propDataChainNodeId = null;
 					let skip = false;
 					let _ui_model_type = false;
@@ -4023,7 +4016,7 @@ export const CreateDefaultView = {
 													link: LinkType.ComponentExternalApi
 												});
 												const externalNode = temp.find(
-													(x: string | GraphMethods.Node) =>
+													(x: any) =>
 														GetNodeProp(x, NodeProperties.NODEType) ===
 															NodeTypes.ComponentExternalApi &&
 														GetNodeTitle(x) === ApiNodeKeys.ViewModel
@@ -4053,7 +4046,7 @@ export const CreateDefaultView = {
 					])(GetDispatchFunc(), GetStateFunc());
 				});
 			}
-			SelectedNode(currentNode.id)(GetDispatchFunc(), GetStateFunc());
+			SelectedNode(currentNode.id)(GetDispatchFunc());
 		};
 		const { uiTypes } = _args;
 		if (uiTypes) {
@@ -4176,7 +4169,7 @@ function CreateFunction(option: {
 						const { constraints } = MethodFunctions[functionType];
 						let commands: any[] = [];
 						Object.values(constraints).forEach((constraint: any) => {
-							let perOrModelNode = null;
+							let perOrModelNode: any = null;
 							switch (constraint.key) {
 								case FunctionTemplateKeys.Model:
 								case FunctionTemplateKeys.Agent:
@@ -4482,9 +4475,9 @@ export function CreateAgentFunction(option: any): any {
 								}
 					].filter((x) => x);
 					Object.values(constraints).forEach((constraint: any) => {
-						let validator: { id: any } | null = null;
-						let perOrModelNode: { id: any } | null = null;
-						let executor: { id: any } | null = null;
+						let validator: any = null;
+						let perOrModelNode: any = null;
+						let executor: any = null;
 						switch (constraint.key) {
 							case FunctionTemplateKeys.Model:
 							case FunctionTemplateKeys.Agent:
@@ -5481,7 +5474,7 @@ function BuildPropertyDataChainAccessor(args: {
 			addcomplete
 				? {
 						operation: ADD_NEW_NODE,
-						options(graph: GraphMethods.Graph) {
+						options(graph: any) {
 							if (skip) {
 								return false;
 							}
@@ -5692,7 +5685,7 @@ function addComponentApiToForm(args: {
 							id: parent,
 							link: LinkType.ComponentInternalApi
 						}).find(
-							(x: string | GraphMethods.Node) =>
+							(x: any) =>
 								GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi &&
 								GetNodeProp(x, NodeProperties.UIText) === text
 						);
@@ -5730,7 +5723,7 @@ function addComponentApiToForm(args: {
 						id: parent,
 						link: LinkType.ComponentExternalApi
 					}).find(
-						(x: string | GraphMethods.Node) =>
+						(x: any) =>
 							GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi &&
 							GetNodeProp(x, NodeProperties.UIText) === text
 					);

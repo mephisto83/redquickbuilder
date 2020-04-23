@@ -68,7 +68,7 @@ export default class ModelItemFilterGenerator {
 			});
 		});
 	}
-	static GetFilterModel(graph: GraphMethods.Graph, methodNode: string | GraphMethods.Node) {
+	static GetFilterModel(graph: any, methodNode: any) {
 		var node = null;
 		var methodProps = GetMethodProps(methodNode);
 		if (methodProps) {

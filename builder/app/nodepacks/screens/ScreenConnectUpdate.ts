@@ -37,6 +37,7 @@ import AppendPostMethod from './AppendPostMethod';
 import GetModelObjectFromSelector from '../GetModelObjectFromSelector';
 import LoadModel from '../LoadModel';
 import ClearScreenInstance from '../datachain/ClearScreenInstance';
+import { Graph } from '../../methods/graph_types';
 
 export default function ScreenConnectUpdate(args: any = {}) {
 	let { node, method } = args;
@@ -288,7 +289,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 						...GetModelObjectFromSelector({
 							model: GetNodeTitle(node),
 							viewPackages,
-							callback: (newContext: { entry: string; }, tempGraph: import("../../methods/graph_methods").Graph | undefined) => {
+							callback: (newContext: { entry: string; }, tempGraph: Graph) => {
 								modelDataChain = GetNodeById(newContext.entry, tempGraph);
 							}
 						}),

@@ -19,6 +19,7 @@ import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import fs from 'fs';
 import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from '../constants/nodetypes';
 import NamespaceGenerator from '../generators/namespacegenerator';
+import { Node } from '../methods/graph_types';
 function GetMethodDefinitionValidationSection(id: any) {
 	let methodDefinition = GetMethodDefinition(id);
 	if (methodDefinition && methodDefinition.validation) {
@@ -45,7 +46,7 @@ export function GetValidationEntries(
 				return GetMethodNode(valNode.id);
 			})
 			.unique()
-			.groupBy((x: GraphMethods.Node) => {
+			.groupBy((x: Node) => {
 				var validationNode = GetValidationNode(x.id);
 				let validationSection = GetMethodDefinitionValidationSection(validationNode.id);
 				if (validationSection.asModel) {
@@ -219,7 +220,7 @@ export function BuildAgentValidationImplementation(
 	let _constructTemplate = fs.readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
 	let constructor = bindTemplate(_constructTemplate, {
 		agent_type: `${GetCodeName(agentId)}`,
-		arbiters: GetArbiterPropertyImplementations(4, language)
+		arbiters: GetArbiterPropertyImplementations(4)
 	});
 	return bindTemplate(template, {
 		agent_type: GetCodeName(agentId),

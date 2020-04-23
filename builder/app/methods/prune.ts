@@ -1,4 +1,4 @@
-import { Graph } from './graph_methods';
+import { Graph } from "./graph_types";
 
 export default function prune(graph: Graph) {
 	let prunedGraph = {

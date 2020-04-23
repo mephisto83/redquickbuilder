@@ -24,6 +24,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from '../methods/graph_methods';
 import NamespaceGenerator from './namespacegenerator';
 import * as GraphMethods from '../methods/graph_methods';
+import { Graph } from '../methods/graph_types';
 
 export default class DataChainGenerator {
 	static GenerateCS(options: { state: any; key?: any; language: any }) {
@@ -236,7 +237,7 @@ ${collections}
 ${funcs}`;
 };
 
-export function CollectionIsInLanguage(graph: GraphMethods.Graph, collection: any, language: any): any {
+export function CollectionIsInLanguage(graph: Graph, collection: any, language: any): any {
 	const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
 	if (itsUiType && itsUiType === language) {
 		return true;

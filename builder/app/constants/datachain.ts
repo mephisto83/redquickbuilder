@@ -18,7 +18,8 @@ import {
 	DEFAULT_TAB,
 	SIDE_PANEL_OPEN
 } from '../actions/uiactions';
-import { GetLinkBetween, getNodesGroups, getNodeLinks, Graph, Node } from '../methods/graph_methods';
+import { GetLinkBetween, getNodesGroups, getNodeLinks } from '../methods/graph_methods';
+import { Graph } from '../methods/graph_types';
 export const DataChainName = {
 	GetObject: 'GetObject'
 };

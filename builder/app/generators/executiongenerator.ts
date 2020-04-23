@@ -140,7 +140,7 @@ export default class ExecutorGenerator {
 		const allagents = allmodels.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
 		const allfunctions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
 
-		allfunctions.map((fun: string | GraphMethods.Node | null) => {
+		allfunctions.map((fun: any) => {
 			const methodProps = GetMethodProps(fun);
 			let model_output;
 			if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {

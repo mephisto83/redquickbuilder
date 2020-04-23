@@ -99,8 +99,17 @@ export default class MaestroGenerator {
 						const ft = MethodFunctions[function_type];
 						if (ft) {
 							let tempFunction = ft.template;
-							let interfaceFunction = ft.interface;
-							const testFunction = ft.test;
+							if (fs.existsSync(ft.template)) {
+								tempFunction = fs.readFileSync(ft.template, 'utf8');
+							}
+              let interfaceFunction = ft.interface;
+              if (fs.existsSync(ft.interface)) {
+								interfaceFunction = fs.readFileSync(ft.interface, 'utf8');
+							}
+              let testFunction = ft.test;
+              if (fs.existsSync(testFunction)) {
+								testFunction = fs.readFileSync(testFunction, 'utf8');
+							}
 							let value_type = '';
 							let parent_type = '';
 							if (ft.parentGet) {
@@ -140,15 +149,15 @@ export default class MaestroGenerator {
 							}
 							let agentTypeNode = null;
 							let fetchTypeNode = null;
-							let userTypeNode: GraphMethods.Node | null = null;
-							let parentNode: GraphMethods.Node | null = null;
+							let userTypeNode: any = null;
+							let parentNode: any = null;
 							let permissionNode = null;
 							let modelFilterNode = null;
-							let compositeInput: GraphMethods.Node | null = null;
-							let manyToManyNode: GraphMethods.Node | null = null;
+							let compositeInput: any = null;
+							let manyToManyNode: any = null;
 							let connectingNode = null;
 							let parent_setup = '';
-							let modelNode: GraphMethods.Node | null = null;
+							let modelNode: any = null;
 							const parent = null;
 							let model_output = null;
 							const methodProps = GetNodeProp(maestro_function, NodeProperties.MethodProps);

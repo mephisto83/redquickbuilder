@@ -26,7 +26,7 @@ import {
 	GetLinkProperty,
 	GetDataChainArgs
 } from '../actions/uiactions';
-import * as GraphMethods from '../methods/graph_methods';
+import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
 import {
 	NodeProperties,
@@ -35,7 +35,6 @@ import {
 	NodeTypes,
 	LinkType,
 	ProgrammingLanguages,
-	NodePropertiesDirtyChain,
 	LinkPropertyKeys,
 	MediaQueries,
 	StyleNodeProperties,
@@ -87,7 +86,7 @@ import { ViewTypes } from '../constants/viewtypes';
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
 	const temps = BindScreensToTemplate(language || UITypes.ReactNative);
-	const result = {};
+	const result: any = {};
 
 	temps.map((t) => {
 		result[path.join(t.relative, t.name)] = t;
@@ -100,8 +99,8 @@ export function GenerateScreenMarkup(id: string, language: string) {
 	const screen = GetNodeById(id);
 	const screenOption = GetScreenOption(id, language);
 	if (screenOption) {
-		const imports = GetScreenImports(id, language);
-		const elements = [ GenerateMarkupTag(screenOption, language, screen) ];
+		const imports: any = GetScreenImports(id, language);
+		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
 		let template = null;
 		switch (language) {
 			case UITypes.ElectronIO:
@@ -266,7 +265,7 @@ export function GetStylesFor(node: any, tag: any) {
 /*
 A  node that is connected to style node, will generate the guts of the style to be named elsewhere.
 */
-export function buildStyle(node: GraphMethods.Node | null) {
+export function buildStyle(node: any) {
 	const graph = GetCurrentGraph();
 	if (typeof node === 'string') {
 		node = GetNodeById(node, graph);
@@ -330,7 +329,7 @@ export function GetItemData(node: any) {
 export function getRelativePathPrefix(relativePath: any) {
 	return relativePath ? relativePath.split('/').map(() => `../`).subset(2).join('') : relativePath;
 }
-export function GenerateRNScreenOptionSource(node: any, relativePath: string, language: string) {
+export function GenerateRNScreenOptionSource(node: any, relativePath: any, language: string) {
 	const layoutObj = GetNodeProp(node, NodeProperties.Layout);
 	const componentType = GetNodeProp(node, NodeProperties.ComponentType);
 	const { specialLayout = null, template = null } = ComponentTypes[language][componentType]
@@ -838,8 +837,8 @@ export function GenerateCss(id: string, language: any) {
 	const screen = GetNodeById(id);
 	const screenOption = GetScreenOption(id, language);
 	if (screenOption) {
-		const imports = GetScreenImports(id, language);
-		const elements = [ GenerateMarkupTag(screenOption, language, screen) ];
+		const imports: any = GetScreenImports(id, language);
+		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
 		let template = null;
 		switch (language) {
 			case UITypes.ElectronIO:
@@ -861,7 +860,7 @@ export function GenerateCss(id: string, language: any) {
 		});
 	}
 }
-export function ConvertViewTypeToComponentNode(node: GraphMethods.Node | null, language: string) {
+export function ConvertViewTypeToComponentNode(node: any, language: string) {
 	let wasstring = false;
 	if (typeof node === 'string') {
 		node = GetNodeById(node);
@@ -925,7 +924,7 @@ export function GenerateMarkupTag(node: any, language: any, parent: any) {
 			return `<${GetCodeName(node)} ${describedApi} />`;
 	}
 }
-function WriteDescribedStateUpdates(parent: GraphMethods.Node | null) {
+function WriteDescribedStateUpdates(parent: any) {
 	let result = ``;
 	const graph = GetCurrentGraph(GetState());
 	if (typeof parent === 'string') {
@@ -1033,7 +1032,7 @@ function WriteDescribedStateUpdates(parent: GraphMethods.Node | null) {
   }
   `;
 }
-function GetDefaultComponentValue(node: GraphMethods.Node | null, key?: string | undefined) {
+function GetDefaultComponentValue(node: any, key?: string | undefined) {
 	let result = ``;
 	const graph = GetCurrentGraph(GetState());
 	if (typeof node === 'string') {
@@ -1433,7 +1432,7 @@ export function GetScreenImports(id: string, language: any) {
 	return null;
 }
 
-export function getMethodInstancesForLifeCylcEvntType(node: GraphMethods.Node | null, evtType: string) {
+export function getMethodInstancesForLifeCylcEvntType(node: any, evtType: string) {
 	if (typeof node === 'string') {
 		node = GetNodeById(node);
 	}
@@ -1445,7 +1444,7 @@ export function getMethodInstancesForLifeCylcEvntType(node: GraphMethods.Node | 
 		exist: true
 	}).filter((x) => GetNodeProp(x, NodeProperties.EventType) === evtType);
 	const methodInstances: any[] = [];
-	methods.map((method) => {
+	methods.map((method: any) => {
 		methodInstances.push(
 			...getNodesLinkedTo(graph, {
 				id: method.id,
@@ -1459,7 +1458,7 @@ export function getMethodInstancesForLifeCylcEvntType(node: GraphMethods.Node | 
 	return methodInstances;
 }
 
-export function getMethodInstancesForEvntType(node: GraphMethods.Node | null, evtType: any) {
+export function getMethodInstancesForEvntType(node: any, evtType: any) {
 	if (typeof node === 'string') {
 		node = GetNodeById(node);
 	}

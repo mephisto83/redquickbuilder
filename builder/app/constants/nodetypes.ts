@@ -1,9 +1,5 @@
 import * as _ from '../utils/array';
 import fs from 'fs';
-import { ViewTypes } from './viewtypes';
-import { GetNodeProp, convertToURLRoute, GetScreenUrl } from '../actions/uiactions';
-import { Node } from '../methods/graph_methods';
-
 export const NodeTypes = {
 	Concept: 'concept',
 	Model: 'model',
@@ -587,80 +583,8 @@ export const StyleNodeProperties = [
 	NodeProperties.BeforeStyle,
 	NodeProperties.AfterStyle
 ];
-function codeTypeWord(x: any) {
-	if (typeof x === 'string') {
-		return x
-			.split('')
-			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1)
-			.join('');
-	}
-	return x;
-}
-
 export const DIRTY_PROP_EXT = '$ _dirty_ $';
-export const NodePropertiesDirtyChain = {
-	[NodeProperties.ServiceType]: [
-		{
-			chainProp: NodeProperties.CodeName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.AgentName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.ValueName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.UIName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.UIText,
-			chainFunc: codeTypeWord
-		}
-	],
-	[NodeProperties.UIText]: [
-		{
-			chainProp: NodeProperties.CodeName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.AgentName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.ValueName,
-			chainFunc: codeTypeWord
-		},
-		{
-			chainProp: NodeProperties.HttpRoute,
-			chainFunc: (x: null | undefined, node: string | Node) => {
-				if (typeof x === 'string') {
-					let template: any = [];
-					if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.Screen) {
-						return GetScreenUrl(node, undefined, x);
-					}
-					return convertToURLRoute(x);
-				}
-				return x;
-			}
-		},
-		{
-			chainProp: NodeProperties.UIName,
-			chainFunc: (x: any) => {
-				return x;
-			}
-		},
-		{
-			chainProp: NodeProperties.Label,
-			chainFunc: (x: any) => {
-				return x;
-			}
-		}
-	]
-};
+
 const letters = 'abcdefghijklmnopqrstuvwxyz';
 const alphanumerics = letters + '0123456789';
 const allowedchars = alphanumerics + ' ';
@@ -1520,11 +1444,11 @@ export function GetValidationsFor(type: any) {
 	return result;
 }
 
-export function GetMoreCompatibles(a: any, vector: string, result = []) {
+export function GetMoreCompatibles(a: any, vector: string, result: any = []) {
 	var parents = GetValidationParents(a, vector).map((t) => t.id);
-	parents = parents.filter((t) => result.indexOf(t) === -1);
+	parents = parents.filter((t: any) => result.indexOf(t) === -1);
 	result = [ a, ...result, ...parents ].unique();
-	parents.map((t) => {
+	parents.map((t: any) => {
 		if (result.indexOf(t) !== -1) {
 			result = GetMoreCompatibles(t, vector, result);
 		}
@@ -1544,8 +1468,8 @@ export function SortValidation(a: any, b: any, vector: any) {
 	}
 	var t = GetMoreCompatibles(a, vector);
 	var v = GetMoreCompatibles(b, vector);
-	var bIsIncluded = t.some((_t) => _t === b);
-	var aIsIncluded = v.some((_v) => _v === a);
+	var bIsIncluded = t.some((_t: any) => _t === b);
+	var aIsIncluded = v.some((_v: any) => _v === a);
 	if (bIsIncluded && aIsIncluded) {
 		return 0;
 	} else if (bIsIncluded) {
@@ -1589,7 +1513,7 @@ export const ValidationCases: any = {
 			length: true
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `new List<string> { "${_.uuidv4()}"}`;
 			},
 			long: function() {
@@ -1607,20 +1531,20 @@ export const ValidationCases: any = {
 			length: true
 		},
 		cases: {
-			$true: function(e: any) {
-				return `"${[].interpolate(0, 9, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+			$true: function() {
+				return `"${[].interpolate(0, 9, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			long: function() {
-				return `"${[].interpolate(0, 12, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			short: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			invalid: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('a')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
 			empty: function() {
-				return `"${[].interpolate(0, 0, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			}
 		}
 	},
@@ -1631,20 +1555,20 @@ export const ValidationCases: any = {
 			length: true
 		},
 		cases: {
-			$true: function(e: any) {
-				return `"${[].interpolate(0, 5, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+			$true: function() {
+				return `"${[].interpolate(0, 5, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			long: function() {
-				return `"${[].interpolate(0, 12, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			short: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			invalid: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('a')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
 			empty: function() {
-				return `"${[].interpolate(0, 0, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			}
 		}
 	},
@@ -1656,22 +1580,22 @@ export const ValidationCases: any = {
 		},
 		cases: {
 			$true: function() {
-				return `"${[].interpolate(0, 5, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 5, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			long: function() {
-				return `"${[].interpolate(0, 12, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			short: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			$empty: function() {
-				return `"${[].interpolate(0, 0, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			invalid: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('a')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
 			invalid2: function() {
-				return `"${[].interpolate(0, 5, (e: any) => 'a').join('')}"`;
+				return `"${[].interpolate(0, 5, () => 'a').join('')}"`;
 			}
 		}
 	},
@@ -1681,7 +1605,7 @@ export const ValidationCases: any = {
 			value: true
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `Date.UtcNow().AddDays(1)`;
 			},
 			false: function() {
@@ -1696,7 +1620,7 @@ export const ValidationCases: any = {
 			value: true
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `Date.UtcNow().AddDays(-1)`;
 			},
 			false: function() {
@@ -1710,7 +1634,7 @@ export const ValidationCases: any = {
 			content: true
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"asdf@asdf.com"`;
 			},
 			false: function() {
@@ -1727,7 +1651,7 @@ export const ValidationCases: any = {
 			content: true
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"asadf@asdf.com"`;
 			},
 			false: function() {
@@ -1746,22 +1670,22 @@ export const ValidationCases: any = {
 		},
 		cases: {
 			$true: function() {
-				return `"${[].interpolate(0, 16, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 16, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			long: function() {
-				return `"${[].interpolate(0, 23, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 23, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			short: function() {
-				return `"${[].interpolate(0, 3, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			$empty: function() {
-				return `"${[].interpolate(0, 0, (e: any) => Math.floor(Math.random() * 10)).join('')}"`;
+				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
 			invalid: function() {
-				return `"${[].interpolate(0, 16, (e: any) => Math.floor(Math.random() * 10)).join('a')}"`;
+				return `"${[].interpolate(0, 16, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
 			invalid2: function() {
-				return `"${[].interpolate(0, 16, (e: any) => 'a').join('')}"`;
+				return `"${[].interpolate(0, 16, () => 'a').join('')}"`;
 			}
 		}
 	},
@@ -1771,7 +1695,7 @@ export const ValidationCases: any = {
 			content: [ ValidationRules.UrlEmpty ]
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"http://yahoo.com"`;
 			},
 			false: function() {
@@ -1788,7 +1712,7 @@ export const ValidationCases: any = {
 			content: [ ValidationRules.Any ]
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"http://yahoo.com"`;
 			},
 			false: function() {
@@ -1835,7 +1759,7 @@ export const ValidationCases: any = {
 		},
 		types: [ NodePropertyTypes.STRING ],
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"1234"`;
 			},
 			false: function() {
@@ -1852,7 +1776,7 @@ export const ValidationCases: any = {
 		},
 		types: [ NodePropertyTypes.STRING ],
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"1234.34"`;
 			},
 			false: function() {
@@ -1870,7 +1794,7 @@ export const ValidationCases: any = {
 		},
 		types: [ NodePropertyTypes.STRING ],
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"httas21df.!@#$ #$%^^&*^&*()aom"`;
 			},
 			empty: function() {
@@ -1884,7 +1808,7 @@ export const ValidationCases: any = {
 		},
 		types: [ NodePropertyTypes.STRING ],
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"httas21dfaom"`;
 			},
 			false: function() {
@@ -1901,7 +1825,7 @@ export const ValidationCases: any = {
 			content: [ ValidationRules.AlphaOnlyWithSpaces ]
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"httasdfaom"`;
 			},
 			false: function() {
@@ -1918,7 +1842,7 @@ export const ValidationCases: any = {
 			content: [ ValidationRules.AlphaNumericPuncLike ]
 		},
 		cases: {
-			$true: function(e: any) {
+			$true: function() {
 				return `"httas dfaom"`;
 			},
 			$false: function() {
@@ -1961,19 +1885,19 @@ export const ValidationCases: any = {
 		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function(self: any, b: any) {
+				[ValidationRules.GreaterThan]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.GreaterThanOrEqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function(self: any, b: any) {
+				[ValidationRules.EqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function(self: any, b: any) {
+				[ValidationRules.LessThan]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.LessThanOrEqualTo]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
@@ -1991,19 +1915,19 @@ export const ValidationCases: any = {
 		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function(self: any, b: any) {
+				[ValidationRules.GreaterThan]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.GreaterThanOrEqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function(self: any, b: any) {
+				[ValidationRules.EqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function(self: any, b: any) {
+				[ValidationRules.LessThan]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.LessThanOrEqualTo]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
@@ -2021,19 +1945,19 @@ export const ValidationCases: any = {
 		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function(self: any, b: any) {
+				[ValidationRules.GreaterThan]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.GreaterThanOrEqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function(self: any, b: any) {
+				[ValidationRules.EqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function(self: any, b: any) {
+				[ValidationRules.LessThan]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.LessThanOrEqualTo]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
@@ -2051,19 +1975,19 @@ export const ValidationCases: any = {
 		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function(self: any, b: any) {
+				[ValidationRules.GreaterThan]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.GreaterThanOrEqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function(self: any, b: any) {
+				[ValidationRules.EqualTo]: function() {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function(self: any, b: any) {
+				[ValidationRules.LessThan]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function(self: any, b: any) {
+				[ValidationRules.LessThanOrEqualTo]: function() {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}

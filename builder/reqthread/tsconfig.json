@@ -38,11 +38,12 @@
     "../app/store/**/*",
     "../app/templates/**/*",
     "../app/main.prod.ts",
-    "../app/dist/renderer.prod.ts",
+    "../app/dist/renderer.prod.*",
     "../app/**/*.tsx"
   ],
   "include": [
       "src/**/*",
-      "../app/**/*.ts"
+      "../app/**/*",
+      "../app/**/*.tpl"
   ]
 }

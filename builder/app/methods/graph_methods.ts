@@ -9,7 +9,6 @@ import * as Titles from '../components/titles';
 import {
 	NodeTypes,
 	NodeProperties,
-	NodePropertiesDirtyChain,
 	LinkProperties,
 	LinkType,
 	LinkPropertyKeys,
@@ -20,71 +19,12 @@ import {
 } from '../constants/nodetypes';
 import { FunctionTemplateKeys, FunctionConstraintKeys } from '../constants/functiontypes';
 import * as Functions from '../constants/functiontypes';
-import {
-	GetNodeProp,
-	GetLinkProperty,
-	GetGroupProperty,
-	GetCurrentGraph,
-	GetRootGraph,
-	GetNodeById
-} from '../actions/uiactions';
+import { GetLinkProperty, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById, GetCodeName } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
+import { Graph, Node, GraphLink } from './graph_types';
 
 const os = require('os');
 
-export interface Graph {
-	id: string;
-	version: Version;
-	workspace: string;
-	title: string;
-	namespace: string;
-	path: string[];
-	groups: string[];
-	groupLib: { [index: string]: Group };
-	groupsNodes: QuickAccess<boolean>;
-	nodesGroups: QuickAccess<boolean>;
-	childGroups: QuickAccess<boolean>;
-	parentGroup: QuickAccess<boolean>;
-	referenceNodes: {};
-	nodeLib: { [index: string]: Node };
-	nodes: string[];
-	nodeLinks: QuickAccess<number>;
-	nodeConnections: QuickAccess<string>;
-	nodeLinkIds: QuickAccess<string>;
-	linkLib: { [index: string]: GraphLink };
-	links: string[];
-	graphs: { [index: string]: Graph };
-	classNodes: { [index: string]: Node };
-	functionNodes: { [index: string]: Node };
-	updated?: Date | number | null;
-	visibleNodes: { [index: string]: string };
-	appConfig: AppConfig;
-	themeColors: any;
-	themeColorUses: any;
-	spaceTheme: any;
-	themeOtherUses: any;
-	themeGridPlacements: any;
-	themeFonts: any;
-	themeVariables: any;
-}
-export interface QuickAccess<T> {
-	[index: string]: { [key: string]: T };
-}
-export interface AppConfig {
-	AppSettings: any;
-	Logging: any;
-}
-export interface Version {}
-export interface Group {
-	id: any;
-	leaves: string[];
-	groups: any;
-}
-export interface Node {
-	properties: any;
-	id: string;
-	dirty: any;
-}
 export function createGraph(): Graph {
 	return {
 		id: uuidv4(),
@@ -167,6 +107,14 @@ export function createGraph(): Graph {
 		}
 	};
 }
+
+export function GetNodeProp(node: any, prop: string, currentGraph?: any) {
+	if (typeof node === 'string') {
+		node = GetNodeById(node, currentGraph) || node;
+	}
+	return node && node.properties && node.properties[prop];
+}
+
 export const GraphKeys = {
 	NAMESPACE: 'namespace',
 	PROJECTNAME: 'project_name',
@@ -775,7 +723,7 @@ export function createExtensionDefinition() {
 export function defaultExtensionDefinitionType() {
 	return 'string';
 }
-export function MatchesProperties(properties, node) {
+export function MatchesProperties(properties: { [x: string]: any }, node: any) {
 	if (properties && node) {
 		const res = !Object.keys(properties).some((key) => properties[key] !== GetNodeProp(node, key));
 
@@ -788,9 +736,11 @@ export function removeNode(graph: any, options: any = {}) {
 	const idsToDelete = [ id ];
 	const autoDelete = GetNodeProp(id, NodeProperties.AutoDelete, graph);
 	if (autoDelete) {
-		GetNodesLinkedTo(graph, { id }).filter((x) => MatchesProperties(autoDelete.properties, x)).forEach((t) => {
-			idsToDelete.push(t.id);
-		});
+		GetNodesLinkedTo(graph, { id })
+			.filter((x: any) => MatchesProperties(autoDelete.properties, x))
+			.forEach((t: { id: any }) => {
+				idsToDelete.push(t.id);
+			});
 	}
 
 	idsToDelete.forEach((id) => {
@@ -823,9 +773,9 @@ export function removeNode(graph: any, options: any = {}) {
 		}
 		delete graph.nodeLib[id];
 		graph.nodeLib = { ...graph.nodeLib };
-		graph.nodes = graph.nodes.filter((x) => x !== id);
+		graph.nodes = graph.nodes.filter((x: any) => x !== id);
 		if (existNodes) {
-			existNodes.forEach((en) => {
+			existNodes.forEach((en: any) => {
 				graph = removeNode(graph, { id: en.id });
 			});
 		}
@@ -833,14 +783,14 @@ export function removeNode(graph: any, options: any = {}) {
 	return graph;
 }
 
-export function GetManyToManyNodes(state, ids) {
+export function GetManyToManyNodes(state: any, ids: any) {
 	if (state && ids && ids.length) {
 		return NodesByType(state, NodeTypes.Model)
-			.filter((x) => GetNodeProp(x, NodeProperties.ManyToManyNexus))
+			.filter((x: any) => GetNodeProp(x, NodeProperties.ManyToManyNexus))
 			.filter(
-				(x) =>
+				(x: any) =>
 					!(ids || [])
-						.some((t) => (GetNodeProp(x, NodeProperties.ManyToManyNexusTypes) || []).indexOf(t) !== -1)
+						.some((t: any) => (GetNodeProp(x, NodeProperties.ManyToManyNexusTypes) || []).indexOf(t) !== -1)
 			);
 	}
 	return [];
@@ -867,7 +817,7 @@ function clearGroupDeep(graph: any, options: any) {
 			var ok = false;
 			graph = clearGroupDeep(graph, {
 				id: i,
-				callback: (v) => {
+				callback: (v: boolean) => {
 					ok = v;
 					success = success && v;
 				}
@@ -883,7 +833,7 @@ function clearGroupDeep(graph: any, options: any) {
 			if (!graph.groupLib[id] || !graph.groupLib[id].groups || !graph.groupLib[id].groups.length) {
 				// if these conditions are met.
 				delete graph.groupLib[id];
-				graph.groups = [ ...graph.groups.filter((x) => x !== id) ];
+				graph.groups = [ ...graph.groups.filter((x: any) => x !== id) ];
 				delete graph.childGroups[id];
 				if (graph.parentGroup[id]) {
 					for (var i in graph.parentGroup[id]) {
@@ -902,7 +852,7 @@ function clearGroupDeep(graph: any, options: any) {
 }
 export function removeNodeFromGroups(graph: any, options: any) {
 	const { id } = options;
-	let groupsContainingNode = [];
+	let groupsContainingNode: any[] = [];
 	// nodesGroups
 	if (graph.nodesGroups[id]) {
 		groupsContainingNode = Object.keys(graph.nodesGroups[id]);
@@ -974,7 +924,7 @@ export function Paused() {
 export function SetPause(value = true) {
 	AppCache.Paused = value;
 }
-export function setupCache(graph) {
+export function setupCache(graph: any) {
 	AppCache.Links = {};
 	AppCache.Nodes = {};
 	AppCache.Pinned = {};
@@ -991,7 +941,7 @@ export function setupCache(graph) {
 
 	if (graph && graph.nodeLib) {
 		Object.keys(graph.nodeLib).forEach((key) => {
-			const node = GetNode(graph, key);
+			const node: any = GetNode(graph, key);
 			const nodeType = GetNodeProp(node, NodeProperties.NODEType);
 			Nodes[nodeType] = Nodes[nodeType] || {};
 			Nodes[nodeType][key] = true;
@@ -1056,7 +1006,7 @@ const runtimeState = {
 	recycleEveryProperty: 300
 };
 
-export function GetNodesByProperties(props, graph) {
+export function GetNodesByProperties(props: { [x: string]: any }, graph: { nodeLib: { [x: string]: any } }) {
 	const orderedLookupProp = Object.keys(props).sort((a, b) => {
 		return AppCache.PropertyKeys.indexOf(a) - AppCache.PropertyKeys.indexOf(b);
 	});
@@ -1067,13 +1017,13 @@ export function GetNodesByProperties(props, graph) {
 
 	runtimeState.lastLropertyKeyRecycle++;
 
-	let subset = null;
+	let subset: any = null;
 	orderedLookupProp.forEach((key) => {
 		if (subset && subset.length === 0) {
 			return;
 		}
 		const val = props[key];
-		let set;
+		let set: { hasOwnProperty?: any };
 		if (typeof val === 'function') {
 			set = {};
 			if (AppCache.Properties[key]) {
@@ -1090,7 +1040,7 @@ export function GetNodesByProperties(props, graph) {
 		if (!subset && set) {
 			subset = set;
 		} else if (subset && set) {
-			const newset = {};
+			const newset: any = {};
 			const setToUse = Object.keys(subset).length > Object.keys(set).length ? set : subset;
 			Object.keys(setToUse).forEach((setKey) => {
 				if (set.hasOwnProperty(setKey) && subset.hasOwnProperty(setKey)) {
@@ -1105,7 +1055,7 @@ export function GetNodesByProperties(props, graph) {
 	}
 	return Object.keys(subset).map((item) => graph.nodeLib[item]).filter((x) => x);
 }
-export function removeCacheLink(id, type) {
+export function removeCacheLink(id: string | number, type: string | number) {
 	if (AppCache.Links && AppCache.Links[type] && AppCache.Links[type][id]) {
 		delete AppCache.Links[type][id];
 		AppCache.Version++;
@@ -1184,7 +1134,10 @@ export function updateCache(options: any, link?: GraphLink) {
 	}
 }
 
-export function addGroup(graph, group) {
+export function addGroup(
+	graph: { groupLib: { [x: string]: any }; groups: any[] },
+	group: { id: any; leaves?: any[]; groups?: any[]; properties?: {} }
+) {
 	graph.groupLib[group.id] = group;
 	if (!fast) {
 		graph.groupLib = { ...graph.groupLib };
@@ -1194,7 +1147,7 @@ export function addGroup(graph, group) {
 			graph.groups.push(group.id);
 		}
 	} else {
-		graph.groups = [ ...graph.groups, group.id ].unique((x) => x);
+		graph.groups = [ ...graph.groups, group.id ].unique((x: any) => x);
 	}
 	if (fast) {
 		return graph;
@@ -1229,7 +1182,7 @@ export function addDefaultProperties(graph: any, options: any) {
 				type: LinkType.PropertyLink
 			}
 		]
-	}).map((t) => GetNodeProp(t, NodeProperties.UIText));
+	}).map((t: any) => GetNodeProp(t, NodeProperties.UIText));
 	DEFAULT_PROPERTIES.filter((t) => propertyNodes.indexOf(t.title) === -1).forEach((dp: any) => {
 		graph = addNewNodeOfType(graph, options, dp.nodeType, (new_node: any, _graph: any) => {
 			_graph = updateNodeProperty(_graph, {
@@ -1259,7 +1212,7 @@ export function addDefaultProperties(graph: any, options: any) {
 	return graph;
 }
 
-function updateNode(node, options) {
+function updateNode(node: Node, options: { node: { properties: any } }) {
 	if (options.node) {
 		Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
 	}
@@ -1330,20 +1283,29 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 		}
 	}
 	if (options.links) {
-		options.links.filter((x) => x).forEach((link) => {
-			if (typeof link === 'function') {
-				link = link(graph);
-				link = link.find((x: any) => x);
-			}
-			if (graph.links.length !== Object.keys(graph.linkLib).length) {
-				throw new Error('invalid grid links');
-			}
-			graph = newLink(graph, {
-				source: node.id,
-				target: link.target,
-				properties: link.linkProperties ? link.linkProperties.properties : null
-			});
-		});
+		options.links
+			.filter((x: any) => x)
+			.forEach(
+				(link: {
+					(arg0: any): any;
+					find: (arg0: (x: any) => any) => any;
+					target: any;
+					linkProperties: { properties: any };
+				}) => {
+					if (typeof link === 'function') {
+						link = link(graph);
+						link = link.find((x: any) => x);
+					}
+					if (graph.links.length !== Object.keys(graph.linkLib).length) {
+						throw new Error('invalid grid links');
+					}
+					graph = newLink(graph, {
+						source: node.id,
+						target: link.target,
+						properties: link.linkProperties ? link.linkProperties.properties : null
+					});
+				}
+			);
 	}
 	graph = updateNodeProperty(graph, {
 		id: node.id,
@@ -1400,7 +1362,7 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 
 export function updateNodeGroup(graph: any, options: any) {
 	const { id, groupProperties, parent, callback, groupCallback } = options;
-	var group = null;
+	var group: any = null;
 	if (groupProperties && groupProperties.id) {
 		group = getGroup(graph, groupProperties.id);
 	} else if (!hasGroup(graph, parent)) {
@@ -1421,7 +1383,7 @@ export function updateNodeGroup(graph: any, options: any) {
 					id: gparentGroup.id,
 					groupId: group.id
 				});
-				ancestores.forEach((anc) => {
+				ancestores.forEach((anc: any) => {
 					graph = addGroupToGroup(graph, {
 						id: anc,
 						groupId: group.id
@@ -1461,7 +1423,7 @@ export function updateNodeGroup(graph: any, options: any) {
 
 	return graph;
 }
-function getGroupAncenstors(graph: Graph, id: string) {
+function getGroupAncenstors(graph: Graph, id: string): any {
 	const result = [];
 	if (graph.parentGroup[id]) {
 		for (const i in graph.parentGroup[id]) {
@@ -1491,7 +1453,7 @@ export function GetChildComponentAncestors(state: any, id: string) {
 		id,
 		direction: TARGET
 	})
-		.filter((x) => {
+		.filter((x: any) => {
 			const nodeType = GetNodeProp(x, NodeProperties.NODEType);
 			switch (nodeType) {
 				case NodeTypes.ScreenOption:
@@ -1501,7 +1463,7 @@ export function GetChildComponentAncestors(state: any, id: string) {
 					return false;
 			}
 		})
-		.map((t) => t.id);
+		.map((t: { id: any }) => t.id);
 
 	result.push(...ancestors);
 	ancestors.forEach((t: any) => {
@@ -1634,7 +1596,7 @@ export function NodesByType(graph: any, nodeType: any, options: any = {}) {
 
 		return currentGraph.nodes
 			.filter(
-				(x) =>
+				(x: string | number) =>
 					(currentGraph.nodeLib &&
 						currentGraph.nodeLib[x] &&
 						currentGraph.nodeLib[x].properties &&
@@ -1644,7 +1606,7 @@ export function NodesByType(graph: any, nodeType: any, options: any = {}) {
 						currentGraph.nodeLib[x].properties &&
 						currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] === nodeType)
 			)
-			.map((x) => currentGraph.nodeLib[x]);
+			.map((x: string | number) => currentGraph.nodeLib[x]);
 	}
 	return [];
 }
@@ -1700,8 +1662,7 @@ export function RequiredClassName(cls: any, node_name: any) {
 
 export function applyFunctionConstraints(graph: any, options: any) {
 	const { id, value } = options;
-
-	const functionConstraints = Functions[value];
+	const functionConstraints: any = null; // Functions[tempValue];
 	if (functionConstraints) {
 		if (functionConstraints.constraints) {
 			if (graph.nodeConnections[id]) {
@@ -1763,7 +1724,7 @@ export function applyFunctionConstraints(graph: any, options: any) {
 			}
 
 			if (!external_group) {
-				graph = newGroup(graph, (_group) => {
+				graph = newGroup(graph, (_group: { id: any }) => {
 					external_group = _group;
 					graph = updateGroupProperty(graph, {
 						id: _group.id,
@@ -1814,7 +1775,7 @@ export function applyFunctionConstraints(graph: any, options: any) {
 							}
 						},
 						NodeTypes.Parameter,
-						(new_node) => {
+						(new_node: { id: any }) => {
 							graph = updateNodeProperty(graph, {
 								id: new_node.id,
 								prop: NodeProperties.UIText,
@@ -1897,10 +1858,10 @@ export function applyFunctionConstraints(graph: any, options: any) {
 	return graph;
 }
 
-function hasMatchingConstraints(linkConstraint, functionConstraints) {
+function hasMatchingConstraints(linkConstraint: any, functionConstraints: any) {
 	return !!findMatchingConstraints(linkConstraint, functionConstraints);
 }
-function findMatchingConstraints(linkConstraint, functionConstraints) {
+function findMatchingConstraints(linkConstraint: any, functionConstraints: { [x: string]: any }) {
 	const lcj = JSON.stringify(linkConstraint);
 	return Object.keys(functionConstraints).find((f) => JSON.stringify(functionConstraints[f]) === lcj);
 }
@@ -2075,7 +2036,11 @@ export const FunctionMeetsConstraint = {
 		return false;
 	}
 };
-function findLinkWithConstraint(nodeId, graph, targetConstraint) {
+function findLinkWithConstraint(
+	nodeId: string | number,
+	graph: { nodeConnections: { [x: string]: { [x: string]: string } }; linkLib: { [x: string]: any } },
+	targetConstraint: any
+) {
 	return Object.keys(graph.nodeConnections[nodeId])
 		.filter((t) => graph.nodeConnections[nodeId][t] === SOURCE)
 		.filter((link) => {
@@ -2148,7 +2113,7 @@ export function getNodesLinkedTo(graph: Graph, options: any) {
 export function getNodeLinkedTo(graph: any, options: any) {
 	return getNodeLinked(graph, { ...options || {}, direction: SOURCE });
 }
-export function matchOneWay(obj1, obj2) {
+export function matchOneWay(obj1: { [x: string]: any }, obj2: { [x: string]: any }) {
 	if (obj1 === obj2) {
 		return true;
 	}
@@ -2165,7 +2130,7 @@ export function matchOneWay(obj1, obj2) {
 	}
 	return true;
 }
-export function matchObject(obj1, obj2) {
+export function matchObject(obj1: { [x: string]: any }, obj2: { [x: string]: any }) {
 	if (Object.keys(obj1).length !== Object.keys(obj2).length) {
 		return false;
 	}
@@ -2182,7 +2147,10 @@ export function GetLinkByNodes(graph: any, options: any) {
 	return [ findLink(graph, { target, source }) ];
 	// return Object.values(graph.linkLib).find(t => t.source === source && t.target === target);
 }
-export function GetLinkChainItem(state, options) {
+export function GetLinkChainItem(
+	state: any,
+	options: { id: any; links: { direction: string; type: string }[] | { direction: string; type: string }[] }
+) {
 	const chains = GetLinkChain(state, options);
 
 	if (chains && chains.length) {
@@ -2221,7 +2189,7 @@ export function GetConditionNodes(state: any, id: any) {
 	const graph = GetRootGraph(state);
 	return GetNodesLinkedTo(graph, {
 		id
-	}).filter((x) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
+	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Condition);
 }
 export function GetConnectedNodesByType(state: any, id: any, type: any, direction?: any) {
 	const graph = GetRootGraph(state);
@@ -2286,7 +2254,7 @@ export function GetLinkChainFromGraph(graph: Graph, options: any, nodeType?: any
 			if (il === links.length - 1) {
 				result = newnodes;
 			} else {
-				newids = [ ...newids, ...newnodes.map((t) => t.id) ];
+				newids = [ ...newids, ...newnodes.map((t: any) => t.id) ];
 			}
 		});
 		newids = newids.unique((x: any) => x);
@@ -2303,7 +2271,9 @@ export function getNodesLinkTypes(graph: Graph, options: any) {
 	if (options) {
 		const { id } = options;
 		const links = graph.nodeConnections[id] || {};
-		const groups = Object.keys(links).groupBy((x) => GetLinkProperty(graph.linkLib[x], LinkPropertyKeys.TYPE));
+		const groups = Object.keys(links).groupBy((x: string | number) =>
+			GetLinkProperty(graph.linkLib[x], LinkPropertyKeys.TYPE)
+		);
 		return Object.keys(groups);
 	}
 	return [];
@@ -2447,7 +2417,18 @@ export function GetNodesLinkedTo(graph: any, options: any): any {
 export const SOURCE = 'SOURCE';
 export const TARGET = 'TARGET';
 const fast = true;
-export function addLink(graph, options, link) {
+export function addLink(
+	graph: {
+		links: any[];
+		linkLib: { [x: string]: any };
+		nodeLib: { [x: string]: any };
+		nodeConnections: { [x: string]: any };
+		nodeLinks: { [x: string]: { [x: string]: any } };
+		nodeLinkIds: { [x: string]: { [x: string]: any } };
+	},
+	options: { target: any; source: any },
+	link: { id: any; source: any; target: any; properties: any }
+) {
 	const { target, source } = options;
 	if (graph.links.length !== Object.keys(graph.linkLib).length) {
 		throw new Error('invalid grid links');
@@ -2565,7 +2546,7 @@ export function addLink(graph, options, link) {
 export function addLinksBetweenNodes(graph: any, options: any) {
 	const { links } = options;
 	if (links && links.length) {
-		links.forEach((link) => {
+		links.forEach((link: any) => {
 			graph = addLinkBetweenNodes(graph, link);
 		});
 	}
@@ -2579,7 +2560,7 @@ export function addLinkBetweenNodes(graph: any, options: any) {
 	}
 	return graph;
 }
-function compareLinkProp(properties, link) {
+function compareLinkProp(properties: { [x: string]: any }, link: { properties: { [x: string]: any } }) {
 	for (const i in properties) {
 		if (!link.properties || link.properties[i] !== properties[i]) {
 			if (typeof link.properties[i] === 'object') {
@@ -2630,7 +2611,8 @@ export function findLinkInstance(graph: any, options: any) {
 	const link =
 		graph && graph.links
 			? graph.links.find(
-					(x) => graph.linkLib[x] && graph.linkLib[x].source === source && graph.linkLib[x].target == target
+					(x: string | number) =>
+						graph.linkLib[x] && graph.linkLib[x].source === source && graph.linkLib[x].target == target
 				)
 			: null;
 	return link;
@@ -2650,7 +2632,7 @@ export function getLink(graph: any, options: any) {
 	return null;
 }
 export function getAllLinksWithNode(graph: any, id: any) {
-	return graph.links.filter((x) => {
+	return graph.links.filter((x: string | number) => {
 		if (!graph.linkLib[x]) {
 			delete graph.linkLib[x];
 		}
@@ -2673,16 +2655,16 @@ export function executeEvents(graph: any, link: any, evt: any) {
 	}
 	return graph;
 }
-export const EventFunctions = {};
-export function addEventFunction(key, func) {
+export const EventFunctions: any = {};
+export function addEventFunction(key: string, func: any) {
 	EventFunctions[key] = func;
 }
-export function removeEventFunction(key) {
+export function removeEventFunction(key: string | number) {
 	delete EventFunctions[key];
 }
-export function executeRemoveEvents(graph, link) {
+export function executeRemoveEvents(graph: any, link: { properties: { on: { [x: string]: any[] } } }) {
 	if (link && link.properties && link.properties.on && link.properties.on[LinkEvents.Remove]) {
-		link.properties.on[LinkEvents.Remove].forEach((args) => {
+		link.properties.on[LinkEvents.Remove].forEach((args: { function: string | number }) => {
 			if (args.function && EventFunctions[args.function]) {
 				graph = EventFunctions[args.function](graph, link, args.function, args);
 			}
@@ -2756,7 +2738,7 @@ addEventFunction('OnRemoveValidationItemPropConnection', (graph: any, link: any,
 	return graph;
 });
 
-addEventFunction('OnRemoveExecutorItemPropConnection', (graph, link, func, args) => {
+addEventFunction('OnRemoveExecutorItemPropConnection', (graph: any, link: any, func: any, args: any) => {
 	const { source, target } = link;
 	const node = GetNode(graph, source);
 	const { property, validator } = args || {};
@@ -2776,12 +2758,15 @@ addEventFunction('OnRemoveExecutorItemPropConnection', (graph, link, func, args)
 	return graph;
 });
 
-export function removeValidatorItem(_validator, options) {
+export function removeValidatorItem(
+	_validator: { properties: { [x: string]: { validators: { [x: string]: any } } } },
+	options: { property: any; validator: any }
+) {
 	const { property, validator } = options;
 	delete _validator.properties[property].validators[validator];
 }
-export function createEventProp(type, options = {}) {
-	const res = { on: {} };
+export function createEventProp(type: string, options = {}) {
+	const res: any = { on: {} };
 	switch (type) {
 		case LinkEvents.Remove:
 			res.on[type] = [
@@ -2817,7 +2802,7 @@ export function removeLink(graph: any, link: any, options: any = {}) {
 		}
 	}
 	if (link) {
-		graph.links = graph.links.filter((x) => x !== link);
+		graph.links = graph.links.filter((x: any) => x !== link);
 		const del_link = graph.linkLib[link];
 		if (del_link.properties) {
 			if (del_link.properties.on && del_link.properties.on[LinkEvents.Remove]) {
@@ -2944,6 +2929,99 @@ export function updateNodePropertyDirty(graph: any, options: any) {
 	}
 	return graph;
 }
+function codeTypeWord(x: any) {
+	if (typeof x === 'string') {
+		return x
+			.split('')
+			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1)
+			.join('');
+	}
+	return x;
+}
+
+export function GetComponentExternalApiNodes(parent: any, graph?: any) {
+	graph = graph || GetCurrentGraph();
+	return  GetNodesLinkedTo(graph, {
+		id: parent,
+		link:  LinkType.ComponentExternalApi
+	});
+}
+
+export function GetScreenUrl(op: any, overrideText: any = null) {
+	const params = GetComponentExternalApiNodes(op.id)
+		.filter((externaApiNodes: any) => GetNodeProp(externaApiNodes, NodeProperties.IsUrlParameter))
+		.map((v: any) => `:${GetCodeName(v)}`)
+		.join('/');
+	const route = `${overrideText || GetNodeProp(op, NodeProperties.UIText)}${params ? `/${params}` : ''}`;
+
+	return convertToURLRoute(route);
+}
+export function convertToURLRoute(x: string) {
+	return [ ...x.split(' ') ].filter((x) => x).join('/').toLowerCase();
+}
+export const NodePropertiesDirtyChain = {
+	[NodeProperties.ServiceType]: [
+		{
+			chainProp: NodeProperties.CodeName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.AgentName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.ValueName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.UIName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.UIText,
+			chainFunc: codeTypeWord
+		}
+	],
+	[NodeProperties.UIText]: [
+		{
+			chainProp: NodeProperties.CodeName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.AgentName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.ValueName,
+			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.HttpRoute,
+			chainFunc: (x: any, node: any) => {
+				if (typeof x === 'string') {
+					if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.Screen) {
+						return GetScreenUrl(node, undefined);
+					}
+					return convertToURLRoute(x);
+				}
+				return x;
+			}
+		},
+		{
+			chainProp: NodeProperties.UIName,
+			chainFunc: (x: any) => {
+				return x;
+			}
+		},
+		{
+			chainProp: NodeProperties.Label,
+			chainFunc: (x: any) => {
+				return x;
+			}
+		}
+	]
+};
+
 export function updateNodeProperty(graph: any, options: any) {
 	const { id, prop } = options;
 	let { value } = options;
@@ -2966,7 +3044,7 @@ export function updateNodeProperty(graph: any, options: any) {
 
 		if (NodePropertiesDirtyChain[prop]) {
 			const temps = NodePropertiesDirtyChain[prop];
-			temps.forEach((temp) => {
+			temps.forEach((temp: any) => {
 				if (!graph.nodeLib[id].dirty[temp.chainProp]) {
 					additionalChange[temp.chainProp] = temp.chainFunc(value, graph.nodeLib[id]);
 				}
@@ -3006,7 +3084,7 @@ export function updateNodeProperty(graph: any, options: any) {
 			if (value) {
 				graph.markedSelectedNodeIds = [ ...(graph.markedSelectedNodeIds || []), id ].unique();
 			} else {
-				graph.markedSelectedNodeIds = (graph.markedSelectedNodeIds || []).filter((x) => x !== id);
+				graph.markedSelectedNodeIds = (graph.markedSelectedNodeIds || []).filter((x: any) => x !== id);
 			}
 		}
 		if (prop === NodeProperties.NODEType && value === NodeTypes.Function) {
@@ -3123,14 +3201,7 @@ function createNode(nodeType?: any): Node {
 	};
 }
 
-export interface GraphLink {
-	id: string;
-	source: string;
-	target: string;
-	properties: { [index: string]: any };
-}
-
-function createLink(target, source, properties) {
+function createLink(target: any, source: any, properties: {}) {
 	properties = properties || {};
 	return {
 		id: uuidv4(),
@@ -3139,17 +3210,17 @@ function createLink(target, source, properties) {
 		properties
 	};
 }
-function copyLink(link) {
+function copyLink(link: any) {
 	return {
 		...JSON.parse(JSON.stringify(link))
 	};
 }
-export function duplicateNode(nn) {
+export function duplicateNode(nn: any) {
 	return {
 		...nn
 	};
 }
-export function duplicateLink(nn, nodes) {
+export function duplicateLink(nn: { source: any; target: any }, nodes: string | any[]) {
 	return {
 		...nn,
 		source: nodes.indexOf(nn.source),
@@ -3157,7 +3228,11 @@ export function duplicateLink(nn, nodes) {
 	};
 }
 
-function GetNodesInsideGroup(graph, t, seenGroups = {}) {
+function GetNodesInsideGroup(
+	graph: { groupsNodes: { [x: string]: {} }; childGroups: { [x: string]: any } },
+	t: string,
+	seenGroups: any = {}
+) {
 	let res = Object.keys(graph.groupsNodes[t]);
 	for (const i in graph.childGroups[t]) {
 		if (!seenGroups[i]) {
@@ -3186,15 +3261,15 @@ export const GroupImportanceOrder = {
 	[NodeTypes.ModelItemFilter]: 13
 };
 
-export function SetVisible(graph) {
+export function SetVisible(graph: any) {
 	graph.visibleNodes = {};
-	graph.nodes.forEach((t) => {
+	graph.nodes.forEach((t: string) => {
 		if (GetNodeProp(GetNode(graph, t), NodeProperties.Pinned)) {
 			graph.visibleNodes[t] = true;
 		}
 	});
 	if (graph.depth) {
-		[].interpolate(0, graph.depth, (x) => {
+		[].interpolate(0, graph.depth, (x: number) => {
 			Object.keys(graph.visibleNodes).forEach((t) => {
 				for (const h in graph.nodeLinks[t]) {
 					if (x > 1 && !graph.visibleNodes[h]) {
@@ -3208,7 +3283,7 @@ export function SetVisible(graph) {
 	}
 	return graph;
 }
-function getDepth(groupId, graph) {
+function getDepth(groupId: string, graph: { groupLib: { [x: string]: any }; parentGroup: { [x: string]: {} } }) {
 	let res = 0;
 	if (graph.groupLib[groupId]) {
 		if (graph.parentGroup[groupId]) {
@@ -3221,7 +3296,7 @@ function getDepth(groupId, graph) {
 	}
 	return res;
 }
-export function FilterGraph(graph) {
+export function FilterGraph(graph: any) {
 	const filteredGraph = createGraph();
 	filteredGraph.id = graph.id;
 	filteredGraph.linkLib = { ...graph.linkLib };
@@ -3232,7 +3307,7 @@ export function FilterGraph(graph) {
 	filteredGraph.childGroups = { ...graph.childGroups };
 	filteredGraph.parentGroup = { ...graph.parentGroup };
 	filteredGraph.links = [
-		...graph.links.filter((linkId) => {
+		...graph.links.filter((linkId: string | number) => {
 			const { target, source } = graph.linkLib[linkId];
 			if (graph.visibleNodes[target] && graph.visibleNodes[source]) {
 				return true;
@@ -3260,13 +3335,13 @@ export function FilterGraph(graph) {
 		if (filteredGraph.groupLib[group].leaves) {
 			filteredGraph.groupLib[group] = { ...filteredGraph.groupLib[group] };
 			filteredGraph.groupLib[group].leaves = [
-				...filteredGraph.groupLib[group].leaves.filter((x) => graph.visibleNodes[x])
+				...filteredGraph.groupLib[group].leaves.filter((x: string | number) => graph.visibleNodes[x])
 			];
 			filteredGraph.groupLib[group].groups = [
-				...filteredGraph.groupLib[group].groups.filter((x) => filteredGraph.groupLib[x])
+				...filteredGraph.groupLib[group].groups.filter((x: string | number) => filteredGraph.groupLib[x])
 			];
 			if (!filteredGraph.groupLib[group].leaves.length && !filteredGraph.groupLib[group].groups.length) {
-				filteredGraph.groups = [ ...filteredGraph.groups.filter((x) => x !== group) ];
+				filteredGraph.groups = [ ...filteredGraph.groups.filter((x: string) => x !== group) ];
 				delete filteredGraph.groupLib[group];
 			}
 		}
@@ -3319,7 +3394,7 @@ export function FilterGraph(graph) {
 
 	return filteredGraph;
 }
-export function VisualProcess(graph) {
+export function VisualProcess(graph: any) {
 	if (Paused()) {
 		return null;
 	}
@@ -3328,9 +3403,11 @@ export function VisualProcess(graph) {
 	graph = SetVisible(graph);
 	vgraph.visibleNodes = { ...graph.visibleNodes };
 	graph = FilterGraph(graph);
-	const collapsedNodes = graph.nodes.filter((node) => GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed));
-	const collapsingGroups = {};
-	collapsedNodes.forEach((t) => {
+	const collapsedNodes = graph.nodes.filter((node: string | number) =>
+		GetNodeProp(graph.nodeLib[node], NodeProperties.Collapsed)
+	);
+	const collapsingGroups: any = {};
+	collapsedNodes.forEach((t: string) => {
 		if (graph.nodesGroups[t]) {
 			const t_importance = GroupImportanceOrder[GetNodeProp(graph.nodeLib[t], NodeProperties.NODEType)] || 1000;
 			const sortedGroups = Object.keys(graph.nodesGroups[t])
@@ -3367,10 +3444,10 @@ export function VisualProcess(graph) {
 		}
 		return true;
 	});
-	let disappearingNodes = {};
+	let disappearingNodes: any = {};
 	smallestsNonCrossingGroups.forEach((t) => {
-		const dt = {};
-		let head = null;
+		const dt: any = {};
+		let head: any = null;
 		let mostimportant = 10000;
 		const _nodes = GetNodesInsideGroup(graph, t);
 		_nodes.forEach((t) => {
@@ -3389,13 +3466,13 @@ export function VisualProcess(graph) {
 		disappearingNodes = { ...disappearingNodes, ...dt };
 	});
 
-	vgraph.nodes = [ ...graph.nodes.filter((x) => !disappearingNodes[x]) ];
+	vgraph.nodes = [ ...graph.nodes.filter((x: string | number) => !disappearingNodes[x]) ];
 	vgraph.nodeLib = {};
-	vgraph.nodes.forEach((t) => {
+	vgraph.nodes.forEach((t: string | number) => {
 		vgraph.nodeLib[t] = graph.nodeLib[t];
 	});
 	vgraph.links = graph.links
-		.map((x) => {
+		.map((x: string | number) => {
 			// Find any link that should be disappearing, and make it go away
 			const { source, target } = graph.linkLib[x];
 			let dupLink;
@@ -3423,15 +3500,15 @@ export function VisualProcess(graph) {
 			}
 			return dupLink.id;
 		})
-		.filter((x) => x);
+		.filter((x: any) => x);
 
 	const vgroups = graph.groups
-		.map((group) => {
-			const oldgroup = graph.groupLib[group];
-			const newgroup = createGroup();
+		.map((group: string | number) => {
+			const oldgroup: any = graph.groupLib[group];
+			const newgroup: any = createGroup();
 			newgroup.id = `${oldgroup.id}`;
 			if (oldgroup && oldgroup.leaves) {
-				oldgroup.leaves.forEach((leaf) => {
+				oldgroup.leaves.forEach((leaf: string | number) => {
 					if (vgraph.nodeLib[leaf]) {
 						newgroup.leaves.push(leaf);
 					}
@@ -3444,9 +3521,9 @@ export function VisualProcess(graph) {
 			}
 			return null;
 		})
-		.filter((x) => x);
-	vgroups.forEach((group) => {
-		vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter((og) => {
+		.filter((x: any) => x);
+	vgroups.forEach((group: string | number) => {
+		vgraph.groupLib[group].groups = (graph.groupLib[group].groups || []).filter((og: string | number) => {
 			if (vgraph.groupLib[og]) {
 				return true;
 			}

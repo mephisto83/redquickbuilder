@@ -59,7 +59,7 @@ const MATCH_REFERENCE = './app/templates/permissions/match-reference.tpl';
 
 const PROPERTY_TABS = 6;
 export default class PermissionGenerator {
-	static PermissionMatches(permission: GraphMethods.Node | null, agent: { id: any }, model: { id: any }) {
+	static PermissionMatches(permission: any | null, agent: { id: any }, model: { id: any }) {
 		var methodNode = GetPermissionMethod(permission);
 		if (methodNode) {
 			let function_type = GetFunctionType(methodNode);
@@ -83,8 +83,8 @@ export default class PermissionGenerator {
 		return false;
 	}
 	static createInstanceEnumerationListName(
-		dNode: GraphMethods.Node | null,
-		enu: GraphMethods.Node | null,
+		dNode: any | null,
+		enu: any | null,
 		method: any,
 		type = 'Enums'
 	) {
@@ -118,8 +118,8 @@ export default class PermissionGenerator {
 		return constants_notallowed;
 	}
 	static createEnumerationInstanceList(
-		dpNode: GraphMethods.Node | null,
-		enumerationNode: GraphMethods.Node | null,
+		dpNode: any | null,
+		enumerationNode: any | null,
 		method: any
 	) {
 		let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
@@ -144,7 +144,7 @@ export default class PermissionGenerator {
 			.join()} ${jNL + Tabs(5)}};${jNL}`;
 	}
 	static _createExtensionInstanceList(
-		dpNode: GraphMethods.Node | null,
+		dpNode: any | null,
 		extensionNode: any,
 		method: any,
 		type = 'Enums'
@@ -159,7 +159,7 @@ export default class PermissionGenerator {
 		return constants_allowed;
 	}
 	static _getNotAllowedExtectionConstances(
-		dpNode: GraphMethods.Node | null,
+		dpNode: any | null,
 		extensionNode: any,
 		method: any,
 		type = 'Enums'
@@ -174,8 +174,8 @@ export default class PermissionGenerator {
 		return constants_disallowed;
 	}
 	static createExtensionInstanceList(
-		dpNode: GraphMethods.Node | null,
-		extensionNode: GraphMethods.Node | null,
+		dpNode: any | null,
+		extensionNode: any | null,
 		method: any,
 		type = 'Enums'
 	) {
@@ -187,7 +187,7 @@ export default class PermissionGenerator {
 			.map((t: string) => jNL + Tabs(5) + t)
 			.join()} ${jNL + Tabs(5)}};${jNL}`;
 	}
-	static IsRequestor(graph: GraphMethods.Graph, model: { id: string }, permission: { id: any }) {
+	static IsRequestor(graph: any, model: { id: string }, permission: { id: any }) {
 		var requestorNodes = GraphMethods.getNodesByLinkType(graph, {
 			id: permission.id,
 			type: LinkType.RequestorPermissionLink
@@ -197,7 +197,7 @@ export default class PermissionGenerator {
 		});
 	}
 	static GetExtensionNodeValues(
-		graph: GraphMethods.Graph,
+		graph: any,
 		permission: { id: any },
 		method: any,
 		agent: { id: any },
@@ -326,7 +326,7 @@ export default class PermissionGenerator {
 
 		return listOfCases;
 	}
-	static IsAppliedPermission(graph: GraphMethods.Graph, permission: { id: any }, propertyNode: { id: any }) {
+	static IsAppliedPermission(graph: any, permission: { id: any }, propertyNode: { id: any }) {
 		let appliedPermissionLinks: any = GraphMethods.getNodesByLinkType(graph, {
 			id: permission.id,
 			type: LinkType.AppliedPermissionLink
@@ -344,7 +344,7 @@ export default class PermissionGenerator {
 		return false;
 	}
 	static GetTestExtensionNodeValues(
-		graph: GraphMethods.Graph,
+		graph: any,
 		permission: { id: any },
 		method: any,
 		agent: any,
@@ -468,7 +468,7 @@ export default class PermissionGenerator {
 	static getReferencedNodeName(graph: any, enumRef: any, type: string) {
 		return GetNodeProp(PermissionGenerator.getReferencedValue(graph, enumRef, type), NodeProperties.CodeName);
 	}
-	static getReferencedValue(graph: GraphMethods.Graph, enumRef: { [x: string]: string }, type: string | number) {
+	static getReferencedValue(graph: any, enumRef: { [x: string]: string }, type: string | number) {
 		return GraphMethods.GetNode(graph, enumRef[type]);
 	}
 	static getReference(enumRef: { [x: string]: any }, type: string) {
@@ -690,11 +690,11 @@ export default class PermissionGenerator {
 		return enumerate(vects);
 	}
 	static EnumeratePermissionCases(
-		graph: GraphMethods.Graph,
-		permission: GraphMethods.Node | null,
+		graph: any,
+		permission: any | null,
 		method: string,
-		agent: GraphMethods.Node | null,
-		model: GraphMethods.Node | null
+		agent: any | null,
+		model: any | null
 	) {
 		if (!permission || !method || !agent || !model) {
 			return [];

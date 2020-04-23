@@ -16,6 +16,7 @@ import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
+import { Graph } from '../methods/graph_types';
 
 const VALIDATION_CLASS = './app/templates/validation/validation_class.tpl';
 const VALIDATION_TEST = './app/templates/validation/tests/validation.tpl';
@@ -55,7 +56,7 @@ export default class ValidationRuleGenerator {
 		}
 		return res;
 	}
-	static GenerateValidationCases(graph: GraphMethods.Graph, validatorNode: any) {
+	static GenerateValidationCases(graph: Graph, validatorNode: any) {
 		var model = GetNodeProp(validatorNode, NodeProperties.ValidatorModel);
 		var validator = GetNodeProp(validatorNode, NodeProperties.Validator);
 		let validatorProperties = GraphMethods.getValidatorProperties(validator);

@@ -1,19 +1,18 @@
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import task from './task';
-import * as UIA from '../../app/actions/uiactions';
 
 process.on('message', (command: any) => {
 	let { message } = command;
 
 	let parsedMessage = message;
-
+  console.log(command);
 	switch (parsedMessage.command) {
-		case 'init':
+		case Operations.INIT:
 			context.options = parsedMessage.options;
 			console.log(context.options);
 			process.send({ response: Operations.INIT });
+			process.send({ response: 'starting loop' });
 			break;
 		default:
 			process.send({ response: Operations.NO_OP });
@@ -21,13 +20,13 @@ process.on('message', (command: any) => {
 	}
 });
 
-function loop() {
-	context.promise = context.promise
-		.then(async () => {
+async function loop() {
+	let noerror = true;
+	do {
+		try {
 			console.log('taking a nap.');
+			process.send({ response: 'taking a nap' });
 			await sleep();
-		})
-		.then(async () => {
 			let { options } = context;
 			if (options) {
 				let { folderPath, agentName, projectName } = options;
@@ -44,11 +43,11 @@ function loop() {
 			} else {
 				console.warn('no options yet');
 			}
-			loop();
-		})
-		.catch((e) => {
+		} catch (e) {
+			noerror = false;
 			console.error(e);
-		});
+		}
+	} while (noerror);
 }
 function sleep(ms: number = 30 * 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -75,7 +74,7 @@ const updateAgent = async (options: any) => {
 };
 
 const context: any = {
-	promise: Promise.resolve()
+	options: null
 };
 export const Operations = {
 	NO_OP: 'NO_OP',
@@ -83,3 +82,7 @@ export const Operations = {
 	INIT: 'INIT',
 	COMPLETED_TASK: 'COMPLETED_TASK'
 };
+
+(async function() {
+	return await loop();
+})();

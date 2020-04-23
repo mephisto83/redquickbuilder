@@ -13,10 +13,10 @@ import {
 	GetNodesLinkedTo,
 	GetNodeLinkedTo,
 	TARGET,
-	SOURCE,
-	Graph
+	SOURCE
 } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
+import { Graph } from '../methods/graph_types';
 
 export default function(args: any = {}) {
 	const result: any = [];

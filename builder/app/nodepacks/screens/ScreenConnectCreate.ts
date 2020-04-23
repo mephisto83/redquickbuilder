@@ -21,6 +21,7 @@ import AppendValidations from './AppendValidations';
 import AppendPostMethod from './AppendPostMethod';
 import GetModelObjectFromSelector from '../GetModelObjectFromSelector';
 import ClearScreenInstance from '../datachain/ClearScreenInstance';
+import { Graph } from '../../methods/graph_types';
 
 export default function ScreenConnectCreate(args: any = {}) {
 	let { node, method } = args;
@@ -43,12 +44,12 @@ export default function ScreenConnectCreate(args: any = {}) {
 		...viewPackages || {}
 	};
 
-	screenOptions.forEach((screenOption: { id: any; }) => {
+	screenOptions.forEach((screenOption: { id: any }) => {
 		const components = GetNodesLinkedTo(graph, {
 			id: screenOption.id,
 			link: LinkType.Component
 		});
-		components.forEach((component: { id: any; }) => {
+		components.forEach((component: { id: any }) => {
 			const subcomponents = GetNodesLinkedTo(graph, {
 				id: component.id,
 				link: LinkType.Component
@@ -67,7 +68,7 @@ export default function ScreenConnectCreate(args: any = {}) {
 						(v) => v === GetNodeProp(x, NodeProperties.EventType)
 					)
 				);
-				onEvents.forEach((evntNode: { id: any; }) => {
+				onEvents.forEach((evntNode: { id: any }) => {
 					const t = GetNodesLinkedTo(graph, {
 						id: evntNode.id,
 						link: LinkType.EventMethodInstance
@@ -92,8 +93,8 @@ export default function ScreenConnectCreate(args: any = {}) {
 							}
 						});
 					}
-					let instanceTempNode: any  = null;
-					let modelDataChain: any  = null;
+					let instanceTempNode: any = null;
+					let modelDataChain: any = null;
 					result.push(
 						...[
 							{
@@ -110,7 +111,7 @@ export default function ScreenConnectCreate(args: any = {}) {
 						...GetModelObjectFromSelector({
 							model: GetNodeTitle(node),
 							viewPackages,
-							callback: (newContext: { entry: string; }, tempGraph: import("../../methods/graph_methods").Graph | undefined) => {
+							callback: (newContext: { entry: string }, tempGraph: Graph) => {
 								modelDataChain = GetNodeById(newContext.entry, tempGraph);
 							}
 						}),
@@ -165,7 +166,9 @@ export default function ScreenConnectCreate(args: any = {}) {
 					id: screenOption.id,
 					link: LinkType.LifeCylceMethod,
 					componentType: NodeTypes.LifeCylceMethod
-				}).find((v: any) => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount);
+				}).find(
+					(v: any) => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount
+				);
 				if (componentDidMount) {
 					componentDidMountInstance = GetNodeLinkedTo(gg, {
 						id: componentDidMount.id,

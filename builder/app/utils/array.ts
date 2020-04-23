@@ -27,6 +27,7 @@ declare global {
 		summation: any;
 		groupBy: any;
 		startsWith: any;
+		chunk: any;
 	}
 }
 ((array) => {
@@ -209,7 +210,25 @@ declare global {
 			}
 		});
 	}
+	/**
+ * Define the chunk method in the prototype of an array
+ * that returns an array with arrays of the given size.
+ *
+ * @param chunkSize {Integer} Size of every group
+ */
+	if (array.chunk) {
+		Object.defineProperty(array, 'chunk', {
+			value: function(chunkSize: any) {
+				var temporal = [];
 
+				for (var i = 0; i < this.length; i += chunkSize) {
+					temporal.push(this.slice(i, i + chunkSize));
+				}
+
+				return temporal;
+			}
+		});
+	}
 	if (!array.groupBy) {
 		Object.defineProperty(array, 'groupBy', {
 			enumerable: false,
