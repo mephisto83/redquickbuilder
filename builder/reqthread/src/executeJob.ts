@@ -32,6 +32,7 @@ const Create_Component_All = 'Create Component All';
 let app_state;
 export default async function executeJob(jobConfig: Job) {
 	let { parts, jobInstancePath } = jobConfig;
+	if (!parts) throw new Error('no parts found in job');
 	await parts.forEachAsync(async (part: string) => {
 		const partPath = path.join(jobInstancePath, part, JobServiceConstants.INPUT);
 		if (partPath) {
@@ -39,7 +40,7 @@ export default async function executeJob(jobConfig: Job) {
 			if (partContent) {
 				const jobPart: JobConfigContract = JSON.parse(partContent);
 				const { command, filter } = jobPart;
-				setupJob(jobInstancePath);
+				await setupJob(jobInstancePath);
 
 				switch (command) {
 					case Create_Component_All:
@@ -65,23 +66,32 @@ export default async function executeJob(jobConfig: Job) {
 	return jobConfig;
 }
 async function setupJob(jobInstancePath) {
-	let graph = await openFile(path.join(jobInstancePath, JobServiceConstants.INPUT), GetDispatchFunc());
-
+	let graph = await openFile(path.join(jobInstancePath, JobServiceConstants.GRAPH_FILE), GetDispatchFunc());
 	let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph));
 	state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
-	app_state = { uiReducer: state };
-	setTestGetState(() => {
-		return app_state;
-	});
+  app_state = { uiReducer: state };
+  console.log('setting dispatch');
 	setTestDispatch((args) => {
 		app_state = uiReducer(app_state, args);
 	});
+
+  console.log('setting getState');
+	setTestGetState(() => {
+		return app_state;
+  });
+  console.log('saving application');
+	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
+  console.log('saving graph');
+	SaveGraph(graph, GetDispatchFunc());
+  console.log('setup cache');
+	setupCache(graph);
+  console.log('setup complete');
 }
 async function saveFile(partFolder: string) {
 	return new Promise((resolve, fail) => {
 		try {
 			let currentGraph = GetCurrentGraph();
-			let fileName =  path.join(partFolder, JobServiceConstants.OUTPUT);
+			let fileName = path.join(partFolder, JobServiceConstants.OUTPUT);
 			let savecontent = JSON.stringify(prune(currentGraph));
 
 			console.log(fileName);
@@ -116,9 +126,7 @@ async function openFile(fileName: string, dispatch: any): Promise<Graph> {
 					opened_graph = unprune(opened_graph);
 					const default_graph = createGraph();
 					opened_graph = { ...default_graph, ...opened_graph };
-					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
-					SaveGraph(opened_graph, dispatch);
-					setupCache(opened_graph);
+
 					resolve(opened_graph);
 				}
 			} catch (e) {

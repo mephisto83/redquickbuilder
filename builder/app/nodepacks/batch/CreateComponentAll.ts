@@ -19,7 +19,7 @@ import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 import { findLink } from '../../methods/graph_methods';
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
-  console.log('Create Component All');
+	console.log('Create Component All');
 	const result: any = [];
 	const models = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model
@@ -28,7 +28,8 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 		[NodeProperties.NODEType]: NodeTypes.Model,
 		[NodeProperties.IsAgent]: (v: any) => v
 	}).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
-
+	agents.map((v) => console.log(GetNodeTitle(v)));
+	models.map((v) => console.log(GetNodeTitle(v)));
 	await agents.forEachAsync(async (agent: any, agentIndex: any, agentCount: any) => {
 		if (progressFunc) {
 			await progressFunc((agentIndex + 0.25) / agentCount);
@@ -38,8 +39,8 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 			const { model, property } = GetViewTypeModelType(viewType.id);
 			if (filter && !filter(model)) {
 				return;
-      }
-      console.log(`Creating shared components for : ${GetNodeTitle(model)}`);
+			}
+			console.log(`Creating shared components for : ${GetNodeTitle(model)}`);
 
 			CreateComponentModel({
 				model: model.id,
@@ -63,7 +64,7 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 			if (filter && !filter(v)) {
 				return;
 			}
-      console.log(`Creating components for : ${GetNodeTitle(v.id)}`);
+			console.log(`Creating components for : ${GetNodeTitle(v.id)}`);
 			CreateComponentModel({
 				agentId: agent.id,
 				model: v.id

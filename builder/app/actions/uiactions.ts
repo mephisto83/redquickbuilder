@@ -3139,16 +3139,21 @@ export function GetDispatchFunc() {
 export function GetStateFunc(): any {
 	return _getState;
 }
+let testMode = false;
 export function setTestGetState(func: Function) {
+	testMode = true;
 	_getState = func;
 }
 export function setTestDispatch(func: Function) {
+	testMode = true;
 	_dispatch = func;
 }
 export function setState() {
 	return (dispatch: Function, getState: Function) => {
-		_getState = getState;
-		_dispatch = dispatch;
+		if (!testMode) {
+			_getState = getState;
+			_dispatch = dispatch;
+		}
 	};
 }
 

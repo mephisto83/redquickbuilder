@@ -275,7 +275,8 @@ const OUTPUT = 'output.json';
 export const JobServiceConstants = {
 	INPUT,
   OUTPUT,
-  GRAPH_FILE
+  GRAPH_FILE,
+  JOB_NAME
 };
 export interface JobConfigContract {
 	complete: boolean;

@@ -6,32 +6,41 @@ import path from 'path';
 import os from 'os';
 import { getDirectories } from './threadutil';
 import executeJob from './executeJob';
-import { Job } from '../../app/jobs/jobservice';
+import { Job, JobServiceConstants } from '../../app/jobs/jobservice';
 
 export default async function task(jobPath: string) {
 	if (ifJobExists(jobPath)) {
 		console.log('there are jobs');
-		if (checkForIncompleteJobs(jobPath)) {
-			let jobConfig: Job = getUnfinishedJob(jobPath);
+		let jobConfig: Job = getUnfinishedJob(jobPath);
+		if (jobConfig) {
+      console.log('execute job');
 			jobConfig = await executeJob(jobConfig);
+      console.log('job complete');
 			await updateJobConfig(jobConfig);
+		} else {
+			console.log('all jobs are complete');
 		}
 	}
 	return new Promise((resolve) => setTimeout(resolve, 120 * 1000));
 }
-function getUnfinishedJob(jobPath: string) {
+function getUnfinishedJob(jobPath: string): Job {
 	let folderExists = fs.existsSync(jobPath);
 	if (folderExists) {
 		let jobList = getDirectories(jobPath);
-		jobList.filter((jobFolder) => {
-			const jobConfig = getJobConfig(path.join(jobPath, jobFolder));
-			if (jobConfig) {
-				if (!isJobComplete(jobConfig)) {
-					return jobConfig;
+		let res = jobList
+			.map((jobFolder) => {
+				const jobConfig = getJobConfig(path.join(jobPath, jobFolder));
+				if (jobConfig) {
+					if (!isJobComplete(jobConfig)) {
+						return jobConfig;
+					}
 				}
-			}
-			return null;
-		});
+				return null;
+			})
+			.filter((x) => x);
+		if (res && res.length) {
+			return res[0];
+		}
 	}
 	return null;
 }
@@ -42,12 +51,12 @@ function isJobComplete(jobConfig: Job) {
 	return jobConfig.complete;
 }
 function getJobConfig(jobInstancePath: string): Job {
-	const configFile: string = path.join(jobInstancePath, 'config.json');
+	const configFile: string = path.join(jobInstancePath, JobServiceConstants.JOB_NAME);
 	if (fs.existsSync(jobInstancePath)) {
 		if (fs.existsSync(configFile)) {
 			const jobConfiguration: Job = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 			jobConfiguration.absolutePath = configFile;
-			jobConfiguration.configAbsolutePath = jobInstancePath;
+			jobConfiguration.configAbsolutePath = configFile;
 			jobConfiguration.jobInstancePath = jobInstancePath;
 			console.log('job found');
 			return jobConfiguration;
@@ -60,7 +69,7 @@ function getJobConfig(jobInstancePath: string): Job {
 function updateJobConfig(jobConfig: Job) {
 	try {
 		jobConfig.updated = Date.now();
-		let content = JSON.stringify(jobConfig.configAbsolutePath, null, 4);
+		let content = JSON.stringify(jobConfig, null, 4);
 		fs.writeFileSync(jobConfig.configAbsolutePath, content, 'utf8');
 	} catch (e) {
 		console.error(e);
