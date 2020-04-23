@@ -123,7 +123,7 @@ export default class JobService {
 		return jobs.filter((x: JobItem) => !x.distributed);
 	}
 	static async DistributeJobs() {
-		debugger;
+
 		let directories: string[] = await JobService.getAgentDirectories();
 		if (!directories.length) {
 			throw new Error('no agents in system');
