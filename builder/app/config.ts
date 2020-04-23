@@ -1,3 +1,3 @@
 export default {
-  distributionPath: '../../../redquickdistribution'
+  distributionPath: '../../redquickdistribution'
 }

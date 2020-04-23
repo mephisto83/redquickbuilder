@@ -91,3 +91,7 @@ net/ImageResizer/.vs/
 net/ImageResizer/bin/
 net/ImageResizer/Properties
 net/ImageResizer/obj/
+
+
+job_service_jobs
+job_service_jobs_output

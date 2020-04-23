@@ -216,7 +216,7 @@ declare global {
  *
  * @param chunkSize {Integer} Size of every group
  */
-	if (array.chunk) {
+	if (!array.chunk) {
 		Object.defineProperty(array, 'chunk', {
 			value: function(chunkSize: any) {
 				var temporal = [];

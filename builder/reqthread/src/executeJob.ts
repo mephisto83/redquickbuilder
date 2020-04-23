@@ -1,4 +1,3 @@
-import { JobConfig } from './task';
 import fs from 'fs';
 import path from 'path';
 import CreateComponentAll from '../../app/nodepacks/batch/CreateComponentAll';
@@ -26,35 +25,48 @@ import uiReducer, { makeDefaultState, updateUI } from '../../app/reducers/uiRedu
 import unprune from '../../app/methods/unprune';
 import { createGraph, setupCache } from '../../app/methods/graph_methods';
 import prune from '../../app/methods/prune';
+import { Job, JobConfigContract, JobServiceConstants } from '../../app/jobs/jobservice';
+import { Graph } from '../../app/methods/graph_types';
 
 const Create_Component_All = 'Create Component All';
 let app_state;
-export default async function executeJob(jobConfig: JobConfig) {
-	setupJob(jobConfig);
-	await openFile(jobConfig.absolutePath, GetDispatchFunc());
+export default async function executeJob(jobConfig: Job) {
+	let { parts, jobInstancePath } = jobConfig;
+	await parts.forEachAsync(async (part: string) => {
+		const partPath = path.join(jobInstancePath, part, JobServiceConstants.INPUT);
+		if (partPath) {
+			const partContent: string = fs.readFileSync(partPath, 'utf8');
+			if (partContent) {
+				const jobPart: JobConfigContract = JSON.parse(partContent);
+				const { command, filter } = jobPart;
+				setupJob(jobInstancePath);
 
-	switch (jobConfig.command) {
-		case Create_Component_All:
-			jobConfig.updated = Date.now();
-			await CreateComponentAll(
-				() => {},
-				(model: any) => {
-					return jobConfig.filter.model === model.id;
+				switch (command) {
+					case Create_Component_All:
+						jobConfig.updated = Date.now();
+						await CreateComponentAll(
+							() => {},
+							(model: any) => {
+								return filter && filter.models.indexOf(model.id) !== -1;
+							}
+						);
+						await saveFile(path.join(jobInstancePath, part));
+						break;
+					default:
+						jobConfig.complete = true;
+						throw new Error('unknown job');
 				}
-			);
-			await saveFile(jobConfig);
-			break;
-		default:
-			jobConfig.complete = true;
-			throw new Error('unknown job');
-	}
 
-	jobConfig.complete = true;
+				jobConfig.complete = true;
+			}
+		}
+	});
+
 	return jobConfig;
 }
-function setupJob(jobConfig: JobConfig) {
-	let graphFile = fs.readFileSync(jobConfig.absolutePath, 'utf8');
-	let graph = JSON.parse(graphFile);
+async function setupJob(jobInstancePath) {
+	let graph = await openFile(path.join(jobInstancePath, JobServiceConstants.INPUT), GetDispatchFunc());
+
 	let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph));
 	state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
 	app_state = { uiReducer: state };
@@ -65,11 +77,11 @@ function setupJob(jobConfig: JobConfig) {
 		app_state = uiReducer(app_state, args);
 	});
 }
-async function saveFile(jobConfig: JobConfig) {
+async function saveFile(partFolder: string) {
 	return new Promise((resolve, fail) => {
 		try {
 			let currentGraph = GetCurrentGraph();
-			let fileName = jobConfig.absolutePath;
+			let fileName =  path.join(partFolder, JobServiceConstants.OUTPUT);
 			let savecontent = JSON.stringify(prune(currentGraph));
 
 			console.log(fileName);
@@ -89,7 +101,7 @@ async function saveFile(jobConfig: JobConfig) {
 		}
 	});
 }
-async function openFile(fileName: string, dispatch: any) {
+async function openFile(fileName: string, dispatch: any): Promise<Graph> {
 	return new Promise((resolve, fail) => {
 		console.log(fileName);
 		fs.readFile(fileName, { encoding: 'utf8' }, (err: { message: any }, res: string) => {
@@ -99,7 +111,7 @@ async function openFile(fileName: string, dispatch: any) {
 				return;
 			}
 			try {
-				let opened_graph = JSON.parse(res);
+				let opened_graph: Graph = JSON.parse(res);
 				if (opened_graph) {
 					opened_graph = unprune(opened_graph);
 					const default_graph = createGraph();
@@ -107,7 +119,7 @@ async function openFile(fileName: string, dispatch: any) {
 					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
 					SaveGraph(opened_graph, dispatch);
 					setupCache(opened_graph);
-					resolve();
+					resolve(opened_graph);
 				}
 			} catch (e) {
 				console.log(e);

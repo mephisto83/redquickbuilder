@@ -19,6 +19,7 @@ import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 import { findLink } from '../../methods/graph_methods';
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
+  console.log('Create Component All');
 	const result: any = [];
 	const models = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model
@@ -29,14 +30,17 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 	}).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
 
 	await agents.forEachAsync(async (agent: any, agentIndex: any, agentCount: any) => {
-		await progressFunc((agentIndex + 0.25) / agentCount);
-
+		if (progressFunc) {
+			await progressFunc((agentIndex + 0.25) / agentCount);
+		}
 		const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
 		await defaultViewTypes.forEachAsync(async (viewType: any, viewTypeIndex: any, viewTypeCount: any) => {
 			const { model, property } = GetViewTypeModelType(viewType.id);
 			if (filter && !filter(model)) {
 				return;
-			}
+      }
+      console.log(`Creating shared components for : ${GetNodeTitle(model)}`);
+
 			CreateComponentModel({
 				model: model.id,
 				viewTypeModelId: viewType.id,
@@ -46,23 +50,28 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 				isSharedComponent: true,
 				isDefaultComponent: true
 			});
-			await progressFunc(
-				(agentIndex * viewTypeIndex + viewTypeIndex) / (agentCount * viewTypeCount + agentCount * models.length)
-			);
+			if (progressFunc)
+				await progressFunc(
+					(agentIndex * viewTypeIndex + viewTypeIndex) /
+						(agentCount * viewTypeCount + agentCount * models.length)
+				);
 		});
-		await progressFunc((agentIndex + 0.5) / agentCount);
-
+		if (progressFunc) {
+			await progressFunc((agentIndex + 0.5) / agentCount);
+		}
 		await models.forEachAsync(async (v: any) => {
 			if (filter && !filter(v)) {
 				return;
 			}
+      console.log(`Creating components for : ${GetNodeTitle(v.id)}`);
 			CreateComponentModel({
 				agentId: agent.id,
 				model: v.id
 			});
 		});
-
-		await progressFunc((agentIndex + 0.75) / agentCount);
+		if (progressFunc) {
+			await progressFunc((agentIndex + 0.75) / agentCount);
+		}
 	});
 
 	return result;
@@ -140,4 +149,3 @@ function defaultParameters(args: any = {}) {
 		chosenChildren
 	};
 }
-

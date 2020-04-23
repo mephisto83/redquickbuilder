@@ -6,12 +6,13 @@ import path from 'path';
 import os from 'os';
 import { getDirectories } from './threadutil';
 import executeJob from './executeJob';
+import { Job } from '../../app/jobs/jobservice';
 
 export default async function task(jobPath: string) {
 	if (ifJobExists(jobPath)) {
 		console.log('there are jobs');
 		if (checkForIncompleteJobs(jobPath)) {
-			let jobConfig: JobConfig = getUnfinishedJob(jobPath);
+			let jobConfig: Job = getUnfinishedJob(jobPath);
 			jobConfig = await executeJob(jobConfig);
 			await updateJobConfig(jobConfig);
 		}
@@ -37,22 +38,26 @@ function getUnfinishedJob(jobPath: string) {
 function checkForIncompleteJobs(jobPath: string) {
 	return getUnfinishedJob(jobPath);
 }
-function isJobComplete(jobConfig: JobConfig) {
+function isJobComplete(jobConfig: Job) {
 	return jobConfig.complete;
 }
-function getJobConfig(jobInstancePath: string): JobConfig {
+function getJobConfig(jobInstancePath: string): Job {
 	const configFile: string = path.join(jobInstancePath, 'config.json');
 	if (fs.existsSync(jobInstancePath)) {
 		if (fs.existsSync(configFile)) {
-			const jobConfiguration: JobConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+			const jobConfiguration: Job = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 			jobConfiguration.absolutePath = configFile;
 			jobConfiguration.configAbsolutePath = jobInstancePath;
+			jobConfiguration.jobInstancePath = jobInstancePath;
+			console.log('job found');
 			return jobConfiguration;
 		}
+	} else {
+		console.log('job instance path didnt exist');
 	}
 	return null;
 }
-function updateJobConfig(jobConfig: JobConfig) {
+function updateJobConfig(jobConfig: Job) {
 	try {
 		jobConfig.updated = Date.now();
 		let content = JSON.stringify(jobConfig.configAbsolutePath, null, 4);
@@ -69,15 +74,4 @@ function ifJobExists(jobPath: string) {
 		return jobList.length;
 	}
 	return false;
-}
-
-export interface JobConfig {
-	complete: boolean;
-	updated: number;
-	absolutePath: string;
-	command: string;
-	configAbsolutePath: string;
-	filter: {
-		model: string;
-	};
 }

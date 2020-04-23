@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import task from './task';
+import { getDirectories } from '../../app/jobs/jobservice';
 
 process.on('message', (command: any) => {
 	let { message } = command;
 
 	let parsedMessage = message;
-  console.log(command);
+	console.log(command);
 	switch (parsedMessage.command) {
 		case Operations.INIT:
 			context.options = parsedMessage.options;
@@ -24,7 +25,6 @@ async function loop() {
 	let noerror = true;
 	do {
 		try {
-			console.log('taking a nap.');
 			process.send({ response: 'taking a nap' });
 			await sleep();
 			let { options } = context;
@@ -34,11 +34,14 @@ async function loop() {
 				if (!success) {
 					return false;
 				}
-				let jobPath = path.join(folderPath, 'jobs', agentName, projectName);
+				let jobPath = path.join(folderPath, 'agents', agentName, projectName);
 				if (fs.existsSync(jobPath)) {
-					process.send({ response: Operations.EXECUTING_TASK });
-					await task(jobPath);
-					process.send({ response: Operations.COMPLETED_TASK });
+					let jobsIndirectories = getDirectories(jobPath);
+					if (jobsIndirectories && jobsIndirectories.length) {
+						process.send({ response: Operations.EXECUTING_TASK });
+						await task(jobPath);
+						process.send({ response: Operations.COMPLETED_TASK });
+					}
 				}
 			} else {
 				console.warn('no options yet');
