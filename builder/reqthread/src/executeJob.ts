@@ -25,7 +25,8 @@ import uiReducer, { makeDefaultState, updateUI } from '../../app/reducers/uiRedu
 import unprune from '../../app/methods/unprune';
 import { createGraph, setupCache } from '../../app/methods/graph_methods';
 import prune from '../../app/methods/prune';
-import { Job, JobConfigContract, JobServiceConstants } from '../../app/jobs/jobservice';
+import { Job, JobOutput, JobConfigContract, JobServiceConstants, ensureDirectory } from '../../app/jobs/jobservice';
+import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
 
 const Create_Component_All = 'Create Component All';
@@ -51,7 +52,8 @@ export default async function executeJob(jobConfig: Job) {
 								return filter && filter.models.indexOf(model.id) !== -1;
 							}
 						);
-						await saveFile(path.join(jobInstancePath, part));
+            await storeOutput(path.join(jobInstancePath, part));
+            await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
 						break;
 					default:
 						jobConfig.complete = true;
@@ -69,71 +71,57 @@ async function setupJob(jobInstancePath) {
 	let graph = await openFile(path.join(jobInstancePath, JobServiceConstants.GRAPH_FILE), GetDispatchFunc());
 	let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph));
 	state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
-  app_state = { uiReducer: state };
-  console.log('setting dispatch');
+	app_state = { uiReducer: state };
+	console.log('setting dispatch');
 	setTestDispatch((args) => {
 		app_state = uiReducer(app_state, args);
 	});
 
-  console.log('setting getState');
+	console.log('setting getState');
 	setTestGetState(() => {
 		return app_state;
-  });
-  console.log('saving application');
+	});
+	console.log('saving application');
 	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
-  console.log('saving graph');
+	console.log('saving graph');
 	SaveGraph(graph, GetDispatchFunc());
-  console.log('setup cache');
+	console.log('setup cache');
 	setupCache(graph);
-  console.log('setup complete');
+	console.log('setup complete');
 }
-async function saveFile(partFolder: string) {
-	return new Promise((resolve, fail) => {
+
+async function storeOutput(partFolder: string) {
+	return new Promise(async (resolve, fail) => {
 		try {
 			let currentGraph = GetCurrentGraph();
-			let fileName = path.join(partFolder, JobServiceConstants.OUTPUT);
 			let savecontent = JSON.stringify(prune(currentGraph));
-
-			console.log(fileName);
-
-			fs.writeFile(fileName, savecontent, (err) => {
-				if (err) {
-					console.error(`An error ocurred updating the file${err.message}`);
-					console.log(err);
-					fail(err);
-					return;
-				}
-				resolve();
-				console.warn('The file has been succesfully saved');
-			});
+			await JobService.BreakFile(
+				partFolder,
+				JobServiceConstants.OUTPUT,
+				JobServiceConstants.OUTPUT_FOLDER,
+				JobServiceConstants.OUTPUT,
+				savecontent
+			);
+			resolve();
 		} catch (e) {
 			fail(e);
 		}
 	});
 }
 async function openFile(fileName: string, dispatch: any): Promise<Graph> {
-	return new Promise((resolve, fail) => {
-		console.log(fileName);
-		fs.readFile(fileName, { encoding: 'utf8' }, (err: { message: any }, res: string) => {
-			if (err) {
-				console.error(`An error ocurred updating the file${err.message}`);
-				console.log(err);
-				return;
-			}
-			try {
-				let opened_graph: Graph = JSON.parse(res);
-				if (opened_graph) {
-					opened_graph = unprune(opened_graph);
-					const default_graph = createGraph();
-					opened_graph = { ...default_graph, ...opened_graph };
+	try {
+		let dirPath = path.dirname(fileName);
+		let res = await JobService.JoinFile(dirPath, path.basename(fileName));
+		let opened_graph: Graph = JSON.parse(res);
+		if (opened_graph) {
+			opened_graph = unprune(opened_graph);
+			const default_graph = createGraph();
+			opened_graph = { ...default_graph, ...opened_graph };
 
-					resolve(opened_graph);
-				}
-			} catch (e) {
-				console.log(e);
-				fail();
-			}
-			console.warn('The file has been succesfully saved');
-		});
-	});
+			return opened_graph;
+		}
+	} catch (e) {
+		console.log('failed to open the file');
+		throw e;
+	}
 }

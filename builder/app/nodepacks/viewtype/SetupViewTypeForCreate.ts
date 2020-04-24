@@ -227,7 +227,7 @@ export function GetViewTypeModelType(node: any) {
 	let property = properties[0];
 	let modelType = null;
 	if (!property) {
-		console.log('no property');
+		console.debug('no property');
 		const modelOptions = GetNodesLinkedTo(graph, {
 			id: node,
 			link: LinkType.DefaultViewType,

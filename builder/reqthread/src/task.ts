@@ -6,22 +6,28 @@ import path from 'path';
 import os from 'os';
 import { getDirectories } from './threadutil';
 import executeJob from './executeJob';
-import { Job, JobServiceConstants } from '../../app/jobs/jobservice';
+import JobService, { Job, JobServiceConstants } from '../../app/jobs/jobservice';
 
 export default async function task(jobPath: string) {
 	if (ifJobExists(jobPath)) {
 		console.log('there are jobs');
 		let jobConfig: Job = getUnfinishedJob(jobPath);
 		if (jobConfig) {
-      console.log('execute job');
-			jobConfig = await executeJob(jobConfig);
-      console.log('job complete');
-			await updateJobConfig(jobConfig);
+			if (await canJobExecute(jobConfig)) {
+				console.log('execute job');
+				jobConfig = await executeJob(jobConfig);
+				console.log('job complete');
+				await updateJobConfig(jobConfig);
+			}
 		} else {
 			console.log('all jobs are complete');
 		}
 	}
 	return new Promise((resolve) => setTimeout(resolve, 120 * 1000));
+}
+async function canJobExecute(jobConfig: Job): Promise<boolean> {
+	const { jobInstancePath } = jobConfig;
+	return await JobService.CanJoinFiles(jobInstancePath, JobServiceConstants.GRAPH_FILE);
 }
 function getUnfinishedJob(jobPath: string): Job {
 	let folderExists = fs.existsSync(jobPath);
