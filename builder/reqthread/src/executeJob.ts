@@ -35,7 +35,7 @@ let app_state;
 async function sleep(ms: number = 30 * 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
-export default async function executeJob(jobConfig: Job) {
+export default async function executeJob(jobConfig: Job, onChange: Function) {
 	let { parts, jobInstancePath } = jobConfig;
 	if (!parts) throw new Error('no parts found in job');
 	await parts.forEachAsync(async (part: string) => {
@@ -58,6 +58,9 @@ export default async function executeJob(jobConfig: Job) {
 						);
 						await storeOutput(path.join(jobInstancePath, part));
 						await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
+						if (onChange) {
+							onChange();
+						}
 						break;
 					default:
 						jobConfig.complete = true;

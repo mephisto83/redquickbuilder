@@ -8,16 +8,19 @@ import { getDirectories } from './threadutil';
 import executeJob from './executeJob';
 import JobService, { Job, JobServiceConstants } from '../../app/jobs/jobservice';
 
-export default async function task(jobPath: string) {
+export default async function task(jobPath: string, onChange: Function) {
 	if (ifJobExists(jobPath)) {
 		console.log('there are jobs');
 		let jobConfig: Job = getUnfinishedJob(jobPath);
 		if (jobConfig) {
 			if (await canJobExecute(jobConfig)) {
 				console.log('execute job');
-				jobConfig = await executeJob(jobConfig);
+				jobConfig = await executeJob(jobConfig, onChange);
 				console.log('job complete');
 				await updateJobConfig(jobConfig);
+				if (onChange) {
+					onChange();
+				}
 			}
 		} else {
 			console.log('all jobs are complete');
@@ -72,7 +75,7 @@ function getJobConfig(jobInstancePath: string): Job {
 	}
 	return null;
 }
-function updateJobConfig(jobConfig: Job) {
+async function updateJobConfig(jobConfig: Job) {
 	try {
 		jobConfig.updated = Date.now();
 		let content = JSON.stringify(jobConfig, null, 4);

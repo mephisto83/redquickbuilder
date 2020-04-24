@@ -39,7 +39,9 @@ async function loop() {
 					let jobsIndirectories = getDirectories(jobPath);
 					if (jobsIndirectories && jobsIndirectories.length) {
 						process.send({ response: Operations.EXECUTING_TASK });
-						await task(jobPath);
+						await task(jobPath, () => {
+							process.send({ response: Operations.CHANGED, changed: true });
+						});
 						process.send({ response: Operations.COMPLETED_TASK });
 					}
 				}
@@ -83,6 +85,7 @@ export const Operations = {
 	NO_OP: 'NO_OP',
 	EXECUTING_TASK: 'EXECUTING_TASK',
 	INIT: 'INIT',
+	CHANGED: 'CHANGED',
 	COMPLETED_TASK: 'COMPLETED_TASK'
 };
 
