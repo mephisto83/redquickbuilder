@@ -264,26 +264,14 @@ export default class JobService {
 					if (!jobAssignment) {
 						throw new Error('no assignments');
 					}
-					let jobFolder = '';
 					jobAssignment.forEach((job) => {
-						jobFolder = job.job;
-						if (fs.existsSync(path.join(assignmentDir, job.job, job.file, INPUT))) {
-							fs.unlinkSync(path.join(assignmentDir, job.job, job.file, INPUT));
-						}
-						if (fs.existsSync(path.join(assignmentDir, job.job, GRAPH_FILE))) {
-							fs.unlinkSync(path.join(assignmentDir, job.job, GRAPH_FILE));
-						}
-						JobService.deleteFolder(path.join(assignmentDir, job.job, GRAPH_FOLDER));
-						// if (fs.existsSync(path.join(assignmentDir, job.job, JOB_NAME))) {
-						// 	fs.unlinkSync(path.join(assignmentDir, job.job, JOB_NAME));
-						// }
+						JobService.deleteFolder(path.join(assignmentDir, job.job));
 					});
-					// fs.unlinkSync(path.join(assignmentDir, jobFolder));
 				});
 			}
 		}
 	}
-	static async MoveCompletedJob(job: Job) {
+	static async MoveCompletedJob(job: Job): Promise<boolean> {
 		let { assignments } = job;
 		if (assignments) {
 			let remoteDirectories = Object.keys(assignments);
@@ -291,18 +279,14 @@ export default class JobService {
 				return await remoteDirectories.forEachAsync(async (assignmentDir: string) => {
 					let jobAssignment = assignments ? assignments[assignmentDir] : [];
 					return await jobAssignment.forEachAsync(async (job: JobItem) => {
-						const outputFile = path.join(assignmentDir, job.job, job.file, OUTPUT);
-						if (fs.existsSync(outputFile)) {
-							let filesToCopy = [ outputFile ];
+						let jobPartOutput: string = await JobService.JoinFile(
+							path.join(assignmentDir, job.job, job.file),
+							OUTPUT
+						);
+						if (jobPartOutput) {
 							await ensureDirectory(path.join(JOB_PATH, job.job, job.file));
-
-							filesToCopy.forEach((fileToCopy) => {
-								fs.copyFileSync(
-									path.join(outputFile, fileToCopy),
-									path.join(JOB_PATH, job.job, job.file, OUTPUT)
-								);
-							});
-							return;
+							fs.writeFileSync(path.join(JOB_PATH, job.job, job.file, OUTPUT), jobPartOutput, 'utf8');
+							return true;
 						}
 						console.error(job);
 						console.error(job.job);
@@ -316,34 +300,55 @@ export default class JobService {
 			return true;
 		}
 		return false;
-	}
+  }
+
 	static async IsComplete(job: Job) {
 		let { assignments } = job;
 		if (assignments) {
 			let remoteDirectories = Object.keys(assignments);
 			if (remoteDirectories.length) {
-				return remoteDirectories.some((assignmentDir) => {
-					let jobAssignment = assignments ? assignments[assignmentDir] : null;
-					if (!jobAssignment) {
-						throw new Error('no assignments');
+				let completed = true;
+				for (let i = 0; i < remoteDirectories.length; i++) {
+					let assignmentDir = remoteDirectories[i];
+					completed = completed && (await JobService.IsJobAssignmentComplete(assignments, assignmentDir));
+					if (!completed) {
+						return false;
 					}
-					return !jobAssignment.some((job) => {
-						if (fs.existsSync(path.join(assignmentDir, job.job, JOB_NAME))) {
-							let content = fs.readFileSync(path.join(assignmentDir, job.job, JOB_NAME), 'utf');
-							let config: Job = JSON.parse(content);
-							if (config) {
-								return !config.complete;
-							}
-						}
-						console.error(job);
-						console.error(job.job);
-						console.error(job.file);
-						console.error(assignmentDir);
-						throw new Error('missing job file');
-					});
-				});
+				}
+				return true;
 			}
-			return true;
+			throw new Error('no assignments assigned');
+		}
+		return false;
+	}
+	static async IsJobAssignmentComplete(assignments: JobAssignment, assignmentDir: string): Promise<boolean> {
+		let jobAssignment: JobItem[] | null = assignments ? assignments[assignmentDir] : null;
+		if (!jobAssignment) {
+			throw new Error('no assignments');
+		}
+		//					return !jobAssignment.some((job: JobItem) => {
+		let completed = true;
+		for (let i = 0; i < jobAssignment.length; i++) {
+			let job = jobAssignment[i];
+			let isComplete = await JobService.IsJobItemComplete(job, assignmentDir);
+			completed = completed && isComplete;
+			if (!completed) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	static async IsJobItemComplete(jobItem: JobItem, assignmentDir: string): Promise<boolean> {
+		if (fs.existsSync(path.join(assignmentDir, jobItem.job, jobItem.file, INPUT))) {
+			let content = fs.readFileSync(path.join(assignmentDir, jobItem.job, jobItem.file, INPUT), 'utf8');
+			let contract: JobConfigContract = JSON.parse(content);
+			if (contract) {
+				if (!contract.complete) {
+					return false;
+				}
+				return await JobService.CanJoinFiles(path.join(assignmentDir, jobItem.job, jobItem.file), OUTPUT);
+			}
 		}
 		return false;
 	}

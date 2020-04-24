@@ -31,6 +31,10 @@ import { Graph } from '../../app/methods/graph_types';
 
 const Create_Component_All = 'Create Component All';
 let app_state;
+
+async function sleep(ms: number = 30 * 1000) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 export default async function executeJob(jobConfig: Job) {
 	let { parts, jobInstancePath } = jobConfig;
 	if (!parts) throw new Error('no parts found in job');
@@ -52,8 +56,8 @@ export default async function executeJob(jobConfig: Job) {
 								return filter && filter.models.indexOf(model.id) !== -1;
 							}
 						);
-            await storeOutput(path.join(jobInstancePath, part));
-            await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
+						await storeOutput(path.join(jobInstancePath, part));
+						await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
 						break;
 					default:
 						jobConfig.complete = true;
@@ -63,6 +67,7 @@ export default async function executeJob(jobConfig: Job) {
 				jobConfig.complete = true;
 			}
 		}
+		await sleep();
 	});
 
 	return jobConfig;
