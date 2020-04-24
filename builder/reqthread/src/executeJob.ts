@@ -40,7 +40,7 @@ export default async function executeJob(jobConfig: Job) {
 	if (!parts) throw new Error('no parts found in job');
 	await parts.forEachAsync(async (part: string) => {
 		const partPath = path.join(jobInstancePath, part, JobServiceConstants.INPUT);
-		if (partPath) {
+		if (partPath && fs.existsSync(partPath)) {
 			const partContent: string = fs.readFileSync(partPath, 'utf8');
 			if (partContent) {
 				const jobPart: JobConfigContract = JSON.parse(partContent);
@@ -67,7 +67,9 @@ export default async function executeJob(jobConfig: Job) {
 				jobConfig.complete = true;
 			}
 		}
-		await sleep();
+		if (fs.existsSync(partPath)) {
+			await sleep();
+		}
 	});
 
 	return jobConfig;
