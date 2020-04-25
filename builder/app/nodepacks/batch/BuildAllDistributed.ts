@@ -122,6 +122,7 @@ const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionDataChainsIntoCollectionsTitle = 'Collection Data Chains Into Collections';
 const Collect_Into_Graph = 'Collect_Into_Graph';
+const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
 const buildAllProgress = [
 	{ name: Create_View_Types },
@@ -142,7 +143,8 @@ const buildAllProgress = [
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
-	{ name: CollectionDataChainsIntoCollectionsTitle }
+	{ name: CollectionDataChainsIntoCollectionsTitle },
+	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
 	Commands: buildAllProgress,
@@ -260,12 +262,14 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			});
 			await progresFunc(1);
 		});
+		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
+			currentJobFile.completed = true;
+		});
 	} catch (e) {
 		console.log(e);
 	}
 
 	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
-
 }
 
 BuildAllDistributed.title = 'Build All Distributed';

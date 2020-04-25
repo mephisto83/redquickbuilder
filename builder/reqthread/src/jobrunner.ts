@@ -40,7 +40,7 @@ async function executeStep(jobFilePath: string) {
 	console.log(jobFilePath);
 	let jobConfigContents = fs.readFileSync(jobFilePath, 'utf8');
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
-	if (!jobConfig.error) {
+	if (!jobConfig.error && !jobConfig.completed) {
 		try {
 			console.log('get next command');
 			let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
@@ -69,7 +69,7 @@ async function executeStep(jobFilePath: string) {
 		} finally {
 			await JobService.saveJobFile(jobFilePath, jobConfig);
 		}
-	} else {
+	} else if (jobConfig.error) {
 		console.log('job has an error, skipping');
 	}
 }
