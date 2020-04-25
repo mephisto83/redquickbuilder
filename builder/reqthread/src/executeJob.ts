@@ -25,7 +25,14 @@ import uiReducer, { makeDefaultState, updateUI } from '../../app/reducers/uiRedu
 import unprune from '../../app/methods/unprune';
 import { createGraph, setupCache } from '../../app/methods/graph_methods';
 import prune from '../../app/methods/prune';
-import { Job, JobOutput, JobConfigContract, JobServiceConstants, ensureDirectory } from '../../app/jobs/jobservice';
+import {
+	Job,
+	JobOutput,
+	JobConfigContract,
+	JobServiceConstants,
+	ensureDirectory,
+	JobItem
+} from '../../app/jobs/jobservice';
 import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
 import { setupJob } from './threadutil';
@@ -44,8 +51,9 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 		if (partPath && fs.existsSync(partPath)) {
 			const partContent: string = fs.readFileSync(partPath, 'utf8');
 			if (partContent) {
-				const jobPart: JobConfigContract = JSON.parse(partContent);
-				const { command, filter } = jobPart;
+				const jobPart: JobItem = JSON.parse(partContent);
+				const { config } = jobPart;
+				const { command, filter } = config;
 				app_state = await setupJob(jobInstancePath);
 
 				switch (command) {
@@ -64,10 +72,10 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 						}
 						break;
 					default:
-            jobConfig.complete = true;
-            console.log(jobPart);
-            console.log(partPath);
-            console.log(command);
+						jobConfig.complete = true;
+						console.log(jobPart);
+						console.log(partPath);
+						console.log(command);
 						throw new Error('unknown job');
 				}
 
