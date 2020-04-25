@@ -392,7 +392,7 @@ export default class JobService {
 	static async MergeCompletedJob(job: Job): Promise<Graph | null> {
 		console.log('merging completed job');
 		let intermedita: { [index: string]: Graph } = {};
-		job.parts.forEachAsync(async (part: string) => {
+		await job.parts.forEachAsync(async (part: string) => {
 			let graphOutput = await JobService.JoinFile(path.join(JOB_PATH, job.name, part), OUTPUT);
 			intermedita[part] = JSON.parse(graphOutput);
 		});
