@@ -3165,7 +3165,7 @@ export function loadGitRuns() {
 			setVisual(JOBS, jobs)(dispatch, getState);
 			await jobs.forEachAsync(async (jobInstance: Job) => {
 				let jobProgress = await JobService.JobProgress(jobInstance);
-        setVisual(JobProgressId(jobInstance), jobProgress)
+        setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
 			});
 		});
 	};

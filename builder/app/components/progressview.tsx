@@ -152,7 +152,7 @@ class ProgressView extends Component<any, any> {
 															<td>{job.parts.length}</td>
 															<td>{new Date(job.updated).toLocaleDateString()}</td>
 															<td>
-																{jobProgress ? jobProgress.total : ''}/{jobProgress ? jobProgress.complete : ''}
+																{jobProgress ? jobProgress.complete : ''}/{jobProgress ? jobProgress.total : ''}
 															</td>
 															<td>
 																{jobProgress && jobProgress.total ? (
