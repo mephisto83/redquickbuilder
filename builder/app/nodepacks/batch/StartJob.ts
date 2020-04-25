@@ -2,6 +2,7 @@ import { JobServiceConstants, ensureDirectory, JobFile } from '../../jobs/jobser
 import { GetCurrentGraph } from '../../actions/uiactions';
 import { Graph } from '../../methods/graph_types';
 import fs from 'fs';
+import path from 'path';
 import NameService from '../../jobs/nameservice';
 export default async function StartJob() {
 	await ensureDirectory(JobServiceConstants.JOBS_FILE_PATH);
@@ -17,3 +18,5 @@ export default async function StartJob() {
 		throw new Error('graph has not been saved');
 	}
 }
+
+StartJob.title = 'Start Job';

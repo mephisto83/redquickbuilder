@@ -57,7 +57,11 @@ export default class JobService {
 	}
 	static async JoinFile(relPath: string, fileName: string): Promise<string> {
 		let fileContents: string = fs.readFileSync(path.join(relPath, fileName), 'utf8');
-		let fileDetails: JobOutput = JSON.parse(fileContents);
+		let parsedResult = JSON.parse(fileContents);
+		if (parsedResult && parsedResult.workspace) {
+			return fileContents;
+		}
+		let fileDetails: JobOutput = parsedResult;
 		let contents: string = '';
 		fileDetails.files.forEach((file) => {
 			contents = contents + fs.readFileSync(path.join(relPath, file));
@@ -110,7 +114,8 @@ export default class JobService {
 	}
 
 	static async WaitForJob(command: string, currentJobFile: JobFile) {
-		let complete = false;
+    let complete = false;
+    console.log('wait for job completion');
 		do {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job);
@@ -442,7 +447,7 @@ export default class JobService {
 		let projectName = `${NameService.projectGenerator()}_${uuidv4().split('-')[0]}`;
 		await ensureDirectory(path.join(JOBS_FILE_PATH, projectName));
 		jobFile.originalGraphPath = jobFile.graphPath;
-		jobFile.graphPath = path.join(JOBS_FILE_PATH, projectName, GRAPH_FILE);
+		jobFile.graphPath = path.resolve(path.join(JOBS_FILE_PATH, projectName, GRAPH_FILE));
 		fs.writeFileSync(path.join(JOBS_FILE_PATH, projectName, JOB_NAME), JSON.stringify(jobFile), 'utf8');
 		fs.writeFileSync(path.join(JOBS_FILE_PATH, projectName, GRAPH_FILE), graph, 'utf8');
 	}
@@ -578,7 +583,7 @@ const isDirectory = (source: any) => fs.lstatSync(source).isDirectory();
 export const getDirectories = (source: any) =>
 	fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
 
-  export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path.join(source, name)));
+export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path.join(source, name)));
 
 export async function ensureDirectory(dir: any) {
 	if (!fs.existsSync(dir)) {

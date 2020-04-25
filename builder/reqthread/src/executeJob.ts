@@ -64,7 +64,10 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 						}
 						break;
 					default:
-						jobConfig.complete = true;
+            jobConfig.complete = true;
+            console.log(jobPart);
+            console.log(partPath);
+            console.log(command);
 						throw new Error('unknown job');
 				}
 
