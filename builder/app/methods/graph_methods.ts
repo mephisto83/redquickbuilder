@@ -1285,6 +1285,7 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 			throw new Error('invalid grid links');
 		}
 	}
+	graph = incrementBuild(graph);
 	if (options.links) {
 		options.links
 			.filter((x: any) => x)

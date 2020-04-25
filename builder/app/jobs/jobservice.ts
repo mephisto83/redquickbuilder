@@ -58,7 +58,7 @@ export default class JobService {
 	static async JoinFile(relPath: string, fileName: string): Promise<string> {
 		let fileContents: string = fs.readFileSync(path.join(relPath, fileName), 'utf8');
 		let parsedResult = JSON.parse(fileContents);
-		if (parsedResult && parsedResult.workspace) {
+		if (parsedResult && (parsedResult.workspace || parsedResult.version)) {
 			return fileContents;
 		}
 		let fileDetails: JobOutput = parsedResult;
@@ -114,8 +114,8 @@ export default class JobService {
 	}
 
 	static async WaitForJob(command: string, currentJobFile: JobFile) {
-    let complete = false;
-    console.log('wait for job completion');
+		let complete = false;
+		console.log('wait for job completion');
 		do {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job);
