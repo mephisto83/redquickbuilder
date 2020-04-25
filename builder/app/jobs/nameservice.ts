@@ -261,7 +261,7 @@ Heart Rich
 Intense Rubber`;
 		let splitNames = names.split('\n').filter((x) => x.trim());
 		let index = Math.floor(Math.random() * splitNames.length);
-		return splitNames[index].split(' ').join('').toLocaleLowerCase();
+		return splitNames[index].split(' ').join('_').toLocaleLowerCase();
 	}
 	static superHeroName(): string {
 		let names = `

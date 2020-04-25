@@ -30,7 +30,7 @@ import CreateFetchServiceIdempotently from '../nodepacks/CreateFetchServiceIdemp
 import { ViewTypes } from '../constants/viewtypes';
 import CreateViewTypes from '../nodepacks/batch/CreateViewTypes';
 import BuildAll from '../nodepacks/batch/buildAll';
-import BuildAllDistributed, { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
+import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props) {
@@ -218,7 +218,7 @@ class QuickMethods extends Component<any, any, any> {
 										}
 									}}
 								/>
-								<TreeViewMenu
+								{/* <TreeViewMenu
 									title={BuildAllDistributed.title}
 									icon="fa fa-plus"
 									onClick={() => {
@@ -239,7 +239,7 @@ class QuickMethods extends Component<any, any, any> {
 											BuildAllDistributed(() => {});
 										}
 									}}
-								/>
+								/> */}
 								<TreeViewMenu
 									title={'Distribute Build All Jobs'}
 									icon="fa fa-plus"

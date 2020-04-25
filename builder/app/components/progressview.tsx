@@ -54,7 +54,7 @@ import Tabs from './tabs';
 import Tab from './tab';
 import TabPane from './tabpane';
 import TabContent from './tabcontent';
-import { Job } from '../jobs/jobservice';
+import { Job, JobAssignment, JobItem } from '../jobs/jobservice';
 
 const PROGRESS_VIEW_TAB = 'PROGRESS_VIEW_TAB';
 
@@ -135,6 +135,7 @@ class ProgressView extends Component<any, any> {
 										<table className="table table-bordered">
 											<tbody>
 												<tr>
+													<th />
 													<th>Nickname</th>
 													<th>Name</th>
 													<th>Parts #</th>
@@ -144,9 +145,77 @@ class ProgressView extends Component<any, any> {
 												</tr>
 												{jobs.map((job: Job, jobIndex: number) => {
 													let jobProgress = Visual(state, JobProgressId(job));
-
+													let { assignments } = job;
+													let assignmentRows: any[] = [];
+													if (assignments && this.state[job.nickName]) {
+														assignmentRows = Object.keys(
+															assignments
+														).map((assignmentId) => {
+															if (assignments) {
+																let jobItems: JobItem[] = assignments[assignmentId];
+																return (
+																	<tr>
+																		<td
+																			style={{
+																				overflow: 'hidden',
+																				maxWidth: 200,
+																				whiteSpace: 'nowrap',
+																				textOverflow: 'ellipsis'
+																			}}
+																		>
+																			{' '}
+																			{assignmentId}
+																		</td>
+																		<td>{jobItems ? jobItems.length : 0}</td>
+																		<td>
+																			<table className="table table-bordered">
+																				<tbody>
+																					<tr>
+																						<th>Job</th>
+																						<th>File</th>
+																						<th>Distributed</th>
+																					</tr>
+																					{jobItems ? (
+																						jobItems.map((jobItem) => {
+																							return (
+																								<tr>
+																									<td>
+																										{jobItem.job}
+																									</td>
+																									<td>
+																										{jobItem.file}
+																									</td>
+																									<td>
+																										{jobItem.distributed ? (
+																											<i className="fa fa-heart" />
+																										) : null}
+																									</td>
+																								</tr>
+																							);
+																						})
+																					) : null}
+																				</tbody>
+																			</table>
+																		</td>
+																	</tr>
+																);
+															}
+														});
+													}
 													return [
 														<tr key={`job-${jobIndex}`}>
+															<td>
+																<i
+																	onClick={() => {
+																		this.setState({
+																			[job.nickName]: !!!this.state[job.nickName]
+																		});
+																	}}
+																	className={`fa ${this.state[job.nickName]
+																		? 'fa-chevron-down'
+																		: 'fa-chevron-right'}`}
+																/>
+															</td>
 															<td>{job.nickName}</td>
 															<td>{job.name}</td>
 															<td>{job.parts.length}</td>
@@ -166,6 +235,11 @@ class ProgressView extends Component<any, any> {
 																		max={100}
 																	/>
 																) : null}
+															</td>
+														</tr>,
+														<tr>
+															<td colSpan="5">
+																<table>{assignmentRows}</table>
 															</td>
 														</tr>
 													];

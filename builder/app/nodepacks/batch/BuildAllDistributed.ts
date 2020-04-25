@@ -30,7 +30,7 @@ import SetupViewTypes from './SetupViewTypes';
 import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';
 import ApplyLoginValidations from './ApplyLoginValidations';
 import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
-import JobService from '../../jobs/jobservice';
+import JobService, { Job, JobFile } from '../../jobs/jobservice';
 
 interface BuildStep {
 	progress?: number;
@@ -71,7 +71,17 @@ function setProgress(array: BuildStep[], name: string, progress: number, estimat
 	}
 }
 
+const buildAllConfig = {
+	command: ''
+};
+function setCommandToRun(command: string) {
+	buildAllConfig.command = command;
+}
+
 async function run(array: BuildStep[], name: string, func: Function) {
+	if (name !== buildAllConfig.command) {
+		return;
+	}
 	activate(array, name);
 	const times = [ Date.now() ];
 	await func(async (progressValue: number) => {
@@ -93,23 +103,54 @@ async function run(array: BuildStep[], name: string, func: Function) {
 	await pause();
 }
 
-export default async function BuildAllDistributed(callback?: Function) {
-	const Create_View_Types = 'Create View Types';
-	const Add_Agent_Methods = 'Add Agent Methods';
-	const Create_Component_All = 'Create Component All';
-	const Select_All_On_Model_Filters = 'Select All On Model Filters';
-	const Add_Filters_To_Get_All = 'Add Filters to Get All';
-	const Create_Dashboard = 'Create Dashboard';
-	const Create_Login_Models = 'Create Login Models';
-	const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
-	const Create_Configuration = 'Create Configuration';
-	const Create_Fetch_Service = 'Create Fetch Service';
-	const Create_Claim_Service = 'Create Claim Service';
-	const Connect_Screens = 'Connect_Screens';
-	const Setup_View_Types = 'Setup_View_Types';
-	const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
-	const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
-	const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
+const Create_View_Types = 'Create View Types';
+const Add_Agent_Methods = 'Add Agent Methods';
+const Create_Component_All = 'Create Component All';
+const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
+const Select_All_On_Model_Filters = 'Select All On Model Filters';
+const Add_Filters_To_Get_All = 'Add Filters to Get All';
+const Create_Dashboard = 'Create Dashboard';
+const Create_Login_Models = 'Create Login Models';
+const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
+const Create_Configuration = 'Create Configuration';
+const Create_Fetch_Service = 'Create Fetch Service';
+const Create_Claim_Service = 'Create Claim Service';
+const Connect_Screens = 'Connect_Screens';
+const Setup_View_Types = 'Setup_View_Types';
+const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
+const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
+const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
+const CollectionDataChainsIntoCollectionsTitle = 'Collection Data Chains Into Collections';
+const Collect_Into_Graph = 'Collect_Into_Graph';
+
+const buildAllProgress = [
+	{ name: Create_View_Types },
+	{ name: Add_Agent_Methods },
+	{ name: Create_Component_All },
+	{ name: Wait_For_Create_Component_All_Completion },
+	{ name: Collect_Into_Graph },
+	{ name: Select_All_On_Model_Filters },
+	{ name: Add_Filters_To_Get_All },
+	{ name: Create_Dashboard },
+	{ name: Create_Login_Models },
+	{ name: Add_Chain_To_Navigate_Next_Screens },
+	{ name: Create_Configuration },
+	{ name: Create_Fetch_Service },
+	{ name: Create_Claim_Service },
+	{ name: Connect_Screens },
+	{ name: Setup_View_Types },
+	{ name: Have_All_Properties_On_Executors },
+	{ name: Add_Copy_Command_To_Executors },
+	{ name: Add_Component_To_Screen_Options },
+	{ name: CollectionDataChainsIntoCollectionsTitle }
+];
+export const BuildAllInfo = {
+	Commands: buildAllProgress,
+	InitialStep: Create_View_Types
+};
+export default async function BuildAllDistributed(command: string, currentJobFile: JobFile = null): Promise<Job> {
+	let result: Job;
+	setCommandToRun(command);
 	const uiTypes = {
 		[UITypes.ElectronIO]: true,
 		[UITypes.ReactWeb]: true,
@@ -118,25 +159,6 @@ export default async function BuildAllDistributed(callback?: Function) {
 	SetPause(true);
 	setVisual(MAIN_CONTENT, PROGRESS_VIEW)(GetDispatchFunc(), GetStateFunc());
 	await pause();
-	const buildAllProgress = [
-		{ name: Create_View_Types },
-		{ name: Add_Agent_Methods },
-		{ name: Create_Component_All },
-		{ name: Select_All_On_Model_Filters },
-		{ name: Add_Filters_To_Get_All },
-		{ name: Create_Dashboard },
-		{ name: Create_Login_Models },
-		{ name: Add_Chain_To_Navigate_Next_Screens },
-		{ name: Create_Configuration },
-		{ name: Create_Fetch_Service },
-		{ name: Create_Claim_Service },
-		{ name: Connect_Screens },
-		{ name: Setup_View_Types },
-		{ name: Have_All_Properties_On_Executors },
-		{ name: Add_Copy_Command_To_Executors },
-		{ name: Add_Component_To_Screen_Options },
-		{ name: 'CollectionDataChainsIntoCollections' }
-	];
 
 	setFlag(true, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
 	try {
@@ -170,75 +192,81 @@ export default async function BuildAllDistributed(callback?: Function) {
 			await ApplyLoginValidations(progresFunc);
 		});
 
+		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
+			result = await JobService.StartJob(Create_Component_All, currentJobFile);
+		});
 
-		await JobService.CreateJob(Create_Component_All);
+		await run(
+			buildAllProgress,
+			Wait_For_Create_Component_All_Completion,
+			async (progresFunc: (arg0: number) => any) => {
+				await JobService.WaitForJob(Wait_For_Create_Component_All_Completion, currentJobFile);
+			}
+		);
+		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
+			await JobService.CollectForJob(Collect_Into_Graph, currentJobFile);
+		});
 
-		// await run(buildAllProgress, Create_Component_All, async (progresFunc: any) => {
-		// 	await CreateComponentAll(progresFunc);
-		// });
+		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
+			await AddFiltersToGetAll(progresFunc);
+		});
 
-		// await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
-		// 	await AddFiltersToGetAll(progresFunc);
-		// });
+		await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc: any) => {
+			await SelectAllOnModelFilters(progresFunc);
+		});
 
-		// await run(buildAllProgress, Select_All_On_Model_Filters, async (progresFunc: any) => {
-		// 	await SelectAllOnModelFilters(progresFunc);
-		// });
+		await run(buildAllProgress, Add_Chain_To_Navigate_Next_Screens, async (progresFunc: any) => {
+			await AddChainToNavigateNextScreens(progresFunc);
+		});
 
-		// await run(buildAllProgress, Add_Chain_To_Navigate_Next_Screens, async (progresFunc: any) => {
-		// 	await AddChainToNavigateNextScreens(progresFunc);
-		// });
+		await run(buildAllProgress, Create_Configuration, async (progresFunc: any) => {
+			graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());
+		});
 
-		// await run(buildAllProgress, Create_Configuration, async (progresFunc: any) => {
-		// 	graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());
-		// });
+		await run(buildAllProgress, Create_Fetch_Service, async (progresFunc: (arg0: number) => any) => {
+			graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
+			await progresFunc(1 / 2);
+			graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
+			await progresFunc(2 / 2);
+		});
 
-		// await run(buildAllProgress, Create_Fetch_Service, async (progresFunc: (arg0: number) => any) => {
-		// 	graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
-		// 	await progresFunc(1 / 2);
-		// 	graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
-		// 	await progresFunc(2 / 2);
-		// });
+		await run(buildAllProgress, Create_Claim_Service, async (progresFunc: any) => {
+			CreateClaimService();
+		});
 
-		// await run(buildAllProgress, Create_Claim_Service, async (progresFunc: any) => {
-		// 	CreateClaimService();
-		// });
+		await run(buildAllProgress, Connect_Screens, async (progresFunc: any) => {
+			await ConnectScreens(progresFunc);
+		});
 
-		// await run(buildAllProgress, Connect_Screens, async (progresFunc: any) => {
-		// 	await ConnectScreens(progresFunc);
-		// });
+		await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {
+			await SetupViewTypes(progresFunc);
+		});
 
-		// await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {
-		// 	await SetupViewTypes(progresFunc);
-		// });
+		await run(buildAllProgress, Have_All_Properties_On_Executors, async (progresFunc: any) => {
+			await HaveAllPropertiesOnExecutors(progresFunc);
+		});
 
-		// await run(buildAllProgress, Have_All_Properties_On_Executors, async (progresFunc: any) => {
-		// 	await HaveAllPropertiesOnExecutors(progresFunc);
-		// });
+		await run(buildAllProgress, Add_Copy_Command_To_Executors, async (progresFunc: any) => {
+			await AddCopyCommandToExecutors(progresFunc);
+		});
+		await run(buildAllProgress, Add_Component_To_Screen_Options, async (progresFunc: any) => {
+			await AddComponentsToScreenOptions(progresFunc);
+		});
 
-		// await run(buildAllProgress, Add_Copy_Command_To_Executors, async (progresFunc: any) => {
-		// 	await AddCopyCommandToExecutors(progresFunc);
-		// });
-		// await run(buildAllProgress, Add_Component_To_Screen_Options, async (progresFunc: any) => {
-		// 	await AddComponentsToScreenOptions(progresFunc);
-		// });
-
-		// await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: any) => {
-		// 	const result = CollectionDataChainsIntoCollections(progresFunc);
-		// 	await result.forEachAsync(async (item: any, index: number, total: number) => {
-		// 		graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
-		// 		await progresFunc(index / total);
-		// 	});
-		// 	await progresFunc(1);
-		// });
+		await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: any) => {
+			const result = CollectionDataChainsIntoCollections(progresFunc);
+			await result.forEachAsync(async (item: any, index: number, total: number) => {
+				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
+				await progresFunc(index / total);
+			});
+			await progresFunc(1);
+		});
 	} catch (e) {
 		console.log(e);
 	}
 
 	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
-	if (callback) {
-		callback();
-	}
+
 	SetPause(false);
 
 	return [];
@@ -247,6 +275,5 @@ export default async function BuildAllDistributed(callback?: Function) {
 BuildAllDistributed.title = 'Build All Distributed';
 
 export async function DistributeBuildAllJobs() {
-
 	await JobService.DistributeJobs();
 }

@@ -28,6 +28,7 @@ import prune from '../../app/methods/prune';
 import { Job, JobOutput, JobConfigContract, JobServiceConstants, ensureDirectory } from '../../app/jobs/jobservice';
 import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
+import { setupJob } from './threadutil';
 
 const Create_Component_All = 'Create Component All';
 let app_state;
@@ -45,7 +46,7 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 			if (partContent) {
 				const jobPart: JobConfigContract = JSON.parse(partContent);
 				const { command, filter } = jobPart;
-				await setupJob(jobInstancePath);
+				app_state = await setupJob(jobInstancePath);
 
 				switch (command) {
 					case Create_Component_All:
@@ -77,28 +78,6 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 
 	return jobConfig;
 }
-async function setupJob(jobInstancePath) {
-	let graph = await openFile(path.join(jobInstancePath, JobServiceConstants.GRAPH_FILE), GetDispatchFunc());
-	let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph));
-	state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
-	app_state = { uiReducer: state };
-	console.log('setting dispatch');
-	setTestDispatch((args) => {
-		app_state = uiReducer(app_state, args);
-	});
-
-	console.log('setting getState');
-	setTestGetState(() => {
-		return app_state;
-	});
-	console.log('saving application');
-	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
-	console.log('saving graph');
-	SaveGraph(graph, GetDispatchFunc());
-	console.log('setup cache');
-	setupCache(graph);
-	console.log('setup complete');
-}
 
 async function storeOutput(partFolder: string) {
 	return new Promise(async (resolve, fail) => {
@@ -117,21 +96,4 @@ async function storeOutput(partFolder: string) {
 			fail(e);
 		}
 	});
-}
-async function openFile(fileName: string, dispatch: any): Promise<Graph> {
-	try {
-		let dirPath = path.dirname(fileName);
-		let res = await JobService.JoinFile(dirPath, path.basename(fileName));
-		let opened_graph: Graph = JSON.parse(res);
-		if (opened_graph) {
-			opened_graph = unprune(opened_graph);
-			const default_graph = createGraph();
-			opened_graph = { ...default_graph, ...opened_graph };
-
-			return opened_graph;
-		}
-	} catch (e) {
-		console.log('failed to open the file');
-		throw e;
-	}
 }

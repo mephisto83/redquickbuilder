@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import task from './task';
 import { getDirectories } from '../../app/jobs/jobservice';
+import { sleep } from './threadutil';
 
 process.on('message', (command: any) => {
 	let { message } = command;
@@ -55,9 +56,6 @@ async function loop() {
 			console.error(e);
 		}
 	} while (noerror);
-}
-function sleep(ms: number = 30 * 1000) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const updateAgent = async (options: any) => {
