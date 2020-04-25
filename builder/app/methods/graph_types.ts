@@ -4,6 +4,7 @@ export interface Graph {
 	workspace: string;
 	title: string;
 	namespace: string;
+	graphFile?: string;
 	path: string[];
 	groups: string[];
 	groupLib: { [index: string]: Group };

@@ -78,6 +78,12 @@ export async function saveCurrentGraphTo(filePath) {
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');
 }
+
+export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
+	let savecontent = JSON.stringify(prune(currentGraph));
+	fs.writeFileSync(filePath, savecontent, 'utf8');
+}
+
 export async function openFile(fileName: string, dispatch: any): Promise<Graph> {
 	try {
 		let dirPath = path.dirname(fileName);

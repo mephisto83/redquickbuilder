@@ -4,9 +4,10 @@ import path from 'path';
 import { NodesByType, GetCurrentGraph } from '../actions/uiactions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
-import { Node } from '../methods/graph_types';
+import { Node, Graph } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
+import mergeGraph from '../methods/mergeGraph';
 
 export default class JobService {
 	static async getAgents() {
@@ -113,13 +114,23 @@ export default class JobService {
 		do {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job);
+			await sleep();
 		} while (!complete);
 	}
 
-	static async CollectForJob(command: string, currentJobFile: JobFile) {
-    // Collect the job parts into a graph again.
-    await JobService.CollectJobResults();
-    // Save the new graph, and continue with the job.
+	static async CollectForJob(currentJobFile: JobFile) {
+		// Collect the job parts into a graph again.
+		let currentJob: Job = await JobService.loadJob(currentJobFile.jobPath);
+		console.log('collecting job results');
+		await JobService.CollectJobResults(currentJob);
+		console.log('merge job results');
+		let graph = await JobService.MergeCompletedJob(currentJob);
+		if (graph) {
+			await writeGraphToFile(graph, currentJobFile.graphPath);
+		} else {
+			throw new Error('graph shouldnt be null, CollectForJob, jobservice.ts');
+		}
+		// Save the new graph, and continue with the job.
 	}
 
 	static async loadJob(filePath: string | undefined): Promise<Job> {
@@ -304,9 +315,12 @@ export default class JobService {
 		return jobToDistribute;
 	}
 
-	static async CollectJobResults() {
-		let jobs = await JobService.getJobs();
-		for (let i: any = 0; i < 0; i++) {
+	static async CollectJobResults(selectedJob?: Job) {
+		let jobs: Job[] = await JobService.getJobs();
+		if (selectedJob) {
+			jobs = jobs.filter((x: Job) => x.name === selectedJob.name);
+		}
+		for (let i: any = 0; i < jobs.length; i++) {
 			let job = jobs[i];
 			try {
 				let isDone = await JobService.IsComplete(job);
@@ -363,6 +377,24 @@ export default class JobService {
 			return true;
 		}
 		return false;
+	}
+
+	static async MergeCompletedJob(job: Job): Promise<Graph | null> {
+		console.log('merging completed job');
+		let intermedita: { [index: string]: Graph } = {};
+		job.parts.forEachAsync(async (part: string) => {
+			let graphOutput = await JobService.JoinFile(path.join(JOB_PATH, job.name, part), OUTPUT);
+			intermedita[part] = JSON.parse(graphOutput);
+		});
+
+		let mergedGraph: Graph | null = null;
+		job.parts.forEach(async (part: string) => {
+			mergedGraph = mergeGraph(mergedGraph, intermedita[part]);
+		});
+
+		console.log('merged completed job');
+
+		return mergedGraph;
 	}
 
 	static async IsComplete(job: Job) {
@@ -540,10 +572,14 @@ export interface JobFile {
 	error?: string;
 	step?: string;
 }
+
 const isDirectory = (source: any) => fs.lstatSync(source).isDirectory();
+
 export const getDirectories = (source: any) =>
 	fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
-export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path.join(source, name)));
+
+  export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path.join(source, name)));
+
 export async function ensureDirectory(dir: any) {
 	if (!fs.existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
@@ -561,4 +597,13 @@ export async function ensureDirectory(dir: any) {
 			}
 		}
 	});
+}
+
+export function sleep(ms: number = 10 * 1000) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
+	let savecontent = JSON.stringify(prune(currentGraph));
+	fs.writeFileSync(filePath, savecontent, 'utf8');
 }

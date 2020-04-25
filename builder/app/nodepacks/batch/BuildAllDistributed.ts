@@ -148,7 +148,7 @@ export const BuildAllInfo = {
 	Commands: buildAllProgress,
 	InitialStep: Create_View_Types
 };
-export default async function BuildAllDistributed(command: string, currentJobFile: JobFile = null): Promise<Job> {
+export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
 	let result: Job;
 	setCommandToRun(command);
 	const uiTypes = {
@@ -204,7 +204,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			}
 		);
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
-			await JobService.CollectForJob(Collect_Into_Graph, currentJobFile);
+			await JobService.CollectForJob(currentJobFile);
 		});
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
@@ -268,12 +268,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
 
 	SetPause(false);
-
-	return [];
 }
 
 BuildAllDistributed.title = 'Build All Distributed';
 
 export async function DistributeBuildAllJobs() {
-	await JobService.DistributeJobs();
+	// await JobService.DistributeJobs();
 }

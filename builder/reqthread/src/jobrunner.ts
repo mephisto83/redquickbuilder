@@ -30,10 +30,10 @@ async function executeStep(jobFilePath: string) {
 	let jobConfigContents = fs.readFileSync(jobFilePath, 'utf8');
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error) {
-		let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
-		await setupJob(path.dirname(jobConfig.graphPath));
-		let step = BuildAllInfo.Commands[currentStep + 1];
 		try {
+      let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
+      await setupJob(path.dirname(jobConfig.graphPath));
+      let step = BuildAllInfo.Commands[currentStep + 1];
 			await BuildAllDistributed(step.name, jobConfig);
 			await saveCurrentGraphTo(jobConfig.graphPath);
 			jobConfig.step = step.name;

@@ -258,7 +258,121 @@ Angry Beta
 Long Weather
 Parachute Restless
 Heart Rich
-Intense Rubber`;
+Intense Rubber
+Strong Golden Beta
+Wild Omega
+Rapid Teal Toothbrush
+Navy Panther
+Coffin Persistent
+Gruesome Strawberry Antique
+Albatross Old
+Postal Rocky
+Waffle Insane
+Surreal Locomotive
+Maximum Streaming Arm
+Gloomy Microphone
+Sun Lost
+Hideous Dreadful Scoreboard
+Intensive Insane Morning
+Dancing Microphone
+Lantern Third
+Golden Parachute
+Permanent Gold Tombstone
+Gold Lion
+Scarlet Crystal
+Dancing Parachute
+Rebel Notorious
+Elastic Venom
+Itchy Sledgehammer
+Brave Alarm
+Random Beacon Breeze
+Lobster Golden
+Lost Tiger
+Modern Mars
+Rough Scoreboard
+Tungsten Aggressive
+Serpent Pure
+Minimum Wild Pineapple
+Deserted Snake
+Toothbrush Nervous
+Morbid Hurricane
+Empty Peasant
+Clown Aimless
+Essential Donut
+Tainted Scorpion
+Yellow Tombstone
+Flaming Aimless Moose
+Rebel Parachute
+Brown Coffin
+Bleeding Torpedo
+Nervous Storm
+Cloudy Crossbow
+Official Elastic Toothbrush
+Surreal Bulldozer
+Red Indigo Sunshine
+Grim Notorious
+Itchy Tuba
+Strong Bitter Coffin
+Venom Blue
+Screaming Foot
+Empty Appropriate Albatross
+Trombone Icy
+Tasty Outstanding Winter
+Rebel Mars
+Strong Butter
+Strawberry Wrench
+Steady Restless Boomerang
+Stormy Peasant
+Helpless Tuba
+Artificial Sad
+Remote Butter
+Aggressive Hammer
+New Space
+Pottery Early
+Outstanding Serpent
+Navy Solid Ostrich
+Full Frostbite
+Scarlet Accidentally Vulture
+Hot Screaming Hurricane
+Indigo Railroad
+Subtle Flag
+Rare Longitude
+Solid Rough Mars
+Supersonic Eternal Scorpion
+Epsilon Hidden
+Stormy Dog
+Running Fish
+Clown Northernmost
+Roadrunner Wooden
+Artificial Brutal
+Endless Dinosaur
+Everyday Aggressive Neptune
+Persistent Lantern
+Orange Tuna
+Appropriate Shower
+Pineapple Scarlet
+Scarlet Accidentally Tea
+Wild Space
+Strong Viper
+Hideous Finger
+Supersonic Summer
+Intensive Alarm
+Viper Ninth
+Massive Postal
+Disappointed Mountain
+Sledgehammer Helpless
+Aggressive Coffin
+Confidential Alien Longitude
+Global Tidy Balcony
+Everyday Alpha
+Alien Scissors
+Eager Foot
+Nervous Helpless Bird
+Temple Black
+Appropriate Hammer
+Surreal Obscure
+Endless Uranium
+Streaming Barbershop`;
 		let splitNames = names.split('\n').filter((x) => x.trim());
 		let index = Math.floor(Math.random() * splitNames.length);
 		return splitNames[index].split(' ').join('_').toLocaleLowerCase();
