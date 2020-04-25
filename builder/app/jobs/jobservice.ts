@@ -125,6 +125,7 @@ export default class JobService {
 
 	static async CollectForJob(currentJobFile: JobFile) {
 		// Collect the job parts into a graph again.
+		await sleep(5 * 1000);
 		let currentJob: Job = await JobService.loadJob(currentJobFile.jobPath);
 		console.log('collecting job results');
 		await JobService.CollectJobResults(currentJob);
@@ -325,6 +326,9 @@ export default class JobService {
 		if (selectedJob) {
 			jobs = jobs.filter((x: Job) => x.name === selectedJob.name);
 		}
+		if (jobs.length === 0) {
+			throw 'no jobs to collect results for';
+		}
 		for (let i: any = 0; i < jobs.length; i++) {
 			let job = jobs[i];
 			try {
@@ -394,7 +398,13 @@ export default class JobService {
 
 		let mergedGraph: Graph | null = null;
 		job.parts.forEach(async (part: string) => {
+			if (!intermedita[part]) {
+				throw new Error('intermedita[part] cant be falsy;');
+			}
 			mergedGraph = mergeGraph(mergedGraph, intermedita[part]);
+			if (!mergedGraph) {
+				throw new Error('graph should be merged');
+			}
 		});
 
 		console.log('merged completed job');
