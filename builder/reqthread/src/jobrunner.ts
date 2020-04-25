@@ -48,6 +48,8 @@ async function executeStep(jobFilePath: string) {
 			await setupJob(path.dirname(jobConfig.graphPath));
 			let step = BuildAllInfo.Commands[currentStep + 1];
 			console.log(`step: ${step.name}`);
+			console.log(`currentStep: ${currentStep + 1}`);
+
 			console.log('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
 			console.log('save current graph to');

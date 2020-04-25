@@ -57,7 +57,6 @@ export async function setupJob(graphFolder: string) {
 	let app_state = { uiReducer: state };
 	console.log('setting dispatch');
 	setTestDispatch((args) => {
-    console.log('here');
 		app_state = uiReducer(app_state, args);
 	});
 

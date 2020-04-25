@@ -1,7 +1,7 @@
 import config from '../config';
 import fs, { existsSync } from 'fs';
 import path from 'path';
-import { NodesByType, GetCurrentGraph } from '../actions/uiactions';
+import { NodesByType, GetCurrentGraph, GetDispatchFunc, UIC, GRAPHS } from '../actions/uiactions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 import { Node, Graph } from '../methods/graph_types';
@@ -132,6 +132,7 @@ export default class JobService {
 		console.log('merge job results');
 		let graph = await JobService.MergeCompletedJob(currentJob);
 		if (graph) {
+			await setCurrentGraph(graph);
 			await writeGraphToFile(graph, currentJobFile.graphPath);
 		} else {
 			throw new Error('graph shouldnt be null, CollectForJob, jobservice.ts');
@@ -335,7 +336,7 @@ export default class JobService {
 				let isDone = await JobService.IsComplete(job);
 				if (isDone) {
 					await JobService.MoveCompletedJob(job);
-					await JobService.CleanUpJob(job);
+					//	await JobService.CleanUpJob(job);
 				}
 			} catch (e) {}
 		}
@@ -397,13 +398,13 @@ export default class JobService {
 		});
 
 		let mergedGraph: Graph | null = null;
-		job.parts.forEach(async (part: string) => {
+		await job.parts.forEachAsync(async (part: string) => {
 			if (!intermedita[part]) {
 				throw new Error('intermedita[part] cant be falsy;');
 			}
 			mergedGraph = mergeGraph(mergedGraph, intermedita[part]);
 			if (!mergedGraph) {
-				throw new Error('graph should be merged');
+				throw new Error('graph should have been merged');
 			}
 		});
 
@@ -422,13 +423,16 @@ export default class JobService {
 					let assignmentDir = remoteDirectories[i];
 					completed = completed && (await JobService.IsJobAssignmentComplete(assignments, assignmentDir));
 					if (!completed) {
+						console.log('job not is completed');
 						return false;
 					}
 				}
+				console.log('job is completed');
 				return true;
 			}
 			throw new Error('no assignments assigned');
 		}
+		console.log('job not is completed: no assignments');
 		return false;
 	}
 
@@ -621,4 +625,9 @@ export function sleep(ms: number = 10 * 1000) {
 export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');
+}
+
+async function setCurrentGraph(graph: Graph) {
+	let dispatch = GetDispatchFunc();
+	dispatch(UIC(GRAPHS, graph.id, graph));
 }
