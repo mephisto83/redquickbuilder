@@ -49,12 +49,12 @@ export function sleep(ms: number = 30 * 1000) {
 
 const isDirectory = (source) => fs.lstatSync(source).isDirectory();
 export const getDirectories = (source) => fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
-
+let app_state;
 export async function setupJob(graphFolder: string) {
 	let graph = await openFile(path.join(graphFolder, JobServiceConstants.GRAPH_FILE), GetDispatchFunc());
 	let state = updateUI(makeDefaultState(), UIC(GRAPHS, graph.id, graph));
 	state = updateUI(state, UIC(APPLICATION, CURRENT_GRAPH, graph.id));
-	let app_state = { uiReducer: state };
+	app_state = { uiReducer: state };
 	console.log('setting dispatch');
 	setTestDispatch((args) => {
 		app_state = uiReducer(app_state, args);
@@ -66,8 +66,8 @@ export async function setupJob(graphFolder: string) {
 	});
 	console.log('saving application');
 	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
-  console.log('saving graph');
-  console.log(graph.version);
+	console.log('saving graph');
+	console.log(graph.version);
 	SaveGraph(graph, GetDispatchFunc());
 	console.log('setup cache');
 	setupCache(graph);
@@ -76,8 +76,8 @@ export async function setupJob(graphFolder: string) {
 }
 export async function saveCurrentGraphTo(filePath) {
 	console.log(`saving to : ${filePath}`);
-  let currentGraph = GetCurrentGraph();
-  console.log(currentGraph.version);
+	let currentGraph = GetCurrentGraph();
+	console.log(currentGraph.version);
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');
 }
