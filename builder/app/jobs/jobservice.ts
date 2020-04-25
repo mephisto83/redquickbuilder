@@ -133,6 +133,7 @@ export default class JobService {
 		let graph = await JobService.MergeCompletedJob(currentJob);
 		if (graph) {
 			await setCurrentGraph(graph);
+			currentJobFile.updatedGraph = graph;
 			await writeGraphToFile(graph, currentJobFile.graphPath);
 		} else {
 			throw new Error('graph shouldnt be null, CollectForJob, jobservice.ts');
@@ -585,6 +586,7 @@ export interface JobOutput {
 export interface JobFile {
 	updated?: number;
 	jobPath?: string;
+	updatedGraph?: Graph;
 	created: boolean;
 	originalGraphPath?: string;
 	graphPath: string;
@@ -628,8 +630,8 @@ export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
 }
 
 async function setCurrentGraph(graph: Graph) {
-  let dispatch = GetDispatchFunc();
-  console.log('the number of nodes in the graph');
+	let dispatch = GetDispatchFunc();
+	console.log('the number of nodes in the graph');
 	console.log(Object.keys(graph.nodeLib).length);
 	dispatch(UIC(GRAPHS, graph.id, graph));
 }

@@ -74,9 +74,9 @@ export async function setupJob(graphFolder: string) {
 	console.log('setup complete');
 	return app_state;
 }
-export async function saveCurrentGraphTo(filePath) {
+export async function saveCurrentGraphTo(filePath, updatedGraph?: Graph) {
 	console.log(`saving to : ${filePath}`);
-	let currentGraph = GetCurrentGraph();
+	let currentGraph = updatedGraph ? updatedGraph : GetCurrentGraph();
 	console.log(currentGraph.version);
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');

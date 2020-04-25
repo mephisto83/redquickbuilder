@@ -52,10 +52,14 @@ async function executeStep(jobFilePath: string) {
 
 			console.log('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
+
 			console.log('save current graph to');
-			await saveCurrentGraphTo(jobConfig.graphPath);
+			await saveCurrentGraphTo(jobConfig.graphPath, jobConfig.updatedGraph);
 			await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
-			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`));
+			await saveCurrentGraphTo(
+				path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`),
+				jobConfig.updatedGraph
+			);
 			jobConfig.step = step.name;
 			console.log(jobConfig.step);
 		} catch (e) {
