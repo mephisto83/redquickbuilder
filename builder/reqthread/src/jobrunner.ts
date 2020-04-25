@@ -9,6 +9,7 @@ import JobService, {
 	ensureDirectory
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
+import { GetCurrentGraph } from '../../app/actions/uiactions';
 
 (async function runner() {
 	while (true) {
@@ -52,14 +53,13 @@ async function executeStep(jobFilePath: string) {
 
 			console.log('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
+			let cg = GetCurrentGraph();
+			console.log(`version to save : ${JSON.stringify(cg.version, null, 4)}`);
 
 			console.log('save current graph to');
-			await saveCurrentGraphTo(jobConfig.graphPath, jobConfig.updatedGraph);
+			await saveCurrentGraphTo(jobConfig.graphPath, cg);
 			await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
-			await saveCurrentGraphTo(
-				path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`),
-				jobConfig.updatedGraph
-			);
+			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`), cg);
 			jobConfig.step = step.name;
 			console.log(jobConfig.step);
 		} catch (e) {

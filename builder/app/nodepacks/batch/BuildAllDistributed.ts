@@ -156,7 +156,6 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		[UITypes.ReactWeb]: true,
 		[UITypes.ReactNative]: true
 	};
-	SetPause(true);
 	setVisual(MAIN_CONTENT, PROGRESS_VIEW)(GetDispatchFunc(), GetStateFunc());
 	await pause();
 
@@ -253,7 +252,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			await AddComponentsToScreenOptions(progresFunc);
 		});
 
-		await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: any) => {
+		await run(buildAllProgress, CollectionDataChainsIntoCollectionsTitle, async (progresFunc: any) => {
 			const result = CollectionDataChainsIntoCollections(progresFunc);
 			await result.forEachAsync(async (item: any, index: number, total: number) => {
 				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
@@ -267,7 +266,6 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
 
-	SetPause(false);
 }
 
 BuildAllDistributed.title = 'Build All Distributed';

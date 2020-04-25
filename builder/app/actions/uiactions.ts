@@ -3132,6 +3132,7 @@ export function NodesConnectedTo(state: any, nodeId: string | number) {
 let _getState: Function;
 let _dispatch: Function;
 export function GetState() {
+
 	if (_getState) return _getState();
 }
 export function GetDispatchFunc() {
@@ -3165,13 +3166,13 @@ export function loadGitRuns() {
 			setVisual(JOBS, jobs)(dispatch, getState);
 			await jobs.forEachAsync(async (jobInstance: Job) => {
 				let jobProgress = await JobService.JobProgress(jobInstance);
-        setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
+				setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
 			});
 		});
 	};
 }
-export function JobProgressId(jobInstance:Job){
-  return `job-progress-id${jobInstance.name}`;
+export function JobProgressId(jobInstance: Job) {
+	return `job-progress-id${jobInstance.name}`;
 }
 export function clearPinned() {
 	const state = _getState();
