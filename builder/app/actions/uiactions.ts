@@ -13,6 +13,7 @@ import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink } from '../methods/graph_types';
+import JobService, { Job } from '../jobs/jobservice';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -3157,6 +3158,21 @@ export function setState() {
 	};
 }
 
+export const JOBS = 'JOBS';
+export function loadGitRuns() {
+	return (dispatch: Function, getState: Function) => {
+		JobService.getJobs().then(async (jobs) => {
+			setVisual(JOBS, jobs)(dispatch, getState);
+			await jobs.forEachAsync(async (jobInstance: Job) => {
+				let jobProgress = await JobService.JobProgress(jobInstance);
+        setVisual(JobProgressId(jobInstance), jobProgress)
+			});
+		});
+	};
+}
+export function JobProgressId(jobInstance:Job){
+  return `job-progress-id${jobInstance.name}`;
+}
 export function clearPinned() {
 	const state = _getState();
 	_dispatch(

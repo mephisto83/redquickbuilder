@@ -41,15 +41,17 @@ async function loop() {
 						process.send({ response: Operations.EXECUTING_TASK });
 						await task(jobPath, () => {
 							process.send({ response: Operations.CHANGED, changed: true });
-						});
+            });
+            console.log('job completed');
 						process.send({ response: Operations.COMPLETED_TASK });
 					}
 				}
 			} else {
 				console.warn('no options yet');
 			}
+      console.log('loop done');
 		} catch (e) {
-			noerror = false;
+      noerror = false;
 			console.error(e);
 		}
 	} while (noerror);

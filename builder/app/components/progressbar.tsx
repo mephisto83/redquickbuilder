@@ -4,6 +4,7 @@
 /* eslint-disable react/prop-types */
 // @flow
 import React, { Component } from 'react';
+import ProgressCircle from './progresscircle';
 // import * as styles from './progressbar.scss';
 
 export default class ProgressBar extends Component {
@@ -48,6 +49,10 @@ export default class ProgressBar extends Component {
 						<div>{timeLeft}</div>
 						<div className={'totalTimeUsed'}>{totalTimeUsed}</div>
 						<progress value={complete ? 100 : activate ? progress || 1 : 0} min={0} max={100} />
+						{/* <ProgressCircle
+							circumference={100}
+							percentage={complete ? 100 : activate ? progress || 1 : 0}
+						/> */}
 					</li>
 				);
 			});

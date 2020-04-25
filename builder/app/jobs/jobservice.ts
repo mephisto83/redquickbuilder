@@ -6,6 +6,7 @@ import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 import { Node } from '../methods/graph_types';
 import prune from '../methods/prune';
+import NameService from './nameservice';
 
 export default class JobService {
 	static async getAgents() {
@@ -139,6 +140,8 @@ export default class JobService {
 		});
 
 		let job: Job = {
+			name: jobName,
+			nickName: NameService.superHeroName(),
 			parts: jobparts,
 			assignments: null,
 			complete: false,
@@ -149,13 +152,13 @@ export default class JobService {
 		};
 		fs.writeFileSync(path.join(JOB_PATH, jobName, JOB_NAME), JSON.stringify(job), 'utf8');
 	}
-	static async getJobs(): Promise<Job[]> {
+	static async getJobs(jpath: string = ''): Promise<Job[]> {
 		let results: Job[] = [];
-		if (!fs.existsSync(JOB_PATH)) {
-			let jobs = getDirectories(JOB_PATH);
+		if (fs.existsSync(jpath || JOB_PATH)) {
+			let jobs = getDirectories(jpath || JOB_PATH);
 			jobs.map((job) => {
-				if (fs.existsSync(path.join(JOB_PATH, job, JOB_NAME))) {
-					let content = fs.readFileSync(path.join(JOB_PATH, job, JOB_NAME), 'utf8');
+				if (fs.existsSync(path.join(jpath || JOB_PATH, job, JOB_NAME))) {
+					let content = fs.readFileSync(path.join(jpath || JOB_PATH, job, JOB_NAME), 'utf8');
 					let config: Job = JSON.parse(content);
 					results.push(config);
 				}
@@ -300,7 +303,7 @@ export default class JobService {
 			return true;
 		}
 		return false;
-  }
+	}
 
 	static async IsComplete(job: Job) {
 		let { assignments } = job;
@@ -321,6 +324,49 @@ export default class JobService {
 		}
 		return false;
 	}
+
+	static async JobProgress(job: Job) {
+		let { assignments } = job;
+		let result = { total: 0, complete: 0 };
+		if (assignments) {
+			let remoteDirectories = Object.keys(assignments);
+			if (remoteDirectories.length) {
+				let completed = true;
+				for (let i = 0; i < remoteDirectories.length; i++) {
+					let assignmentDir = remoteDirectories[i];
+					completed = completed && (await JobService.IsJobAssignmentComplete(assignments, assignmentDir));
+					if (completed) {
+						result.complete++;
+					}
+					result.total++;
+				}
+				return result;
+			}
+			throw new Error('no assignments assigned');
+		}
+		return result;
+  }
+
+	static async  JobAssignmentProgress(assignments: JobAssignment, assignmentDir: string): Promise<Progress> {
+		let jobAssignment: JobItem[] | null = assignments ? assignments[assignmentDir] : null;
+		let result = { total: 0, complete: 0 };
+		if (!jobAssignment) {
+			throw new Error('no assignments');
+		}
+		//					return !jobAssignment.some((job: JobItem) => {
+		let completed = true;
+		for (let i = 0; i < jobAssignment.length; i++) {
+			let job = jobAssignment[i];
+			let isComplete = await JobService.IsJobItemComplete(job, assignmentDir);
+			completed = completed && isComplete;
+			if (completed) {
+				result.complete++;
+			}
+			result.total++;
+		}
+		return result;
+	}
+
 	static async IsJobAssignmentComplete(assignments: JobAssignment, assignmentDir: string): Promise<boolean> {
 		let jobAssignment: JobItem[] | null = assignments ? assignments[assignmentDir] : null;
 		if (!jobAssignment) {
@@ -373,6 +419,10 @@ export const JobServiceConstants = {
 	GRAPH_FILE_PARTS,
 	GRAPH_FOLDER
 };
+export interface Progress {
+	total: number;
+	complete: number;
+}
 export interface JobConfigContract {
 	complete: boolean;
 	updated: number;
@@ -383,6 +433,8 @@ export interface JobConfigContract {
 	};
 }
 export interface Job {
+	name: string;
+	nickName: string;
 	complete: boolean;
 	assignments: JobAssignment | null;
 	updated: number;
