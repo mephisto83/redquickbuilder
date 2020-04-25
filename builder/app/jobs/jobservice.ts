@@ -628,6 +628,8 @@ export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
 }
 
 async function setCurrentGraph(graph: Graph) {
-	let dispatch = GetDispatchFunc();
+  let dispatch = GetDispatchFunc();
+  console.log('the number of nodes in the graph');
+	console.log(Object.keys(graph.nodeLib).length);
 	dispatch(UIC(GRAPHS, graph.id, graph));
 }
