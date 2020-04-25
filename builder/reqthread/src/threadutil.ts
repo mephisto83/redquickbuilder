@@ -57,6 +57,7 @@ export async function setupJob(graphFolder: string) {
 	let app_state = { uiReducer: state };
 	console.log('setting dispatch');
 	setTestDispatch((args) => {
+    console.log('here');
 		app_state = uiReducer(app_state, args);
 	});
 
@@ -66,7 +67,8 @@ export async function setupJob(graphFolder: string) {
 	});
 	console.log('saving application');
 	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
-	console.log('saving graph');
+  console.log('saving graph');
+  console.log(graph.version);
 	SaveGraph(graph, GetDispatchFunc());
 	console.log('setup cache');
 	setupCache(graph);
@@ -74,12 +76,12 @@ export async function setupJob(graphFolder: string) {
 	return app_state;
 }
 export async function saveCurrentGraphTo(filePath) {
-	let currentGraph = GetCurrentGraph();
+	console.log(`saving to : ${filePath}`);
+  let currentGraph = GetCurrentGraph();
+  console.log(currentGraph.version);
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');
 }
-
-
 
 export async function openFile(fileName: string, dispatch: any): Promise<Graph> {
 	try {

@@ -300,17 +300,20 @@ export function GetCellIdByTag(setup: any, tag: any) {
 
 export function incrementBuild(graph: any) {
 	graph.version.build++;
+  console.log(graph.version);
 	return graph;
 }
 
 export function incrementMinor(graph: any) {
-	graph.version.minor++;
+  graph.version.minor++;
+  console.log(graph.version);
 	graph.version.build = 0;
 	return graph;
 }
 
 export function incrementMajor(graph: any) {
 	graph.version.major++;
+  console.log(graph.version);
 	graph.version.minor = 0;
 	graph.version.build = 0;
 	return graph;

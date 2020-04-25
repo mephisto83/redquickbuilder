@@ -1,7 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import { sleep, setupJob, saveCurrentGraphTo } from './threadutil';
-import JobService, { JobServiceConstants, getFiles, JobFile, getDirectories, ensureDirectory } from '../../app/jobs/jobservice';
+import JobService, {
+	JobServiceConstants,
+	getFiles,
+	JobFile,
+	getDirectories,
+	ensureDirectory
+} from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 
 (async function runner() {
@@ -41,12 +47,13 @@ async function executeStep(jobFilePath: string) {
 			console.log(jobConfig.graphPath);
 			await setupJob(path.dirname(jobConfig.graphPath));
 			let step = BuildAllInfo.Commands[currentStep + 1];
+			console.log(`step: ${step.name}`);
 			console.log('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
 			console.log('save current graph to');
-      await saveCurrentGraphTo(jobConfig.graphPath);
-      await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
-			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', step.name));
+			await saveCurrentGraphTo(jobConfig.graphPath);
+			await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
+			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`));
 			jobConfig.step = step.name;
 			console.log(jobConfig.step);
 		} catch (e) {

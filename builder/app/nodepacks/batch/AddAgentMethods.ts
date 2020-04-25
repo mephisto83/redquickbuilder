@@ -21,7 +21,8 @@ export default async function AddAgentMethods(progresFunc: any) {
 		[NodeProperties.NODEType]: NodeTypes.Model,
 		[NodeProperties.IsAgent]: (v: string | boolean) => v === 'true' || v === true,
 		[NodeProperties.UIText]: (v: string) => v !== 'User'
-	}); //  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
+  }); //  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
+  console.log('executing add agent methods');
 	const models = NodesByType(null, NodeTypes.Model).filter((x: any) => !GetNodeProp(x, NodeProperties.IsAgent));
 	const functionTypes = [
 		FunctionTypes.Create_Object__Object,
@@ -33,7 +34,10 @@ export default async function AddAgentMethods(progresFunc: any) {
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 
 	await agents.forEachAsync(async (agent: any, aindex: any) => {
-		await models.forEachAsync(async (model: any, mindex: any) => {
+
+    console.log(`adding ${GetNodeTitle(agent)} methods`);
+    await models.forEachAsync(async (model: any, mindex: any) => {
+      console.log(`${GetNodeTitle(model)} methods`);
 			const graph = GetCurrentGraph();
 			const agentAcesses = agentAccesses.find((aa: any) => isAccessNode(agent, model, aa, graph));
 			if (agentAcesses) {
