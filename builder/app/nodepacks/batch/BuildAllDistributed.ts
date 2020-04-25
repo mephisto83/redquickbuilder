@@ -122,18 +122,17 @@ const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionDataChainsIntoCollectionsTitle = 'Collection Data Chains Into Collections';
 const Collect_Into_Graph = 'Collect_Into_Graph';
-const CompletedJob = 'Completed Job';
 
 const buildAllProgress = [
 	{ name: Create_View_Types },
 	{ name: Add_Agent_Methods },
-	{ name: Create_Dashboard },
-	{ name: Create_Login_Models },
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
 	{ name: Collect_Into_Graph },
-	{ name: Add_Filters_To_Get_All },
 	{ name: Select_All_On_Model_Filters },
+	{ name: Add_Filters_To_Get_All },
+	{ name: Create_Dashboard },
+	{ name: Create_Login_Models },
 	{ name: Add_Chain_To_Navigate_Next_Screens },
 	{ name: Create_Configuration },
 	{ name: Create_Fetch_Service },
@@ -143,8 +142,7 @@ const buildAllProgress = [
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
-	{ name: CollectionDataChainsIntoCollectionsTitle },
-	{ name: CompletedJob }
+	{ name: CollectionDataChainsIntoCollectionsTitle }
 ];
 export const BuildAllInfo = {
 	Commands: buildAllProgress,
@@ -255,7 +253,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			await AddComponentsToScreenOptions(progresFunc);
 		});
 
-		await run(buildAllProgress, CollectionDataChainsIntoCollectionsTitle, async (progresFunc: any) => {
+		await run(buildAllProgress, 'CollectionDataChainsIntoCollections', async (progresFunc: any) => {
 			const result = CollectionDataChainsIntoCollections(progresFunc);
 			await result.forEachAsync(async (item: any, index: number, total: number) => {
 				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
@@ -263,18 +261,13 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			});
 			await progresFunc(1);
 		});
-
-		await run(buildAllProgress, CompletedJob, async (functionProce: any) => {
-      currentJobFile.completed = true;
-    });
 	} catch (e) {
 		console.log(e);
-		throw e;
-	} finally {
-		setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
-
-		SetPause(false);
 	}
+
+	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+
+	SetPause(false);
 }
 
 BuildAllDistributed.title = 'Build All Distributed';
