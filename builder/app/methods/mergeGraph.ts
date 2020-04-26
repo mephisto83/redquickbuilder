@@ -15,7 +15,7 @@ export default function mergeGraph(graph1: Graph | null, graph2: Graph): Graph {
 		if (!graph1.linkLib[key]) {
 			graph1.linkLib[key] = graph2.linkLib[key];
 		}
-  });
+	});
 
 	Object.keys(graph2.groupLib).forEach((key) => {
 		if (!graph1.groupLib[key]) {
@@ -23,5 +23,9 @@ export default function mergeGraph(graph1: Graph | null, graph2: Graph): Graph {
 		}
 	});
 
-	return graph1;
+	graph1.version.major = graph1.version.major + graph1.version.major;
+	graph1.version.minor = graph1.version.minor + graph1.version.minor;
+  graph1.version.build = graph1.version.build + graph1.version.build;
+
+  return graph1;
 }

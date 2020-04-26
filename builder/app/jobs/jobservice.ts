@@ -106,8 +106,13 @@ export default class JobService {
 		}
 	}
 
-	static async StartJob(command: string, currentJobFile: JobFile, batchSize: number = 1): Promise<Job> {
-		let job = await JobService.CreateJob(command, batchSize);
+	static async StartJob(
+		command: string,
+		currentJobFile: JobFile,
+		batchSize: number = 1,
+		modelTypes?: string | string[]
+	): Promise<Job> {
+		let job = await JobService.CreateJob(command, batchSize, modelTypes);
 		job = await JobService.DistributeJobs(job);
 		currentJobFile.jobPath = path.join(JOB_PATH, job.name, JOB_NAME);
 		return job;
@@ -151,8 +156,8 @@ export default class JobService {
 		}
 	}
 
-	static async CreateJob(command: string, batchSize: number = 1): Promise<Job> {
-		let models: string[] = NodesByType(null, NodeTypes.Model).map((x: Node) => x.id);
+	static async CreateJob(command: string, batchSize: number = 1, modelTypes?: string | string[]): Promise<Job> {
+		let models: string[] = NodesByType(null, modelTypes || NodeTypes.Model).map((x: Node) => x.id);
 		// let targets = await JobService.getAgentDirectories();
 		let graph = GetCurrentGraph();
 		let chunks = models.chunk(batchSize || 1);
@@ -495,7 +500,7 @@ export default class JobService {
 		if (!jobAssignment) {
 			throw new Error('no assignments');
 		}
-		//					return !jobAssignment.some((job: JobItem) => {
+
 		let completed = true;
 		for (let i = 0; i < jobAssignment.length; i++) {
 			let job = jobAssignment[i];

@@ -11,7 +11,8 @@ import {
 	graphOperation,
 	executeGraphOperation,
 	setVisual,
-	BuildAllProgress
+	BuildAllProgress,
+	NodeTypes
 } from '../../actions/uiactions';
 import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
@@ -198,7 +199,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
-			result = await JobService.StartJob(Create_Component_All, currentJobFile);
+			result = await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Screen);
 		});
 
 		await run(

@@ -41,7 +41,11 @@ export interface AppConfig {
 	AppSettings: any;
 	Logging: any;
 }
-export interface Version {}
+export interface Version {
+	major: number;
+	minor: number;
+	build: number;
+}
 export interface Group {
 	id: any;
 	leaves: string[];
