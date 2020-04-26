@@ -41,7 +41,7 @@ import ConnectScreens from '../../app/nodepacks/batch/ConnectScreens';
 
 let app_state;
 
-async function sleep(ms: number = 30 * 1000) {
+async function sleep(ms: number = 5 * 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 export default async function executeJob(jobConfig: Job, onChange: Function) {

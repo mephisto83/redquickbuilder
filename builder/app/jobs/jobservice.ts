@@ -156,8 +156,18 @@ export default class JobService {
 		}
 	}
 
-	static async CreateJob(command: string, batchSize: number = 1, modelTypes?: string | string[]): Promise<Job> {
-		let models: string[] = NodesByType(null, modelTypes || NodeTypes.Model).map((x: Node) => x.id);
+	static async CreateJob(
+		command: string,
+		batchSize: number = 1,
+		modelTypes: string | string[] = NodeTypes.Model
+	): Promise<Job> {
+		if (!modelTypes) {
+			throw new Error('node types to filter on');
+		}
+		let models: string[] = NodesByType(null, modelTypes).map((x: Node) => x.id);
+		if (!models || !models.length) {
+			throw new Error('nothing to filter for batching');
+		}
 		// let targets = await JobService.getAgentDirectories();
 		let graph = GetCurrentGraph();
 		let chunks = models.chunk(batchSize || 1);

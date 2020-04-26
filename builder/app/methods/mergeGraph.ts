@@ -26,6 +26,6 @@ export default function mergeGraph(graph1: Graph | null, graph2: Graph): Graph {
 	graph1.version.major = graph1.version.major + graph1.version.major;
 	graph1.version.minor = graph1.version.minor + graph1.version.minor;
   graph1.version.build = graph1.version.build + graph1.version.build;
-
+  console.log(graph1.version);
   return graph1;
 }
