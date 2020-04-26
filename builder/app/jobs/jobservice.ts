@@ -8,6 +8,7 @@ import { Node, Graph } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
+import { GetState } from '../templates/electronio/v1/app/actions/uiActions';
 
 export default class JobService {
 	static async getAgents() {
@@ -413,7 +414,7 @@ export default class JobService {
 			intermedita[part] = JSON.parse(graphOutput);
 		});
 
-		let mergedGraph: Graph | null = null;
+		let mergedGraph: Graph | null = GetCurrentGraph(GetState());
 		await job.parts.forEachAsync(async (part: string) => {
 			if (!intermedita[part]) {
 				throw new Error('intermedita[part] cant be falsy;');
