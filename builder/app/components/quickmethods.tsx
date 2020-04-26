@@ -29,7 +29,7 @@ import CreateConfiguration from '../nodepacks/CreateConfiguration';
 import CreateFetchServiceIdempotently from '../nodepacks/CreateFetchServiceIdempotently';
 import { ViewTypes } from '../constants/viewtypes';
 import CreateViewTypes from '../nodepacks/batch/CreateViewTypes';
-import BuildAll from '../nodepacks/batch/buildAll';
+import BuildAll from '../nodepacks/batch/BuildAll';
 import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
 
