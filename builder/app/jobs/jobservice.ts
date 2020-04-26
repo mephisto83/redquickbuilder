@@ -1,14 +1,13 @@
 import config from '../config';
 import fs, { existsSync } from 'fs';
 import path from 'path';
-import { NodesByType, GetCurrentGraph, GetDispatchFunc, UIC, GRAPHS } from '../actions/uiactions';
+import { NodesByType, GetCurrentGraph, GetDispatchFunc, UIC, GRAPHS, GetState } from '../actions/uiactions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 import { Node, Graph } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
-import { GetState } from '../templates/electronio/v1/app/actions/uiActions';
 
 export default class JobService {
 	static async getAgents() {
