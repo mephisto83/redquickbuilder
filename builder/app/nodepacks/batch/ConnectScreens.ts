@@ -17,56 +17,58 @@ import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
 import { Node } from '../../methods/graph_types';
 
-export default async function ConnectScreens(progresFunc: any) {
+export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
 	const screens = allscreens.filter(ScreenOptionFilter);
-	await screens.forEachAsync(async (screen: any, index: any, total: any) => {
-		const viewType = GetNodeProp(screen, NodeProperties.ViewType);
+	await screens
+		.filter((screen: any) => (filter ? filter(screen) : true))
+		.forEachAsync(async (screen: any, index: any, total: any) => {
+			const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 
-		const methods = GetPossibleMethods(screen);
+			const methods = GetPossibleMethods(screen);
 
-		const navigateToScreens = GetPossibleNavigateScreens(screen, allscreens);
+			const navigateToScreens = GetPossibleNavigateScreens(screen, allscreens);
 
-		const componentsDidMounts = GetPossibleComponentDidMount(screen);
+			const componentsDidMounts = GetPossibleComponentDidMount(screen);
 
-		if (methods.length) {
-			let commands = [];
-			switch (viewType) {
-				case ViewTypes.Get:
-					commands = ScreenConnectGet({
-						method: methods[0].id,
-						node: screen.id,
-						navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
-					});
-					break;
-				case ViewTypes.GetAll:
-					commands = ScreenConnectGetAll({
-						method: methods[0].id,
-						node: screen.id,
-						navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
-					});
-					break;
-				case ViewTypes.Create:
-					commands = ScreenConnectCreate({
-						method: methods[0].id,
-						node: screen.id
-					});
-					break;
-				case ViewTypes.Update:
-					commands = ScreenConnectUpdate({
-						method: methods[0].id,
-						componentDidMountMethods: componentsDidMounts.map((x: any) => x.id),
-						node: screen.id
-					});
-					break;
-				default:
-					break;
+			if (methods.length) {
+				let commands = [];
+				switch (viewType) {
+					case ViewTypes.Get:
+						commands = ScreenConnectGet({
+							method: methods[0].id,
+							node: screen.id,
+							navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
+						});
+						break;
+					case ViewTypes.GetAll:
+						commands = ScreenConnectGetAll({
+							method: methods[0].id,
+							node: screen.id,
+							navigateTo: navigateToScreens.length ? navigateToScreens[0].id : null
+						});
+						break;
+					case ViewTypes.Create:
+						commands = ScreenConnectCreate({
+							method: methods[0].id,
+							node: screen.id
+						});
+						break;
+					case ViewTypes.Update:
+						commands = ScreenConnectUpdate({
+							method: methods[0].id,
+							componentDidMountMethods: componentsDidMounts.map((x: any) => x.id),
+							node: screen.id
+						});
+						break;
+					default:
+						break;
+				}
+
+				graphOperation([ ...commands ])(GetDispatchFunc(), GetStateFunc());
 			}
-
-			graphOperation([ ...commands ])(GetDispatchFunc(), GetStateFunc());
-		}
-		await progresFunc(index / total);
-	});
+			await progresFunc(index / total);
+		});
 	graphOperation([ () => CollectionDataChainsIntoCollections() ])(GetDispatchFunc(), GetStateFunc());
 }
 

@@ -337,7 +337,7 @@ export default class JobService {
 				let isDone = await JobService.IsComplete(job);
 				if (isDone) {
 					await JobService.MoveCompletedJob(job);
-					//	await JobService.CleanUpJob(job);
+					await JobService.CleanUpJob(job);
 				}
 			} catch (e) {}
 		}
@@ -584,7 +584,7 @@ export interface JobOutput {
 	files: string[];
 }
 export interface JobFile {
-  completed?: boolean;
+	completed?: boolean;
 	updated?: number;
 	jobPath?: string;
 	updatedGraph?: Graph;

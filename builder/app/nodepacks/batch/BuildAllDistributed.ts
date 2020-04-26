@@ -105,7 +105,7 @@ async function run(array: BuildStep[], name: string, func: Function) {
 
 const Create_View_Types = 'Create View Types';
 const Add_Agent_Methods = 'Add Agent Methods';
-const Create_Component_All = 'Create Component All';
+export const Create_Component_All = 'Create Component All';
 const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
 const Select_All_On_Model_Filters = 'Select All On Model Filters';
 const Add_Filters_To_Get_All = 'Add Filters to Get All';
@@ -115,7 +115,9 @@ const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
 const Create_Configuration = 'Create Configuration';
 const Create_Fetch_Service = 'Create Fetch Service';
 const Create_Claim_Service = 'Create Claim Service';
-const Connect_Screens = 'Connect_Screens';
+export const Connect_Screens = 'Connect_Screens';
+const Wait_For_Screen_Connect = 'Wait_For_Screen_Connect';
+const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
 const Setup_View_Types = 'Setup_View_Types';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
@@ -139,6 +141,8 @@ const buildAllProgress = [
 	{ name: Create_Fetch_Service },
 	{ name: Create_Claim_Service },
 	{ name: Connect_Screens },
+	{ name: Wait_For_Screen_Connect },
+	{ name: Collect_Screen_Connect_Into_Graph },
 	{ name: Setup_View_Types },
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
@@ -236,7 +240,16 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Connect_Screens, async (progresFunc: any) => {
-			await ConnectScreens(progresFunc);
+			result = await JobService.StartJob(Connect_Screens, currentJobFile);
+			//     await ConnectScreens(progresFunc);
+		});
+
+		await run(buildAllProgress, Wait_For_Screen_Connect, async (progresFunc: (arg0: number) => any) => {
+			await JobService.WaitForJob(Wait_For_Screen_Connect, currentJobFile);
+		});
+
+		await run(buildAllProgress, Collect_Screen_Connect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
+			await JobService.CollectForJob(currentJobFile);
 		});
 
 		await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {

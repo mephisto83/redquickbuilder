@@ -36,8 +36,9 @@ import {
 import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
 import { setupJob } from './threadutil';
+import { Create_Component_All, Connect_Screens } from '../../app/nodepacks/batch/BuildAllDistributed';
+import ConnectScreens from '../../app/nodepacks/batch/ConnectScreens';
 
-const Create_Component_All = 'Create Component All';
 let app_state;
 
 async function sleep(ms: number = 30 * 1000) {
@@ -56,10 +57,23 @@ export default async function executeJob(jobConfig: Job, onChange: Function) {
 				const { command, filter } = config;
 				app_state = await setupJob(jobInstancePath);
 
+				jobConfig.updated = Date.now();
 				switch (command) {
 					case Create_Component_All:
-						jobConfig.updated = Date.now();
 						await CreateComponentAll(
+							() => {},
+							(model: any) => {
+								return filter && filter.models.indexOf(model.id) !== -1;
+							}
+						);
+						await storeOutput(path.join(jobInstancePath, part));
+						await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
+						if (onChange) {
+							onChange();
+						}
+						break;
+					case Connect_Screens:
+						await ConnectScreens(
 							() => {},
 							(model: any) => {
 								return filter && filter.models.indexOf(model.id) !== -1;

@@ -57,6 +57,7 @@ async function executeStep(jobFilePath: string) {
 			console.log(`version to save : ${JSON.stringify(cg.version, null, 4)}`);
 
 			console.log('save current graph to');
+			delete jobConfig.updatedGraph;
 			await saveCurrentGraphTo(jobConfig.graphPath, cg);
 			await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
 			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`), cg);
