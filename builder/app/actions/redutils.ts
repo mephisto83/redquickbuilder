@@ -1,4 +1,4 @@
-import { GetItem } from './uiActions';
+import { GetItem } from './uiactions';
 const context: any = {};
 export function setParameters(params: any) {
 	context.params = params;
