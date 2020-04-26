@@ -27,7 +27,7 @@
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "preinstall": "node ./internals/scripts/CheckYarn.js",
     "prestart": "yarn build",
-    "jobrunner": "node ./reqthread/dist/reqthread/src/jobrunner.js",
+    "jobrunner": "node --max-old-space-size=8000 ./reqthread/dist/reqthread/src/jobrunner.js",
     "jobrunnbuild": "cd ./reqthread/dist/reqthread && yarn build",
     "jr": "npm run jobrunnbuild && npm run jobrunner ",
     "start": "cross-env NODE_ENV=production electron ./app/main.prod.js",

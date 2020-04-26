@@ -8,6 +8,7 @@ export function uuidv4() {
 declare global {
 	export interface String {
 		toJavascriptName: Function;
+		stringView: any;
 	}
 	export interface Array<T> {
 		relativeCompliment: any;
@@ -28,6 +29,7 @@ declare global {
 		groupBy: any;
 		startsWith: any;
 		chunk: any;
+		chunkView: any;
 	}
 }
 ((array) => {
@@ -229,6 +231,22 @@ declare global {
 			}
 		});
 	}
+	if (!array.chunkView) {
+		Object.defineProperty(array, 'chunkView', {
+			value: async function(func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
+				const collection = this;
+				const chunks = Math.ceil(collection.length / chunkSize);
+				let promise: any = Promise.resolve();
+				[].interpolate(0, Math.ceil(collection.length / chunkSize), (i: number) => {
+					promise = promise.then(async () =>
+						func(collection.slice(i * chunkSize, (i + 1) * chunkSize), i, chunks)
+					);
+				});
+				// }
+				return promise;
+			}
+		});
+	}
 	if (!array.groupBy) {
 		Object.defineProperty(array, 'groupBy', {
 			enumerable: false,
@@ -368,6 +386,22 @@ String.prototype.toJavascriptName = function() {
 	}
 	return str;
 };
+((array) => {
+	if (!array.stringView) {
+		Object.defineProperty(array, 'stringView', {
+			value: async function(func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
+				const stringOfLetters = this;
+				const chunks = Math.ceil(stringOfLetters.length / chunkSize);
+				let promise: any = Promise.resolve();
+				[].interpolate(0, Math.ceil(stringOfLetters.length / chunkSize), (i: number) => {
+					promise = promise.then(async () => func(stringOfLetters.slice(i * chunkSize, (i + 1) * chunkSize), i, chunks));
+				});
+				// }
+				return promise;
+			}
+		});
+	}
+})(String.prototype);
 const NEW_LINE = `
 `;
 Array.prototype.tightenPs = function() {

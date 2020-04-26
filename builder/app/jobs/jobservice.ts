@@ -42,14 +42,13 @@ export default class JobService {
 	}
 
 	static async BreakFile(relPath: string, fileName: string, chunkFolder: string, chunkName: string, content: string) {
-		let chunks: string[] = content.split('').chunk(Math.pow(2, 20));
 		await ensureDirectory(path.join(relPath, chunkFolder));
 		let files: string[] = [];
-		await chunks.forEachAsync(async (chunk: string[], i: number) => {
+		await content.stringView(async (chunk: string[], i: number) => {
 			let chunkPath = path.join(relPath, chunkFolder, chunkName + i);
 			files.push(path.join(chunkFolder, chunkName + i));
 			fs.writeFileSync(chunkPath, chunk.join(''), 'utf8');
-		});
+		}, Math.pow(2, 23));
 		let jobContent: JobOutput = {
 			files
 		};
