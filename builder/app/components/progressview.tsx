@@ -33,7 +33,8 @@ import {
 	Visual,
 	VisualEq,
 	JOBS,
-	JobProgressId
+	JobProgressId,
+	AssignmentId
 } from '../actions/uiactions';
 import TextInput from './textinput';
 import ColorInput from './colorinput';
@@ -146,6 +147,7 @@ class ProgressView extends Component<any, any> {
 												{jobs.map((job: Job, jobIndex: number) => {
 													let jobProgress = Visual(state, JobProgressId(job));
 													let { assignments } = job;
+
 													let assignmentRows: any[] = [];
 													if (assignments && this.state[job.nickName]) {
 														assignmentRows = Object.keys(
@@ -153,7 +155,11 @@ class ProgressView extends Component<any, any> {
 														).map((assignmentId) => {
 															if (assignments) {
 																let jobItems: JobItem[] = assignments[assignmentId];
-																return (
+																let assignemtProgress = Visual(
+																	state,
+																	AssignmentId(assignments, assignmentId)
+																);
+																return [
 																	<tr>
 																		<td
 																			style={{
@@ -174,6 +180,7 @@ class ProgressView extends Component<any, any> {
 																						<th>Job</th>
 																						<th>File</th>
 																						<th>Distributed</th>
+																						<th>Progress</th>
 																					</tr>
 																					{jobItems ? (
 																						jobItems.map((jobItem) => {
@@ -190,6 +197,36 @@ class ProgressView extends Component<any, any> {
 																											<i className="fa fa-heart" />
 																										) : null}
 																									</td>
+																									<td>
+																										{assignemtProgress ? (
+																											<progress
+																												title={
+																													job.complete ? (
+																														100
+																													) : (
+																														100 *
+																														assignemtProgress.complete /
+																														assignemtProgress.total
+																													)
+																												}
+																												value={
+																													job.complete ? (
+																														100
+																													) : (
+																														100 *
+																														assignemtProgress.complete /
+																														assignemtProgress.total
+																													)
+																												}
+																												min={0}
+																												max={
+																													100
+																												}
+																											/>
+																										) : (
+																											''
+																										)}
+																									</td>
 																								</tr>
 																							);
 																						})
@@ -198,8 +235,9 @@ class ProgressView extends Component<any, any> {
 																			</table>
 																		</td>
 																	</tr>
-																);
+																];
 															}
+															return [];
 														});
 													}
 													return [
@@ -226,10 +264,23 @@ class ProgressView extends Component<any, any> {
 															<td>
 																{jobProgress && jobProgress.total ? (
 																	<progress
+																		title={
+																			job.complete ? (
+																				100
+																			) : (
+																				100 *
+																				jobProgress.complete /
+																				jobProgress.total
+																			)
+																		}
 																		value={
-																			100 *
-																			jobProgress.complete /
-																			jobProgress.total
+																			job.complete ? (
+																				100
+																			) : (
+																				100 *
+																				jobProgress.complete /
+																				jobProgress.total
+																			)
 																		}
 																		min={0}
 																		max={100}
@@ -238,8 +289,10 @@ class ProgressView extends Component<any, any> {
 															</td>
 														</tr>,
 														<tr>
-															<td colSpan="5">
-																<table>{assignmentRows}</table>
+															<td colSpan="8">
+																<table className="table table-bordered">
+																	{assignmentRows}
+																</table>
 															</td>
 														</tr>
 													];

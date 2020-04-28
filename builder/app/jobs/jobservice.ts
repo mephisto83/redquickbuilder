@@ -8,8 +8,14 @@ import { Node, Graph } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
+import { AgentProject, AgentProjects } from './interfaces';
+import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
 
 export default class JobService {
+	static communicationTower: CommunicationTower;
+	static SetComunicationTower(communicationTower: CommunicationTower) {
+		this.communicationTower = communicationTower;
+	}
 	static async getAgents() {
 		const agentFolder = path.join(config.distributionPath, AGENTS_FOLDER);
 		if (fs.existsSync(agentFolder)) {
@@ -102,6 +108,7 @@ export default class JobService {
 			dirs.forEach((dir) => {
 				JobService.deleteFolder(path.join(folder, dir));
 			});
+			fs.rmdirSync(folder);
 		}
 	}
 
@@ -277,7 +284,98 @@ export default class JobService {
 		let jobItemPath: string = JobService.getJobItemLocalPath(jobItem);
 		fs.writeFileSync(jobItemPath, JSON.stringify(jobItem));
 	}
-	static async DistributeJobs(jobToDistribute: Job): Promise<Job> {
+	static agentProjects: AgentProject[] = [];
+	static async UpdateReadyAgents(agentProject: AgentProject) {
+		JobService.agentProjects = [
+			...JobService.agentProjects.filter((x) => x.name !== agentProject.name && x.agent !== agentProject.agent),
+			agentProject
+		];
+	}
+	static async GetAvailableProject(): Promise<AgentProject> {
+		let result: AgentProject | null = null;
+		do {
+			result = JobService.agentProjects.find((x) => x.ready) || null;
+			if (!result) {
+				console.log('looking for agent project');
+				await sleep(3000);
+			}
+		} while (!result);
+		console.log('found agentproject');
+		console.log(result);
+		return result;
+	}
+	static async DistributeJobs(jobToDistribute: Job): Promise<Job | null> {
+		let result: Job | null = null;
+		let jobs: JobItem[] = await JobService.getUndistributedJobItems();
+		jobs = jobs.filter((jobItem: JobItem) => {
+			if (jobToDistribute) {
+				return jobToDistribute.name === jobItem.job;
+			}
+			return true;
+		});
+
+		if (jobs && jobs.length) {
+			let agentProject: AgentProject = await JobService.GetAvailableProject();
+			let jobItem: JobItem | null = jobs.find((j) => j) || null;
+			if (jobItem) {
+				let dir = path.join(jobItem.job, jobItem.file);
+				let configContent = fs.readFileSync(path.join(JOB_PATH, jobItem.job, JOB_NAME), 'utf8');
+				if (configContent) {
+					let config: Job = JSON.parse(configContent);
+					config.assignments = config.assignments || {};
+					config.assignments[dir] = config.assignments[dir] || [];
+					config.assignments[dir].push(jobItem);
+					result = config;
+					fs.writeFileSync(path.join(JOB_PATH, jobItem.job, JOB_NAME), JSON.stringify(config), 'utf8');
+				} else {
+					throw new Error('no config content found');
+				}
+
+				jobItem.distributed = true;
+				await JobService.saveJobItem(jobItem);
+
+				//Every agent gets a copy of the graph.
+				await this.transferFile(
+					agentProject,
+					path.join(jobItem.job, jobItem.file, GRAPH_FILE),
+					path.join(JOB_PATH, jobItem.job, GRAPH_FILE)
+				);
+
+				await this.transferFiles(
+					agentProject,
+					path.join(JOB_PATH, jobItem.job, jobItem.file, GRAPH_FOLDER),
+					path.join(dir, jobItem.job, GRAPH_FOLDER)
+				);
+
+				await this.transferFile(
+					agentProject,
+					path.join(jobItem.job, jobItem.file, JOB_NAME),
+					path.join(JOB_PATH, jobItem.job, JOB_NAME)
+				);
+				await this.beginJob(agentProject, jobItem);
+			}
+		}
+		return result;
+	}
+	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
+		return await this.communicationTower.send(
+			agentProject,
+			path.join(jobItem.job, jobItem.file),
+			RedQuickDistributionCommand.RUN_JOB
+		);
+	}
+	static async transferFile(agentProject: AgentProject, relativePath: string, localPath: string) {
+		return await this.communicationTower.transferFile(agentProject, relativePath, localPath);
+	}
+
+	static async transferFiles(agentProject: AgentProject, srcFolder: string, outFolder: string) {
+		let filesToCopy = getFiles(srcFolder);
+		await filesToCopy.forEachAsync(async (file: string) => {
+			await this.transferFile(agentProject, path.resolve(path.join(srcFolder, file)), path.join(outFolder, file));
+		});
+	}
+
+	static async DistributeJobs_Old(jobToDistribute: Job): Promise<Job> {
 		let directories: string[] = await JobService.getAgentDirectories();
 		if (!directories.length) {
 			throw new Error('no agents in system');
@@ -460,7 +558,7 @@ export default class JobService {
 				let completed = true;
 				for (let i = 0; i < remoteDirectories.length; i++) {
 					let assignmentDir = remoteDirectories[i];
-					completed = completed && (await JobService.IsJobAssignmentComplete(assignments, assignmentDir));
+					completed = await JobService.IsJobAssignmentComplete(assignments, assignmentDir);
 					if (completed) {
 						result.complete++;
 					}
@@ -495,7 +593,7 @@ export default class JobService {
 		for (let i = 0; i < jobAssignment.length; i++) {
 			let job = jobAssignment[i];
 			let isComplete = await JobService.IsJobItemComplete(job, assignmentDir);
-			completed = completed && isComplete;
+			completed = isComplete;
 			if (completed) {
 				result.complete++;
 			}
@@ -556,6 +654,7 @@ export const JobServiceConstants = {
 	JOBS_FILE_PATH,
 	OUTPUT_FOLDER,
 	GRAPH_FILE_PARTS,
+	JOB_PATH,
 	GRAPH_FOLDER
 };
 export interface Progress {

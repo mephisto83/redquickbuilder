@@ -3,6 +3,7 @@ import path from 'path';
 import task from './task';
 import { getDirectories } from '../../app/jobs/jobservice';
 import { sleep } from './threadutil';
+import { RedQuickDistributionCommand } from '../../app/jobs/communicationTower';
 
 process.on('message', (command: any) => {
 	let { message } = command;
@@ -12,15 +13,54 @@ process.on('message', (command: any) => {
 	switch (parsedMessage.command) {
 		case Operations.INIT:
 			context.options = parsedMessage.options;
+			context.config = parsedMessage.config;
 			console.log(context.options);
 			process.send({ response: Operations.INIT });
 			process.send({ response: 'starting loop' });
+			break;
+		case RedQuickDistributionCommand.RUN_JOB:
+			let { projectName } = parsedMessage;
+			let { options } = context;
+			jobPromise = jobPromise.then(async () => {
+				return await job({ ...options, projectName });
+			});
 			break;
 		default:
 			process.send({ response: Operations.NO_OP });
 			break;
 	}
 });
+let jobPromise = Promise.resolve();
+async function job(options) {
+	let { folderPath, agentName, projectName } = options;
+	let jobPath = path.join(folderPath, agentName, projectName);
+	if (fs.existsSync(jobPath)) {
+		let jobsIndirectories = getDirectories(jobPath);
+		if (jobsIndirectories && jobsIndirectories.length) {
+			process.send({
+				response: RedQuickDistributionCommand.RaisingAgentProjectBusy,
+				command: RedQuickDistributionCommand.RaisingAgentProjectBusy,
+				changed: true,
+				ready: false,
+				agentName,
+				agentProject: projectName
+			});
+			await task(jobPath, () => {
+				process.send({ response: Operations.CHANGED, changed: true });
+			});
+			console.log('job completed');
+			process.send({ response: Operations.COMPLETED_TASK });
+			process.send({
+				response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+				command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+				changed: true,
+				ready: true,
+				agentName,
+				agentProject: projectName
+			});
+		}
+	}
+}
 
 async function loop() {
 	let noerror = true;
@@ -35,24 +75,12 @@ async function loop() {
 				if (!success) {
 					return false;
 				}
-				let jobPath = path.join(folderPath, 'agents', agentName, projectName);
-				if (fs.existsSync(jobPath)) {
-					let jobsIndirectories = getDirectories(jobPath);
-					if (jobsIndirectories && jobsIndirectories.length) {
-						process.send({ response: Operations.EXECUTING_TASK });
-						await task(jobPath, () => {
-							process.send({ response: Operations.CHANGED, changed: true });
-            });
-            console.log('job completed');
-						process.send({ response: Operations.COMPLETED_TASK });
-					}
-				}
 			} else {
 				console.warn('no options yet');
 			}
-      console.log('loop done');
+			console.log('loop done');
 		} catch (e) {
-      noerror = false;
+			noerror = false;
 			console.error(e);
 		}
 	} while (noerror);
@@ -79,12 +107,14 @@ const updateAgent = async (options: any) => {
 };
 
 const context: any = {
-	options: null
+	options: null,
+	config: null
 };
 export const Operations = {
 	NO_OP: 'NO_OP',
 	EXECUTING_TASK: 'EXECUTING_TASK',
 	INIT: 'INIT',
+	RUN_JOB: 'RUN_JOB',
 	CHANGED: 'CHANGED',
 	COMPLETED_TASK: 'COMPLETED_TASK'
 };

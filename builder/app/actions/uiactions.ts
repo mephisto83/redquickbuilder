@@ -13,7 +13,7 @@ import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink } from '../methods/graph_types';
-import JobService, { Job } from '../jobs/jobservice';
+import JobService, { Job, JobAssignment } from '../jobs/jobservice';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -3132,7 +3132,6 @@ export function NodesConnectedTo(state: any, nodeId: string | number) {
 let _getState: Function;
 let _dispatch: Function;
 export function GetState() {
-
 	if (_getState) return _getState();
 }
 export function GetDispatchFunc() {
@@ -3167,12 +3166,24 @@ export function loadGitRuns() {
 			await jobs.forEachAsync(async (jobInstance: Job) => {
 				let jobProgress = await JobService.JobProgress(jobInstance);
 				setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
+				let { assignments } = jobInstance;
+				if (assignments) {
+					Object.keys(assignments).forEachAsync(async (dir: string) => {
+						if (assignments != null) {
+							let assignmentProgress = await JobService.JobAssignmentProgress(assignments, dir);
+							setVisual(AssignmentId(assignments, dir), assignmentProgress)(dispatch, getState);
+						}
+					});
+				}
 			});
 		});
 	};
 }
 export function JobProgressId(jobInstance: Job) {
 	return `job-progress-id${jobInstance.name}`;
+}
+export function AssignmentId(assignments: JobAssignment, id: string) {
+	return `assignment-${id}`;
 }
 export function clearPinned() {
 	const state = _getState();

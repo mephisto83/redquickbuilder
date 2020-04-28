@@ -10,15 +10,111 @@ import JobService, {
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 import { GetCurrentGraph } from '../../app/actions/uiactions';
-
+import CommunicationTower, {
+	RedQuickDistributionCommand,
+	RedQuickDistributionMessage,
+	ListenerReply
+} from '../../app/jobs/communicationTower';
+import { RunnerContext } from '../../app/jobs/interfaces';
+let communicationTower: CommunicationTower;
+let runnerContext: RunnerContext = {
+	agents: {}
+};
 (async function runner() {
-	while (true) {
-		await createJobs();
-		await processJobs();
-		await sleep();
+	try {
+		communicationTower = new CommunicationTower();
+		communicationTower.init({
+			agentName: null,
+			baseFolder: JobServiceConstants.JOB_PATH,
+			serverPort: 7979,
+			topDirectory: '../../jobrunner'
+		});
+
+		communicationTower.start({
+			[RedQuickDistributionCommand.RaisingHand]: handleHandRaising,
+			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
+			[RedQuickDistributionCommand.Progress]: noOp,
+			[RedQuickDistributionCommand.RUN_JOB]: noOp,
+			[RedQuickDistributionCommand.SendFile]: noOp,
+			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
+			[RedQuickDistributionCommand.RaisingAgentProjectReady]: handleAgentProjectReady,
+			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy
+		});
+		JobService.SetComunicationTower(communicationTower);
+		while (true) {
+			await createJobs();
+			await processJobs();
+			await sleep();
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
 	}
 })();
-
+async function noOp(): Promise<ListenerReply> {
+	return { error: 'this operation is handled by the runner.' };
+}
+function GetCurrentAgents() {
+	return Object.keys(runnerContext.agents);
+}
+async function handleAgentProjectReady(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	return await handleAgentProjectStateChange(message, true);
+}
+async function handleAgentProjectStateChange(
+	message: RedQuickDistributionMessage,
+	ready: boolean
+): Promise<ListenerReply> {
+	if (message.agentName) {
+		if (runnerContext.agents[message.agentName]) {
+			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
+				runnerContext.agents[message.agentName].projects[message.agentProject].ready = ready;
+				JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[message.agentProject]);
+				return {
+					success: true
+				};
+			}
+			return { error: 'no agent with that project' };
+		}
+		return { error: 'no agent with that name' };
+	}
+	return {
+		error: 'agentName is not set'
+	};
+}
+async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	return await handleAgentProjectStateChange(message, false);
+}
+async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	if (message.agentName) {
+		runnerContext.agents[message.agentName] = {
+			...runnerContext.agents[message.agentName] || { projects: {} },
+			projects: message.projects || {},
+			name: message.agentName,
+			host: message.hostname,
+			port: message.port,
+			lastUpdated: Date.now()
+		};
+		Object.keys(runnerContext.agents[message.agentName].projects).forEach((agentProject) => {
+			JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[agentProject]);
+    });
+    console.log('hand raised');
+    console.log(runnerContext.agents);
+		return {
+			success: true
+		};
+	}
+	return {
+		error: 'agentName was not set'
+	};
+}
+async function setAgentProjects(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	if (message.agentName) {
+		runnerContext.agents[message.agentName].projects = message.agentProjects;
+	}
+	return {
+		error: 'agentName was not set'
+	};
+}
 async function processJobs() {
 	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
 		let projectFolders = getDirectories(JobServiceConstants.JOBS_FILE_PATH);
