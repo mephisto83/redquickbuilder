@@ -152,6 +152,9 @@ export default class JobService {
 		// Save the new graph, and continue with the job.
 	}
 
+	static async loadRemoteJob(filePath: string): Promise<Job> {
+		return this.loadJob(path.join(filePath, JOB_NAME));
+	}
 	static async loadJob(filePath: string | undefined): Promise<Job> {
 		if (filePath) {
 			let fileContents = fs.readFileSync(filePath, 'utf8');
@@ -314,7 +317,7 @@ export default class JobService {
 			return true;
 		});
 
-		if (jobs && jobs.length) {
+		while (jobs && jobs.length) {
 			let agentProject: AgentProject = await JobService.GetAvailableProject();
 			let jobItem: JobItem | null = jobs.find((j) => j) || null;
 			if (jobItem) {
@@ -337,41 +340,48 @@ export default class JobService {
 				//Every agent gets a copy of the graph.
 				await this.transferFile(
 					agentProject,
-					path.join(jobItem.job, jobItem.file, GRAPH_FILE),
-					path.join(JOB_PATH, jobItem.job, GRAPH_FILE)
+					path.join(JOB_PATH, jobItem.job, GRAPH_FILE),
+					path.join(dir, GRAPH_FILE)
 				);
 
 				await this.transferFiles(
 					agentProject,
-					path.join(JOB_PATH, jobItem.job, jobItem.file, GRAPH_FOLDER),
-					path.join(dir, jobItem.job, GRAPH_FOLDER)
+					path.join(JOB_PATH, jobItem.job, GRAPH_FOLDER),
+					path.join(dir, GRAPH_FOLDER)
 				);
 
 				await this.transferFile(
 					agentProject,
-					path.join(jobItem.job, jobItem.file, JOB_NAME),
-					path.join(JOB_PATH, jobItem.job, JOB_NAME)
+					path.join(JOB_PATH, jobItem.job, JOB_NAME),
+					path.join(dir, JOB_NAME)
 				);
+				await this.transferFile(
+					agentProject,
+					path.join(JOB_PATH, jobItem.job, jobItem.file, INPUT),
+					path.join(dir, INPUT)
+				);
+
 				await this.beginJob(agentProject, jobItem);
 			}
 		}
 		return result;
 	}
 	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
+		agentProject.ready = false;
 		return await this.communicationTower.send(
 			agentProject,
 			path.join(jobItem.job, jobItem.file),
 			RedQuickDistributionCommand.RUN_JOB
 		);
 	}
-	static async transferFile(agentProject: AgentProject, relativePath: string, localPath: string) {
-		return await this.communicationTower.transferFile(agentProject, relativePath, localPath);
+	static async transferFile(agentProject: AgentProject, srcFolder: string, outFolder: string) {
+		return await this.communicationTower.transferFile(agentProject, outFolder, srcFolder);
 	}
 
 	static async transferFiles(agentProject: AgentProject, srcFolder: string, outFolder: string) {
 		let filesToCopy = getFiles(srcFolder);
 		await filesToCopy.forEachAsync(async (file: string) => {
-			await this.transferFile(agentProject, path.resolve(path.join(srcFolder, file)), path.join(outFolder, file));
+			await this.transferFile(agentProject, path.join(srcFolder, file), path.join(outFolder, file));
 		});
 	}
 

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path from 'path';
+import path, { parse } from 'path';
 import task from './task';
 import { getDirectories } from '../../app/jobs/jobservice';
 import { sleep } from './threadutil';
@@ -10,30 +10,44 @@ process.on('message', (command: any) => {
 
 	let parsedMessage = message;
 	console.log(command);
-	switch (parsedMessage.command) {
-		case Operations.INIT:
-			context.options = parsedMessage.options;
-			context.config = parsedMessage.config;
-			console.log(context.options);
-			process.send({ response: Operations.INIT });
-			process.send({ response: 'starting loop' });
-			break;
-		case RedQuickDistributionCommand.RUN_JOB:
-			let { projectName } = parsedMessage;
-			let { options } = context;
-			jobPromise = jobPromise.then(async () => {
-				return await job({ ...options, projectName });
-			});
-			break;
-		default:
-			process.send({ response: Operations.NO_OP });
-			break;
+	if (parsedMessage) {
+		switch (parsedMessage.command || command.command) {
+			case Operations.INIT:
+				context.options = parsedMessage.options;
+				context.config = parsedMessage.config;
+				console.log(context.options);
+				process.send({ response: Operations.INIT });
+				process.send({ response: 'starting loop' });
+				break;
+			case RedQuickDistributionCommand.RUN_JOB:
+				let { projectName } = parsedMessage;
+				let { options } = context;
+				jobPromise = jobPromise.then(async () => {
+					return await job({ ...options, projectName });
+				});
+				break;
+			default:
+				process.send({ response: Operations.NO_OP });
+				break;
+		}
+	} else if (command.command) {
+		switch (command.command) {
+			case RedQuickDistributionCommand.RUN_JOB:
+				let { filePath } = command;
+				let { options } = context;
+				jobPromise = jobPromise.then(async () => {
+					return await job({ ...options, projectName: filePath[0], fileName: filePath[1] });
+				});
+				break;
+		}
 	}
 });
 let jobPromise = Promise.resolve();
 async function job(options) {
-	let { folderPath, agentName, projectName } = options;
-	let jobPath = path.join(folderPath, agentName, projectName);
+	let { folderPath, agentName, projectName, fileName } = options;
+	let jobPath = path.join(folderPath, agentName, projectName, fileName);
+	console.log(`jobPath: ${jobPath}`);
+
 	if (fs.existsSync(jobPath)) {
 		let jobsIndirectories = getDirectories(jobPath);
 		if (jobsIndirectories && jobsIndirectories.length) {
@@ -45,8 +59,8 @@ async function job(options) {
 				agentName,
 				agentProject: projectName
 			});
-			await task(jobPath, () => {
-				process.send({ response: Operations.CHANGED, changed: true });
+			await task(jobPath, options, (completedJobItem) => {
+				process.send({ response: Operations.CHANGED, changed: true, completedJobItem });
 			});
 			console.log('job completed');
 			process.send({ response: Operations.COMPLETED_TASK });

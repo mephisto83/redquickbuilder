@@ -44,62 +44,66 @@ let app_state;
 async function sleep(ms: number = 5 * 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
-export default async function executeJob(jobConfig: Job, onChange: Function) {
-	let { parts, jobInstancePath } = jobConfig;
-	if (!parts) throw new Error('no parts found in job');
-	await parts.forEachAsync(async (part: string) => {
-		const partPath = path.join(jobInstancePath, part, JobServiceConstants.INPUT);
-		if (partPath && fs.existsSync(partPath)) {
-			const partContent: string = fs.readFileSync(partPath, 'utf8');
-			if (partContent) {
-				const jobPart: JobItem = JSON.parse(partContent);
-				const { config } = jobPart;
-				const { command, filter } = config;
-				app_state = await setupJob(jobInstancePath);
+export default async function executeJob(
+	jobConfig: Job,
+	options: { folderPath: string; agentName: string; projectName: string; fileName: string },
+	onChange: Function
+) {
+	let jobInstancePath = path.join(options.folderPath, options.agentName, options.projectName, options.fileName);
+	const partPath = path.join(jobInstancePath, JobServiceConstants.INPUT);
+	if (partPath && fs.existsSync(partPath)) {
+		const partContent: string = fs.readFileSync(partPath, 'utf8');
+		if (partContent) {
+			const jobPart: JobItem = JSON.parse(partContent);
+			const { config } = jobPart;
+			const { command, filter } = config;
+			app_state = await setupJob(jobInstancePath);
 
-				jobConfig.updated = Date.now();
-				switch (command) {
-					case Create_Component_All:
-						await CreateComponentAll(
-							() => {},
-							(model: any) => {
-								return filter && filter.models.indexOf(model.id) !== -1;
-							}
-						);
-						await storeOutput(path.join(jobInstancePath, part));
-						await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
-						if (onChange) {
-							onChange();
+			jobConfig.updated = Date.now();
+			switch (command) {
+				case Create_Component_All:
+					await CreateComponentAll(
+						() => {},
+						(model: any) => {
+							return filter && filter.models.indexOf(model.id) !== -1;
 						}
-						break;
-					case Connect_Screens:
-						await ConnectScreens(
-							() => {},
-							(model: any) => {
-								return filter && filter.models.indexOf(model.id) !== -1;
-							}
-						);
-						await storeOutput(path.join(jobInstancePath, part));
-						await JobService.SetJobPartComplete(path.join(jobInstancePath, part));
-						if (onChange) {
-							onChange();
+          );
+          console.log('CreateComponentAll completed');
+					await storeOutput(path.join(jobInstancePath));
+					if (onChange) {
+						onChange({ ...options, jobInstancePath });
+					}
+					break;
+				case Connect_Screens:
+					await ConnectScreens(
+						() => {},
+						(model: any) => {
+							return filter && filter.models.indexOf(model.id) !== -1;
 						}
-						break;
-					default:
-						jobConfig.complete = true;
-						console.log(jobPart);
-						console.log(partPath);
-						console.log(command);
-						throw new Error('unknown job');
-				}
-
-				jobConfig.complete = true;
+					);
+					await storeOutput(path.join(jobInstancePath));
+					if (onChange) {
+						onChange({ ...options, jobInstancePath });
+					}
+					break;
+				default:
+					jobConfig.complete = true;
+					console.log(jobPart);
+					console.log(partPath);
+					console.log(command);
+					throw new Error('unknown job');
 			}
+
+			jobConfig.complete = true;
 		}
-		if (fs.existsSync(partPath)) {
-			await sleep();
-		}
-	});
+	} else {
+		console.log(jobConfig);
+		console.log(options);
+		throw new Error('missing partPath');
+	}
+	if (fs.existsSync(partPath)) {
+		await sleep();
+	}
 
 	return jobConfig;
 }

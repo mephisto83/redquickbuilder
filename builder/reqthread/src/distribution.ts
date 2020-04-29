@@ -12,6 +12,7 @@ import CommunicationTower, {
 } from '../../app/jobs/communicationTower';
 import { ProgressTracking } from './progressTracking';
 import { AgentProjects } from '../../app/jobs/interfaces';
+import JobService, { JobServiceConstants, getFiles } from '../../app/jobs/jobservice';
 let oneHour = 1000 * 60 * 60;
 
 export default class Distribution {
@@ -82,10 +83,14 @@ export default class Distribution {
 					});
 					this.threads[pn].onChange(async (arg: any) => {
 						//	await this.updateLocalDev(localDev);
+						console.log('distribution change');
 						if (this.configuration.remoteServerPort && this.configuration.remoteServerHost) {
-							if (arg.command) {
+							if (arg.completedJobItem) {
+								console.log('send back results');
+								await this.sendBackResults(arg.completedJobItem);
+							} else if (arg.command) {
 								console.log(`${arg.command}`);
-								this.communicationTower.send(
+								await this.communicationTower.send(
 									{
 										...arg,
 										agent: arg.agentName,
@@ -135,17 +140,86 @@ export default class Distribution {
 					[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
 					[RedQuickDistributionCommand.RaisingHand]: noOp,
 					[RedQuickDistributionCommand.SendFile]: noOp,
-					[RedQuickDistributionCommand.SetAgentProjects]: noOp
+					[RedQuickDistributionCommand.SetAgentProjects]: noOp,
+					[RedQuickDistributionCommand.CompletedJobItem]: noOp
 				});
 				await this.raiseHand(projects);
 			})
 		]);
 	}
+	async sendBackResults(completedJobItem: {
+		folderPath: string;
+		agentName: string;
+		projectName: string;
+		fileName: string;
+		jobInstancePath: string;
+	}) {
+		let attempts = 3;
+		do {
+			attempts--;
+			try {
+				await this.communicationTower.transferFile(
+					{
+						agent: completedJobItem.agentName,
+						name: completedJobItem.projectName,
+						host: this.configuration.remoteServerHost,
+						port: this.configuration.remoteServerPort
+					},
+					path.join(completedJobItem.projectName, JobServiceConstants.OUTPUT),
+					path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
+				);
+
+				await getFiles(
+					path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER)
+				).forEachAsync(async (outputGraphFile) => {
+					await this.communicationTower.transferFile(
+						{
+							agent: completedJobItem.agentName,
+							name: completedJobItem.projectName,
+							host: this.configuration.remoteServerHost,
+							port: this.configuration.remoteServerPort
+						},
+						path.join(completedJobItem.projectName, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile),
+						path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
+					);
+				});
+				let result = await this.communicationTower.send(
+					{
+						agent: completedJobItem.agentName,
+						name: completedJobItem.projectName,
+						host: this.configuration.remoteServerHost,
+						port: this.configuration.remoteServerPort
+					},
+					'',
+					RedQuickDistributionCommand.CompletedJobItem,
+					{
+						projectName: completedJobItem.projectName,
+						fileName: completedJobItem.fileName
+					}
+				);
+				console.log(result);
+				await sleep(10 * 1000);
+				if (result.success) {
+					attempts = 0;
+					let jobFolder = path.join(
+						this.configuration.baseFolder,
+						this.getAgentName(),
+						completedJobItem.projectName
+					);
+					if (fs.existsSync(jobFolder)) {
+						await JobService.deleteFolder(jobFolder);
+					}
+				}
+			} catch (e) {
+				console.error('error transferring files back');
+			}
+		} while (attempts);
+	}
 	async raiseHand(projects: AgentProjects) {
-		let completed = false;
 		let command = RedQuickDistributionCommand.RaisingHand;
 		let agentName = this.getAgentName();
 		do {
+			let completed = false;
 			try {
 				console.log(
 					`calling ${this.configuration.remoteServerHost}:${this.configuration
@@ -171,12 +245,16 @@ export default class Distribution {
 				if (res && res.error) {
 					console.log('didnt get ack without error');
 				} else {
-          completed = true;
-          console.log(res);
+					completed = true;
+					console.log(res);
 				}
-				await sleep(this.configuration.checkWait || 10 * 1000);
+				if (completed) {
+					await sleep(120 * 1000);
+				} else {
+					await sleep(this.configuration.checkWait || 10 * 1000);
+				}
 			} catch (e) {}
-		} while (!completed);
+		} while (true);
 		console.log('successfully raised hand');
 	}
 	async coordinateLocalThreads(localDev: LocalDev) {

@@ -12,7 +12,7 @@ import {
 	SaveApplication,
 	SaveGraph,
 	GetCurrentGraph,
-  GetC
+	GetC
 } from '../../app/actions/uiactions';
 import JobService, { JobServiceConstants } from '../../app/jobs/jobservice';
 import { setupCache, createGraph } from '../../app/methods/graph_methods';
@@ -58,7 +58,7 @@ export async function setupJob(graphFolder: string) {
 	app_state = { uiReducer: state };
 	console.log('setting dispatch');
 	setTestDispatch((args) => {
-    app_state = uiReducer(app_state, args);
+		app_state = uiReducer(app_state, args);
 	});
 
 	console.log('setting getState');

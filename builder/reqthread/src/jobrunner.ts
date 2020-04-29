@@ -38,7 +38,8 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.SendFile]: noOp,
 			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: handleAgentProjectReady,
-			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy
+			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy,
+			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
@@ -84,6 +85,39 @@ async function handleAgentProjectStateChange(
 async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	return await handleAgentProjectStateChange(message, false);
 }
+async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+  console.log('CompletedJobItem');
+  console.log('handing completed job item')
+	if (message.projectName) {
+		if (message.fileName) {
+			let relativePath = path.join(JobServiceConstants.JOB_PATH, message.projectName, message.fileName);
+			if (fs.existsSync(path.join(relativePath, JobServiceConstants.OUTPUT))) {
+				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
+					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
+					await JobService.deleteFolder(path.join(relativePath, JobServiceConstants.OUTPUT_FOLDER));
+
+					fs.writeFileSync(path.join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+					return {
+						success: true
+					};
+				} else {
+					return {
+						error: 'cant join output'
+					};
+				}
+			}
+			return {
+				error: 'missing graph file'
+			};
+		}
+		return {
+			error: 'no file name'
+		};
+	}
+	return {
+		error: 'no project name'
+	};
+}
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
 		runnerContext.agents[message.agentName] = {
@@ -96,9 +130,9 @@ async function handleHandRaising(message: RedQuickDistributionMessage): Promise<
 		};
 		Object.keys(runnerContext.agents[message.agentName].projects).forEach((agentProject) => {
 			JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[agentProject]);
-    });
-    console.log('hand raised');
-    console.log(runnerContext.agents);
+		});
+		console.log('hand raised');
+		console.log(runnerContext.agents);
 		return {
 			success: true
 		};
@@ -115,6 +149,7 @@ async function setAgentProjects(message: RedQuickDistributionMessage): Promise<L
 		error: 'agentName was not set'
 	};
 }
+
 async function processJobs() {
 	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
 		let projectFolders = getDirectories(JobServiceConstants.JOBS_FILE_PATH);
