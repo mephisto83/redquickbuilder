@@ -13,6 +13,7 @@ import CommunicationTower, {
 import { ProgressTracking } from './progressTracking';
 import { AgentProjects } from '../../app/jobs/interfaces';
 import JobService, { JobServiceConstants, getFiles } from '../../app/jobs/jobservice';
+import { uuidv4 } from '../../app/utils/array';
 let oneHour = 1000 * 60 * 60;
 
 export default class Distribution {
@@ -90,6 +91,7 @@ export default class Distribution {
 								await this.sendBackResults(arg.completedJobItem);
 							} else if (arg.command) {
 								console.log(`${arg.command}`);
+								console.log(arg);
 								await this.communicationTower.send(
 									{
 										...arg,
@@ -165,7 +167,7 @@ export default class Distribution {
 						host: this.configuration.remoteServerHost,
 						port: this.configuration.remoteServerPort
 					},
-					path.join(completedJobItem.projectName, JobServiceConstants.OUTPUT),
+					path.join(completedJobItem.projectName, completedJobItem.fileName, JobServiceConstants.OUTPUT),
 					path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
 				);
 
@@ -179,7 +181,12 @@ export default class Distribution {
 							host: this.configuration.remoteServerHost,
 							port: this.configuration.remoteServerPort
 						},
-						path.join(completedJobItem.projectName, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile),
+						path.join(
+							completedJobItem.projectName,
+							completedJobItem.fileName,
+							JobServiceConstants.OUTPUT_FOLDER,
+							outputGraphFile
+						),
 						path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
 					);
 				});
@@ -351,7 +358,7 @@ export default class Distribution {
 		const projectNames = [];
 
 		do {
-			let projectname = NameService.projectGenerator();
+			let projectname = `${NameService.projectGenerator()}-${uuidv4().split('-')[0]}`;
 			if (projectNames.indexOf(projectname) === -1) {
 				projectNames.push(projectname);
 				console.log(projectname);

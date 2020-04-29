@@ -10,6 +10,7 @@ import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
 import { AgentProject, AgentProjects } from './interfaces';
 import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
+import { SelectExecution } from '../components/titles';
 
 export default class JobService {
 	static communicationTower: CommunicationTower;
@@ -247,8 +248,10 @@ export default class JobService {
 		if (fs.existsSync(path.join(jobPartPath, INPUT))) {
 			let jobInput: JobConfigContract = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 			jobInput.complete = true;
-			fs.writeFileSync(inputPath, JSON.stringify(jobInput), 'utf8');
-		}
+      fs.writeFileSync(inputPath, JSON.stringify(jobInput), 'utf8');
+      return true;
+    }
+    return false;
 	}
 	static getJobItemLocalPath(jobItem: JobItem): string {
 		return path.join(JOB_PATH, jobItem.job, jobItem.file, INPUT);
@@ -289,14 +292,21 @@ export default class JobService {
 	}
 	static agentProjects: AgentProject[] = [];
 	static async UpdateReadyAgents(agentProject: AgentProject) {
+		console.log(agentProject);
 		JobService.agentProjects = [
-			...JobService.agentProjects.filter((x) => x.name !== agentProject.name && x.agent !== agentProject.agent),
+			...JobService.agentProjects.filter((x) => x.name !== agentProject.name),
 			agentProject
 		];
 	}
 	static async GetAvailableProject(): Promise<AgentProject> {
 		let result: AgentProject | null = null;
+
 		do {
+			console.log(
+				`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter(
+					(x) => x.ready
+				).length} avaiable`
+			);
 			result = JobService.agentProjects.find((x) => x.ready) || null;
 			if (!result) {
 				console.log('looking for agent project');
@@ -319,7 +329,7 @@ export default class JobService {
 
 		while (jobs && jobs.length) {
 			let agentProject: AgentProject = await JobService.GetAvailableProject();
-			let jobItem: JobItem | null = jobs.find((j) => j) || null;
+			let jobItem: JobItem | undefined = jobs.shift();
 			if (jobItem) {
 				let dir = path.join(jobItem.job, jobItem.file);
 				let configContent = fs.readFileSync(path.join(JOB_PATH, jobItem.job, JOB_NAME), 'utf8');
@@ -362,6 +372,7 @@ export default class JobService {
 				);
 
 				await this.beginJob(agentProject, jobItem);
+				await sleep(10 * 1000);
 			}
 		}
 		return result;

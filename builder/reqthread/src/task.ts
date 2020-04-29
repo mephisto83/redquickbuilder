@@ -25,8 +25,8 @@ export default async function task(
 		} else {
 			throw new Error('job not found');
 		}
-	}
-	return new Promise((resolve) => setTimeout(resolve, 120 * 1000));
+  }
+
 }
 async function canJobExecute(jobConfig: Job): Promise<boolean> {
 	const { jobInstancePath } = jobConfig;

@@ -86,16 +86,19 @@ async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Pro
 	return await handleAgentProjectStateChange(message, false);
 }
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
-  console.log('CompletedJobItem');
-  console.log('handing completed job item')
+	console.log('CompletedJobItem');
+	console.log('handing completed job item');
 	if (message.projectName) {
 		if (message.fileName) {
 			let relativePath = path.join(JobServiceConstants.JOB_PATH, message.projectName, message.fileName);
 			if (fs.existsSync(path.join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
-					await JobService.deleteFolder(path.join(relativePath, JobServiceConstants.OUTPUT_FOLDER));
-
+					// await JobService.deleteFolder(path.join(relativePath, JobServiceConstants.OUTPUT_FOLDER));
+					let completed = await JobService.SetJobPartComplete(relativePath);
+					if (!completed) {
+						throw new Error('job was not set to completed');
+					}
 					fs.writeFileSync(path.join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
 					return {
 						success: true

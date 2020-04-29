@@ -57,7 +57,7 @@ async function job(options) {
 				changed: true,
 				ready: false,
 				agentName,
-				agentProject: projectName
+				agentProject: context.options.projectName
 			});
 			await task(jobPath, options, (completedJobItem) => {
 				process.send({ response: Operations.CHANGED, changed: true, completedJobItem });
@@ -70,7 +70,7 @@ async function job(options) {
 				changed: true,
 				ready: true,
 				agentName,
-				agentProject: projectName
+				agentProject: context.options.projectName
 			});
 		}
 	}
