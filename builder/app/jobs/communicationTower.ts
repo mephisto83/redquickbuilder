@@ -4,10 +4,13 @@ import os from 'os';
 import http from 'http';
 import fetch from 'node-fetch';
 import net from 'net';
-import { AgentProject } from './interfaces_';
+import { AgentProject } from './interfaces';
+import { sleep } from './jobservice';
+import { DistrConfig } from '../../reqthread/src/distrconfig';
 
 export enum RedQuickDistributionCommand {
-  RUN_JOB
+	RUN_JOB,
+	SendFile
 }
 
 export default class CommunicationTower {
@@ -26,33 +29,32 @@ export default class CommunicationTower {
 
 		this.baseFolder = '';
 	}
-	async send(agentProject: AgentProject, arg1: string, command, options = {}) {
+	async send(agentProject: AgentProject, arg1: string, command: RedQuickDistributionCommand, options = {}) {
 		let body = {
 			...agentProject,
 			...options,
 			command,
 			agentName: agentProject.agent,
 			agentProject: agentProject.name,
-			filePath: arg1.split(path_1.default.sep)
+			filePath: arg1.split(path.sep)
 		};
-		return node_fetch_1
-			.default(`http://${agentProject.host}:${agentProject.port}`, {
-				method: 'POST',
-				body: JSON.stringify(body)
-			})
-			.then((res) => {
+		return fetch(`http://${agentProject.host}:${agentProject.port}`, {
+			method: 'POST',
+			body: JSON.stringify(body)
+		})
+			.then((res: { error: string | undefined }) => {
 				if (res.error) {
 					console.error(res);
 					throw new Error(res.error);
 				}
 				return res;
 			})
-			.catch((err) => {
+			.catch((err: any) => {
 				console.log(err);
 				throw err;
 			});
 	}
-	async transferFile(agentProject, outFolder, localPath) {
+	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
 		let maxattempts = 10;
 		do {
 			maxattempts--;
@@ -69,7 +71,7 @@ export default class CommunicationTower {
 					localPath
 				);
 				if (!success) {
-					await jobservice_1.sleep(10 * 1000);
+					await sleep(10 * 1000);
 				} else {
 					maxattempts = 0;
 				}
@@ -78,7 +80,7 @@ export default class CommunicationTower {
 			}
 		} while (maxattempts);
 	}
-	init(config) {
+	init(config: DistrConfig) {
 		this.topDirectory = config.topDirectory;
 		this.baseFolder = config.baseFolder;
 		this.agentName = config.agentName;
@@ -165,8 +167,8 @@ export default class CommunicationTower {
 	}
 	async sendFile(message, localFilePath) {
 		let server,
-			istream = fs_1.default.createReadStream(localFilePath);
-		let filePathArray = message.relativePath.split(path_1.default.sep);
+			istream = fs.createReadStream(localFilePath);
+		let filePathArray = message.relativePath.split(path.sep);
 		let port = await this.getAvailbePort();
 		let address = this.getIpaddress();
 		message.port = port;
@@ -198,7 +200,7 @@ export default class CommunicationTower {
 			});
 			server.listen(port, address.hostname, () => {
 				console.log('trying to send a file');
-				node_fetch_1.default(`http://${message.targetHost}:${message.targetPort}`, {
+				fetch.default(`http://${message.targetHost}:${message.targetPort}`, {
 					method: 'POST',
 					body: JSON.stringify({
 						...message,
@@ -214,17 +216,17 @@ export default class CommunicationTower {
 		return await new Promise(async (resolve, fail) => {
 			// console.log(this.baseFolder);
 			// console.log(this.agentName);
-			let requestedPath = path_1.default.join(
-				'.' + path_1.default.sep,
+			let requestedPath = path.join(
+				'.' + path.sep,
 				this.baseFolder,
 				this.agentName || '',
-				(req.filePath || []).join(path_1.default.sep)
+				(req.filePath || []).join(path.sep)
 			);
-			await ensureDirectory(path_1.default.resolve(path_1.default.dirname(requestedPath)));
+			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
 			console.log(`writing to: ${requestedPath}`);
 			let socket;
 			socket = net_1.default.connect(req.port, req.hostname);
-			let ostream = fs_1.default.createWriteStream(requestedPath);
+			let ostream = fs.createWriteStream(requestedPath);
 			let size = 0,
 				elapsed = 0;
 			this.sockets.push(socket);
@@ -336,32 +338,33 @@ export default class CommunicationTower {
 		return result;
 	}
 }
-exports.default = CommunicationTower;
-var RedQuickDistributionCommand;
-(function(RedQuickDistributionCommand) {
-	RedQuickDistributionCommand['SendFile'] = 'SendFile';
-	RedQuickDistributionCommand['RUN_JOB'] = 'RUN_JOB';
-	RedQuickDistributionCommand['Progress'] = 'Progress';
-	RedQuickDistributionCommand['RaisingHand'] = 'RaisingHand';
-	RedQuickDistributionCommand['SetAgentProjects'] = 'SetAgentProjects';
-	RedQuickDistributionCommand['RaisingAgentProjectReady'] = 'RaisingAgentProjectReady';
-	RedQuickDistributionCommand['RaisingAgentProjectBusy'] = 'RaisingAgentProjectBusy';
-	RedQuickDistributionCommand['CompletedJobItem'] = 'CompletedJobItem';
-})((RedQuickDistributionCommand = exports.RedQuickDistributionCommand || (exports.RedQuickDistributionCommand = {})));
-async function ensureDirectory(dir) {
-	if (!fs_1.default.existsSync(dir)) {
+
+// var RedQuickDistributionCommand;
+// (function(RedQuickDistributionCommand) {
+// 	RedQuickDistributionCommand['SendFile'] = 'SendFile';
+// 	RedQuickDistributionCommand['RUN_JOB'] = 'RUN_JOB';
+// 	RedQuickDistributionCommand['Progress'] = 'Progress';
+// 	RedQuickDistributionCommand['RaisingHand'] = 'RaisingHand';
+// 	RedQuickDistributionCommand['SetAgentProjects'] = 'SetAgentProjects';
+// 	RedQuickDistributionCommand['RaisingAgentProjectReady'] = 'RaisingAgentProjectReady';
+// 	RedQuickDistributionCommand['RaisingAgentProjectBusy'] = 'RaisingAgentProjectBusy';
+// 	RedQuickDistributionCommand['CompletedJobItem'] = 'CompletedJobItem';
+// })((RedQuickDistributionCommand = exports.RedQuickDistributionCommand || (exports.RedQuickDistributionCommand = {})));
+
+async function ensureDirectory(dir: string) {
+	if (!fs.existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
 	}
-	const _dir_parts = dir.split(path_1.default.sep);
+	const _dir_parts = dir.split(path.sep);
 	_dir_parts.map((_, i) => {
 		if (i > 1 || _dir_parts.length - 1 === i) {
-			let tempDir = path_1.default.join(..._dir_parts.slice(0, i + 1));
-			if (dir.startsWith(path_1.default.sep)) {
-				tempDir = `${path_1.default.sep}${tempDir}`;
+			let tempDir = path.join(..._dir_parts.slice(0, i + 1));
+			if (dir.startsWith(path.sep)) {
+				tempDir = `${path.sep}${tempDir}`;
 			}
-			if (!fs_1.default.existsSync(tempDir)) {
-				fs_1.default.mkdirSync(tempDir);
+			if (!fs.existsSync(tempDir)) {
+				fs.mkdirSync(tempDir);
 			}
 		}
 	});
