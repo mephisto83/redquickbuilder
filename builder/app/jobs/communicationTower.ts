@@ -73,7 +73,7 @@ export default class CommunicationTower {
 			method: 'POST',
 			body: JSON.stringify(body)
 		})
-			.then((res: { error: string | undefined }) => {
+			.then((res: any) => {
 				if (res.error) {
 					console.error(res);
 					throw new Error(res.error);
