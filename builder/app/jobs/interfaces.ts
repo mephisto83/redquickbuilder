@@ -6,6 +6,7 @@ export interface RunnerContext {
 export interface Agents {
 	[agent: string]: Agent;
 }
+
 export interface Agent {
 	name: string;
 	lastUpdated: number;
@@ -13,6 +14,7 @@ export interface Agent {
 	port: number;
 	projects: AgentProjects;
 }
+
 export interface AgentProjects {
 	[project: string]: AgentProject;
 }
