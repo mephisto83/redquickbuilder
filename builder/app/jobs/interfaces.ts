@@ -3,6 +3,7 @@ import { RedQuickDistributionCommand } from './communicationTower';
 export interface RunnerContext {
 	agents: Agents;
 }
+
 export interface Agents {
 	[agent: string]: Agent;
 }
@@ -18,6 +19,7 @@ export interface Agent {
 export interface AgentProjects {
 	[project: string]: AgentProject;
 }
+
 export interface AgentProject {
 	agent?: string;
 	agentName?: string;
