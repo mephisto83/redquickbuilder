@@ -67,9 +67,11 @@ async function job(options) {
 				agentName,
 				agentProject: context.options.projectName
 			});
+			context.busy = true;
 			await task(jobPath, options, (completedJobItem) => {
 				process.send({ response: Operations.CHANGED, changed: true, completedJobItem });
 			});
+			context.busy = false;
 			console.log('job completed');
 			process.send({ response: Operations.COMPLETED_TASK });
 			process.send({
@@ -101,6 +103,16 @@ async function loop() {
 				console.warn('no options yet');
 			}
 			console.log('loop done');
+			if (!context.busy) {
+				process.send({
+					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					changed: true,
+					ready: true,
+					agentName: context.options.agentName,
+					agentProject: context.options.projectName
+				});
+			}
 		} catch (e) {
 			noerror = false;
 			console.error(e);
