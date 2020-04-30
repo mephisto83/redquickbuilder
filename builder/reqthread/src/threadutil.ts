@@ -68,7 +68,6 @@ export async function setupJob(graphFolder: string) {
 	console.log('saving application');
 	SaveApplication(graph.id, CURRENT_GRAPH, GetDispatchFunc());
 	console.log('saving graph');
-	console.log(graph.version);
 	SaveGraph(graph, GetDispatchFunc());
 	console.log('setup cache');
 	setupCache(graph);
@@ -78,7 +77,6 @@ export async function setupJob(graphFolder: string) {
 export async function saveCurrentGraphTo(filePath, updatedGraph: Graph) {
 	console.log(`saving to : ${filePath}`);
 	let currentGraph = updatedGraph;
-	console.log(currentGraph.version);
 	let savecontent = JSON.stringify(prune(currentGraph));
 	fs.writeFileSync(filePath, savecontent, 'utf8');
 }

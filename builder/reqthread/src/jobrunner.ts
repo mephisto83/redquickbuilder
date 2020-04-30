@@ -121,6 +121,17 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 }
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
+    // The ready value shouldn't be effected by the hand raising
+		if (runnerContext.agents[message.agentName]) {
+			let tempProjects = runnerContext.agents[message.agentName].projects;
+			if (tempProjects) {
+				Object.keys(tempProjects).forEach((v) => {
+					if (message.projects && message.projects[v]) {
+						message.projects[v].ready = tempProjects[v].ready;
+					}
+				});
+			}
+		}
 		runnerContext.agents[message.agentName] = {
 			...runnerContext.agents[message.agentName] || { projects: {} },
 			projects: message.projects || {},
@@ -153,7 +164,7 @@ async function setAgentProjects(message: RedQuickDistributionMessage): Promise<L
 
 async function processJobs() {
 	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
-    // Get jobs from ./jobs directory.
+		// Get jobs from ./jobs directory.
 		let projectFolders = getDirectories(JobServiceConstants.JOBS_FILE_PATH);
 		await projectFolders.forEachAsync(async (projectFolder) => {
 			let jobFilePath = path.join(
@@ -175,7 +186,7 @@ async function executeStep(jobFilePath: string) {
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error && !jobConfig.completed) {
 		try {
-      let graphPath = jobConfig.graphPath;
+			let graphPath = jobConfig.graphPath;
 			console.log('get next command');
 			let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
 			console.log('setup job');
