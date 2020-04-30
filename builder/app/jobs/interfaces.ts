@@ -1,3 +1,5 @@
+import { RedQuickDistributionCommand } from './communicationTower';
+
 export interface RunnerContext {
 	agents: Agents;
 }
@@ -18,9 +20,13 @@ export interface AgentProject {
 	agent?: string;
 	agentName?: string;
 	agentProject?: string;
+	relativePath?: string | null;
+	command?: RedQuickDistributionCommand;
 	ready?: boolean;
-	hostname?: string | undefined;
+	hostname?: string | null;
+	targetHost?: string;
+	targetPort?: number;
 	name?: string;
-	host: string;
-	port: number;
+	host?: string;
+	port?: number;
 }

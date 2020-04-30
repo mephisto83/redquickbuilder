@@ -6,25 +6,24 @@ import fetch from 'node-fetch';
 import net from 'net';
 import { AgentProject, AgentProjects } from './interfaces';
 import { sleep } from './jobservice';
-import { DistrConfig } from '../../reqthread/src/distrconfig';
 
 export interface RedQuickDistributionMessage {
-	success: any;
-	agentProjects: AgentProjects;
-	hostname: string | null;
-	projects: any;
-	fileName: any;
-	error: boolean;
-	errorMessage: string;
-	relativePath: string;
-	targetHost: string;
-	targetPort: number;
-	noPort: boolean;
-	projectName: any;
-	agentProject: any;
-	agentName: any;
-	command: RedQuickDistributionCommand;
-	port: number;
+	success?: any;
+	agentProjects?: AgentProjects;
+	hostname?: string | null;
+	projects?: any;
+	fileName?: any;
+	error?: boolean;
+	errorMessage?: string;
+	relativePath?: string;
+	targetHost?: string;
+	targetPort?: number;
+	noPort?: boolean;
+	projectName?: any;
+	agentProject?: any;
+	agentName?: any;
+	command?: RedQuickDistributionCommand;
+	port?: number;
 }
 export interface CommunicationTowerConfig {
 	serverPort: number;
@@ -191,7 +190,7 @@ export default class CommunicationTower {
 		return reply;
 	}
 	async onHandleReceivedMessage(message: RedQuickDistributionMessage) {
-		let progressListeners = this.listeners ? this.listeners[message.command] : null;
+		let progressListeners = this.listeners && message.command ? this.listeners[message.command] : null;
 		if (progressListeners) {
 			return await progressListeners(message);
 		}
@@ -200,9 +199,9 @@ export default class CommunicationTower {
 	async sendFile(message: AgentProject, localFilePath: string) {
 		let server: net.Server,
 			istream = fs.createReadStream(localFilePath);
-		let filePathArray = message.relativePath.split(path.sep);
+		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let port = await this.getAvailbePort();
-		let address = this.getIpaddress();
+		let address: any = this.getIpaddress();
 		message.port = port;
 		message.hostname = address.hostname;
 		this.ports[port] = true;
@@ -244,7 +243,7 @@ export default class CommunicationTower {
 			});
 		});
 	}
-	async receiveFile(req) {
+	async receiveFile(req: any) {
 		return await new Promise(async (resolve, fail) => {
 			// console.log(this.baseFolder);
 			// console.log(this.agentName);
@@ -256,7 +255,7 @@ export default class CommunicationTower {
 			);
 			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
 			console.log(`writing to: ${requestedPath}`);
-			let socket;
+			let socket: net.Socket;
 			socket = net.connect(req.port, req.hostname);
 			let ostream = fs.createWriteStream(requestedPath);
 			let size = 0,
@@ -296,11 +295,11 @@ export default class CommunicationTower {
 		});
 	}
 	getAvailbePort() {
-		let res = Object.keys(this.ports).filter((key) => !this.ports[key]);
+		let res = Object.keys(this.ports).filter((key: any) => !this.ports[key]);
 		return parseInt(res[Math.floor(Math.random() * res.length)] || '0', 10);
 	}
 	async startServers() {
-		let address = this.getIpaddress();
+		let address: any = this.getIpaddress();
 		await this.setupPorts();
 		let port = this.serverPort;
 		const server = http.createServer((request, res) => {
@@ -314,8 +313,8 @@ export default class CommunicationTower {
 		});
 	}
 	getIpaddress() {
-		var ifaces = os_1.default.networkInterfaces();
-		let addressLib = { hostname: null };
+		var ifaces = os.networkInterfaces();
+		let addressLib: { [key: string]: string | null } = { hostname: null };
 		Object.keys(ifaces).forEach(function(ifname) {
 			var alias = 0;
 			ifaces[ifname].forEach(function(iface) {
@@ -345,10 +344,10 @@ export default class CommunicationTower {
 		});
 	}
 	async getPorts() {
-		let result = [];
+		let result: number[] = [];
 		var portrange = 45032;
 		for (let i = 0; i < 500; i++) {
-			let newport = await new Promise((resolve, fail) => {
+			let newport: number = await new Promise((resolve, fail) => {
 				function getPort() {
 					var port = portrange;
 					portrange += 1;
