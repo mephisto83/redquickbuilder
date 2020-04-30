@@ -16,7 +16,10 @@ export interface AgentProjects {
 }
 export interface AgentProject {
 	agent?: string;
+	agentName?: string;
+	agentProject?: string;
 	ready?: boolean;
+	hostname?: string | undefined;
 	name?: string;
 	host: string;
 	port: number;

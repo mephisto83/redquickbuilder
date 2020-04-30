@@ -4,12 +4,27 @@ import os from 'os';
 import http from 'http';
 import fetch from 'node-fetch';
 import net from 'net';
-import { AgentProject } from './interfaces';
+import { AgentProject, AgentProjects } from './interfaces';
 import { sleep } from './jobservice';
 import { DistrConfig } from '../../reqthread/src/distrconfig';
 
 export interface RedQuickDistributionMessage {
+	success: any;
+	agentProjects: AgentProjects;
+	hostname: string | null;
+	projects: any;
+	fileName: any;
+	error: boolean;
+	errorMessage: string;
+	relativePath: string;
+	targetHost: string;
+	targetPort: number;
+	noPort: boolean;
+	projectName: any;
+	agentProject: any;
+	agentName: any;
 	command: RedQuickDistributionCommand;
+	port: number;
 }
 export interface CommunicationTowerConfig {
 	serverPort: number;
@@ -17,6 +32,7 @@ export interface CommunicationTowerConfig {
 	baseFolder: string;
 	topDirectory: string;
 }
+export interface ListenerReply {}
 export enum RedQuickDistributionCommand {
 	RUN_JOB,
 	SendFile,
@@ -144,9 +160,9 @@ export default class CommunicationTower {
 			response.end();
 		}
 	}
-	async processRequest(strinResult) {
+	async processRequest(strinResult: string) {
 		let parsed = JSON.parse(strinResult);
-		let reply = {
+		let reply: RedQuickDistributionMessage = {
 			port: 0,
 			error: false,
 			noPort: false,
@@ -181,8 +197,8 @@ export default class CommunicationTower {
 		}
 		return null;
 	}
-	async sendFile(message, localFilePath) {
-		let server,
+	async sendFile(message: AgentProject, localFilePath: string) {
+		let server: net.Server,
 			istream = fs.createReadStream(localFilePath);
 		let filePathArray = message.relativePath.split(path.sep);
 		let port = await this.getAvailbePort();
@@ -191,7 +207,7 @@ export default class CommunicationTower {
 		message.hostname = address.hostname;
 		this.ports[port] = true;
 		return await new Promise((resolve, fail) => {
-			server = net_1.default.createServer((socket) => {
+			server = net.createServer((socket) => {
 				socket.pipe(process.stdout);
 				istream.on('readable', function() {
 					let data;
@@ -241,7 +257,7 @@ export default class CommunicationTower {
 			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
 			console.log(`writing to: ${requestedPath}`);
 			let socket;
-			socket = net_1.default.connect(req.port, req.hostname);
+			socket = net.connect(req.port, req.hostname);
 			let ostream = fs.createWriteStream(requestedPath);
 			let size = 0,
 				elapsed = 0;
@@ -336,7 +352,7 @@ export default class CommunicationTower {
 				function getPort() {
 					var port = portrange;
 					portrange += 1;
-					var server = net_1.default.createServer();
+					var server = net.createServer();
 					server.listen(port, () => {
 						server.once('close', function() {
 							resolve(port);
