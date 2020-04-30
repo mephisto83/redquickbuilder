@@ -52,7 +52,6 @@ export default class Distribution {
 			localDev.projects[project].agent = agent;
 			localDev.projects[project].port = this.configuration.serverPort;
 			localDev.projects[project].host = this.ipAddress.hostname;
-			localDev.projects[project].ready = true;
 		});
 	}
 

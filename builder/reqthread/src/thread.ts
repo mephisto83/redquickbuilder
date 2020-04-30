@@ -18,6 +18,14 @@ process.on('message', (command: any) => {
 				console.log(context.options);
 				process.send({ response: Operations.INIT });
 				process.send({ response: 'starting loop' });
+				process.send({
+					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					changed: true,
+					ready: true,
+					agentName: context.options.agentName,
+					agentProject: context.options.projectName
+				});
 				break;
 			case RedQuickDistributionCommand.RUN_JOB:
 				let { projectName } = parsedMessage;
