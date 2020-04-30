@@ -86,6 +86,7 @@ async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Pro
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	console.log('CompletedJobItem');
 	console.log('handing completed job item');
+	await sleep(10 * 1000);
 	if (message.projectName) {
 		if (message.fileName) {
 			let relativePath = path.join(JobServiceConstants.JOB_PATH, message.projectName, message.fileName);
@@ -120,7 +121,7 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 }
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
-    // The ready value shouldn't be effected by the hand raising
+		// The ready value shouldn't be effected by the hand raising
 		if (runnerContext.agents[message.agentName]) {
 			let tempProjects = runnerContext.agents[message.agentName].projects;
 			if (tempProjects) {

@@ -203,8 +203,8 @@ export default class Distribution {
 						projectName: completedJobItem.projectName,
 						fileName: completedJobItem.fileName
 					}
-				);
-				console.log(result);
+        );
+
 				await sleep(10 * 1000);
 				if (result.success) {
 					attempts = 0;
@@ -253,7 +253,6 @@ export default class Distribution {
 					console.log('didnt get ack without error');
 				} else {
 					completed = true;
-					console.log(res);
 				}
 				if (completed) {
 					await sleep(120 * 1000);

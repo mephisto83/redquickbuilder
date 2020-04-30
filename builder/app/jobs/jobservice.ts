@@ -104,18 +104,23 @@ export default class JobService {
 
 	static deleteFolder(folder: string) {
 		if (fs.existsSync(folder)) {
-			let dirs = getDirectories(folder);
-			dirs.forEach((dir) => {
-				JobService.deleteFolder(path.join(folder, dir));
-			});
-			let files = getFiles(folder);
-			files.forEach((file) => {
-				fs.unlinkSync(path.join(folder, file));
-			});
-			fs.rmdirSync(folder);
+			if (isDirectory(folder)) {
+				let dirs = getDirectories(folder);
+				dirs.forEach((dir) => {
+					JobService.deleteFolder(path.join(folder, dir));
+				});
+				let files = getFiles(folder);
+				files.forEach((file) => {
+					fs.unlinkSync(path.join(folder, file));
+				});
+				if (isDirectory(folder)) {
+					fs.rmdirSync(folder);
+				}
+			} else {
+				fs.unlinkSync(folder);
+			}
 		}
 	}
-
 	static async StartJob(
 		command: string,
 		currentJobFile: JobFile,
@@ -148,10 +153,14 @@ export default class JobService {
 		let graph = await JobService.MergeCompletedJob(currentJob);
 		if (graph) {
 			await setCurrentGraph(graph);
-      currentJobFile.updatedGraph = graph;
-      currentJobFile.started = true;
-      await writeGraphToFile(graph, currentJobFile.graphPath);
-      await JobService.deleteFolder(path.dirname(currentJobFile.jobPath))
+			currentJobFile.updatedGraph = graph;
+			currentJobFile.started = true;
+			await writeGraphToFile(graph, currentJobFile.graphPath);
+			if (currentJobFile.jobPath) {
+				await JobService.deleteFolder(path.dirname(currentJobFile.jobPath));
+			} else {
+				throw new Error('currentJobFile.jobPath is empty');
+			}
 		} else {
 			throw new Error('graph shouldnt be null, CollectForJob, jobservice.ts');
 		}
@@ -224,7 +233,6 @@ export default class JobService {
 			name: jobName,
 			nickName: NameService.superHeroName(),
 			parts: jobparts,
-			assignments: null,
 			complete: false,
 			updated: Date.now(),
 			configAbsolutePath: '',
@@ -251,8 +259,9 @@ export default class JobService {
 	static async SetJobPartComplete(jobPartPath: string) {
 		let inputPath: string = path.join(jobPartPath, INPUT);
 		if (fs.existsSync(path.join(jobPartPath, INPUT))) {
-			let jobInput: JobConfigContract = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+			let jobInput: JobItem = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 			jobInput.complete = true;
+			jobInput.config.complete = true;
 			fs.writeFileSync(inputPath, JSON.stringify(jobInput), 'utf8');
 			return true;
 		}
@@ -340,9 +349,6 @@ export default class JobService {
 				let configContent = fs.readFileSync(path.join(JOB_PATH, jobItem.job, JOB_NAME), 'utf8');
 				if (configContent) {
 					let config: Job = JSON.parse(configContent);
-					config.assignments = config.assignments || {};
-					config.assignments[dir] = config.assignments[dir] || [];
-					config.assignments[dir].push(jobItem);
 					result = config;
 					fs.writeFileSync(path.join(JOB_PATH, jobItem.job, JOB_NAME), JSON.stringify(config), 'utf8');
 				} else {
@@ -452,7 +458,6 @@ export default class JobService {
 			let configContent = fs.readFileSync(path.join(JOB_PATH, job, JOB_NAME), 'utf8');
 			if (configContent) {
 				let config: Job = JSON.parse(configContent);
-				config.assignments = jobAssignments[job];
 				fs.writeFileSync(path.join(JOB_PATH, job, JOB_NAME), JSON.stringify(config), 'utf8');
 				jobToDistribute = config;
 			} else {
@@ -475,58 +480,16 @@ export default class JobService {
 			try {
 				let isDone = await JobService.IsComplete(job);
 				if (isDone) {
-					await JobService.MoveCompletedJob(job);
 					await JobService.CleanUpJob(job);
 				}
 			} catch (e) {}
 		}
 	}
 	static CleanUpJob(job: Job) {
-		let { assignments } = job;
-		if (assignments) {
-			let remoteDirectories = Object.keys(assignments);
-			if (remoteDirectories.length) {
-				return remoteDirectories.forEach((assignmentDir) => {
-					let jobAssignment = assignments ? assignments[assignmentDir] : null;
-					if (!jobAssignment) {
-						throw new Error('no assignments');
-					}
-					jobAssignment.forEach((job) => {
-						JobService.deleteFolder(path.join(assignmentDir, job.job));
-					});
-				});
-			}
+		let { parts } = job;
+		if (parts) {
+			JobService.deleteFolder(path.join(JOB_PATH, job.name));
 		}
-	}
-	static async MoveCompletedJob(job: Job): Promise<boolean> {
-		let { assignments } = job;
-		if (assignments) {
-			let remoteDirectories = Object.keys(assignments);
-			if (remoteDirectories.length) {
-				return await remoteDirectories.forEachAsync(async (assignmentDir: string) => {
-					let jobAssignment = assignments ? assignments[assignmentDir] : [];
-					return await jobAssignment.forEachAsync(async (job: JobItem) => {
-						let jobPartOutput: string = await JobService.JoinFile(
-							path.join(assignmentDir, job.job, job.file),
-							OUTPUT
-						);
-						if (jobPartOutput) {
-							await ensureDirectory(path.join(JOB_PATH, job.job, job.file));
-							fs.writeFileSync(path.join(JOB_PATH, job.job, job.file, OUTPUT), jobPartOutput, 'utf8');
-							return true;
-						}
-						console.error(job);
-						console.error(job.job);
-						console.error(job.file);
-						console.error(assignmentDir);
-						console.error('cant move completed job back because of missing file.');
-						throw new Error('missing job file');
-					});
-				});
-			}
-			return true;
-		}
-		return false;
 	}
 
 	static async MergeCompletedJob(job: Job): Promise<Graph | null> {
@@ -575,7 +538,7 @@ export default class JobService {
 	}
 
 	static async JobProgress(job: Job) {
-		let {  parts } = job;
+		let { parts } = job;
 		let result = { total: 0, complete: 0 };
 		if (parts) {
 			if (parts.length) {
@@ -615,7 +578,7 @@ export default class JobService {
 		let completed = true;
 		for (let i = 0; i < jobAssignment.length; i++) {
 			let job = jobAssignment[i];
-			let isComplete = await JobService.IsJobItemComplete(job, assignmentDir);
+			let isComplete = await JobService.IsJobItemComplete(job);
 			completed = isComplete;
 			if (completed) {
 				result.complete++;
@@ -638,18 +601,12 @@ export default class JobService {
 			throw new Error('no assignments');
 		}
 
-		let isComplete = await JobService.IsJobItemComplete(jobItem, JobServiceConstants.JOB_PATH);
+		let isComplete = await JobService.IsJobItemComplete(jobItem);
 		return isComplete;
 	}
 
-	static async IsJobItemComplete(jobItem: JobItem, assignmentDir: string): Promise<boolean> {
-		if (fs.existsSync(path.join(assignmentDir, jobItem.job, jobItem.file, INPUT))) {
-			let content = fs.readFileSync(path.join(assignmentDir, jobItem.job, jobItem.file, INPUT), 'utf8');
-			let contract: JobConfigContract = JSON.parse(content);
-			if (contract) {
-				return contract.complete;
-			}
-		}
+	static async IsJobItemComplete(jobItem: JobItem): Promise<boolean> {
+		if (jobItem && jobItem.config) return jobItem.config.complete;
 		return false;
 	}
 }
@@ -693,7 +650,6 @@ export interface Job {
 	name: string;
 	nickName: string;
 	complete: boolean;
-	assignments: JobAssignment | null;
 	updated: number;
 	parts: string[];
 	absolutePath: string;
@@ -710,13 +666,14 @@ export interface JobItem {
 	job: string;
 	file: string;
 	distributed: boolean;
+	complete?: boolean;
 	config: JobConfigContract;
 }
 export interface JobOutput {
 	files: string[];
 }
 export interface JobFile {
-  started?: boolean;
+	started?: boolean;
 	completed?: boolean;
 	updated?: number;
 	jobPath?: string;

@@ -3166,12 +3166,12 @@ export function loadGitRuns() {
 			await jobs.forEachAsync(async (jobInstance: Job) => {
 				let jobProgress = await JobService.JobProgress(jobInstance);
 				setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
-				let { assignments } = jobInstance;
-				if (assignments) {
-					Object.keys(assignments).forEachAsync(async (dir: string) => {
-						if (assignments != null) {
-							let assignmentProgress = await JobService.JobAssignmentProgress(assignments, dir);
-							setVisual(AssignmentId(assignments, dir), assignmentProgress)(dispatch, getState);
+				let { parts } = jobInstance;
+				if (parts) {
+					parts.forEachAsync(async (dir: string) => {
+						if (parts != null) {
+							// let assignmentProgress = await JobService.JobAssignmentProgress(parts, dir);
+							// setVisual(AssignmentId(assignments, dir), assignmentProgress)(dispatch, getState);
 						}
 					});
 				}

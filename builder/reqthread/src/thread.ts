@@ -8,10 +8,11 @@ import { RedQuickDistributionCommand } from '../../app/jobs/communicationTower';
 process.on('message', (command: any) => {
 	let { message } = command;
 
-	let parsedMessage = message;
+  let parsedMessage = message;
+  console.log('received message from parent thread');
 	console.log(command);
 	if (parsedMessage) {
-		switch (parsedMessage.command || command.command) {
+		switch (parsedMessage.command) {
 			case Operations.INIT:
 				context.options = parsedMessage.options;
 				context.config = parsedMessage.config;
@@ -27,13 +28,6 @@ process.on('message', (command: any) => {
 					agentProject: context.options.projectName
 				});
 				break;
-			case RedQuickDistributionCommand.RUN_JOB:
-				let { projectName } = parsedMessage;
-				let { options } = context;
-				jobPromise = jobPromise.then(async () => {
-					return await job({ ...options, projectName });
-				});
-				break;
 			default:
 				process.send({ response: Operations.NO_OP });
 				break;
@@ -44,6 +38,7 @@ process.on('message', (command: any) => {
 				let { filePath } = command;
 				let { options } = context;
 				jobPromise = jobPromise.then(async () => {
+					console.log('Starting job --------- ');
 					return await job({ ...options, projectName: filePath[0], fileName: filePath[1] });
 				});
 				break;
@@ -55,7 +50,6 @@ async function job(options) {
 	let { folderPath, agentName, projectName, fileName } = options;
 	let jobPath = path.join(folderPath, agentName, projectName, fileName);
 	console.log(`jobPath: ${jobPath}`);
-
 	if (fs.existsSync(jobPath)) {
 		let jobsIndirectories = getDirectories(jobPath);
 		if (jobsIndirectories && jobsIndirectories.length) {

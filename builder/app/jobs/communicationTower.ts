@@ -33,14 +33,14 @@ export interface CommunicationTowerConfig {
 }
 export interface ListenerReply {}
 export enum RedQuickDistributionCommand {
-	RUN_JOB,
-	SendFile,
-	RaisingHand,
-	SetAgentProjects,
-	Progress,
-	RaisingAgentProjectReady,
-	RaisingAgentProjectBusy,
-	CompletedJobItem
+	RUN_JOB = 'RUN_JOB',
+	SendFile = 'SendFile',
+	RaisingHand = 'RaisingHand',
+	SetAgentProjects = 'SetAgentProjects',
+	Progress = 'Progress',
+	RaisingAgentProjectReady = 'RaisingAgentProjectReady',
+	RaisingAgentProjectBusy = 'RaisingAgentProjectBusy',
+	CompletedJobItem = 'CompletedJobItem'
 }
 export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;
 export default class CommunicationTower {
@@ -245,8 +245,6 @@ export default class CommunicationTower {
 	}
 	async receiveFile(req: any) {
 		return await new Promise(async (resolve, fail) => {
-			// console.log(this.baseFolder);
-			// console.log(this.agentName);
 			let requestedPath = path.join(
 				'.' + path.sep,
 				this.baseFolder,
