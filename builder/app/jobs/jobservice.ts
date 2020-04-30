@@ -8,8 +8,8 @@ import { Node, Graph } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
-import { AgentProject, AgentProjects } from './interfaces';
-import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
+import { AgentProject, AgentProjects } from './interfaces_';
+import CommunicationTower, { RedQuickDistributionCommand } from './ccommunicationTower';
 import { SelectExecution } from '../components/titles';
 
 export default class JobService {
