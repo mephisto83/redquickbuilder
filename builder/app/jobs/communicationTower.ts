@@ -8,23 +8,39 @@ import { AgentProject } from './interfaces';
 import { sleep } from './jobservice';
 import { DistrConfig } from '../../reqthread/src/distrconfig';
 
+export interface RedQuickDistributionMessage {
+	command: RedQuickDistributionCommand;
+}
+export interface CommunicationTowerConfig {
+	serverPort: number;
+	agentName: string;
+	baseFolder: string;
+	topDirectory: string;
+}
 export enum RedQuickDistributionCommand {
 	RUN_JOB,
-	SendFile
+	SendFile,
+	RaisingHand,
+	SetAgentProjects,
+	Progress,
+	RaisingAgentProjectReady,
+	RaisingAgentProjectBusy,
+	CompletedJobItem
 }
-
+export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;
 export default class CommunicationTower {
 	topDirectory: string;
 	ports: { [port: number]: boolean };
 	sockets: net.Socket[];
 	agentName: string;
-
+	listeners: CommunicationTowerListen;
 	baseFolder: string;
 	serverPort: any;
 	constructor() {
 		this.topDirectory = '';
 		this.ports = {};
 		this.sockets = [];
+		this.listeners = null;
 		this.agentName = '';
 
 		this.baseFolder = '';
@@ -80,7 +96,7 @@ export default class CommunicationTower {
 			}
 		} while (maxattempts);
 	}
-	init(config: DistrConfig) {
+	init(config: CommunicationTowerConfig) {
 		this.topDirectory = config.topDirectory;
 		this.baseFolder = config.baseFolder;
 		this.agentName = config.agentName;
@@ -88,13 +104,13 @@ export default class CommunicationTower {
 		this.sockets = [];
 		this.ports = {};
 	}
-	start(listeners) {
+	start(listeners: CommunicationTowerListen) {
 		this.listeners = listeners;
 		this.startServers();
 	}
-	handleRequest(request, response) {
+	handleRequest(request: http.IncomingMessage, response: http.ServerResponse) {
 		const { headers, method, url } = request;
-		let body = [];
+		let body: any[] = [];
 		let stringResult = '';
 		if (method === 'POST') {
 			request
@@ -107,7 +123,7 @@ export default class CommunicationTower {
 				.on('end', async () => {
 					stringResult = Buffer.concat(body).toString();
 					let replyObject = await this.processRequest(stringResult);
-					response.on('error', (err) => {
+					response.on('error', (err: any) => {
 						console.error(err);
 					});
 					response.statusCode = 200;
@@ -158,7 +174,7 @@ export default class CommunicationTower {
 		}
 		return reply;
 	}
-	async onHandleReceivedMessage(message) {
+	async onHandleReceivedMessage(message: RedQuickDistributionMessage) {
 		let progressListeners = this.listeners ? this.listeners[message.command] : null;
 		if (progressListeners) {
 			return await progressListeners(message);
@@ -271,7 +287,7 @@ export default class CommunicationTower {
 		let address = this.getIpaddress();
 		await this.setupPorts();
 		let port = this.serverPort;
-		const server = http_1.default.createServer((request, res) => {
+		const server = http.createServer((request, res) => {
 			this.handleRequest(request, res);
 		});
 		server.on('clientError', (err, socket) => {
