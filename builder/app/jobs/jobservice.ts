@@ -105,13 +105,13 @@ export default class JobService {
 
 	static deleteFolder(folder: string) {
 		if (fs.existsSync(folder)) {
-			let files = getFiles(folder);
-			files.forEach((file) => {
-				fs.unlinkSync(path.join(folder, file));
-			});
 			let dirs = getDirectories(folder);
 			dirs.forEach((dir) => {
 				JobService.deleteFolder(path.join(folder, dir));
+			});
+			let files = getFiles(folder);
+			files.forEach((file) => {
+				fs.unlinkSync(path.join(folder, file));
 			});
 			fs.rmdirSync(folder);
 		}
@@ -151,7 +151,8 @@ export default class JobService {
 			await setCurrentGraph(graph);
       currentJobFile.updatedGraph = graph;
       currentJobFile.started = true;
-			await writeGraphToFile(graph, currentJobFile.graphPath);
+      await writeGraphToFile(graph, currentJobFile.graphPath);
+      await JobService.deleteFolder(path.dirname(currentJobFile.jobPath))
 		} else {
 			throw new Error('graph shouldnt be null, CollectForJob, jobservice.ts');
 		}
