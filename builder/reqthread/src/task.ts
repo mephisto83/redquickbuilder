@@ -28,11 +28,7 @@ export default async function task(
   }
 
 }
-async function canJobExecute(jobConfig: Job): Promise<boolean> {
-	const { jobInstancePath } = jobConfig;
-	console.log(jobConfig);
-	return await JobService.CanJoinFiles(jobInstancePath, JobServiceConstants.GRAPH_FILE);
-}
+
 function getUnfinishedJob(jobPath: string): Job {
 	let folderExists = fs.existsSync(jobPath);
 	if (folderExists) {

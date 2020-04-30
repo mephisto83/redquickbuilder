@@ -156,7 +156,7 @@ export const BuildAllInfo = {
 	InitialStep: Create_View_Types
 };
 export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
-	let result: Job;
+
 	setCommandToRun(command);
 	const uiTypes = {
 		[UITypes.ElectronIO]: true,
@@ -199,7 +199,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
-			result = await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Model);
+			await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Model);
 		});
 
 		await run(
@@ -241,7 +241,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Connect_Screens, async (progresFunc: any) => {
-			result = await JobService.StartJob(Connect_Screens, currentJobFile, 1, NodeTypes.Screen);
+			await JobService.StartJob(Connect_Screens, currentJobFile, 1, NodeTypes.Screen);
 			//     await ConnectScreens(progresFunc);
 		});
 

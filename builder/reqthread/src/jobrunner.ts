@@ -55,9 +55,7 @@ let runnerContext: RunnerContext = {
 async function noOp(): Promise<ListenerReply> {
 	return { error: 'this operation is handled by the runner.' };
 }
-function GetCurrentAgents() {
-	return Object.keys(runnerContext.agents);
-}
+
 async function handleAgentProjectReady(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	return await handleAgentProjectStateChange(message, true);
 }
@@ -155,6 +153,7 @@ async function setAgentProjects(message: RedQuickDistributionMessage): Promise<L
 
 async function processJobs() {
 	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
+    // Get jobs from ./jobs directory.
 		let projectFolders = getDirectories(JobServiceConstants.JOBS_FILE_PATH);
 		await projectFolders.forEachAsync(async (projectFolder) => {
 			let jobFilePath = path.join(
@@ -176,11 +175,12 @@ async function executeStep(jobFilePath: string) {
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error && !jobConfig.completed) {
 		try {
+      let graphPath = jobConfig.graphPath;
 			console.log('get next command');
 			let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
 			console.log('setup job');
-			console.log(jobConfig.graphPath);
-			await setupJob(path.dirname(jobConfig.graphPath));
+			console.log(graphPath);
+			await setupJob(path.dirname(graphPath));
 			let step = BuildAllInfo.Commands[currentStep + 1];
 			console.log(`step: ${step.name}`);
 			console.log(`currentStep: ${currentStep + 1}`);
@@ -192,9 +192,9 @@ async function executeStep(jobFilePath: string) {
 
 			console.log('save current graph to');
 			delete jobConfig.updatedGraph;
-			await saveCurrentGraphTo(jobConfig.graphPath, cg);
-			await ensureDirectory(path.join(path.dirname(jobConfig.graphPath), 'stages'));
-			await saveCurrentGraphTo(path.join(path.dirname(jobConfig.graphPath), 'stages', `${step.name}.rqb`), cg);
+			await saveCurrentGraphTo(graphPath, cg);
+			await ensureDirectory(path.join(path.dirname(graphPath), 'stages'));
+			await saveCurrentGraphTo(path.join(path.dirname(graphPath), 'stages', `${step.name}.rqb`), cg);
 			jobConfig.step = step.name;
 			console.log(jobConfig.step);
 		} catch (e) {
