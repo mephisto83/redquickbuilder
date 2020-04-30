@@ -231,7 +231,7 @@ export default class CommunicationTower {
 			});
 			server.listen(port, address.hostname, () => {
 				console.log('trying to send a file');
-				fetch.default(`http://${message.targetHost}:${message.targetPort}`, {
+				fetch(`http://${message.targetHost}:${message.targetPort}`, {
 					method: 'POST',
 					body: JSON.stringify({
 						...message,
@@ -382,7 +382,7 @@ export default class CommunicationTower {
 // 	RedQuickDistributionCommand['CompletedJobItem'] = 'CompletedJobItem';
 // })((RedQuickDistributionCommand = exports.RedQuickDistributionCommand || (exports.RedQuickDistributionCommand = {})));
 
-async function ensureDirectory(dir: string) {
+export async function ensureDirectory(dir: string) {
 	if (!fs.existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
@@ -400,6 +400,3 @@ async function ensureDirectory(dir: string) {
 		}
 	});
 }
-
-exports.ensureDirectory = ensureDirectory;
-//# sourceMappingURL=communicationTower.js.map
