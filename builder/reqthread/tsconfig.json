@@ -39,7 +39,8 @@
     "../app/templates/**/*",
     "../app/main.prod.ts",
     "../app/dist/renderer.prod.*",
-    "../app/**/*.tsx"
+    "../app/**/*.tsx",
+    "build.js"
   ],
   "include": [
       "src/**/*",

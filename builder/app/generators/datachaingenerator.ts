@@ -122,7 +122,7 @@ export default class DataChainGenerator {
 				name: 'observable'
 			},
 			{
-				template: readFileSync('./app/utils/array.js', 'utf8'),
+				template: readFileSync('./app/utils/array.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./array${fileEnding}`,
 				name: 'array'

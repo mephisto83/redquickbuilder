@@ -1034,6 +1034,7 @@ export function GenerateDataChainArguments(id: string) {
 			const functionType = GetNodeProp(methods[0], NodeProperties.FunctionType);
 			const { lambda } = MethodFunctions[functionType];
 			if (lambda && lambda.default) {
+				const methodProps: any = GetMethodProps(methods[0]);
 				_arguments = Object.keys(lambda.default)
 					.filter((x) => x !== 'return')
 					.map((key) => `${key.split('.').join('')}:${key} `)
@@ -1105,7 +1106,18 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	}
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
-	const setProcess: string[] = [];
+  const setProcess: string[] = [];
+	const funcs = chain.map((c: any, index: number) => {
+		if (index === 0) {
+			args = GetDataChainArgs(c);
+		}
+		const temp = GenerateDataChainMethod(c, options);
+		observables.push(GenerateObservable(c, index));
+		setArgs.push(GenerateArgs(c, chain));
+		setProcess.push(GenerateSetProcess(c, chain, options));
+		subscribes.push(GetSubscribes(c, chain));
+		return temp;
+	});
 	const index = chain.indexOf(id);
 	const nodeName = (GetJSCodeName(id) || 'node' + index).toJavascriptName();
 	const lastLink = GetLastChainLink(chain);

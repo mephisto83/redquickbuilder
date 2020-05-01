@@ -1895,7 +1895,7 @@ export const CreateDefaultView = {
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.NODEType]: NodeTypes.Screen,
 												[NodeProperties.Model]: currentNode.id,
-												[NodeProperties.Agent]: agentId
+												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											},
 											graph
 										).find((x) => x);
@@ -1929,7 +1929,7 @@ export const CreateDefaultView = {
 													? GetNodeTitle(agentId)
 													: ''} Form`,
 												[NodeProperties.Model]: currentNode.id,
-												[NodeProperties.Agent]: agentId
+												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											}
 										};
 									}
@@ -2013,7 +2013,7 @@ export const CreateDefaultView = {
 												[NodeProperties.NODEType]: NodeTypes.DataChain,
 												[NodeProperties.EntryPoint]: true,
 												[NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object,
-												[NodeProperties.Agent]: agentId
+												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											},
 											graph
 										);
@@ -2033,7 +2033,7 @@ export const CreateDefaultView = {
 												[NodeProperties.Pinned]: false,
 												[NodeProperties.AsOutput]: true,
 												[NodeProperties.SelectorProperty]: SelectorPropertyKeys.Object,
-												[NodeProperties.Agent]: agentId
+												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											},
 											links: [
 												{
@@ -2106,7 +2106,7 @@ export const CreateDefaultView = {
 												[NodeProperties.InstanceType]: useModelInstance
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
-												[NodeProperties.Agent]: agentId
+												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											},
 											groupProperties: {},
 											linkProperties: {
@@ -2291,7 +2291,7 @@ export const CreateDefaultView = {
 												[NodeProperties.Pinned]: false,
 												[NodeProperties.SharedComponent]: isSharedComponent,
 												[NodeProperties.ComponentType]: multi_item_component,
-												[NodeProperties.Agent]: agentId,
+												...agentId ? { [NodeProperties.Agent]: agentId } : {},
 												[NodeProperties.InstanceType]: useModelInstance
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
@@ -2502,7 +2502,7 @@ export const CreateDefaultView = {
 										[NodeProperties.ViewType]: viewType,
 										[NodeProperties.SharedComponent]: isSharedComponent,
 										[NodeProperties.Pinned]: false,
-										[NodeProperties.Agent]: agentId,
+										...agentId ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: isList
 											? ComponentTypes[uiType].ListItem.key
 											: ComponentTypes[uiType].Form.key,
@@ -2815,7 +2815,7 @@ export const CreateDefaultView = {
 														sharedComponent || componentTypeToUse,
 													[NodeProperties.UsingSharedComponent]: !!sharedComponent,
 													[NodeProperties.Pinned]: false,
-													[NodeProperties.Agent]: agentId,
+													...agentId ? { [NodeProperties.Agent]: agentId } : {},
 													[NodeProperties.InstanceType]: useModelInstance
 														? InstanceTypes.ModelInstance
 														: InstanceTypes.ScreenInstance
@@ -3005,7 +3005,7 @@ export const CreateDefaultView = {
 											agentId
 										)} ${Titles.Execute} Button ${viewName} Component`,
 										[NodeProperties.UIType]: uiType,
-										[NodeProperties.Agent]: agentId,
+										...agentId ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.Pinned]: false,
 										[NodeProperties.Label]: `${GetNodeTitle(
 											agentId
@@ -3046,7 +3046,7 @@ export const CreateDefaultView = {
 										[NodeProperties.Label]: `${GetNodeTitle(
 											agentId
 										)} ${Titles.Cancel} Button ${viewName} Component`,
-										[NodeProperties.Agent]: agentId,
+										...agentId ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
 										[NodeProperties.InstanceType]: useModelInstance
 											? InstanceTypes.ModelInstance

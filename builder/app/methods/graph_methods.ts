@@ -19,7 +19,14 @@ import {
 } from '../constants/nodetypes';
 import { FunctionTemplateKeys, FunctionConstraintKeys } from '../constants/functiontypes';
 import * as Functions from '../constants/functiontypes';
-import { GetLinkProperty, GetGroupProperty, GetCurrentGraph, GetRootGraph, GetNodeById, GetCodeName } from '../actions/uiactions';
+import {
+	GetLinkProperty,
+	GetGroupProperty,
+	GetCurrentGraph,
+	GetRootGraph,
+	GetNodeById,
+	GetCodeName
+} from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import { Graph, Node, GraphLink } from './graph_types';
 
@@ -304,7 +311,7 @@ export function incrementBuild(graph: any) {
 }
 
 export function incrementMinor(graph: any) {
-  graph.version.minor++;
+	graph.version.minor++;
 	graph.version.build = 0;
 	return graph;
 }
@@ -1006,7 +1013,7 @@ const runtimeState = {
 };
 
 export function GetNodesByProperties(props: { [x: string]: any }, graph: { nodeLib: { [x: string]: any } }) {
-	const orderedLookupProp = Object.keys(props).sort((a, b) => {
+	const orderedLookupProp = Object.keys(props).filter((x) => props[x] !== undefined).sort((a, b) => {
 		return AppCache.PropertyKeys.indexOf(a) - AppCache.PropertyKeys.indexOf(b);
 	});
 	if (runtimeState.lastLropertyKeyRecycle > runtimeState.recycleEveryProperty) {
@@ -2941,9 +2948,9 @@ function codeTypeWord(x: any) {
 
 export function GetComponentExternalApiNodes(parent: any, graph?: any) {
 	graph = graph || GetCurrentGraph();
-	return  GetNodesLinkedTo(graph, {
+	return GetNodesLinkedTo(graph, {
 		id: parent,
-		link:  LinkType.ComponentExternalApi
+		link: LinkType.ComponentExternalApi
 	});
 }
 

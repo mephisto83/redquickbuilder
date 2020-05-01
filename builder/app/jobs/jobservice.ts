@@ -104,21 +104,23 @@ export default class JobService {
 
 	static deleteFolder(folder: string) {
 		if (fs.existsSync(folder)) {
-			if (isDirectory(folder)) {
-				let dirs = getDirectories(folder);
-				dirs.forEach((dir) => {
-					JobService.deleteFolder(path.join(folder, dir));
-				});
-				let files = getFiles(folder);
-				files.forEach((file) => {
-					fs.unlinkSync(path.join(folder, file));
-				});
+			try {
 				if (isDirectory(folder)) {
-					fs.rmdirSync(folder);
+					let dirs = getDirectories(folder);
+					dirs.forEach((dir) => {
+						JobService.deleteFolder(path.join(folder, dir));
+					});
+					let files = getFiles(folder);
+					files.forEach((file) => {
+						fs.unlinkSync(path.join(folder, file));
+					});
+					if (isDirectory(folder)) {
+						fs.rmdirSync(folder);
+					}
+				} else {
+					fs.unlinkSync(folder);
 				}
-			} else {
-				fs.unlinkSync(folder);
-			}
+			} catch (e) {}
 		}
 	}
 	static async StartJob(
@@ -128,9 +130,12 @@ export default class JobService {
 		modelTypes?: string | string[]
 	): Promise<Job> {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
-		job = await JobService.DistributeJobs(job);
-		currentJobFile.jobPath = path.join(JOB_PATH, job.name, JOB_NAME);
-		return job;
+		let distributedJob = await JobService.DistributeJobs(job);
+		if (distributedJob) {
+			currentJobFile.jobPath = path.join(JOB_PATH, distributedJob.name, JOB_NAME);
+			return distributedJob;
+		}
+		throw new Error('job not distributed');
 	}
 
 	static async WaitForJob(command: string, currentJobFile: JobFile) {

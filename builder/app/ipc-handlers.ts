@@ -194,7 +194,7 @@ function scaffoldProject(body: any, target?: any): any {
 }
 
 function copyFile(source: any, destination: any) {
-	return new Promise((resolve, fall) => {
+	return new Promise((resolve, fail) => {
 		// destination.txt will be created or overwritten by default.
 		console.log(`copying ${source} to ${destination}`);
 		fs.copyFile(source, destination, (err) => {
