@@ -20,7 +20,7 @@ import HaveAllPropertiesOnExecutors from './HaveAllPropertiesOnExecutors';
 import AddCopyCommandToExecutors from './AddCopyCommandToExecutors';
 import CreateDashboard from '../CreateDashboard_1';
 import { AuthorizedDashboard } from '../../components/titles';
-import { CreateLoginModels } from '../../constants/nodepackages';
+import { CreateLoginModels, ListRequiredModels } from '../../constants/nodepackages';
 import { UITypes, MAIN_CONTENT, PROGRESS_VIEW } from '../../constants/nodetypes';
 import AddChainToNavigateNextScreens from './AddChainToNavigateNextScreens';
 import CreateConfiguration from '../CreateConfiguration';
@@ -112,6 +112,7 @@ const Select_All_On_Model_Filters = 'Select All On Model Filters';
 const Add_Filters_To_Get_All = 'Add Filters to Get All';
 const Create_Dashboard = 'Create Dashboard';
 const Create_Login_Models = 'Create Login Models';
+const ListRequiredModelTitles = 'ListRequiredModelTitles';
 const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
 const Create_Configuration = 'Create Configuration';
 const Create_Fetch_Service = 'Create Fetch Service';
@@ -130,6 +131,7 @@ const COMPLETED_BUILD = 'COMPLETED_BUILD';
 const buildAllProgress = [
 	{ name: Create_View_Types },
 	{ name: Add_Agent_Methods },
+	{ name: ListRequiredModelTitles },
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
 	{ name: Collect_Into_Graph },
@@ -156,7 +158,6 @@ export const BuildAllInfo = {
 	InitialStep: Create_View_Types
 };
 export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
-
 	setCommandToRun(command);
 	const uiTypes = {
 		[UITypes.ElectronIO]: true,
@@ -189,7 +190,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				await progresFunc(uiIndex / count);
 			});
 		});
-
+		await run(buildAllProgress, ListRequiredModelTitles, async (progressFunc: any) => {
+			ListRequiredModels();
+		});
 		await run(buildAllProgress, Create_Login_Models, async (progresFunc: (arg0: number) => any) => {
 			await progresFunc(1 / 10);
 			executeGraphOperation(null, CreateLoginModels, uiTypes)(GetDispatchFunc(), GetStateFunc());

@@ -74,7 +74,7 @@ export const ComponentEvents: any = {
 	onChangeText: 'onChangeText'
 };
 export const ComponentEventStandardHandler: any = {
-	[ComponentEvents.onChange]: `onChange={(evt)=>{
+	[ComponentEvents.onChange]: `onChange={(evt: any)=>{
     if(this.props.onChange) {
       this.props.onChange(evt);
     }

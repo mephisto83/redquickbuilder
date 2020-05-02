@@ -14,7 +14,6 @@ import ScreenConnectGet from '../screens/ScreenConnectGet';
 import ScreenConnectGetAll from '../screens/ScreenConnectGetAll';
 import ScreenConnectCreate from '../screens/ScreenConnectCreate';
 import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
-import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
 import { Node } from '../../methods/graph_types';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
@@ -69,7 +68,6 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 			}
 			await progresFunc(index / total);
 		});
-	graphOperation([ () => CollectionDataChainsIntoCollections() ])(GetDispatchFunc(), GetStateFunc());
 }
 
 export function GetPossibleNavigateScreens(screen: any, allscreens: any) {

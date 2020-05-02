@@ -7,7 +7,6 @@ import AttachGetAllOnComponentDidMount from './AttachGetAllOnComponentDidMount';
 import { setViewPackageStamp, GetLinkBetween, GetNodesLinkedTo } from '../../methods/graph_methods';
 import RemoveAllViewPackage from '../RemoveAllViewPackage';
 import AppendViewTypeValidation from './AppendViewTypeValidation';
-import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
 
 export default function SetupViewTypeFor(args: any = {}) {
 	const { skipClear = false, node, uiType = UITypes.ElectronIO } = args;

@@ -1750,7 +1750,11 @@ export function CreatePagingModel() {
 
 	return result;
 }
-
+export function ListRequiredModels() {
+	CreatePagingModel();
+	CreatePagingSkipDataChains();
+	CreatePagingTakeDataChains();
+}
 export const CreateDefaultView = {
 	type: 'Create View - Form',
 	methodType: 'React Native Views',
