@@ -170,7 +170,7 @@ export default function(args: any = {}) {
 					options: {
 						prop: 'Lambda',
 						id: context.node1,
-						value: 'x => x.object'
+						value: '(x: any) => x.object'
 					}
 				}
 			];

@@ -1107,12 +1107,12 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
   const setProcess: string[] = [];
-	const funcs = chain.map((c: any, index: number) => {
+	chain.forEach((c: any, index: number) => {
 		if (index === 0) {
 			args = GetDataChainArgs(c);
 		}
 		const temp = GenerateDataChainMethod(c, options);
-		observables.push(GenerateObservable(c, index));
+		observables.push(GenerateObservable(c));
 		setArgs.push(GenerateArgs(c, chain));
 		setProcess.push(GenerateSetProcess(c, chain, options));
 		subscribes.push(GetSubscribes(c, chain));

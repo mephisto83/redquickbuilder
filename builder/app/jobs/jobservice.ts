@@ -144,8 +144,28 @@ export default class JobService {
 		do {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job);
+			if (!complete) {
+				await JobService.MakeSureAgentsAreWorking(job);
+			}
 			await sleep();
 		} while (!complete);
+	}
+
+	static async MakeSureAgentsAreWorking(job: Job) {
+		let availableProjects: AgentProject[] = await this.GetAvailableProjects();
+		let items = await this.getJobsItems(job);
+		items.forEachAsync(async (item: JobItem) => {
+			let isComplete = await this.IsJobItemComplete(item);
+			if (!isComplete) {
+				let notBusyProject = availableProjects.find((v) => v.agentProject === item.assignedTo);
+				if (notBusyProject && !notBusyProject.ready) {
+					console.log(`${notBusyProject.agentProject} isnt busy, but it hasnt finished the project.`);
+					console.log('so telling it to begin job again');
+					await this.moveJobItemFiles(notBusyProject, item);
+					await this.beginJob(notBusyProject, item);
+				}
+			}
+		});
 	}
 
 	static async CollectForJob(currentJobFile: JobFile) {
@@ -296,6 +316,25 @@ export default class JobService {
 		}
 		return results;
 	}
+	static async getJobsItems(jobObject: Job): Promise<JobItem[]> {
+		let results: JobItem[] = [];
+		let job: string = jobObject.name;
+		if (fs.existsSync(JOB_PATH)) {
+			getDirectories(path.join(JOB_PATH, job)).map((fileDir) => {
+				if (fs.existsSync(path.join(JOB_PATH, job, fileDir, INPUT))) {
+					let content = fs.readFileSync(path.join(JOB_PATH, job, fileDir, INPUT), 'utf8');
+					let config: JobConfigContract = JSON.parse(content);
+					results.push({
+						job,
+						file: fileDir,
+						distributed: config.distributed,
+						config
+					});
+				}
+			});
+		}
+		return results;
+	}
 	static async getUndistributedJobItems(): Promise<JobItem[]> {
 		let jobs = await JobService.getJobItems();
 		return jobs.filter((x: JobItem) => !x.distributed);
@@ -317,6 +356,10 @@ export default class JobService {
 			agentProject
 		];
 	}
+	static async GetAvailableProjects(): Promise<AgentProject[]> {
+		return JobService.agentProjects.filter((x) => !x.ready);
+	}
+
 	static async GetAvailableProject(): Promise<AgentProject> {
 		let result: AgentProject | null = null;
 
@@ -362,37 +405,34 @@ export default class JobService {
 
 				jobItem.distributed = true;
 				jobItem.config.distributed = true;
+				jobItem.assignedTo = agentProject.agentProject;
 				await JobService.saveJobItem(jobItem);
 
-				//Every agent gets a copy of the graph.
-				await this.transferFile(
-					agentProject,
-					path.join(JOB_PATH, jobItem.job, GRAPH_FILE),
-					path.join(dir, GRAPH_FILE)
-				);
-
-				await this.transferFiles(
-					agentProject,
-					path.join(JOB_PATH, jobItem.job, GRAPH_FOLDER),
-					path.join(dir, GRAPH_FOLDER)
-				);
-
-				await this.transferFile(
-					agentProject,
-					path.join(JOB_PATH, jobItem.job, JOB_NAME),
-					path.join(dir, JOB_NAME)
-				);
-				await this.transferFile(
-					agentProject,
-					path.join(JOB_PATH, jobItem.job, jobItem.file, INPUT),
-					path.join(dir, INPUT)
-				);
+				await this.moveJobItemFiles(agentProject, jobItem);
 
 				await this.beginJob(agentProject, jobItem);
 				await sleep(2 * 1000);
 			}
 		}
 		return result;
+	}
+	static async moveJobItemFiles(agentProject: AgentProject, jobItem: JobItem) {
+		//Every agent gets a copy of the graph.
+		let dir = path.join(jobItem.job, jobItem.file);
+		await this.transferFile(agentProject, path.join(JOB_PATH, jobItem.job, GRAPH_FILE), path.join(dir, GRAPH_FILE));
+
+		await this.transferFiles(
+			agentProject,
+			path.join(JOB_PATH, jobItem.job, GRAPH_FOLDER),
+			path.join(dir, GRAPH_FOLDER)
+		);
+
+		await this.transferFile(agentProject, path.join(JOB_PATH, jobItem.job, JOB_NAME), path.join(dir, JOB_NAME));
+		await this.transferFile(
+			agentProject,
+			path.join(JOB_PATH, jobItem.job, jobItem.file, INPUT),
+			path.join(dir, INPUT)
+		);
 	}
 	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
 		agentProject.ready = false;
@@ -668,6 +708,7 @@ export interface JobAssignment {
 	[dir: string]: JobItem[];
 }
 export interface JobItem {
+	assignedTo?: string;
 	job: string;
 	file: string;
 	distributed: boolean;

@@ -107,14 +107,13 @@ function createReactWeb() {
 					'redux',
 					'react-router',
 					'redux-logger'
-				].map((dependency) => {
+				].forEach((dependency) => {
 					promise = promise.then(() =>
 						executeSpawnCmd('yarn', [ 'add', dependency ], {
 							shell: true,
 							cwd: path.join(localDir, appName)
 						})
 					);
-					return promise;
 				});
 				return promise;
 			})

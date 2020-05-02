@@ -510,6 +510,7 @@ function generateFolderStructure(
 			let file = fs.readFileSync(dirPath, 'utf8');
 			const reldir = dir.substr(relative.length);
 			file = bindTemplate(file, lib);
+			ensureDirectory(path.join(target_dir, reldir));
 			fs.writeFileSync(path.join(target_dir, reldir, item), file, 'utf8');
 		}
 	});
