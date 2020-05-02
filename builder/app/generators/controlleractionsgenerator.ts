@@ -188,7 +188,7 @@ export default class ControllerActionGenerator {
 			})[0];
 			const service = `
 import { setFetchServiceFunction } from '../actions/redutils';
-import { GetState, GetDispatch } from '../actions/uiActions';
+import { GetState, GetDispatch } from '../actions/uiactions';
 import { ${GetCodeName(datachain)} } from '../actions/data-chain';
 import * as Util from "../actions/util";
 import service from './controllerService';

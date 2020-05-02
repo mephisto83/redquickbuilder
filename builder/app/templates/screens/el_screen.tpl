@@ -3,7 +3,7 @@ import { redConnect, titleService } from '../actions/util';
 import * as DC from '../actions/data-chain';
 import * as S from '../actions/selector';
 import { setParameters } from '../actions/redutils';
-import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiActions';
+import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiactions';
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
 import ViewModelKeys from '../viewmodel_keys';

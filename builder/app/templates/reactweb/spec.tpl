@@ -1,7 +1,7 @@
 import { spy } from 'sinon';
 import * as DC from '../app/actions/data-chain';
 import { makeDefaultState, updateUI } from '../app/reducers/uiReducer';
-import { setDispatch, setTestGetState } from '../app/actions/uiActions'; 
+import { setDispatch, setTestGetState } from '../app/actions/uiactions';
 describe('{{name}} specs', () => {
     let state;
     beforeEach(()=>{

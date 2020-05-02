@@ -1,6 +1,6 @@
 import { bindActionCreators } from 'redux';
-import * as UIActions from '../actions/uiActions';
-import { Visual } from '../actions/uiActions';
+import * as UIActions from './uiactions';
+import { Visual } from './uiactions';
 import * as ControllerActions from '../actions/controllerActions';
 import { TitleService } from './titles';
 import { connect } from 'react-redux';

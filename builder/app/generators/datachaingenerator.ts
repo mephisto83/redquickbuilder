@@ -189,7 +189,7 @@ let dcTemplate = (collections: any, funcs: string, rel = '') => {
     UIKeys,
     clearScreenInstance
 
-  } from '../${rel}actions/uiActions';
+  } from '../${rel}actions/uiactions';
 import {
     validateEmail,
     maxLength,

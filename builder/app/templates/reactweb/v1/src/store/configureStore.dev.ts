@@ -5,7 +5,7 @@ import { routerMiddleware, routerActions } from 'connected-react-router';
 import createRootReducer from '../reducers';
 import * as controllerActions from "../actions/controllerActions";
 import * as navigationActions from "../actions/navigationActions";
-import * as uiActions from "../actions/uiActions";
+import * as uiActions from "../actions/uiactions";
 
 declare global {
   interface Window {
