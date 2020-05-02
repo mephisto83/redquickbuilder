@@ -101,11 +101,10 @@ export default class CommunicationTower {
 					},
 					localPath
 				);
-				if (!success) {
-					await sleep(10 * 1000);
-				} else {
+				if (success) {
 					maxattempts = 0;
 				}
+				await sleep(2 * 1000);
 			} catch (e) {
 				console.log(`failed to send file : ${maxattempts} attemps left`);
 			}

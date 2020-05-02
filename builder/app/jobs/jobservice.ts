@@ -173,7 +173,7 @@ export default class JobService {
 		await sleep(5 * 1000);
 		let currentJob: Job = await JobService.loadJob(currentJobFile.jobPath);
 		console.log('collecting job results');
-		await JobService.CollectJobResults(currentJob);
+		// await JobService.CollectJobResults(currentJob);
 		console.log('merge job results');
 		let graph = await JobService.MergeCompletedJob(currentJob);
 		if (graph) {
@@ -525,7 +525,7 @@ export default class JobService {
 			try {
 				let isDone = await JobService.IsComplete(job);
 				if (isDone) {
-					await JobService.CleanUpJob(job);
+					// await JobService.CleanUpJob(job);
 				}
 			} catch (e) {}
 		}
@@ -656,7 +656,7 @@ export default class JobService {
 	}
 }
 const JOB_NAME = `config.json`;
-const JOB_PATH = './job_service_jobs';
+const JOB_PATH = path.join('D:/', 'temp', 'job_service_jobs');
 const JOBS_FILE_PATH = './jobs';
 const GRAPH_FILE = `graph.json`;
 const GRAPH_FILE_PARTS = 'graph_part';
