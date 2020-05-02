@@ -19,14 +19,16 @@ import {
 	CONTEXT_MENU_MODE,
 	GetDispatchFunc,
 	GetStateFunc,
-	GetCurrentGraph
+	GetCurrentGraph,
+	ApplicationConfig
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
 import unprune from '../methods/unprune';
 const BUILDER_BACK_UP = '.builder';
 const path = require('path');
-const fs = require('fs');
+import fs from 'fs';
+import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 const dialog = remote.dialog;
@@ -227,6 +229,64 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 		}
 	};
 }
+
+export function setJobFolder(key: string) {
+	return (dispatch: Function, getState: () => any) => {
+		let currentGraph = GetRootGraph(getState());
+		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+		if (currentGraph) {
+			dialog
+				.showOpenDialog(remote.getCurrentWindow(), {
+					properties: [ 'openDirectory' ]
+				})
+				.then((opts) => {
+					let fileName = opts.filePaths.find((x) => x);
+					if (fileName === undefined) {
+						console.log("You didn't save the file");
+						return;
+					}
+
+					console.log(fileName);
+					return storeApplicationConfig(fileName, key, dispatch, getState);
+				});
+		}
+	};
+}
+
+async function storeApplicationConfig(folder: string, key: string, dispatch: any, getState: any) {
+	if (!fs.existsSync(folder)) {
+		await ensureDirectory(folder);
+	}
+	let application = 'applicationConfig.json';
+	let applicationPathReq = path.join('./reqthread', application);
+	let applicationPath = path.join('./', application);
+	if (!fs.existsSync(applicationPath)) {
+		fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
+	}
+
+	let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+	if (applicationConfiguration) {
+		applicationConfiguration[key] = folder;
+	}
+
+	fs.writeFileSync(applicationPathReq, JSON.stringify(applicationConfiguration), 'utf8');
+	fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
+
+	setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+}
+
+export function loadApplicationConfig() {
+	return (dispatch: any, getState: any) => {
+		let application = 'applicationConfig.json';
+		let applicationPath = path.join('./', application);
+		let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+
+		fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
+
+		setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+	};
+}
+
 export function saveRecording(recording: any) {
 	return (dispatch: any, getState: any) => {
 		dialog

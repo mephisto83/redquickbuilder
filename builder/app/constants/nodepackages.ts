@@ -1928,6 +1928,9 @@ export const CreateDefaultView = {
 												[NodeProperties.InstanceType]: useModelInstance
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
+												[NodeProperties.Screen]: GraphMethods.convertToURLRoute(
+													`${viewName} ${agentId ? GetNodeTitle(agentId) : ''} Form`
+												),
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)

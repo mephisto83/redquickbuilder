@@ -25,7 +25,7 @@ let runnerContext: RunnerContext = {
 		communicationTower = new CommunicationTower();
 		communicationTower.init({
 			agentName: null,
-			baseFolder: JobServiceConstants.JOB_PATH,
+			baseFolder: JobServiceConstants.JobPath(),
 			serverPort: 7979,
 			topDirectory: '../../jobrunner'
 		});
@@ -89,7 +89,7 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 	await sleep(10 * 1000);
 	if (message.projectName) {
 		if (message.fileName) {
-			let relativePath = path.join(JobServiceConstants.JOB_PATH, message.projectName, message.fileName);
+			let relativePath = path.join(JobServiceConstants.JobPath(), message.projectName, message.fileName);
 			if (fs.existsSync(path.join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
@@ -163,12 +163,12 @@ async function setAgentProjects(message: RedQuickDistributionMessage): Promise<L
 }
 
 async function processJobs() {
-	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
+	if (fs.existsSync(JobServiceConstants.JobsFilePath())) {
 		// Get jobs from ./jobs directory.
-		let projectFolders = getDirectories(JobServiceConstants.JOBS_FILE_PATH);
+		let projectFolders = getDirectories(JobServiceConstants.JobsFilePath());
 		await projectFolders.forEachAsync(async (projectFolder) => {
 			let jobFilePath = path.join(
-				JobServiceConstants.JOBS_FILE_PATH,
+				JobServiceConstants.JobsFilePath(),
 				projectFolder,
 				JobServiceConstants.JOB_NAME
 			);
@@ -220,11 +220,11 @@ async function executeStep(jobFilePath: string) {
 	}
 }
 async function createJobs() {
-	if (fs.existsSync(JobServiceConstants.JOBS_FILE_PATH)) {
-		let jobFiles = getFiles(JobServiceConstants.JOBS_FILE_PATH);
+	if (fs.existsSync(JobServiceConstants.JobsFilePath())) {
+		let jobFiles = getFiles(JobServiceConstants.JobsFilePath());
 		await jobFiles.forEachAsync(async (jobFileName) => {
 			try {
-				let jobFilePath = path.join(JobServiceConstants.JOBS_FILE_PATH, jobFileName);
+				let jobFilePath = path.join(JobServiceConstants.JobsFilePath(), jobFileName);
 				let fileContents = fs.readFileSync(jobFilePath, 'utf8');
 				let jobFile: JobFile = JSON.parse(fileContents);
 				if (jobFile && jobFile.graphPath && !jobFile.created) {

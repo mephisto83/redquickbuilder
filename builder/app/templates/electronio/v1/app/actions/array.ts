@@ -18,7 +18,7 @@ declare global {
 		maxSelection: any;
 		maximum: any;
 		minimum: any;
-		interpolate: Function;
+		interpolate: any;
 		removeIndices: any;
 		orderBy: any;
 		subset: any;

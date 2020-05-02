@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import NameService from '../../jobs/nameservice';
 export default async function StartJob() {
-	await ensureDirectory(JobServiceConstants.JOBS_FILE_PATH);
+	await ensureDirectory(JobServiceConstants.JobsFilePath());
 	let currentGraoh: Graph = GetCurrentGraph();
 	if (currentGraoh.graphFile) {
 		let job: JobFile = {
@@ -13,7 +13,7 @@ export default async function StartJob() {
 			graphPath: currentGraoh.graphFile ? currentGraoh.graphFile : ''
 		};
 		let jobName = NameService.projectGenerator();
-		fs.writeFileSync(path.join(JobServiceConstants.JOBS_FILE_PATH, jobName), JSON.stringify(job), 'utf8');
+		fs.writeFileSync(path.join(JobServiceConstants.JobsFilePath(), jobName), JSON.stringify(job), 'utf8');
 	} else {
 		throw new Error('graph has not been saved');
 	}

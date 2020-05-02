@@ -34,6 +34,7 @@ export const NodePropertyTypes = NodeConstants.NodePropertyTypes;
 export const ValidationRules = NodeConstants.ValidationRules;
 export const OptionsTypes = NodeConstants.OptionsTypes;
 export const NODE_COST = 'NODE_COST';
+export const ApplicationConfig = 'ApplicationConfig';
 export const NODE_CONNECTION_COST = 'NODE_CONNECTION_COST';
 
 export const BuildAllProgress = 'BuildAllProgress';

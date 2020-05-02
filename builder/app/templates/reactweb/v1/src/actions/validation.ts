@@ -1,4 +1,5 @@
-import * as _ from './array';
+import _ from './array';
+_();
 
 export function MinLengthAttribute(min: any, equal?: any) {
 	return createValidationAttribute((val: any) => {
