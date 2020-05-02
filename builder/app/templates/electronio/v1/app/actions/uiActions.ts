@@ -249,7 +249,7 @@ export function GetScreenInst(state) {
 }
 
 export function GetScreenModelInst(state, instance, id) {
-  let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE, instance, id);
+  let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE, instance);
   if (item) {
     return item[id] || null;
   }

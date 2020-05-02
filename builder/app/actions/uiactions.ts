@@ -926,25 +926,6 @@ export function GetNodesByProperties(props: { [x: string]: any }, graph?: any, s
 	const currentGraph = graph || GetCurrentGraph(state || GetState());
 	if (currentGraph) {
 		const nodeSubset = GraphMethods.GetNodesByProperties(props, currentGraph);
-		// if (props && props[NodeProperties.NODEType]) {
-		//   nodeSubset = NodesByType(state, props[NodeProperties.NODEType]);
-		// }
-		// else if (props && props[NodeProperties.ViewPackage]) {
-		//   nodeSubset = NodesByViewPackage(state, props[NodeProperties.NODEType]);
-		// }
-		// else {
-		//   nodeSubset = currentGraph.nodes.map(t => currentGraph.nodeLib[t]);
-		// }
-		// return nodeSubset.filter(
-		//   x => {
-		//     for (const i in props) {
-		//       if (props[i] !== GetNodeProp(x, i)) {
-		//         return false;
-		//       }
-		//     }
-		//     return true;
-		//   }
-		// );
 		return nodeSubset;
 	}
 	return [];

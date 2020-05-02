@@ -4,31 +4,35 @@
 /* eslint-disable no-empty */
 import titleLib from './titleServiceLib';
 
-const titleOptions = { preferredLang: false };
+const titleOptions: any = { preferredLang: false };
 export const TitleService = {
-  get: key => {
-    if (key && key.trim) {
-      key = key.trim();
-    }
-    if (titleLib) {
-      const { preferredLang } = titleOptions;
-      const { preferred, lib } = titleLib;
-      if (lib && lib[key]) {
-        const { properties } = lib[key];
-        if (properties &&
-          properties.languages &&
-          (properties.languages.hasOwnProperty(preferred) ||
-            properties.languages.hasOwnProperty(preferredLang))) {
-          return properties.languages[preferredLang] || properties.languages[preferred];
-        }
-      }
-    }
-    return `[${key}]`;
-  }
+	get: (key: string) => {
+		if (key && key.trim) {
+			key = key.trim();
+		}
+		if (titleLib) {
+			const { preferredLang } = titleOptions;
+			const { preferred } = titleLib;
+			const lib: { [k: string]: any } = titleLib.lib;
+			if (lib && lib[key]) {
+				const { properties } = lib[key];
+				if (
+					properties &&
+					properties.languages &&
+					(properties.languages.hasOwnProperty(preferred) ||
+						properties.languages.hasOwnProperty(preferredLang))
+				) {
+					return properties.languages[preferredLang] || properties.languages[preferred];
+				}
+			}
+		}
+		return `[${key}]`;
+	}
 };
 
-export function setPreferredLanguage(lang) {
-  titleOptions.preferredLang = lang;
+export function setPreferredLanguage(lang: any) {
+	titleOptions.preferredLang = lang;
 }
 
-window.setPreferredLanguage = setPreferredLanguage;
+let temp: any = window;
+temp.setPreferredLanguage = setPreferredLanguage;

@@ -16,7 +16,7 @@ export default class SelectorGenerator {
 		let funcs = GenerateSelectorFunctions();
 		let temps = [
 			{
-				template: `import * as UIA from './uiActions';
+				template: `import * as UIA from './uiactions';
 ${funcs.join(NEW_LINE)}`,
 				relative: './src/actions',
 				relativeFilePath: `./selector.js`,

@@ -248,35 +248,35 @@ export function GetScreenInst(state: any) {
 }
 
 export function GetScreenModelInst(state: any, instance: any, id: any) {
-	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE, instance, id);
+	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE, instance);
 	if (item) {
 		return item[id] || null;
 	}
 	return null;
 }
 export function GetScreenModelDirtyInst(state: any, instance: any, id: any) {
-	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_DIRTY, instance, id);
+	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_DIRTY, instance);
 	if (item) {
 		return item[id] || null;
 	}
 	return null;
 }
 export function GetScreenModelFocusedInst(state: any, instance: any, id: any) {
-	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_FOCUSED, instance, id);
+	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_FOCUSED, instance);
 	if (item) {
 		return item[id] || null;
 	}
 	return null;
 }
 export function GetScreenModelBlurInst(state: any, instance: any, id: any) {
-	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_ON_BLUR, instance, id);
+	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_ON_BLUR, instance);
 	if (item) {
 		return item[id] || null;
 	}
 	return null;
 }
 export function GetScreenModelFocusInst(state: any, instance: any, id: any) {
-	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_ON_FOCUS, instance, id);
+	let item = GetK(state, SCREEN_MODEL_INSTANCE, SCREEN_INSTANCE_ON_FOCUS, instance);
 	if (item) {
 		return item[id] || null;
 	}
@@ -613,7 +613,7 @@ export function updateScreenInstanceObject(model: any, instance: any, value: any
 }
 
 export function clearScreenInstance(model: any, id: any, options: any = {}) {
-	return (dispatch: any, getState: any) => {
+	return (dispatch: any) => {
 		if (options && options.update) {
 			dispatch(
 				Batch(
@@ -678,8 +678,8 @@ export function updateModelInstance(model: any, instance: any, id: any, value: a
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE, model, instance, id, value),
-				UISI(MODEL_INSTANCE_DIRTY, model, instance, id, true)
+				UISI(MODEL_INSTANCE, model, instance, id/*, value*/),
+				UISI(MODEL_INSTANCE_DIRTY, model, instance, id/*, true*/)
 			)
 		);
 	};
@@ -689,11 +689,11 @@ export function clearModelInstance(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id, false),
-				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id, false),
-				UISI(MODEL_INSTANCE_DIRTY, model, instance, id, false),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id, false),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id, false)
+				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id/*, false*/),
+				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id/*, false*/),
+				UISI(MODEL_INSTANCE_DIRTY, model, instance, id/*, false*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/)
 			)
 		);
 	};
@@ -703,8 +703,8 @@ export function updateModelInstanceBlur(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id, true),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id, false)
+				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id/*, true*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/)
 			)
 		);
 	};
@@ -714,8 +714,8 @@ export function updateModelInstanceFocus(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id, true),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id, true)
+				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id/*, true*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, true*/)
 			)
 		);
 	};

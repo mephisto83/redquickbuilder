@@ -5,6 +5,30 @@ export function uuidv4() {
 		return v.toString(16);
 	});
 }
+declare global {
+	export interface String {}
+	export interface Array<T> {
+		relativeCompliment: any;
+		unique: any;
+		intersection: any;
+		forEachAsync: any;
+		tightenPs: any;
+		flatten: any;
+		split: any;
+		maxSelection: any;
+		maximum: any;
+		minimum: any;
+		interpolate: any;
+		removeIndices: any;
+		orderBy: any;
+		subset: any;
+		summation: any;
+		groupBy: any;
+		startsWith: any;
+		chunk: any;
+		chunkView: any;
+	}
+}
 ((array: any) => {
 	if (!array.relativeCompliment) {
 		const extrasection_relativeCompliment = {
