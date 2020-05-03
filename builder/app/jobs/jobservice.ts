@@ -26,7 +26,7 @@ export default class JobService {
 		this.communicationTower = communicationTower;
 	}
 	static async getAgents() {
-		const agentFolder = path.join(config.distributionPath, AGENTS_FOLDER);
+		const agentFolder = path_join(config.distributionPath, AGENTS_FOLDER);
 		if (fs.existsSync(agentFolder)) {
 			let agents = getDirectories(agentFolder);
 			return agents;
@@ -35,42 +35,42 @@ export default class JobService {
 		return [];
 	}
 	static async getAgentProjects(): Promise<any> {
-		const agentFolder = path.join(config.distributionPath, AGENTS_FOLDER);
+		const agentFolder = path_join(config.distributionPath, AGENTS_FOLDER);
 		const agents = await JobService.getAgents();
 		const projects: any = [];
 		agents.forEach((agent) => {
-			projects.push(...getDirectories(path.join(agentFolder, agent)));
+			projects.push(...getDirectories(path_join(agentFolder, agent)));
 		});
 		return projects;
 	}
 
 	static async getAgentDirectories(): Promise<string[]> {
-		const agentFolder = path.join(config.distributionPath, AGENTS_FOLDER);
+		const agentFolder = path_join(config.distributionPath, AGENTS_FOLDER);
 		const agents = await JobService.getAgents();
 		const projects: any = [];
 		agents.forEach((agent) => {
 			projects.push(
-				...getDirectories(path.join(agentFolder, agent)).map((dir) => path.join(agentFolder, agent, dir))
+				...getDirectories(path_join(agentFolder, agent)).map((dir) => path_join(agentFolder, agent, dir))
 			);
 		});
 		return projects;
 	}
 
 	static async BreakFile(relPath: string, fileName: string, chunkFolder: string, chunkName: string, content: string) {
-		await ensureDirectory(path.join(relPath, chunkFolder));
+		await ensureDirectory(path_join(relPath, chunkFolder));
 		let files: string[] = [];
 		await content.stringView(async (chunk: string, i: number) => {
-			let chunkPath = path.join(relPath, chunkFolder, chunkName + i);
-			files.push(path.join(chunkFolder, chunkName + i));
+			let chunkPath = path_join(relPath, chunkFolder, chunkName + i);
+			files.push(path_join(chunkFolder, chunkName + i));
 			fs.writeFileSync(chunkPath, chunk, 'utf8');
 		}, Math.pow(2, 23));
 		let jobContent: JobOutput = {
 			files
 		};
-		fs.writeFileSync(path.join(relPath, fileName), JSON.stringify(jobContent), 'utf8');
+		fs.writeFileSync(path_join(relPath, fileName), JSON.stringify(jobContent), 'utf8');
 	}
 	static async JoinFile(relPath: string, fileName: string): Promise<string> {
-		let fileContents: string = fs.readFileSync(path.join(relPath, fileName), 'utf8');
+		let fileContents: string = fs.readFileSync(path_join(relPath, fileName), 'utf8');
 		let parsedResult = JSON.parse(fileContents);
 		if (parsedResult && (parsedResult.workspace || parsedResult.version)) {
 			return fileContents;
@@ -78,23 +78,23 @@ export default class JobService {
 		let fileDetails: JobOutput = parsedResult;
 		let contents: string = '';
 		fileDetails.files.forEach((file) => {
-			contents = contents + fs.readFileSync(path.join(relPath, file));
+			contents = contents + fs.readFileSync(path_join(relPath, file));
 		});
 
 		return contents;
 	}
 	static async CanJoinFiles(relPath: string, fileName: string): Promise<boolean> {
-		let fileContents: string = fs.readFileSync(path.join(relPath, fileName), 'utf8');
+		let fileContents: string = fs.readFileSync(path_join(relPath, fileName), 'utf8');
 		let fileDetails: JobOutput = JSON.parse(fileContents);
 		let contents: boolean = true;
 		console.log('can join');
-		console.log(path.join(relPath, fileName));
+		console.log(path_join(relPath, fileName));
 		if (fileDetails && fileDetails.files) {
 			fileDetails.files.forEach((file) => {
 				if (contents) {
-					contents = contents && fs.existsSync(path.join(relPath, file));
+					contents = contents && fs.existsSync(path_join(relPath, file));
 					if (contents) {
-						let guts = fs.readFileSync(path.join(relPath, file), 'utf8');
+						let guts = fs.readFileSync(path_join(relPath, file), 'utf8');
 						contents = contents && !!guts.length;
 					}
 				}
@@ -116,7 +116,7 @@ export default class JobService {
 		let filesToCopy = getFiles(srcFolder);
 		await filesToCopy.forEachAsync(async (file: string) => {
 			await ensureDirectory(outFolder);
-			fs.copyFileSync(path.join(srcFolder, file), path.join(outFolder, file));
+			fs.copyFileSync(path_join(srcFolder, file), path_join(outFolder, file));
 		});
 	}
 
@@ -126,11 +126,11 @@ export default class JobService {
 				if (isDirectory(folder)) {
 					let dirs = getDirectories(folder);
 					dirs.forEach((dir) => {
-						JobService.deleteFolder(path.join(folder, dir));
+						JobService.deleteFolder(path_join(folder, dir));
 					});
 					let files = getFiles(folder);
 					files.forEach((file) => {
-						fs.unlinkSync(path.join(folder, file));
+						fs.unlinkSync(path_join(folder, file));
 					});
 					if (isDirectory(folder)) {
 						fs.rmdirSync(folder);
@@ -150,7 +150,7 @@ export default class JobService {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
 		let distributedJob = await JobService.DistributeJobs(job, command);
 		if (distributedJob) {
-			currentJobFile.jobPath = path.join(JobPath(), distributedJob.name, JOB_NAME);
+			currentJobFile.jobPath = path_join(JobPath(), distributedJob.name, JOB_NAME);
 			return distributedJob;
 		}
 		throw new Error('job not distributed');
@@ -187,10 +187,10 @@ export default class JobService {
 					);
 					console.log('so telling it to begin job again');
 					await this.moveJobItemFiles(notBusyProject, item);
-          await this.beginJob(notBusyProject, item);
-          if(notBusyProject.ready){
-            throw new Error('project cant be ready this fast');
-          }
+					await this.beginJob(notBusyProject, item);
+					if (notBusyProject.ready) {
+						throw new Error('project cant be ready this fast');
+					}
 				} else {
 					if (notBusyProject) {
 						console.log(`${item.assignedTo} is still busy apparently`);
@@ -201,10 +201,10 @@ export default class JobService {
 						item.assignedTo = availableProjects[0].agentProject || availableProjects[0].name;
 						await this.saveJobItem(item);
 						await this.moveJobItemFiles(availableProjects[0], item);
-            await this.beginJob(availableProjects[0], item);
-            if(availableProjects[0].ready){
-              throw new Error('project cant be ready this fast');
-            }
+						await this.beginJob(availableProjects[0], item);
+						if (availableProjects[0].ready) {
+							throw new Error('project cant be ready this fast');
+						}
 					}
 				}
 			}
@@ -236,7 +236,7 @@ export default class JobService {
 	}
 
 	static async loadRemoteJob(filePath: string): Promise<Job> {
-		return this.loadJob(path.join(filePath, JOB_NAME));
+		return this.loadJob(path_join(filePath, JOB_NAME));
 	}
 	static async loadJob(filePath: string | undefined): Promise<Job> {
 		if (filePath) {
@@ -268,12 +268,12 @@ export default class JobService {
 		}
 
 		const jobName = `job_${uuidv4().split('-')[0]}`;
-		if (!fs.existsSync(path.join(JobPath(), jobName))) {
-			fs.mkdirSync(path.join(JobPath(), jobName));
+		if (!fs.existsSync(path_join(JobPath(), jobName))) {
+			fs.mkdirSync(path_join(JobPath(), jobName));
 		}
 
 		JobService.BreakFile(
-			path.join(JobPath(), jobName),
+			path_join(JobPath(), jobName),
 			GRAPH_FILE,
 			GRAPH_FOLDER,
 			GRAPH_FILE_PARTS,
@@ -299,8 +299,8 @@ export default class JobService {
 				config: temp
 			};
 
-			await ensureDirectory(path.join(JobPath(), jobName, jobpart));
-			fs.writeFileSync(path.join(JobPath(), jobName, jobpart, INPUT), JSON.stringify(jobItem), 'utf8');
+			await ensureDirectory(path_join(JobPath(), jobName, jobpart));
+			fs.writeFileSync(path_join(JobPath(), jobName, jobpart, INPUT), JSON.stringify(jobItem), 'utf8');
 			jobparts.push(jobpart);
 		});
 
@@ -314,7 +314,7 @@ export default class JobService {
 			jobInstancePath: '',
 			absolutePath: ''
 		};
-		fs.writeFileSync(path.join(JobPath(), jobName, JOB_NAME), JSON.stringify(job), 'utf8');
+		fs.writeFileSync(path_join(JobPath(), jobName, JOB_NAME), JSON.stringify(job), 'utf8');
 		return job;
 	}
 	static async getJobs(jpath: string = ''): Promise<Job[]> {
@@ -322,8 +322,8 @@ export default class JobService {
 		if (fs.existsSync(jpath || JobPath())) {
 			let jobs = getDirectories(jpath || JobPath());
 			jobs.map((job) => {
-				if (fs.existsSync(path.join(jpath || JobPath(), job, JOB_NAME))) {
-					let content = fs.readFileSync(path.join(jpath || JobPath(), job, JOB_NAME), 'utf8');
+				if (fs.existsSync(path_join(jpath || JobPath(), job, JOB_NAME))) {
+					let content = fs.readFileSync(path_join(jpath || JobPath(), job, JOB_NAME), 'utf8');
 					let config: Job = JSON.parse(content);
 					results.push(config);
 				}
@@ -337,8 +337,8 @@ export default class JobService {
 		if (fs.existsSync(JobsFilePath())) {
 			let jobsFilePaths = getDirectories(JobsFilePath());
 			jobsFilePaths.forEach((jfp: string) => {
-				if (fs.existsSync(path.join(JobsFilePath(), jfp, JOB_NAME))) {
-					let content = fs.readFileSync(path.join(JobsFilePath(), jfp, JOB_NAME), 'utf8');
+				if (fs.existsSync(path_join(JobsFilePath(), jfp, JOB_NAME))) {
+					let content = fs.readFileSync(path_join(JobsFilePath(), jfp, JOB_NAME), 'utf8');
 					let jobFile: JobFile = JSON.parse(content);
 					result.push(jobFile);
 				}
@@ -348,13 +348,13 @@ export default class JobService {
 	}
 	static GetJobFileStages(jobFile: JobFile): string[] {
 		if (jobFile.name) {
-			return getDirectories(path.join(JobsFilePath(), jobFile.name, 'stages'));
+			return getDirectories(path_join(JobsFilePath(), jobFile.name, 'stages'));
 		}
 		return [];
 	}
 	static async SetJobPartComplete(jobPartPath: string) {
-		let inputPath: string = path.join(jobPartPath, INPUT);
-		if (fs.existsSync(path.join(jobPartPath, INPUT))) {
+		let inputPath: string = path_join(jobPartPath, INPUT);
+		if (fs.existsSync(path_join(jobPartPath, INPUT))) {
 			let jobInput: JobItem = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 			jobInput.complete = true;
 			jobInput.config.complete = true;
@@ -364,16 +364,16 @@ export default class JobService {
 		return false;
 	}
 	static getJobItemLocalPath(jobItem: JobItem): string {
-		return path.join(JobPath(), jobItem.job, jobItem.file, INPUT);
+		return path_join(JobPath(), jobItem.job, jobItem.file, INPUT);
 	}
 	static async getJobItems(): Promise<JobItem[]> {
 		let results: JobItem[] = [];
 		if (fs.existsSync(JobPath())) {
 			let jobs = getDirectories(JobPath());
 			jobs.map((job) => {
-				getDirectories(path.join(JobPath(), job)).map((fileDir) => {
-					if (fs.existsSync(path.join(JobPath(), job, fileDir, INPUT))) {
-						let content = fs.readFileSync(path.join(JobPath(), job, fileDir, INPUT), 'utf8');
+				getDirectories(path_join(JobPath(), job)).map((fileDir) => {
+					if (fs.existsSync(path_join(JobPath(), job, fileDir, INPUT))) {
+						let content = fs.readFileSync(path_join(JobPath(), job, fileDir, INPUT), 'utf8');
 						let jobItem: JobItem = JSON.parse(content);
 						results.push({
 							...jobItem
@@ -392,9 +392,9 @@ export default class JobService {
 		let results: JobItem[] = [];
 		let job: string = jobObject.name;
 		if (fs.existsSync(JobPath())) {
-			getDirectories(path.join(JobPath(), job)).map((fileDir) => {
-				if (fs.existsSync(path.join(JobPath(), job, fileDir, INPUT))) {
-					let content = fs.readFileSync(path.join(JobPath(), job, fileDir, INPUT), 'utf8');
+			getDirectories(path_join(JobPath(), job)).map((fileDir) => {
+				if (fs.existsSync(path_join(JobPath(), job, fileDir, INPUT))) {
+					let content = fs.readFileSync(path_join(JobPath(), job, fileDir, INPUT), 'utf8');
 					let config: JobItem = JSON.parse(content);
 					results.push({
 						...config
@@ -463,12 +463,12 @@ export default class JobService {
 			let agentProject: AgentProject = await JobService.GetAvailableProject();
 			let jobItem: JobItem | undefined = jobItems.shift();
 			if (jobItem) {
-				let dir = path.join(jobItem.job, jobItem.file);
-				let configContent = fs.readFileSync(path.join(JobPath(), jobItem.job, JOB_NAME), 'utf8');
+				let dir = path_join(jobItem.job, jobItem.file);
+				let configContent = fs.readFileSync(path_join(JobPath(), jobItem.job, JOB_NAME), 'utf8');
 				if (configContent) {
 					let config: Job = JSON.parse(configContent);
 					result = config;
-					fs.writeFileSync(path.join(JobPath(), jobItem.job, JOB_NAME), JSON.stringify(config), 'utf8');
+					fs.writeFileSync(path_join(JobPath(), jobItem.job, JOB_NAME), JSON.stringify(config), 'utf8');
 				} else {
 					throw new Error('no config content found');
 				}
@@ -490,35 +490,35 @@ export default class JobService {
 	}
 	static async moveJobItemFiles(agentProject: AgentProject, jobItem: JobItem) {
 		//Every agent gets a copy of the graph.
-		let dir = path.join(jobItem.job, jobItem.file);
+		let dir = path_join(jobItem.job, jobItem.file);
 		await this.transferFile(
 			agentProject,
-			path.join(JobPath(), jobItem.job, GRAPH_FILE),
-			path.join(dir, GRAPH_FILE)
+			path_join(JobPath(), jobItem.job, GRAPH_FILE),
+			path_join(dir, GRAPH_FILE)
 		);
 
 		await this.transferFiles(
 			agentProject,
-			path.join(JobPath(), jobItem.job, GRAPH_FOLDER),
-			path.join(dir, GRAPH_FOLDER)
+			path_join(JobPath(), jobItem.job, GRAPH_FOLDER),
+			path_join(dir, GRAPH_FOLDER)
 		);
 
-		await this.transferFile(agentProject, path.join(JobPath(), jobItem.job, JOB_NAME), path.join(dir, JOB_NAME));
+		await this.transferFile(agentProject, path_join(JobPath(), jobItem.job, JOB_NAME), path_join(dir, JOB_NAME));
 		await this.transferFile(
 			agentProject,
-			path.join(JobPath(), jobItem.job, jobItem.file, INPUT),
-			path.join(dir, INPUT)
+			path_join(JobPath(), jobItem.job, jobItem.file, INPUT),
+			path_join(dir, INPUT)
 		);
 	}
 	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
 		agentProject.ready = false;
 		await this.communicationTower.send(
 			agentProject,
-			path.join(jobItem.job, jobItem.file),
+			path_join(jobItem.job, jobItem.file),
 			RedQuickDistributionCommand.RUN_JOB
 		);
-    agentProject.ready = false;
-  }
+		agentProject.ready = false;
+	}
 	static async transferFile(agentProject: AgentProject, srcFolder: string, outFolder: string) {
 		return await this.communicationTower.transferFile(agentProject, outFolder, srcFolder);
 	}
@@ -526,7 +526,7 @@ export default class JobService {
 	static async transferFiles(agentProject: AgentProject, srcFolder: string, outFolder: string) {
 		let filesToCopy = getFiles(srcFolder);
 		await filesToCopy.forEachAsync(async (file: string) => {
-			await this.transferFile(agentProject, path.join(srcFolder, file), path.join(outFolder, file));
+			await this.transferFile(agentProject, path_join(srcFolder, file), path_join(outFolder, file));
 		});
 	}
 
@@ -547,27 +547,27 @@ export default class JobService {
 			})
 			.forEachAsync(async (jobItem: JobItem) => {
 				let dir = directories[directoryIndex];
-				let relativeFolder = path.join(dir, jobItem.job, jobItem.file);
+				let relativeFolder = path_join(dir, jobItem.job, jobItem.file);
 				jobItem.distributed = true;
 				await JobService.saveJobItem(jobItem);
 				let absoluteFolder = path.resolve(relativeFolder);
 				await ensureDirectory(absoluteFolder);
 
-				if (!fs.existsSync(path.join(dir, jobItem.job, GRAPH_FILE))) {
+				if (!fs.existsSync(path_join(dir, jobItem.job, GRAPH_FILE))) {
 					fs.copyFileSync(
-						path.join(JobPath(), jobItem.job, GRAPH_FILE),
-						path.join(dir, jobItem.job, GRAPH_FILE)
+						path_join(JobPath(), jobItem.job, GRAPH_FILE),
+						path_join(dir, jobItem.job, GRAPH_FILE)
 					);
 					await JobService.copyFiles(
-						path.join(JobPath(), jobItem.job, GRAPH_FOLDER),
-						path.join(dir, jobItem.job, GRAPH_FOLDER)
+						path_join(JobPath(), jobItem.job, GRAPH_FOLDER),
+						path_join(dir, jobItem.job, GRAPH_FOLDER)
 					);
-					fs.copyFileSync(path.join(JobPath(), jobItem.job, JOB_NAME), path.join(dir, jobItem.job, JOB_NAME));
+					fs.copyFileSync(path_join(JobPath(), jobItem.job, JOB_NAME), path_join(dir, jobItem.job, JOB_NAME));
 				}
 
 				fs.copyFileSync(
-					path.join(JobPath(), jobItem.job, jobItem.file, INPUT),
-					path.join(dir, jobItem.job, jobItem.file, INPUT)
+					path_join(JobPath(), jobItem.job, jobItem.file, INPUT),
+					path_join(dir, jobItem.job, jobItem.file, INPUT)
 				);
 				jobAssignments[jobItem.job] = jobAssignments[jobItem.job] || {};
 				jobAssignments[jobItem.job][dir] = jobAssignments[jobItem.job][dir] || [];
@@ -577,10 +577,10 @@ export default class JobService {
 			});
 
 		Object.keys(jobAssignments).forEach((job) => {
-			let configContent = fs.readFileSync(path.join(JobPath(), job, JOB_NAME), 'utf8');
+			let configContent = fs.readFileSync(path_join(JobPath(), job, JOB_NAME), 'utf8');
 			if (configContent) {
 				let config: Job = JSON.parse(configContent);
-				fs.writeFileSync(path.join(JobPath(), job, JOB_NAME), JSON.stringify(config), 'utf8');
+				fs.writeFileSync(path_join(JobPath(), job, JOB_NAME), JSON.stringify(config), 'utf8');
 				jobToDistribute = config;
 			} else {
 				throw new Error('no config content found');
@@ -610,7 +610,7 @@ export default class JobService {
 	static CleanUpJob(job: Job) {
 		let { parts } = job;
 		if (parts) {
-			JobService.deleteFolder(path.join(JobPath(), job.name));
+			JobService.deleteFolder(path_join(JobPath(), job.name));
 		}
 	}
 
@@ -618,7 +618,7 @@ export default class JobService {
 		console.log('merging completed job');
 		let intermedita: { [index: string]: Graph } = {};
 		await job.parts.forEachAsync(async (part: string) => {
-			let graphOutput = await JobService.JoinFile(path.join(JobPath(), job.name, part), OUTPUT);
+			let graphOutput = await JobService.JoinFile(path_join(JobPath(), job.name, part), OUTPUT);
 			intermedita[part] = JSON.parse(graphOutput);
 		});
 
@@ -680,12 +680,12 @@ export default class JobService {
 	}
 	static async WriteJob(jobFile: JobFile, graph: string) {
 		let projectName = `${NameService.projectGenerator()}_${uuidv4().split('-')[0]}`;
-		await ensureDirectory(path.join(JobsFilePath(), projectName));
+		await ensureDirectory(path_join(JobsFilePath(), projectName));
 		jobFile.originalGraphPath = jobFile.graphPath;
 		jobFile.name = projectName;
-		jobFile.graphPath = path.resolve(path.join(JobsFilePath(), projectName, GRAPH_FILE));
-		fs.writeFileSync(path.join(JobsFilePath(), projectName, JOB_NAME), JSON.stringify(jobFile), 'utf8');
-		fs.writeFileSync(path.join(JobsFilePath(), projectName, GRAPH_FILE), graph, 'utf8');
+		jobFile.graphPath = path.resolve(path_join(JobsFilePath(), projectName, GRAPH_FILE));
+		fs.writeFileSync(path_join(JobsFilePath(), projectName, JOB_NAME), JSON.stringify(jobFile), 'utf8');
+		fs.writeFileSync(path_join(JobsFilePath(), projectName, GRAPH_FILE), graph, 'utf8');
 	}
 	static async saveJobFile(jobFilePath: string, jobFile: JobFile) {
 		jobFile.updated = Date.now();
@@ -711,7 +711,7 @@ export default class JobService {
 		return result;
 	}
 	static async loadJobItem(jobId: string, partId: string, relative: string): Promise<JobItem | null> {
-		let jobItemPath = path.join(relative, jobId, partId, INPUT);
+		let jobItemPath = path_join(relative, jobId, partId, INPUT);
 		if (fs.existsSync(jobItemPath)) {
 			let content = fs.readFileSync(jobItemPath, 'utf8');
 			return JSON.parse(content);
@@ -741,7 +741,7 @@ export default class JobService {
 	}
 	static loadJobItemOutput(jobItem: JobItem) {
 		try {
-			let outputPath = path.join(
+			let outputPath = path_join(
 				JobServiceConstants.JobPath(),
 				jobItem.job,
 				jobItem.file,
@@ -766,7 +766,7 @@ export default class JobService {
 }
 function getAppConfig() {
 	let application = 'applicationConfig.json';
-	let applicationPath = path.join('./', application);
+	let applicationPath = path_join('./', application);
 	let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
 	return applicationConfiguration;
 }
@@ -787,7 +787,7 @@ function JobsFilePath() {
 }
 
 const JOB_NAME = `config.json`;
-const JOB_PATH = path.join('D:/', 'temp', 'job_service_jobs');
+const JOB_PATH = path_join('D:/', 'temp', 'job_service_jobs');
 const JOBS_FILE_PATH = './jobs';
 
 const GRAPH_FILE = `graph.json`;
@@ -870,9 +870,9 @@ export interface JobFile {
 const isDirectory = (source: any) => fs.lstatSync(source).isDirectory();
 
 export const getDirectories = (source: any) =>
-	fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
+	fs.readdirSync(source).filter((name) => isDirectory(path_join(source, name)));
 
-export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path.join(source, name)));
+export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path_join(source, name)));
 
 export async function ensureDirectory(dir: any) {
 	if (!fs.existsSync(dir)) {
@@ -882,7 +882,7 @@ export async function ensureDirectory(dir: any) {
 	const _dir_parts = dir.split(path.sep);
 	_dir_parts.map((_: any, i: number) => {
 		if (i > 1 || _dir_parts.length - 1 === i) {
-			let tempDir = path.join(..._dir_parts.subset(0, i + 1));
+			let tempDir = path_join(..._dir_parts.subset(0, i + 1));
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
@@ -907,4 +907,12 @@ async function setCurrentGraph(graph: Graph) {
 	console.log('the number of nodes in the graph');
 	console.log(Object.keys(graph.nodeLib).length);
 	dispatch(UIC(GRAPHS, graph.id, graph));
+}
+
+export function path_join(...args: string[]) {
+	let items: string[] = [];
+	args.forEach((arg) => {
+		items.push(arg.split('/').join(path.sep).split('\\').join(path.sep));
+	});
+	return path.join(...items);
 }

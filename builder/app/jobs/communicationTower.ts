@@ -5,7 +5,7 @@ import http from 'http';
 import fetch from 'node-fetch';
 import net from 'net';
 import { AgentProject, AgentProjects } from './interfaces';
-import { sleep } from './jobservice';
+import { sleep, path_join } from './jobservice';
 
 export interface RedQuickDistributionMessage {
 	success?: any;
@@ -420,7 +420,7 @@ export async function ensureDirectory(dir: string) {
 	const _dir_parts = dir.split(path.sep);
 	_dir_parts.map((_, i) => {
 		if (i > 1 || _dir_parts.length - 1 === i) {
-			let tempDir = path.join(..._dir_parts.slice(0, i + 1));
+			let tempDir = path_join(..._dir_parts.slice(0, i + 1));
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
