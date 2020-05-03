@@ -37,10 +37,8 @@ process.on('message', (command: any) => {
 			case RedQuickDistributionCommand.RUN_JOB:
 				let { filePath } = command;
 				let { options } = context;
-				jobPromise = jobPromise.then(async () => {
-					console.log('Starting job --------- ');
-					return await job({ ...options, projectName: filePath[0], fileName: filePath[1] });
-				});
+				console.log('Starting job --------- ');
+				job({ ...options, projectName: filePath[0], fileName: filePath[1] });
 				break;
 		}
 	}
