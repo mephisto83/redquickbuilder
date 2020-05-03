@@ -252,7 +252,6 @@ export default class CommunicationTower {
 	async receiveFile(req: any) {
 		return await new Promise(async (resolve, fail) => {
 			let requestedPath = path.join(
-				'.' + path.sep,
 				this.baseFolder,
 				this.agentName || '',
 				(req.filePath || []).join(path.sep)
