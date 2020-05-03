@@ -1,14 +1,15 @@
+var os = require('os');
 console.log('execute red quick distro worker')
 var Distribution = require('./dist/reqthread/src/distribution').default;
 let distribution = new Distribution();
 (async function () {
   console.log(distribution);
-
+  let dir = os.platform() === 'linux' ? '/home/andrew/work_folder' :'D:/temp/workout_wd';
   await distribution.start({
     entryPath: './dist/reqthread/src/thread.js',
-    folder: 'D:/temp/workout_wd',
-    baseFolder: 'D:/temp/workout_wd',
-    workingDirectory: 'D:/temp/workout_wd',
+    folder: dir,
+    baseFolder: dir,
+    workingDirectory:dir,
     throttle: 120 * 1000,
     threads: 3,
     serverPort: 8000,
