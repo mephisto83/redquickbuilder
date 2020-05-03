@@ -1220,7 +1220,13 @@ export function addDefaultProperties(graph: any, options: any) {
 
 function updateNode(node: Node, options: { node: { properties: any } }) {
 	if (options.node) {
-		Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
+		Object.keys(options.node.properties).forEach((propKey) => {
+			if (node.properties[propKey] !== options.node.properties[propKey]) {
+				node.properties[propKey] = options.node.properties[propKey];
+				node.propertyVersions[propKey] = (node.propertyVersions[propKey] || 0) + 1;
+			}
+		});
+		// Object.apply(node.properties, JSON.parse(JSON.stringify(options.node.properties)));
 	}
 }
 let _viewPackageStamp: any = null;
@@ -3068,7 +3074,22 @@ export function updateNodeProperty(graph: any, options: any) {
 				graph.nodeLib[id].properties = {};
 			}
 			graph.nodeLib[id].dirty[prop] = true;
+			let node: Node = graph.nodeLib[id];
+			if (node) {
+				node.propertyVersions = node.propertyVersions || {};
+				if (node.properties[prop] !== value) {
+					node.propertyVersions[prop] = (node.propertyVersions[prop] || 0) + 1;
+				}
+				if (additionalChange) {
+					Object.keys(additionalChange).forEach((propKey) => {
+						if (node.properties[propKey] !== additionalChange[propKey] && node.propertyVersions) {
+							node.propertyVersions[propKey] = (node.propertyVersions[propKey] || 0) + 1;
+						}
+					});
+				}
+			}
 			graph.nodeLib[id].properties[prop] = value;
+
 			Object.assign(graph.nodeLib[id].properties, additionalChange || {});
 		} else {
 			graph.nodeLib[id] = {
@@ -3202,6 +3223,9 @@ function createNode(nodeType?: any): Node {
 	return {
 		id: uuidv4(),
 		dirty: {},
+		propertyVersions: {
+			text: 1
+		},
 		properties: {
 			text: nodeType || Titles.Unknown
 		}

@@ -53,6 +53,7 @@ export interface Group {
 }
 export interface Node {
 	properties: any;
+	propertyVersions?: { [index: string]: any };
 	id: string;
 	dirty: any;
 }
@@ -61,5 +62,6 @@ export interface GraphLink {
 	id: string;
 	source: string;
 	target: string;
+	propertyVersions?: { [index: string]: any };
 	properties: { [index: string]: any };
 }
