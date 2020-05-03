@@ -31,6 +31,7 @@
     "jobrunnbuild": "cd ./reqthread/dist/reqthread && yarn build",
     "jr": "npm run jobrunnbuild && npm run jobrunner ",
     "jw": "cd ./reqthread/ && node --max-old-space-size=8000 ./worker.js",
+    "jwb":"npm run jobrunnbuild && npm run jw",
     "start": "cross-env NODE_ENV=production electron ./app/main.prod.js",
     "start-main-dev": "cross-env START_HOT=1 NODE_ENV=development electron -r ./internals/scripts/BabelRegister ./app/main.dev.ts",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config configs/webpack.config.renderer.dev.babel.js",
