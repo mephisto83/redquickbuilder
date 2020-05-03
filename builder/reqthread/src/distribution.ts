@@ -12,7 +12,7 @@ import CommunicationTower, {
 } from '../../app/jobs/communicationTower';
 import { ProgressTracking } from './progressTracking';
 import { AgentProjects } from '../../app/jobs/interfaces';
-import JobService, { JobServiceConstants, getFiles } from '../../app/jobs/jobservice';
+import JobService, { JobServiceConstants, getFiles, ensureDirectory } from '../../app/jobs/jobservice';
 import { uuidv4 } from '../../app/utils/array';
 let oneHour = 1000 * 60 * 60;
 
@@ -26,6 +26,7 @@ export default class Distribution {
 		let localDev: LocalDev;
 		this.configuration = config;
 		this.threads = {};
+		await ensureDirectory(this.configuration.workingDirectory);
 		if (this.hasLocalDev()) {
 			localDev = this.getLocalDev();
 		} else {
@@ -140,9 +141,9 @@ export default class Distribution {
 					},
 					[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 					[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
-          [RedQuickDistributionCommand.RaisingHand]: noOp,
-          [RedQuickDistributionCommand.SetCommandCenter]: noOp,
-          [RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
+					[RedQuickDistributionCommand.RaisingHand]: noOp,
+					[RedQuickDistributionCommand.SetCommandCenter]: noOp,
+					[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
 					[RedQuickDistributionCommand.SendFile]: noOp,
 					[RedQuickDistributionCommand.SetAgentProjects]: noOp,
 					[RedQuickDistributionCommand.CompletedJobItem]: noOp
@@ -205,7 +206,7 @@ export default class Distribution {
 						projectName: completedJobItem.projectName,
 						fileName: completedJobItem.fileName
 					}
-        );
+				);
 
 				await sleep(10 * 1000);
 				if (result.success) {

@@ -40,9 +40,9 @@ export enum RedQuickDistributionCommand {
 	Progress = 'Progress',
 	RaisingAgentProjectReady = 'RaisingAgentProjectReady',
 	RaisingAgentProjectBusy = 'RaisingAgentProjectBusy',
-  CompletedJobItem = 'CompletedJobItem',
-  SetCommandCenter = 'SetCommandCenter',
-  UpdateCommandCenter = 'UpdateCommandCenter'
+	CompletedJobItem = 'CompletedJobItem',
+	SetCommandCenter = 'SetCommandCenter',
+	UpdateCommandCenter = 'UpdateCommandCenter'
 }
 export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;
 export default class CommunicationTower {
@@ -170,7 +170,7 @@ export default class CommunicationTower {
 		};
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
-				reply.port = this.getAvailbePort();
+				reply.port = await this.getAvailbePort();
 				let address = this.getIpaddress();
 				reply.hostname = address.hostname;
 				await this.receiveFile(parsed);
@@ -201,11 +201,8 @@ export default class CommunicationTower {
 		let server: net.Server,
 			istream = fs.createReadStream(localFilePath);
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
-		let port = await this.getAvailbePort();
 		let address: any = this.getIpaddress();
-		message.port = port;
 		message.hostname = address.hostname;
-		this.ports[port] = true;
 		return await new Promise((resolve, fail) => {
 			server = net.createServer((socket) => {
 				socket.pipe(process.stdout);
@@ -221,26 +218,34 @@ export default class CommunicationTower {
 				socket.on('end', () => {
 					server.close(() => {
 						console.log('\nTransfer is done!');
-						this.ports[port] = true;
-						resolve(true);
 					});
 				});
+				socket.on('close', () => {
+					resolve(true);
+				});
 				socket.on('error', () => {
-					this.ports[port] = true;
 					fail(false);
 				});
 			});
-			server.listen(port, address.hostname, () => {
+			server.listen(0, address.hostname, () => {
 				console.log('trying to send a file');
-				fetch(`http://${message.targetHost}:${message.targetPort}`, {
-					method: 'POST',
-					body: JSON.stringify({
-						...message,
-						command: RedQuickDistributionCommand.SendFile,
-						agentName: this.agentName,
-						filePath: filePathArray
-					})
-				});
+				let address: any = server.address();
+				let port = address && address.port ? address.port : null;
+				if (port) {
+					console.log(`using port: ${port}`);
+					fetch(`http://${message.targetHost}:${message.targetPort}`, {
+						method: 'POST',
+						body: JSON.stringify({
+							...message,
+							port,
+							command: RedQuickDistributionCommand.SendFile,
+							agentName: this.agentName,
+							filePath: filePathArray
+						})
+					}).catch((e) => fail(e));
+				} else {
+					throw new Error('no port found');
+				}
 			});
 		});
 	}
@@ -264,6 +269,7 @@ export default class CommunicationTower {
 				process.stdout.write(`\r${err.message}`);
 				socket.destroy(err);
 				this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
+				fail(err);
 			});
 			socket.on('data', (chunk) => {
 				size += chunk.length;
@@ -282,20 +288,18 @@ export default class CommunicationTower {
 					`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(2)} MB/s`
 				);
 				socket.destroy();
+				resolve(true);
 			});
 			ostream.on('error', (err) => {
 				console.log('ostream error');
 				console.log(err);
 				fail(err);
 			});
-			ostream.on('ready', () => {
-				resolve(true);
-			});
+			ostream.on('ready', () => {});
 		});
 	}
-	getAvailbePort() {
-		let res = Object.keys(this.ports).filter((key: any) => !this.ports[key]);
-		return parseInt(res[Math.floor(Math.random() * res.length)] || '0', 10);
+	async getAvailbePort() {
+		return await this.getFreePort();
 	}
 	async startServers() {
 		let address: any = this.getIpaddress();
@@ -341,6 +345,34 @@ export default class CommunicationTower {
 		ports.forEach((port) => {
 			this.ports[port] = false;
 		});
+	}
+	async getFreePort() {
+		var portrange = 3000 + Math.floor(Math.random() * 50000);
+		let newport: number = await new Promise((resolve) => {
+			function getPort() {
+				console.log('get port');
+				var port = portrange;
+				portrange += 1;
+				var server = net.createServer();
+				server.listen(port, () => {
+					console.log('port: ' + port);
+					server.once('close', function() {
+						setTimeout(() => {
+							resolve(port);
+						}, 1000);
+					});
+					server.close();
+				});
+				server.on('error', function(err) {
+					console.log(err);
+					console.log(`port ${port} is busy`);
+					getPort();
+				});
+			}
+			getPort();
+		});
+		console.log(`free port is : ${newport}`);
+		return newport;
 	}
 	async getPorts() {
 		let result: number[] = [];

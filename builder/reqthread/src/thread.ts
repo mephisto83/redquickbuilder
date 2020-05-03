@@ -8,8 +8,8 @@ import { RedQuickDistributionCommand } from '../../app/jobs/communicationTower';
 process.on('message', (command: any) => {
 	let { message } = command;
 
-  let parsedMessage = message;
-  console.log('received message from parent thread');
+	let parsedMessage = message;
+	console.log('received message from parent thread');
 	console.log(command);
 	if (parsedMessage) {
 		switch (parsedMessage.command) {
@@ -106,7 +106,10 @@ async function loop() {
 					agentName: context.options.agentName,
 					agentProject: context.options.projectName
 				});
-			}
+      }
+      else {
+        console.log('------------ is busy -----------------');
+      }
 		} catch (e) {
 			noerror = false;
 			console.error(e);
@@ -136,6 +139,7 @@ const updateAgent = async (options: any) => {
 
 const context: any = {
 	options: null,
+	busy: false,
 	config: null
 };
 export const Operations = {

@@ -87,10 +87,12 @@ export default async function executeJob(
 					}
 					break;
 				default:
-					jobConfig.complete = true;
+          jobConfig.complete = true;
+          console.log('-------------invalid job----------------')
 					console.log(jobPart);
 					console.log(partPath);
 					console.log(command);
+          console.log('-----------------------------')
 					throw new Error('unknown job');
 			}
 

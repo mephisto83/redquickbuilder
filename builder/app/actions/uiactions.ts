@@ -13,7 +13,7 @@ import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink } from '../methods/graph_types';
-import JobService, { Job, JobAssignment, JobFile } from '../jobs/jobservice';
+import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -3166,7 +3166,7 @@ export function loadGitRuns() {
 					if (parts) {
 						parts.forEachAsync(async (dir: string) => {
 							if (parts != null) {
-								let item = await JobService.loadJobItem(jobInstance.name, dir);
+								let item = await JobService.loadJobItem(jobInstance.name, dir, JobServiceConstants.JobPath());
 								setVisual(JobItemId(dir), item)(dispatch, getState);
 							}
 						});

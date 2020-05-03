@@ -50,8 +50,8 @@ let runnerContext: RunnerContext = {
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
 			await createJobs();
-      await processJobs();
-      await tellCommandCenter();
+			await processJobs();
+			await tellCommandCenter();
 			await sleep();
 		}
 	} catch (e) {
@@ -60,12 +60,12 @@ let runnerContext: RunnerContext = {
 	}
 })();
 async function setCommandCenter(message: RedQuickDistributionMessage): Promise<ListenerReply> {
-  let msg: any = message;
-  console.log('set command center');
+	let msg: any = message;
+	console.log('set command center');
 	if (msg) {
 		runnerContext.commandCenter = { ...runnerContext.commandCenter, ...msg };
-  }
-  console.log(runnerContext.commandCenter);
+	}
+	console.log(runnerContext.commandCenter);
 	return { success: true };
 }
 async function noOp(): Promise<ListenerReply> {
@@ -83,7 +83,10 @@ async function handleAgentProjectStateChange(
 		if (runnerContext.agents[message.agentName]) {
 			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
 				runnerContext.agents[message.agentName].projects[message.agentProject].ready = ready;
-				JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[message.agentProject]);
+				await JobService.UpdateReadyAgents(
+					runnerContext.agents[message.agentName].projects[message.agentProject]
+				);
+				console.log(`updating ready to ${ready} for ${message.agentProject}.`);
 				return {
 					success: true
 				};
@@ -100,7 +103,7 @@ async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Pro
 	return await handleAgentProjectStateChange(message, false);
 }
 async function tellCommandCenter() {
-  console.log('tell command center');
+	console.log('tell command center');
 	if (
 		runnerContext.commandCenter &&
 		runnerContext.commandCenter.commandCenterPort &&
@@ -115,27 +118,36 @@ async function tellCommandCenter() {
 				'',
 				RedQuickDistributionCommand.UpdateCommandCenter
 			);
-      console.log('told command center');
+			console.log('told command center');
 		} catch (e) {
-      console.log(e);
-    }
+			console.log(e);
+		}
 	}
 }
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	await sleep(10 * 1000);
 	console.log('CompletedJobItem');
 	console.log('handing completed job item');
-	await sleep(10 * 1000);
 	if (message.projectName) {
 		if (message.fileName) {
-			let relativePath = path.join(JobServiceConstants.JobPath(), message.projectName, message.fileName);
+			console.log(communicationTower.agentName || '');
+			let relativePath = path.join(
+				JobServiceConstants.JobPath(),
+				communicationTower.agentName || '',
+				message.projectName,
+				message.fileName
+			);
+			console.log(relativePath);
 			if (fs.existsSync(path.join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
 					let completed = await JobService.SetJobPartComplete(relativePath);
+					await JobService.SetJobPartComplete(relativePath);
 					if (!completed) {
 						throw new Error('job was not set to completed');
 					}
 					fs.writeFileSync(path.join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+
 					await tellCommandCenter();
 					return {
 						success: true

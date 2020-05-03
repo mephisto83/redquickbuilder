@@ -216,7 +216,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			buildAllProgress,
 			Wait_For_Create_Component_All_Completion,
 			async (progresFunc: (arg0: number) => any) => {
-				await JobService.WaitForJob(Wait_For_Create_Component_All_Completion, currentJobFile);
+				await JobService.WaitForJob(Create_Component_All, currentJobFile);
 			}
 		);
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
