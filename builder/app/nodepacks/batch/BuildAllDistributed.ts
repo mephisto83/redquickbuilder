@@ -13,10 +13,11 @@ import {
 	setVisual,
 	BuildAllProgress,
 	NodeTypes,
-  clearPinned
+	clearPinned
 } from '../../actions/uiactions';
 import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
+import UpdateScreenUrls from '../screens/UpdateScreenUrls';
 import HaveAllPropertiesOnExecutors from './HaveAllPropertiesOnExecutors';
 import AddCopyCommandToExecutors from './AddCopyCommandToExecutors';
 import CreateDashboard from '../CreateDashboard_1';
@@ -33,6 +34,7 @@ import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';
 import ApplyLoginValidations from './ApplyLoginValidations';
 import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
+import ModifyUpdateLinks from '../ModifyUpdateLinks';
 
 interface BuildStep {
 	progress?: number;
@@ -120,7 +122,9 @@ const Create_Fetch_Service = 'Create Fetch Service';
 const Create_Claim_Service = 'Create Claim Service';
 export const Connect_Screens = 'Connect_Screens';
 const Wait_For_Screen_Connect = 'Wait_For_Screen_Connect';
+const Update_Screen_Urls = 'Update_Screen_Urls';
 const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
+const Modify_Update_Links = 'Modify_Update_Links';
 const Setup_View_Types = 'Setup_View_Types';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
@@ -136,6 +140,7 @@ const buildAllProgress = [
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
 	{ name: Collect_Into_Graph },
+	{ name: Update_Screen_Urls },
 	{ name: Select_All_On_Model_Filters },
 	{ name: Add_Filters_To_Get_All },
 	{ name: Create_Dashboard },
@@ -147,6 +152,7 @@ const buildAllProgress = [
 	{ name: Connect_Screens },
 	{ name: Wait_For_Screen_Connect },
 	{ name: Collect_Screen_Connect_Into_Graph },
+	{ name: Modify_Update_Links },
 	{ name: Setup_View_Types },
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
@@ -219,6 +225,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				await JobService.WaitForJob(Create_Component_All, currentJobFile);
 			}
 		);
+		await run(buildAllProgress, Update_Screen_Urls, async (progressFunc: any) => {
+			await UpdateScreenUrls(progressFunc);
+		});
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
 		});
@@ -262,7 +271,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Collect_Screen_Connect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
 		});
-
+		await run(buildAllProgress, Modify_Update_Links, async (progresFunc: (arg0: number) => any) => {
+			await graphOperation(ModifyUpdateLinks())(GetDispatchFunc(), GetStateFunc());
+		});
 		await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {
 			await SetupViewTypes(progresFunc);
 		});
@@ -284,11 +295,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
 				await progresFunc(index / total);
 			});
-      clearPinned();
+			clearPinned();
 			await progresFunc(1);
 		});
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
-      currentJobFile.completed = true;
+			currentJobFile.completed = true;
 		});
 	} catch (e) {
 		console.log(e);

@@ -225,7 +225,7 @@ export default class JobService {
 			currentJobFile.started = true;
 			await writeGraphToFile(graph, currentJobFile.graphPath);
 			if (currentJobFile.jobPath) {
-				await JobService.deleteFolder(path.dirname(currentJobFile.jobPath));
+				// await JobService.deleteFolder(path.dirname(currentJobFile.jobPath));
 			} else {
 				throw new Error('currentJobFile.jobPath is empty');
 			}

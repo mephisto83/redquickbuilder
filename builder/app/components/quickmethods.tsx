@@ -32,6 +32,7 @@ import CreateViewTypes from '../nodepacks/batch/CreateViewTypes';
 import BuildAll from '../nodepacks/batch/BuildAll';
 import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
+import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props) {
@@ -227,17 +228,13 @@ class QuickMethods extends Component<any, any, any> {
 										StartJob();
 									}}
 								/>
-								{/* 	<TreeViewMenu
-									title={BuildAllDistributed.title}
+								<TreeViewMenu
+									title={'Update Screen Urls'}
 									icon="fa fa-plus"
 									onClick={() => {
-										this.props.setState();
-										if (!this.state.buildAll) {
-											this.setState({ buildAll: true });
-											BuildAllDistributed(() => {});
-										}
+										UpdateScreenUrls(() => {});
 									}}
-								/> */}
+								/>
 								<TreeViewMenu
 									title={'Distribute Build All Jobs'}
 									icon="fa fa-plus"

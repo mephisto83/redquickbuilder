@@ -3160,18 +3160,29 @@ export function loadGitRuns() {
 			.then(async (jobs) => {
 				setVisual(JOBS, jobs)(dispatch, getState);
 				await jobs.forEachAsync(async (jobInstance: Job) => {
-					let jobProgress = await JobService.JobProgress(jobInstance);
-					setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
-					let { parts } = jobInstance;
-					if (parts) {
-						parts.forEachAsync(async (dir: string) => {
-							if (parts != null) {
-								let item = await JobService.loadJobItem(jobInstance.name, dir, JobServiceConstants.JobPath());
-								setVisual(JobItemId(dir), item)(dispatch, getState);
-							}
-						});
+					try {
+						let jobProgress = await JobService.JobProgress(jobInstance);
+						setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
+						let { parts } = jobInstance;
+						if (parts) {
+							parts.forEachAsync(async (dir: string) => {
+								if (parts != null) {
+									let item = await JobService.loadJobItem(
+										jobInstance.name,
+										dir,
+										JobServiceConstants.JobPath()
+									);
+									setVisual(JobItemId(dir), item)(dispatch, getState);
+								}
+							});
+						}
+					} catch (e) {
+						console.log(e);
 					}
 				});
+			})
+			.catch((e) => {
+				console.log(e);
 			})
 			.then(() => {
 				return JobService.GetJobFiles().then(async (jobFiles: JobFile[]) => {

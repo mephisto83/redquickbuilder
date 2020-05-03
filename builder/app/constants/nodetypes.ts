@@ -305,6 +305,7 @@ export const NodeProperties = {
 	MergeNode: 'MergeNode',
 	DataChainTypeName: 'DataChainTypeName',
 	HoverStyle: ':hover',
+	IsHomeView: 'IsHomeView',
 	AsLocalContext: 'AsLocalContext',
 	DataChainName: 'DataChainName',
 	ActiveStyle: ':active',

@@ -86,7 +86,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 				}
 			: null
 	);
-	screenOptions.forEach((screenOptionInstance: { id: any; }) => {
+	screenOptions.forEach((screenOptionInstance: { id: any }) => {
 		const lifeCylcleMethods = GetNodesLinkedTo(graph, {
 			id: screenOptionInstance.id,
 			link: LinkType.LifeCylceMethod
@@ -99,7 +99,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 
 		lifeCylcleMethods
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
-			.forEach((lifeCylcleMethod: { id: any; }) => {
+			.forEach((lifeCylcleMethod: { id: any }) => {
 				const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
 					id: lifeCylcleMethod.id,
 					link: LinkType.LifeCylceMethodInstance
@@ -125,7 +125,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 				});
 				componentDidMountMethods.forEach((componentDidMountMethod: any) => {
 					let dataChainForLoading: null = null;
-					let cycleInstance: any  = null;
+					let cycleInstance: any = null;
 					result.push(
 						...AddLifeCylcleMethodInstance({
 							node: lifeCylcleMethod.id,
@@ -167,7 +167,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 							viewPackages,
 							model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
 							model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
-							callback: (context: { entry: any; }) => {
+							callback: (context: { entry: any }) => {
 								dataChainForLoading = context.entry;
 							}
 						}),
@@ -191,7 +191,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			id: screenOptionInstance.id,
 			link: LinkType.Component
 		});
-		components.forEach((component: { id: any; }) => {
+		components.forEach((component: { id: any }) => {
 			const subcomponents = GetNodesLinkedTo(graph, {
 				id: component.id,
 				link: LinkType.Component
@@ -229,14 +229,14 @@ export default function ScreenConnectUpdate(args: any = {}) {
 					);
 					onEvents.push({ newEventNode: () => newEventNode });
 				}
-				onEvents.forEach((onEventHandler: { newEventNode: any; id: any; }) => {
+				onEvents.forEach((onEventHandler: { newEventNode: any; id: any }) => {
 					if (!onEventHandler.newEventNode) {
 						const t = GetNodesLinkedTo(graph, {
 							id: onEventHandler.id,
 							link: LinkType.EventMethodInstance
 						});
 						if (t && t.length) {
-							t.forEach((instance: { id: any; }) => {
+							t.forEach((instance: { id: any }) => {
 								const vp = GetNodeProp(instance, NodeProperties.ViewPackage);
 								const parentViewPackage = GetNodeProp(onEventHandler, NodeProperties.ViewPackage);
 								if (vp && vp !== parentViewPackage) {
@@ -289,7 +289,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 						...GetModelObjectFromSelector({
 							model: GetNodeTitle(node),
 							viewPackages,
-							callback: (newContext: { entry: string; }, tempGraph: Graph) => {
+							callback: (newContext: { entry: string }, tempGraph: Graph) => {
 								modelDataChain = GetNodeById(newContext.entry, tempGraph);
 							}
 						}),
@@ -346,7 +346,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			);
 
 			const screenOption = screenOptionInstance;
-			let clearScreenContext: any  = null;
+			let clearScreenContext: any = null;
 			let componentDidMountInstance: any = null;
 			let componentDidMount = null;
 			result.push(
@@ -366,7 +366,8 @@ export default function ScreenConnectUpdate(args: any = {}) {
 						link: LinkType.LifeCylceMethod,
 						componentType: NodeTypes.LifeCylceMethod
 					}).find(
-						(v: any) => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount
+						(v: any) =>
+							GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount
 					);
 					if (componentDidMount) {
 						componentDidMountInstance = GetNodeLinkedTo(gg, {
@@ -429,6 +430,6 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			);
 		});
 	});
-	result = [ ...result, ...ModifyUpdateLinks() ].filter((x) => x);
+	result = [ ...result ].filter((x) => x);
 	return result;
 }

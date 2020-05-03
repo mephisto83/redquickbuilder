@@ -71,6 +71,18 @@ export default function (args: any = {}) {
             {
               operation: "CHANGE_NODE_PROPERTY",
               options: {
+                id: context.node0,
+                value: true,
+                prop: "IsHomeView"
+              }
+            }
+          ];
+        },
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
                 prop: "nodeType",
                 id: context.node0,
                 value: "screen"
@@ -149,6 +161,19 @@ export default function (args: any = {}) {
             id: context.node1,
             value: "/",
             prop: "HttpRoute"
+          }
+        }
+      ];
+    },
+
+    function () {
+      return [
+        {
+          operation: "CHANGE_NODE_PROPERTY",
+          options: {
+            id: context.node1,
+            value: true,
+            prop: "IsHomeView"
           }
         }
       ];
