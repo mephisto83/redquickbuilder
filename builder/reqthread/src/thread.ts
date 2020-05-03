@@ -62,9 +62,13 @@ async function job(options) {
 				agentProject: context.options.projectName
 			});
 			context.busy = true;
-			await task(jobPath, options, (completedJobItem) => {
-				process.send({ response: Operations.CHANGED, changed: true, completedJobItem });
-			});
+			try {
+				await task(jobPath, options, (completedJobItem) => {
+					process.send({ response: Operations.CHANGED, changed: true, completedJobItem });
+				});
+			} catch (e) {
+				console.log(e);
+			}
 			context.busy = false;
 			console.log('job completed');
 			process.send({ response: Operations.COMPLETED_TASK });
@@ -98,6 +102,7 @@ async function loop() {
 			}
 			console.log('loop done');
 			if (!context.busy) {
+				console.log('not busy');
 				process.send({
 					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
 					command: RedQuickDistributionCommand.RaisingAgentProjectReady,
@@ -106,10 +111,9 @@ async function loop() {
 					agentName: context.options.agentName,
 					agentProject: context.options.projectName
 				});
-      }
-      else {
-        console.log('------------ is busy -----------------');
-      }
+			} else {
+				console.log('------------ is busy -----------------');
+			}
 		} catch (e) {
 			noerror = false;
 			console.error(e);
