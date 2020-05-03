@@ -78,7 +78,12 @@ async function job(options) {
 				agentName,
 				agentProject: context.options.projectName
 			});
-		}
+    }
+    else {
+      throw new Error(`no inDirectories in the job path : ${jobPath}`)
+    }
+	} else {
+		throw new Error(`jobPath:${jobPath} doesnt exist`);
 	}
 }
 

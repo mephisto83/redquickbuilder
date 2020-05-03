@@ -187,7 +187,10 @@ export default class JobService {
 					);
 					console.log('so telling it to begin job again');
 					await this.moveJobItemFiles(notBusyProject, item);
-					await this.beginJob(notBusyProject, item);
+          await this.beginJob(notBusyProject, item);
+          if(notBusyProject.ready){
+            throw new Error('project cant be ready this fast');
+          }
 				} else {
 					if (notBusyProject) {
 						console.log(`${item.assignedTo} is still busy apparently`);
@@ -198,7 +201,10 @@ export default class JobService {
 						item.assignedTo = availableProjects[0].agentProject || availableProjects[0].name;
 						await this.saveJobItem(item);
 						await this.moveJobItemFiles(availableProjects[0], item);
-						await this.beginJob(availableProjects[0], item);
+            await this.beginJob(availableProjects[0], item);
+            if(availableProjects[0].ready){
+              throw new Error('project cant be ready this fast');
+            }
 					}
 				}
 			}
@@ -506,12 +512,13 @@ export default class JobService {
 	}
 	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
 		agentProject.ready = false;
-		return await this.communicationTower.send(
+		await this.communicationTower.send(
 			agentProject,
 			path.join(jobItem.job, jobItem.file),
 			RedQuickDistributionCommand.RUN_JOB
 		);
-	}
+    agentProject.ready = false;
+  }
 	static async transferFile(agentProject: AgentProject, srcFolder: string, outFolder: string) {
 		return await this.communicationTower.transferFile(agentProject, outFolder, srcFolder);
 	}
