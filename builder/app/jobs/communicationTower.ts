@@ -40,7 +40,9 @@ export enum RedQuickDistributionCommand {
 	Progress = 'Progress',
 	RaisingAgentProjectReady = 'RaisingAgentProjectReady',
 	RaisingAgentProjectBusy = 'RaisingAgentProjectBusy',
-	CompletedJobItem = 'CompletedJobItem'
+  CompletedJobItem = 'CompletedJobItem',
+  SetCommandCenter = 'SetCommandCenter',
+  UpdateCommandCenter = 'UpdateCommandCenter'
 }
 export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;
 export default class CommunicationTower {

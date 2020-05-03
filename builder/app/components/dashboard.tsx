@@ -151,8 +151,8 @@ class Dashboard extends Component {
 		this.props.setState();
 		this.props.setRemoteState();
 		this.props.setVisual(UIA.NODE_COST, 1);
-    this.props.setVisual(UIA.NODE_CONNECTION_COST, 0.2);
-    this.props.loadApplicationConfig();
+		this.props.setVisual(UIA.NODE_CONNECTION_COST, 0.2);
+		this.props.loadApplicationConfig();
 	}
 
 	minified() {
@@ -1578,6 +1578,7 @@ class Dashboard extends Component {
 										}}
 									>
 										<TreeViewMenu
+											description={Titles.JobPath}
 											title={
 												applicationConfig ? (
 													applicationConfig[JobServiceConstants.JOB_PATH] || Titles.JobPath
@@ -1591,9 +1592,11 @@ class Dashboard extends Component {
 											}}
 										/>
 										<TreeViewMenu
+											description={Titles.JobsFilePath}
 											title={
 												applicationConfig ? (
-													applicationConfig[JobServiceConstants.JOBS_FILE_PATH] || Titles.JobPath
+													applicationConfig[JobServiceConstants.JOBS_FILE_PATH] ||
+													Titles.JobsFilePath
 												) : (
 													Titles.JobsFilePath
 												)

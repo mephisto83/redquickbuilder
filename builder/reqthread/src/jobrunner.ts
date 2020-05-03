@@ -18,7 +18,11 @@ import CommunicationTower, {
 import { RunnerContext } from '../../app/jobs/interfaces';
 let communicationTower: CommunicationTower;
 let runnerContext: RunnerContext = {
-	agents: {}
+	agents: {},
+	commandCenter: {
+		commandCenterPort: null,
+		commandCenterHost: null
+	}
 };
 (async function runner() {
 	try {
@@ -39,12 +43,15 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: handleAgentProjectReady,
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy,
-			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem
+			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem,
+			[RedQuickDistributionCommand.SetCommandCenter]: setCommandCenter,
+			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
 			await createJobs();
-			await processJobs();
+      await processJobs();
+      await tellCommandCenter();
 			await sleep();
 		}
 	} catch (e) {
@@ -52,6 +59,15 @@ let runnerContext: RunnerContext = {
 	} finally {
 	}
 })();
+async function setCommandCenter(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+  let msg: any = message;
+  console.log('set command center');
+	if (msg) {
+		runnerContext.commandCenter = { ...runnerContext.commandCenter, ...msg };
+  }
+  console.log(runnerContext.commandCenter);
+	return { success: true };
+}
 async function noOp(): Promise<ListenerReply> {
 	return { error: 'this operation is handled by the runner.' };
 }
@@ -83,6 +99,28 @@ async function handleAgentProjectStateChange(
 async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	return await handleAgentProjectStateChange(message, false);
 }
+async function tellCommandCenter() {
+  console.log('tell command center');
+	if (
+		runnerContext.commandCenter &&
+		runnerContext.commandCenter.commandCenterPort &&
+		runnerContext.commandCenter.commandCenterHost
+	) {
+		try {
+			await communicationTower.send(
+				{
+					host: runnerContext.commandCenter.commandCenterHost,
+					port: runnerContext.commandCenter.commandCenterPort
+				},
+				'',
+				RedQuickDistributionCommand.UpdateCommandCenter
+			);
+      console.log('told command center');
+		} catch (e) {
+      console.log(e);
+    }
+	}
+}
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	console.log('CompletedJobItem');
 	console.log('handing completed job item');
@@ -98,6 +136,7 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 						throw new Error('job was not set to completed');
 					}
 					fs.writeFileSync(path.join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+					await tellCommandCenter();
 					return {
 						success: true
 					};

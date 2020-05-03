@@ -3,6 +3,8 @@ const { ipcMain } = require('electron');
 import { HandlerEvents } from './ipc/handler-events';
 import fs from 'fs';
 import path from 'path';
+import CommunicationTower, { RedQuickDistributionCommand } from './jobs/communicationTower';
+import { JobServiceConstants, sleep } from './jobs/jobservice';
 var child_process = require('child_process'),
 	spawn = child_process.spawn;
 
@@ -96,7 +98,8 @@ export default class IPCHandlers {
 				})
 			);
 		});
-
+		console.log('setup communication tower');
+		setupCommunicationTower(() => mainWindow);
 		const menu2 = new Menu();
 		menu2.append(
 			new MenuItem({
@@ -121,7 +124,78 @@ const throttle: any = (func: any, limit: any, context: any) => {
 		}
 	};
 };
+let communicationTower: CommunicationTower;
+function setupCommunicationTower(mainWindowFunc: any) {
+	communicationTower = new CommunicationTower();
+	communicationTower.init({
+		agentName: 'RedQuickBuilder',
+		baseFolder: JobServiceConstants.JobPath(),
+		serverPort: 8001,
+		topDirectory: '../../jobrunner'
+	});
 
+	communicationTower.start({
+		[RedQuickDistributionCommand.RaisingHand]: noOp,
+		[RedQuickDistributionCommand.SetAgentProjects]: noOp,
+		[RedQuickDistributionCommand.Progress]: noOp,
+		[RedQuickDistributionCommand.RUN_JOB]: noOp,
+		[RedQuickDistributionCommand.SendFile]: noOp,
+		[RedQuickDistributionCommand.SetAgentProjects]: noOp,
+		[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
+		[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
+		[RedQuickDistributionCommand.CompletedJobItem]: noOp,
+		[RedQuickDistributionCommand.SetCommandCenter]: noOp,
+		[RedQuickDistributionCommand.UpdateCommandCenter]: () => {
+			console.log('update command center');
+			updateCommandCenter(mainWindowFunc);
+		}
+	});
+  console.log('set command center');
+	setCommandCenter(7979, 8001);
+}
+function setCommandCenter(targetPort: number, port: number) {
+	return Promise.resolve()
+		.then(async () => {
+			await sleep(30000);
+		})
+		.then(async () => {
+			if (communicationTower) {
+				console.log('communication tower, set command center');
+				try {
+					await communicationTower.send(
+						{
+							host: communicationTower.getIpaddress().hostname || '',
+							port: targetPort
+						},
+						'',
+						RedQuickDistributionCommand.SetCommandCenter,
+						{
+							commandCenterPort: port,
+							commandCenterHost: communicationTower.getIpaddress().hostname
+						}
+					);
+				} catch (e) {
+          console.log('didnt set command center');
+        }
+			}
+		})
+		.then(() => {
+			setCommandCenter(targetPort, port);
+		});
+}
+function updateCommandCenter(mainWindowFunc: any) {
+	let mainWindow = mainWindowFunc();
+	if (mainWindow && mainWindow.webContents) {
+		mainWindow.webContents.send('update-jobs', {
+			args: 'update-jobs'
+		});
+	} else if (mainWindow) {
+		console.log('no webContents');
+	} else {
+		console.log('no mainWindow');
+	}
+}
+function noOp() {}
 function handle(msg: any) {
 	let message = msg.msg;
 	let result = Promise.resolve();

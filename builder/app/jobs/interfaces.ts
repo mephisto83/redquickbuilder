@@ -2,8 +2,13 @@ import { RedQuickDistributionCommand } from './communicationTower';
 
 export interface RunnerContext {
 	agents: Agents;
+	commandCenter: CommandCenter;
 }
 
+export interface CommandCenter {
+	commandCenterPort: any;
+	commandCenterHost: any;
+}
 export interface Agents {
 	[agent: string]: Agent;
 }

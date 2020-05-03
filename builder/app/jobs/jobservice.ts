@@ -290,6 +290,27 @@ export default class JobService {
 		}
 		return results;
 	}
+
+	static async GetJobFiles(): Promise<JobFile[]> {
+		let result: JobFile[] = [];
+		if (fs.existsSync(JobsFilePath())) {
+			let jobsFilePaths = getDirectories(JobsFilePath());
+			jobsFilePaths.forEach((jfp: string) => {
+				if (fs.existsSync(path.join(JobsFilePath(), jfp, JOB_NAME))) {
+					let content = fs.readFileSync(path.join(JobsFilePath(), jfp, JOB_NAME), 'utf8');
+					let jobFile: JobFile = JSON.parse(content);
+					result.push(jobFile);
+				}
+			});
+		}
+		return result;
+	}
+	static GetJobFileStages(jobFile: JobFile): string[] {
+		if (jobFile.name) {
+			return getDirectories(path.join(JobsFilePath(), jobFile.name, 'stages'));
+		}
+		return [];
+	}
 	static async SetJobPartComplete(jobPartPath: string) {
 		let inputPath: string = path.join(jobPartPath, INPUT);
 		if (fs.existsSync(path.join(jobPartPath, INPUT))) {
@@ -618,6 +639,7 @@ export default class JobService {
 		let projectName = `${NameService.projectGenerator()}_${uuidv4().split('-')[0]}`;
 		await ensureDirectory(path.join(JobsFilePath(), projectName));
 		jobFile.originalGraphPath = jobFile.graphPath;
+		jobFile.name = projectName;
 		jobFile.graphPath = path.resolve(path.join(JobsFilePath(), projectName, GRAPH_FILE));
 		fs.writeFileSync(path.join(JobsFilePath(), projectName, JOB_NAME), JSON.stringify(jobFile), 'utf8');
 		fs.writeFileSync(path.join(JobsFilePath(), projectName, GRAPH_FILE), graph, 'utf8');
@@ -668,9 +690,14 @@ export default class JobService {
 		return false;
 	}
 }
-
+function getAppConfig() {
+	let application = 'applicationConfig.json';
+	let applicationPath = path.join('./', application);
+	let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+	return applicationConfiguration;
+}
 function JobPath() {
-	let applicationConfig = Visual(GetState(), ApplicationConfig);
+	let applicationConfig = getAppConfig();
 	if (applicationConfig && applicationConfig[JOB_PATH]) {
 		return applicationConfig[JOB_PATH];
 	}
@@ -678,7 +705,7 @@ function JobPath() {
 }
 
 function JobsFilePath() {
-	let applicationConfig = Visual(GetState(), ApplicationConfig);
+	let applicationConfig = getAppConfig();
 	if (applicationConfig && applicationConfig[JOBS_FILE_PATH]) {
 		return applicationConfig[JOBS_FILE_PATH];
 	}
@@ -754,6 +781,7 @@ export interface JobOutput {
 export interface JobFile {
 	started?: boolean;
 	completed?: boolean;
+	name?: string;
 	updated?: number;
 	jobPath?: string;
 	updatedGraph?: Graph;
@@ -762,6 +790,7 @@ export interface JobFile {
 	graphPath: string;
 	error?: string;
 	step?: string;
+	stages?: string[];
 }
 
 const isDirectory = (source: any) => fs.lstatSync(source).isDirectory();

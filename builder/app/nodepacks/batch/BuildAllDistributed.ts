@@ -12,7 +12,8 @@ import {
 	executeGraphOperation,
 	setVisual,
 	BuildAllProgress,
-	NodeTypes
+	NodeTypes,
+  clearPinned
 } from '../../actions/uiactions';
 import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
@@ -157,6 +158,12 @@ export const BuildAllInfo = {
 	Commands: buildAllProgress,
 	InitialStep: Create_View_Types
 };
+export function GetStepIndex(step: string) {
+	return buildAllProgress.findIndex((x) => x.name === step) + 1;
+}
+export function GetStepCount() {
+	return buildAllProgress.length;
+}
 export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
 	setCommandToRun(command);
 	const uiTypes = {
@@ -277,10 +284,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
 				await progresFunc(index / total);
 			});
+      clearPinned();
 			await progresFunc(1);
 		});
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
-			currentJobFile.completed = true;
+      currentJobFile.completed = true;
 		});
 	} catch (e) {
 		console.log(e);

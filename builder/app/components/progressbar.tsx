@@ -7,8 +7,8 @@ import React, { Component } from 'react';
 import ProgressCircle from './progresscircle';
 // import * as styles from './progressbar.scss';
 
-export default class ProgressBar extends Component {
-	static formatTime(time) {
+export default class ProgressBar extends Component<any, any> {
+	static formatTime(time: any) {
 		let result = time;
 		if (time > 1000) {
 			result = `${(time / 1000).toFixed(2)}s`;

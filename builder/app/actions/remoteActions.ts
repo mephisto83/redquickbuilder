@@ -31,7 +31,6 @@ import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
-const dialog = remote.dialog;
 
 export function openGraph() {
 	openRedQuickBuilderGraph()(_dispatch, _getState);
@@ -71,6 +70,8 @@ export function setRightMenuTab(num: any) {
 }
 export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
 	return (dispatch: Function, getState: any) => {
+		const remote = require('electron').remote;
+		const dialog = remote.dialog;
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
 				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ],
@@ -124,6 +125,8 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
 }
 export function openRedQuickBuilderTheme() {
 	return (dispatch: Function) => {
+		const remote = require('electron').remote;
+		const dialog = remote.dialog;
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
 				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_THEME_EXT$ ] } ],
@@ -196,6 +199,9 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 			if (pruneGraph) {
 				savecontent = JSON.stringify(prune(currentGraph));
 			}
+
+			const remote = require('electron').remote;
+			const dialog = remote.dialog;
 			dialog
 				.showSaveDialog(remote.getCurrentWindow(), {
 					filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ]
@@ -235,6 +241,9 @@ export function setJobFolder(key: string) {
 		let currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
 		if (currentGraph) {
+			const remote = require('electron').remote;
+			const dialog = remote.dialog;
+
 			dialog
 				.showOpenDialog(remote.getCurrentWindow(), {
 					properties: [ 'openDirectory' ]
@@ -289,6 +298,8 @@ export function loadApplicationConfig() {
 
 export function saveRecording(recording: any) {
 	return (dispatch: any, getState: any) => {
+		const remote = require('electron').remote;
+		const dialog = remote.dialog;
 		dialog
 			.showSaveDialog(remote.getCurrentWindow(), {
 				filters: [
@@ -326,6 +337,8 @@ export function saveRecording(recording: any) {
 
 export function saveTheme(theme: any) {
 	return (dispatch: any, getState: any) => {
+		const remote = require('electron').remote;
+		const dialog = remote.dialog;
 		dialog
 			.showSaveDialog(remote.getCurrentWindow(), {
 				filters: [
@@ -412,6 +425,8 @@ export function setWorkingDirectory() {
 		let currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
 		if (currentGraph) {
+			const remote = require('electron').remote;
+			const dialog = remote.dialog;
 			dialog
 				.showOpenDialog(remote.getCurrentWindow(), {
 					properties: [ 'openDirectory' ]

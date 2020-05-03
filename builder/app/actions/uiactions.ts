@@ -13,7 +13,7 @@ import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink } from '../methods/graph_types';
-import JobService, { Job, JobAssignment } from '../jobs/jobservice';
+import JobService, { Job, JobAssignment, JobFile } from '../jobs/jobservice';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -1088,7 +1088,7 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	}
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
-  const setProcess: string[] = [];
+	const setProcess: string[] = [];
 	chain.forEach((c: any, index: number) => {
 		if (index === 0) {
 			args = GetDataChainArgs(c);
@@ -3153,31 +3153,44 @@ export function setState() {
 }
 
 export const JOBS = 'JOBS';
+export const JOB_FILES = 'JOB_FILES';
 export function loadGitRuns() {
 	return (dispatch: Function, getState: Function) => {
-		JobService.getJobs().then(async (jobs) => {
-			setVisual(JOBS, jobs)(dispatch, getState);
-			await jobs.forEachAsync(async (jobInstance: Job) => {
-				let jobProgress = await JobService.JobProgress(jobInstance);
-				setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
-				let { parts } = jobInstance;
-				if (parts) {
-					parts.forEachAsync(async (dir: string) => {
-						if (parts != null) {
-							// let assignmentProgress = await JobService.JobAssignmentProgress(parts, dir);
-							// setVisual(AssignmentId(assignments, dir), assignmentProgress)(dispatch, getState);
-						}
+		return JobService.getJobs()
+			.then(async (jobs) => {
+				setVisual(JOBS, jobs)(dispatch, getState);
+				await jobs.forEachAsync(async (jobInstance: Job) => {
+					let jobProgress = await JobService.JobProgress(jobInstance);
+					setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
+					let { parts } = jobInstance;
+					if (parts) {
+						parts.forEachAsync(async (dir: string) => {
+							if (parts != null) {
+								let item = await JobService.loadJobItem(jobInstance.name, dir);
+								setVisual(JobItemId(dir), item)(dispatch, getState);
+							}
+						});
+					}
+				});
+			})
+			.then(() => {
+				return JobService.GetJobFiles().then(async (jobFiles: JobFile[]) => {
+					jobFiles.forEach((jf) => {
+						jf.stages = JobService.GetJobFileStages(jf);
 					});
-				}
+					setVisual(JOB_FILES, jobFiles)(dispatch, getState);
+				});
 			});
-		});
 	};
+}
+export function updateJobs() {
+	loadGitRuns()(GetDispatchFunc(), GetStateFunc());
 }
 export function JobProgressId(jobInstance: Job) {
 	return `job-progress-id${jobInstance.name}`;
 }
-export function AssignmentId(assignments: JobAssignment, id: string) {
-	return `assignment-${id}`;
+export function JobItemId(id: string) {
+	return `jobitem-${id}`;
 }
 export function clearPinned() {
 	const state = _getState();

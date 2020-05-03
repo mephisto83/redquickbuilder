@@ -38,7 +38,8 @@ import {
 	GetModelPropertyChildren,
 	GetMethodProps,
 	GetMaestroNode,
-	GetControllerNode
+	GetControllerNode,
+	updateJobs
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -62,6 +63,16 @@ ipcRenderer.on('message-reply', (event, arg) => {
 		hub[reply.id].resolve(reply.msg);
 	}
 	delete hub[reply.id];
+});
+
+ipcRenderer.on('update-jobs', (event, arg) => {
+	console.log(event);
+	console.log(arg);
+	switch (arg.args) {
+		case 'update-jobs':
+			updateJobs();
+			break;
+	}
 });
 
 ipcRenderer.on('commands', (event, arg) => {

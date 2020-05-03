@@ -140,7 +140,9 @@ export default class Distribution {
 					},
 					[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 					[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
-					[RedQuickDistributionCommand.RaisingHand]: noOp,
+          [RedQuickDistributionCommand.RaisingHand]: noOp,
+          [RedQuickDistributionCommand.SetCommandCenter]: noOp,
+          [RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
 					[RedQuickDistributionCommand.SendFile]: noOp,
 					[RedQuickDistributionCommand.SetAgentProjects]: noOp,
 					[RedQuickDistributionCommand.CompletedJobItem]: noOp

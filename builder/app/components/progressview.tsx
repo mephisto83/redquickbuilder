@@ -11,56 +11,31 @@
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 import TopViewer from './topviewer';
-import { StyleLib } from '../constants/styles';
 
 import {
-	ThemeColors,
-	FormThemePropertyKeys,
-	HTMLElementGroups,
-	ColorUses,
-	OtherUses,
-	CssPseudoSelectors
-} from '../constants/themes';
-import {
 	GetCurrentGraph,
-	GUID,
-	GetNodes,
-	GetNodeTitle,
-	NodesByType,
-	NodeProperties,
-	GetNodeProp,
 	BuildAllProgress,
 	Visual,
 	VisualEq,
 	JOBS,
 	JobProgressId,
-	AssignmentId
+	JobItemId
 } from '../actions/uiactions';
-import TextInput from './textinput';
-import ColorInput from './colorinput';
 import Box from './box';
-import FormControl from './formcontrol';
 import * as Titles from './titles';
-import SelectInput from './selectinput';
-import { ComponentTags } from '../constants/componenttypes';
-import CheckBox from './checkbox';
-import ButtonList from './buttonlist';
-import Typeahead from './typeahead';
-import { MediaQueries, Languages, NodeTypes, PROGRESS_VIEW } from '../constants/nodetypes';
-import translationservice from '../service/translationservice';
-import GridPlacementField from './gridplacementfield';
 import ProgressBar from './progressbar';
 import TabContainer from './tabcontainer';
 import Tabs from './tabs';
 import Tab from './tab';
 import TabPane from './tabpane';
 import TabContent from './tabcontent';
-import { Job, JobAssignment, JobItem } from '../jobs/jobservice';
+import { Job, JobItem } from '../jobs/jobservice';
+import JobFilesPane from './jobfilespane';
 
 const PROGRESS_VIEW_TAB = 'PROGRESS_VIEW_TAB';
 
 class ProgressView extends Component<any, any> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}
@@ -69,7 +44,7 @@ class ProgressView extends Component<any, any> {
 		return !!this.props.active;
 	}
 
-	getTranslation(item, language) {
+	getTranslation(item: any, language: any) {
 		if (item && item.properties && item.properties.languages) {
 			return `${language}: ${item.properties.languages[language]}`;
 		}
@@ -85,7 +60,7 @@ class ProgressView extends Component<any, any> {
 		let { state } = this.props;
 		let jobs = Visual(state, JOBS) || [];
 		return (
-			<TopViewer active={active}>
+			<TopViewer active={!!active}>
 				<section className="content">
 					<div className="row">
 						<div className="col-md-12">
@@ -100,7 +75,7 @@ class ProgressView extends Component<any, any> {
 									/>
 									<Tab
 										active={VisualEq(state, PROGRESS_VIEW_TAB, 'Git Run')}
-										title={'Git Run'}
+										title={'Render Run'}
 										onClick={() => {
 											this.props.setVisual(PROGRESS_VIEW_TAB, 'Git Run');
 											this.props.loadGitRuns();
@@ -121,7 +96,7 @@ class ProgressView extends Component<any, any> {
 									<Box
 										maxheight={600}
 										title={Titles.Input}
-										onSearch={(search) => {
+										onSearch={(search: any) => {
 											this.setState({
 												titleSearch: search
 											});
@@ -146,18 +121,19 @@ class ProgressView extends Component<any, any> {
 												</tr>
 												{jobs.map((job: Job, jobIndex: number) => {
 													let jobProgress = Visual(state, JobProgressId(job));
-													let { assignments } = job;
+													let { parts } = job;
 
-													let assignmentRows: any[] = [];
-													if (assignments && this.state[job.nickName]) {
-														assignmentRows = Object.keys(
-															assignments
-														).map((assignmentId) => {
-															if (assignments) {
-																let jobItems: JobItem[] = assignments[assignmentId];
+													let jobItemRows: any[] = [];
+													if (parts && this.state[job.nickName]) {
+														jobItemRows = parts.map((assignmentId) => {
+															if (parts) {
+																let jobItem: JobItem = Visual(
+																	state,
+																	JobItemId(assignmentId)
+																);
 																let assignemtProgress = Visual(
 																	state,
-																	AssignmentId(assignments, assignmentId)
+																	JobItemId(assignmentId)
 																);
 																return [
 																	<tr>
@@ -172,7 +148,7 @@ class ProgressView extends Component<any, any> {
 																			{' '}
 																			{assignmentId}
 																		</td>
-																		<td>{jobItems ? jobItems.length : 0}</td>
+																		<td>{jobItem ? jobItem.complete : 0}</td>
 																		<td>
 																			<table className="table table-bordered">
 																				<tbody>
@@ -182,54 +158,44 @@ class ProgressView extends Component<any, any> {
 																						<th>Distributed</th>
 																						<th>Progress</th>
 																					</tr>
-																					{jobItems ? (
-																						jobItems.map((jobItem) => {
-																							return (
-																								<tr>
-																									<td>
-																										{jobItem.job}
-																									</td>
-																									<td>
-																										{jobItem.file}
-																									</td>
-																									<td>
-																										{jobItem.distributed ? (
-																											<i className="fa fa-heart" />
-																										) : null}
-																									</td>
-																									<td>
-																										{assignemtProgress ? (
-																											<progress
-																												title={
-																													job.complete ? (
-																														100
-																													) : (
-																														100 *
-																														assignemtProgress.complete /
-																														assignemtProgress.total
-																													)
-																												}
-																												value={
-																													job.complete ? (
-																														100
-																													) : (
-																														100 *
-																														assignemtProgress.complete /
-																														assignemtProgress.total
-																													)
-																												}
-																												min={0}
-																												max={
-																													100
-																												}
-																											/>
-																										) : (
-																											''
-																										)}
-																									</td>
-																								</tr>
-																							);
-																						})
+																					{jobItem ? (
+																						<tr>
+																							<td>{jobItem.job}</td>
+																							<td>{jobItem.file}</td>
+																							<td>
+																								{jobItem.distributed ? (
+																									<i className="fa fa-heart" />
+																								) : null}
+																							</td>
+																							<td>
+																								{assignemtProgress ? (
+																									<progress
+																										title={
+																											job.complete ? (
+																												`100`
+																											) : (
+																												`${100 *
+																													assignemtProgress.complete /
+																													assignemtProgress.total}`
+																											)
+																										}
+																										value={
+																											job.complete ? (
+																												100
+																											) : (
+																												100 *
+																												assignemtProgress.complete /
+																												assignemtProgress.total
+																											)
+																										}
+																										min={0}
+																										max={100}
+																									/>
+																								) : (
+																									''
+																								)}
+																							</td>
+																						</tr>
 																					) : null}
 																				</tbody>
 																			</table>
@@ -291,7 +257,7 @@ class ProgressView extends Component<any, any> {
 														<tr>
 															<td colSpan="8">
 																<table className="table table-bordered">
-																	{assignmentRows}
+																	{jobItemRows}
 																</table>
 															</td>
 														</tr>
@@ -301,6 +267,7 @@ class ProgressView extends Component<any, any> {
 										</table>
 									</Box>
 								</TabPane>
+                <JobFilesPane />
 							</TabContent>
 						</div>
 					</div>
