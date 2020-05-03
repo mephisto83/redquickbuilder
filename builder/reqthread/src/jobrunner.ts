@@ -6,7 +6,8 @@ import JobService, {
 	getFiles,
 	JobFile,
 	getDirectories,
-	ensureDirectory
+	ensureDirectory,
+  path_join
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 import { GetCurrentGraph } from '../../app/actions/uiactions';
@@ -131,14 +132,14 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 	if (message.projectName) {
 		if (message.fileName) {
 			console.log(communicationTower.agentName || '');
-			let relativePath = path.join(
+			let relativePath = path_join(
 				JobServiceConstants.JobPath(),
 				communicationTower.agentName || '',
 				message.projectName,
 				message.fileName
 			);
 			console.log(relativePath);
-			if (fs.existsSync(path.join(relativePath, JobServiceConstants.OUTPUT))) {
+			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
 					let completed = await JobService.SetJobPartComplete(relativePath);
@@ -146,7 +147,7 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 					if (!completed) {
 						throw new Error('job was not set to completed');
 					}
-					fs.writeFileSync(path.join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+					fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
 
 					await tellCommandCenter();
 					return {
@@ -218,7 +219,7 @@ async function processJobs() {
 		// Get jobs from ./jobs directory.
 		let projectFolders = getDirectories(JobServiceConstants.JobsFilePath());
 		await projectFolders.forEachAsync(async (projectFolder) => {
-			let jobFilePath = path.join(
+			let jobFilePath = path_join(
 				JobServiceConstants.JobsFilePath(),
 				projectFolder,
 				JobServiceConstants.JOB_NAME
@@ -255,8 +256,8 @@ async function executeStep(jobFilePath: string) {
 			console.log('save current graph to');
 			delete jobConfig.updatedGraph;
 			await saveCurrentGraphTo(graphPath, cg);
-			await ensureDirectory(path.join(path.dirname(graphPath), 'stages'));
-			await saveCurrentGraphTo(path.join(path.dirname(graphPath), 'stages', `${step.name}.rqb`), cg);
+			await ensureDirectory(path_join(path.dirname(graphPath), 'stages'));
+			await saveCurrentGraphTo(path_join(path.dirname(graphPath), 'stages', `${step.name}.rqb`), cg);
 			jobConfig.step = step.name;
 			console.log(jobConfig.step);
 		} catch (e) {
@@ -275,7 +276,7 @@ async function createJobs() {
 		let jobFiles = getFiles(JobServiceConstants.JobsFilePath());
 		await jobFiles.forEachAsync(async (jobFileName) => {
 			try {
-				let jobFilePath = path.join(JobServiceConstants.JobsFilePath(), jobFileName);
+				let jobFilePath = path_join(JobServiceConstants.JobsFilePath(), jobFileName);
 				let fileContents = fs.readFileSync(jobFilePath, 'utf8');
 				let jobFile: JobFile = JSON.parse(fileContents);
 				if (jobFile && jobFile.graphPath && !jobFile.created) {
