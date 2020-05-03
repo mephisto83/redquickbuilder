@@ -1350,7 +1350,21 @@ class Dashboard extends Component {
 										title={Titles.Open}
 										icon="fa fa-folder-open"
 										onClick={() => {
-											this.props.openRedQuickBuilderGraph(true);
+											this.props.openRedQuickBuilderGraph(
+												true,
+												UIA.Visual(state, 'clear_pinned_nodes')
+											);
+										}}
+									/>
+									<NavBarButton
+										title={
+											UIA.Visual(state, 'clear_pinned_nodes') ? 'without pinned' : 'with pinned'
+										}
+										onClick={() => {
+											this.props.setVisual(
+												'clear_pinned_nodes',
+												!!!UIA.Visual(state, 'clear_pinned_nodes')
+											);
 										}}
 									/>
 									<NavBarButton

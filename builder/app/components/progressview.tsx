@@ -254,20 +254,22 @@ class ProgressView extends Component<any, any> {
 																) : null}
 															</td>
 														</tr>,
-														<tr>
-															<td colSpan="8">
-																<table className="table table-bordered">
-																	{jobItemRows}
-																</table>
-															</td>
-														</tr>
-													];
+														jobItemRows && jobItemRows.length ? (
+															<tr>
+																<td colSpan="8">
+																	<table className="table table-bordered">
+																		{jobItemRows}
+																	</table>
+																</td>
+															</tr>
+														) : null
+													].filter((x) => x);
 												})}
 											</tbody>
 										</table>
 									</Box>
 								</TabPane>
-                <JobFilesPane />
+								<JobFilesPane />
 							</TabContent>
 						</div>
 					</div>

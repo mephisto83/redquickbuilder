@@ -92,12 +92,14 @@ class JobFilesPane extends Component<any, any> {
 											) : null}
 										</td>
 									</tr>,
-									<tr>
-										<td colSpan="8">
-											<table className="table table-bordered">{jobItemRows}</table>
-										</td>
-									</tr>
-								];
+									jobItemRows && jobItemRows.length && false ? (
+										<tr>
+											<td colSpan="8">
+												<table className="table table-bordered">{jobItemRows}</table>
+											</td>
+										</tr>
+									) : null
+								].filter((x: any) => x);
 							})}
 						</tbody>
 					</table>

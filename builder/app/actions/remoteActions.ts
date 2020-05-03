@@ -20,7 +20,8 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	GetCurrentGraph,
-	ApplicationConfig
+	ApplicationConfig,
+  clearPinned
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -68,7 +69,7 @@ export function setRightMenuTab(num: any) {
 			break;
 	}
 }
-export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
+export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: boolean) {
 	return (dispatch: Function, getState: any) => {
 		const remote = require('electron').remote;
 		const dialog = remote.dialog;
@@ -110,7 +111,10 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean) {
 							opened_graph = { ...default_graph, ...opened_graph };
 							SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
 							SaveGraph(opened_graph, dispatch);
-							setupCache(opened_graph);
+              setupCache(opened_graph);
+              if(unpinned){
+                clearPinned();
+              }
 						}
 					} catch (e) {
 						console.log(e);
