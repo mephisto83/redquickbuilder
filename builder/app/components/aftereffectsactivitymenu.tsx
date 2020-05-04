@@ -10,7 +10,7 @@ import FormControl from './formcontrol';
 import { SetAffterEffectProperty, GetMethodNode, GetNode, TARGET, GetLinkChain, SOURCE } from '../methods/graph_methods';
 import { LinkType, Methods } from '../constants/nodetypes';
 
-class AfterEffectsActivityMenu extends Component {
+class AfterEffectsActivityMenu extends Component<any, any> {
 	getControls() {
 		var { state } = this.props;
 		var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 let navigationInstance;
 
 export default class Validation extends React.Component {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};

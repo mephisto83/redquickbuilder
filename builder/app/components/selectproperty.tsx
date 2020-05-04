@@ -5,7 +5,7 @@ import * as UIA from "../actions/uiactions";
 import CheckBox from "./checkbox";
 import SelectInput from "./selectinput";
 
-class SelectProperty extends Component {
+class SelectProperty extends Component<any, any> {
   render() {
     let currentNode = this.props.node;
     return (
@@ -14,7 +14,7 @@ class SelectProperty extends Component {
         title={this.props.title}
         options={this.props.options}
         value={UIA.GetNodeProp(currentNode, this.props.property)}
-        onChange={value => {
+        onChange={(value: any) => {
           let ops = [];
           if (this.props.link) {
             let oldprop = UIA.GetNodeProp(currentNode, this.props.property);

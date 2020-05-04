@@ -15,8 +15,8 @@ import TextInput from './textinput';
 import SideMenuContainer from './sidemenucontainer';
 import ButtonList from './buttonlist';
 import { SCOPE_TAB } from './dashboard';
-class ComponentPropertyMenu extends Component {
-    constructor(props) {
+class ComponentPropertyMenu extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {};
     }

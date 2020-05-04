@@ -10,7 +10,7 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 
-class ValidationItemFormControl extends Component {
+class ValidationItemFormControl extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ValidationListItem);

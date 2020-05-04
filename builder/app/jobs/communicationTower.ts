@@ -13,6 +13,7 @@ export interface RedQuickDistributionMessage {
 	hostname?: string | null;
 	projects?: any;
 	fileName?: any;
+	filePath?: any;
 	error?: boolean;
 	errorMessage?: string;
 	relativePath?: string;
@@ -53,6 +54,7 @@ export default class CommunicationTower {
 	listeners: CommunicationTowerListen;
 	baseFolder: string;
 	serverPort: any;
+	ctPort: any;
 	constructor() {
 		this.topDirectory = '';
 		this.ports = {};
@@ -116,13 +118,13 @@ export default class CommunicationTower {
 		this.topDirectory = config.topDirectory;
 		this.baseFolder = config.baseFolder;
 		this.agentName = config.agentName;
-		this.serverPort = config.serverPort || 8000;
+		this.serverPort = config.serverPort;
 		this.sockets = [];
 		this.ports = {};
 	}
-	start(listeners: CommunicationTowerListen) {
+	async start(listeners: CommunicationTowerListen) {
 		this.listeners = listeners;
-		this.startServers();
+		await this.startServers();
 	}
 	handleRequest(request: http.IncomingMessage, response: http.ServerResponse) {
 		const { headers, method, url } = request;
@@ -251,11 +253,7 @@ export default class CommunicationTower {
 	}
 	async receiveFile(req: any) {
 		return await new Promise(async (resolve, fail) => {
-			let requestedPath = path.join(
-				this.baseFolder,
-				this.agentName || '',
-				(req.filePath || []).join(path.sep)
-			);
+			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
 			console.log(`writing to: ${requestedPath}`);
 			let socket: net.Socket;
@@ -304,15 +302,27 @@ export default class CommunicationTower {
 		let address: any = this.getIpaddress();
 		await this.setupPorts();
 		let port = this.serverPort;
-		const server = http.createServer((request, res) => {
-			this.handleRequest(request, res);
+		await new Promise((resolve, fail) => {
+			const server = http.createServer((request, res) => {
+				this.handleRequest(request, res);
+			});
+			server.on('clientError', (err, socket) => {
+				socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+			});
+			server.listen(port, address.hostname, () => {
+				let portAddr: any = server.address();
+				let port = portAddr && portAddr.port ? portAddr.port : null;
+				this.setPort(port);
+        console.log(`Server running at http://${address.hostname}:${port}/`);
+        resolve();
+			});
 		});
-		server.on('clientError', (err, socket) => {
-			socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-		});
-		server.listen(port, address.hostname, () => {
-			console.log(`Server running at http://${address.hostname}:${port}/`);
-		});
+	}
+	setPort(port: any) {
+		this.ctPort = port;
+	}
+	getPort() {
+		return this.ctPort;
 	}
 	getIpaddress() {
 		var ifaces = os.networkInterfaces();

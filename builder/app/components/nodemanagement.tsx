@@ -12,8 +12,8 @@ import { NodeProperties } from "../constants/nodetypes";
 
 const NODE_MANAGEMENT_MENU = "NODE_MANAGEMENT_MENU";
 const NODE_MANAGEMENT = "NODE_MANAGEMENT";
-class NodeManagement extends Component {
-  constructor(props) {
+class NodeManagement extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {
       filter: ""
@@ -148,7 +148,7 @@ class NodeManagement extends Component {
           <TextInput
             value={this.state.filter}
             immediate={false}
-            onChange={value => {
+            onChange={(value: any) => {
               this.setState({ filter: value });
             }}
             inputgroup={true}

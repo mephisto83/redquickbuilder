@@ -5,7 +5,7 @@ let navigationInstance;
 import StyleProvider from './styleprovider';
 
 export default class StyleSheet extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {};

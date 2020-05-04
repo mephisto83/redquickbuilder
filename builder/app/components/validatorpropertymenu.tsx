@@ -16,7 +16,7 @@ import { NodeProperties, NodeTypes, LinkEvents, LinkType } from '../constants/no
 import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, createEventProp, GetNode } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 
-class ValidatorPropertyMenu extends Component {
+class ValidatorPropertyMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Validator);

@@ -15,7 +15,7 @@ import {
 import { Iterator } from "webcola";
 import { ServiceTypes, ServiceTypeSetups } from "../constants/servicetypes";
 import { InstanceTypes } from "../constants/componenttypes";
-class SelectorActivityMenu extends Component {
+class SelectorActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Selector);

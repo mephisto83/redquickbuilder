@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class CheckBox extends Component {
+export default class CheckBox extends Component<any, any> {
   label() {
     return this.props.label || '{label}';
   }

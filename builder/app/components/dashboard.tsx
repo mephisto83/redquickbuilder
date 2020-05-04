@@ -119,7 +119,8 @@ import {
 	THEME_VIEW,
 	TRANSLATION_VIEW,
 	PROGRESS_VIEW,
-	AGENT_ACCESS_VIEW
+	AGENT_ACCESS_VIEW,
+	CODE_EDITOR
 } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
@@ -139,6 +140,7 @@ import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
 import { JobServiceConstants } from '../jobs/jobservice';
+import CodeEditor from './codeeditor';
 
 const { clipboard } = require('electron');
 
@@ -146,7 +148,7 @@ const SIDE_PANEL_OPEN = 'side-panel-open';
 const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 const LINK_DISTANCE = 'LINK_DISTANCE';
-class Dashboard extends Component {
+class Dashboard extends Component<any, any> {
 	componentDidMount() {
 		this.props.setState();
 		this.props.setRemoteState();
@@ -1347,10 +1349,31 @@ class Dashboard extends Component {
 										}}
 									/>
 									<NavBarButton
+										title={'CODE_EDITOR'}
+										icon="fa fa-code"
+										onClick={() => {
+											this.props.setVisual(MAIN_CONTENT, CODE_EDITOR);
+										}}
+									/>
+									<NavBarButton
 										title={Titles.Open}
 										icon="fa fa-folder-open"
 										onClick={() => {
-											this.props.openRedQuickBuilderGraph(true);
+											this.props.openRedQuickBuilderGraph(
+												true,
+												UIA.Visual(state, 'clear_pinned_nodes')
+											);
+										}}
+									/>
+									<NavBarButton
+										title={
+											UIA.Visual(state, 'clear_pinned_nodes') ? 'without pinned' : 'with pinned'
+										}
+										onClick={() => {
+											this.props.setVisual(
+												'clear_pinned_nodes',
+												!!!UIA.Visual(state, 'clear_pinned_nodes')
+											);
 										}}
 									/>
 									<NavBarButton
@@ -1697,6 +1720,7 @@ class Dashboard extends Component {
 							<AgentAccessView active={UIA.Visual(state, MAIN_CONTENT) === AGENT_ACCESS_VIEW} />
 							<TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
 							<ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
+							<CodeEditor active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR} />
 							{mainContent === MIND_MAP || true ? (
 								<MindMap
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}

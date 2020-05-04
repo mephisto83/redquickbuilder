@@ -13,7 +13,7 @@ import { Functions, FunctionConstraintKeys } from '../constants/functiontypes';
 import { getNodesLinkedTo } from '../methods/graph_methods';
 import { LinkPropertyKeys } from '../constants/nodetypes';
 
-class MaestroActivityMenu extends Component {
+class MaestroActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Maestro);

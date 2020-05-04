@@ -12,7 +12,7 @@ import ButtonList from './buttonlist';
 import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties, GeneratedDataTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
-class PropertyActivityMenu extends Component {
+class PropertyActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Property);

@@ -2,7 +2,7 @@ import * as React from 'react';
 import StyleProvider from './styleprovider';
 
 export default class Content extends React.Component {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {};

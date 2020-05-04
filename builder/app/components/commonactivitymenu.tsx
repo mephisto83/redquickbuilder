@@ -10,7 +10,7 @@ import TextBox from './textinput';
 import { ExcludeDefaultNode } from '../constants/nodetypes';
 import { PARAMETER_TAB } from './dashboard';
 
-class CommonActivityMenu extends Component {
+class CommonActivityMenu extends Component<any, any> {
   render() {
     const { state } = this.props;
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

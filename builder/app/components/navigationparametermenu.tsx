@@ -18,7 +18,7 @@ import TreeViewMenu from './treeviewmenu';
 import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
 const NAVIGATION_PARAMETERS = 'NAVIGATION_PARAMETERS';
-class NavigationParameterMenu extends Component {
+class NavigationParameterMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

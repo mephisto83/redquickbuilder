@@ -5,7 +5,7 @@ import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } 
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
-class ValidationActivityMenu extends Component {
+class ValidationActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ValidationList);

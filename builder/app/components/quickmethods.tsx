@@ -35,7 +35,7 @@ import StartJob from '../nodepacks/batch/StartJob';
 import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 
 class QuickMethods extends Component<any, any, any> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {
 			selectedMethods: {}

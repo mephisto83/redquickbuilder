@@ -13,7 +13,7 @@ import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties, UITypes, MAIN_CONTENT, MIND_MAP, LAYOUT_VIEW } from '../constants/nodetypes';
 import { GetNode, CreateLayout } from '../methods/graph_methods';
 import { ComponentTypes } from '../constants/componenttypes';
-class ScreenOptionsActivityMenu extends Component {
+class ScreenOptionsActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ScreenOption);

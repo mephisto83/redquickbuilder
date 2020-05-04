@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-export default class Input extends Component {
-    constructor(props) {
+export default class Input extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {};
     }

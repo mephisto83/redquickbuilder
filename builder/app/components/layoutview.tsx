@@ -40,8 +40,8 @@ import FormControl from "./formcontrol";
 import { StyleLib } from "../constants/styles";
 import Typeahead from "./typeahead";
 
-class LayoutView extends Component {
-  constructor(props) {
+class LayoutView extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -90,7 +90,7 @@ class LayoutView extends Component {
             label={Titles.ComponentAPIMenu}
             value={selectedComponentApiProperty}
             options={getComponentApiList(componentApi)}
-            onChange={value => {
+            onChange={(value: any) => {
               this.setState({
                 componentApi: {
                   ...(this.state.componentApi || {}),
@@ -108,7 +108,7 @@ class LayoutView extends Component {
                   title: t,
                   value: HandlerTypes[t]
                 }))}
-                onChange={value => {
+                onChange={(value: any) => {
                   cellProperties.componentApi[selectedComponentApiProperty] =
                     cellProperties.componentApi[selectedComponentApiProperty] ||
                     {};
@@ -138,7 +138,7 @@ class LayoutView extends Component {
                 title: t,
                 value: InstanceTypes[t]
               }))}
-              onChange={value => {
+              onChange={(value: any) => {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
@@ -162,7 +162,7 @@ class LayoutView extends Component {
                   state,
                   NodeTypes.Selector
                 ).toNodeSelect()}
-                onChange={value => {
+                onChange={(value: any) => {
                   cellProperties.componentApi[selectedComponentApiProperty] =
                     cellProperties.componentApi[selectedComponentApiProperty] ||
                     {};
@@ -212,7 +212,7 @@ class LayoutView extends Component {
                   state,
                   NodeTypes.ViewModel
                 ).toNodeSelect()}
-                onChange={value => {
+                onChange={(value: any) => {
                   cellProperties.componentApi[selectedComponentApiProperty] =
                     cellProperties.componentApi[selectedComponentApiProperty] ||
                     {};
@@ -257,7 +257,7 @@ class LayoutView extends Component {
             instanceType === InstanceTypes.ScreenInstance ? (
               <SelectInput
                 options={properties}
-                onChange={val => {
+                onChange={(val: any) => {
                   cellProperties.componentApi[selectedComponentApiProperty] =
                     cellProperties.componentApi[selectedComponentApiProperty] ||
                     {};
@@ -269,16 +269,16 @@ class LayoutView extends Component {
 
                   this.props.graphOperation([
                     {
-                      operation: REMOVE_LINK_BETWEEN_NODES,
+                      operation: UIA.REMOVE_LINK_BETWEEN_NODES,
                       options: {
                         target: old,
                         source: currentNode.id
                       }
                     },
                     {
-                      operation: ADD_LINK_BETWEEN_NODES,
+                      operation: UIA.ADD_LINK_BETWEEN_NODES,
                       options: {
-                        target: value,
+                        target: val,
                         source: currentNode.id,
                         properties: {
                           ...UIA.LinkProperties.ComponentApi,
@@ -303,7 +303,7 @@ class LayoutView extends Component {
           selectedComponentApiProperty ? (
             <SelectInput
               options={UIA.GetDataChainEntryNodes().toNodeSelect()}
-              onChange={val => {
+              onChange={(val: any) => {
                 cellProperties.componentApi[selectedComponentApiProperty] =
                   cellProperties.componentApi[selectedComponentApiProperty] ||
                   {};
@@ -515,7 +515,7 @@ class LayoutView extends Component {
                 ) : null}
                 <SelectInput
                   options={[].interpolate(1, 20, t => ({ title: t, value: t }))}
-                  onChange={val => {
+                  onChange={(val: any) => {
                     let layout =
                       UIA.GetNodeProp(currentNode, NodeProperties.Layout) ||
                       CreateLayout();
@@ -537,7 +537,7 @@ class LayoutView extends Component {
                 {cellChildren ? (
                   <SelectInput
                     options={componentNodes.toNodeSelect()}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       cellChildren[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -555,7 +555,7 @@ class LayoutView extends Component {
                   this.state.selectedCell ? (
                     <TextInput
                       immediate
-                      onChange={val => {
+                      onChange={(val: any) => {
                         const layout = nodeLayout || CreateLayout();
                         if (!cellProperties.name !== "object") {
                           cellProperties.name = {};
@@ -578,7 +578,7 @@ class LayoutView extends Component {
                       title: t,
                       value: t
                     }))}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       cellStyle.flexDirection = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -598,7 +598,7 @@ class LayoutView extends Component {
                       title: t,
                       value: t
                     }))}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       if (!parseInt(val)) cellStyle.flex = null;
                       else cellStyle.flex = parseInt(val);
@@ -620,7 +620,7 @@ class LayoutView extends Component {
                       "center",
                       "space-between"
                     ].map(t => ({ title: t, value: t }))}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
 
                       cellStyle.justifyContent = val;
@@ -642,7 +642,7 @@ class LayoutView extends Component {
                       "center",
                       "stretch"
                     ].map(t => ({ title: t, value: t }))}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
 
                       cellStyle.alignItems = val;
@@ -659,7 +659,7 @@ class LayoutView extends Component {
                 {cellStyle ? (
                   <TextInput
                     immediate
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       let percentage = 0;
                       if ((val || "").indexOf("%") !== -1) {
@@ -680,7 +680,7 @@ class LayoutView extends Component {
                 {cellStyle ? (
                   <TextInput
                     immediate
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       let percentage = 0;
                       if ((val || "").indexOf("%") !== -1) {
@@ -705,7 +705,7 @@ class LayoutView extends Component {
                 {cellChildren && cellChildren[this.state.selectedCell] ? (
                   <CheckBox
                     label={Titles.UseAsRoot}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
                       cellRoot[this.state.selectedCell] = val;
                       this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -724,7 +724,7 @@ class LayoutView extends Component {
                   componentPropertiesList.length ? (
                     <SelectInput
                       options={componentPropertiesList}
-                      onChange={val => {
+                      onChange={(val: any) => {
                         const layout = nodeLayout || CreateLayout();
                         cellModel[this.state.selectedCell] = val;
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -749,7 +749,7 @@ class LayoutView extends Component {
                         ),
                         direction: SOURCE
                       }).toNodeSelect()}
-                      onChange={val => {
+                      onChange={(val: any) => {
                         const layout = nodeLayout || CreateLayout();
                         cellModelProperty[this.state.selectedCell] = val;
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -770,7 +770,7 @@ class LayoutView extends Component {
                       title: t,
                       value: t
                     }))}
-                    onChange={val => {
+                    onChange={(val: any) => {
                       const layout = nodeLayout || CreateLayout();
 
                       cellProperties.properties.componentType = val;
@@ -791,7 +791,7 @@ class LayoutView extends Component {
                     inputgroup
                     immediate
                     value={this.state.componentTag}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({
                         componentTag: value
                       })
@@ -825,7 +825,7 @@ class LayoutView extends Component {
                   <TextInput
                     value={this.state.filter}
                     immediate
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({ filter: value });
                     }}
                     placeholder={Titles.Filter}

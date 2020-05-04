@@ -19,7 +19,7 @@ import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
 import { MethodFunctions } from '../constants/functiontypes';
 const METHOD_PARAMETERS = 'METHOD_PARAMETERS';
-class MethodParameterMenu extends Component {
+class MethodParameterMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 
 
-export default class EnumeratedTable extends Component {
+export default class EnumeratedTable extends Component<any, any> {
     render() {
         var me = this;
         var dataFunc = me.props.dataFunc || ((y) => y || '');

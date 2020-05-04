@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import TextInput from './textinput';
 
-export default class Typeahead extends Component {
-	constructor(props) {
+export default class Typeahead extends Component<any, any> {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}

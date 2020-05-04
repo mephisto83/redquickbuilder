@@ -24,7 +24,7 @@ import { PERMISSION, FILTER, VALIDATION } from '../constants/condition';
 import { DataChainContextMethods } from '../constants/datachain';
 const CONDITION_FILTER_MENU_PARAMETER = 'condition-filter-menu-parameter';
 const DATA_SOURCE = 'DATA_SOURCE';
-class ModelContextMenu extends Component {
+class ModelContextMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

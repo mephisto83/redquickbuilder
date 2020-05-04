@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 
-export default class TabContent extends Component {
+export default class TabContent extends Component<any, any> {
     active() {
         return this.props.active ? 'active' : '';
     }

@@ -6,7 +6,7 @@ import TabPane from './tabpane';
 import { UIConnect } from '../utils/utils';
 
 
-class CommandHeader extends Component {
+class CommandHeader extends Component<any, any> {
     icon() {
         if (this.props.open) {
             return this.props.icon || 'fa fa-angle-down';

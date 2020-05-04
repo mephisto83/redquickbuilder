@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class LayoutCreator extends Component {
+export default class LayoutCreator extends Component<any, any> {
     buildLayoutTree(layoutObj, currentRoot) {
         let result = [];
         let { layout, properties } = layoutObj;

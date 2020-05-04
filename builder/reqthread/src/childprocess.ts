@@ -13,43 +13,41 @@ export default class ChildProcess implements DistrThread {
 	changeFunc: (arg: any) => Promise<void>;
 	constructor(
 		public options: ChildProcessOptions,
-		public config: DistrConfig,
-		callback: (response: string) => Promise<void>
+		public config: DistrConfig
 	) {
 		console.log('starting thread @ ' + (config.entryPath || path.join('./dist/thread.js')));
 		const thread = child_process.fork(config.entryPath || path.join('./dist/thread.js'));
 		thread.on('message', (message: ThreadMessage) => {
 			let { id, response, complete, changed } = message;
-			if (this.threadResponse) {
-				this.threadResponse.used = false;
-				try {
-					callbackChain = callbackChain
-						.then(async () => {
-							await callback(response);
-						})
-						.catch((e) => {
-							console.log(e);
-						});
-					// probably can go away
-					if (changed) {
-						this.changeFunc(message);
-					}
-					if (complete) {
-						this.completed(message);
-					}
-					// to here
-				} catch (e) {
-					console.error(e);
-					this.errored(message);
-				}
-				if (this.commandQueue && this.commandQueue.length) {
-					let command = this.commandQueue.shift();
-					this.threadResponse.used = true;
-					this.threadResponse.thread.send({
-						...command
-					});
-				}
-			}
+			// if (this.threadResponse) {
+			// 	this.threadResponse.used = false;
+			// 	try {
+			// 		callbackChain = callbackChain
+			// 			.then(async () => {
+			// 			})
+			// 			.catch((e) => {
+			// 				console.log(e);
+			// 			});
+			// 		// probably can go away
+			// 		if (changed) {
+			// 			this.changeFunc(message);
+			// 		}
+			// 		if (complete) {
+			// 			this.completed(message);
+			// 		}
+			// 		// to here
+			// 	} catch (e) {
+			// 		console.error(e);
+			// 		this.errored(message);
+			// 	}
+			// 	if (this.commandQueue && this.commandQueue.length) {
+			// 		let command = this.commandQueue.shift();
+			// 		this.threadResponse.used = true;
+			// 		this.threadResponse.thread.send({
+			// 			...command
+			// 		});
+			// 	}
+			// }
 		});
 		let initialCommand: Command = {
 			message: {
@@ -96,10 +94,9 @@ export default class ChildProcess implements DistrThread {
 	}
 	static async init(
 		config: DistrConfig,
-		childProcessOptions: ChildProcessOptions,
-		callback: (response: string) => Promise<void>
+		childProcessOptions: ChildProcessOptions
 	): Promise<ChildProcess> {
-		let childProces = new ChildProcess(childProcessOptions, config, callback);
+		let childProces = new ChildProcess(childProcessOptions, config);
 
 		return childProces;
 	}

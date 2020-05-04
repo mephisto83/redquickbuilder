@@ -50,8 +50,8 @@ import { PERMISSION, FILTER, VALIDATION } from "../constants/condition";
 import { DataChainContextMethods } from "../constants/datachain";
 const CONDITION_FILTER_MENU_PARAMETER = "condition-filter-menu-parameter";
 const DATA_SOURCE = "DATA_SOURCE";
-class ConditionContextMenu extends Component {
-  constructor(props) {
+class ConditionContextMenu extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }

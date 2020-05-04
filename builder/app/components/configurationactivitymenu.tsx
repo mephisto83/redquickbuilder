@@ -11,7 +11,7 @@ import { TARGET, GetLinkChain, SOURCE, GetNode } from '../methods/graph_methods'
 import { ConditionTypes, ConditionFunctionSetups, ConditionTypeOptions, ConditionTypeParameters } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import TextInput from './textinput';
-class ConfigurationActivityMenu extends Component {
+class ConfigurationActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Configuration);

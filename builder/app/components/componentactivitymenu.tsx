@@ -41,8 +41,8 @@ import CommandHeader from "./commandheader";
 import CheckBox from "./checkbox";
 import { getComponentApiList } from "../methods/component_api_methods";
 import { ViewTypes } from "../constants/viewtypes";
-class ComponentActivityMenu extends Component {
-  constructor(props) {
+class ComponentActivityMenu extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -82,7 +82,7 @@ class ComponentActivityMenu extends Component {
                 title: t,
                 value: InstanceTypes[t]
               }))}
-              onChange={value => {
+              onChange={(value: any) => {
                 componentProperties[selectedComponentApiProperty] =
                   componentProperties[selectedComponentApiProperty] || {};
                 let temp = componentProperties[selectedComponentApiProperty];
@@ -102,7 +102,7 @@ class ComponentActivityMenu extends Component {
               value={apiProperty}
               key={`apiProperty${apiProperty}`}
               options={getComponentApiList(componentApi)}
-              onChange={value => {
+              onChange={(value: any) => {
                 componentProperties[selectedComponentApiProperty] =
                   componentProperties[selectedComponentApiProperty] || {};
                 let temp = componentProperties[selectedComponentApiProperty];
@@ -125,7 +125,7 @@ class ComponentActivityMenu extends Component {
                 this.props.state,
                 NodeTypes.Model
               ).toNodeSelect()}
-              onChange={value => {
+              onChange={(value: any) => {
                 componentProperties[selectedComponentApiProperty] =
                   componentProperties[selectedComponentApiProperty] || {};
                 let temp = componentProperties[selectedComponentApiProperty];
@@ -146,7 +146,7 @@ class ComponentActivityMenu extends Component {
                 id: model,
                 direction: SOURCE
               }).toNodeSelect()}
-              onChange={val => {
+              onChange={(val: any) => {
                 componentProperties[selectedComponentApiProperty] =
                   componentProperties[selectedComponentApiProperty] || {};
                 let temp = componentProperties[selectedComponentApiProperty];
@@ -166,7 +166,7 @@ class ComponentActivityMenu extends Component {
               label={Titles.IsHandler}
               key={`isHandler${apiProperty}`}
               value={isHandler}
-              onChange={value => {
+              onChange={(value: any) => {
                 componentProperties[selectedComponentApiProperty] =
                   componentProperties[selectedComponentApiProperty] || {};
                 let temp = componentProperties[selectedComponentApiProperty];
@@ -231,7 +231,7 @@ class ComponentActivityMenu extends Component {
                 key={`${_ui_type} - ${componentType}- ${key}`}
                 options={prop_obj.options.map(t => ({ title: t, value: t }))}
                 value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: prop_obj.nodeProperty,
                     id: currentNode.id,
@@ -249,7 +249,7 @@ class ComponentActivityMenu extends Component {
                   .filter(prop_obj.nodeFilter || (() => true))
                   .toNodeSelect()}
                 value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: prop_obj.nodeProperty,
                     id: currentNode.id,
@@ -263,7 +263,7 @@ class ComponentActivityMenu extends Component {
               <CheckBox
                 label={" Use Parameter in url "}
                 value={UIA.GetNodeProp(currentNode, prop_obj.nodeProperty)}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: prop_obj.nodeProperty,
                     id: currentNode.id,
@@ -286,7 +286,7 @@ class ComponentActivityMenu extends Component {
             <TextInput
               label={Titles.Label}
               value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Label)}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.Label,
                   id: currentNode.id,
@@ -301,7 +301,7 @@ class ComponentActivityMenu extends Component {
                 value: t
               }))}
               value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIType)}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.UIType,
                   id: currentNode.id,
@@ -319,7 +319,7 @@ class ComponentActivityMenu extends Component {
                 currentNode,
                 UIA.NodeProperties.ComponentType
               )}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.ComponentType,
                   id: currentNode.id,

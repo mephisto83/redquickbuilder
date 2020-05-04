@@ -30,7 +30,7 @@ import TreeViewMenu from "./treeviewmenu";
 import CheckBoxProperty from "./checkboxproperty";
 import { PARAMETER_TAB } from "./dashboard";
 
-class ModelActivityMenu extends Component {
+class ModelActivityMenu extends Component<any, any> {
   render() {
     const { state } = this.props;
     const active = UIA.IsCurrentNodeA(state, [UIA.NodeTypes.Model]);
@@ -64,7 +64,7 @@ class ModelActivityMenu extends Component {
                     ? currentNode.properties[UIA.NodeProperties.IsAgent]
                     : ""
                 }
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.IsAgent,
                     id: currentNode.id,
@@ -85,7 +85,7 @@ class ModelActivityMenu extends Component {
                       title: UIA.GetNodeTitle(node)
                     })
                   )}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     const id = currentNode.id;
                     this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                       target: currentNode.properties[UIA.NodeProperties.UIUser],
@@ -117,7 +117,7 @@ class ModelActivityMenu extends Component {
                     ? currentNode.properties[UIA.NodeProperties.IsUser]
                     : ""
                 }
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.IsUser,
                     id: currentNode.id,
@@ -133,7 +133,7 @@ class ModelActivityMenu extends Component {
                     ? currentNode.properties[UIA.NodeProperties.IsOwnedByAgents]
                     : ""
                 }
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.IsOwnedByAgents,
                     id: currentNode.id,
@@ -148,7 +148,7 @@ class ModelActivityMenu extends Component {
                   currentNode,
                   UIA.NodeProperties.ManyToManyNexus
                 )}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation([
                     {
                       operation: UIA.CHANGE_NODE_PROPERTY,
@@ -167,7 +167,7 @@ class ModelActivityMenu extends Component {
                   currentNode,
                   UIA.NodeProperties.IsCompositeInput
                 )}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.IsCompositeInput,
                     id: currentNode.id,
@@ -181,7 +181,7 @@ class ModelActivityMenu extends Component {
                   currentNode,
                   UIA.NodeProperties.ExcludeFromController
                 )}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.ExcludeFromController,
                     id: currentNode.id,
@@ -201,7 +201,7 @@ class ModelActivityMenu extends Component {
                     title: UIA.GetNodeTitle(x)
                   }))}
                   label={Titles.ManyToManyNexusModel}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     const id = currentNode.id;
                     const types =
                       UIA.GetNodeProp(
@@ -359,7 +359,7 @@ class ModelActivityMenu extends Component {
             <SelectInput
               label={Titles.PermissionType}
               options={permission_nodes}
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
                   target: value,
@@ -383,7 +383,7 @@ class ModelActivityMenu extends Component {
                     ? currentNode.properties[UIA.NodeProperties.IsParent]
                     : ""
                 }
-                onChange={value => {
+                onChange={(value: any) => {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.IsParent,
                     id: currentNode.id,
@@ -400,7 +400,7 @@ class ModelActivityMenu extends Component {
                 value: node.id,
                 title: UIA.GetNodeTitle(node)
               }))}
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:

@@ -4,7 +4,7 @@ import { UIConnect } from "../utils/utils";
 import * as UIA from "../actions/uiactions";
 import TextInput from "./textinput";
 
-class TextProperty extends Component {
+class TextProperty extends Component<any, any> {
   render() {
     let currentNode = this.props.node;
     return (
@@ -17,7 +17,7 @@ class TextProperty extends Component {
             ? currentNode.properties[this.props.property]
             : ""
         }
-        onChange={value => {
+        onChange={(value: any) => {
           this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
             prop: this.props.property,
             id: currentNode.id,

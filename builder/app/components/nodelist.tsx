@@ -13,8 +13,8 @@ import TextBox from './textinput';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 
-class NodeList extends Component {
-    constructor(props) {
+class NodeList extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {};
     }

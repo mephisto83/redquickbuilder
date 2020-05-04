@@ -10,8 +10,8 @@ import Box from './box';
 import * as Titles from './titles';
 import SelectInput from './selectinput';
 
-class NodeManagement extends Component {
-    constructor(props) {
+class NodeManagement extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {
             filter: ''

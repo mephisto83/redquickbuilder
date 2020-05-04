@@ -10,7 +10,7 @@ import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 
-class PermissionMenu extends Component {
+class PermissionMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);

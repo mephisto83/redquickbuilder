@@ -17,7 +17,7 @@ import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLink
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 
-class ModelFilterItemActivityMenu extends Component {
+class ModelFilterItemActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ModelItemFilter);

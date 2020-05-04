@@ -12,7 +12,7 @@ import { ComponentTypes } from '../constants/componenttypes';
 import AddComponent from '../nodepacks/AddComponent';
 import { UIConnect } from '../utils/utils';
  class AddComponentMenu extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {};
 
@@ -40,7 +40,7 @@ import { UIConnect } from '../utils/utils';
               value: v
             }))}
             label={Titles.ComponentType}
-            onChange={value => {
+            onChange={(value: any) => {
               this.setState({ componentType: value });
             }}
             value={this.state.componentType}

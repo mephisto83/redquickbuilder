@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import * as Titles from './titles';
 import * as style from './selectinput.css';
-export default class SelectInput extends Component {
+export default class SelectInput extends Component<any, any> {
   label() {
     return this.props.label || '{label}';
   }

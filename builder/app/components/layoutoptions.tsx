@@ -19,8 +19,8 @@ import GridHeaderMainMenuMain from "../nodepacks/layouts/GridHeaderMainMenuMain"
 import ListItemGrid from "../nodepacks/layouts/ListItemGrid";
 import FunctionExecutor from './functionexecutor';
 
-class LayoutOptions extends Component {
-  constructor(props) {
+class LayoutOptions extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }

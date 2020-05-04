@@ -17,7 +17,7 @@ import { addValidatator, TARGET, createEventProp, GetNode, GetLinkChain, GetLink
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 
-class DataSourceActivityMenu extends Component {
+class DataSourceActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.DataSource);
@@ -70,7 +70,7 @@ class DataSourceActivityMenu extends Component {
                         value={UIA.GetNodeProp(currentNode, NodeProperties.DataChain)}
                         options={UIA.GetDataChainEntryNodes().toNodeSelect()}
                     />
-                    
+
                 </FormControl>
                 <button type="submit" className="btn btn-primary" onClick={() => {
                     this.props.graphOperation(UIA.NEW_CONDITION_NODE, {

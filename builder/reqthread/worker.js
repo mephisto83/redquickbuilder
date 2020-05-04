@@ -1,10 +1,14 @@
+var fs = require('fs');
 var os = require('os');
 console.log('execute red quick distro worker')
 var Distribution = require('./dist/reqthread/src/distribution').default;
 let distribution = new Distribution();
 (async function () {
   console.log(distribution);
-  let dir = os.platform() === 'linux' ? `${require('os').homedir()}/work_folder` :'D:/temp/workout_wd';
+  let fle = fs.readFileSync('./applicationConfig.json', 'utf8');
+  let adata = JSON.parse(fle);
+  let dir = os.platform() === 'linux' ? '/home/andrew/work_folder' :(adata["D:\\temp\\job_service_jobs"]||'D:/temp/workout_wd');
+  
   await distribution.start({
     entryPath: './dist/reqthread/src/thread.js',
     folder: dir,
@@ -12,7 +16,6 @@ let distribution = new Distribution();
     workingDirectory:dir,
     throttle: 120 * 1000,
     threads: 3,
-    serverPort: 8002,
     remoteServerHost: '192.168.1.146',
     remoteServerPort: 7979
   })

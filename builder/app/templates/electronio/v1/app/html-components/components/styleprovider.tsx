@@ -4,7 +4,7 @@ import * as React from 'react';
 let navigationInstance;
 
 export default class StyleProvider extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.state = {};

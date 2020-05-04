@@ -18,8 +18,8 @@ import TabPane from './tabpane';
 
 const NODE_MANAGEMENT_MENU = 'NODE_MANAGEMENT_MENU';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
-class UIParameters extends Component {
-    constructor(props) {
+class UIParameters extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {
             filter: ''

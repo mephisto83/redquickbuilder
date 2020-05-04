@@ -36,7 +36,7 @@ import SideBarMenu from "./sidebarmenu";
 import { exec } from "child_process";
 import { uuidv4 } from "../utils/array";
 
-class ExecutorPropertyMenu extends Component {
+class ExecutorPropertyMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Executor);

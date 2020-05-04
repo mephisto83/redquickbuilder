@@ -13,7 +13,7 @@ import TextBox from './textinput';
 import { NodeTypes } from '../constants/nodetypes';
 import { GetNode } from '../methods/graph_methods';
 
-class ModelRelationshipMenu extends Component {
+class ModelRelationshipMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Model);

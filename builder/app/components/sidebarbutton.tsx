@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 
 
-export default class SidebarButton extends Component {
+export default class SidebarButton extends Component<any, any> {
     title() {
         return this.props.title || '';
     }

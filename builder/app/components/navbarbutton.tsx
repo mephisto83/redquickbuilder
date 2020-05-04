@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 
 
-export default class NavBarButton extends Component {
+export default class NavBarButton extends Component<any, any> {
   icon() {
     return this.props.icon || "fa fa-gears"
   }

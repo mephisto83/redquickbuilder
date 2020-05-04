@@ -11,7 +11,7 @@ import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 import { NodeProperties, Methods } from '../constants/nodetypes';
 
-class ExecutorActivityMenu extends Component {
+class ExecutorActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Executor);

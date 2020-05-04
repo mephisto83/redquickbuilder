@@ -19,7 +19,7 @@ import SideBarMenu from './sidebarmenu';
 import TreeViewItem from './treeviewitem';
 const NAVIGATION_PARAMETERS = 'NAVIGATION_PARAMETERS';
 const SELECTED_TAB = 'SELECTED_TAB'
-class SideMenuContainer extends Component {
+class SideMenuContainer extends Component<any, any> {
     render() {
         var { state } = this.props;
         if (this.props.tab && !UIA.VisualEq(state, SELECTED_TAB, this.props.tab)) {

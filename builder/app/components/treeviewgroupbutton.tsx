@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 
 
-export default class TreeViewGroupButton extends Component {
+export default class TreeViewGroupButton extends Component<any, any> {
     icon() {
         return this.props.icon || "fa fa-circle-o";
     }

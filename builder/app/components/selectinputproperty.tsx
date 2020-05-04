@@ -11,7 +11,7 @@ import {
   GetNodeProp
 } from "../actions/uiactions";
 import { NodeProperties } from "../constants/nodetypes";
-class SelectInputProperty extends Component {
+class SelectInputProperty extends Component<any, any> {
   render() {
     let { state, value, model, valueObj } = this.props;
     let currentNode = this.props.node;

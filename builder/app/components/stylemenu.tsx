@@ -24,8 +24,8 @@ import SelectProperty from "./selectproperty";
 import GenericPropertyContainer from "./genericpropertycontainer";
 import GridAreaSelect from "./gridareaselect";
 import GridPlacement from "./gridplacement";
-class StyleMenu extends Component {
-  constructor(props) {
+class StyleMenu extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -118,7 +118,7 @@ class StyleMenu extends Component {
                   value={this.state.filter}
                   label={Titles.Filter}
                   immediate={true}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({ filter: value });
                   }}
                   placeholder={Titles.Filter}

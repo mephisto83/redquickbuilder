@@ -6,7 +6,7 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
 import { LinkType } from '../constants/nodetypes';
-class ViewTypeMenu extends Component {
+class ViewTypeMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

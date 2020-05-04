@@ -19,8 +19,8 @@ import EnumeratedTable from './enumeratedtable';
 import { createExtensionDefinition, defaultExtensionDefinitionType } from '../methods/graph_methods';
 const EXTENSION_DEFINITION_MENU = 'EXTENSION_DEFINITION_MENU';
 const EDITMODE = 'EDITMODE';
-class ExtensionDefinitionMenu extends Component {
-    constructor(props) {
+class ExtensionDefinitionMenu extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {
             property: ''

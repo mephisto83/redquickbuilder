@@ -18,8 +18,8 @@ import TextInput from "./textinput";
 import Typeahead from "./typeahead";
 import CheckBox from "./checkbox";
 
-export default class GridPlacementField extends Component {
-  constructor(props) {
+export default class GridPlacementField extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -56,7 +56,7 @@ export default class GridPlacementField extends Component {
             label={Titles.Name}
             title={Titles.Name}
             value={name}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.onChange({
                 ...gridSetup,
                 name: value
@@ -66,7 +66,7 @@ export default class GridPlacementField extends Component {
             label={Titles.GridTemplateColumns}
             title={Titles.GridTemplateColumns}
             value={gridTemplateColumns}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.onChange({
                 ...gridSetup,
                 gridTemplateColumns: value
@@ -76,7 +76,7 @@ export default class GridPlacementField extends Component {
             label={Titles.GridTemplateRows}
             title={Titles.GridTemplateRows}
             value={gridTemplateRows}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.onChange({
                 ...gridSetup,
                 gridTemplateRows: value
@@ -86,7 +86,7 @@ export default class GridPlacementField extends Component {
             label={Titles.GridColumnGap}
             title={Titles.GridColumnGap}
             value={gridTemplateColumnGap}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.onChange({
                 ...gridSetup,
                 gridTemplateColumnGap: value
@@ -96,7 +96,7 @@ export default class GridPlacementField extends Component {
               label={Titles.GridRowGap}
               title={Titles.GridRowGap}
               value={gridTemplateRowGap}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.onChange({
                   ...gridSetup,
                   gridTemplateRowGap: value
@@ -107,7 +107,7 @@ export default class GridPlacementField extends Component {
             title={Titles.GridAreas}
             options={tags.map(x => ({ title: x, id: x, value: x }))}
             value={this.state.currentSection}
-            onChange={value => {
+            onChange={(value: any) => {
               this.setState({ currentSection: value });
             }}
           />
@@ -168,7 +168,7 @@ export default class GridPlacementField extends Component {
             title={mediaSize}
             key={`mediasize-${mediaSize}`}
             value={mediaSizes[mediaSize]}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.onChange({
                 ...gridSetup,
                 mediaSizes: {

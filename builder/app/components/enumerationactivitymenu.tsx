@@ -14,7 +14,7 @@ import EnumerationEditMenu from './enumerationeditmenu';
 import { NodeProperties } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 
-class EnumerationActivityMenu extends Component {
+class EnumerationActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Enumeration);

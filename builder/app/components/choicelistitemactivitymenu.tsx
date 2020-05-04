@@ -6,7 +6,7 @@ import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
 import Box from './box';
-class ChoiceListItemActivityMenu extends Component {
+class ChoiceListItemActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ChoiceList);

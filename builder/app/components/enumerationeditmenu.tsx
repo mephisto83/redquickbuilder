@@ -11,8 +11,8 @@ import SelectInput from './selectinput';
 import TextBox from './textinput';
 import TextInput from './textinput';
 
-export default class EnumerationEditMenu extends Component {
-    constructor(props) {
+export default class EnumerationEditMenu extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = { value: '' };
     }

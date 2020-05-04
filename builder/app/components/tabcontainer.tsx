@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 
-export default class TabContainer extends Component {
+export default class TabContainer extends Component<any, any> {
 
     render() {
         return (

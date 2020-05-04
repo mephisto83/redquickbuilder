@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class Tabs extends Component {
+export default class Tabs extends Component<any, any> {
 
     render() {
         return (

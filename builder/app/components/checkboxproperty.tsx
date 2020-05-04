@@ -5,7 +5,7 @@ import { UIConnect } from "../utils/utils";
 import * as UIA from "../actions/uiactions";
 import CheckBox from "./checkbox";
 
-class CheckBoxProperty extends Component {
+class CheckBoxProperty extends Component<any, any> {
   render() {
     const currentNode = this.props.node;
     const { link, property } = this.props
@@ -14,7 +14,7 @@ class CheckBoxProperty extends Component {
         label={this.props.title}
         title={this.props.title}
         value={link ? UIA.GetLinkProperty(link, this.props.property) : UIA.GetNodeProp(currentNode, this.props.property)}
-        onChange={value => {
+        onChange={(value: any) => {
           if (this.props.link) {
             this.props.graphOperation([
               {

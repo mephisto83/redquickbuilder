@@ -22,7 +22,7 @@ const iconSize = 30;
 let mapSelectedNodes = null;
 let mapSelectedLinks = null;
 let version;
-export default class MindMap extends Component {
+export default class MindMap extends Component<any, any> {
 	constructor() {
 		super();
 		this.textSize = {};

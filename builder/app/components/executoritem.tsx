@@ -31,7 +31,7 @@ import {
 } from '../methods/graph_methods';
 import SideBarMenu from './sidebarmenu';
 
-class ExecutorItem extends Component {
+class ExecutorItem extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Executor);

@@ -10,7 +10,7 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ControlSideBarMenu, { ControlSideBarMenuItem } from './controlsidebarmenu';
 
-class OptionItemFormControl extends Component {
+class OptionItemFormControl extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.OptionListItem);

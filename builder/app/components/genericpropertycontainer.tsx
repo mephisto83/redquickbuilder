@@ -18,7 +18,7 @@ import SideBarMenu from "./sidebarmenu";
 import { uuidv4 } from "../utils/array";
 
 import SideBarHeader from "./sidebarheader";
-class GenericPropertyContainer extends Component {
+class GenericPropertyContainer extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active =
