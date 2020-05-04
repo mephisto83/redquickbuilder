@@ -41,7 +41,6 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.Progress]: noOp,
 			[RedQuickDistributionCommand.RUN_JOB]: noOp,
 			[RedQuickDistributionCommand.SendFile]: noOp,
-			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: handleAgentProjectReady,
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy,
 			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem,

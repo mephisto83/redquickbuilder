@@ -1,7 +1,8 @@
 export interface DistrConfig {
 	baseFolder: string;
-	serverPort: number;
 	workingDirectory: string;
+	agentName: string;
+	agentProject: string;
 	folder: string;
 	throttle: number;
 	entryPath: string;
