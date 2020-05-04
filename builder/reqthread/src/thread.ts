@@ -91,6 +91,11 @@ async function loop() {
 	let noerror = true;
 	do {
 		try {
+			if(!process.send){
+				console.log('no process.send')
+				await sleep();
+				continue;
+			}
 			process.send({ response: 'taking a nap' });
 			await sleep();
 			let { options } = context;

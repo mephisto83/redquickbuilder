@@ -1,4 +1,5 @@
 
+
 export default function(): any {
 	// Difficulty: "Moderate"
 	// This is the JavaScript tokenizer that is actually used to highlight
