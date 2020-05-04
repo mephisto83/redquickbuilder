@@ -4,7 +4,7 @@ var Distribution = require('./dist/reqthread/src/distribution').default;
 let distribution = new Distribution();
 (async function () {
   console.log(distribution);
-  let dir = os.platform() === 'linux' ? '/home/andrew/work_folder' :'D:/temp/workout_wd';
+  let dir = os.platform() === 'linux' ? `${require('os').homedir()}/work_folder` :'D:/temp/workout_wd';
   await distribution.start({
     entryPath: './dist/reqthread/src/thread.js',
     folder: dir,
@@ -12,7 +12,7 @@ let distribution = new Distribution();
     workingDirectory:dir,
     throttle: 120 * 1000,
     threads: 3,
-    serverPort: 8000,
+    serverPort: 8002,
     remoteServerHost: '192.168.1.146',
     remoteServerPort: 7979
   })
