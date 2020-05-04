@@ -7,3 +7,7 @@
 	margin: 0;
 	padding-right: 5px;
 }
+
+.monaco-editor .margin {
+	margin: 0;
+}

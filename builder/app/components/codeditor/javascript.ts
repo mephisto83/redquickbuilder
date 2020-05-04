@@ -1,6 +1,5 @@
-import * as monaco from 'monaco-editor';
 
-export default function(): monaco.languages.IMonarchLanguage {
+export default function(): any {
 	// Difficulty: "Moderate"
 	// This is the JavaScript tokenizer that is actually used to highlight
 	// all code in the syntax definition editor and the documentation!

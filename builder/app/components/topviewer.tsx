@@ -13,7 +13,8 @@ export default class TopViewer extends Component<any, any> {
 	render() {
 		var style = {
 			position: 'relative',
-			width: '100%'
+			width: '100%',
+			...this.props.style || {}
 		};
 		let active = this.active();
 		let height = 600;
@@ -26,7 +27,8 @@ export default class TopViewer extends Component<any, any> {
 						transition: 'all 1s',
 						pointerEvents: active ? 'all' : 'none',
 						top: active ? 0 : '-2000px',
-						backgroundColor: '#dd4b39d2'
+						backgroundColor: '#dd4b39d2',
+            ...this.props.innerStyle || {}
 					}}
 				>
 					{this.props.children}
