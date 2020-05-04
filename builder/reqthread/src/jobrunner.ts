@@ -7,7 +7,7 @@ import JobService, {
 	JobFile,
 	getDirectories,
 	ensureDirectory,
-  path_join
+	path_join
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 import { GetCurrentGraph } from '../../app/actions/uiactions';
@@ -173,24 +173,33 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
 		// The ready value shouldn't be effected by the hand raising
-		if (runnerContext.agents[message.agentName]) {
-			let tempProjects = runnerContext.agents[message.agentName].projects;
-			if (tempProjects) {
-				Object.keys(tempProjects).forEach((v) => {
-					if (message.projects && message.projects[v]) {
-						message.projects[v].ready = tempProjects[v].ready;
-					}
-				});
-			}
-		}
-		runnerContext.agents[message.agentName] = {
-			...runnerContext.agents[message.agentName] || { projects: {} },
-			projects: message.projects || {},
-			name: message.agentName,
-			host: message.hostname,
-			port: message.port,
-			lastUpdated: Date.now()
-		};
+		// if (runnerContext.agents[message.agentName]) {
+		// 	let tempProjects = runnerContext.agents[message.agentName].projects;
+		// 	if (tempProjects) {
+		// 		Object.keys(tempProjects).forEach((v) => {
+		// 			if (message.projects && message.projects[v]) {
+		// 				message.projects[v].ready = tempProjects[v].ready;
+		// 			}
+		// 		});
+		// 	}
+		// }
+		// runnerContext.agents[message.agentName] = {
+		// 	...runnerContext.agents[message.agentName] || { projects: {} },
+		// 	name: message.agentName,
+		// 	host: message.hostname,
+		// 	port: message.port,
+		// 	lastUpdated: Date.now()
+		// };
+		let temp: any = message;
+		runnerContext.agents[message.agentName] = runnerContext.agents[message.agentName] || <any>{};
+		runnerContext.agents[message.agentName].projects = runnerContext.agents[message.agentName].projects || <any>{};
+		runnerContext.agents[message.agentName].projects[temp.project.agentProject] =
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject] || <any>{};
+		if (temp.project) {
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].port = temp.project.port;
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].host = temp.project.host;
+    }
+    console.log(message);
 		Object.keys(runnerContext.agents[message.agentName].projects).forEach((agentProject) => {
 			JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[agentProject]);
 		});
@@ -199,7 +208,8 @@ async function handleHandRaising(message: RedQuickDistributionMessage): Promise<
 		return {
 			success: true
 		};
-	}
+  }
+
 	return {
 		error: 'agentName was not set'
 	};

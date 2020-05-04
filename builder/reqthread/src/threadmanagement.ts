@@ -27,9 +27,9 @@ export default class ThreadManagement {
 	async start(config: DistrConfig, options: ChildProcessOptions, $runJobHandler: any, onReady: any) {
 		this.configuration = config;
 		this.configuration.agentName = options.agentName;
-    this.configuration.agentProject = options.projectName;
-    console.log(options);
-    console.log(config);
+		this.configuration.agentProject = options.projectName;
+		console.log(options);
+		console.log(config);
 		console.log(`starting thread management ${this.configuration.agentName} ${this.configuration.agentProject}`);
 		this.onReady = onReady;
 		this.threads = {};
@@ -88,7 +88,7 @@ export default class ThreadManagement {
 			});
 			let ctPort = this.communicationTower.getPort();
 			if (ctPort) {
-				await this.raiseHand({
+				this.raiseHand({
 					agentName: this.configuration.agentName,
 					agentProject: this.configuration.agentProject,
 					port: ctPort,
@@ -193,8 +193,9 @@ export default class ThreadManagement {
 	}
 	async raiseHand(project: AgentProject) {
 		let command = RedQuickDistributionCommand.RaisingHand;
-		let agentName = this.getAgentName();
+    let agentName = this.getAgentName();
 		do {
+      console.log(project);
 			let completed = false;
 			try {
 				console.log(
