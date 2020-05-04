@@ -52,7 +52,7 @@ const CONDITION_FILTER_MENU_PARAMETER = "condition-filter-menu-parameter";
 const CONDITION_FILTER_MENU_PARAMETER_PROPERTIES =
   "condition-filter-menu-parameter-properties";
 const DATA_SOURCE = "DATA_SOURCE";
-class ConditionFilterMenu extends Component {
+class ConditionFilterMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class ControlSideBarMenu extends Component {
+export default class ControlSideBarMenu extends Component<any, any> {
     render() {
         return (
             <ul className="control-sidebar-menu">
@@ -13,7 +13,7 @@ export default class ControlSideBarMenu extends Component {
 }
 
 
-export class ControlSideBarMenuItem extends Component {
+export class ControlSideBarMenuItem extends Component<any, any> {
     icon() {
         return this.props.icon || 'fa fa-birthday-cake';
     }
@@ -38,7 +38,7 @@ export class ControlSideBarMenuItem extends Component {
     }
 }
 
-export class ControlSideBarMenuHeader extends Component {
+export class ControlSideBarMenuHeader extends Component<any, any> {
     render() {
         return (
             <h3 className="control-sidebar-heading">{this.props.title}</h3>

@@ -11,7 +11,7 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 
 const SECTION_LIST = 'SECTION_LIST';
-class SectionList extends Component {
+class SectionList extends Component<any, any> {
   render() {
     const me = this;
     const { state } = me.props;

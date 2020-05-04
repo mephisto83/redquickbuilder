@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class DropDownMenu extends Component {
+export default class DropDownMenu extends Component<any, any> {
     menuType() {
         return 'messages-menu';
     }

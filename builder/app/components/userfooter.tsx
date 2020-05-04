@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class Tab extends Component {
+export default class Tab extends Component<any, any> {
     active() {
         return this.props.active ? 'active' : '';
     }
@@ -12,7 +12,7 @@ export default class Tab extends Component {
     render() {
         return (
             <li className="user-footer">
-                {this.props.children} 
+                {this.props.children}
             </li>
         );
     }

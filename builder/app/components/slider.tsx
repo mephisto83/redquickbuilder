@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class Slider extends Component {
+export default class Slider extends Component<any, any> {
     min() {
         return this.props.min || "1";
     }

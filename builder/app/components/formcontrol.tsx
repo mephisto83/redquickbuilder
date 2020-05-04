@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class FormControl extends Component {
+export default class FormControl extends Component<any, any> {
     _class() {
         return this.props.sidebarform ? 'sidebar-form' : '';
     }

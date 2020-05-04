@@ -12,7 +12,7 @@ import TextInput from './textinput';
 import { HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
 import { NodeProperties, Methods } from '../constants/nodetypes';
 
-class FunctionActivityMenu extends Component {
+class FunctionActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Function);

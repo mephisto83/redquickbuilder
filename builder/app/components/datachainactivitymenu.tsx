@@ -32,7 +32,7 @@ import { getReferenceInserts } from "../utils/utilservice";
 import CheckBoxProperty from "./checkboxproperty";
 import Typeahead from "./typeahead";
 
-class DataChainActvityMenu extends Component {
+class DataChainActvityMenu extends Component<any, any> {
   getLambdaVariableTree() {
     const { state } = this.props;
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -218,7 +218,7 @@ class DataChainActvityMenu extends Component {
           <CheckBox
             label={Titles.EntryPoint}
             value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.EntryPoint)}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.EntryPoint,
                 id: currentNode.id,
@@ -239,7 +239,7 @@ class DataChainActvityMenu extends Component {
           <CheckBox
             label={Titles.AsOutput}
             value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsOutput)}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.AsOutput,
                 id: currentNode.id,
@@ -248,7 +248,7 @@ class DataChainActvityMenu extends Component {
             }}
           />
           <SelectInput
-            onChange={value => {
+            onChange={(value: any) => {
               const id = currentNode.id;
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.DataChainFunctionType,
@@ -265,7 +265,7 @@ class DataChainActvityMenu extends Component {
           />
           {showNumber ? (
             <TextInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 if (!isNaN(value)) {
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -285,7 +285,7 @@ class DataChainActvityMenu extends Component {
           {lambda ? (
             <TextInput
               textarea={true}
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.Lambda,
@@ -301,7 +301,7 @@ class DataChainActvityMenu extends Component {
           {lambdaVariables}
           {showModel ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:
@@ -326,7 +326,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {showProperty ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
@@ -355,7 +355,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {stateKey ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
@@ -384,7 +384,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {modelKey ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
@@ -411,7 +411,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {viewModelKey ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target: UIA.GetNodeProp(
@@ -440,7 +440,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {showDataChainRef ? (
             <Typeahead
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   source:
@@ -470,7 +470,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {dataChainReferences ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 // this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                 //   source:
@@ -516,7 +516,7 @@ class DataChainActvityMenu extends Component {
             <CheckBox
               label={Titles.UseNavigationParams}
               value={UIA.GetNodeProp(currentNode, useNavigationParms)}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: useNavigationParms,
                   id: currentNode.id,
@@ -604,7 +604,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {shownavigateMethod ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                   prop: UIA.NodeProperties.NavigationAction,
                   id: currentNode.id,
@@ -644,7 +644,7 @@ class DataChainActvityMenu extends Component {
           ) : null}
           {showNode2 ? (
             <SelectInput
-              onChange={value => {
+              onChange={(value: any) => {
                 const id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   source:

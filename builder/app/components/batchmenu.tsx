@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import TextInput from './textinput';
 import { MethodFunctions } from '../constants/functiontypes';
 
-class BatchMenu extends Component {
+class BatchMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         if (!state || !UIA.HasCurrentGraph()) { return <div></div> }

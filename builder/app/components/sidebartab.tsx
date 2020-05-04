@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class SideBarTab extends Component {
+export default class SideBarTab extends Component<any, any> {
     icon() {
         return this.props.icon || "fa fa-wrench";
     }

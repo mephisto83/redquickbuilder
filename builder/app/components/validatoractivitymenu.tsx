@@ -13,7 +13,7 @@ import ControlSideBarMenu, {
 } from "./controlsidebarmenu";
 import { NodeProperties, LinkProperties } from "../constants/nodetypes";
 
-class ValidatorActivityMenu extends Component {
+class ValidatorActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Validator);
@@ -49,7 +49,7 @@ class ValidatorActivityMenu extends Component {
             <SelectInput
               options={modelNodes}
               label={Titles.Models}
-              onChange={value => {
+              onChange={(value: any) => {
                 var id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:
@@ -76,7 +76,7 @@ class ValidatorActivityMenu extends Component {
             <SelectInput
               options={agents}
               label={Titles.Agents}
-              onChange={value => {
+              onChange={(value: any) => {
                 var id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:
@@ -105,7 +105,7 @@ class ValidatorActivityMenu extends Component {
             <SelectInput
               options={functionNodes}
               label={Titles.Functions}
-              onChange={value => {
+              onChange={(value: any) => {
                 var id = currentNode.id;
                 this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
                   target:

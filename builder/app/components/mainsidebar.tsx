@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import { RelativeMenuCss } from "../constants/visual";
 
-export default class Header extends Component {
+export default class Header extends Component<any, any> {
   relative() {
     return this.props.relative ? RelativeMenuCss : {};
   }

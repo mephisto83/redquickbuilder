@@ -32,7 +32,7 @@ import {
 import SideBarMenu from "./sidebarmenu";
 import { Functions, MethodFunctions } from "../constants/functiontypes";
 
-class ModelFilterMenu extends Component {
+class ModelFilterMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ModelFilter);
@@ -60,7 +60,7 @@ class ModelFilterMenu extends Component {
                   )[t.id]
                 : ""
             }
-            onChange={value => {
+            onChange={(value: any) => {
               let fprops =
                 UIA.GetNodeProp(
                   currentNode,

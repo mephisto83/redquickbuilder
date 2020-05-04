@@ -251,6 +251,7 @@ export const CODE_VIEW = 'CODE_VIEW';
 export const LAYOUT_VIEW = 'LAYOUT_VIEW';
 export const TRANSLATION_VIEW = 'TRANSLATION_VIEW';
 export const PROGRESS_VIEW = 'PROGRESS_VIEW';
+export const CODE_EDITOR = 'CODE_EDITOR';
 export const THEME_VIEW = 'THEME_VIEW';
 export const AGENT_ACCESS_VIEW = 'AGENT_ACCESS_VIEW';
 

@@ -13,7 +13,7 @@ import { Functions, FunctionConstraintKeys, HTTP_METHODS } from '../constants/fu
 import { getNodesLinkedTo } from '../methods/graph_methods';
 import { LinkPropertyKeys, NodeProperties, ExcludeDefaultNode } from '../constants/nodetypes';
 
-class ControllerActivityMenu extends Component {
+class ControllerActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));

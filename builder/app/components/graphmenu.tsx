@@ -9,7 +9,7 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 
 const GRAPH_MENU = 'GRAPH_MENU';
-class GraphMenu extends Component {
+class GraphMenu extends Component<any, any> {
     render() {
         var me = this;
         var { state } = me.props;

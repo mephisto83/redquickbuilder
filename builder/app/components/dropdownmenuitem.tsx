@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class DropDownMenuItem extends Component {
+export default class DropDownMenuItem extends Component<any, any> {
 
     icon() {
         return this.props.icon || "fa fa-envelope-o"

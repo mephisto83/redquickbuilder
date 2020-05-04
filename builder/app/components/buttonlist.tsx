@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import TabPane from './tabpane';
 
 
-export default class ButtonList extends Component {
+export default class ButtonList extends Component<any, any> {
   render() {
     let tabPaneStyle = this.props.tabPaneStyle || {};
     return (

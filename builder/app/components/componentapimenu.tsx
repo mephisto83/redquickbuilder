@@ -8,8 +8,8 @@ import { NodeProperties } from "../constants/nodetypes";
 import SideMenuContainer from "./sidemenucontainer";
 import { SCOPE_TAB } from "./dashboard";
 import CheckBoxProperty from "./checkboxproperty";
-class ComponentAPIMenu extends Component {
-  constructor(props) {
+class ComponentAPIMenu extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }

@@ -18,7 +18,7 @@ import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainContextMethods } from '../constants/datachain';
 
-class DataChainOperator extends Component {
+class DataChainOperator extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.DataChain);

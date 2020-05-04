@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class NavBarMenu extends Component {
+export default class NavBarMenu extends Component<any, any> {
     render() {
         let style = {};
         if (this.props.paddingRight) {

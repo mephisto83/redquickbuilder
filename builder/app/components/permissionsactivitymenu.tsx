@@ -28,7 +28,7 @@ import {
 } from "../constants/nodetypes";
 import SidebarButton from "./sidebarbutton";
 
-class PermissionActivityMenu extends Component {
+class PermissionActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Permission);
@@ -107,7 +107,7 @@ class PermissionActivityMenu extends Component {
             title={Titles.OwnedResourcesDescription}
             label={Titles.OwnedResources}
             value={currentNode.properties[UIA.NodeProperties.IsOwned]}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.IsOwned,
                 id: currentNode.id,
@@ -125,7 +125,7 @@ class PermissionActivityMenu extends Component {
                   key={`permissions-${key}`}
                   label={Titles.Permissions[key]}
                   value={permissions[key]}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     permissions[key] = value;
                     this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                       prop: UIA.NodeProperties.UIPermissions,
@@ -144,7 +144,7 @@ class PermissionActivityMenu extends Component {
           <SelectInput
             options={methodProps}
             label={Titles.PermissionValueType}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.PermissionValueType,
                 id: currentNode.id,

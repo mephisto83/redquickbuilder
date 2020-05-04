@@ -36,7 +36,7 @@ import {
 import SideBarMenu from "./sidebarmenu";
 import { uuidv4 } from "../utils/array";
 
-class ValidatorPropertyActivityMenu extends Component {
+class ValidatorPropertyActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Validator);

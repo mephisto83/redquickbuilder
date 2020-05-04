@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 
-export default class TreeViewItem extends Component {
+export default class TreeViewItem extends Component<any, any> {
     icon() {
         return this.props.icon || "fa fa-circle-o";
     }

@@ -7,7 +7,7 @@ import { ComponentTags } from "../constants/componenttypes";
 import { NodeProperties } from "../constants/nodetypes";
 import * as Titles from "./titles";
 
-class GridAreaSelect extends Component {
+class GridAreaSelect extends Component<any, any> {
   render() {
     let currentNode = this.props.node;
     let tags =

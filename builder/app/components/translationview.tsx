@@ -36,8 +36,8 @@ import { MediaQueries, Languages, NodeTypes } from "../constants/nodetypes";
 import translationservice from '../service/translationservice';
 import GridPlacementField from "./gridplacementfield";
 
-class TranslationView extends Component {
-  constructor(props) {
+class TranslationView extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -170,7 +170,7 @@ class TranslationView extends Component {
                           }
                         }
                       }}
-                      onChange={value => {
+                      onChange={(value: any) => {
                         const { item } = this.state;
                         item.properties = item.properties || {};
                         item.properties.languages = item.properties.languages || {};

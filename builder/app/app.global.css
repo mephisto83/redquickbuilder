@@ -1,6 +1,7 @@
 @import './components/typeahead.css';
 @import './components/progressbar.css';
 @import './components/progresscircle.css';
+@import './components//editor.main.css';
 
 .treeview-menu > li {
 	margin: 0;

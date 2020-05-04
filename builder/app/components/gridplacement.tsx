@@ -9,8 +9,8 @@ import * as Titles from "./titles";
 import { StyleLib } from "../constants/styles";
 import SelectInput from "./selectinput";
 
-class GridPlacement extends Component {
-  constructor(props) {
+class GridPlacement extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -51,7 +51,7 @@ class GridPlacement extends Component {
           title={Titles.GridAreas}
           options={tags.map(x => ({ title: x, id: x, value: x }))}
           value={this.state.currentSection}
-          onChange={value => {
+          onChange={(value: any) => {
             this.setState({ currentSection: value });
           }}
         />

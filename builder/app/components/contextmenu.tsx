@@ -116,8 +116,8 @@ import { SecondaryOptions } from "../constants/visual";
 import AddMenuComponent from "../nodepacks/layouts/AddMenuComponent";
 
 const DATA_SOURCE = "DATA_SOURCE";
-class ContextMenu extends Component {
-  constructor(props) {
+class ContextMenu extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -215,7 +215,7 @@ class ContextMenu extends Component {
                       id: LinkType[v]
                     }))}
                   label={Titles.LinkType}
-                  onChange={value => { }}
+                  onChange={(value: any) => { }}
                   value={UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)}
                 />
               </TreeViewItemContainer>
@@ -239,7 +239,7 @@ class ContextMenu extends Component {
                 <TreeViewItemContainer>
                   <CheckBox
                     label={Titles.AsForm}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.props.graphOperation([
                         {
                           operation: UIA.UPDATE_LINK_PROPERTY,
@@ -279,7 +279,7 @@ class ContextMenu extends Component {
                       title: x
                     }))}
                     label={Titles.LinkType}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.props.graphOperation([
                         {
                           operation: UIA.UPDATE_LINK_PROPERTY,
@@ -307,7 +307,7 @@ class ContextMenu extends Component {
                       title: x
                     }))}
                     label={Titles.LinkType}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.props.graphOperation([
                         {
                           operation: UIA.UPDATE_LINK_PROPERTY,
@@ -382,7 +382,7 @@ class ContextMenu extends Component {
                         link,
                         LinkPropertyKeys.InstanceUpdate
                       )}
-                      onChange={value => {
+                      onChange={(value: any) => {
                         this.props.graphOperation([
                           {
                             operation: UIA.UPDATE_LINK_PROPERTY,
@@ -713,7 +713,7 @@ class ContextMenu extends Component {
                     UIA.GetNodeTitle(b)
                   ))
                   .toNodeSelect()}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     componentA: value
                   });
@@ -726,7 +726,7 @@ class ContextMenu extends Component {
                 immediate
                 label={`${Titles.ExternalApi} A`}
                 placeholder={`${Titles.ExternalApi} A`}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     externalApiA: value
                   });
@@ -739,7 +739,7 @@ class ContextMenu extends Component {
                 immediate
                 label={`${Titles.InternalApi} A`}
                 placeholder={Titles.InternalApi}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     internalApiA: value
                   });
@@ -761,7 +761,7 @@ class ContextMenu extends Component {
                     })
                   )
                   .toNodeSelect()}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     componentB: value
                   });
@@ -774,7 +774,7 @@ class ContextMenu extends Component {
                 immediate
                 label={`${Titles.ExternalApi} B`}
                 placeholder={`${Titles.ExternalApi} B`}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     externalApiB: value
                   });
@@ -787,7 +787,7 @@ class ContextMenu extends Component {
                 immediate
                 label={`${Titles.InternalApi} B`}
                 placeholder={`${Titles.InternalApi} B`}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({
                     internalApiB: value
                   });
@@ -841,7 +841,7 @@ class ContextMenu extends Component {
               immediate
               label={Titles.Name}
               placeholder={Titles.EnterName}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.setState({
                   dashboard: value
                 });
@@ -996,7 +996,7 @@ class ContextMenu extends Component {
                           return true;
                         })
                         .toNodeSelect()}
-                      onChange={value => {
+                      onChange={(value: any) => {
                         this.setState({
                           method: value
                         });
@@ -1037,7 +1037,7 @@ class ContextMenu extends Component {
                               return true;
                             })
                             .toNodeSelect()}
-                          onChange={value => {
+                          onChange={(value: any) => {
                             this.setState({
                               navigateTo: value
                             });
@@ -1081,7 +1081,7 @@ class ContextMenu extends Component {
                             return true;
                           })
                           .toNodeSelect()}
-                        onChange={value => {
+                        onChange={(value: any) => {
                           this.setState({
                             componentDidMountMethod: value
                           });
@@ -1159,7 +1159,7 @@ class ContextMenu extends Component {
                 <TextInput
                   label={Titles.Name}
                   immediate
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       name: value
                     });
@@ -1174,7 +1174,7 @@ class ContextMenu extends Component {
                     this.props.state,
                     NodeTypes.Model
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       model: value
                     });
@@ -1189,7 +1189,7 @@ class ContextMenu extends Component {
                     options={UIA.GetModelPropertyChildren(
                       this.state.model
                     ).toNodeSelect()}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({
                         property: value
                       });
@@ -1244,7 +1244,7 @@ class ContextMenu extends Component {
                     this.props.state,
                     NodeTypes.Screen
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       screen: value
                     });
@@ -1318,7 +1318,7 @@ class ContextMenu extends Component {
                     this.props.state,
                     NodeTypes.Screen
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       screen: value
                     });
@@ -1413,7 +1413,7 @@ class ContextMenu extends Component {
                     this.props.state,
                     NodeTypes.Model
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       model: value
                     });
@@ -1427,7 +1427,7 @@ class ContextMenu extends Component {
                   options={UIA.GetModelPropertyChildren(
                     this.state.model
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       property: value
                     });
@@ -1493,7 +1493,7 @@ class ContextMenu extends Component {
                 <TextInput
                   label={Titles.ViewModel}
                   placeholder={Titles.ViewModel}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       viewModelName: value
                     });
@@ -1532,7 +1532,7 @@ class ContextMenu extends Component {
                       this.props.state,
                       NodeTypes.Model
                     ).toNodeSelect()}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({
                         model: value
                       });
@@ -1638,7 +1638,7 @@ class ContextMenu extends Component {
                     value: FunctionTemplateKeys[x],
                     id: FunctionTemplateKeys[x]
                   }))}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       key: value
                     });
@@ -1656,7 +1656,7 @@ class ContextMenu extends Component {
                       ),
                       this.state.key
                     ).toNodeSelect()}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({
                         property: value
                       });
@@ -1862,7 +1862,7 @@ class ContextMenu extends Component {
                 <SelectInput
                   label={Titles.OptionsType}
                   options={Object.keys(MenuTreeOptions).map(v => ({ title: v, value: v, id: v }))}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       menuTreeOption: value
                     });
@@ -1873,7 +1873,7 @@ class ContextMenu extends Component {
               <TreeViewItemContainer>
                 <TextInput
                   label={Titles.Name}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       menuName: value
                     });
@@ -1948,7 +1948,7 @@ class ContextMenu extends Component {
                   immediate
                   label={Titles.Name}
                   placeholder={Titles.EnterName}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       viewName: value
                     });
@@ -1963,7 +1963,7 @@ class ContextMenu extends Component {
                     this.props.state,
                     NodeTypes.Model
                   ).toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       model: value
                     });
@@ -2118,7 +2118,7 @@ class ContextMenu extends Component {
                     value: v
                   }))}
                   label={Titles.Select}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({ eventType: value });
                   }}
                   value={this.state.eventType}
@@ -2132,7 +2132,7 @@ class ContextMenu extends Component {
                     value: v
                   }))}
                   label={Titles.IncludeEventHandler}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({ eventTypeHandler: value });
                   }}
                   value={this.state.eventTypeHandler}
@@ -2186,7 +2186,7 @@ class ContextMenu extends Component {
                       .filter(x => x.id !== currentNode.id)
                       .toNodeSelect()}
                     label={Titles.ComponentType}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       this.setState({ component: value });
                     }}
                     value={this.state.component}
@@ -2228,7 +2228,7 @@ class ContextMenu extends Component {
                   .toNodeSelect()
                   .filter(x => x.id !== currentNode.id)}
                 label={Titles.CopyValidationConditions}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({ validator: value });
                 }}
                 value={this.state.validator}
@@ -2340,7 +2340,7 @@ class ContextMenu extends Component {
                   .toNodeSelect()
                   .filter(x => x.id !== currentNode.id)}
                 label={Titles.CopyPermissionConditions}
-                onChange={value => {
+                onChange={(value: any) => {
                   this.setState({ permission: value });
                 }}
                 value={this.state.permission}
@@ -2409,7 +2409,7 @@ class ContextMenu extends Component {
                     value: v
                   }))}
                   label={Titles.Select}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({ eventType: value });
                   }}
                   value={this.state.eventType}
@@ -2423,7 +2423,7 @@ class ContextMenu extends Component {
                     value: v
                   }))}
                   label={Titles.IncludeEventHandler}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({ eventTypeHandler: value });
                   }}
                   value={this.state.eventTypeHandler}
@@ -2483,7 +2483,7 @@ class ContextMenu extends Component {
                   label={Titles.LoadModelsOnComponentMount}
                   options={GetFunctionToLoadModels(currentNode)
                     .toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       functionToLoadModels: value
                     });
@@ -2496,7 +2496,7 @@ class ContextMenu extends Component {
                   label={Titles.MethodThatValidationComesFrom}
                   options={GetValidationMethodForViewTypes(currentNode)
                     .toNodeSelect()}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.setState({
                       validationMethod: value
                     });
@@ -2664,7 +2664,7 @@ class ContextMenu extends Component {
               immediate
               label={Titles.Name}
               placeholder={Titles.EnterName}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.setState({
                   customApi: value
                 });

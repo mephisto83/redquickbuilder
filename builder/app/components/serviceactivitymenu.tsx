@@ -12,7 +12,7 @@ import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties } from '../constants/nodetypes';
 import { Iterator } from 'webcola';
 import { ServiceTypes, ServiceTypeSetups } from '../constants/servicetypes';
-class ServiceActivityMenu extends Component {
+class ServiceActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Services);

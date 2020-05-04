@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import { getNodesLinkedTo, getNodesByLinkType, SOURCE, GetNode } from '../methods/graph_methods';
 import { NodeTypes, LinkType, NodeProperties } from '../constants/nodetypes';
 
-class PermissionDependencyActivityMenu extends Component {
+class PermissionDependencyActivityMenu extends Component<any, any> {
     getTargetNodes(graph, currentNode) {
         let targetPropertyNodes = [];
         if (currentNode) {

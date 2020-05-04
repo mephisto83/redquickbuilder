@@ -37,8 +37,8 @@ import TabPane from "./tabpane";
 import Tab from "./tab";
 const THEME_VIEW_TAB = 'theme-view-tab';
 
-class ThemeView extends Component {
-  constructor(props) {
+class ThemeView extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = { quickColor: '', bindAll: true, mediaSize: MediaQueries["Extra devices"] };
   }
@@ -261,7 +261,7 @@ class ThemeView extends Component {
           immediate
           label={`${color} : ${themeColors[color]}`}
           key={`color-${color}`}
-          onChange={value => {
+          onChange={(value: any) => {
             this.props.updateGraph('themeColors', { ...themeColors, [color]: value });
             const quickColor = [ThemeColors.primary,
             ThemeColors.secondary,
@@ -289,7 +289,7 @@ class ThemeView extends Component {
           label={use}
           title={use}
           color={themeColors && themeColorUses ? themeColors[themeColorUses[use]] : null}
-          onChange={value => {
+          onChange={(value: any) => {
             this.props.updateGraph('themeColorUses', { ...themeColorUses, [use]: value });
           }}
           options={Object.keys(ThemeColors).map(d => ({ title: d, value: d }))} />)
@@ -306,7 +306,7 @@ class ThemeView extends Component {
             value={themeOtherUses ? themeOtherUses[use] : null}
             label={use}
             title={use}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.updateGraph('themeOtherUses', { ...themeOtherUses, [use]: value });
             }}
             options={themeVariables.variables
@@ -323,7 +323,7 @@ class ThemeView extends Component {
             value={themeOtherUses ? themeOtherUses[use] : null}
             label={use}
             title={use}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.updateGraph('themeOtherUses', { ...themeOtherUses, [use]: value });
             }}
             options={themeFonts.fonts.map(d => ({ title: d.fontCssVar, value: d.fontCssVar }))} />)
@@ -334,7 +334,7 @@ class ThemeView extends Component {
           label={use}
           title={use}
           color={themeOtherUses ? themeOtherUses[use] : null}
-          onChange={value => {
+          onChange={(value: any) => {
             this.props.updateGraph('themeOtherUses', { ...themeOtherUses, [use]: value });
           }} />)
       }
@@ -368,7 +368,7 @@ class ThemeView extends Component {
                   <TextInput value={this.state.quickColor}
                     immediate
                     label={Titles.QuickColor}
-                    onChange={value => {
+                    onChange={(value: any) => {
                       if (value) {
                         const pcolors = value.split('-');
                         if (pcolors && pcolors.length === 5) {

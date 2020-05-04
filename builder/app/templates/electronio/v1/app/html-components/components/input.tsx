@@ -2,7 +2,7 @@ import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
 export default class Input extends React.Component {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}

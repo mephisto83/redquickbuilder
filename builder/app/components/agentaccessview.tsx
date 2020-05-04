@@ -35,8 +35,8 @@ import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
-class AgentAccessView extends Component {
-	constructor(props) {
+class AgentAccessView extends Component<any, any> {
+	constructor(props: any) {
 		super(props);
 		this.state = {
 			agents: [],

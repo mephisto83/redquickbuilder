@@ -5,6 +5,9 @@
 import path from 'path';
 import webpack from 'webpack';
 import { dependencies as externals } from '../app/package.json';
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const APP_DIR = path.resolve(__dirname, './src');
+const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
 
 export default {
   externals: [...Object.keys(externals || {})],
@@ -20,6 +23,23 @@ export default {
             cacheDirectory: true
           }
         }
+      },
+      {
+        test: /\.css$/,
+        include: APP_DIR,
+        use: [{
+          loader: 'style-loader',
+        }, {
+          loader: 'css-loader',
+          options: {
+            modules: true,
+            namedExport: true,
+          },
+        }],
+      }, {
+        test: /\.css$/,
+        include: MONACO_DIR,
+        use: ['style-loader', 'css-loader'],
       }
     ]
   },
@@ -34,7 +54,7 @@ export default {
    * Determine the array of extensions that should be used to resolve modules.
    */
   resolve: {
-    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.css'],
     modules: [path.join(__dirname, '..', 'app'), 'node_modules']
   },
 
@@ -43,6 +63,10 @@ export default {
       NODE_ENV: 'production'
     }),
 
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    new MonacoWebpackPlugin({
+      // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+      languages: ['json']
+    })
   ]
 };

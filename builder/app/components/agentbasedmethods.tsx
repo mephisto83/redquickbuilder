@@ -13,7 +13,7 @@ import { MethodFunctions, HTTP_METHODS } from '../constants/functiontypes';
 import TreeViewMenu from './treeviewmenu';
 import { CreateAgentFunction } from '../constants/nodepackages';
 
-class AgentBasedMethods extends Component {
+class AgentBasedMethods extends Component<any, any> {
   render() {
     var { state } = this.props;
     if (!state || !UIA.HasCurrentGraph()) { return <div></div> }

@@ -12,7 +12,7 @@ import { createValidator, addValidatator, GetNode } from '../methods/graph_metho
 import SideBarMenu from './sidebarmenu';
 import { uuidv4 } from '../utils/array';
 
-class ExecutorPropertyActivityMenu extends Component {
+class ExecutorPropertyActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, this.props.nodeType || UIA.NodeTypes.Executor);

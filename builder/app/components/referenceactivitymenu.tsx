@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties } from '../constants/nodetypes';
 import { Iterator } from 'webcola';
-class ReferenceActivityMenu extends Component {
+class ReferenceActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = !!(UIA.Application(state, UIA.GRAPH_SCOPE) || []).length;

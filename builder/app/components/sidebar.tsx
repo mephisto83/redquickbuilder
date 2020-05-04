@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { RelativeMenuCss } from "../constants/visual";
 import { Paused } from "../methods/graph_methods";
 
-export default class SideBar extends Component {
+export default class SideBar extends Component<any, any> {
   open() {
     return this.props.open ? "control-sidebar-open" : "";
   }

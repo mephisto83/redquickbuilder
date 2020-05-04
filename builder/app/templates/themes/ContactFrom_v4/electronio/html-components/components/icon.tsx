@@ -5,7 +5,7 @@ import StyleProvider from './styleprovider';
 let navigationInstance;
 
 export default class Icon extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {};

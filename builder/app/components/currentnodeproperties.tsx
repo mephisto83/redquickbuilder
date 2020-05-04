@@ -39,7 +39,7 @@ import {
 } from "../constants/functiontypes";
 import { DataChainContextMethods } from "../constants/datachain";
 
-class CurrentNodeProperties extends Component {
+class CurrentNodeProperties extends Component<any, any> {
   render() {
     var { state } = this.props;
 

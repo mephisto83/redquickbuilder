@@ -17,7 +17,7 @@ import { getNodesByLinkType, SOURCE, createValidator, addValidatator, TARGET, cr
 import SideBarMenu from './sidebarmenu';
 import { Functions, MethodFunctions } from '../constants/functiontypes';
 
-class ModelFilterActivityMenu extends Component {
+class ModelFilterActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ModelFilter);

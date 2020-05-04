@@ -10,7 +10,7 @@ import { getNodeLinks, getNodesLinkedFrom } from '../methods/graph_methods';
 import * as GraphMethods from '../methods/graph_methods';
 import { LinkPropertyKeys } from '../constants/nodetypes';
 import { FunctionConstraintKeys } from '../constants/functiontypes';
-class ParameterActivityMenu extends Component {
+class ParameterActivityMenu extends Component<any, any> {
     mustBeModel(currentNode) {
         var { state } = this.props;
         var links = getNodeLinks(UIA.GetCurrentGraph(state), currentNode.id, GraphMethods.TARGET);

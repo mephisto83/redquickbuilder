@@ -6,7 +6,7 @@ import FormControl from './formcontrol';
 import CheckBoxProperty from './checkboxproperty';
 import { ViewTypes } from '../constants/viewtypes';
 
-class AgentAccessProperties extends Component {
+class AgentAccessProperties extends Component<any, any> {
   render() {
     const { state } = this.props;
     const active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.AgentAccessDescription);

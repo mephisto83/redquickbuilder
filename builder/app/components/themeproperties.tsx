@@ -15,7 +15,7 @@ import { Themes } from "../constants/themes";
 import TreeViewItemContainer from "./treeviewitemcontainer";
 import SelectInput from "./selectinput";
 
-class ThemeProperties extends Component {
+class ThemeProperties extends Component<any, any> {
   render() {
     const { state } = this.props;
 
@@ -85,7 +85,7 @@ class ThemeProperties extends Component {
                     title: x
                   }))}
                   label={Titles.Priority}
-                  onChange={value => {
+                  onChange={(value: any) => {
                     this.props.graphOperation([
                       {
                         operation: UIA.UPDATE_NODE_PROPERTY,

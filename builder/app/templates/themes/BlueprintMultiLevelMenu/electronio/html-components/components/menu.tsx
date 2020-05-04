@@ -4,7 +4,7 @@ import styles from './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
 export default class Menu extends Component<any, any> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}

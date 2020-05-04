@@ -7,7 +7,7 @@ import TabPane from './tabpane';
 import * as Titles from './titles';
 import FormControl from './formcontrol';
 import SelectInput from './selectinput';
-class ExtensionListActivityMenu extends Component {
+class ExtensionListActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionTypeList);

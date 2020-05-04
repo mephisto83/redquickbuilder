@@ -14,7 +14,7 @@ import { uuidv4 } from '../utils/array';
 import SideBarHeader from './sidebarheader';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-class GenericPropertyMenu extends Component {
+class GenericPropertyMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, this.props.nodeType);

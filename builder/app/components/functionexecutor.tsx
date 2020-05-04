@@ -10,8 +10,8 @@ import { SOURCE, GetConnectedNodesByType, GetCellIdByTag, GetCellProperties, Get
 import { NodeTypes } from "../constants/nodetypes";
 import { UIConnect } from "../utils/utils";
 
-class FunctionExecutor extends Component {
-  constructor(props) {
+class FunctionExecutor extends Component<any, any> {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }
@@ -85,7 +85,7 @@ class FunctionExecutor extends Component {
             <SelectInput
               options={nodes}
               label={arg.name}
-              onChange={value => {
+              onChange={(value: any) => {
                 this.setState({ [arg.name]: value });
               }}
               value={this.state[arg.name] || defaults[arg.name]} />

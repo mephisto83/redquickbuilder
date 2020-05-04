@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 
 
-class SidebarToggle extends Component {
+class SidebarToggle extends Component<any, any> {
     render() {
         var me = this;
         return (

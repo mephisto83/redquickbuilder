@@ -31,7 +31,7 @@ import { PARAMETER_TAB } from "./dashboard";
 import { ComponentEvents } from "../constants/componenttypes";
 import CheckBoxProperty from "./checkboxproperty";
 
-class EventHandlerActivityMenu extends Component {
+class EventHandlerActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, [UIA.NodeTypes.EventHandler]);
@@ -54,7 +54,7 @@ class EventHandlerActivityMenu extends Component {
                     title: val
                   };
                 })}
-                onChange={value => {
+                onChange={(value: any) => {
                   var id = currentNode.id;
                   this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                     prop: UIA.NodeProperties.EventType,

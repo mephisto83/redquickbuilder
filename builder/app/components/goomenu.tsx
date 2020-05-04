@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 
-export default class NavBarButton extends Component {
-  constructor(props) {
+export default class NavBarButton extends Component<any, any> {
+  constructor(props: any) {
     super(props)
     this.state = {
       id: UIA.GUID()
@@ -96,7 +96,7 @@ export default class NavBarButton extends Component {
   }
 }
 
-export class GooMenuSVG extends Component {
+export class GooMenuSVG extends Component<any, any> {
   render() {
     return (
       <div style={{ display: 'none' }}>

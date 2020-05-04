@@ -14,8 +14,8 @@ import * as Titles from './titles';
 import { NodeProperties } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
-export default class RadioButton extends Component {
-    constructor(props) {
+export default class RadioButton extends Component<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {
             filter: '',

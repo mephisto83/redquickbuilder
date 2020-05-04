@@ -15,7 +15,7 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewItem from './treeviewitem';
 const MAESTRO_DETAILS_MENU = 'MAESTRO_DETAILS_MENU';
 
-class MaestroDetailsMenu extends Component {
+class MaestroDetailsMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Maestro);

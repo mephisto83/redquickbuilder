@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import TextBox from './textinput';
 import TextInput from './textinput';
 
-class SectionEdit extends Component {
+class SectionEdit extends Component<any, any> {
     render() {
         var { state } = this.props;
 

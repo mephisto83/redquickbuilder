@@ -5,7 +5,7 @@ import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } 
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
-class OptionActivityMenu extends Component {
+class OptionActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.OptionList);

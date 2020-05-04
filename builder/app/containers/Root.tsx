@@ -5,7 +5,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import Routes from '../Routes';
 
 
-export default class Root extends Component {
+export default class Root extends Component<any, any> {
   render() {
     const { store, history } = this.props;
     return (

@@ -23,7 +23,7 @@ import {
   LinkProperties
 } from "../constants/nodetypes";
 
-class MethodActivityMenu extends Component {
+class MethodActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Method);
@@ -42,7 +42,7 @@ class MethodActivityMenu extends Component {
           <SelectInput
             label={Titles.FunctionTypes}
             options={function_types}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.FunctionType,
                 id: currentNode.id,
@@ -64,7 +64,7 @@ class MethodActivityMenu extends Component {
               title: t,
               value: Methods[t]
             }))}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.MethodType,
                 id: currentNode.id,
@@ -85,7 +85,7 @@ class MethodActivityMenu extends Component {
               title: t,
               value: HTTP_METHODS[t]
             }))}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 id: currentNode.id,
                 value,
@@ -99,7 +99,7 @@ class MethodActivityMenu extends Component {
           <TextInput
             label={Titles.HttpRoute}
             value={UIA.GetNodeProp(currentNode, NodeProperties.HttpRoute)}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 id: currentNode.id,
                 value,
@@ -111,7 +111,7 @@ class MethodActivityMenu extends Component {
         {currentNode ? (
           <CheckBox
             label={Titles.NotIncludeInController}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.NotIncludedInController,
                 id: currentNode.id,
@@ -127,7 +127,7 @@ class MethodActivityMenu extends Component {
         {currentNode ? (
           <CheckBox
             label={Titles.AsForm}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.AsForm,
                 id: currentNode.id,
@@ -141,7 +141,7 @@ class MethodActivityMenu extends Component {
         UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm) ? (
           <CheckBox
             label={Titles.CollectCookies}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.CollectCookies,
                 id: currentNode.id,
@@ -157,7 +157,7 @@ class MethodActivityMenu extends Component {
         {currentNode ? (
           <CheckBox
             label={Titles.AsText}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.AsText,
                 id: currentNode.id,
@@ -170,7 +170,7 @@ class MethodActivityMenu extends Component {
         {currentNode ? (
           <CheckBox
             label={Titles.NoApiPrefix}
-            onChange={value => {
+            onChange={(value: any) => {
               this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                 prop: UIA.NodeProperties.NoApiPrefix,
                 id: currentNode.id,
