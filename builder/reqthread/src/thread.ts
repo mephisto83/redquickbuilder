@@ -79,8 +79,8 @@ async function job(options) {
 			} catch (e) {
 				console.log(e);
 			}
+			context.busy = false;
 			if (!context.jobArgs) {
-				context.busy = false;
 				console.log('job completed');
 				threadManagement.send({
 					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
@@ -88,7 +88,8 @@ async function job(options) {
 					changed: true,
 					ready: true
 				});
-			}
+      }
+      else throw new Error('shouldnt start another job before saying that it is ready');
 		} else {
 			throw new Error(`no inDirectories in the job path : ${jobPath}`);
 		}
@@ -102,7 +103,11 @@ async function loop() {
 	do {
 		try {
 			console.log('taking a nap');
-			await sleep();
+			if (context.busy) {
+				await sleep(30 * 1000);
+			} else {
+				await sleep();
+			}
 			if (!threadManagement.ready) {
 				console.log('not ready');
 				continue;
