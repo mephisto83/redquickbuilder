@@ -27,7 +27,8 @@ process.on(
 							let { filePath } = command;
 							let { options } = context;
 							console.log('Starting job --------- ');
-							job({ ...options, projectName: filePath[0], fileName: filePath[1] });
+
+							context.jobArgs = { ...options, projectName: filePath[0], fileName: filePath[1] };
 						},
 						() => {
 							console.log('calling on ready-------------');
@@ -103,6 +104,11 @@ async function loop() {
 			if (!threadManagement.ready) {
 				console.log('not ready');
 				continue;
+			}
+			if (context.jobArgs) {
+				let jobArgs = context.jobArgs;
+				await job(jobArgs);
+				delete context.jobArgs;
 			}
 			let { options } = context;
 			if (options) {

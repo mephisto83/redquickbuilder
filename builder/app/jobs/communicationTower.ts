@@ -76,7 +76,7 @@ export default class CommunicationTower {
 
 		console.debug(`http://${agentProject.host}:${agentProject.port}`);
 
-		return fetch(`http://${agentProject.host}:${agentProject.port}`, {
+		return await fetch(`http://${agentProject.host}:${agentProject.port}`, {
 			method: 'POST',
 			body: JSON.stringify(body)
 		})
@@ -130,43 +130,49 @@ export default class CommunicationTower {
 		this.listeners = listeners;
 		await this.startServers();
 	}
-	handleRequest(request: http.IncomingMessage, response: http.ServerResponse) {
+	handleRequest(request: http.IncomingMessage, response: http.ServerResponse): Promise<void> {
 		const { headers, method, url } = request;
 		let body: any[] = [];
 		let stringResult = '';
-		if (method === 'POST') {
-			request
-				.on('error', (err) => {
-					console.error(err);
-				})
-				.on('data', (chunk) => {
-					body.push(chunk);
-				})
-				.on('end', async () => {
-					stringResult = Buffer.concat(body).toString();
-					let replyObject = await this.processRequest(stringResult);
-					response.on('error', (err: any) => {
+		return new Promise((resolve, fail) => {
+			if (method === 'POST') {
+				request
+					.on('error', (err) => {
 						console.error(err);
+						fail();
+					})
+					.on('data', (chunk) => {
+						body.push(chunk);
+					})
+					.on('end', async () => {
+						stringResult = Buffer.concat(body).toString();
+						let replyObject = await this.processRequest(stringResult);
+						response.on('error', (err: any) => {
+							console.error(err);
+						});
+						response.statusCode = 200;
+						response.setHeader('Content-Type', 'application/json');
+						// Note: the 2 lines above could be replaced with this next one:
+						// response.writeHead(200, {'Content-Type': 'application/json'})
+						const responseBody = { headers, method, url, body: replyObject };
+						response.write(JSON.stringify(responseBody));
+						response.end();
+						resolve();
+						// At this point, we have the headers, method, url and body, and can now
+						// do whatever we need to in order to respond to this request.
 					});
-					response.statusCode = 200;
-					response.setHeader('Content-Type', 'application/json');
-					// Note: the 2 lines above could be replaced with this next one:
-					// response.writeHead(200, {'Content-Type': 'application/json'})
-					const responseBody = { headers, method, url, body: replyObject };
-					response.write(JSON.stringify(responseBody));
-					response.end();
-					// At this point, we have the headers, method, url and body, and can now
-					// do whatever we need to in order to respond to this request.
-				});
-		} else {
-			response.statusCode = 200;
-			response.setHeader('Content-Type', 'application/json');
-			const responseBody = { headers, method, url, body: 'noop' };
-			response.write(JSON.stringify(responseBody));
-			response.end();
-		}
+			} else {
+				response.statusCode = 200;
+				response.setHeader('Content-Type', 'application/json');
+				const responseBody = { headers, method, url, body: 'noop' };
+				response.write(JSON.stringify(responseBody));
+				response.end();
+				resolve();
+			}
+		});
 	}
 	async processRequest(strinResult: string) {
+		console.debug('process request');
 		let parsed = JSON.parse(strinResult);
 		let reply: RedQuickDistributionMessage = {
 			port: 0,
@@ -174,6 +180,7 @@ export default class CommunicationTower {
 			noPort: false,
 			hostname: ''
 		};
+		console.debug(parsed.command);
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
 				reply.port = await this.getAvailbePort();
@@ -194,14 +201,17 @@ export default class CommunicationTower {
 			reply.error = true;
 			reply.noPort = true;
 		}
+		console.debug('finished request');
+
 		return reply;
 	}
 	async onHandleReceivedMessage(message: RedQuickDistributionMessage) {
 		let progressListeners = this.listeners && message.command ? this.listeners[message.command] : null;
 		if (progressListeners) {
+			console.debug(`handle received message`);
 			return await progressListeners(message);
 		}
-		return null;
+		throw new Error('no handler for ' + message.command);
 	}
 	async sendFile(message: AgentProject, localFilePath: string) {
 		let server: net.Server,

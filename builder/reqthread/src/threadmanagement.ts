@@ -58,20 +58,23 @@ export default class ThreadManagement {
 				};
 			},
 			[RedQuickDistributionCommand.RUN_JOB]: async (message: RedQuickDistributionMessage) => {
-			 	if (!message.agentProject) {
+				console.log('run job here');
+				if (!message.agentProject) {
 					return {
 						error: 'no agentProject set'
 					};
 				}
-
+				console.debug(`${message.agentProject} === ${this.configuration.agentProject}`);
 				if (message.agentProject === this.configuration.agentProject) {
 					this.runJob(message);
 					await sleep(1000);
+					console.log('running job here');
 					return {
 						error: null,
 						success: true
 					};
 				}
+				console.log('error trying to run');
 				return {
 					error: 'No agent'
 				};
@@ -105,7 +108,9 @@ export default class ThreadManagement {
 		}
 	}
 	runJob(message: RedQuickDistributionMessage) {
-		this.runJobHandler(message);
+		setTimeout(() => {
+			this.runJobHandler(message);
+		}, 100);
 	}
 	async sendBackResults(completedJobItem: {
 		folderPath: string;

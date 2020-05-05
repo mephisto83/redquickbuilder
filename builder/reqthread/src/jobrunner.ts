@@ -155,12 +155,13 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 				message.projectName,
 				message.fileName
 			);
-			// console.debug(relativePath);
 			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
 					let completed = await JobService.SetJobPartComplete(relativePath);
-					await JobService.SetJobPartComplete(relativePath);
+					// await JobService.SetJobPartComplete(relativePath);
+
+					console.debug(relativePath);
 					if (!completed) {
 						throw new Error('job was not set to completed');
 					}

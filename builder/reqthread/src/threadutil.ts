@@ -44,7 +44,7 @@ export function getAgentTrees(folder: string): AgentDirectories {
 
 	throw new Error('folder doesnt exist');
 }
-export function sleep(ms: number = 30 * 1000) {
+export function sleep(ms: number = 3 * 1000) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

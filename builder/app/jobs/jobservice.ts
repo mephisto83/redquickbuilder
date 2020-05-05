@@ -488,14 +488,20 @@ export default class JobService {
 				agentProject.workingOnJob = jobItem.job;
 
 				await JobService.saveJobItem(jobItem);
-        console.log('saved job item');
+				console.log('saved job item');
 
 				await this.moveJobItemFiles(agentProject, jobItem);
 
-        console.log('moved job item files');
+				console.log('moved job item files');
 
-				await this.beginJob(agentProject, jobItem);
-        console.log('began job item');
+				console.log('begin job item');
+				try {
+					await this.beginJob(agentProject, jobItem);
+				} catch (e) {
+					console.log(e);
+					throw e;
+				}
+				console.log('began job item');
 
 				if (JobService.NewJobCallback) {
 					await JobService.NewJobCallback(jobToDistribute);
@@ -529,10 +535,12 @@ export default class JobService {
 	}
 	static async beginJob(agentProject: AgentProject, jobItem: JobItem) {
 		agentProject.ready = false;
+		console.log(agentProject);
 		await this.communicationTower.send(
 			agentProject,
 			path_join(jobItem.job, jobItem.file),
-			RedQuickDistributionCommand.RUN_JOB
+			RedQuickDistributionCommand.RUN_JOB,
+			{}
 		);
 		agentProject.ready = false;
 	}
