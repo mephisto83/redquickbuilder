@@ -79,7 +79,7 @@ async function job(options) {
 			} catch (e) {
 				console.log(e);
 			}
-			if (context.jobArgs) {
+			if (!context.jobArgs) {
 				context.busy = false;
 				console.log('job completed');
 				threadManagement.send({
@@ -122,11 +122,11 @@ async function loop() {
 			} else {
 				console.warn('no options yet');
 			}
-			console.log('loop done');
+			console.log('loop done ' + context.config.agentProject);
 			if (!context.busy) {
-				console.log('not busy');
+				console.log('not busy' + context.config.agentProject);
 
-				if (context.jobArgs) {
+				if (!context.jobArgs) {
 					threadManagement.send({
 						response: RedQuickDistributionCommand.RaisingAgentProjectReady,
 						command: RedQuickDistributionCommand.RaisingAgentProjectReady,
