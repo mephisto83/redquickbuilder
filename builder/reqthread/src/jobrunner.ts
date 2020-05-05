@@ -9,7 +9,8 @@ import JobService, {
 	ensureDirectory,
 	path_join,
 	JobItem,
-	Job
+	Job,
+	CurrentJobInformation
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 import { GetCurrentGraph } from '../../app/actions/uiactions';
@@ -113,6 +114,16 @@ async function tellCommandCenter() {
 		runnerContext.commandCenter.commandCenterHost
 	) {
 		try {
+			let jobs = await JobService.getJobs();
+			await jobs.forEachAsync(async (job: Job) => {
+        let parts = [];
+				await job.parts.forEachAsync(async (part: string) => {
+					parts.push(await JobService.loadJobItem(job.name, part, JobServiceConstants.JobPath()));
+				});
+				currentJobInformation.jobs = currentJobInformation.jobs || {};
+				currentJobInformation.jobs[job.name] = { job: job, parts };
+      });
+
 			await communicationTower.send(
 				{
 					host: runnerContext.commandCenter.commandCenterHost,
@@ -265,19 +276,16 @@ async function executeStep(jobFilePath: string) {
 
 			currentJobInformation.jobFile = jobConfig;
 
-			try {
-				let loadedJob = await JobService.loadJob(jobConfig.jobPath);
-				if (loadedJob) {
-					let parts = [];
-					await loadedJob.parts.forEachAsync(async (part: string) => {
-						parts.push(await JobService.loadJobItem(loadedJob.name, part, JobServiceConstants.JobPath()));
-					});
-					currentJobInformation.currentJobName = loadedJob.name;
-					currentJobInformation.currentStep = step.name;
-					currentJobInformation.jobs[loadedJob.name] = { job: loadedJob, parts };
-					await tellCommandCenter();
-				}
-			} catch (e) {}
+			JobService.NewJobCallback = async (updatedJob: Job) => {
+				try {
+					let loadedJob = updatedJob;
+					if (loadedJob) {
+						currentJobInformation.currentJobName = loadedJob.name;
+						currentJobInformation.currentStep = step.name;
+						await tellCommandCenter();
+					}
+				} catch (e) {}
+			};
 			console.debug('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
 			let cg = GetCurrentGraph();
@@ -291,17 +299,18 @@ async function executeStep(jobFilePath: string) {
 			jobConfig.step = step.name;
 			console.debug(jobConfig.step);
 			currentJobInformation.jobFile = jobConfig;
-			try {
-				let loadedJob = await JobService.loadJob(jobConfig.jobPath);
-				if (loadedJob) {
-					let parts = [];
-					await loadedJob.parts.forEachAsync(async (part: string) => {
-						parts.push(await JobService.loadJobItem(loadedJob.name, part, JobServiceConstants.JobPath()));
-					});
-					currentJobInformation.currentJobName = loadedJob.name;
-					currentJobInformation.jobs[loadedJob.name] = { job: loadedJob, parts };
-				}
-			} catch (e) {}
+			// try {
+			// 	let loadedJob = await JobService.loadJob(jobConfig.jobPath);
+			// 	if (loadedJob) {
+			// 		let parts = [];
+			// 		await loadedJob.parts.forEachAsync(async (part: string) => {
+			// 			parts.push(await JobService.loadJobItem(loadedJob.name, part, JobServiceConstants.JobPath()));
+			// 		});
+			// 		currentJobInformation.currentJobName = loadedJob.name;
+			// 		currentJobInformation.jobs = currentJobInformation.jobs || {};
+			// 		currentJobInformation.jobs[loadedJob.name] = { job: loadedJob, parts };
+			// 	}
+			// } catch (e) {}
 			await tellCommandCenter();
 		} catch (e) {
 			console.debug(e);
@@ -314,17 +323,7 @@ async function executeStep(jobFilePath: string) {
 		console.debug('job has an error, skipping');
 	}
 }
-let currentJobInformation: {
-	jobFile?: JobFile;
-	currentJobName?: string;
-	currentStep?: string;
-	jobs?: {
-		[index: string]: {
-			job?: Job;
-			parts?: JobItem[];
-		};
-	};
-} = {};
+let currentJobInformation: CurrentJobInformation = {};
 function GetCurrentJobInformation() {
 	return currentJobInformation;
 }

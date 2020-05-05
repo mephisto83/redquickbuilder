@@ -141,6 +141,7 @@ export default class JobService {
 			} catch (e) {}
 		}
 	}
+	static NewJobCallback: any;
 	static async StartJob(
 		command: string,
 		currentJobFile: JobFile,
@@ -148,6 +149,9 @@ export default class JobService {
 		modelTypes?: string | string[]
 	): Promise<Job> {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
+		if (JobService.NewJobCallback) {
+			await JobService.NewJobCallback(job);
+		}
 		let distributedJob = await JobService.DistributeJobs(job, command);
 		if (distributedJob) {
 			currentJobFile.jobPath = path_join(JobPath(), distributedJob.name, JOB_NAME);
@@ -476,8 +480,8 @@ export default class JobService {
 				jobItem.distributed = true;
 				jobItem.config.distributed = true;
 				jobItem.assignedTo = agentProject.agentProject || agentProject.name;
-        agentProject.workingOnFile = jobItem.file;
-        agentProject.workingOnJob = jobItem.job;
+				agentProject.workingOnFile = jobItem.file;
+				agentProject.workingOnJob = jobItem.job;
 
 				await JobService.saveJobItem(jobItem);
 
@@ -852,6 +856,17 @@ export interface JobItem {
 }
 export interface JobOutput {
 	files: string[];
+}
+export interface CurrentJobInformation {
+	jobFile?: JobFile;
+	currentJobName?: string;
+	currentStep?: string;
+	jobs?: {
+		[index: string]: {
+			job?: Job;
+			parts?: JobItem[];
+		};
+	};
 }
 export interface JobFile {
 	started?: boolean;
