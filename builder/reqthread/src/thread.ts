@@ -88,8 +88,7 @@ async function job(options) {
 					changed: true,
 					ready: true
 				});
-      }
-      else throw new Error('shouldnt start another job before saying that it is ready');
+			} else throw new Error('shouldnt start another job before saying that it is ready');
 		} else {
 			throw new Error(`no inDirectories in the job path : ${jobPath}`);
 		}
@@ -114,8 +113,8 @@ async function loop() {
 			}
 			if (context.jobArgs) {
 				let jobArgs = context.jobArgs;
+				context.jobArgs = null;
 				await job(jobArgs);
-				delete context.jobArgs;
 			}
 			let { options } = context;
 			if (options) {
