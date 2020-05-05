@@ -79,14 +79,16 @@ async function job(options) {
 			} catch (e) {
 				console.log(e);
 			}
-			context.busy = false;
-			console.log('job completed');
-			threadManagement.send({
-				response: RedQuickDistributionCommand.RaisingAgentProjectReady,
-				command: RedQuickDistributionCommand.RaisingAgentProjectReady,
-				changed: true,
-				ready: true
-			});
+			if (context.jobArgs) {
+				context.busy = false;
+				console.log('job completed');
+				threadManagement.send({
+					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+					changed: true,
+					ready: true
+				});
+			}
 		} else {
 			throw new Error(`no inDirectories in the job path : ${jobPath}`);
 		}
@@ -123,12 +125,15 @@ async function loop() {
 			console.log('loop done');
 			if (!context.busy) {
 				console.log('not busy');
-				threadManagement.send({
-					response: RedQuickDistributionCommand.RaisingAgentProjectReady,
-					command: RedQuickDistributionCommand.RaisingAgentProjectReady,
-					changed: true,
-					ready: true
-				});
+
+				if (context.jobArgs) {
+					threadManagement.send({
+						response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+						command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+						changed: true,
+						ready: true
+					});
+				}
 			} else {
 				console.log('------------ is busy -----------------');
 			}
