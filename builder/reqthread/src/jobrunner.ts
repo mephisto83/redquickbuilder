@@ -61,11 +61,11 @@ let runnerContext: RunnerContext = {
 })();
 async function setCommandCenter(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	let msg: any = message;
-	console.log('set command center');
+	console.debug('set command center');
 	if (msg) {
 		runnerContext.commandCenter = { ...runnerContext.commandCenter, ...msg };
 	}
-	console.log(runnerContext.commandCenter);
+	console.debug(runnerContext.commandCenter);
 	return { success: true };
 }
 async function noOp(): Promise<ListenerReply> {
@@ -86,7 +86,7 @@ async function handleAgentProjectStateChange(
 				await JobService.UpdateReadyAgents(
 					runnerContext.agents[message.agentName].projects[message.agentProject]
 				);
-				console.log(`updating ready to ${ready} for ${message.agentProject}.`);
+				console.debug(`updating ready to ${ready} for ${message.agentProject}.`);
 				return {
 					success: true
 				};
@@ -103,7 +103,7 @@ async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Pro
 	return await handleAgentProjectStateChange(message, false);
 }
 async function tellCommandCenter() {
-	console.log('tell command center');
+	console.debug('tell command center');
 	if (
 		runnerContext.commandCenter &&
 		runnerContext.commandCenter.commandCenterPort &&
@@ -118,26 +118,26 @@ async function tellCommandCenter() {
 				'',
 				RedQuickDistributionCommand.UpdateCommandCenter
 			);
-			console.log('told command center');
+			console.debug('told command center');
 		} catch (e) {
-			console.log(e);
+			console.debug(e);
 		}
 	}
 }
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	await sleep(10 * 1000);
-	console.log('CompletedJobItem');
-	console.log('handing completed job item');
+	console.debug('CompletedJobItem');
+	console.debug('handing completed job item');
 	if (message.projectName) {
 		if (message.fileName) {
-			console.log(communicationTower.agentName || '');
+			console.debug(communicationTower.agentName || '');
 			let relativePath = path_join(
 				JobServiceConstants.JobPath(),
 				communicationTower.agentName || '',
 				message.projectName,
 				message.fileName
 			);
-			console.log(relativePath);
+			console.debug(relativePath);
 			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
@@ -199,12 +199,12 @@ async function handleHandRaising(message: RedQuickDistributionMessage): Promise<
 			runnerContext.agents[message.agentName].projects[temp.project.agentProject].port = temp.project.port;
 			runnerContext.agents[message.agentName].projects[temp.project.agentProject].host = temp.project.host;
     }
-    console.log(message);
+    console.debug(message);
 		Object.keys(runnerContext.agents[message.agentName].projects).forEach((agentProject) => {
 			JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[agentProject]);
 		});
-		console.log('hand raised');
-		console.log(runnerContext.agents);
+		console.debug('hand raised');
+		console.debug(runnerContext.agents);
 		return {
 			success: true
 		};
@@ -241,43 +241,43 @@ async function processJobs() {
 }
 
 async function executeStep(jobFilePath: string) {
-	console.log('read job file path');
-	console.log(jobFilePath);
+	console.debug('read job file path');
+	console.debug(jobFilePath);
 	let jobConfigContents = fs.readFileSync(jobFilePath, 'utf8');
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error && !jobConfig.completed) {
 		try {
 			let graphPath = jobConfig.graphPath;
-			console.log('get next command');
+			console.debug('get next command');
 			let currentStep = BuildAllInfo.Commands.findIndex((v) => v.name === jobConfig.step);
-			console.log('setup job');
-			console.log(graphPath);
+			console.debug('setup job');
+			console.debug(graphPath);
 			await setupJob(path.dirname(graphPath));
 			let step = BuildAllInfo.Commands[currentStep + 1];
-			console.log(`step: ${step.name}`);
-			console.log(`currentStep: ${currentStep + 1}`);
+			console.debug(`step: ${step.name}`);
+			console.debug(`currentStep: ${currentStep + 1}`);
 
-			console.log('build all distributed');
+			console.debug('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
 			let cg = GetCurrentGraph();
-			console.log(`version to save : ${JSON.stringify(cg.version, null, 4)}`);
+			console.debug(`version to save : ${JSON.stringify(cg.version, null, 4)}`);
 
-			console.log('save current graph to');
+			console.debug('save current graph to');
 			delete jobConfig.updatedGraph;
 			await saveCurrentGraphTo(graphPath, cg);
 			await ensureDirectory(path_join(path.dirname(graphPath), 'stages'));
 			await saveCurrentGraphTo(path_join(path.dirname(graphPath), 'stages', `${step.name}.rqb`), cg);
 			jobConfig.step = step.name;
-			console.log(jobConfig.step);
+			console.debug(jobConfig.step);
 		} catch (e) {
-			console.log(e);
-			console.log(jobConfig);
+			console.debug(e);
+			console.debug(jobConfig);
 			jobConfig.error = `${e}`;
 		} finally {
 			await JobService.saveJobFile(jobFilePath, jobConfig);
 		}
 	} else if (jobConfig.error) {
-		console.log('job has an error, skipping');
+		console.debug('job has an error, skipping');
 	}
 }
 async function createJobs() {
@@ -300,16 +300,16 @@ async function createJobs() {
 							console.error(e);
 						}
 					} else {
-						console.log('createJobs: file doesnt exist');
+						console.debug('createJobs: file doesnt exist');
 					}
 				} else {
-					console.log('no file path');
+					console.debug('no file path');
 				}
 			} catch (e) {
 				console.error(e);
 			}
 		});
 	} else {
-		console.log('no jobs folder');
+		console.debug('no jobs folder');
 	}
 }

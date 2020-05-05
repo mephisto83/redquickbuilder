@@ -36,8 +36,9 @@ import {
 import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
 import { setupJob } from './threadutil';
-import { Create_Component_All, Connect_Screens } from '../../app/nodepacks/batch/BuildAllDistributed';
+import { Create_Component_All, Connect_Screens, Add_Component_To_Screen_Options } from '../../app/nodepacks/batch/BuildAllDistributed';
 import ConnectScreens from '../../app/nodepacks/batch/ConnectScreens';
+import AddComponentsToScreenOptions from '../../app/nodepacks/batch/AddComponentsToScreenOptions';
 
 let app_state;
 
@@ -85,7 +86,19 @@ export default async function executeJob(
 					if (onChange) {
 						onChange({ ...options, jobInstancePath });
 					}
-					break;
+          break;
+        case Add_Component_To_Screen_Options:
+          await AddComponentsToScreenOptions(
+						() => {},
+						(model: any) => {
+							return filter && filter.models.indexOf(model.id) !== -1;
+						}
+					);
+					await storeOutput(path.join(jobInstancePath));
+					if (onChange) {
+						onChange({ ...options, jobInstancePath });
+					}
+          break;
 				default:
           jobConfig.complete = true;
           console.log('-------------invalid job----------------')

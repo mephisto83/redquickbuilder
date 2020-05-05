@@ -81,7 +81,19 @@ const buildAllConfig = {
 function setCommandToRun(command: string) {
 	buildAllConfig.command = command;
 }
+function wait(name: string) {
+	return `wait_for_${name}`;
+}
+async function threadRun(array: BuildStep[], name: string, currentJobFile: JobFile, nodeTypes: string[] | string) {
+	await run(array, Connect_Screens, async (progresFunc: any) => {
+		await JobService.StartJob(name, currentJobFile, 1, nodeTypes);
+		//     await ConnectScreens(progresFunc);
+	});
 
+	await run(array, wait(name), async (progresFunc: (arg0: number) => any) => {
+		await JobService.WaitForJob(wait(name), currentJobFile);
+	});
+}
 async function run(array: BuildStep[], name: string, func: Function) {
 	if (name !== buildAllConfig.command) {
 		return;
@@ -127,7 +139,7 @@ const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
 const Modify_Update_Links = 'Modify_Update_Links';
 const Setup_View_Types = 'Setup_View_Types';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
-const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
+export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionDataChainsIntoCollectionsTitle = 'Collection Data Chains Into Collections';
 const Collect_Into_Graph = 'Collect_Into_Graph';
@@ -226,9 +238,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			}
 		);
 
-    await run(buildAllProgress, Update_Screen_Urls, async (progressFunc: any) => {
+		await run(buildAllProgress, Update_Screen_Urls, async (progressFunc: any) => {
 			await UpdateScreenUrls(progressFunc);
-    });
+		});
 
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
@@ -287,9 +299,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Add_Copy_Command_To_Executors, async (progresFunc: any) => {
 			await AddCopyCommandToExecutors(progresFunc);
 		});
-		await run(buildAllProgress, Add_Component_To_Screen_Options, async (progresFunc: any) => {
-			await AddComponentsToScreenOptions(progresFunc);
-		});
+		// await run(buildAllProgress, Add_Component_To_Screen_Options, async (progresFunc: any) => {
+		// 	await AddComponentsToScreenOptions(progresFunc);
+    // });
+
+		await threadRun(buildAllProgress, Add_Component_To_Screen_Options, currentJobFile, NodeTypes.Screen);
 
 		await run(buildAllProgress, CollectionDataChainsIntoCollectionsTitle, async (progresFunc: any) => {
 			const result = CollectionDataChainsIntoCollections(progresFunc);
