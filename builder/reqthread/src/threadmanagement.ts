@@ -24,6 +24,7 @@ export default class ThreadManagement {
 	runJobHandler: Function;
 	ipAddress: any;
 	onReady: any;
+	ready: boolean;
 	async start(config: DistrConfig, options: ChildProcessOptions, $runJobHandler: any, onReady: any) {
 		this.configuration = config;
 		this.configuration.agentName = options.agentName;
@@ -100,6 +101,7 @@ export default class ThreadManagement {
 		});
 
 		this.onReady();
+		this.ready = true;
 	}
 	runJob(message: RedQuickDistributionMessage) {
 		this.runJobHandler(message);
@@ -193,9 +195,9 @@ export default class ThreadManagement {
 	}
 	async raiseHand(project: AgentProject) {
 		let command = RedQuickDistributionCommand.RaisingHand;
-    let agentName = this.getAgentName();
+		let agentName = this.getAgentName();
 		do {
-      console.log(project);
+			console.log(project);
 			let completed = false;
 			try {
 				console.log(

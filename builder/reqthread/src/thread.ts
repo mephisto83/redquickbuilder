@@ -21,8 +21,8 @@ process.on(
 			switch (message.command) {
 				case Operations.INIT:
 					threadManagement.start(
-            message.config,
-            options,
+						message.config,
+						options,
 						(command: RedQuickDistributionMessage) => {
 							let { filePath } = command;
 							let { options } = context;
@@ -40,10 +40,6 @@ process.on(
 								changed: true,
 								ready: true
 							});
-
-							(async function() {
-								await loop();
-							})();
 						}
 					);
 					break;
@@ -103,6 +99,9 @@ async function loop() {
 		try {
 			console.log('taking a nap');
 			await sleep();
+			if (!threadManagement.ready) {
+				continue;
+			}
 			let { options } = context;
 			if (options) {
 				let { folderPath, agentName, projectName } = options;
@@ -164,3 +163,7 @@ export const Operations = {
 	CHANGED: 'CHANGED',
 	COMPLETED_TASK: 'COMPLETED_TASK'
 };
+
+(async function() {
+	await loop();
+})();
