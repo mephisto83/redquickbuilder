@@ -108,9 +108,9 @@ class CurrentJobProgressView extends Component<any, any> {
 							<table className="table table-bordered">
 								{BuildAllInfo.Commands
 									.map((command, index) => {
-										if (index && BuildAllInfo.Commands.length < index + 1) {
-											command = BuildAllInfo.Commands[index + 1];
-										}
+										// if (index && BuildAllInfo.Commands.length < index + 1) {
+										// 	command = BuildAllInfo.Commands[index + 1];
+										// }
 										let cls = 'fa fa-circle';
 										let currentStyle = {};
 										if (indexOfCompletion < index) {
@@ -140,15 +140,35 @@ class CurrentJobProgressView extends Component<any, any> {
 															}
 															return currentValue;
 														});
+													let distrubted = parts
+														.filter((x: JobItem) => x)
+														.summation((value: JobItem, currentValue: number) => {
+															currentValue = currentValue || 0;
+															if (value.distributed) {
+																return currentValue + 1;
+															}
+															return currentValue;
+														});
 													rows.push(
 														<tr>
 															<td colSpan="2">
 																<progress
 																	title={
-																		Math.floor(completed / parts.length * 1000) /
-																		10
+																		Math.floor(completed / parts.length * 1000) / 10
 																	}
 																	value={completed}
+																	min={0}
+																	max={parts.length}
+																/>
+															</td>
+														</tr>
+													);
+													rows.push(
+														<tr>
+															<td colSpan="2">
+																<progress
+																	title={`${distrubted} / ${parts.length}`}
+																	value={distrubted}
 																	min={0}
 																	max={parts.length}
 																/>

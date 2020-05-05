@@ -58,8 +58,7 @@ export default class ThreadManagement {
 				};
 			},
 			[RedQuickDistributionCommand.RUN_JOB]: async (message: RedQuickDistributionMessage) => {
-				let agentProject = this.threads[message.agentProject];
-				if (!message.agentProject) {
+			 	if (!message.agentProject) {
 					return {
 						error: 'no agentProject set'
 					};

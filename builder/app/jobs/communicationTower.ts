@@ -73,16 +73,20 @@ export default class CommunicationTower {
 			agentProject: agentProject.name,
 			filePath: arg1.split(path.sep)
 		};
+
+		console.debug(`http://${agentProject.host}:${agentProject.port}`);
+
 		return fetch(`http://${agentProject.host}:${agentProject.port}`, {
 			method: 'POST',
 			body: JSON.stringify(body)
 		})
-			.then((res: any) => {
-				if (res.error) {
-					console.error(res);
-					throw new Error(res.error);
-				}
-				return res;
+			.then((response: any) => {
+				return response.json((res: any) => {
+					if (res.error) {
+						console.error(res);
+						throw new Error(res.error);
+					}
+				});
 			})
 			.catch((err: any) => {
 				console.log(err);
@@ -313,8 +317,8 @@ export default class CommunicationTower {
 				let portAddr: any = server.address();
 				let port = portAddr && portAddr.port ? portAddr.port : null;
 				this.setPort(port);
-        console.log(`Server running at http://${address.hostname}:${port}/`);
-        resolve();
+				console.log(`Server running at http://${address.hostname}:${port}/`);
+				resolve();
 			});
 		});
 	}

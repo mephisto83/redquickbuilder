@@ -149,9 +149,7 @@ export default class JobService {
 		modelTypes?: string | string[]
 	): Promise<Job> {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
-		if (JobService.NewJobCallback) {
-			await JobService.NewJobCallback(job);
-		}
+
 		let distributedJob = await JobService.DistributeJobs(job, command);
 		if (distributedJob) {
 			currentJobFile.jobPath = path_join(JobPath(), distributedJob.name, JOB_NAME);
@@ -423,11 +421,15 @@ export default class JobService {
 	}
 	static agentProjects: AgentProject[] = [];
 	static async UpdateReadyAgents(agentProject: AgentProject) {
-		console.log('update ready');
+		// console.log('update ready');
 		JobService.agentProjects = [
 			...JobService.agentProjects.filter((x) => x.name !== agentProject.name),
 			agentProject
 		];
+		console.debug(
+			`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter((x) => x.ready)
+				.length} available`
+		);
 	}
 	static async GetAvailableProjects(): Promise<AgentProject[]> {
 		return JobService.agentProjects.filter((x) => x.ready);
@@ -437,10 +439,10 @@ export default class JobService {
 		let result: AgentProject | null = null;
 
 		do {
-			console.log(
+			console.debug(
 				`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter(
 					(x) => x.ready
-				).length} avaiable`
+				).length} available`
 			);
 			result = JobService.agentProjects.find((x) => x.ready) || null;
 			if (!result) {
@@ -463,7 +465,9 @@ export default class JobService {
 		});
 
 		while (jobItems && jobItems.length) {
+			console.log('Distributing Jobs');
 			let agentProject: AgentProject = await JobService.GetAvailableProject();
+			console.log('Distributing Job to ' + agentProject.name);
 			let jobItem: JobItem | undefined = jobItems.shift();
 			if (jobItem) {
 				let dir = path_join(jobItem.job, jobItem.file);
@@ -484,10 +488,18 @@ export default class JobService {
 				agentProject.workingOnJob = jobItem.job;
 
 				await JobService.saveJobItem(jobItem);
+        console.log('saved job item');
 
 				await this.moveJobItemFiles(agentProject, jobItem);
 
+        console.log('moved job item files');
+
 				await this.beginJob(agentProject, jobItem);
+        console.log('began job item');
+
+				if (JobService.NewJobCallback) {
+					await JobService.NewJobCallback(jobToDistribute);
+				}
 				await sleep(10);
 			}
 		}

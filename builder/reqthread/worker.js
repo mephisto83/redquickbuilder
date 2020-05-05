@@ -8,14 +8,14 @@ let distribution = new Distribution();
   let fle = fs.readFileSync('./applicationConfig.json', 'utf8');
   let adata = JSON.parse(fle);
   let dir = os.platform() === 'linux' ? '/home/andrew/work_folder' :(adata["D:\\temp\\job_service_jobs"]||'D:/temp/workout_wd');
-  
+
   await distribution.start({
     entryPath: './dist/reqthread/src/thread.js',
     folder: dir,
     baseFolder: dir,
     workingDirectory:dir,
     throttle: 120 * 1000,
-    threads: 3,
+    threads: 1,
     remoteServerHost: '192.168.1.146',
     remoteServerPort: 7979
   })
