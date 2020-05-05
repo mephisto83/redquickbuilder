@@ -108,6 +108,7 @@ async function loop() {
 				await sleep();
 			}
 			if (!threadManagement.ready) {
+				if(context.config)
 				console.log('not ready ' + context.config.agentProject);
 				continue;
 			}
