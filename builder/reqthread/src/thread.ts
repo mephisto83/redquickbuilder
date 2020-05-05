@@ -114,6 +114,7 @@ async function loop() {
 			if (context.jobArgs) {
 				let jobArgs = context.jobArgs;
 				context.jobArgs = null;
+				await sleep(10 * 1000);
 				await job(jobArgs);
 			}
 			let { options } = context;
