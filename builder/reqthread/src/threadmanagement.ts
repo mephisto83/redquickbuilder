@@ -50,58 +50,60 @@ export default class ThreadManagement {
 	}
 
 	async listen() {
-		await new Promise(async (resolve, fail) => {
-			await this.communicationTower.start({
-				[RedQuickDistributionCommand.Progress]: async (message: RedQuickDistributionMessage) => {
+		await this.communicationTower.start({
+			[RedQuickDistributionCommand.Progress]: async (message: RedQuickDistributionMessage) => {
+				return {
+					progress: this.progressTracking,
+					succes: true
+				};
+			},
+			[RedQuickDistributionCommand.RUN_JOB]: async (message: RedQuickDistributionMessage) => {
+				let agentProject = this.threads[message.agentProject];
+				if (!message.agentProject) {
 					return {
-						progress: this.progressTracking,
-						succes: true
+						error: 'no agentProject set'
 					};
-				},
-				[RedQuickDistributionCommand.RUN_JOB]: async (message: RedQuickDistributionMessage) => {
-					let agentProject = this.threads[message.agentProject];
-					if (!message.agentProject) {
-						return {
-							error: 'no agentProject set'
-						};
-					}
+				}
 
-					if (message.agentProject === this.configuration.agentProject) {
-						this.runJob(message);
-						await sleep(1000);
-						return {
-							error: null,
-							success: true
-						};
-					}
+				if (message.agentProject === this.configuration.agentProject) {
+					this.runJob(message);
+					await sleep(1000);
 					return {
-						error: 'No agent'
+						error: null,
+						success: true
 					};
-				},
-				[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
-				[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
-				[RedQuickDistributionCommand.RaisingHand]: noOp,
-				[RedQuickDistributionCommand.SetCommandCenter]: noOp,
-				[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
-				[RedQuickDistributionCommand.SendFile]: noOp,
-				[RedQuickDistributionCommand.SetAgentProjects]: noOp,
-				[RedQuickDistributionCommand.CompletedJobItem]: noOp
-			});
-			let ctPort = this.communicationTower.getPort();
-			if (ctPort) {
-				this.raiseHand({
-					agentName: this.configuration.agentName,
-					agentProject: this.configuration.agentProject,
-					port: ctPort,
-					host: this.ipAddress
-				});
-			} else {
-				throw new Error(`ctPort is not valid ${ctPort}`);
-			}
+				}
+				return {
+					error: 'No agent'
+				};
+			},
+			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
+			[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
+			[RedQuickDistributionCommand.RaisingHand]: noOp,
+			[RedQuickDistributionCommand.SetCommandCenter]: noOp,
+			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
+			[RedQuickDistributionCommand.SendFile]: noOp,
+			[RedQuickDistributionCommand.SetAgentProjects]: noOp,
+			[RedQuickDistributionCommand.CompletedJobItem]: noOp
 		});
+		let ctPort = this.communicationTower.getPort();
+		if (ctPort) {
+			this.raiseHand({
+				agentName: this.configuration.agentName,
+				agentProject: this.configuration.agentProject,
+				port: ctPort,
+				host: this.ipAddress
+			});
+		} else {
+			throw new Error(`ctPort is not valid ${ctPort}`);
+		}
 
-		this.onReady();
 		this.ready = true;
+		console.log('ready to call onReady');
+		if (this.onReady) {
+			console.log('called on ready');
+			this.onReady();
+		}
 	}
 	runJob(message: RedQuickDistributionMessage) {
 		this.runJobHandler(message);
@@ -180,7 +182,6 @@ export default class ThreadManagement {
 		} while (attempts);
 	}
 	async send(arg: any) {
-		throw new Error('Method not implemented.');
 		await this.communicationTower.send(
 			{
 				...arg,

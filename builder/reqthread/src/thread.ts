@@ -30,6 +30,7 @@ process.on(
 							job({ ...options, projectName: filePath[0], fileName: filePath[1] });
 						},
 						() => {
+							console.log('calling on ready-------------');
 							context.options = message.options;
 							context.config = message.config;
 							console.log(context.options);
@@ -100,6 +101,7 @@ async function loop() {
 			console.log('taking a nap');
 			await sleep();
 			if (!threadManagement.ready) {
+				console.log('not ready');
 				continue;
 			}
 			let { options } = context;
