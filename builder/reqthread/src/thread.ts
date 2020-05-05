@@ -108,7 +108,7 @@ async function loop() {
 				await sleep();
 			}
 			if (!threadManagement.ready) {
-				console.log('not ready');
+				console.log('not ready ' + context.config.agentProject);
 				continue;
 			}
 			if (context.jobArgs) {

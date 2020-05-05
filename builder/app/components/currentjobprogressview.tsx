@@ -113,7 +113,10 @@ class CurrentJobProgressView extends Component<any, any> {
 										// }
 										let cls = 'fa fa-circle';
 										let currentStyle = {};
-										if (indexOfCompletion < index) {
+										if (indexOfCompletion + 1 === index) {
+											currentStyle = { backgroundColor: '#21515237' };
+											cls = `fa  fa-cog fa-spin`;
+										} else if (indexOfCompletion < index) {
 											cls = 'fa  fa-circle-o-notch';
 										} else if (jobFile && jobFile.step == command.name) {
 											cls = 'fa fa- fa-circle-thin';
