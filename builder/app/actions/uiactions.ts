@@ -14,6 +14,7 @@ import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink } from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
+import { AgentProject } from '../jobs/interfaces';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -3157,54 +3158,12 @@ export const JOB_FILES = 'JOB_FILES';
 let runningGitRunPromise = false;
 let gitrunPromise = Promise.resolve();
 export function loadGitRuns() {
-	return (dispatch: Function, getState: Function) => {
-		if (Visual(getState(), NodeConstants.MAIN_CONTENT) === NodeConstants.PROGRESS_VIEW)
-			return JobService.getJobs()
-				.then(async (jobs) => {
-					if (!runningGitRunPromise) {
-						setVisual(JOBS, jobs)(dispatch, getState);
-						gitrunPromise = gitrunPromise.then(async () => {
-							runningGitRunPromise = true;
-							await jobs.forEachAsync(async (jobInstance: Job) => {
-								try {
-									let jobProgress = await JobService.JobProgress(jobInstance);
-									setVisual(JobProgressId(jobInstance), jobProgress)(dispatch, getState);
-									let { parts } = jobInstance;
-									if (parts) {
-										parts.forEachAsync(async (dir: string) => {
-											if (parts != null) {
-												let item = await JobService.loadJobItem(
-													jobInstance.name,
-													dir,
-													JobServiceConstants.JobPath()
-												);
-												setVisual(JobItemId(dir), item)(dispatch, getState);
-											}
-										});
-									}
-								} catch (e) {
-									console.log(e);
-								}
-							});
-							runningGitRunPromise = false;
-						});
-					}
-				})
-				.catch((e) => {
-					console.log(e);
-				})
-				.then(() => {
-					return JobService.GetJobFiles().then(async (jobFiles: JobFile[]) => {
-						jobFiles.forEach((jf) => {
-							jf.stages = JobService.GetJobFileStages(jf);
-						});
-						setVisual(JOB_FILES, jobFiles)(dispatch, getState);
-					});
-				});
-	};
+	return (dispatch: Function, getState: Function) => {};
 }
-export function updateJobs() {
-	loadGitRuns()(GetDispatchFunc(), GetStateFunc());
+// }
+export const JOB_INFO = 'JOB_INFO';
+export function updateJobs(info: { currentJobInformation: { jobFile?: JobFile }; agents: AgentProject[] }) {
+	setVisual(JOB_INFO, info)(GetDispatchFunc(), GetStateFunc());
 }
 export function JobProgressId(jobInstance: Job) {
 	return `job-progress-id${jobInstance.name}`;

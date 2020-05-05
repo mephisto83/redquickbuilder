@@ -7,7 +7,9 @@ import JobService, {
 	JobFile,
 	getDirectories,
 	ensureDirectory,
-	path_join
+	path_join,
+	JobItem,
+	Job
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
 import { GetCurrentGraph } from '../../app/actions/uiactions';
@@ -83,6 +85,7 @@ async function handleAgentProjectStateChange(
 		if (runnerContext.agents[message.agentName]) {
 			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
 				runnerContext.agents[message.agentName].projects[message.agentProject].ready = ready;
+
 				await JobService.UpdateReadyAgents(
 					runnerContext.agents[message.agentName].projects[message.agentProject]
 				);
@@ -116,7 +119,11 @@ async function tellCommandCenter() {
 					port: runnerContext.commandCenter.commandCenterPort
 				},
 				'',
-				RedQuickDistributionCommand.UpdateCommandCenter
+				RedQuickDistributionCommand.UpdateCommandCenter,
+				{
+					agents: JobService.agentProjects,
+					currentJobInformation: GetCurrentJobInformation()
+				}
 			);
 			console.debug('told command center');
 		} catch (e) {
@@ -147,7 +154,17 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 						throw new Error('job was not set to completed');
 					}
 					fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
-
+					let temp: any = message;
+					if (
+						temp.agent &&
+						runnerContext.agents &&
+						temp.name &&
+						runnerContext.agents[temp.agent] &&
+						runnerContext.agents[temp.agent].projects[temp.name]
+					) {
+						runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
+						runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
+					}
 					await tellCommandCenter();
 					return {
 						success: true
@@ -172,24 +189,6 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 }
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
-		// The ready value shouldn't be effected by the hand raising
-		// if (runnerContext.agents[message.agentName]) {
-		// 	let tempProjects = runnerContext.agents[message.agentName].projects;
-		// 	if (tempProjects) {
-		// 		Object.keys(tempProjects).forEach((v) => {
-		// 			if (message.projects && message.projects[v]) {
-		// 				message.projects[v].ready = tempProjects[v].ready;
-		// 			}
-		// 		});
-		// 	}
-		// }
-		// runnerContext.agents[message.agentName] = {
-		// 	...runnerContext.agents[message.agentName] || { projects: {} },
-		// 	name: message.agentName,
-		// 	host: message.hostname,
-		// 	port: message.port,
-		// 	lastUpdated: Date.now()
-		// };
 		let temp: any = message;
 		runnerContext.agents[message.agentName] = runnerContext.agents[message.agentName] || <any>{};
 		runnerContext.agents[message.agentName].projects = runnerContext.agents[message.agentName].projects || <any>{};
@@ -198,17 +197,24 @@ async function handleHandRaising(message: RedQuickDistributionMessage): Promise<
 		if (temp.project) {
 			runnerContext.agents[message.agentName].projects[temp.project.agentProject].port = temp.project.port;
 			runnerContext.agents[message.agentName].projects[temp.project.agentProject].host = temp.project.host;
-    }
-    console.debug(message);
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].agent = message.agentName;
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].agentName = message.agentName;
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].agentProject =
+				temp.project.agentProject;
+			runnerContext.agents[message.agentName].projects[temp.project.agentProject].name =
+				temp.project.agentProject;
+		}
+		console.debug(message);
 		Object.keys(runnerContext.agents[message.agentName].projects).forEach((agentProject) => {
 			JobService.UpdateReadyAgents(runnerContext.agents[message.agentName].projects[agentProject]);
 		});
 		console.debug('hand raised');
 		console.debug(runnerContext.agents);
+		await tellCommandCenter();
 		return {
 			success: true
 		};
-  }
+	}
 
 	return {
 		error: 'agentName was not set'
@@ -257,6 +263,21 @@ async function executeStep(jobFilePath: string) {
 			console.debug(`step: ${step.name}`);
 			console.debug(`currentStep: ${currentStep + 1}`);
 
+			currentJobInformation.jobFile = jobConfig;
+
+			try {
+				let loadedJob = await JobService.loadJob(jobConfig.jobPath);
+				if (loadedJob) {
+					let parts = [];
+					await loadedJob.parts.forEachAsync(async (part: string) => {
+						parts.push(await JobService.loadJobItem(loadedJob.name, part, JobServiceConstants.JobPath()));
+					});
+					currentJobInformation.currentJobName = loadedJob.name;
+					currentJobInformation.currentStep = step.name;
+					currentJobInformation.jobs[loadedJob.name] = { job: loadedJob, parts };
+					await tellCommandCenter();
+				}
+			} catch (e) {}
 			console.debug('build all distributed');
 			await BuildAllDistributed(step.name, jobConfig);
 			let cg = GetCurrentGraph();
@@ -269,6 +290,19 @@ async function executeStep(jobFilePath: string) {
 			await saveCurrentGraphTo(path_join(path.dirname(graphPath), 'stages', `${step.name}.rqb`), cg);
 			jobConfig.step = step.name;
 			console.debug(jobConfig.step);
+			currentJobInformation.jobFile = jobConfig;
+			try {
+				let loadedJob = await JobService.loadJob(jobConfig.jobPath);
+				if (loadedJob) {
+					let parts = [];
+					await loadedJob.parts.forEachAsync(async (part: string) => {
+						parts.push(await JobService.loadJobItem(loadedJob.name, part, JobServiceConstants.JobPath()));
+					});
+					currentJobInformation.currentJobName = loadedJob.name;
+					currentJobInformation.jobs[loadedJob.name] = { job: loadedJob, parts };
+				}
+			} catch (e) {}
+			await tellCommandCenter();
 		} catch (e) {
 			console.debug(e);
 			console.debug(jobConfig);
@@ -279,6 +313,20 @@ async function executeStep(jobFilePath: string) {
 	} else if (jobConfig.error) {
 		console.debug('job has an error, skipping');
 	}
+}
+let currentJobInformation: {
+	jobFile?: JobFile;
+	currentJobName?: string;
+	currentStep?: string;
+	jobs?: {
+		[index: string]: {
+			job?: Job;
+			parts?: JobItem[];
+		};
+	};
+} = {};
+function GetCurrentJobInformation() {
+	return currentJobInformation;
 }
 async function createJobs() {
 	if (fs.existsSync(JobServiceConstants.JobsFilePath())) {

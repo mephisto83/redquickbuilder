@@ -26,6 +26,9 @@ export interface AgentProjects {
 }
 
 export interface AgentProject {
+	busy?: boolean;
+	workingOnFile?: string;
+	workingOnJob?: string;
 	agent?: string;
 	agentName?: string;
 	agentProject?: string;

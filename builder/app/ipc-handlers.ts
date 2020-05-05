@@ -145,12 +145,12 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 		[RedQuickDistributionCommand.CompletedJobItem]: noOp,
 		[RedQuickDistributionCommand.SetCommandCenter]: noOp,
-		[RedQuickDistributionCommand.UpdateCommandCenter]: () => {
+		[RedQuickDistributionCommand.UpdateCommandCenter]: (args) => {
 			console.log('update command center');
-			updateCommandCenter(mainWindowFunc);
+			updateCommandCenter(mainWindowFunc, args);
 		}
 	});
-  console.log('set command center');
+	console.log('set command center');
 	setCommandCenter(7979, 8001);
 }
 function setCommandCenter(targetPort: number, port: number) {
@@ -175,19 +175,20 @@ function setCommandCenter(targetPort: number, port: number) {
 						}
 					);
 				} catch (e) {
-          console.log('didnt set command center');
-        }
+					console.log('didnt set command center');
+				}
 			}
 		})
 		.then(() => {
 			setCommandCenter(targetPort, port);
 		});
 }
-function updateCommandCenter(mainWindowFunc: any) {
+function updateCommandCenter(mainWindowFunc: any, args: any) {
 	let mainWindow = mainWindowFunc();
 	if (mainWindow && mainWindow.webContents) {
 		mainWindow.webContents.send('update-jobs', {
-			args: 'update-jobs'
+			args: 'update-jobs',
+			package: args
 		});
 	} else if (mainWindow) {
 		console.log('no webContents');

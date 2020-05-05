@@ -70,7 +70,7 @@ ipcRenderer.on('update-jobs', (event, arg) => {
 	console.log(arg);
 	switch (arg.args) {
 		case 'update-jobs':
-			updateJobs();
+			updateJobs(arg.package);
 			break;
 	}
 });

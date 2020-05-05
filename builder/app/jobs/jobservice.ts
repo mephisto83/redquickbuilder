@@ -420,7 +420,6 @@ export default class JobService {
 	static agentProjects: AgentProject[] = [];
 	static async UpdateReadyAgents(agentProject: AgentProject) {
 		console.log('update ready');
-		console.log(agentProject);
 		JobService.agentProjects = [
 			...JobService.agentProjects.filter((x) => x.name !== agentProject.name),
 			agentProject
@@ -477,13 +476,15 @@ export default class JobService {
 				jobItem.distributed = true;
 				jobItem.config.distributed = true;
 				jobItem.assignedTo = agentProject.agentProject || agentProject.name;
+        agentProject.workingOnFile = jobItem.file;
+        agentProject.workingOnJob = jobItem.job;
 
 				await JobService.saveJobItem(jobItem);
 
 				await this.moveJobItemFiles(agentProject, jobItem);
 
 				await this.beginJob(agentProject, jobItem);
-				await sleep(2 * 1000);
+				await sleep(10);
 			}
 		}
 		return result;
