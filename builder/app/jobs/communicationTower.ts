@@ -74,7 +74,7 @@ export default class CommunicationTower {
 			filePath: arg1.split(path.sep)
 		};
 
-		console.debug(`http://${agentProject.host}:${agentProject.port}`);
+		// console.debug(`http://${agentProject.host}:${agentProject.port}`);
 
 		return await fetch(`http://${agentProject.host}:${agentProject.port}`, {
 			method: 'POST',
@@ -128,7 +128,15 @@ export default class CommunicationTower {
 	}
 	async start(listeners: CommunicationTowerListen) {
 		this.listeners = listeners;
-		await this.startServers();
+		let error = false;
+		do {
+      error = false;
+			try {
+				await this.startServers();
+			} catch (e) {
+				error = true;
+			}
+		} while (error);
 	}
 	handleRequest(request: http.IncomingMessage, response: http.ServerResponse): Promise<void> {
 		const { headers, method, url } = request;
@@ -322,6 +330,9 @@ export default class CommunicationTower {
 			});
 			server.on('clientError', (err, socket) => {
 				socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+			});
+			server.on('error', (err) => {
+				fail(err);
 			});
 			server.listen(port, address.hostname, () => {
 				let portAddr: any = server.address();

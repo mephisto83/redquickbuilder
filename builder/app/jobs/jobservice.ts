@@ -162,6 +162,7 @@ export default class JobService {
 		let complete = false;
 		console.log('wait for job completion');
 		do {
+			console.debug(currentJobFile.jobPath);
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job, JobServiceConstants.JobPath());
 			if (!complete) {
@@ -669,7 +670,11 @@ export default class JobService {
 			if (parts.length) {
 				let completed = true;
 				for (let i = 0; i < parts.length; i++) {
-					completed = completed && (await JobService.IsJobAssignmentComplete(job, parts[i], relative));
+					try {
+						completed = completed && (await JobService.IsJobAssignmentComplete(job, parts[i], relative));
+					} catch (e) {
+						completed = false;
+					}
 					if (!completed) {
 						console.log('job not is completed');
 						return false;
@@ -678,7 +683,7 @@ export default class JobService {
 				console.log('job is completed');
 				return true;
 			}
-			throw new Error('no parts assigned');
+      console.warn('no parts assigned');
 		}
 		console.log('job not is completed: no parts');
 		return false;
@@ -699,7 +704,7 @@ export default class JobService {
 				}
 				return result;
 			}
-			throw new Error('no assignments assigned');
+			console.warn('no assignments assigned');
 		}
 		return result;
 	}
@@ -746,7 +751,7 @@ export default class JobService {
 	static async IsJobAssignmentComplete(job: Job, partId: string, relative: string): Promise<boolean> {
 		let jobItem: JobItem | null = await JobService.loadJobItem(job.name, partId, relative);
 		if (!jobItem) {
-			throw new Error('no assignments');
+      return false;
 		}
 
 		let isComplete = await JobService.IsJobItemComplete(jobItem);

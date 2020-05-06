@@ -101,7 +101,7 @@ async function loop() {
 	let noerror = true;
 	do {
 		try {
-			console.log('taking a nap');
+			// console.log('taking a nap');
 			if (context.busy) {
 				await sleep(30 * 1000);
 			} else {
@@ -127,9 +127,9 @@ async function loop() {
 			} else {
 				console.warn('no options yet');
 			}
-			console.log('loop done ' + context.config.agentProject);
+			// console.log('loop done ' + context.config.agentProject);
 			if (!context.busy) {
-				console.log('not busy' + context.config.agentProject);
+				// console.log('not busy' + context.config.agentProject);
 
 				if (!context.jobArgs) {
 					threadManagement.send({
