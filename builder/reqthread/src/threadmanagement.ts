@@ -119,71 +119,66 @@ export default class ThreadManagement {
 		fileName: string;
 		jobInstancePath: string;
 	}) {
-		let attempts = 3;
-		do {
-			attempts--;
-			try {
-				await this.communicationTower.transferFile(
-					{
-						agent: completedJobItem.agentName,
-						name: completedJobItem.projectName,
-						host: this.configuration.remoteServerHost,
-						port: this.configuration.remoteServerPort
-					},
-					path.join(completedJobItem.projectName, completedJobItem.fileName, JobServiceConstants.OUTPUT),
-					path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
-				);
+		// let attempts = 3;
+		// do {
+		// 	attempts--;
+		// 	try {
+		await this.communicationTower.transferFile(
+			{
+				agent: completedJobItem.agentName,
+				name: completedJobItem.projectName,
+				host: this.configuration.remoteServerHost,
+				port: this.configuration.remoteServerPort
+			},
+			path.join(completedJobItem.projectName, completedJobItem.fileName, JobServiceConstants.OUTPUT),
+			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
+		);
 
-				await getFiles(
-					path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER)
-				).forEachAsync(async (outputGraphFile) => {
-					await this.communicationTower.transferFile(
-						{
-							agent: completedJobItem.agentName,
-							name: completedJobItem.projectName,
-							host: this.configuration.remoteServerHost,
-							port: this.configuration.remoteServerPort
-						},
-						path.join(
-							completedJobItem.projectName,
-							completedJobItem.fileName,
-							JobServiceConstants.OUTPUT_FOLDER,
-							outputGraphFile
-						),
-						path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
-					);
-				});
-				let result = await this.communicationTower.send(
-					{
-						agent: completedJobItem.agentName,
-						name: completedJobItem.projectName,
-						host: this.configuration.remoteServerHost,
-						port: this.configuration.remoteServerPort
-					},
-					'',
-					RedQuickDistributionCommand.CompletedJobItem,
-					{
-						projectName: completedJobItem.projectName,
-						fileName: completedJobItem.fileName
-					}
-				);
-
-				await sleep(10 * 1000);
-				if (result.success) {
-					attempts = 0;
-					let jobFolder = path.join(
-						this.configuration.baseFolder,
-						this.getAgentName(),
-						completedJobItem.projectName
-					);
-					if (fs.existsSync(jobFolder)) {
-						await JobService.deleteFolder(jobFolder);
-					}
-				}
-			} catch (e) {
-				console.error('error transferring files back');
+		await getFiles(
+			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER)
+		).forEachAsync(async (outputGraphFile) => {
+			await this.communicationTower.transferFile(
+				{
+					agent: completedJobItem.agentName,
+					name: completedJobItem.projectName,
+					host: this.configuration.remoteServerHost,
+					port: this.configuration.remoteServerPort
+				},
+				path.join(
+					completedJobItem.projectName,
+					completedJobItem.fileName,
+					JobServiceConstants.OUTPUT_FOLDER,
+					outputGraphFile
+				),
+				path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
+			);
+		});
+		let result = await this.communicationTower.send(
+			{
+				agent: completedJobItem.agentName,
+				name: completedJobItem.projectName,
+				host: this.configuration.remoteServerHost,
+				port: this.configuration.remoteServerPort
+			},
+			'',
+			RedQuickDistributionCommand.CompletedJobItem,
+			{
+				projectName: completedJobItem.projectName,
+				fileName: completedJobItem.fileName
 			}
-		} while (attempts);
+		);
+
+		// await sleep(10 * 1000);
+		if (result.success) {
+			let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName);
+			if (fs.existsSync(jobFolder)) {
+				await JobService.deleteFolder(jobFolder);
+			}
+		}
+		// 	} catch (e) {
+		// 		console.error('error transferring files back');
+		// 	}
+		// } while (attempts);
 	}
 	async send(arg: any) {
 		await this.communicationTower.send(

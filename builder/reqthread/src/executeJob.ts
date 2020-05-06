@@ -36,7 +36,11 @@ import {
 import JobService from '../../app/jobs/jobservice';
 import { Graph } from '../../app/methods/graph_types';
 import { setupJob } from './threadutil';
-import { Create_Component_All, Connect_Screens, Add_Component_To_Screen_Options } from '../../app/nodepacks/batch/BuildAllDistributed';
+import {
+	Create_Component_All,
+	Connect_Screens,
+	Add_Component_To_Screen_Options
+} from '../../app/nodepacks/batch/BuildAllDistributed';
 import ConnectScreens from '../../app/nodepacks/batch/ConnectScreens';
 import AddComponentsToScreenOptions from '../../app/nodepacks/batch/AddComponentsToScreenOptions';
 
@@ -68,11 +72,11 @@ export default async function executeJob(
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
-          );
-          console.log('CreateComponentAll completed');
+					);
+					console.log('CreateComponentAll completed');
 					await storeOutput(path.join(jobInstancePath));
 					if (onChange) {
-						onChange({ ...options, jobInstancePath });
+						await onChange({ ...options, jobInstancePath });
 					}
 					break;
 				case Connect_Screens:
@@ -84,11 +88,11 @@ export default async function executeJob(
 					);
 					await storeOutput(path.join(jobInstancePath));
 					if (onChange) {
-						onChange({ ...options, jobInstancePath });
+						await onChange({ ...options, jobInstancePath });
 					}
-          break;
-        case Add_Component_To_Screen_Options:
-          await AddComponentsToScreenOptions(
+					break;
+				case Add_Component_To_Screen_Options:
+					await AddComponentsToScreenOptions(
 						() => {},
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
@@ -96,16 +100,16 @@ export default async function executeJob(
 					);
 					await storeOutput(path.join(jobInstancePath));
 					if (onChange) {
-						onChange({ ...options, jobInstancePath });
+						await onChange({ ...options, jobInstancePath });
 					}
-          break;
+					break;
 				default:
-          jobConfig.complete = true;
-          console.log('-------------invalid job----------------')
+					jobConfig.complete = true;
+					console.log('-------------invalid job----------------');
 					console.log(jobPart);
 					console.log(partPath);
 					console.log(command);
-          console.log('-----------------------------')
+					console.log('-----------------------------');
 					throw new Error('unknown job');
 			}
 

@@ -69,13 +69,9 @@ async function job(options) {
 			});
 			context.busy = true;
 			try {
-				let jobResult = null;
-				await task(jobPath, options, (completedJobItem) => {
-					jobResult = threadManagement.sendBackResults(completedJobItem);
+				await task(jobPath, options, async (completedJobItem) => {
+					await threadManagement.sendBackResults(completedJobItem);
 				});
-				if (jobResult) {
-					await jobResult;
-				}
 			} catch (e) {
 				console.log(e);
 			}
@@ -108,8 +104,7 @@ async function loop() {
 				await sleep();
 			}
 			if (!threadManagement.ready) {
-				if(context.config)
-				console.log('not ready ' + context.config.agentProject);
+				if (context.config) console.log('not ready ' + context.config.agentProject);
 				continue;
 			}
 			if (context.jobArgs) {
