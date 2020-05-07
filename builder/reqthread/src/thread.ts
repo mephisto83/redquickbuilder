@@ -104,6 +104,8 @@ async function loop() {
 				if (context.config) console.log('not ready ' + context.config.agentProject);
 				continue;
 			}
+			else {
+			await sleep(10 * 1000);}
 			if (context.jobArgs) {
 				let jobArgs = context.jobArgs;
 				context.jobArgs = null;
@@ -115,7 +117,7 @@ async function loop() {
 					// console.log('not busy' + context.config.agentProject);
 
 					if (!context.jobArgs) {
-						if (!context.sinceLastReady || context.sinceLastReady % 1000) {
+						if (!context.sinceLastReady || context.sinceLastReady % 100) {
 							threadManagement.send({
 								response: RedQuickDistributionCommand.RaisingAgentProjectReady,
 								command: RedQuickDistributionCommand.RaisingAgentProjectReady,
