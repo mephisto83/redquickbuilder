@@ -94,7 +94,7 @@ export default class CommunicationTower {
 				throw err;
 			});
 	}
-	static NetworkDrive: string = '\\192.168.1.113\\Public\\tmp\\';
+	static NetworkDrive: string = os.platform() =='linux'?'/run/user/1000/gvfs/smb-share:server=mephistowa,share=public/tmp': '\\192.168.1.113\\Public\\tmp\\';
 
 	getNetworkFilePath(requestedPath: string): fs.PathLike {
 		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
