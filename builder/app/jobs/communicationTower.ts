@@ -96,8 +96,9 @@ export default class CommunicationTower {
 	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
 		let maxattempts = 10;
 		do {
+			let success;
 			try {
-				let success = await this.sendFile(
+				success = await this.sendFile(
 					{
 						agentName: agentProject.agent,
 						agentProject: agentProject.name,
@@ -111,10 +112,14 @@ export default class CommunicationTower {
 				if (success) {
 					maxattempts = 0;
 				} else {
-					await sleep(30 * 1000);
+					await sleep(30 * 1000 + Math.random() * 40000);
 				}
 			} catch (e) {
 				console.log(`failed to send file : ${maxattempts} attemps left`);
+			}
+
+			if (!success) {
+				await sleep(30 * 1000 + Math.random() * 40000);
 			}
 		} while (maxattempts);
 	}

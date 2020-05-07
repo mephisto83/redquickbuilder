@@ -145,7 +145,7 @@ export default class JobService {
 	static async StartJob(
 		command: string,
 		currentJobFile: JobFile,
-		batchSize: number = 1,
+		batchSize: number,
 		modelTypes?: string | string[]
 	): Promise<Job> {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
@@ -253,7 +253,7 @@ export default class JobService {
 
 	static async CreateJob(
 		command: string,
-		batchSize: number = 1,
+		batchSize: number,
 		modelTypes: string | string[] = NodeTypes.Model
 	): Promise<Job> {
 		if (!modelTypes) {
@@ -265,7 +265,10 @@ export default class JobService {
 		}
 		// let targets = await JobService.getAgentDirectories();
 		let graph = GetCurrentGraph();
-		let chunks = models.chunk(batchSize || 1);
+		if (!batchSize) {
+			throw new Error('missing batch size');
+		}
+		let chunks = models.chunk(batchSize);
 		if (!fs.existsSync(JobPath())) {
 			fs.mkdirSync(JobPath());
 		}
@@ -664,7 +667,11 @@ export default class JobService {
 		return mergedGraph;
 	}
 
+	static jobCompleteCache: { [str: string]: boolean } = {};
 	static async IsComplete(job: Job, relative: string) {
+		if (this.jobCompleteCache[job.name]) {
+			return true;
+		}
 		let { parts } = job;
 		if (parts) {
 			if (parts.length) {
@@ -681,9 +688,10 @@ export default class JobService {
 					}
 				}
 				console.log('job is completed');
+				this.jobCompleteCache[job.name] = true;
 				return true;
 			}
-      console.warn('no parts assigned');
+			console.warn('no parts assigned');
 		}
 		console.log('job not is completed: no parts');
 		return false;
@@ -748,13 +756,22 @@ export default class JobService {
 		}
 		return null;
 	}
+
+	static jobItemCompleteCache: { [index: string]: boolean } = {};
 	static async IsJobAssignmentComplete(job: Job, partId: string, relative: string): Promise<boolean> {
+		if (this.jobItemCompleteCache[`${job.name} ${partId}`]) {
+			return true;
+		}
+
 		let jobItem: JobItem | null = await JobService.loadJobItem(job.name, partId, relative);
 		if (!jobItem) {
-      return false;
+			return false;
 		}
 
 		let isComplete = await JobService.IsJobItemComplete(jobItem);
+		if (isComplete) {
+			this.jobItemCompleteCache[`${job.name} ${partId}`] = isComplete;
+		}
 		return isComplete;
 	}
 
