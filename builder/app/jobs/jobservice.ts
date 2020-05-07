@@ -177,7 +177,8 @@ export default class JobService {
 		let availableProjects: AgentProject[] = await this.GetAvailableProjects();
 		console.log(`there are ${availableProjects.length} available agentProjects`);
 		let items = await this.getJobsItems(job);
-		items.forEachAsync(async (item: JobItem) => {
+		await items.forEachAsync(async (item: JobItem) => {
+			console.log('checking if job item is complete');
 			let isComplete = await this.IsJobItemComplete(item);
 			if (!isComplete) {
 				let notBusyProject = availableProjects.find(
@@ -397,6 +398,7 @@ export default class JobService {
 	static async getJobsItems(jobObject: Job): Promise<JobItem[]> {
 		let results: JobItem[] = [];
 		let job: string = jobObject.name;
+		console.log('getting job items');
 		if (fs.existsSync(JobPath())) {
 			getDirectories(path_join(JobPath(), job)).map((fileDir) => {
 				if (fs.existsSync(path_join(JobPath(), job, fileDir, INPUT))) {
@@ -774,10 +776,19 @@ export default class JobService {
 		}
 		return isComplete;
 	}
-
+	static quickConfirm = true;
 	static async IsJobItemComplete(jobItem: JobItem): Promise<boolean> {
+		if (this.jobItemCompleteCache[`${jobItem.job} ${jobItem.file}`]) {
+			return true;
+		}
 		if (jobItem && jobItem.config) {
 			if (jobItem.config.complete) {
+				if (jobItem.config.complete) {
+					this.jobItemCompleteCache[`${jobItem.job} ${jobItem.file}`] = true;
+				}
+				if (this.quickConfirm) {
+					return true;
+				}
 				let res = this.loadJobItemOutput(jobItem);
 				if (res) {
 					return jobItem.config.complete;

@@ -6,7 +6,7 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
-import { UITypes } from '../constants/nodetypes';
+import { UITypes, NodeTypes } from '../constants/nodetypes';
 import {
 	GetSpecificModels,
 	GetAllModels,
@@ -33,6 +33,7 @@ import BuildAll from '../nodepacks/batch/BuildAll';
 import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
 import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
+import JobService from '../jobs/jobservice';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -226,6 +227,15 @@ class QuickMethods extends Component<any, any, any> {
 									onClick={() => {
 										this.props.setState();
 										StartJob();
+									}}
+								/>
+								<TreeViewMenu
+									title={'Create Job'}
+									icon="fa fa-plus"
+									onClick={() => {
+                    this.props.setState();
+                    debugger;
+										JobService.CreateJob('asdf', 10, NodeTypes.Screen);
 									}}
 								/>
 								<TreeViewMenu

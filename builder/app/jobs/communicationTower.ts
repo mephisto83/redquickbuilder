@@ -111,15 +111,13 @@ export default class CommunicationTower {
 				);
 				if (success) {
 					maxattempts = 0;
-				} else {
-					await sleep(30 * 1000 + Math.random() * 40000);
 				}
 			} catch (e) {
 				console.log(`failed to send file : ${maxattempts} attemps left`);
 			}
 
 			if (!success) {
-				await sleep(30 * 1000 + Math.random() * 40000);
+				await sleep(30 * 1000 + Math.random() * 100000);
 			}
 		} while (maxattempts);
 	}
@@ -278,49 +276,63 @@ export default class CommunicationTower {
 			});
 		});
 	}
+	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
-		return await new Promise(async (resolve, fail) => {
-			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
-			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-			console.log(`writing to: ${requestedPath}`);
-			let socket: net.Socket;
-			socket = net.connect(req.port, req.hostname);
-			let ostream = fs.createWriteStream(requestedPath);
-			let size = 0,
-				elapsed = 0;
-			this.sockets.push(socket);
-			socket.on('error', (err) => {
-				process.stdout.write(`\r${err.message}`);
-				socket.destroy(err);
-				this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
-				fail(err);
-			});
-			socket.on('data', (chunk) => {
-				size += chunk.length;
-				socket.write(
-					`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-						1000} s`
+		CommunicationTower.receiveQueue = CommunicationTower.receiveQueue.then(async () => {
+			let res = await new Promise(async (resolve, fail) => {
+				let requestedPath = path.join(
+					this.baseFolder,
+					this.agentName || '',
+					(req.filePath || []).join(path.sep)
 				);
-				process.stdout.write(
-					`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-						1000} s`
-				);
-				ostream.write(chunk);
+				await ensureDirectory(path.resolve(path.dirname(requestedPath)));
+				console.log(`writing to: ${requestedPath}`);
+				let socket: net.Socket;
+				socket = net.connect(req.port, req.hostname);
+				let ostream = fs.createWriteStream(requestedPath);
+				let size = 0,
+					elapsed = 0;
+				this.sockets.push(socket);
+				socket.on('error', (err) => {
+					process.stdout.write(`\r${err.message}`);
+					socket.destroy(err);
+					this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
+					fail(false);
+				});
+				socket.on('data', (chunk) => {
+					size += chunk.length;
+					socket.write(
+						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+							1000} s : ${requestedPath}`
+					);
+					process.stdout.write(
+						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+							1000} s : ${requestedPath}`
+					);
+					ostream.write(chunk);
+				});
+				socket.on('end', () => {
+					console.log(
+						`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
+							2
+						)} MB/s to : ${requestedPath}`
+					);
+					socket.destroy();
+					resolve(true);
+				});
+				ostream.on('error', (err) => {
+					console.log('ostream error');
+					console.log(err);
+					fail(err);
+				});
+				ostream.on('ready', () => {});
 			});
-			socket.on('end', () => {
-				console.log(
-					`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(2)} MB/s`
-				);
-				socket.destroy();
-				resolve(true);
-			});
-			ostream.on('error', (err) => {
-				console.log('ostream error');
-				console.log(err);
-				fail(err);
-			});
-			ostream.on('ready', () => {});
+			if (res) {
+				return true;
+			}
+			return false;
 		});
+		return CommunicationTower.receiveQueue;
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();

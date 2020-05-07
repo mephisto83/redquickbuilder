@@ -85,8 +85,8 @@ function wait(name: string) {
 	return `wait_for_${name}`;
 }
 async function threadRun(array: BuildStep[], name: string, currentJobFile: JobFile, nodeTypes: string[] | string) {
-	await run(array, Connect_Screens, async (progresFunc: any) => {
-		await JobService.StartJob(name, currentJobFile, 1, nodeTypes);
+	await run(array, name, async (progresFunc: any) => {
+		await JobService.StartJob(name, currentJobFile, 12, nodeTypes);
 		//     await ConnectScreens(progresFunc);
 	});
 
@@ -227,7 +227,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
-			await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Model);
+			await JobService.StartJob(Create_Component_All, currentJobFile, 2, NodeTypes.Model);
 		});
 
 		await run(

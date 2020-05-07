@@ -99,9 +99,9 @@ async function loop() {
 		try {
 			// console.log('taking a nap');
 			if (context.busy) {
-				await sleep(30 * 1000);
+				await sleep(30 * 1000 + Math.random() * 100 * 1000);
 			} else {
-				await sleep();
+				await sleep(3 * 1000 + Math.random() * 100 * 1000);
 			}
 			if (!threadManagement.ready) {
 				if (context.config) console.log('not ready ' + context.config.agentProject);
