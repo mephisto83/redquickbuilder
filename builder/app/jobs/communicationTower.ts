@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 import net from 'net';
 import { AgentProject, AgentProjects } from './interfaces';
 import { sleep, path_join } from './jobservice';
+import { OnFailureLink } from '../components/titles';
 
 export interface RedQuickDistributionMessage {
 	success?: any;
@@ -93,30 +94,24 @@ export default class CommunicationTower {
 				throw err;
 			});
 	}
+	static NetworkDrive: string = '\\192.168.1.113\\Public\\tmp\\';
 
+	getNetworkFilePath(requestedPath: string): fs.PathLike {
+		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
+	}
 	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
-		return new Promise((resolve, fail) => {
-			let networkdrive: string = '\\192.168.1.113\\Public\\tmp\\';
-			let istream = fs.createReadStream(localFilePath);
-			// fs.writeFile(path_join(networkdrive, outFolder), );
-			let ostream = fs.createWriteStream(networkdrive);
-			istream.on('readable', function() {
-				let data;
-				while ((data = this.read())) {
-					ostream.write(data);
-				}
-			});
-			istream.on('end', function() {
-				ostream.end();
+		return new Promise(async (resolve, fail) => {
+			try {
+				await ensureDirectory(`\\${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`);
+				console.log(
+					`write to : \\${path_join(CommunicationTower.NetworkDrive, outFolder)} <= from ${localFilePath}`
+				);
+				fs.copyFileSync(localFilePath, `\\${path_join(CommunicationTower.NetworkDrive, outFolder)}`);
 				resolve();
-			});
-
-			ostream.on('error', (err) => {
-				console.log('ostream error');
-				console.log(err);
-				fail(err);
-			});
-			ostream.on('ready', () => {});
+			} catch (e) {
+				console.log(e);
+				fail(e);
+			}
 		});
 	}
 	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
@@ -252,55 +247,58 @@ export default class CommunicationTower {
 		throw new Error('no handler for ' + message.command);
 	}
 	async sendFile(message: AgentProject, localFilePath: string) {
-		let server: net.Server,
-			istream = fs.createReadStream(localFilePath);
+		// let server: net.Server,
+		// 	istream = fs.createReadStream(localFilePath);
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let address: any = this.getIpaddress();
 		message.hostname = address.hostname;
 		return await new Promise((resolve, fail) => {
-			server = net.createServer((socket) => {
-				socket.pipe(process.stdout);
-				istream.on('readable', function() {
-					let data;
-					while ((data = this.read())) {
-						socket.write(data);
-					}
-				});
-				istream.on('end', function() {
-					socket.end();
-				});
-				socket.on('end', () => {
-					server.close(() => {
-						console.log('\nTransfer is done!');
-					});
-				});
-				socket.on('close', () => {
-					resolve(true);
-				});
-				socket.on('error', () => {
-					fail(false);
-				});
-			});
-			server.listen(0, address.hostname, () => {
-				console.log('trying to send a file');
-				let address: any = server.address();
-				let port = address && address.port ? address.port : null;
-				if (port) {
-					console.log(`using port: ${port}`);
-					fetch(`http://${message.targetHost}:${message.targetPort}`, {
-						method: 'POST',
-						body: JSON.stringify({
-							...message,
-							port,
-							command: RedQuickDistributionCommand.SendFile,
-							agentName: this.agentName,
-							filePath: filePathArray
-						})
-					}).catch((e) => fail(e));
-				} else {
-					throw new Error('no port found');
-				}
-			});
+			// server = net.createServer((socket) => {
+			// 	socket.pipe(process.stdout);
+			// 	istream.on('readable', function() {
+			// 		let data;
+			// 		while ((data = this.read())) {
+			// 			socket.write(data);
+			// 		}
+			// 	});
+			// 	istream.on('end', function() {
+			// 		socket.end();
+			// 	});
+			// 	socket.on('end', () => {
+			// 		server.close(() => {
+			// 			console.log('\nTransfer is done!');
+			// 		});
+			// 	});
+			// 	socket.on('close', () => {
+			// 		resolve(true);
+			// 	});
+			// 	socket.on('error', () => {
+			// 		fail(false);
+			// 	});
+			// });
+			// server.listen(0, address.hostname, () => {
+			// 	console.log('trying to send a file');
+			// 	let address: any = server.address();
+			// 	let port = address && address.port ? address.port : null;
+			// 	if (port) {
+			// 		console.log(`using port: ${port}`);
+
+			// 	} else {
+			// 		throw new Error('no port found');
+			// 	}
+			// });
+			fetch(`http://${message.targetHost}:${message.targetPort}`, {
+				method: 'POST',
+				body: JSON.stringify({
+					...message,
+					port: 0,
+					command: RedQuickDistributionCommand.SendFile,
+					agentName: this.agentName,
+					filePath: filePathArray
+				})
+			})
+				.then((e: any) => resolve())
+				.catch((e: any) => fail(e));
 		});
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
@@ -312,47 +310,53 @@ export default class CommunicationTower {
 					this.agentName || '',
 					(req.filePath || []).join(path.sep)
 				);
-				await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-				console.log(`writing to: ${requestedPath}`);
-				let socket: net.Socket;
-				socket = net.connect(req.port, req.hostname);
-				let ostream = fs.createWriteStream(requestedPath);
-				let size = 0,
-					elapsed = 0;
-				this.sockets.push(socket);
-				socket.on('error', (err) => {
-					process.stdout.write(`\r${err.message}`);
-					socket.destroy(err);
-					this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
-					fail(false);
-				});
-				socket.on('data', (chunk) => {
-					size += chunk.length;
-					socket.write(
-						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-							1000} s : ${requestedPath}`
-					);
-					process.stdout.write(
-						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-							1000} s : ${requestedPath}`
-					);
-					ostream.write(chunk);
-				});
-				socket.on('end', () => {
-					console.log(
-						`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
-							2
-						)} MB/s to : ${requestedPath}`
-					);
-					socket.destroy();
-					resolve(true);
-				});
-				ostream.on('error', (err) => {
-					console.log('ostream error');
-					console.log(err);
-					fail(err);
-				});
-				ostream.on('ready', () => {});
+				try {
+					await ensureDirectory(path.resolve(path.dirname(requestedPath)));
+					this.copyFileFromNetwork(requestedPath);
+					console.log(`writing to: ${requestedPath}`);
+					resolve();
+				} catch (e) {
+					fail(e);
+				}
+				// let socket: net.Socket;
+				// socket = net.connect(req.port, req.hostname);
+				// let ostream = fs.createWriteStream(requestedPath);
+				// let size = 0,
+				// 	elapsed = 0;
+				// // this.sockets.push(socket);
+				// socket.on('error', (err) => {
+				// 	process.stdout.write(`\r${err.message}`);
+				// 	socket.destroy(err);
+				// 	this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
+				// 	fail(false);
+				// });
+				// socket.on('data', (chunk) => {
+				// 	size += chunk.length;
+				// 	socket.write(
+				// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+				// 			1000} s : ${requestedPath}`
+				// 	);
+				// 	process.stdout.write(
+				// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+				// 			1000} s : ${requestedPath}`
+				// 	);
+				// 	ostream.write(chunk);
+				// });
+				// socket.on('end', () => {
+				// 	console.log(
+				// 		`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
+				// 			2
+				// 		)} MB/s to : ${requestedPath}`
+				// 	);
+				// 	socket.destroy();
+				// 	resolve(true);
+				// });
+				// ostream.on('error', (err) => {
+				// 	console.log('ostream error');
+				// 	console.log(err);
+				// 	fail(err);
+				// });
+				// ostream.on('ready', () => {});
 			});
 			if (res) {
 				return true;
@@ -360,6 +364,9 @@ export default class CommunicationTower {
 			return false;
 		});
 		return CommunicationTower.receiveQueue;
+	}
+	copyFileFromNetwork(requestedPath: string) {
+		fs.copyFileSync(requestedPath, this.getNetworkFilePath(requestedPath));
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();
@@ -500,7 +507,9 @@ export async function ensureDirectory(dir: string) {
 	_dir_parts.map((_, i) => {
 		if (i > 1 || _dir_parts.length - 1 === i) {
 			let tempDir = path_join(..._dir_parts.slice(0, i + 1));
-			if (dir.startsWith(path.sep)) {
+			if (dir.startsWith(`${path.sep}${path.sep}`)) {
+				tempDir = `${path.sep}${path.sep}${tempDir}`;
+			} else if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
 			if (!fs.existsSync(tempDir)) {
