@@ -314,7 +314,7 @@ export default class CommunicationTower {
 				);
 				try {
 					await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-					this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
+					await this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
 					console.log(`writing to: ${requestedPath}`);
 					resolve();
 				} catch (e) {
@@ -367,8 +367,17 @@ export default class CommunicationTower {
 		});
 		return CommunicationTower.receiveQueue;
 	}
-	copyFileFromNetwork(requestedPath: string, fromPath: string) {
-		fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
+	async copyFileFromNetwork(requestedPath: string, fromPath: string) {
+		let success = true;
+		do {
+			success = true;
+			try {
+				fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
+			} catch (e) {
+				await sleep(1000);
+				success = false;
+			}
+		} while (!success);
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();
