@@ -94,7 +94,7 @@ export default class CommunicationTower {
 			});
 	}
 
-	async writeToDrive(agentProject: AgentProject, outFolder: STRING, localFilePath: string) {
+	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
 		return new Promise((resolve, fail) => {
 			let networkdrive: string = '\\192.168.1.113\\Public\\tmp\\';
 			let istream = fs.createReadStream(localFilePath);
