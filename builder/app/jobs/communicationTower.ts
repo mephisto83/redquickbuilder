@@ -93,11 +93,38 @@ export default class CommunicationTower {
 				throw err;
 			});
 	}
+
+	async writeToDrive(agentProject: AgentProject, outFolder: STRING, localFilePath: string) {
+		return new Promise((resolve, fail) => {
+			let networkdrive: string = '\\192.168.1.113\\Public\\tmp\\';
+			let istream = fs.createReadStream(localFilePath);
+			// fs.writeFile(path_join(networkdrive, outFolder), );
+			let ostream = fs.createWriteStream(networkdrive);
+			istream.on('readable', function() {
+				let data;
+				while ((data = this.read())) {
+					ostream.write(data);
+				}
+			});
+			istream.on('end', function() {
+				ostream.end();
+				resolve();
+			});
+
+			ostream.on('error', (err) => {
+				console.log('ostream error');
+				console.log(err);
+				fail(err);
+			});
+			ostream.on('ready', () => {});
+		});
+	}
 	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
 		let maxattempts = 10;
 		do {
 			let success;
 			try {
+				await this.writeToDrive(agentProject, outFolder, localPath);
 				success = await this.sendFile(
 					{
 						agentName: agentProject.agent,
