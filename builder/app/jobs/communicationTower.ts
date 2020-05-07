@@ -94,7 +94,9 @@ export default class CommunicationTower {
 				throw err;
 			});
 	}
-	static NetworkDrive: string = os.platform() =='linux'?'/run/user/1000/gvfs/smb-share:server=mephistowa,share=public/tmp/': '\\192.168.1.113\\Public\\tmp\\';
+	static NetworkDrive: string = os.platform() == 'linux'
+		? '/run/user/1000/gvfs/smb-share:server=mephistowa,share=public/tmp/'
+		: '\\192.168.1.113\\Public\\tmp\\';
 
 	getNetworkFilePath(requestedPath: string): fs.PathLike {
 		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
@@ -312,7 +314,7 @@ export default class CommunicationTower {
 				);
 				try {
 					await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-					this.copyFileFromNetwork(requestedPath);
+					this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
 					console.log(`writing to: ${requestedPath}`);
 					resolve();
 				} catch (e) {
@@ -365,8 +367,8 @@ export default class CommunicationTower {
 		});
 		return CommunicationTower.receiveQueue;
 	}
-	copyFileFromNetwork(requestedPath: string) {
-		fs.copyFileSync(requestedPath, this.getNetworkFilePath(requestedPath));
+	copyFileFromNetwork(requestedPath: string, fromPath: string) {
+		fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();
