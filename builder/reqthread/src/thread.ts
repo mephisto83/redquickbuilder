@@ -98,11 +98,7 @@ async function loop() {
 	do {
 		try {
 			// console.log('taking a nap');
-			if (context.busy) {
-				await sleep(30 * 1000 + Math.random() * 100 * 1000);
-			} else {
-				await sleep(3 * 1000 + Math.random() * 100 * 1000);
-			}
+
 			if (!threadManagement.ready) {
 				if (context.config) console.log('not ready ' + context.config.agentProject);
 				continue;
@@ -112,6 +108,28 @@ async function loop() {
 				context.jobArgs = null;
 				await sleep(10 * 1000);
 				await job(jobArgs);
+			} else {
+				await sleep(3 * 1000);
+				// console.log('loop done ' + context.config.agentProject);
+				if (!context.busy) {
+					// console.log('not busy' + context.config.agentProject);
+
+					if (!context.jobArgs) {
+						if (!context.sinceLastReady || context.sinceLastReady % 1000) {
+							threadManagement.send({
+								response: RedQuickDistributionCommand.RaisingAgentProjectReady,
+								command: RedQuickDistributionCommand.RaisingAgentProjectReady,
+								changed: true,
+								ready: true
+							});
+							context.sinceLastReady = 0;
+						}
+						context.sinceLastReady = context.sinceLastReady || 0;
+						context.sinceLastReady++;
+					}
+				} else {
+					console.log('------------ is busy -----------------');
+				}
 			}
 			let { options } = context;
 			if (options) {
@@ -122,21 +140,6 @@ async function loop() {
 				}
 			} else {
 				console.warn('no options yet');
-			}
-			// console.log('loop done ' + context.config.agentProject);
-			if (!context.busy) {
-				// console.log('not busy' + context.config.agentProject);
-
-				if (!context.jobArgs) {
-					threadManagement.send({
-						response: RedQuickDistributionCommand.RaisingAgentProjectReady,
-						command: RedQuickDistributionCommand.RaisingAgentProjectReady,
-						changed: true,
-						ready: true
-					});
-				}
-			} else {
-				console.log('------------ is busy -----------------');
 			}
 		} catch (e) {
 			noerror = false;
