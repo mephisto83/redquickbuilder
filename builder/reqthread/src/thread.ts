@@ -98,6 +98,7 @@ async function loop() {
 	do {
 		try {
 		 console.log('taking a nap');
+				await sleep(3 * 1000);
 
 			if (!threadManagement.ready) {
 				if (context.config) console.log('not ready ' + context.config.agentProject);
@@ -109,7 +110,6 @@ async function loop() {
 				await job(jobArgs);
 				await sleep(10 * 1000);
 			} else {
-				await sleep(3 * 1000);
 				// console.log('loop done ' + context.config.agentProject);
 				if (!context.busy) {
 					// console.log('not busy' + context.config.agentProject);
