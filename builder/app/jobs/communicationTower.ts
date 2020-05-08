@@ -49,7 +49,6 @@ export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: F
 export default class CommunicationTower {
 	topDirectory: string;
 	ports: { [port: number]: boolean };
-	sockets: net.Socket[];
 	agentName: string;
 	listeners: CommunicationTowerListen;
 	baseFolder: string;
@@ -58,7 +57,6 @@ export default class CommunicationTower {
 	constructor() {
 		this.topDirectory = '';
 		this.ports = {};
-		this.sockets = [];
 		this.listeners = null;
 		this.agentName = '';
 
@@ -126,7 +124,6 @@ export default class CommunicationTower {
 		this.baseFolder = config.baseFolder;
 		this.agentName = config.agentName;
 		this.serverPort = config.serverPort;
-		this.sockets = [];
 		this.ports = {};
 	}
 	async start(listeners: CommunicationTowerListen) {
@@ -292,11 +289,9 @@ export default class CommunicationTower {
 				let ostream = fs.createWriteStream(requestedPath);
 				let size = 0,
 					elapsed = 0;
-				this.sockets.push(socket);
 				socket.on('error', (err) => {
 					process.stdout.write(`\r${err.message}`);
 					socket.destroy(err);
-					this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
 					fail(false);
 				});
 				socket.on('data', (chunk) => {
@@ -332,7 +327,7 @@ export default class CommunicationTower {
 			}
 			return false;
 		});
-		return CommunicationTower.receiveQueue;
+		return await CommunicationTower.receiveQueue;
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();

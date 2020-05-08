@@ -97,7 +97,7 @@ async function loop() {
 	let noerror = true;
 	do {
 		try {
-		 console.log('taking a nap');
+		//  console.log('taking a nap');
 
 			if (!threadManagement.ready) {
 				await sleep(30 * 1000);

@@ -227,7 +227,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
-			await JobService.StartJob(Create_Component_All, currentJobFile, 2, NodeTypes.Model);
+			await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Model);
 		});
 
 		await run(
