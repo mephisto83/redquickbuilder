@@ -99,8 +99,7 @@ export default class CommunicationTower {
 		: '\\192.168.1.113\\Public\\tmp\\';
 
 	getNetworkFilePath(requestedPath: string): fs.PathLike {
-		if(os.platform() == 'linux')
-		return `${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
+		if (os.platform() == 'linux') return `${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
 		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
 	}
 	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
@@ -307,67 +306,54 @@ export default class CommunicationTower {
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
-		CommunicationTower.receiveQueue = CommunicationTower.receiveQueue.then(async () => {
-			let res = await new Promise(async (resolve, fail) => {
-				let requestedPath = path.join(
-					this.baseFolder,
-					this.agentName || '',
-					(req.filePath || []).join(path.sep)
-				);
-				try {
-					await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-					await this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
-					console.log(`writing to: ${requestedPath}`);
-					resolve(true);
-				} catch (e) {
-					fail(e);
-				}
-				// let socket: net.Socket;
-				// socket = net.connect(req.port, req.hostname);
-				// let ostream = fs.createWriteStream(requestedPath);
-				// let size = 0,
-				// 	elapsed = 0;
-				// // this.sockets.push(socket);
-				// socket.on('error', (err) => {
-				// 	process.stdout.write(`\r${err.message}`);
-				// 	socket.destroy(err);
-				// 	this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
-				// 	fail(false);
-				// });
-				// socket.on('data', (chunk) => {
-				// 	size += chunk.length;
-				// 	socket.write(
-				// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-				// 			1000} s : ${requestedPath}`
-				// 	);
-				// 	process.stdout.write(
-				// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-				// 			1000} s : ${requestedPath}`
-				// 	);
-				// 	ostream.write(chunk);
-				// });
-				// socket.on('end', () => {
-				// 	console.log(
-				// 		`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
-				// 			2
-				// 		)} MB/s to : ${requestedPath}`
-				// 	);
-				// 	socket.destroy();
-				// 	resolve(true);
-				// });
-				// ostream.on('error', (err) => {
-				// 	console.log('ostream error');
-				// 	console.log(err);
-				// 	fail(err);
-				// });
-				// ostream.on('ready', () => {});
-			});
-			if (res) {
-				return true;
-			}
+		let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
+		try {
+			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
+			await this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
+			console.log(`writing to: ${requestedPath}`);
+			return true;
+		} catch (e) {
 			return false;
-		});
-		return CommunicationTower.receiveQueue;
+		}
+		// let socket: net.Socket;
+		// socket = net.connect(req.port, req.hostname);
+		// let ostream = fs.createWriteStream(requestedPath);
+		// let size = 0,
+		// 	elapsed = 0;
+		// // this.sockets.push(socket);
+		// socket.on('error', (err) => {
+		// 	process.stdout.write(`\r${err.message}`);
+		// 	socket.destroy(err);
+		// 	this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
+		// 	fail(false);
+		// });
+		// socket.on('data', (chunk) => {
+		// 	size += chunk.length;
+		// 	socket.write(
+		// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+		// 			1000} s : ${requestedPath}`
+		// 	);
+		// 	process.stdout.write(
+		// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+		// 			1000} s : ${requestedPath}`
+		// 	);
+		// 	ostream.write(chunk);
+		// });
+		// socket.on('end', () => {
+		// 	console.log(
+		// 		`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
+		// 			2
+		// 		)} MB/s to : ${requestedPath}`
+		// 	);
+		// 	socket.destroy();
+		// 	resolve(true);
+		// });
+		// ostream.on('error', (err) => {
+		// 	console.log('ostream error');
+		// 	console.log(err);
+		// 	fail(err);
+		// });
+		// ostream.on('ready', () => {});
 	}
 	async copyFileFromNetwork(requestedPath: string, fromPath: string) {
 		let success = true;
@@ -376,8 +362,8 @@ export default class CommunicationTower {
 			try {
 				fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
 			} catch (e) {
-        await sleep(1000);
-        console.log(e);
+				await sleep(1000);
+				console.log(e);
 				success = false;
 			}
 		} while (!success);
