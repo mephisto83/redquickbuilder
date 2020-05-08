@@ -255,42 +255,8 @@ export default class CommunicationTower {
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let address: any = this.getIpaddress();
 		message.hostname = address.hostname;
-		return await new Promise((resolve, fail) => {
-			// server = net.createServer((socket) => {
-			// 	socket.pipe(process.stdout);
-			// 	istream.on('readable', function() {
-			// 		let data;
-			// 		while ((data = this.read())) {
-			// 			socket.write(data);
-			// 		}
-			// 	});
-			// 	istream.on('end', function() {
-			// 		socket.end();
-			// 	});
-			// 	socket.on('end', () => {
-			// 		server.close(() => {
-			// 			console.log('\nTransfer is done!');
-			// 		});
-			// 	});
-			// 	socket.on('close', () => {
-			// 		resolve(true);
-			// 	});
-			// 	socket.on('error', () => {
-			// 		fail(false);
-			// 	});
-			// });
-			// server.listen(0, address.hostname, () => {
-			// 	console.log('trying to send a file');
-			// 	let address: any = server.address();
-			// 	let port = address && address.port ? address.port : null;
-			// 	if (port) {
-			// 		console.log(`using port: ${port}`);
-
-			// 	} else {
-			// 		throw new Error('no port found');
-			// 	}
-			// });
-			fetch(`http://${message.targetHost}:${message.targetPort}`, {
+		try {
+			await fetch(`http://${message.targetHost}:${message.targetPort}`, {
 				method: 'POST',
 				body: JSON.stringify({
 					...message,
@@ -299,10 +265,11 @@ export default class CommunicationTower {
 					agentName: this.agentName,
 					filePath: filePathArray
 				})
-			})
-				.then((e: any) => resolve())
-				.catch((e: any) => fail(e));
-		});
+			});
+			return true;
+		} catch (e) {
+			return false;
+		}
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
