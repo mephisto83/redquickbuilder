@@ -105,18 +105,16 @@ export default class CommunicationTower {
 	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
 		return new Promise(async (resolve, fail) => {
 			try {
-				let  fullnetworkpath ='';
-				if (os.platform() == 'linux')  {
-					fullnetworkpath=  `${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
+				let fullnetworkpath = '';
+
+				if (os.platform() == 'linux') {
+					fullnetworkpath = `${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
+				} else {
+					fullnetworkpath = `\\${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
 				}
-				else {
-				  fullnetworkpath = `\\${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
-				}
-				await ensureDirectory( fullnetworkpath);
-				console.log(
-					`write to :  ${ fullnetworkpath} <= from ${localFilePath}`
-				);
-				fs.copyFileSync(localFilePath, `${ fullnetworkpath}`);
+				await ensureDirectory(fullnetworkpath);
+				console.log(`write to :  ${fullnetworkpath} <= from ${localFilePath}`);
+				fs.copyFileSync(localFilePath, `${fullnetworkpath + path.sep + path.basename(outFolder)}`);
 				resolve();
 			} catch (e) {
 				console.log(e);
