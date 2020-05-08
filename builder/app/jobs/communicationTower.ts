@@ -316,7 +316,7 @@ export default class CommunicationTower {
 					await ensureDirectory(path.resolve(path.dirname(requestedPath)));
 					await this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
 					console.log(`writing to: ${requestedPath}`);
-					resolve();
+					resolve(true);
 				} catch (e) {
 					fail(e);
 				}
