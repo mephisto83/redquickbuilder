@@ -374,7 +374,8 @@ export default class CommunicationTower {
 			try {
 				fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
 			} catch (e) {
-				await sleep(1000);
+        await sleep(1000);
+        console.log(e);
 				success = false;
 			}
 		} while (!success);
