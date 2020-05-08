@@ -6,7 +6,6 @@ import fetch from 'node-fetch';
 import net from 'net';
 import { AgentProject, AgentProjects } from './interfaces';
 import { sleep, path_join } from './jobservice';
-import { OnFailureLink } from '../components/titles';
 
 export interface RedQuickDistributionMessage {
 	success?: any;
@@ -94,40 +93,11 @@ export default class CommunicationTower {
 				throw err;
 			});
 	}
-	static NetworkDrive: string = os.platform() == 'linux'
-		? '/run/user/1000/gvfs/smb-share:server=mephistowa,share=public/tmp/'
-		: '\\192.168.1.113\\Public\\tmp\\';
-
-	getNetworkFilePath(requestedPath: string): fs.PathLike {
-		if (os.platform() == 'linux') return `${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
-		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
-	}
-	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
-		return new Promise(async (resolve, fail) => {
-			try {
-				let fullnetworkpath = '';
-
-				if (os.platform() == 'linux') {
-					fullnetworkpath = `${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
-				} else {
-					fullnetworkpath = `\\${path.dirname(path_join(CommunicationTower.NetworkDrive, outFolder))}`;
-				}
-				await ensureDirectory(fullnetworkpath);
-				console.log(`write to :  ${fullnetworkpath} <= from ${localFilePath}`);
-				fs.copyFileSync(localFilePath, `${fullnetworkpath + path.sep + path.basename(outFolder)}`);
-				resolve();
-			} catch (e) {
-				console.log(e);
-				fail(e);
-			}
-		});
-	}
 	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
 		let maxattempts = 10;
 		do {
 			let success;
 			try {
-				await this.writeToDrive(agentProject, outFolder, localPath);
 				success = await this.sendFile(
 					{
 						agentName: agentProject.agent,
@@ -147,7 +117,7 @@ export default class CommunicationTower {
 			}
 
 			if (!success) {
-				await sleep(3 * 1000 + Math.random() * 1000);
+				await sleep(30 * 1000 + Math.random() * 100000);
 			}
 		} while (maxattempts);
 	}
@@ -255,90 +225,114 @@ export default class CommunicationTower {
 		throw new Error('no handler for ' + message.command);
 	}
 	async sendFile(message: AgentProject, localFilePath: string) {
-		// let server: net.Server,
-		// 	istream = fs.createReadStream(localFilePath);
+		let server: net.Server,
+			istream = fs.createReadStream(localFilePath);
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let address: any = this.getIpaddress();
 		message.hostname = address.hostname;
-		try {
-			await fetch(`http://${message.targetHost}:${message.targetPort}`, {
-				method: 'POST',
-				body: JSON.stringify({
-					...message,
-					port: 0,
-					command: RedQuickDistributionCommand.SendFile,
-					agentName: this.agentName,
-					filePath: filePathArray
-				})
+		return await new Promise((resolve, fail) => {
+			server = net.createServer((socket) => {
+				socket.pipe(process.stdout);
+				istream.on('readable', function() {
+					let data;
+					while ((data = this.read())) {
+						socket.write(data);
+					}
+				});
+				istream.on('end', function() {
+					socket.end();
+				});
+				socket.on('end', () => {
+					server.close(() => {
+						console.log('\nTransfer is done!');
+					});
+				});
+				socket.on('close', () => {
+					resolve(true);
+				});
+				socket.on('error', () => {
+					fail(false);
+				});
 			});
-			return true;
-		} catch (e) {
-			return false;
-		}
+			server.listen(0, address.hostname, () => {
+				console.log('trying to send a file');
+				let address: any = server.address();
+				let port = address && address.port ? address.port : null;
+				if (port) {
+					console.log(`using port: ${port}`);
+					fetch(`http://${message.targetHost}:${message.targetPort}`, {
+						method: 'POST',
+						body: JSON.stringify({
+							...message,
+							port,
+							command: RedQuickDistributionCommand.SendFile,
+							agentName: this.agentName,
+							filePath: filePathArray
+						})
+					}).catch((e) => fail(e));
+				} else {
+					throw new Error('no port found');
+				}
+			});
+		});
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
-		let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
-		try {
-			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-			await this.copyFileFromNetwork(requestedPath, path.join((req.filePath || []).join(path.sep)));
-			console.log(`writing to: ${requestedPath}`);
-			return true;
-		} catch (e) {
-			return false;
-		}
-		// let socket: net.Socket;
-		// socket = net.connect(req.port, req.hostname);
-		// let ostream = fs.createWriteStream(requestedPath);
-		// let size = 0,
-		// 	elapsed = 0;
-		// // this.sockets.push(socket);
-		// socket.on('error', (err) => {
-		// 	process.stdout.write(`\r${err.message}`);
-		// 	socket.destroy(err);
-		// 	this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
-		// 	fail(false);
-		// });
-		// socket.on('data', (chunk) => {
-		// 	size += chunk.length;
-		// 	socket.write(
-		// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-		// 			1000} s : ${requestedPath}`
-		// 	);
-		// 	process.stdout.write(
-		// 		`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-		// 			1000} s : ${requestedPath}`
-		// 	);
-		// 	ostream.write(chunk);
-		// });
-		// socket.on('end', () => {
-		// 	console.log(
-		// 		`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
-		// 			2
-		// 		)} MB/s to : ${requestedPath}`
-		// 	);
-		// 	socket.destroy();
-		// 	resolve(true);
-		// });
-		// ostream.on('error', (err) => {
-		// 	console.log('ostream error');
-		// 	console.log(err);
-		// 	fail(err);
-		// });
-		// ostream.on('ready', () => {});
-	}
-	async copyFileFromNetwork(requestedPath: string, fromPath: string) {
-		let success = true;
-		do {
-			success = true;
-			try {
-				fs.copyFileSync(this.getNetworkFilePath(fromPath), requestedPath);
-			} catch (e) {
-				await sleep(1000);
-				console.log(e);
-				success = false;
+		CommunicationTower.receiveQueue = CommunicationTower.receiveQueue.then(async () => {
+			let res = await new Promise(async (resolve, fail) => {
+				let requestedPath = path.join(
+					this.baseFolder,
+					this.agentName || '',
+					(req.filePath || []).join(path.sep)
+				);
+				await ensureDirectory(path.resolve(path.dirname(requestedPath)));
+				console.log(`writing to: ${requestedPath}`);
+				let socket: net.Socket;
+				socket = net.connect(req.port, req.hostname);
+				let ostream = fs.createWriteStream(requestedPath);
+				let size = 0,
+					elapsed = 0;
+				this.sockets.push(socket);
+				socket.on('error', (err) => {
+					process.stdout.write(`\r${err.message}`);
+					socket.destroy(err);
+					this.sockets = [ ...this.sockets.filter((s) => s !== socket) ];
+					fail(false);
+				});
+				socket.on('data', (chunk) => {
+					size += chunk.length;
+					socket.write(
+						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+							1000} s : ${requestedPath}`
+					);
+					process.stdout.write(
+						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+							1000} s : ${requestedPath}`
+					);
+					ostream.write(chunk);
+				});
+				socket.on('end', () => {
+					console.log(
+						`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
+							2
+						)} MB/s to : ${requestedPath}`
+					);
+					socket.destroy();
+					resolve(true);
+				});
+				ostream.on('error', (err) => {
+					console.log('ostream error');
+					console.log(err);
+					fail(err);
+				});
+				ostream.on('ready', () => {});
+			});
+			if (res) {
+				return true;
 			}
-		} while (!success);
+			return false;
+		});
+		return CommunicationTower.receiveQueue;
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();
@@ -479,9 +473,7 @@ export async function ensureDirectory(dir: string) {
 	_dir_parts.map((_, i) => {
 		if (i > 1 || _dir_parts.length - 1 === i) {
 			let tempDir = path_join(..._dir_parts.slice(0, i + 1));
-			if (dir.startsWith(`${path.sep}${path.sep}`)) {
-				tempDir = `${path.sep}${path.sep}${tempDir}`;
-			} else if (dir.startsWith(path.sep)) {
+			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
 			if (!fs.existsSync(tempDir)) {

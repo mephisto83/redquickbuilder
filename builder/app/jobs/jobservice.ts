@@ -63,7 +63,7 @@ export default class JobService {
 			let chunkPath = path_join(relPath, chunkFolder, chunkName + i);
 			files.push(path_join(chunkFolder, chunkName + i));
 			fs.writeFileSync(chunkPath, chunk, 'utf8');
-		}, Math.pow(2, 26));
+		}, Math.pow(2, 24));
 		let jobContent: JobOutput = {
 			files
 		};
