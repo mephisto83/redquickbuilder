@@ -99,6 +99,8 @@ export default class CommunicationTower {
 		: '\\192.168.1.113\\Public\\tmp\\';
 
 	getNetworkFilePath(requestedPath: string): fs.PathLike {
+		if(os.platform() == 'linux')
+		return `${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
 		return `\\${path_join(CommunicationTower.NetworkDrive, requestedPath)}`;
 	}
 	async writeToDrive(agentProject: AgentProject, outFolder: string, localFilePath: string) {
