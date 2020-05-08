@@ -149,7 +149,7 @@ export default class CommunicationTower {
 			}
 
 			if (!success) {
-				await sleep(30 * 1000 + Math.random() * 100000);
+				await sleep(3 * 1000 + Math.random() * 1000);
 			}
 		} while (maxattempts);
 	}
