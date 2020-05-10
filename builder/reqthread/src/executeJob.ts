@@ -1,9 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import CreateComponentAll from '../../app/nodepacks/batch/CreateComponentAll';
-import {
-	GetCurrentGraph
-} from '../../app/actions/uiactions';
+import { GetCurrentGraph } from '../../app/actions/uiactions';
 import {
 	Job,
 	JobOutput,
@@ -20,8 +18,16 @@ import {
 	Connect_Screens,
 	Add_Component_To_Screen_Options
 } from '../../app/nodepacks/batch/BuildAllDistributed';
+
+import * as BAD from '../../app/nodepacks/batch/BuildAllDistributed';
+
 import ConnectScreens from '../../app/nodepacks/batch/ConnectScreens';
 import AddComponentsToScreenOptions from '../../app/nodepacks/batch/AddComponentsToScreenOptions';
+import {
+	CollectionScreenWithoutDatachainDistributed,
+	CollectionComponentNodes,
+	CollectionScreenNodes
+} from '../../app/nodepacks/CollectionDataChainsIntoCollections';
 
 let app_state;
 
@@ -53,10 +59,32 @@ export default async function executeJob(
 						}
 					);
 					console.log('CreateComponentAll completed');
-					await storeOutput(path.join(jobInstancePath));
-					if (onChange) {
-						await onChange({ ...options, jobInstancePath });
-					}
+
+					break;
+				case BAD.CollectionScreenWithoutDatachainDistributed:
+					await CollectionScreenWithoutDatachainDistributed((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case BAD.CollectionComponentNodes:
+					await CollectionComponentNodes((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case BAD.CollectionScreenNodes:
+					await CollectionScreenNodes((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case Create_Component_All:
+					await CreateComponentAll(
+						() => {},
+						(model: any) => {
+							return filter && filter.models.indexOf(model.id) !== -1;
+						}
+					);
+					console.log('CreateComponentAll completed');
+
 					break;
 				case Connect_Screens:
 					await ConnectScreens(
@@ -65,10 +93,6 @@ export default async function executeJob(
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
 					);
-					await storeOutput(path.join(jobInstancePath));
-					if (onChange) {
-						await onChange({ ...options, jobInstancePath });
-					}
 					break;
 				case Add_Component_To_Screen_Options:
 					await AddComponentsToScreenOptions(
@@ -77,10 +101,6 @@ export default async function executeJob(
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
 					);
-					await storeOutput(path.join(jobInstancePath));
-					if (onChange) {
-						await onChange({ ...options, jobInstancePath });
-					}
 					break;
 				default:
 					jobConfig.complete = true;
@@ -91,7 +111,12 @@ export default async function executeJob(
 					console.log('-----------------------------');
 					throw new Error('unknown job');
 			}
-
+			if (!jobConfig.complete) {
+				await storeOutput(path.join(jobInstancePath));
+				if (onChange) {
+					await onChange({ ...options, jobInstancePath });
+				}
+			}
 			jobConfig.complete = true;
 		}
 	} else {
@@ -111,7 +136,7 @@ async function storeOutput(partFolder: string) {
 		try {
 			let currentGraph = GetCurrentGraph();
 			// let savecontent = JSON.stringify(prune(currentGraph));
-      await JobService.BreakFile(
+			await JobService.BreakFile(
 				partFolder,
 				JobServiceConstants.OUTPUT,
 				JobServiceConstants.OUTPUT_FOLDER,

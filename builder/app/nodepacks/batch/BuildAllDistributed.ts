@@ -32,7 +32,7 @@ import CreateClaimService from './CreateClaimService';
 import SetupViewTypes from './SetupViewTypes';
 import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';
 import ApplyLoginValidations from './ApplyLoginValidations';
-import CollectionDataChainsIntoCollections from '../CollectionDataChainsIntoCollections';
+import CollectionDataChainsIntoCollections, { CollectionSharedReference } from '../CollectionDataChainsIntoCollections';
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
 
@@ -84,9 +84,25 @@ function setCommandToRun(command: string) {
 function wait(name: string) {
 	return `wait_for_${name}`;
 }
-async function threadRun(array: BuildStep[], name: string, currentJobFile: JobFile, nodeTypes: string[] | string) {
+function waiting(name: string) {
+	return [
+		{
+			name
+		},
+		{
+			name: wait(name)
+		}
+	];
+}
+async function threadRun(
+	array: BuildStep[],
+	name: string,
+	currentJobFile: JobFile,
+	nodeTypes: string[] | string,
+	chunkSize: number = 12
+) {
 	await run(array, name, async (progresFunc: any) => {
-		await JobService.StartJob(name, currentJobFile, 12, nodeTypes);
+		await JobService.StartJob(name, currentJobFile, chunkSize, nodeTypes);
 		//     await ConnectScreens(progresFunc);
 	});
 
@@ -141,7 +157,10 @@ const Setup_View_Types = 'Setup_View_Types';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
-const CollectionDataChainsIntoCollectionsTitle = 'Collection Data Chains Into Collections';
+const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
+export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
+export const CollectionComponentNodes = 'CollectionComponentNodes';
+export const CollectionScreenNodes = 'CollectionScreenNodes';
 const Collect_Into_Graph = 'Collect_Into_Graph';
 const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
@@ -169,7 +188,11 @@ const buildAllProgress = [
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
-	{ name: CollectionDataChainsIntoCollectionsTitle },
+	{ name: wait(Add_Component_To_Screen_Options) },
+	{ name: CollectionSharedReferenceTo },
+	...waiting(CollectionScreenWithoutDatachainDistributed),
+  ...waiting(CollectionComponentNodes),
+  ...waiting(CollectionScreenNodes),
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -305,15 +328,38 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await threadRun(buildAllProgress, Add_Component_To_Screen_Options, currentJobFile, NodeTypes.Screen);
 
-		await run(buildAllProgress, CollectionDataChainsIntoCollectionsTitle, async (progresFunc: any) => {
-			const result = CollectionDataChainsIntoCollections(progresFunc);
+		await run(buildAllProgress, CollectionSharedReferenceTo, async (progresFunc: any) => {
+			const result = CollectionSharedReference(progresFunc);
 			await result.forEachAsync(async (item: any, index: number, total: number) => {
-				graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
+				await graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
 				await progresFunc(index / total);
 			});
 			clearPinned();
 			// await progresFunc(1);
 		});
+
+		await threadRun(
+			buildAllProgress,
+			CollectionScreenWithoutDatachainDistributed,
+			currentJobFile,
+			NodeTypes.Screen
+    );
+
+		await threadRun(
+			buildAllProgress,
+			CollectionComponentNodes,
+			currentJobFile,
+      NodeTypes.ComponentNode,
+      3
+    );
+
+		await threadRun(
+			buildAllProgress,
+			CollectionScreenNodes,
+			currentJobFile,
+      NodeTypes.Screen
+    );
+
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
 			currentJobFile.completed = true;
 		});

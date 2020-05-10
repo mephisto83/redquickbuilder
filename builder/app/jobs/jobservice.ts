@@ -659,18 +659,10 @@ export default class JobService {
 
 	static async MergeCompletedJob(job: Job): Promise<Graph | null> {
 		console.log('merging completed job');
-		let intermedita: { [index: string]: Graph } = {};
-		await job.parts.forEachAsync(async (part: string) => {
-			let graphOutput = await JobService.JoinFile(path_join(JobPath(), job.name, part), OUTPUT);
-			intermedita[part] = graphOutput;
-		});
-
 		let mergedGraph: Graph | null = GetCurrentGraph(GetState());
 		await job.parts.forEachAsync(async (part: string) => {
-			if (!intermedita[part]) {
-				throw new Error('intermedita[part] cant be falsy;');
-			}
-			mergedGraph = mergeGraph(mergedGraph, intermedita[part]);
+			let graphOutput = await JobService.JoinFile(path_join(JobPath(), job.name, part), OUTPUT);
+			mergedGraph = mergeGraph(mergedGraph, graphOutput);
 			if (!mergedGraph) {
 				throw new Error('graph should have been merged');
 			}

@@ -9,12 +9,7 @@ import {
 	GetCurrentGraph,
 	GetNodeByProperties
 } from '../actions/uiactions';
-import {
-	GetNodesLinkedTo,
-	GetNodeLinkedTo,
-	TARGET,
-	SOURCE
-} from '../methods/graph_methods';
+import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
 import { Graph } from '../methods/graph_types';
 
@@ -368,29 +363,441 @@ export default function(args: any = {}) {
 					];
 				});
 			});
-		screens.forEach((screen: any) => {
-			const screen_data_chains = [];
-			const externalApiDataChains = getComponentExternalApiDataChains(graph, screen);
-			const internalApiDataChains = getComponentInternalApiDataChains(graph, screen);
-			const eventApiDataChains = getComponentEventDataChains(graph, screen);
-			screen_data_chains.push(...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains);
-			let reference: any = null;
-			result.push(
-				...[ ...screen_data_chains ].map((dc) => {
+	});
+	screens.forEach((screen: any) => {
+		const screen_data_chains = [];
+		const externalApiDataChains = getComponentExternalApiDataChains(graph, screen);
+		const internalApiDataChains = getComponentInternalApiDataChains(graph, screen);
+		const eventApiDataChains = getComponentEventDataChains(graph, screen);
+		screen_data_chains.push(...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains);
+		let reference: any = null;
+		result.push(
+			...[ ...screen_data_chains ].map((dc) => {
+				return {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options(graph: any) {
+						reference = reference || getCollectionReference(graph, screen);
+						return {
+							target: reference.id,
+							source: dc.id,
+							properties: { ...LinkProperties.DataChainCollection }
+						};
+					}
+				};
+			})
+		);
+	});
+	return result.filter((x: any) => x);
+}
+
+export function CollectionScreenWithoutDatachainDistributed(filter: any) {
+	filter = filter || (() => true);
+	const result: any = [];
+	const graph = GetCurrentGraph();
+	const screens = NodesByType(null, NodeTypes.Screen).filter((x: any) => filter(x));
+	const screenWithoutDataChainCollection = screens;
+	// .filter(screen => {
+	//   return !GetNodesLinkedTo(graph, {
+	//     id: screen.id,
+	//     link: LinkType.DataChainCollectionReference
+	//   }).length;
+	// });
+
+	screenWithoutDataChainCollection.map((screen: any) => {
+		const temp: any = {};
+		const screenoptions: any = GetNodesLinkedTo(graph, {
+			id: screen.id,
+			link: LinkType.ScreenOptions
+		});
+		if (
+			!GetNodesLinkedTo(graph, {
+				id: screen.id,
+				link: LinkType.DataChainCollectionReference
+			}).length
+		) {
+			result.push({
+				operation: ADD_NEW_NODE,
+				options() {
 					return {
+						nodeType: NodeTypes.DataChainCollection,
+						linkProperties: {
+							properties: {
+								...LinkProperties.DataChainCollectionReference
+							}
+						},
+						parent: screen.id,
+						properties: {
+							[NodeProperties.UIText]: `${GetNodeTitle(screen)}`,
+							[NodeProperties.Pinned]: false
+						},
+						callback: (node: any) => {
+							temp.screen = node;
+						}
+					};
+				}
+			});
+		}
+
+		screenoptions.map((screenoption: { id: any }) => {
+			result.push((graph: any) => {
+				const add_screenoption_reference = !GetNodesLinkedTo(graph, {
+					id: screenoption.id,
+					link: LinkType.DataChainCollectionReference
+				}).length;
+
+				const screen = GetNodeLinkedTo(graph, {
+					id: screenoption.id,
+					link: LinkType.ScreenOptions
+				});
+
+				let collectionReference: any;
+				if (screen) {
+					collectionReference = GetNodeLinkedTo(graph, {
+						id: screen.id,
+						link: LinkType.DataChainCollectionReference
+					});
+				}
+				let temp: { id: any };
+				return [
+					add_screenoption_reference
+						? {
+								operation: ADD_NEW_NODE,
+								options(graph: any) {
+									return {
+										nodeType: NodeTypes.DataChainCollection,
+										linkProperties: {
+											properties: {
+												...LinkProperties.DataChainCollectionReference
+											}
+										},
+										parent: screenoption.id,
+										properties: {
+											[NodeProperties.UIText]: `${GetNodeTitle(screenoption)}`,
+											[NodeProperties.Pinned]: false
+										},
+										callback: (node: any) => {
+											temp = node;
+										}
+									};
+								}
+							}
+						: false,
+					collectionReference && add_screenoption_reference
+						? {
+								operation: ADD_LINK_BETWEEN_NODES,
+								options() {
+									return {
+										source: temp.id,
+										target: collectionReference.id,
+										properties: { ...LinkProperties.DataChainCollection }
+									};
+								}
+							}
+						: null
+				];
+			});
+
+			const components = GetNodesLinkedTo(graph, {
+				id: screenoption.id,
+				link: LinkType.Component
+			});
+
+			components.map((component: { id: any }) => {
+				const nodes_linked = GetNodesLinkedTo(graph, {
+					id: component.id,
+					link: LinkType.DataChainCollectionReference
+				});
+				if (nodes_linked.length) {
+					return null;
+				}
+
+				result.push((graph: any) => {
+					const screenoption = GetNodesLinkedTo(graph, {
+						id: component.id,
+						link: LinkType.Component
+					}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ScreenOption)[0];
+					let collectionReference: any;
+					if (screenoption) {
+						collectionReference = GetNodeLinkedTo(graph, {
+							id: screenoption.id,
+							link: LinkType.DataChainCollectionReference
+						});
+					}
+					let subtemp: { id: any };
+					return [
+						{
+							operation: ADD_NEW_NODE,
+							options() {
+								return {
+									nodeType: NodeTypes.DataChainCollection,
+									linkProperties: {
+										properties: {
+											...LinkProperties.DataChainCollectionReference
+										}
+									},
+									parent: component.id,
+									properties: {
+										[NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+										[NodeProperties.Pinned]: false
+									},
+									callback: (node: any) => {
+										subtemp = node;
+									}
+								};
+							}
+						},
+						collectionReference
+							? {
+									operation: ADD_LINK_BETWEEN_NODES,
+									options() {
+										return {
+											source: subtemp.id,
+											target: collectionReference.id,
+											properties: { ...LinkProperties.DataChainCollection }
+										};
+									}
+								}
+							: null
+					];
+				});
+			});
+
+			GetNodesLinkedTo(graph, {
+				id: screenoption.id,
+				link: LinkType.LifeCylceMethod
+			})
+				.map((lifeCycleMethod: { id: any }) => {
+					const res = GetNodesLinkedTo(graph, {
+						id: lifeCycleMethod.id,
+						link: LinkType.LifeCylceMethodInstance
+					}).map((lifecylceInstanceMethod: { id: any }) => {
+						const chains = [
+							...GetNodesLinkedTo(graph, {
+								id: lifecylceInstanceMethod.id,
+								link: LinkType.DataChainLink
+							}).filter((chain: { id: any }) => {
+								return GetNodesLinkedTo(graph, {
+									id: chain.id
+								}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.DataChain)
+									.length;
+							}),
+							...GetNodesLinkedTo(graph, {
+								id: lifecylceInstanceMethod.id,
+								link: LinkType.PreDataChainLink
+							}).filter((chain: { id: any }) => {
+								return GetNodesLinkedTo(graph, {
+									id: chain.id
+								}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.DataChain)
+									.length;
+							}),
+							...GetNodesLinkedTo(graph, {
+								id: lifecylceInstanceMethod.id,
+								link: LinkType.CallDataChainLink
+							}).filter((chain: { id: any }) => {
+								return GetNodesLinkedTo(graph, {
+									id: chain.id
+								}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) !== NodeTypes.DataChain)
+									.length;
+							})
+						];
+						return chains;
+					});
+					return res;
+				})
+				.flatten()
+				.forEach((chain: { id: any }) => {
+					result.push({
 						operation: ADD_LINK_BETWEEN_NODES,
-						options(graph: any) {
-							reference = reference || getCollectionReference(graph, screen);
+						options(ggraph: any) {
+							let screenOptionCollectionReference;
+							if (screenoption) {
+								screenOptionCollectionReference = GetNodeLinkedTo(ggraph, {
+									id: screenoption.id,
+									link: LinkType.DataChainCollectionReference
+								});
+							}
 							return {
-								target: reference.id,
-								source: dc.id,
+								target: screenOptionCollectionReference.id,
+								source: chain.id,
 								properties: { ...LinkProperties.DataChainCollection }
 							};
 						}
-					};
-				})
-			);
+					});
+				});
 		});
+	});
+	return result;
+}
+//this can be first
+export function CollectionSharedReference(filter: any) {
+	filter = filter || (() => true);
+	const result: any = [];
+	const graph = GetCurrentGraph();
+
+	[ UITypes.ElectronIO, UITypes.ReactNative, UITypes.ReactWeb ].forEach((uiType) => {
+		let sharedReferenceCollection = GetNodeByProperties(
+			{
+				[NodeProperties.SharedReferenceCollection]: true,
+				[NodeProperties.UIType]: uiType
+			},
+			graph
+		);
+		if (!sharedReferenceCollection) {
+			result.push({
+				operation: ADD_NEW_NODE,
+				options() {
+					return {
+						nodeType: NodeTypes.DataChainCollection,
+						properties: {
+							[NodeProperties.UIText]: `Shared Components ${uiType}`,
+							[NodeProperties.Pinned]: false,
+							[NodeProperties.UIType]: uiType,
+							[NodeProperties.SharedReferenceCollection]: true
+						},
+						callback: (node: any) => {
+							sharedReferenceCollection = node;
+						}
+					};
+				}
+			});
+		}
+	});
+	return result;
+}
+
+export function CollectionComponentNodes(filter: any) {
+	filter = filter || (() => true);
+	const result: any = [];
+	const graph = GetCurrentGraph();
+	[ UITypes.ElectronIO, UITypes.ReactNative, UITypes.ReactWeb ].forEach((uiType) => {
+		let sharedReferenceCollection = GetNodeByProperties(
+			{
+				[NodeProperties.SharedReferenceCollection]: true,
+				[NodeProperties.UIType]: uiType
+			},
+			graph
+		);
+
+		const componentNodes = NodesByType(null, NodeTypes.ComponentNode)
+			.filter((x: any) => filter(x))
+			.filter((x: any) => {
+				return GetNodeProp(x, NodeProperties.UIType) === uiType;
+			});
+		componentNodes
+			.map((d: any) => getTopComponent(graph, d))
+			.filter((x: any) => GetNodeProp(x, NodeProperties.SharedComponent))
+			.unique();
+
+		componentNodes
+			.sort((a: any, b: any) => {
+				const a_lineage = getComponentLineage(graph, a);
+				const b_lineage = getComponentLineage(graph, b);
+				const intersects = a_lineage.intersection(b_lineage);
+				if (intersects.length === 0) {
+					return a_lineage.length - b_lineage.length;
+				}
+				if (a_lineage.length !== b_lineage.length) {
+					return a_lineage.length - b_lineage.length;
+				}
+				return 0;
+			})
+			.forEach((component: { id: any }) => {
+				result.push(function(graph: any) {
+					const externalApiDataChains = getComponentExternalApiDataChains(graph, component);
+					const internalApiDataChains = getComponentInternalApiDataChains(graph, component);
+					const eventApiDataChains = getComponentEventDataChains(graph, component);
+					let reference: any = null;
+					const steps = [];
+					reference = getCollectionReference(graph, component);
+					if (!reference) {
+						steps.push({
+							operation: ADD_NEW_NODE,
+							options(graph: any) {
+								const parentReference = getParentCollectionReference(graph, component);
+								if (true || parentReference) {
+									return {
+										nodeType: NodeTypes.DataChainCollection,
+										properties: {
+											[NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+											[NodeProperties.Pinned]: false
+										},
+										links: [
+											{
+												target: (parentReference || sharedReferenceCollection).id,
+												linkProperties: {
+													properties: {
+														...LinkProperties.DataChainCollection
+													}
+												}
+											},
+											{
+												linkProperties: {
+													properties: {
+														...LinkProperties.DataChainCollectionReference
+													}
+												},
+												target: component.id
+											}
+										].filter((x) => x),
+										callback: (node: any) => {
+											reference = node;
+										}
+									};
+								} else {
+									console.log(component.id);
+									//  throw "parent should have a reference before getting here";
+								}
+							}
+						});
+					}
+					return [
+						...steps,
+						...[ ...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains ].map((dc) => {
+							return {
+								operation: ADD_LINK_BETWEEN_NODES,
+								options(graph: any) {
+									reference = reference || getCollectionReference(graph, component);
+									return {
+										target: reference.id,
+										source: dc.id,
+										properties: { ...LinkProperties.DataChainCollection }
+									};
+								}
+							};
+						})
+					];
+				});
+			});
+	});
+}
+
+export function CollectionScreenNodes(filter: any) {
+	filter = filter || (() => true);
+	const result: any = [];
+	const graph = GetCurrentGraph();
+	const screens = NodesByType(null, NodeTypes.Screen).filter((x: any) => filter(x));
+	screens.forEach((screen: any) => {
+		const screen_data_chains = [];
+		const externalApiDataChains = getComponentExternalApiDataChains(graph, screen);
+		const internalApiDataChains = getComponentInternalApiDataChains(graph, screen);
+		const eventApiDataChains = getComponentEventDataChains(graph, screen);
+		screen_data_chains.push(...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains);
+		let reference: any = null;
+		result.push(
+			...[ ...screen_data_chains ].map((dc) => {
+				return {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options(graph: any) {
+						reference = reference || getCollectionReference(graph, screen);
+						return {
+							target: reference.id,
+							source: dc.id,
+							properties: { ...LinkProperties.DataChainCollection }
+						};
+					}
+				};
+			})
+		);
 	});
 	return result.filter((x: any) => x);
 }
