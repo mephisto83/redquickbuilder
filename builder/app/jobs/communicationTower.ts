@@ -186,7 +186,7 @@ export default class CommunicationTower {
 			error: false,
 			noPort: false,
 			hostname: ''
-    };
+		};
 
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
@@ -240,11 +240,14 @@ export default class CommunicationTower {
 					server.close(() => {
 						console.log('\nTransfer is done!');
 					});
-				});
-				socket.on('close', () => {
 					resolve(true);
 				});
-				socket.on('error', () => {
+				socket.on('close', () => {
+					socket.destroy();
+					resolve(true);
+				});
+				socket.on('error', (er) => {
+					console.log(er);
 					fail(false);
 				});
 			});
@@ -310,6 +313,7 @@ export default class CommunicationTower {
 						)} MB/s to : ${requestedPath}`
 					);
 					socket.destroy();
+					ostream.close();
 					resolve(true);
 				});
 				ostream.on('error', (err) => {
