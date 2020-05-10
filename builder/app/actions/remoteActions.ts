@@ -21,7 +21,7 @@ import {
 	GetStateFunc,
 	GetCurrentGraph,
 	ApplicationConfig,
-  clearPinned
+	clearPinned
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -30,6 +30,7 @@ const BUILDER_BACK_UP = '.builder';
 const path = require('path');
 import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
+import StoreGraph, { LoadGraph } from '../methods/storeGraph';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 
@@ -78,7 +79,7 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ],
 				properties: [ 'openFile' ]
 			})
-			.then((opts) => {
+			.then(async (opts) => {
 				let filePaths = opts.filePaths;
 				console.log(opts.filePaths);
 				let fileName: any = filePaths.find((x) => x);
@@ -95,32 +96,19 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 					fileName = `${fileName}${RED_QUICK_FILE_EXT}`;
 				}
 				console.log(fileName);
-				fs.readFile(fileName, { encoding: 'utf8' }, (err: { message: any }, res: string) => {
-					if (err) {
-						console.error(`An error ocurred updating the file${err.message}`);
-						console.log(err);
-						return;
+
+				let opened_graph: any = await LoadGraph(fileName);
+				if (opened_graph) {
+					opened_graph = unprune(opened_graph);
+					const default_graph = createGraph();
+					opened_graph = { ...default_graph, ...opened_graph };
+					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
+					SaveGraph(opened_graph, dispatch);
+					setupCache(opened_graph);
+					if (unpinned) {
+						clearPinned();
 					}
-					try {
-						let opened_graph = JSON.parse(res);
-						if (opened_graph) {
-							if (unpruneGraph) {
-								opened_graph = unprune(opened_graph);
-							}
-							const default_graph = createGraph();
-							opened_graph = { ...default_graph, ...opened_graph };
-							SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
-							SaveGraph(opened_graph, dispatch);
-              setupCache(opened_graph);
-              if(unpinned){
-                clearPinned();
-              }
-						}
-					} catch (e) {
-						console.log(e);
-					}
-					console.warn('The file has been succesfully saved');
-				});
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -158,7 +146,7 @@ export function openRedQuickBuilderTheme() {
 						return;
 					}
 					try {
-						const openedTheme = JSON.parse(res);
+						let openedTheme = JSON.parse(res);
 						if (openedTheme) {
 							let defaultGraph = GetCurrentGraph();
 							defaultGraph = { ...defaultGraph, ...openedTheme };
@@ -198,19 +186,13 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 		const currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
 		if (currentGraph) {
-			const content = JSON.stringify(currentGraph);
-			let savecontent = content;
-			if (pruneGraph) {
-				savecontent = JSON.stringify(prune(currentGraph));
-			}
-
 			const remote = require('electron').remote;
 			const dialog = remote.dialog;
 			dialog
 				.showSaveDialog(remote.getCurrentWindow(), {
 					filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ]
 				})
-				.then((opts) => {
+				.then(async (opts) => {
 					let fileName = opts.filePath;
 					if (fileName === undefined) {
 						console.log("You didn't save the file");
@@ -226,15 +208,23 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 						prop: 'graphFile',
 						value: fileName
 					});
-					fs.writeFile(fileName, savecontent, (err: { message: any }) => {
-						if (err) {
-							console.error(`An error ocurred updating the file${err.message}`);
-							console.log(err);
-							return;
-						}
+					debugger;
+					await StoreGraph(prune(currentGraph), fileName);
+					// const content = JSON.stringify(currentGraph);
+					// let savecontent = content;
+					// if (pruneGraph) {
+					// 	savecontent = JSON.stringify(prune(currentGraph));
+					// }
 
-						console.warn('The file has been succesfully saved');
-					});
+					// fs.writeFile(fileName, savecontent, (err: any) => {
+					// 	if (err) {
+					// 		console.error(`An error ocurred updating the file${err.message}`);
+					// 		console.log(err);
+					// 		return;
+					// 	}
+
+					// 	console.warn('The file has been succesfully saved');
+					// });
 				});
 		}
 	};
@@ -378,7 +368,7 @@ export function saveTheme(theme: any) {
 }
 let lastSavedDate: null = null;
 export function saveGraph(graph: any) {
-	return (dispatch: any, getState: () => any) => {
+	return async (dispatch: any, getState: () => any) => {
 		const currentGraph = GetRootGraph(getState());
 		if (currentGraph && currentGraph.graphFile) {
 			if (fs.existsSync(currentGraph.graphFile)) {
@@ -405,7 +395,8 @@ export function saveGraph(graph: any) {
 						fs.copyFileSync(currentGraph.graphFile, path.join(backupFolder, `${fileName}.${fileNumber}`));
 					}
 				}
-				fs.writeFileSync(currentGraph.graphFile, JSON.stringify(currentGraph));
+				await StoreGraph(prune(currentGraph), currentGraph.graphFile);
+				// fs.writeFileSync(currentGraph.graphFile, JSON.stringify(currentGraph));
 			}
 			lastSavedDate = currentGraph.updated;
 		}

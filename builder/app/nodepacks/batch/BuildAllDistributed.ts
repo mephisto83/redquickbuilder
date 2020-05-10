@@ -312,7 +312,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				await progresFunc(index / total);
 			});
 			clearPinned();
-			await progresFunc(1);
+			// await progresFunc(1);
 		});
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
 			currentJobFile.completed = true;

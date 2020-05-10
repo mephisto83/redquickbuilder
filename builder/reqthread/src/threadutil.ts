@@ -19,6 +19,7 @@ import { setupCache, createGraph } from '../../app/methods/graph_methods';
 import { Graph } from '../../app/methods/graph_types';
 import unprune from '../../app/methods/unprune';
 import prune from '../../app/methods/prune';
+import StoreGraph, { LoadGraph } from '../../app/methods/storeGraph';
 
 export interface AgentDirectories {
 	[id: string]: AgentDirectory;
@@ -77,15 +78,22 @@ export async function setupJob(graphFolder: string) {
 export async function saveCurrentGraphTo(filePath, updatedGraph: Graph) {
 	console.log(`saving to : ${filePath}`);
 	let currentGraph = updatedGraph;
-	let savecontent = JSON.stringify(prune(currentGraph));
-	fs.writeFileSync(filePath, savecontent, 'utf8');
+	// let savecontent = JSON.stringify(prune(currentGraph));
+	// fs.writeFileSync(filePath, savecontent, 'utf8');
+	await StoreGraph(updatedGraph, filePath);
 }
 
 export async function openFile(fileName: string, dispatch: any): Promise<Graph> {
 	try {
 		let dirPath = path.dirname(fileName);
-		let res = await JobService.JoinFile(dirPath, path.basename(fileName));
-		let opened_graph: Graph = JSON.parse(res);
+		console.log(fileName);
+		let opened_graph: Graph;
+		if (fs.existsSync(path.join(dirPath, JobServiceConstants.GRAPH_FOLDER))) {
+			opened_graph = await JobService.JoinFile(dirPath, path.basename(fileName));
+		} else {
+			opened_graph = await LoadGraph(fileName);
+		}
+		// let opened_graph: Graph = JSON.parse(res);
 		if (opened_graph) {
 			opened_graph = unprune(opened_graph);
 			const default_graph = createGraph();

@@ -19,6 +19,7 @@ import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
 import { AgentProject, AgentProjects } from './interfaces';
 import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
+import StoreGraph, { LoadGraph, LoadBrokenGraph, SplitIntoFiles } from '../methods/storeGraph';
 
 export default class JobService {
 	static communicationTower: CommunicationTower;
@@ -56,32 +57,49 @@ export default class JobService {
 		return projects;
 	}
 
-	static async BreakFile(relPath: string, fileName: string, chunkFolder: string, chunkName: string, content: string) {
-		await ensureDirectory(path_join(relPath, chunkFolder));
-		let files: string[] = [];
-		await content.stringView(async (chunk: string, i: number) => {
-			let chunkPath = path_join(relPath, chunkFolder, chunkName + i);
-			files.push(path_join(chunkFolder, chunkName + i));
-			fs.writeFileSync(chunkPath, chunk, 'utf8');
-		}, Math.pow(2, 24));
+	static async BreakFile(
+		relPath: string,
+		fileName: string,
+		chunkFolder: string,
+		chunkName: string,
+		currentGraph: Graph
+	) {
+		console.log('Break files into pieces');
+		let files = await SplitIntoFiles(relPath, chunkFolder, chunkName, currentGraph);
+
+		// await StoreGraph(currentGraph, temporaryFile);
+		// fs.createReadStream(temporaryFile);
+		// await ensureDirectory(path_join(relPath, chunkFolder));
+		// let files: string[] = [];
+		// await content.stringView(async (chunk: string, i: number) => {
+		// 	let chunkPath = path_join(relPath, chunkFolder, chunkName + i);
+		// 	files.push(path_join(chunkFolder, chunkName + i));
+		// 	fs.writeFileSync(chunkPath, chunk, 'utf8');
+		// }, Math.pow(2, 24));
 		let jobContent: JobOutput = {
 			files
 		};
 		fs.writeFileSync(path_join(relPath, fileName), JSON.stringify(jobContent), 'utf8');
 	}
-	static async JoinFile(relPath: string, fileName: string): Promise<string> {
+	static async JoinFile(relPath: string, fileName: string): Promise<Graph> {
+		/** Use LoadGraph */
 		let fileContents: string = fs.readFileSync(path_join(relPath, fileName), 'utf8');
 		let parsedResult = JSON.parse(fileContents);
 		if (parsedResult && (parsedResult.workspace || parsedResult.version)) {
-			return fileContents;
+			return parsedResult;
 		}
 		let fileDetails: JobOutput = parsedResult;
-		let contents: string = '';
-		fileDetails.files.forEach((file) => {
-			contents = contents + fs.readFileSync(path_join(relPath, file));
-		});
+		// let contents: string = '';
+		// fileDetails.files.forEach((file) => {
+		// 	contents = contents + fs.readFileSync(path_join(relPath, file));
+		// });
 
-		return contents;
+		let res = await LoadBrokenGraph(relPath, fileDetails.files);
+
+		if (res) {
+			return res;
+		}
+		throw new Error('couldnt load graph');
 	}
 	static async CanJoinFiles(relPath: string, fileName: string): Promise<boolean> {
 		let fileContents: string = fs.readFileSync(path_join(relPath, fileName), 'utf8');
@@ -227,7 +245,7 @@ export default class JobService {
 			await setCurrentGraph(graph);
 			currentJobFile.updatedGraph = graph;
 			currentJobFile.started = true;
-			await writeGraphToFile(graph, currentJobFile.graphPath);
+			await writeGraphToFile(graph, path_join(path.dirname(currentJobFile.graphPath), OUTPUT_GRAPH));
 			if (currentJobFile.jobPath) {
 				// await JobService.deleteFolder(path.dirname(currentJobFile.jobPath));
 			} else {
@@ -279,13 +297,7 @@ export default class JobService {
 			fs.mkdirSync(path_join(JobPath(), jobName));
 		}
 
-		JobService.BreakFile(
-			path_join(JobPath(), jobName),
-			GRAPH_FILE,
-			GRAPH_FOLDER,
-			GRAPH_FILE_PARTS,
-			JSON.stringify(prune(graph))
-		);
+		await JobService.BreakFile(path_join(JobPath(), jobName), GRAPH_FILE, GRAPH_FOLDER, GRAPH_FILE_PARTS, graph);
 
 		let jobparts: string[] = [];
 		await chunks.forEachAsync(async (chunk: any) => {
@@ -650,7 +662,7 @@ export default class JobService {
 		let intermedita: { [index: string]: Graph } = {};
 		await job.parts.forEachAsync(async (part: string) => {
 			let graphOutput = await JobService.JoinFile(path_join(JobPath(), job.name, part), OUTPUT);
-			intermedita[part] = JSON.parse(graphOutput);
+			intermedita[part] = graphOutput;
 		});
 
 		let mergedGraph: Graph | null = GetCurrentGraph(GetState());
@@ -719,6 +731,8 @@ export default class JobService {
 		return result;
 	}
 	static async WriteJob(jobFile: JobFile, graph: string) {
+		/** Use LoadGraph */
+
 		let projectName = `${NameService.projectGenerator()}_${uuidv4().split('-')[0]}`;
 		await ensureDirectory(path_join(JobsFilePath(), projectName));
 		jobFile.originalGraphPath = jobFile.graphPath;
@@ -854,6 +868,8 @@ const GRAPH_FOLDER = 'graph';
 const INPUT = 'input.json';
 const AGENTS_FOLDER = 'agents';
 const OUTPUT = 'output.json';
+const OUTPUT_GRAPH = 'output_graph.rqb';
+const TEMPORARY_OUTPUT = 'temporaryOutput.json';
 const OUTPUT_FOLDER = 'output';
 const OUTPUT_CHUNK = 'output_chunk_';
 export const JobServiceConstants = {
@@ -861,6 +877,8 @@ export const JobServiceConstants = {
 	OUTPUT,
 	GRAPH_FILE,
 	OUTPUT_CHUNK,
+	OUTPUT_GRAPH,
+	TEMPORARY_OUTPUT,
 	JOB_NAME,
 	JOBS_FILE_PATH,
 	JobsFilePath,
@@ -967,8 +985,9 @@ export function sleep(ms: number = 10 * 1000) {
 }
 
 export async function writeGraphToFile(currentGraph: Graph, filePath: string) {
-	let savecontent = JSON.stringify(prune(currentGraph));
-	fs.writeFileSync(filePath, savecontent, 'utf8');
+	// let savecontent = JSON.stringify(prune(currentGraph));
+	// fs.writeFileSync(filePath, savecontent, 'utf8');
+	await StoreGraph(currentGraph, filePath);
 }
 
 async function setCurrentGraph(graph: Graph) {

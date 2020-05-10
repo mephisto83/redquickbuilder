@@ -11,6 +11,7 @@ export default function prune(graph: Graph) {
   delete prunedGraph.classNodes;
   delete prunedGraph.functionNodes;
   delete prunedGraph.nodeLinks;
+  delete prunedGraph.links;
   delete prunedGraph.visibleNodes;
   delete prunedGraph.groupsNodes;
   delete prunedGraph.nodes;

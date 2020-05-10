@@ -2,29 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import CreateComponentAll from '../../app/nodepacks/batch/CreateComponentAll';
 import {
-	GetDataChainEntryNodes,
-	APPLICATION,
-	CURRENT_GRAPH,
-	GRAPHS,
-	UIC,
-	setTestGetState,
-	GetDataChainFrom,
-	GenerateDataChainMethod,
-	GenerateChainFunction,
-	GenerateChainFunctions,
-	GetDataChainNextId,
-	GetDataChainArgs,
-	GetDataChainParts,
-	SaveApplication,
-	SaveGraph,
-	setTestDispatch,
-	GetDispatchFunc,
 	GetCurrentGraph
 } from '../../app/actions/uiactions';
-import uiReducer, { makeDefaultState, updateUI } from '../../app/reducers/uiReducer';
-import unprune from '../../app/methods/unprune';
-import { createGraph, setupCache } from '../../app/methods/graph_methods';
-import prune from '../../app/methods/prune';
 import {
 	Job,
 	JobOutput,
@@ -131,13 +110,13 @@ async function storeOutput(partFolder: string) {
 	return new Promise(async (resolve, fail) => {
 		try {
 			let currentGraph = GetCurrentGraph();
-			let savecontent = JSON.stringify(prune(currentGraph));
-			await JobService.BreakFile(
+			// let savecontent = JSON.stringify(prune(currentGraph));
+      await JobService.BreakFile(
 				partFolder,
 				JobServiceConstants.OUTPUT,
 				JobServiceConstants.OUTPUT_FOLDER,
 				JobServiceConstants.OUTPUT,
-				savecontent
+				currentGraph
 			);
 			resolve();
 		} catch (e) {

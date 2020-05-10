@@ -180,15 +180,14 @@ export default class CommunicationTower {
 		});
 	}
 	async processRequest(strinResult: string) {
-		console.debug('process request');
 		let parsed = JSON.parse(strinResult);
 		let reply: RedQuickDistributionMessage = {
 			port: 0,
 			error: false,
 			noPort: false,
 			hostname: ''
-		};
-		console.debug(parsed.command);
+    };
+
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
 				reply.port = await this.getAvailbePort();
@@ -209,14 +208,12 @@ export default class CommunicationTower {
 			reply.error = true;
 			reply.noPort = true;
 		}
-		console.debug('finished request');
 
 		return reply;
 	}
 	async onHandleReceivedMessage(message: RedQuickDistributionMessage) {
 		let progressListeners = this.listeners && message.command ? this.listeners[message.command] : null;
 		if (progressListeners) {
-			console.debug(`handle received message`);
 			return await progressListeners(message);
 		}
 		throw new Error('no handler for ' + message.command);

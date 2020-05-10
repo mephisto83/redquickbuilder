@@ -20,6 +20,7 @@ import CommunicationTower, {
 	ListenerReply
 } from '../../app/jobs/communicationTower';
 import { RunnerContext } from '../../app/jobs/interfaces';
+import StoreGraph from '../../app/methods/storeGraph';
 let communicationTower: CommunicationTower;
 let runnerContext: RunnerContext = {
 	agents: {},
@@ -157,15 +158,16 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 			);
 			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
+					console.debug(relativePath);
 					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
+					await StoreGraph(content, path_join(relativePath, JobServiceConstants.OUTPUT_GRAPH));
 					let completed = await JobService.SetJobPartComplete(relativePath);
 					// await JobService.SetJobPartComplete(relativePath);
 
-					console.debug(relativePath);
 					if (!completed) {
 						throw new Error('job was not set to completed');
 					}
-					fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+					// fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
 					let temp: any = message;
 					if (
 						temp.agent &&

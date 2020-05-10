@@ -134,6 +134,7 @@ import HomeViewCredentialLoading from '../nodepacks/HomeViewCredentialLoading';
 import HomeViewContinueAsButtonStyle from '../nodepacks/HomeViewContinueAsButtonStyle';
 import Anonymous from '../nodepacks/screens/Anonymous';
 import AnonymousGuest from '../nodepacks/screens/AnonymousGuest';
+import PostRegister from '../nodepacks/PostRegister';
 
 export const GetSpecificModels = {
 	type: 'get-specific-models',
@@ -642,7 +643,7 @@ export const CreateLoginModels = {
 			chosenChildren,
 			viewType: ViewTypes.Create
 		});
-		const authenticateScreen = method_results.screenNodeId;
+		const authenticateScreenResults = method_results;
 		Object.keys(uiTypeConfig).forEach((key) => {
 			if (uiTypeConfig[key]) {
 				addInstanceEventsToForms({
@@ -727,10 +728,11 @@ export const CreateLoginModels = {
 					}
 
 					PerformGraphOperation([
-						...PostAuthenticate({
-							screen: null,
+						...PostRegister({
+							screen:  authenticateScreenResults.uiTypes[uiType].screenNodeId,
 							uiType,
-							functionName: `Post Authenticate ${uiType}`,
+							functionName: `Post Register ${uiType}`,
+							name: `Post Register ${uiType}`,
 							pressInstance:
 								uiType === UITypes.ReactNative
 									? method_results.uiTypes[uiType].instanceFunc.onPress
@@ -758,7 +760,7 @@ export const CreateLoginModels = {
 					...HomeView({
 						titleService: titleService.id,
 						registerForm: registerScreen,
-						authenticateForm: authenticateScreen,
+						authenticateForm: authenticateScreenResults.uiTypes[uiType].screenNodeId,
 						anonymousForm: anonymousScreen,
 						continueAsForm: continueAsScreen,
 						forgotForm: forgotLoginScreen,
@@ -3008,15 +3010,15 @@ export const CreateDefaultView = {
 									groupProperties: {},
 									properties: {
 										...viewPackage,
-										[NodeProperties.UIText]: `${GetNodeTitle(
-											agentId
-										)} ${Titles.Execute} Button ${viewName} Component`,
+										[NodeProperties.UIText]: `${agentId
+											? GetNodeTitle(agentId)
+											: ''} ${Titles.Execute} Button ${viewName} Component`,
 										[NodeProperties.UIType]: uiType,
 										...agentId ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.Pinned]: false,
-										[NodeProperties.Label]: `${GetNodeTitle(
-											agentId
-										)} ${Titles.Execute} Button ${viewName} Component`,
+										[NodeProperties.Label]: `${agentId
+											? GetNodeTitle(agentId)
+											: ''} ${Titles.Execute} Button ${viewName} Component`,
 										[NodeProperties.ExecuteButton]: true,
 										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
 										[NodeProperties.InstanceType]: useModelInstance
@@ -3044,15 +3046,15 @@ export const CreateDefaultView = {
 									groupProperties: {},
 									properties: {
 										...viewPackage,
-										[NodeProperties.UIText]: `${GetNodeTitle(
-											agentId
-										)} ${Titles.Cancel} Button ${viewName} Component`,
+										[NodeProperties.UIText]: `${agentId
+											? GetNodeTitle(agentId)
+											: ''} ${Titles.Cancel} Button ${viewName} Component`,
 										[NodeProperties.UIType]: uiType,
 										[NodeProperties.Pinned]: false,
 										[NodeProperties.CancelButton]: true,
-										[NodeProperties.Label]: `${GetNodeTitle(
-											agentId
-										)} ${Titles.Cancel} Button ${viewName} Component`,
+										[NodeProperties.Label]: `${agentId
+											? GetNodeTitle(agentId)
+											: ''} ${Titles.Cancel} Button ${viewName} Component`,
 										...agentId ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
 										[NodeProperties.InstanceType]: useModelInstance
