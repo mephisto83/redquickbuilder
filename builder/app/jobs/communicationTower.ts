@@ -92,11 +92,10 @@ export default class CommunicationTower {
 			});
 	}
 	async transferFile(agentProject: AgentProject, outFolder: string, localPath: string) {
-		let maxattempts = 10;
+		let maxattempts = true;
 		do {
-			let success;
 			try {
-				success = await this.sendFile(
+				await this.sendFile(
 					{
 						agentName: agentProject.agent,
 						agentProject: agentProject.name,
@@ -107,15 +106,10 @@ export default class CommunicationTower {
 					},
 					localPath
 				);
-				if (success) {
-					maxattempts = 0;
-				}
+				maxattempts = false;
 			} catch (e) {
-				console.log(`failed to send file : ${maxattempts} attemps left`);
-			}
-
-			if (!success) {
-				await sleep(30 * 1000 + Math.random() * 100000);
+				console.log(`failed to send file : attempts left`);
+        await sleep(30 * 1000 + Math.random() * 100000);
 			}
 		} while (maxattempts);
 	}

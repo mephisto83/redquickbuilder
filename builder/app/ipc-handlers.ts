@@ -145,17 +145,16 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 		[RedQuickDistributionCommand.CompletedJobItem]: noOp,
 		[RedQuickDistributionCommand.SetCommandCenter]: noOp,
-		[RedQuickDistributionCommand.UpdateCommandCenter]: (args) => {
+		[RedQuickDistributionCommand.UpdateCommandCenter]: (args: any) => {
 			// console.log('update command center');
 			updateCommandCenter(mainWindowFunc, args);
 		}
 	});
 	console.log('set command center');
-	setCommandCenter(7979, 8001);
+	setCommandCenter(7978, 8001);
 }
 function setCommandCenter(targetPort: number, port: number) {
 	return Promise.resolve()
-
 		.then(async () => {
 			if (communicationTower) {
 				console.log('communication tower, set command center');
@@ -176,8 +175,8 @@ function setCommandCenter(targetPort: number, port: number) {
 					console.log('didnt set command center');
 				}
 			}
-    })
-    .then(async () => {
+		})
+		.then(async () => {
 			await sleep(300000);
 		})
 		.then(() => {
