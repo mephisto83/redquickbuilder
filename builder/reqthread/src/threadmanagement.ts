@@ -169,11 +169,9 @@ export default class ThreadManagement {
 		);
 
 		// await sleep(10 * 1000);
-		if (result.success) {
-			let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName);
-			if (fs.existsSync(jobFolder)) {
-				await JobService.deleteFolder(jobFolder);
-			}
+		let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName);
+		if (fs.existsSync(jobFolder)) {
+			await JobService.deleteFolder(jobFolder);
 		}
 		// 	} catch (e) {
 		// 		console.error('error transferring files back');

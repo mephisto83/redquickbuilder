@@ -84,6 +84,9 @@ function setCommandToRun(command: string) {
 function wait(name: string) {
 	return `wait_for_${name}`;
 }
+function collect(name: String) {
+	return `collect_for_${name}`;
+}
 function waiting(name: string) {
 	return [
 		{
@@ -91,6 +94,9 @@ function waiting(name: string) {
 		},
 		{
 			name: wait(name)
+		},
+		{
+			name: collect(name)
 		}
 	];
 }
@@ -108,6 +114,10 @@ async function threadRun(
 
 	await run(array, wait(name), async (progresFunc: (arg0: number) => any) => {
 		await JobService.WaitForJob(wait(name), currentJobFile);
+	});
+
+	await run(array, collect(name), async (progresFunc: (arg0: number) => any) => {
+		await JobService.CollectForJob(currentJobFile);
 	});
 }
 async function run(array: BuildStep[], name: string, func: Function) {
@@ -191,8 +201,8 @@ const buildAllProgress = [
 	{ name: wait(Add_Component_To_Screen_Options) },
 	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionScreenWithoutDatachainDistributed),
-  ...waiting(CollectionComponentNodes),
-  ...waiting(CollectionScreenNodes),
+	...waiting(CollectionComponentNodes),
+	...waiting(CollectionScreenNodes),
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -343,22 +353,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			CollectionScreenWithoutDatachainDistributed,
 			currentJobFile,
 			NodeTypes.Screen
-    );
+		);
 
-		await threadRun(
-			buildAllProgress,
-			CollectionComponentNodes,
-			currentJobFile,
-      NodeTypes.ComponentNode,
-      3
-    );
+		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
 
-		await threadRun(
-			buildAllProgress,
-			CollectionScreenNodes,
-			currentJobFile,
-      NodeTypes.Screen
-    );
+		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
 			currentJobFile.completed = true;
