@@ -17,7 +17,7 @@ let distribution = new Distribution();
     throttle: 120 * 1000,
     threads: 1,
     remoteServerHost: '192.168.1.146',
-    remoteServerPort: 7979
+    remoteServerPort: 7978
   })
 
   await distribution.run(false);
