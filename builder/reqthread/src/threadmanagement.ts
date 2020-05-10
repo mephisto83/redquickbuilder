@@ -169,7 +169,7 @@ export default class ThreadManagement {
 		);
 
 		// await sleep(10 * 1000);
-		let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName);
+		let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName,completedJobItem.fileName);
 		if (fs.existsSync(jobFolder)) {
 			await JobService.deleteFolder(jobFolder);
 		}
