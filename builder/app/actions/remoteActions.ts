@@ -31,6 +31,8 @@ const path = require('path');
 import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
+import { Graph } from '../methods/graph_types';
+import { NodeProperties } from '../constants/nodetypes';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 
@@ -97,13 +99,21 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 				}
 				console.log(fileName);
 
-				let opened_graph: any = await LoadGraph(fileName);
+				let opened_graph: Graph = await LoadGraph(fileName);
 				if (opened_graph) {
+					debugger;
+					let pinnedCount = 0;
+					Object.keys(opened_graph.nodeLib).forEach((key) => {
+						let node = opened_graph.nodeLib[key];
+						if (node.properties[NodeProperties.Pinned]) pinnedCount++;
+						node.properties[NodeProperties.Pinned] = false;
+					});
+					console.log(`Pinned count ${pinnedCount}`);
 					opened_graph = unprune(opened_graph);
 					const default_graph = createGraph();
 					opened_graph = { ...default_graph, ...opened_graph };
 					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
-					SaveGraph(opened_graph, dispatch);
+					SaveGraph(opened_graph, dispatch, true);
 					setupCache(opened_graph);
 					if (unpinned) {
 						clearPinned();

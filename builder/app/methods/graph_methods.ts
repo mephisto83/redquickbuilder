@@ -3292,15 +3292,21 @@ export const GroupImportanceOrder = {
 	[NodeTypes.ModelItemFilter]: 13
 };
 
-export function SetVisible(graph: any) {
+export function SetVisible(graph: any, clearPinned: boolean = false) {
 	graph.visibleNodes = {};
 	graph.nodes.forEach((t: string) => {
-		if (GetNodeProp(GetNode(graph, t), NodeProperties.Pinned)) {
-			graph.visibleNodes[t] = true;
+		let node = GetNode(graph, t);
+		if (GetNodeProp(node, NodeProperties.Pinned)) {
+			if (clearPinned) {
+				if (node) node.properties[NodeProperties.Pinned] = false;
+				graph.visibleNodes[t] = false;
+			} else {
+				graph.visibleNodes[t] = true;
+			}
 		}
 	});
-	if (graph.depth) {
-		[].interpolate(0, graph.depth, (x: number) => {
+	if (graph.depth && !isNaN(graph.depth) && parseInt(graph.depth)) {
+		[].interpolate(0, parseInt(graph.depth), (x: number) => {
 			Object.keys(graph.visibleNodes).forEach((t) => {
 				for (const h in graph.nodeLinks[t]) {
 					if (x > 1 && !graph.visibleNodes[h]) {
@@ -3425,13 +3431,13 @@ export function FilterGraph(graph: any) {
 
 	return filteredGraph;
 }
-export function VisualProcess(graph: any) {
+export function VisualProcess(graph: any, clearPinned: boolean = false) {
 	if (Paused()) {
 		return null;
 	}
 	const vgraph = createGraph();
 	vgraph.id = graph.id;
-	graph = SetVisible(graph);
+	graph = SetVisible(graph, clearPinned);
 	vgraph.visibleNodes = { ...graph.visibleNodes };
 	graph = FilterGraph(graph);
 	const collapsedNodes = graph.nodes.filter((node: string | number) =>

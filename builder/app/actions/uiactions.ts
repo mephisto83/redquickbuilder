@@ -2802,16 +2802,9 @@ export function Graphs(state: any, key: any) {
 	return GetC(state, GRAPHS, key);
 }
 
-export function SaveGraph(graph: any, dispatch: Function) {
-	// graph = {
-	//   ...graph,
-	//   ...{
-	//     updated: Date.now()
-	//   }
-	// };
+export function SaveGraph(graph: any, dispatch: Function, clearPinned: boolean = false) {
 	graph.updated = Date.now();
-
-	const visualGraph = GraphMethods.VisualProcess(graph);
+	const visualGraph = GraphMethods.VisualProcess(graph, clearPinned);
 	if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
 	if (!GraphMethods.Paused()) {
 		dispatch(UIC(GRAPHS, graph.id, graph));

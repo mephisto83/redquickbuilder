@@ -7,7 +7,10 @@ import {
 	GetNodeProp,
 	ADD_LINK_BETWEEN_NODES,
 	GetCurrentGraph,
-	GetNodeByProperties
+	GetNodeByProperties,
+	executeGraphOperations,
+	GetDispatchFunc,
+	GetStateFunc
 } from '../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
@@ -625,7 +628,10 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 					});
 				});
 		});
-	});
+  });
+
+  executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
+
 	return result;
 }
 //this can be first
@@ -767,8 +773,12 @@ export function CollectionComponentNodes(filter: any) {
 						})
 					];
 				});
-			});
+      });
+
+		executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
 	});
+
+	executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
 }
 
 export function CollectionScreenNodes(filter: any) {

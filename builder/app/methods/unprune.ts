@@ -1,7 +1,7 @@
 import { SOURCE, TARGET } from './graph_methods';
 import { Graph } from './graph_types';
 
-export default function unprune(graph: Graph) {
+export default function unprune(graph: Graph): Graph {
 	addNodeConnections(graph);
 	addLinks(graph);
 	addNodeLinks(graph);
