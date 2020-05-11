@@ -284,6 +284,7 @@ export default class CommunicationTower {
 				let size = 0,
 					elapsed = 0;
 				socket.on('error', (err) => {
+          console.log(err);
 					process.stdout.write(`\r${err.message}`);
 					socket.destroy(err);
 					fail(false);
