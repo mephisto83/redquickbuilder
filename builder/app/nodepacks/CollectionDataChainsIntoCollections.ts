@@ -10,7 +10,8 @@ import {
 	GetNodeByProperties,
 	executeGraphOperations,
 	GetDispatchFunc,
-	GetStateFunc
+	GetStateFunc,
+	graphOperation
 } from '../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
@@ -630,7 +631,7 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 		});
   });
 
-  executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
+  graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
 
 	return result;
 }
@@ -775,10 +776,9 @@ export function CollectionComponentNodes(filter: any) {
 				});
       });
 
-		executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
 	});
 
-	executeGraphOperations(result)(GetDispatchFunc, GetStateFunc);
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
 }
 
 export function CollectionScreenNodes(filter: any) {
@@ -809,7 +809,8 @@ export function CollectionScreenNodes(filter: any) {
 			})
 		);
 	});
-	return result.filter((x: any) => x);
+	
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
 }
 function getComponentLineage(graph: Graph, node: { id: any }): any {
 	let parent = GetNodesLinkedTo(graph, {
