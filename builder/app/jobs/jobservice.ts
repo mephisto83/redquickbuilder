@@ -196,7 +196,6 @@ export default class JobService {
 		console.log(`there are ${availableProjects.length} available agentProjects`);
 		let items = await this.getJobsItems(job);
 		await items.forEachAsync(async (item: JobItem) => {
-			console.log('checking if job item is complete');
 			let isComplete = await this.IsJobItemComplete(item);
 			if (!isComplete) {
 				let notBusyProject = availableProjects.find(
@@ -212,6 +211,12 @@ export default class JobService {
 					await this.beginJob(notBusyProject, item);
 					if (notBusyProject.ready) {
 						throw new Error('project cant be ready this fast');
+					}
+				} else if (!(await this.GetProjects()).find((v) => v.agentProject === item.assignedTo)) {
+					console.log('agent no longer available');
+					if (availableProjects && availableProjects.length) {
+						console.log('reassigning job');
+						await this.reassignJobItem(item, availableProjects[0]);
 					}
 				} else {
 					if (notBusyProject) {
@@ -231,6 +236,12 @@ export default class JobService {
 				}
 			}
 		});
+	}
+	static async reassignJobItem(item: JobItem, project: AgentProject) {
+		item.assignedTo = project.agentProject || project.name;
+		await this.saveJobItem(item);
+		await this.moveJobItemFiles(project, item);
+		await this.beginJob(project, item);
 	}
 
 	static async CollectForJob(currentJobFile: JobFile) {
@@ -444,30 +455,27 @@ export default class JobService {
 			...JobService.agentProjects.filter((x) => x.name !== agentProject.name),
 			agentProject
 		];
-		console.debug(
-			`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter((x) => x.ready)
-				.length} available`
-		);
 	}
 	static async GetAvailableProjects(): Promise<AgentProject[]> {
 		return JobService.agentProjects.filter((x) => x.ready);
 	}
+	static async GetProjects(): Promise<AgentProject[]> {
+		return JobService.agentProjects;
+	}
 
 	static async GetAvailableProject(): Promise<AgentProject> {
 		let result: AgentProject | null = null;
-
 		do {
-			console.debug(
-				`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter(
-					(x) => x.ready
-				).length} available`
-			);
 			result = JobService.agentProjects.find((x) => x.ready) || null;
 			if (!result) {
 				console.log('looking for agent project');
 				await sleep(3000);
 			}
 		} while (!result);
+		console.debug(
+			`there are ${JobService.agentProjects.length} agents and ${JobService.agentProjects.filter((x) => x.ready)
+				.length} available`
+		);
 		console.log('found agentproject');
 		console.log(result);
 		return result;
