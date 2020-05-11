@@ -256,7 +256,7 @@ export default class JobService {
 			await setCurrentGraph(graph);
 			currentJobFile.updatedGraph = graph;
 			currentJobFile.started = true;
-			await writeGraphToFile(graph, path_join(path.dirname(currentJobFile.graphPath), OUTPUT_GRAPH));
+			// await writeGraphToFile(graph, path_join(path.dirname(currentJobFile.graphPath), OUTPUT_GRAPH));
 			if (currentJobFile.jobPath) {
 				// await JobService.deleteFolder(path.dirname(currentJobFile.jobPath));
 			} else {

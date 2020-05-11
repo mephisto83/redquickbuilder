@@ -199,8 +199,8 @@ const buildAllProgress = [
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
 	{ name: wait(Add_Component_To_Screen_Options) },
-	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionScreenWithoutDatachainDistributed),
+	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionComponentNodes),
 	...waiting(CollectionScreenNodes),
 	{ name: COMPLETED_BUILD }
