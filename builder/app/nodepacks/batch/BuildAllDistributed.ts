@@ -340,11 +340,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, CollectionSharedReferenceTo, async (progresFunc: any) => {
 			const result = CollectionSharedReference(progresFunc);
-			await result.forEachAsync(async (item: any, index: number, total: number) => {
-				await graphOperation([ item ])(GetDispatchFunc(), GetStateFunc());
-				await progresFunc(index / total);
-			});
-			clearPinned();
+			await graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 			// await progresFunc(1);
 		});
 
