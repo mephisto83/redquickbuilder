@@ -112,17 +112,17 @@ export default function ClearScreenInstance(args: any) {
 			}
 		);
 	});
-	// if (lastChain) {
-	// 	result.push({
-	// 		operation: UPDATE_NODE_PROPERTY,
-	// 		options: {
-	// 			id: lastChain,
-	// 			properties: {
-	// 				[NodeProperties.AsOutput]: true
-	// 			}
-	// 		}
-	// 	});
-	// }
+	if (lastChain) {
+		result.push({
+			operation: UPDATE_NODE_PROPERTY,
+			options: {
+				id: lastChain,
+				properties: {
+					[NodeProperties.AsOutput]: true
+				}
+			}
+		});
+	}
 	result.push({
 		operation: NO_OP,
 		options() {
