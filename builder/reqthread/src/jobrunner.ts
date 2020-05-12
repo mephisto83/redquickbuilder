@@ -263,7 +263,7 @@ async function processJobs() {
 async function executeStep(jobFilePath: string) {
 	// console.debug('read job file path');
 	// console.debug(jobFilePath);
-	console.debug('execute step');
+	// console.debug('execute step');
 	let jobConfigContents = fs.readFileSync(jobFilePath, 'utf8');
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error && !jobConfig.completed) {
