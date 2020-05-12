@@ -25,7 +25,8 @@ import {
 	GetCurrentGraph,
 	GetRootGraph,
 	GetNodeById,
-	GetCodeName
+	GetCodeName,
+	GetNodeByProperties
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import { Graph, Node, GraphLink } from './graph_types';
@@ -3294,14 +3295,14 @@ export const GroupImportanceOrder = {
 
 export function SetVisible(graph: any, clearPinned: boolean = false) {
 	graph.visibleNodes = {};
-	graph.nodes.forEach((t: string) => {
-		let node = GetNode(graph, t);
+	let nodes = GetNodesByProperties({ [NodeProperties.Pinned]: true }, graph);
+	nodes.forEach((node: Node) => {
 		if (GetNodeProp(node, NodeProperties.Pinned)) {
 			if (clearPinned) {
 				if (node) node.properties[NodeProperties.Pinned] = false;
-				graph.visibleNodes[t] = false;
+				graph.visibleNodes[node.id] = false;
 			} else {
-				graph.visibleNodes[t] = true;
+				graph.visibleNodes[node.id] = true;
 			}
 		}
 	});
