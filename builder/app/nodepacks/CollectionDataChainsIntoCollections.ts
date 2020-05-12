@@ -406,7 +406,7 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 	//     link: LinkType.DataChainCollectionReference
 	//   }).length;
 	// });
-
+debugger;
 	screenWithoutDataChainCollection.map((screen: any) => {
 		const temp: any = {};
 		const screenoptions: any = GetNodesLinkedTo(graph, {
@@ -613,12 +613,16 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 					result.push({
 						operation: ADD_LINK_BETWEEN_NODES,
 						options(ggraph: any) {
+              debugger;
 							let screenOptionCollectionReference;
 							if (screenoption) {
 								screenOptionCollectionReference = GetNodeLinkedTo(ggraph, {
 									id: screenoption.id,
 									link: LinkType.DataChainCollectionReference
 								});
+							}
+							if (!screenOptionCollectionReference) {
+								throw new Error('missing screenOptionCollectionReference');
 							}
 							return {
 								target: screenOptionCollectionReference.id,
@@ -631,7 +635,7 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 		});
 	});
 
-  graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc(), GetStateFunc());
 
 	return result;
 }
@@ -774,11 +778,10 @@ export function CollectionComponentNodes(filter: any) {
 						})
 					];
 				});
-      });
-
+			});
 	});
 
-	graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc(), GetStateFunc());
 }
 
 export function CollectionScreenNodes(filter: any) {
@@ -810,7 +813,7 @@ export function CollectionScreenNodes(filter: any) {
 		);
 	});
 
-	graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc(), GetStateFunc());
 }
 function getComponentLineage(graph: Graph, node: { id: any }): any {
 	let parent = GetNodesLinkedTo(graph, {

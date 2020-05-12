@@ -34,6 +34,7 @@ import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
 import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 import JobService from '../jobs/jobservice';
+import { CollectionScreenWithoutDatachainDistributed } from '../nodepacks/CollectionDataChainsIntoCollections';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -233,8 +234,8 @@ class QuickMethods extends Component<any, any, any> {
 									title={'Create Job'}
 									icon="fa fa-plus"
 									onClick={() => {
-                    this.props.setState();
-                    debugger;
+										this.props.setState();
+										debugger;
 										JobService.CreateJob('asdf', 10, NodeTypes.Screen);
 									}}
 								/>
@@ -243,6 +244,14 @@ class QuickMethods extends Component<any, any, any> {
 									icon="fa fa-plus"
 									onClick={() => {
 										UpdateScreenUrls(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title={'CollectionScreenWithoutDatachainDistributed'}
+									onClick={() => {
+										CollectionScreenWithoutDatachainDistributed(() => {
+											return true;
+										});
 									}}
 								/>
 								<TreeViewMenu
