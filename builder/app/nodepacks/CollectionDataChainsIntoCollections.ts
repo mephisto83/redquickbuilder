@@ -629,7 +629,7 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 					});
 				});
 		});
-  });
+	});
 
   graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
 
@@ -809,7 +809,7 @@ export function CollectionScreenNodes(filter: any) {
 			})
 		);
 	});
-	
+
 	graphOperation(result.filter((x: any) => x))(GetDispatchFunc, GetStateFunc);
 }
 function getComponentLineage(graph: Graph, node: { id: any }): any {

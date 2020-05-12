@@ -250,7 +250,8 @@ export default class CommunicationTower {
 				let address: any = server.address();
 				let port = address && address.port ? address.port : null;
 				if (port) {
-					console.log(`using port: ${port}`);
+          console.log(`using port: ${port}`);
+          console.log(`http://${message.targetHost}:${message.targetPort}`)
 					fetch(`http://${message.targetHost}:${message.targetPort}`, {
 						method: 'POST',
 						body: JSON.stringify({
