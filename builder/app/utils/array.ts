@@ -394,7 +394,9 @@ String.prototype.toJavascriptName = function() {
 				const chunks = Math.ceil(stringOfLetters.length / chunkSize);
 				let promise: any = Promise.resolve();
 				[].interpolate(0, Math.ceil(stringOfLetters.length / chunkSize), (i: number) => {
-					promise = promise.then(async () => func(stringOfLetters.slice(i * chunkSize, (i + 1) * chunkSize), i, chunks));
+					promise = promise.then(async () =>
+						func(stringOfLetters.slice(i * chunkSize, (i + 1) * chunkSize), i, chunks)
+					);
 				});
 				// }
 				return promise;
@@ -415,5 +417,6 @@ export function addNewLine(str?: string, count?: number) {
 	return ((str ? NEW_LINE + spaces : '') + (str || ''))
 		.split(NEW_LINE)
 		.filter((x) => x.trim())
+		.filter((x) => x)
 		.join(NEW_LINE + spaces);
 }

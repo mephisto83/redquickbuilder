@@ -729,7 +729,7 @@ export const CreateLoginModels = {
 
 					PerformGraphOperation([
 						...PostRegister({
-							screen:  authenticateScreenResults.uiTypes[uiType].screenNodeId,
+							screen: authenticateScreenResults.uiTypes[uiType].screenNodeId,
 							uiType,
 							functionName: `Post Register ${uiType}`,
 							name: `Post Register ${uiType}`,
@@ -2293,7 +2293,9 @@ export const CreateDefaultView = {
 											parent: screenNodeOptionId,
 											properties: {
 												...viewPackage,
-												[NodeProperties.UIText]: `${viewName} ${multi_item_component}`,
+												[NodeProperties.UIText]: `${viewName} ${multi_item_component} ${agentId
+													? GetNodeTitle(agentId)
+													: ''}`,
 												[NodeProperties.UIType]: uiType,
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.IsPluralComponent]: isPluralComponent,

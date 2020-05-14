@@ -1726,25 +1726,29 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
 		})
 		.filter((x) => x)
 		.join(NEW_LINE);
-	const chainInvocations = (methodInstances || []).map((mi) => {
-		const chains = GetNodesLinkedTo(null, {
-			id: mi.id,
-			link: LinkType.CallDataChainLink
-		});
+	const chainInvocations = (methodInstances || [])
+		.map((mi) => {
+			const chains = GetNodesLinkedTo(null, {
+				id: mi.id,
+				link: LinkType.CallDataChainLink
+			});
 
-		return chains
-			.map((chain: { id: any }) => {
-				const input = GetDataChainInputArgs(chain.id);
-				return `DC.${GetCodeName(chain, { includeNameSpace: true })}(${input});`;
-			})
-			.join(NEW_LINE);
-	});
+			return chains
+				.map((chain: { id: any }) => {
+					const input = GetDataChainInputArgs(chain.id);
+					return `DC.${GetCodeName(chain, { includeNameSpace: true })}(${input});//here`;
+				})
+				.join(NEW_LINE);
+		})
+		.filter((x) => x)
+		.join('');
 	const componentDidMount = `componentDidMount() {
+    // here 3
         ${options.skipSetGetState ? '' : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
         ${invocations}
-        ${chainInvocations}
+        ${chainInvocations}//asdf
 {{handles}}
 }
 `;
