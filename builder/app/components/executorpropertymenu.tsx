@@ -40,6 +40,10 @@ class ExecutorPropertyMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Executor);
+
+    if (!active) {
+      return <div />;
+    }
     var graph = UIA.GetCurrentGraph(state);
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     var executor;

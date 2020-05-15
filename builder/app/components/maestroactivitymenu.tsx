@@ -17,6 +17,9 @@ class MaestroActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Maestro);
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var graph = UIA.GetCurrentGraph(state);
         var functions = UIA.NodesByType(state, [UIA.NodeTypes.Function, UIA.NodeTypes.Method]).map(funcKey => {

@@ -218,23 +218,8 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 						prop: 'graphFile',
 						value: fileName
 					});
-					debugger;
+
 					await StoreGraph(prune(currentGraph), fileName);
-					// const content = JSON.stringify(currentGraph);
-					// let savecontent = content;
-					// if (pruneGraph) {
-					// 	savecontent = JSON.stringify(prune(currentGraph));
-					// }
-
-					// fs.writeFile(fileName, savecontent, (err: any) => {
-					// 	if (err) {
-					// 		console.error(`An error ocurred updating the file${err.message}`);
-					// 		console.log(err);
-					// 		return;
-					// 	}
-
-					// 	console.warn('The file has been succesfully saved');
-					// });
 				});
 		}
 	};

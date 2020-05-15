@@ -22,10 +22,10 @@ class ServiceInterfaceMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ServiceInterface);
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (!active) {
-            return <div></div>
+          return <div />;
         }
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         return (
             <MainSideBar active={active} relative={true}>
                 <SideBar style={{ paddingTop: 0 }}>

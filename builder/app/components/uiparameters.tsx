@@ -29,10 +29,10 @@ class UIParameters extends Component<any, any> {
         let me = this;
         let { state } = me.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Screen);
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (!active) {
-            return <div></div>
+          return <div />;
         }
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
         var graph = UIA.GetCurrentGraph(state);
         let filter = (this.state.filter || '').toLowerCase();

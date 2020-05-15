@@ -16,6 +16,9 @@ class FunctionActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Function);
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var agent_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).filter(x => UIA.GetNodeProp(x, UIA.NodeProperties.IsAgent)).map(node => {
             return {

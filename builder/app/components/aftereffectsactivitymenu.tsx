@@ -12,7 +12,8 @@ import { LinkType, Methods } from '../constants/nodetypes';
 
 class AfterEffectsActivityMenu extends Component<any, any> {
 	getControls() {
-		var { state } = this.props;
+    var { state } = this.props;
+
 		var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
 		let result = [];
@@ -129,6 +130,9 @@ class AfterEffectsActivityMenu extends Component<any, any> {
 	render() {
 		var { state } = this.props;
 		var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.AfterEffect);
+    if (!active) {
+      return <div />;
+    }
 		var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
 		let controls = active ? this.getControls() : [];

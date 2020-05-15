@@ -18,6 +18,11 @@ class EnumerationActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Enumeration);
+
+        if (!active) {
+          return <div />;
+        }
+
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var enums = UIA.GetNodeProp(currentNode, NodeProperties.Enumeration) || [];
 

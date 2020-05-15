@@ -23,6 +23,9 @@ class NavigationParameterMenu extends Component<any, any> {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var active = UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType) === UIA.NodeTypes.ComponentNode;
+        if (!active) {
+          return <div />;
+        }
         let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
         let _ui_type = UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType);
         let componentTypes = ComponentTypes[_ui_type] || {};

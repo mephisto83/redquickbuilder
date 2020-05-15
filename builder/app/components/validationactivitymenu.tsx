@@ -9,6 +9,9 @@ class ValidationActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ValidationList);
+        if (!active) {
+          return <div />;
+        }
 
         return (
             <TabPane active={active}>

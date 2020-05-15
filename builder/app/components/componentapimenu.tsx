@@ -15,10 +15,14 @@ class ComponentAPIMenu extends Component<any, any> {
   }
   render() {
     var { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     var active = [UIA.NodeTypes.ComponentNode, UIA.NodeTypes.ScreenOption].some(
       v => v === UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
     );
+    if (!active) {
+      return <div />;
+    }
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
     return (
       <SideMenuContainer
         active={active}

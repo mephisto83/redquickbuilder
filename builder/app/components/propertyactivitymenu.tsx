@@ -8,14 +8,15 @@ import * as Titles from './titles';
 import FormControl from './formcontrol';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
-import ButtonList from './buttonlist';
 import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties, GeneratedDataTypes } from '../constants/nodetypes';
-import { GetNode } from '../methods/graph_methods';
 class PropertyActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Property);
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         if (currentNode) {
             var show_dependent = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIDependsOn];

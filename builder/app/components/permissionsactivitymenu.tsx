@@ -32,6 +32,9 @@ class PermissionActivityMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Permission);
+    if (!active) {
+			return <div />;
+		}
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     var is_agent = UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsAgent);
     var permissions = currentNode

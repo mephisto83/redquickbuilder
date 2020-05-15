@@ -22,8 +22,13 @@ class ComponentPropertyMenu extends Component<any, any> {
     }
     render() {
         var { state } = this.props;
-        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var active = [UIA.NodeTypes.ComponentNode, UIA.NodeTypes.ScreenOption].some(v => v === UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType));
+
+        if (!active) {
+          return <div />;
+        }
+        var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
         let screenOption = currentNode ? GetConnectedNodeByType(state, currentNode.id, NodeTypes.ScreenOption) || GetConnectedNodeByType(state, currentNode.id, NodeTypes.ComponentNode, TARGET) : null;
         let componentTypes = ComponentTypes[UIA.GetNodeProp(screenOption, UIA.NodeProperties.UIType)] || {};
         let componentType = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ComponentType);

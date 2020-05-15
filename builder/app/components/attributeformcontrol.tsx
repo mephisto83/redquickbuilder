@@ -14,6 +14,10 @@ class AttributeFormControl extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Attribute);
+        if (!active) {
+          return <div />;
+        }
+
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var choice_nodes = UIA.NodesByType(state, UIA.NodeTypes.ChoiceList).map(node => {
             return {

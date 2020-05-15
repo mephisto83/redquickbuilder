@@ -11,15 +11,19 @@ import CheckBox from './checkbox';
 import SelectInput from './selectinput';
 
 class PermissionMenu extends Component<any, any> {
-    render() {
-        var { state } = this.props;
-        var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
-        return (
-            <TabPane active={active} >
-                <ControlSideBarMenuHeader title={Titles.ModelActions} />
-            </TabPane >
-        );
-    }
+	render() {
+		var { state } = this.props;
+		var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Condition);
+
+		if (!active) {
+			return <div />;
+		}
+		return (
+			<TabPane active={active}>
+				<ControlSideBarMenuHeader title={Titles.ModelActions} />
+			</TabPane>
+		);
+	}
 }
 
-export default UIConnect(PermissionMenu)
+export default UIConnect(PermissionMenu);

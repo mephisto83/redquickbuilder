@@ -115,7 +115,12 @@ class ExtensionDefinitionMenu extends Component<any, any> {
     }
     render() {
         var { state } = this.props;
+        let active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
         var form = this.form();
         var footer = this.footer();
         var tab_key = currentNode ? this.tabKey(currentNode.id) : null;
@@ -127,7 +132,7 @@ class ExtensionDefinitionMenu extends Component<any, any> {
             }
         }) : [];
         return (
-            <TabPane active={UIA.IsCurrentNodeA(state, UIA.NodeTypes.ExtensionType)}>
+            <TabPane active={active}>
                 {!UIA.VisualEq(state, tab_key, Titles.DependsOn) ? (<FormControl>
                     {def ? <CheckBox
                         label={Titles.Enumerable}

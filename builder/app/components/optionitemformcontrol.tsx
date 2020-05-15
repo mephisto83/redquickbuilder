@@ -14,6 +14,9 @@ class OptionItemFormControl extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.OptionListItem);
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
         var show_custom = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseCustomUIOption];
 

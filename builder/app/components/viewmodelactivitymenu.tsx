@@ -17,6 +17,10 @@ class ViewModelActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ViewModel);
+        if (!active) {
+          return <div />;
+        }
+
         var currentNode = active ? UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE)) : null;
 
         let models = UIA.NodesByType(state, NodeTypes.Model).toNodeSelect();

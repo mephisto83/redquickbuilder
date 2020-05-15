@@ -2156,7 +2156,6 @@ class Dashboard extends Component<any, any> {
 									nodeProp={NodeProperties.Condition}
 								/>
 							) : null}
-							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <SideBarContent /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <DataChainOperator /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <ServiceIntefaceMenu /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <StyleMenu /> : null}
