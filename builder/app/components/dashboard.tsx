@@ -1892,9 +1892,10 @@ class Dashboard extends Component<any, any> {
 											this.props.setVisual(CONNECTING_NODE, false);
 											this.props.setVisual(UIA.SELECTED_NODE, null);
 										} else if ([ UIA.Visual(state, UIA.SELECTED_NODE) ].indexOf(nodeId) === -1) {
-											this.props.SelectedNode(nodeId);
-											this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
-											this.props.setVisual(SIDE_PANEL_OPEN, true);
+											// this.props.SelectedNode(nodeId);
+											// this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
+                      // this.props.setVisual(SIDE_PANEL_OPEN, true);
+                      this.props.SelectNode(nodeId, boundingBox);
 										} else {
 											this.props.SelectedNode(null);
 										}

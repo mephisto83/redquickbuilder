@@ -10,6 +10,9 @@ class ChoiceListItemActivityMenu extends Component<any, any> {
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.ChoiceList);
+        if (!active) {
+          return <div />;
+        }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
         var def = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIExtensionDefinition);

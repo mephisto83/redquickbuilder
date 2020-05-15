@@ -52,6 +52,10 @@ class CodeView extends Component<any, any> {
 		var { state } = this.props;
 		let active = this.active();
 
+		if (!active) {
+			return <div />;
+    }
+
 		let codeString = '';
 		let info = UIA.Visual(state, MODEL_CODE) || null;
 		let graphRoot = UIA.GetRootGraph(state);

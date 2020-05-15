@@ -27,6 +27,9 @@ class CodeEditor extends Component<any, any> {
 		monaco.languages.setMonarchTokensProvider('typescript', Javascript());
 	}
 	render() {
+		if (!this.props.active) {
+			return <div />;
+		}
 		const { state } = this.props;
 		const options = {
 			selectOnLineNumbers: true

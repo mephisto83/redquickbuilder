@@ -18,6 +18,7 @@ import { AgentProject } from '../jobs/interfaces';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
+export const BATCH = 'BATCH';
 export const HIDDEN = 'HIDDEN';
 export const APPLICATION = 'APPLICATION';
 export const GRAPHS = 'GRAPHS';
@@ -2819,6 +2820,12 @@ export function UIC(section: string, item: string, value: any) {
 		section
 	};
 }
+export function Batch(batch: any) {
+	return {
+		type: BATCH,
+		batch
+	};
+}
 export function toggleVisual(key: string) {
 	return (dispatch: Function, getState: Function) => {
 		const state = getState();
@@ -2858,6 +2865,17 @@ export function GUID() {
 		const v = c == 'x' ? r : (r & 0x3) | 0x8;
 		return v.toString(16);
 	});
+}
+export function SelectNode(nodeId: string, boundingBox: any) {
+	return (dispatch: any) => {
+		dispatch(
+			Batch([
+				UIC(VISUAL, SELECTED_NODE, nodeId),
+				UIC(VISUAL, SELECTED_NODE_BB, boundingBox),
+				UIC(VISUAL, SIDE_PANEL_OPEN, true)
+			])
+		);
+	};
 }
 export function setVisual(key: string, value: any) {
 	if (key === SELECTED_NODE || key === SELECTED_NODE_BB)

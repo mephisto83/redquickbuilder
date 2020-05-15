@@ -60,7 +60,11 @@ class AgentAccessView extends Component<any, any> {
 	}
 
 	render() {
-		const active = this.active();
+    const active = this.active();
+
+		if (!active) {
+			return <div />;
+		}
 		const graph = GetCurrentGraph();
 		if (!graph) {
 			return <div />;

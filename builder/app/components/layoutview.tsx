@@ -352,6 +352,10 @@ class LayoutView extends Component<any, any> {
     const { state } = this.props;
     const active = this.active();
 
+		if (!active) {
+			return <div />;
+		}
+
     const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let componentNodes = currentNode
       ? GetConnectedNodesByType(
