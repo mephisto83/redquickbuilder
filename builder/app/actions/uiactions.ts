@@ -2857,6 +2857,20 @@ export function toggleHideByTypes(key: any) {
 		)(dispatch, getState);
 	};
 }
+export function pin(ids: string[]) {
+	return (dispatch: Function, getState: Function) => {
+		PerformGraphOperation(
+			ids.map((id: any) => ({
+				operation: CHANGE_NODE_PROPERTY,
+				options: {
+					prop: NodeProperties.Pinned,
+					id: id,
+					value: true
+				}
+			}))
+		)(dispatch, getState);
+	};
+}
 
 export function GUID() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

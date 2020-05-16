@@ -106,7 +106,7 @@ export default class DataChainGenerator {
 					),
 					relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
 					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
-					name: `${chainPath.join('_')}${GetJSCodeName(nc)}`
+					name: `${chainPath.join('_')}${nc.id}`
 				};
 			}),
 			{

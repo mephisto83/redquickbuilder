@@ -26,7 +26,8 @@ import AddComponentsToScreenOptions from '../../app/nodepacks/batch/AddComponent
 import {
 	CollectionScreenWithoutDatachainDistributed,
 	CollectionComponentNodes,
-	CollectionScreenNodes
+	CollectionScreenNodes,
+  CollectionConnectDataChainCollection
 } from '../../app/nodepacks/CollectionDataChainsIntoCollections';
 
 let app_state;
@@ -73,6 +74,11 @@ export default async function executeJob(
 					break;
 				case BAD.CollectionScreenNodes:
 					await CollectionScreenNodes((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case BAD.CollectionConnectDataChainCollection:
+					await CollectionConnectDataChainCollection((model: any) => {
 						return filter && filter.models.indexOf(model.id) !== -1;
 					});
 					break;

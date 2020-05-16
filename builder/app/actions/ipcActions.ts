@@ -66,8 +66,6 @@ ipcRenderer.on('message-reply', (event, arg) => {
 });
 
 ipcRenderer.on('update-jobs', (event, arg) => {
-	console.log(event);
-	console.log(arg);
 	switch (arg.args) {
 		case 'update-jobs':
 			updateJobs(arg.package);

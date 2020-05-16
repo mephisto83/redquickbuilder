@@ -101,7 +101,6 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 
 				let opened_graph: Graph = await LoadGraph(fileName);
 				if (opened_graph) {
-					debugger;
 					let pinnedCount = 0;
 					Object.keys(opened_graph.nodeLib).forEach((key) => {
 						let node = opened_graph.nodeLib[key];

@@ -171,6 +171,7 @@ const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
+export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
 const Collect_Into_Graph = 'Collect_Into_Graph';
 const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
@@ -202,7 +203,8 @@ const buildAllProgress = [
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionComponentNodes),
-	...waiting(CollectionScreenNodes),
+  ...waiting(CollectionScreenNodes),
+  ...waiting(CollectionConnectDataChainCollection),
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
