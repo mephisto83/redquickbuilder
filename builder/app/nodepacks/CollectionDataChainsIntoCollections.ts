@@ -693,28 +693,27 @@ export function CollectionConnectDataChainCollection(filter: any) {
 				return GetNodeProp(x, NodeProperties.UIType) === uiType;
 			});
 
-		componentNodes
-			.forEach((component: { id: any }) => {
-				let reference: any = null;
-				const steps = [];
-				reference = getCollectionReference(graph, component);
-				if (!reference) {
-					const parentReference = getParentCollectionReference(graph, component);
-					steps.push({
-						operation: ADD_LINK_BETWEEN_NODES,
-						options(graph: any) {
-							return {
-								target: (parentReference || sharedReferenceCollection).id,
-								source: reference.id,
-								properties: {
-									...LinkProperties.DataChainCollection
-								}
-							};
-						}
-					});
-				}
-				result.push(...steps);
-			});
+		componentNodes.forEach((component: { id: any }) => {
+			let reference: any = null;
+			const steps = [];
+			reference = getCollectionReference(graph, component);
+			if (!reference) {
+				const parentReference = getParentCollectionReference(graph, component);
+				steps.push({
+					operation: ADD_LINK_BETWEEN_NODES,
+					options(graph: any) {
+						return {
+							target: (parentReference || sharedReferenceCollection).id,
+							source: reference.id,
+							properties: {
+								...LinkProperties.DataChainCollection
+							}
+						};
+					}
+				});
+			}
+			result.push(...steps);
+		});
 	});
 
 	graphOperation(result.filter((x: any) => x))(GetDispatchFunc(), GetStateFunc());
@@ -769,38 +768,36 @@ export function CollectionComponentNodes(filter: any) {
 							operation: ADD_NEW_NODE,
 							options(graph: any) {
 								const parentReference = getParentCollectionReference(graph, component);
-								if (parentReference) {
-									return {
-										nodeType: NodeTypes.DataChainCollection,
-										properties: {
-											[NodeProperties.UIText]: `${GetNodeTitle(component)}`,
-											[NodeProperties.Pinned]: false
-										},
-										links: [
-											{
-												target: (parentReference || sharedReferenceCollection).id,
-												linkProperties: {
-													properties: {
-														...LinkProperties.DataChainCollection
-													}
-												}
-											},
-											{
-												linkProperties: {
-													properties: {
-														...LinkProperties.DataChainCollectionReference
+								return {
+									nodeType: NodeTypes.DataChainCollection,
+									properties: {
+										[NodeProperties.UIText]: `${GetNodeTitle(component)}`,
+										[NodeProperties.Pinned]: false
+									},
+									links: [
+										!parentReference
+											? null
+											: {
+													target: parentReference.id,
+													linkProperties: {
+														properties: {
+															...LinkProperties.DataChainCollection
+														}
 													}
 												},
-												target: component.id
-											}
-										].filter((x) => x),
-										callback: (node: any) => {
-											reference = node;
+										{
+											linkProperties: {
+												properties: {
+													...LinkProperties.DataChainCollectionReference
+												}
+											},
+											target: component.id
 										}
-									};
-								} else {
-									return null;
-								}
+									].filter((x) => x),
+									callback: (node: any) => {
+										reference = node;
+									}
+								};
 							}
 						});
 					}

@@ -203,8 +203,8 @@ const buildAllProgress = [
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionComponentNodes),
-  ...waiting(CollectionScreenNodes),
-  ...waiting(CollectionConnectDataChainCollection),
+	...waiting(CollectionScreenNodes),
+	...waiting(CollectionConnectDataChainCollection),
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -356,7 +356,13 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
 
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
-
+		await threadRun(
+			buildAllProgress,
+			CollectionConnectDataChainCollection,
+			currentJobFile,
+			NodeTypes.ComponentNode,
+			50
+		);
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
 			currentJobFile.completed = true;
 		});
