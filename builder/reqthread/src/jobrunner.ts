@@ -35,7 +35,7 @@ let runnerContext: RunnerContext = {
 		communicationTower.init({
 			agentName: null,
 			baseFolder: JobServiceConstants.JobPath(),
-			serverPort: 7976,
+			serverPort: 7975,
 			topDirectory: '../../jobrunner'
 		});
 
