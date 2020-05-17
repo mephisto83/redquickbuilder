@@ -108,8 +108,9 @@ export default class CommunicationTower {
 				);
 				maxattempts = false;
 			} catch (e) {
+        console.log(e);
 				console.log(`failed to send file : attempts left`);
-        await sleep(30 * 1000 + Math.random() * 100000);
+				await sleep(30 * 1000 + Math.random() * 100000);
 			}
 		} while (maxattempts);
 	}
@@ -250,8 +251,8 @@ export default class CommunicationTower {
 				let address: any = server.address();
 				let port = address && address.port ? address.port : null;
 				if (port) {
-          console.log(`using port: ${port}`);
-          console.log(`http://${message.targetHost}:${message.targetPort}`)
+					console.log(`using port: ${port}`);
+					console.log(`http://${message.targetHost}:${message.targetPort}`);
 					fetch(`http://${message.targetHost}:${message.targetPort}`, {
 						method: 'POST',
 						body: JSON.stringify({
@@ -261,7 +262,10 @@ export default class CommunicationTower {
 							agentName: this.agentName,
 							filePath: filePathArray
 						})
-					}).catch((e) => fail(e));
+					}).catch((e) => {
+						console.log(e);
+						fail(e);
+					});
 				} else {
 					throw new Error('no port found');
 				}
@@ -285,7 +289,7 @@ export default class CommunicationTower {
 				let size = 0,
 					elapsed = 0;
 				socket.on('error', (err) => {
-          console.log(err);
+					console.log(err);
 					process.stdout.write(`\r${err.message}`);
 					socket.destroy(err);
 					fail(false);
