@@ -4247,8 +4247,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 								if (nodeAdded) {
 									graphOperationOccurences.push({
 										command: GraphMethods.VisualCommand.ADD_NODE,
-										nodeId: currentGraph.nodes[currentGraph.nodes.length - 1],
-										options
+										nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
 									});
 								}
 							}
