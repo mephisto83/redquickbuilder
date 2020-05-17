@@ -13,7 +13,8 @@ import {
 	CreateLoginModels,
 	CreateDefaultView,
 	AddAgentUser,
-	CreateAgentFunction
+	CreateAgentFunction,
+	addTitleService
 } from '../constants/nodepackages';
 import TreeViewMenu from './treeviewmenu';
 import SideBar from './sidebar';
@@ -34,7 +35,10 @@ import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
 import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 import JobService from '../jobs/jobservice';
-import { CollectionScreenWithoutDatachainDistributed, CollectionConnectDataChainCollection } from '../nodepacks/CollectionDataChainsIntoCollections';
+import {
+	CollectionScreenWithoutDatachainDistributed,
+	CollectionConnectDataChainCollection
+} from '../nodepacks/CollectionDataChainsIntoCollections';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -252,6 +256,12 @@ class QuickMethods extends Component<any, any, any> {
 										CollectionConnectDataChainCollection(() => {
 											return true;
 										});
+									}}
+								/>
+								<TreeViewMenu
+									title={'Add Title Service'}
+									onClick={() => {
+										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
 									}}
 								/>
 								<TreeViewMenu

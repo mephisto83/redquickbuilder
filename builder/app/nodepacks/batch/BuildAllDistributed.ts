@@ -237,7 +237,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, AddTitleService, async (progressFunc: any) => {
-			graphOperation(addTitleService({ newItems: {} }))(GetDispatchFunc(), GetStateFunc());
+			graphOperation([ addTitleService({ newItems: {} }) ])(GetDispatchFunc(), GetStateFunc());
 		});
 
 		await run(buildAllProgress, Add_Agent_Methods, async (progresFunc: any) => {
