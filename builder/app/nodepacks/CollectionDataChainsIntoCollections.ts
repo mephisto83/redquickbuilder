@@ -697,20 +697,21 @@ export function CollectionConnectDataChainCollection(filter: any) {
 			let reference: any = null;
 			const steps = [];
 			reference = getCollectionReference(graph, component);
-			if (!reference) {
+			if (reference) {
 				const parentReference = getParentCollectionReference(graph, component);
-				steps.push({
-					operation: ADD_LINK_BETWEEN_NODES,
-					options(graph: any) {
-						return {
-							target: (parentReference || sharedReferenceCollection).id,
-							source: reference.id,
-							properties: {
-								...LinkProperties.DataChainCollection
-							}
-						};
-					}
-				});
+				if (parentReference || sharedReferenceCollection)
+					steps.push({
+						operation: ADD_LINK_BETWEEN_NODES,
+						options() {
+							return {
+								target: (parentReference || sharedReferenceCollection).id,
+								source: reference.id,
+								properties: {
+									...LinkProperties.DataChainCollection
+								}
+							};
+						}
+					});
 			}
 			result.push(...steps);
 		});

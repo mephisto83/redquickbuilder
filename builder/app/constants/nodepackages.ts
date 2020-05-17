@@ -817,7 +817,7 @@ export const CreateLoginModels = {
 	}
 };
 
-function addTitleService(args: { newItems: any }) {
+export function addTitleService(args: { newItems: any }) {
 	const { newItems } = args;
 	return {
 		operation: ADD_NEW_NODE,

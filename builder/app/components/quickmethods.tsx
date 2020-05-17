@@ -34,7 +34,7 @@ import { DistributeBuildAllJobs } from '../nodepacks/batch/BuildAllDistributed';
 import StartJob from '../nodepacks/batch/StartJob';
 import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 import JobService from '../jobs/jobservice';
-import { CollectionScreenWithoutDatachainDistributed } from '../nodepacks/CollectionDataChainsIntoCollections';
+import { CollectionScreenWithoutDatachainDistributed, CollectionConnectDataChainCollection } from '../nodepacks/CollectionDataChainsIntoCollections';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -247,9 +247,9 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'CollectionScreenWithoutDatachainDistributed'}
+									title={'CollectionConnectDataChainCollection'}
 									onClick={() => {
-										CollectionScreenWithoutDatachainDistributed(() => {
+										CollectionConnectDataChainCollection(() => {
 											return true;
 										});
 									}}

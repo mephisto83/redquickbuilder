@@ -22,7 +22,7 @@ import HaveAllPropertiesOnExecutors from './HaveAllPropertiesOnExecutors';
 import AddCopyCommandToExecutors from './AddCopyCommandToExecutors';
 import CreateDashboard from '../CreateDashboard_1';
 import { AuthorizedDashboard } from '../../components/titles';
-import { CreateLoginModels, ListRequiredModels } from '../../constants/nodepackages';
+import { CreateLoginModels, ListRequiredModels, addTitleService } from '../../constants/nodepackages';
 import { UITypes, MAIN_CONTENT, PROGRESS_VIEW } from '../../constants/nodetypes';
 import AddChainToNavigateNextScreens from './AddChainToNavigateNextScreens';
 import CreateConfiguration from '../CreateConfiguration';
@@ -154,6 +154,7 @@ const Add_Filters_To_Get_All = 'Add Filters to Get All';
 const Create_Dashboard = 'Create Dashboard';
 const Create_Login_Models = 'Create Login Models';
 const ListRequiredModelTitles = 'ListRequiredModelTitles';
+const AddTitleService = 'AddTitleService';
 const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
 const Create_Configuration = 'Create Configuration';
 const Create_Fetch_Service = 'Create Fetch Service';
@@ -177,6 +178,7 @@ const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
 const buildAllProgress = [
 	{ name: Create_View_Types },
+	{ name: AddTitleService },
 	{ name: Add_Agent_Methods },
 	{ name: ListRequiredModelTitles },
 	{ name: Create_Component_All },
@@ -232,6 +234,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Create_View_Types, async (progresFunc: any) => {
 			const res = await CreateViewTypes(progresFunc);
 			graphOperation(res)(GetDispatchFunc(), GetStateFunc());
+		});
+
+		await run(buildAllProgress, AddTitleService, async (progressFunc: any) => {
+			graphOperation(addTitleService({ newItems: {} }))(GetDispatchFunc(), GetStateFunc());
 		});
 
 		await run(buildAllProgress, Add_Agent_Methods, async (progresFunc: any) => {
@@ -361,7 +367,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			CollectionConnectDataChainCollection,
 			currentJobFile,
 			NodeTypes.ComponentNode,
-			50
+			100
 		);
 		await run(buildAllProgress, COMPLETED_BUILD, async (progresFunc: any) => {
 			currentJobFile.completed = true;

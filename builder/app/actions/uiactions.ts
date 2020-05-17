@@ -4233,8 +4233,8 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									break;
 							}
 
+							let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
 							if (recording && Visual(state, RECORDING)) {
-								let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
 								recording.push({
 									operation,
 									options,
@@ -4244,12 +4244,12 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										: null}`,
 									callback: nodeAdded ? currentGraph.nodes[currentGraph.nodes.length - 1] : null
 								});
-								if (nodeAdded) {
-									graphOperationOccurences.push({
-										command: GraphMethods.VisualCommand.ADD_NODE,
-										nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
-									});
-								}
+							}
+							if (nodeAdded) {
+								graphOperationOccurences.push({
+									command: GraphMethods.VisualCommand.ADD_NODE,
+									nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
+								});
 							}
 						}
 					});
