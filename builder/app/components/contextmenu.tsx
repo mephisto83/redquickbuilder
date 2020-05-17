@@ -1815,8 +1815,11 @@ class ContextMenu extends Component<any, any> {
 								this.props.pin(lineage);
 								// let topComponent = getTopComponent(UIA.GetCurrentGraph(), currentNode);
 								// console.log(topComponent);
-								// let parentCollectionReference = getParentCollectionReference(UIA.GetCurrentGraph(), currentNode);
-								// console.log(parentCollectionReference);
+								let parentCollectionReference = getParentCollectionReference(
+									UIA.GetCurrentGraph(),
+									currentNode
+								);
+								console.log(parentCollectionReference);
 								// window.sortComponentByLineage = sortComponentByLineage;
 							}}
 						/>

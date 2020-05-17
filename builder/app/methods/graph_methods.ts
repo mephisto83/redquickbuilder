@@ -1259,7 +1259,7 @@ export function isFlagged(flag: any): any {
 }
 
 export function addNewNodeOfType(graph: any, options: any, nodeType: any, callback?: any) {
-	const { parent, linkProperties, groupProperties } = options;
+	const { parent, linkProperties, groupProperties, skipGroup } = options;
 	if (!callback) {
 		callback = options.callback;
 	}
@@ -1358,14 +1358,16 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 	}
 	let groupId = null;
 	if (groupProperties) {
-		graph = updateNodeGroup(graph, {
-			id: node.id,
-			groupProperties,
-			parent,
-			callback: (_gid: any) => {
-				groupId = _gid;
-			}
-		});
+		if (!skipGroup) {
+			graph = updateNodeGroup(graph, {
+				id: node.id,
+				groupProperties,
+				parent,
+				callback: (_gid: any) => {
+					groupId = _gid;
+				}
+			});
+		}
 	}
 	if (callback) {
 		graph = callback(GetNodeById(node.id, graph), graph, groupId) || graph;
@@ -1715,6 +1717,7 @@ export function applyFunctionConstraints(graph: any, options: any) {
 					}
 				}
 			}
+
 			if (!core_group) {
 				graph = newGroup(graph, (_group: any) => {
 					core_group = _group;
@@ -2381,6 +2384,41 @@ export function GetLinkedNodes(graph: any, options: any) {
 
 	return {};
 }
+
+export function GetLinksForNode(graph: any, options: any): any {
+	if (options) {
+		graph = graph || GetCurrentGraph();
+		const { id, direction, link, componentType, properties } = options;
+		if (graph && graph.nodeConnections && id) {
+			const nodeLinks = graph.nodeConnections[id];
+			if (nodeLinks) {
+				return Object.keys(nodeLinks)
+					.map((_id) => {
+						let target = null;
+						if (link) {
+							if (GetLinkProperty(graph.linkLib[_id], LinkPropertyKeys.TYPE) !== link) {
+								return null;
+							}
+							if (properties) {
+								for (const prop in properties) {
+									if (properties[prop] !== GetLinkProperty(graph.linkLib[_id], prop)) {
+										return null;
+									}
+								}
+							}
+						}
+						if (graph.linkLib[_id]) {
+							return graph.linkLib[_id];
+						}
+						return false;
+					})
+					.filter((x) => x);
+			}
+		}
+	}
+	return [];
+}
+
 export function GetNodesLinkedTo(graph: any, options: any): any {
 	if (options) {
 		graph = graph || GetCurrentGraph();
@@ -2432,17 +2470,10 @@ export const SOURCE = 'SOURCE';
 export const TARGET = 'TARGET';
 const fast = true;
 export function addLink(
-	graph: {
-		links: any[];
-		linkLib: { [x: string]: any };
-		nodeLib: { [x: string]: any };
-		nodeConnections: { [x: string]: any };
-		nodeLinks: { [x: string]: { [x: string]: any } };
-		nodeLinkIds: { [x: string]: { [x: string]: any } };
-	},
+	graph: Graph,
 	options: { target: any; source: any },
 	link: { id: any; source: any; target: any; properties: any }
-) {
+): Graph {
 	const { target, source } = options;
 	if (graph.links.length !== Object.keys(graph.linkLib).length) {
 		throw new Error('invalid grid links');
@@ -2653,8 +2684,11 @@ export function getAllLinksWithNode(graph: any, id: any) {
 		return graph.linkLib[x] && (graph.linkLib[x].source === id || graph.linkLib[x].target === id);
 	});
 }
-export function removeLinkBetweenNodes(graph: any, options: any) {
+export function removeLinkBetweenNodes(graph: any, options: any, callback?: any) {
 	const link = findLinkInstance(graph, options);
+	if (callback) {
+		callback(link);
+	}
 	return removeLink(graph, link, options);
 }
 export function removeLinkById(graph: any, options: any) {
@@ -3431,6 +3465,78 @@ export function FilterGraph(graph: any) {
 	});
 
 	return filteredGraph;
+}
+
+export enum VisualCommand {
+	ADD_NODE = 'ADD_NODE',
+	REMOVE_NODE = 'REMOVE_NODE',
+	ADD_CONNECTION = 'ADD_CONNECTION',
+	REMOVE_LINK = 'REMOVE_CONNECTION'
+}
+export interface VisualOperation {
+	command: VisualCommand;
+	nodeId?: string;
+	linkId?: string;
+}
+export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visualCommand: VisualOperation) {
+	if (!visualGraph) {
+		visualGraph = createGraph();
+	}
+	let nodeGroups: string[] = [];
+	switch (visualCommand.command) {
+		case VisualCommand.ADD_NODE:
+			if (visualCommand.nodeId) {
+				let newNode = GetNode(graph, visualCommand.nodeId);
+				if (newNode) {
+					visualGraph = addNode(visualGraph, newNode);
+					let links = GetLinksForNode(graph, { id: newNode.id });
+					links.map((link: GraphLink) => {
+						if (!getLink(visualGraph, link)) {
+							let otherNode = newNode && link.source == newNode.id ? link.target : link.source;
+							if (visualGraph && GetNode(visualGraph, otherNode)) {
+								visualGraph = addLink(visualGraph, link, link);
+							}
+						}
+					});
+				}
+				if (graph.nodesGroups[visualCommand.nodeId]) {
+					Object.keys(graph.nodesGroups[visualCommand.nodeId]).forEach((t) => {
+						if (nodeGroups.indexOf(t) === -1) {
+							nodeGroups.push(t);
+							let ancestors = getGroupAncenstors(graph, t);
+							ancestors.forEach((ancestor: string) => {
+								if (nodeGroups.indexOf(ancestor) === -1) {
+									nodeGroups.push(ancestor);
+								}
+							});
+						}
+					});
+				}
+			}
+			break;
+		case VisualCommand.REMOVE_NODE:
+			if (visualCommand.nodeId) {
+				visualGraph = removeNode(visualGraph, { id: visualCommand.nodeId });
+			}
+			break;
+		case VisualCommand.ADD_CONNECTION:
+			let link: GraphLink = getLink(graph, { id: visualCommand.linkId });
+			visualGraph = addLink(visualGraph, link, link);
+			break;
+		case VisualCommand.REMOVE_LINK:
+			visualGraph = removeLink(visualGraph, visualCommand.linkId);
+			break;
+	}
+	if (visualGraph) {
+		visualGraph.groupLib = graph.groupLib;
+		visualGraph.groups = nodeGroups;
+		visualGraph.groupsNodes = graph.groupsNodes;
+		visualGraph.childGroups = graph.childGroups;
+		visualGraph.nodesGroups = graph.nodesGroups;
+		visualGraph.parentGroup = graph.parentGroup;
+		visualGraph.id = graph.id;
+	}
+	return visualGraph;
 }
 export function VisualProcess(graph: any, clearPinned: boolean = false) {
 	if (Paused()) {

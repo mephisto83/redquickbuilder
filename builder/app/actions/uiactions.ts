@@ -2805,8 +2805,11 @@ export function Graphs(state: any, key: any) {
 
 export function SaveGraph(graph: any, dispatch: Function, clearPinned: boolean = false) {
 	graph.updated = Date.now();
-	const visualGraph = GraphMethods.VisualProcess(graph, clearPinned);
-	if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
+	let visualGraph = GetC(GetState(), VISUAL_GRAPH, graph.id);
+	if (!visualGraph) {
+		dispatch(UIC(VISUAL_GRAPH, graph.id, GraphMethods.createGraph()));
+	}
+
 	if (!GraphMethods.Paused()) {
 		dispatch(UIC(GRAPHS, graph.id, graph));
 	}
@@ -3858,7 +3861,8 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 			setViewPackageStamp(viewPackage, stamp);
 		}
 		const state = getState();
-		let rootGraph = null;
+		let rootGraph: any = null;
+		let graphOperationOccurences: GraphMethods.VisualOperation[] = [];
 		let currentGraph = Application(state, CURRENT_GRAPH);
 		const scope = Application(state, GRAPH_SCOPE) || [];
 		if (!currentGraph) {
@@ -3923,13 +3927,13 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									break;
 								case NEW_NODE:
 									currentGraph = GraphMethods.newNode(currentGraph, options);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
 									break;
 								case REMOVE_NODE:
 									currentGraph = GraphMethods.removeNode(currentGraph, options);
+									graphOperationOccurences.push({
+										command: GraphMethods.VisualCommand.REMOVE_NODE,
+										nodeId: options.id
+									});
 									break;
 								case UPDATE_GRAPH_TITLE:
 									currentGraph = GraphMethods.updateGraphTitle(currentGraph, options);
@@ -3964,10 +3968,29 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									}
 									break;
 								case REMOVE_LINK_BETWEEN_NODES:
-									currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options);
+									let removedLink: any = null;
+									currentGraph = GraphMethods.removeLinkBetweenNodes(
+										currentGraph,
+										options,
+										(link: GraphLink) => {
+											removedLink = link;
+										}
+									);
+									if (removedLink) {
+										graphOperationOccurences.push({
+											command: GraphMethods.VisualCommand.REMOVE_LINK,
+											linkId: removedLink.id
+										});
+									}
 									break;
 								case REMOVE_LINK:
 									currentGraph = GraphMethods.removeLinkById(currentGraph, options);
+									if (options && options.id) {
+										graphOperationOccurences.push({
+											command: GraphMethods.VisualCommand.REMOVE_LINK,
+											linkId: options.id
+										});
+									}
 									break;
 								case UPDATE_GROUP_PROPERTY:
 									currentGraph = GraphMethods.updateGroupProperty(currentGraph, options);
@@ -3980,16 +4003,26 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									break;
 								case CHANGE_NODE_PROPERTY:
 									currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
+									if (options && options.prop && options.prop === NodeProperties.Pinned) {
+										if (options.value) {
+											graphOperationOccurences.push({
+												command: GraphMethods.VisualCommand.ADD_NODE,
+												nodeId: options.id
+											});
+										} else {
+											graphOperationOccurences.push({
+												command: GraphMethods.VisualCommand.REMOVE_NODE,
+												nodeId: options.id
+											});
+										}
+									}
 									break;
 								case CHANGE_APP_SETTINGS:
 									currentGraph = GraphMethods.updateAppSettings(currentGraph, options);
 									break;
 								case NEW_PROPERTY_NODE:
 									currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case ADD_DEFAULT_PROPERTIES:
 									currentGraph = GraphMethods.addDefaultProperties(currentGraph, options);
@@ -4000,13 +4033,27 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.Attribute
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case UPDATE_NODE_PROPERTY:
 									currentGraph = GraphMethods.updateNodeProperties(currentGraph, options);
+									if (
+										options &&
+										options.properties &&
+										options.properties.hasOwnProperty(NodeProperties.Pinned)
+									) {
+										if (options.properties[NodeProperties.Pinned]) {
+											graphOperationOccurences.push({
+												command: GraphMethods.VisualCommand.ADD_NODE,
+												nodeId: options.id
+											});
+										} else {
+											graphOperationOccurences.push({
+												command: GraphMethods.VisualCommand.REMOVE_NODE,
+												nodeId: options.id
+											});
+										}
+									}
 									break;
 								case NEW_CONDITION_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4014,10 +4061,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.Condition
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case ADD_NEW_NODE:
 									if (options && options.nodeType) {
@@ -4039,10 +4083,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ModelItemFilter
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_AFTER_METHOD:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4050,10 +4091,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.AfterEffect
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_COMPONENT_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4061,10 +4099,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ComponentNode
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_DATA_SOURCE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4072,10 +4107,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.DataSource
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_VALIDATION_TYPE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4083,10 +4115,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ValidationList
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4094,10 +4123,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.PermissionDependency
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case UPDATE_LINK_PROPERTY:
 									currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
@@ -4108,10 +4134,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ChoiceList
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_PARAMETER_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4119,10 +4142,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.Parameter
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_FUNCTION_OUTPUT_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4130,10 +4150,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.FunctionOutput
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_PERMISSION_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4141,10 +4158,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.Permission
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_OPTION_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4152,10 +4166,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.OptionList
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_CUSTOM_OPTION:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4163,10 +4174,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.OptionCustom
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_SCREEN_OPTIONS:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4174,10 +4182,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ScreenOption
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case ADD_NEW_REFERENCE_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4185,10 +4190,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ReferenceNode
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_EXTENSION_LIST_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4196,10 +4198,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ExtensionTypeList
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_VALIDATION_ITEM_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4207,10 +4206,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ValidationListItem
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_EXTENTION_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4218,10 +4214,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.ExtensionType
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case NEW_OPTION_ITEM_NODE:
 									currentGraph = GraphMethods.addNewNodeOfType(
@@ -4229,14 +4222,10 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 										options,
 										NodeTypes.OptionListItem
 									);
-									setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-										dispatch,
-										getState
-									);
+
 									break;
 								case APPLY_FUNCTION_CONSTRAINTS:
 									currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
-									// setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
 									break;
 								case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
 									break;
@@ -4245,6 +4234,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 							}
 
 							if (recording && Visual(state, RECORDING)) {
+								let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
 								recording.push({
 									operation,
 									options,
@@ -4252,11 +4242,15 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									currentGraph.groups[currentGraph.groups.length - 1]
 										? currentGraph.groups[currentGraph.groups.length - 1]
 										: null}`,
-									callback:
-										currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1]
-											? currentGraph.nodes[currentGraph.nodes.length - 1]
-											: null
+									callback: nodeAdded ? currentGraph.nodes[currentGraph.nodes.length - 1] : null
 								});
+								if (nodeAdded) {
+									graphOperationOccurences.push({
+										command: GraphMethods.VisualCommand.ADD_NODE,
+										nodeId: currentGraph.nodes[currentGraph.nodes.length - 1],
+										options
+									});
+								}
 							}
 						}
 					});
@@ -4273,6 +4267,12 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 		}
 		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
 		if (stamp) setViewPackageStamp(null, stamp);
+
+		let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
+		graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
+			visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
+		});
+		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
 
 		SaveGraph(rootGraph, dispatch);
 	};

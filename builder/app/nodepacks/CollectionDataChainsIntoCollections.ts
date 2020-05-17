@@ -767,7 +767,7 @@ export function CollectionComponentNodes(filter: any) {
 						steps.push({
 							operation: ADD_NEW_NODE,
 							options(graph: any) {
-								const parentReference = getParentCollectionReference(graph, component);
+								// const parentReference = getParentCollectionReference(graph, component);
 								return {
 									nodeType: NodeTypes.DataChainCollection,
 									properties: {
@@ -775,16 +775,16 @@ export function CollectionComponentNodes(filter: any) {
 										[NodeProperties.Pinned]: false
 									},
 									links: [
-										!parentReference
-											? null
-											: {
-													target: parentReference.id,
-													linkProperties: {
-														properties: {
-															...LinkProperties.DataChainCollection
-														}
-													}
-												},
+										// !parentReference
+										// 	? null
+										// 	: {
+										// 			target: parentReference.id,
+										// 			linkProperties: {
+										// 				properties: {
+										// 					...LinkProperties.DataChainCollection
+										// 				}
+										// 			}
+										// 		},
 										{
 											linkProperties: {
 												properties: {

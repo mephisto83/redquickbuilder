@@ -799,12 +799,17 @@ function duplicateLink(nn, nodes) {
 		target: nodes.findIndex((x) => x.id === nn.target)
 	};
 }
-function applyGroup(mindmapgroup, _group, groups, nodes) {
+function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
 	if (_group) {
 		if (_group.leaves && _group.leaves.length) {
 			mindmapgroup.leaves = mindmapgroup.leaves || [];
 			mindmapgroup.leaves.length = 0;
-			mindmapgroup.leaves.push(..._group.leaves.map((l) => nodes.findIndex((x) => x.id === l)));
+			_group.leaves.map((l: any) => {
+				let res = nodes.findIndex((x: any) => x.id === l);
+				if (res !== -1 && mindmapgroup.leaves.indexOf(res) === -1) {
+					mindmapgroup.leaves.push(res);
+				}
+			});
 		} else {
 			delete mindmapgroup.leaves;
 		}
@@ -812,7 +817,13 @@ function applyGroup(mindmapgroup, _group, groups, nodes) {
 		if (_group.groups && _group.groups.length) {
 			mindmapgroup.groups = mindmapgroup.groups || [];
 			mindmapgroup.groups.length = 0;
-			mindmapgroup.groups.push(..._group.groups.map((l) => groups.findIndex((x) => x.id === l)));
+			_group.groups.forEach((l: any) => {
+				let res = groups.findIndex((x: any) => x.id === l);
+				if (res !== -1 && mindmapgroup.groups.indexOf(res) === -1) {
+					mindmapgroup.groups.push(res);
+				}
+			});
+			// mindmapgroup.groups.push(..._group.groups.map((l) => groups.findIndex((x) => x.id === l)));
 		} else {
 			delete mindmapgroup.groups;
 		}
