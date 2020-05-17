@@ -3518,6 +3518,9 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 			if (visualCommand.nodeId) {
 				visualGraph = removeNode(visualGraph, { id: visualCommand.nodeId });
 			}
+			if (visualGraph && visualGraph.groups) {
+				visualGraph.groups = visualGraph.groups.filter((x) => graph.groupsNodes[x]);
+			}
 			break;
 		case VisualCommand.ADD_CONNECTION:
 			let link: GraphLink = getLink(graph, { id: visualCommand.linkId });
@@ -3529,7 +3532,15 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 	}
 	if (visualGraph) {
 		visualGraph.groupLib = graph.groupLib;
-		visualGraph.groups = nodeGroups;
+		if (!visualGraph.groups) {
+			visualGraph.groups = nodeGroups;
+		} else {
+			nodeGroups.forEach((ng: string) => {
+				if (visualGraph && visualGraph.groups.indexOf(ng) === -1) {
+					visualGraph.groups.push(ng);
+				}
+			});
+		}
 		visualGraph.groupsNodes = graph.groupsNodes;
 		visualGraph.childGroups = graph.childGroups;
 		visualGraph.nodesGroups = graph.nodesGroups;

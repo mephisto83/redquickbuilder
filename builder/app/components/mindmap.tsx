@@ -23,9 +23,14 @@ let mapSelectedNodes = null;
 let mapSelectedLinks = null;
 let version;
 export default class MindMap extends Component<any, any> {
+	hasStarted: boolean;
+	mapScale: number;
+	mapTranslate: any;
+	textSize: any;
 	constructor() {
 		super();
 		this.textSize = {};
+		this.hasStarted = false;
 		this.mapScale = 1;
 		this.mapTranslate = { x: 0, y: 0 };
 		this.state = {
@@ -591,8 +596,9 @@ export default class MindMap extends Component<any, any> {
 		const initialAllConstraintsIterations = 20;
 		const gridSnapIterations = null;
 		const keepRunning = true;
-
 		force.start(null, null, null, null, !options.once);
+
+		this.hasStarted = true;
 	}
 
 	buildNode(graph, cola, color) {
