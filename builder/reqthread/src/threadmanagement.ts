@@ -139,7 +139,7 @@ export default class ThreadManagement {
 					}
         );
         console.log(canReturnFiles)
-				if (!canReturnFiles.success) {
+				if (!canReturnFiles.body.success) {
 					canReturnFiles = false;
 				}
 			} catch (e) {

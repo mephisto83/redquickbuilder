@@ -83,7 +83,7 @@ export default class CommunicationTower {
 		})
 			.then((response: any) => {
 				return response.json((res: any) => {
-					if (res.error) {
+					if (res.body && res.body.error) {
 						console.error(res);
 						throw new Error(res.error);
 					}
