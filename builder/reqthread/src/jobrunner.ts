@@ -204,13 +204,14 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 }
 async function canReturnResults(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
-    return {
-			success: communicationTower.receivingFile
+		return {
+			success: !communicationTower.receivingFile,
+			error: communicationTower.receivingFile
 		};
-  }
-  return {
-    error:true;
-  }
+	}
+	return {
+		error: true
+	};
 }
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
