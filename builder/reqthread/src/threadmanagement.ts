@@ -153,23 +153,36 @@ export default class ThreadManagement {
 				path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
 			);
 		});
-		let result = await this.communicationTower.send(
-			{
-				agent: completedJobItem.agentName,
-				name: completedJobItem.projectName,
-				host: this.configuration.remoteServerHost,
-				port: this.configuration.remoteServerPort
-			},
-			'',
-			RedQuickDistributionCommand.CompletedJobItem,
-			{
-				projectName: completedJobItem.projectName,
-				fileName: completedJobItem.fileName
+		let result = false;
+		do {
+			try {
+				result = await this.communicationTower.send(
+					{
+						agent: completedJobItem.agentName,
+						name: completedJobItem.projectName,
+						host: this.configuration.remoteServerHost,
+						port: this.configuration.remoteServerPort
+					},
+					'',
+					RedQuickDistributionCommand.CompletedJobItem,
+					{
+						projectName: completedJobItem.projectName,
+						fileName: completedJobItem.fileName
+					}
+				);
+			} catch (e) {
+				await sleep(10 * 1000);
+				result = false;
 			}
-		);
+		} while (!result);
 
 		// await sleep(10 * 1000);
-		let jobFolder = path.join(this.configuration.baseFolder, this.getAgentName(), completedJobItem.projectName,completedJobItem.fileName);
+		let jobFolder = path.join(
+			this.configuration.baseFolder,
+			this.getAgentName(),
+			completedJobItem.projectName,
+			completedJobItem.fileName
+		);
 		if (fs.existsSync(jobFolder)) {
 			await JobService.deleteFolder(jobFolder);
 		}
@@ -234,104 +247,6 @@ export default class ThreadManagement {
 		console.log('successfully raised hand');
 	}
 
-	// async coordinateLocalThreads(localDev: LocalDev) {
-	// 	await this.initThreads(localDev);
-	// }
-	// async initThreads(localDev: LocalDev) {
-	// 	let projects = localDev.projects;
-	// 	let promise = Promise.resolve();
-	// 	Object.keys(projects).map((projectName) => {
-	// 		promise = promise
-	// 			.then(async () => {
-	// 				this.threads[projectName] = await ChildProcess.init(this.configuration, {
-	// 					projectName,
-	// 					folderPath: path.resolve(this.configuration.workingDirectory),
-	// 					agentName: this.getAgentName()
-	// 				});
-	// 			})
-	// 			.catch(console.error);
-	// 	});
-	// 	return promise;
-	// }
-
-	// async writeAgentStrucuture(localDev: LocalDev) {
-	// 	let agentPath = path.join(this.configuration.workingDirectory, './agents', this.getAgentName());
-	// 	await ensureDirectory(agentPath);
-
-	// 	// Object.keys(localDev.projects).forEach((pn) => {
-	// 	// 	if (!fs.existsSync(path.join(agentPath, pn))) {
-	// 	// 		fs.mkdirSync(path.join(agentPath, pn));
-	// 	// 	}
-	// 	// 	fs.writeFileSync(path.join(agentPath, pn, `config.json`), this.getProjectConfig(localDev, pn), 'utf8');
-	// 	// });
-	// }
-	// ensureJob(localDev: LocalDev) {
-	// 	if (!fs.existsSync(path.join(this.configuration.workingDirectory, './jobs'))) {
-	// 		fs.mkdirSync(path.join(this.configuration.workingDirectory, './jobs'));
-	// 	}
-	// }
-	// getProjectConfig(localDev: LocalDev, pn: string): string {
-	// 	return JSON.stringify({
-	// 		project: pn,
-	// 		updated: Date.now()
-	// 	});
-	// }
-	// async isOk() {
-	// 	let ld: LocalDev = this.getLocalDev();
-	// 	return ld.updated + oneHour < Date.now();
-	// }
-	// hasLocalDev() {
-	// 	console.log('has local dev?');
-	// 	return fs.existsSync(path.join(this.configuration.workingDirectory || './', './dev.local'));
-	// }
-	// storeLocalDev(ld: LocalDev) {
-	// 	console.log('storing local dev');
-	// 	fs.writeFileSync(
-	// 		path.join(this.configuration.workingDirectory || './', './dev.local'),
-	// 		JSON.stringify(ld, null, 4),
-	// 		'utf8'
-	// 	);
-	// }
-	// getLocalDev(): LocalDev {
-	// 	console.log('get local dev');
-	// 	let localDev = fs.readFileSync(path.join(this.configuration.workingDirectory || './', './dev.local'), 'utf8');
-	// 	return JSON.parse(localDev);
-	// }
-	// initLocalDev(): LocalDev {
-	// 	console.log('initialize local dev');
-	// 	const cpuCount = os.cpus().length;
-	// 	const threads = this.configuration.threads || Math.floor(cpuCount / 2 - 1) || 1;
-	// 	const projectNames = [];
-
-	// 	do {
-	// 		let projectname = `${NameService.projectGenerator()}-${uuidv4().split('-')[0]}`;
-	// 		if (projectNames.indexOf(projectname) === -1) {
-	// 			projectNames.push(projectname);
-	// 			console.log(projectname);
-	// 		} else {
-	// 			break;
-	// 		}
-	// 		if (projectNames.length >= threads) {
-	// 			break;
-	// 		}
-	// 	} while (true);
-	// 	let projects = {};
-	// 	projectNames.forEach((pn) => {
-	// 		console.log(pn);
-	// 		projects[pn.trim()] = {};
-	// 	});
-
-	// 	let localDev: LocalDev = {
-	// 		cpuCount,
-	// 		agent: this.getAgentName(),
-	// 		threads: Math.floor(cpuCount / 2 - 1) || 1,
-	// 		projects,
-	// 		lastCommit: 0,
-	// 		updated: Date.now()
-	// 	};
-
-	// 	return localDev;
-	// }
 	getAgentName() {
 		return `${os.hostname()}_${os.platform()}`;
 	}

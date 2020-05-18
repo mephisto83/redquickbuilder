@@ -110,7 +110,7 @@ export default class CommunicationTower {
 			} catch (e) {
 				console.log(e);
 				console.log(`failed to send file : attempts left`);
-				await sleep(30 * 1000 + Math.random() * 100000);
+				await sleep(60 * 1000 + Math.random() * 100000);
 			}
 		} while (maxattempts);
 	}
@@ -262,7 +262,7 @@ export default class CommunicationTower {
 							agentName: this.agentName,
 							filePath: filePathArray
 						})
-					}).catch((e) => {
+					}).catch((e: any) => {
 						console.log(e);
 						fail(e);
 					});
