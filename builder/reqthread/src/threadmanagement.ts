@@ -123,6 +123,7 @@ export default class ThreadManagement {
 		let canReturnFiles: any = false;
 		do {
 			try {
+        console.log('can i return files');
 				canReturnFiles = await this.communicationTower.send(
 					{
 						agent: completedJobItem.agentName,
@@ -146,6 +147,7 @@ export default class ThreadManagement {
 			}
 		} while (!canReturnFiles);
 
+    console.log('now i can');
 		// let attempts = 3;
 		// do {
 		// 	attempts--;

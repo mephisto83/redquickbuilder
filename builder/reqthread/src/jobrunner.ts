@@ -204,11 +204,19 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 }
 async function canReturnResults(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
+		if (!communicationTower.receivingFile) {
+			console.log('can send a file ');
+    }
+    else {
+      console.log('cant send a file')
+    }
+    console.log(message);
 		return {
 			success: !communicationTower.receivingFile,
 			error: communicationTower.receivingFile
 		};
 	}
+	console.log('missing agentName');
 	return {
 		error: true
 	};
