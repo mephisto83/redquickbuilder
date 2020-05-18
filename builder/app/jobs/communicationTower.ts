@@ -108,7 +108,7 @@ export default class CommunicationTower {
 				);
 				maxattempts = false;
 			} catch (e) {
-        console.log(e);
+				console.log(e);
 				console.log(`failed to send file : attempts left`);
 				await sleep(30 * 1000 + Math.random() * 100000);
 			}
@@ -185,7 +185,7 @@ export default class CommunicationTower {
 
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
-				reply.port = await this.getAvailbePort();
+				// reply.port = await this.getAvailbePort();
 				let address = this.getIpaddress();
 				reply.hostname = address.hostname;
 				await this.receiveFile(parsed);
@@ -274,61 +274,54 @@ export default class CommunicationTower {
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
-		CommunicationTower.receiveQueue = CommunicationTower.receiveQueue.then(async () => {
-			let res = await new Promise(async (resolve, fail) => {
-				let requestedPath = path.join(
-					this.baseFolder,
-					this.agentName || '',
-					(req.filePath || []).join(path.sep)
-				);
-				await ensureDirectory(path.resolve(path.dirname(requestedPath)));
-				console.log(`writing to: ${requestedPath}`);
-				let socket: net.Socket;
-				socket = net.connect(req.port, req.hostname);
-				let ostream = fs.createWriteStream(requestedPath);
-				let size = 0,
-					elapsed = 0;
-				socket.on('error', (err) => {
-					console.log(err);
-					process.stdout.write(`\r${err.message}`);
-					socket.destroy(err);
-					fail(false);
-				});
-				socket.on('data', (chunk) => {
-					size += chunk.length;
-					socket.write(
-						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-							1000} s : ${requestedPath}`
-					);
-					process.stdout.write(
-						`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
-							1000} s : ${requestedPath}`
-					);
-					ostream.write(chunk);
-				});
-				socket.on('end', () => {
-					console.log(
-						`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
-							2
-						)} MB/s to : ${requestedPath}`
-					);
-					socket.destroy();
-					ostream.close();
-					resolve(true);
-				});
-				ostream.on('error', (err) => {
-					console.log('ostream error');
-					console.log(err);
-					fail(err);
-				});
-				ostream.on('ready', () => {});
+		let res = await new Promise(async (resolve, fail) => {
+			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
+			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
+			console.log(`writing to: ${requestedPath}`);
+			let socket: net.Socket;
+			socket = net.connect(req.port, req.hostname);
+			let ostream = fs.createWriteStream(requestedPath);
+			let size = 0,
+				elapsed = 0;
+			socket.on('error', (err) => {
+				console.log(err);
+				process.stdout.write(`\r${err.message}`);
+				socket.destroy(err);
+				fail(false);
 			});
-			if (res) {
-				return true;
-			}
-			return false;
+			socket.on('data', (chunk) => {
+				size += chunk.length;
+				socket.write(
+					`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+						1000} s : ${requestedPath}`
+				);
+				process.stdout.write(
+					`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
+						1000} s : ${requestedPath}`
+				);
+				ostream.write(chunk);
+			});
+			socket.on('end', () => {
+				console.log(
+					`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
+						2
+					)} MB/s to : ${requestedPath}`
+				);
+				socket.destroy();
+				ostream.close();
+				resolve(true);
+			});
+			ostream.on('error', (err) => {
+				console.log('ostream error');
+				console.log(err);
+				fail(err);
+			});
+			ostream.on('ready', () => {});
 		});
-		return await CommunicationTower.receiveQueue;
+		if (res) {
+			return true;
+		}
+		return false;
 	}
 	async getAvailbePort() {
 		return await this.getFreePort();
