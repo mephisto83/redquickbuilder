@@ -137,7 +137,8 @@ export default class ThreadManagement {
 						projectName: completedJobItem.projectName,
 						fileName: completedJobItem.fileName
 					}
-				);
+        );
+        console.log(canReturnFiles)
 				if (!canReturnFiles.success) {
 					canReturnFiles = false;
 				}
