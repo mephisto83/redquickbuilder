@@ -43,7 +43,8 @@ export enum RedQuickDistributionCommand {
 	RaisingAgentProjectBusy = 'RaisingAgentProjectBusy',
 	CompletedJobItem = 'CompletedJobItem',
 	SetCommandCenter = 'SetCommandCenter',
-	UpdateCommandCenter = 'UpdateCommandCenter'
+	UpdateCommandCenter = 'UpdateCommandCenter',
+	CanReturnResults = 'CanReturnResults'
 }
 export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;
 export default class CommunicationTower {
@@ -54,11 +55,13 @@ export default class CommunicationTower {
 	baseFolder: string;
 	serverPort: any;
 	ctPort: any;
+	receivingFile: boolean;
 	constructor() {
 		this.topDirectory = '';
 		this.ports = {};
 		this.listeners = null;
 		this.agentName = '';
+		this.receivingFile = false;
 
 		this.baseFolder = '';
 	}
@@ -84,6 +87,7 @@ export default class CommunicationTower {
 						console.error(res);
 						throw new Error(res.error);
 					}
+					return res;
 				});
 			})
 			.catch((err: any) => {
@@ -274,6 +278,7 @@ export default class CommunicationTower {
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async receiveFile(req: any) {
+		this.receivingFile = true;
 		let res = await new Promise(async (resolve, fail) => {
 			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			await ensureDirectory(path.resolve(path.dirname(requestedPath)));
@@ -283,11 +288,13 @@ export default class CommunicationTower {
 			let ostream = fs.createWriteStream(requestedPath);
 			let size = 0,
 				elapsed = 0;
+
 			socket.on('error', (err) => {
 				console.log(err);
 				process.stdout.write(`\r${err.message}`);
 				socket.destroy(err);
 				fail(false);
+				this.receivingFile = false;
 			});
 			socket.on('data', (chunk) => {
 				size += chunk.length;
@@ -310,11 +317,13 @@ export default class CommunicationTower {
 				socket.destroy();
 				ostream.close();
 				resolve(true);
+				this.receivingFile = false;
 			});
 			ostream.on('error', (err) => {
 				console.log('ostream error');
 				console.log(err);
 				fail(err);
+				this.receivingFile = false;
 			});
 			ostream.on('ready', () => {});
 		});

@@ -79,6 +79,7 @@ export default class ThreadManagement {
 					error: 'No agent'
 				};
 			},
+			[RedQuickDistributionCommand.CanReturnResults]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
 			[RedQuickDistributionCommand.RaisingHand]: noOp,
@@ -119,6 +120,32 @@ export default class ThreadManagement {
 		fileName: string;
 		jobInstancePath: string;
 	}) {
+		let canReturnFiles: any = false;
+		do {
+			try {
+				canReturnFiles = await this.communicationTower.send(
+					{
+						agent: completedJobItem.agentName,
+						name: completedJobItem.projectName,
+						host: this.configuration.remoteServerHost,
+						port: this.configuration.remoteServerPort
+					},
+					'',
+					RedQuickDistributionCommand.CanReturnResults,
+					{
+						projectName: completedJobItem.projectName,
+						fileName: completedJobItem.fileName
+					}
+				);
+				if (!canReturnFiles.success) {
+					canReturnFiles = false;
+				}
+			} catch (e) {
+				await sleep(10 * 1000);
+				canReturnFiles = false;
+			}
+		} while (!canReturnFiles);
+
 		// let attempts = 3;
 		// do {
 		// 	attempts--;

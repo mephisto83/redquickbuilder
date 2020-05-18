@@ -49,7 +49,8 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy,
 			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem,
 			[RedQuickDistributionCommand.SetCommandCenter]: setCommandCenter,
-			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp
+			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
+			[RedQuickDistributionCommand.CanReturnResults]: canReturnResults
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
@@ -200,6 +201,16 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 	return {
 		error: 'no project name'
 	};
+}
+async function canReturnResults(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	if (message.agentName) {
+    return {
+			success: communicationTower.receivingFile
+		};
+  }
+  return {
+    error:true;
+  }
 }
 async function handleHandRaising(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	if (message.agentName) {
