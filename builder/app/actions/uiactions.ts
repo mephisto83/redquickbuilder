@@ -2860,6 +2860,24 @@ export function toggleHideByTypes(key: any) {
 		)(dispatch, getState);
 	};
 }
+export function deleteByTypes(types: string[]) {
+	return (dispatch: Function, getState: Function) => {
+		const state = getState();
+		let commands: any[] = [];
+		types.forEach((key: string) => {
+			commands.push(
+				...NodesByType(state, key).map((node: { id: any }) => ({
+					operation: REMOVE_NODE,
+					options: {
+						id: node.id
+					}
+				}))
+			);
+		});
+
+		PerformGraphOperation(commands)(dispatch, getState);
+	};
+}
 export function pin(ids: string[]) {
 	return (dispatch: Function, getState: Function) => {
 		PerformGraphOperation(

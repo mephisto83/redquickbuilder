@@ -100,7 +100,9 @@ import { SecondaryOptions } from '../constants/visual';
 class ContextMenu extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = {};
+		this.state = {
+			deleteType: {}
+		};
 	}
 
 	getMenuMode(mode) {
@@ -153,6 +155,7 @@ class ContextMenu extends Component<any, any> {
 		result.push(this.minimizeMenu());
 		result.push(...this.linkOperations());
 		result.push(this.hideTypeMenu());
+		result.push(this.deleteByTypeMenu());
 		return result.filter((x) => x);
 	}
 
@@ -407,6 +410,48 @@ class ContextMenu extends Component<any, any> {
 						icon={UIA.Hidden(state, NodeTypes[type]) ? 'fa fa-circle-o' : 'fa fa-check-circle-o'}
 						toggle={() => {
 							this.props.toggleHideByTypes(NodeTypes[type]);
+						}}
+					/>
+				))}
+			</TreeViewMenu>
+		);
+	}
+
+	deleteByTypeMenu() {
+		const DELETE_TYPE_MENU = 'DELETE_TYPE_MENU';
+		const { state } = this.props;
+		return (
+			<TreeViewMenu
+				open={UIA.Visual(state, DELETE_TYPE_MENU)}
+				active
+				title={Titles.DeleteType}
+				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+				toggle={() => {
+					this.props.toggleVisual(DELETE_TYPE_MENU);
+				}}
+			>
+				<TreeViewMenu
+					title={'Clear'}
+					onClick={() => {
+						this.props.deleteByTypes(
+							Object.keys(NodeTypes)
+								.filter((x) => this.state.deleteType[NodeTypes[x]])
+								.map((x) => NodeTypes[x])
+						);
+					}}
+				/>
+				{Object.keys(NodeTypes).sort().map((type) => (
+					<TreeViewMenu
+						key={`node-${type}`}
+						title={type}
+						icon={!this.state.deleteType[NodeTypes[type]] ? 'fa fa-circle-o' : 'fa fa-check-circle-o'}
+						toggle={() => {
+							this.setState({
+								deleteType: {
+									...this.state.deleteType,
+									[NodeTypes[type]]: !this.state.deleteType[NodeTypes[type]]
+								}
+							});
 						}}
 					/>
 				))}

@@ -112,8 +112,9 @@ export default class JobService {
 				if (contents) {
 					contents = contents && fs.existsSync(path_join(relPath, file));
 					if (contents) {
-						let guts = fs.readFileSync(path_join(relPath, file), 'utf8');
-						contents = contents && !!guts.length;
+						var stats = fs.statSync(path_join(relPath, file));
+						var fileSizeInBytes = stats['size'];
+						contents = contents && !!fileSizeInBytes;
 					}
 				}
 			});
