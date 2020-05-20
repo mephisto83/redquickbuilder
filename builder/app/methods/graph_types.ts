@@ -6,6 +6,8 @@ export interface Graph {
 	namespace: string;
 	graphFile?: string;
 	path: string[];
+	linkCount?: number;
+	nodeCount?: number;
 	groups: string[];
 	groupLib: { [index: string]: Group };
 	groupsNodes: QuickAccess<boolean>;

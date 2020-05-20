@@ -762,18 +762,21 @@ export default class MindMap extends Component<any, any> {
 						newGroups.map((nn) => {
 							this.state.graph.groups.push(duplicateGroup(graph.groupLib[nn], this.state.graph.nodes));
 						});
-
-						graph_groups.forEach((group) => {
+						let toremove: any[] = [];
+						graph_groups.forEach((group: any) => {
 							const g = this.state.graph.groups.find((x) => x.id === group);
-							applyGroup(
+							let ok: boolean = applyGroup(
 								g,
 								graph.groupLib[group],
 								this.state.graph.groups,
-								this.state.graph.nodes,
-								this.props.groupsDisabled
+								this.state.graph.nodes
 							);
+							if (!ok) {
+								toremove.push(this.state.graph.groups.indexOf(g));
+							}
 							// (duplicateGroup(graph.groupLib[nn], this.state.graph.nodes))
 						});
+						this.state.graph.groups.removeIndices(toremove);
 					}
 
 					// this.state.graph.groups.map(group => {
@@ -833,7 +836,12 @@ function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
 		} else {
 			delete mindmapgroup.groups;
 		}
-
+		if (
+			!(mindmapgroup.groups && mindmapgroup.groups.length) &&
+			!(mindmapgroup.leaves && mindmapgroup.leaves.length)
+		) {
+			return false;
+		}
 		// if (nn.leaves) {
 		//     let leaves = nn.leaves.map(l => nodes.findIndex(x => x.id === l));
 		//     temp.leaves = leaves;
@@ -843,6 +851,7 @@ function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
 		//     temp.groups = groups;
 		// }
 	}
+	return true;
 }
 function duplicateGroup(nn, nodes, groups) {
 	const temp = {

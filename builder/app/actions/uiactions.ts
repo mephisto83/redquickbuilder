@@ -12,7 +12,7 @@ import { buildValidation } from '../service/validation_js_service';
 import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
-import { GraphLink } from '../methods/graph_types';
+import { GraphLink, Graph } from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject } from '../jobs/interfaces';
 const fs = require('fs');
@@ -4290,7 +4290,8 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 			visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
 		});
 		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
-
+    rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
+    rootGraph.linkCount = (<Graph>rootGraph).links.length
 		SaveGraph(rootGraph, dispatch);
 	};
 }

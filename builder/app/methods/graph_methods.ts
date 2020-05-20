@@ -3532,15 +3532,7 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 	}
 	if (visualGraph) {
 		visualGraph.groupLib = graph.groupLib;
-		if (!visualGraph.groups) {
-			visualGraph.groups = nodeGroups;
-		} else {
-			nodeGroups.forEach((ng: string) => {
-				if (visualGraph && visualGraph.groups.indexOf(ng) === -1) {
-					visualGraph.groups.push(ng);
-				}
-			});
-		}
+		visualGraph.groups = graph.groups; // nodeGroups;
 		visualGraph.groupsNodes = graph.groupsNodes;
 		visualGraph.childGroups = graph.childGroups;
 		visualGraph.nodesGroups = graph.nodesGroups;

@@ -141,6 +141,7 @@ import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
 import { JobServiceConstants } from '../jobs/jobservice';
 import CodeEditor from './codeeditor';
+import { Graph } from '../methods/graph_types';
 
 const { clipboard } = require('electron');
 
@@ -1177,19 +1178,17 @@ class Dashboard extends Component<any, any> {
 	getCost() {
 		const { state } = this.props;
 		let cost = 0;
-		const graph = UIA.GetCurrentGraph(state);
+		const graph: Graph = UIA.GetCurrentGraph(state);
 		const node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
 		const node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
 
 		if (graph) {
-			cost =
-				Object.keys(graph.linkLib || {}).length * node_connection_cost +
-				Object.keys(graph.nodeLib || {}).length * node_cost;
+			cost = (graph.linkCount || 0) * node_connection_cost + (graph.nodeCount || 0) * node_cost;
 		}
-		return Dashboard.formatMoney(cost, 2, '.', ',');
+		return Dashboard.formatMoney(cost);
 	}
 
-	static formatMoney(number) {
+	static formatMoney(number: number) {
 		return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(number);
 	}
 
@@ -1894,8 +1893,8 @@ class Dashboard extends Component<any, any> {
 										} else if ([ UIA.Visual(state, UIA.SELECTED_NODE) ].indexOf(nodeId) === -1) {
 											// this.props.SelectedNode(nodeId);
 											// this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
-                      // this.props.setVisual(SIDE_PANEL_OPEN, true);
-                      this.props.SelectNode(nodeId, boundingBox);
+											// this.props.setVisual(SIDE_PANEL_OPEN, true);
+											this.props.SelectNode(nodeId, boundingBox);
 										} else {
 											this.props.SelectedNode(null);
 										}
