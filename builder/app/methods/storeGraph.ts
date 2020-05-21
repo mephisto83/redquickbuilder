@@ -9,10 +9,10 @@ import prune from './prune';
 import { GUID } from '../actions/uiactions';
 const NEW_LINE_REPLACEMENT = '$Åøcå';
 const SECTION_HEADER = '$@HEADER#!@_';
-const LINK_LIB = 'linkLib';
-const NODE_LIB = 'nodeLib';
-const GROUP_LIB = 'groupLib';
-const GRAPH_LIB = 'graphLib';
+export const LINK_LIB = 'linkLib';
+export const NODE_LIB = 'nodeLib';
+export const GROUP_LIB = 'groupLib';
+export const GRAPH_LIB = 'graphLib';
 export default async function StoreGraph(graph: Graph, filePath: string) {
 	console.log('writing graph to : ' + filePath);
 	await writeGraph(filePath, graph);
@@ -91,6 +91,64 @@ export async function LoadBrokenGraph(relPath: string, fileNames: string[]) {
 	return await readLine(relPath, fileNames);
 }
 
+export async function StreamGraph(
+	relPath: string,
+	fileNames: string[],
+	callback: (key: any, obj: any, type: string) => void
+) {
+	console.log('load broken graph');
+	console.log(relPath);
+	console.log(fileNames);
+	await streamLine(relPath, fileNames, callback);
+}
+
+async function streamLine(
+	relPath: string,
+	fileNames: string[],
+	callback: (key: any, obj: any, type: string) => void
+): Promise<void> {
+	let currentSection: string | null = null;
+
+	let bucket = '';
+	await fileNames.map((fname) => path_join(relPath, fname)).forEachAsync(async (filename: string, index: number) => {
+		console.log(`Reading : ${filename}`);
+		return await new Promise((resolve, fail) => {
+			var instream = fs.createReadStream(filename);
+			var rl = readline.createInterface(instream);
+			rl.on('line', function(line: string) {
+				// process line here
+				if (line.startsWith(SECTION_HEADER)) {
+					currentSection = line.substring(SECTION_HEADER.length);
+				} else if (!currentSection) {
+					bucket = bucket + line;
+				} else {
+					line = line.replace(NEW_LINE_REPLACEMENT, '\n');
+					let obj = JSON.parse(line);
+					switch (currentSection) {
+						case LINK_LIB:
+						case GROUP_LIB:
+						case NODE_LIB:
+							callback(obj.k, obj.v, currentSection);
+							break;
+						case GRAPH_LIB:
+							callback(null, obj, currentSection);
+							break;
+					}
+				}
+			});
+
+			rl.on('close', function() {
+				// do something on finish here
+				resolve();
+				instream.close();
+			});
+		});
+	});
+	if (bucket) {
+    throw new Error('not supported type');
+	}
+}
+
 async function readLine(relPath: string, fileNames: string[]) {
 	let currentSection: string | null = null;
 	let linkLib: { [key: string]: any } = {};
@@ -139,6 +197,7 @@ async function readLine(relPath: string, fileNames: string[]) {
 				} else {
 				}
 				resolve();
+				instream.close();
 			});
 		});
 	});

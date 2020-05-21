@@ -13,13 +13,14 @@ import {
 } from '../actions/uiactions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
-import { Node, Graph } from '../methods/graph_types';
+import { Node, Graph, Version } from '../methods/graph_types';
 import prune from '../methods/prune';
 import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
 import { AgentProject, AgentProjects } from './interfaces';
 import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
 import StoreGraph, { LoadGraph, LoadBrokenGraph, SplitIntoFiles } from '../methods/storeGraph';
+import { mergeStreamGraph } from '../methods/mergeGraph';
 
 export default class JobService {
 	static communicationTower: CommunicationTower;
@@ -89,12 +90,24 @@ export default class JobService {
 			return parsedResult;
 		}
 		let fileDetails: JobOutput = parsedResult;
-		// let contents: string = '';
-		// fileDetails.files.forEach((file) => {
-		// 	contents = contents + fs.readFileSync(path_join(relPath, file));
-		// });
 
 		let res = await LoadBrokenGraph(relPath, fileDetails.files);
+
+		if (res) {
+			return res;
+		}
+		throw new Error('couldnt load graph');
+	}
+	static async GetJobOutput(relPath: string, fileName: string): Promise<JobOutput> {
+		/** Use LoadGraph */
+		let fileContents: string = fs.readFileSync(path_join(relPath, fileName), 'utf8');
+		let parsedResult = JSON.parse(fileContents);
+		if (parsedResult && (parsedResult.workspace || parsedResult.version)) {
+			return parsedResult;
+		}
+		let fileDetails: JobOutput = parsedResult;
+
+		let res = fileDetails;
 
 		if (res) {
 			return res;
@@ -252,7 +265,7 @@ export default class JobService {
 		console.log('collecting job results');
 		// await JobService.CollectJobResults(currentJob);
 		console.log('merge job results');
-		let graph = await JobService.MergeCompletedJob(currentJob);
+		let graph = await JobService.MergeCompletedJobStream(currentJob);
 		if (graph) {
 			await setCurrentGraph(graph);
 			currentJobFile.updatedGraph = graph;
@@ -669,14 +682,44 @@ export default class JobService {
 	static async MergeCompletedJob(job: Job): Promise<Graph | null> {
 		console.log('merging completed job');
 		let mergedGraph: Graph | null = GetCurrentGraph(GetState());
+		let temp: Graph | null = mergedGraph;
+		let version: Version = {
+			major: temp ? temp.version.major : 0,
+			minor: temp ? temp.version.minor : 0,
+			build: temp ? temp.version.build : 0
+		};
 		await job.parts.forEachAsync(async (part: string) => {
 			let graphOutput = await JobService.JoinFile(path_join(JobPath(), job.name, part), OUTPUT);
-			mergedGraph = mergeGraph(mergedGraph, graphOutput);
+			mergedGraph = mergeGraph(mergedGraph, graphOutput, version);
 			if (!mergedGraph) {
 				throw new Error('graph should have been merged');
 			}
 		});
 
+		console.log('merged completed job');
+
+		return mergedGraph;
+	}
+
+	static async MergeCompletedJobStream(job: Job): Promise<Graph | null> {
+		console.log('merging completed job');
+		let mergedGraph: Graph | null = GetCurrentGraph(GetState());
+		if (mergedGraph) {
+			mergedGraph = await mergeStreamGraph(mergedGraph, JobPath(), OUTPUT, job);
+		}
+		// await job.parts.forEachAsync(async (part: string) => {
+		// 		path_join(JobPath(), job.name, part),
+		// 		OUTPUT,
+		// 		mergedGraph,
+		// 		version
+		// 	);
+		// 	if (!mergedGraph) {
+		// 		throw new Error('graph should have been merged');
+		// 	}
+		// });
+		if (!mergedGraph) {
+			throw new Error('graph should have been merged');
+		}
 		console.log('merged completed job');
 
 		return mergedGraph;
