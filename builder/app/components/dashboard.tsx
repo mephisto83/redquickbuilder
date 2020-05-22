@@ -120,7 +120,8 @@ import {
 	TRANSLATION_VIEW,
 	PROGRESS_VIEW,
 	AGENT_ACCESS_VIEW,
-	CODE_EDITOR
+	CODE_EDITOR,
+	ConditionTypes
 } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
@@ -134,7 +135,8 @@ import {
 	getNodesByLinkType,
 	SOURCE,
 	GetNodesLinkedTo,
-	Paused
+	Paused,
+	GetNodeProp
 } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
@@ -168,7 +170,8 @@ class Dashboard extends Component<any, any> {
 		const { state } = this.props;
 		if (UIA.Visual(state, UIA.SELECTED_NODE)) {
 			const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-			switch (UIA.GetNodeProp(currentNode, NodeProperties.NODEType)) {
+			let nodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+			switch (nodeType) {
 				case NodeTypes.DataChain:
 					return this.getDataChainContext();
 				case NodeTypes.Controller:
@@ -201,7 +204,16 @@ class Dashboard extends Component<any, any> {
 				case NodeTypes.Model:
 				case NodeTypes.Property:
 					result.push(...this.getModelContext());
+					if (nodeType === NodeTypes.Property) {
+						result.push(...this.getPropertyContent());
+					}
 					return result;
+				case NodeTypes.PermissionTemplate:
+					result.push(...this.getPermissionTemplateContent());
+					break;
+				case NodeTypes.ConditionTemplate:
+					result.push(...this.getConditionTemplate());
+					break;
 				case NodeTypes.ComponentNode:
 					result.push(...this.getComponentContext());
 					break;
@@ -1026,7 +1038,109 @@ class Dashboard extends Component<any, any> {
 
 		return result;
 	}
+	getConditionTemplate() {
+		const result = [];
+		let { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
+		if (GetNodeProp(currentNode, NodeProperties.Condition) === ConditionTypes.Enumeration) {
+			result.push({
+				onClick: () => {
+					this.props.setVisual(CONNECTING_NODE, {
+						...LinkProperties.EnumerationLink,
+						singleLink: true,
+						nodeTypes: [ NodeTypes.Enumeration ]
+					});
+				},
+				icon: 'fa fa-puzzle-piece',
+				title: Titles.Enumeration
+			});
+		}
+		return result;
+	}
+	getPermissionTemplateContent() {
+		const result = [];
+		let { state } = this.props;
+
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
+		result.push(
+			{
+				onClick: () => {
+					this.props.setVisual(CONNECTING_NODE, {
+						...LinkProperties.AgentLink,
+						singleLink: true,
+						nodeTypes: [ NodeTypes.Model ],
+            properties: {
+              [NodeProperties.IsAgent]: true
+            }
+					});
+				},
+				icon: 'fa fa-puzzle-piece',
+				title: Titles.Agents
+			},
+			{
+				onClick: () => {
+					this.props.setVisual(CONNECTING_NODE, {
+						...LinkProperties.ModelTypeLink,
+						singleLink: true,
+						nodeTypes: [ NodeTypes.Model ]
+					});
+				},
+				icon: 'fa fa-genderless',
+				title: Titles.Models
+			},
+			...Object.keys(ConditionTypes).map((key, index) => {
+				let icons = [ 'fa fa-rss-square', 'fa fa-object-ungroup', 'fa fa-plane' ];
+				return {
+					onClick: () => {
+						this.props.graphOperation([
+							{
+								operation: UIA.ADD_NEW_NODE,
+								options() {
+									return {
+										nodeType: NodeTypes.ConditionTemplate,
+										parent: currentNode.id,
+
+										linkProperties: {
+											properties: {
+												...LinkProperties.ConditionTemplate
+											}
+										},
+										groupProperties: {},
+										properties: {
+											[NodeProperties.UIText]: `${key}`,
+											[NodeProperties.Condition]: key
+										}
+									};
+								}
+							}
+						]);
+					},
+					icon: icons[index % icons.length] || 'fa fa-plus',
+					title: `Condition Template ${key}`
+				};
+			})
+		);
+
+		return result;
+	}
+
+	getPropertyContent() {
+		const result = [];
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.EnumerationLink,
+					singleLink: true,
+					nodeTypes: [ NodeTypes.Enumeration ]
+				});
+			},
+			icon: 'fa fa-magnet',
+			title: `Enumeration Link`
+		});
+		return result;
+	}
 	getModelContext() {
 		const result = [];
 

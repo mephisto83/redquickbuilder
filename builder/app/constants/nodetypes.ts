@@ -66,7 +66,12 @@ export const NodeTypes = {
 	FetchService: 'FetchService',
 	Style: 'Style',
 	Theme: 'Theme',
-	DataChainCollection: 'DataChainCollection'
+	DataChainCollection: 'DataChainCollection',
+	PermissionTemplate: 'PermissionTemplate',
+	ConditionTemplate: 'ConditionTemplate'
+};
+export const ConditionTypes = {
+	Enumeration: 'Enumeration'
 };
 export const NodeTypeIcons: any = {};
 export function GetNodeTypeIcon(type: string | number) {
@@ -637,6 +642,7 @@ export const LinkType = {
 	ModelAccess: 'ModelAccess',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
+	ConditionTemplate: 'ConditionTemplate',
 	ComponentApiConnector: 'Component Api Connector',
 	EventMethod: 'EventMethod',
 	UsingSharedComponent: 'UsingSharedComponent',
@@ -738,7 +744,8 @@ export const LinkType = {
 	DataChainCollection: 'DataChainCollection',
 	DataChainCollectionReference: 'DataChainCollectionReference',
 	DataChainStyleLink: 'DataChainStyleLink',
-	StyleArgument: 'StyleArgument'
+	StyleArgument: 'StyleArgument',
+	AgentLink: 'AgentLink'
 };
 const VIKTIG_LINKS = 5;
 export const LinkStyles = {
@@ -871,6 +878,7 @@ export const LinkPropertyKeys = {
 	ComponentStyle: 'ComponentStyle',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
+	Enumeration: 'Enumeration',
 	AsForm: 'AsForm'
 };
 
@@ -886,6 +894,9 @@ export const LinkProperties: any = {
 	},
 	LambdaInsertArguments: {
 		type: LinkType.LambdaInsertArguments
+	},
+	ConditionTemplate: {
+		type: LinkType.ConditionTemplate
 	},
 	ComponentApiConnector: {
 		type: LinkType.ComponentApiConnector
@@ -1147,6 +1158,9 @@ export const LinkProperties: any = {
 	},
 	ValidationLinkItem: {
 		type: LinkType.ValidationItem
+	},
+	AgentLink: {
+		type: LinkType.AgentLink
 	},
 	ValidatorAgentLink: {
 		type: LinkType.ValidatorAgent

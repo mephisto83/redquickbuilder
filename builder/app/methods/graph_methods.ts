@@ -2107,9 +2107,12 @@ export function findLink(graph: any, options: any) {
 	// }
 	return null;
 }
-export function newLink(graph: Graph, options: any) {
+export function newLink(graph: Graph, options: any, callback: any) {
 	const { target, source, properties } = options;
 	const link = createLink(target, source, properties);
+	if (callback) {
+		callback(link);
+	}
 	return addLink(graph, options, link);
 }
 
@@ -2588,19 +2591,22 @@ export function addLink(
 
 	return graph;
 }
-export function addLinksBetweenNodes(graph: any, options: any) {
+export function addLinksBetweenNodes(graph: any, options: any, callback: any) {
 	const { links } = options;
 	if (links && links.length) {
 		links.forEach((link: any) => {
-			graph = addLinkBetweenNodes(graph, link);
+			graph = addLinkBetweenNodes(graph, link, callback);
 		});
 	}
 	return graph;
 }
-export function addLinkBetweenNodes(graph: any, options: any) {
+export function addLinkBetweenNodes(graph: any, options: any, callback: any) {
 	const { target, source, properties } = options;
 	if (target !== source && target) {
 		const link = createLink(target, source, properties);
+		if (callback) {
+			callback(link);
+		}
 		return addLink(graph, options, link);
 	}
 	return graph;

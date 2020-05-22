@@ -40,7 +40,7 @@ import LayoutOptions from './layoutoptions';
 import { FunctionTemplateKeys } from '../constants/functiontypes';
 import NavigateBack from '../nodepacks/NavigateBack';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { getLinkInstance, GetNodesLinkedTo, SOURCE, existsLinkBetween } from '../methods/graph_methods';
+import { getLinkInstance, GetNodesLinkedTo, SOURCE, existsLinkBetween, GetNodeProp } from '../methods/graph_methods';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
 import CreateStandardClaimService from '../nodepacks/CreateStandardClaimService';
@@ -343,6 +343,56 @@ class ContextMenu extends Component<any, any> {
 								</TreeViewItemContainer>
 							</TreeViewMenu>
 						);
+						break;
+					case LinkType.Enumeration:
+						let enumeration: any = GetNodeProp(link.target, NodeProperties.Enumeration);
+						if (enumeration) {
+							result.push(
+								<TreeViewMenu
+									open={UIA.Visual(state, linkType)}
+									active
+									title={linkType}
+									key={`${linkType}${selectedLink.id}`}
+									innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+									toggle={() => {
+										this.props.toggleVisual(linkType);
+									}}
+								>
+									{enumeration.map((enumer: any) => {
+										let currentValue =
+											UIA.GetLinkProperty(link, LinkPropertyKeys.Enumeration) || [];
+										return (
+											<TreeViewItemContainer key={enumer.id}>
+												<CheckBox
+													label={enumer.value}
+													value={currentValue.indexOf(enumer.id) !== -1}
+													onChange={(value: any) => {
+														this.props.graphOperation([
+															{
+																operation: UIA.UPDATE_LINK_PROPERTY,
+																options() {
+																	return {
+																		id: link.id,
+																		prop: LinkPropertyKeys.Enumeration,
+																		value: value
+																			? [ ...currentValue, enumer.id ]
+																			: [
+																					...currentValue.filter(
+																						(x: any) => x !== enumer.id
+																					)
+																				]
+																	};
+																}
+															}
+														]);
+													}}
+												/>
+											</TreeViewItemContainer>
+										);
+									})}
+								</TreeViewMenu>
+							);
+						}
 						break;
 					case LinkType.ComponentExternalConnection:
 					case LinkType.EventMethodInstance:
@@ -2498,6 +2548,7 @@ class ContextMenu extends Component<any, any> {
 			default:
 				return this.getGenericLinks(currentNode);
 		}
+		return [];
 	}
 
 	getViewTypes() {

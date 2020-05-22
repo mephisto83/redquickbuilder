@@ -3960,29 +3960,70 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									currentGraph = GraphMethods.updateNodePropertyDirty(currentGraph, options);
 									break;
 								case NEW_LINK:
-									currentGraph = GraphMethods.newLink(currentGraph, options);
+									currentGraph = GraphMethods.newLink(currentGraph, options,
+										(link: GraphLink) => {
+											if (link) {
+												graphOperationOccurences.push({
+													command: GraphMethods.VisualCommand.ADD_CONNECTION,
+													linkId: link.id
+												});
+											}
+										});
 									break;
 								case ADD_LINK_BETWEEN_NODES:
-									currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options);
+									currentGraph = GraphMethods.addLinkBetweenNodes(
+										currentGraph,
+										options,
+										(link: GraphLink) => {
+											if (link) {
+												graphOperationOccurences.push({
+													command: GraphMethods.VisualCommand.ADD_CONNECTION,
+													linkId: link.id
+												});
+											}
+										}
+									);
 									break;
 								case ADD_TO_GROUP:
 									currentGraph = GraphMethods.updateNodeGroup(currentGraph, options);
 									break;
 								case ADD_LINKS_BETWEEN_NODES:
-									currentGraph = GraphMethods.addLinksBetweenNodes(currentGraph, options);
+									currentGraph = GraphMethods.addLinksBetweenNodes(
+										currentGraph,
+										options,
+										(link: GraphLink) => {
+											if (link) {
+												graphOperationOccurences.push({
+													command: GraphMethods.VisualCommand.ADD_CONNECTION,
+													linkId: link.id
+												});
+											}
+										}
+									);
 									break;
 								case CONNECT_TO_TITLE_SERVICE:
 									const titleService = GetTitleService();
 									if (titleService) {
-										currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, {
-											source: options.id,
-											target: titleService.id,
-											properties: {
-												...LinkProperties.TitleServiceLink,
-												singleLink: true,
-												nodeTypes: [ NodeTypes.TitleService ]
+										currentGraph = GraphMethods.addLinkBetweenNodes(
+											currentGraph,
+											{
+												source: options.id,
+												target: titleService.id,
+												properties: {
+													...LinkProperties.TitleServiceLink,
+													singleLink: true,
+													nodeTypes: [ NodeTypes.TitleService ]
+												}
+											},
+											(link: GraphLink) => {
+												if (link) {
+													graphOperationOccurences.push({
+														command: GraphMethods.VisualCommand.ADD_CONNECTION,
+														linkId: link.id
+													});
+												}
 											}
-										});
+										);
 									}
 									break;
 								case REMOVE_LINK_BETWEEN_NODES:
@@ -4290,8 +4331,8 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 			visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
 		});
 		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
-    rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
-    rootGraph.linkCount = (<Graph>rootGraph).links.length
+		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
+		rootGraph.linkCount = (<Graph>rootGraph).links.length;
 		SaveGraph(rootGraph, dispatch);
 	};
 }
