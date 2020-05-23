@@ -1259,7 +1259,7 @@ export const UITypes = {
 	AR: 'AR',
 	ElectronIO: 'ElectronIO'
 };
-export const ValidationRules: any = {
+export const ValidationRules: { [str: string]: string } = {
 	CVV: 'cvv',
 	AlphaNumericLike: 'alphanumericlike',
 	AlphaNumericPuncLike: 'alphaNumericpunclike',
@@ -1403,7 +1403,9 @@ export const NodeAttributePropertyTypes = {
 	CHECKLIST: 'CHECKLIST',
 	STRING: 'STRING',
 	GEOLOCATION: 'GEOLOCATION',
-	YEAR: 'YEAR'
+	YEAR: 'YEAR',
+	ENUMERATION: 'ENUMERATION',
+	NAME: 'NAME'
 };
 
 const COMMON_DATETIME_ARGS = {
@@ -2099,7 +2101,7 @@ export const FilterRules = {
 	IsNotInModelPropertyCollection: 'is-not-in-model-property-collection',
 	Many2ManyPropertyIsTrue: 'many-2-many-property-is-true'
 };
-export const FilterUI: any = {
+export const FilterUI: { [str: string]: any } = {
 	[FilterRules.EqualsTrue]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'EqualsTrue'

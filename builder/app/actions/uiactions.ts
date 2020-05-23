@@ -3418,7 +3418,7 @@ export function GetMethodPermissionParameters(id: any, all: boolean) {
 export function GetMethodValidationParameters(id: any, all: boolean) {
 	return GetMethod_Parameters(id, 'validation', all);
 }
-export function GetPermissionMethod(permission: any | null) {
+export function GetPermissionMethod(permission: { id: string } | null) {
 	if (permission)
 		return GetLinkChainItem({
 			id: permission.id,
@@ -3960,15 +3960,14 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									currentGraph = GraphMethods.updateNodePropertyDirty(currentGraph, options);
 									break;
 								case NEW_LINK:
-									currentGraph = GraphMethods.newLink(currentGraph, options,
-										(link: GraphLink) => {
-											if (link) {
-												graphOperationOccurences.push({
-													command: GraphMethods.VisualCommand.ADD_CONNECTION,
-													linkId: link.id
-												});
-											}
-										});
+									currentGraph = GraphMethods.newLink(currentGraph, options, (link: GraphLink) => {
+										if (link) {
+											graphOperationOccurences.push({
+												command: GraphMethods.VisualCommand.ADD_CONNECTION,
+												linkId: link.id
+											});
+										}
+									});
 									break;
 								case ADD_LINK_BETWEEN_NODES:
 									currentGraph = GraphMethods.addLinkBetweenNodes(
@@ -4326,10 +4325,12 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
 		if (stamp) setViewPackageStamp(null, stamp);
 
-		let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
-		graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
-			visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
-		});
+		if (!GraphMethods.Paused()) {
+			let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
+			graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
+				visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
+			});
+		}
 		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
 		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
 		rootGraph.linkCount = (<Graph>rootGraph).links.length;

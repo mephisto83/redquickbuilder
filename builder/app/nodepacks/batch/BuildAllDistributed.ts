@@ -170,6 +170,7 @@ export const Add_Component_To_Screen_Options = 'Add Component To Screen Options'
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
+export const ApplyTemplates = 'ApplyTemplates';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
@@ -201,6 +202,7 @@ const buildAllProgress = [
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
+	...waiting(ApplyTemplates),
 	{ name: wait(Add_Component_To_Screen_Options) },
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
@@ -360,7 +362,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		);
 
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
-
+		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 		await threadRun(
 			buildAllProgress,

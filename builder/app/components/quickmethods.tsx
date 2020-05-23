@@ -39,6 +39,7 @@ import {
 	CollectionScreenWithoutDatachainDistributed,
 	CollectionConnectDataChainCollection
 } from '../nodepacks/CollectionDataChainsIntoCollections';
+import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -262,6 +263,13 @@ class QuickMethods extends Component<any, any, any> {
 									title={'Add Title Service'}
 									onClick={() => {
 										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
+									}}
+								/>
+								<TreeViewMenu
+									title={'Apply Templates'}
+									icon="fa fa-plus"
+									onClick={() => {
+										ApplyTemplates(null);
 									}}
 								/>
 								<TreeViewMenu

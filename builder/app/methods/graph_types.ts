@@ -9,6 +9,7 @@ export interface Graph {
 	linkCount?: number;
 	nodeCount?: number;
 	groups: string[];
+	$vGroups?: string[];
 	groupLib: { [index: string]: Group };
 	groupsNodes: QuickAccess<boolean>;
 	nodesGroups: QuickAccess<boolean>;

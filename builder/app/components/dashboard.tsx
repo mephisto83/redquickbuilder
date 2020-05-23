@@ -207,6 +207,9 @@ class Dashboard extends Component<any, any> {
 					if (nodeType === NodeTypes.Property) {
 						result.push(...this.getPropertyContent());
 					}
+					if (GetNodeProp(currentNode, NodeProperties.IsAgent)) {
+						result.push(...this.getAgentContext());
+					}
 					return result;
 				case NodeTypes.PermissionTemplate:
 					result.push(...this.getPermissionTemplateContent());
@@ -1044,17 +1047,52 @@ class Dashboard extends Component<any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
 		if (GetNodeProp(currentNode, NodeProperties.Condition) === ConditionTypes.Enumeration) {
-			result.push({
-				onClick: () => {
-					this.props.setVisual(CONNECTING_NODE, {
-						...LinkProperties.EnumerationLink,
-						singleLink: true,
-						nodeTypes: [ NodeTypes.Enumeration ]
-					});
+			result.push(
+				{
+					onClick: () => {
+						this.props.setVisual(CONNECTING_NODE, {
+							...LinkProperties.EnumerationLink,
+							singleLink: true,
+							nodeTypes: [ NodeTypes.Enumeration ]
+						});
+					},
+					icon: 'fa fa-puzzle-piece',
+					title: Titles.Enumeration
 				},
-				icon: 'fa fa-puzzle-piece',
-				title: Titles.Enumeration
-			});
+				{
+					onClick: () => {
+						this.props.setVisual(CONNECTING_NODE, {
+							...LinkProperties.PropertyLink,
+							singleLink: true,
+							nodeTypes: [ NodeTypes.Property ]
+						});
+					},
+					icon: 'fa fa-circle',
+					title: Titles.Property
+				},
+				{
+					onClick: () => {
+						this.props.setVisual(CONNECTING_NODE, {
+							...LinkProperties.AgentLink,
+							singleLink: true,
+							nodeTypes: [ NodeTypes.Model ]
+						});
+					},
+					icon: 'fa  fa-square',
+					title: Titles.Agents
+				},
+				{
+					onClick: () => {
+						this.props.setVisual(CONNECTING_NODE, {
+							...LinkProperties.ModelTypeLink,
+							singleLink: true,
+							nodeTypes: [ NodeTypes.Model ]
+						});
+					},
+					icon: 'fa  fa-heartbea',
+					title: Titles.Models
+				}
+			);
 		}
 		return result;
 	}
@@ -1071,9 +1109,9 @@ class Dashboard extends Component<any, any> {
 						...LinkProperties.AgentLink,
 						singleLink: true,
 						nodeTypes: [ NodeTypes.Model ],
-            properties: {
-              [NodeProperties.IsAgent]: true
-            }
+						properties: {
+							[NodeProperties.IsAgent]: true
+						}
 					});
 				},
 				icon: 'fa fa-puzzle-piece',
@@ -1122,6 +1160,42 @@ class Dashboard extends Component<any, any> {
 				};
 			})
 		);
+
+		return result;
+	}
+	getAgentContext() {
+		const result = [];
+		const { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+		result.push({
+			onClick: () => {
+				this.props.graphOperation([
+					{
+						operation: UIA.ADD_NEW_NODE,
+						options() {
+							return {
+								nodeType: NodeTypes.PermissionTemplate,
+								links: [
+									{
+										target: currentNode.id,
+										linkProperties: {
+											properties: {
+												...LinkProperties.AgentLink
+											}
+										}
+									}
+								],
+								properties: {
+									[NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Permission Template`
+								}
+							};
+						}
+					}
+				]);
+			},
+			icon: 'fa fa-plus',
+			title: `Permission Template `
+		});
 
 		return result;
 	}

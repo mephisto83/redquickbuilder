@@ -27,8 +27,10 @@ import {
 	CollectionScreenWithoutDatachainDistributed,
 	CollectionComponentNodes,
 	CollectionScreenNodes,
-  CollectionConnectDataChainCollection
+	CollectionConnectDataChainCollection
 } from '../../app/nodepacks/CollectionDataChainsIntoCollections';
+import { SetPause } from '../../app/methods/graph_methods';
+import ApplyTemplates from '../../app/nodepacks/permission/ApplyTemplates';
 
 let app_state;
 
@@ -41,6 +43,7 @@ export default async function executeJob(
 	onChange: Function
 ) {
 	let jobInstancePath = path.join(options.folderPath, options.agentName, options.projectName, options.fileName);
+	SetPause(true);
 	const partPath = path.join(jobInstancePath, JobServiceConstants.INPUT);
 	if (partPath && fs.existsSync(partPath)) {
 		const partContent: string = fs.readFileSync(partPath, 'utf8');
@@ -61,6 +64,11 @@ export default async function executeJob(
 					);
 					console.log('CreateComponentAll completed');
 
+					break;
+				case BAD.ApplyTemplates:
+					await ApplyTemplates((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					break;
 				case BAD.CollectionScreenWithoutDatachainDistributed:
 					await CollectionScreenWithoutDatachainDistributed((model: any) => {

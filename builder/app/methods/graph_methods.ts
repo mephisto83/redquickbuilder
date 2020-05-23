@@ -414,6 +414,7 @@ export function GetNodesInGroup(graph: any, group: any) {
 		[]
 	);
 }
+
 export function addLeaf(graph: any, ops: any) {
 	const { leaf, id } = ops;
 	let leaves = graph.groupLib[id].leaves || [];
@@ -1286,11 +1287,15 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 		throw new Error('invalid grid links');
 	}
 	if (parent) {
-		graph = newLink(graph, {
-			source: parent,
-			target: node.id,
-			properties: linkProperties ? linkProperties.properties : null
-		});
+		graph = newLink(
+			graph,
+			{
+				source: parent,
+				target: node.id,
+				properties: linkProperties ? linkProperties.properties : null
+			},
+			() => {}
+		);
 		if (graph.links.length !== Object.keys(graph.linkLib).length) {
 			throw new Error('invalid grid links');
 		}
@@ -1313,11 +1318,15 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 					if (graph.links.length !== Object.keys(graph.linkLib).length) {
 						throw new Error('invalid grid links');
 					}
-					graph = newLink(graph, {
-						source: node.id,
-						target: link.target,
-						properties: link.linkProperties ? link.linkProperties.properties : null
-					});
+					graph = newLink(
+						graph,
+						{
+							source: node.id,
+							target: link.target,
+							properties: link.linkProperties ? link.linkProperties.properties : null
+						},
+						() => {}
+					);
 				}
 			);
 	}
@@ -2422,7 +2431,10 @@ export function GetLinksForNode(graph: any, options: any): any {
 	return [];
 }
 
-export function GetNodesLinkedTo(graph: any, options: any): any {
+export function GetNodesLinkedTo(
+	graph: any,
+	options: { id?: any; direction?: any; link?: any; componentType?: any; properties?: any }
+): any {
 	if (options) {
 		graph = graph || GetCurrentGraph();
 		const { id, direction, link, componentType, properties } = options;
@@ -3484,11 +3496,31 @@ export interface VisualOperation {
 	nodeId?: string;
 	linkId?: string;
 }
+function getGroupsContainingNode(graph: Graph, nodeId: string) {
+	let nodeGroups: string[] = [];
+	if (graph.nodesGroups[nodeId]) {
+		Object.keys(graph.nodesGroups[nodeId]).forEach((t) => {
+			if (nodeGroups.indexOf(t) === -1) {
+				nodeGroups.push(t);
+				let ancestors = getGroupAncenstors(graph, t);
+				ancestors.forEach((ancestor: string) => {
+					if (nodeGroups.indexOf(ancestor) === -1) {
+						nodeGroups.push(ancestor);
+					}
+				});
+			}
+		});
+	}
+	return nodeGroups;
+}
 export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visualCommand: VisualOperation) {
+	if (Paused()) {
+		return;
+	}
 	if (!visualGraph) {
 		visualGraph = createGraph();
 	}
-	let nodeGroups: string[] = [];
+	let nodeGroups: string[] = visualGraph.$vGroups || [];
 	switch (visualCommand.command) {
 		case VisualCommand.ADD_NODE:
 			if (visualCommand.nodeId) {
@@ -3506,27 +3538,32 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 					});
 				}
 				if (graph.nodesGroups[visualCommand.nodeId]) {
-					Object.keys(graph.nodesGroups[visualCommand.nodeId]).forEach((t) => {
-						if (nodeGroups.indexOf(t) === -1) {
-							nodeGroups.push(t);
-							let ancestors = getGroupAncenstors(graph, t);
-							ancestors.forEach((ancestor: string) => {
-								if (nodeGroups.indexOf(ancestor) === -1) {
-									nodeGroups.push(ancestor);
-								}
-							});
-						}
-					});
+					nodeGroups.push(...getGroupsContainingNode(graph, visualCommand.nodeId));
+					nodeGroups = nodeGroups.unique();
 				}
 			}
 			break;
 		case VisualCommand.REMOVE_NODE:
 			if (visualCommand.nodeId) {
+				visualGraph.groupLib = {};
+				visualGraph.groups = []; // nodeGroups;
+				visualGraph.groupsNodes = {};
+				visualGraph.childGroups = {};
+				visualGraph.nodesGroups = {};
+				visualGraph.parentGroup = {};
+
 				visualGraph = removeNode(visualGraph, { id: visualCommand.nodeId });
+				nodeGroups = [];
+				if (visualGraph) {
+					visualGraph.nodes.forEach((nodeId: string) => {
+						nodeGroups.push(...getGroupsContainingNode(graph, nodeId));
+					});
+				}
+				nodeGroups = nodeGroups.unique();
 			}
-			if (visualGraph && visualGraph.groups) {
-				visualGraph.groups = visualGraph.groups.filter((x) => graph.groupsNodes[x]);
-			}
+			// if (visualGraph && visualGraph.groups) {
+			// 	visualGraph.groups = visualGraph.groups.filter((x) => graph.groupsNodes[x]);
+			// }
 			break;
 		case VisualCommand.ADD_CONNECTION:
 			let link: GraphLink = getLink(graph, { id: visualCommand.linkId });
@@ -3540,6 +3577,7 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 		visualGraph.groupLib = graph.groupLib;
 		visualGraph.groups = graph.groups; // nodeGroups;
 		visualGraph.groupsNodes = graph.groupsNodes;
+		visualGraph.$vGroups = nodeGroups;
 		visualGraph.childGroups = graph.childGroups;
 		visualGraph.nodesGroups = graph.nodesGroups;
 		visualGraph.parentGroup = graph.parentGroup;

@@ -237,8 +237,12 @@ export default class MindMap extends Component<any, any> {
 			g.padding = pad;
 		});
 
-		force.nodes(graph.nodes).groups(graph.groups).links(graph.links).on('tick', tick);
-
+		try {
+			force.nodes(graph.nodes).groups(graph.groups).links(graph.links).on('tick', tick);
+		} catch (e) {
+			console.log(e);
+			return;
+		}
 		const group = svg
 			.selectAll('.group')
 			.data(graph.groups)
@@ -709,12 +713,6 @@ export default class MindMap extends Component<any, any> {
 						if (nl && nl.properties) {
 							nn.properties = { ...nl.properties };
 						}
-						// if (graph.visibleNodes && graph.visibleNodes[nn.id]) {
-						//   if (graph.visibleNodes[nn.id] === 2) nn.fixed = true;
-						//   else {
-						//     nn.fixed = false;
-						//   }
-						// }
 					});
 
 					draw = draw || newNodes.length || removedNodes.length;
@@ -743,9 +741,9 @@ export default class MindMap extends Component<any, any> {
 				}
 
 				if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
-					const graph_groups = graph.groups.filter(
-						(x) => graph.groupLib[x].leaves || graph.groupLib[x].groups
-					);
+					const graph_groups = (graph.$vGroups || graph.groups)
+            .filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
+
 					let removedGroups = null;
 					if (this.props.groupsDisabled) {
 						removedGroups = [].interpolate(0, this.state.graph.groups.length, (x) => x);
@@ -759,8 +757,8 @@ export default class MindMap extends Component<any, any> {
 						const newGroups = graph_groups
 							.relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
 							.filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
-						newGroups.map((nn) => {
-							this.state.graph.groups.push(duplicateGroup(graph.groupLib[nn], this.state.graph.nodes));
+						newGroups.map((nn: any) => {
+							this.state.graph.groups.push(duplicateGroup(graph.groupLib[nn]));
 						});
 						let toremove: any[] = [];
 						graph_groups.forEach((group: any) => {
@@ -808,12 +806,12 @@ function duplicateLink(nn, nodes) {
 		target: nodes.findIndex((x) => x.id === nn.target)
 	};
 }
-function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
-	if (_group) {
-		if (_group.leaves && _group.leaves.length) {
+function applyGroup(mindmapgroup: any, lib_group: any, groups: any, nodes: any) {
+	if (lib_group) {
+		if (lib_group.leaves && lib_group.leaves.length) {
 			mindmapgroup.leaves = mindmapgroup.leaves || [];
 			mindmapgroup.leaves.length = 0;
-			_group.leaves.map((l: any) => {
+			lib_group.leaves.map((l: any) => {
 				let res = nodes.findIndex((x: any) => x.id === l);
 				if (res !== -1 && mindmapgroup.leaves.indexOf(res) === -1) {
 					mindmapgroup.leaves.push(res);
@@ -823,10 +821,10 @@ function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
 			delete mindmapgroup.leaves;
 		}
 
-		if (_group.groups && _group.groups.length) {
+		if (lib_group.groups && lib_group.groups.length) {
 			mindmapgroup.groups = mindmapgroup.groups || [];
 			mindmapgroup.groups.length = 0;
-			_group.groups.forEach((l: any) => {
+			lib_group.groups.forEach((l: any) => {
 				let res = groups.findIndex((x: any) => x.id === l);
 				if (res !== -1 && mindmapgroup.groups.indexOf(res) === -1) {
 					mindmapgroup.groups.push(res);
@@ -853,7 +851,7 @@ function applyGroup(mindmapgroup: any, _group: any, groups: any, nodes: any) {
 	}
 	return true;
 }
-function duplicateGroup(nn, nodes, groups) {
+function duplicateGroup(nn) {
 	const temp = {
 		...nn
 	};

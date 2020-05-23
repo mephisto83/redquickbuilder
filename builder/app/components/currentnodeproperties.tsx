@@ -74,6 +74,7 @@ class CurrentNodeProperties extends Component<any, any> {
                       key={`component-props-${key}`}
                       hideArrow={true}
                       onClick={() => {
+                        console.log(JSON.stringify(nodeProperties[key]));
                         this.props.graphOperation([
                           {
                             operation: UIA.UPDATE_NODE_DIRTY,
