@@ -1582,7 +1582,7 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		if (templateObject) {
 			const templateParameters = GetNodesLinkedTo(graph, {
 				id: templateObject.id,
-				type: LinkType.MethodApiParameters,
+				link: LinkType.MethodApiParameters,
 				direction: SOURCE
 			}).filter((x: any) => GetNodeProp(x, NodeProperties.TemplateParameter));
 

@@ -327,6 +327,12 @@ export function alphanumeric(val: any) {
 		return 'abcdefghijklmnopqrstuvwxyz0123456789'.indexOf(t) === -1;
 	});
 }
+export function numericint(val: any) {
+	return !(val || '').toString().split('').find((t: any) => {
+		t = `${t}`.toLowerCase();
+		return '0123456789'.indexOf(t) === -1;
+	});
+}
 export function alpha(val: any) {
 	return !(val || '').toString().split('').find((t: any) => {
 		t = `${t}`.toLowerCase();

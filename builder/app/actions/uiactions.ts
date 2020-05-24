@@ -1752,6 +1752,8 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 			return `(value${anyType}) => alphanumericLike(value)`;
 		case DataChainFunctionKeys.AlphaNumeric:
 			return `(value${anyType}) => alphanumeric(value)`;
+		case DataChainFunctionKeys.NumericInt:
+			return `(value${anyType}) => numericint(value)`;
 		case DataChainFunctionKeys.AlphaOnly:
 			return `(value${anyType}) => alpha(value)`;
 		case DataChainFunctionKeys.BooleanAnd:
@@ -2369,6 +2371,13 @@ export function GetConditionClause(
 				model: clauseKey,
 				model_property: propertyName,
 				validation_Func_name: 'AlphaNumericLikeAttribute'
+			};
+			break;
+		case NodeConstants.ValidationRules.NumericInt:
+			properties = {
+				model: clauseKey,
+				model_property: propertyName,
+				validation_Func_name: 'NumericIntAttribute'
 			};
 			break;
 		case NodeConstants.ValidationRules.AlphaOnly:

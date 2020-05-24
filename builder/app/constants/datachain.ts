@@ -38,6 +38,7 @@ export const DataChainFunctionKeys = {
 	GreaterThanOrEqualTo: 'Greater than or equal to',
 	AlphaNumericLike: 'Alphanumeric like',
 	AlphaNumeric: 'Alphanumeric',
+	NumericInt: 'NumericInt',
 	AlphaOnly: 'Alpha only',
 	LessThanOrEqualTo: 'Less than or equal to',
 	Equals: 'Are Equal',

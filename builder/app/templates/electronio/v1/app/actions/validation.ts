@@ -39,8 +39,16 @@ export function AlphaNumericLikeAttribute() {
 	return createValidationAttribute(alphanumericLike, createDefaultError(`Only alphanumeric characters.`));
 }
 
+export function AlphaNumericAttribute() {
+	return createValidationAttribute(alphanumeric, createDefaultError(`Only alphanumeric characters.`));
+}
+
 export function AlphaOnlyWithSpacesAttribute() {
 	return createValidationAttribute(alphawithspaces, createDefaultError(`Only alphanumeric characters and spaces.`));
+}
+
+export function NumericIntAttribute() {
+	return createValidationAttribute(alphawithspaces, createDefaultError(`Only numeric characters and spaces.`));
 }
 
 export function IsNullAttribute() {
@@ -327,6 +335,12 @@ export function alphanumeric(val: any) {
 	return !(val || '').toString().split('').find((t: any) => {
 		t = `${t}`.toLowerCase();
 		return 'abcdefghijklmnopqrstuvwxyz0123456789'.indexOf(t) === -1;
+	});
+}
+export function numericint(val: any) {
+	return !(val || '').toString().split('').find((t: any) => {
+		t = `${t}`.toLowerCase();
+		return '0123456789'.indexOf(t) === -1;
 	});
 }
 export function alpha(val: any) {

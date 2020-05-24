@@ -39,7 +39,9 @@ import {
 	GetMethodProps,
 	GetMaestroNode,
 	GetControllerNode,
-	updateJobs
+	updateJobs,
+  GetState,
+  GetCurrentGraph
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -154,8 +156,8 @@ export function publishFiles() {
 export function scaffoldProject(options: any = {}) {
 	const { filesOnly } = options;
 	return (dispatch: any, getState: () => any) => {
-		const state = getState();
-		const root = GetRootGraph(state);
+		const state = GetState();
+		const root = GetCurrentGraph();
 		const solutionName = root.title.split(' ').join('.');
 		const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
 		ensureDirectory(path.join(workspace));
@@ -220,7 +222,7 @@ export function scaffoldProject(options: any = {}) {
 				const namespace = root ? root[GraphKeys.NAMESPACE] : null;
 				const server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
 				const graph = root;
-				const userNode = NodesByType(state, NodeTypes.Model).find((x: any) =>
+				const userNode = NodesByType(GetState(), NodeTypes.Model).find((x: any) =>
 					GetNodeProp(x, NodeProperties.IsUser)
 				);
 				const logicalParents = GetNodesLinkedTo(graph, {
@@ -535,6 +537,8 @@ function generateReactNative(workspace: string, state: any) {
 		});
 
 		for (const fileName in temp) {
+      console.log(fileName);
+      console.log(temp[fileName].relative)
 			ensureDirectory(path.join(workspace, temp[fileName].relative));
 			writeFileSync(
 				path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`),

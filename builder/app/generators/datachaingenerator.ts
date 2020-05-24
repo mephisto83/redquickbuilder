@@ -9,7 +9,8 @@ import {
 	GetNodeProp,
 	GetCurrentGraph,
 	GetRelativeDataChainPath,
-	GetRootGraph
+	GetRootGraph,
+	GetCodeName
 } from '../actions/uiactions';
 import {
 	UITypes,
@@ -76,6 +77,7 @@ export default class DataChainGenerator {
 		}
 		const graph = GetCurrentGraph(state);
 		const funcs = GenerateChainFunctions(options);
+		const enumerations = NodesByType(state, NodeTypes.Enumeration);
 		const collections = GetDataChainCollections(options)
 			.split(NEW_LINE)
 			.sort((a: string, b: any) => {
@@ -102,7 +104,8 @@ export default class DataChainGenerator {
 					template: dcTemplate(
 						collectionsInLanguage,
 						cfunc,
-						[].interpolate(0, chainPath.length + 1).map(() => '../').join('')
+						[].interpolate(0, chainPath.length + 1).map(() => '../').join(''),
+						enumerations
 					),
 					relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
 					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
@@ -110,7 +113,7 @@ export default class DataChainGenerator {
 				};
 			}),
 			{
-				template: dcTemplate(collections, funcs),
+				template: dcTemplate(collections, funcs, '', enumerations),
 				relative: './src/actions',
 				relativeFilePath: `./data-chain${fileEnding}`,
 				name: 'data-chain'
@@ -168,13 +171,18 @@ export default class DataChainGenerator {
 	}
 }
 
-let dcTemplate = (collections: any, funcs: string, rel = '') => {
+let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = []) => {
 	if (!funcs || !funcs.trim()) {
 		if (!collections) {
 			return `export default {}`;
 		}
 		return `${collections}`;
 	}
+	let enumeration_imports = enumerations
+		.map((enums) => {
+			return `import { ${GetCodeName(enums)} } from '../${rel}constants/${GetJSCodeName(enums)}';`;
+		})
+		.join(NEW_LINE);
 	return `import {
     GetC,
     updateScreenInstanceObject,
@@ -217,7 +225,7 @@ import {
     ZipAttribute,
     ZipEmptyAttribute
 } from './${rel}validation';
-
+${enumeration_imports}
 import * as navigate from '../${rel}actions/navigationActions';
 import * as $service from '../${rel}util/service';
 import routes from '../${rel}constants/routes';

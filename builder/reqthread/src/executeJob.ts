@@ -31,6 +31,7 @@ import {
 } from '../../app/nodepacks/CollectionDataChainsIntoCollections';
 import { SetPause } from '../../app/methods/graph_methods';
 import ApplyTemplates from '../../app/nodepacks/permission/ApplyTemplates';
+import ApplyValidationFromProperties from '../../app/nodepacks/permission/ApplyValidationFromProperties';
 
 let app_state;
 
@@ -67,6 +68,11 @@ export default async function executeJob(
 					break;
 				case BAD.ApplyTemplates:
 					await ApplyTemplates((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case BAD.ApplyValidationFromProperties:
+					await ApplyValidationFromProperties((model: any) => {
 						return filter && filter.models.indexOf(model.id) !== -1;
 					});
 					break;
@@ -141,6 +147,7 @@ export default async function executeJob(
 	if (fs.existsSync(partPath)) {
 		await sleep();
 	}
+	SetPause(false);
 
 	return jobConfig;
 }

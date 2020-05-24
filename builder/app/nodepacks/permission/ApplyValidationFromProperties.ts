@@ -5,7 +5,10 @@ import {
 	GetNodeTitle,
 	GetModelPropertyChildren,
 	GetFunctionMethodKey,
-	GetValidatorMethod
+	GetValidatorMethod,
+  graphOperation,
+  GetDispatchFunc,
+  GetStateFunc
 } from '../../actions/uiactions';
 import {
 	NodeTypes,
@@ -22,7 +25,13 @@ import NameLikeValidation from '../validation/NameLikeValidation';
 import DescriptionLikeValidation from '../validation/DescriptionLikeValidation';
 import AddressValidation from '../validation/AddressValidation';
 import StringValidation from '../validation/StringValidation';
-import { EmailValidationPart, CreditCardValidationPart, OneOfAttributePart } from '../validation/validation-parts';
+import {
+	EmailValidationPart,
+	CreditCardValidationPart,
+	OneOfAttributePart,
+	AlphaNumericValidationPart,
+	NumericIntValidationPart
+} from '../validation/validation-parts';
 
 export default function ApplyValidationFromProperties(filter?: any) {
 	let result: any[] = [];
@@ -74,11 +83,14 @@ export default function ApplyValidationFromProperties(filter?: any) {
 							id: prop.id,
 							link: LinkType.AttributeLink
 						});
-						if (attr && condition) {
+						if (attr) {
 							let attributeType = GetNodeProp(attr, NodeProperties.UIAttributeType, graph);
 							switch (attributeType) {
 								case NodeAttributePropertyTypes.ADDRESS:
 									return function() {
+										if (!condition) {
+											return [];
+										}
 										return AddressValidation({
 											condition: methodKey ? condition.id : null,
 											property: prop.id,
@@ -90,6 +102,9 @@ export default function ApplyValidationFromProperties(filter?: any) {
 								case NodeAttributePropertyTypes.COUNTRY:
 								case NodeAttributePropertyTypes.NAME:
 									return function() {
+										if (!condition) {
+											return [];
+										}
 										return NameLikeValidation({
 											condition: methodKey ? condition.id : null,
 											property: prop.id,
@@ -100,46 +115,97 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									break;
 								case NodeAttributePropertyTypes.CARMAKE:
 								case NodeAttributePropertyTypes.CARMODEL:
-								case NodeAttributePropertyTypes.CARYEAR:
 									return function() {
-										return function() {
-											return StringValidation({
-												condition: methodKey ? condition.id : null,
-												property: prop.id,
-												methodKey: methodKey,
-												minLength: 1,
-												methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
-											});
-										};
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: methodKey ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											minLength: 1,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
 									};
 
 								case NodeAttributePropertyTypes.EMAIL:
 									return function() {
-										return function() {
-											return StringValidation({
-												condition: condition ? condition.id : null,
-												property: prop.id,
-												methodKey: methodKey,
-												sections: {
-													...EmailValidationPart()
-												},
-												minLength: 1,
-												methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
-											});
-										};
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											sections: {
+												...EmailValidationPart()
+											},
+											minLength: 1,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
+									};
+								case NodeAttributePropertyTypes.VIN:
+									return function() {
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											sections: {
+												...AlphaNumericValidationPart()
+											},
+											minLength: 17,
+											maxLength: 17,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
+									};
+								case NodeAttributePropertyTypes.SOCIALSECURITY:
+									return function() {
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											sections: {
+												...NumericIntValidationPart()
+											},
+											minLength: 9,
+											maxLength: 9,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
 									};
 								case NodeAttributePropertyTypes.YEAR:
+								case NodeAttributePropertyTypes.CARYEAR:
 									return function() {
-										return function() {
-											return StringValidation({
-												condition: condition ? condition.id : null,
-												property: prop.id,
-												methodKey: methodKey,
-												maxLength: 4,
-												minLength: 4,
-												methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
-											});
-										};
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											maxLength: 4,
+											minLength: 4,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
+									};
+								case NodeAttributePropertyTypes.ZIPCODE:
+									return function() {
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											maxLength: 5,
+											minLength: 5,
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
 									};
 								case NodeAttributePropertyTypes.ENUMERATION:
 									let enumNode = GetNodeLinkedTo(graph, {
@@ -148,6 +214,9 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									});
 									if (enumNode) {
 										return function() {
+											if (!condition) {
+												return [];
+											}
 											return StringValidation({
 												condition: condition ? condition.id : null,
 												property: prop.id,
@@ -164,20 +233,24 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									}
 								case NodeAttributePropertyTypes.CREDITCARD:
 									return function() {
-										return function() {
-											return StringValidation({
-												condition: condition ? condition.id : null,
-												property: prop.id,
-												methodKey: methodKey,
-												sections: {
-													...CreditCardValidationPart()
-												},
-												methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
-											});
-										};
+										if (!condition) {
+											return [];
+										}
+										return StringValidation({
+											condition: condition ? condition.id : null,
+											property: prop.id,
+											methodKey: methodKey,
+											sections: {
+												...CreditCardValidationPart()
+											},
+											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
+										});
 									};
 								case NodeAttributePropertyTypes.LONGSTRING:
 									return function() {
+										if (!condition) {
+											return [];
+										}
 										return DescriptionLikeValidation({
 											condition: methodKey ? condition.id : null,
 											property: prop.id,
@@ -185,7 +258,6 @@ export default function ApplyValidationFromProperties(filter?: any) {
 											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
 										});
 									};
-									break;
 							}
 						}
 						return false;
@@ -195,5 +267,5 @@ export default function ApplyValidationFromProperties(filter?: any) {
 		}
 	});
 
-	return result;
+	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 }

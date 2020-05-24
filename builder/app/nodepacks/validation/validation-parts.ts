@@ -65,3 +65,27 @@ export function OneOfAttributePart(enumNode: Node | string) {
 		}
 	};
 }
+
+export function AlphaNumericValidationPart() {
+	return {
+		[uuidv4()]: {
+			type: 'alphanumeric',
+			code: { csharp: 'AlphaNumericAttribute' },
+			template: './app/templates/validation/validation_generic.tpl',
+			templatejs: './app/templates/validation/validation_generic_js.tpl',
+			arguments: { value: { type: 'STRING', nodeType: 'model-property' } }
+		}
+	};
+}
+
+export function NumericIntValidationPart() {
+	return {
+		[uuidv4()]: {
+			type: 'numericint',
+			code: { csharp: 'NumericIntAttribute' },
+			template: './app/templates/validation/validation_generic.tpl',
+			templatejs: './app/templates/validation/validation_generic_js.tpl',
+			arguments: { value: { type: 'STRING', nodeType: 'model-property' } }
+		}
+	};
+}

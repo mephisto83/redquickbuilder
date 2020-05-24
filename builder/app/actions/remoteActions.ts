@@ -21,7 +21,9 @@ import {
 	GetStateFunc,
 	GetCurrentGraph,
 	ApplicationConfig,
-	clearPinned
+	clearPinned,
+  VISUAL_GRAPH,
+  UIC
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -113,7 +115,8 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 					opened_graph = { ...default_graph, ...opened_graph };
 					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
 					SaveGraph(opened_graph, dispatch, true);
-					setupCache(opened_graph);
+          setupCache(opened_graph);
+          dispatch(UIC(VISUAL_GRAPH, opened_graph.id, createGraph()));
 					if (unpinned) {
 						clearPinned();
 					}

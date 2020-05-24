@@ -105,6 +105,24 @@ export default class Generator {
 					state,
 					key
 				});
+			case ReactNativeTypes.ConstantsTs:
+				const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
+					const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
+					const larg_ts: any = {};
+					enums_ts.forEach((t: { value: any }) => {
+						larg_ts[MakeConstant(t.value || t)] = t.value;
+					});
+					return {
+						name: GetNodeProp(node, NodeProperties.CodeName),
+						model: larg_ts
+					};
+				});
+
+				return ConstantsGenerator.GenerateTs({
+					values: [ ...enumerations_ts ],
+					state,
+					key
+				});
 			case GeneratedTypes.Permissions:
 				return PermissionGenerator.Generate({ state, key, language });
 			case GeneratedTypes.Validators:

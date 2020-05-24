@@ -20,7 +20,8 @@ import {
 	UITypes,
 	LinkProperties,
 	LinkPropertyKeys,
-	SelectorType
+	SelectorType,
+	DefaultPropertyValueType
 } from '../constants/nodetypes';
 import AddNameDescription from '../nodepacks/AddNameDescription';
 import GenericPropertyContainer from './genericpropertycontainer';
@@ -392,6 +393,55 @@ class ContextMenu extends Component<any, any> {
 									})}
 								</TreeViewMenu>
 							);
+						}
+						if (enumeration) {
+
+							const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+							if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Property) {
+								result.push(
+									<TreeViewItemContainer>
+										<SelectInput
+											label={`${Titles.Component} A`}
+											options={enumeration.map((v) => ({ title: v.value, value: v.id }))}
+											onChange={(value: any) => {
+												this.props.graphOperation([
+													{
+														operation: UIA.CHANGE_NODE_PROPERTY,
+														options() {
+															return {
+																prop: NodeProperties.DefaultPropertyValue,
+																id: currentNode.id,
+																value: value
+															};
+														}
+													},
+													{
+														operation: UIA.CHANGE_NODE_PROPERTY,
+														options() {
+															return {
+																prop: NodeProperties.DefaultPropertyValueType,
+																id: currentNode.id,
+																value: DefaultPropertyValueType.Enumeration
+															};
+														}
+													},
+													{
+														operation: UIA.CHANGE_NODE_PROPERTY,
+														options() {
+															return {
+																prop: NodeProperties.EnumerationReference,
+																id: currentNode.id,
+																value: link.target
+															};
+														}
+													}
+												]);
+											}}
+											value={UIA.GetNodeProp(currentNode, NodeProperties.DefaultPropertyValue)}
+										/>
+									</TreeViewItemContainer>
+								);
+							}
 						}
 						break;
 					case LinkType.ComponentExternalConnection:

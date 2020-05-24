@@ -171,6 +171,7 @@ const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
 export const ApplyTemplates = 'ApplyTemplates';
+export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
@@ -202,7 +203,8 @@ const buildAllProgress = [
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	{ name: Add_Component_To_Screen_Options },
-	...waiting(ApplyTemplates),
+  ...waiting(ApplyTemplates),
+  ...waiting(ApplyValidationFromProperties),
 	{ name: wait(Add_Component_To_Screen_Options) },
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
@@ -222,7 +224,8 @@ export function GetStepCount() {
 	return buildAllProgress.length;
 }
 export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
-	setCommandToRun(command);
+  setCommandToRun(command);
+  SetPause(true);
 	const uiTypes = {
 		[UITypes.ElectronIO]: true,
 		[UITypes.ReactWeb]: true,
@@ -362,7 +365,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		);
 
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
-		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
+    await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
+    await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
+
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 		await threadRun(
 			buildAllProgress,
@@ -378,7 +383,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		console.log(e);
 	}
 
-	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+  setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+  SetPause(false);
+
 }
 
 BuildAllDistributed.title = 'Build All Distributed';

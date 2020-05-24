@@ -13,6 +13,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 
 const CONSTANTS_CLASS = './app/templates/constants.tpl';
+const CONSTANTS_JS_CLASS = './app/templates/constants_js.tpl';
 
 export default class ConstantsGenerator {
 	static Tabs(c: number) {
@@ -58,6 +59,44 @@ export default class ConstantsGenerator {
 					namespace,
 					space: NameSpace.Constants
 				})
+			};
+		});
+
+		return result;
+	}
+
+	static GenerateTs(options: { values: any; state: any; key?: any }) {
+		var { values = [], state } = options;
+		let graphRoot = GetRootGraph(state);
+		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
+
+		let _constantsClass = fs.readFileSync(CONSTANTS_JS_CLASS, 'utf8');
+		let result: any = {};
+		values.map((value: { model: any; name: any }) => {
+			let { model, name } = value;
+			let constantsClass = _constantsClass;
+			var consts = Object.keys(model)
+				.map((key) => {
+					let template = `{{name}} = "{{value}}"`;
+					let temp = bindTemplate(template, {
+						name: key,
+						value: model[key]
+					});
+					return ConstantsGenerator.Tabs(3) + temp;
+				})
+				.join(`,${jNL}`);
+
+			constantsClass = bindTemplate(constantsClass, {
+				constants: consts,
+				constants_type: name
+			});
+
+			result[`./${name}.ts`] = {
+				id: name,
+				name: name,
+				relative: './src/constants',
+				relativeFilePath: `./${name.toJavascriptName()}.ts`,
+				template: constantsClass
 			};
 		});
 

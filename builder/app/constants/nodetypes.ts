@@ -107,6 +107,7 @@ export const GeneratedTypes = {
 export const ReactNativeTypes = {
 	Screens: 'screens',
 	Navigation: 'navigation',
+	ConstantsTs: 'constantsts',
 	Keys: 'keys',
 	ControllerActions: 'controller-actions',
 	TitleService: 'title-service',
@@ -299,12 +300,18 @@ export const SelectorType = {
 	InternalProperties: 'InternalProperties'
 };
 
+export const DefaultPropertyValueType = {
+	Enumeration: 'Enumeration'
+};
+
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
 	IsFetchParameter: 'IsFetchParameter',
 	ViewModelKey: 'ViewModelKey',
 	StateKey: 'StateKey',
+	DefaultPropertyValueType: 'DefaultPropertyValueType',
+	DefaultPropertyValue: 'DefaultPropertyValue',
 	GridPlacement: 'GridPlacement',
 	IsFetchDataChainStorage: 'IsFetchDataChainStorage',
 	GridRowCount: 'GridRowCount',
@@ -1262,6 +1269,7 @@ export const UITypes = {
 export const ValidationRules: { [str: string]: string } = {
 	CVV: 'cvv',
 	AlphaNumericLike: 'alphanumericlike',
+	AlphaNumeric: 'alphanumeric',
 	AlphaNumericPuncLike: 'alphaNumericpunclike',
 	AlphaOnly: 'alphaonly',
 	NumericOnly: 'numericonly',
@@ -1390,6 +1398,7 @@ export const NodeAttributePropertyTypes = {
 	MONTH: 'MONTH',
 	STATE: 'STATE',
 	CHOICE: 'CHOICE',
+	ZIPCODE: 'ZIPCODE',
 	NUMBER: 'NUMBER',
 	SLIDER: 'SLIDER',
 	DATE: 'DATE',
@@ -2308,6 +2317,14 @@ export const FilterUI: { [str: string]: any } = {
 		templatejs: './app/templates/validation/validation_generic_js.tpl',
 		arguments: { ...COMMON_STRING_ARGS }
 	},
+	[ValidationRules.AlphaNumeric]: {
+		code: {
+			[ProgrammingLanguages.CSHARP]: 'AlphaNumericAttribute'
+		},
+		template: './app/templates/validation/validation_generic.tpl',
+		templatejs: './app/templates/validation/validation_generic_js.tpl',
+		arguments: { ...COMMON_STRING_ARGS }
+	},
 	[ValidationRules.AlphaOnly]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'AlphaOnlyAttribute'
@@ -2485,6 +2502,12 @@ export const ValidationUI: any = {
 	[ValidationRules.AlphaNumericLike]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'AlphaNumericLikeAttribute'
+		},
+		arguments: { ...COMMON_STRING_ARGS }
+	},
+	[ValidationRules.AlphaNumeric]: {
+		code: {
+			[ProgrammingLanguages.CSHARP]: 'AlphaNumericAttribute'
 		},
 		arguments: { ...COMMON_STRING_ARGS }
 	},

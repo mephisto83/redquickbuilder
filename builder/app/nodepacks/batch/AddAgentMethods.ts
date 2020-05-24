@@ -14,9 +14,10 @@ import {
 import { NodeTypes, NodeProperties, LinkType, Methods } from '../../constants/nodetypes';
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';
-import { existsLinksBetween, findLink, existsLinkBetween } from '../../methods/graph_methods';
+import { existsLinksBetween, findLink, existsLinkBetween, Paused, SetPause } from '../../methods/graph_methods';
 
 export default async function AddAgentMethods(progresFunc: any) {
+  SetPause(true);
 	const agents = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model,
 		[NodeProperties.IsAgent]: (v: string | boolean) => v === 'true' || v === true,
@@ -85,5 +86,6 @@ export default async function AddAgentMethods(progresFunc: any) {
 		});
 	});
 
+  SetPause(false);
 	return [];
 }

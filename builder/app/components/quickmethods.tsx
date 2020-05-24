@@ -40,6 +40,8 @@ import {
 	CollectionConnectDataChainCollection
 } from '../nodepacks/CollectionDataChainsIntoCollections';
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
+import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
+import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -270,6 +272,20 @@ class QuickMethods extends Component<any, any, any> {
 									icon="fa fa-plus"
 									onClick={() => {
 										ApplyTemplates(null);
+									}}
+								/>
+								<TreeViewMenu
+									title={'Apply Validation From Properties'}
+									icon="fa fa-plus"
+									onClick={() => {
+										ApplyValidationFromProperties(null);
+									}}
+								/>
+								<TreeViewMenu
+									title={'Add Agent Methods'}
+									icon="fa fa-plus"
+									onClick={() => {
+										AddAgentMethods(() => {});
 									}}
 								/>
 								<TreeViewMenu
