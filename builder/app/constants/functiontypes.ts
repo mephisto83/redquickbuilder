@@ -26,6 +26,8 @@ export const FunctionTypes: any = {
 	Get_Object_Agent_Value__IListObject_By_Specific: 'Get/Object/Agent/Value => IList<Object> specific id',
 	//Delete
 	Delete_M2M_By_Reference: 'Delete M2M by reference => list',
+	//Unique object to an agent function
+	Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
 
 	//Functions with Object result
 	Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
@@ -667,6 +669,42 @@ export const GET_QUERY_PARAMETERS = {
 };
 
 export const MethodFunctions: any = {
+  [FunctionTypes.Get_Unique_Object_To_Agent]:{
+    title: Titles.Create_Object__Object,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Unique ${t} by ${a}`;
+		},
+		template: './app/templates/standard/unique_model_to_agent.tpl',
+		interface: './app/templates/standard/unique_model_to_agent_interface.tpl',
+		templates: {},
+		permission: {
+			...PERMISSION_DEFAULTS
+		},
+		parameters: {
+			body: false,
+			parameters: false
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			...COMMON_CONSTRAINTS_OBJECT_METHOD,
+			...COMMON_CREATE_UPDATE_CONSTRAINTS
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
 	[FunctionTypes.Create_Object__Object]: {
 		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
@@ -1208,7 +1246,6 @@ export const MethodFunctions: any = {
 		method: Methods.Create,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
-
 	[FunctionTypes.Create_Parent$Child_Agent_Value__IListChild]: {
 		title: Titles.Create_Parent$Child_Agent_Value__IListChild,
 		titleTemplate: function(t: any, a: any) {
@@ -1332,7 +1369,6 @@ export const MethodFunctions: any = {
 		...COMMON_FUNCTION_REQUIREMENTS,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
-
 	[FunctionTypes.Get_Object_Agent_Value__IListObject_By_Specific]: {
 		title: Titles.Get_Object_Agent_Value__IListObject_By_Specific,
 		titleTemplate: function(t: any, a: any) {
