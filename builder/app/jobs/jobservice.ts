@@ -312,7 +312,8 @@ export default class JobService {
 		if (!batchSize) {
 			throw new Error('missing batch size');
 		}
-		let chunks = models.chunk(batchSize);
+		let available_agents = await this.GetProjects();
+		let chunks = models.chunk(Math.max(Math.floor(models.length / available_agents.length), batchSize));
 		if (!fs.existsSync(JobPath())) {
 			fs.mkdirSync(JobPath());
 		}
