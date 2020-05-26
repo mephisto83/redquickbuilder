@@ -23,13 +23,19 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 	const result: any = [];
 	const models = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model
-	}).filter((v) => !GetNodeProp(v, NodeProperties.IsViewModel));
+	})
+		.filter((v) => !GetNodeProp(v, NodeProperties.IsViewModel))
+		.filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
 	const agents = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model,
 		[NodeProperties.IsAgent]: (v: any) => v
 	}).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
+	console.log('----------------- agents ---------------------------');
 	agents.map((v) => console.log(GetNodeTitle(v)));
+	console.log('----------------- end agents -----------------------');
+	console.log('----------------- model ---------------------------');
 	models.map((v) => console.log(GetNodeTitle(v)));
+	console.log('----------------- end models -----------------------');
 	await agents.forEachAsync(async (agent: any, agentIndex: any, agentCount: any) => {
 		if (progressFunc) {
 			await progressFunc((agentIndex + 0.25) / agentCount);

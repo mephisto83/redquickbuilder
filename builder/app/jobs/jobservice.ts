@@ -305,7 +305,8 @@ export default class JobService {
 		}
 		let models: string[] = NodesByType(null, modelTypes).map((x: Node) => x.id);
 		if (!models || !models.length) {
-			throw new Error('nothing to filter for batching');
+			// throw new Error('nothing to filter for batching');
+			console.warn('nothing to filter for batching');
 		}
 		// let targets = await JobService.getAgentDirectories();
 		let graph = GetCurrentGraph();
@@ -313,7 +314,12 @@ export default class JobService {
 			throw new Error('missing batch size');
 		}
 		let available_agents = await this.GetProjects();
-		let chunks = models.chunk(Math.max(Math.floor(models.length / available_agents.length), batchSize));
+		let chunkSize = Math.max(Math.floor(models.length / (available_agents.length * 2)), 1);
+		if (isNaN(chunkSize)) {
+			chunkSize = 1;
+		}
+		console.log(`chunkSize : ${chunkSize}`);
+		let chunks = models.chunk(chunkSize);
 		if (!fs.existsSync(JobPath())) {
 			fs.mkdirSync(JobPath());
 		}

@@ -164,7 +164,7 @@ const Wait_For_Screen_Connect = 'Wait_For_Screen_Connect';
 const Update_Screen_Urls = 'Update_Screen_Urls';
 const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
 const Modify_Update_Links = 'Modify_Update_Links';
-const Setup_View_Types = 'Setup_View_Types';
+export const Setup_View_Types = 'Setup_View_Types';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
@@ -199,12 +199,13 @@ const buildAllProgress = [
 	{ name: Wait_For_Screen_Connect },
 	{ name: Collect_Screen_Connect_Into_Graph },
 	{ name: Modify_Update_Links },
-	{ name: Setup_View_Types },
+	// { name: Setup_View_Types },
+	...waiting(Setup_View_Types),
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
-  ...waiting(Add_Component_To_Screen_Options),
-  ...waiting(ApplyTemplates),
-  ...waiting(ApplyValidationFromProperties),
+	...waiting(Add_Component_To_Screen_Options),
+	...waiting(ApplyTemplates),
+	...waiting(ApplyValidationFromProperties),
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
 	...waiting(CollectionComponentNodes),
@@ -223,8 +224,8 @@ export function GetStepCount() {
 	return buildAllProgress.length;
 }
 export default async function BuildAllDistributed(command: string, currentJobFile: JobFile) {
-  setCommandToRun(command);
-  SetPause(true);
+	setCommandToRun(command);
+	SetPause(true);
 	const uiTypes = {
 		[UITypes.ElectronIO]: true,
 		[UITypes.ReactWeb]: true,
@@ -333,9 +334,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Modify_Update_Links, async (progresFunc: (arg0: number) => any) => {
 			await graphOperation(ModifyUpdateLinks())(GetDispatchFunc(), GetStateFunc());
 		});
-		await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {
-			await SetupViewTypes(progresFunc);
-		});
+		// await run(buildAllProgress, Setup_View_Types, async (progresFunc: any) => {
+		// 	await SetupViewTypes(progresFunc, null);
+		// });
+		await threadRun(buildAllProgress, Setup_View_Types, currentJobFile, NodeTypes.ViewType);
 
 		await run(buildAllProgress, Have_All_Properties_On_Executors, async (progresFunc: any) => {
 			await HaveAllPropertiesOnExecutors(progresFunc);
@@ -364,8 +366,8 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		);
 
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
-    await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
-    await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
+		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
+		await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
 
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 		await threadRun(
@@ -382,9 +384,8 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		console.log(e);
 	}
 
-  setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
-  SetPause(false);
-
+	setFlag(false, 'hide_new_nodes', Flags.HIDE_NEW_NODES);
+	SetPause(false);
 }
 
 BuildAllDistributed.title = 'Build All Distributed';

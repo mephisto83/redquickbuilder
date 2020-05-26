@@ -50,6 +50,7 @@ class CurrentJobProgressView extends Component<any, any> {
 								<tbody>
 									<tr>
 										<th />
+										<th />
 										<th>Name</th>
 										<th>Agent</th>
 										<th>Ready</th>
@@ -82,6 +83,7 @@ class CurrentJobProgressView extends Component<any, any> {
 																: 'fa-chevron-right'}`}
 														/>
 													</td>
+													<td>{jobIndex + 1}</td>
 													<td>{agentProject.name}</td>
 													<td>{agentProject.agent}</td>
 													<td>

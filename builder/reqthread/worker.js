@@ -16,7 +16,7 @@ let distribution = new Distribution();
     workingDirectory:dir,
     throttle: 120 * 1000,
     threads: adata.threads || 1,
-    remoteServerHost: '192.168.1.125',
+    remoteServerHost: '192.168.1.146',
     remoteServerPort: 7973
   })
 

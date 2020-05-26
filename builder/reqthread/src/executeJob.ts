@@ -32,6 +32,7 @@ import {
 import { SetPause } from '../../app/methods/graph_methods';
 import ApplyTemplates from '../../app/nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../../app/nodepacks/permission/ApplyValidationFromProperties';
+import SetupViewTypes from '../../app/nodepacks/batch/SetupViewTypes';
 
 let app_state;
 
@@ -65,6 +66,14 @@ export default async function executeJob(
 					);
 					console.log('CreateComponentAll completed');
 
+					break;
+				case BAD.Setup_View_Types:
+					await SetupViewTypes(
+						() => {},
+						(model: any) => {
+							return filter && filter.models.indexOf(model.id) !== -1;
+						}
+					);
 					break;
 				case BAD.ApplyTemplates:
 					await ApplyTemplates((model: any) => {
