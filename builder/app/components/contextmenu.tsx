@@ -21,7 +21,8 @@ import {
 	LinkProperties,
 	LinkPropertyKeys,
 	SelectorType,
-	DefaultPropertyValueType
+	DefaultPropertyValueType,
+	NodeAttributePropertyTypes
 } from '../constants/nodetypes';
 import AddNameDescription from '../nodepacks/AddNameDescription';
 import GenericPropertyContainer from './genericpropertycontainer';
@@ -106,6 +107,7 @@ import { MenuTreeOptions } from '../constants/menu';
 import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from '../nodepacks/batch/SetupViewTypes';
 import { SecondaryOptions } from '../constants/visual';
 import SetupEnumerationPermissionTemplate from '../nodepacks/permission/SetupEnumerationPermissionTemplate';
+import AddAttributeOfType from '../nodepacks/attributes/AddAttributeOfType';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1111,6 +1113,37 @@ class ContextMenu extends Component<any, any> {
 			/>
 		);
 		switch (currentNodeType) {
+			case NodeTypes.Property:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						{Object.keys(NodeAttributePropertyTypes).sort((a, b) => a.localeCompare(b)).map((key) => {
+							return (
+								<TreeViewMenu
+									active
+									title={key}
+									key={key}
+									onClick={() => {
+										this.props.graphOperation(
+											AddAttributeOfType({
+												property: currentNode.id,
+												attributename: key,
+												uiAttributeType: NodeAttributePropertyTypes[key]
+											})
+										);
+									}}
+								/>
+							);
+						})}
+					</TreeViewMenu>
+				];
 			case NodeTypes.DataChainCollection:
 				return [
 					<TreeViewMenu
