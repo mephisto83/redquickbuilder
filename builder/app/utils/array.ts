@@ -97,8 +97,8 @@ declare global {
 			value: async function(func: (arg0: any, arg1: any, arg2: any) => any) {
 				const collection = this;
 				let promise = Promise.resolve();
-				[].interpolate(0, collection.length, (i) => {
-					promise = promise.then(async () => func(collection[i], i, collection.length));
+				[].interpolate(0, collection.length, (i: any) => {
+					promise = promise.then(async () => await func(collection[i], i, collection.length));
 				});
 				// }
 				return promise;

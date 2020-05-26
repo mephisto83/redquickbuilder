@@ -96,7 +96,7 @@ export async function StreamGraph(
 	fileNames: string[],
 	callback: (key: any, obj: any, type: string) => void
 ) {
-	console.log('load broken graph');
+	console.log('stream broken graph');
 	console.log(relPath);
 	console.log(fileNames);
 	await streamLine(relPath, fileNames, callback);
@@ -111,8 +111,8 @@ async function streamLine(
 
 	let bucket = '';
 	await fileNames.map((fname) => path_join(relPath, fname)).forEachAsync(async (filename: string, index: number) => {
-		console.log(`Reading : ${filename}`);
 		return await new Promise((resolve, fail) => {
+			console.log(`Reading : ${filename}`);
 			var instream = fs.createReadStream(filename);
 			var rl = readline.createInterface(instream);
 			rl.on('line', function(line: string) {
@@ -145,7 +145,7 @@ async function streamLine(
 		});
 	});
 	if (bucket) {
-    throw new Error('not supported type');
+		throw new Error('not supported type');
 	}
 }
 
@@ -158,8 +158,8 @@ async function readLine(relPath: string, fileNames: string[]) {
 
 	let bucket = '';
 	await fileNames.map((fname) => path_join(relPath, fname)).forEachAsync(async (filename: string, index: number) => {
-		console.log(`Reading : ${filename}`);
 		return await new Promise((resolve, fail) => {
+			console.log(`Reading : ${filename}`);
 			var instream = fs.createReadStream(filename);
 			var rl = readline.createInterface(instream);
 			rl.on('line', function(line: string) {

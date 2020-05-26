@@ -27,7 +27,8 @@ let runnerContext: RunnerContext = {
 	commandCenter: {
 		commandCenterPort: null,
 		commandCenterHost: null
-	}
+	},
+	jobCompletionList: Promise.resolve()
 };
 (async function runner() {
 	try {
@@ -144,8 +145,50 @@ async function tellCommandCenter() {
 		}
 	}
 }
+async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage): Promise<void> {
+	let relativePath = path_join(
+		JobServiceConstants.JobPath(),
+		communicationTower.agentName || '',
+		message.projectName,
+		message.fileName
+	);
+	if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
+		console.debug(relativePath);
+		let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
+		await StoreGraph(content, path_join(relativePath, JobServiceConstants.OUTPUT_GRAPH));
+		let completed = await JobService.SetJobPartComplete(relativePath);
+		// await JobService.SetJobPartComplete(relativePath);
+
+		if (!completed) {
+			throw new Error('job was not set to completed');
+		}
+		// fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+		let temp: any = message;
+		if (
+			temp.agent &&
+			runnerContext.agents &&
+			temp.name &&
+			runnerContext.agents[temp.agent] &&
+			runnerContext.agents[temp.agent].projects[temp.name]
+		) {
+			runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
+			runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
+		}
+		await tellCommandCenter();
+	}
+}
+function AppendToJobCompletedList(promise: any) {
+	runnerContext.jobCompletionList = runnerContext.jobCompletionList
+		.then(promise)
+		.catch((e) => {
+			console.log(e);
+		})
+		.then(async () => {
+			console.log('completed job from completed list');
+			await tellCommandCenter();
+		});
+}
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
-	await sleep(10 * 1000);
 	// console.debug('CompletedJobItem');
 	// console.debug('handing completed job item');
 	if (message.projectName) {
@@ -160,26 +203,29 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					console.debug(relativePath);
-					let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
-					await StoreGraph(content, path_join(relativePath, JobServiceConstants.OUTPUT_GRAPH));
-					let completed = await JobService.SetJobPartComplete(relativePath);
-					// await JobService.SetJobPartComplete(relativePath);
+					AppendToJobCompletedList(async () => {
+						return pullCompletedJobItemTogether(message);
+					});
+					// let content = await JobService.JoinFile(relativePath, JobServiceConstants.OUTPUT);
+					// await StoreGraph(content, path_join(relativePath, JobServiceConstants.OUTPUT_GRAPH));
+					// let completed = await JobService.SetJobPartComplete(relativePath);
+					// // await JobService.SetJobPartComplete(relativePath);
 
-					if (!completed) {
-						throw new Error('job was not set to completed');
-					}
-					// fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
-					let temp: any = message;
-					if (
-						temp.agent &&
-						runnerContext.agents &&
-						temp.name &&
-						runnerContext.agents[temp.agent] &&
-						runnerContext.agents[temp.agent].projects[temp.name]
-					) {
-						runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
-						runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
-					}
+					// if (!completed) {
+					// 	throw new Error('job was not set to completed');
+					// }
+					// // fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
+					// let temp: any = message;
+					// if (
+					// 	temp.agent &&
+					// 	runnerContext.agents &&
+					// 	temp.name &&
+					// 	runnerContext.agents[temp.agent] &&
+					// 	runnerContext.agents[temp.agent].projects[temp.name]
+					// ) {
+					// 	runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
+					// 	runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
+					// }
 					await tellCommandCenter();
 					return {
 						success: true
@@ -206,11 +252,10 @@ async function canReturnResults(message: RedQuickDistributionMessage): Promise<L
 	if (message.agentName) {
 		if (!communicationTower.receivingFile) {
 			console.log('can send a file ');
-    }
-    else {
-      console.log('cant send a file')
-    }
-    console.log(message);
+		} else {
+			console.log('cant send a file');
+		}
+		console.log(message);
 		return {
 			success: !communicationTower.receivingFile,
 			error: communicationTower.receivingFile

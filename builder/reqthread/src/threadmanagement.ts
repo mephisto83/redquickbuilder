@@ -201,6 +201,7 @@ export default class ThreadManagement {
 					}
 				);
 			} catch (e) {
+        console.log(e);
 				await sleep(10 * 1000);
 				result = false;
 			}
