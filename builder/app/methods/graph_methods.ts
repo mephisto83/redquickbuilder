@@ -1071,6 +1071,9 @@ export function removeCacheLink(id: string | number, type: string | number) {
 }
 export function updateCache(options: any, link?: GraphLink) {
 	const { previous, value, id, prop } = options;
+	if (isFlagged(Flags.VISUAL_UPDATING)) {
+		return;
+	}
 	if (link) {
 		if (AppCache.Links && link.properties) {
 			AppCache.Links[link.properties.type] = AppCache.Links[link.properties.type] || {};
@@ -1244,7 +1247,8 @@ export function isStamped() {
 	return !!_view_package_key;
 }
 export const Flags = {
-	HIDE_NEW_NODES: 'HIDE_NEW_NODES'
+	HIDE_NEW_NODES: 'HIDE_NEW_NODES',
+	VISUAL_UPDATING: 'VISUAL_UPDATING'
 };
 const FunctionFlags: any = {};
 const FunctionFlagKeys: any = {};
@@ -3517,6 +3521,7 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 	if (Paused()) {
 		return;
 	}
+	setFlag(Flags.VISUAL_UPDATING, Flags.VISUAL_UPDATING, Flags.VISUAL_UPDATING);
 	if (!visualGraph) {
 		visualGraph = createGraph();
 	}
@@ -3525,7 +3530,8 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 		case VisualCommand.ADD_NODE:
 			if (visualCommand.nodeId) {
 				let newNode = GetNode(graph, visualCommand.nodeId);
-				if (newNode) {
+				let visualNode = GetNode(visualGraph, visualCommand.nodeId);
+				if (newNode && !visualNode) {
 					visualGraph = addNode(visualGraph, newNode);
 					let links = GetLinksForNode(graph, { id: newNode.id });
 					links.map((link: GraphLink) => {
@@ -3573,6 +3579,8 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 			visualGraph = removeLink(visualGraph, visualCommand.linkId);
 			break;
 	}
+
+	setFlag(false, Flags.VISUAL_UPDATING, Flags.VISUAL_UPDATING);
 	if (visualGraph) {
 		visualGraph.groupLib = graph.groupLib;
 		visualGraph.groups = graph.groups; // nodeGroups;

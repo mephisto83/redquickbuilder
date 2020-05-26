@@ -41,7 +41,15 @@ import LayoutOptions from './layoutoptions';
 import { FunctionTemplateKeys } from '../constants/functiontypes';
 import NavigateBack from '../nodepacks/NavigateBack';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { getLinkInstance, GetNodesLinkedTo, SOURCE, existsLinkBetween, GetNodeProp } from '../methods/graph_methods';
+import {
+	getLinkInstance,
+	GetNodesLinkedTo,
+	SOURCE,
+	existsLinkBetween,
+	GetNodeProp,
+	GetNodeLinkedTo,
+	setupCache
+} from '../methods/graph_methods';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
 import CreateStandardClaimService from '../nodepacks/CreateStandardClaimService';
@@ -97,7 +105,9 @@ import AddMenuToComponent from '../nodepacks/AddMenuToComponent';
 import { MenuTreeOptions } from '../constants/menu';
 import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from '../nodepacks/batch/SetupViewTypes';
 import { SecondaryOptions } from '../constants/visual';
+import SetupEnumerationPermissionTemplate from '../nodepacks/permission/SetupEnumerationPermissionTemplate';
 
+const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
@@ -106,7 +116,7 @@ class ContextMenu extends Component<any, any> {
 		};
 	}
 
-	getMenuMode(mode) {
+	getMenuMode(mode: any) {
 		const result = [ ...this.generalMenu() ];
 		const exit = () => {
 			this.props.setVisual(UIA.CONTEXT_MENU_MODE, null);
@@ -176,7 +186,7 @@ class ContextMenu extends Component<any, any> {
 							active
 							title={Titles.LinkType}
 							key={Titles.LinkType}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							open={UIA.Visual(state, Titles.LinkType)}
 							toggle={() => {
 								this.props.toggleVisual(Titles.LinkType);
@@ -206,7 +216,7 @@ class ContextMenu extends Component<any, any> {
 								active
 								title={linkType}
 								key={`${linkType}${selectedLink.id} componenttag`}
-								innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 								toggle={() => {
 									this.props.toggleVisual(`linkType coponent`);
 								}}
@@ -241,7 +251,7 @@ class ContextMenu extends Component<any, any> {
 								active
 								title={linkType}
 								key={`${linkType}${selectedLink.id} componenttag`}
-								innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 								toggle={() => {
 									this.props.toggleVisual(`linkType coponent`);
 								}}
@@ -306,7 +316,7 @@ class ContextMenu extends Component<any, any> {
 								active
 								title={linkType}
 								key={`${linkType}${selectedLink.id}`}
-								innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 								toggle={() => {
 									this.props.toggleVisual(linkType);
 								}}
@@ -354,7 +364,7 @@ class ContextMenu extends Component<any, any> {
 									active
 									title={linkType}
 									key={`${linkType}${selectedLink.id}`}
-									innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+									innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 									toggle={() => {
 										this.props.toggleVisual(linkType);
 									}}
@@ -395,7 +405,6 @@ class ContextMenu extends Component<any, any> {
 							);
 						}
 						if (enumeration) {
-
 							const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 							if (GetNodeProp(currentNode, NodeProperties.NODEType) === NodeTypes.Property) {
 								result.push(
@@ -456,7 +465,7 @@ class ContextMenu extends Component<any, any> {
 									active
 									title={linkType}
 									key={`${linkType}${selectedLink.id}`}
-									innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+									innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 									toggle={() => {
 										this.props.toggleVisual(linkType);
 									}}
@@ -498,7 +507,7 @@ class ContextMenu extends Component<any, any> {
 				open={UIA.Visual(state, HIDE_TYPE_MENU)}
 				active
 				title={Titles.HideTypeMenu}
-				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+				innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 				toggle={() => {
 					this.props.toggleVisual(HIDE_TYPE_MENU);
 				}}
@@ -525,7 +534,7 @@ class ContextMenu extends Component<any, any> {
 				open={UIA.Visual(state, DELETE_TYPE_MENU)}
 				active
 				title={Titles.DeleteType}
-				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+				innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 				toggle={() => {
 					this.props.toggleVisual(DELETE_TYPE_MENU);
 				}}
@@ -567,7 +576,7 @@ class ContextMenu extends Component<any, any> {
 				open={UIA.Visual(state, MINIMIZE_MENU)}
 				active
 				title={Titles.MinimizeTypeMenu}
-				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+				innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 				toggle={() => {
 					this.props.toggleVisual(MINIMIZE_MENU);
 				}}
@@ -595,7 +604,7 @@ class ContextMenu extends Component<any, any> {
 				open={UIA.Visual(state, 'GENERAL_MENU')}
 				active
 				title={Titles.Operations}
-				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+				innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 				toggle={() => {
 					this.props.toggleVisual('GENERAL_MENU');
 				}}
@@ -604,7 +613,7 @@ class ContextMenu extends Component<any, any> {
 					open={UIA.Visual(state, 'dccollections')}
 					active
 					title={Titles.Collections}
-					innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 					toggle={() => {
 						this.props.toggleVisual('dccollections');
 					}}
@@ -637,7 +646,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, `${NodeTypes.Permission} ${Titles.Operations}`)}
 						active
 						title={`Permission ${Titles.Operations}`}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual(`${NodeTypes.Permission} ${Titles.Operations}`);
 						}}
@@ -675,37 +684,169 @@ class ContextMenu extends Component<any, any> {
 					open={UIA.Visual(state, 'modelfilter OPERATIONS')}
 					active
 					title={`Model Filter ${Titles.Operations}`}
-					innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 					toggle={() => {
 						this.props.toggleVisual('modelfilter OPERATIONS');
 					}}
+				/>
+				<TreeViewMenu
+					open={UIA.Visual(state, 'Permission Template')}
+					active
+					title={`Permission Template`}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+					toggle={() => {
+						this.props.toggleVisual('Permission Template');
+					}}
 				>
-					<TreeViewMenu
-						active
-						title={`${Titles.SelectAll} on all nodes`}
-						onClick={() => {
-							const filters = UIA.NodesByType(null, NodeTypes.ModelFilter);
-							filters.map((filter) => {
-								const model = UIA.GetNodeProp(filter, NodeProperties.FilterModel);
-								const propnodes = UIA.GetModelPropertyChildren(model);
-								const fprops = UIA.GetNodeProp(filter, UIA.NodeProperties.FilterPropreties) || {};
-								propnodes.map((node) => {
-									fprops[node.id] = true;
+					<TreeViewItemContainer>
+						<TextInput
+							immediate
+							label={`${Titles.Name}`}
+							placeholder={`${Titles.Name}`}
+							onChange={(value: any) => {
+								this.setState({
+									name: value
 								});
-								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-									prop: UIA.NodeProperties.FilterPropreties,
-									id: filter.id,
-									value: fprops
+							}}
+							value={
+								this.state.name ||
+								`${UIA.GetNodeTitle(this.state.agent)} ${UIA.GetNodeTitle(
+									this.state.model
+								)} Permission Template`
+							}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Agents}`}
+							options={UIA.NodesByType(null, NodeTypes.Model)
+								.filter((a: Node) => GetNodeProp(a, NodeProperties.IsAgent))
+								.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsUser))
+								.sort((a: Node, b: Node) => UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b)))
+								.toNodeSelect()}
+							onChange={(value: any) => {
+								this.setState({
+									agent: value
 								});
-							});
-						}}
-					/>
+							}}
+							value={this.state.agent}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Property}`}
+							options={
+								!this.state.agent ? (
+									[]
+								) : (
+									UIA.GetModelPropertyChildren(this.state.agent)
+										.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsAgent))
+										.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsUser))
+										.sort((a: Node, b: Node) =>
+											UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
+										)
+										.toNodeSelect()
+								)
+							}
+							onChange={(value: any) => {
+								this.setState({
+									agentProperty: value
+								});
+								let enumeration = GetNodeLinkedTo(UIA.GetCurrentGraph(), {
+									id: value,
+									link: LinkType.Enumeration
+								});
+								if (enumeration) {
+									this.setState({
+										enumeration: value
+									});
+								}
+							}}
+							value={this.state.agentProperty}
+						/>
+					</TreeViewItemContainer>
+
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Enumeration}`}
+							options={
+								!this.state.agent ? (
+									[]
+								) : (
+									UIA.NodesByType(null, NodeTypes.Enumeration)
+										.sort((a: Node, b: Node) =>
+											UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
+										)
+										.toNodeSelect()
+								)
+							}
+							onChange={(value: any) => {
+								this.setState({
+									enumeration: value
+								});
+							}}
+							value={this.state.enumeration}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Models}`}
+							options={UIA.NodesByType(this.props.state, NodeTypes.Model)
+								.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsAgent))
+								.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsUser))
+								.sort((a: Node, b: Node) => UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b)))
+								.toNodeSelect()}
+							onChange={(value: any) => {
+								this.setState({
+									model: value
+								});
+							}}
+							value={this.state.model}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewButtonGroup>
+						<TreeViewGroupButton
+							title="Create Permission Template"
+							onClick={() => {
+								let name =
+									this.state.name ||
+									`${UIA.GetNodeTitle(this.state.agent)} ${UIA.GetNodeTitle(
+										this.state.model
+									)} Permission Template`;
+								if (
+									this.state.model &&
+									this.state.agent &&
+									name &&
+									this.state.agentProperty &&
+									this.state.enumeration
+								) {
+									this.props.graphOperation(
+										SetupEnumerationPermissionTemplate({
+											permissiontemplatename: name,
+											model: this.state.model,
+											agent: this.state.agent,
+											enumeration: this.state.enumeration,
+											agentProperty: this.state.agentProperty
+										})
+									);
+								}
+							}}
+							icon="fa fa-plus"
+						/>
+						<TreeViewGroupButton
+							title="Setup Cache"
+							onClick={() => {
+								setupCache(UIA.GetCurrentGraph());
+							}}
+							icon="fa fa-recycle"
+						/>
+					</TreeViewButtonGroup>
 				</TreeViewMenu>
 				<TreeViewMenu
 					open={UIA.Visual(state, 'method OPERATIONS')}
 					active
 					title={`Method ${Titles.Operations}`}
-					innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 					toggle={() => {
 						this.props.toggleVisual('method OPERATIONS');
 					}}
@@ -722,7 +863,7 @@ class ContextMenu extends Component<any, any> {
 					open={UIA.Visual(state, 'executor OPERATIONS')}
 					active
 					title={`Executor ${Titles.Operations}`}
-					innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 					toggle={() => {
 						this.props.toggleVisual('executor OPERATIONS');
 					}}
@@ -976,7 +1117,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1029,7 +1170,7 @@ class ContextMenu extends Component<any, any> {
 								open={UIA.Visual(state, 'OPERATIONS')}
 								active
 								title={Titles.Operations}
-								innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 								toggle={() => {
 									this.props.toggleVisual('OPERATIONS');
 								}}
@@ -1192,7 +1333,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1268,7 +1409,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1326,7 +1467,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1386,7 +1527,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1423,7 +1564,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1584,7 +1725,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1629,7 +1770,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'condition OPERATIONS')}
 						active
 						title={`Condition ${Titles.Operations}`}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('condition OPERATIONS');
 						}}
@@ -1638,7 +1779,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, 'Validations')}
 							active
 							title="Validations"
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual('Validations');
 							}}
@@ -1718,7 +1859,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'OPERATIONS')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('OPERATIONS');
 						}}
@@ -1790,7 +1931,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'ComponentNode')}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('ComponentNode');
 						}}
@@ -1854,7 +1995,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, 'Add Menu')}
 							active
 							title={Titles.AddMenu}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual('Add Menu');
 							}}
@@ -1931,7 +2072,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'Component-Lineage')}
 						active
 						title={'Component-Lineage'}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('Component-Lineage');
 						}}
@@ -1985,7 +2126,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'Styling')}
 						active
 						title={Titles.Styling}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('Styling');
 						}}
@@ -1995,7 +2136,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, 'Create Form')}
 							active
 							title="Create Form"
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual('Create Form');
 							}}
@@ -2093,7 +2234,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, 'ComponentNode')}
 						active
 						title={Titles.Layout}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual('ComponentNode');
 						}}
@@ -2150,7 +2291,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, `${currentNodeType} eventtype`)}
 							active
 							title={Titles.AddEvent}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual(`${currentNodeType} eventtype`);
 							}}
@@ -2213,7 +2354,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, 'Reattach Component')}
 							active
 							title={Titles.ReattachComponent}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual('Reattach Component');
 							}}
@@ -2258,7 +2399,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, NodeTypes.Validator)}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual(NodeTypes.Validator);
 						}}
@@ -2347,7 +2488,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, NodeTypes.ModelFilter)}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual(NodeTypes.ModelFilter);
 						}}
@@ -2360,7 +2501,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, NodeTypes.Permission)}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual(NodeTypes.Permission);
 						}}
@@ -2414,7 +2555,7 @@ class ContextMenu extends Component<any, any> {
 						open={UIA.Visual(state, currentNodeType)}
 						active
 						title={Titles.Operations}
-						innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 						toggle={() => {
 							this.props.toggleVisual(currentNodeType);
 						}}
@@ -2423,7 +2564,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, `${currentNodeType} eventtype`)}
 							active
 							title={Titles.AddEvent}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual(`${currentNodeType} eventtype`);
 							}}
@@ -2496,7 +2637,7 @@ class ContextMenu extends Component<any, any> {
 							open={UIA.Visual(state, `setup view type`)}
 							active
 							title={Titles.SetupViewType}
-							innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual(`setup view type`);
 							}}

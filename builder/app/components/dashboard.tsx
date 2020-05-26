@@ -1085,7 +1085,6 @@ class Dashboard extends Component<any, any> {
 					onClick: () => {
 						this.props.setVisual(CONNECTING_NODE, {
 							...LinkProperties.ModelTypeLink,
-							singleLink: true,
 							nodeTypes: [ NodeTypes.Model ]
 						});
 					},
@@ -1121,7 +1120,6 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.ModelTypeLink,
-						singleLink: true,
 						nodeTypes: [ NodeTypes.Model ]
 					});
 				},
