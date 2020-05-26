@@ -9,7 +9,8 @@ import {
 	GRAPHS,
 	GetState,
 	Visual,
-	ApplicationConfig
+	ApplicationConfig,
+	GetNodeTitle
 } from '../actions/uiactions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
@@ -345,6 +346,7 @@ export default class JobService {
 			let jobItem: JobItem = {
 				job: jobName,
 				distributed: false,
+				models: models.map((str: string) => GetNodeTitle(str)),
 				file: jobpart,
 				complete: false,
 				config: temp
@@ -975,6 +977,7 @@ export interface JobItem {
 	distributed: boolean;
 	complete?: boolean;
 	config: JobConfigContract;
+	models?: string[];
 }
 export interface JobOutput {
 	files: string[];

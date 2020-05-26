@@ -67,6 +67,23 @@ class CurrentJobProgressView extends Component<any, any> {
 											if (!agentProject.ready) {
 												color = 'green';
 											}
+											let modelsWorkedOn = null;
+											let temp: any =
+												currentJobInformation &&
+												currentJobInformation.jobs &&
+												agentProject &&
+												agentProject.workingOnJob
+													? currentJobInformation.jobs[agentProject.workingOnJob]
+													: { parts: [] };
+											let { parts } = temp;
+											if (parts && agentProject && agentProject.workingOnFile) {
+												let jobItem: JobItem = parts.find(
+													(x: JobItem) => x.file == agentProject.workingOnFile
+												);
+												if (jobItem && jobItem.models) {
+													modelsWorkedOn = jobItem.models.map((model) => <div>{model}</div>);
+												}
+											}
 											return [
 												<tr key={`agent-project-${jobIndex}`}>
 													<td>
@@ -93,7 +110,14 @@ class CurrentJobProgressView extends Component<any, any> {
 													<td>{agentProject.workingOnFile}</td>
 													<td>{agentProject.host}</td>
 													<td>{agentProject.port}</td>
-												</tr>
+												</tr>,
+												this.state[agentProject.name || 'no-name'] ? (
+													<tr>
+														<td colSpan={9}>{modelsWorkedOn}</td>
+													</tr>
+												) : (
+													false
+												)
 											].filter((x: any) => x);
 										})}
 								</tbody>
