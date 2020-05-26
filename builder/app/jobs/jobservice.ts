@@ -346,7 +346,7 @@ export default class JobService {
 			let jobItem: JobItem = {
 				job: jobName,
 				distributed: false,
-				models: models.map((str: string) => GetNodeTitle(str)),
+				models: chunk.map((str: string) => GetNodeTitle(str)),
 				file: jobpart,
 				complete: false,
 				config: temp
