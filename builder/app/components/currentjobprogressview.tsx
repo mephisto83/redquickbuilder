@@ -60,7 +60,13 @@ class CurrentJobProgressView extends Component<any, any> {
 										<th>Port</th>
 									</tr>
 									{agents
-										.sort((a, b) => `${a.host}`.localeCompare(`${b.host}`))
+										.sort((a: AgentProject, b: AgentProject) => {
+											let temp = `${a.host}`.localeCompare(`${b.host}`);
+											if (temp === 0) {
+												return `${a.name}`.localeCompare(`${b.name}`);
+											}
+											return temp;
+										})
 										.map((agentProject: AgentProject, jobIndex: number) => {
 											let busyCls = 'fa fa-circle';
 											let color = 'red';

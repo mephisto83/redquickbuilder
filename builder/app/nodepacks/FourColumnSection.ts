@@ -1,10 +1,9 @@
 import { uuidv4 } from '../utils/array';
-export default function(args: any = {}) {
-	// node0,node1,node2,node3,node4,node5
+export default function FourColumnSection(args: any = {}) {
+	// node0,node1,node3,node4,node5
 	let context = {
 		node0: args.component,
 		node1: uuidv4(),
-		node2: uuidv4(),
 		node3: uuidv4(),
 		node4: uuidv4(),
 		node5: uuidv4(),
@@ -24,7 +23,6 @@ export default function(args: any = {}) {
 						value: {
 							layout: {
 								[context.node1]: {
-									[context.node2]: {},
 									[context.node3]: {
 										[context.node4]: {},
 										[context.node5]: {},
@@ -46,24 +44,6 @@ export default function(args: any = {}) {
 									children: {},
 									cellModel: {},
 									properties: {},
-									cellModelProperty: {},
-									cellRoot: {},
-									cellEvents: {}
-								},
-								[context.node2]: {
-									style: {
-										display: 'flex',
-										flex: null,
-										height: null,
-										borderStyle: 'solid',
-										borderWidth: 1,
-										width: null
-									},
-									children: {},
-									cellModel: {},
-									properties: {
-										tags: [ 'MainMenu', 'MainHeader', 'TopMenu' ]
-									},
 									cellModelProperty: {},
 									cellRoot: {},
 									cellEvents: {}
@@ -162,13 +142,6 @@ export default function(args: any = {}) {
 					}
 				}
 			];
-		},
-		function() {
-			if (context.callback) {
-				context.containers = [ context.node4, context.node5, context.node6, context.node7 ];
-				context.callback(context);
-			}
-			return [];
 		}
 	];
 }

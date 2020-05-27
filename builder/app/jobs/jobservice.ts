@@ -747,6 +747,8 @@ export default class JobService {
 					try {
 						completed = completed && (await JobService.IsJobAssignmentComplete(job, parts[i], relative));
 					} catch (e) {
+						console.log(e);
+						console.log('error while checking for completeion');
 						completed = false;
 					}
 					if (!completed) {
@@ -757,11 +759,13 @@ export default class JobService {
 				console.log('job is completed');
 				this.jobCompleteCache[job.name] = true;
 				return true;
+			} else {
+        console.warn('no parts assigned');
+        return true;
 			}
-			console.warn('no parts assigned');
 		}
 		console.log('job not is completed: no parts');
-		return false;
+		return true;
 	}
 
 	static async JobProgress(job: Job) {

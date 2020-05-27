@@ -475,6 +475,8 @@ export default function CreateDashboard_1(args: any = {}) {
     function () {
       if (context.callback) {
         context.entry = context.node0;
+        context.mainSection = context.node10;
+        context.screenOption = context.node1;
         context.callback(context);
       }
       return [];
