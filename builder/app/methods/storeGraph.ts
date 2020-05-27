@@ -110,50 +110,67 @@ async function streamLine(
 	let currentSection: string | null = null;
 
 	let bucket = '';
-	await fileNames.map((fname) => path_join(relPath, fname)).forEachAsync(async (filename: string, index: number) => {
-		return await new Promise((resolve, fail) => {
-			console.log(`Reading : ${filename}`);
-			var instream = fs.createReadStream(filename);
-			var rl = readline.createInterface(instream);
-			rl.on('line', function(line: string) {
-				// process line here
-				if (line.startsWith(SECTION_HEADER)) {
-					currentSection = line.substring(SECTION_HEADER.length);
-				} else if (!currentSection) {
-					bucket = bucket + line;
-				} else {
-					line = line.replace(NEW_LINE_REPLACEMENT, '\n');
-					let obj;
-					try {
-						if (line.trim()) {
-							obj = JSON.parse(line);
-						}
-					} catch (e) {
-						console.log(currentSection);
-						console.log(line);
-						console.log(e);
-						throw e;
-					}
-					switch (currentSection) {
-						case LINK_LIB:
-						case GROUP_LIB:
-						case NODE_LIB:
-							callback(obj.k, obj.v, currentSection);
-							break;
-						case GRAPH_LIB:
-							callback(null, obj, currentSection);
-							break;
-					}
-				}
-			});
+	let attempts = 10;
+	let successful = true;
+	do {
+		successful = true;
+		try {
+			await fileNames
+				.map((fname) => path_join(relPath, fname))
+				.forEachAsync(async (filename: string, index: number) => {
+					return await new Promise((resolve, fail) => {
+						console.log(`Reading : ${filename}`);
+						var instream = fs.createReadStream(filename);
+						var rl = readline.createInterface(instream);
+						rl.on('line', function(line: string) {
+							// process line here
+							if (line.startsWith(SECTION_HEADER)) {
+								currentSection = line.substring(SECTION_HEADER.length);
+							} else if (!currentSection) {
+								bucket = bucket + line;
+							} else {
+								line = line.replace(NEW_LINE_REPLACEMENT, '\n');
+								let obj;
+								try {
+									if (line.trim()) {
+										obj = JSON.parse(line);
+									}
+								} catch (e) {
+									console.log(currentSection);
+									console.log(line);
+									console.log(e);
+									throw e;
+								}
+								switch (currentSection) {
+									case LINK_LIB:
+									case GROUP_LIB:
+									case NODE_LIB:
+										callback(obj.k, obj.v, currentSection);
+										break;
+									case GRAPH_LIB:
+										callback(null, obj, currentSection);
+										break;
+								}
+							}
+						});
 
-			rl.on('close', function() {
-				// do something on finish here
-				resolve();
-				instream.close();
-			});
-		});
-	});
+						rl.on('close', function() {
+							// do something on finish here
+							resolve();
+							instream.close();
+						});
+					});
+				});
+		} catch (e) {
+			console.log('something went wrong trying to read a file');
+			console.log(e);
+			successful = false;
+			attempts--;
+			if (!attempts) {
+				throw 'something really went wrong with this crap';
+			}
+		}
+	} while (!successful);
 	if (bucket) {
 		throw new Error('not supported type');
 	}
@@ -167,60 +184,77 @@ async function readLine(relPath: string, fileNames: string[]) {
 	let graph: Graph | null = null;
 
 	let bucket = '';
-	await fileNames.map((fname) => path_join(relPath, fname)).forEachAsync(async (filename: string, index: number) => {
-		return await new Promise((resolve, fail) => {
-			console.log(`Reading : ${filename}`);
-			var instream = fs.createReadStream(filename);
-			var rl = readline.createInterface(instream);
-			rl.on('line', function(line: string) {
-				// process line here
-				if (line.startsWith(SECTION_HEADER)) {
-					currentSection = line.substring(SECTION_HEADER.length);
-				} else if (!currentSection) {
-					bucket = bucket + line;
-				} else {
-					line = line.replace(NEW_LINE_REPLACEMENT, '\n');
-          let obj;
-					try {
-						if (line.trim()) {
-							obj = JSON.parse(line);
-						}
-					} catch (e) {
-						console.log(currentSection);
-						console.log(line);
-						console.log(e);
-						throw e;
-					}
-					switch (currentSection) {
-						case LINK_LIB:
-							linkLib[obj.k] = obj.v;
-							break;
-						case GROUP_LIB:
-							groupLib[obj.k] = obj.v;
-							break;
-						case NODE_LIB:
-							nodeLib[obj.k] = obj.v;
-							break;
-						case GRAPH_LIB:
-							graph = obj;
-							break;
-					}
-				}
-			});
+	let attempts = 10;
+	let successful = true;
+	do {
+		successful = true;
+		try {
+			await fileNames
+				.map((fname) => path_join(relPath, fname))
+				.forEachAsync(async (filename: string, index: number) => {
+					return await new Promise((resolve, fail) => {
+						console.log(`Reading : ${filename}`);
+						var instream = fs.createReadStream(filename);
+						var rl = readline.createInterface(instream);
+						rl.on('line', function(line: string) {
+							// process line here
+							if (line.startsWith(SECTION_HEADER)) {
+								currentSection = line.substring(SECTION_HEADER.length);
+							} else if (!currentSection) {
+								bucket = bucket + line;
+							} else {
+								line = line.replace(NEW_LINE_REPLACEMENT, '\n');
+								let obj;
+								try {
+									if (line.trim()) {
+										obj = JSON.parse(line);
+									}
+								} catch (e) {
+									console.log(currentSection);
+									console.log(line);
+									console.log(e);
+									throw e;
+								}
+								switch (currentSection) {
+									case LINK_LIB:
+										linkLib[obj.k] = obj.v;
+										break;
+									case GROUP_LIB:
+										groupLib[obj.k] = obj.v;
+										break;
+									case NODE_LIB:
+										nodeLib[obj.k] = obj.v;
+										break;
+									case GRAPH_LIB:
+										graph = obj;
+										break;
+								}
+							}
+						});
 
-			rl.on('close', function() {
-				// do something on finish here
-				if (graph) {
-					graph.linkLib = linkLib;
-					graph.nodeLib = nodeLib;
-					graph.groupLib = groupLib;
-				} else {
-				}
-				resolve();
-				instream.close();
-			});
-		});
-	});
+						rl.on('close', function() {
+							// do something on finish here
+							if (graph) {
+								graph.linkLib = linkLib;
+								graph.nodeLib = nodeLib;
+								graph.groupLib = groupLib;
+							} else {
+							}
+							resolve();
+							instream.close();
+						});
+					});
+				});
+		} catch (e) {
+			console.log('something went wrong trying to read a file');
+			console.log(e);
+			successful = false;
+			attempts--;
+			if (!attempts) {
+				throw 'something really went wrong with this crap';
+			}
+		}
+	} while (!successful);
 	if (bucket) {
 		graph = JSON.parse(bucket);
 		return graph;
