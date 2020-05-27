@@ -169,6 +169,7 @@ export const ComponentTypeKeys = {
 	Password: 'Password',
 	MultiSelectList: 'MultiSelectList',
 	CheckBox: 'CheckBox',
+	View: 'View',
 	Menu: 'Menu',
 	Input: 'Input',
 	Text: 'Text',

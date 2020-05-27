@@ -123,7 +123,17 @@ async function streamLine(
 					bucket = bucket + line;
 				} else {
 					line = line.replace(NEW_LINE_REPLACEMENT, '\n');
-					let obj = JSON.parse(line);
+					let obj;
+					try {
+						if (line.trim()) {
+							obj = JSON.parse(line);
+						}
+					} catch (e) {
+						console.log(currentSection);
+						console.log(line);
+						console.log(e);
+						throw e;
+					}
 					switch (currentSection) {
 						case LINK_LIB:
 						case GROUP_LIB:

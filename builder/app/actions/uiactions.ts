@@ -728,6 +728,16 @@ export function GetJSCodeName(node: any | string) {
 	return l;
 }
 
+export function SetLayoutComponent(currentNode: Node, selectedCell: string, component: string) {
+	let cellProperties;
+	const nodeLayout = GetNodeProp(currentNode, NodeProperties.Layout);
+	cellProperties = GraphMethods.GetCellProperties(nodeLayout, selectedCell);
+	cellProperties.children = cellProperties.children || {};
+	let cellChildren = cellProperties.children;
+  cellChildren[selectedCell] = component;
+  return nodeLayout;
+}
+
 export function GetModelPropertyChildren(id: string, options: any = {}) {
 	const { skipLogicalChildren } = options;
 	const propertyNodes = GetModelPropertyNodes(id);
