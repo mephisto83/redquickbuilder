@@ -292,8 +292,7 @@ export async function SplitIntoFiles(relPath: string, chunkFolder: string, chunk
 				currentCount++;
 			}
 		});
-
-		rl.on('close', function() {
+    rl.on('close', function() {
 			// do something on finish here
 			if (fileContent) {
 				fs.writeFileSync(path.join(relPath, chunkFolder, chunkName + currentFile), fileContent);

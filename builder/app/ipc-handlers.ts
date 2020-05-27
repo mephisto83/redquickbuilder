@@ -152,7 +152,7 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		}
 	});
 	console.log('set command center');
-	setCommandCenter(7973, 8001);
+	setCommandCenter(7972, 8001);
 }
 function setCommandCenter(targetPort: number, port: number) {
 	return Promise.resolve()
