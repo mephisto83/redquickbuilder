@@ -216,7 +216,8 @@ export default class CommunicationTower {
 			hostname: ''
 		};
 
-		let address = this.getIpaddress();
+    let address = this.getIpaddress();
+    console.log(`command: ${parsed.command}`)
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
 				reply.hostname = address.hostname;
@@ -336,6 +337,7 @@ export default class CommunicationTower {
 		let res = await Promise.resolve().then(() => {
 			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			if (fs.existsSync(requestedPath)) {
+        console.log(`file exists at location ${requestedPath}`)
 				let stats = fs.statSync(requestedPath);
 				var fileSizeInBytes = stats['size'];
 				return {
@@ -345,6 +347,7 @@ export default class CommunicationTower {
 					errorMessage: 'file size doesnt match'
 				};
 			} else {
+        console.log(`file doesnt exists at location ${requestedPath}`)
 				return {
 					error: true,
 					port: -1,
