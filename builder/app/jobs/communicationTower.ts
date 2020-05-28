@@ -332,6 +332,7 @@ export default class CommunicationTower {
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async checkFile(req: any, reply: any) {
+    console.log(`checking file`)
 		let res = await Promise.resolve().then(() => {
 			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			if (fs.existsSync(requestedPath)) {
