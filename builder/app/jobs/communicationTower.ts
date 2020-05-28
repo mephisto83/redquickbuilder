@@ -138,8 +138,9 @@ export default class CommunicationTower {
 					localPath
 				);
 				console.log(res);
-				let { body } = res;
-				if (!body.sucess) {
+        let { body } = res;
+        console.log(body);
+				if (!body.success) {
 					maxattempts = true;
 					throw new Error('file size not confirmed');
 				}
