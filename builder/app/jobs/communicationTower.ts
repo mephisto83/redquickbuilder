@@ -158,7 +158,8 @@ export default class CommunicationTower {
 			try {
 				await this.startServers();
 			} catch (e) {
-				error = true;
+        error = true;
+        console.log(e);
 			}
 		} while (error);
 	}
