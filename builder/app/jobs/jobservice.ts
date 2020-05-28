@@ -72,16 +72,8 @@ export default class JobService {
 		let ok = await CheckBrokenGraph(relPath, files);
 		if (!ok) {
 			throw new Error('files were no written correctly');
-		}
-		// await StoreGraph(currentGraph, temporaryFile);
-		// fs.createReadStream(temporaryFile);
-		// await ensureDirectory(path_join(relPath, chunkFolder));
-		// let files: string[] = [];
-		// await content.stringView(async (chunk: string, i: number) => {
-		// 	let chunkPath = path_join(relPath, chunkFolder, chunkName + i);
-		// 	files.push(path_join(chunkFolder, chunkName + i));
-		// 	fs.writeFileSync(chunkPath, chunk, 'utf8');
-		// }, Math.pow(2, 24));
+    }
+
 		let jobContent: JobOutput = {
 			files
 		};
