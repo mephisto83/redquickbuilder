@@ -457,11 +457,11 @@ export default class CommunicationTower {
 		return addressLib;
 	}
 	async setupPorts() {
-		let ports = await this.getPorts();
+		// let ports = await this.getPorts();
 		this.ports = {};
-		ports.forEach((port) => {
-			this.ports[port] = false;
-		});
+		// ports.forEach((port) => {
+		// 	this.ports[port] = false;
+		// });
 	}
 	async getFreePort() {
 		var portrange = 3000 + Math.floor(Math.random() * 50000);
