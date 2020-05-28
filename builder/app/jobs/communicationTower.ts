@@ -344,7 +344,7 @@ export default class CommunicationTower {
 					port: -1,
 					success: fileSizeInBytes === req.fileSizeInBytes,
 					error: fileSizeInBytes !== req.fileSizeInBytes,
-					errorMessage: 'file size doesnt match'
+					errorMessage: `file size doesnt match ${fileSizeInBytes} === ${req.fileSizeInBytes}`
 				};
 			} else {
         console.log(`file doesnt exists at location ${requestedPath}`)
