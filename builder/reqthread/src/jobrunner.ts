@@ -40,7 +40,7 @@ let runnerContext: RunnerContext = {
 			topDirectory: '../../jobrunner'
 		});
 
-		communicationTower.start({
+		await communicationTower.start({
 			[RedQuickDistributionCommand.RaisingHand]: handleHandRaising,
 			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
 			[RedQuickDistributionCommand.Progress]: noOp,
