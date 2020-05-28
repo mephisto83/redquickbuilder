@@ -60,100 +60,109 @@ export default function(args: any = {}) {
 				}
 			];
 		},
-
-		function() {
-			return [
-				{
-					operation: 'ADD_NEW_NODE',
-					options: {
-						nodeType: 'ComponentApi',
-						linkProperties: {
-							properties: {
-								type: 'component-internal-api',
-								'component-internal-api': {}
+		args.skipLabel
+			? null
+			: function() {
+					return [
+						{
+							operation: 'ADD_NEW_NODE',
+							options: {
+								nodeType: 'ComponentApi',
+								linkProperties: {
+									properties: {
+										type: 'component-internal-api',
+										'component-internal-api': {}
+									}
+								},
+								parent: context.node1,
+								groupProperties: {},
+								properties: {
+									text: 'label',
+									Pinned: false,
+									UseAsValue: true
+								},
+								callback: function(node: any, graph: any, group: any) {
+									context.node2 = node.id;
+									context.group0 = group;
+								}
 							}
-						},
-						parent: context.node1,
-						groupProperties: {},
-						properties: {
-							text: 'label',
-							Pinned: false,
-							UseAsValue: true
-						},
-						callback: function(node: any, graph: any, group: any) {
-							context.node2 = node.id;
-							context.group0 = group;
 						}
-					}
-				}
-			];
-		},
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'ADD_NEW_NODE',
-					options: {
-						nodeType: 'ComponentExternalApi',
-						parent: context.node1,
-						linkProperties: {
-							properties: {
-								type: 'component-external-api',
-								'component-external-api': {}
+		args.skipLabel
+			? null
+			: function() {
+					return [
+						{
+							operation: 'ADD_NEW_NODE',
+							options: {
+								nodeType: 'ComponentExternalApi',
+								parent: context.node1,
+								linkProperties: {
+									properties: {
+										type: 'component-external-api',
+										'component-external-api': {}
+									}
+								},
+								groupProperties: {},
+								properties: {
+									text: 'label',
+									Pinned: false
+								},
+								callback: function(node: any) {
+									context.node3 = node.id;
+								}
 							}
-						},
-						groupProperties: {},
-						properties: {
-							text: 'label',
-							Pinned: false
-						},
-						callback: function(node: any) {
-							context.node3 = node.id;
 						}
-					}
-				}
-			];
-		},
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'ADD_LINK_BETWEEN_NODES',
-					options: {
-						source: context.node2,
-						target: context.node3,
-						properties: {
-							type: 'component-internal-connection',
-							'component-internal-connection': {}
+		args.skipLabel
+			? null
+			: function() {
+					return [
+						{
+							operation: 'ADD_LINK_BETWEEN_NODES',
+							options: {
+								source: context.node2,
+								target: context.node3,
+								properties: {
+									type: 'component-internal-connection',
+									'component-internal-connection': {}
+								}
+							}
 						}
-					}
-				}
-			];
-		},
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Pinned',
-						id: context.node3,
-						value: true
-					}
-				}
-			];
-		},
+		args.skipLabel
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'Pinned',
+								id: context.node3,
+								value: true
+							}
+						}
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CONNECT_TO_TITLE_SERVICE',
-					options: {
-						id: context.node3
-					}
+		args.skipLabel
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CONNECT_TO_TITLE_SERVICE',
+							options: {
+								id: context.node3
+							}
+						}
+					];
 				}
-			];
-		}
 	];
 	let clearPinned = !args.clearPinned
 		? []

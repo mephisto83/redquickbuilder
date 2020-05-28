@@ -939,7 +939,9 @@ class ContextMenu extends Component<any, any> {
 							<SelectInput
 								label={`${Titles.Component} A`}
 								options={UIA.NodesByType(this.props.state, NodeTypes.ComponentNode)
-									.sort((a, b) => UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b)))
+									.sort((a: Node, b: Node) =>
+										`${UIA.GetNodeTitle(a)}`.localeCompare(`${UIA.GetNodeTitle(b)}`)
+									)
 									.toNodeSelect()}
 								onChange={(value: any) => {
 									this.setState({

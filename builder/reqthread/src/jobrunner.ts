@@ -51,7 +51,8 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem,
 			[RedQuickDistributionCommand.SetCommandCenter]: setCommandCenter,
 			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
-			[RedQuickDistributionCommand.CanReturnResults]: canReturnResults
+      [RedQuickDistributionCommand.CanReturnResults]: canReturnResults,
+      [RedQuickDistributionCommand.ConfirmFile]: noOp
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
@@ -187,6 +188,46 @@ function AppendToJobCompletedList(promise: any) {
 			console.log('completed job from completed list');
 			await tellCommandCenter();
 		});
+}
+async function checkTransferredFile(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+  	// console.debug('CompletedJobItem');
+	// console.debug('handing completed job item');
+	if (message.projectName) {
+		if (message.fileName) {
+			// console.debug(communicationTower.agentName || '');
+			let relativePath = path_join(
+				JobServiceConstants.JobPath(),
+				communicationTower.agentName || '',
+				message.projectName,
+				message.fileName
+			);
+			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
+				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
+					console.debug(relativePath);
+					AppendToJobCompletedList(async () => {
+						return pullCompletedJobItemTogether(message);
+					});
+					await tellCommandCenter();
+					return {
+						success: true
+					};
+				} else {
+					return {
+						error: 'cant join output'
+					};
+				}
+			}
+			return {
+				error: 'missing graph file'
+			};
+		}
+		return {
+			error: 'no file name'
+		};
+	}
+	return {
+		error: 'no project name'
+	};
 }
 async function handleCompltedJobItem(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	// console.debug('CompletedJobItem');

@@ -42,6 +42,7 @@ import {
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
+import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDashboard';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -286,6 +287,23 @@ class QuickMethods extends Component<any, any, any> {
 									icon="fa fa-plus"
 									onClick={() => {
 										AddAgentMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title={'Create Smart Dashboard'}
+									icon="fa fa-plus"
+									onClick={() => {
+										CreateSmartDashboard({
+											buttons: [
+												{
+													title: 'button 1'
+												}
+											],
+											dashboardName: 'Easy dash',
+											callback: () => {
+												console.log('done');
+											}
+										});
 									}}
 								/>
 								<TreeViewMenu

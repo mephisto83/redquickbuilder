@@ -15,6 +15,7 @@ export const NodeTypes = {
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
 	NavigationAction: 'NavigationAction',
+	NavigationScreen: 'NavigationScreen',
 	Lists: 'Lists',
 	EventMethodInstance: 'EventMethodInstance',
 	LifeCylceMethod: 'LifeCylceMethod',
@@ -210,6 +211,7 @@ export const NodeTypeColors = {
 	[NodeTypes.ComponentApi]: '#E2C044',
 	[NodeTypes.ComponentExternalApi]: '#2E5266',
 	[NodeTypes.NavigationAction]: '#1282A2',
+	[NodeTypes.NavigationScreen]: '#148222',
 	[NodeTypes.Lists]: '#2DC7FF',
 	[NodeTypes.ClaimService]: '#034748',
 	[NodeTypes.FetchService]: '#BA1200',
@@ -647,6 +649,7 @@ export const LinkType = {
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
 	ModelAccess: 'ModelAccess',
+	NavigationScreen: 'NavigationScreen',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
 	ConditionTemplate: 'ConditionTemplate',
@@ -895,6 +898,9 @@ export const LinkProperties: any = {
 	},
 	AgentAccess: {
 		type: LinkType.AgentAccess
+	},
+	NavigationScreen: {
+		type: LinkType.NavigationScreen
 	},
 	ModelAccess: {
 		type: LinkType.ModelAccess

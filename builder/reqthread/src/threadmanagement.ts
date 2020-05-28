@@ -51,6 +51,7 @@ export default class ThreadManagement {
 
 	async listen() {
 		await this.communicationTower.start({
+			[RedQuickDistributionCommand.ConfirmFile]: noOp,
 			[RedQuickDistributionCommand.Progress]: async (message: RedQuickDistributionMessage) => {
 				return {
 					progress: this.progressTracking,
@@ -123,7 +124,7 @@ export default class ThreadManagement {
 		let canReturnFiles: any = false;
 		do {
 			try {
-        console.log('can i return files');
+				console.log('can i return files');
 				canReturnFiles = await this.communicationTower.send(
 					{
 						agent: completedJobItem.agentName,
@@ -137,8 +138,8 @@ export default class ThreadManagement {
 						projectName: completedJobItem.projectName,
 						fileName: completedJobItem.fileName
 					}
-        );
-        console.log(canReturnFiles)
+				);
+				console.log(canReturnFiles);
 				if (!canReturnFiles.body.success) {
 					canReturnFiles = false;
 				}
@@ -148,7 +149,7 @@ export default class ThreadManagement {
 			}
 		} while (!canReturnFiles);
 
-    console.log('now i can');
+		console.log('now i can');
 		// let attempts = 3;
 		// do {
 		// 	attempts--;
@@ -201,7 +202,7 @@ export default class ThreadManagement {
 					}
 				);
 			} catch (e) {
-        console.log(e);
+				console.log(e);
 				await sleep(10 * 1000);
 				result = false;
 			}

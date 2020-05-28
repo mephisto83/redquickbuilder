@@ -25,6 +25,10 @@ export interface RedQuickDistributionMessage {
 	agentName?: any;
 	command?: RedQuickDistributionCommand;
 	port?: number;
+	fileInfo?: FileInfo;
+}
+export interface FileInfo {
+	files: { name: string; size: number }[];
 }
 export interface CommunicationTowerConfig {
 	serverPort: number;
@@ -36,6 +40,7 @@ export interface ListenerReply {}
 export enum RedQuickDistributionCommand {
 	RUN_JOB = 'RUN_JOB',
 	SendFile = 'SendFile',
+	ConfirmFile = 'ConfirmFile',
 	RaisingHand = 'RaisingHand',
 	SetAgentProjects = 'SetAgentProjects',
 	Progress = 'Progress',
@@ -110,12 +115,32 @@ export default class CommunicationTower {
 					},
 					localPath
 				);
+
 				maxattempts = false;
 			} catch (e) {
 				console.log(e);
 				console.log(`failed to send file : attempts left`);
 				await sleep(60 * 1000 + Math.random() * 100000);
 			}
+
+			try {
+				await sleep(1000);
+				let { body } = await this.confirmFile(
+					{
+						agentName: agentProject.agent,
+						agentProject: agentProject.name,
+						command: RedQuickDistributionCommand.ConfirmFile,
+						relativePath: outFolder,
+						targetHost: agentProject.host,
+						targetPort: agentProject.port
+					},
+					localPath
+				);
+				if (!body.sucess) {
+					maxattempts = true;
+					throw new Error('file size not confirmed');
+				}
+			} catch (e) {}
 		} while (maxattempts);
 	}
 	init(config: CommunicationTowerConfig) {
@@ -187,12 +212,15 @@ export default class CommunicationTower {
 			hostname: ''
 		};
 
+		let address = this.getIpaddress();
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
-				// reply.port = await this.getAvailbePort();
-				let address = this.getIpaddress();
 				reply.hostname = address.hostname;
 				await this.receiveFile(parsed);
+				break;
+			case RedQuickDistributionCommand.ConfirmFile:
+				reply.hostname = address.hostname;
+				await this.checkFile(parsed);
 				break;
 			default:
 				let res = await this.onHandleReceivedMessage(parsed);
@@ -216,6 +244,23 @@ export default class CommunicationTower {
 			return await progressListeners(message);
 		}
 		throw new Error('no handler for ' + message.command);
+	}
+	async confirmFile(message: AgentProject, localFilePath: string) {
+		var stats = fs.statSync(localFilePath);
+		var fileSizeInBytes = stats['size'];
+		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
+		let address: any = this.getIpaddress();
+		message.hostname = address.hostname;
+		return await fetch(`http://${message.targetHost}:${message.targetPort}`, {
+			method: 'POST',
+			body: JSON.stringify({
+				...message,
+				size: fileSizeInBytes,
+				command: RedQuickDistributionCommand.ConfirmFile,
+				agentName: this.agentName,
+				filePath: filePathArray
+			})
+		});
 	}
 	async sendFile(message: AgentProject, localFilePath: string) {
 		let server: net.Server,
@@ -277,6 +322,25 @@ export default class CommunicationTower {
 		});
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
+	async checkFile(req: any) {
+		let res = await Promise.resolve().then(() => {
+			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
+			if (fs.existsSync(requestedPath)) {
+				let stats = fs.statSync(requestedPath);
+				var fileSizeInBytes = stats['size'];
+				return {
+					success: fileSizeInBytes === req.fileSizeInBytes,
+					error: fileSizeInBytes !== req.fileSizeInBytes,
+					errorMessage: 'file size doesnt match'
+				};
+			} else {
+				return {
+					error: true,
+					errorMessage: 'file doesnt exist here'
+				};
+			}
+		});
+	}
 	async receiveFile(req: any) {
 		this.receivingFile = true;
 		let res = await new Promise(async (resolve, fail) => {
@@ -288,6 +352,7 @@ export default class CommunicationTower {
 			let ostream = fs.createWriteStream(requestedPath);
 			let size = 0,
 				elapsed = 0;
+			let startTime = Date.now();
 
 			socket.on('error', (err) => {
 				console.log(err);
@@ -298,6 +363,7 @@ export default class CommunicationTower {
 			});
 			socket.on('data', (chunk) => {
 				size += chunk.length;
+				elapsed = Date.now() - startTime;
 				socket.write(
 					`\r${(size / (1024 * 1024)).toFixed(2)} MB of data was sent. Total elapsed time is ${elapsed /
 						1000} s : ${requestedPath}`
@@ -309,6 +375,7 @@ export default class CommunicationTower {
 				ostream.write(chunk);
 			});
 			socket.on('end', () => {
+				elapsed = Date.now() - startTime;
 				console.log(
 					`\nFinished getting file. speed was: ${(size / (1024 * 1024) / (elapsed / 1000)).toFixed(
 						2

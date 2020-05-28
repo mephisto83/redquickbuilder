@@ -136,14 +136,15 @@ import {
 	SOURCE,
 	GetNodesLinkedTo,
 	Paused,
-	GetNodeProp
+	GetNodeProp,
+	NodesByType
 } from '../methods/graph_methods';
 import { DataChainContextMethods } from '../constants/datachain';
 import StyleMenu from './stylemenu';
 import { ViewTypes } from '../constants/viewtypes';
 import { JobServiceConstants } from '../jobs/jobservice';
 import CodeEditor from './codeeditor';
-import { Graph } from '../methods/graph_types';
+import { Graph, Node } from '../methods/graph_types';
 
 const { clipboard } = require('electron');
 
@@ -213,6 +214,9 @@ class Dashboard extends Component<any, any> {
 					return result;
 				case NodeTypes.PermissionTemplate:
 					result.push(...this.getPermissionTemplateContent());
+					break;
+				case NodeTypes.NavigationScreen:
+					result.push(...this.getNavigationScreenContext());
 					break;
 				case NodeTypes.ConditionTemplate:
 					result.push(...this.getConditionTemplate());
@@ -1159,6 +1163,85 @@ class Dashboard extends Component<any, any> {
 			})
 		);
 
+		return result;
+	}
+	getNavigationScreenContext() {
+		const result = [];
+		let { state } = this.props;
+
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.NavigationScreen,
+					nodeTypes: [ NodeTypes.NavigationScreen ]
+				});
+			},
+			icon: 'fa fa-external-link-square',
+			title: 'Navigate to'
+		});
+		// /
+		result.push({
+			onClick: () => {
+				let models = NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model).filter((model: Node) => {
+					return !UIA.GetNodeByProperties({
+						[NodeProperties.Model]: model.id,
+						[NodeProperties.ViewType]: ViewTypes.Get
+					});
+				});
+				this.props.graphOperation(
+					models.map((model: Node) => {
+						return {
+							operation: UIA.ADD_NEW_NODE,
+							options() {
+								return {
+									nodeType: NodeTypes.NavigationScreen,
+									parent: currentNode.id,
+
+									linkProperties: {
+										properties: {
+											...LinkProperties.NavigationScreen
+										}
+									},
+									properties: {
+										[NodeProperties.UIText]: `Naviget to ${UIA.GetNodeTitle(model)} Screen`
+									}
+								};
+							}
+						};
+					})
+				);
+			},
+			icon: 'fa fa-external-link',
+			title: `Add Nav to all Get Model Screens`
+		});
+		result.push({
+			onClick: () => {
+				this.props.graphOperation([
+					{
+						operation: UIA.ADD_NEW_NODE,
+						options() {
+							return {
+								nodeType: NodeTypes.NavigationScreen,
+								parent: currentNode.id,
+
+								linkProperties: {
+									properties: {
+										...LinkProperties.NavigationScreen
+									}
+								},
+								properties: {
+									[NodeProperties.UIText]: `Nav Screen`
+								}
+							};
+						}
+					}
+				]);
+			},
+			icon: 'fa fa-plus',
+			title: `Add Nav Screen`
+		});
 		return result;
 	}
 	getAgentContext() {

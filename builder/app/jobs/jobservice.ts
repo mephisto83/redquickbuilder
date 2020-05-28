@@ -20,7 +20,7 @@ import NameService from './nameservice';
 import mergeGraph from '../methods/mergeGraph';
 import { AgentProject, AgentProjects } from './interfaces';
 import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
-import StoreGraph, { LoadGraph, LoadBrokenGraph, SplitIntoFiles } from '../methods/storeGraph';
+import StoreGraph, { LoadGraph, LoadBrokenGraph, SplitIntoFiles, CheckBrokenGraph } from '../methods/storeGraph';
 import { mergeStreamGraph } from '../methods/mergeGraph';
 
 export default class JobService {
@@ -69,6 +69,10 @@ export default class JobService {
 		console.log('Break files into pieces');
 		let files = await SplitIntoFiles(relPath, chunkFolder, chunkName, currentGraph);
 
+		let ok = await CheckBrokenGraph(relPath, files);
+		if (!ok) {
+			throw new Error('files were no written correctly');
+		}
 		// await StoreGraph(currentGraph, temporaryFile);
 		// fs.createReadStream(temporaryFile);
 		// await ensureDirectory(path_join(relPath, chunkFolder));
@@ -760,8 +764,8 @@ export default class JobService {
 				this.jobCompleteCache[job.name] = true;
 				return true;
 			} else {
-        console.warn('no parts assigned');
-        return true;
+				console.warn('no parts assigned');
+				return true;
 			}
 		}
 		console.log('job not is completed: no parts');

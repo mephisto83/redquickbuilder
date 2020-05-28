@@ -145,6 +145,7 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 		[RedQuickDistributionCommand.CompletedJobItem]: noOp,
 		[RedQuickDistributionCommand.CanReturnResults]: noOp,
+		[RedQuickDistributionCommand.ConfirmFile]: noOp,
 		[RedQuickDistributionCommand.SetCommandCenter]: noOp,
 		[RedQuickDistributionCommand.UpdateCommandCenter]: (args: any) => {
 			// console.log('update command center');

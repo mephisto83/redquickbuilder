@@ -91,6 +91,13 @@ export async function LoadBrokenGraph(relPath: string, fileNames: string[]) {
 	return await readLine(relPath, fileNames);
 }
 
+export async function CheckBrokenGraph(relPath: string, fileNames: string[]): Promise<boolean> {
+	console.log('check broken graph');
+	console.log(relPath);
+	console.log(fileNames);
+	return await checkLines(relPath, fileNames);
+}
+
 export async function StreamGraph(
 	relPath: string,
 	fileNames: string[],
@@ -121,6 +128,7 @@ async function streamLine(
 					return await new Promise((resolve, fail) => {
 						console.log(`Reading : ${filename}`);
 						var instream = fs.createReadStream(filename);
+						let failed = false;
 						var rl = readline.createInterface(instream);
 						rl.on('line', function(line: string) {
 							// process line here
@@ -139,7 +147,10 @@ async function streamLine(
 									console.log(currentSection);
 									console.log(line);
 									console.log(e);
-									throw e;
+
+									fail(e);
+									rl.close();
+									failed = true;
 								}
 								switch (currentSection) {
 									case LINK_LIB:
@@ -156,7 +167,9 @@ async function streamLine(
 
 						rl.on('close', function() {
 							// do something on finish here
-							resolve();
+							if (!failed) {
+								resolve();
+							}
 							instream.close();
 						});
 					});
@@ -196,6 +209,7 @@ async function readLine(relPath: string, fileNames: string[]) {
 						console.log(`Reading : ${filename}`);
 						var instream = fs.createReadStream(filename);
 						var rl = readline.createInterface(instream);
+						let failed = false;
 						rl.on('line', function(line: string) {
 							// process line here
 							if (line.startsWith(SECTION_HEADER)) {
@@ -213,7 +227,10 @@ async function readLine(relPath: string, fileNames: string[]) {
 									console.log(currentSection);
 									console.log(line);
 									console.log(e);
-									throw e;
+									fail(e);
+									rl.close();
+									failed = true;
+									return;
 								}
 								switch (currentSection) {
 									case LINK_LIB:
@@ -240,7 +257,9 @@ async function readLine(relPath: string, fileNames: string[]) {
 								graph.groupLib = groupLib;
 							} else {
 							}
-							resolve();
+							if (!failed) {
+								resolve();
+							}
 							instream.close();
 						});
 					});
@@ -261,6 +280,59 @@ async function readLine(relPath: string, fileNames: string[]) {
 	}
 	return graph;
 }
+async function checkLines(relPath: string, fileNames: string[]): Promise<boolean> {
+	let currentSection: string | null = null;
+	let bucket = '';
+
+	return await fileNames
+		.map((fname) => path_join(relPath, fname))
+		.forEachAsync(async (filename: string, index: number) => {
+			return await new Promise((resolve, fail) => {
+				console.log(`Reading : ${filename}`);
+				var instream = fs.createReadStream(filename);
+				var rl = readline.createInterface(instream);
+				let failed = false;
+				rl.on('line', function(line: string) {
+					// process line here
+					if (line.startsWith(SECTION_HEADER)) {
+						currentSection = line.substring(SECTION_HEADER.length);
+					} else if (!currentSection) {
+						bucket = bucket + line;
+					} else {
+						line = line.replace(NEW_LINE_REPLACEMENT, '\n');
+						let obj;
+						try {
+							if (line.trim()) {
+								obj = JSON.parse(line);
+							}
+						} catch (e) {
+							console.log(currentSection);
+							console.log(line);
+							console.log(e);
+							fail(e);
+							rl.close();
+							failed = true;
+							return;
+						}
+					}
+				});
+
+				rl.on('close', function() {
+					// do something on finish here
+					if (!failed) {
+						resolve();
+					}
+					instream.close();
+				});
+			});
+		})
+		.then(() => {
+			return true;
+		})
+		.catch(() => {
+			return false;
+		});
+}
 
 export async function SplitIntoFiles(relPath: string, chunkFolder: string, chunkName: string, currentGraph: Graph) {
 	console.log('split into files');
@@ -271,7 +343,7 @@ export async function SplitIntoFiles(relPath: string, chunkFolder: string, chunk
 	let temporaryFile = path.join(relPath, chunkFolder, tempName);
 	console.log('store graph in temporary file');
 	await StoreGraph(currentGraph, temporaryFile);
-	const linesPerFile = Math.pow(2, 16);
+	const linesPerFile = Math.pow(2, 15);
 	let currentCount = 0;
 	let currentFile = 0;
 	let fileContent = '';
@@ -292,7 +364,7 @@ export async function SplitIntoFiles(relPath: string, chunkFolder: string, chunk
 				currentCount++;
 			}
 		});
-    rl.on('close', function() {
+		rl.on('close', function() {
 			// do something on finish here
 			if (fileContent) {
 				fs.writeFileSync(path.join(relPath, chunkFolder, chunkName + currentFile), fileContent);

@@ -142,6 +142,13 @@ export default function FourColumnSection(args: any = {}) {
 					}
 				}
 			];
+		},
+		function() {
+			if (context.callback) {
+				context.containers = [ context.node4, context.node5, context.node6, context.node7 ];
+				context.callback(context);
+			}
+			return [];
 		}
 	];
 }

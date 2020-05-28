@@ -16,13 +16,15 @@ import { Graph } from '../../../methods/graph_types';
 import { NodeProperties } from '../../../constants/nodetypes';
 
 export interface ButtonDescription {
-	externalLabelApi: string;
+	externalLabelApi?: string;
 	id?: string;
 	title: string;
 }
 export interface SmartDashbordParmater {
-	buttons: [];
+	buttons: ButtonDescription[];
 	dashboardName: string;
+	callback?: Function;
+	componentName?: any;
 }
 export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 	let result: any[] = [];
@@ -51,7 +53,9 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			}
 			return AddComponent({
 				component: screenOption,
-				componentType: ComponentTypes.ReactNative[ComponentTypeKeys.View],
+				skipLabel: true,
+				componentName: args.componentName,
+				componentType: ComponentTypes.ReactNative[ComponentTypeKeys.View].key,
 				callback: (context: { entry: string }) => {
 					viewComponent = context.entry;
 				}
@@ -68,51 +72,85 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 				}
 			});
 		});
+
+		result.push(function(graph: Graph) {
+			if (!screenOption) {
+				throw new Error('missing screenOption');
+			}
+			if (!mainSection) {
+				throw new Error('missing mainSection');
+			}
+			if (!viewComponent) {
+				throw new Error('missing viewComponent');
+			}
+			let layout: any;
+			layout = SetLayoutComponent(GetNodeById(screenOption, graph), mainSection, viewComponent);
+
+			return {
+				operation: UPDATE_NODE_PROPERTY,
+				options() {
+					return {
+						id: screenOption,
+						properties: { [NodeProperties.Layout]: layout }
+					};
+				}
+			};
+		});
+
 		result.push(
 			...args.buttons.map((button: ButtonDescription) => {
-				return AddComponent({
-					component: viewComponent,
-					componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button],
-					callback: (bt: { entry: string }) => {
-						button.id = bt.entry;
-					}
-				});
-			})
-		);
-		result.push(
-			...args.buttons.map((button: ButtonDescription) => {
-				if (button.id)
-					return $addComponentApiNodes(button.id, 'label', null, {}, (inner: { externalApi: string }) => {
-						button.externalLabelApi = inner.externalApi;
+				return function() {
+					return AddComponent({
+            component: viewComponent,
+            skipLabel: true,
+						componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button].key,
+						callback: (bt: { entry: string }) => {
+							button.id = bt.entry;
+						}
 					});
-				throw new Error('missing button id in create smart dashboards');
+				};
 			})
 		);
 		result.push(
 			...args.buttons.map((button: ButtonDescription) => {
-				if (button.externalLabelApi) {
-					return {
-						operation: CONNECT_TO_TITLE_SERVICE,
-						options: {
-							id: button.externalLabelApi
-						}
-					};
-				}
-				throw new Error('external label api is missing in create smart dashboards');
+				return function() {
+					if (button.id)
+						return $addComponentApiNodes(button.id, 'label', null, {}, (inner: { externalApi: string }) => {
+							button.externalLabelApi = inner.externalApi;
+						});
+					throw new Error('missing button id in create smart dashboards');
+				};
 			})
 		);
 		result.push(
 			...args.buttons.map((button: ButtonDescription) => {
-				if (button.externalLabelApi) {
-					return {
-						operation: UPDATE_NODE_PROPERTY,
-						options: {
-							id: button.id,
-							properties: { [NodeProperties.UIText]: button.title }
-						}
-					};
-				}
-				throw new Error('external label api is missing in create smart dashboards');
+				return function() {
+					if (button.externalLabelApi) {
+						return {
+							operation: CONNECT_TO_TITLE_SERVICE,
+							options: {
+								id: button.externalLabelApi
+							}
+						};
+					}
+					throw new Error('external label api is missing in create smart dashboards');
+				};
+			})
+		);
+		result.push(
+			...args.buttons.map((button: ButtonDescription) => {
+				return function() {
+					if (button.externalLabelApi) {
+						return {
+							operation: UPDATE_NODE_PROPERTY,
+							options: {
+								id: button.id,
+								properties: { [NodeProperties.UIText]: `${button.title}` }
+							}
+						};
+					}
+					throw new Error('external label api is missing in create smart dashboards');
+				};
 			})
 		);
 		result.push(function(graph: Graph) {
@@ -136,6 +174,15 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 					};
 				}
 			};
+		});
+
+		result.push(function() {
+			if (args.callback) {
+				args.callback({
+					entry: dashboardScreen,
+					buttons: args.buttons
+				});
+			}
 		});
 	}
 
