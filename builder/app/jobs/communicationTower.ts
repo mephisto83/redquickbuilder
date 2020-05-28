@@ -125,7 +125,8 @@ export default class CommunicationTower {
 
 			try {
 				await sleep(1000);
-				let { body } = await this.confirmFile(
+
+				let res = await this.confirmFile(
 					{
 						agentName: agentProject.agent,
 						agentProject: agentProject.name,
@@ -136,6 +137,8 @@ export default class CommunicationTower {
 					},
 					localPath
 				);
+				console.log(res);
+				let { body } = res;
 				if (!body.sucess) {
 					maxattempts = true;
 					throw new Error('file size not confirmed');
@@ -158,8 +161,8 @@ export default class CommunicationTower {
 			try {
 				await this.startServers();
 			} catch (e) {
-        error = true;
-        console.log(e);
+				error = true;
+				console.log(e);
 			}
 		} while (error);
 	}
