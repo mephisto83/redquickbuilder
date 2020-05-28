@@ -337,6 +337,7 @@ export default class CommunicationTower {
 				let stats = fs.statSync(requestedPath);
 				var fileSizeInBytes = stats['size'];
 				return {
+					port: -1,
 					success: fileSizeInBytes === req.fileSizeInBytes,
 					error: fileSizeInBytes !== req.fileSizeInBytes,
 					errorMessage: 'file size doesnt match'
@@ -344,6 +345,8 @@ export default class CommunicationTower {
 			} else {
 				return {
 					error: true,
+					port: -1,
+					file: requestedPath,
 					errorMessage: 'file doesnt exist here'
 				};
 			}
