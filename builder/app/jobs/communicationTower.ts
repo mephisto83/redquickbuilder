@@ -264,6 +264,10 @@ export default class CommunicationTower {
 				agentName: this.agentName,
 				filePath: filePathArray
 			})
+		}).then((res: any) => {
+			return res.json().then((rt: any) => {
+				return rt;
+			});
 		});
 	}
 	async sendFile(message: AgentProject, localFilePath: string) {
