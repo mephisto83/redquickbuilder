@@ -224,7 +224,7 @@ export default class CommunicationTower {
 				break;
 			case RedQuickDistributionCommand.ConfirmFile:
 				reply.hostname = address.hostname;
-				await this.checkFile(parsed);
+				await this.checkFile(parsed, reply);
 				break;
 			default:
 				let res = await this.onHandleReceivedMessage(parsed);
@@ -330,7 +330,7 @@ export default class CommunicationTower {
 		});
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
-	async checkFile(req: any) {
+	async checkFile(req: any, reply: any) {
 		let res = await Promise.resolve().then(() => {
 			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			if (fs.existsSync(requestedPath)) {
@@ -348,6 +348,8 @@ export default class CommunicationTower {
 				};
 			}
 		});
+
+		Object.assign(reply, res);
 	}
 	async receiveFile(req: any) {
 		this.receivingFile = true;
