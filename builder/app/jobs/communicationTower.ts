@@ -254,7 +254,8 @@ export default class CommunicationTower {
 		var fileSizeInBytes = stats['size'];
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let address: any = this.getIpaddress();
-		message.hostname = address.hostname;
+    message.hostname = address.hostname;
+    console.log(`confirming file size is ${fileSizeInBytes}`)
 		return await fetch(`http://${message.targetHost}:${message.targetPort}`, {
 			method: 'POST',
 			body: JSON.stringify({
