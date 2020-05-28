@@ -261,7 +261,7 @@ export default class CommunicationTower {
 			method: 'POST',
 			body: JSON.stringify({
 				...message,
-				size: fileSizeInBytes,
+				fileSizeInBytes: fileSizeInBytes,
 				command: RedQuickDistributionCommand.ConfirmFile,
 				agentName: this.agentName,
 				filePath: filePathArray
