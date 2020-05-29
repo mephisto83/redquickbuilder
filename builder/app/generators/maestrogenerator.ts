@@ -547,7 +547,7 @@ export default class MaestroGenerator {
 						`${namespace}${NameSpace.Interface}`
 					],
 					namespace,
-					space: NameSpace.Controllers
+					space: NameSpace.Interface
 				}),
 				test: NamespaceGenerator.Generate({
 					template: testTemplate,

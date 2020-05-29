@@ -1146,6 +1146,120 @@ class ContextMenu extends Component<any, any> {
 						})}
 					</TreeViewMenu>
 				];
+			case NodeTypes.NavigationScreen:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						<TreeViewItemContainer>
+							<CheckBox
+								label={Titles.Dashboard}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.IsDashboard,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.IsDashboard)}
+							/>
+						</TreeViewItemContainer>
+
+						<TreeViewItemContainer>
+							<TextInput
+								label={Titles.Name}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.UIText,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.UIText)}
+							/>
+						</TreeViewItemContainer>
+						{!GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+							<TreeViewItemContainer>
+								<CheckBox
+									label={Titles.IsAuthenticatedLaunchHome}
+									onChange={(value: any) => {
+										this.props.graphOperation([
+											{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													prop: UIA.NodeProperties.IsHomeLaunchView,
+													id: currentNode.id,
+													value: value
+												}
+											}
+										]);
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.IsHomeLaunchView)}
+								/>
+							</TreeViewItemContainer>
+						)}
+						<TreeViewItemContainer>
+							<SelectInput
+								label={Titles.Models}
+								options={UIA.NodesByType(this.props.state, NodeTypes.Model).toNodeSelect()}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.Model,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.Model)}
+							/>
+						</TreeViewItemContainer>
+						{GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+							<TreeViewItemContainer>
+								<SelectInput
+									label={Titles.ViewTypes}
+									options={Object.keys(ViewTypes).map((key: string) => ({
+										title: key,
+										value: ViewTypes[key],
+										id: key
+									}))}
+									onChange={(value: any) => {
+										this.props.graphOperation([
+											{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													prop: UIA.NodeProperties.ViewType,
+													id: currentNode.id,
+													value: value
+												}
+											}
+										]);
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.ViewType)}
+								/>
+							</TreeViewItemContainer>
+						)}
+					</TreeViewMenu>
+				];
 			case NodeTypes.DataChainCollection:
 				return [
 					<TreeViewMenu

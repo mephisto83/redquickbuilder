@@ -145,6 +145,7 @@ import { ViewTypes } from '../constants/viewtypes';
 import { JobServiceConstants } from '../jobs/jobservice';
 import CodeEditor from './codeeditor';
 import { Graph, Node } from '../methods/graph_types';
+import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 
 const { clipboard } = require('electron');
 
@@ -1182,39 +1183,51 @@ class Dashboard extends Component<any, any> {
 			title: 'Navigate to'
 		});
 		// /
-		result.push({
-			onClick: () => {
-				let models = NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model).filter((model: Node) => {
-					return !UIA.GetNodeByProperties({
-						[NodeProperties.Model]: model.id,
-						[NodeProperties.ViewType]: ViewTypes.Get
-					});
-				});
-				this.props.graphOperation(
-					models.map((model: Node) => {
-						return {
-							operation: UIA.ADD_NEW_NODE,
-							options() {
-								return {
-									nodeType: NodeTypes.NavigationScreen,
-									parent: currentNode.id,
+		let icons = [ 'fa fa-angellist', 'fa fa-bitbucket', 'fa fa-btc', 'fa  fa-cc-discover', 'fa fa-connectdevelop' ];
+		Object.values(ViewTypes).map((v, index) => {
+			let viewType = v;
+			result.push({
+				onClick: () => {
+					let models = NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
+						.filter((model: Node) => !GetNodeProp(model, NodeProperties.IsAgent))
+						.filter((model: Node) => !GetNodeProp(model, NodeProperties.IsUser))
+						.filter((model: Node) => {
+							return !UIA.GetNodeByProperties({
+								[NodeProperties.Model]: model.id,
+								[NodeProperties.ViewType]: viewType,
+								[NodeProperties.NODEType]: NodeTypes.NavigationScreen
+							});
+						});
+					this.props.graphOperation(
+						models.map((model: Node) => {
+							return {
+								operation: UIA.ADD_NEW_NODE,
+								options() {
+									return {
+										nodeType: NodeTypes.NavigationScreen,
+										parent: currentNode.id,
 
-									linkProperties: {
+										linkProperties: {
+											properties: {
+												...LinkProperties.NavigationScreen
+											}
+										},
 										properties: {
-											...LinkProperties.NavigationScreen
+											[NodeProperties.UIText]: `Navigate to ${UIA.GetNodeTitle(
+												model
+											)} ${viewType} Screen`,
+											[NodeProperties.Model]: model.id,
+											[NodeProperties.ViewType]: viewType
 										}
-									},
-									properties: {
-										[NodeProperties.UIText]: `Naviget to ${UIA.GetNodeTitle(model)} Screen`
-									}
-								};
-							}
-						};
-					})
-				);
-			},
-			icon: 'fa fa-external-link',
-			title: `Add Nav to all Get Model Screens`
+									};
+								}
+							};
+						})
+					);
+				},
+				icon: icons[index] || 'fa fa-external-link',
+				title: `Add Nav to all ${viewType} Model Screens`
+			});
 		});
 		result.push({
 			onClick: () => {
@@ -1232,7 +1245,8 @@ class Dashboard extends Component<any, any> {
 									}
 								},
 								properties: {
-									[NodeProperties.UIText]: `Nav Screen`
+									[NodeProperties.UIText]: `Nav Screen`,
+									[NodeProperties.IsDashboard]: true
 								}
 							};
 						}
@@ -1242,6 +1256,21 @@ class Dashboard extends Component<any, any> {
 			icon: 'fa fa-plus',
 			title: `Add Nav Screen`
 		});
+		if (GetNodeProp(currentNode, NodeProperties.IsDashboard)) {
+			result.push({
+				onClick: () => {
+					this.props.graphOperation(
+						DashboardScreenNavigation({
+              modelTitle:UIA.GetNodeTitle(currentNode),
+							component: currentNode.id,
+							model: GetNodeProp(currentNode, NodeProperties.Model)
+						})
+					);
+				},
+				icon: 'fa fa-external-link-square',
+				title: 'Build Standard Dashboard loop'
+			});
+		}
 		return result;
 	}
 	getAgentContext() {

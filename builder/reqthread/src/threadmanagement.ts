@@ -154,17 +154,6 @@ export default class ThreadManagement {
 		// do {
 		// 	attempts--;
 		// 	try {
-		await this.communicationTower.transferFile(
-			{
-				agent: completedJobItem.agentName,
-				name: completedJobItem.projectName,
-				host: this.configuration.remoteServerHost,
-				port: this.configuration.remoteServerPort
-			},
-			path.join(completedJobItem.projectName, completedJobItem.fileName, JobServiceConstants.OUTPUT),
-			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
-		);
-
 		await getFiles(
 			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER)
 		).forEachAsync(async (outputGraphFile) => {
@@ -184,6 +173,18 @@ export default class ThreadManagement {
 				path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
 			);
 		});
+
+		await this.communicationTower.transferFile(
+			{
+				agent: completedJobItem.agentName,
+				name: completedJobItem.projectName,
+				host: this.configuration.remoteServerHost,
+				port: this.configuration.remoteServerPort
+			},
+			path.join(completedJobItem.projectName, completedJobItem.fileName, JobServiceConstants.OUTPUT),
+			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
+		);
+
 		let result = false;
 		do {
 			try {

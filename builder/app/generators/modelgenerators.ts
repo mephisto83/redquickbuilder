@@ -145,7 +145,7 @@ export default class ModelGenerator {
 						propType = GetCodeName(types[0]);
 						propType = `IList<${propType}>`;
 					}
-				} else if (GetNodeProp(propNode, NodeProperties.UIModelType)) {
+				} else if (GetNodeProp(propNode, NodeProperties.UIModelType) && GetNodeProp(propNode, NodeProperties.UseModelAsType)) {
 					propType = 'string';
 				} else if (GetNodeProp(propNode, NodeProperties.NODEType) === NodeTypes.Model) {
 					let propLink = GraphMethods.GetLinkBetween(nodeId, propNode.id, graph);

@@ -734,8 +734,8 @@ export function SetLayoutComponent(currentNode: Node, selectedCell: string, comp
 	cellProperties = GraphMethods.GetCellProperties(nodeLayout, selectedCell);
 	cellProperties.children = cellProperties.children || {};
 	let cellChildren = cellProperties.children;
-  cellChildren[selectedCell] = component;
-  return nodeLayout;
+	cellChildren[selectedCell] = component;
+	return nodeLayout;
 }
 
 export function GetModelPropertyChildren(id: string, options: any = {}) {
@@ -2388,6 +2388,13 @@ export function GetConditionClause(
 				model: clauseKey,
 				model_property: propertyName,
 				validation_Func_name: 'NumericIntAttribute'
+			};
+			break;
+		case NodeConstants.ValidationRules.AlphaNumeric:
+			properties = {
+				model: clauseKey,
+				model_property: propertyName,
+				validation_Func_name: 'AlphaNumericAttribute'
 			};
 			break;
 		case NodeConstants.ValidationRules.AlphaOnly:

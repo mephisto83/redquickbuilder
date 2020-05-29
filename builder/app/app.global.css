@@ -11,3 +11,7 @@
 .monaco-editor .margin {
 	margin: 0;
 }
+
+.control-sidebar .treeview-menu .form-group {
+	margin-left: 12px;
+}
