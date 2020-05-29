@@ -1,6 +1,7 @@
 import { uuidv4 } from '../../utils/array';
 import { GetNodeById, GetNodeProp } from '../../actions/uiactions';
 import { NodeProperties } from '../../constants/nodetypes';
+import { Node } from '../../methods/graph_types';
 
 export function EmailValidationPart() {
 	return {
@@ -60,7 +61,7 @@ export function OneOfAttributePart(enumNode: Node | string) {
 					types: [ 'enumeration', 'extension-type' ]
 				}
 			},
-			node: '9d82ef30-5bf5-4d3e-b541-b1459ab59a34',
+			node: typeof enumNode === 'string' ? enumNode : enumNode.id,
 			enumeration
 		}
 	};
