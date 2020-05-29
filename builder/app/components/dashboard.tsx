@@ -1261,7 +1261,7 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.graphOperation(
 						DashboardScreenNavigation({
-              modelTitle:UIA.GetNodeTitle(currentNode),
+							modelTitle: UIA.GetNodeTitle(currentNode),
 							component: currentNode.id,
 							model: GetNodeProp(currentNode, NodeProperties.Model)
 						})
@@ -1311,6 +1311,7 @@ class Dashboard extends Component<any, any> {
 	}
 
 	getPropertyContent() {
+		let { state } = this.props;
 		const result = [];
 		result.push({
 			onClick: () => {
@@ -1322,6 +1323,21 @@ class Dashboard extends Component<any, any> {
 			},
 			icon: 'fa fa-magnet',
 			title: `Enumeration Link`
+    });
+
+		result.push({
+			onClick: () => {
+        const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+				this.props.graphOperation(UIA.NEW_ATTRIBUTE_NODE, {
+					parent: currentNode.id,
+					groupProperties: {},
+					linkProperties: {
+						properties: { ...LinkProperties.AttributeLink }
+					}
+				});
+			},
+			icon: 'fa fa-plus',
+			title: `Add Attribute`
 		});
 		return result;
 	}

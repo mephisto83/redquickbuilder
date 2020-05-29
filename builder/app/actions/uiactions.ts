@@ -4401,11 +4401,15 @@ declare global {
 			configurable: true,
 			value() {
 				const collection = this;
-				return collection.map((node: any) => ({
-					value: node.id,
-					id: node.id,
-					title: GetNodeTitle(node)
-				}));
+				return collection
+					.map((node: any) => ({
+						value: node.id,
+						id: node.id,
+						title: GetNodeTitle(node)
+					}))
+					.sort((a: any, b: any) => {
+						return `${a.title}`.localeCompare(`${b.title}`);
+					});
 			}
 		});
 	}
