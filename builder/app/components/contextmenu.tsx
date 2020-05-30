@@ -49,7 +49,9 @@ import {
 	existsLinkBetween,
 	GetNodeProp,
 	GetNodeLinkedTo,
-	setupCache
+	setupCache,
+	GetAllChildren,
+	GetLinkBetween
 } from '../methods/graph_methods';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
@@ -108,6 +110,7 @@ import { GetFunctionToLoadModels, GetValidationMethodForViewTypes } from '../nod
 import { SecondaryOptions } from '../constants/visual';
 import SetupEnumerationPermissionTemplate from '../nodepacks/permission/SetupEnumerationPermissionTemplate';
 import AddAttributeOfType from '../nodepacks/attributes/AddAttributeOfType';
+import { GraphLink, Node } from '../methods/graph_types';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -639,6 +642,172 @@ class ContextMenu extends Component<any, any> {
 									}
 								}))
 							);
+						}}
+					/>
+				</TreeViewMenu>
+				<TreeViewMenu
+					title={`${Titles.BuildReferenceObject}`}
+					open={UIA.Visual(state, Titles.BuildReferenceObject)}
+					active
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+					toggle={() => {
+						this.props.toggleVisual(Titles.BuildReferenceObject);
+					}}
+				>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Model} 1`}
+							options={UIA.NodesByType(null, NodeTypes.Model).toNodeSelect()}
+							onChange={(value: any) => {
+								this.setState({
+									model: value
+								});
+							}}
+							value={this.state.model}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={`${Titles.Model} 2`}
+							options={UIA.NodesByType(null, NodeTypes.Model).toNodeSelect()}
+							onChange={(value: any) => {
+								this.setState({
+									model2: value
+								});
+							}}
+							value={this.state.model2}
+						/>
+					</TreeViewItemContainer>
+
+					<TreeViewMenu
+						title={`${Titles.BuildReferenceObject}`}
+						onClick={() => {
+							let { model, model2 } = this.state;
+							let newModel: any;
+							let newModel1: any;
+							let newModel2: any;
+							this.props.graphOperation([
+								{
+									operation: UIA.ADD_NEW_NODE,
+									options() {
+										return {
+											nodeType: NodeTypes.Model,
+											properties: {
+												[NodeProperties.UIText]: `${GetNodeProp(
+													model,
+													NodeProperties.UIText
+												)} to ${GetNodeProp(model2, NodeProperties.UIText)}`
+											},
+											groupProperties: {},
+											callback: (node: Node) => {
+												newModel = node.id;
+											}
+										};
+									}
+								},
+								{
+									operation: UIA.ADD_NEW_NODE,
+									options() {
+										return {
+											nodeType: NodeTypes.Property,
+											linkProperties: {
+												properties: {
+													...LinkProperties.PropertyLink
+												}
+											},
+											parent: newModel,
+											properties: {
+												[NodeProperties.UIText]: GetNodeProp(model, NodeProperties.UIText)
+											},
+											groupProperties: {},
+											callback(node: Node) {
+												newModel1 = node.id;
+											}
+										};
+									}
+								},
+								{
+									operation: UIA.ADD_NEW_NODE,
+									options() {
+										return {
+											nodeType: NodeTypes.Property,
+											linkProperties: {
+												properties: {
+													...LinkProperties.PropertyLink
+												}
+											},
+											parent: newModel,
+											properties: {
+												[NodeProperties.UIText]: GetNodeProp(model2, NodeProperties.UIText)
+											},
+											groupProperties: {},
+											callback(node: Node) {
+												newModel2 = node.id;
+											}
+										};
+									}
+								},
+								{
+									operation: UIA.CHANGE_NODE_PROPERTY,
+									options() {
+										return {
+											prop: UIA.NodeProperties.UIModelType,
+											id: newModel1,
+											value: model
+										};
+									}
+								},
+								{
+									operation: UIA.ADD_LINK_BETWEEN_NODES,
+									options() {
+										return {
+											target: model,
+											source: newModel1,
+											properties: { ...LinkProperties.ModelTypeLink }
+										};
+									}
+								},
+								{
+									operation: UIA.CHANGE_NODE_PROPERTY,
+									options() {
+										return {
+											prop: UIA.NodeProperties.UIModelType,
+											id: newModel2,
+											value: model2
+										};
+									}
+								},
+								{
+									operation: UIA.CHANGE_NODE_PROPERTY,
+									options() {
+										return {
+											prop: UIA.NodeProperties.UseModelAsType,
+											id: newModel2,
+											value: true
+										};
+									}
+								},
+								{
+									operation: UIA.CHANGE_NODE_PROPERTY,
+									options() {
+										return {
+											prop: UIA.NodeProperties.UseModelAsType,
+											id: newModel1,
+											value: true
+										};
+									}
+								},
+								{
+									operation: UIA.ADD_LINK_BETWEEN_NODES,
+									options() {
+										return {
+											target: model2,
+											source: newModel2,
+											properties: { ...UIA.LinkProperties.ModelTypeLink }
+										};
+									}
+								}
+							]);
 						}}
 					/>
 				</TreeViewMenu>
@@ -2019,6 +2188,68 @@ class ContextMenu extends Component<any, any> {
 								this.props.graphOperation(AddNameDescription({ node0: currentNode.id }));
 							}}
 						/>
+						<TreeViewMenu
+							title={`${Titles.DuplicateProperties}`}
+							open={UIA.Visual(state, Titles.DuplicateProperties)}
+							active
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual(Titles.DuplicateProperties);
+							}}
+						>
+							<TreeViewItemContainer>
+								<SelectInput
+									label={Titles.OptionsType}
+									options={UIA.NodesByType(null, NodeTypes.Model).toNodeSelect()}
+									onChange={(value: any) => {
+										this.setState({
+											model: value
+										});
+									}}
+									value={this.state.model}
+								/>
+							</TreeViewItemContainer>
+
+							<TreeViewMenu
+								title={`${Titles.Copy}`}
+								onClick={() => {
+									let children = UIA.GetModelPropertyChildren(this.state.model, {
+										skipLogicalChildren: true
+									});
+									let { model } = this.state;
+									this.props.graphOperation(
+										children.map((child: Node) => {
+											return {
+												operation: UIA.ADD_NEW_NODE,
+												options() {
+													let link: GraphLink = GetLinkBetween(
+														model,
+														child.id,
+														UIA.GetCurrentGraph()
+													);
+													return {
+														nodeType: GetNodeProp(child, NodeProperties.NODEType),
+														linkProperties: {
+															properties: {
+																...link ? link.properties : LinkProperties.PropertyLink
+															}
+														},
+														parent: currentNode.id,
+														properties: {
+															[NodeProperties.UIText]: GetNodeProp(
+																child,
+																NodeProperties.UIText
+															)
+														},
+														groupProperties: {}
+													};
+												}
+											};
+										})
+									);
+								}}
+							/>
+						</TreeViewMenu>
 						<TreeViewMenu
 							title="Create Claim Service(Agent)"
 							onClick={() => {
