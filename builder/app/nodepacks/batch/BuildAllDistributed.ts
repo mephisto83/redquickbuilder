@@ -166,6 +166,7 @@ const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
 const Modify_Update_Links = 'Modify_Update_Links';
 export const Setup_View_Types = 'Setup_View_Types';
 export const Build_Dashboards = 'Build_Dashboards';
+export const Connect_Dashboards = 'Connect_Dashboards';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
@@ -201,6 +202,7 @@ const buildAllProgress = [
 	{ name: Collect_Screen_Connect_Into_Graph },
 	{ name: Modify_Update_Links },
 	...waiting(Build_Dashboards),
+	...waiting(Connect_Dashboards),
 	...waiting(Setup_View_Types),
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
@@ -369,6 +371,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
 		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
 		await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
+
+		await threadRun(buildAllProgress, Connect_Dashboards, currentJobFile, NodeTypes.Screen);
+		await threadRun(buildAllProgress, Build_Dashboards, currentJobFile, NodeTypes.NavigationScreen);
 
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 		await threadRun(
