@@ -10,8 +10,7 @@ export default function NColumnSection(args: { component: string; count: number;
 	};
 	let { count } = args;
 	let nodes: { [st: string]: {} } = {};
-	for (var i = 0; i < count; i++) {}
-	{
+	for (var i = 0; i < count; i++) {
 		nodes[uuidv4()] = {};
 	}
 	let properties: { [st: string]: {} } = {};

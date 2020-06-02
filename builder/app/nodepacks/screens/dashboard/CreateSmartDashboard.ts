@@ -20,11 +20,13 @@ export interface ButtonDescription {
 	externalLabelApi?: string;
 	id?: string;
 	title: string;
+	target: string;
 	buttonId?: string;
 }
 export interface SmartDashbordParmater {
 	buttons: ButtonDescription[];
 	dashboardName: string;
+	uiType: string;
 	callback?: Function;
 	componentName?: any;
 }
@@ -36,16 +38,18 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 	let mainSection: string;
 	let viewComponent: string;
 	let dashboardScreen: string;
-	result.push(
+
+	graphOperation(
 		CreateDashboard_1({
 			name: dashboardName,
+			uiType: args.uiType,
 			callback: (dashboardContext: { entry: string; screenOption: string; mainSection: string }) => {
 				mainSection = dashboardContext.mainSection;
 				screenOption = dashboardContext.screenOption;
 				dashboardScreen = dashboardContext.entry;
 			}
 		})
-	);
+	)(GetDispatchFunc(), GetStateFunc());
 
 	if (args.buttons && args.buttons.length) {
 		result.push(function() {
@@ -157,7 +161,10 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 							operation: UPDATE_NODE_PROPERTY,
 							options: {
 								id: button.id,
-								properties: { [NodeProperties.UIText]: `${button.title}` }
+								properties: {
+									[NodeProperties.UIText]: `${button.title}`,
+									[NodeProperties.Target]: button.target
+								}
 							}
 						};
 					}
@@ -184,7 +191,19 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 				}
 			};
 		});
-
+		result.push(function() {
+			return {
+				operation: UPDATE_NODE_PROPERTY,
+				options: () => {
+					return {
+						id: screenOption,
+						properties: {
+							[NodeProperties.DashboardButtons]: args.buttons
+						}
+					};
+				}
+			};
+		});
 		result.push(function() {
 			if (args.callback) {
 				args.callback({

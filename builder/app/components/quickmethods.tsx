@@ -44,6 +44,7 @@ import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidati
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
 import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDashboard';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
+import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -184,6 +185,13 @@ class QuickMethods extends Component<any, any, any> {
 									icon={'fa fa-plus'}
 									onClick={() => {
 										BuildDashboards(() => true);
+									}}
+								/>
+								<TreeViewMenu
+									title={'Connect Dashboards'}
+									icon={'fa fa-plus'}
+									onClick={() => {
+										ConnectDashboards(() => true);
 									}}
 								/>
 								<TreeViewMenu

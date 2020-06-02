@@ -1,6 +1,6 @@
 import * as _ from '../utils/array';
 import fs from 'fs';
-export const NodeTypes: { [str: string]: string } = {
+export const NodeTypes = {
 	Concept: 'concept',
 	Model: 'model',
 	DataSource: 'data-source',
@@ -390,6 +390,7 @@ export const NodeProperties = {
 	OnFocus: 'onFocus',
 	OnChange: 'onChangeText',
 	UIType: 'UIType',
+	DashboardButtons: 'DashboardButtons',
 	TextType: 'TextType',
 	Enumeration: 'Enumeration',
 	ConditionType: 'ConditionType',
@@ -468,6 +469,7 @@ export const NodeProperties = {
 	IsDataChainPagingSkip: 'IsDataChainPagingSkip',
 	IsDataChainPagingTake: 'IsDataChainPagingTake',
 	UIText: 'text',
+	Target: 'Target',
 	UseAsValue: 'UseAsValue',
 	IsUrlParameter: 'IsUrlParameter',
 	NavigationAction: 'NavigationAction',

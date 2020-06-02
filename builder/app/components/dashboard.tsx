@@ -146,6 +146,7 @@ import { JobServiceConstants } from '../jobs/jobservice';
 import CodeEditor from './codeeditor';
 import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
+import CheckBoxProperty from './checkboxproperty';
 
 const { clipboard } = require('electron');
 
@@ -1323,11 +1324,11 @@ class Dashboard extends Component<any, any> {
 			},
 			icon: 'fa fa-magnet',
 			title: `Enumeration Link`
-    });
+		});
 
 		result.push({
 			onClick: () => {
-        const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+				const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 				this.props.graphOperation(UIA.NEW_ATTRIBUTE_NODE, {
 					parent: currentNode.id,
 					groupProperties: {},

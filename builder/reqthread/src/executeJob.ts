@@ -33,6 +33,7 @@ import { SetPause } from '../../app/methods/graph_methods';
 import ApplyTemplates from '../../app/nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../../app/nodepacks/permission/ApplyValidationFromProperties';
 import SetupViewTypes from '../../app/nodepacks/batch/SetupViewTypes';
+import BuildDashboards from '../../app/nodepacks/screens/dashboard/BuildDashboards';
 
 let app_state;
 
@@ -74,6 +75,11 @@ export default async function executeJob(
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
 					);
+					break;
+				case BAD.Build_Dashboards:
+					await BuildDashboards((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					break;
 				case BAD.ApplyTemplates:
 					await ApplyTemplates((model: any) => {
