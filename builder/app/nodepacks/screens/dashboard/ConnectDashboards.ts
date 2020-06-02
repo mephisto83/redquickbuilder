@@ -11,7 +11,8 @@ import {
 	GetNodeById,
 	graphOperation,
 	GetDispatchFunc,
-	GetStateFunc
+	GetStateFunc,
+	GetNodeByProperties
 } from '../../../actions/uiactions';
 import { Node, Graph } from '../../../methods/graph_types';
 import CreateSmartDashboard, { ButtonDescription } from './CreateSmartDashboard';
@@ -26,8 +27,7 @@ export default function ConnectDashboards(
 		[UITypes.ReactWeb]: true
 	}
 ) {
-	let screens = NodesByType(null, NodeTypes.Screen)
-		.filter(filter);
+	let screens = NodesByType(null, NodeTypes.Screen).filter(filter);
 	let graph = GetCurrentGraph();
 	SetPause(true);
 	let result: any = [];
@@ -67,7 +67,19 @@ export default function ConnectDashboards(
 					}
 					let navScreenTarget = GetNodeById(target);
 					let screenTarget = GetNodeProp(navScreenTarget, NodeProperties.Screen);
-					return ConnectLifecycleMethod({ target: screenTarget.id, source: handleInstance.id, graph });
+					if (!screenTarget) {
+						screenTarget = GetNodeByProperties({
+							[NodeProperties.NODEType]: NodeTypes.Screen,
+							[NodeProperties.Agent]: GetNodeProp(navScreenTarget, NodeProperties.Agent),
+							[NodeProperties.Model]: GetNodeProp(navScreenTarget, NodeProperties.Model),
+							[NodeProperties.ViewType]: GetNodeProp(navScreenTarget, NodeProperties.ViewType)
+						});
+					}
+					if (screenTarget) {
+						return ConnectLifecycleMethod({ target: screenTarget.id, source: handleInstance.id, graph });
+					}
+					console.warn('didnt find a screen');
+					return null;
 				});
 			});
 		});
