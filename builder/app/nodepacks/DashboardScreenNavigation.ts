@@ -5,6 +5,8 @@ export default function DashboardScreenNavigation(args: {
 	component: string;
 	model: string;
 	viewPackages?: any;
+	agent: string;
+	skipCreate: boolean;
 }) {
 	if (!args.model) {
 		throw new Error('missing model argument');
@@ -106,6 +108,19 @@ export default function DashboardScreenNavigation(args: {
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
 					options: {
+						prop: 'Agent',
+						id: context.node1,
+						value: context.agent
+					}
+				}
+			];
+		},
+
+		function() {
+			return [
+				{
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: {
 						prop: 'view-type',
 						id: context.node1,
 						value: 'GetAll'
@@ -114,82 +129,92 @@ export default function DashboardScreenNavigation(args: {
 			];
 		},
 
-		function() {
-			return [
-				{
-					operation: 'ADD_NEW_NODE',
-					options: {
-						nodeType: 'NavigationScreen',
-						parent: context.node0,
-						linkProperties: {
-							properties: {
-								type: 'NavigationScreen',
-								NavigationScreen: {}
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'ADD_NEW_NODE',
+							options: {
+								nodeType: 'NavigationScreen',
+								parent: context.node0,
+								linkProperties: {
+									properties: {
+										type: 'NavigationScreen',
+										NavigationScreen: {}
+									}
+								},
+								properties: {
+									text: 'Nav Screen',
+									IsDashboard: true
+								},
+								callback: function(node: { id: any }) {
+									context.node3 = node.id;
+								}
 							}
-						},
-						properties: {
-							text: 'Nav Screen',
-							IsDashboard: true
-						},
-						callback: function(node: { id: any }) {
-							context.node3 = node.id;
 						}
-					}
-				}
-			];
-		},
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'IsDashboard',
-						id: context.node3,
-						value: false
-					}
-				}
-			];
-		},
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'IsDashboard',
+								id: context.node3,
+								value: false
+							}
+						}
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'text',
-						id: context.node3,
-						value: '' + args.modelTitle + ' Create'
-					}
-				}
-			];
-		},
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'text',
+								id: context.node3,
+								value: '' + args.modelTitle + ' Create'
+							}
+						}
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Model',
-						id: context.node3,
-						value: context.node2
-					}
-				}
-			];
-		},
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'Model',
+								id: context.node3,
+								value: context.node2
+							}
+						}
+					];
+				},
 
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'view-type',
-						id: context.node3,
-						value: 'Create'
-					}
-				}
-			];
-		},
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'view-type',
+								id: context.node3,
+								value: 'Create'
+							}
+						}
+					];
+				},
 
 		function() {
 			return [
@@ -366,16 +391,18 @@ export default function DashboardScreenNavigation(args: {
 				};
 			}
 		},
-		{
-			operation: 'CHANGE_NODE_PROPERTY',
-			options: function() {
-				return {
-					prop: 'Pinned',
-					id: context.node3,
-					value: false
-				};
-			}
-		},
+		context.skipCreate
+			? null
+			: {
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: function() {
+						return {
+							prop: 'Pinned',
+							id: context.node3,
+							value: false
+						};
+					}
+				},
 		{
 			operation: 'CHANGE_NODE_PROPERTY',
 			options: function() {
@@ -398,6 +425,18 @@ export default function DashboardScreenNavigation(args: {
 		}
 	];
 	let applyViewPackages = [
+		function() {
+			return [
+				{
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: {
+						prop: 'Agent',
+						id: context.node1,
+						value: context.agent
+					}
+				}
+			];
+		},
 		{
 			operation: 'UPDATE_NODE_PROPERTY',
 			options: function() {
@@ -407,6 +446,20 @@ export default function DashboardScreenNavigation(args: {
 				};
 			}
 		},
+		context.skipCreate
+			? null
+			: function() {
+					return [
+						{
+							operation: 'CHANGE_NODE_PROPERTY',
+							options: {
+								prop: 'Agent',
+								id: context.node3,
+								value: context.agent
+							}
+						}
+					];
+				},
 		{
 			operation: 'UPDATE_NODE_PROPERTY',
 			options: function() {
@@ -415,6 +468,18 @@ export default function DashboardScreenNavigation(args: {
 					properties: viewPackages
 				};
 			}
+		},
+		function() {
+			return [
+				{
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: {
+						prop: 'Agent',
+						id: context.node4,
+						value: context.agent
+					}
+				}
+			];
 		},
 		{
 			operation: 'UPDATE_NODE_PROPERTY',
@@ -425,6 +490,19 @@ export default function DashboardScreenNavigation(args: {
 				};
 			}
 		},
+		function() {
+			return [
+				{
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: {
+						prop: 'Agent',
+						id: context.node5,
+						value: context.agent
+					}
+				}
+			];
+		},
+
 		{
 			operation: 'UPDATE_NODE_PROPERTY',
 			options: function() {

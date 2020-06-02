@@ -21,6 +21,9 @@ import { findLink } from '../../methods/graph_methods';
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
 	console.log('Create Component All');
 	const result: any = [];
+	const navigableScreens = GetNodesByProperties({
+		[NodeProperties.NODEType]: NodeTypes.NavigationScreen
+	});
 	const models = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model
 	})
@@ -47,7 +50,22 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 				return;
 			}
 			console.log(`Creating shared components for : ${GetNodeTitle(model)}`);
+			if (navigableScreens && navigableScreens.length) {
+				let naviScreen = navigableScreens.find((navigableScreen: Node) => {
+					let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
+					let navViewType = GetNodeProp(navigableScreen, NodeTypes.ViewType);
+					let navModel = GetNodeProp(navigableScreen, NodeTypes.Model);
 
+					return (
+						model.id === navModel &&
+						navAgent === agent.id &&
+						navViewType === GetNodeProp(viewType, NodeProperties.ViewType)
+					);
+				});
+				if (!naviScreen) {
+					return;
+				}
+			}
 			CreateComponentModel({
 				model: model.id,
 				viewTypeModelId: viewType.id,

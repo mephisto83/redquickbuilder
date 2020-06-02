@@ -14,11 +14,13 @@ import { ComponentTypes, ComponentTypeKeys } from '../../../constants/componentt
 import FourColumnSection from '../../FourColumnSection';
 import { Graph } from '../../../methods/graph_types';
 import { NodeProperties } from '../../../constants/nodetypes';
+import NColumnSection from '../../NColumnSection';
 
 export interface ButtonDescription {
 	externalLabelApi?: string;
 	id?: string;
 	title: string;
+	buttonId?: string;
 }
 export interface SmartDashbordParmater {
 	buttons: ButtonDescription[];
@@ -33,7 +35,6 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 	let screenOption: string;
 	let mainSection: string;
 	let viewComponent: string;
-	let buttonContainers: string[];
 	let dashboardScreen: string;
 	result.push(
 		CreateDashboard_1({
@@ -65,10 +66,16 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			if (!viewComponent) {
 				throw new Error('no viewComponent in createsmartdashboard');
 			}
-			return FourColumnSection({
+			return NColumnSection({
 				component: viewComponent,
+				count: args.buttons.length,
 				callback: (buttonContext: { containers: [] }) => {
-					buttonContainers = buttonContext.containers;
+					if (args.buttons.length !== buttonContext.containers.length) {
+						throw new Error('produced the wrong number of buttons');
+					}
+					buttonContext.containers.forEach((id: string, index: number) => {
+						args.buttons[index].buttonId = id;
+					});
 				}
 			});
 		});
@@ -83,6 +90,11 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			if (!viewComponent) {
 				throw new Error('missing viewComponent');
 			}
+			args.buttons.forEach((btnInfo: ButtonDescription) => {
+				if (!btnInfo.buttonId) {
+					throw new Error('missing button Id');
+				}
+			});
 			let layout: any;
 			layout = SetLayoutComponent(GetNodeById(screenOption, graph), mainSection, viewComponent);
 
@@ -101,8 +113,8 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			...args.buttons.map((button: ButtonDescription) => {
 				return function() {
 					return AddComponent({
-            component: viewComponent,
-            skipLabel: true,
+						component: viewComponent,
+						skipLabel: true,
 						componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button].key,
 						callback: (bt: { entry: string }) => {
 							button.id = bt.entry;
@@ -154,13 +166,10 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			})
 		);
 		result.push(function(graph: Graph) {
-			if (!buttonContainers) {
-				throw new Error('missing button containers');
-			}
 			let layout: any;
 			args.buttons.forEach((button: ButtonDescription, index: number) => {
-				if (button.id) {
-					layout = SetLayoutComponent(GetNodeById(viewComponent, graph), buttonContainers[index], button.id);
+				if (button.id && button.buttonId) {
+					layout = SetLayoutComponent(GetNodeById(viewComponent, graph), button.buttonId, button.id);
 				} else {
 					throw new Error('button no found, in create smart dashboard');
 				}

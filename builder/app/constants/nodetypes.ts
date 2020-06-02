@@ -1,6 +1,6 @@
 import * as _ from '../utils/array';
 import fs from 'fs';
-export const NodeTypes = {
+export const NodeTypes: { [str: string]: string } = {
 	Concept: 'concept',
 	Model: 'model',
 	DataSource: 'data-source',

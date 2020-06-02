@@ -165,6 +165,7 @@ const Update_Screen_Urls = 'Update_Screen_Urls';
 const Collect_Screen_Connect_Into_Graph = 'Collect_Screen_Connect_Into_Graph';
 const Modify_Update_Links = 'Modify_Update_Links';
 export const Setup_View_Types = 'Setup_View_Types';
+export const Build_Dashboards = 'Build_Dashboards';
 const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
@@ -199,7 +200,7 @@ const buildAllProgress = [
 	{ name: Wait_For_Screen_Connect },
 	{ name: Collect_Screen_Connect_Into_Graph },
 	{ name: Modify_Update_Links },
-	// { name: Setup_View_Types },
+	...waiting(Build_Dashboards),
 	...waiting(Setup_View_Types),
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },

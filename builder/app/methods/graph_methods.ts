@@ -1264,7 +1264,7 @@ export function isFlagged(flag: any): any {
 }
 
 export function addNewNodeOfType(graph: any, options: any, nodeType: any, callback?: any) {
-	const { parent, linkProperties, groupProperties, skipGroup } = options;
+	const { parent, linkProperties, groupProperties, skipGroup, overrideId, id } = options;
 	if (!callback) {
 		callback = options.callback;
 	}
@@ -1273,6 +1273,9 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 		throw new Error('invalid grid links');
 	}
 	const node = createNode(nodeType);
+	if (id && overrideId) {
+		node.id = id;
+	}
 	if (options.node) {
 		updateNode(node, options);
 		if (nodeType === NodeTypes.ReferenceNode) {
