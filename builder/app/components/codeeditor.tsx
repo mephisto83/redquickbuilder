@@ -25,6 +25,10 @@ class CodeEditor extends Component<any, any> {
 
 		// Register a tokens provider for the language
 		monaco.languages.setMonarchTokensProvider('typescript', Javascript());
+		monaco.editor.setTheme('vs-dark');
+	}
+	componentDidMount() {
+		this.editorWillMount();
 	}
 	render() {
 		if (!this.props.active) {
@@ -92,24 +96,23 @@ class CodeEditor extends Component<any, any> {
 						</div>
 						<div style={{ margin: 0 }}>
 							<MonacoEditor
-								height="600"
+								height="700"
 								width={'100%'}
-								language="typescript"
+								language={this.props.language || 'typescript'}
 								onChange={(val: string) => {
-									console.log(val);
 									this.setState({ value: val });
-									if (currentNode) {
-										throttled(() => {
-											const id = currentNode.id;
-											this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-												prop: NodeProperties.Lambda,
-												id,
-												value: this.state.value
-											});
-										});
-									}
+									// if (currentNode) {
+									// 	throttled(() => {
+									// 		const id = currentNode.id;
+									// 		this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+									// 			prop: NodeProperties.Lambda,
+									// 			id,
+									// 			value: this.state.value
+									// 		});
+									// 	});
+									// }
 								}}
-								value={this.state.value}
+								value={this.state.value || this.props.value}
 								options={options}
 							/>
 						</div>
