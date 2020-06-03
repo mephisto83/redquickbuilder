@@ -27,6 +27,7 @@ export interface SmartDashbordParmater {
 	buttons: ButtonDescription[];
 	dashboardName: string;
 	uiType: string;
+	isHome?: boolean;
 	callback?: Function;
 	componentName?: any;
 }
@@ -199,6 +200,19 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 						id: screenOption,
 						properties: {
 							[NodeProperties.DashboardButtons]: args.buttons
+						}
+					};
+				}
+			};
+		});
+		result.push(function() {
+			return {
+				operation: UPDATE_NODE_PROPERTY,
+				options: () => {
+					return {
+						id: dashboardScreen,
+						properties: {
+							[NodeProperties.IsHomeLaunchView]: !!args.isHome
 						}
 					};
 				}

@@ -38,6 +38,7 @@ export default function BuildDashboards(filter: Function) {
 				uiType,
 				componentName: `${GetNodeTitle(navigationScreen)} Component`,
 				buttons,
+				isHome: !!GetNodeProp(navigationScreen, NodeProperties.IsHomeLaunchView),
 				callback: (sdcontext: { entry: string }) => {
 					screenContext = sdcontext;
 				}
