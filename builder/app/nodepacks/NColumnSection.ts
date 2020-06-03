@@ -78,7 +78,7 @@ export default function NColumnSection(args: { component: string; count: number;
 									children: {},
 									cellModel: {},
 									properties: {
-										tags: []
+										tags: ['NColumnSection', `COLUMN-SIZE-${Object.keys(nodes).length}`]
 									},
 									cellModelProperty: {},
 									cellRoot: {},
