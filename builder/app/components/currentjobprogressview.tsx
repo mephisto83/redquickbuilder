@@ -81,6 +81,7 @@ class CurrentJobProgressView extends Component<any, any> {
 										<th>File</th>
 										<th>Host</th>
 										<th>Port</th>
+										<th>Error</th>
 									</tr>
 									{agents
 										.sort((a: AgentProject, b: AgentProject) => {
@@ -144,6 +145,11 @@ class CurrentJobProgressView extends Component<any, any> {
 													<td>{agentProject.workingOnFile}</td>
 													<td>{agentProject.host}</td>
 													<td>{agentProject.port}</td>
+													<td>
+														{agentProject.error ? (
+															<i className="fa fa-stop" title={`${agentProject.error}`} style={{ color: 'red' }} />
+														) : null}
+													</td>
 												</tr>,
 												this.state[agentProject.name || 'no-name'] ? (
 													<tr>

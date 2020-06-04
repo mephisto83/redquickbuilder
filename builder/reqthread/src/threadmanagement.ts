@@ -84,6 +84,7 @@ export default class ThreadManagement {
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectProgress]: noOp,
+			[RedQuickDistributionCommand.RaisingAgentProjectError]: noOp,
 			[RedQuickDistributionCommand.RaisingHand]: noOp,
 			[RedQuickDistributionCommand.SetCommandCenter]: noOp,
 			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,

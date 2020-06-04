@@ -53,7 +53,8 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.RaisingAgentProjectProgress]: handleAgentProjectProgress,
 			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
 			[RedQuickDistributionCommand.CanReturnResults]: canReturnResults,
-			[RedQuickDistributionCommand.ConfirmFile]: noOp
+			[RedQuickDistributionCommand.ConfirmFile]: noOp,
+			[RedQuickDistributionCommand.RaisingAgentProjectError]: handleAgentProjectError
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
@@ -87,8 +88,18 @@ async function handleAgentProjectProgress(message: RedQuickDistributionMessage):
 	if (runnerContext.agents[message.agentName]) {
 		if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
 			runnerContext.agents[message.agentName].projects[message.agentProject].updated = Date.now();
-      runnerContext.agents[message.agentName].projects[message.agentProject].progress = message.progress;
-      await tellCommandCenter();
+			runnerContext.agents[message.agentName].projects[message.agentProject].progress = message.progress;
+			await tellCommandCenter();
+		}
+	}
+	return { success: true };
+}
+async function handleAgentProjectError(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	if (message.agentName) {
+		if (runnerContext.agents[message.agentName]) {
+			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
+				runnerContext.agents[message.agentName].projects[message.agentProject].error = true;
+			}
 		}
 	}
 	return { success: true };

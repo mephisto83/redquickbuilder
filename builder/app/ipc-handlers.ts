@@ -146,6 +146,7 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		[RedQuickDistributionCommand.CompletedJobItem]: noOp,
 		[RedQuickDistributionCommand.CanReturnResults]: noOp,
 		[RedQuickDistributionCommand.ConfirmFile]: noOp,
+		[RedQuickDistributionCommand.RaisingAgentProjectError]: noOp,
 		[RedQuickDistributionCommand.RaisingAgentProjectProgress]: noOp,
 		[RedQuickDistributionCommand.SetCommandCenter]: noOp,
 		[RedQuickDistributionCommand.UpdateCommandCenter]: (args: any) => {

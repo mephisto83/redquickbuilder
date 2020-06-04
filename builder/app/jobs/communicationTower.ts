@@ -51,6 +51,7 @@ export enum RedQuickDistributionCommand {
 	CompletedJobItem = 'CompletedJobItem',
 	SetCommandCenter = 'SetCommandCenter',
 	UpdateCommandCenter = 'UpdateCommandCenter',
+	RaisingAgentProjectError = 'RaisingAgentProjectError',
 	CanReturnResults = 'CanReturnResults'
 }
 export type CommunicationTowerListen = { [key in RedQuickDistributionCommand]: Function } | null;

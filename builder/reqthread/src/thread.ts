@@ -69,15 +69,20 @@ async function job(options) {
 			});
 			context.busy = true;
 			try {
-				await task(jobPath, options, async (completedJobItem) => {
-					await threadManagement.sendBackResults(completedJobItem);
-				}, async (progress)=>{
-          await threadManagement.send({
-            response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
-            command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
-            progress: progress
-          })
-        });
+				await task(
+					jobPath,
+					options,
+					async (completedJobItem) => {
+						await threadManagement.sendBackResults(completedJobItem);
+					},
+					async (progress) => {
+						await threadManagement.send({
+							response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+							command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+							progress: progress
+						});
+					}
+				);
 			} catch (e) {
 				console.log(e);
 			}
@@ -103,15 +108,15 @@ async function loop() {
 	let noerror = true;
 	do {
 		try {
-		//  console.log('taking a nap');
+			//  console.log('taking a nap');
 
 			if (!threadManagement.ready) {
 				await sleep(30 * 1000);
 				if (context.config) console.log('not ready ' + context.config.agentProject);
 				continue;
+			} else {
+				await sleep(10 * 1000);
 			}
-			else {
-			await sleep(10 * 1000);}
 			if (context.jobArgs) {
 				let jobArgs = context.jobArgs;
 				context.jobArgs = null;
@@ -124,7 +129,7 @@ async function loop() {
 
 					if (!context.jobArgs) {
 						if (!context.sinceLastReady || context.sinceLastReady % 100) {
-							threadManagement.send({
+							await threadManagement.send({
 								response: RedQuickDistributionCommand.RaisingAgentProjectReady,
 								command: RedQuickDistributionCommand.RaisingAgentProjectReady,
 								changed: true,
