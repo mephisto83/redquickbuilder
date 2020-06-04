@@ -71,7 +71,13 @@ async function job(options) {
 			try {
 				await task(jobPath, options, async (completedJobItem) => {
 					await threadManagement.sendBackResults(completedJobItem);
-				});
+				}, async (progress)=>{
+          await threadManagement.send({
+            response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+            command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+            progress: progress
+          })
+        });
 			} catch (e) {
 				console.log(e);
 			}

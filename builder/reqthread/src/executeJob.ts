@@ -44,7 +44,8 @@ async function sleep(ms: number = 5 * 1000) {
 export default async function executeJob(
 	jobConfig: Job,
 	options: { folderPath: string; agentName: string; projectName: string; fileName: string },
-	onChange: Function
+	onChange: Function,
+	onProgress: Function
 ) {
 	let jobInstancePath = path.join(options.folderPath, options.agentName, options.projectName, options.fileName);
 	SetPause(true);
@@ -61,7 +62,7 @@ export default async function executeJob(
 			switch (command) {
 				case Create_Component_All:
 					await CreateComponentAll(
-						() => {},
+						onProgress,
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
@@ -71,7 +72,7 @@ export default async function executeJob(
 					break;
 				case BAD.Setup_View_Types:
 					await SetupViewTypes(
-						() => {},
+						onProgress,
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
@@ -119,7 +120,7 @@ export default async function executeJob(
 					break;
 				case Create_Component_All:
 					await CreateComponentAll(
-						() => {},
+						onProgress,
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
@@ -129,7 +130,7 @@ export default async function executeJob(
 					break;
 				case Connect_Screens:
 					await ConnectScreens(
-						() => {},
+						onProgress,
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}
@@ -137,7 +138,7 @@ export default async function executeJob(
 					break;
 				case Add_Component_To_Screen_Options:
 					await AddComponentsToScreenOptions(
-						() => {},
+						onProgress,
 						(model: any) => {
 							return filter && filter.models.indexOf(model.id) !== -1;
 						}

@@ -83,6 +83,7 @@ export default class ThreadManagement {
 			[RedQuickDistributionCommand.CanReturnResults]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: noOp,
 			[RedQuickDistributionCommand.RaisingAgentProjectReady]: noOp,
+			[RedQuickDistributionCommand.RaisingAgentProjectProgress]: noOp,
 			[RedQuickDistributionCommand.RaisingHand]: noOp,
 			[RedQuickDistributionCommand.SetCommandCenter]: noOp,
 			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,

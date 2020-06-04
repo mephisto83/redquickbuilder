@@ -29,6 +29,7 @@ export interface AgentProjects {
 export interface AgentProject {
 	busy?: boolean;
 	updated?: number;
+	progress?: number;
 	workingOnFile?: string;
 	workingOnJob?: string;
 	agent?: string;

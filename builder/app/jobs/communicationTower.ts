@@ -20,6 +20,7 @@ export interface RedQuickDistributionMessage {
 	targetHost?: string;
 	targetPort?: number;
 	noPort?: boolean;
+	progress?: number;
 	projectName?: any;
 	agentProject?: any;
 	agentName?: any;
@@ -45,6 +46,7 @@ export enum RedQuickDistributionCommand {
 	SetAgentProjects = 'SetAgentProjects',
 	Progress = 'Progress',
 	RaisingAgentProjectReady = 'RaisingAgentProjectReady',
+	RaisingAgentProjectProgress = 'RaisingAgentProjectProgress',
 	RaisingAgentProjectBusy = 'RaisingAgentProjectBusy',
 	CompletedJobItem = 'CompletedJobItem',
 	SetCommandCenter = 'SetCommandCenter',
@@ -138,8 +140,8 @@ export default class CommunicationTower {
 					localPath
 				);
 				console.log(res);
-        let { body } = res;
-        console.log(body);
+				let { body } = res;
+				console.log(body);
 				if (!body.success) {
 					maxattempts = true;
 					throw new Error('file size not confirmed');
@@ -217,8 +219,8 @@ export default class CommunicationTower {
 			hostname: ''
 		};
 
-    let address = this.getIpaddress();
-    console.log(`command: ${parsed.command}`)
+		let address = this.getIpaddress();
+		console.log(`command: ${parsed.command}`);
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
 				reply.hostname = address.hostname;
@@ -256,8 +258,8 @@ export default class CommunicationTower {
 		var fileSizeInBytes = stats['size'];
 		let filePathArray = message.relativePath ? message.relativePath.split(path.sep) : [];
 		let address: any = this.getIpaddress();
-    message.hostname = address.hostname;
-    console.log(`confirming file size is ${fileSizeInBytes}`)
+		message.hostname = address.hostname;
+		console.log(`confirming file size is ${fileSizeInBytes}`);
 		return await fetch(`http://${message.targetHost}:${message.targetPort}`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -334,11 +336,11 @@ export default class CommunicationTower {
 	}
 	static receiveQueue: Promise<boolean> = Promise.resolve(true);
 	async checkFile(req: any, reply: any) {
-    console.log(`checking file`)
+		console.log(`checking file`);
 		let res = await Promise.resolve().then(() => {
 			let requestedPath = path.join(this.baseFolder, this.agentName || '', (req.filePath || []).join(path.sep));
 			if (fs.existsSync(requestedPath)) {
-        console.log(`file exists at location ${requestedPath}`)
+				console.log(`file exists at location ${requestedPath}`);
 				let stats = fs.statSync(requestedPath);
 				var fileSizeInBytes = stats['size'];
 				return {
@@ -348,7 +350,7 @@ export default class CommunicationTower {
 					errorMessage: `file size doesnt match ${fileSizeInBytes} === ${req.fileSizeInBytes}`
 				};
 			} else {
-        console.log(`file doesnt exists at location ${requestedPath}`)
+				console.log(`file doesnt exists at location ${requestedPath}`);
 				return {
 					error: true,
 					port: -1,

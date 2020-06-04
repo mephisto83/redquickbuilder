@@ -50,9 +50,10 @@ let runnerContext: RunnerContext = {
 			[RedQuickDistributionCommand.RaisingAgentProjectBusy]: handleAgentProjectBusy,
 			[RedQuickDistributionCommand.CompletedJobItem]: handleCompltedJobItem,
 			[RedQuickDistributionCommand.SetCommandCenter]: setCommandCenter,
+			[RedQuickDistributionCommand.RaisingAgentProjectProgress]: handleAgentProjectProgress,
 			[RedQuickDistributionCommand.UpdateCommandCenter]: noOp,
-      [RedQuickDistributionCommand.CanReturnResults]: canReturnResults,
-      [RedQuickDistributionCommand.ConfirmFile]: noOp
+			[RedQuickDistributionCommand.CanReturnResults]: canReturnResults,
+			[RedQuickDistributionCommand.ConfirmFile]: noOp
 		});
 		JobService.SetComunicationTower(communicationTower);
 		while (true) {
@@ -81,6 +82,16 @@ async function noOp(): Promise<ListenerReply> {
 
 async function handleAgentProjectReady(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	return await handleAgentProjectStateChange(message, true);
+}
+async function handleAgentProjectProgress(message: RedQuickDistributionMessage): Promise<ListenerReply> {
+	if (runnerContext.agents[message.agentName]) {
+		if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
+			runnerContext.agents[message.agentName].projects[message.agentProject].updated = Date.now();
+      runnerContext.agents[message.agentName].projects[message.agentProject].progress = message.progress;
+      await tellCommandCenter();
+		}
+	}
+	return { success: true };
 }
 async function handleAgentProjectStateChange(
 	message: RedQuickDistributionMessage,
@@ -190,7 +201,7 @@ function AppendToJobCompletedList(promise: any) {
 		});
 }
 async function checkTransferredFile(message: RedQuickDistributionMessage): Promise<ListenerReply> {
-  	// console.debug('CompletedJobItem');
+	// console.debug('CompletedJobItem');
 	// console.debug('handing completed job item');
 	if (message.projectName) {
 		if (message.fileName) {

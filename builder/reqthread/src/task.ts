@@ -11,7 +11,8 @@ import JobService, { Job, JobServiceConstants } from '../../app/jobs/jobservice'
 export default async function task(
 	jobPath: string,
 	options: { folderPath: string; agentName: string; projectName: string; fileName: string },
-	onChange: Function
+	onChange: Function,
+	onProgress: Function
 ) {
 	if (ifJobExists(jobPath)) {
 		console.log('there are jobs');
@@ -20,13 +21,12 @@ export default async function task(
 		let jobConfig: Job = await JobService.loadRemoteJob(jobPath);
 		if (jobConfig) {
 			console.log('execute job');
-			jobConfig = await executeJob(jobConfig, options, onChange);
+			jobConfig = await executeJob(jobConfig, options, onChange, onProgress);
 			console.log('job complete');
 		} else {
 			throw new Error('job not found');
 		}
-  }
-
+	}
 }
 
 function getUnfinishedJob(jobPath: string): Job {
