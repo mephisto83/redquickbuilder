@@ -29,11 +29,11 @@ class CurrentJobProgressView extends Component<any, any> {
 		var elapsed = current - previous;
 
 		if (elapsed < msPerMinute) {
-			return Math.round(elapsed / 1000) + ' seconds ago';
+			return Math.round(elapsed / 1000) + 's';
 		} else if (elapsed < msPerHour) {
-			return Math.round(elapsed / msPerMinute) + ' minutes ago';
+			return Math.round(elapsed / msPerMinute) + ' m';
 		} else if (elapsed < msPerDay) {
-			return Math.round(elapsed / msPerHour) + ' hours ago';
+			return Math.round(elapsed / msPerHour) + ' hrs';
 		} else if (elapsed < msPerMonth) {
 			return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
 		} else if (elapsed < msPerYear) {
