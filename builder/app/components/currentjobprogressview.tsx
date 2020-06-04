@@ -39,7 +39,7 @@ class CurrentJobProgressView extends Component<any, any> {
 		} else if (elapsed < msPerYear) {
 			return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
 		} else {
-			return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
+			return 'approximately ' + Math.round(elapsed / msPerYear) + ' yrs ago';
 		}
 	}
 	render() {
