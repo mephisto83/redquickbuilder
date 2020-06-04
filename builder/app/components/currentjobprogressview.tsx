@@ -81,6 +81,7 @@ class CurrentJobProgressView extends Component<any, any> {
 										<th>File</th>
 										<th>Host</th>
 										<th>Port</th>
+										<th>Progress</th>
 										<th>Error</th>
 									</tr>
 									{agents
@@ -100,7 +101,11 @@ class CurrentJobProgressView extends Component<any, any> {
 											let updated = 'Unknown';
 											if (agentProject.updated) {
 												updated = this.timeDifference(Date.now(), agentProject.updated);
-											}
+                      }
+                      let progress = 0;
+                      if(agentProject.progress){
+                        progress = agentProject.progress;
+                      }
 											let modelsWorkedOn = null;
 											let temp: any =
 												currentJobInformation &&
@@ -146,8 +151,20 @@ class CurrentJobProgressView extends Component<any, any> {
 													<td>{agentProject.host}</td>
 													<td>{agentProject.port}</td>
 													<td>
+														<progress
+															title={`${Math.floor(progress * 1000) / 10}`}
+															value={progress}
+															min={0}
+															max={parts.length}
+														/>
+													</td>
+													<td>
 														{agentProject.error ? (
-															<i className="fa fa-stop" title={`${agentProject.error}`} style={{ color: 'red' }} />
+															<i
+																className="fa fa-stop"
+																title={`${agentProject.error}`}
+																style={{ color: 'red' }}
+															/>
 														) : null}
 													</td>
 												</tr>,

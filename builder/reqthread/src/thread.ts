@@ -156,6 +156,11 @@ async function loop() {
 			}
 		} catch (e) {
 			noerror = false;
+			await threadManagement.send({
+				response: RedQuickDistributionCommand.RaisingAgentProjectError,
+				command: RedQuickDistributionCommand.RaisingAgentProjectError,
+				error: e
+			});
 			console.error(e);
 		}
 	} while (noerror);
