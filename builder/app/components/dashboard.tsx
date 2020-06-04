@@ -147,6 +147,7 @@ import CodeEditor from './codeeditor';
 import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
+import { Visual } from '../templates/electronio/v1/app/actions/uiactions';
 
 const { clipboard } = require('electron');
 
@@ -2034,7 +2035,7 @@ class Dashboard extends Component<any, any> {
 							<AgentAccessView active={UIA.Visual(state, MAIN_CONTENT) === AGENT_ACCESS_VIEW} />
 							<TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
 							<ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
-							<CodeEditor active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR} />
+							<CodeEditor active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR} value={Visual(state, UIA.CODE_EDITOR_INIT_VALUE)} />
 							{mainContent === MIND_MAP || true ? (
 								<MindMap
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}

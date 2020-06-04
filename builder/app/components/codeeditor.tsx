@@ -23,9 +23,21 @@ class CodeEditor extends Component<any, any> {
 		// Register a new language
 		// monaco.languages.register({ id: 'mySpecialLanguage' });
 
+
 		// Register a tokens provider for the language
 		monaco.languages.setMonarchTokensProvider('typescript', Javascript());
 		monaco.editor.setTheme('vs-dark');
+	}
+	componentDidUpdate(prevProps: any) {
+		// Typical usage (don't forget to compare props):
+		if (this.props.value !== prevProps.value) {
+			const { state } = this.props;
+			const currentNode = Node(state, Visual(state, SELECTED_NODE));
+			this.setState({ value: GetNodeProp(currentNode, this.props.prop || NodeProperties.Lambda) });
+		}
+		if (this.props.language !== prevProps.language) {
+			this.setState({ language: this.props.language });
+		}
 	}
 	componentDidMount() {
 		this.editorWillMount();
@@ -52,7 +64,7 @@ class CodeEditor extends Component<any, any> {
 								onClick={() => {
 									const id = currentNode.id;
 									this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-										prop: NodeProperties.Lambda,
+										prop: this.props.prop || NodeProperties.Lambda,
 										id,
 										value: this.state.value
 									});
@@ -60,57 +72,18 @@ class CodeEditor extends Component<any, any> {
 							>
 								<i className="fa fa-save" />
 							</a>
-							{/* <a className="btn btn-social-icon btn-dropbox">
-								<i className="fa fa-dropbox" />
-							</a>
-							<a className="btn btn-social-icon btn-facebook">
-								<i className="fa fa-facebook" />
-							</a>
-							<a className="btn btn-social-icon btn-flickr">
-								<i className="fa fa-flickr" />
-							</a>
-							<a className="btn btn-social-icon btn-foursquare">
-								<i className="fa fa-foursquare" />
-							</a>
-							<a className="btn btn-social-icon btn-github">
-								<i className="fa fa-github" />
-							</a>
-							<a className="btn btn-social-icon btn-google">
-								<i className="fa fa-google-plus" />
-							</a>
-							<a className="btn btn-social-icon btn-instagram">
-								<i className="fa fa-instagram" />
-							</a>
-							<a className="btn btn-social-icon btn-linkedin">
-								<i className="fa fa-linkedin" />
-							</a>
-							<a className="btn btn-social-icon btn-tumblr">
-								<i className="fa fa-tumblr" />
-							</a>
-							<a className="btn btn-social-icon btn-twitter">
-								<i className="fa fa-twitter" />
-							</a>
-							<a className="btn btn-social-icon btn-vk">
-								<i className="fa fa-vk" />
-							</a> */}
 						</div>
 						<div style={{ margin: 0 }}>
 							<MonacoEditor
 								height="700"
 								width={'100%'}
-								language={this.props.language || 'typescript'}
+								language={
+									this.props.language ||
+									(currentNode && GetNodeProp(currentNode, NodeProperties.CS) ? 'csharp' : null) ||
+									'typescript'
+								}
 								onChange={(val: string) => {
 									this.setState({ value: val });
-									// if (currentNode) {
-									// 	throttled(() => {
-									// 		const id = currentNode.id;
-									// 		this.props.graphOperation(CHANGE_NODE_PROPERTY, {
-									// 			prop: NodeProperties.Lambda,
-									// 			id,
-									// 			value: this.state.value
-									// 		});
-									// 	});
-									// }
 								}}
 								value={this.state.value || this.props.value}
 								options={options}

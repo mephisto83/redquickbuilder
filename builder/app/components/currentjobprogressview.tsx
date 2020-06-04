@@ -19,7 +19,29 @@ class CurrentJobProgressView extends Component<any, any> {
 	active() {
 		return !!this.props.active;
 	}
+	timeDifference(current: number, previous: number) {
+		var msPerMinute = 60 * 1000;
+		var msPerHour = msPerMinute * 60;
+		var msPerDay = msPerHour * 24;
+		var msPerMonth = msPerDay * 30;
+		var msPerYear = msPerDay * 365;
 
+		var elapsed = current - previous;
+
+		if (elapsed < msPerMinute) {
+			return Math.round(elapsed / 1000) + ' seconds ago';
+		} else if (elapsed < msPerHour) {
+			return Math.round(elapsed / msPerMinute) + ' minutes ago';
+		} else if (elapsed < msPerDay) {
+			return Math.round(elapsed / msPerHour) + ' hours ago';
+		} else if (elapsed < msPerMonth) {
+			return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
+		} else if (elapsed < msPerYear) {
+			return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
+		} else {
+			return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
+		}
+	}
 	render() {
 		const active = this.active();
 		const graph = GetCurrentGraph();
@@ -53,6 +75,7 @@ class CurrentJobProgressView extends Component<any, any> {
 										<th />
 										<th>Name</th>
 										<th>Agent</th>
+										<th>Updated</th>
 										<th>Ready</th>
 										<th>Job</th>
 										<th>File</th>
@@ -72,6 +95,10 @@ class CurrentJobProgressView extends Component<any, any> {
 											let color = 'red';
 											if (!agentProject.ready) {
 												color = 'green';
+											}
+											let updated = 'Unknown';
+											if (agentProject.updated) {
+												updated = this.timeDifference(Date.now(), agentProject.updated);
 											}
 											let modelsWorkedOn = null;
 											let temp: any =
@@ -109,6 +136,7 @@ class CurrentJobProgressView extends Component<any, any> {
 													<td>{jobIndex + 1}</td>
 													<td>{agentProject.name}</td>
 													<td>{agentProject.agent}</td>
+													<td>{updated}</td>
 													<td>
 														<i className={busyCls} style={{ color }} />
 													</td>

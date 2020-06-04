@@ -72,7 +72,7 @@ export default class JobService {
 		let ok = await CheckBrokenGraph(relPath, files);
 		if (!ok) {
 			throw new Error('files were no written correctly');
-    }
+		}
 
 		let jobContent: JobOutput = {
 			files
@@ -470,6 +470,7 @@ export default class JobService {
 	static agentProjects: AgentProject[] = [];
 	static async UpdateReadyAgents(agentProject: AgentProject) {
 		// console.log('update ready');
+		agentProject.updated = Date.now();
 		JobService.agentProjects = [
 			...JobService.agentProjects.filter((x) => x.name !== agentProject.name),
 			agentProject

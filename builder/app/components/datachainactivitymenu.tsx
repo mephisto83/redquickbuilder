@@ -9,7 +9,15 @@ import TabPane from './tabpane';
 import * as Titles from './titles';
 import SelectInputProperty from './selectinputproperty';
 import CheckBox from './checkbox';
-import { NodeProperties, NodeTypes, LinkType, SelectorPropertyKeys, NavigateTypes } from '../constants/nodetypes';
+import {
+	NodeProperties,
+	NodeTypes,
+	LinkType,
+	SelectorPropertyKeys,
+	NavigateTypes,
+	CODE_EDITOR,
+	MAIN_CONTENT
+} from '../constants/nodetypes';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 import { MethodFunctions } from '../constants/functiontypes';
 import { DataChainFunctions, DataChainContextMethods } from '../constants/datachain';
@@ -18,6 +26,8 @@ import ButtonList from './buttonlist';
 import { getReferenceInserts } from '../utils/utilservice';
 import CheckBoxProperty from './checkboxproperty';
 import Typeahead from './typeahead';
+import TreeViewButtonGroup from './treeviewbuttongroup';
+import TreeViewGroupButton from './treeviewgroupbutton';
 
 class DataChainActvityMenu extends Component<any, any> {
 	getLambdaVariableTree() {
@@ -246,6 +256,7 @@ class DataChainActvityMenu extends Component<any, any> {
 					{lambda ? (
 						<TextInput
 							textarea={true}
+							disabled
 							onChange={(value: any) => {
 								const id = currentNode.id;
 								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
@@ -257,6 +268,19 @@ class DataChainActvityMenu extends Component<any, any> {
 							label={Titles.Lambda}
 							value={UIA.GetNodeProp(currentNode, NodeProperties.Lambda)}
 						/>
+					) : null}
+					{lambda ? (
+						<TreeViewButtonGroup>
+							<TreeViewGroupButton
+								title={Titles.Load}
+								onClick={() => {
+									this.props.setVisual(UIA.CODE_EDITOR_INIT_VALUE, UIA.GUID());
+
+									this.props.setVisual(MAIN_CONTENT, CODE_EDITOR);
+								}}
+								icon="fa  fa-cloud-upload"
+							/>
+						</TreeViewButtonGroup>
 					) : null}
 					{lambda ? inserts : null}
 					{lambdaVariables}

@@ -40,6 +40,7 @@ export const ApplicationConfig = 'ApplicationConfig';
 export const NODE_CONNECTION_COST = 'NODE_CONNECTION_COST';
 
 export const BuildAllProgress = 'BuildAllProgress';
+export const CODE_EDITOR_INIT_VALUE = 'CODE_EDITOR_INIT_VALUE';
 export const BATCH_MODEL = 'BATCH_MODEL';
 export const BATCH_AGENT = 'BATCH_AGENT';
 export const BATCH_PARENT = 'BATCH_PARENT';

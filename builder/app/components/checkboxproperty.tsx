@@ -15,6 +15,7 @@ class CheckBoxProperty extends Component<any, any> {
         title={this.props.title}
         value={link ? UIA.GetLinkProperty(link, this.props.property) : UIA.GetNodeProp(currentNode, this.props.property)}
         onChange={(value: any) => {
+
           if (this.props.link) {
             this.props.graphOperation([
               {

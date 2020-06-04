@@ -12,6 +12,7 @@ export const GraphOperations = 'Graph Operations';
 export const AgentBaseMethods = 'Agent Based Methods';
 export const LinkType = 'Link Type';
 export const DefaultViewModel = 'Default View Model';
+export const Load = 'Load';
 export const DeleteType = 'Delete Type';
 export const AddServiceInterfaceMenu = 'Add Interface Method';
 export const AddDefaults = 'Add Defaults';

@@ -2,8 +2,8 @@ import { RedQuickDistributionCommand } from './communicationTower';
 
 export interface RunnerContext {
 	agents: Agents;
-  commandCenter: CommandCenter;
-  jobCompletionList: Promise<void>;
+	commandCenter: CommandCenter;
+	jobCompletionList: Promise<void>;
 }
 
 export interface CommandCenter {
@@ -28,6 +28,7 @@ export interface AgentProjects {
 
 export interface AgentProject {
 	busy?: boolean;
+	updated?: number;
 	workingOnFile?: string;
 	workingOnJob?: string;
 	agent?: string;
