@@ -155,7 +155,7 @@ class CurrentJobProgressView extends Component<any, any> {
 															title={`${Math.floor(progress * 1000) / 10}`}
 															value={progress}
 															min={0}
-															max={parts.length}
+															max={1}
 														/>
 													</td>
 													<td>

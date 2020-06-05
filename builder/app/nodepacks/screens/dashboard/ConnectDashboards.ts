@@ -21,6 +21,7 @@ import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
 
 export default function ConnectDashboards(
 	filter: Function,
+	onProgress: any,
 	types = {
 		[UITypes.ElectronIO]: true,
 		[UITypes.ReactNative]: true,
@@ -31,12 +32,16 @@ export default function ConnectDashboards(
 	let graph = GetCurrentGraph();
 	SetPause(true);
 	let result: any = [];
-	screens.forEach((screen: Node) => {
+	let total = screens.length;
+	screens.forEach((screen: Node, sindex: number) => {
 		let screenOptions = GetNodesLinkedTo(graph, {
 			id: screen.id,
 			componentType: NodeTypes.ScreenOption
 		});
 		screenOptions.forEach((screenOption: Node) => {
+			if (onProgress) {
+				onProgress(sindex / total);
+			}
 			let button: ButtonDescription[] = GetNodeProp(screenOption, NodeProperties.DashboardButtons) || [];
 			let clickEvent = 'onClick';
 			switch (GetNodeProp(screenOption, NodeProperties.ViewType)) {
