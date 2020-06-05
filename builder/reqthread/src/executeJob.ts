@@ -61,27 +61,21 @@ export default async function executeJob(
 			jobConfig.updated = Date.now();
 			switch (command) {
 				case Create_Component_All:
-					await CreateComponentAll(
-						onProgress,
-						(model: any) => {
-							return filter && filter.models.indexOf(model.id) !== -1;
-						}
-					);
+					await CreateComponentAll(onProgress, (model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					console.log('CreateComponentAll completed');
 
 					break;
 				case BAD.Setup_View_Types:
-					await SetupViewTypes(
-						onProgress,
-						(model: any) => {
-							return filter && filter.models.indexOf(model.id) !== -1;
-						}
-					);
+					await SetupViewTypes(onProgress, (model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					break;
 				case BAD.Connect_Dashboards:
 					await ConnectDashboards((model: any) => {
 						return filter && filter.models.indexOf(model.id) !== -1;
-					});
+					}, onProgress);
 					break;
 				case BAD.Build_Dashboards:
 					await BuildDashboards((model: any) => {
@@ -119,30 +113,21 @@ export default async function executeJob(
 					});
 					break;
 				case Create_Component_All:
-					await CreateComponentAll(
-						onProgress,
-						(model: any) => {
-							return filter && filter.models.indexOf(model.id) !== -1;
-						}
-					);
+					await CreateComponentAll(onProgress, (model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					console.log('CreateComponentAll completed');
 
 					break;
 				case Connect_Screens:
-					await ConnectScreens(
-						onProgress,
-						(model: any) => {
-							return filter && filter.models.indexOf(model.id) !== -1;
-						}
-					);
+					await ConnectScreens(onProgress, (model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					break;
 				case Add_Component_To_Screen_Options:
-					await AddComponentsToScreenOptions(
-						onProgress,
-						(model: any) => {
-							return filter && filter.models.indexOf(model.id) !== -1;
-						}
-					);
+					await AddComponentsToScreenOptions(onProgress, (model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
 					break;
 				default:
 					jobConfig.complete = true;
