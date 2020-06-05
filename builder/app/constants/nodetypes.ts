@@ -29,6 +29,7 @@ export const NodeTypes = {
 	Attribute: 'attribute-property',
 	ChoiceList: 'choice-list',
 	Permission: 'permission',
+	MenuDataSource: 'MenuDataSource',
 	Configuration: 'configuration',
 	PermissionDependency: 'permission-dependency',
 	ComponentNode: 'component-node',
@@ -183,6 +184,7 @@ export const NodeTypeColors = {
 	[NodeTypes.Selector]: '#20063B',
 	[NodeTypes.OptionList]: '#2EC4B6',
 	[NodeTypes.OptionListItem]: '#856A5D',
+	[NodeTypes.MenuDataSource]: '#3B429F',
 	[NodeTypes.OptionCustom]: '#403F4C',
 	[NodeTypes.ExtensionTypeList]: '#2C2B3C',
 	[NodeTypes.ExtensionType]: '#1B2432',
@@ -653,6 +655,7 @@ export const LinkType = {
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
 	ModelAccess: 'ModelAccess',
+	MenuLink: 'MenuLink',
 	NavigationScreen: 'NavigationScreen',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
@@ -905,6 +908,9 @@ export const LinkProperties: any = {
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen
+	},
+	MenuLink: {
+		type: LinkType.MenuLink
 	},
 	ModelAccess: {
 		type: LinkType.ModelAccess

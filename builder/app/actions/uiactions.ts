@@ -3148,24 +3148,6 @@ export function NodesByType(state: null, nodeType: string | any[], options: any 
 			nodeType = [ nodeType ];
 		}
 		return GraphMethods.NodesByType(currentGraph, nodeType, options);
-		// GetAppCacheNodeTypes()
-		// return currentGraph.nodes
-		//   .filter(
-		//     x =>
-		//       (currentGraph.nodeLib &&
-		//         currentGraph.nodeLib[x] &&
-		//         currentGraph.nodeLib[x].properties &&
-		//         nodeType.indexOf(
-		//           currentGraph.nodeLib[x].properties[NodeProperties.NODEType]
-		//         ) !== -1) ||
-		//       (!options.excludeRefs &&
-		//         currentGraph.nodeLib &&
-		//         currentGraph.nodeLib[x] &&
-		//         currentGraph.nodeLib[x].properties &&
-		//         currentGraph.nodeLib[x].properties[NodeProperties.ReferenceType] ===
-		//         nodeType)
-		//   )
-		//   .map(x => currentGraph.nodeLib[x]);
 	}
 	return [];
 }
@@ -4064,7 +4046,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 									if (removedLink) {
 										graphOperationOccurences.push({
 											command: GraphMethods.VisualCommand.REMOVE_LINK,
-											linkId: removedLink.id
+											linkId: removedLink
 										});
 									}
 									break;

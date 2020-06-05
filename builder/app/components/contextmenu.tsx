@@ -54,7 +54,9 @@ import {
 	GetAllChildren,
 	GetLinkBetween,
 	getNodeLinks,
-	NodesByType
+	NodesByType,
+	existsLinksBetween,
+	findLink
 } from '../methods/graph_methods';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
@@ -119,6 +121,7 @@ import DuplicateModel from '../nodepacks/DuplicateModel';
 import AddMappingProperty from '../nodepacks/AddMappingProperty';
 import BuildReferenceObject from '../nodepacks/BuildReferenceObject';
 import BuildNavigationScreen from '../nodepacks/BuildNavigationScreen';
+import BuildLowerMenus from '../nodepacks/screens/menus/BuildLowerMenus';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -169,7 +172,7 @@ class ContextMenu extends Component<any, any> {
 				);
 				break;
 			default:
-				result.push(this.getContextMenu());
+				result.push(...this.getContextMenu());
 				break;
 		}
 
@@ -268,14 +271,13 @@ class ContextMenu extends Component<any, any> {
 					<TreeViewGroupButton
 						title={'Invert'}
 						onClick={() => {
-              let temp: any = {};
+							let temp: any = {};
 							NodesByType(graph, NodeTypes.Model)
 								.toNodeSelect()
 								.filter((x: any) => !GetNodeProp(x.value, NodeProperties.IsUser))
 								.forEach((t: any) => {
 									temp[t.value] = !this.state.gns[t.value];
-                });
-
+								});
 
 							this.setState({ gns: temp });
 						}}
@@ -790,7 +792,7 @@ class ContextMenu extends Component<any, any> {
 						active
 						onClick={() => {
 							this.props.graphOperation(
-								UIA.NodesByType(null, NodeTypes.DataChainCollection).map((v) => ({
+								UIA.NodesByType(null, NodeTypes.DataChainCollection).map((v: Node) => ({
 									operation: UIA.REMOVE_NODE,
 									options: {
 										id: v.id
@@ -798,6 +800,23 @@ class ContextMenu extends Component<any, any> {
 								}))
 							);
 						}}
+					/>
+				</TreeViewMenu>
+				<TreeViewMenu
+					title={`${Titles.BuildMenus}`}
+					open={UIA.Visual(state, Titles.BuildMenus)}
+					active
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+					toggle={() => {
+						this.props.toggleVisual(Titles.BuildMenus);
+					}}
+				>
+					<TreeViewMenu
+						title={`${Titles.BuildLowerMenu}`}
+            description={`Builds menus for each model, and the menu can be put together`}
+            onClick={()=>{
+              BuildLowerMenus();
+            }}
 					/>
 				</TreeViewMenu>
 				<TreeViewMenu
@@ -1498,7 +1517,7 @@ class ContextMenu extends Component<any, any> {
 		];
 	}
 
-	operations() {
+	operations(): any[] {
 		const { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
@@ -1688,6 +1707,145 @@ class ContextMenu extends Component<any, any> {
 								/>
 							</TreeViewItemContainer>
 						)}
+					</TreeViewMenu>
+				];
+			case NodeTypes.MenuDataSource:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'Build Menu')}
+							active
+							title={Titles.BuildMenu}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('Build Menu');
+							}}
+						>
+							<TreeViewMenu
+								open={UIA.Visual(state, 'Build Menu Filter')}
+								active
+								title={Titles.Filter}
+								innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+								toggle={() => {
+									this.props.toggleVisual('Build Menu Filter');
+								}}
+							>
+								<TreeViewItemContainer>
+									<SelectInput
+										title={Titles.Agents}
+										label={Titles.Agents}
+										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
+											.filter(
+												(x: any) =>
+													!GetNodeProp(x, NodeProperties.IsUser) &&
+													GetNodeProp(x, NodeProperties.IsAgent)
+											)
+											.toNodeSelect()}
+										onChange={(value: any) => {
+											this.setState({ agent: value });
+										}}
+										value={this.state.agent}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<TextInput
+										title={Titles.Filter}
+										label={Titles.Filter}
+										onChange={(value: any) => {
+											this.setState({ menuFilter: value });
+										}}
+										value={this.state.menuFilter}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<CheckBox
+										title={Titles.Dashboard}
+										label={Titles.Dashboard}
+										onChange={(value: any) => {
+											this.setState({ isDashboard: value });
+										}}
+										value={this.state.isDashboard}
+									/>
+								</TreeViewItemContainer>
+							</TreeViewMenu>
+						</TreeViewMenu>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'Navigation Screens')}
+							active
+							title={NodeTypes.NavigationScreen}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT / 2, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('Navigation Screens');
+							}}
+						>
+							{UIA.NodesByType(null, NodeTypes.NavigationScreen)
+								.filter((node: Node) => {
+									return this.state.agent
+										? GetNodeProp(node, NodeProperties.Agent) === this.state.agent
+										: true;
+								})
+								.filter((node: Node) => {
+									let title = UIA.GetNodeTitle(node);
+
+									return (
+										`${title}`
+											.toLocaleLowerCase()
+											.indexOf(`${this.state.menuFilter || ''}`.toLocaleLowerCase()) !== -1
+									);
+								})
+								.map((node: Node) => {
+									return (
+										<TreeViewItemContainer>
+											<CheckBox
+												title={UIA.GetNodeTitle(node)}
+												label={UIA.GetNodeTitle(node)}
+												onChange={(value: boolean) => {
+													var id = node.id;
+													if (value) {
+														this.props.graphOperation([
+															{
+																operation: UIA.ADD_LINK_BETWEEN_NODES,
+																options: () => ({
+																	target: id,
+																	source: currentNode.id,
+																	properties: { ...UIA.LinkProperties.MenuLink }
+																})
+															},
+															{
+																operation: UIA.UPDATE_NODE_PROPERTY,
+																options: () => ({
+																	id: id,
+																	properties: { [NodeProperties.Pinned]: true }
+																})
+															}
+														]);
+													} else {
+														this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+															target: id,
+															source: currentNode.id
+														});
+													}
+												}}
+												value={
+													currentNode &&
+													findLink(UIA.GetCurrentGraph(), {
+														source: currentNode.id,
+														target: node.id
+													})
+												}
+											/>
+										</TreeViewItemContainer>
+									);
+								})}
+						</TreeViewMenu>
 					</TreeViewMenu>
 				];
 			case NodeTypes.DataChainCollection:
@@ -3441,7 +3599,7 @@ class ContextMenu extends Component<any, any> {
 		return [];
 	}
 
-	eventMenu() {
+	eventMenu(): any[] {
 		const { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
@@ -3458,7 +3616,7 @@ class ContextMenu extends Component<any, any> {
 		return [];
 	}
 
-	getContextMenu() {
+	getContextMenu(): any[] {
 		const { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
@@ -3647,7 +3805,7 @@ class ContextMenu extends Component<any, any> {
 		}
 		const { state } = this.props;
 		const linkTypes = UIA.GetNodesLinkTypes(current.id);
-		return (
+		return [
 			<TreeViewMenu
 				active
 				title={Titles.Select}
@@ -3666,7 +3824,7 @@ class ContextMenu extends Component<any, any> {
 					/>
 				))}
 			</TreeViewMenu>
-		);
+		];
 	}
 
 	getModelMenu() {
