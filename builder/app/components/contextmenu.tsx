@@ -813,10 +813,10 @@ class ContextMenu extends Component<any, any> {
 				>
 					<TreeViewMenu
 						title={`${Titles.BuildLowerMenu}`}
-            description={`Builds menus for each model, and the menu can be put together`}
-            onClick={()=>{
-              BuildLowerMenus();
-            }}
+						description={`Builds menus for each model, and the menu can be put together`}
+						onClick={() => {
+							BuildLowerMenus();
+						}}
 					/>
 				</TreeViewMenu>
 				<TreeViewMenu
@@ -1794,7 +1794,80 @@ class ContextMenu extends Component<any, any> {
 								})
 								.filter((node: Node) => {
 									let title = UIA.GetNodeTitle(node);
-
+									if (!title) {
+										return true;
+									}
+									return (
+										`${title}`
+											.toLocaleLowerCase()
+											.indexOf(`${this.state.menuFilter || ''}`.toLocaleLowerCase()) !== -1
+									);
+								})
+								.map((node: Node) => {
+									return (
+										<TreeViewItemContainer>
+											<CheckBox
+												title={UIA.GetNodeTitle(node)}
+												label={UIA.GetNodeTitle(node)}
+												onChange={(value: boolean) => {
+													var id = node.id;
+													if (value) {
+														this.props.graphOperation([
+															{
+																operation: UIA.ADD_LINK_BETWEEN_NODES,
+																options: () => ({
+																	target: id,
+																	source: currentNode.id,
+																	properties: { ...UIA.LinkProperties.MenuLink }
+																})
+															},
+															{
+																operation: UIA.UPDATE_NODE_PROPERTY,
+																options: () => ({
+																	id: id,
+																	properties: { [NodeProperties.Pinned]: true }
+																})
+															}
+														]);
+													} else {
+														this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+															target: id,
+															source: currentNode.id
+														});
+													}
+												}}
+												value={
+													currentNode &&
+													findLink(UIA.GetCurrentGraph(), {
+														source: currentNode.id,
+														target: node.id
+													})
+												}
+											/>
+										</TreeViewItemContainer>
+									);
+								})}
+						</TreeViewMenu>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'Menus')}
+							active
+							title={NodeTypes.NavigationScreen}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT / 2, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('Menus');
+							}}
+						>
+							{UIA.NodesByType(null, NodeTypes.MenuDataSource)
+								.filter((node: Node) => {
+									return this.state.agent
+										? GetNodeProp(node, NodeProperties.Agent) === this.state.agent
+										: true;
+								})
+								.filter((node: Node) => {
+									let title = UIA.GetNodeTitle(node);
+									if (!title) {
+										return true;
+									}
 									return (
 										`${title}`
 											.toLocaleLowerCase()
