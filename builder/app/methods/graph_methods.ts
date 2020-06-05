@@ -2494,7 +2494,8 @@ const fast = true;
 export function addLink(
 	graph: Graph,
 	options: { target: any; source: any },
-	link: { id: any; source: any; target: any; properties: any }
+	link: { id: any; source: any; target: any; properties: any },
+	callback?: any
 ): Graph {
 	const { target, source } = options;
 	if (graph.links.length !== Object.keys(graph.linkLib).length) {
@@ -2513,6 +2514,9 @@ export function addLink(
 				}
 
 				updateCache(options, link);
+				if (callback) {
+					callback(link);
+				}
 				// Keeps track of the links for each node.
 				if (fast) {
 					if (!graph.nodeConnections[link.source]) {
@@ -2623,10 +2627,8 @@ export function addLinkBetweenNodes(graph: any, options: any, callback: any) {
 	const { target, source, properties } = options;
 	if (target !== source && target) {
 		const link = createLink(target, source, properties);
-		if (callback) {
-			callback(link);
-		}
-		return addLink(graph, options, link);
+
+		return addLink(graph, options, link, callback);
 	}
 	return graph;
 }

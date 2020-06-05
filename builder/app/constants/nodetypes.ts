@@ -549,6 +549,7 @@ export const NodeProperties = {
 	ChainNodeInput2: 'ChainNodeInput2',
 	ScreenInstance: 'ScreenInstance',
 	Model: 'Model',
+	NavigationScreen: 'NavigationScreen',
 	Agent: 'Agent',
 	Screen: 'Screen',
 	ChainNodeInput1: 'ChainNodeInput1',

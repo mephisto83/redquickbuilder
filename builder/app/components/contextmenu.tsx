@@ -122,6 +122,7 @@ import AddMappingProperty from '../nodepacks/AddMappingProperty';
 import BuildReferenceObject from '../nodepacks/BuildReferenceObject';
 import BuildNavigationScreen from '../nodepacks/BuildNavigationScreen';
 import BuildLowerMenus from '../nodepacks/screens/menus/BuildLowerMenus';
+import CreateMirrorMenu from '../nodepacks/screens/menus/CreateMirrorMenu';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1581,132 +1582,149 @@ class ContextMenu extends Component<any, any> {
 							this.props.toggleVisual('OPERATIONS');
 						}}
 					>
-						<TreeViewItemContainer>
-							<CheckBox
-								label={Titles.Dashboard}
-								onChange={(value: any) => {
-									this.props.graphOperation([
-										{
-											operation: UIA.CHANGE_NODE_PROPERTY,
-											options: {
-												prop: UIA.NodeProperties.IsDashboard,
-												id: currentNode.id,
-												value: value
-											}
-										}
-									]);
-								}}
-								value={GetNodeProp(currentNode, NodeProperties.IsDashboard)}
-							/>
-						</TreeViewItemContainer>
-
-						<TreeViewItemContainer>
-							<TextInput
-								label={Titles.Name}
-								onChange={(value: any) => {
-									this.props.graphOperation([
-										{
-											operation: UIA.CHANGE_NODE_PROPERTY,
-											options: {
-												prop: UIA.NodeProperties.UIText,
-												id: currentNode.id,
-												value: value
-											}
-										}
-									]);
-								}}
-								value={GetNodeProp(currentNode, NodeProperties.UIText)}
-							/>
-						</TreeViewItemContainer>
-						{!GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+						<TreeViewMenu
+							title={Titles.CreateMirrorMenu}
+							description={'creates a menu mirroring the paths'}
+							onClick={() => {
+								CreateMirrorMenu({ id: currentNode.id });
+							}}
+						/>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'Navigation Screen Properties')}
+							active
+							title={'Navigation Screen Props'}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('Navigation Screen Properties');
+							}}
+						>
 							<TreeViewItemContainer>
 								<CheckBox
-									label={Titles.IsAuthenticatedLaunchHome}
+									label={Titles.Dashboard}
 									onChange={(value: any) => {
 										this.props.graphOperation([
 											{
 												operation: UIA.CHANGE_NODE_PROPERTY,
 												options: {
-													prop: UIA.NodeProperties.IsHomeLaunchView,
+													prop: UIA.NodeProperties.IsDashboard,
 													id: currentNode.id,
 													value: value
 												}
 											}
 										]);
 									}}
-									value={GetNodeProp(currentNode, NodeProperties.IsHomeLaunchView)}
+									value={GetNodeProp(currentNode, NodeProperties.IsDashboard)}
 								/>
 							</TreeViewItemContainer>
-						)}
-						<TreeViewItemContainer>
-							<SelectInput
-								label={Titles.Models}
-								options={UIA.NodesByType(this.props.state, NodeTypes.Model).toNodeSelect()}
-								onChange={(value: any) => {
-									this.props.graphOperation([
-										{
-											operation: UIA.CHANGE_NODE_PROPERTY,
-											options: {
-												prop: UIA.NodeProperties.Model,
-												id: currentNode.id,
-												value: value
+
+							<TreeViewItemContainer>
+								<TextInput
+									label={Titles.Name}
+									onChange={(value: any) => {
+										this.props.graphOperation([
+											{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													prop: UIA.NodeProperties.UIText,
+													id: currentNode.id,
+													value: value
+												}
 											}
-										}
-									]);
-								}}
-								value={GetNodeProp(currentNode, NodeProperties.Model)}
-							/>
-						</TreeViewItemContainer>
-						<TreeViewItemContainer>
-							<SelectInput
-								label={Titles.Agents}
-								options={UIA.NodesByType(this.props.state, NodeTypes.Model)
-									.filter(
-										(x: Node) =>
-											GetNodeProp(x, NodeProperties.IsAgent) &&
-											!GetNodeProp(x, NodeProperties.IsUser)
-									)
-									.toNodeSelect()}
-								onChange={(value: any) => {
-									this.props.graphOperation([
-										{
-											operation: UIA.CHANGE_NODE_PROPERTY,
-											options: {
-												prop: UIA.NodeProperties.Agent,
-												id: currentNode.id,
-												value: value
-											}
-										}
-									]);
-								}}
-								value={GetNodeProp(currentNode, NodeProperties.Agent)}
-							/>
-						</TreeViewItemContainer>
-						{GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+										]);
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.UIText)}
+								/>
+							</TreeViewItemContainer>
+							{!GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+								<TreeViewItemContainer>
+									<CheckBox
+										label={Titles.IsAuthenticatedLaunchHome}
+										onChange={(value: any) => {
+											this.props.graphOperation([
+												{
+													operation: UIA.CHANGE_NODE_PROPERTY,
+													options: {
+														prop: UIA.NodeProperties.IsHomeLaunchView,
+														id: currentNode.id,
+														value: value
+													}
+												}
+											]);
+										}}
+										value={GetNodeProp(currentNode, NodeProperties.IsHomeLaunchView)}
+									/>
+								</TreeViewItemContainer>
+							)}
 							<TreeViewItemContainer>
 								<SelectInput
-									label={Titles.ViewTypes}
-									options={Object.keys(ViewTypes).map((key: string) => ({
-										title: key,
-										value: ViewTypes[key],
-										id: key
-									}))}
+									label={Titles.Models}
+									options={UIA.NodesByType(this.props.state, NodeTypes.Model).toNodeSelect()}
 									onChange={(value: any) => {
 										this.props.graphOperation([
 											{
 												operation: UIA.CHANGE_NODE_PROPERTY,
 												options: {
-													prop: UIA.NodeProperties.ViewType,
+													prop: UIA.NodeProperties.Model,
 													id: currentNode.id,
 													value: value
 												}
 											}
 										]);
 									}}
-									value={GetNodeProp(currentNode, NodeProperties.ViewType)}
+									value={GetNodeProp(currentNode, NodeProperties.Model)}
 								/>
 							</TreeViewItemContainer>
-						)}
+							<TreeViewItemContainer>
+								<SelectInput
+									label={Titles.Agents}
+									options={UIA.NodesByType(this.props.state, NodeTypes.Model)
+										.filter(
+											(x: Node) =>
+												GetNodeProp(x, NodeProperties.IsAgent) &&
+												!GetNodeProp(x, NodeProperties.IsUser)
+										)
+										.toNodeSelect()}
+									onChange={(value: any) => {
+										this.props.graphOperation([
+											{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													prop: UIA.NodeProperties.Agent,
+													id: currentNode.id,
+													value: value
+												}
+											}
+										]);
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.Agent)}
+								/>
+							</TreeViewItemContainer>
+							{GetNodeProp(currentNode, NodeProperties.IsDashboard) ? null : (
+								<TreeViewItemContainer>
+									<SelectInput
+										label={Titles.ViewTypes}
+										options={Object.keys(ViewTypes).map((key: string) => ({
+											title: key,
+											value: ViewTypes[key],
+											id: key
+										}))}
+										onChange={(value: any) => {
+											this.props.graphOperation([
+												{
+													operation: UIA.CHANGE_NODE_PROPERTY,
+													options: {
+														prop: UIA.NodeProperties.ViewType,
+														id: currentNode.id,
+														value: value
+													}
+												}
+											]);
+										}}
+										value={GetNodeProp(currentNode, NodeProperties.ViewType)}
+									/>
+								</TreeViewItemContainer>
+							)}
+						</TreeViewMenu>
 					</TreeViewMenu>
 				];
 			case NodeTypes.MenuDataSource:

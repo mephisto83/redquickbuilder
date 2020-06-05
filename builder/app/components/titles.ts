@@ -448,6 +448,7 @@ export const Operations = 'Operations';
 export const HttpMethod = 'Http Methods';
 export const AddMaestros = 'Add Maestro';
 export const HttpRoute = 'Relative Http Route';
+export const CreateMirrorMenu = 'Create Menu';
 export const NotIncludeInController = `Don't include in controller`;
 export const AsForm = 'As Form';
 export const AsText = 'As Text';
