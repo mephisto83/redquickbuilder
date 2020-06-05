@@ -1851,7 +1851,7 @@ class ContextMenu extends Component<any, any> {
 						<TreeViewMenu
 							open={UIA.Visual(state, 'Menus')}
 							active
-							title={NodeTypes.NavigationScreen}
+							title={NodeTypes.MenuDataSource}
 							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT / 2, overflowY: 'auto' }}
 							toggle={() => {
 								this.props.toggleVisual('Menus');
