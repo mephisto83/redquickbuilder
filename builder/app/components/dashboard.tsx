@@ -148,6 +148,7 @@ import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import { Visual } from '../templates/electronio/v1/app/actions/uiactions';
+import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
 
 const { clipboard } = require('electron');
 
@@ -236,6 +237,9 @@ class Dashboard extends Component<any, any> {
 				case NodeTypes.Executor:
 					result.push(...this.getExecutorContext());
 					return result;
+				case NodeTypes.MenuDataSource:
+					result.push(...this.getMenuDataSourceContext());
+					break;
 				case NodeTypes.Validator:
 					result.push(...this.getValidatorContext());
 					return result;
@@ -709,7 +713,27 @@ class Dashboard extends Component<any, any> {
 
 		return result;
 	}
+	getMenuDataSourceContext() {
+		const result = [];
+		const { state } = this.props;
+		result.push({
+			onClick: () => {
+				const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+				let shouldShowNode: Node[] = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+					id: currentNode.id,
+					direction: SOURCE,
+					link: LinkType.DataChainShouldShow
+				});
+				if (!shouldShowNode.length) {
+					this.props.graphOperation(AddShouldShowDataChain({ id: currentNode.id, name: '' }));
+				}
+			},
+			icon: 'fa fa-rocket',
+			title: `Data Chain Should Show`
+		});
 
+		return result;
+	}
 	getExecutorContext() {
 		const result = [];
 
@@ -1265,7 +1289,9 @@ class Dashboard extends Component<any, any> {
 						DashboardScreenNavigation({
 							modelTitle: UIA.GetNodeTitle(currentNode),
 							component: currentNode.id,
-							model: GetNodeProp(currentNode, NodeProperties.Model)
+							model: GetNodeProp(currentNode, NodeProperties.Model),
+							skipCreate: false,
+							agent: ''
 						})
 					);
 				},
@@ -2035,7 +2061,10 @@ class Dashboard extends Component<any, any> {
 							<AgentAccessView active={UIA.Visual(state, MAIN_CONTENT) === AGENT_ACCESS_VIEW} />
 							<TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
 							<ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
-							<CodeEditor active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR} value={Visual(state, UIA.CODE_EDITOR_INIT_VALUE)} />
+							<CodeEditor
+								active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR}
+								value={Visual(state, UIA.CODE_EDITOR_INIT_VALUE)}
+							/>
 							{mainContent === MIND_MAP || true ? (
 								<MindMap
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}

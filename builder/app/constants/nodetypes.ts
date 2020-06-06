@@ -651,6 +651,7 @@ export const LinkType = {
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
+	DataChainShouldShow: 'DataChainShouldShow',
 	StateKey: 'StateKey',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
@@ -906,6 +907,9 @@ export const LinkProperties: any = {
 	},
 	AgentAccess: {
 		type: LinkType.AgentAccess
+	},
+	DataChainShouldShow: {
+		type: LinkType.DataChainShouldShow
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen

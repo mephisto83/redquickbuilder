@@ -10,24 +10,46 @@ import { Visual } from '../templates/electronio/v1/app/actions/uiactions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties } from '../constants/nodetypes';
+import fs from 'fs';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
+		let definitions = fs.readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
 		this.state = {
 			original: '',
-			value: ''
+			value: '',
+			definitions
 		};
 	}
 	editorWillMount() {
 		// Register a new language
 		// monaco.languages.register({ id: 'mySpecialLanguage' });
-
-
+		// monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+		// 	target: monaco.languages.typescript.ScriptTarget.ES2016,
+		// 	allowNonTsExtensions: true,
+		// 	moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+		// 	module: monaco.languages.typescript.ModuleKind.CommonJS,
+		// 	noEmit: true,
+		// 	typeRoots: [ 'node_modules/@types' ]
+		// });
 		// Register a tokens provider for the language
-		monaco.languages.setMonarchTokensProvider('typescript', Javascript());
-		monaco.editor.setTheme('vs-dark');
+		// monaco.languages.setMonarchTokensProvider('typescript', Javascript());
+		// monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+		// 	noSemanticValidation: true,
+		// 	noSyntaxValidation: false
+		// });
+		// // compiler options
+		// monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+		// 	target: monaco.languages.typescript.ScriptTarget.ES2015,
+		// 	allowNonTsExtensions: true
+		// // });
+		// const MONACO_LIB_PREFIX = 'ts:filename/';
+		// const path_ = `${MONACO_LIB_PREFIX}uiactions.d.ts`;
+		// let definitions = fs.readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
+		// monaco.languages.typescript.typescriptDefaults.addExtraLib(definitions, `inmemory://model/uiactios.d.ts`);
 	}
+
 	componentDidUpdate(prevProps: any) {
 		// Typical usage (don't forget to compare props):
 		if (this.props.value !== prevProps.value) {
@@ -53,7 +75,7 @@ class CodeEditor extends Component<any, any> {
 		let offsetWidth = Visual(state, SIDE_PANEL_OPEN) ? 250 : 0;
 		const currentNode = Node(state, Visual(state, SELECTED_NODE));
 		const code = GetNodeProp(currentNode, NodeProperties.Lambda);
-
+		const defs = '//<!-uiactions - defs->';
 		return (
 			<TopViewer active={this.props.active} style={{ width: `calc(100% - ${offsetWidth}px)` }}>
 				<div style={{ position: 'relative' }}>
@@ -77,15 +99,25 @@ class CodeEditor extends Component<any, any> {
 							<MonacoEditor
 								height="700"
 								width={'100%'}
+								editorWillMount={(editor) => {
+									monaco.editor.setTheme('vs-dark');
+								}}
 								language={
 									this.props.language ||
 									(currentNode && GetNodeProp(currentNode, NodeProperties.CS) ? 'csharp' : null) ||
 									'typescript'
 								}
 								onChange={(val: string) => {
-									this.setState({ value: val });
+									this.setState({ value: `${val}`.split(defs)[0] || '' });
 								}}
-								value={this.state.value || this.props.value}
+								value={
+									(this.state.value || this.props.value) +
+                  `${defs}
+//#region section
+${this.state.definitions}
+//#endregion
+                `
+							 	}
 								options={options}
 							/>
 						</div>
