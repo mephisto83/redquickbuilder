@@ -75,6 +75,7 @@ export const DataChainFunctionKeys = {
 	Lambda: 'Lambda',
 	MethodBaseValidation: 'MethodBaseValidation',
 	ModelMethodMenu: 'ModelMethodMenu',
+	NavigationMethodMenu: 'NavigationMethodMenu',
 	Validation: 'Validation',
 	NavigateTo: 'Navigate To',
 	GetModelIds: 'Get Model Ids', // Get an array of model ids from an array

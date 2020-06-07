@@ -28,6 +28,7 @@ export const MenuTreeOptions = {
 		menuGeneration: () => `() => {
       return BuildMenu();
     }`,
-		navigate_function: standardNavigate
+		navigate_function: standardNavigate,
+		buildMethod: DataChainFunctionKeys.NavigationMethodMenu
 	}
 };
