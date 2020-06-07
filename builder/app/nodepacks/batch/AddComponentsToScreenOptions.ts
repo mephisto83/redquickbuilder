@@ -7,7 +7,8 @@ import {
 	NodeProperties,
 	GetNodeProp,
 	GetDefaults,
-	ScreenOptionFilter
+	ScreenOptionFilter,
+	GetCurrentGraph
 } from '../../actions/uiactions';
 import { NodeTypes } from '../../constants/nodetypes';
 import AddComponent from '../AddComponent';
@@ -15,14 +16,19 @@ import { ComponentTypeKeys } from '../../constants/componenttypes';
 import AddMenuComponent from '../layouts/AddMenuComponent';
 import { MenuTreeOptions, MenuTreeOptionKeys } from '../../constants/menu';
 import GridHeaderMainMenuMain from '../layouts/GridHeaderMainMenuMain';
+import { GetNodesLinkedTo } from '../../methods/graph_methods';
+import { Node } from '../../methods/graph_types';
 
 export default async function AddComponentsToScreenOptions(progresFunc: any, screenFilter: Function = () => true) {
-	const screenOptions = NodesByType(null, NodeTypes.ScreenOption);
-	const menuTreeOption = MenuTreeOptionKeys.ModelMethodMenu;
-	await screenOptions
-		.filter(ScreenOptionFilter)
-		.filter(screenFilter)
-		.forEachAsync(async (screenOption: any, index: any, total: any) => {
+	const screenOptions = NodesByType(null, NodeTypes.Screen);
+	const menuTreeOption = MenuTreeOptionKeys.NavigationMenu;
+	await screenOptions.filter(ScreenOptionFilter).filter(screenFilter).forEachAsync(async (screen: Node) => {
+		let screenOptions = GetNodesLinkedTo(GetCurrentGraph(), {
+			id: screen.id,
+			componentType: NodeTypes.ScreenOption
+		});
+
+		return await screenOptions.forEachAsync(async (screenOption: any, index: any, total: any) => {
 			const context = {
 				title: null,
 				menu: null
@@ -70,4 +76,5 @@ export default async function AddComponentsToScreenOptions(progresFunc: any, scr
 
 			await progresFunc(index / total);
 		});
+	});
 }

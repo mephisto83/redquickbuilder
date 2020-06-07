@@ -74,6 +74,18 @@ export default function CreateDashboard_1(args: any = {}) {
             }
           ];
         },
+        function () {
+          return [
+            {
+              operation: "CHANGE_NODE_PROPERTY",
+              options: {
+                prop: NodeProperties.IsDashboard,
+                id: context.node0,
+                value: true
+              }
+            }
+          ];
+        },
 
         function () {
           return [

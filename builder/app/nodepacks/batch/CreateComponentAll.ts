@@ -20,8 +20,8 @@ import { findLink } from '../../methods/graph_methods';
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
 	console.log('Create Component All');
-  const result: any = [];
-  debugger;
+	const result: any = [];
+	debugger;
 	const navigableScreens = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.NavigationScreen
 	});
@@ -118,8 +118,8 @@ export function CreateComponentModel(args: any = {}) {
 			if (!args.isSharedComponent && navigableScreens) {
 				let naviScreen = navigableScreens.find((navigableScreen: Node) => {
 					let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
-					let navViewType = GetNodeProp(navigableScreen, NodeTypes.ViewType);
-					let navModel = GetNodeProp(navigableScreen, NodeTypes.Model);
+					let navViewType = GetNodeProp(navigableScreen, NodeProperties.ViewType);
+					let navModel = GetNodeProp(navigableScreen, NodeProperties.Model);
 
 					return model === navModel && navAgent === args.agentId && navViewType === viewType;
 				});
@@ -139,7 +139,9 @@ export function CreateComponentModel(args: any = {}) {
 							isSharedComponent: args.isSharedComponent,
 							viewTypeModelId: args.viewTypeModelId,
 							connectedModel,
+							model: args.model,
 							agentId: args.agentId,
+							viewType,
 							...defaultArgs,
 							viewName
 						}),
