@@ -45,6 +45,7 @@ import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
 import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDashboard';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
+import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -191,7 +192,13 @@ class QuickMethods extends Component<any, any, any> {
 									title={'Connect Dashboards'}
 									icon={'fa fa-plus'}
 									onClick={() => {
-										ConnectDashboards(() => true);
+										ConnectDashboards(() => true, () => {});
+									}}
+								/>
+								<TreeViewMenu
+									title={'CreateComponentAll'}
+									onClick={() => {
+										CreateComponentAll(() => true);
 									}}
 								/>
 								<TreeViewMenu

@@ -20,7 +20,8 @@ import { findLink } from '../../methods/graph_methods';
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
 	console.log('Create Component All');
-	const result: any = [];
+  const result: any = [];
+  debugger;
 	const navigableScreens = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.NavigationScreen
 	});
@@ -96,12 +97,14 @@ export function CreateComponentModel(args: any = {}) {
 		defaultArgs = {},
 		navigableScreens = null
 	} = args;
-
+	if (navigableScreens && navigableScreens.length === 0) {
+		throw new Error('no navigableScreens');
+	}
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 	const operations: any = [];
 	const result: any = [];
 	const graph = GetCurrentGraph();
-	viewTypes.forEach((viewType: any) => {
+	viewTypes.forEach((viewType: string) => {
 		const viewName = `${args.isSharedComponent ? 'Shared' : ''} ${GetNodeTitle(model)} ${viewType}`;
 		const properties = GetModelPropertyChildren(model).filter(
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
@@ -110,7 +113,7 @@ export function CreateComponentModel(args: any = {}) {
 			isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa)
 		);
 		if (agentAccess || args.isSharedComponent) {
-      const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
+			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
 
 			if (!args.isSharedComponent && navigableScreens) {
 				let naviScreen = navigableScreens.find((navigableScreen: Node) => {
@@ -118,11 +121,7 @@ export function CreateComponentModel(args: any = {}) {
 					let navViewType = GetNodeProp(navigableScreen, NodeTypes.ViewType);
 					let navModel = GetNodeProp(navigableScreen, NodeTypes.Model);
 
-					return (
-						model === navModel &&
-						navAgent === args.agentId &&
-						navViewType ===  viewType
-					);
+					return model === navModel && navAgent === args.agentId && navViewType === viewType;
 				});
 				if (!naviScreen) {
 					return;
