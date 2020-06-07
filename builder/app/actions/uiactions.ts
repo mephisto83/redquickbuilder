@@ -1864,7 +1864,7 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
           }
         }
         if(a && a.accessToken) {
-          $service.setBearerAccessToken(a.accessToken);
+          $service.setBearerAccessToken(a.accessToken, a.userId);
           if(a && a.userName && a.password) {
             // Anonymous users
             $service.setUserNameAndPasswordForAnonymousUser(a.userName, a.password);

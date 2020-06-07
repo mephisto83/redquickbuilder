@@ -28,7 +28,8 @@ export default class TopViewer extends Component<any, any> {
 						pointerEvents: active ? 'all' : 'none',
 						top: active ? 0 : '-2000px',
 						backgroundColor: '#dd4b39d2',
-            ...this.props.innerStyle || {}
+						zIndex: 1,
+						...this.props.innerStyle || {}
 					}}
 				>
 					{this.props.children}

@@ -9,8 +9,9 @@ import { SIDE_PANEL_OPEN, Node, SELECTED_NODE, CHANGE_NODE_PROPERTY } from '../a
 import { Visual } from '../templates/electronio/v1/app/actions/uiactions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp } from '../methods/graph_methods';
-import { NodeProperties } from '../constants/nodetypes';
+import { NodeProperties, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
+import ModelGenerator from '../generators/modelgenerators';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
@@ -55,7 +56,9 @@ class CodeEditor extends Component<any, any> {
 		if (this.props.value !== prevProps.value) {
 			const { state } = this.props;
 			const currentNode = Node(state, Visual(state, SELECTED_NODE));
-			this.setState({ value: GetNodeProp(currentNode, this.props.prop || NodeProperties.Lambda) });
+			this.setState({
+				value: GetNodeProp(currentNode, this.props.prop || NodeProperties.Lambda)
+			});
 		}
 		if (this.props.language !== prevProps.language) {
 			this.setState({ language: this.props.language });
@@ -76,6 +79,37 @@ class CodeEditor extends Component<any, any> {
 		const currentNode = Node(state, Visual(state, SELECTED_NODE));
 		const code = GetNodeProp(currentNode, NodeProperties.Lambda);
 		const defs = '//<!-uiactions - defs->';
+		let value: string = this.state.value || this.props.value;
+		if (value.indexOf(defs) === -1) {
+			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
+			let common_functions: any = ModelGenerator.GenerateCommon({ state: this.props.state });
+			let modelTsScript = Object.keys(tsModels)
+				.map((key: string) => {
+					let { template } = tsModels[key];
+					return `
+        ${template || ''}`;
+				})
+				.join(NEW_LINE);
+			value += `
+${defs}
+
+//#region models
+${modelTsScript}
+//#endregion
+//#region common functions
+${Object.keys(common_functions)
+				.map((key: string) => {
+					let { template } = common_functions[key];
+					return `
+  ${template || ''}`;
+				})
+				.join(NEW_LINE)}
+//#endregion
+//#region section
+${this.state.definitions}
+//#endregion
+  `;
+		}
 		return (
 			<TopViewer active={this.props.active} style={{ width: `calc(100% - ${offsetWidth}px)` }}>
 				<div style={{ position: 'relative' }}>
@@ -88,7 +122,7 @@ class CodeEditor extends Component<any, any> {
 									this.props.graphOperation(CHANGE_NODE_PROPERTY, {
 										prop: this.props.prop || NodeProperties.Lambda,
 										id,
-										value: this.state.value
+										value: `${this.state.value}`.split(defs)[0] || ''
 									});
 								}}
 							>
@@ -108,16 +142,9 @@ class CodeEditor extends Component<any, any> {
 									'typescript'
 								}
 								onChange={(val: string) => {
-									this.setState({ value: `${val}`.split(defs)[0] || '' });
+									this.setState({ value: `${val}` });
 								}}
-								value={
-									(this.state.value || this.props.value) +
-                  `${defs}
-//#region section
-${this.state.definitions}
-//#endregion
-                `
-							 	}
+								value={value}
 								options={options}
 							/>
 						</div>

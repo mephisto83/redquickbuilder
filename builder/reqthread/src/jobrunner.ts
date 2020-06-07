@@ -196,6 +196,7 @@ async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage
 		) {
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
+			runnerContext.agents[temp.agent].projects[temp.name].progress = 1;
 		}
 		await tellCommandCenter();
 	}

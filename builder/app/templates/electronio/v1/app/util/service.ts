@@ -11,6 +11,7 @@ import * as Globals from './globals';
 //   require("isomorphic-fetch");
 // }
 var accessToken = '';
+let userId = '';
 let credentials: any = {};
 const CREDENTIALS = '$CREDENTIALS$';
 var getEndpoint = (baseDomain: string, path: string) => {
@@ -24,11 +25,16 @@ var getEndpoint = (baseDomain: string, path: string) => {
 	return endpoint;
 };
 
-export function setBearerAccessToken(access_token: string) {
+export function setBearerAccessToken(access_token: string, _userId: string) {
 	accessToken = access_token;
 	credentials = credentials || {};
-	credentials.accessToken = accessToken;
+  credentials.accessToken = accessToken;
+  userId = _userId;
+	credentials.userId = _userId;
 	updateStoredCredentials();
+}
+export function getUser() {
+	return userId || (credentials ? credentials.userId : null);
 }
 
 let storagePromise = Promise.resolve();

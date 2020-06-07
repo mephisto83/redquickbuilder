@@ -11,6 +11,7 @@ if (typeof self !== 'undefined' && !fetch) {
 	require('isomorphic-fetch');
 }
 var accessToken = '';
+let userId: string;
 let credentials: any = {};
 const CREDENTIALS = '$CREDENTIALS$';
 var getEndpoint = (baseDomain: string, path: string) => {
@@ -24,11 +25,16 @@ var getEndpoint = (baseDomain: string, path: string) => {
 	return endpoint;
 };
 let storagePromise = Promise.resolve();
-export function setBearerAccessToken(access_token: string) {
+export function setBearerAccessToken(access_token: string, _userId: string) {
 	accessToken = access_token;
 	credentials = credentials || {};
 	credentials.accessToken = accessToken;
+	userId = _userId;
+	credentials.userId = _userId;
 	updateStoredCredentials();
+}
+export function getUser() {
+	return userId || (credentials ? credentials.userId : null);
 }
 
 export function setUserNameAndPasswordForAnonymousUser(username: any, password: any) {

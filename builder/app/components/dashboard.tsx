@@ -552,7 +552,7 @@ class Dashboard extends Component<any, any> {
 						GetNodesLinkedTo(graph, {
 							id: currentNode.id,
 							link: LinkType.ComponentExternalApi
-						}).some((v) => UIA.GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.ScreenOption)
+						}).some((v: Node) => UIA.GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.ScreenOption)
 					) {
 						result.push({
 							onClick: () => {
@@ -716,21 +716,40 @@ class Dashboard extends Component<any, any> {
 	getMenuDataSourceContext() {
 		const result = [];
 		const { state } = this.props;
-		result.push({
-			onClick: () => {
-				const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-				let shouldShowNode: Node[] = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
-					id: currentNode.id,
-					direction: SOURCE,
-					link: LinkType.DataChainShouldShow
-				});
-				if (!shouldShowNode.length) {
-					this.props.graphOperation(AddShouldShowDataChain({ id: currentNode.id, name: '' }));
-				}
+		result.push(
+			{
+				onClick: () => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					let shouldShowNode: Node[] = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+						id: currentNode.id,
+						direction: SOURCE,
+						link: LinkType.DataChainShouldShow
+					});
+					if (!shouldShowNode.length) {
+						this.props.graphOperation(AddShouldShowDataChain({ id: currentNode.id, name: '' }));
+					}
+				},
+				icon: 'fa fa-rocket',
+				title: `Data Chain Should Show`
 			},
-			icon: 'fa fa-rocket',
-			title: `Data Chain Should Show`
-		});
+			{
+				onClick: () => {
+					this.props.graphOperation([
+						{
+							operation: UIA.CONNECT_TO_TITLE_SERVICE,
+							options: () => {
+								const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+								return {
+									id: currentNode.id
+								};
+							}
+						}
+					]);
+				},
+				icon: 'fa fa-industry',
+				title: `Connect to title service`
+			}
+		);
 
 		return result;
 	}

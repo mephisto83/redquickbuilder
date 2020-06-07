@@ -1388,8 +1388,20 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.BOOLEAN]: 'bool',
 		[NodePropertyTypes.EMAIL]: 'Email',
 		[NodePropertyTypes.PHONENUMBER]: 'PhoneNumber'
+	},
+	[ProgrammingLanguages.JavaScript]: {
+		[NodePropertyTypes.DATETIME]: 'any',
+		[NodePropertyTypes.STRING]: 'string',
+		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
+		[NodePropertyTypes.INT]: 'number',
+		[NodePropertyTypes.FLOAT]: 'number',
+		[NodePropertyTypes.DOUBLE]: 'number',
+		[NodePropertyTypes.BOOLEAN]: 'boolean',
+		[NodePropertyTypes.EMAIL]: 'string',
+		[NodePropertyTypes.PHONENUMBER]: 'string'
 	}
 };
+
 export const RED_QUICK_DATA = 'RedQuick.Data';
 export const RED_QUICK_ATTRIBUTES = 'RedQuick.Attributes';
 export const Usings = {
