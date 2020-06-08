@@ -140,9 +140,7 @@ export default class CommunicationTower {
 					},
 					localPath
 				);
-				console.log(res);
 				let { body } = res;
-				console.log(body);
 				if (!body.success) {
 					maxattempts = true;
 					throw new Error('file size not confirmed');
@@ -221,7 +219,6 @@ export default class CommunicationTower {
 		};
 
 		let address = this.getIpaddress();
-		console.log(`command: ${parsed.command}`);
 		switch (parsed.command) {
 			case RedQuickDistributionCommand.SendFile:
 				reply.hostname = address.hostname;
@@ -463,13 +460,7 @@ export default class CommunicationTower {
 					// skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
 					return;
 				}
-				if (alias >= 1) {
-					// this single interface has multiple ipv4 addresses
-					console.log(ifname + ':' + alias, iface.address);
-				} else {
-					// this interface has only one ipv4 adress
-					console.log(ifname, iface.address);
-				}
+
 				addressLib[ifname] = iface.address;
 				addressLib.hostname = iface.address;
 				++alias;

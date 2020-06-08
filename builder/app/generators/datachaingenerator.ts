@@ -199,6 +199,9 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = []) 
 
   } from '../${rel}actions/uiactions';
 import {
+  GetMenuSource
+} from '../${rel}actions/menusource';
+import {
     validateEmail,
     maxLength,
     minLength,

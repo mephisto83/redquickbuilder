@@ -15,19 +15,13 @@ import {
 } from '../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
-import { Graph } from '../methods/graph_types';
+import { Graph, Node } from '../methods/graph_types';
 
 export default function(args: any = {}) {
 	const result: any = [];
 	const graph = GetCurrentGraph();
 	const screens = NodesByType(null, NodeTypes.Screen);
 	const screenWithoutDataChainCollection = screens;
-	// .filter(screen => {
-	//   return !GetNodesLinkedTo(graph, {
-	//     id: screen.id,
-	//     link: LinkType.DataChainCollectionReference
-	//   }).length;
-	// });
 
 	screenWithoutDataChainCollection.map((screen: any) => {
 		const temp: any = {};
@@ -639,8 +633,7 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 	return result;
 }
 //this can be first
-export function CollectionSharedReference(filter: any) {
-	filter = filter || (() => true);
+export function CollectionSharedReference() {
 	const result: any = [];
 	const graph = GetCurrentGraph();
 
@@ -673,6 +666,76 @@ export function CollectionSharedReference(filter: any) {
 		}
 	});
 	return result;
+}
+//this can be first
+export function CollectionSharedMenuDataSource() {
+	const result: any = [];
+	const graph = GetCurrentGraph();
+
+	let sharedMenuCollection = GetNodeByProperties(
+		{
+			[NodeProperties.SharedMenuCollection]: true
+		},
+		graph
+	);
+	if (!sharedMenuCollection) {
+		result.push({
+			operation: ADD_NEW_NODE,
+			options() {
+				return {
+					nodeType: NodeTypes.DataChainCollection,
+					properties: {
+						[NodeProperties.UIText]: `Menu Data Functions`,
+						[NodeProperties.Pinned]: false,
+						[NodeProperties.SharedMenuCollection]: true
+					},
+					callback: (node: any) => {
+						sharedMenuCollection = node;
+					}
+				};
+			}
+		});
+	}
+	return result;
+}
+export function CollectionDataChainsRelatedToMenuSource(filter: any) {
+	filter = filter || (() => true);
+	const result: any = [];
+	const graph = GetCurrentGraph();
+	let sharedMenuCollection = GetNodeByProperties(
+		{
+			[NodeProperties.SharedMenuCollection]: true
+		},
+		graph
+	);
+
+	const menuDataSources = NodesByType(null, NodeTypes.MenuDataSource).filter((x: any) => filter(x));
+
+	menuDataSources.forEach((menuDataSource: { id: any }) => {
+		const steps: any[] = [];
+		let connectedChains = GetNodesLinkedTo(graph, {
+			id: menuDataSource.id,
+			componentType: NodeTypes.DataChain
+		});
+		connectedChains.forEach((connectedChain: Node) => {
+			if (sharedMenuCollection)
+				steps.push({
+					operation: ADD_LINK_BETWEEN_NODES,
+					options() {
+						return {
+							target: sharedMenuCollection.id,
+							source: connectedChain.id,
+							properties: {
+								...LinkProperties.DataChainCollection
+							}
+						};
+					}
+				});
+		});
+		result.push(...steps);
+	});
+
+	graphOperation(result.filter((x: any) => x))(GetDispatchFunc(), GetStateFunc());
 }
 export function CollectionConnectDataChainCollection(filter: any) {
 	filter = filter || (() => true);
@@ -738,11 +801,6 @@ export function CollectionComponentNodes(filter: any) {
 			.filter((x: any) => {
 				return GetNodeProp(x, NodeProperties.UIType) === uiType;
 			});
-		// componentNodes
-		// 	.map((d: any) => getTopComponent(graph, d))
-		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.SharedComponent))
-		// 	.unique((x: any) => x.id);
-
 		componentNodes
 			.sort((a: any, b: any) => {
 				const a_lineage = getComponentLineage(graph, a);

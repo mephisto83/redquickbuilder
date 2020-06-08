@@ -40,6 +40,7 @@ export const FunctionTypes: any = {
 	Update_Object_Agent_Value__Object: 'Update/Object/Agent/Value => Object',
 	Update_Object_Agent_Value__Object_With_Object: 'Update/Object/with/Model/Agent/Value => Object',
 	Get_Object_Agent_Value__Object: 'Get/Object/Agent/Value => Object',
+	Get_Object_User_Object: 'Get object by user idt',
 	Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
 	Create_Object_Agent_Many_to_Many_CompositeInput__Object:
@@ -669,8 +670,8 @@ export const GET_QUERY_PARAMETERS = {
 };
 
 export const MethodFunctions: any = {
-  [FunctionTypes.Get_Unique_Object_To_Agent]:{
-    title: Titles.Create_Object__Object,
+	[FunctionTypes.Get_Unique_Object_To_Agent]: {
+		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Unique ${t} by ${a}`;
 		},
@@ -704,7 +705,7 @@ export const MethodFunctions: any = {
 		isList: false,
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
+	},
 	[FunctionTypes.Create_Object__Object]: {
 		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
@@ -1463,6 +1464,49 @@ export const MethodFunctions: any = {
 			body: false,
 			parameters: {
 				template: { ...TEMPLATE_PARAMETERS }
+			}
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
+
+	[FunctionTypes.Get_Object_User_Object]: {
+		title: FunctionTypes.Get_Object_User_Object,
+		titleTemplate: function(t: any, a: any) {
+			return `Get ${t} by ${a}`;
+		},
+		template: './app/templates/standard/get_model_user_object.tpl',
+		interface: './app/templates/standard/get_model_user_object_interface.tpl',
+		controller: './app/templates/controller/controller_get_model_user_object.tpl', //controller_get_all_by_ids
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+
+		parameters: {
+			body: false,
+			parameters: {
+				template: {}
 			}
 		},
 		isList: false,

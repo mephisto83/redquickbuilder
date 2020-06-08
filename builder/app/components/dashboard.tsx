@@ -734,6 +734,27 @@ class Dashboard extends Component<any, any> {
 			},
 			{
 				onClick: () => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					let shouldBeDisabled: Node[] = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+						id: currentNode.id,
+						direction: SOURCE,
+						link: LinkType.DataChainIsDisabled
+					});
+					if (!shouldBeDisabled.length) {
+						this.props.graphOperation(
+							AddShouldShowDataChain({
+								id: currentNode.id,
+                name: `Is disabled ${UIA.GetNodeTitle(currentNode)}`,
+                linkProperty: LinkProperties.DataChainIsDisabled
+							})
+						);
+					}
+				},
+				icon: 'fa fa-rocket',
+				title: `Data Chain Is Disabled`
+			},
+			{
+				onClick: () => {
 					this.props.graphOperation([
 						{
 							operation: UIA.CONNECT_TO_TITLE_SERVICE,

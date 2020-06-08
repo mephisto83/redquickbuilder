@@ -391,6 +391,7 @@ export const NodeProperties = {
 	Number: 'Number',
 	OnFocus: 'onFocus',
 	OnChange: 'onChangeText',
+	SharedMenuCollection: 'SharedMenuCollection',
 	UIType: 'UIType',
 	DashboardButtons: 'DashboardButtons',
 	TextType: 'TextType',
@@ -652,6 +653,7 @@ export const LinkType = {
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
 	DataChainShouldShow: 'DataChainShouldShow',
+	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
@@ -910,6 +912,9 @@ export const LinkProperties: any = {
 	},
 	DataChainShouldShow: {
 		type: LinkType.DataChainShouldShow
+	},
+	DataChainIsDisabled: {
+		type: LinkType.DataChainIsDisabled
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen

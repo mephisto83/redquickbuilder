@@ -48,6 +48,9 @@ export interface MenuItem {
 	title: string;
 	screen: string | null;
 	leaf: boolean;
+	parent: string;
+	shouldBeDisabled: string | null;
+	shouldShowDataChain: string | null;
 }
 export interface MenuChildren {
 	[str: string]: MenuChildrenProperty;
@@ -61,9 +64,17 @@ function createMenuObj(): MenuObject {
 		children: {}
 	};
 }
-function createMenuItem(node: Node): MenuItem {
+function createMenuItem(node: Node, graph: Graph, parent: string): MenuItem {
 	let isScreen = GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.NavigationScreen;
 	let screen: Node | null = null;
+	let shouldShowDataChain = GraphMethods.GetNodeLinkedTo(graph, {
+		id: node.id,
+		link: LinkType.DataChainShouldShow
+	});
+	let shouldBeDisabled = GraphMethods.GetNodeLinkedTo(graph, {
+		id: node.id,
+		link: LinkType.DataChainIsDisabled
+	});
 	if (isScreen) {
 		screen = GetNodeByProperties({
 			[NodeProperties.Model]: GetNodeProp(node, NodeProperties.Model),
@@ -77,20 +88,23 @@ function createMenuItem(node: Node): MenuItem {
 		isScreen: isScreen,
 		title: `menu:${GetNodeTitle(node)}`,
 		screen: screen ? GetCodeName(screen) : null,
-		leaf: false
+		leaf: false,
+		parent,
+		shouldShowDataChain: shouldShowDataChain ? shouldShowDataChain.id : null,
+		shouldBeDisabled: shouldBeDisabled ? shouldBeDisabled.id : null
 	};
 }
 function createMenuChildren() {
 	return {};
 }
 export default class MenuGenerator {
-	static constructMenu(root: Node, menuObj: MenuObject, graph: Graph): MenuObject {
+	static constructMenu(root: Node, menuObj: MenuObject, graph: Graph, parent: string): MenuObject {
 		menuObj = menuObj || createMenuObj();
 
 		if (!menuObj.items[root.id]) {
-			menuObj.items[root.id] = createMenuItem(root);
+			menuObj.items[root.id] = createMenuItem(root, graph, parent);
 
-			let submenuItems = GraphMethods.GetNodeLinkedTo(graph, {
+			let submenuItems = GraphMethods.GetNodesLinkedTo(graph, {
 				id: root.id,
 				link: LinkType.MenuLink,
 				direction: GraphMethods.SOURCE
@@ -104,6 +118,7 @@ export default class MenuGenerator {
 				menuObj.children[root.id][item.id] = {
 					[MenuChildProperty.IsScreen]: isScreen
 				};
+				this.constructMenu(item, menuObj, graph, root.id);
 			});
 			let menuItems = submenuItems.filter(
 				(node: Node) => GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.MenuDataSource
@@ -116,6 +131,59 @@ export default class MenuGenerator {
 
 		return menuObj;
 	}
+	static convertToMenuCode(menuObj: MenuObject): string {
+		let result = `
+    let result = [];
+
+{{code}}
+
+    return result;
+`;
+		let code = Object.keys(menuObj.items)
+			.map((item: string) => {
+				let menuItem = menuObj.items[item];
+				if (menuItem.shouldShowDataChain) {
+				}
+				let { parent } = menuObj.items[item];
+				let disabledFunc = `false`;
+				if (menuItem.shouldBeDisabled) {
+					disabledFunc = `DC.${GetCodeName(menuItem.shouldBeDisabled)}({
+            context: {
+              getState,
+              dispatch
+            },
+            screen: Screens.${GetCodeName(item)}
+          })`;
+				}
+				let shouldShowPart1 = '';
+				let shouldShowPart2 = '';
+				if (menuItem.shouldShowDataChain) {
+					shouldShowPart1 = `if(DC.${GetCodeName(menuItem.shouldShowDataChain)}({
+            context: {
+              getState,
+              dispatch
+            },
+          })){`;
+					shouldShowPart2 = '}';
+				}
+				return `
+          ${shouldShowPart1}
+            result.push({
+              id: '${item}',
+              disabled: ${disabledFunc},
+              title: titleService.get('${item}', '${GetNodeTitle(item)}'),
+              parent: ${parent ? `'${parent}'` : 'null'}
+            });
+          ${shouldShowPart2}
+      `;
+			})
+			.join(NEW_LINE);
+
+		return bindTemplate(result, {
+			code
+		});
+	}
+
 	static Generate(options: { state: any; key?: any; language?: any }) {
 		const { state } = options;
 		const graphRoot = GetRootGraph(state);
@@ -130,17 +198,50 @@ export default class MenuGenerator {
 				id: topNavigationScreen.id,
 				link: LinkType.MenuLink
 			});
-			menuObj = this.constructMenu(topMenu, createMenuObj(), graphRoot);
+			menuObj = this.constructMenu(topMenu, createMenuObj(), graphRoot, '');
+
+			let menuGuts = this.convertToMenuCode(menuObj);
+			let rel = '';
+			const result: any = {
+				id: 'menuSource.ts',
+				name: 'menuSource.ts',
+				menusource: {
+					template: `
+          import * as navigate from '../${rel}actions/navigationActions';
+          import * as $service from '../${rel}util/service';
+          import routes from '../${rel}constants/routes';
+          import { titleService} from '../${rel}actions/util';
+          import * as RedLists from '../${rel}actions/lists';
+          import StateKeys from '../${rel}state_keys';
+          import ModelKeys from '../${rel}model_keys';
+          import ViewModelKeys from '../${rel}viewmodel_keys';
+          import Models from '../${rel}model_keys';
+          import RedObservable from '../${rel}actions/observable';
+          import RedGraph from '../${rel}actions/redgraph';
+          import { retrieveParameters, fetchModel } from '../${rel}actions/redutils';
+          import * as DC from './${rel}data-chain';
+          import * as DC from 'menusourceActions';
+          import titleService from './titleService';
+
+          export interface MenuItem {
+            id: string;
+            title: string;
+            parent: string | null;
+          }
+          export function GetMenuSource(args: { getState: Function, dispatch: Function }) {
+            ${menuGuts}
+          }
+        `
+				}
+			};
+			return { [`menuSource.ts`]: result };
 		}
-		const result: any = {};
-		models.map((model: { id: any }) => {
-			const res: any = {};
-			result[res.id] = res;
-		});
-
-		return result;
+		// models.map((model: { id: any }) => {
+		// 	const res: any = {};
+		// 	result[res.id] = res;
+		// });
+		return {};
 	}
-
 	static tabs(c: number) {
 		let res = '';
 		const TAB = '\t';

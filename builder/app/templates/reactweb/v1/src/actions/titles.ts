@@ -6,7 +6,7 @@ import titleLib from './titleServiceLib';
 
 const titleOptions: any = { preferredLang: false };
 export const TitleService = {
-	get: (key: string) => {
+	get: (key: string, defaultValue?: string) => {
 		if (key && key.trim) {
 			key = key.trim();
 		}
@@ -26,7 +26,7 @@ export const TitleService = {
 				}
 			}
 		}
-		return `[${key}]`;
+		return `[${defaultValue || key}]`;
 	}
 };
 

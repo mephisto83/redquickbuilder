@@ -448,7 +448,7 @@ export default class ModelGenerator {
 
 		const staticFunctions = [];
 		const properties = connectedProperties
-			.filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
+			// .filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
 			.filter((x: { id: any }) => x.id !== nodeId)
 			.map((propNode: { id: any }) => {
 				let propertyInstanceTemplate = propertyTemplate;

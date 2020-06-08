@@ -1747,6 +1747,8 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
         ${options.skipSetGetState ? '' : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
+        // ${screenOption.id}
+
         ${invocations}
         ${chainInvocations}//asdf
 {{handles}}

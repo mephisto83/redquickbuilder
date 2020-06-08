@@ -191,6 +191,7 @@ export default class ControllerGenerator {
 					template: controllerTemplateClass,
 					usings: [
 						...STANDARD_CONTROLLER_USING,
+						`${namespace}${NameSpace.Interface}`,
 						`${namespace}${NameSpace.Model}`,
 						'Microsoft.AspNetCore.Mvc'
 					],

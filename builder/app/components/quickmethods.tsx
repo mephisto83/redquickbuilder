@@ -46,6 +46,7 @@ import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDash
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
 import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
+import MenuGenerator from '../generators/menugenerator';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -313,31 +314,32 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Create Smart Dashboard'}
-									icon="fa fa-plus"
-									onClick={() => {
-										CreateSmartDashboard({
-											buttons: [
-												{
-													title: 'button 1'
-												}
-											],
-											dashboardName: 'Easy dash',
-											callback: () => {
-												console.log('done');
-											}
-										});
+									title="Random"
+									open={UIA.Visual(state, CreateDefaultView.type)}
+									active
+									toggle={() => {
+										this.props.toggleVisual(CreateDefaultView.type);
 									}}
-								/>
-								<TreeViewMenu
-									title={'Distribute Build All Jobs'}
-									icon="fa fa-plus"
-									onClick={() => {
-										this.props.setState();
-										DistributeBuildAllJobs();
-									}}
-								/>
+									icon="fa fa-tag"
+								>
+									<TreeViewMenu
+										title={'Distribute Build All Jobs'}
+										icon="fa fa-plus"
+										onClick={() => {
+											this.props.setState();
+											DistributeBuildAllJobs();
+										}}
+									/>
+									<TreeViewMenu
+										title={'Generate Menu Source'}
+										icon="fa fa-plus"
+										onClick={() => {
+											MenuGenerator.Generate({ state: this.props.state });
+										}}
+									/>
+								</TreeViewMenu>
 							</TreeViewMenu>
+
 							<TreeViewMenu
 								title={CreateDefaultView.type}
 								open={UIA.Visual(state, CreateDefaultView.type)}

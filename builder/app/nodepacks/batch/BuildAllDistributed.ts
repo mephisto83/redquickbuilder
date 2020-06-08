@@ -32,7 +32,11 @@ import CreateClaimService from './CreateClaimService';
 import SetupViewTypes from './SetupViewTypes';
 import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';
 import ApplyLoginValidations from './ApplyLoginValidations';
-import CollectionDataChainsIntoCollections, { CollectionSharedReference } from '../CollectionDataChainsIntoCollections';
+import CollectionDataChainsIntoCollections, {
+	CollectionSharedReference,
+	CollectionSharedMenuDataSource,
+	CollectionDataChainsRelatedToMenuSource
+} from '../CollectionDataChainsIntoCollections';
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
 
@@ -171,6 +175,8 @@ const Have_All_Properties_On_Executors = 'HaveAllPropertiesOnExecutors';
 export const Add_Component_To_Screen_Options = 'Add Component To Screen Options';
 const Add_Copy_Command_To_Executors = 'Add_Copy_Command_To_Executors';
 const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
+const Collection_SharedMenuDataSource = 'Add Shared Menu Data Source';
+const Collection_DataChainsRelatedToMenuSource = 'Add Data Chains related to menu source';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
 export const ApplyTemplates = 'ApplyTemplates';
 export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
@@ -211,6 +217,8 @@ const buildAllProgress = [
 	...waiting(ApplyValidationFromProperties),
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
+	{ name: Collection_SharedMenuDataSource },
+	{ name: Collection_DataChainsRelatedToMenuSource },
 	...waiting(CollectionComponentNodes),
 	...waiting(CollectionScreenNodes),
 	...waiting(CollectionConnectDataChainCollection),
@@ -356,9 +364,19 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await threadRun(buildAllProgress, Add_Component_To_Screen_Options, currentJobFile, NodeTypes.Screen);
 
 		await run(buildAllProgress, CollectionSharedReferenceTo, async (progresFunc: any) => {
-			const result = CollectionSharedReference(progresFunc);
+			const result = CollectionSharedReference();
 			await graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 			// await progresFunc(1);
+		});
+
+		await run(buildAllProgress, Collection_SharedMenuDataSource, async (progressFunc: any) => {
+			const result = CollectionSharedMenuDataSource();
+			await graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+		});
+
+		await run(buildAllProgress, Collection_DataChainsRelatedToMenuSource, async (progressFunc: any) => {
+			const result = CollectionDataChainsRelatedToMenuSource(false);
+			await graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 		});
 
 		await threadRun(

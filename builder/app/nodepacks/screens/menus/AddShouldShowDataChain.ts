@@ -1,7 +1,12 @@
 import { uuidv4 } from '../../../utils/array';
 import { NodeProperties, LinkProperties } from '../../../constants/nodetypes';
 import { GetNodeTitle, ADD_LINK_BETWEEN_NODES } from '../../../actions/uiactions';
-export default function AddShouldShowDataChain(args: { id: string; viewPackages?: any; name: string }) {
+export default function AddShouldShowDataChain(args: {
+	linkProperty?: any;
+	id: string;
+	viewPackages?: any;
+	name: string;
+}) {
 	//
 
 	// name
@@ -124,11 +129,11 @@ export default function AddShouldShowDataChain(args: { id: string; viewPackages?
 	result.push({
 		operation: ADD_LINK_BETWEEN_NODES,
 		options: () => {
-				return {
-					target: context.node0,
-					source: args.id,
-					properties: { ...LinkProperties.DataChainShouldShow }
-				};
+			return {
+				target: context.node0,
+				source: args.id,
+				properties: args.linkProperty || { ...LinkProperties.DataChainShouldShow }
+			};
 		}
 	});
 	let clearPinned: any[] = [];
