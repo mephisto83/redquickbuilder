@@ -13,7 +13,8 @@ import {
 	GetLinkProperty,
 	GetNodeType,
 	GetJSCodeName,
-	GetNodeByProperties
+	GetNodeByProperties,
+	GetSnakeCase
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -31,6 +32,7 @@ import {
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { GetState } from '../templates/electronio/v1/app/actions/uiactions';
 const MODEL_TEMPLATE = './app/templates/models/model.tpl';
 const MODEL_TEMPLATE_TS = './app/templates/models/model-ts.tpl';
 const MODEL_PROPERTY_TEMPLATE = './app/templates/models/model_property.tpl';
@@ -72,8 +74,8 @@ export default class ModelGenerator {
 		};
 	}
 
-	static GenerateTs(options: { state: any; key?: any; language?: any }) {
-		const { state } = options;
+	static GenerateTs(options: { state: any; key?: any; language?: any; includeImports: boolean }) {
+		const { includeImports, state } = options;
 		const graphRoot = GetRootGraph(state);
 		const models = NodesByType(state, NodeTypes.Model)
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
@@ -83,7 +85,8 @@ export default class ModelGenerator {
 			const res: any = ModelGenerator.GenerateModelTs({
 				graph: graphRoot,
 				nodeId: model.id,
-				state
+				state,
+				includeImports
 			});
 			result[res.id] = res;
 		});
@@ -425,8 +428,25 @@ export default class ModelGenerator {
 		};
 		return result;
 	}
-	static GenerateModelTs(options: { graph: any; nodeId: any; state: any }) {
+	static ModelImports(options: { graph: any; rel: any }) {
+		const state = GetState();
+		let { rel } = options;
+
+		let result: string[] = [];
+		const models = NodesByType(state, NodeTypes.Model)
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+
+		result = models.map((model: { id: any }) => {
+			return `import { ${GetCodeName(model)} } from '../${rel}models/${GetSnakeCase(model)}';`;
+		});
+
+		return result.join(NEW_LINE);
+	}
+	static GenerateModelTs(options: { graph: any; nodeId: any; state: any; includeImports: boolean }) {
 		const { state, graph, nodeId } = options;
+
+		const { includeImports } = options;
 		const usings: string[] = [];
 		const templateSwapDictionary: any = {};
 		const graphRoot = GetRootGraph(state);
@@ -446,6 +466,7 @@ export default class ModelGenerator {
 		const propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE_TS, 'utf8');
 		const staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 
+		let imports: string[] = [];
 		const staticFunctions = [];
 		const properties = connectedProperties
 			// .filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
@@ -463,6 +484,7 @@ export default class ModelGenerator {
 					});
 					if (types && types.length) {
 						propType = GetCodeName(types[0]);
+						imports.push(`import { ${GetCodeName(types[0])} } from './${GetSnakeCase(types[0])}';`);
 						propType = `${propType}[]`;
 					}
 				} else if (
@@ -519,7 +541,7 @@ export default class ModelGenerator {
 					property: GetJSCodeName(propNode),
 					attributes: ''
 				};
-
+				imports.push(`import { ${GetCodeName(t)} } from './${GetSnakeCase(t)}';`);
 				properties.push(bindTemplate(propertyTemplate, propSwapDictionary));
 			});
 		}
@@ -539,14 +561,17 @@ export default class ModelGenerator {
 				properties.push(propertyInstanceTemplate);
 			});
 		}
-		templateSwapDictionary.properties = properties.join('');
+		templateSwapDictionary.properties = properties.unique().join('');
 
 		let modelTemplate = fs.readFileSync(MODEL_TEMPLATE_TS, 'utf8');
+		templateSwapDictionary.imports = includeImports ? imports.join(NEW_LINE) : '';
 		modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
 		const result = {
 			id: `${GetNodeProp(node, NodeProperties.CodeName)}.ts`,
 			name: `${GetNodeProp(node, NodeProperties.CodeName)}.ts`,
+			relative: './src/models',
+			relativeFilePath: `/${GetSnakeCase(node)}.ts`,
 			template: modelTemplate
 		};
 		return result;

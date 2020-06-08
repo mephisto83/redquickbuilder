@@ -434,13 +434,6 @@ class DataChainActvityMenu extends Component<any, any> {
 						<SelectInput
 							onChange={(value: any) => {
 								const id = currentNode.id;
-								// this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-								//   source:
-								//     currentNode.properties[
-								//       UIA.NodeProperties.DataChainReference
-								//     ],
-								//   target: id
-								// });
 
 								const currentValue =
 									UIA.GetNodeProp(currentNode, NodeProperties.DataChainReferences) || {};
@@ -488,7 +481,7 @@ class DataChainActvityMenu extends Component<any, any> {
 									id: datachainreferenceValues[key]
 								};
 							})}
-							onClick={(item) => {
+							onClick={(item: { value: string }) => {
 								this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
 									source: item.value,
 									target: currentNode.id

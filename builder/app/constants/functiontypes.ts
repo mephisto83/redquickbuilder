@@ -40,7 +40,7 @@ export const FunctionTypes: any = {
 	Update_Object_Agent_Value__Object: 'Update/Object/Agent/Value => Object',
 	Update_Object_Agent_Value__Object_With_Object: 'Update/Object/with/Model/Agent/Value => Object',
 	Get_Object_Agent_Value__Object: 'Get/Object/Agent/Value => Object',
-	Get_Object_User_Object: 'Get object by user idt',
+	Get_Object_User_Object: '[Get object by user id]',
 	Delete_Object_Agent_Value__Object: 'Delete/Object/Agent/Value => Object',
 
 	Create_Object_Agent_Many_to_Many_CompositeInput__Object:

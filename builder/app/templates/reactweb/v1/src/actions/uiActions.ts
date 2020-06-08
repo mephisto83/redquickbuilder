@@ -30,7 +30,8 @@ export const VISUAL = 'VISUAL';
 
 export const UIKeys = {
 	HAS_CREDENTIALS: 'HAS_CREDENTIALS',
-	CREDENTIALS: 'CREDENTIALS'
+	CREDENTIALS: 'CREDENTIALS',
+	USER_ID: 'USER_ID'
 };
 
 let _getState: any;

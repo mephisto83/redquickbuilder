@@ -16,7 +16,9 @@ import {
 	GetComponentApiNode,
 	Connect,
 	UPDATE_NODE_PROPERTY,
-	ScreenOptionFilter
+	ScreenOptionFilter,
+	GetLambdaVariableTitle,
+	graphOperation
 } from '../../actions/uiactions';
 import { LinkType, NodeProperties, LinkProperties, Methods } from '../../constants/nodetypes';
 import { ComponentLifeCycleEvents, ComponentEvents } from '../../constants/componenttypes';
@@ -26,6 +28,7 @@ import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
 import { uuidv4 } from '../../utils/array';
 import AppendValidations from './AppendValidations';
 import { TEMPLATE_PARAMETERS } from '../../constants/functiontypes';
+import StoreModelInLake from '../datachain/StoreModelInLake';
 
 export default function ScreenConnectGet(args: any = {}) {
 	let { node, method } = args;
@@ -42,14 +45,14 @@ export default function ScreenConnectGet(args: any = {}) {
 		id: node,
 		link: LinkType.ScreenOptions
 	}).filter(ScreenOptionFilter);
-	const result : any = [];
+	const result: any = [];
 	let { viewPackages } = args;
 	viewPackages = {
 		[NodeProperties.ViewPackage]: uuidv4(),
 		...viewPackages || {}
 	};
 
-	screen_options.map((screen_option: { id: any; }) => {
+	screen_options.map((screen_option: { id: any }) => {
 		const components = GetNodesLinkedTo(graph, {
 			id: screen_option.id,
 			link: LinkType.Component
@@ -60,7 +63,7 @@ export default function ScreenConnectGet(args: any = {}) {
 			link: LinkType.ComponentInternalApi
 		});
 
-		components.map((component: { id: any; }) => {
+		components.map((component: { id: any }) => {
 			const subcomponents = GetNodesLinkedTo(graph, {
 				id: component.id,
 				link: LinkType.Component
@@ -147,7 +150,7 @@ export default function ScreenConnectGet(args: any = {}) {
 							}
 						: null
 				);
-				events.forEach((evnt: { id: any; }) => {
+				events.forEach((evnt: { id: any }) => {
 					const eventMethodInstances = GetNodesLinkedTo(graph, {
 						id: evnt.id,
 						link: LinkType.EventMethodInstance
@@ -231,7 +234,7 @@ export default function ScreenConnectGet(args: any = {}) {
 
 		lifeCylcleMethods
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
-			.map((lifeCylcleMethod: { id: any; }) => {
+			.map((lifeCylcleMethod: { id: any }) => {
 				const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
 					id: lifeCylcleMethod.id,
 					link: LinkType.LifeCylceMethodInstance
@@ -255,8 +258,9 @@ export default function ScreenConnectGet(args: any = {}) {
 						});
 					}
 				});
-				const apiEndpoints: any  = {};
-				let cycleInstance: { id: any; } | null = null;
+				const apiEndpoints: any = {};
+				let cycleInstance: { id: any } | null = null;
+				let datachain: string;
 				result.push(
 					...AddLifeCylcleMethodInstance({
 						node: lifeCylcleMethod.id,
@@ -272,9 +276,9 @@ export default function ScreenConnectGet(args: any = {}) {
 								source: cycleInstance.id,
 								graph,
 								viewPackages,
-								callback: (context: { apiEndPoints: any[]; }, graph: any) => {
+								callback: (context: { apiEndPoints: any[] }, graph: any) => {
 									if (context.apiEndPoints) {
-										context.apiEndPoints.filter((d: { id: any; }) => {
+										context.apiEndPoints.filter((d: { id: any }) => {
 											const temp = GetNodesLinkedTo(graph, {
 												id: d.id,
 												link: LinkType.ComponentApiConnection
@@ -291,10 +295,38 @@ export default function ScreenConnectGet(args: any = {}) {
 						return [];
 					},
 					() => {
+						let model = GetNodeProp(node, NodeProperties.Model);
+						return StoreModelInLake({
+							modelId: model,
+							modelInsertName: GetLambdaVariableTitle(model, false, true),
+							model: GetNodeTitle(model),
+							viewPackages,
+							callback: (dcontext: { entry: string }) => {
+								datachain = dcontext.entry;
+							}
+						});
+					},
+					() => {
+						return [
+							{
+								operation: ADD_LINK_BETWEEN_NODES,
+								options() {
+									return {
+										properties: { ...LinkProperties.DataChainLink },
+										target: datachain,
+										source: cycleInstance ? cycleInstance.id : null
+									};
+								}
+							}
+						];
+					},
+					() => {
 						if (apiEndpoints) {
 							return Object.keys(apiEndpoints).map((key) => {
 								const apiEndpoint = apiEndpoints[key];
-								let internalComponentApi = internalComponentApis.find((v: any) => GetCodeName(v) === key);
+								let internalComponentApi = internalComponentApis.find(
+									(v: any) => GetCodeName(v) === key
+								);
 								if (!internalComponentApi) {
 									internalComponentApi = internalComponentApis.find(
 										(v: any) => GetCodeName(v) === 'value'

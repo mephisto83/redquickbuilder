@@ -47,6 +47,7 @@ import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
 import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
 import MenuGenerator from '../generators/menugenerator';
+import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -147,6 +148,40 @@ class QuickMethods extends Component<any, any, any> {
 								}}
 								icon="fa fa-tag"
 							>
+								<TreeViewMenu
+									title="Random"
+									open={UIA.Visual(state, CreateDefaultView.type)}
+									active
+									toggle={() => {
+										this.props.toggleVisual(CreateDefaultView.type);
+									}}
+									icon="fa fa-tag"
+								>
+									<TreeViewMenu
+										title={'Distribute Build All Jobs'}
+										icon="fa fa-plus"
+										onClick={() => {
+											this.props.setState();
+											DistributeBuildAllJobs();
+										}}
+									/>
+									<TreeViewMenu
+										title={'Add user requirements'}
+										icon="fa fa-plus"
+										onClick={() => {
+											this.props.setState();
+											AddUserRequirements();
+										}}
+									/>
+
+									<TreeViewMenu
+										title={'Generate Menu Source'}
+										icon="fa fa-plus"
+										onClick={() => {
+											MenuGenerator.Generate({ state: this.props.state });
+										}}
+									/>
+								</TreeViewMenu>
 								<TreeViewMenu
 									title={GetSpecificModels.type}
 									icon="fa fa-plus"
@@ -313,31 +348,6 @@ class QuickMethods extends Component<any, any, any> {
 										AddAgentMethods(() => {});
 									}}
 								/>
-								<TreeViewMenu
-									title="Random"
-									open={UIA.Visual(state, CreateDefaultView.type)}
-									active
-									toggle={() => {
-										this.props.toggleVisual(CreateDefaultView.type);
-									}}
-									icon="fa fa-tag"
-								>
-									<TreeViewMenu
-										title={'Distribute Build All Jobs'}
-										icon="fa fa-plus"
-										onClick={() => {
-											this.props.setState();
-											DistributeBuildAllJobs();
-										}}
-									/>
-									<TreeViewMenu
-										title={'Generate Menu Source'}
-										icon="fa fa-plus"
-										onClick={() => {
-											MenuGenerator.Generate({ state: this.props.state });
-										}}
-									/>
-								</TreeViewMenu>
 							</TreeViewMenu>
 
 							<TreeViewMenu

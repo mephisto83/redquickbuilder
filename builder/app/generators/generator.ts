@@ -155,6 +155,8 @@ export default class Generator {
 				return ReactNativeNavigation.Generate({ state, key, language });
 			case ReactNativeTypes.Keys:
 				return ReactNativeKeys.Generate({ state, key, language });
+			case ReactNativeTypes.ModelInterfaces:
+				return ModelGenerator.GenerateTs({ state, key, language, includeImports: true });
 			case ReactNativeTypes.Configuration:
 				return ReactNativeConfiguration.Generate({ state, key, language });
 			case ReactNativeTypes.ControllerActions:

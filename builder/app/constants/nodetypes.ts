@@ -111,6 +111,7 @@ export const ReactNativeTypes = {
 	Navigation: 'navigation',
 	ConstantsTs: 'constantsts',
 	Keys: 'keys',
+	ModelInterfaces: 'model-interfaces',
 	ControllerActions: 'controller-actions',
 	TitleService: 'title-service',
 	Configuration: 'configuration',

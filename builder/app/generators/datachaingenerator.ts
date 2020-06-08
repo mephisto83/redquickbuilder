@@ -26,6 +26,7 @@ import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from '../methods/graph_meth
 import NamespaceGenerator from './namespacegenerator';
 import * as GraphMethods from '../methods/graph_methods';
 import { Graph } from '../methods/graph_types';
+import ModelGenerator from './modelgenerators';
 
 export default class DataChainGenerator {
 	static GenerateCS(options: { state: any; key?: any; language: any }) {
@@ -105,7 +106,8 @@ export default class DataChainGenerator {
 						collectionsInLanguage,
 						cfunc,
 						[].interpolate(0, chainPath.length + 1).map(() => '../').join(''),
-						enumerations
+						enumerations,
+						graph
 					),
 					relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
 					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
@@ -113,7 +115,7 @@ export default class DataChainGenerator {
 				};
 			}),
 			{
-				template: dcTemplate(collections, funcs, '', enumerations),
+				template: dcTemplate(collections, funcs, '', enumerations, graph),
 				relative: './src/actions',
 				relativeFilePath: `./data-chain${fileEnding}`,
 				name: 'data-chain'
@@ -171,13 +173,14 @@ export default class DataChainGenerator {
 	}
 }
 
-let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = []) => {
+let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = [], graph: Graph) => {
 	if (!funcs || !funcs.trim()) {
 		if (!collections) {
 			return `export default {}`;
 		}
 		return `${collections}`;
 	}
+	let model_imports = ModelGenerator.ModelImports({ graph, rel });
 	let enumeration_imports = enumerations
 		.map((enums) => {
 			return `import { ${GetCodeName(enums)} } from '../${rel}constants/${GetJSCodeName(enums)}';`;
@@ -198,6 +201,7 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = []) 
     clearScreenInstance
 
   } from '../${rel}actions/uiactions';
+${model_imports}
 import {
   GetMenuSource
 } from '../${rel}actions/menusource';

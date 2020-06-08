@@ -25,6 +25,7 @@ export declare const VISUAL = "VISUAL";
 export declare const UIKeys: {
     HAS_CREDENTIALS: string;
     CREDENTIALS: string;
+    USER_ID: string;
 };
 export declare function GetItems(modelType: any): unknown[];
 export declare function GetScreenProperties(screen: any): any;

@@ -2943,7 +2943,7 @@ class ContextMenu extends Component<any, any> {
 											!GetNodesLinkedTo(UIA.GetCurrentGraph(), {
 												id: currentNode.id,
 												link: LinkType.LifeCylceMethod
-											}).find((_y) => UIA.GetNodeProp(_y, NodeProperties.Event) === x)
+											}).find((_y) => UIA.GetNodeProp(_y, NodeProperties.EventType) === x)
 									).map((t) => ({
 										operation: UIA.ADD_NEW_NODE,
 										options() {

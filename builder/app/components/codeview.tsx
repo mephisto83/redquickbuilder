@@ -54,7 +54,7 @@ class CodeView extends Component<any, any> {
 
 		if (!active) {
 			return <div />;
-    }
+		}
 
 		let codeString = '';
 		let info = UIA.Visual(state, MODEL_CODE) || null;

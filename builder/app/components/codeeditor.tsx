@@ -5,13 +5,22 @@ import MonacoEditor from 'react-monaco-editor';
 import Box from './box';
 import * as monaco from 'monaco-editor';
 import Javascript from './codeditor/javascript';
-import { SIDE_PANEL_OPEN, Node, SELECTED_NODE, CHANGE_NODE_PROPERTY } from '../actions/uiactions';
-import { Visual } from '../templates/electronio/v1/app/actions/uiactions';
+import {
+	SIDE_PANEL_OPEN,
+	SELECTED_NODE,
+	CHANGE_NODE_PROPERTY,
+	NodeTypes,
+	NodesByType,
+	GetCodeName,
+	GetLambdaVariableTitle
+} from '../actions/uiactions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
+import * as UIA from '../actions/uiactions';
 import ModelGenerator from '../generators/modelgenerators';
+import { Node } from '../methods/graph_types';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
@@ -55,7 +64,7 @@ class CodeEditor extends Component<any, any> {
 		// Typical usage (don't forget to compare props):
 		if (this.props.value !== prevProps.value) {
 			const { state } = this.props;
-			const currentNode = Node(state, Visual(state, SELECTED_NODE));
+			const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 			this.setState({
 				value: GetNodeProp(currentNode, this.props.prop || NodeProperties.Lambda)
 			});
@@ -75,11 +84,12 @@ class CodeEditor extends Component<any, any> {
 		const options = {
 			selectOnLineNumbers: true
 		};
-		let offsetWidth = Visual(state, SIDE_PANEL_OPEN) ? 250 : 0;
-		const currentNode = Node(state, Visual(state, SELECTED_NODE));
+		let offsetWidth = UIA.Visual(state, SIDE_PANEL_OPEN) ? 250 : 0;
+		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		const code = GetNodeProp(currentNode, NodeProperties.Lambda);
 		const defs = '//<!-uiactions - defs->';
 		let value: string = this.state.value || this.props.value;
+		value = this.untransformLambda(value);
 		if (value.indexOf(defs) === -1) {
 			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
 			let common_functions: any = ModelGenerator.GenerateCommon({ state: this.props.state });
@@ -119,11 +129,23 @@ ${this.state.definitions}
 								className="btn btn-social-icon btn-bitbucket"
 								onClick={() => {
 									const id = currentNode.id;
+									let lambdaValue = `${this.state.value}`.split(defs)[0] || '';
+									let _insertArgs: any;
+									lambdaValue = this.transformLambdaValue(lambdaValue, (insertArgs) => {
+										_insertArgs = insertArgs;
+									});
 									this.props.graphOperation(CHANGE_NODE_PROPERTY, {
 										prop: this.props.prop || NodeProperties.Lambda,
 										id,
-										value: `${this.state.value}`.split(defs)[0] || ''
+										value: lambdaValue
 									});
+									if (_insertArgs) {
+										this.props.graphOperation(CHANGE_NODE_PROPERTY, {
+											prop: this.props.prop || NodeProperties.LambdaInsertArguments,
+											id,
+											value: _insertArgs
+										});
+									}
 								}}
 							>
 								<i className="fa fa-save" />
@@ -152,6 +174,42 @@ ${this.state.definitions}
 				</div>
 			</TopViewer>
 		);
+	}
+	untransformLambda(value: string): string {
+		let { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
+		if (currentNode) {
+			const models: Node[] = NodesByType(state, NodeTypes.Model)
+				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
+				var regex = new RegExp(`${GetLambdaVariableTitle(item, true)}`, 'g');
+				value = value.replace(regex, GetCodeName(item));
+			});
+		}
+		return value;
+	}
+	transformLambdaValue(lambdaValue: string, callback?: Function): string {
+		let { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
+		if (currentNode) {
+			let tempvalue = GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
+			const models: Node[] = NodesByType(state, NodeTypes.Model)
+				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item: Node) => {
+				var regex = new RegExp('\\b' + `${GetCodeName(item)}` + '\\b', 'g');
+				let before = lambdaValue;
+				lambdaValue = lambdaValue.replace(regex, GetLambdaVariableTitle(item));
+				if (before !== lambdaValue) {
+					tempvalue[GetLambdaVariableTitle(item, false, true)] = item.id;
+				}
+			});
+			if (callback) {
+				callback(tempvalue);
+			}
+		}
+		return lambdaValue;
 	}
 }
 

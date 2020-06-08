@@ -39,6 +39,7 @@ import CollectionDataChainsIntoCollections, {
 } from '../CollectionDataChainsIntoCollections';
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
+import AddUserRequirements from './AddUserRequirements';
 
 interface BuildStep {
 	progress?: number;
@@ -157,6 +158,7 @@ const Select_All_On_Model_Filters = 'Select All On Model Filters';
 const Add_Filters_To_Get_All = 'Add Filters to Get All';
 const Create_Dashboard = 'Create Dashboard';
 const Create_Login_Models = 'Create Login Models';
+const Add_UserRequirements = 'Add User Requirements';
 const ListRequiredModelTitles = 'ListRequiredModelTitles';
 const AddTitleService = 'AddTitleService';
 const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
@@ -210,6 +212,7 @@ const buildAllProgress = [
 	{ name: Add_Chain_To_Navigate_Next_Screens },
 	...waiting(Connect_Dashboards),
 	...waiting(Setup_View_Types),
+	{ name: Add_UserRequirements },
 	{ name: Have_All_Properties_On_Executors },
 	{ name: Add_Copy_Command_To_Executors },
 	...waiting(Add_Component_To_Screen_Options),
@@ -281,6 +284,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			await progresFunc(2 / 10);
 
 			await ApplyLoginValidations(progresFunc);
+		});
+
+		await run(buildAllProgress, Add_UserRequirements, async (progresFunc: (arg0: number) => any) => {
+			AddUserRequirements();
 		});
 
 		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {

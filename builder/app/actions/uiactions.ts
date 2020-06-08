@@ -191,7 +191,10 @@ export function GetNodeType(node: any, graph?: any) {
 	return GraphMethods.GetNodeProp(node, NodeProperties.NODEType, graph);
 }
 export const GetNodeProp = GraphMethods.GetNodeProp;
-
+export function GetSnakeCase(node: any) {
+	let temp = GetNodeTitle(node);
+	return temp.split(' ').filter((x: string) => x).map((x: string) => x.toLowerCase()).join('-');
+}
 export function GetNodePropDirty(node: any, prop: any, currentGraph: any) {
 	if (typeof node === 'string') {
 		node = GetNodeById(node, currentGraph) || node;
@@ -671,6 +674,16 @@ export function IsAgent(node: any) {
 }
 export function GetLinkChainItem(options: any) {
 	return GraphMethods.GetLinkChainItem(GetState(), options);
+}
+export function GetLambdaVariableTitle(node: any, escape?: boolean, shortKey?: boolean) {
+	let title: string = GetNodeTitle(node);
+	if (shortKey) {
+		return `${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}`;
+	}
+	if (escape) {
+		return `\#\{${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}\}`;
+	}
+	return `#{${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}}`;
 }
 export function GetCodeName(node: any, options?: any): string {
 	const graph = GetCurrentGraph(GetState());
@@ -1953,9 +1966,9 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 			}
 			return `(a${anyType}) => false`;
 		case DataChainFunctionKeys.ModelMethodMenu:
-      return buildModelMethodMenu(options);
-    case DataChainFunctionKeys.NavigationMethodMenu:
-      return `() => GetMenuSource({ context: { getState: GetState(), dispatch: GetDispatch() } })`;
+			return buildModelMethodMenu(options);
+		case DataChainFunctionKeys.NavigationMethodMenu:
+			return `() => GetMenuSource({ context: { getState: GetState(), dispatch: GetDispatch() } })`;
 		default:
 			throw new Error(`${GetNodeTitle(node)} ${node.id} - ${functionType} is not a defined function type.`);
 	}
