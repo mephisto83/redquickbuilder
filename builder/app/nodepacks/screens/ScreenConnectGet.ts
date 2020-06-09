@@ -29,6 +29,7 @@ import { uuidv4 } from '../../utils/array';
 import AppendValidations from './AppendValidations';
 import { TEMPLATE_PARAMETERS } from '../../constants/functiontypes';
 import StoreModelInLake from '../datachain/StoreModelInLake';
+import { Graph } from '../../methods/graph_types';
 
 export default function ScreenConnectGet(args: any = {}) {
 	let { node, method } = args;
@@ -294,8 +295,8 @@ export default function ScreenConnectGet(args: any = {}) {
 						}
 						return [];
 					},
-					() => {
-						let model = GetNodeProp(node, NodeProperties.Model);
+					(graph: Graph) => {
+						let model = GetNodeProp(node, NodeProperties.Model, graph);
 						return StoreModelInLake({
 							modelId: model,
 							modelInsertName: GetLambdaVariableTitle(model, false, true),

@@ -116,7 +116,9 @@ export default function StoreModelInLake(args: {
 							modelInsertName +
 							'}): #{' +
 							modelInsertName +
-							'} => {\n    let dispatch: Function = GetDispatch();\n    let getState: Function = GetState();\n\n    dispatch(Batch(UIModels(user.id, user)));\n\n    return user;\n}\n'
+							'} => {\n    let dispatch: Function = GetDispatch();\n    let getState: Function = GetState();\n\n    dispatch(Batch(UIModels(Models.#{' +
+							modelInsertName +
+							'}, user)));\n\n    return user;\n}\n'
 					}
 				}
 			];

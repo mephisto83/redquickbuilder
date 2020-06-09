@@ -205,6 +205,8 @@ export default class MenuGenerator {
 			const result: any = {
 				id: 'menuSource.ts',
 				name: 'menuSource.ts',
+        relative: `./src/actions`,
+        relativeFilePath: `./menuSource.ts`,
 				menusource: {
 					template: `
           import * as navigate from '../${rel}actions/navigationActions';

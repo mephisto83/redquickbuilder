@@ -199,7 +199,7 @@ export default function StoreUserInDataLake(args: {
 						prop: 'Lambda',
 						id: context.node2,
 						value:
-							'(user: #{user}) : #{user} => {\n    let dispatch: Function = GetDispatch();\n    let getState: Function = GetState();\n\n    dispatch(Batch(UIModels(user.id, user)));\n\n    return user;\n}\n\n'
+							'(user: #{user}) : #{user} => {\n    let dispatch: Function = GetDispatch();\n    let getState: Function = GetState();\n\n    dispatch(Batch(UIModels(Models.#{user}, user)));\n\n    return user;\n}\n\n'
 					}
 				}
 			];

@@ -65,11 +65,19 @@ export default class ModelGenerator {
 			[NodeProperties.IsUser]: true,
 			[NodeProperties.NODEType]: NodeTypes.Model
 		});
+		let modelconsts =
+			`
+      const Models = { ` +
+			NodesByType(GetState(), NodeTypes.Model)
+				.map((g) => `${GetCodeName(g)}: '${GetCodeName(g)}'`)
+				.join(',' + NEW_LINE) +
+			'};';
 		return {
 			common: {
-				template: bindTemplate(template, {
-					user_type: GetCodeName(userModel)
-				})
+				template:
+					bindTemplate(template, {
+						user_type: GetCodeName(userModel)
+					}) + modelconsts
 			}
 		};
 	}
