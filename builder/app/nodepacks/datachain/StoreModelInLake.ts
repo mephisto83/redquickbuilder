@@ -112,13 +112,13 @@ export default function StoreModelInLake(args: {
 						prop: 'Lambda',
 						id: context.node0,
 						value:
-							'(user: #{' +
+							'(a: #{' +
 							modelInsertName +
 							'}): #{' +
 							modelInsertName +
 							'} => {\n    let dispatch: Function = GetDispatch();\n    let getState: Function = GetState();\n\n    dispatch(Batch(UIModels(Models.#{' +
 							modelInsertName +
-							'}, user)));\n\n    return user;\n}\n'
+							'}, a)));\n\n    return a;\n}\n'
 					}
 				}
 			];
