@@ -4590,68 +4590,77 @@ export function CreateAgentFunction(option: any): any {
 								break;
 							case FunctionTemplateKeys.Executor:
 								if (!modelNotRequired) {
-									commands.push(
-										...[
-											{
-												operation: ADD_NEW_NODE,
-												options() {
-													return {
-														parent: methodNode.id,
-														nodeType: NodeTypes.Executor,
-														groupProperties: {},
-														properties: {
-															[NodeProperties.NodePackage]: model.id,
-															[NodeProperties.NodePackageType]: nodePackageType,
-															[NodeProperties.ExecutorFunctionType]: methodType,
-															[NodeProperties.UIText]: `${GetNodeTitle(
-																methodNode
-															)} Executor`,
-															[NodeProperties.ExecutorModel]: model.id,
-															[NodeProperties.ExecutorModelOutput]: model.id,
-															[NodeProperties.ExecutorFunction]: methodNode.id,
-															[NodeProperties.ExecutorAgent]: agent.id
-														},
-														callback: (_node: { id: any }) => {
-															methodProps[constraint.key] = _node.id;
-															executor = _node;
-														}
-													};
+									let executors = MethodFunctions[functionType].constraints[
+										FunctionTemplateKeys.Executor
+									].executors || [ { name: '', methodType } ];
+									executors.forEach((temp: { methodType: string; name: string }) => {
+										commands.push(
+											...[
+												{
+													operation: ADD_NEW_NODE,
+													options() {
+														return {
+															parent: methodNode.id,
+															nodeType: NodeTypes.Executor,
+															groupProperties: {},
+															properties: {
+																[NodeProperties.NodePackage]: model.id,
+																[NodeProperties.NodePackageType]: nodePackageType,
+																[NodeProperties.ExecutorFunctionType]: temp.methodType,
+																[NodeProperties.UIText]: `${GetNodeTitle(
+																	methodNode
+																)} ${temp.name} Executor`,
+																[NodeProperties.ExecutorModel]: model.id,
+																[NodeProperties.ExecutorModelOutput]: model.id,
+																[NodeProperties.ExecutorFunction]: methodNode.id,
+																[NodeProperties.ExecutorAgent]: agent.id
+															},
+															callback: (_node: { id: any }) => {
+																methodProps[constraint.key] = _node.id;
+																methodProps.executors = methodProps.executors || [];
+																if (methodProps.executors.indexOf(_node.id) === -1) {
+																	methodProps.executors.push(_node.id);
+																}
+																executor = _node;
+															}
+														};
+													}
+												},
+												{
+													operation: ADD_LINK_BETWEEN_NODES,
+													options() {
+														return {
+															target: model.id,
+															source: executor.id,
+															properties: { ...LinkProperties.ExecutorModelLink }
+														};
+													}
+												},
+												{
+													operation: ADD_LINK_BETWEEN_NODES,
+													options() {
+														return {
+															target: agent.id,
+															source: executor.id,
+															properties: { ...LinkProperties.ExecutorAgentLink }
+														};
+													}
+												},
+												{
+													operation: ADD_LINK_BETWEEN_NODES,
+													options() {
+														return {
+															target: methodNode.id,
+															source: executor.id,
+															properties: {
+																...LinkProperties.ExecutorFunctionLink
+															}
+														};
+													}
 												}
-											},
-											{
-												operation: ADD_LINK_BETWEEN_NODES,
-												options() {
-													return {
-														target: model.id,
-														source: executor.id,
-														properties: { ...LinkProperties.ExecutorModelLink }
-													};
-												}
-											},
-											{
-												operation: ADD_LINK_BETWEEN_NODES,
-												options() {
-													return {
-														target: agent.id,
-														source: executor.id,
-														properties: { ...LinkProperties.ExecutorAgentLink }
-													};
-												}
-											},
-											{
-												operation: ADD_LINK_BETWEEN_NODES,
-												options() {
-													return {
-														target: methodNode.id,
-														source: executor.id,
-														properties: {
-															...LinkProperties.ExecutorFunctionLink
-														}
-													};
-												}
-											}
-										]
-									);
+											]
+										);
+									});
 								}
 								break;
 							case FunctionTemplateKeys.Permission:

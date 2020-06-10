@@ -32,6 +32,7 @@ import { bindTemplate, FunctionTemplateKeys, MethodTemplateKeys } from '../const
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
+import { Node } from '../methods/graph_types';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
 const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
@@ -42,6 +43,7 @@ const EXECUTOR_ENTRY_METHODS = './app/templates/executor/executor_entry_methods.
 const EXECUTOR_ENTRY_METHODS_INTERFACE = './app/templates/executor/executor_entry_methods_interface.tpl';
 const EXECUTOR_METHOD_CASE = './app/templates/executor/entry_method_case.tpl';
 const EXECUTOR_UPDATE = './app/templates/executor/update.tpl';
+const EXECUTOR_DELETE = './app/templates/executor/delete.tpl';
 const EXECUTOR_GET = './app/templates/executor/get.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const EXECUTOR_METHOD_COMPOSITE_INPUT = './app/templates/executor/executor_method_composite_input.tpl';
@@ -119,6 +121,7 @@ export default class ExecutorGenerator {
 		const _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf8');
 		const _executor_create_composite_input = fs.readFileSync(EXECUTOR_CREATE_COMPOSITE_INPUT, 'utf8');
 		const _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf8');
+		const _executor_delete = fs.readFileSync(EXECUTOR_DELETE, 'utf8');
 		const _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf8');
 		const _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
 		const _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
@@ -132,29 +135,39 @@ export default class ExecutorGenerator {
 			agentId: any;
 			agent: string;
 			model: string;
+			modelId: string;
+			modelOutputId: string;
 			model_output: string;
+			functionNode: Node;
 			function: string;
+			functionId: string;
 			method: any;
 		}[] = [];
 		const allmodels = NodesByType(state, NodeTypes.Model);
 		const allagents = allmodels.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
 		const allfunctions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
 
-		allfunctions.map((fun: any) => {
+		allfunctions.map((fun: Node) => {
 			const methodProps = GetMethodProps(fun);
-			let model_output;
-			if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
-				model_output = GetCodeName(methodProps[FunctionTemplateKeys.CompositeInput]);
-			}
 			const agent = methodProps[FunctionTemplateKeys.Agent];
 			const model = methodProps[FunctionTemplateKeys.Model];
+			let model_output;
+			let model_output_id = model;
+			if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
+				model_output = GetCodeName(methodProps[FunctionTemplateKeys.CompositeInput]);
+				model_output_id = methodProps[FunctionTemplateKeys.CompositeInput];
+			}
 
 			agmCombos.push({
 				agentId: agent,
 				agent: GetCodeName(agent),
 				model: model_output || GetCodeName(model),
+				modelId: model,
+				modelOutputId: model_output_id,
 				model_output: GetCodeName(model),
 				function: GetCodeName(fun),
+				functionNode: fun,
+				functionId: fun.id,
 				method: GetNodeProp(fun, NodeProperties.MethodType)
 			});
 		});
@@ -247,6 +260,9 @@ export default class ExecutorGenerator {
 								case ExecutorRules.ParentReference:
 									template = `result{{model_property}} = data{{model_property}};`;
 									break;
+								case ExecutorRules.SetToDeleted:
+									template = `result.Deleted = true;`;
+									break;
 								case ExecutorRules.Copy:
 									break;
 								case ExecutorRules.AddModelReference:
@@ -303,6 +319,9 @@ export default class ExecutorGenerator {
 				case Methods.GetAll:
 					template = _executor_get;
 					break;
+				case Methods.Delete:
+					template = _executor_delete;
+					break;
 				default:
 					break;
 			}
@@ -333,7 +352,7 @@ export default class ExecutorGenerator {
 			var templateRes = bindTemplate(execution_method, {
 				model: GetCodeName(modelNode),
 				model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
-				method_name: GetCodeName(functionNode),
+				method_name: GetCodeName(executor_node),
 				parameters,
 				data: GetCodeName(modelNode),
 				agent: GetCodeName(agentNode),
@@ -344,7 +363,7 @@ export default class ExecutorGenerator {
 			const templateResInterface = bindTemplate(_executor_methods_interface, {
 				model: GetCodeName(modelNode),
 				model_output: GetCodeName(modelOutputNode) || GetCodeName(modelNode),
-				method_name: GetCodeName(functionNode),
+				method_name: GetCodeName(executor_node),
 				parameters,
 				data: GetCodeName(modelNode),
 				agent: GetCodeName(agentNode),
@@ -362,36 +381,56 @@ export default class ExecutorGenerator {
 			agentFunctionInterfaceDic[agent].push(templateResInterface);
 		});
 		let lastCase;
-		const static_methods = agmCombos.map((amd) => {
-			const { agent, agentId, model, model_output, method } = amd;
-			const cases = (agentModelDic[agent + model + amd.method] || [])
-				.map((_cases: { agent: any; model: any; functType: any; funct: any }) => {
-					const { agent, model, functType, funct } = _cases;
-					if (amd.agent !== agent) {
-						'';
-					}
+		const static_methods: any[] = [];
+		let agmGroups = agmCombos.groupBy((amd: any) => {
+			const { agentId, modelId, method, functionId, modelOutputId } = amd;
+			return `${agentId} - ${modelId} ~ ${method} - ${modelOutputId}`;
+		});
+		Object.keys(agmGroups).forEach((kagm) => {
+			let agmCombos = agmGroups[kagm];
 
-					const _case = bindTemplate(_exe_case, {
-						agent,
-						model,
-						func_name: funct
-					});
-					return _case + NEW_LINE;
-				})
-				.unique((x: any) => x)
-				.join('');
-			return {
+			const cases: any[] = [];
+			const { agent, agentId, model, model_output, method, functionNode } = agmCombos[0];
+			agmCombos.map((amd) => {
+				const { agent, model, functionNode } = amd;
+				let executors = GraphMethods.GetNodesLinkedTo(graph, {
+					id: functionNode.id,
+					componentType: NodeTypes.Executor,
+					link: LinkType.ExecutorFunction
+				});
+				executors.forEach((executor: Node) => {
+					cases.push(
+						...(agentModelDic[agent + model + amd.method] || [])
+							.map((_cases: { agent: any; model: any; functType: any; funct: any }) => {
+								const { agent, model, funct } = _cases;
+								if (amd.agent !== agent) {
+									'';
+								}
+
+								const _case = bindTemplate(_exe_case, {
+									agent,
+									model,
+									executor_func_name: GetCodeName(executor),
+									func_name: GetCodeName(executor) || funct
+								});
+								return _case + NEW_LINE;
+							})
+					);
+				});
+      });
+
+			static_methods.push({
 				template:
 					bindTemplate(_exe_method, {
 						agent,
 						model,
-						cases,
+						cases: cases.unique((x: any) => x).join(''),
 						change: `${model}`,
 						model_output: model_output || model,
 						method
 					}) + NEW_LINE,
 				agent: agentId
-			};
+			});
 		});
 		const static_methods_interface = agmCombos.map((amd) => {
 			const { agent, model, method, agentId, model_output } = amd;

@@ -147,7 +147,7 @@ export default class MenuGenerator {
 				let { parent } = menuObj.items[item];
 				let disabledFunc = `false`;
 				if (menuItem.shouldBeDisabled) {
-					disabledFunc = `DC.${GetCodeName(menuItem.shouldBeDisabled)}({
+					disabledFunc = `MA.${GetCodeName(menuItem.shouldBeDisabled)}({
             context: {
               getState,
               dispatch
@@ -158,7 +158,7 @@ export default class MenuGenerator {
 				let shouldShowPart1 = '';
 				let shouldShowPart2 = '';
 				if (menuItem.shouldShowDataChain) {
-					shouldShowPart1 = `if(DC.${GetCodeName(menuItem.shouldShowDataChain)}({
+					shouldShowPart1 = `if(MA.${GetCodeName(menuItem.shouldShowDataChain)}({
             context: {
               getState,
               dispatch
@@ -205,10 +205,9 @@ export default class MenuGenerator {
 			const result: any = {
 				id: 'menuSource.ts',
 				name: 'menuSource.ts',
-        relative: `./src/actions`,
-        relativeFilePath: `./menuSource.ts`,
-				menusource: {
-					template: `
+				relative: `./src/actions`,
+				relativeFilePath: `./menuSource.ts`,
+				template: `
           import * as navigate from '../${rel}actions/navigationActions';
           import * as $service from '../${rel}util/service';
           import routes from '../${rel}constants/routes';
@@ -222,8 +221,7 @@ export default class MenuGenerator {
           import RedGraph from '../${rel}actions/redgraph';
           import { retrieveParameters, fetchModel } from '../${rel}actions/redutils';
           import * as DC from './${rel}data-chain';
-          import * as DC from 'menusourceActions';
-          import titleService from './titleService';
+          import * as MA from './datachains/menuDataFunctions/menuDataFunctions';
 
           export interface MenuItem {
             id: string;
@@ -231,10 +229,10 @@ export default class MenuGenerator {
             parent: string | null;
           }
           export function GetMenuSource(args: { getState: Function, dispatch: Function }) {
+            let { getState, dispatch } = args;
             ${menuGuts}
           }
         `
-				}
 			};
 			return { [`menuSource.ts`]: result };
 		}

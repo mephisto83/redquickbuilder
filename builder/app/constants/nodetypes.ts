@@ -114,6 +114,7 @@ export const ReactNativeTypes = {
 	ModelInterfaces: 'model-interfaces',
 	ControllerActions: 'controller-actions',
 	TitleService: 'title-service',
+	Menus: 'menus',
 	Configuration: 'configuration',
 	Selectors: 'selectors',
 	DataChainFunctions: 'data-chain',
@@ -2077,7 +2078,8 @@ export const ExecutorRules = {
 	Copy: 'copy',
 	AgentReference: 'agent-reference',
 	ParentReference: 'parent-reference',
-	AddModelReference: 'add-model-reference'
+	AddModelReference: 'add-model-reference',
+	SetToDeleted: 'set-to-deleted'
 };
 export const ExecutorUI: any = {
 	[ExecutorRules.ModelReference]: {

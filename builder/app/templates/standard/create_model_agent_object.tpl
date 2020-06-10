@@ -4,7 +4,7 @@
 
             if(await {{agent#lower}}Permissions.{{permission_function}}(value, agent).ConfigureAwait(false)) {
 
-                var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, value, FunctionName.{{function_name}});
+                var parameters = {{model}}ChangeBy{{agent_type}}.Create(agent, value, FunctionName.{{default_executor_function_name}});
 
                 var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
 

@@ -36,6 +36,7 @@ import ReactNativeLists from './listsgenerator';
 import ValidatorGenerator from './validatorgenerator';
 import FetchServiceGenerator from './fetchservicegenerator';
 import TitleServiceLibraryGenerator from './titleServiceLibraryGenerator';
+import MenuGenerator from './menugenerator';
 
 export default class Generator {
 	static generate(options: any) {
@@ -61,6 +62,7 @@ export default class Generator {
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController));
 				const functions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
+				const executors = NodesByType(state, [ NodeTypes.Executor ]);
 				const enumerations = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
 					const enums = GetNodeProp(node, NodeProperties.Enumeration);
 					const larg: any = {};
@@ -80,7 +82,7 @@ export default class Generator {
 					).toUpperCase();
 				});
 				const functionsTypes: any = {};
-				functions.forEach((t: any) => {
+				[ ...executors, ...functions ].forEach((t: any) => {
 					functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(
 						t,
 						NodeProperties.CodeName
@@ -157,6 +159,8 @@ export default class Generator {
 				return ReactNativeKeys.Generate({ state, key, language });
 			case ReactNativeTypes.ModelInterfaces:
 				return ModelGenerator.GenerateTs({ state, key, language, includeImports: true });
+			case ReactNativeTypes.Menus:
+				return MenuGenerator.Generate({ state, key, language });
 			case ReactNativeTypes.Configuration:
 				return ReactNativeConfiguration.Generate({ state, key, language });
 			case ReactNativeTypes.ControllerActions:

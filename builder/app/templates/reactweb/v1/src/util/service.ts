@@ -35,12 +35,12 @@ var getEndpoint = (baseDomain: any, path: any) => {
 	return endpoint;
 };
 
-export function setBearerAccessToken(access_token: string, _userId: string) {
+export function setBearerAccessToken(access_token: string, _userId?: string) {
 	accessToken = access_token;
 	credentials = credentials || {};
 	credentials.accessToken = accessToken;
-	userId = _userId;
-	credentials.userId = _userId;
+	userId = _userId || '';
+	credentials.userId = _userId || '';
 	updateStoredCredentials();
 }
 export function getUser() {

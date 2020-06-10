@@ -27,13 +27,15 @@ import {
 	TEMPLATE_KEY_MODIFIERS,
 	FunctionTemplateKeys,
 	ToInterface,
-	MethodFunctions
+	MethodFunctions,
+	FunctionMethodTypes
 } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import StreamProcessOrchestrationGenerator from './streamprocessorchestrationgenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
 import PermissionGenerator from './permissiongenerator';
 import ModelItemFilterGenerator from './modelitemfiltergenerator';
+import { Node } from '../methods/graph_types';
 
 const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
 const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
@@ -102,12 +104,12 @@ export default class MaestroGenerator {
 							if (fs.existsSync(ft.template)) {
 								tempFunction = fs.readFileSync(ft.template, 'utf8');
 							}
-              let interfaceFunction = ft.interface;
-              if (fs.existsSync(ft.interface)) {
+							let interfaceFunction = ft.interface;
+							if (fs.existsSync(ft.interface)) {
 								interfaceFunction = fs.readFileSync(ft.interface, 'utf8');
 							}
-              let testFunction = ft.test;
-              if (fs.existsSync(testFunction)) {
+							let testFunction = ft.test;
+							if (fs.existsSync(testFunction)) {
 								testFunction = fs.readFileSync(testFunction, 'utf8');
 							}
 							let value_type = '';
@@ -265,10 +267,34 @@ export default class MaestroGenerator {
 									? `${GetNodeProp(modelNode, NodeProperties.CodeName)}`.toLowerCase()
 									: `{maestro_generator_mising_model}`;
 							}
-
+							let executor_delete_name = '';
+							let executor_create_name = '';
+							let default_executor_function_name = '';
+							let executorNodes = GraphMethods.GetNodesLinkedTo(graph, {
+								id: maestro_function.id,
+								link: LinkType.ExecutorFunction,
+								componentType: NodeTypes.Executor
+							});
+							if (executorNodes.length) {
+								default_executor_function_name = GetCodeName(executorNodes[0]);
+							}
+							let delectExector = executorNodes.find(
+								(x: Node) => GetNodeProp(x, NodeProperties.ExecutorFunctionType) === Methods.Delete
+							);
+							if (delectExector) {
+								executor_delete_name = GetCodeName(delectExector);
+							}
+							let createExector = executorNodes.find(
+								(x: Node) => GetNodeProp(x, NodeProperties.ExecutorFunctionType) === Methods.Create
+							);
+							if (createExector) {
+								executor_create_name = GetCodeName(delectExector);
+							}
+							default_executor_function_name = default_executor_function_name || functionName;
 							const bindOptions = {
 								...datachainoptions,
 								function_name: functionName,
+								default_executor_function_name,
 								agent_type,
 								'agent_type#lower': `${agent_type}`.toLowerCase(),
 								parent_type,
@@ -284,6 +310,8 @@ export default class MaestroGenerator {
 								connect_type,
 								comma: predicates.length ? ',' : '',
 								predicates,
+								executor_delete_name,
+								executor_create_name,
 								maestro_function: functionName,
 								filter_function: modelFilterNode
 									? GetNodeProp(modelFilterNode, NodeProperties.CodeName)

@@ -1968,7 +1968,7 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.ModelMethodMenu:
 			return buildModelMethodMenu(options);
 		case DataChainFunctionKeys.NavigationMethodMenu:
-			return `() => GetMenuSource({ context: { getState: GetState(), dispatch: GetDispatch() } })`;
+			return `() => GetMenuSource({ getState: GetState(), dispatch: GetDispatch() })`;
 		default:
 			throw new Error(`${GetNodeTitle(node)} ${node.id} - ${functionType} is not a defined function type.`);
 	}

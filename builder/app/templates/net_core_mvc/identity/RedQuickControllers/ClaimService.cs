@@ -4,6 +4,7 @@ using RedQuick.Interfaces.Arbiter;
 using RedQuick.Util;
 using RedQuickCore.Interfaces;
 using {{namespace}}.Models;
+using {{namespace}}.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -204,7 +204,7 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = [], 
 ${model_imports}
 import {
   GetMenuSource
-} from '../${rel}actions/menusource';
+} from '../${rel}actions/menuSource';
 import {
     validateEmail,
     maxLength,

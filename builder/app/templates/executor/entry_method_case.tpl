@@ -1,2 +1,2 @@
                 case FunctionName.{{func_name}}:
-                    return await {{func_name}}(data, agent, change);
+                    return await {{executor_func_name}}(data, agent, change);

@@ -677,10 +677,12 @@ export const MethodFunctions: any = {
 		},
 		template: './app/templates/standard/unique_model_to_agent.tpl',
 		interface: './app/templates/standard/unique_model_to_agent_interface.tpl',
+		controller: './app/templates/controller/controller_get_model_user_object.tpl', //controller_get_all_by_ids
 		templates: {},
 		permission: {
 			...PERMISSION_DEFAULTS
 		},
+
 		parameters: {
 			body: false,
 			parameters: false
@@ -697,13 +699,27 @@ export const MethodFunctions: any = {
 		},
 		constraints: {
 			...COMMON_CONSTRAINTS_OBJECT_METHOD,
-			...COMMON_CREATE_UPDATE_CONSTRAINTS
+			...COMMON_CREATE_UPDATE_CONSTRAINTS,
+			[FunctionTemplateKeys.Executor]: {
+				key: FunctionTemplateKeys.Executor,
+				nodeTypes: [ NodeTypes.Executor ],
+				executors: [
+					{
+						methodType: Methods.Create,
+						name: 'UniqueCreate'
+					},
+					{
+						methodType: Methods.Delete,
+						name: 'DeleteExtras'
+					}
+				]
+			}
 		},
 		output: {
 			...COMMON_OUTPUT.OBJECT
 		},
 		isList: false,
-		method: Methods.Get,
+		method: Methods.Create,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
 	[FunctionTypes.Create_Object__Object]: {
