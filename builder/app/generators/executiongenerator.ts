@@ -11,7 +11,8 @@ import {
 	GetMethodNode,
 	GetMethodNodeProp,
 	GetCurrentGraph,
-	GetState
+	GetState,
+	GetNodeById
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -140,6 +141,8 @@ export default class ExecutorGenerator {
 			model_output: string;
 			functionNode: Node;
 			function: string;
+			executorId: string | null;
+			executorType: string | null;
 			functionId: string;
 			method: any;
 		}[] = [];
@@ -151,25 +154,61 @@ export default class ExecutorGenerator {
 			const methodProps = GetMethodProps(fun);
 			const agent = methodProps[FunctionTemplateKeys.Agent];
 			const model = methodProps[FunctionTemplateKeys.Model];
-			let model_output;
+			let model_output: any;
 			let model_output_id = model;
 			if (methodProps && methodProps[FunctionTemplateKeys.CompositeInput]) {
 				model_output = GetCodeName(methodProps[FunctionTemplateKeys.CompositeInput]);
 				model_output_id = methodProps[FunctionTemplateKeys.CompositeInput];
 			}
-
-			agmCombos.push({
-				agentId: agent,
-				agent: GetCodeName(agent),
-				model: model_output || GetCodeName(model),
-				modelId: model,
-				modelOutputId: model_output_id,
-				model_output: GetCodeName(model),
-				function: GetCodeName(fun),
-				functionNode: fun,
-				functionId: fun.id,
-				method: GetNodeProp(fun, NodeProperties.MethodType)
+			let executors = GraphMethods.GetNodesLinkedTo(graph, {
+				id: fun.id,
+				componentType: NodeTypes.Executor,
+				link: LinkType.ExecutorFunction
 			});
+
+			if (executors.length) {
+				executors.forEach((executor: Node) => {
+					let method =
+						GetNodeProp(executor, NodeProperties.ExecutorFunctionType) ||
+						GetNodeProp(fun, NodeProperties.MethodType);
+					if (method !== Methods.Get && method !== Methods.GetAll) {
+						agmCombos.push({
+							agentId: agent,
+							agent: GetCodeName(agent),
+							model: model_output || GetCodeName(model),
+							modelId: model,
+							executorId: executor.id,
+							executorType: GetNodeProp(executor, NodeProperties.ExecutorFunctionType),
+							modelOutputId: model_output_id,
+							model_output: GetCodeName(model),
+							function: GetCodeName(fun),
+							functionNode: fun,
+							functionId: fun.id,
+							method:
+								GetNodeProp(executor, NodeProperties.ExecutorFunctionType) ||
+								GetNodeProp(fun, NodeProperties.MethodType)
+						});
+					}
+				});
+			} else {
+				let method = GetNodeProp(fun, NodeProperties.MethodType);
+				if (method !== Methods.Get && method !== Methods.GetAll) {
+					agmCombos.push({
+						agentId: agent,
+						agent: GetCodeName(agent),
+						model: model_output || GetCodeName(model),
+						modelId: model,
+						executorId: null,
+						executorType: GetNodeProp(fun, NodeProperties.MethodType),
+						modelOutputId: model_output_id,
+						model_output: GetCodeName(model),
+						function: GetCodeName(fun),
+						functionNode: fun,
+						functionId: fun.id,
+						method: GetNodeProp(fun, NodeProperties.MethodType)
+					});
+				}
+			}
 		});
 
 		executor_nodes.map((executor_node: { id: any }) => {
@@ -189,13 +228,16 @@ export default class ExecutorGenerator {
 			const amdid =
 				GetNodeProp(agentNode, NodeProperties.CodeName) +
 				GetNodeProp(modelNode, NodeProperties.CodeName) +
-				GetNodeProp(functionNode, NodeProperties.MethodType);
+				GetNodeProp(executor_node, NodeProperties.CodeName) +
+				(GetNodeProp(executor_node, NodeProperties.ExecutorFunctionType) ||
+					GetNodeProp(functionNode, NodeProperties.MethodType));
 			agentModelDic[amdid] = agentModelDic[amdid] || [];
 
 			agentModelDic[amdid].push({
 				agent: GetCodeName(agentNode),
 				model: GetCodeName(modelNode),
 				model_output: GetCodeName(modelOutputNode),
+				executorId: executor_node.id,
 				functType,
 				funct: GetCodeName(functNode)
 			});
@@ -302,6 +344,7 @@ export default class ExecutorGenerator {
 				})
 				.unique((x: any) => x)
 				.join('');
+
 			let template = '{{not-defined template}}';
 			let execution_method = _executor_methods;
 			switch (functType) {
@@ -383,41 +426,45 @@ export default class ExecutorGenerator {
 		let lastCase;
 		const static_methods: any[] = [];
 		let agmGroups = agmCombos.groupBy((amd: any) => {
-			const { agentId, modelId, method, functionId, modelOutputId } = amd;
+			const { agentId, modelId, method, modelOutputId } = amd;
 			return `${agentId} - ${modelId} ~ ${method} - ${modelOutputId}`;
 		});
 		Object.keys(agmGroups).forEach((kagm) => {
 			let agmCombos = agmGroups[kagm];
 
 			const cases: any[] = [];
-			const { agent, agentId, model, model_output, method, functionNode } = agmCombos[0];
-			agmCombos.map((amd) => {
-				const { agent, model, functionNode } = amd;
-				let executors = GraphMethods.GetNodesLinkedTo(graph, {
-					id: functionNode.id,
-					componentType: NodeTypes.Executor,
-					link: LinkType.ExecutorFunction
-				});
-				executors.forEach((executor: Node) => {
-					cases.push(
-						...(agentModelDic[agent + model + amd.method] || [])
-							.map((_cases: { agent: any; model: any; functType: any; funct: any }) => {
-								const { agent, model, funct } = _cases;
-								if (amd.agent !== agent) {
-									'';
-								}
+			const { agent, agentId, model, model_output, method } = agmCombos[0];
+			agmCombos.map((amd: any) => {
+				const { agent, model, functionId, executorId } = amd;
+				let executor = GetNodeById(executorId);
+				let funcName = GetCodeName(functionId);
+				const _case =
+					bindTemplate(_exe_case, {
+						agent,
+						model,
+						executor_func_name: GetCodeName(executor) || funcName,
+						func_name: GetCodeName(executor) || funcName
+					}) + NEW_LINE;
+				cases.push(_case);
 
-								const _case = bindTemplate(_exe_case, {
-									agent,
-									model,
-									executor_func_name: GetCodeName(executor),
-									func_name: GetCodeName(executor) || funct
-								});
-								return _case + NEW_LINE;
-							})
-					);
-				});
-      });
+				// cases.push(
+				// 	...(agentModelDic[agent + model + amd.method] || [])
+				// 		.map((_cases: { agent: any; model: any; functType: any; funct: any }) => {
+				// 			const { agent, model, funct } = _cases;
+				// 			if (amd.agent !== agent) {
+				// 				'';
+				// 			}
+
+				// 			const _case = bindTemplate(_exe_case, {
+				// 				agent,
+				// 				model,
+				// 				executor_func_name: GetCodeName(executor),
+				// 				func_name: GetCodeName(executor) || funct
+				// 			});
+				// 			return _case + NEW_LINE;
+				// 		})
+				// );
+			});
 
 			static_methods.push({
 				template:

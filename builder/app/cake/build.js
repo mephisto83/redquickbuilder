@@ -294,117 +294,118 @@ function createWorkSpace() {
 	let build = fs.readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const solutionPath = path.resolve(`./${build.solutionName}.sln`);
+	let framework = 'netcoreapp3.1';
 	return Promise.resolve()
 		.then(() => {
 			if (!fs.existsSync(`${build.solutionName}`)) {
-				return executeSpawnCmd('dotnet', [ 'new', 'sln', '--force', '-n', build.solutionName ], {});
+				return executeSpawnCmd('dotnet', ['new', 'sln', '--force', '-n', build.solutionName], {});
 			}
 		})
-		.then(() => executeSpawnCmd('dotnet', [ 'new', 'web', '--force', '-n', `${build.solutionName}.Web` ], {}))
-		.then(() => executeSpawnCmd('dotnet', [ 'new', 'mstest', '--force', '-n', `${build.solutionName}.Tests` ], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Web`], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'mstest', '--force', '-n', `${build.solutionName}.Tests`], {}))
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Models` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--framework', framework, '--force', '-n', `${build.solutionName}.Models`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Interfaces` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--framework', framework, '--force', '-n', `${build.solutionName}.Interfaces`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Controllers` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--framework', framework, '--force', '-n', `${build.solutionName}.Controllers`], {})
 		)
 		.then(() => {
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// D:\dev\redquick\RedQuick\RedQuickCore
@@ -431,15 +432,15 @@ function createWorkSpace() {
 				promise = promise.then(() =>
 					executeSpawnCmd(
 						'dotnet',
-						[ 'add', project, 'package', 'RedQuick' ], // , '-s', source
+						['add', project, 'package', 'RedQuick'], // , '-s', source
 						{}
 					)
 				);
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', project, 'package', 'Swashbuckle.AspNetCore' ], {})
+					executeSpawnCmd('dotnet', ['add', project, 'package', 'Swashbuckle.AspNetCore'], {})
 				);
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', project, 'package', 'Microsoft.AspNetCore.StaticFiles' ], {})
+					executeSpawnCmd('dotnet', ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'], {})
 				);
 			});
 
@@ -447,12 +448,12 @@ function createWorkSpace() {
 
 			webProjectDeps.map((dep) => {
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', webProject, 'package', dep, '-s', source ], {})
+					executeSpawnCmd('dotnet', ['add', webProject, 'package', dep, '-s', source], {})
 				);
 			});
 
 			dependencies.map((depen) => {
-				promise = promise.then(() => executeSpawnCmd('dotnet', [ 'add', testProject, 'package', depen ], {}));
+				promise = promise.then(() => executeSpawnCmd('dotnet', ['add', testProject, 'package', depen], {}));
 			});
 
 			promise = promise.then(() => {

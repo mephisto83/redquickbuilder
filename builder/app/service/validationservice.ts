@@ -12,12 +12,13 @@ import {
 	GetAgentNodes,
 	GetMethodFunctionValidation,
 	GetValidationNode,
-	safeFormatTemplateProperty
+	safeFormatTemplateProperty,
+	GetCurrentGraph
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_methods';
 import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import fs from 'fs';
-import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from '../constants/nodetypes';
+import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE, LinkType } from '../constants/nodetypes';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import { Node } from '../methods/graph_types';
 function GetMethodDefinitionValidationSection(id: any) {
@@ -60,16 +61,33 @@ export function GetValidationEntries(
 			let parameters = `${GetCodeName(modelId)} model, ${GetCodeName(agent)} agent, ${GetCodeName(
 				modelId
 			)}ChangeBy${GetCodeName(agent)} change_parameter`;
-			let conditions = [];
-			conditions = methods[modelId]
+			let conditions: any[] = [];
+			methods[modelId]
 				.map((method: { id: string }) => {
 					let validationNode = GetValidationNode(method.id);
-					if (validatorNodes.some((v: { id: any }) => v.id === validationNode.id))
-						return bindTemplate(validation_case_template, {
-							function_name: `FunctionName.${GetCodeName(method.id)}`,
-							function: `${GetCodeName(validationNode)}`,
-							parameters: `model, agent, change_parameter`
+					if (validatorNodes.some((v: { id: any }) => v.id === validationNode.id)) {
+						let executors: Node[] = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+							id: method.id,
+							link: LinkType.ExecutorFunction
 						});
+
+						conditions.push(
+							bindTemplate(validation_case_template, {
+								function_name: `FunctionName.${GetCodeName(method.id)}`,
+								function: `${GetCodeName(validationNode)}`,
+								parameters: `model, agent, change_parameter`
+							})
+						);
+						executors.forEach((executor: Node) => {
+							conditions.push(
+								bindTemplate(validation_case_template, {
+									function_name: `FunctionName.${GetCodeName(executor)}`,
+									function: `${GetCodeName(validationNode)}`,
+									parameters: `model, agent, change_parameter`
+								})
+							);
+						});
+					}
 				})
 				.filter((x: any) => x);
 			return bindTemplate(validation_entry_template, {
