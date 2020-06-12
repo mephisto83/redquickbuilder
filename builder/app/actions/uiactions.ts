@@ -107,6 +107,9 @@ export function ScreenOptionFilter(x: any) {
 	if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Forgot Login') {
 		return false;
 	}
+	if (GetNodeProp(x, NodeProperties.IsHomeView)) {
+		return false;
+	}
 
 	if (GetNodeProp(x, NodeProperties.ViewPackageTitle) === 'Continue As') {
 		return false;
@@ -2364,7 +2367,9 @@ export function GetConditionClause(
 		case NodeConstants.FilterRules.Many2ManyPropertyIsTrue:
 			properties = {
 				agent: safeFormatTemplateProperty(clauseKey),
-				agent_property: safeFormatTemplateProperty(propertyName),
+				agent_property: isjavascript
+					? safeFormatTemplateProperty(propertyName).toJavascriptName()
+					: safeFormatTemplateProperty(propertyName),
 				agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
 				model_type: GetCodeName(nodeNodeId) || 'model_type missing',
 				model: node,
@@ -2380,7 +2385,9 @@ export function GetConditionClause(
 			const listItems = GenerateConstantList(validator);
 			properties = {
 				agent: safeFormatTemplateProperty(clauseKey),
-				agent_property: safeFormatTemplateProperty(propertyName),
+				agent_property: isjavascript
+					? safeFormatTemplateProperty(propertyName).toJavascriptName()
+					: safeFormatTemplateProperty(propertyName),
 				agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
 				list: listItems
 			};
