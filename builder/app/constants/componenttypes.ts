@@ -172,6 +172,7 @@ export const ComponentTypeKeys = {
 	View: 'View',
 	Menu: 'Menu',
 	Input: 'Input',
+	Dropdown: 'Dropdown',
 	Text: 'Text',
 	H1: 'H1',
 	InfiniteList: 'InfiniteList' // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
@@ -244,6 +245,54 @@ export const ComponentTypes: any = {
 		},
 		Container: {},
 		Content: {},
+		[ComponentTypeKeys.Dropdown]: {
+			template: './app/templates/components/dropdown.tpl',
+			defaultApi: INPUT_DEFAULT_API,
+			eventApi: [ ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText ],
+			properties: {
+				item_attributes: {
+					nodeProperty: NodeProperties.TextType,
+					template: '{{value}}',
+					options: [
+						'fixedLabel',
+						'inlineLabel',
+						'floatingLabel',
+						'stackedLabel',
+						'regular',
+						'rounded',
+						'success',
+						'error',
+						'disabled'
+					],
+					ui: true
+				},
+				...DEFAULT_INPUT_API_PROPERTIES,
+				value: {
+					nodeProperty: NodeProperties.value,
+					template: true
+        },
+        options:{
+					nodeProperty: NodeProperties.Options,
+					template: true
+        },
+				label: {
+					nodeProperty: NodeProperties.Label,
+					template: true
+				},
+				placeholder: {
+					nodeProperty: NodeProperties.Placeholder,
+					template: true
+				},
+				error: {
+					nodeProperty: NodeProperties.Error,
+					template: true
+				},
+				success: {
+					nodeProperty: NodeProperties.Success,
+					template: true
+				}
+			}
+		},
 		Fab: {},
 		Footer: {},
 		FooterTab: {},

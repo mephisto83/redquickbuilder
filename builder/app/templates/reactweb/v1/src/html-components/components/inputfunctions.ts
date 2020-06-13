@@ -67,7 +67,6 @@ export default class InputFunctions {
 			}
 		};
 	}
-
 	static onChange(arg0: any) {
 		return (v: { target: { checked: any; value: any } }) => {
 			if (arg0.immediate()) {

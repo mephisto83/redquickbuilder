@@ -9,6 +9,7 @@ import { Content, StyleProvider } from '../html-components';
 import ViewModelKeys from '../viewmodel_keys';
 import {
   MultiSelectList, MultiViewList, Container,
+  Dropdown,
   ListItem, H3, H1, H2, Header, Title,
   Footer, FooterTab, Button, Left, Right,
   Body, Icon, Text, View, Menu

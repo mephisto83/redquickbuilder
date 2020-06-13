@@ -124,7 +124,7 @@ export default class ModelGenerator {
 		};
 	}
 
-	static GenerateTs(options: { state: any; key?: any; language?: any; includeImports: boolean }) {
+	static GenerateTs(options: { state: any; key?: any; language?: any; includeImports?: boolean }) {
 		const { includeImports, state } = options;
 		const graphRoot = GetRootGraph(state);
 		const models = NodesByType(state, NodeTypes.Model)

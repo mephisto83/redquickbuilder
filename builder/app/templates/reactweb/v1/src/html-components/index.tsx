@@ -9,6 +9,7 @@ import Button from './components/button';
 import Left from './components/left';
 import Right from './components/right';
 import Body from './components/body';
+import Dropdown from './components/dropdown';
 import Icon from './components/icon';
 import Text from './components/text';
 import Input from './components/input';
@@ -42,6 +43,7 @@ export {
   Button,
   Form,
   H3,
+  Dropdown,
   H2,
   PasswordField,
   H1,

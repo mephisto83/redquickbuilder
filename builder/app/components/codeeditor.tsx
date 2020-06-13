@@ -16,11 +16,12 @@ import {
 } from '../actions/uiactions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp } from '../methods/graph_methods';
-import { NodeProperties, NEW_LINE } from '../constants/nodetypes';
+import { NodeProperties, NEW_LINE, MakeConstant } from '../constants/nodetypes';
 import fs from 'fs';
 import * as UIA from '../actions/uiactions';
 import ModelGenerator from '../generators/modelgenerators';
 import { Node } from '../methods/graph_types';
+import ConstantsGenerator from '../generators/constantsgenerator';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
@@ -32,33 +33,7 @@ class CodeEditor extends Component<any, any> {
 			definitions
 		};
 	}
-	editorWillMount() {
-		// Register a new language
-		// monaco.languages.register({ id: 'mySpecialLanguage' });
-		// monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-		// 	target: monaco.languages.typescript.ScriptTarget.ES2016,
-		// 	allowNonTsExtensions: true,
-		// 	moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-		// 	module: monaco.languages.typescript.ModuleKind.CommonJS,
-		// 	noEmit: true,
-		// 	typeRoots: [ 'node_modules/@types' ]
-		// });
-		// Register a tokens provider for the language
-		// monaco.languages.setMonarchTokensProvider('typescript', Javascript());
-		// monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-		// 	noSemanticValidation: true,
-		// 	noSyntaxValidation: false
-		// });
-		// // compiler options
-		// monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-		// 	target: monaco.languages.typescript.ScriptTarget.ES2015,
-		// 	allowNonTsExtensions: true
-		// // });
-		// const MONACO_LIB_PREFIX = 'ts:filename/';
-		// const path_ = `${MONACO_LIB_PREFIX}uiactions.d.ts`;
-		// let definitions = fs.readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
-		// monaco.languages.typescript.typescriptDefaults.addExtraLib(definitions, `inmemory://model/uiactios.d.ts`);
-	}
+	editorWillMount() {}
 
 	componentDidUpdate(prevProps: any) {
 		// Typical usage (don't forget to compare props):
@@ -92,7 +67,30 @@ class CodeEditor extends Component<any, any> {
 		value = this.untransformLambda(value);
 		if (value.indexOf(defs) === -1) {
 			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
+			const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
+				const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
+				const larg_ts: any = {};
+				enums_ts.forEach((t: { value: any }) => {
+					larg_ts[MakeConstant(t.value || t)] = t.value;
+				});
+				return {
+					name: GetNodeProp(node, NodeProperties.CodeName),
+					model: larg_ts
+				};
+			});
+
 			let common_functions: any = ModelGenerator.GenerateCommon({ state: this.props.state });
+			let _consts = ConstantsGenerator.GenerateTs({
+				values: [ ...enumerations_ts ],
+				state: this.props.state
+			});
+			let constants = Object.keys(_consts)
+				.map((key: string) => {
+					let { template } = _consts[key];
+					return `
+          ${template || ''}`;
+				})
+				.join(NEW_LINE);
 			let modelTsScript = Object.keys(tsModels)
 				.map((key: string) => {
 					let { template } = tsModels[key];
@@ -102,9 +100,16 @@ class CodeEditor extends Component<any, any> {
 				.join(NEW_LINE);
 			value += `
 ${defs}
-
+//#region constants
+${constants}
+//#endregion
 //#region models
 ${modelTsScript}
+//#endregion
+//#region mocks
+export const titleService = {
+  get: (str: string): string => { return ''; }
+};
 //#endregion
 //#region common functions
 ${Object.keys(common_functions)
@@ -179,7 +184,7 @@ ${this.state.definitions}
 		let { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		if (currentNode) {
-			const models: Node[] = NodesByType(state, NodeTypes.Model)
+			const models: Node[] = NodesByType(state, [ NodeTypes.Model, NodeTypes.Enumeration ])
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
@@ -194,7 +199,7 @@ ${this.state.definitions}
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		if (currentNode) {
 			let tempvalue = GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
-			const models: Node[] = NodesByType(state, NodeTypes.Model)
+			const models: Node[] = NodesByType(state, [ NodeTypes.Model, NodeTypes.Enumeration ])
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item: Node) => {

@@ -512,6 +512,7 @@ export const NodeProperties = {
 	Label: 'Label',
 	Error: 'Error',
 	Placeholder: 'Placeholder',
+	Options: 'Options',
 	Success: 'Success',
 	Style: 'Style',
 	MethodProps: 'methodProperties',

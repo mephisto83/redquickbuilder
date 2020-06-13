@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class Validation extends React.Component {
+export default class Validation extends React.Component<any, any> {
 	constructor(props: any) {
 		super(props);
 
@@ -31,7 +31,7 @@ export default class Validation extends React.Component {
 			if (validated) {
 				if (errors.length) {
 					result.push(
-						...errors.filter((error) => error.title).map((error, index) => {
+						...errors.filter((error: { title: any; }) => error.title).map((error: { title: React.ReactNode; }, index: any) => {
 							return (
 								<li key={`error${index}`}>
 									<span>{error.title}</span>
@@ -40,7 +40,7 @@ export default class Validation extends React.Component {
 						})
 					);
 				} else if (success) {
-					result = success.filter((success) => success.title).map((suc, index) => {
+					result = success.filter((success: { title: any; }) => success.title).map((suc: { title: React.ReactNode; }, index: any) => {
 						return (
 							<li key={`success ${index}`}>
 								<span>{suc.title}</span>
@@ -65,7 +65,7 @@ export default class Validation extends React.Component {
 }
 
 Validation.propTypes = {
-	data: function(v) {
+	data: function(v: any) {
 		return null;
 	}
 };

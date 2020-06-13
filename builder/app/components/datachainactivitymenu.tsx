@@ -101,7 +101,7 @@ class DataChainActvityMenu extends Component<any, any> {
 					const property = args[1];
 					let types = args.subset(1);
 					if (!types.length) {
-						types = [ NodeTypes.Model ];
+						types = [ NodeTypes.Model, NodeTypes.Enumeration ];
 					}
 					const value = UIA.GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
 					const nodes = property
@@ -379,7 +379,7 @@ class DataChainActvityMenu extends Component<any, any> {
 							}}
 							label={Titles.ModelKey}
 							value={UIA.GetNodeProp(currentNode, NodeProperties.ModelKey)}
-							options={UIA.NodesByType(state, [ NodeTypes.Model ]).toNodeSelect()}
+							options={UIA.NodesByType(state, [ NodeTypes.Model, NodeTypes.Enumeration ]).toNodeSelect()}
 						/>
 					) : null}
 					{viewModelKey ? (

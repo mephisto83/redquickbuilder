@@ -65,7 +65,7 @@ export default class ConstantsGenerator {
 		return result;
 	}
 
-	static GenerateTs(options: { values: any; state: any; key?: any }) {
+	static GenerateTs(options: { values?: any; state: any; key?: any }) {
 		var { values = [], state } = options;
 		let graphRoot = GetRootGraph(state);
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;

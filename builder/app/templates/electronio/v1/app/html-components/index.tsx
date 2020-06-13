@@ -8,6 +8,7 @@ import FooterTab from './components/footer-tab';
 import Button from './components/button';
 import Left from './components/left';
 import Right from './components/right';
+import Dropdown from './components/dropdown';
 import Body from './components/body';
 import Icon from './components/icon';
 import Text from './components/text';
@@ -35,6 +36,7 @@ export {
   ListItem,
   Header,
   Title,
+  Dropdown,
   Footer,
   Label,
   Menu,
