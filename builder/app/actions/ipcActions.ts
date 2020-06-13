@@ -40,8 +40,8 @@ import {
 	GetMaestroNode,
 	GetControllerNode,
 	updateJobs,
-  GetState,
-  GetCurrentGraph
+	GetState,
+	GetCurrentGraph
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -54,6 +54,7 @@ import {
 	toggleVisualKey
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
+import ModelGenerator from '../generators/modelgenerators';
 
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
@@ -332,6 +333,7 @@ export function scaffoldProject(options: any = {}) {
 										const model = GetCodeName(parameters[FunctionTemplateKeys.Model]);
 										const user = GetCodeName(parameters[FunctionTemplateKeys.User]);
 										const maestro = GetMaestroNode(method.id);
+										const modelPropertyDefaults = ModelGenerator.GenerateModelPropertyDefaults(parameters[FunctionTemplateKeys.Model], model.toLowerCase());
 										if (maestro) {
 											const controller = GetControllerNode(maestro.id);
 											if (controller) {
@@ -344,6 +346,7 @@ export function scaffoldProject(options: any = {}) {
                     }`);
 												post_registrations.push(`
                     var  ${model.toLowerCase()} =  ${model}.Create();
+                    ${modelPropertyDefaults}
                     ${model.toLowerCase()}.Owner = user.Id;
                     ${model.toLowerCase()} = await Create(user, ${model.toLowerCase()});
                     user.${model}  = ${model.toLowerCase()}.Id;`);
@@ -537,8 +540,8 @@ function generateReactNative(workspace: string, state: any) {
 		});
 
 		for (const fileName in temp) {
-      console.log(fileName);
-      console.log(temp[fileName].relative)
+			console.log(fileName);
+			console.log(temp[fileName].relative);
 			ensureDirectory(path.join(workspace, temp[fileName].relative));
 			writeFileSync(
 				path.join(workspace, temp[fileName].relative, `${temp[fileName].relativeFilePath}`),

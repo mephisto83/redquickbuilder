@@ -902,7 +902,8 @@ export const LinkPropertyKeys = {
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
 	Enumeration: 'Enumeration',
-	AsForm: 'AsForm'
+	AsForm: 'AsForm',
+	DefaultValue: 'DefaultValue'
 };
 
 export const LinkProperties: any = {

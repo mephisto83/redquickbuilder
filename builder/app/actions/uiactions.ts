@@ -2678,7 +2678,7 @@ export function GetConnectedScreen(id: any) {
 		id
 	}).find((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen);
 }
-export function GetModelPropertyNodes(refId: any) {
+export function GetModelPropertyNodes(refId: any): Node[] {
 	const state = _getState();
 	return GraphMethods.GetLinkChain(state, {
 		id: refId,

@@ -94,19 +94,19 @@ function createReactWeb() {
 				console.log('adding redux-logger');
 				let promise = Promise.resolve();
 				[
-					'@types/react-router',
-					'react-router-dom',
-					'@types/react-redux',
+					'@types/react-router@5.1.7',
+					'react-router-dom@5.2.0',
+					'@types/react-redux@7.1.9',
 					'typescript@3.8.3',
-					'node-sass',
-					'redux-thunk',
-					'react-redux',
-					'connected-react-router',
-					'history',
-					'react-hot-loader',
-					'redux',
-					'react-router',
-					'redux-logger'
+					'node-sass@4.14.1',
+					'redux-thunk@2.3.0',
+					'react-redux@7.2.0',
+					'connected-react-router@6.8.0',
+					'history@4.10.1',
+					'react-hot-loader@4.12.21',
+					'redux@4.0.5',
+					'react-router@5.2.0',
+					'redux-logger@3.0.6'
 				].forEach((dependency) => {
 					promise = promise.then(() =>
 						executeSpawnCmd('yarn', [ 'add', dependency ], {

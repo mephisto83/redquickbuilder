@@ -123,6 +123,7 @@ import BuildReferenceObject from '../nodepacks/BuildReferenceObject';
 import BuildNavigationScreen from '../nodepacks/BuildNavigationScreen';
 import BuildLowerMenus from '../nodepacks/screens/menus/BuildLowerMenus';
 import CreateMirrorMenu from '../nodepacks/screens/menus/CreateMirrorMenu';
+import EnumerationLinkMenu from './enumerationlinkmenu';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -564,7 +565,16 @@ class ContextMenu extends Component<any, any> {
 											</TreeViewItemContainer>
 										);
 									})}
-								</TreeViewMenu>
+								</TreeViewMenu>,
+								// <EnumerationLinkMenu
+								// 	linkType={linkType}
+								// 	selectedLink={selectedLink}
+								// 	enumeration={enumeration}
+                //   link={link}
+                //   title={'Default Value'}
+								// 	linkKey={LinkPropertyKeys.DefaultValue}
+								// 	key={`${linkType}${selectedLink.id}-default-value`}
+								// />
 							);
 						}
 						if (enumeration) {

@@ -14,7 +14,8 @@ import {
 	GetNodeType,
 	GetJSCodeName,
 	GetNodeByProperties,
-	GetSnakeCase
+	GetSnakeCase,
+	GetModelPropertyNodes
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -40,6 +41,47 @@ const MODEL_PROPERTY_TEMPLATE_TS = './app/templates/models/model_property-ts.tpl
 const MODEL_STATIC_TEMPLATES = './app/templates/models/model_statics.tpl';
 const MODEL_ATTRIBUTE_TEMPLATE = './app/templates/models/model_attributes.tpl';
 export default class ModelGenerator {
+	static GenerateModelPropertyDefaults(
+		modelId: any,
+		codeSymbol: string,
+		language: string = ProgrammingLanguages.CSHARP
+	) {
+		let graph = GetCurrentGraph();
+		let propertyNodes = GetModelPropertyNodes(modelId);
+		let result: any[] = [];
+		propertyNodes.forEach((property) => {
+			let enumeration = GraphMethods.GetNodeLinkedTo(graph, {
+				id: property.id,
+				link: LinkType.Enumeration,
+				direction: GraphMethods.SOURCE
+			});
+			if (enumeration) {
+				let link = GraphMethods.GetLinkBetween(property.id, enumeration.id, graph);
+				if (link) {
+					let defaultValues = GetLinkProperty(link, LinkPropertyKeys.DefaultValue);
+					if (defaultValues && defaultValues.length) {
+						let defaultValue = defaultValues[0];
+						if (language === ProgrammingLanguages.CSHARP) {
+							let eumerationValues = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
+							if (eumerationValues) {
+								let enumerationValue = eumerationValues.find(
+									(enem: { id: string }) => enem.id === defaultValue
+								);
+								if (enumerationValue) {
+									result.push(
+										`${codeSymbol}.${GetCodeName(property)} = ${GetCodeName(
+											enumeration
+										)}.${`${enumerationValue.value}`.toUpperCase()};`
+									);
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+		return result.join(NEW_LINE);
+	}
 	static Generate(options: { state: any; key?: any; language?: any }) {
 		const { state } = options;
 		const graphRoot = GetRootGraph(state);
