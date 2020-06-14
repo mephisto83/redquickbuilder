@@ -15,7 +15,8 @@ import {
 	GetJSCodeName,
 	GetNodeByProperties,
 	GetSnakeCase,
-	GetModelPropertyNodes
+	GetModelPropertyNodes,
+  GetState
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -33,7 +34,7 @@ import {
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
-import { GetState } from '../templates/electronio/v1/app/actions/uiactions';
+
 import { Node } from '../methods/graph_types';
 const MODEL_TEMPLATE = './app/templates/models/model.tpl';
 const MODEL_TEMPLATE_TS = './app/templates/models/model-ts.tpl';
