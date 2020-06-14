@@ -22,34 +22,44 @@ export async function LoadGraph(filePath: string): Promise<Graph | any> {
 	return await readLine(path.dirname(filePath), [ path.basename(filePath) ]);
 }
 async function writeGraph(fileName: string, unprunedGraph: Graph) {
+	let tryagain = false;
 	let graph = prune({ ...unprunedGraph });
-	await ensureDirectory(path.dirname(fileName));
-	console.log('write graph ' + fileName);
+	do {
+		try {
+			tryagain = false;
+			await ensureDirectory(path.dirname(fileName));
+			console.log('write graph ' + fileName);
 
-	let outstream = fs.createWriteStream(fileName);
-	outstream.write(`${SECTION_HEADER}${LINK_LIB}\n`);
-	for (var i in graph.linkLib) {
-		await writeToStream(i, graph.linkLib[i], outstream);
-	}
-	outstream.write(`${SECTION_HEADER}${GROUP_LIB}\n`);
-	for (var i in graph.groupLib) {
-		await writeToStream(i, graph.groupLib[i], outstream);
-	}
-	outstream.write(`${SECTION_HEADER}${NODE_LIB}\n`);
-	for (var i in graph.nodeLib) {
-		await writeToStream(i, graph.nodeLib[i], outstream);
-	}
+			let outstream = fs.createWriteStream(fileName);
+			outstream.write(`${SECTION_HEADER}${LINK_LIB}\n`);
+			for (var i in graph.linkLib) {
+				await writeToStream(i, graph.linkLib[i], outstream);
+			}
+			outstream.write(`${SECTION_HEADER}${GROUP_LIB}\n`);
+			for (var i in graph.groupLib) {
+				await writeToStream(i, graph.groupLib[i], outstream);
+			}
+			outstream.write(`${SECTION_HEADER}${NODE_LIB}\n`);
+			for (var i in graph.nodeLib) {
+				await writeToStream(i, graph.nodeLib[i], outstream);
+			}
 
-	let newgraph: Graph = { ...graph };
-	newgraph.linkLib = {};
-	newgraph.nodeLib = {};
-	newgraph.groupLib = {};
+			let newgraph: Graph = { ...graph };
+			newgraph.linkLib = {};
+			newgraph.nodeLib = {};
+			newgraph.groupLib = {};
 
-	outstream.write(`${SECTION_HEADER}${GRAPH_LIB}\n`);
+			outstream.write(`${SECTION_HEADER}${GRAPH_LIB}\n`);
 
-	await writeGraphToStream(newgraph, outstream);
+			await writeGraphToStream(newgraph, outstream);
 
-	outstream.close();
+			outstream.close();
+		} catch (e) {
+			console.log(e);
+			console.log('failed to write graph');
+			tryagain = true;
+		}
+	} while (tryagain);
 	console.log('wrote graph');
 }
 
