@@ -1489,6 +1489,7 @@ export function GetChildComponentAncestors(state: any, id: string) {
 			const nodeType = GetNodeProp(x, NodeProperties.NODEType);
 			switch (nodeType) {
 				case NodeTypes.ScreenOption:
+				case NodeTypes.Screen:
 				case NodeTypes.ComponentNode:
 					return true;
 				default:

@@ -48,6 +48,7 @@ import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards'
 import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
 import MenuGenerator from '../generators/menugenerator';
 import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
+import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -171,6 +172,13 @@ class QuickMethods extends Component<any, any, any> {
 										onClick={() => {
 											this.props.setState();
 											AddUserRequirements();
+										}}
+									/>
+									<TreeViewMenu
+										title={'Change Input To Select'}
+										icon="fa fa-plane"
+										onClick={() => {
+											ChangeInputToSelect();
 										}}
 									/>
 

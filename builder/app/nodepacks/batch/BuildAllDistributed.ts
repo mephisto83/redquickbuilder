@@ -181,6 +181,7 @@ const Collection_SharedMenuDataSource = 'Add Shared Menu Data Source';
 const Collection_DataChainsRelatedToMenuSource = 'Add Data Chains related to menu source';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
 export const ApplyTemplates = 'ApplyTemplates';
+export const ChangeInputToSelects = 'Change Input To Selects';
 export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
@@ -218,6 +219,7 @@ const buildAllProgress = [
 	...waiting(Add_Component_To_Screen_Options),
 	...waiting(ApplyTemplates),
 	...waiting(ApplyValidationFromProperties),
+	...waiting(ChangeInputToSelects),
 	...waiting(CollectionScreenWithoutDatachainDistributed),
 	{ name: CollectionSharedReferenceTo },
 	{ name: Collection_SharedMenuDataSource },
@@ -325,7 +327,6 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Create_Configuration, async (progresFunc: any) => {
 			graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());
 		});
-
 		await run(buildAllProgress, Create_Fetch_Service, async (progresFunc: (arg0: number) => any) => {
 			graphOperation(CreateFetchServiceIdempotently())(GetDispatchFunc(), GetStateFunc());
 			await progresFunc(1 / 2);
@@ -399,7 +400,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await threadRun(buildAllProgress, Connect_Dashboards, currentJobFile, NodeTypes.Screen);
 		await threadRun(buildAllProgress, Build_Dashboards, currentJobFile, NodeTypes.NavigationScreen);
-
+		await threadRun(buildAllProgress, ChangeInputToSelects, currentJobFile, NodeTypes.Screen);
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
 		await threadRun(
 			buildAllProgress,

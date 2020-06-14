@@ -35,6 +35,7 @@ import ApplyValidationFromProperties from '../../app/nodepacks/permission/ApplyV
 import SetupViewTypes from '../../app/nodepacks/batch/SetupViewTypes';
 import BuildDashboards from '../../app/nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../../app/nodepacks/screens/dashboard/ConnectDashboards';
+import ChangeInputToSelect from '../../app/nodepacks/screens/ChangeInputToSelect';
 
 let app_state;
 
@@ -94,6 +95,11 @@ export default async function executeJob(
 					break;
 				case BAD.CollectionScreenWithoutDatachainDistributed:
 					await CollectionScreenWithoutDatachainDistributed((model: any) => {
+						return filter && filter.models.indexOf(model.id) !== -1;
+					});
+					break;
+				case BAD.ChangeInputToSelects:
+					await ChangeInputToSelect((model: any) => {
 						return filter && filter.models.indexOf(model.id) !== -1;
 					});
 					break;

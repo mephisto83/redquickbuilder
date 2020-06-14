@@ -34,6 +34,7 @@ import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import { GetState } from '../templates/electronio/v1/app/actions/uiactions';
+import { Node } from '../methods/graph_types';
 const MODEL_TEMPLATE = './app/templates/models/model.tpl';
 const MODEL_TEMPLATE_TS = './app/templates/models/model-ts.tpl';
 const MODEL_PROPERTY_TEMPLATE = './app/templates/models/model_property.tpl';
@@ -47,9 +48,9 @@ export default class ModelGenerator {
 		language: string = ProgrammingLanguages.CSHARP
 	) {
 		let graph = GetCurrentGraph();
-		let propertyNodes = GetModelPropertyNodes(modelId);
+		let propertyNodes: any[] = GetModelPropertyNodes(modelId);
 		let result: any[] = [];
-		propertyNodes.forEach((property) => {
+		propertyNodes.forEach((property: Node) => {
 			let enumeration = GraphMethods.GetNodeLinkedTo(graph, {
 				id: property.id,
 				link: LinkType.Enumeration,

@@ -2,13 +2,18 @@ import { uuidv4 } from '../../utils/array';
 import { NodeProperties } from '../../constants/nodetypes';
 import { GetNodeTitle, GetLambdaVariableTitle } from '../../actions/uiactions';
 
-export default function(args: { viewPackages?: any; enumeration?: string; enumerationId: string }) {
+export default function(args: {
+	viewPackages?: any;
+	enumeration?: string;
+	enumerationId: string;
+	callback?: Function;
+}) {
 	// node1
 	if (!args.enumerationId) {
 		throw new Error('missing enumeration id');
 	}
 	args.enumeration = args.enumeration || GetNodeTitle(args.enumerationId);
-	const enumerationModelName = GetLambdaVariableTitle(args.enumerationId);
+	const enumerationModelName = GetLambdaVariableTitle(args.enumerationId, false, true);
 	// enumeration
 	if (!args.enumeration) {
 		throw new Error('missing enumeration argument');
@@ -126,7 +131,7 @@ export default function(args: { viewPackages?: any; enumeration?: string; enumer
 						prop: 'LambdaInsertArguments',
 						id: context.node0,
 						value: {
-							[enumerationModelName]: context.node1
+							[enumerationModelName]: args.enumerationId
 						}
 					}
 				}
