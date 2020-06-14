@@ -30,6 +30,7 @@ export interface AgentProject {
 	busy?: boolean;
 	updated?: number;
 	error?: any;
+	errorMessage?: any;
 	progress?: number;
 	workingOnFile?: string;
 	workingOnJob?: string;

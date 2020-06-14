@@ -162,7 +162,7 @@ class CurrentJobProgressView extends Component<any, any> {
 														{agentProject.error ? (
 															<i
 																className="fa fa-stop"
-																title={`${agentProject.error}`}
+																title={`${agentProject.errorMessage}`}
 																style={{ color: 'red' }}
 															/>
 														) : null}

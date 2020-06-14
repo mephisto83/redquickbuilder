@@ -99,6 +99,7 @@ async function handleAgentProjectError(message: RedQuickDistributionMessage): Pr
 		if (runnerContext.agents[message.agentName]) {
 			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
 				runnerContext.agents[message.agentName].projects[message.agentProject].error = true;
+				runnerContext.agents[message.agentName].projects[message.agentProject].errorMessage = message.errorMessage;
 			}
 		}
 	}
