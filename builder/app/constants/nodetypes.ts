@@ -63,6 +63,7 @@ export const NodeTypes = {
 	ClassNode: 'class-node',
 	DataChain: 'data-chain',
 	ServiceInterface: 'service-interface',
+	DefaultValue: 'default-value',
 	ServiceInterfaceMethod: 'service-interface-method',
 	ViewModel: 'view-model',
 	FetchService: 'FetchService',
@@ -175,6 +176,7 @@ export const NodeTypeColors = {
 	[ColorStates.Error]: '#FF0000',
 	[NodeTypes.Concept]: '#DD4B39',
 	[NodeTypes.ModelItemFilter]: '#4ECDC4',
+	[NodeTypes.DefaultValue]: '#34EF2',
 	[NodeTypes.ViewType]: '#412451',
 	[NodeTypes.Model]: '#713E5A',
 	[NodeTypes.Property]: '#484349',
@@ -260,6 +262,7 @@ export const NameSpace = {
 export const MAIN_CONTENT = 'MAIN_CONTENT';
 export const MIND_MAP = 'MIND_MAP';
 export const CODE_VIEW = 'CODE_VIEW';
+export const ANALYSIS_VIEW = 'ANALYSIS_VIEW';
 export const LAYOUT_VIEW = 'LAYOUT_VIEW';
 export const TRANSLATION_VIEW = 'TRANSLATION_VIEW';
 export const PROGRESS_VIEW = 'PROGRESS_VIEW';
@@ -325,6 +328,8 @@ export const NodeProperties = {
 	MergeNode: 'MergeNode',
 	DataChainTypeName: 'DataChainTypeName',
 	IsHomeLaunchView: 'IsHomeLaunchView',
+	UseDefaultValue: 'UseDefaultValue',
+	DefaultValue: 'DefaultValue',
 	HoverStyle: ':hover',
 	IsHomeView: 'IsHomeView',
 	AsLocalContext: 'AsLocalContext',
@@ -658,6 +663,7 @@ export const LinkType = {
 	DataChainShouldShow: 'DataChainShouldShow',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
+	DefaultValue: 'DefaultValue',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
@@ -922,6 +928,9 @@ export const LinkProperties: any = {
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen
+	},
+	DefaultValue: {
+		type: LinkType.DefaultValue
 	},
 	MenuLink: {
 		type: LinkType.MenuLink

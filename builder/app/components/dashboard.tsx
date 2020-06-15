@@ -113,6 +113,7 @@ import {
 	MIND_MAP,
 	CODE_VIEW,
 	LAYOUT_VIEW,
+	ANALYSIS_VIEW,
 	LinkEvents,
 	NavigateTypes,
 	LinkPropertyKeys,
@@ -129,6 +130,7 @@ import ThemeView from './themeview';
 import AgentAccessView from './agentaccessview';
 import TranslationView from './translationview';
 import ProgressView from './progressview';
+import AnalysisView from './analysisview';
 import {
 	getLinkInstance,
 	createEventProp,
@@ -743,8 +745,8 @@ class Dashboard extends Component<any, any> {
 						this.props.graphOperation(
 							AddShouldShowDataChain({
 								id: currentNode.id,
-                name: `Is disabled ${UIA.GetNodeTitle(currentNode)}`,
-                linkProperty: LinkProperties.DataChainIsDisabled
+								name: `Is disabled ${UIA.GetNodeTitle(currentNode)}`,
+								linkProperty: LinkProperties.DataChainIsDisabled
 							})
 						);
 					}
@@ -1395,6 +1397,31 @@ class Dashboard extends Component<any, any> {
 		result.push({
 			onClick: () => {
 				const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+				this.props.graphOperation([
+					{
+						operation: UIA.ADD_NEW_NODE,
+						options() {
+							return {
+								nodeType: NodeTypes.DefaultValue,
+								parent: currentNode.id,
+								linkProperties: {
+									properties: { ...LinkProperties.DefaultValue }
+								},
+								properties: {
+									[NodeProperties.UIText]: `${UIA.GetNodeTitle(currentNode)} Default`
+								}
+							};
+						}
+					}
+				]);
+			},
+			icon: 'fa fa-map-signs',
+			title: `Add Default Value`
+		});
+
+		result.push({
+			onClick: () => {
+				const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 				this.props.graphOperation(UIA.NEW_ATTRIBUTE_NODE, {
 					parent: currentNode.id,
 					groupProperties: {},
@@ -1719,6 +1746,15 @@ class Dashboard extends Component<any, any> {
 											this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
 										}}
 									/>
+									<NavBarButton
+										active={mainContent === ANALYSIS_VIEW}
+										hideArrow
+										title={Titles.Analysis}
+										icon="fa fa-tv"
+										onClick={() => {
+											this.props.setVisual(MAIN_CONTENT, ANALYSIS_VIEW);
+										}}
+									/>
 								</NavBarMenu>
 								<NavBarMenu paddingRight={15} style={{ float: 'left' }}>
 									<NavBarButton
@@ -1899,6 +1935,16 @@ class Dashboard extends Component<any, any> {
 										icon="fa fa-code"
 										onClick={() => {
 											this.props.setVisual(MAIN_CONTENT, LAYOUT_VIEW);
+										}}
+									/>
+								) : null}
+								{UIA.Visual(state, 'MAIN_NAV') ? (
+									<TreeViewMenu
+										active={mainContent === ANALYSIS_VIEW}
+										title={Titles.Analysis}
+										icon="fa fa-tv"
+										onClick={() => {
+											this.props.setVisual(MAIN_CONTENT, ANALYSIS_VIEW);
 										}}
 									/>
 								) : null}
@@ -2100,6 +2146,7 @@ class Dashboard extends Component<any, any> {
 							<AgentAccessView active={UIA.Visual(state, MAIN_CONTENT) === AGENT_ACCESS_VIEW} />
 							<TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
 							<ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
+							<AnalysisView active={UIA.Visual(state, MAIN_CONTENT) === ANALYSIS_VIEW} />
 							<CodeEditor
 								active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR}
 								value={UIA.Visual(state, UIA.CODE_EDITOR_INIT_VALUE)}

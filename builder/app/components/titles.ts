@@ -487,8 +487,10 @@ export const ManyToManyNexusModel = 'Many to Many model';
 export const SaveThemeAs = 'Save theme as';
 export const SelectThemeFromFile = 'Select theme from file';
 export const ManyToManyNexusDescription = 'This property will be a quick access for many to many relationships.';
-
+export const UseDefaultValue = 'Use Default Value';
+export const DefaultValue = 'DefaultValue';
 export const HasLogicalChildren = 'Has logical children';
+export const Analysis = 'Analysis';
 export const LogicalChildrenTypes = 'Logical children types';
 export const LogicalNieceTypes = 'Logical niece types';
 export const HasLogicalChildrenDescription = 'Children have references to this node, as some sort of logical parent.';

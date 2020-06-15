@@ -2,7 +2,7 @@ import * as Titles from '../components/titles';
 import fs from 'fs';
 import { Methods, NodeTypes, NodeProperties } from './nodetypes';
 
-export const FunctionTypes: any = {
+export const FunctionTypes = {
 	//Functions with List<Child> result
 	Create_ManyToMany_Agent_Value__IListChild: 'Create/ManyToMany/Agent/Value => IList<Child>',
 	Update_ManyToMany_Agent_Value__IListChild: 'Update/ManyToMany/Agent/Value => IList<Child>',
@@ -27,7 +27,8 @@ export const FunctionTypes: any = {
 	//Delete
 	Delete_M2M_By_Reference: 'Delete M2M by reference => list',
 	//Unique object to an agent function
-	Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
+  Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
+  Get_Default_Object_For_Agent:'Get_Default_Object_For_Agent',
 
 	//Functions with Object result
 	Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
@@ -1116,7 +1117,60 @@ export const MethodFunctions: any = {
 		isList: true,
 		method: Methods.GetAll,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-	},
+  },
+  [FunctionTypes.Get_Default_Object_For_Agent] :{
+    title: Titles.Get_Object_Agent_Value__Object,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Default ${t} by ${a}`;
+		},
+		template: './app/templates/standard/get_model_agent_object.tpl',
+		interface: './app/templates/standard/get_model_agent_object_interface.tpl',
+		controller: './app/templates/standard/get_default_model_agent_controller.tpl',
+		permission: {
+			...PERMISSION_DEFAULTS
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+
+		parameters: {
+			body: false,
+			parameters: false
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
 	[FunctionTypes.Get_Agent_Value__IListObject]: {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {

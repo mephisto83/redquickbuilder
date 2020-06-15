@@ -16,7 +16,7 @@ import {
 	GetNodeByProperties,
 	GetSnakeCase,
 	GetModelPropertyNodes,
-  GetState
+	GetState
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -180,6 +180,8 @@ export default class ModelGenerator {
             };
         }`;
 		}
+		let defaultModelFunc = this.GenerateDefaultModelFunc(node);
+		templateSwapDictionary.default_model_create = defaultModelFunc;
 		templateSwapDictionary.attributes = '';
 		let connectedProperties = GetModelPropertyChildren(node.id); //Get all properties including link to other models
 		//  GraphMethods.getNodesByLinkType(graph, {
@@ -479,6 +481,43 @@ export default class ModelGenerator {
 			})
 		};
 		return result;
+	}
+	static GenerateDefaultModelFunc(node: Node) {
+		let properties = GetModelPropertyNodes(node.id);
+		let items = ``;
+		properties.filter((x) => GetNodeProp(x, NodeProperties.UseDefaultValue)).forEach((property) => {
+			let type = GetNodeProp(property, NodeProperties.UIAttributeType);
+			switch (type) {
+				case NodePropertyTypes.PHONENUMBER:
+				case NodePropertyTypes.EMAIL:
+				case NodePropertyTypes.STRING:
+					items =
+						items +
+						`
+        result.${GetCodeName(property)} = "${GetNodeProp(property, NodeProperties.DefaultValue)}";
+        `;
+					break;
+				case NodePropertyTypes.BOOLEAN:
+				case NodePropertyTypes.DOUBLE:
+				case NodePropertyTypes.FLOAT:
+				case NodePropertyTypes.INT:
+					items =
+						items +
+						`
+          result.${GetCodeName(property)} = ${GetNodeProp(property, NodeProperties.DefaultValue)};
+          `;
+					break;
+			}
+		});
+		let template = `public static function GetDefaultModel() {
+      var result = CreateModel();
+
+${items}
+
+      return result;
+    }`;
+
+		return template;
 	}
 	static ModelImports(options: { graph: any; rel: any }) {
 		const state = GetState();

@@ -31,7 +31,8 @@ export default async function AddAgentMethods(progresFunc: any) {
 		FunctionTypes.Update_Object_Agent_Value__Object,
 		FunctionTypes.Get_Agent_Value__IListObject,
     FunctionTypes.Get_Object_Agent_Value__Object,
-    FunctionTypes.Get_Unique_Object_To_Agent
+    FunctionTypes.Get_Unique_Object_To_Agent,
+    FunctionTypes.Get_Default_Object_For_Agent
 	];
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 

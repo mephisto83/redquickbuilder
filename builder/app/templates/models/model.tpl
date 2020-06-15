@@ -4,6 +4,7 @@
     {
 
 {{staticFunctions}}
+{{default_model_create}}
 
 {{account_enabling_func}}
 

@@ -565,13 +565,13 @@ class ContextMenu extends Component<any, any> {
 											</TreeViewItemContainer>
 										);
 									})}
-								</TreeViewMenu>,
+								</TreeViewMenu>
 								// <EnumerationLinkMenu
 								// 	linkType={linkType}
 								// 	selectedLink={selectedLink}
 								// 	enumeration={enumeration}
-                //   link={link}
-                //   title={'Default Value'}
+								//   link={link}
+								//   title={'Default Value'}
 								// 	linkKey={LinkPropertyKeys.DefaultValue}
 								// 	key={`${linkType}${selectedLink.id}-default-value`}
 								// />
@@ -875,128 +875,6 @@ class ContextMenu extends Component<any, any> {
 								model,
 								model2
 							});
-							// this.props.graphOperation([
-							// 	{
-							// 		operation: UIA.ADD_NEW_NODE,
-							// 		options() {
-							// 			return {
-							// 				nodeType: NodeTypes.Model,
-							// 				properties: {
-							// 					[NodeProperties.UIText]: `${GetNodeProp(
-							// 						model,
-							// 						NodeProperties.UIText
-							// 					)} to ${GetNodeProp(model2, NodeProperties.UIText)}`
-							// 				},
-							// 				groupProperties: {},
-							// 				callback: (node: Node) => {
-							// 					newModel = node.id;
-							// 				}
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.ADD_NEW_NODE,
-							// 		options() {
-							// 			return {
-							// 				nodeType: NodeTypes.Property,
-							// 				linkProperties: {
-							// 					properties: {
-							// 						...LinkProperties.PropertyLink
-							// 					}
-							// 				},
-							// 				parent: newModel,
-							// 				properties: {
-							// 					[NodeProperties.UIText]: GetNodeProp(model, NodeProperties.UIText)
-							// 				},
-							// 				groupProperties: {},
-							// 				callback(node: Node) {
-							// 					newModel1 = node.id;
-							// 				}
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.ADD_NEW_NODE,
-							// 		options() {
-							// 			return {
-							// 				nodeType: NodeTypes.Property,
-							// 				linkProperties: {
-							// 					properties: {
-							// 						...LinkProperties.PropertyLink
-							// 					}
-							// 				},
-							// 				parent: newModel,
-							// 				properties: {
-							// 					[NodeProperties.UIText]: GetNodeProp(model2, NodeProperties.UIText)
-							// 				},
-							// 				groupProperties: {},
-							// 				callback(node: Node) {
-							// 					newModel2 = node.id;
-							// 				}
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.CHANGE_NODE_PROPERTY,
-							// 		options() {
-							// 			return {
-							// 				prop: UIA.NodeProperties.UIModelType,
-							// 				id: newModel1,
-							// 				value: model
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.ADD_LINK_BETWEEN_NODES,
-							// 		options() {
-							// 			return {
-							// 				target: model,
-							// 				source: newModel1,
-							// 				properties: { ...LinkProperties.ModelTypeLink }
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.CHANGE_NODE_PROPERTY,
-							// 		options() {
-							// 			return {
-							// 				prop: UIA.NodeProperties.UIModelType,
-							// 				id: newModel2,
-							// 				value: model2
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.CHANGE_NODE_PROPERTY,
-							// 		options() {
-							// 			return {
-							// 				prop: UIA.NodeProperties.UseModelAsType,
-							// 				id: newModel2,
-							// 				value: true
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.CHANGE_NODE_PROPERTY,
-							// 		options() {
-							// 			return {
-							// 				prop: UIA.NodeProperties.UseModelAsType,
-							// 				id: newModel1,
-							// 				value: true
-							// 			};
-							// 		}
-							// 	},
-							// 	{
-							// 		operation: UIA.ADD_LINK_BETWEEN_NODES,
-							// 		options() {
-							// 			return {
-							// 				target: model2,
-							// 				source: newModel2,
-							// 				properties: { ...UIA.LinkProperties.ModelTypeLink }
-							// 			};
-							// 		}
-							// 	}
-							// ]);
 						}}
 					/>
 				</TreeViewMenu>
@@ -1550,6 +1428,58 @@ class ContextMenu extends Component<any, any> {
 			/>
 		);
 		switch (currentNodeType) {
+			case NodeTypes.DefaultValue:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						<TreeViewItemContainer>
+							<SelectInput
+								label={Titles.Models}
+								options={UIA.NodesByType(this.props.state, NodeTypes.Model)
+									.filter((x: Node) => GetNodeProp(x, NodeProperties.IsAgent))
+									.toNodeSelect()}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.Agent,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.Agent)}
+							/>
+						</TreeViewItemContainer>
+            <TreeViewItemContainer>
+							<TextInput
+									label={Titles.DefaultValue}
+									onChange={(value: any) => {
+										this.props.graphOperation([
+											{
+												operation: UIA.CHANGE_NODE_PROPERTY,
+												options: {
+													prop: UIA.NodeProperties.DefaultValue,
+													id: currentNode.id,
+													value: value
+												}
+											}
+										]);
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.DefaultValue)}
+							/>
+						</TreeViewItemContainer>
+					</TreeViewMenu>
+				];
 			case NodeTypes.Property:
 				return [
 					<TreeViewMenu
