@@ -59,7 +59,11 @@ export default async function executeJob(
 			const { command, filter } = config;
 			app_state = await setupJob(jobInstancePath);
 
-			jobConfig.updated = Date.now();
+      jobConfig.updated = Date.now();
+
+			if (onProgress) {
+				await onProgress(.03);
+			}
 			switch (command) {
 				case Create_Component_All:
 					await CreateComponentAll(onProgress, (model: any) => {
