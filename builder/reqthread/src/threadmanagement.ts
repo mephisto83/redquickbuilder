@@ -141,7 +141,7 @@ export default class ThreadManagement {
 						fileName: completedJobItem.fileName
 					}
 				);
-				console.log(canReturnFiles);
+				// console.log(canReturnFiles);
 				if (!canReturnFiles.body.success) {
 					canReturnFiles = false;
 				}
@@ -256,13 +256,13 @@ export default class ThreadManagement {
 		let command = RedQuickDistributionCommand.RaisingHand;
 		let agentName = this.getAgentName();
 		do {
-			console.log(project);
+			// console.log(project);
 			let completed = false;
 			try {
-				console.log(
-					`calling ${this.configuration.remoteServerHost}:${this.configuration
-						.remoteServerPort} to ${command}`
-				);
+				// console.log(
+				// 	`calling ${this.configuration.remoteServerHost}:${this.configuration
+				// 		.remoteServerPort} to ${command}`
+				// );
 				let res = await this.communicationTower
 					.send(
 						{
