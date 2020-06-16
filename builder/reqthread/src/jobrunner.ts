@@ -188,6 +188,8 @@ async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage
 		}
 		// fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
 		let temp: any = message;
+    console.log('completed');
+    console.log(message);
 		if (
 			temp.agent &&
 			runnerContext.agents &&
@@ -195,10 +197,13 @@ async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage
 			runnerContext.agents[temp.agent] &&
 			runnerContext.agents[temp.agent].projects[temp.name]
 		) {
+      console.log('updating progress to 1')
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
-			runnerContext.agents[temp.agent].projects[temp.name].progress = 1;
-		}
+      runnerContext.agents[temp.agent].projects[temp.name].progress = 1;
+      runnerContext.agents[temp.agent].projects[temp.name].updated = Date.now();
+    }
+    console.log(JSON.stringify(runnerContext.agents, null, 4));
 		await tellCommandCenter();
 	}
 }

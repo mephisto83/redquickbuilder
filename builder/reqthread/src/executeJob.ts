@@ -150,6 +150,9 @@ export default async function executeJob(
 					await onChange({ ...options, jobInstancePath });
 				}
 			}
+			if (onProgress) {
+				await onProgress(1);
+			}
 			jobConfig.complete = true;
 		}
 	} else {
