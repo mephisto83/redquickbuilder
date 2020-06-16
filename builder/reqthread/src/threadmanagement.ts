@@ -150,15 +150,18 @@ export default class ThreadManagement {
 				canReturnFiles = false;
 			}
 		} while (!canReturnFiles);
-
+		await this.send({
+			response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+			command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+			progress: 0
+		});
 		console.log('now i can');
 		// let attempts = 3;
 		// do {
 		// 	attempts--;
 		// 	try {
-		await getFiles(
-			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER)
-		).forEachAsync(async (outputGraphFile) => {
+		let files = getFiles(path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER));
+		await files.forEachAsync(async (outputGraphFile, index, end) => {
 			await this.communicationTower.transferFile(
 				{
 					agent: completedJobItem.agentName,
@@ -174,6 +177,11 @@ export default class ThreadManagement {
 				),
 				path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT_FOLDER, outputGraphFile)
 			);
+			await this.send({
+				response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+				command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+				progress: index / end
+			});
 		});
 
 		await this.communicationTower.transferFile(
@@ -187,6 +195,11 @@ export default class ThreadManagement {
 			path.join(completedJobItem.jobInstancePath, JobServiceConstants.OUTPUT)
 		);
 
+		await this.send({
+			response: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+			command: RedQuickDistributionCommand.RaisingAgentProjectProgress,
+			progress: 1
+		});
 		let result = false;
 		do {
 			try {
