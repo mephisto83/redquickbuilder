@@ -105,13 +105,14 @@ class ProgressView extends Component<any, any> {
 													<th />
 												</tr>
 												<tr>
-													<td>
+													<td
+														onClick={() => {
+															this.props.toggleVisual(
+																`GetValidationMethodForViewType_Details`
+															);
+														}}
+													>
 														<i
-															onClick={() => {
-																this.props.toggleVisual(
-																	`GetValidationMethodForViewType_Details`
-																);
-															}}
 															className={
 																Visual(
 																	state,
@@ -157,7 +158,14 @@ class ProgressView extends Component<any, any> {
 																			node: string;
 																		}) => {
 																			return (
-																				<tr>
+																				<tr
+																					onClick={() => {
+																						Check(
+																							'GetValidationMethodForViewType',
+																							res.node
+																						);
+																					}}
+																				>
 																					<td>
 																						<i
 																							style={{

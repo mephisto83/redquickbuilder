@@ -340,7 +340,6 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, Connect_Screens, async (progresFunc: any) => {
 			await JobService.StartJob(Connect_Screens, currentJobFile, 12, NodeTypes.Screen);
-			//     await ConnectScreens(progresFunc);
 		});
 
 		await run(buildAllProgress, Wait_For_Screen_Connect, async (progresFunc: (arg0: number) => any) => {

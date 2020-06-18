@@ -97,9 +97,7 @@ export function CreateComponentModel(args: any = {}) {
 		defaultArgs = {},
 		navigableScreens = null
 	} = args;
-	if (navigableScreens && navigableScreens.length === 0) {
-		throw new Error('no navigableScreens');
-	}
+
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 	const operations: any = [];
 	const result: any = [];
@@ -115,7 +113,7 @@ export function CreateComponentModel(args: any = {}) {
 		if (agentAccess || args.isSharedComponent) {
 			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
 
-			if (!args.isSharedComponent && navigableScreens) {
+			if (!args.isSharedComponent && navigableScreens.length) {
 				let naviScreen = navigableScreens.find((navigableScreen: Node) => {
 					let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
 					let navViewType = GetNodeProp(navigableScreen, NodeProperties.ViewType);

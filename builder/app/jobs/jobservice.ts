@@ -195,7 +195,7 @@ export default class JobService {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job, JobServiceConstants.JobPath());
 			if (!complete) {
-				await JobService.MakeSureAgentsAreWorking(job, command);
+				//		await JobService.MakeSureAgentsAreWorking(job, command);
 			}
 			await sleep();
 		} while (!complete);
