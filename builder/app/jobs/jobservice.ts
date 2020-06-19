@@ -174,7 +174,7 @@ export default class JobService {
 	static async StartJob(
 		command: string,
 		currentJobFile: JobFile,
-		batchSize: number,
+		batchSize: number | null,
 		modelTypes?: string | string[]
 	): Promise<Job> {
 		let job = await JobService.CreateJob(command, batchSize, modelTypes);
@@ -294,7 +294,7 @@ export default class JobService {
 
 	static async CreateJob(
 		command: string,
-		batchSize: number,
+		batchSize: number | null,
 		modelTypes: string | string[] = NodeTypes.Model
 	): Promise<Job> {
 		if (!modelTypes) {
@@ -307,11 +307,9 @@ export default class JobService {
 		}
 		// let targets = await JobService.getAgentDirectories();
 		let graph = GetCurrentGraph();
-		if (!batchSize) {
-			throw new Error('missing batch size');
-		}
+
 		let available_agents = await this.GetProjects();
-		let chunkSize = Math.max(Math.floor(models.length / (available_agents.length * 2)), 1);
+		let chunkSize = batchSize ? batchSize : Math.max(Math.floor(models.length / (available_agents.length * 2)), 1);
 		if (isNaN(chunkSize)) {
 			chunkSize = 1;
 		}

@@ -110,7 +110,7 @@ async function threadRun(
 	name: string,
 	currentJobFile: JobFile,
 	nodeTypes: string[] | string,
-	chunkSize: number = 12
+	chunkSize: number | null = null
 ) {
 	await run(array, name, async (progresFunc: any) => {
 		await JobService.StartJob(name, currentJobFile, chunkSize, nodeTypes);
@@ -393,7 +393,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			NodeTypes.Screen
 		);
 
-		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode, 50);
+		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode);
 		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
 		await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
 
