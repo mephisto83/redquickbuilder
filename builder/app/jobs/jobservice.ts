@@ -309,7 +309,7 @@ export default class JobService {
 		let graph = GetCurrentGraph();
 
 		let available_agents = await this.GetProjects();
-		let chunkSize = batchSize ? batchSize : Math.max(Math.floor(models.length / (available_agents.length * 2)), 1);
+		let chunkSize = batchSize ? batchSize : Math.max(Math.floor(models.length / available_agents.length), 1);
 		if (isNaN(chunkSize)) {
 			chunkSize = 1;
 		}
