@@ -397,7 +397,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);
 		await threadRun(buildAllProgress, ApplyValidationFromProperties, currentJobFile, NodeTypes.Model);
 
-		await threadRun(buildAllProgress, Connect_Dashboards, currentJobFile, NodeTypes.Screen);
+		await threadRun(buildAllProgress, Connect_Dashboards, currentJobFile, NodeTypes.Screen, 20);
 		await threadRun(buildAllProgress, Build_Dashboards, currentJobFile, NodeTypes.NavigationScreen);
 		await threadRun(buildAllProgress, ChangeInputToSelects, currentJobFile, NodeTypes.Screen);
 		await threadRun(buildAllProgress, CollectionScreenNodes, currentJobFile, NodeTypes.Screen);
