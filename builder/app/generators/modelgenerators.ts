@@ -510,7 +510,7 @@ export default class ModelGenerator {
 					break;
 			}
 		});
-		let template = `public static ${GetNodeTitle(node)}  GetDefaultModel() {
+		let template = `public static ${GetCodeName(node)}  GetDefaultModel() {
       var result = Create();
 
 ${items}
