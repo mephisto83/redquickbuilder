@@ -16,7 +16,8 @@ import {
 	GetNodeByProperties,
 	GetSnakeCase,
 	GetModelPropertyNodes,
-	GetState
+	GetState,
+	GetNodeTitle
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -509,7 +510,7 @@ export default class ModelGenerator {
 					break;
 			}
 		});
-		let template = `public static  GetDefaultModel() {
+		let template = `public static ${GetNodeTitle(node)}  GetDefaultModel() {
       var result = Create();
 
 ${items}
