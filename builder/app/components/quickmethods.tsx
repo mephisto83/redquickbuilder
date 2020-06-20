@@ -49,6 +49,8 @@ import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
 import MenuGenerator from '../generators/menugenerator';
 import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
+import { Node } from '../methods/graph_types';
+import RedressProperties from '../nodepacks/batch/RedressProperties';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -67,8 +69,8 @@ class QuickMethods extends Component<any, any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		function getChosenChildren() {
 			const chosenChildren = UIA.GetModelPropertyChildren(currentNode.id)
-				.filter((child) => UIA.Visual(state, UIA.ChoseModel(child.id)))
-				.map((x) => x.id);
+				.filter((child: Node) => UIA.Visual(state, UIA.ChoseModel(child.id)))
+				.map((x: Node) => x.id);
 			return chosenChildren;
 		}
 		const defaultParameters = () => ({
@@ -164,6 +166,13 @@ class QuickMethods extends Component<any, any, any> {
 										onClick={() => {
 											this.props.setState();
 											DistributeBuildAllJobs();
+										}}
+									/>
+									<TreeViewMenu
+										title={'Redress Properties'}
+										description={RedressProperties.description}
+										toggle={() => {
+											RedressProperties();
 										}}
 									/>
 									<TreeViewMenu
