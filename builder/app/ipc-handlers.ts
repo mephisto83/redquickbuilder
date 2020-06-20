@@ -161,7 +161,6 @@ function setCommandCenter(targetPort: number, port: number) {
 	return Promise.resolve()
 		.then(async () => {
 			if (communicationTower) {
-				console.log('communication tower, set command center');
 				try {
 					await communicationTower.send(
 						{
