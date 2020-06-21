@@ -63,12 +63,12 @@ class CodeEditor extends Component<any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		const code = GetNodeProp(currentNode, NodeProperties.Lambda);
 		const defs = '//<!-uiactions - defs->';
-		let value: string = this.state.value || this.props.value;
+		let value: string = this.state.value || this.props.value || '';
 		value = this.untransformLambda(value);
 		if (value.indexOf(defs) === -1) {
 			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
 			const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
-				const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
+				const enums_ts = GetNodeProp(node, NodeProperties.Enumeration) || [];
 				const larg_ts: any = {};
 				enums_ts.forEach((t: { value: any }) => {
 					larg_ts[MakeConstant(t.value || t)] = t.value;

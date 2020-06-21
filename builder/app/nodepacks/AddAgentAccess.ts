@@ -8,7 +8,7 @@ export default function AddAgentAccess(args: any = {}) {
 	// node1,node2
 	args.model = GetNodeTitle(args.modelId);
 	args.agent = GetNodeTitle(args.agentId);
-	const { linkProps } = args;
+	const { linkProps, methodProps } = args;
 	// model, agent
 	if (!args.model) {
 		throw new Error('missing model argument');
@@ -32,7 +32,7 @@ export default function AddAgentAccess(args: any = {}) {
 				{
 					operation: 'NEW_NODE',
 					options: {
-						callback: function(node: { id: any; }) {
+						callback: function(node: { id: any }) {
 							context.node0 = node.id;
 						}
 					}
@@ -120,6 +120,7 @@ export default function AddAgentAccess(args: any = {}) {
 							AgentAccess: {},
 							nodeTypes: [ 'model' ],
 							...linkProps,
+							methodProps,
 							properties: {
 								isAgent: true
 							}

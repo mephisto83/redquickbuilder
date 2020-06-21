@@ -4,7 +4,7 @@ import { REMOVE_NODE, graphOperation, GetDispatchFunc, GetStateFunc, GetCurrentG
 import AddAgentAccess from './AddAgentAccess';
 
 export default function BuildAgentAccessWeb(args: any) {
-	const { agents, models, agentAccess } = args;
+	const { agents, models, agentAccess, agentMethod } = args;
 
 	const graph = GetCurrentGraph();
 
@@ -23,12 +23,17 @@ export default function BuildAgentAccessWeb(args: any) {
 		agents.forEach((agent: any, agentIndex: any) => {
 			if (agentAccess && agentAccess[agentIndex] && agentAccess[agentIndex][modelIndex]) {
 				const values = agentAccess[agentIndex][modelIndex];
+				const methods =
+					agentMethod[agentIndex] && agentMethod[agentIndex][modelIndex]
+						? agentMethod[agentIndex][modelIndex] || {}
+						: {};
 				if (values) {
 					result.push(
 						...AddAgentAccess({
 							modelId: model,
 							agentId: agent,
-							linkProps: { ...values }
+							linkProps: { ...values },
+							methodProps: { ...methods }
 						})
 					);
 				}

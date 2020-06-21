@@ -17,13 +17,14 @@ import {
 	GetLinkProperty,
 	GetNodeTitle,
 	GetNodeProp,
-	isAccessNode
+	isAccessNode,
+	NodesByType
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
-import { NodeTypes, LinkType } from '../constants/nodetypes';
+import { NodeTypes, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
 import TabContainer from './tabcontainer';
 import Tabs from './tabs';
 import TabContent from './tabcontent';
@@ -32,6 +33,8 @@ import Tab from './tab';
 import { GetNodesByProperties, existsLinkBetween, findLink, existsLinksBetween } from '../methods/graph_methods';
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
+import SelectInput from './selectinput';
+import { FunctionTypes, MethodFunctions } from '../constants/functiontypes';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -41,7 +44,8 @@ class AgentAccessView extends Component<any, any> {
 		this.state = {
 			agents: [],
 			models: [],
-			agentAccess: []
+			agentAccess: [],
+			agentMethod: []
 		};
 	}
 
@@ -49,7 +53,7 @@ class AgentAccessView extends Component<any, any> {
 		return !!this.props.active;
 	}
 
-	setTable(modelIndex, agentIndex, v, value) {
+	setAgentAccess(modelIndex: number, agentIndex: number, v: string, value: boolean) {
 		if (!this.state.agentAccess[agentIndex]) {
 			this.state.agentAccess[agentIndex] = {};
 		}
@@ -59,8 +63,44 @@ class AgentAccessView extends Component<any, any> {
 		this.state.agentAccess[agentIndex][modelIndex][v] = value;
 	}
 
+	setAgentMethod(modelIndex: number, agentIndex: number, v: string, functionType: string) {
+		if (!this.state.agentMethod[agentIndex]) {
+			this.state.agentMethod[agentIndex] = {};
+		}
+		if (!this.state.agentMethod[agentIndex][modelIndex]) {
+			this.state.agentMethod[agentIndex][modelIndex] = {};
+		}
+		if (typeof this.state.agentMethod[agentIndex][modelIndex][v] === 'string') {
+			this.state.agentMethod[agentIndex][modelIndex][v] = {
+				functionType: this.state.agentMethod[agentIndex][modelIndex][v]
+			};
+		}
+		if (!this.state.agentMethod[agentIndex][modelIndex][v]) {
+			this.state.agentMethod[agentIndex][modelIndex][v] = { properties: {} };
+		}
+		this.state.agentMethod[agentIndex][modelIndex][v].functionType = functionType;
+	}
+
+	setAgentMethodProperty(modelIndex: number, agentIndex: number, v: string, key: string, value: string) {
+		if (!this.state.agentMethod[agentIndex]) {
+			this.state.agentMethod[agentIndex] = {};
+		}
+		if (!this.state.agentMethod[agentIndex][modelIndex]) {
+			this.state.agentMethod[agentIndex][modelIndex] = {};
+		}
+		if (typeof this.state.agentMethod[agentIndex][modelIndex][v] === 'string') {
+			this.state.agentMethod[agentIndex][modelIndex][v] = {
+				functionType: this.state.agentMethod[agentIndex][modelIndex][v]
+			};
+		}
+		if (!this.state.agentMethod[agentIndex][modelIndex][v]) {
+			this.state.agentMethod[agentIndex][modelIndex][v] = { properties: {} };
+		}
+		this.state.agentMethod[agentIndex][modelIndex][v].properties[key] = value;
+	}
+
 	render() {
-    const active = this.active();
+		const active = this.active();
 
 		if (!active) {
 			return <div />;
@@ -86,7 +126,7 @@ class AgentAccessView extends Component<any, any> {
 								<FormControl>
 									<CheckBox
 										label={Titles.BindAll}
-										onChange={(value) => {
+										onChange={(value: any) => {
 											this.setState({ bindAll: value });
 										}}
 										value={this.state.bindAll}
@@ -110,6 +150,46 @@ class AgentAccessView extends Component<any, any> {
 													},
 													graph
 												).map((d) => d.id),
+												agentmethod: onlyAgents.map((agent) => {
+													const agentAccessDescription = accessDescriptions.filter((v) =>
+														existsLinkBetween(graph, {
+															source: agent.id,
+															target: v.id,
+															type: LinkType.AgentAccess
+														})
+													);
+													return GetNodesByProperties(
+														{
+															[NodeProperties.NODEType]: NodeTypes.Model
+														},
+														graph
+													).map((model) => {
+														const accessDescription = agentAccessDescription.find((v) =>
+															isAccessNode(agent, model, v)
+														);
+														if (accessDescription) {
+															const link = findLink(graph, {
+																source: agent.id,
+																target: accessDescription.id
+															});
+															let methodProps = GetLinkProperty(
+																link,
+																LinkPropertyKeys.MethodProps
+															);
+															return {
+																...methodProps
+															};
+														}
+
+														return {
+															[ViewTypes.GetAll]: false,
+															[ViewTypes.Get]: false,
+															[ViewTypes.Create]: false,
+															[ViewTypes.Update]: false,
+															[ViewTypes.Delete]: false
+														};
+													});
+												}),
 												agentAccess: onlyAgents.map((agent) => {
 													const agentAccessDescription = accessDescriptions.filter((v) =>
 														existsLinkBetween(graph, {
@@ -180,16 +260,23 @@ class AgentAccessView extends Component<any, any> {
 								<Tabs>
 									<Tab
 										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}
-										title="agentaccessview"
+										title="Access"
 										onClick={() => {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agentaccessview');
+										}}
+									/>
+									<Tab
+										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}
+										title="Method"
+										onClick={() => {
+											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agentmethoduse');
 										}}
 									/>
 								</Tabs>
 							</TabContainer>
 							<TabContent>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}>
-									<Box>
+									<Box maxheight={700}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -244,7 +331,7 @@ class AgentAccessView extends Component<any, any> {
 																		);
 																		this.state.models.forEach(
 																			(model, modelIndex) => {
-																				this.setTable(
+																				this.setAgentAccess(
 																					modelIndex,
 																					agentIndex,
 																					v,
@@ -292,7 +379,7 @@ class AgentAccessView extends Component<any, any> {
 																);
 																this.state.agents.forEach((_, agentIndex) => {
 																	return Object.values(ViewTypes).some((v) => {
-																		this.setTable(
+																		this.setAgentAccess(
 																			modelIndex,
 																			agentIndex,
 																			v,
@@ -333,7 +420,7 @@ class AgentAccessView extends Component<any, any> {
 																				)} ${GetNodeTitle(model)}`}
 																				style={{ height: 40, width: 40 }}
 																				onChange={(value) => {
-																					this.setTable(
+																					this.setAgentAccess(
 																						modelIndex,
 																						agentIndex,
 																						v,
@@ -365,7 +452,219 @@ class AgentAccessView extends Component<any, any> {
 																})
 														)
 													);
-													return <tr key={`key${model}`}>{result.flatten()}</tr>;
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</Box>
+								</TabPane>
+								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
+									<Box maxheight={700}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th
+														colSpan={
+															this.state.agents.length * Object.keys(ViewTypes).length + 1
+														}
+														style={{
+															cursor: 'pointer',
+															display: 'table-caption',
+															textAlign: 'center',
+															fontSize: '20px',
+															fontWeight: 'bold'
+														}}
+													>
+														Agent Methods
+													</th>
+												</tr>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th colSpan={5}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+												<tr>
+													<th />
+													{[]
+														.interpolate(
+															0,
+															this.state.agents.length,
+															(agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => (
+																	<th onClick={() => {}}>{v}</th>
+																))
+														)
+														.flatten()}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.models.map((model: string, modelIndex: number) => {
+													const result = [
+														<td
+															style={{ cursor: 'pointer' }}
+															key={`${model}`}
+															onClick={() => {}}
+														>
+															{GetNodeTitle(model)}
+														</td>
+													];
+
+													result.push(
+														...[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number, agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => {
+																	const accessIndex =
+																		modelIndex * this.state.agents.length +
+																		agentIndex;
+																	const agent = this.state.agents[index];
+																	const functionType =
+																		this.state.agentMethod[agentIndex] &&
+																		this.state.agentMethod[agentIndex][
+																			modelIndex
+																		] &&
+																		this.state.agentMethod[agentIndex][modelIndex][
+																			v
+																		]
+																			? this.state.agentMethod[agentIndex][
+																					modelIndex
+																				][v].functionType
+																			: '';
+																	let functionOptions: any = null;
+																	if (
+																		functionType &&
+																		MethodFunctions[FunctionTypes[functionType]]
+																	) {
+																		let { constraints } = MethodFunctions[
+																			FunctionTypes[functionType]
+																		];
+																		if (constraints) {
+																			functionOptions = Object.keys(
+																				constraints
+																			).map((functionKey: string) => {
+																				const value =
+																					this.state.agentMethod[
+																						agentIndex
+																					] &&
+																					this.state.agentMethod[agentIndex][
+																						modelIndex
+																					] &&
+																					this.state.agentMethod[agentIndex][
+																						modelIndex
+																					][v]
+																						? this.state.agentMethod[
+																								agentIndex
+																							][modelIndex][v][functionKey]
+																						: '';
+																				return (
+																					<SelectInput
+																						label={functionKey}
+																						values={value}
+																						onChange={(value: string) => {
+																							this.setAgentMethodProperty(
+																								modelIndex,
+																								agentIndex,
+																								v,
+																								functionKey,
+																								value
+																							);
+																						}}
+																						options={NodesByType(
+																							null,
+																							constraints[functionKey]
+																								.nodeTypes
+																						).toNodeSelect()}
+																					/>
+																				);
+																			});
+																		}
+																	}
+																	return (
+																		<td
+																			key={`${model} ${modelIndex} ${this.state
+																				.agents[
+																				index
+																			]} ${agentIndex} ${ViewTypes[v]}`}
+																		>
+																			{!this.state.agentAccess[agentIndex][
+																				modelIndex
+																			][ViewTypes[v]] ? null : (
+																				<SelectInput
+																					label={' '}
+																					options={Object.keys(
+																						FunctionTypes
+																					).map((d) => {
+																						if (
+																							MethodFunctions[
+																								FunctionTypes[d]
+																							] &&
+																							MethodFunctions[
+																								FunctionTypes[d]
+																							].title
+																						) {
+																							return {
+																								title:
+																									MethodFunctions[
+																										FunctionTypes[d]
+																									].title,
+																								value: d
+																							};
+																						}
+																						return {
+																							title: d,
+																							value: d
+																						};
+																					})}
+																					onChange={(value: string) => {
+																						this.setAgentMethod(
+																							modelIndex,
+																							agentIndex,
+																							v,
+																							value
+																						);
+																						this.setState({
+																							agentMethod: [
+																								...this.state
+																									.agentMethod
+																							]
+																						});
+																					}}
+																					value={functionType}
+																				/>
+																			)}
+																			{functionOptions}
+																		</td>
+																	);
+																})
+														)
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
 												})}
 											</tbody>
 										</table>

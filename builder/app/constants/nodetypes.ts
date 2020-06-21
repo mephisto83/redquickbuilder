@@ -906,6 +906,7 @@ export const LinkPropertyKeys = {
 	InstanceUpdate: 'InstanceUpdate',
 	ComponentTag: 'ComponentTag',
 	ComponentStyle: 'ComponentStyle',
+	MethodProps: 'methodProps',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
 	Enumeration: 'Enumeration',
