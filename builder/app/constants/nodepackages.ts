@@ -4185,6 +4185,7 @@ function CreateFunction(option: {
 								case FunctionTemplateKeys.Model:
 								case FunctionTemplateKeys.Agent:
 								case FunctionTemplateKeys.User:
+								case FunctionTemplateKeys.Owner:
 								case FunctionTemplateKeys.ModelOutput:
 									methodProps = {
 										...methodProps,

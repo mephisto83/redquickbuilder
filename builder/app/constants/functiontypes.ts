@@ -27,8 +27,8 @@ export const FunctionTypes = {
 	//Delete
 	Delete_M2M_By_Reference: 'Delete M2M by reference => list',
 	//Unique object to an agent function
-  Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
-  Get_Default_Object_For_Agent:'Get_Default_Object_For_Agent',
+	Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
+	Get_Default_Object_For_Agent: 'Get_Default_Object_For_Agent',
 
 	//Functions with Object result
 	Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
@@ -84,6 +84,7 @@ export const FunctionTemplateKeys: { [str: string]: string } = {
 	Parent: 'parent',
 	AgentInstance: 'agent_instance',
 	Agent: 'agent',
+	Owner: 'owner',
 	Item: 'item',
 	AgentProperty: 'agent-property',
 	AgentType: 'agent_type',
@@ -1117,9 +1118,9 @@ export const MethodFunctions: any = {
 		isList: true,
 		method: Methods.GetAll,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
-  [FunctionTypes.Get_Default_Object_For_Agent] :{
-    title: Titles.Get_Object_Agent_Value__Object,
+	},
+	[FunctionTypes.Get_Default_Object_For_Agent]: {
+		title: Titles.Get_Object_Agent_Value__Object,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a}`;
 		},
@@ -1170,7 +1171,7 @@ export const MethodFunctions: any = {
 		isList: false,
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
+	},
 	[FunctionTypes.Get_Agent_Value__IListObject]: {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
