@@ -534,18 +534,16 @@ class AgentAccessView extends Component<any, any> {
 																		modelIndex * this.state.agents.length +
 																		agentIndex;
 																	const agent = this.state.agents[index];
-																	const functionType =
-																		this.state.agentMethod[agentIndex] &&
-																		this.state.agentMethod[agentIndex][
-																			modelIndex
-																		] &&
-																		this.state.agentMethod[agentIndex][modelIndex][
-																			v
-																		]
-																			? this.state.agentMethod[agentIndex][
-																					modelIndex
-																				][v].functionType
-																			: '';
+																	const functionType = this.hasFunctionViewTypeValue(
+																		agentIndex,
+																		modelIndex,
+																		v
+																	)
+																		? this.state.agentMethod[agentIndex][
+																				modelIndex
+																			][v].functionType
+																		: '';
+																	let functionKeySelect: any = null;
 																	let functionOptions: any = null;
 																	if (
 																		functionType &&
@@ -555,27 +553,57 @@ class AgentAccessView extends Component<any, any> {
 																			FunctionTypes[functionType]
 																		];
 																		if (constraints) {
-																			functionOptions = Object.keys(
-																				constraints
-																			).map((functionKey: string) => {
-																				const value =
-																					this.state.agentMethod[
-																						agentIndex
-																					] &&
-																					this.state.agentMethod[agentIndex][
+																			functionKeySelect = (
+																				<SelectInput
+																					onChange={(c: string) => {
+																						this.setState({
+																							[this.getKey(
+																								agentIndex,
+																								modelIndex,
+																								v
+																							)]: c
+																						});
+																					}}
+																					label={'Constraint'}
+																					value={
+																						this.state[
+																							this.getKey(
+																								agentIndex,
+																								modelIndex,
+																								v
+																							)
+																						]
+																					}
+																					options={Object.keys(
+																						constraints
+																					).map((d) => ({
+																						title: d,
+																						value: d
+																					}))}
+																				/>
+																			);
+																			let functionKey = this.state[
+																				this.getKey(agentIndex, modelIndex, v)
+																			];
+																			const value = this.hasFunctionKeyValue(
+																				agentIndex,
+																				modelIndex,
+																				v,
+																				functionKey
+																			)
+																				? this.state.agentMethod[agentIndex][
 																						modelIndex
-																					] &&
-																					this.state.agentMethod[agentIndex][
-																						modelIndex
-																					][v]
-																						? this.state.agentMethod[
-																								agentIndex
-																							][modelIndex][v][functionKey]
-																						: '';
-																				return (
+																					][v].properties[functionKey]
+																				: '';
+																			if (
+																				constraints[functionKey] &&
+																				constraints[functionKey].nodeTypes
+																			)
+																				functionOptions = (
 																					<SelectInput
 																						label={functionKey}
-																						values={value}
+																						key={`func-key${functionKey}`}
+																						value={value}
 																						onChange={(value: string) => {
 																							this.setAgentMethodProperty(
 																								modelIndex,
@@ -592,7 +620,6 @@ class AgentAccessView extends Component<any, any> {
 																						).toNodeSelect()}
 																					/>
 																				);
-																			});
 																		}
 																	}
 																	return (
@@ -648,6 +675,7 @@ class AgentAccessView extends Component<any, any> {
 																					value={functionType}
 																				/>
 																			)}
+																			{functionKeySelect}
 																			{functionOptions}
 																		</td>
 																	);
@@ -675,6 +703,26 @@ class AgentAccessView extends Component<any, any> {
 					</div>
 				</section>
 			</TopViewer>
+		);
+	}
+	private getKey(a: number, b: number, c: string) {
+		return `${a}-${b}-${c}`;
+	}
+	private hasFunctionViewTypeValue(agentIndex: number, modelIndex: number, v: string) {
+		return (
+			this.state.agentMethod[agentIndex] &&
+			this.state.agentMethod[agentIndex][modelIndex] &&
+			this.state.agentMethod[agentIndex][modelIndex][v]
+		);
+	}
+
+	private hasFunctionKeyValue(agentIndex: number, modelIndex: number, v: string, functionKey: string) {
+		return (
+			this.state.agentMethod[agentIndex] &&
+			this.state.agentMethod[agentIndex][modelIndex] &&
+			this.state.agentMethod[agentIndex][modelIndex][v] &&
+			this.state.agentMethod[agentIndex][modelIndex][v].properties &&
+			this.state.agentMethod[agentIndex][modelIndex][v].properties[functionKey]
 		);
 	}
 }
