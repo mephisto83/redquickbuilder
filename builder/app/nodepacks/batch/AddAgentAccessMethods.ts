@@ -9,7 +9,7 @@ import {
 	GetNodeById
 } from '../../actions/uiactions';
 import { NodeTypes, LinkType, Methods, LinkPropertyKeys } from '../../constants/nodetypes';
-import { MethodFunctions, HTTP_METHODS } from '../../constants/functiontypes';
+import { MethodFunctions, HTTP_METHODS, FunctionTypes } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';
 import { findLink, SetPause, GetNodeLinkedTo } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
@@ -32,25 +32,26 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 			link: LinkType.AgentAccess
 		});
 		if (model && agent) {
-			let modeLink = findLink(graph, {
+			let agentLink = findLink(graph, {
 				target: agentAccess.id,
-				source: model.id
+				source: agent.id
 			});
-			if (modeLink) {
-				let methodProps: any = GetLinkProperty(modeLink, LinkPropertyKeys.MethodProps);
+			if (agentLink) {
+				let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
 				if (methodProps) {
 					Object.keys(methodProps).forEach((key: string) => {
 						let methodDescription: MethodDescription = methodProps[key];
 						if (methodDescription && methodDescription.functionType) {
 							let functionType = methodDescription.functionType;
-							const functionName = MethodFunctions[methodDescription.functionType].titleTemplate(
+							let methodProperties = MethodFunctions[FunctionTypes[methodDescription.functionType]];
+							const functionName = methodProperties.titleTemplate(
 								GetNodeTitle(agentAccess),
 								GetNodeTitle(agent)
 							);
-							if (functionType && MethodFunctions[functionType]) {
+							if (functionType && methodProperties) {
 								let httpMethod;
-								if (MethodFunctions[functionType].method) {
-									switch (MethodFunctions[functionType].method) {
+								if (methodProperties.method) {
+									switch (methodProperties.method) {
 										case Methods.Create:
 										case Methods.Update:
 											httpMethod = HTTP_METHODS.POST;
@@ -65,19 +66,19 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 										method: {
 											method: CreateAgentFunction({
 												nodePackageType: functionName,
-												methodType: MethodFunctions[functionType].method,
+												methodType: methodProperties.method,
 												model: methodDescription.properties.model
 													? GetNodeById(methodDescription.properties.model)
-													: null,
+													: model,
 												model_output: methodDescription.properties.model_output
 													? GetNodeById(methodDescription.properties.model_output)
-													: null,
+													: model,
 												parentId: methodDescription.properties.parent
 													? GetNodeById(methodDescription.properties.parent)
 													: null,
 												agent,
 												httpMethod, //might not be used
-												functionType,
+												functionType: FunctionTypes[methodDescription.functionType],
 												functionName
 											})
 										},

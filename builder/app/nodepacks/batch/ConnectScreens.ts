@@ -5,16 +5,23 @@ import {
 	GetStateFunc,
 	GetDispatchFunc,
 	graphOperation,
-	ScreenOptionFilter
+	ScreenOptionFilter,
+	GetLinkProperty,
+	GetCurrentGraph,
+	GetNodeByProperties,
+	GetMethodProps,
+  GetNodesByProperties
 } from '../../actions/uiactions';
-import { NodeTypes, NodeProperties } from '../../constants/nodetypes';
-import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';
+import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys } from '../../constants/nodetypes';
+import { MethodFunctions, FunctionTemplateKeys, FunctionTypes } from '../../constants/functiontypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import ScreenConnectGet from '../screens/ScreenConnectGet';
 import ScreenConnectGetAll from '../screens/ScreenConnectGetAll';
 import ScreenConnectCreate from '../screens/ScreenConnectCreate';
 import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 import { Node } from '../../methods/graph_types';
+import { GetNodeLinkedTo, findLink } from '../../methods/graph_methods';
+import { MethodDescription } from '../../interface/methodprops';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -116,12 +123,62 @@ export function GetPossibleComponentDidMount(screen: any) {
 			return true;
 		});
 }
+export function GetAccessAgentPreferredMethods(screen: any, agentId: string, screenModel: string, viewType: string) {
+	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
+	const graph = GetCurrentGraph();
+	let result: Node[] = [];
+	agentAccesses.filter((agentAccess: Node, mindex: any) => {
+		let model = GetNodeLinkedTo(graph, {
+			id: agentAccess.id,
+			link: LinkType.ModelAccess
+		});
+		let agent = GetNodeLinkedTo(graph, {
+			id: agentAccess.id,
+			link: LinkType.AgentAccess
+		});
+		if (model && agent) {
+			let agentLink = findLink(graph, {
+				target: agentAccess.id,
+				source: agent.id
+			});
+			if (agentLink) {
+				let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
+				if (methodProps) {
+					let methodDescription: MethodDescription = methodProps[viewType];
+					if (methodDescription) {
+						methodDescription.functionType;
+						let functionType = FunctionTypes[methodDescription.functionType];
+						if (functionType) {
+							result.push(
+								...GetNodesByProperties({
+									[NodeProperties.FunctionType]: functionType,
+									[NodeProperties.NODEType]: NodeTypes.Method
+								}).filter((methodNode: Node) => {
+									let methodProps = GetMethodProps(methodNode);
+									return (
+										methodProps[FunctionTemplateKeys.Model] === model.id &&
+										methodProps[FunctionTemplateKeys.Agent] === agent.id
+									);
+								})
+							);
+						}
+					}
+				}
+			}
+		}
+	});
 
+	return result;
+}
 export function GetPossibleMethods(screen: any) {
 	const viewType = GetNodeProp(screen, NodeProperties.ViewType);
 	const screenModel = GetNodeProp(screen, NodeProperties.Model);
 	const agentId = GetNodeProp(screen, NodeProperties.Agent);
 
+	let preferredMethods = GetAccessAgentPreferredMethods(screen, agentId, screenModel, viewType);
+	if (preferredMethods && preferredMethods.length) {
+		return preferredMethods;
+	}
 	return NodesByType(null, NodeTypes.Method)
 		.filter((x: string | Node) => {
 			if (screenModel) {

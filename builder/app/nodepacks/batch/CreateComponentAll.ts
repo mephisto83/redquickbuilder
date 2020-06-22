@@ -12,7 +12,8 @@ import {
 	GetNodesByProperties,
 	isAccessNode,
 	GetCurrentGraph,
-	GetLinkProperty
+	GetLinkProperty,
+  hasAccessNode
 } from '../../actions/uiactions';
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
@@ -108,7 +109,7 @@ export function CreateComponentModel(args: any = {}) {
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 		);
 		const agentAccess = agentAccesses.find((aa: any) =>
-			isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
+			hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
 		);
 		if (agentAccess || args.isSharedComponent) {
 			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;

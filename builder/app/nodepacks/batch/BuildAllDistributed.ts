@@ -42,6 +42,7 @@ import ModifyUpdateLinks from '../ModifyUpdateLinks';
 import AddUserRequirements from './AddUserRequirements';
 import ModifyAgentMethods from './ModifyAgentMethods';
 import AddAgentAccessMethods from './AddAgentAccessMethods';
+import UpdateScreenParameters from '../screens/UpdateScreenParameters';
 
 interface BuildStep {
 	progress?: number;
@@ -154,6 +155,7 @@ async function run(array: BuildStep[], name: string, func: Function) {
 
 const Create_View_Types = 'Create View Types';
 const Add_Agent_Methods = 'Add Agent Methods';
+const Update_Screen_Parameters = 'Update Screen Paramters';
 const Modify_Agent_Methods = 'Modify Agent Methods';
 const Add_Agent_Access_Methods = 'Add Agent Access Methods';
 export const Create_Component_All = 'Create Component All';
@@ -203,6 +205,7 @@ const buildAllProgress = [
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
 	{ name: Collect_Into_Graph },
+	{ name: Update_Screen_Parameters },
 	{ name: Select_All_On_Model_Filters },
 	{ name: Add_Filters_To_Get_All },
 	{ name: Create_Dashboard },
@@ -315,7 +318,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				await JobService.WaitForJob(Create_Component_All, currentJobFile);
 			}
 		);
-
+		await run(buildAllProgress, Update_Screen_Parameters, async (progressFunc: any) => {
+      await UpdateScreenParameters(progressFunc);
+    });
 		await run(buildAllProgress, Update_Screen_Urls, async (progressFunc: any) => {
 			await UpdateScreenUrls(progressFunc);
 		});

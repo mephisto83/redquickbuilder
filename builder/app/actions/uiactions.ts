@@ -3896,8 +3896,8 @@ export function isAccessNode(agent: any, model: any, aa: { id: any }, viewType?:
 		})
 	) {
 		let link = GraphMethods.findLink(graph, {
-      source: agent.id,
-			target: aa.id,
+			source: agent.id,
+			target: aa.id
 		});
 		let methodProps = GetLinkProperty(link, NodeConstants.LinkPropertyKeys.MethodProps);
 		if (methodProps) {
@@ -3906,6 +3906,37 @@ export function isAccessNode(agent: any, model: any, aa: { id: any }, viewType?:
 			}
 			return methodProps[viewType];
 		}
+	}
+	return false;
+}
+export function getAccessScreen(screen: { id: string }) {
+	return (access: { id: string }) => {
+		let agent = GetNodeById(GetNodeProp(screen, NodeProperties.Agent));
+		let model = GetNodeById(GetNodeProp(screen, NodeProperties.Model));
+		let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+
+		return hasAccessNode(agent, model, access, viewType);
+	};
+}
+export function hasAccessNode(agent: any, model: any, aa: { id: any }, viewType?: string | null, graph?: any): any {
+	graph = graph || GetCurrentGraph();
+	if (
+		GraphMethods.existsLinkBetween(graph, {
+			source: agent.id,
+			target: aa.id,
+			type: NodeConstants.LinkType.AgentAccess
+		}) &&
+		GraphMethods.existsLinkBetween(graph, {
+			source: aa.id,
+			target: model.id,
+			type: NodeConstants.LinkType.ModelAccess
+		})
+	) {
+		let link = GraphMethods.findLink(graph, {
+			source: agent.id,
+			target: aa.id
+		});
+		return viewType ? GetLinkProperty(link, viewType) : false;
 	}
 	return false;
 }

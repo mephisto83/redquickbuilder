@@ -51,6 +51,7 @@ import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
 import { Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
+import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -365,6 +366,14 @@ class QuickMethods extends Component<any, any, any> {
 										AddAgentMethods(() => {});
 									}}
 								/>
+								<TreeViewMenu
+									title={'Add Agent Access Methods'}
+									icon="fa fa-plus"
+									onClick={() => {
+										AddAgentAccessMethods(() => {});
+									}}
+								/>
+
 							</TreeViewMenu>
 
 							<TreeViewMenu

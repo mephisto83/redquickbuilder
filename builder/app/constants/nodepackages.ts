@@ -4525,7 +4525,7 @@ export function CreateAgentFunction(option: any): any {
 									} else {
 										methodProps[constraint.key] = parent.id;
 									}
-								} else if (constraint.key === FunctionTemplateKeys.ModelOutput) {
+								} else if (constraint.key === FunctionTemplateKeys.ModelOutput && model_output) {
 									methodProps[constraint.key] =
 										typeof model_output === 'string' ? model_output : model_output.id;
 								} else if (!modelNotRequired) {
