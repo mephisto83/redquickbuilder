@@ -108,7 +108,7 @@ export function CreateComponentModel(args: any = {}) {
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 		);
 		const agentAccess = agentAccesses.find((aa: any) =>
-			isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa)
+			isAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
 		);
 		if (agentAccess || args.isSharedComponent) {
 			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;

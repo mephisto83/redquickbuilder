@@ -421,6 +421,7 @@ export const Update_Object_Agent_Value__Object_With_Object = 'Update Object by A
 export const AddLifeCylceEvents = 'Add Life Cycle Events';
 export const CopyPermissionConditions = 'Copy Permission Conditions';
 export const CopyValidationConditions = 'Copy Validation Conditions';
+export const Get_Default_Object_For_Agent = 'Get Default Object for Agent';
 export const Functions = 'Functions';
 export const IncludeEventHandler = 'Include Event Handler';
 export const Login = 'Login';

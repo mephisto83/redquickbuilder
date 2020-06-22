@@ -40,6 +40,8 @@ import CollectionDataChainsIntoCollections, {
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
 import AddUserRequirements from './AddUserRequirements';
+import ModifyAgentMethods from './ModifyAgentMethods';
+import AddAgentAccessMethods from './AddAgentAccessMethods';
 
 interface BuildStep {
 	progress?: number;
@@ -152,6 +154,8 @@ async function run(array: BuildStep[], name: string, func: Function) {
 
 const Create_View_Types = 'Create View Types';
 const Add_Agent_Methods = 'Add Agent Methods';
+const Modify_Agent_Methods = 'Modify Agent Methods';
+const Add_Agent_Access_Methods = 'Add Agent Access Methods';
 export const Create_Component_All = 'Create Component All';
 const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
 const Select_All_On_Model_Filters = 'Select All On Model Filters';
@@ -193,6 +197,8 @@ const buildAllProgress = [
 	{ name: Create_View_Types },
 	{ name: AddTitleService },
 	{ name: Add_Agent_Methods },
+	{ name: Modify_Agent_Methods },
+	{ name: Add_Agent_Access_Methods },
 	{ name: ListRequiredModelTitles },
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
@@ -263,6 +269,12 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, Add_Agent_Methods, async (progresFunc: any) => {
 			await AddAgentMethods(progresFunc);
+		});
+		await run(buildAllProgress, Modify_Agent_Methods, async (progressFunc: any) => {
+			await ModifyAgentMethods(progressFunc);
+		});
+		await run(buildAllProgress, Add_Agent_Access_Methods, async (progressFunc: any) => {
+			await AddAgentAccessMethods(progressFunc);
 		});
 
 		await run(buildAllProgress, Create_Dashboard, async (progresFunc: (arg0: number) => any) => {

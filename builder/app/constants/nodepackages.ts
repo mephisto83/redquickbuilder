@@ -4410,6 +4410,7 @@ export function CreateAgentFunction(option: any): any {
 		viewPackage,
 		modelNotRequired = false,
 		model,
+		model_output,
 		agent
 	} = option;
 
@@ -4519,7 +4520,14 @@ export function CreateAgentFunction(option: any): any {
 										}
 									});
 								} else if (constraint.key === FunctionTemplateKeys.Parent) {
-									methodProps[constraint.key] = parent.id;
+									if (typeof parent === 'string') {
+										methodProps[constraint.key] = parent;
+									} else {
+										methodProps[constraint.key] = parent.id;
+									}
+								} else if (constraint.key === FunctionTemplateKeys.ModelOutput) {
+									methodProps[constraint.key] =
+										typeof model_output === 'string' ? model_output : model_output.id;
 								} else if (!modelNotRequired) {
 									methodProps[constraint.key] = model.id;
 								}

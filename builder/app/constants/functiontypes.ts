@@ -665,6 +665,11 @@ export const TEMPLATE_PARAMETERS = {
 		isGuid: true
 	}
 };
+export const TEMPLATE_PARENT_PARAMETERS = {
+	[TEMPLATE_PARAMETER_KEYS.ParentId]: {
+		isGuid: true
+	}
+};
 export const GET_QUERY_PARAMETERS = {
 	[QUERY_PARAMETER_KEYS.Id]: {
 		isGuid: true
@@ -1120,7 +1125,7 @@ export const MethodFunctions: any = {
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
 	[FunctionTypes.Get_Default_Object_For_Agent]: {
-		title: Titles.Get_Object_Agent_Value__Object,
+		title: Titles.Get_Default_Object_For_Agent,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a}`;
 		},
@@ -1158,7 +1163,10 @@ export const MethodFunctions: any = {
 			[FunctionTemplateKeys.Permission]: {
 				key: FunctionTemplateKeys.Permission,
 				nodeTypes: [ NodeTypes.Permission ]
-			}
+      },
+      [FunctionTemplateKeys.ModelFilter]:{
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]}
 		},
 		output: {
 			...COMMON_OUTPUT.OBJECT
@@ -1428,7 +1436,7 @@ export const MethodFunctions: any = {
 		parameters: {
 			body: false,
 			parameters: {
-				path: [ FunctionTemplateKeys.Parent ],
+				template: { ...TEMPLATE_PARENT_PARAMETERS },
 				query: { ...QUERY_PARAMETERS }
 			}
 		},

@@ -914,7 +914,7 @@ export const LinkPropertyKeys = {
 	DefaultValue: 'DefaultValue'
 };
 
-export const LinkProperties: any = {
+export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
 	},

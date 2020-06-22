@@ -3881,9 +3881,9 @@ export function deleteAllSelected() {
 	};
 }
 
-export function isAccessNode(agent: any, model: any, aa: { id: any }, graph?: any): any {
+export function isAccessNode(agent: any, model: any, aa: { id: any }, viewType?: string | null, graph?: any): any {
 	graph = graph || GetCurrentGraph();
-	return (
+	if (
 		GraphMethods.existsLinkBetween(graph, {
 			source: agent.id,
 			target: aa.id,
@@ -3894,7 +3894,20 @@ export function isAccessNode(agent: any, model: any, aa: { id: any }, graph?: an
 			target: model.id,
 			type: NodeConstants.LinkType.ModelAccess
 		})
-	);
+	) {
+		let link = GraphMethods.findLink(graph, {
+      source: agent.id,
+			target: aa.id,
+		});
+		let methodProps = GetLinkProperty(link, NodeConstants.LinkPropertyKeys.MethodProps);
+		if (methodProps) {
+			if (!viewType) {
+				return methodProps;
+			}
+			return methodProps[viewType];
+		}
+	}
+	return false;
 }
 
 export function setViewPackageStamp(viewPackage: any, stamp: any) {

@@ -2151,7 +2151,7 @@ class Dashboard extends Component<any, any> {
 								active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR}
 								value={UIA.Visual(state, UIA.CODE_EDITOR_INIT_VALUE)}
 							/>
-							{mainContent === MIND_MAP || true ? (
+							{mainContent === MIND_MAP ? (
 								<MindMap
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
 									onNodeClick={(nodeId, boundingBox) => {

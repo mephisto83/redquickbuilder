@@ -124,6 +124,8 @@ import BuildNavigationScreen from '../nodepacks/BuildNavigationScreen';
 import BuildLowerMenus from '../nodepacks/screens/menus/BuildLowerMenus';
 import CreateMirrorMenu from '../nodepacks/screens/menus/CreateMirrorMenu';
 import EnumerationLinkMenu from './enumerationlinkmenu';
+import AddFiltersToMethod from '../nodepacks/method/AddFilterToMethod';
+import AddMethodFilterToMethod from '../nodepacks/method/AddFilterToModelFilter';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1460,22 +1462,22 @@ class ContextMenu extends Component<any, any> {
 								value={GetNodeProp(currentNode, NodeProperties.Agent)}
 							/>
 						</TreeViewItemContainer>
-            <TreeViewItemContainer>
+						<TreeViewItemContainer>
 							<TextInput
-									label={Titles.DefaultValue}
-									onChange={(value: any) => {
-										this.props.graphOperation([
-											{
-												operation: UIA.CHANGE_NODE_PROPERTY,
-												options: {
-													prop: UIA.NodeProperties.DefaultValue,
-													id: currentNode.id,
-													value: value
-												}
+								label={Titles.DefaultValue}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.DefaultValue,
+												id: currentNode.id,
+												value: value
 											}
-										]);
-									}}
-									value={GetNodeProp(currentNode, NodeProperties.DefaultValue)}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.DefaultValue)}
 							/>
 						</TreeViewItemContainer>
 					</TreeViewMenu>
@@ -2619,6 +2621,31 @@ class ContextMenu extends Component<any, any> {
 								}}
 							/>
 						</TreeViewMenu>
+					</TreeViewMenu>
+				];
+			case NodeTypes.Method:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+          <TreeViewMenu
+            title={`${Titles.Add} Item Filter`}
+            onClick={() => {
+              AddFiltersToMethod({ method: currentNode.id });
+            }}
+          />
+          <TreeViewMenu
+            title={`${Titles.Add} Model Filter`}
+            onClick={() => {
+              AddMethodFilterToMethod({ method: currentNode.id });
+            }}
+          />
 					</TreeViewMenu>
 				];
 			case NodeTypes.Model:

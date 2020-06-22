@@ -71,13 +71,13 @@ class ProgressView extends Component<any, any> {
 						<div className="col-md-12">
 							<TabContainer>
 								<Tabs>
-									<Tab
+									{/* <Tab
 										active={VisualEq(state, PROGRESS_VIEW_TAB, 'Variables')}
 										title={'Local'}
 										onClick={() => {
 											this.props.setVisual(PROGRESS_VIEW_TAB, 'Variables');
 										}}
-									/>
+									/> */}
 									<Tab
 										active={VisualEq(state, PROGRESS_VIEW_TAB, 'Git Run')}
 										title={'Render Run'}
@@ -86,13 +86,13 @@ class ProgressView extends Component<any, any> {
 											this.props.loadGitRuns();
 										}}
 									/>
-									<Tab
+									{/* <Tab
 										active={VisualEq(state, PROGRESS_VIEW_TAB, 'Others')}
 										title={'Others'}
 										onClick={() => {
 											this.props.setVisual(PROGRESS_VIEW_TAB, 'Others');
 										}}
-									/>
+									/> */}
 								</Tabs>
 							</TabContainer>
 							<TabContent>
