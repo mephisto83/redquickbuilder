@@ -18,7 +18,8 @@ import {
 	GetNodeTitle,
 	GetNodeProp,
 	isAccessNode,
-	NodesByType
+	NodesByType,
+	ROUTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -35,7 +36,7 @@ import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 import SelectInput from './selectinput';
 import { FunctionTypes, MethodFunctions } from '../constants/functiontypes';
-import MethodProps, { MethodDescription } from '../interface/methodprops';
+import MethodProps, { MethodDescription, RoutingProps, Routing } from '../interface/methodprops';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -152,6 +153,7 @@ class AgentAccessView extends Component<any, any> {
 													graph
 												).map((d) => d.id),
 												agentMethod: loadAgentMethods(onlyAgents, accessDescriptions, graph),
+												agentRouting: loadAgentRouting(onlyAgents, accessDescriptions, graph),
 												agentAccess: loadAgentAccess(onlyAgents, accessDescriptions, graph)
 											});
 											return false;
@@ -188,6 +190,13 @@ class AgentAccessView extends Component<any, any> {
 										title="Method"
 										onClick={() => {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agentmethoduse');
+										}}
+									/>
+									<Tab
+										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}
+										title="Routing"
+										onClick={() => {
+											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'button_routes');
 										}}
 									/>
 								</Tabs>
@@ -437,15 +446,7 @@ class AgentAccessView extends Component<any, any> {
 											</thead>
 											<tbody>
 												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [
-														<td
-															style={{ cursor: 'pointer' }}
-															key={`${model}`}
-															onClick={() => {}}
-														>
-															{GetNodeTitle(model)}
-														</td>
-													];
+													const result = [ <td>{GetNodeTitle(model)}</td> ];
 
 													result.push(
 														...[].interpolate(
@@ -631,6 +632,129 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 								</TabPane>
+								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}>
+									<Box maxheight={700}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th
+														colSpan={
+															this.state.agents.length * Object.keys(ViewTypes).length + 1
+														}
+														style={{
+															cursor: 'pointer',
+															display: 'table-caption',
+															textAlign: 'center',
+															fontSize: '20px',
+															fontWeight: 'bold'
+														}}
+													>
+														Agent Routing
+													</th>
+												</tr>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th colSpan={5}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+												<tr>
+													<th />
+													{[]
+														.interpolate(
+															0,
+															this.state.agents.length,
+															(agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => (
+																	<th onClick={() => {}}>{v}</th>
+																))
+														)
+														.flatten()}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.models.map((model: string, modelIndex: number) => {
+													const result = [ <td>{GetNodeTitle(model)}</td> ];
+
+													result.push(
+														...[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number, agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => {
+																	const accessIndex =
+																		modelIndex * this.state.agents.length +
+																		agentIndex;
+																	const agent = this.state.agents[index];
+																	let functionType = '';
+																	if (
+																		this.hasFunctionViewTypeValue(
+																			agentIndex,
+																			modelIndex,
+																			v
+																		)
+																	) {
+																		let localSettings: Routing = this.getRoutingDescription(
+																			agentIndex,
+																			modelIndex,
+																			v
+																		);
+																	}
+																	let addRoutingDescriptionBtn = (
+																		<div className="btn-group">
+																			<button
+																				className="btn btn-default"
+																				type="button"
+																				onClick={() => {
+																					this.props.setVisual(
+																						ROUTING_CONTEXT_MENU,
+																						{
+                                              agentIndex,
+                                              agent: onlyAgents[agentIndex],
+                                              model,
+																							modelIndex,
+																							viewType: v
+																						}
+																					);
+																				}}
+																			>
+																				<i className={'fa fa-plus'} />
+																			</button>
+																		</div>
+																	);
+																	return (
+																		<td
+																			key={`${model} ${modelIndex} ${this.state
+																				.agents[
+																				index
+																			]} ${agentIndex} ${ViewTypes[v]}`}
+																		>
+																			{addRoutingDescriptionBtn}
+																		</td>
+																	);
+																})
+														)
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</Box>
+								</TabPane>
 							</TabContent>
 						</div>
 					</div>
@@ -640,6 +764,9 @@ class AgentAccessView extends Component<any, any> {
 	}
 	private getMethodDescription(agentIndex: number, modelIndex: number, v: string): MethodDescription {
 		return this.state.agentMethod[agentIndex][modelIndex][v];
+	}
+	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): MethodDescription {
+		return this.state.agentRouting[agentIndex][modelIndex][v];
 	}
 
 	private getKey(a: number, b: number, c: string) {
@@ -666,86 +793,122 @@ class AgentAccessView extends Component<any, any> {
 
 export default UIConnect(AgentAccessView);
 function loadAgentAccess(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-  return onlyAgents.map((agent) => {
-    const agentAccessDescription = accessDescriptions.filter((v) => existsLinkBetween(graph, {
-      source: agent.id,
-      target: v.id,
-      type: LinkType.AgentAccess
-    })
-    );
-    return GetNodesByProperties(
-      {
-        [NodeProperties.NODEType]: NodeTypes.Model
-      },
-      graph
-    ).map((model) => {
-      const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v)
-      );
-      if (accessDescription) {
-        const link = findLink(graph, {
-          source: agent.id,
-          target: accessDescription.id
-        });
-        return {
-          [ViewTypes.GetAll]: GetLinkProperty(link, ViewTypes.GetAll) || false,
-          [ViewTypes.Get]: GetLinkProperty(link, ViewTypes.Get) || false,
-          [ViewTypes.Create]: GetLinkProperty(link, ViewTypes.Create) || false,
-          [ViewTypes.Update]: GetLinkProperty(link, ViewTypes.Update) || false,
-          [ViewTypes.Delete]: GetLinkProperty(link, ViewTypes.Delete) || false
-        };
-      }
+	return onlyAgents.map((agent) => {
+		const agentAccessDescription = accessDescriptions.filter((v) =>
+			existsLinkBetween(graph, {
+				source: agent.id,
+				target: v.id,
+				type: LinkType.AgentAccess
+			})
+		);
+		return GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.Model
+			},
+			graph
+		).map((model) => {
+			const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
+			if (accessDescription) {
+				const link = findLink(graph, {
+					source: agent.id,
+					target: accessDescription.id
+				});
+				return {
+					[ViewTypes.GetAll]: GetLinkProperty(link, ViewTypes.GetAll) || false,
+					[ViewTypes.Get]: GetLinkProperty(link, ViewTypes.Get) || false,
+					[ViewTypes.Create]: GetLinkProperty(link, ViewTypes.Create) || false,
+					[ViewTypes.Update]: GetLinkProperty(link, ViewTypes.Update) || false,
+					[ViewTypes.Delete]: GetLinkProperty(link, ViewTypes.Delete) || false
+				};
+			}
 
-      return {
-        [ViewTypes.GetAll]: false,
-        [ViewTypes.Get]: false,
-        [ViewTypes.Create]: false,
-        [ViewTypes.Update]: false,
-        [ViewTypes.Delete]: false
-      };
-    });
-  });
+			return {
+				[ViewTypes.GetAll]: false,
+				[ViewTypes.Get]: false,
+				[ViewTypes.Create]: false,
+				[ViewTypes.Update]: false,
+				[ViewTypes.Delete]: false
+			};
+		});
+	});
 }
 
 function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-  return onlyAgents.map((agent) => {
-    const agentAccessDescription = accessDescriptions.filter((v) => existsLinkBetween(graph, {
-      source: agent.id,
-      target: v.id,
-      type: LinkType.AgentAccess
-    })
-    );
-    return GetNodesByProperties(
-      {
-        [NodeProperties.NODEType]: NodeTypes.Model
-      },
-      graph
-    ).map((model) => {
-      const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v)
-      );
-      if (accessDescription) {
-        const link = findLink(graph, {
-          source: agent.id,
-          target: accessDescription.id
-        });
-        let methodProps: MethodProps = GetLinkProperty(
-          link,
-          LinkPropertyKeys.MethodProps
-        );
-        if (methodProps && methodProps.GetAll) {
-          return {
-            ...methodProps
-          };
-        }
-      }
+	return onlyAgents.map((agent) => {
+		const agentAccessDescription = accessDescriptions.filter((v) =>
+			existsLinkBetween(graph, {
+				source: agent.id,
+				target: v.id,
+				type: LinkType.AgentAccess
+			})
+		);
+		return GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.Model
+			},
+			graph
+		).map((model) => {
+			const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
+			if (accessDescription) {
+				const link = findLink(graph, {
+					source: agent.id,
+					target: accessDescription.id
+				});
+				let methodProps: MethodProps = GetLinkProperty(link, LinkPropertyKeys.MethodProps);
+				if (methodProps) {
+					return {
+						...methodProps
+					};
+				}
+			}
 
-      return {
-        [ViewTypes.GetAll]: false,
-        [ViewTypes.Get]: false,
-        [ViewTypes.Create]: false,
-        [ViewTypes.Update]: false,
-        [ViewTypes.Delete]: false
-      };
-    });
-  });
+			return {
+				[ViewTypes.GetAll]: false,
+				[ViewTypes.Get]: false,
+				[ViewTypes.Create]: false,
+				[ViewTypes.Update]: false,
+				[ViewTypes.Delete]: false
+			};
+		});
+	});
 }
 
+function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return onlyAgents.map((agent) => {
+		const agentAccessDescription = accessDescriptions.filter((v) =>
+			existsLinkBetween(graph, {
+				source: agent.id,
+				target: v.id,
+				type: LinkType.AgentAccess
+			})
+		);
+		return GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.Model
+			},
+			graph
+		).map((model) => {
+			const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
+			if (accessDescription) {
+				const link = findLink(graph, {
+					source: agent.id,
+					target: accessDescription.id
+				});
+				let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.Routing);
+				if (routingProps) {
+					return {
+						...routingProps
+					};
+				}
+			}
+
+			return {
+				[ViewTypes.GetAll]: false,
+				[ViewTypes.Get]: false,
+				[ViewTypes.Create]: false,
+				[ViewTypes.Update]: false,
+				[ViewTypes.Delete]: false
+			};
+		});
+	});
+}

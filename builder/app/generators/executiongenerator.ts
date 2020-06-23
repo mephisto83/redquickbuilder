@@ -147,7 +147,9 @@ export default class ExecutorGenerator {
 			method: any;
 		}[] = [];
 		const allmodels = NodesByType(state, NodeTypes.Model);
-		const allagents = allmodels.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
+		const allagents = allmodels.filter(
+			(x: any) => GetNodeProp(x, NodeProperties.IsAgent) && !GetNodeProp(x, NodeProperties.IsUser)
+		);
 		const allfunctions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
 
 		allfunctions.map((fun: Node) => {
@@ -555,6 +557,71 @@ export default class ExecutorGenerator {
 				//     space: NameSpace.Tests
 				// }),
 			};
+		});
+
+		allagents.forEach((node: Node) => {
+			if (!result[GetNodeProp(node, NodeProperties.CodeName)]) {
+				// add empty executor
+				const templateRes = bindTemplate(_executor_class, {
+					model: GetNodeProp(node, NodeProperties.CodeName),
+					methods: '',
+					staticentry: static_methods
+						.unique((x: { template: any }) => x.template)
+						.filter((x: { agent: string }) => x.agent === node.id)
+						.map((x: { template: any }) => x.template)
+						.join('')
+				});
+				const templateInterfaceRes = bindTemplate(_executor_class_interface, {
+					model: GetNodeProp(node, NodeProperties.CodeName),
+					methods: '',
+					staticentry: static_methods_interface
+						.unique((x: { template: any }) => x.template)
+						.filter((x: { agent: string }) => x.agent === node.id)
+						.map((x: { template: any }) => x.template)
+						.join('')
+				});
+
+				result[GetNodeProp(node, NodeProperties.CodeName)] = {
+					id: GetNodeProp(node, NodeProperties.CodeName),
+					name: `${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+					tname: `${GetNodeProp(node, NodeProperties.CodeName)}ExecutorTests`,
+					iname: `I${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+					template: NamespaceGenerator.Generate({
+						template: templateRes,
+						usings: [
+							...STANDARD_CONTROLLER_USING,
+							`${namespace}${NameSpace.Model}`,
+							`${namespace}${NameSpace.Parameters}`,
+							`${namespace}${NameSpace.Interface}`,
+							`${namespace}${NameSpace.Constants}`
+						],
+						namespace,
+						space: NameSpace.Executors
+					}),
+					interface: NamespaceGenerator.Generate({
+						template: templateInterfaceRes,
+						usings: [
+							...STANDARD_CONTROLLER_USING,
+							`${namespace}${NameSpace.Model}`,
+							`${namespace}${NameSpace.Parameters}`,
+							`${namespace}${NameSpace.Constants}`
+						],
+						namespace,
+						space: NameSpace.Interface
+					})
+					// test: NamespaceGenerator.Generate({
+					//     template: testTemplate,
+					//     usings: [
+					//         ...STANDARD_CONTROLLER_USING,
+					//         ...STANDARD_TEST_USING,
+					//         `${namespace}${NameSpace.Executors}`,
+					//         `${namespace}${NameSpace.Model}`,
+					//         `${namespace}${NameSpace.Constants}`],
+					//     namespace,
+					//     space: NameSpace.Tests
+					// }),
+				};
+			}
 		});
 
 		return result;

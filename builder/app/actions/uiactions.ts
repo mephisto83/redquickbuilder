@@ -2980,6 +2980,7 @@ export const HOVERED_LINK = 'HOVERED_LINK';
 export const SELECTED_NODE = 'SELECTED_NODE';
 export const CONTEXT_MENU_VISIBLE = 'CONTEXT_MENU_VISIBLE';
 export const CONTEXT_MENU_MODE = 'CONTEXT_MENU_MODE';
+export const ROUTING_CONTEXT_MENU = 'ROUTING_CONTEXT_MENU';
 export function SelectedNode(nodeId: any) {
 	return (dispatch: Function) => {
 		if (!GraphMethods.Paused()) {
@@ -3914,8 +3915,8 @@ export function getAccessScreen(screen: { id: string }) {
 		let agent = GetNodeById(GetNodeProp(screen, NodeProperties.Agent));
 		let model = GetNodeById(GetNodeProp(screen, NodeProperties.Model));
 		let viewType = GetNodeProp(screen, NodeProperties.ViewType);
-
-		return hasAccessNode(agent, model, access, viewType);
+		if (agent && model) return hasAccessNode(agent, model, access, viewType);
+		return false;
 	};
 }
 export function hasAccessNode(agent: any, model: any, aa: { id: any }, viewType?: string | null, graph?: any): any {

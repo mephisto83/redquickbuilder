@@ -620,6 +620,11 @@ const PERMISSION_DEFAULTS = {
 	params: [ FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent ]
 };
 
+const PERMISSION_ON_AGENT = {
+	implementation: './app/templates/permissions/permission_method.tpl',
+	interface_: './app/templates/permissions/permission_method_interface.tpl',
+	params: [ FunctionTemplateKeys.Agent ]
+};
 const VALIDATION_DEFAULTS = {
 	implementation: './app/templates/validation/validation_method.tpl',
 	interface_: './app/templates/validation/validation_method_interface.tpl',
@@ -1129,11 +1134,11 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a}`;
 		},
-		template: './app/templates/standard/get_model_agent_object.tpl',
-		interface: './app/templates/standard/get_model_agent_object_interface.tpl',
+		template: './app/templates/standard/get_default_model_agent_object.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_controller.tpl',
 		permission: {
-			...PERMISSION_DEFAULTS
+			...PERMISSION_ON_AGENT
 		},
 		lambda: {
 			default: {
@@ -1163,10 +1168,11 @@ export const MethodFunctions: any = {
 			[FunctionTemplateKeys.Permission]: {
 				key: FunctionTemplateKeys.Permission,
 				nodeTypes: [ NodeTypes.Permission ]
-      },
-      [FunctionTemplateKeys.ModelFilter]:{
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
 				key: FunctionTemplateKeys.ModelFilter,
-				nodeTypes: [ NodeTypes.ModelFilter ]}
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
 		},
 		output: {
 			...COMMON_OUTPUT.OBJECT

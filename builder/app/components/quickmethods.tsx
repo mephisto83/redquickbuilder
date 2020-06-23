@@ -52,6 +52,7 @@ import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
 import { Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
 import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
+import UpdateScreenParameters from '../nodepacks/screens/UpdateScreenParameters';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -373,6 +374,14 @@ class QuickMethods extends Component<any, any, any> {
 										AddAgentAccessMethods(() => {});
 									}}
 								/>
+								<TreeViewMenu
+									title={'Update Screen Parameters'}
+									icon="fa fa-plus"
+									onClick={() => {
+										UpdateScreenParameters(() => {});
+									}}
+								/>
+
 
 							</TreeViewMenu>
 
