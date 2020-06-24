@@ -284,7 +284,7 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th colSpan={5}>
+															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -458,30 +458,14 @@ class AgentAccessView extends Component<any, any> {
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
-									<Box maxheight={700}>
+									<Box maxheight={700} title={'Agent Methods'}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
-												<tr>
-													<th
-														colSpan={
-															this.state.agents.length * Object.keys(ViewTypes).length + 1
-														}
-														style={{
-															cursor: 'pointer',
-															display: 'table-caption',
-															textAlign: 'center',
-															fontSize: '20px',
-															fontWeight: 'bold'
-														}}
-													>
-														Agent Methods
-													</th>
-												</tr>
 												<tr>
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th colSpan={5}>
+															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -690,7 +674,7 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th colSpan={5}>
+															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -720,6 +704,15 @@ class AgentAccessView extends Component<any, any> {
 															this.state.agents.length,
 															(index: number, agentIndex: number) =>
 																Object.keys(ViewTypes).map((v) => {
+																	const tdkey = `routing- ${model} ${modelIndex} ${this
+																		.state.agents[index]} ${agentIndex} ${ViewTypes[
+																		v
+																	]}`;
+																	if (
+																		!this.hasAgentAccess(agentIndex, modelIndex, v)
+																	) {
+																		return <td key={tdkey} />;
+																	}
 																	const accessIndex =
 																		modelIndex * this.state.agents.length +
 																		agentIndex;
@@ -742,44 +735,19 @@ class AgentAccessView extends Component<any, any> {
 																				v
 																			) || routing;
 																	}
-																	let addRoutingDescriptionBtn = (
-																		<div className="btn-group">
-																			<button
-																				className="btn btn-default"
-																				type="button"
-																				onClick={() => {
-																					this.props.setVisual(
-																						ROUTING_CONTEXT_MENU,
-																						{
-																							agentIndex,
-																							agent:
-																								onlyAgents[agentIndex],
-																							model,
-																							modelIndex,
-																							viewType: v,
-																							routing,
-																							callback: (
-																								value: Routing
-																							) => {
-																								this.setAgentRoutingProperty(
-																									modelIndex,
-																									agentIndex,
-																									v,
-																									value
-																								);
-																								this.setState({
-																									agentRouting: this
-																										.state
-																										.agentRouting
-																								});
-																							}
-																						}
-																					);
-																				}}
-																			>
-																				<i className={'fa fa-plus'} />
-																			</button>
-																		</div>
+																	let onComponentMountMethod = this.getMethodDescription(
+																		agentIndex,
+																		modelIndex,
+																		v
+																	);
+																	let addRoutingDescriptionBtn = this.createRoutingDescriptionButton(
+																		agentIndex,
+																		onlyAgents,
+																		onComponentMountMethod,
+																		model,
+																		modelIndex,
+																		v,
+																		routing
 																	);
 																	let routesDom: any = null;
 																	if (routing) {
@@ -796,12 +764,7 @@ class AgentAccessView extends Component<any, any> {
 																		);
 																	}
 																	return (
-																		<td
-																			key={`${model} ${modelIndex} ${this.state
-																				.agents[
-																				index
-																			]} ${agentIndex} ${ViewTypes[v]}`}
-																		>
+																		<td key={tdkey}>
 																			{addRoutingDescriptionBtn}
 																			{routesDom}
 																		</td>
@@ -832,6 +795,51 @@ class AgentAccessView extends Component<any, any> {
 			</TopViewer>
 		);
 	}
+	private createRoutingDescriptionButton(
+		agentIndex: number,
+		onlyAgents: any[],
+		onComponentMountMethod: MethodDescription,
+		model: string,
+		modelIndex: number,
+		v: string,
+		routing: Routing
+	) {
+		routing.routes.forEach((route: RouteDescription) => {
+			if (route.viewType && route.model) {
+				let targetModelIndex = this.state.models.indexOf(route.model);
+        let targetMethodDescription = this.getMethodDescription(agentIndex, targetModelIndex, route.viewType);
+        route.targetMethodDescription = targetMethodDescription;
+			}
+		});
+		return (
+			<div className="btn-group">
+				<button
+					className="btn btn-default"
+					type="button"
+					onClick={() => {
+						this.props.setVisual(ROUTING_CONTEXT_MENU, {
+							agentIndex,
+							agent: onlyAgents[agentIndex],
+							onComponentMountMethod,
+							model,
+							modelIndex,
+							viewType: v,
+							routing,
+							callback: (value: Routing) => {
+								this.setAgentRoutingProperty(modelIndex, agentIndex, v, value);
+								this.setState({
+									agentRouting: this.state.agentRouting
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
+
 	private getFunctionTypeOptions(): any {
 		return Object.keys(FunctionTypes).map((d) => {
 			let functionType = FunctionTypes[d];

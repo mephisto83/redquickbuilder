@@ -20,8 +20,10 @@ export interface Routing {
 export interface RouteDescription {
 	viewType: string;
 	model: string;
+	agent: string;
 	id: string;
 	name: string;
+	targetMethodDescription?: MethodDescription;
 }
 export interface MethodDescription {
 	functionType: string;

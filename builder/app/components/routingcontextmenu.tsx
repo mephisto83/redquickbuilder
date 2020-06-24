@@ -16,11 +16,12 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { Routing, RouteDescription } from '../interface/methodprops';
+import { Routing, RouteDescription, MethodDescription } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
 import TextInput from './textinput';
+import { Node } from '../methods/graph_types';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -36,6 +37,7 @@ class ContextMenu extends Component<any, any> {
 		const graph = UIA.GetCurrentGraph(state);
 		let routing: Routing = mode.routing;
 		let callback: any = mode.callback;
+		let agent: string = mode.agent;
 		return (
 			<TreeViewButtonGroup>
 				<TreeViewGroupButton
@@ -44,6 +46,7 @@ class ContextMenu extends Component<any, any> {
 						routing.routes.push({
 							id: UIA.GUID(),
 							model: '',
+							agent,
 							name: '',
 							viewType: ViewTypes.Get
 						});
@@ -57,12 +60,12 @@ class ContextMenu extends Component<any, any> {
 			</TreeViewButtonGroup>
 		);
 	}
-	getRoutingApi(routing: Routing) {
-
-  }
+	getRoutingApi(routing: Routing) {}
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let routing: Routing = mode.routing;
+		let onComponentMountMethod: MethodDescription = mode.onComponentMountMethod;
+
 		let callback: any = mode.callback;
 		if (routing) {
 			const exit = () => {
@@ -74,7 +77,74 @@ class ContextMenu extends Component<any, any> {
 				default:
 					routing.routes.forEach((route: RouteDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, viewType } = route;
+						let { name, model, agent, viewType, targetMethodDescription } = route;
+						let parameterConnections: any = null;
+						if (onComponentMountMethod && targetMethodDescription) {
+							parameterConnections = Object.keys(
+								targetMethodDescription.properties
+							).map((urlParameter: string, index: number) => {
+								let routeKey = `url-param-${urlParameter}-${index}`;
+								let agentPropertyOptions: Node[] = UIA.GetModelPropertyChildren(agent);
+								let options = [
+									...Object.keys(onComponentMountMethod.properties).map((k: string) => {
+										return (
+											<TreeViewMenu icon={'fa fa-square-o'} title={k} key={`url-parma-k-${k}`} />
+										);
+									}),
+									<TreeViewMenu
+										icon={'fa fa-square-o'}
+										title={UIA.GetNodeTitle(model)}
+										key={`url-parma-k-modle`}
+                    open={this.state[model]}
+										toggle={() => {
+											this.setState({ [model]: !this.state[model] });
+										}}
+									>
+										{agentPropertyOptions.map((agentPropertyOption: Node) => {
+											return (
+												<TreeViewMenu
+													icon={'fa fa-square-o'}
+													title={UIA.GetNodeTitle(agentPropertyOption)}
+													key={`url-parma-k-${agentPropertyOption.id}`}
+												/>
+											);
+										})}
+									</TreeViewMenu>,
+									<TreeViewMenu
+										icon={'fa fa-square-o'}
+                    open={this.state[agent]}
+										toggle={() => {
+											this.setState({ [agent]: !this.state[agent] });
+										}}
+										title={UIA.GetNodeTitle(agent)}
+										key={`url-parma-k-genta`}
+									>
+										{agentPropertyOptions.map((agentPropertyOption: Node) => {
+											return (
+												<TreeViewMenu
+													icon={'fa fa-square-o'}
+													title={UIA.GetNodeTitle(agentPropertyOption)}
+													key={`url-parma-k-${agentPropertyOption.id}`}
+												/>
+											);
+										})}
+									</TreeViewMenu>
+								];
+								return (
+									<TreeViewMenu
+										key={routeKey}
+                    active
+                    open={this.state[routeKey]}
+										title={urlParameter}
+										toggle={() => {
+											this.setState({ [routeKey]: !this.state[routeKey] });
+										}}
+									>
+										{options}
+									</TreeViewMenu>
+								);
+							});
+						}
 						result.push(
 							<TreeViewMenu
 								key={routeKey}
@@ -115,6 +185,7 @@ class ContextMenu extends Component<any, any> {
 										value={this.state.viewType || viewType}
 									/>
 								</TreeViewItemContainer>
+                {parameterConnections}
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
@@ -163,7 +234,6 @@ class ContextMenu extends Component<any, any> {
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;
 		const menuMode = UIA.Visual(state, UIA.ROUTING_CONTEXT_MENU) || {};
-		const { agent, model } = menuMode;
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
