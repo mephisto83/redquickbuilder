@@ -147,7 +147,7 @@ export function GetAccessAgentPreferredMethods(screen: any, agentId: string, scr
 					let methodDescription: MethodDescription = methodProps[viewType];
 					if (methodDescription) {
 						methodDescription.functionType;
-						let functionType = FunctionTypes[methodDescription.functionType];
+						let functionType = methodDescription.functionType;
 						if (functionType) {
 							result.push(
 								...GetNodesByProperties({
