@@ -100,7 +100,9 @@ export default function ScreenConnectGet(args: any = {}) {
 									}
 								}
 							: null
-					);
+          );
+          // This will cause a chain update, so the url for the screen will get updated to include
+          // the parameter, i think.
 					result.push(
 						_valueNavigateTargetApi
 							? {
@@ -191,7 +193,10 @@ export default function ScreenConnectGet(args: any = {}) {
 								)
 							}
 						],
-						...(navigateTo
+            ...(navigateTo
+              // this can be updated to include different types of parameters,
+              // checkout the lambda property for the arguments, setting it to the appropriate
+              // lambda string will get use the parameters in the url that we desire.
 							? CreateNavigateToScreenDC({
 									screen: navigateTo,
 									node: () => _instanceNode.id,
@@ -203,7 +208,9 @@ export default function ScreenConnectGet(args: any = {}) {
 								ComponentApiKeys.Value,
 								subcomponent.id,
 								currentGraph
-							);
+              );
+              // if all the values can be calculated in the lambda,
+              // this might not be necessary
 							return {
 								operation: ADD_LINK_BETWEEN_NODES,
 								options: Connect(

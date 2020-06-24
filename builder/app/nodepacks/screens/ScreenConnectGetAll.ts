@@ -155,7 +155,8 @@ export default function ScreenConnectGetAll(args: any = {}) {
 									)
 								}
 							],
-							...(navigateTo
+              ...(navigateTo
+                // See nots in the ScreenConnectGet
 								? CreateNavigateToScreenDC({
 										screen: navigateTo,
 										node: () => _instanceNode.id,

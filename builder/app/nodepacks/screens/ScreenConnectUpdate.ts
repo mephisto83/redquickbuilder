@@ -92,6 +92,8 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			link: LinkType.LifeCylceMethod
 		});
 
+    // With a variety of parameters, this will need to be generalized to handle
+    // all the possible parameters.
 		const valueScreenOptionNavigateTargetApi = GetNodesLinkedTo(graph, {
 			id: screenOptionInstance.id,
 			link: LinkType.ComponentInternalApi

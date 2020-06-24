@@ -35,8 +35,8 @@ import { GetNodesByProperties, existsLinkBetween, findLink, existsLinksBetween }
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 import SelectInput from './selectinput';
-import { FunctionTypes, MethodFunctions } from '../constants/functiontypes';
-import MethodProps, { MethodDescription, RoutingProps, Routing } from '../interface/methodprops';
+import { FunctionTypes, MethodFunctions, FunctionTemplateKeys } from '../constants/functiontypes';
+import MethodProps, { MethodDescription, RoutingProps, Routing, RouteDescription } from '../interface/methodprops';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -99,6 +99,63 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentMethod[agentIndex][modelIndex][v] = { properties: {} };
 		}
 		this.state.agentMethod[agentIndex][modelIndex][v].properties[key] = value;
+	}
+
+	private setDefaultAgentMethod(
+		value: string,
+		v: string,
+		modelIndex: number,
+		agentIndex: number,
+		agent: string,
+		model: string
+	) {
+		if (value) {
+			let functionType: string = '';
+			switch (v) {
+				case ViewTypes.Update:
+				case ViewTypes.Get:
+					functionType = FunctionTypes.Get_Object_Agent_Value__Object;
+					break;
+				case ViewTypes.GetAll:
+					functionType = FunctionTypes.Get_Agent_Value__IListObject;
+					break;
+				case ViewTypes.Delete:
+				case ViewTypes.Create:
+					break;
+			}
+			if (functionType) {
+				let { constraints } = MethodFunctions[functionType];
+				[
+					FunctionTemplateKeys.Model,
+					FunctionTemplateKeys.ModelOutput,
+					FunctionTemplateKeys.Agent
+				].forEach((constraintKey: string) => {
+					if (constraints && constraints[constraintKey]) {
+						let temp: string = model;
+						if (constraintKey === FunctionTemplateKeys.Agent) {
+							temp = agent;
+						}
+						this.setAgentMethodProperty(modelIndex, agentIndex, v, constraintKey, temp);
+					}
+				});
+			}
+		}
+	}
+
+	setAgentRoutingProperty(modelIndex: number, agentIndex: number, v: string, routing: Routing) {
+		if (!this.state.agentMethod[agentIndex]) {
+			this.state.agentRouting[agentIndex] = {};
+		}
+		if (!this.state.agentRouting[agentIndex][modelIndex]) {
+			this.state.agentRouting[agentIndex][modelIndex] = {};
+		}
+		if (typeof this.state.agentRouting[agentIndex][modelIndex][v] === 'string') {
+			this.state.agentRouting[agentIndex][modelIndex][v] = {
+				functionType: this.state.agentRouting[agentIndex][modelIndex][v]
+			};
+		}
+
+		this.state.agentRouting[agentIndex][modelIndex][v] = routing;
 	}
 
 	render() {
@@ -291,7 +348,7 @@ class AgentAccessView extends Component<any, any> {
 															key={`${model}`}
 															onClick={() => {
 																const istrue = this.state.agents.some(
-																	(agent, agentIndex: number) => {
+																	(agent: string, agentIndex: number) => {
 																		if (
 																			this.state.agentAccess[agentIndex] &&
 																			this.state.agentAccess[agentIndex][
@@ -357,6 +414,14 @@ class AgentAccessView extends Component<any, any> {
 																						agentIndex,
 																						v,
 																						value
+																					);
+																					this.setDefaultAgentMethod(
+																						value,
+																						v,
+																						modelIndex,
+																						agentIndex,
+																						model,
+																						agent
 																					);
 																					this.setState({
 																						agentAccess: [
@@ -599,6 +664,7 @@ class AgentAccessView extends Component<any, any> {
 																							v,
 																							value
 																						);
+
 																						this.setState({
 																							agentMethod: [
 																								...this.state
@@ -691,6 +757,9 @@ class AgentAccessView extends Component<any, any> {
 																		agentIndex;
 																	const agent = this.state.agents[index];
 																	let functionType = '';
+																	let routing: Routing = {
+																		routes: []
+																	};
 																	if (
 																		this.hasFunctionViewTypeValue(
 																			agentIndex,
@@ -698,11 +767,12 @@ class AgentAccessView extends Component<any, any> {
 																			v
 																		)
 																	) {
-																		let localSettings: Routing = this.getRoutingDescription(
-																			agentIndex,
-																			modelIndex,
-																			v
-																		);
+																		routing =
+																			this.getRoutingDescription(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			) || routing;
 																	}
 																	let addRoutingDescriptionBtn = (
 																		<div className="btn-group">
@@ -713,11 +783,28 @@ class AgentAccessView extends Component<any, any> {
 																					this.props.setVisual(
 																						ROUTING_CONTEXT_MENU,
 																						{
-                                              agentIndex,
-                                              agent: onlyAgents[agentIndex],
-                                              model,
+																							agentIndex,
+																							agent:
+																								onlyAgents[agentIndex],
+																							model,
 																							modelIndex,
-																							viewType: v
+																							viewType: v,
+																							routing,
+																							callback: (
+																								value: Routing
+																							) => {
+																								this.setAgentRoutingProperty(
+																									modelIndex,
+																									agentIndex,
+																									v,
+																									value
+																								);
+																								this.setState({
+																									agentRouting: this
+																										.state
+																										.agentRouting
+																								});
+																							}
 																						}
 																					);
 																				}}
@@ -726,6 +813,20 @@ class AgentAccessView extends Component<any, any> {
 																			</button>
 																		</div>
 																	);
+																	let routesDom: any = null;
+																	if (routing) {
+																		routesDom = routing.routes.map(
+																			(route: RouteDescription) => {
+																				return (
+																					<i
+																						title={route.name}
+																						className={'fa fa-genderless'}
+																						style={{ color: 'orange' }}
+																					/>
+																				);
+																			}
+																		);
+																	}
 																	return (
 																		<td
 																			key={`${model} ${modelIndex} ${this.state
@@ -734,6 +835,7 @@ class AgentAccessView extends Component<any, any> {
 																			]} ${agentIndex} ${ViewTypes[v]}`}
 																		>
 																			{addRoutingDescriptionBtn}
+																			{routesDom}
 																		</td>
 																	);
 																})
@@ -765,7 +867,7 @@ class AgentAccessView extends Component<any, any> {
 	private getMethodDescription(agentIndex: number, modelIndex: number, v: string): MethodDescription {
 		return this.state.agentMethod[agentIndex][modelIndex][v];
 	}
-	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): MethodDescription {
+	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): Routing {
 		return this.state.agentRouting[agentIndex][modelIndex][v];
 	}
 

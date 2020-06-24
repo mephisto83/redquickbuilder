@@ -3241,7 +3241,7 @@ export function loadGitRuns() {
 // }
 export const JOB_INFO = 'JOB_INFO';
 export function updateJobs(info: { currentJobInformation: { jobFile?: JobFile }; agents: AgentProject[] }) {
-	let state = GetStateFunc()();
+	let state = GetStateFunc() ? GetStateFunc()() : null;
 	if (VisualEq(state, 'PROGRESS_VIEW_TAB', 'Git Run')) {
 		setVisual(JOB_INFO, info)(GetDispatchFunc(), GetStateFunc());
 	}

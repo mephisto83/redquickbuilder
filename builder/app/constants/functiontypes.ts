@@ -68,7 +68,7 @@ export const FunctionTypes = {
 	// IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 };
 
-export const FunctionTemplateKeys: { [str: string]: string } = {
+export const FunctionTemplateKeys = {
 	Model: 'model',
 	ModelOutput: 'model_output',
 	ChangeParameter: 'change_parameter',
