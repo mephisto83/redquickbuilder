@@ -656,8 +656,10 @@ export const QUERY_PARAMETER_KEYS = {
 	Id: 'id'
 };
 export const TEMPLATE_PARAMETER_KEYS = {
-	ModelId: 'modelId',
-	ParentId: 'parentId'
+	ModelId: 'model', // changed this for consistency
+	Model: 'model', // changed this for consistency
+	ParentId: 'parent', // changed this for consistency
+	Parent: 'parent'
 };
 export const QUERY_PARAMETERS = {
 	[QUERY_PARAMETER_KEYS.Skip]: true,
@@ -666,12 +668,12 @@ export const QUERY_PARAMETERS = {
 	[QUERY_PARAMETER_KEYS.Sort]: true
 };
 export const TEMPLATE_PARAMETERS = {
-	[TEMPLATE_PARAMETER_KEYS.ModelId]: {
+	[TEMPLATE_PARAMETER_KEYS.Model]: {
 		isGuid: true
 	}
 };
 export const TEMPLATE_PARENT_PARAMETERS = {
-	[TEMPLATE_PARAMETER_KEYS.ParentId]: {
+	[TEMPLATE_PARAMETER_KEYS.Parent]: {
 		isGuid: true
 	}
 };

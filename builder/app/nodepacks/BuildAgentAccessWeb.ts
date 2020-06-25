@@ -4,7 +4,7 @@ import { REMOVE_NODE, graphOperation, GetDispatchFunc, GetStateFunc, GetCurrentG
 import AddAgentAccess from './AddAgentAccess';
 
 export default function BuildAgentAccessWeb(args: any) {
-	const { agents, models, agentAccess, agentMethod } = args;
+	const { agents, models, agentRouting, agentAccess, agentMethod } = args;
 
 	const graph = GetCurrentGraph();
 
@@ -27,13 +27,19 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentMethod[agentIndex] && agentMethod[agentIndex][modelIndex]
 						? agentMethod[agentIndex][modelIndex] || {}
 						: {};
+				const routing =
+					agentRouting[agentIndex] && agentRouting[agentIndex][modelIndex]
+						? agentRouting[agentIndex][modelIndex] || {}
+						: {};
+
 				if (values) {
 					result.push(
 						...AddAgentAccess({
 							modelId: model,
 							agentId: agent,
 							linkProps: { ...values },
-							methodProps: { ...methods }
+							methodProps: { ...methods },
+							routingProps: { ...routing }
 						})
 					);
 				}

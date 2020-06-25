@@ -767,6 +767,28 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
+
+/**
+ * Gets the models properties, that will appear on the model.
+ * @param id node id
+ */
+export function GetModelCodeProperties(id: string) {
+	const propertyNodes = GetModelPropertyNodes(id);
+	let graph = GetCurrentGraph();
+	// const logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
+	const logicalParents = GraphMethods.GetNodesLinkedTo(graph, {
+		id,
+		direction: GraphMethods.TARGET,
+		link: NodeConstants.LinkType.LogicalChildren
+	});
+	let userModels = [];
+	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
+		userModels = GetUserReferenceNodes(id);
+	}
+	return [ ...userModels, ...propertyNodes, ...logicalParents ]
+		.filter((x) => x.id !== id)
+		.unique((v: { id: any }) => v.id);
+}
 export function GetMethodParameters(methodId: string) {
 	const method = GetNodeById(methodId);
 	if (method) {

@@ -261,30 +261,14 @@ class AgentAccessView extends Component<any, any> {
 							</TabContainer>
 							<TabContent>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}>
-									<Box maxheight={700}>
+									<Box title={'Agent Access'} maxheight={700}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
-												<tr>
-													<th
-														colSpan={
-															this.state.agents.length * Object.keys(ViewTypes).length + 1
-														}
-														style={{
-															cursor: 'pointer',
-															display: 'table-caption',
-															textAlign: 'center',
-															fontSize: '20px',
-															fontWeight: 'bold'
-														}}
-													>
-														Agent Access
-													</th>
-												</tr>
 												<tr>
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -421,7 +405,7 @@ class AgentAccessView extends Component<any, any> {
 																						v,
 																						modelIndex,
 																						agentIndex,
-																						agent,
+																						agent.id,
 																						model
 																					);
 																					this.setState({
@@ -465,7 +449,7 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -651,30 +635,14 @@ class AgentAccessView extends Component<any, any> {
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}>
-									<Box maxheight={700}>
+									<Box title={'Agent Routing'} maxheight={700}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
-												<tr>
-													<th
-														colSpan={
-															this.state.agents.length * Object.keys(ViewTypes).length + 1
-														}
-														style={{
-															cursor: 'pointer',
-															display: 'table-caption',
-															textAlign: 'center',
-															fontSize: '20px',
-															fontWeight: 'bold'
-														}}
-													>
-														Agent Routing
-													</th>
-												</tr>
 												<tr>
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#f1f9f1' }} colSpan={5}>
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -807,8 +775,8 @@ class AgentAccessView extends Component<any, any> {
 		routing.routes.forEach((route: RouteDescription) => {
 			if (route.viewType && route.model) {
 				let targetModelIndex = this.state.models.indexOf(route.model);
-        let targetMethodDescription = this.getMethodDescription(agentIndex, targetModelIndex, route.viewType);
-        route.targetMethodDescription = targetMethodDescription;
+				let targetMethodDescription = this.getMethodDescription(agentIndex, targetModelIndex, route.viewType);
+				route.targetMethodDescription = targetMethodDescription;
 			}
 		});
 		return (
@@ -819,7 +787,7 @@ class AgentAccessView extends Component<any, any> {
 					onClick={() => {
 						this.props.setVisual(ROUTING_CONTEXT_MENU, {
 							agentIndex,
-							agent: onlyAgents[agentIndex],
+							agent: onlyAgents[agentIndex].id,
 							onComponentMountMethod,
 							model,
 							modelIndex,
@@ -994,7 +962,7 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 					source: agent.id,
 					target: accessDescription.id
 				});
-				let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.Routing);
+				let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.RoutingProps);
 				if (routingProps) {
 					return {
 						...routingProps

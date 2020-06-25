@@ -16,12 +16,13 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { Routing, RouteDescription, MethodDescription } from '../interface/methodprops';
+import { Routing, RouteDescription, MethodDescription, RouteSource, RouteSourceType } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
+import { MethodFunctions } from '../constants/functiontypes';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -80,70 +81,121 @@ class ContextMenu extends Component<any, any> {
 						let { name, model, agent, viewType, targetMethodDescription } = route;
 						let parameterConnections: any = null;
 						if (onComponentMountMethod && targetMethodDescription) {
-							parameterConnections = Object.keys(
-								targetMethodDescription.properties
-							).map((urlParameter: string, index: number) => {
-								let routeKey = `url-param-${urlParameter}-${index}`;
-								let agentPropertyOptions: Node[] = UIA.GetModelPropertyChildren(agent);
-								let options = [
-									...Object.keys(onComponentMountMethod.properties).map((k: string) => {
-										return (
-											<TreeViewMenu icon={'fa fa-square-o'} title={k} key={`url-parma-k-${k}`} />
-										);
-									}),
-									<TreeViewMenu
-										icon={'fa fa-square-o'}
-										title={UIA.GetNodeTitle(model)}
-										key={`url-parma-k-modle`}
-                    open={this.state[model]}
-										toggle={() => {
-											this.setState({ [model]: !this.state[model] });
-										}}
-									>
-										{agentPropertyOptions.map((agentPropertyOption: Node) => {
-											return (
-												<TreeViewMenu
-													icon={'fa fa-square-o'}
-													title={UIA.GetNodeTitle(agentPropertyOption)}
-													key={`url-parma-k-${agentPropertyOption.id}`}
-												/>
-											);
-										})}
-									</TreeViewMenu>,
-									<TreeViewMenu
-										icon={'fa fa-square-o'}
-                    open={this.state[agent]}
-										toggle={() => {
-											this.setState({ [agent]: !this.state[agent] });
-										}}
-										title={UIA.GetNodeTitle(agent)}
-										key={`url-parma-k-genta`}
-									>
-										{agentPropertyOptions.map((agentPropertyOption: Node) => {
-											return (
-												<TreeViewMenu
-													icon={'fa fa-square-o'}
-													title={UIA.GetNodeTitle(agentPropertyOption)}
-													key={`url-parma-k-${agentPropertyOption.id}`}
-												/>
-											);
-										})}
-									</TreeViewMenu>
-								];
-								return (
-									<TreeViewMenu
-										key={routeKey}
-                    active
-                    open={this.state[routeKey]}
-										title={urlParameter}
-										toggle={() => {
-											this.setState({ [routeKey]: !this.state[routeKey] });
-										}}
-									>
-										{options}
-									</TreeViewMenu>
-								);
-							});
+							parameterConnections = Object.keys(targetMethodDescription.properties)
+								.filter(this.filterFunctionParameters(targetMethodDescription))
+								.map((urlParameter: string, index: number) => {
+									let routeKey = `url-param-${urlParameter}-${index}`;
+									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
+									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
+									let value = route.source ? route.source.model : null;
+									let options = [
+										...Object.keys(onComponentMountMethod.properties)
+											.filter(this.filterFunctionParameters(onComponentMountMethod))
+											.map((k: string) => {
+												return (
+													<TreeViewMenu
+														title={k}
+														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
+														onClick={() => {
+															route.source = {
+																model: k,
+																property: null,
+																type: RouteSourceType.UrlParameter
+															};
+															callback(routing);
+															this.setState({ turn: UIA.GUID() });
+														}}
+														key={`url-parma-k-${k}`}
+													/>
+												);
+											}),
+										<TreeViewMenu
+											icon={value !== model ? 'fa fa-square-o' : 'fa fa-square'}
+											title={`${UIA.GetNodeTitle(model)}(model)`}
+											active
+											key={`url-parma-k-modle`}
+											open={this.state[model]}
+											toggle={() => {
+												this.setState({ [model]: !this.state[model] });
+											}}
+										>
+											{modelPropertyOptions.map((modelPropertyOption: Node) => {
+												let value = route.source ? route.source.property : null;
+												return (
+													<TreeViewMenu
+														icon={
+															value !== modelPropertyOption.id ? (
+																'fa fa-square-o'
+															) : (
+																'fa fa-square'
+															)
+														}
+														title={UIA.GetNodeTitle(modelPropertyOption)}
+														onClick={() => {
+															route.source = {
+																model,
+																property: modelPropertyOption.id,
+																type: RouteSourceType.Model
+															};
+															callback(routing);
+															this.setState({ turn: UIA.GUID() });
+														}}
+														key={`url-parsma-k-${modelPropertyOption.id}`}
+													/>
+												);
+											})}
+										</TreeViewMenu>,
+										<TreeViewMenu
+											icon={value !== agent ? 'fa fa-square-o' : 'fa fa-square'}
+											open={this.state[agent]}
+											active
+											toggle={() => {
+												this.setState({ [agent]: !this.state[agent] });
+											}}
+											title={`${UIA.GetNodeTitle(agent)}(agent)`}
+											key={`url-parma-k-genta`}
+										>
+											{agentPropertyOptions.map((agentPropertyOption: Node) => {
+												let value = route.source ? route.source.property : null;
+												return (
+													<TreeViewMenu
+														title={UIA.GetNodeTitle(agentPropertyOption)}
+														icon={
+															value !== agentPropertyOption.id ? (
+																'fa fa-square-o'
+															) : (
+																'fa fa-square'
+															)
+														}
+														onClick={() => {
+															route.source = {
+																model: agent,
+																property: agentPropertyOption.id,
+																type: RouteSourceType.Agent
+															};
+															callback(routing);
+															this.setState({ turn: UIA.GUID() });
+														}}
+														key={`url-parma-k-${agentPropertyOption.id}`}
+													/>
+												);
+											})}
+										</TreeViewMenu>
+									];
+									return (
+										<TreeViewMenu
+											key={routeKey}
+											active
+											open={this.state[routeKey]}
+											title={urlParameter}
+											toggle={() => {
+												this.setState({ [routeKey]: !this.state[routeKey] });
+											}}
+										>
+											{options}
+										</TreeViewMenu>
+									);
+								});
 						}
 						result.push(
 							<TreeViewMenu
@@ -185,7 +237,7 @@ class ContextMenu extends Component<any, any> {
 										value={this.state.viewType || viewType}
 									/>
 								</TreeViewItemContainer>
-                {parameterConnections}
+								{parameterConnections}
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
@@ -221,6 +273,20 @@ class ContextMenu extends Component<any, any> {
 			}
 		}
 		return result;
+	}
+
+	private filterFunctionParameters(
+		onComponentMountMethod: MethodDescription
+	): (value: string, index: number, array: string[]) => boolean {
+		return (x: string) => {
+			let { parameters } = MethodFunctions[onComponentMountMethod.functionType];
+			if (parameters && parameters.parameters) {
+				if (parameters && parameters.parameters && parameters.parameters.template) {
+					return !!parameters.parameters.template[x];
+				}
+			}
+			return false;
+		};
 	}
 
 	render() {
@@ -299,11 +365,14 @@ class ContextMenu extends Component<any, any> {
 		);
 	}
 	getCurrentInfo(menuMode: any) {
-		let { model, agent } = menuMode;
+		let { model, agent, viewType } = menuMode;
 		if (model && agent) {
 			return [
-				<TreeViewMenu key={'current-agent'} icon={'fa fa-square-o'} title={`${UIA.GetNodeTitle(agent)}`} />,
-				<TreeViewMenu key={'current-model'} icon={'fa fa-square-o'} title={`${UIA.GetNodeTitle(model)}`} />
+				<TreeViewMenu
+					key={'current-agent'}
+					icon={'fa fa-square-o'}
+					title={`${UIA.GetNodeTitle(agent)}/${UIA.GetNodeTitle(model)}/${viewType}`}
+				/>
 			];
 		}
 		return null;
