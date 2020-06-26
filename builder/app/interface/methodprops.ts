@@ -13,6 +13,29 @@ export interface RoutingProps {
 	Delete?: Routing;
 	Update?: Routing;
 }
+export interface ViewMoutingProps {
+  GetAll?: ViewMounting;
+	Get?: ViewMounting;
+	Create?: ViewMounting;
+	Delete?: ViewMounting;
+	Update?: ViewMounting;
+}
+export interface ViewMounting {
+  mountings: MountingDescription[]; // an array of mounting events
+}
+export interface MountingDescription {
+  // ------
+  // use these properties to identify the screen
+  viewType: string;
+	model: string;
+	agent: string;
+  // ------
+	id: string;
+	name: string;
+	targetMethodDescription?: MethodDescription;
+	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
+
+}
 export interface Routing {
 	routes: RouteDescription[];
 }

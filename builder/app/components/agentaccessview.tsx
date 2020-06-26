@@ -19,7 +19,8 @@ import {
 	GetNodeProp,
 	isAccessNode,
 	NodesByType,
-	ROUTING_CONTEXT_MENU
+	ROUTING_CONTEXT_MENU,
+  MOUNTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -36,7 +37,15 @@ import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 import SelectInput from './selectinput';
 import { FunctionTypes, MethodFunctions, FunctionTemplateKeys } from '../constants/functiontypes';
-import MethodProps, { MethodDescription, RoutingProps, Routing, RouteDescription } from '../interface/methodprops';
+import MethodProps, {
+	MethodDescription,
+	RoutingProps,
+	Routing,
+	RouteDescription,
+	ViewMoutingProps,
+	ViewMounting,
+  MountingDescription
+} from '../interface/methodprops';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -144,7 +153,7 @@ class AgentAccessView extends Component<any, any> {
 	}
 
 	setAgentRoutingProperty(modelIndex: number, agentIndex: number, v: string, routing: Routing) {
-		if (!this.state.agentMethod[agentIndex]) {
+		if (!this.state.agentRouting[agentIndex]) {
 			this.state.agentRouting[agentIndex] = {};
 		}
 		if (!this.state.agentRouting[agentIndex][modelIndex]) {
@@ -157,6 +166,21 @@ class AgentAccessView extends Component<any, any> {
 		}
 
 		this.state.agentRouting[agentIndex][modelIndex][v] = routing;
+	}
+  setAgentMountingProperty(modelIndex: number, agentIndex: number, v: string, mounting: ViewMounting) {
+		if (!this.state.agentViewMount[agentIndex]) {
+			this.state.agentViewMount[agentIndex] = {};
+		}
+		if (!this.state.agentViewMount[agentIndex][modelIndex]) {
+			this.state.agentViewMount[agentIndex][modelIndex] = {};
+		}
+		if (typeof this.state.agentViewMount[agentIndex][modelIndex][v] === 'string') {
+			this.state.agentViewMount[agentIndex][modelIndex][v] = {
+				functionType: this.state.agentViewMount[agentIndex][modelIndex][v]
+			};
+		}
+
+		this.state.agentViewMount[agentIndex][modelIndex][v] = mounting;
 	}
 
 	render() {
@@ -212,6 +236,11 @@ class AgentAccessView extends Component<any, any> {
 												).map((d) => d.id),
 												agentMethod: loadAgentMethods(onlyAgents, accessDescriptions, graph),
 												agentRouting: loadAgentRouting(onlyAgents, accessDescriptions, graph),
+												agentViewMount: loadAgentViewMount(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentAccess: loadAgentAccess(onlyAgents, accessDescriptions, graph)
 											});
 											return false;
@@ -255,6 +284,13 @@ class AgentAccessView extends Component<any, any> {
 										title="Routing"
 										onClick={() => {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'button_routes');
+										}}
+									/>
+									<Tab
+										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agent_mounting')}
+										title="Mounting"
+										onClick={() => {
+											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agent_mounting');
 										}}
 									/>
 								</Tabs>
@@ -756,6 +792,128 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 								</TabPane>
+								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agent_mounting')}>
+									<Box title={'Agent Mounting'} maxheight={700}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+												<tr>
+													<th />
+													{[]
+														.interpolate(
+															0,
+															this.state.agents.length,
+															(agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => (
+																	<th onClick={() => {}}>{v}</th>
+																))
+														)
+														.flatten()}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.models.map((model: string, modelIndex: number) => {
+													const result = [ <td>{GetNodeTitle(model)}</td> ];
+
+													result.push(
+														...[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number, agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => {
+																	const tdkey = `mounting- ${model} ${modelIndex} ${this
+																		.state.agents[index]} ${agentIndex} ${ViewTypes[
+																		v
+																	]}`;
+																	if (
+																		!this.hasAgentAccess(agentIndex, modelIndex, v)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+																	const accessIndex =
+																		modelIndex * this.state.agents.length +
+																		agentIndex;
+																	const agent = this.state.agents[index];
+																	let functionType = '';
+																	let mounting: ViewMounting = {
+																		mountings: []
+																	};
+																	if (
+																		this.hasFunctionViewTypeValue(
+																			agentIndex,
+																			modelIndex,
+																			v
+																		)
+																	) {
+																		mounting =
+																			this.getMountingDescription(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			) || mounting;
+																	}
+																	let onComponentMountMethod = this.getMethodDescription(
+																		agentIndex,
+																		modelIndex,
+																		v
+																	);
+																	let addRoutingDescriptionBtn = this.createMountingDescriptionButton(
+																		agentIndex,
+																		onlyAgents,
+																		onComponentMountMethod,
+																		model,
+																		modelIndex,
+																		v,
+																		mounting
+																	);
+																	let mountingDom: any = null;
+																	if (mounting) {
+																		mountingDom = mounting.mountings.map(
+																			(mount: MountingDescription) => {
+																				return (
+																					<i
+																						title={mount.name}
+																						className={'fa fa-genderless'}
+																						style={{ color: 'orange' }}
+																					/>
+																				);
+																			}
+																		);
+																	}
+																	return (
+																		<td key={tdkey}>
+																			{addRoutingDescriptionBtn}
+																			{mountingDom}
+																		</td>
+																	);
+																})
+														)
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</Box>
+								</TabPane>
 							</TabContent>
 						</div>
 					</div>
@@ -808,6 +966,49 @@ class AgentAccessView extends Component<any, any> {
 		);
 	}
 
+	private createMountingDescriptionButton(
+		agentIndex: number,
+		onlyAgents: any[],
+		onComponentMountMethod: MethodDescription,
+		model: string,
+		modelIndex: number,
+		v: string,
+		mounting: ViewMounting
+	) {
+		mounting.mountings.forEach((mounting: MountingDescription) => {
+			if (mounting.viewType && mounting.model) {
+				let targetMethodDescription = this.getMethodDescription(agentIndex, modelIndex, mounting.viewType);
+				mounting.targetMethodDescription = targetMethodDescription;
+			}
+		});
+		return (
+			<div className="btn-group">
+				<button
+					className="btn btn-default"
+					type="button"
+					onClick={() => {
+						this.props.setVisual(MOUNTING_CONTEXT_MENU, {
+							agentIndex,
+							agent: onlyAgents[agentIndex].id,
+							onComponentMountMethod,
+							model,
+							modelIndex,
+							viewType: v,
+							mounting,
+							callback: (value: ViewMounting) => {
+								this.setAgentMountingProperty(modelIndex, agentIndex, v, value);
+								this.setState({
+									agentViewMount: this.state.agentViewMount
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
 	private getFunctionTypeOptions(): any {
 		return Object.keys(FunctionTypes).map((d) => {
 			let functionType = FunctionTypes[d];
@@ -835,6 +1036,9 @@ class AgentAccessView extends Component<any, any> {
 	}
 	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): Routing {
 		return this.state.agentRouting[agentIndex][modelIndex][v];
+	}
+	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
+		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
 
 	private getKey(a: number, b: number, c: string) {
@@ -940,8 +1144,51 @@ function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: a
 		});
 	});
 }
-
+function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadAgent<ViewMoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.ViewMoutingProps);
+}
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadAgent<RoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.RoutingProps);
+	// return onlyAgents.map((agent) => {
+	// 	const agentAccessDescription = accessDescriptions.filter((v) =>
+	// 		existsLinkBetween(graph, {
+	// 			source: agent.id,
+	// 			target: v.id,
+	// 			type: LinkType.AgentAccess
+	// 		})
+	// 	);
+	// 	return GetNodesByProperties(
+	// 		{
+	// 			[NodeProperties.NODEType]: NodeTypes.Model
+	// 		},
+	// 		graph
+	// 	).map((model) => {
+	// 		const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
+	// 		if (accessDescription) {
+	// 			const link = findLink(graph, {
+	// 				source: agent.id,
+	// 				target: accessDescription.id
+	// 			});
+	// 			let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.RoutingProps);
+	// 			if (routingProps) {
+	// 				return {
+	// 					...routingProps
+	// 				};
+	// 			}
+	// 		}
+
+	// 		return {
+	// 			[ViewTypes.GetAll]: false,
+	// 			[ViewTypes.Get]: false,
+	// 			[ViewTypes.Create]: false,
+	// 			[ViewTypes.Update]: false,
+	// 			[ViewTypes.Delete]: false
+	// 		};
+	// 	});
+	// });
+}
+
+function loadAgent<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, propKey: string) {
 	return onlyAgents.map((agent) => {
 		const agentAccessDescription = accessDescriptions.filter((v) =>
 			existsLinkBetween(graph, {
@@ -962,7 +1209,7 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 					source: agent.id,
 					target: accessDescription.id
 				});
-				let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.RoutingProps);
+				let routingProps: T = GetLinkProperty(link, propKey);
 				if (routingProps) {
 					return {
 						...routingProps

@@ -907,6 +907,7 @@ export const LinkPropertyKeys = {
 	ComponentTag: 'ComponentTag',
 	ComponentStyle: 'ComponentStyle',
 	MethodProps: 'methodProps',
+	ViewMoutingProps: 'viewMountingProps',
 	RoutingProps: 'routingProps',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
