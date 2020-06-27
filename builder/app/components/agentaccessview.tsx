@@ -1014,7 +1014,7 @@ function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: a
 	});
 }
 function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadAgent<ViewMoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.ViewMoutingProps);
+	return loadAgent<ViewMoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.MountingProps);
 }
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadAgent<RoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.RoutingProps);
