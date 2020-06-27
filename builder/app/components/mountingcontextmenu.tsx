@@ -16,13 +16,21 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { Routing, RouteDescription, MethodDescription, RouteSource, RouteSourceType, ViewMounting, MountingDescription } from '../interface/methodprops';
+import {
+	Routing,
+	RouteDescription,
+	MethodDescription,
+	RouteSource,
+	RouteSourceType,
+	ViewMounting,
+	MountingDescription
+} from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
-import { MethodFunctions } from '../constants/functiontypes';
+import { MethodFunctions, GetFunctionTypeOptions } from '../constants/functiontypes';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -36,23 +44,25 @@ class ContextMenu extends Component<any, any> {
 	getDefaultMenu(mode: any) {
 		const { state } = this.props;
 		const graph = UIA.GetCurrentGraph(state);
-		let routing: Routing = mode.routing;
+		let mounting: ViewMounting = mode.mounting;
 		let callback: any = mode.callback;
+		let model: string = mode.model;
 		let agent: string = mode.agent;
+		let viewType: string = mode.viewType;
 		return (
 			<TreeViewButtonGroup>
 				<TreeViewGroupButton
-					title={`${Titles.DeleteAllSelected}(${graph ? graph.selected : '0'})`}
+					title={`${Titles.AddMountFunction}`}
 					onClick={() => {
-						routing.routes.push({
+						mounting.mountings.push({
 							id: UIA.GUID(),
-							model: '',
+							model,
 							agent,
 							name: '',
-							viewType: ViewTypes.Get
+							viewType
 						});
 						if (callback) {
-							callback(routing);
+							callback(mounting);
 							this.setState({ turn: UIA.GUID() });
 						}
 					}}
@@ -65,7 +75,6 @@ class ContextMenu extends Component<any, any> {
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let mounting: ViewMounting = mode.mounting;
-		let onComponentMountMethod: MethodDescription = mode.onComponentMountMethod;
 
 		let callback: any = mode.callback;
 		if (mounting) {
@@ -76,28 +85,32 @@ class ContextMenu extends Component<any, any> {
 			this.getRoutingApi(mode);
 			switch (mode) {
 				default:
-					mounting.mountings.forEach((mounting: MountingDescription, index: number) => {
+					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, agent, viewType, targetMethodDescription } = mounting;
+						let { name, model, agent, viewType, methodDescription } = mountingItem;
 						let parameterConnections: any = null;
-						if (onComponentMountMethod && targetMethodDescription) {
-							parameterConnections = Object.keys(targetMethodDescription.properties)
-								.filter(this.filterFunctionParameters(targetMethodDescription))
+						if (methodDescription) {
+							parameterConnections = this.getMethodDescriptionParameters(methodDescription)
+								.filter(this.filterFunctionParameters(methodDescription))
 								.map((urlParameter: string, index: number) => {
 									let routeKey = `url-param-${urlParameter}-${index}`;
 									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
 									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = mounting.source ? mounting.source.model : null;
+									let value = mountingItem.source ? mountingItem.source.model : null;
 									let options = [
-										...Object.keys(onComponentMountMethod.properties)
-											.filter(this.filterFunctionParameters(onComponentMountMethod))
+										...[ urlParameter ]
+											.filter(
+												methodDescription
+													? this.filterFunctionParameters(methodDescription)
+													: () => false
+											)
 											.map((k: string) => {
 												return (
 													<TreeViewMenu
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
-															mounting.source = {
+															mountingItem.source = {
 																model: k,
 																property: null,
 																type: RouteSourceType.UrlParameter
@@ -120,7 +133,7 @@ class ContextMenu extends Component<any, any> {
 											}}
 										>
 											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = mounting.source ? mounting.source.property : null;
+												let value = mountingItem.source ? mountingItem.source.property : null;
 												return (
 													<TreeViewMenu
 														icon={
@@ -132,7 +145,7 @@ class ContextMenu extends Component<any, any> {
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
-															mounting.source = {
+															mountingItem.source = {
 																model,
 																property: modelPropertyOption.id,
 																type: RouteSourceType.Model
@@ -156,7 +169,7 @@ class ContextMenu extends Component<any, any> {
 											key={`url-parma-k-genta`}
 										>
 											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = mounting.source ? mounting.source.property : null;
+												let value = mountingItem.source ? mountingItem.source.property : null;
 												return (
 													<TreeViewMenu
 														title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -168,7 +181,7 @@ class ContextMenu extends Component<any, any> {
 															)
 														}
 														onClick={() => {
-															mounting.source = {
+															mountingItem.source = {
 																model: agent,
 																property: agentPropertyOption.id,
 																type: RouteSourceType.Agent
@@ -208,33 +221,32 @@ class ContextMenu extends Component<any, any> {
 								}}
 							>
 								<TreeViewItemContainer>
+									<SelectInput
+										onChange={(c: string) => {
+											let defaultMethodDescription: any = {
+												functionType: c,
+												properties: {}
+											};
+											methodDescription = methodDescription || defaultMethodDescription;
+											if (methodDescription) {
+												methodDescription.functionType = c;
+											}
+											mountingItem.methodDescription = methodDescription;
+											this.setState({ turn: UIA.GUID() });
+										}}
+										label={Titles.FunctionTypes}
+										value={methodDescription ? methodDescription.functionType : null}
+										options={GetFunctionTypeOptions()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}
 										onChange={(value: string) => {
-											this.setState({ name: value });
+											mountingItem.name = value;
+											this.setState({ turn: UIA.GUID() });
 										}}
-										value={this.state.name || name}
-									/>
-								</TreeViewItemContainer>
-								<TreeViewItemContainer>
-									<SelectInput
-										options={models}
-										label={Titles.Model}
-										onChange={(value: string) => {
-											this.setState({ model: value });
-										}}
-										value={this.state.model || model}
-									/>
-								</TreeViewItemContainer>
-
-								<TreeViewItemContainer>
-									<SelectInput
-										options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
-										label={Titles.ViewTypes}
-										onChange={(value: string) => {
-											this.setState({ viewType: value });
-										}}
-										value={this.state.viewType || viewType}
+										value={mountingItem.name}
 									/>
 								</TreeViewItemContainer>
 								{parameterConnections}
@@ -242,14 +254,12 @@ class ContextMenu extends Component<any, any> {
 									<TreeViewGroupButton
 										onClick={() => {
 											if (callback) {
-												let update = mounting.routes.find((x) => x.id === mounting.id);
+												let update = mounting.mountings.find((x) => x.id === mountingItem.id);
 												if (update) {
-													update.viewType = this.state.viewType || viewType;
-													update.model = this.state.model || model;
-													update.name = this.state.name || name;
 													if (callback) {
 														callback(mounting);
 													}
+													this.setState({ turn: UIA.GUID() });
 												}
 											}
 										}}
@@ -257,7 +267,7 @@ class ContextMenu extends Component<any, any> {
 									/>
 									<TreeViewGroupButton
 										onClick={() => {
-											mounting.routes.splice(index, 1);
+											mounting.mountings.splice(index, 1);
 											if (callback) {
 												callback(mounting);
 												this.setState({ turn: UIA.GUID() });
@@ -275,14 +285,28 @@ class ContextMenu extends Component<any, any> {
 		return result;
 	}
 
-	private filterFunctionParameters(
-		onComponentMountMethod: MethodDescription
-	): (value: string, index: number, array: string[]) => boolean {
-		return (x: string) => {
-			let { parameters } = MethodFunctions[onComponentMountMethod.functionType];
+	private getMethodDescriptionParameters(methodDescription: MethodDescription): any[] {
+		if (MethodFunctions[methodDescription.functionType]) {
+			let { parameters } = MethodFunctions[methodDescription.functionType];
 			if (parameters && parameters.parameters) {
 				if (parameters && parameters.parameters && parameters.parameters.template) {
-					return !!parameters.parameters.template[x];
+					return Object.keys(parameters.parameters.template);
+				}
+			}
+		}
+		return [];
+	}
+
+	private filterFunctionParameters(
+		methodDescription: MethodDescription
+	): (value: string, index: number, array: string[]) => boolean {
+		return (x: string) => {
+			if (MethodFunctions[methodDescription.functionType]) {
+				let { parameters } = MethodFunctions[methodDescription.functionType];
+				if (parameters && parameters.parameters) {
+					if (parameters && parameters.parameters && parameters.parameters.template) {
+						return !!parameters.parameters.template[x];
+					}
 				}
 			}
 			return false;

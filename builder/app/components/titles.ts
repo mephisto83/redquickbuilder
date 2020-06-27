@@ -31,6 +31,7 @@ export const Management = 'Management';
 export const JobPath = 'Job Path';
 export const PricePerConnection = 'Connection cost';
 export const JobsFilePath = 'Jobs File Path';
+export const AddMountFunction = 'Add Mount Function';
 export const DuplicateProperties = 'Duplicate Properties';
 export const BuildMenu = 'Build Menu';
 export const PricePerNode = 'Node cost';

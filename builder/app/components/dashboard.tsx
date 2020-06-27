@@ -92,6 +92,7 @@ import ModelFilterItemActivityMenu from './modelfilteritemactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
 import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
+import MountingContextMenu from './mountingcontextmenu';
 import ContextMenu from './contextmenu';
 import RoutingContextMenu from './routingcontextmenu';
 import SidebarButton from './sidebarbutton';
@@ -2602,6 +2603,7 @@ class Dashboard extends Component<any, any> {
 				</div>
 				<ContextMenu />
         <RoutingContextMenu />
+        <MountingContextMenu />
 			</div>
 		);
 	}

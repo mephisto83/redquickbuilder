@@ -36,7 +36,12 @@ import { GetNodesByProperties, existsLinkBetween, findLink, existsLinksBetween }
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 import SelectInput from './selectinput';
-import { FunctionTypes, MethodFunctions, FunctionTemplateKeys } from '../constants/functiontypes';
+import {
+	FunctionTypes,
+	MethodFunctions,
+	FunctionTemplateKeys,
+	GetFunctionTypeOptions
+} from '../constants/functiontypes';
 import MethodProps, {
 	MethodDescription,
 	RoutingProps,
@@ -286,13 +291,6 @@ class AgentAccessView extends Component<any, any> {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'button_routes');
 										}}
 									/>
-									<Tab
-										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agent_mounting')}
-										title="Mounting"
-										onClick={() => {
-											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agent_mounting');
-										}}
-									/>
 								</Tabs>
 							</TabContainer>
 							<TabContent>
@@ -304,7 +302,11 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+															<th
+																style={{ backgroundColor: '#FEFCAD' }}
+																key={`${index}-agent-access-th`}
+																colSpan={5}
+															>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -619,35 +621,36 @@ class AgentAccessView extends Component<any, any> {
 																	) {
 																		return <td key={tdkey} />;
 																	}
-																	return (
-																		<td key={tdkey}>
-																			{!this.state.agentAccess[agentIndex][
-																				modelIndex
-																			][ViewTypes[v]] ? null : (
-																				<SelectInput
-																					label={' '}
-																					options={this.getFunctionTypeOptions()}
-																					onChange={(value: string) => {
-																						this.setAgentMethod(
-																							modelIndex,
-																							agentIndex,
-																							v,
-																							value
-																						);
 
-																						this.setState({
-																							agentMethod: [
-																								...this.state
-																									.agentMethod
-																							]
-																						});
-																					}}
-																					value={functionType}
-																				/>
-																			)}
-																			{functionKeySelect}
-																			{functionOptions}
-																		</td>
+																	let mounting: ViewMounting = {
+																		mountings: []
+																	};
+																	if (
+																		this.hasFunctionViewTypeValue(
+																			agentIndex,
+																			modelIndex,
+																			v
+																		)
+																	) {
+																		mounting =
+																			this.getMountingDescription(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			) || mounting;
+																		mounting.mountings = mounting.mountings || [];
+																	}
+
+																	let mountingDescriptionButton = this.createMountingDescriptionButton(
+																		agentIndex,
+																		onlyAgents,
+																		model,
+																		modelIndex,
+																		v,
+																		mounting
+																	);
+																	return (
+																		<td key={tdkey}>{mountingDescriptionButton}</td>
 																	);
 																})
 														)
@@ -790,128 +793,6 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 								</TabPane>
-								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agent_mounting')}>
-									<Box title={'Agent Mounting'} maxheight={700}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{[]
-														.interpolate(
-															0,
-															this.state.agents.length,
-															(agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => (
-																	<th onClick={() => {}}>{v}</th>
-																))
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [ <td>{GetNodeTitle(model)}</td> ];
-
-													result.push(
-														...[].interpolate(
-															0,
-															this.state.agents.length,
-															(index: number, agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => {
-																	const tdkey = `mounting- ${model} ${modelIndex} ${this
-																		.state.agents[index]} ${agentIndex} ${ViewTypes[
-																		v
-																	]}`;
-																	if (
-																		!this.hasAgentAccess(agentIndex, modelIndex, v)
-																	) {
-																		return <td key={tdkey} />;
-																	}
-																	const accessIndex =
-																		modelIndex * this.state.agents.length +
-																		agentIndex;
-																	const agent = this.state.agents[index];
-																	let functionType = '';
-																	let mounting: ViewMounting = {
-																		mountings: []
-																	};
-																	if (
-																		this.hasFunctionViewTypeValue(
-																			agentIndex,
-																			modelIndex,
-																			v
-																		)
-																	) {
-																		mounting =
-																			this.getMountingDescription(
-																				agentIndex,
-																				modelIndex,
-																				v
-																			) || mounting;
-																	}
-																	let onComponentMountMethod = this.getMethodDescription(
-																		agentIndex,
-																		modelIndex,
-																		v
-																	);
-																	let addRoutingDescriptionBtn = this.createMountingDescriptionButton(
-																		agentIndex,
-																		onlyAgents,
-																		onComponentMountMethod,
-																		model,
-																		modelIndex,
-																		v,
-																		mounting
-																	);
-																	let mountingDom: any = null;
-																	if (mounting) {
-																		mountingDom = mounting.mountings.map(
-																			(mount: MountingDescription) => {
-																				return (
-																					<i
-																						title={mount.name}
-																						className={'fa fa-genderless'}
-																						style={{ color: 'orange' }}
-																					/>
-																				);
-																			}
-																		);
-																	}
-																	return (
-																		<td key={tdkey}>
-																			{addRoutingDescriptionBtn}
-																			{mountingDom}
-																		</td>
-																	);
-																})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-								</TabPane>
 							</TabContent>
 						</div>
 					</div>
@@ -967,28 +848,30 @@ class AgentAccessView extends Component<any, any> {
 	private createMountingDescriptionButton(
 		agentIndex: number,
 		onlyAgents: any[],
-		onComponentMountMethod: MethodDescription,
 		model: string,
 		modelIndex: number,
 		v: string,
 		mounting: ViewMounting
 	) {
-		mounting.mountings.forEach((mounting: MountingDescription) => {
-			if (mounting.viewType && mounting.model) {
-				let targetMethodDescription = this.getMethodDescription(agentIndex, modelIndex, mounting.viewType);
-				mounting.targetMethodDescription = targetMethodDescription;
-			}
-		});
+		let hasMountings = false;
+		if (mounting && mounting.mountings) {
+			mounting.mountings.forEach((mounting: MountingDescription) => {
+				if (mounting.viewType && mounting.model) {
+					let targetMethodDescription = this.getMethodDescription(agentIndex, modelIndex, mounting.viewType);
+					mounting.methodDescription = targetMethodDescription;
+				}
+			});
+			hasMountings = !!mounting.mountings.length;
+		}
 		return (
 			<div className="btn-group">
 				<button
-					className="btn btn-default"
+					className={hasMountings ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(MOUNTING_CONTEXT_MENU, {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,
-							onComponentMountMethod,
 							model,
 							modelIndex,
 							viewType: v,
@@ -1008,19 +891,7 @@ class AgentAccessView extends Component<any, any> {
 		);
 	}
 	private getFunctionTypeOptions(): any {
-		return Object.keys(FunctionTypes).map((d) => {
-			let functionType = FunctionTypes[d];
-			if (MethodFunctions[functionType] && MethodFunctions[functionType].title) {
-				return {
-					title: MethodFunctions[functionType].title,
-					value: functionType
-				};
-			}
-			return {
-				title: d,
-				value: functionType
-			};
-		});
+		return GetFunctionTypeOptions();
 	}
 
 	private hasAgentAccess(agentIndex: number, modelIndex: number, v: string): any {

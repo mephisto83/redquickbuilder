@@ -32,7 +32,7 @@ export interface MountingDescription {
   // ------
 	id: string;
 	name: string;
-	targetMethodDescription?: MethodDescription;
+	methodDescription?: MethodDescription;
 	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
 
 }

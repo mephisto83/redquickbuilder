@@ -1894,3 +1894,23 @@ export function bindReferenceTemplate(templateString: any, data: any) {
 	}
 	return templateString;
 }
+
+export function GetFunctionTypeOptions() {
+	return Object.keys(FunctionTypes)
+		.map((d) => {
+			let functionType = FunctionTypes[d];
+			if (MethodFunctions[functionType] && MethodFunctions[functionType].title) {
+				return {
+					title: MethodFunctions[functionType].title,
+					value: functionType
+				};
+			}
+			return {
+				title: d,
+				value: functionType
+			};
+		})
+		.sort((a, b) => {
+			return `${a.title}`.localeCompare(`${b.title}`);
+		});
+}
