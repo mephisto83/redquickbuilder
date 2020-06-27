@@ -51,6 +51,7 @@ import MethodProps, {
 	ViewMounting,
 	MountingDescription
 } from '../interface/methodprops';
+import { Node } from '../methods/graph_types';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -718,11 +719,11 @@ class AgentAccessView extends Component<any, any> {
 																	) {
 																		return <td key={tdkey} />;
 																	}
-																	const accessIndex =
-																		modelIndex * this.state.agents.length +
-																		agentIndex;
-																	const agent = this.state.agents[index];
-																	let functionType = '';
+																	// const accessIndex =
+																	// 	modelIndex * this.state.agents.length +
+																	// 	agentIndex;
+																	// const agent = this.state.agents[index];
+																	// let functionType = '';
 																	let routing: Routing = {
 																		routes: []
 																	};
@@ -740,7 +741,7 @@ class AgentAccessView extends Component<any, any> {
 																				v
 																			) || routing;
 																	}
-																	let onComponentMountMethod = this.getMethodDescription(
+																	let onComponentMountMethod = this.getMountingDescription(
 																		agentIndex,
 																		modelIndex,
 																		v
@@ -771,7 +772,6 @@ class AgentAccessView extends Component<any, any> {
 																	return (
 																		<td key={tdkey}>
 																			{addRoutingDescriptionBtn}
-																			{routesDom}
 																		</td>
 																	);
 																})
@@ -803,7 +803,7 @@ class AgentAccessView extends Component<any, any> {
 	private createRoutingDescriptionButton(
 		agentIndex: number,
 		onlyAgents: any[],
-		onComponentMountMethod: MethodDescription,
+		onComponentMountMethod: ViewMounting,
 		model: string,
 		modelIndex: number,
 		v: string,
@@ -819,7 +819,7 @@ class AgentAccessView extends Component<any, any> {
 		return (
 			<div className="btn-group">
 				<button
-					className="btn btn-default"
+					className={routing.routes && routing.routes.length ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(ROUTING_CONTEXT_MENU, {
@@ -830,6 +830,11 @@ class AgentAccessView extends Component<any, any> {
 							modelIndex,
 							viewType: v,
 							routing,
+							getMountingDescription: (a: string, m: string, v: string): ViewMounting => {
+								let aI = onlyAgents.findIndex((f: Node) => f.id === a);
+								let mI = this.state.models.findIndex((f: string) => f === m);
+								return this.getMountingDescription(aI, mI, v);
+							},
 							callback: (value: Routing) => {
 								this.setAgentRoutingProperty(modelIndex, agentIndex, v, value);
 								this.setState({
@@ -903,6 +908,7 @@ class AgentAccessView extends Component<any, any> {
 	private getMethodDescription(agentIndex: number, modelIndex: number, v: string): MethodDescription {
 		return this.state.agentMethod[agentIndex][modelIndex][v];
 	}
+
 	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): Routing {
 		return this.state.agentRouting[agentIndex][modelIndex][v];
 	}

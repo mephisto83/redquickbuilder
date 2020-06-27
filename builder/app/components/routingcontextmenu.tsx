@@ -16,7 +16,16 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { Routing, RouteDescription, MethodDescription, RouteSource, RouteSourceType } from '../interface/methodprops';
+import {
+	Routing,
+	RouteDescription,
+	MethodDescription,
+	RouteSource,
+	RouteSourceType,
+	ViewMounting,
+	ViewMoutingProps,
+	MountingDescription
+} from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
@@ -65,8 +74,9 @@ class ContextMenu extends Component<any, any> {
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let routing: Routing = mode.routing;
-		let onComponentMountMethod: MethodDescription = mode.onComponentMountMethod;
-
+		let onComponentMountMethod: ViewMounting = mode.onComponentMountMethod;
+		let sourceAgent = mode.agent;
+		let sourceModel = mode.model;
 		let callback: any = mode.callback;
 		if (routing) {
 			const exit = () => {
@@ -78,124 +88,132 @@ class ContextMenu extends Component<any, any> {
 				default:
 					routing.routes.forEach((route: RouteDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, agent, viewType, targetMethodDescription } = route;
+						let { name, model, agent, viewType } = route;
+						let viewMounting: ViewMounting =
+							agent && model ? mode.getMountingDescription(agent, model, viewType) : null;
+						let sourceViewMounting: ViewMounting =
+							agent && model
+								? mode.getMountingDescription(sourceAgent, sourceModel, mode.viewType)
+								: null;
 						let parameterConnections: any = null;
-						if (onComponentMountMethod && targetMethodDescription) {
-							parameterConnections = Object.keys(targetMethodDescription.properties)
-								.filter(this.filterFunctionParameters(targetMethodDescription))
-								.map((urlParameter: string, index: number) => {
-									let routeKey = `url-param-${urlParameter}-${index}`;
-									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
-									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = route.source ? route.source.model : null;
-									let options = [
-										...Object.keys(onComponentMountMethod.properties)
-											.filter(this.filterFunctionParameters(onComponentMountMethod))
-											.map((k: string) => {
-												return (
-													<TreeViewMenu
-														title={k}
-														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
-														onClick={() => {
-															route.source = {
-																model: k,
-																property: null,
-																type: RouteSourceType.UrlParameter
-															};
-															callback(routing);
-															this.setState({ turn: UIA.GUID() });
-														}}
-														key={`url-parma-k-${k}`}
-													/>
-												);
-											}),
-										<TreeViewMenu
-											icon={value !== model ? 'fa fa-square-o' : 'fa fa-square'}
-											title={`${UIA.GetNodeTitle(model)}(model)`}
-											active
-											key={`url-parma-k-modle`}
-											open={this.state[model]}
-											toggle={() => {
-												this.setState({ [model]: !this.state[model] });
-											}}
-										>
-											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = route.source ? route.source.property : null;
-												return (
-													<TreeViewMenu
-														icon={
-															value !== modelPropertyOption.id ? (
-																'fa fa-square-o'
-															) : (
-																'fa fa-square'
-															)
-														}
-														title={UIA.GetNodeTitle(modelPropertyOption)}
-														onClick={() => {
-															route.source = {
-																model,
-																property: modelPropertyOption.id,
-																type: RouteSourceType.Model
-															};
-															callback(routing);
-															this.setState({ turn: UIA.GUID() });
-														}}
-														key={`url-parsma-k-${modelPropertyOption.id}`}
-													/>
-												);
-											})}
-										</TreeViewMenu>,
-										<TreeViewMenu
-											icon={value !== agent ? 'fa fa-square-o' : 'fa fa-square'}
-											open={this.state[agent]}
-											active
-											toggle={() => {
-												this.setState({ [agent]: !this.state[agent] });
-											}}
-											title={`${UIA.GetNodeTitle(agent)}(agent)`}
-											key={`url-parma-k-genta`}
-										>
-											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = route.source ? route.source.property : null;
-												return (
-													<TreeViewMenu
-														title={UIA.GetNodeTitle(agentPropertyOption)}
-														icon={
-															value !== agentPropertyOption.id ? (
-																'fa fa-square-o'
-															) : (
-																'fa fa-square'
-															)
-														}
-														onClick={() => {
-															route.source = {
-																model: agent,
-																property: agentPropertyOption.id,
-																type: RouteSourceType.Agent
-															};
-															callback(routing);
-															this.setState({ turn: UIA.GUID() });
-														}}
-														key={`url-parma-k-${agentPropertyOption.id}`}
-													/>
-												);
-											})}
-										</TreeViewMenu>
-									];
-									return (
-										<TreeViewMenu
-											key={routeKey}
-											active
-											open={this.state[routeKey]}
-											title={urlParameter}
-											toggle={() => {
-												this.setState({ [routeKey]: !this.state[routeKey] });
-											}}
-										>
-											{options}
-										</TreeViewMenu>
-									);
-								});
+						if (onComponentMountMethod && viewMounting) {
+							parameterConnections = this.getViewMountingDescriptionParameters(
+								viewMounting
+							).map((urlParameter: string, index: number) => {
+								let routeKey = `url-param-${urlParameter}-${index}`;
+								let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(sourceAgent);
+								let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(sourceModel);
+								let value = route.source ? route.source.model : null;
+								let sourceParameters =
+									this.getViewMountingDescriptionParameters(sourceViewMounting) || [];
+								let options = [
+									...sourceParameters
+										.filter(this.filterFunctionParameters(onComponentMountMethod))
+										.map((k: string) => {
+											return (
+												<TreeViewMenu
+													title={k}
+													icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
+													onClick={() => {
+														route.source = {
+															model: k,
+															property: null,
+															type: RouteSourceType.UrlParameter
+														};
+														callback(routing);
+														this.setState({ turn: UIA.GUID() });
+													}}
+													key={`url-parma-k-${k}`}
+												/>
+											);
+										}),
+									<TreeViewMenu
+										icon={value !== sourceModel ? 'fa fa-square-o' : 'fa fa-square'}
+										title={`${UIA.GetNodeTitle(sourceModel)}(model)`}
+										active
+										key={`url-parma-k-modle`}
+										open={this.state[sourceModel]}
+										toggle={() => {
+											this.setState({ [sourceModel]: !this.state[sourceModel] });
+										}}
+									>
+										{modelPropertyOptions.map((modelPropertyOption: Node) => {
+											let value = route.source ? route.source.property : null;
+											return (
+												<TreeViewMenu
+													icon={
+														value !== modelPropertyOption.id ? (
+															'fa fa-square-o'
+														) : (
+															'fa fa-square'
+														)
+													}
+													title={UIA.GetNodeTitle(modelPropertyOption)}
+													onClick={() => {
+														route.source = {
+															model: sourceModel,
+															property: modelPropertyOption.id,
+															type: RouteSourceType.Model
+														};
+														callback(routing);
+														this.setState({ turn: UIA.GUID() });
+													}}
+													key={`url-parsma-k-${modelPropertyOption.id}`}
+												/>
+											);
+										})}
+									</TreeViewMenu>,
+									<TreeViewMenu
+										icon={value !== sourceAgent ? 'fa fa-square-o' : 'fa fa-square'}
+										open={this.state[sourceAgent]}
+										active
+										toggle={() => {
+											this.setState({ [sourceAgent]: !this.state[sourceAgent] });
+										}}
+										title={`${UIA.GetNodeTitle(sourceAgent)}(agent)`}
+										key={`url-parma-k-genta`}
+									>
+										{agentPropertyOptions.map((agentPropertyOption: Node) => {
+											let value = route.source ? route.source.property : null;
+											return (
+												<TreeViewMenu
+													title={UIA.GetNodeTitle(agentPropertyOption)}
+													icon={
+														value !== agentPropertyOption.id ? (
+															'fa fa-square-o'
+														) : (
+															'fa fa-square'
+														)
+													}
+													onClick={() => {
+														route.source = {
+															model: agent,
+															property: agentPropertyOption.id,
+															type: RouteSourceType.Agent
+														};
+														callback(routing);
+														this.setState({ turn: UIA.GUID() });
+													}}
+													key={`url-parma-k-${agentPropertyOption.id}`}
+												/>
+											);
+										})}
+									</TreeViewMenu>
+								];
+								return (
+									<TreeViewMenu
+										key={routeKey}
+										active
+										open={this.state[routeKey]}
+										title={urlParameter}
+										toggle={() => {
+											this.setState({ [routeKey]: !this.state[routeKey] });
+										}}
+									>
+										{options}
+									</TreeViewMenu>
+								);
+							});
 						}
 						result.push(
 							<TreeViewMenu
@@ -211,9 +229,10 @@ class ContextMenu extends Component<any, any> {
 									<TextInput
 										label={Titles.Name}
 										onChange={(value: string) => {
-											this.setState({ name: value });
+											route.name = value;
+											this.setState({ turn: UIA.GUID() });
 										}}
-										value={this.state.name || name}
+										value={route.name}
 									/>
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
@@ -221,9 +240,10 @@ class ContextMenu extends Component<any, any> {
 										options={models}
 										label={Titles.Model}
 										onChange={(value: string) => {
-											this.setState({ model: value });
+											route.model = value;
+											this.setState({ turn: UIA.GUID() });
 										}}
-										value={this.state.model || model}
+										value={route.model}
 									/>
 								</TreeViewItemContainer>
 
@@ -232,9 +252,10 @@ class ContextMenu extends Component<any, any> {
 										options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
 										label={Titles.ViewTypes}
 										onChange={(value: string) => {
-											this.setState({ viewType: value });
+											route.viewType = value;
+											this.setState({ turn: UIA.GUID() });
 										}}
-										value={this.state.viewType || viewType}
+										value={route.viewType}
 									/>
 								</TreeViewItemContainer>
 								{parameterConnections}
@@ -244,9 +265,9 @@ class ContextMenu extends Component<any, any> {
 											if (callback) {
 												let update = routing.routes.find((x) => x.id === route.id);
 												if (update) {
-													update.viewType = this.state.viewType || viewType;
-													update.model = this.state.model || model;
-													update.name = this.state.name || name;
+													// update.viewType = this.state.viewType || viewType;
+													// update.model = this.state.model || model;
+													// update.name = this.state.name || name;
 													if (callback) {
 														callback(routing);
 													}
@@ -274,18 +295,59 @@ class ContextMenu extends Component<any, any> {
 		}
 		return result;
 	}
-
-	private filterFunctionParameters(
-		onComponentMountMethod: MethodDescription
+	private filterMethodDescriptionFunctionParameters(
+		methodDescription: MethodDescription
 	): (value: string, index: number, array: string[]) => boolean {
 		return (x: string) => {
-			let { parameters } = MethodFunctions[onComponentMountMethod.functionType];
+			let { parameters } = MethodFunctions[methodDescription.functionType];
 			if (parameters && parameters.parameters) {
 				if (parameters && parameters.parameters && parameters.parameters.template) {
 					return !!parameters.parameters.template[x];
 				}
 			}
 			return false;
+		};
+	}
+	private getViewMountingDescriptionParameters(viewMounting: ViewMounting): any[] {
+		let result: string[] = [];
+		viewMounting.mountings.forEach((mounting: MountingDescription) => {
+			if (mounting.methodDescription) {
+				let parameters = this.getMethodDescriptionParameters(mounting.methodDescription);
+				result.push(...parameters);
+			}
+		});
+		return result;
+	}
+	private getMethodDescriptionParameters(methodDescription: MethodDescription): any[] {
+		if (MethodFunctions[methodDescription.functionType]) {
+			let { parameters } = MethodFunctions[methodDescription.functionType];
+			if (parameters && parameters.parameters) {
+				if (parameters && parameters.parameters && parameters.parameters.template) {
+					return Object.keys(parameters.parameters.template);
+				}
+			}
+		}
+		return [];
+	}
+	private filterFunctionParameters(
+		viewMounting: ViewMounting
+	): (value: string, index: number, array: string[]) => boolean {
+		return (x: string) => {
+			return (
+				viewMounting &&
+				viewMounting.mountings &&
+				!!viewMounting.mountings.find((mounting: MountingDescription) => {
+					if (mounting && mounting.methodDescription) {
+						let { parameters } = MethodFunctions[mounting.methodDescription.functionType];
+						if (parameters && parameters.parameters) {
+							if (parameters && parameters.parameters && parameters.parameters.template) {
+								return !!parameters.parameters.template[x];
+							}
+						}
+					}
+					return false;
+				})
+			);
 		};
 	}
 
