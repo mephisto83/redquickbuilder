@@ -20,7 +20,7 @@ import {
 	isAccessNode,
 	NodesByType,
 	ROUTING_CONTEXT_MENU,
-  MOUNTING_CONTEXT_MENU
+	MOUNTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -44,7 +44,7 @@ import MethodProps, {
 	RouteDescription,
 	ViewMoutingProps,
 	ViewMounting,
-  MountingDescription
+	MountingDescription
 } from '../interface/methodprops';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
@@ -167,7 +167,7 @@ class AgentAccessView extends Component<any, any> {
 
 		this.state.agentRouting[agentIndex][modelIndex][v] = routing;
 	}
-  setAgentMountingProperty(modelIndex: number, agentIndex: number, v: string, mounting: ViewMounting) {
+	setAgentMountingProperty(modelIndex: number, agentIndex: number, v: string, mounting: ViewMounting) {
 		if (!this.state.agentViewMount[agentIndex]) {
 			this.state.agentViewMount[agentIndex] = {};
 		}
@@ -498,9 +498,7 @@ class AgentAccessView extends Component<any, any> {
 															0,
 															this.state.agents.length,
 															(agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => (
-																	<th onClick={() => {}}>{v}</th>
-																))
+																Object.keys(ViewTypes).map((v) => <th>{v}</th>)
 														)
 														.flatten()}
 												</tr>
