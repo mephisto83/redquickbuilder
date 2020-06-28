@@ -431,7 +431,7 @@ class AgentAccessView extends Component<any, any> {
 																				title={`${GetNodeTitle(
 																					agent
 																				)} ${GetNodeTitle(model)}`}
-																				style={{ height: 40, width: 40 }}
+																				style={{ height: 30, width: 30 }}
 																				onChange={(value: any) => {
 																					this.setAgentAccess(
 																						modelIndex,
@@ -497,11 +497,8 @@ class AgentAccessView extends Component<any, any> {
 												<tr>
 													<th />
 													{[]
-														.interpolate(
-															0,
-															this.state.agents.length,
-															(agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => <th>{v}</th>)
+														.interpolate(0, this.state.agents.length, () =>
+															Object.keys(ViewTypes).map((v) => <th>{v}</th>)
 														)
 														.flatten()}
 												</tr>
@@ -516,105 +513,6 @@ class AgentAccessView extends Component<any, any> {
 															this.state.agents.length,
 															(index: number, agentIndex: number) =>
 																Object.keys(ViewTypes).map((v) => {
-																	const accessIndex =
-																		modelIndex * this.state.agents.length +
-																		agentIndex;
-																	const agent = this.state.agents[index];
-																	let functionType = '';
-																	if (
-																		this.hasFunctionViewTypeValue(
-																			agentIndex,
-																			modelIndex,
-																			v
-																		)
-																	) {
-																		let localSettings: MethodDescription = this.getMethodDescription(
-																			agentIndex,
-																			modelIndex,
-																			v
-																		);
-																		functionType = localSettings.functionType;
-																	}
-																	let functionKeySelect: any = null;
-																	let functionOptions: any = null;
-																	if (functionType && MethodFunctions[functionType]) {
-																		let { constraints } = MethodFunctions[
-																			functionType
-																		];
-																		if (constraints) {
-																			functionKeySelect = (
-																				<SelectInput
-																					onChange={(c: string) => {
-																						this.setState({
-																							[this.getKey(
-																								agentIndex,
-																								modelIndex,
-																								v
-																							)]: c
-																						});
-																					}}
-																					label={'Constraint'}
-																					value={
-																						this.state[
-																							this.getKey(
-																								agentIndex,
-																								modelIndex,
-																								v
-																							)
-																						]
-																					}
-																					options={Object.keys(
-																						constraints
-																					).map((d) => ({
-																						title: d,
-																						value: d
-																					}))}
-																				/>
-																			);
-																			let functionKey = this.state[
-																				this.getKey(agentIndex, modelIndex, v)
-																			];
-																			const value = this.hasFunctionKeyValue(
-																				agentIndex,
-																				modelIndex,
-																				v,
-																				functionKey
-																			)
-																				? this.state.agentMethod[agentIndex][
-																						modelIndex
-																					][v].properties[functionKey]
-																				: '';
-																			if (
-																				constraints[functionKey] &&
-																				constraints[functionKey].nodeTypes
-																			)
-																				functionOptions = (
-																					<SelectInput
-																						label={functionKey}
-																						key={`func-key${functionKey}`}
-																						value={value}
-																						onChange={(value: string) => {
-																							this.setAgentMethodProperty(
-																								modelIndex,
-																								agentIndex,
-																								v,
-																								functionKey,
-																								value
-																							);
-																							this.setState({
-																								agentMethod: this.state
-																									.agentMethod
-																							});
-																						}}
-																						options={NodesByType(
-																							null,
-																							constraints[functionKey]
-																								.nodeTypes
-																						).toNodeSelect()}
-																					/>
-																				);
-																		}
-																	}
 																	const tdkey = `${model} ${modelIndex} ${this.state
 																		.agents[index]} ${agentIndex} ${ViewTypes[v]}`;
 																	if (
@@ -623,24 +521,23 @@ class AgentAccessView extends Component<any, any> {
 																		return <td key={tdkey} />;
 																	}
 
-																	let mounting: ViewMounting = {
-																		mountings: []
-																	};
-																	if (
-																		this.hasFunctionViewTypeValue(
-																			agentIndex,
+																	let mounting: ViewMounting = this.getMountingDescription(
+																		agentIndex,
+																		modelIndex,
+																		v
+																	);
+																	if (!mounting) {
+																		mounting = {
+																			mountings: []
+																		};
+																		this.setAgentMountingProperty(
 																			modelIndex,
-																			v
-																		)
-																	) {
-																		mounting =
-																			this.getMountingDescription(
-																				agentIndex,
-																				modelIndex,
-																				v
-																			) || mounting;
-																		mounting.mountings = mounting.mountings || [];
+																			agentIndex,
+																			v,
+																			mounting
+																		);
 																	}
+																	mounting.mountings = mounting.mountings || [];
 
 																	let mountingDescriptionButton = this.createMountingDescriptionButton(
 																		agentIndex,
@@ -770,9 +667,7 @@ class AgentAccessView extends Component<any, any> {
 																		);
 																	}
 																	return (
-																		<td key={tdkey}>
-																			{addRoutingDescriptionBtn}
-																		</td>
+																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
 																	);
 																})
 														)
@@ -860,12 +755,12 @@ class AgentAccessView extends Component<any, any> {
 	) {
 		let hasMountings = false;
 		if (mounting && mounting.mountings) {
-			mounting.mountings.forEach((mounting: MountingDescription) => {
-				if (mounting.viewType && mounting.model) {
-					let targetMethodDescription = this.getMethodDescription(agentIndex, modelIndex, mounting.viewType);
-					mounting.methodDescription = targetMethodDescription;
-				}
-			});
+			// mounting.mountings.forEach((mounting: MountingDescription) => {
+			// 	if (mounting.viewType && mounting.model) {
+			// 		// let targetMethodDescription = this.getMethodDescription(agentIndex, modelIndex, mounting.viewType);
+			// 		// mounting.methodDescription = targetMethodDescription;
+			// 	}
+			// });
 			hasMountings = !!mounting.mountings.length;
 		}
 		return (

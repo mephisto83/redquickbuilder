@@ -29,6 +29,8 @@ export const FunctionTypes = {
 	//Unique object to an agent function
 	Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
 	Get_Default_Object_For_Agent: 'Get_Default_Object_For_Agent',
+	Get_Default_Object_For_Agent_With_Parent: 'Get_Default_Object_For_Agent_With_Parent',
+	Get_Default_Object_For_Agent_With_ParentandAgent: 'Get_Default_Object_For_Agent_With_ParentandAgent',
 
 	//Functions with Object result
 	Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
@@ -1188,6 +1190,133 @@ export const MethodFunctions: any = {
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
+	[FunctionTypes.Get_Default_Object_For_Agent_With_Parent]: {
+		title: Titles.Get_Default_Object_For_Agent_With_Parent,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Default ${t} by ${a} with Parent`;
+		},
+		template: './app/templates/standard/get_default_model_agent_object_with_parent.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_with_parent_interface.tpl',
+		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
+		permission: {
+			...PERMISSION_ON_AGENT
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				parent: 'parent',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+
+			[FunctionTemplateKeys.Parent]: {
+				key: FunctionTemplateKeys.Parent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+		parameters: {
+			body: false,
+			parameters: {
+				template: { ...TEMPLATE_PARENT_PARAMETERS }
+			}
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
+	[FunctionTypes.Get_Default_Object_For_Agent_With_ParentandAgent]: {
+		title: Titles.Get_Default_Object_For_Agent_With_ParentandAgent,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Default ${t} by ${a} with Parent`;
+		},
+		template: './app/templates/standard/get_default_model_agent_object_with_parentagent.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_with_parentagent_interface.tpl',
+		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
+		permission: {
+			...PERMISSION_ON_AGENT
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				parent: 'parent',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Parent]: {
+				key: FunctionTemplateKeys.Parent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+		parameters: {
+			body: false,
+			parameters: {
+				template: { ...TEMPLATE_PARENT_PARAMETERS }
+			}
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+  },
 	[FunctionTypes.Get_Agent_Value__IListObject]: {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
