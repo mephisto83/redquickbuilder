@@ -9,7 +9,7 @@ import Draggable from 'react-draggable'; // The default
 import { UIConnect } from '../utils/utils';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
-import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
 import GenericPropertyContainer from './genericpropertycontainer';
 import _create_get_view_model from '../nodepacks/_create_get_view_model';
 import TreeViewMenu from './treeviewmenu';
@@ -30,7 +30,13 @@ import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
-import { MethodFunctions, GetFunctionTypeOptions } from '../constants/functiontypes';
+import {
+	MethodFunctions,
+	GetFunctionTypeOptions,
+	GetConstraints,
+	FunctionTemplateKeys,
+	FunctionConstraintKeys
+} from '../constants/functiontypes';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -89,6 +95,7 @@ class ContextMenu extends Component<any, any> {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription } = mountingItem;
 						let parameterConnections: any = null;
+						let methodConstraints: any = null;
 						if (methodDescription) {
 							parameterConnections = this.getMethodDescriptionParameters(methodDescription)
 								.filter(this.filterFunctionParameters(methodDescription))
@@ -209,7 +216,36 @@ class ContextMenu extends Component<any, any> {
 										</TreeViewMenu>
 									);
 								});
+							methodConstraints = this.getMethodDescriptionConstraints(
+								methodDescription
+							).map((constraint: string, index: number) => {
+								let props: any = null;
+								if (!(mountingItem.methodDescription && mountingItem.methodDescription.properties)) {
+									props = mountingItem.methodDescription;
+									props.properties = {};
+								} else {
+									props = mountingItem.methodDescription.properties;
+								}
+								this.applyDefaultConstraintValues(mountingItem);
+								return (
+									<SelectInput
+										onChange={(c: string) => {
+											if (
+												mountingItem.methodDescription &&
+												mountingItem.methodDescription.properties
+											) {
+												props[constraint] = c;
+												this.setState({ turn: UIA.GUID() });
+											}
+										}}
+										value={props[constraint]}
+										label={constraint}
+										options={UIA.NodesByType(null, NodeTypes.Model).toNodeSelect()}
+									/>
+								);
+							});
 						}
+
 						result.push(
 							<TreeViewMenu
 								key={routeKey}
@@ -249,7 +285,26 @@ class ContextMenu extends Component<any, any> {
 										value={mountingItem.name}
 									/>
 								</TreeViewItemContainer>
-								{parameterConnections}
+								<TreeViewMenu
+									title={'Screen to API'}
+									open={this.state.screenToApi}
+									active
+									onClick={() => {
+										this.setState({ screenToApi: !this.state.screenToApi });
+									}}
+								>
+									{parameterConnections}
+								</TreeViewMenu>
+								<TreeViewMenu
+									active
+									title={'Method constraint values'}
+									open={this.state.methodConstraintValues}
+									onClick={() => {
+										this.setState({ methodConstraintValues: !this.state.methodConstraintValues });
+									}}
+								>
+									{methodConstraints}
+								</TreeViewMenu>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
@@ -284,6 +339,34 @@ class ContextMenu extends Component<any, any> {
 		}
 		return result;
 	}
+	applyDefaultConstraintValues(mountingItem: MountingDescription) {
+		let { methodDescription } = mountingItem;
+		4;
+		if (methodDescription) {
+			let constraintKeys = this.getMethodDescriptionConstraints(methodDescription);
+			if (constraintKeys) {
+				constraintKeys.map((key: string) => {
+					switch (key) {
+						case FunctionTemplateKeys.Agent:
+							if (methodDescription) {
+								methodDescription.properties.agent = mountingItem.agent;
+							}
+							break;
+						case FunctionTemplateKeys.Model:
+							if (methodDescription) {
+								methodDescription.properties.model = mountingItem.model;
+							}
+							break;
+						case FunctionTemplateKeys.ModelProperty:
+							if (methodDescription) {
+								methodDescription.properties.model_output = mountingItem.model;
+							}
+							break;
+					}
+				});
+			}
+		}
+	}
 
 	private getMethodDescriptionParameters(methodDescription: MethodDescription): any[] {
 		if (MethodFunctions[methodDescription.functionType]) {
@@ -292,6 +375,24 @@ class ContextMenu extends Component<any, any> {
 				if (parameters && parameters.parameters && parameters.parameters.template) {
 					return Object.keys(parameters.parameters.template);
 				}
+			}
+		}
+		return [];
+	}
+
+	private getMethodDescriptionConstraints(methodDescription: MethodDescription): any[] {
+		if (MethodFunctions[methodDescription.functionType]) {
+			let { constraints } = MethodFunctions[methodDescription.functionType];
+			if (constraints) {
+				return Object.keys(constraints).filter((key: string) => {
+					let isNotUser = constraints[key] && !constraints[key][NodeProperties.IsUser];
+					return (
+						constraints[key] &&
+						isNotUser &&
+						constraints[key].nodeTypes &&
+						constraints[key].nodeTypes.indexOf(NodeTypes.Model) !== -1
+					);
+				});
 			}
 		}
 		return [];

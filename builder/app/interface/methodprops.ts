@@ -67,7 +67,8 @@ export interface MethodDescription {
 }
 
 export interface MethodPropsProperties {
-	parent: string;
-	model: string;
-	model_output: string;
+	parent?: string;
+	model?: string;
+	model_output?: string;
+	agent?: string;
 }

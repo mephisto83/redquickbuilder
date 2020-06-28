@@ -153,7 +153,7 @@ const COMMON_CONSTRAINTS = {
 		key: FunctionTemplateKeys.AgentType
 	},
 	[FunctionTemplateKeys.User]: {
-		[FunctionConstraintKeys.IsUser]: true,
+		[NodeProperties.IsUser]: true,
 		[FunctionConstraintKeys.IsSingleLink]: true,
 		[FunctionConstraintKeys.IsModel]: true,
 		key: FunctionTemplateKeys.User
@@ -684,7 +684,12 @@ export const GET_QUERY_PARAMETERS = {
 		isGuid: true
 	}
 };
-
+export function GetConstraints(functionType: string) {
+	if (MethodFunctions[functionType]) {
+		return MethodFunctions[functionType].constraints;
+	}
+	return null;
+}
 export const MethodFunctions: any = {
 	[FunctionTypes.Get_Unique_Object_To_Agent]: {
 		title: Titles.Create_Object__Object,
@@ -1253,7 +1258,7 @@ export const MethodFunctions: any = {
 		isList: false,
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
+	},
 	[FunctionTypes.Get_Default_Object_For_Agent_With_ParentandAgent]: {
 		title: Titles.Get_Default_Object_For_Agent_With_ParentandAgent,
 		titleTemplate: function(t: any, a: any) {
@@ -1316,7 +1321,7 @@ export const MethodFunctions: any = {
 		isList: false,
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
+	},
 	[FunctionTypes.Get_Agent_Value__IListObject]: {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
@@ -1351,6 +1356,9 @@ export const MethodFunctions: any = {
 	},
 	[FunctionTypes.Login]: {
 		title: Titles.Login,
+		titleTemplate: function(t: any, a: any) {
+			return `Login ${t} by ${a}`;
+		},
 		constraints: {
 			...COMMON_CONSTRAINTS_ANONYMOUS
 		},

@@ -92,8 +92,8 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			link: LinkType.LifeCylceMethod
 		});
 
-    // With a variety of parameters, this will need to be generalized to handle
-    // all the possible parameters.
+		// With a variety of parameters, this will need to be generalized to handle
+		// all the possible parameters.
 		const valueScreenOptionNavigateTargetApi = GetNodesLinkedTo(graph, {
 			id: screenOptionInstance.id,
 			link: LinkType.ComponentInternalApi
@@ -350,7 +350,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 			const screenOption = screenOptionInstance;
 			let clearScreenContext: any = null;
 			let componentDidMountInstance: any = null;
-			let componentDidMount = null;
+			let componentDidMount: any = null;
 			result.push(
 				...ClearScreenInstance({
 					viewPackages,
@@ -371,6 +371,7 @@ export default function ScreenConnectUpdate(args: any = {}) {
 						(v: any) =>
 							GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount
 					);
+
 					if (componentDidMount) {
 						componentDidMountInstance = GetNodeLinkedTo(gg, {
 							id: componentDidMount.id,
@@ -378,20 +379,30 @@ export default function ScreenConnectUpdate(args: any = {}) {
 							componentType: NodeTypes.LifeCylceMethodInstance
 						});
 						if (!componentDidMountInstance) {
-							return addInstanceFunc(
-								componentDidMount,
-								(instanceNode: any) => {
-									componentDidMountInstance = instanceNode;
-								},
-								viewPackages,
-								{ lifecycle: true }
-							)();
+							console.log('create a component did mount instance');
+							return {
+								operation: ADD_NEW_NODE,
+								options: addInstanceFunc(
+									componentDidMount,
+									(instanceNode: any) => {
+										componentDidMountInstance = instanceNode;
+									},
+									viewPackages,
+									{ lifecycle: true }
+								)
+							};
 						}
 					}
 				},
 				() => ({
 					operation: ADD_LINK_BETWEEN_NODES,
 					options() {
+						if (!componentDidMountInstance) {
+							console.log(`screen : ${GetNodeTitle(node)}`);
+							console.log(node);
+							console.log('componentDidMount');
+							console.log(componentDidMount);
+						}
 						return {
 							target: clearScreenContext.entry,
 							source: componentDidMountInstance.id,

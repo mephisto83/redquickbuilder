@@ -34,6 +34,7 @@ export const JobsFilePath = 'Jobs File Path';
 export const AddMountFunction = 'Add Mount Function';
 export const DuplicateProperties = 'Duplicate Properties';
 export const BuildMenu = 'Build Menu';
+export const BuildCommands = 'Build Commands';
 export const PricePerNode = 'Node cost';
 export const GridAreas = 'Grid Areas';
 export const MethodThatValidationComesFrom = 'Method validation source';

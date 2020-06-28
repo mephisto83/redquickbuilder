@@ -13,7 +13,12 @@ import { MethodFunctions, HTTP_METHODS, FunctionTypes } from '../../constants/fu
 import { CreateAgentFunction } from '../../constants/nodepackages';
 import { findLink, SetPause, GetNodeLinkedTo } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
-import { MethodDescription } from '../../interface/methodprops';
+import MethodProps, {
+	MethodDescription,
+	ViewMoutingProps,
+	ViewMounting,
+	MountingDescription
+} from '../../interface/methodprops';
 
 export default async function AddAgentAccessMethods(progresFunc: any) {
 	SetPause(true);
@@ -37,67 +42,27 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 				source: agent.id
 			});
 			if (agentLink) {
-				let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
-				if (methodProps) {
-					Object.keys(methodProps).forEach((key: string) => {
-						let methodDescription: MethodDescription = methodProps[key];
-						if (methodDescription && methodDescription.functionType) {
-							let functionType = methodDescription.functionType;
-							let methodProperties = MethodFunctions[FunctionTypes[methodDescription.functionType]];
-							const functionName = methodProperties.titleTemplate(
-								GetNodeTitle(agentAccess),
-								GetNodeTitle(agent)
-							);
-							if (functionType && methodProperties) {
-								let httpMethod;
-								if (methodProperties.method) {
-									switch (methodProperties.method) {
-										case Methods.Create:
-										case Methods.Update:
-											httpMethod = HTTP_METHODS.POST;
-											break;
-										default:
-											httpMethod = HTTP_METHODS.GET;
-											break;
-									}
-									const result = [];
-
-									result.push({
-										method: {
-											method: CreateAgentFunction({
-												nodePackageType: functionName,
-												methodType: methodProperties.method,
-												model: methodDescription.properties.model
-													? GetNodeById(methodDescription.properties.model)
-													: model,
-												model_output: methodDescription.properties.model_output
-													? GetNodeById(methodDescription.properties.model_output)
-													: model,
-												parentId: methodDescription.properties.parent
-													? GetNodeById(methodDescription.properties.parent)
-													: null,
-												agent,
-												httpMethod, //might not be used
-												functionType: FunctionTypes[methodDescription.functionType],
-												functionName
-											})
-										},
-										methodType: functionType
-									});
-									executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
-								} else {
-									console.info('no method on function: AddAgentAccessMethods');
-								}
-							} else {
-								console.info('no function type: AddAgentAccessMethods');
-							}
-						}
-					});
-					const progress = mindex / agentAccesses.length;
-					await progresFunc(progress);
+				let methodProps: MethodProps = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
+				let mountingProps: ViewMoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.MountingProps);
+				if (mountingProps) {
+					let createMountings: ViewMounting | undefined = mountingProps.Create;
+					let getMountings: ViewMounting | undefined = mountingProps.Get;
+					let getAllMountings: ViewMounting | undefined = mountingProps.GetAll;
+					let updateMountings: ViewMounting | undefined = mountingProps.Update;
+					makeViewMountingMethods(createMountings, agentAccess, agent, model);
+					makeViewMountingMethods(getMountings, agentAccess, agent, model);
+					makeViewMountingMethods(getAllMountings, agentAccess, agent, model);
+					makeViewMountingMethods(updateMountings, agentAccess, agent, model);
 				} else {
-					console.info('no method props: AddAgentAccessMethods');
+					console.info('no mounting props: AddAgentAccessMethods');
 				}
+				// if (methodProps) {
+				// 	Object.keys(methodProps).forEach(buildFunctions(methodProps, agentAccess, agent, model));
+				// 	const progress = mindex / agentAccesses.length;
+				// 	await progresFunc(progress);
+				// } else {
+				// 	console.info('no method props: AddAgentAccessMethods');
+				// }
 			} else {
 				console.info('mode link: AddAgentAccessMethods');
 			}
@@ -113,4 +78,81 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 
 	SetPause(false);
 	return [];
+}
+function makeViewMountingMethods(createMountings: ViewMounting | undefined, agentAccess: Node, agent: any, model: any) {
+	if (createMountings && createMountings.mountings) {
+		createMountings.mountings.forEach((mounting: MountingDescription) => {
+			mounting.methodDescription
+				? buildMethodDescriptionFunctions(mounting.methodDescription, agentAccess, agent, model)
+				: null;
+		});
+	}
+}
+
+function buildFunctions(
+	methodProps: any,
+	agentAccess: Node,
+	agent: any,
+	model: any
+): (value: string, index: number, array: string[]) => void {
+	return (key: string) => {
+		let methodDescription: MethodDescription = methodProps[key];
+		buildMethodDescriptionFunctions(methodDescription, agentAccess, agent, model);
+	};
+}
+
+function buildMethodDescriptionFunctions(
+	methodDescription: MethodDescription,
+	agentAccess: Node,
+	agent: any,
+	model: any
+) {
+	if (methodDescription && methodDescription.functionType) {
+		let functionType = methodDescription.functionType;
+		let methodProperties = MethodFunctions[methodDescription.functionType];
+		const functionName = methodProperties.titleTemplate(GetNodeTitle(agentAccess), GetNodeTitle(agent));
+		if (functionType && methodProperties) {
+			let httpMethod;
+			if (methodProperties.method) {
+				switch (methodProperties.method) {
+					case Methods.Create:
+					case Methods.Update:
+						httpMethod = HTTP_METHODS.POST;
+						break;
+					default:
+						httpMethod = HTTP_METHODS.GET;
+						break;
+				}
+				const result = [];
+
+				result.push({
+					method: {
+						method: CreateAgentFunction({
+							nodePackageType: functionName,
+							methodType: methodProperties.method,
+							model: methodDescription.properties.model
+								? GetNodeById(methodDescription.properties.model)
+								: model,
+							model_output: methodDescription.properties.model_output
+								? GetNodeById(methodDescription.properties.model_output)
+								: model,
+							parentId: methodDescription.properties.parent
+								? GetNodeById(methodDescription.properties.parent)
+								: null,
+							agent,
+							httpMethod,
+							functionType: methodDescription.functionType,
+							functionName
+						})
+					},
+					methodType: functionType
+				});
+				executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
+			} else {
+				console.info('no method on function: AddAgentAccessMethods');
+			}
+		} else {
+			console.info('no function type: AddAgentAccessMethods');
+		}
+	}
 }

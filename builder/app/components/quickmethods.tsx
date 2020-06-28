@@ -53,6 +53,7 @@ import { Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
 import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
 import UpdateScreenParameters from '../nodepacks/screens/UpdateScreenParameters';
+import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -101,6 +102,36 @@ class QuickMethods extends Component<any, any, any> {
 							}}
 							icon="fa fa-tag"
 						>
+							<TreeViewMenu
+								title={Titles.BuildCommands}
+								open={UIA.Visual(state, Titles.BuildCommands)}
+								active
+								toggle={() => {
+									this.props.toggleVisual(Titles.BuildCommands);
+								}}
+								icon="fa fa-tag"
+							>
+								<TreeViewMenu
+									title={'Add Agent Access Methods'}
+									onClick={() => {
+										AddAgentAccessMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title={'Connect Screens'}
+									onClick={() => {
+										ConnectScreens(() => {}, () => true);
+									}}
+								/>
+								<TreeViewMenu
+									title={StartJob.title}
+									icon="fa fa-plus"
+									onClick={() => {
+										this.props.setState();
+										StartJob();
+									}}
+								/>
+							</TreeViewMenu>
 							<TreeViewMenu
 								title={Titles.UIParameters}
 								open={UIA.Visual(state, Titles.UIParameters)}
@@ -309,14 +340,6 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={StartJob.title}
-									icon="fa fa-plus"
-									onClick={() => {
-										this.props.setState();
-										StartJob();
-									}}
-								/>
-								<TreeViewMenu
 									title={'Create Job'}
 									icon="fa fa-plus"
 									onClick={() => {
@@ -381,8 +404,6 @@ class QuickMethods extends Component<any, any, any> {
 										UpdateScreenParameters(() => {});
 									}}
 								/>
-
-
 							</TreeViewMenu>
 
 							<TreeViewMenu
