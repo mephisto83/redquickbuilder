@@ -354,6 +354,8 @@ class ContextMenu extends Component<any, any> {
 							break;
 						case FunctionTemplateKeys.Model:
 							if (methodDescription) {
+								methodDescription.properties.model_output =
+									methodDescription.properties.model_output || mountingItem.model;
 								methodDescription.properties.model = mountingItem.model;
 							}
 							break;
