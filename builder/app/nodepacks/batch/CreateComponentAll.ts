@@ -114,18 +114,18 @@ export function CreateComponentModel(args: any = {}) {
 		if (agentAccess || args.isSharedComponent) {
 			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
 
-			if (!args.isSharedComponent && navigableScreens.length) {
-				let naviScreen = navigableScreens.find((navigableScreen: Node) => {
-					let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
-					let navViewType = GetNodeProp(navigableScreen, NodeProperties.ViewType);
-					let navModel = GetNodeProp(navigableScreen, NodeProperties.Model);
+			// if (!args.isSharedComponent && navigableScreens.length) {
+			// 	let naviScreen = navigableScreens.find((navigableScreen: Node) => {
+			// 		let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
+			// 		let navViewType = GetNodeProp(navigableScreen, NodeProperties.ViewType);
+			// 		let navModel = GetNodeProp(navigableScreen, NodeProperties.Model);
 
-					return model === navModel && navAgent === args.agentId && navViewType === viewType;
-				});
-				if (!naviScreen) {
-					return;
-				}
-			}
+			// 		return model === navModel && navAgent === args.agentId && navViewType === viewType;
+			// 	});
+			// 	if (!naviScreen) {
+			// 		return;
+			// 	}
+			// }
 
 			if (args.isSharedComponent || (agentCreds && GetLinkProperty(agentCreds, viewType))) {
 				operations.push({
