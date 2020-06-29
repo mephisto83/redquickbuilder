@@ -3797,6 +3797,20 @@ export function executeGraphOperations(operations: any[]) {
 		});
 	};
 }
+export function updateComponentProperty(nodeId: string, prop: string, value: string) {
+	graphOperation([
+		{
+			operation: CHANGE_NODE_PROPERTY,
+			options() {
+				return {
+					prop: prop,
+					value,
+					id: nodeId
+				};
+			}
+		}
+	])(GetDispatchFunc(), GetStateFunc());
+}
 export function selectAllConnected(id: string) {
 	return (dispatch: any, getState: Function) => {
 		const nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {

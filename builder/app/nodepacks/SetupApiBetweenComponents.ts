@@ -7,8 +7,16 @@ import {
 	ADD_LINK_BETWEEN_NODES
 } from '../actions/uiactions';
 import { existsLinkBetween } from '../methods/graph_methods';
-
-let func: any = function(args: any = {}) {
+export interface ComponentApiSetup {
+	id: string | any;
+	external: string | any;
+	internal: string | any;
+}
+let func: any = function SetupApiBetweenComponent(args: {
+	component_a: ComponentApiSetup;
+	viewPackages?: any;
+	component_b: ComponentApiSetup;
+}) {
 	//
 	let result = [];
 

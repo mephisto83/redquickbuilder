@@ -127,6 +127,7 @@ import EnumerationLinkMenu from './enumerationlinkmenu';
 import AddFiltersToMethod from '../nodepacks/method/AddFilterToMethod';
 import AddMethodFilterToMethod from '../nodepacks/method/AddFilterToModelFilter';
 import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
+import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -2007,6 +2008,32 @@ class ContextMenu extends Component<any, any> {
 										ClearScreenConnection({ node: currentNode.id });
 									}}
 								/>
+								<TreeViewMenu
+									title="Clear Api"
+									open={UIA.Visual(state, `Clear Api`)}
+									active
+									onClick={() => {
+										this.props.toggleVisual(`Clear Api`);
+									}}
+								>
+									<TreeViewItemContainer>
+										<TextInput
+											label={Titles.ComponentApi}
+											onChange={(value: any) => {
+												this.setState({
+													api: value
+												});
+											}}
+											value={this.state.api}
+										/>
+									</TreeViewItemContainer>
+									<TreeViewMenu
+										title={'Clear Api'}
+										onClick={() => {
+											ClearApiBetweenComponents({ id: currentNode.id, api: this.state.api });
+										}}
+									/>
+								</TreeViewMenu>
 								<TreeViewMenu
 									title="Connect"
 									open={UIA.Visual(state, `Connect`)}

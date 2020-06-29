@@ -6,9 +6,10 @@ import {
 	GetStateFunc,
 	GetCurrentGraph,
 	GetLinkProperty,
-	GetNodeById
+	GetNodeById,
+	updateComponentProperty
 } from '../../actions/uiactions';
-import { NodeTypes, LinkType, Methods, LinkPropertyKeys } from '../../constants/nodetypes';
+import { NodeTypes, LinkType, Methods, LinkPropertyKeys, NodeProperties } from '../../constants/nodetypes';
 import { MethodFunctions, HTTP_METHODS, FunctionTypes } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';
 import { findLink, SetPause, GetNodeLinkedTo } from '../../methods/graph_methods';
@@ -42,7 +43,7 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 				source: agent.id
 			});
 			if (agentLink) {
-				let methodProps: MethodProps = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
+				// let methodProps: MethodProps = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
 				let mountingProps: ViewMoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.MountingProps);
 				if (mountingProps) {
 					let createMountings: ViewMounting | undefined = mountingProps.Create;
@@ -124,7 +125,7 @@ function buildMethodDescriptionFunctions(
 						break;
 				}
 				const result = [];
-
+				let newMethodId: string | null = null;
 				result.push({
 					method: {
 						method: CreateAgentFunction({
@@ -142,12 +143,18 @@ function buildMethodDescriptionFunctions(
 							agent,
 							httpMethod,
 							functionType: methodDescription.functionType,
-							functionName
+							functionName,
+							callback: (newMethod: string) => {
+								newMethodId = newMethod;
+							}
 						})
 					},
 					methodType: functionType
 				});
 				executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
+				if (newMethodId) {
+					updateComponentProperty(agentAccess.id, NodeProperties.Method, newMethodId);
+				}
 			} else {
 				console.info('no method on function: AddAgentAccessMethods');
 			}

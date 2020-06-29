@@ -671,7 +671,8 @@ export const QUERY_PARAMETERS = {
 };
 export const TEMPLATE_PARAMETERS = {
 	[TEMPLATE_PARAMETER_KEYS.Model]: {
-		isGuid: true
+    isGuid: true,
+    defaultValue: true // When there is a value api for a component, that value should be from the model
 	}
 };
 export const TEMPLATE_PARENT_PARAMETERS = {

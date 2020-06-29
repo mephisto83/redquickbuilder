@@ -4839,6 +4839,9 @@ export function CreateAgentFunction(option: any): any {
 		}
 
 		setViewPackageStamp(null, 'CreateAgentFunction');
+		if (option.callback && new_nodes.methodNode) {
+			option.callback(new_nodes.methodNode.id);
+		}
 		return new_nodes;
 	};
 }
