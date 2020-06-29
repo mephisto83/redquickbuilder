@@ -132,9 +132,9 @@ class ContextMenu extends Component<any, any> {
 										title={`${UIA.GetNodeTitle(sourceModel)}(model)`}
 										active
 										key={`url-parma-k-modle`}
-										open={this.state[sourceModel]}
+										open={this.state[`${sourceModel}-model`]}
 										toggle={() => {
-											this.setState({ [sourceModel]: !this.state[sourceModel] });
+											this.setState({ [`${sourceModel}-model`]: !this.state[`${sourceModel}-model`] });
 										}}
 									>
 										{modelPropertyOptions.map((modelPropertyOption: Node) => {

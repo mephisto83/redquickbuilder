@@ -202,6 +202,18 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
+										title={'Check Access'}
+										icon="fa fa-plus"
+										onClick={() => {
+											let aa = UIA.GetNodeById('1f2f965e-205f-45ed-b12e-aac517cd3ed8');
+											let viewType = ViewTypes.Create;
+											let agent = UIA.GetNodeById('34c87cff-b102-4d38-b605-f9bf57469eee');
+											let model = UIA.GetNodeById('2f913160-4f5b-45c2-8cad-e54833dbbc8c');
+                      let hasAccess = UIA.hasAccessNode(agent, model, aa, viewType);
+                      console.log(`hasAccess: ${hasAccess}`)
+										}}
+									/>
+									<TreeViewMenu
 										title={'Redress Properties'}
 										description={RedressProperties.description}
 										toggle={() => {

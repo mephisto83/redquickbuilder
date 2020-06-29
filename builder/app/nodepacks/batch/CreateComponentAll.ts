@@ -18,6 +18,7 @@ import {
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 import { findLink } from '../../methods/graph_methods';
+import { Node } from '../../methods/graph_types';
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
 	console.log('Create Component All');
@@ -108,7 +109,7 @@ export function CreateComponentModel(args: any = {}) {
 		const properties = GetModelPropertyChildren(model).filter(
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 		);
-		const agentAccess = agentAccesses.find((aa: any) =>
+		const agentAccess = agentAccesses.find((aa: Node) =>
 			hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
 		);
 		if (agentAccess || args.isSharedComponent) {

@@ -669,6 +669,7 @@ export const LinkType = {
 	AgentAccess: 'AgentAccess',
 	ModelAccess: 'ModelAccess',
 	MenuLink: 'MenuLink',
+	AccessScreen: 'AccessScreen',
 	NavigationScreen: 'NavigationScreen',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
@@ -919,6 +920,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	AccessScreen: {
+		type: LinkType.AccessScreen
 	},
 	AgentAccess: {
 		type: LinkType.AgentAccess
