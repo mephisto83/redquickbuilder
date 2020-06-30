@@ -1,5 +1,3 @@
-import { uuidv4 } from '../utils/array';
-import { NodeProperties } from '../constants/nodetypes';
 export default function(args: any = {}) {
 	// node0,node1
 

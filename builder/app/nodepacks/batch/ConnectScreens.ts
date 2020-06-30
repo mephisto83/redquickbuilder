@@ -25,7 +25,15 @@ import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 import SetupApiBetweenComponent from '../../nodepacks/SetupApiBetweenComponents';
 
 import { Node, GraphLink } from '../../methods/graph_types';
-import { GetNodeLinkedTo, findLink, GetNodesLinkedTo } from '../../methods/graph_methods';
+import {
+	GetNodeLinkedTo,
+	findLink,
+	GetNodesLinkedTo,
+	TARGET,
+	SOURCE,
+	SetPause,
+	Paused
+} from '../../methods/graph_methods';
 import MethodProps, {
 	MethodDescription,
 	ViewMoutingProps,
@@ -89,54 +97,148 @@ function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 			let { parameters } = methodFunctionProperties.parameters;
 			if (parameters) {
 				let { template } = parameters;
-				Object.keys(template).map((paramName: string) => {
-					let changeParam = false;
-					if (template[paramName].defaultValue) {
-						//change the value, to the name of the parameters
-						console.log('change the value, to the name of the parameters');
-						changeParam = true;
-					}
-					if (!changeParam) {
-						screenOptions.forEach((screenOption: Node) => {
-							if (!changeParam) {
-								graphOperation(
-									SetupApiBetweenComponent({
-										component_a: {
-											id: screen.id,
-											external: paramName,
-											internal: paramName
-										},
-										component_b: {
-											id: screenOption.id,
-											external: paramName,
-											internal: paramName
-										}
-									})
-								)(GetDispatchFunc(), GetStateFunc());
-							}
-						});
-					} else {
-						UpdateValueApiToDifferentName(screen, paramName);
-					}
-				});
+				if (template) {
+					Object.keys(template).map((paramName: string) => {
+						let changeParam = false;
+						if (template[paramName].defaultValue) {
+							//change the value, to the name of the parameters
+							console.log('change the value, to the name of the parameters');
+							changeParam = true;
+						}
+						if (!changeParam) {
+							screenOptions.forEach((screenOption: Node) => {
+								if (!changeParam) {
+									SetupApi(screen, paramName, screenOption);
+								}
+							});
+						} else {
+							UpdateValueApiToDifferentName(screen, paramName);
+						}
+
+						SetScreenParamToUrl(screen, paramName);
+						SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
+						updateComponentProperty(
+							screen.id,
+							NodeProperties.UIText,
+							GetNodeProp(screen, NodeProperties.UIText)
+						);
+						// Setup the api values all the way down to the bottom components
+						SetupApiValueDownToTheBottomComponent(screen, paramName);
+					});
+				}
 			}
 		}
 	}
 }
 
-function UpdateValueApiToDifferentName(screen: Node, paramName: string) {
+function SetupApi(parent: Node, paramName: string, child: Node) {
+	graphOperation(
+		SetupApiBetweenComponent({
+			component_a: {
+				id: parent.id,
+				external: paramName,
+				internal: paramName
+			},
+			component_b: {
+				id: child.id,
+				external: paramName,
+				internal: paramName
+			}
+		})
+	)(GetDispatchFunc(), GetStateFunc());
+}
+function SetInternalScreenOptionsParamToUrlParameter(screen: Node, paramName: string) {
+	let graph = GetCurrentGraph();
+	let screenOptions = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		link: LinkType.ScreenOptions
+	});
+
+	screenOptions.forEach((screenOption: Node) => {
+		let internalApi = GetNodesLinkedTo(graph, {
+			id: screenOption.id,
+			link: LinkType.ComponentInternalApi
+		}).find((v: Node) => GetNodeTitle(v) === paramName);
+		if (internalApi) {
+			updateComponentProperty(internalApi.id, NodeProperties.IsUrlParameter, true);
+		}
+	});
+}
+function SetupApiValueDownToTheBottomComponent(screen: Node, paramName: string) {
+	let graph = GetCurrentGraph();
+	let screenOptions = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		link: LinkType.ScreenOptions
+	});
+	let seen: string[] = [];
+	let paused = Paused();
+	SetPause(true);
+	screenOptions.forEach((screenOption: Node) => {
+		SetupApiToBottom(screenOption, paramName, seen);
+	});
+	SetPause(paused);
+}
+
+function SetupApiToBottom(parent: Node, paramName: string, seen: string[]) {
+	let graph = GetCurrentGraph();
+	seen.push(parent.id);
+	let components: Node[] = GetNodesLinkedTo(graph, {
+		id: parent.id,
+		componentType: NodeTypes.ComponentNode,
+		direction: SOURCE
+	});
+	debugger;
+	components
+		.filter((component: Node) => {
+			return seen.indexOf(component.id) === -1;
+		})
+		.forEach((component: Node) => {
+			SetupApi(parent, paramName, component);
+			SetupApiToBottom(component, paramName, seen);
+		});
+}
+
+function ChangeValueApiToDifferentName(screeOrOption: Node, paramName: string) {
+	let graph = GetCurrentGraph();
+	let externalApi = GetNodesLinkedTo(graph, {
+		id: screeOrOption.id,
+		link: LinkType.ComponentExternalApi
+	}).find((v: Node) => GetNodeTitle(v) === ComponentApiKeys.Value);
+	let internalApi = GetNodesLinkedTo(graph, {
+		id: screeOrOption.id,
+		link: LinkType.ComponentInternalApi
+	}).find((v: Node) => GetNodeTitle(v) === ComponentApiKeys.Value);
+
+	if (externalApi) {
+		updateComponentProperty(externalApi.id, NodeProperties.UIText, paramName);
+	}
+
+	if (internalApi) {
+		updateComponentProperty(internalApi.id, NodeProperties.UIText, paramName);
+	}
+}
+function SetScreenParamToUrl(screen: Node, paramName: string) {
 	let graph = GetCurrentGraph();
 	let externalApi = GetNodesLinkedTo(graph, {
 		id: screen.id,
 		link: LinkType.ComponentExternalApi
-	}).find((v: string) => GetNodeTitle(v) === ComponentApiKeys.Value);
-	let internalApi = GetNodesLinkedTo(graph, {
-		id: screen.id,
-		link: LinkType.ComponentApi
-	}).find((v: string) => GetNodeTitle(v) === ComponentApiKeys.Value);
+	}).find((v: Node) => GetNodeTitle(v) === paramName);
 
-	updateComponentProperty(externalApi.id, NodeProperties.UIText, paramName);
-	updateComponentProperty(internalApi.id, NodeProperties.UIText, paramName);
+	if (externalApi) {
+		updateComponentProperty(externalApi.id, NodeProperties.IsUrlParameter, paramName);
+		updateComponentProperty(externalApi.id, NodeProperties.UIText, paramName);
+	}
+}
+function UpdateValueApiToDifferentName(screen: Node, paramName: string) {
+	let graph = GetCurrentGraph();
+	let screenOptions = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		link: LinkType.ScreenOptions
+	});
+	ChangeValueApiToDifferentName(screen, paramName);
+	screenOptions.forEach((screenOption: Node) => {
+		ChangeValueApiToDifferentName(screenOption, paramName);
+	});
 }
 
 function GetViewMounting(mountingProps: ViewMoutingProps, viewType: string): ViewMounting | null {

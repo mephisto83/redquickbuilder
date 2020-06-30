@@ -59,33 +59,35 @@ export default function ScreenConnectUpdate(args: any = {}) {
 		id: node,
 		link: LinkType.ScreenOptions
 	}).filter(ScreenOptionFilter);
-	let result = [];
+	let result: any[] = [];
 	let { viewPackages } = args;
 	viewPackages = {
 		[NodeProperties.ViewPackage]: uuidv4(),
 		...viewPackages || {}
 	};
 
-	const valueNavigateTargetApi = GetNodesLinkedTo(graph, {
-		id: node,
-		link: LinkType.ComponentExternalApi
-	}).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
+	// HANDLED IN NEW Screen CONNECTION
+	// const valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+	// 	id: node,
+	// 	link: LinkType.ComponentExternalApi
+	// }).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
+	// HANDLED IN NEW Screen CONNECTION
+	// result.push(
+	// 	valueNavigateTargetApi
+	// 		? {
+	// 				operation: UPDATE_NODE_PROPERTY,
+	// 				options() {
+	// 					return {
+	// 						id: valueNavigateTargetApi.id,
+	// 						properties: {
+	// 							[NodeProperties.IsUrlParameter]: true
+	// 						}
+	// 					};
+	// 				}
+	// 			}
+	// 		: null
+	// );
 
-	result.push(
-		valueNavigateTargetApi
-			? {
-					operation: UPDATE_NODE_PROPERTY,
-					options() {
-						return {
-							id: valueNavigateTargetApi.id,
-							properties: {
-								[NodeProperties.IsUrlParameter]: true
-							}
-						};
-					}
-				}
-			: null
-	);
 	screenOptions.forEach((screenOptionInstance: { id: any }) => {
 		const lifeCylcleMethods = GetNodesLinkedTo(graph, {
 			id: screenOptionInstance.id,
@@ -102,29 +104,33 @@ export default function ScreenConnectUpdate(args: any = {}) {
 		lifeCylcleMethods
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
 			.forEach((lifeCylcleMethod: { id: any }) => {
-				const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
-					id: lifeCylcleMethod.id,
-					link: LinkType.LifeCylceMethodInstance
-				});
-				lifeCylcleMethodInstances.forEach((lifeCylcleMethodInstance: any) => {
-					const vp = GetNodeProp(lifeCylcleMethodInstance, NodeProperties.ViewPackage);
-					if (vp) {
-						const inPackageNodes = GetNodesByProperties({
-							[NodeProperties.ViewPackage]: vp
-						});
+				//- This is for idempotency - we don't care about that anymore
+				// const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+				// 	id: lifeCylcleMethod.id,
+				// 	link: LinkType.LifeCylceMethodInstance
+				// });
 
-						inPackageNodes.forEach((inPackageNode) => {
-							result.push({
-								operation: REMOVE_NODE,
-								options() {
-									return {
-										id: inPackageNode.id
-									};
-								}
-							});
-						});
-					}
-				});
+				// lifeCylcleMethodInstances.forEach((lifeCylcleMethodInstance: any) => {
+				// 	const vp = GetNodeProp(lifeCylcleMethodInstance, NodeProperties.ViewPackage);
+				// 	if (vp) {
+				// 		const inPackageNodes = GetNodesByProperties({
+				// 			[NodeProperties.ViewPackage]: vp
+				// 		});
+
+				// 		inPackageNodes.forEach((inPackageNode) => {
+				// 			result.push({
+				// 				operation: REMOVE_NODE,
+				// 				options() {
+				// 					return {
+				// 						id: inPackageNode.id
+				// 					};
+				// 				}
+				// 			});
+				// 		});
+				// 	}
+				// });
+				//-end This is for idempotency - we don't care about that anymore
+
 				componentDidMountMethods.forEach((componentDidMountMethod: any) => {
 					let dataChainForLoading: null = null;
 					let cycleInstance: any = null;
