@@ -13,31 +13,46 @@ export interface RoutingProps {
 	Delete?: Routing;
 	Update?: Routing;
 }
+export interface EffectProps {
+	GetAll?: Effect;
+	Get?: Effect;
+	Create?: Effect;
+	Delete?: Effect;
+	Update?: Effect;
+}
 export interface ViewMoutingProps {
-  GetAll?: ViewMounting;
+	GetAll?: ViewMounting;
 	Get?: ViewMounting;
 	Create?: ViewMounting;
 	Delete?: ViewMounting;
 	Update?: ViewMounting;
 }
 export interface ViewMounting {
-  mountings: MountingDescription[]; // an array of mounting events
+	mountings: MountingDescription[]; // an array of mounting events
+	clearScreen?: boolean;
+	validationTargetMethod?: string; // The mounting description that will be used a validation method.
 }
 export interface MountingDescription {
-  // ------
-  // use these properties to identify the screen
-  viewType: string;
+	// ------
+	// use these properties to identify the screen
+	viewType: string;
 	model: string;
 	agent: string;
-  // ------
+	// ------
 	id: string;
 	name: string;
 	methodDescription?: MethodDescription;
 	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
-
 }
 export interface Routing {
 	routes: RouteDescription[];
+}
+
+export interface EffectDescription extends MountingDescription {
+	body: boolean;
+}
+export interface Effect {
+	effects: EffectDescription[];
 }
 
 export interface RouteDescription {
@@ -58,6 +73,7 @@ export interface RouteSource {
 export enum RouteSourceType {
 	Model = 'model', // The value should be retrieved from the model for the page
 	Agent = 'agent', // The value should be retrieved from the agent for the page
+	Body = 'body',
 	UrlParameter = 'urlParameter' // The value should be retrieved from the url parameters for the page
 }
 

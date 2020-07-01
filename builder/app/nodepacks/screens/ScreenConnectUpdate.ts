@@ -399,7 +399,8 @@ export default function ScreenConnectUpdate(args: any = {}) {
 							};
 						}
 					}
-				},
+        },
+        // - clear screen -
 				() => ({
 					operation: ADD_LINK_BETWEEN_NODES,
 					options() {

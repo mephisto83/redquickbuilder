@@ -40,6 +40,7 @@ import MethodProps, {
 	ViewMounting,
 	MountingDescription
 } from '../../interface/methodprops';
+import ConnectComponentDidMount from './ConnectComponentDidMount';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -59,7 +60,7 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 					let mountingProps: ViewMoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.MountingProps);
 					let viewMounting: ViewMounting | null = GetViewMounting(mountingProps, viewType);
 					if (viewMounting) {
-						SetupViewMouting(screen, viewMounting, { agent, model, viewType });
+						SetupViewMouting(screen, viewMounting, { agent, model, viewType, agentAccessDescription });
 					}
 				} else {
 					console.log('Agent link missing, this should never happen');
@@ -75,15 +76,35 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 			// Setup mounting functions
 		});
 }
-function SetupViewMouting(
-	screen: Node,
-	viewMounting: ViewMounting,
-	information: { agent: string; model: string; viewType: string }
-) {
+interface SetupInformation {
+	agent: string;
+	model: string;
+	viewType: string;
+	agentAccessDescription: Node;
+}
+function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information: SetupInformation) {
 	viewMounting.mountings.forEach((mounting: MountingDescription) => {
 		SetupMountDescription(mounting, screen);
+		SetupMountingMethod(mounting, screen, information);
 	});
 }
+
+function SetupMountingMethod(mouting: MountingDescription, screen: Node, information: SetupInformation) {
+	let graph = GetCurrentGraph();
+	let setup_options = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		link: LinkType.ScreenOptions
+	});
+	let methodId = GetNodeProp(information.agentAccessDescription, NodeProperties.Method);
+	setup_options.forEach((screenOption: Node) => {
+		ConnectComponentDidMount({
+			screen: screen.id,
+			screenOption: screenOption.id,
+			methods: [ methodId ]
+		});
+	});
+}
+
 function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 	let graph = GetCurrentGraph();
 	let screenOptions: Node[] = GetNodesLinkedTo(graph, {

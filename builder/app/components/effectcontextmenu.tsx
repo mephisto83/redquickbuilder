@@ -23,24 +23,21 @@ import {
 	RouteSource,
 	RouteSourceType,
 	ViewMounting,
-	MountingDescription
+	ViewMoutingProps,
+	MountingDescription,
+	Effect,
+	EffectDescription
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
 import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
-import {
-	MethodFunctions,
-	GetFunctionTypeOptions,
-	GetConstraints,
-	FunctionTemplateKeys,
-	FunctionConstraintKeys
-} from '../constants/functiontypes';
+import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
-class ContextMenu extends Component<any, any> {
+class EffectContextMenu extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -51,25 +48,24 @@ class ContextMenu extends Component<any, any> {
 	getDefaultMenu(mode: any) {
 		const { state } = this.props;
 		const graph = UIA.GetCurrentGraph(state);
-		let mounting: ViewMounting = mode.mounting;
+		let effect: Effect = mode.effect;
 		let callback: any = mode.callback;
-		let model: string = mode.model;
 		let agent: string = mode.agent;
-		let viewType: string = mode.viewType;
 		return (
 			<TreeViewButtonGroup>
 				<TreeViewGroupButton
-					title={`${Titles.AddMountFunction}`}
+					title={`${Titles.AddEffect}`}
 					onClick={() => {
-						mounting.mountings.push({
+						effect.effects.push({
 							id: UIA.GUID(),
-							model,
+							model: mode.model,
+							body: false,
 							agent,
 							name: '',
-							viewType
+							viewType: ViewTypes.Get
 						});
 						if (callback) {
-							callback(mounting);
+							callback(effect);
 							this.setState({ turn: UIA.GUID() });
 						}
 					}}
@@ -81,63 +77,39 @@ class ContextMenu extends Component<any, any> {
 	getRoutingApi(routing: Routing) {}
 	getMenuMode(mode: any) {
 		const result: any = [];
-		let mounting: ViewMounting = mode.mounting;
-
+		let effect: Effect = mode.effect;
+		let onComponentMountMethod: ViewMounting = mode.onComponentMountMethod;
+		let sourceAgent = mode.agent;
+		let sourceModel = mode.model;
 		let callback: any = mode.callback;
-		if (mounting) {
+		if (effect) {
 			const exit = () => {
 				this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
-			};
-
-			result.push(
-				<TreeViewMenu
-					key={'clear-screen'}
-					open={this.state.mountingProperties}
-					active
-					title={Titles.Properties}
-					toggle={() => {
-						this.setState({
-							mountingProperties: !this.state.mountingProperties
-						});
-					}}
-				>
-					<TreeViewItemContainer>
-						<CheckBox
-							label={'Clear Screen On Mount'}
-							value={mounting && mounting.clearScreen}
-							onChange={(value: boolean) => {
-								mounting.clearScreen = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-							}}
-						/>
-					</TreeViewItemContainer>
-				</TreeViewMenu>
-			);
-
+      };
 			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
 			this.getRoutingApi(mode);
 			switch (mode) {
 				default:
-					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
+					effect.effects.forEach((effectItem: EffectDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, agent, viewType, methodDescription } = mountingItem;
+						let { name, model, agent, viewType, methodDescription, source } = effectItem;
+
 						let parameterConnections: any = null;
+						let bodyParameter: any = null;
 						let methodConstraints: any = null;
 						if (methodDescription) {
 							parameterConnections = this.getMethodDescriptionParameters(methodDescription)
-								.filter(this.filterFunctionParameters(methodDescription))
+								.filter(this.filterMethodDescriptionFunctionParameters(methodDescription))
 								.map((urlParameter: string, index: number) => {
 									let routeKey = `url-param-${urlParameter}-${index}`;
 									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
 									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = mountingItem.source ? mountingItem.source.model : null;
+									let value = effectItem.source ? effectItem.source.model : null;
 									let options = [
 										...[ urlParameter ]
 											.filter(
 												methodDescription
-													? this.filterFunctionParameters(methodDescription)
+													? this.filterMethodDescriptionFunctionParameters(methodDescription)
 													: () => false
 											)
 											.map((k: string) => {
@@ -146,12 +118,12 @@ class ContextMenu extends Component<any, any> {
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
-															mountingItem.source = {
+															effectItem.source = {
 																model: k,
 																property: null,
 																type: RouteSourceType.UrlParameter
 															};
-															callback(mounting);
+															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}
 														key={`url-parma-k-${k}`}
@@ -169,7 +141,7 @@ class ContextMenu extends Component<any, any> {
 											}}
 										>
 											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = mountingItem.source ? mountingItem.source.property : null;
+												let value = effectItem.source ? effectItem.source.property : null;
 												return (
 													<TreeViewMenu
 														icon={
@@ -181,12 +153,12 @@ class ContextMenu extends Component<any, any> {
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
-															mountingItem.source = {
+															effectItem.source = {
 																model,
 																property: modelPropertyOption.id,
 																type: RouteSourceType.Model
 															};
-															callback(mounting);
+															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}
 														key={`url-parsma-k-${modelPropertyOption.id}`}
@@ -205,7 +177,7 @@ class ContextMenu extends Component<any, any> {
 											key={`url-parma-k-genta`}
 										>
 											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = mountingItem.source ? mountingItem.source.property : null;
+												let value = effectItem.source ? effectItem.source.property : null;
 												return (
 													<TreeViewMenu
 														title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -217,12 +189,12 @@ class ContextMenu extends Component<any, any> {
 															)
 														}
 														onClick={() => {
-															mountingItem.source = {
+															effectItem.source = {
 																model: agent,
 																property: agentPropertyOption.id,
 																type: RouteSourceType.Agent
 															};
-															callback(mounting);
+															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}
 														key={`url-parma-k-${agentPropertyOption.id}`}
@@ -245,23 +217,39 @@ class ContextMenu extends Component<any, any> {
 										</TreeViewMenu>
 									);
 								});
+							if (this.hasBodyParameter(methodDescription)) {
+								bodyParameter = (
+									<TreeViewItemContainer>
+										<CheckBox
+											label={'Body'}
+											value={effectItem && effectItem.body}
+											onChange={(value: boolean) => {
+												effectItem.body = value;
+												this.setState({
+													turn: UIA.GUID()
+												});
+											}}
+										/>
+									</TreeViewItemContainer>
+								);
+							}
 							methodConstraints = this.getMethodDescriptionConstraints(
 								methodDescription
 							).map((constraint: string, index: number) => {
 								let props: any = null;
-								if (!(mountingItem.methodDescription && mountingItem.methodDescription.properties)) {
-									props = mountingItem.methodDescription;
+								if (!(effectItem.methodDescription && effectItem.methodDescription.properties)) {
+									props = effectItem.methodDescription;
 									props.properties = {};
 								} else {
-									props = mountingItem.methodDescription.properties;
+									props = effectItem.methodDescription.properties;
 								}
-								this.applyDefaultConstraintValues(mountingItem);
+								this.applyDefaultConstraintValues(effectItem);
 								return (
 									<SelectInput
 										onChange={(c: string) => {
 											if (
-												mountingItem.methodDescription &&
-												mountingItem.methodDescription.properties
+												effectItem.methodDescription &&
+												effectItem.methodDescription.properties
 											) {
 												props[constraint] = c;
 												this.setState({ turn: UIA.GUID() });
@@ -286,6 +274,16 @@ class ContextMenu extends Component<any, any> {
 								}}
 							>
 								<TreeViewItemContainer>
+									<TextInput
+										label={Titles.Name}
+										onChange={(value: string) => {
+											effectItem.name = value;
+											this.setState({ turn: UIA.GUID() });
+										}}
+										value={effectItem.name}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
 									<SelectInput
 										onChange={(c: string) => {
 											let defaultMethodDescription: any = {
@@ -296,7 +294,7 @@ class ContextMenu extends Component<any, any> {
 											if (methodDescription) {
 												methodDescription.functionType = c;
 											}
-											mountingItem.methodDescription = methodDescription;
+											effectItem.methodDescription = methodDescription;
 											this.setState({ turn: UIA.GUID() });
 										}}
 										label={Titles.FunctionTypes}
@@ -304,26 +302,8 @@ class ContextMenu extends Component<any, any> {
 										options={GetFunctionTypeOptions()}
 									/>
 								</TreeViewItemContainer>
-								<TreeViewItemContainer>
-									<TextInput
-										label={Titles.Name}
-										onChange={(value: string) => {
-											mountingItem.name = value;
-											this.setState({ turn: UIA.GUID() });
-										}}
-										value={mountingItem.name}
-									/>
-								</TreeViewItemContainer>
-								<TreeViewMenu
-									title={'Screen to API'}
-									open={this.state.screenToApi}
-									active
-									onClick={() => {
-										this.setState({ screenToApi: !this.state.screenToApi });
-									}}
-								>
-									{parameterConnections}
-								</TreeViewMenu>
+								{bodyParameter}
+								{parameterConnections}
 								<TreeViewMenu
 									active
 									title={'Method constraint values'}
@@ -338,12 +318,11 @@ class ContextMenu extends Component<any, any> {
 									<TreeViewGroupButton
 										onClick={() => {
 											if (callback) {
-												let update = mounting.mountings.find((x) => x.id === mountingItem.id);
+												let update = effect.effects.find((x) => x.id === effectItem.id);
 												if (update) {
 													if (callback) {
-														callback(mounting);
+														callback(effect);
 													}
-													this.setState({ turn: UIA.GUID() });
 												}
 											}
 										}}
@@ -351,9 +330,9 @@ class ContextMenu extends Component<any, any> {
 									/>
 									<TreeViewGroupButton
 										onClick={() => {
-											mounting.mountings.splice(index, 1);
+											effect.effects.splice(index, 1);
 											if (callback) {
-												callback(mounting);
+												callback(effect);
 												this.setState({ turn: UIA.GUID() });
 											}
 										}}
@@ -368,7 +347,8 @@ class ContextMenu extends Component<any, any> {
 		}
 		return result;
 	}
-	applyDefaultConstraintValues(mountingItem: MountingDescription) {
+
+	applyDefaultConstraintValues(mountingItem: EffectDescription) {
 		let { methodDescription } = mountingItem;
 
 		if (methodDescription) {
@@ -398,7 +378,15 @@ class ContextMenu extends Component<any, any> {
 			}
 		}
 	}
-
+	private hasBodyParameter(methodDescription: MethodDescription): boolean {
+		if (MethodFunctions[methodDescription.functionType]) {
+			let { parameters } = MethodFunctions[methodDescription.functionType];
+			if (parameters && parameters.body) {
+				return parameters.body;
+			}
+		}
+		return false;
+	}
 	private getMethodDescriptionParameters(methodDescription: MethodDescription): any[] {
 		if (MethodFunctions[methodDescription.functionType]) {
 			let { parameters } = MethodFunctions[methodDescription.functionType];
@@ -410,7 +398,6 @@ class ContextMenu extends Component<any, any> {
 		}
 		return [];
 	}
-
 	private getMethodDescriptionConstraints(methodDescription: MethodDescription): any[] {
 		if (MethodFunctions[methodDescription.functionType]) {
 			let { constraints } = MethodFunctions[methodDescription.functionType];
@@ -429,7 +416,7 @@ class ContextMenu extends Component<any, any> {
 		return [];
 	}
 
-	private filterFunctionParameters(
+	private filterMethodDescriptionFunctionParameters(
 		methodDescription: MethodDescription
 	): (value: string, index: number, array: string[]) => boolean {
 		return (x: string) => {
@@ -448,14 +435,14 @@ class ContextMenu extends Component<any, any> {
 	render() {
 		const { state } = this.props;
 		const exit = () => {
-			this.props.setVisual(UIA.MOUNTING_CONTEXT_MENU, null);
+			this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		const display = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) ? 'block' : 'none';
-		const nodeType = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU)
+		const display = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU) ? 'block' : 'none';
+		const nodeType = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;
-		const menuMode = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) || {};
+		const menuMode = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU) || {};
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
@@ -535,4 +522,4 @@ class ContextMenu extends Component<any, any> {
 	}
 }
 
-export default UIConnect(ContextMenu);
+export default UIConnect(EffectContextMenu);

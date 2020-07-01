@@ -20,7 +20,8 @@ import {
 	isAccessNode,
 	NodesByType,
 	ROUTING_CONTEXT_MENU,
-	MOUNTING_CONTEXT_MENU
+	MOUNTING_CONTEXT_MENU,
+	EFFECT_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -49,7 +50,9 @@ import MethodProps, {
 	RouteDescription,
 	ViewMoutingProps,
 	ViewMounting,
-	MountingDescription
+	MountingDescription,
+	EffectProps,
+	Effect
 } from '../interface/methodprops';
 import { Node } from '../methods/graph_types';
 
@@ -62,7 +65,8 @@ class AgentAccessView extends Component<any, any> {
 			agents: [],
 			models: [],
 			agentAccess: [],
-			agentMethod: []
+			agentMethod: [],
+			agentEffect: []
 		};
 	}
 
@@ -188,6 +192,21 @@ class AgentAccessView extends Component<any, any> {
 
 		this.state.agentViewMount[agentIndex][modelIndex][v] = mounting;
 	}
+	setAgentEffectProperty(modelIndex: number, agentIndex: number, v: string, effect: Effect) {
+		if (!this.state.agentEffect[agentIndex]) {
+			this.state.agentEffect[agentIndex] = {};
+		}
+		if (!this.state.agentEffect[agentIndex][modelIndex]) {
+			this.state.agentEffect[agentIndex][modelIndex] = {};
+		}
+		if (typeof this.state.agentEffect[agentIndex][modelIndex][v] === 'string') {
+			this.state.agentEffect[agentIndex][modelIndex][v] = {
+				functionType: this.state.agentEffect[agentIndex][modelIndex][v]
+			};
+		}
+
+		this.state.agentEffect[agentIndex][modelIndex][v] = effect;
+	}
 
 	render() {
 		const active = this.active();
@@ -247,6 +266,7 @@ class AgentAccessView extends Component<any, any> {
 													accessDescriptions,
 													graph
 												),
+												agentEffect: loadAgentEffect(onlyAgents, accessDescriptions, graph),
 												agentAccess: loadAgentAccess(onlyAgents, accessDescriptions, graph)
 											});
 											return false;
@@ -280,9 +300,16 @@ class AgentAccessView extends Component<any, any> {
 									/>
 									<Tab
 										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}
-										title="Method"
+										title="Mounting"
 										onClick={() => {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agentmethoduse');
+										}}
+									/>
+									<Tab
+										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agenteffects')}
+										title="Effects"
+										onClick={() => {
+											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'agenteffects');
 										}}
 									/>
 									<Tab
@@ -422,9 +449,7 @@ class AgentAccessView extends Component<any, any> {
 																	return (
 																		<td
 																			key={`${model} ${modelIndex} ${this.state
-																				.agents[
-																				index
-																			]} ${agentIndex} ${ViewTypes[v]}`}
+																				.agents[index]} ${agentIndex} ${v}`}
 																		>
 																			<CheckBox
 																				label={' '}
@@ -481,7 +506,7 @@ class AgentAccessView extends Component<any, any> {
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
-									<Box maxheight={700} title={'Agent Methods'}>
+									<Box maxheight={700} title={'Agent Mounting Methods'}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -514,7 +539,7 @@ class AgentAccessView extends Component<any, any> {
 															(index: number, agentIndex: number) =>
 																Object.keys(ViewTypes).map((v) => {
 																	const tdkey = `${model} ${modelIndex} ${this.state
-																		.agents[index]} ${agentIndex} ${ViewTypes[v]}`;
+																		.agents[index]} ${agentIndex} ${v}`;
 																	if (
 																		!this.hasAgentAccess(agentIndex, modelIndex, v)
 																	) {
@@ -549,6 +574,95 @@ class AgentAccessView extends Component<any, any> {
 																	);
 																	return (
 																		<td key={tdkey}>{mountingDescriptionButton}</td>
+																	);
+																})
+														)
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</Box>
+								</TabPane>
+								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agenteffects')}>
+									<Box maxheight={700} title={'Agent Effect Methods'}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+												<tr>
+													<th />
+													{[]
+														.interpolate(0, this.state.agents.length, () =>
+															Object.keys(ViewTypes).map((v) => <th>{v}</th>)
+														)
+														.flatten()}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.models.map((model: string, modelIndex: number) => {
+													const result = [ <td>{GetNodeTitle(model)}</td> ];
+
+													result.push(
+														...[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number, agentIndex: number) =>
+																Object.keys(ViewTypes).map((v) => {
+																	const tdkey = `${model} ${modelIndex} ${this.state
+																		.agents[index]} ${agentIndex} -effects ${v}`;
+																	if (
+																		!this.hasAgentAccess(agentIndex, modelIndex, v)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+
+																	let effect: Effect = this.getEffectDescription(
+																		agentIndex,
+																		modelIndex,
+																		v
+																	);
+																	if (!effect) {
+																		effect = {
+																			effects: []
+																		};
+																		this.setAgentEffectProperty(
+																			modelIndex,
+																			agentIndex,
+																			v,
+																			effect
+																		);
+																	}
+																	effect.effects = effect.effects || [];
+
+																	let effectDescriptionButton = this.createEffectDescriptionButton(
+																		agentIndex,
+																		onlyAgents,
+																		model,
+																		modelIndex,
+																		v,
+																		effect
+																	);
+																	return (
+																		<td key={tdkey}>{effectDescriptionButton}</td>
 																	);
 																})
 														)
@@ -608,19 +722,13 @@ class AgentAccessView extends Component<any, any> {
 															(index: number, agentIndex: number) =>
 																Object.keys(ViewTypes).map((v) => {
 																	const tdkey = `routing- ${model} ${modelIndex} ${this
-																		.state.agents[index]} ${agentIndex} ${ViewTypes[
-																		v
-																	]}`;
+																		.state.agents[index]} ${agentIndex} ${v}`;
 																	if (
 																		!this.hasAgentAccess(agentIndex, modelIndex, v)
 																	) {
 																		return <td key={tdkey} />;
 																	}
-																	// const accessIndex =
-																	// 	modelIndex * this.state.agents.length +
-																	// 	agentIndex;
-																	// const agent = this.state.agents[index];
-																	// let functionType = '';
+
 																	let routing: Routing = {
 																		routes: []
 																	};
@@ -790,6 +898,47 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
+
+	private createEffectDescriptionButton(
+		agentIndex: number,
+		onlyAgents: any[],
+		model: string,
+		modelIndex: number,
+		v: string,
+		effect: Effect
+	) {
+		let hasEffects = false;
+		if (effect && effect.effects) {
+			hasEffects = !!effect.effects.length;
+		}
+		return (
+			<div className="btn-group">
+				<button
+					className={hasEffects ? 'btn btn-info' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(EFFECT_CONTEXT_MENU, {
+							agentIndex,
+							agent: onlyAgents[agentIndex].id,
+							model,
+							modelIndex,
+							viewType: v,
+							effect: effect,
+							callback: (value: Effect) => {
+								this.setAgentEffectProperty(modelIndex, agentIndex, v, value);
+								this.setState({
+									agentEffect: this.state.agentEffect
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
+
 	private getFunctionTypeOptions(): any {
 		return GetFunctionTypeOptions();
 	}
@@ -810,7 +959,9 @@ class AgentAccessView extends Component<any, any> {
 	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
-
+	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
+		return this.state.agentViewMount[agentIndex][modelIndex][v];
+	}
 	private getKey(a: number, b: number, c: string) {
 		return `${a}-${b}-${c}`;
 	}
@@ -919,43 +1070,9 @@ function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph:
 }
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadAgent<RoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.RoutingProps);
-	// return onlyAgents.map((agent) => {
-	// 	const agentAccessDescription = accessDescriptions.filter((v) =>
-	// 		existsLinkBetween(graph, {
-	// 			source: agent.id,
-	// 			target: v.id,
-	// 			type: LinkType.AgentAccess
-	// 		})
-	// 	);
-	// 	return GetNodesByProperties(
-	// 		{
-	// 			[NodeProperties.NODEType]: NodeTypes.Model
-	// 		},
-	// 		graph
-	// 	).map((model) => {
-	// 		const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
-	// 		if (accessDescription) {
-	// 			const link = findLink(graph, {
-	// 				source: agent.id,
-	// 				target: accessDescription.id
-	// 			});
-	// 			let routingProps: RoutingProps = GetLinkProperty(link, LinkPropertyKeys.RoutingProps);
-	// 			if (routingProps) {
-	// 				return {
-	// 					...routingProps
-	// 				};
-	// 			}
-	// 		}
-
-	// 		return {
-	// 			[ViewTypes.GetAll]: false,
-	// 			[ViewTypes.Get]: false,
-	// 			[ViewTypes.Create]: false,
-	// 			[ViewTypes.Update]: false,
-	// 			[ViewTypes.Delete]: false
-	// 		};
-	// 	});
-	// });
+}
+function loadAgentEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadAgent<EffectProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.EffectProps);
 }
 
 function loadAgent<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, propKey: string) {

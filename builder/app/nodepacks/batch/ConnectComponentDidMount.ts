@@ -82,7 +82,12 @@ export default function ConnectComponentDidMount(args: {
 											const temp = GetNodesLinkedTo(graph, {
 												id: d.id,
 												link: LinkType.ComponentApiConnection
-											}).find((v: any) => functionTypeParameters[GetCodeName(v)]);
+											}).find(
+												(v: any) =>
+													functionTypeParameters
+														? functionTypeParameters[GetCodeName(v)]
+														: false
+											);
 											if (temp) {
 												apiEndpoints[GetCodeName(temp)] = d;
 											}

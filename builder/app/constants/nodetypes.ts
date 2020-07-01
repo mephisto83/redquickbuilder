@@ -910,6 +910,7 @@ export const LinkPropertyKeys = {
 	MethodProps: 'methodProps',
 	MountingProps: 'mountingProps',
 	RoutingProps: 'routingProps',
+	EffectProps: 'effectProps',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
 	Enumeration: 'Enumeration',

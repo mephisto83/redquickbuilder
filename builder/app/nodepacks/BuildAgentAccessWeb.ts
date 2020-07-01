@@ -1,10 +1,11 @@
 import { NodesByType } from '../methods/graph_methods';
-import { NodeTypes } from '../constants/nodetypes';
+import { NodeTypes, LinkProperties, LinkPropertyKeys } from '../constants/nodetypes';
 import { REMOVE_NODE, graphOperation, GetDispatchFunc, GetStateFunc, GetCurrentGraph } from '../actions/uiactions';
 import AddAgentAccess from './AddAgentAccess';
+import { NodeProperties } from '../components/titles';
 
 export default function BuildAgentAccessWeb(args: any) {
-	const { agents, models, agentViewMount, agentRouting, agentAccess, agentMethod } = args;
+	const { agents, models, agentViewMount, agentRouting, agentAccess, agentMethod, agentEffect } = args;
 
 	const graph = GetCurrentGraph();
 
@@ -35,15 +36,20 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentViewMount[agentIndex] && agentViewMount[agentIndex][modelIndex]
 						? agentViewMount[agentIndex][modelIndex] || {}
 						: {};
+				const effects =
+					agentEffect[agentIndex] && agentEffect[agentIndex][modelIndex]
+						? agentEffect[agentIndex][modelIndex] || {}
+						: {};
 				if (values) {
 					result.push(
 						...AddAgentAccess({
 							modelId: model,
 							agentId: agent,
 							linkProps: { ...values },
-							methodProps: { ...methods },
-							routingProps: { ...routing },
-							mountingProps: { ...mounting }
+							[LinkPropertyKeys.MethodProps]: { ...methods },
+							[LinkPropertyKeys.RoutingProps]: { ...routing },
+							[LinkPropertyKeys.MountingProps]: { ...mounting },
+							[LinkPropertyKeys.EffectProps]: { ...effects }
 						})
 					);
 				}

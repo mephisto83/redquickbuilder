@@ -90,17 +90,6 @@ function makeViewMountingMethods(createMountings: ViewMounting | undefined, agen
 	}
 }
 
-function buildFunctions(
-	methodProps: any,
-	agentAccess: Node,
-	agent: any,
-	model: any
-): (value: string, index: number, array: string[]) => void {
-	return (key: string) => {
-		let methodDescription: MethodDescription = methodProps[key];
-		buildMethodDescriptionFunctions(methodDescription, agentAccess, agent, model);
-	};
-}
 
 function buildMethodDescriptionFunctions(
 	methodDescription: MethodDescription,

@@ -17,6 +17,7 @@ export const DeleteType = 'Delete Type';
 export const AddServiceInterfaceMenu = 'Add Interface Method';
 export const AddDefaults = 'Add Defaults';
 export const BatchMenu = 'Batch Menu';
+export const AddEffect = 'Add Effect';
 export const BuildLowerMenu = 'Build Lower Menu';
 export const GenerateNavigationScreen = 'Navigation Screens';
 export const BuildReferenceObject = 'Build Reference Object';
