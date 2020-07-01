@@ -18,6 +18,8 @@ import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
 import { Graph } from '../../methods/graph_types';
 import StoreModelInLake from '../datachain/StoreModelInLake';
 import { MethodFunctions } from '../../constants/functiontypes';
+import LoadModel from '../LoadModel';
+import { ViewTypes } from '../../constants/viewtypes';
 
 export default function ConnectComponentDidMount(args: {
 	screen: string;
@@ -35,7 +37,17 @@ export default function ConnectComponentDidMount(args: {
 
 	let graph = GetCurrentGraph();
 	let screen_option = GetNodeById(args.screenOption, graph);
-
+	let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+  let instanceType = false; // change this to be methodFunction related,
+  // if it is create/update, it should use and appropriate storage
+  // if it is returning a list or model, it should be able to use the appropriate thing
+  // check the methods functionType to see if it is returning a list or single model or whatever.
+	switch (viewType) {
+		case ViewTypes.Create:
+		case ViewTypes.Update:
+			instanceType = true;
+			break;
+	}
 	let { viewPackages } = args;
 	viewPackages = {
 		[NodeProperties.ViewPackage]: uuidv4(),
@@ -61,6 +73,7 @@ export default function ConnectComponentDidMount(args: {
 				let datachain: string;
 				let functionType: string = GetNodeProp(method, NodeProperties.FunctionType);
 				let functionTypeParameters = GetMethodTemplateParameters(functionType);
+				let dataChainForLoading: null = null;
 				result.push(
 					...AddLifeCylcleMethodInstance({
 						node: lifeCylcleMethod.id,
@@ -70,12 +83,32 @@ export default function ConnectComponentDidMount(args: {
 						}
 					}),
 					(graph: any) => {
+						// With a variety of parameters, this will need to be generalized to handle
+						// all the possible parameters.
 						if (cycleInstance) {
 							return ConnectLifecycleMethod({
 								target: method,
 								source: cycleInstance.id,
 								graph,
 								viewPackages,
+								connectToParameter: (ae: any) => {
+									let param = GetNodeProp(ae, NodeProperties.UIText);
+									const valueScreenOptionNavigateTargetApi = GetNodesLinkedTo(graph, {
+										id: screen_option.id,
+										link: LinkType.ComponentInternalApi
+									}).find((x: any) => GetNodeTitle(x) === param);
+									if (valueScreenOptionNavigateTargetApi) {
+										return {
+											target: valueScreenOptionNavigateTargetApi.id,
+											linkProperties: {
+												properties: {
+													...LinkProperties.ComponentApi
+												}
+											}
+										};
+									}
+									return false;
+								},
 								callback: (context: { apiEndPoints: any[] }, graph: any) => {
 									if (context.apiEndPoints) {
 										context.apiEndPoints.filter((d: { id: any }) => {
@@ -99,32 +132,63 @@ export default function ConnectComponentDidMount(args: {
 						}
 						return [];
 					},
-					(graph: Graph) => {
-						let model = GetNodeProp(screen, NodeProperties.Model, graph);
-						return StoreModelInLake({
-							modelId: model,
-							modelInsertName: GetLambdaVariableTitle(model, false, true),
-							model: GetNodeTitle(model),
-							viewPackages,
-							callback: (dcontext: { entry: string }) => {
-								datachain = dcontext.entry;
-							}
-						});
-					},
-					() => {
-						return [
-							{
-								operation: ADD_LINK_BETWEEN_NODES,
-								options() {
-									return {
-										properties: { ...LinkProperties.DataChainLink },
-										target: datachain,
-										source: cycleInstance ? cycleInstance.id : null
-									};
+					...(instanceType
+						? [
+								LoadModel({
+									screen: screen,
+									viewPackages,
+									model_view_name: `Load ${GetCodeName(
+										GetNodeProp(screen, NodeProperties.Model)
+									)} into state`,
+									model_item: `Models.${GetCodeName(GetNodeProp(screen, NodeProperties.Model))}`,
+									callback: (context: { entry: any }) => {
+										dataChainForLoading = context.entry;
+									}
+								}),
+								{
+									operation: ADD_LINK_BETWEEN_NODES,
+									options() {
+										return {
+											target: dataChainForLoading,
+											source: cycleInstance ? cycleInstance.id : null,
+											properties: {
+												...LinkProperties.DataChainLink
+											}
+										};
+									}
 								}
-							}
-						];
-					},
+							]
+						: []),
+					...(!instanceType
+						? [
+								(graph: Graph) => {
+									let model = GetNodeProp(screen, NodeProperties.Model, graph);
+									return StoreModelInLake({
+										modelId: model,
+										modelInsertName: GetLambdaVariableTitle(model, false, true),
+										model: GetNodeTitle(model),
+										viewPackages,
+										callback: (dcontext: { entry: string }) => {
+											datachain = dcontext.entry;
+										}
+									});
+								},
+								() => {
+									return [
+										{
+											operation: ADD_LINK_BETWEEN_NODES,
+											options() {
+												return {
+													properties: { ...LinkProperties.DataChainLink },
+													target: datachain,
+													source: cycleInstance ? cycleInstance.id : null
+												};
+											}
+										}
+									];
+								}
+							]
+						: []),
 					() => {
 						if (apiEndpoints) {
 							return Object.keys(apiEndpoints).map((key) => {

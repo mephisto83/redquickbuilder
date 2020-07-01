@@ -13,9 +13,12 @@ import {
 	GetNodesByProperties,
 	GetNodeTitle,
 	updateComponentProperty,
-	ComponentApiKeys
+	ComponentApiKeys,
+	ADD_NEW_NODE,
+	addInstanceFunc,
+	ADD_LINK_BETWEEN_NODES
 } from '../../actions/uiactions';
-import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys } from '../../constants/nodetypes';
+import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys, LinkProperties } from '../../constants/nodetypes';
 import { MethodFunctions, FunctionTemplateKeys, FunctionTypes } from '../../constants/functiontypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import ScreenConnectGet from '../screens/ScreenConnectGet';
@@ -41,6 +44,10 @@ import MethodProps, {
 	MountingDescription
 } from '../../interface/methodprops';
 import ConnectComponentDidMount from './ConnectComponentDidMount';
+import { GetDispatch } from '../../templates/electronio/v1/app/actions/uiactions';
+import ClearScreenInstance from '../datachain/ClearScreenInstance';
+import { uuidv4 } from '../../utils/array';
+import { ComponentLifeCycleEvents } from '../../constants/componenttypes';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -87,6 +94,9 @@ function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information:
 		SetupMountDescription(mounting, screen);
 		SetupMountingMethod(mounting, screen, information);
 	});
+	if (viewMounting.clearScreen) {
+		addClearScreen(screen);
+	}
 }
 
 function SetupMountingMethod(mouting: MountingDescription, screen: Node, information: SetupInformation) {
@@ -105,6 +115,85 @@ function SetupMountingMethod(mouting: MountingDescription, screen: Node, informa
 	});
 }
 
+function addClearScreen(screen: Node) {
+	let graph = GetCurrentGraph();
+	let setup_options = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		link: LinkType.ScreenOptions
+	});
+	setup_options.forEach((screenOption: Node) => {
+		let viewPackages = {
+			[NodeProperties.ViewPackage]: uuidv4()
+		};
+
+		let clearScreenContext: any = null;
+		let componentDidMountInstance: any = null;
+		let componentDidMount: any = null;
+		let result: any[] = [];
+		result.push(
+			...ClearScreenInstance({
+				viewPackages,
+				update: true,
+				screen: screen.id,
+				title: `Clear ${GetNodeTitle(screen)} State`,
+				model: GetNodeProp(screen, NodeProperties.Model),
+				callback: (temp: any) => {
+					clearScreenContext = temp;
+				}
+			}),
+			(gg: any) => {
+				componentDidMount = GetNodesLinkedTo(gg, {
+					id: screenOption.id,
+					link: LinkType.LifeCylceMethod,
+					componentType: NodeTypes.LifeCylceMethod
+				}).find(
+					(v: any) => GetNodeProp(v, NodeProperties.EventType) === ComponentLifeCycleEvents.ComponentDidMount
+				);
+
+				if (componentDidMount) {
+					componentDidMountInstance = GetNodeLinkedTo(gg, {
+						id: componentDidMount.id,
+						link: LinkType.LifeCylceMethodInstance,
+						componentType: NodeTypes.LifeCylceMethodInstance
+					});
+					if (!componentDidMountInstance) {
+						console.log('create a component did mount instance');
+						return {
+							operation: ADD_NEW_NODE,
+							options: addInstanceFunc(
+								componentDidMount,
+								(instanceNode: any) => {
+									componentDidMountInstance = instanceNode;
+								},
+								viewPackages,
+								{ lifecycle: true }
+							)
+						};
+					}
+				}
+				return null;
+			},
+			// - clear screen -
+			() => ({
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					if (!componentDidMountInstance) {
+						console.log(`screen : ${GetNodeTitle(screen)}`);
+						console.log(screen);
+						console.log('componentDidMount');
+						console.log(componentDidMount);
+					}
+					return {
+						target: clearScreenContext.entry,
+						source: componentDidMountInstance.id,
+						properties: { ...LinkProperties.CallDataChainLink }
+					};
+				}
+			})
+		);
+		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+	});
+}
 function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 	let graph = GetCurrentGraph();
 	let screenOptions: Node[] = GetNodesLinkedTo(graph, {
