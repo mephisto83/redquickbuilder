@@ -7,7 +7,8 @@ import {
 	GetCodeName,
 	graphOperation,
 	GetStateFunc,
-	GetDispatchFunc
+	GetDispatchFunc,
+	NodeTypes
 } from '../../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeProp } from '../../methods/graph_methods';
 import { LinkType, NodeProperties, LinkProperties } from '../../constants/nodetypes';
@@ -20,6 +21,7 @@ import StoreModelInLake from '../datachain/StoreModelInLake';
 import { MethodFunctions } from '../../constants/functiontypes';
 import LoadModel from '../LoadModel';
 import { ViewTypes } from '../../constants/viewtypes';
+import StoreModelArrayStandard from '../StoreModelArrayStandard';
 
 export default function ConnectComponentDidMount(args: {
 	screen: string;
@@ -38,10 +40,10 @@ export default function ConnectComponentDidMount(args: {
 	let graph = GetCurrentGraph();
 	let screen_option = GetNodeById(args.screenOption, graph);
 	let viewType = GetNodeProp(screen, NodeProperties.ViewType);
-  let instanceType = false; // change this to be methodFunction related,
-  // if it is create/update, it should use and appropriate storage
-  // if it is returning a list or model, it should be able to use the appropriate thing
-  // check the methods functionType to see if it is returning a list or single model or whatever.
+	let instanceType = false; // change this to be methodFunction related,
+	// if it is create/update, it should use and appropriate storage
+	// if it is returning a list or model, it should be able to use the appropriate thing
+	// check the methods functionType to see if it is returning a list or single model or whatever.
 	switch (viewType) {
 		case ViewTypes.Create:
 		case ViewTypes.Update:
@@ -73,7 +75,9 @@ export default function ConnectComponentDidMount(args: {
 				let datachain: string;
 				let functionType: string = GetNodeProp(method, NodeProperties.FunctionType);
 				let functionTypeParameters = GetMethodTemplateParameters(functionType);
+				let returnsAList = MethodReturnsList(functionType);
 				let dataChainForLoading: null = null;
+				let storeModelDataChain: null = null;
 				result.push(
 					...AddLifeCylcleMethodInstance({
 						node: lifeCylcleMethod.id,
@@ -131,8 +135,9 @@ export default function ConnectComponentDidMount(args: {
 							});
 						}
 						return [];
-					},
-					...(instanceType
+          },
+          //Returns a MODEL and an instanceType[IS edit]
+					...(!returnsAList && instanceType
 						? [
 								LoadModel({
 									screen: screen,
@@ -159,7 +164,8 @@ export default function ConnectComponentDidMount(args: {
 								}
 							]
 						: []),
-					...(!instanceType
+					//Returns a model and not an instanceType[not edit]
+					...(!returnsAList && !instanceType
 						? [
 								(graph: Graph) => {
 									let model = GetNodeProp(screen, NodeProperties.Model, graph);
@@ -182,6 +188,38 @@ export default function ConnectComponentDidMount(args: {
 													properties: { ...LinkProperties.DataChainLink },
 													target: datachain,
 													source: cycleInstance ? cycleInstance.id : null
+												};
+											}
+										}
+									];
+								}
+							]
+						: []),
+					//Returns a LIST and not an instanceType[not edit]
+					...(returnsAList && !instanceType
+						? [
+								...StoreModelArrayStandard({
+									viewPackages,
+									model: GetNodeProp(screen, NodeProperties.Model),
+									modelText: GetNodeTitle(screen),
+									state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
+									callback: (context: { entry: any }) => {
+										storeModelDataChain = context.entry;
+									}
+								}),
+								() => {
+									return [
+										{
+											operation: ADD_LINK_BETWEEN_NODES,
+											options() {
+												return {
+													target: storeModelDataChain,
+													source: cycleInstance ? cycleInstance.id : null,
+													properties: {
+														...LinkProperties.DataChainLink,
+														singleLink: true,
+														nodeTypes: [ NodeTypes.DataChain ]
+													}
 												};
 											}
 										}
@@ -221,7 +259,13 @@ export default function ConnectComponentDidMount(args: {
 		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	});
 }
-
+export function MethodReturnsList(functionType: string): boolean {
+	let methodFunctionProperties = MethodFunctions[functionType];
+	if (methodFunctionProperties) {
+		return methodFunctionProperties.isList;
+	}
+	return false;
+}
 export function GetMethodTemplateParameters(functionType: string) {
 	let methodFunctionProperties = MethodFunctions[functionType];
 	if (methodFunctionProperties && methodFunctionProperties.parameters) {
