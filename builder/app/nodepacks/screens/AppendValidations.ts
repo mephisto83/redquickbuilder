@@ -142,7 +142,7 @@ export default function AppendValidations({
 								...CreateValidatorForObject({
 									model: GetNodeTitle(modelId),
 									modelId,
-									method,
+									method: targetValidationMethod || method,
 									methodType,
 									viewPackages,
 									callback: (context: { entry: any }) => {

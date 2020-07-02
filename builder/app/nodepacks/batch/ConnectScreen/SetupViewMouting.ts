@@ -1,7 +1,7 @@
 import { ViewMounting, MountingDescription, ViewMoutingProps } from "../../../interface/methodprops";
 import { SetupInformation } from "./SetupInformation";
 import { Node } from "../../../methods/graph_types";
-import { GetCurrentGraph, GetNodeTitle, NodeTypes, addInstanceFunc, ADD_NEW_NODE, ADD_LINK_BETWEEN_NODES, graphOperation, GetDispatchFunc, GetStateFunc, updateComponentProperty, ComponentApiKeys } from "../../../actions/uiactions";
+import { GetCurrentGraph, GetNodeTitle, NodeTypes, addInstanceFunc, ADD_NEW_NODE, ADD_LINK_BETWEEN_NODES, graphOperation, GetDispatchFunc, GetStateFunc, updateComponentProperty, ComponentApiKeys, GetComponentExternalApiNode } from "../../../actions/uiactions";
 import { GetNodesLinkedTo, GetNodeProp, GetNodeLinkedTo, SetPause, Paused, SOURCE } from "../../../methods/graph_methods";
 import { LinkType, NodeProperties, LinkProperties } from "../../../constants/nodetypes";
 import { MethodFunctions } from "../../../constants/functiontypes";
@@ -112,7 +112,37 @@ function addClearScreen(screen: Node) {
 						properties: { ...LinkProperties.CallDataChainLink }
 					};
 				}
-			})
+			}),
+      () => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options(gg: any) {
+          const viewModelExternalApiNode = GetComponentExternalApiNode(
+            ComponentApiKeys.ViewModel,
+            screenOption.id,
+            gg
+          );
+          return {
+            source: clearScreenContext.entry,
+            target: viewModelExternalApiNode.id,
+            properties: { ...LinkProperties.DataChainInputLink }
+          };
+        }
+      }),
+      () => ({
+        operation: ADD_LINK_BETWEEN_NODES,
+        options(gg: any) {
+          const valueExternalApiNode = GetComponentExternalApiNode(
+            ComponentApiKeys.Value,
+            screenOption.id,
+            gg
+          );
+          return {
+            source: clearScreenContext.entry,
+            target: valueExternalApiNode.id,
+            properties: { ...LinkProperties.DataChainInputLink }
+          };
+        }
+      })
 		);
 		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	});
