@@ -21,7 +21,7 @@ export default function AppendValidations({
 	InstanceUpdate = true,
 	viewPackages,
 	method
-}: any ) {
+}: any) {
 	if (!subcomponents) {
 		throw new Error('no subcomponents');
 	}
@@ -112,7 +112,7 @@ export default function AppendValidations({
 		});
 	}
 	if (executeButtons.length) {
-		executeButtons.forEach((button: any ) => {
+		executeButtons.forEach((button: any) => {
 			const componentType = GetNodeProp(button, NodeProperties.ComponentType);
 			let externalValidationApi: { id: any };
 			switch (componentType) {
@@ -136,7 +136,8 @@ export default function AppendValidations({
 						if (externalValidationApi) {
 							const modelId = GetNodeProp(screen_option, NodeProperties.Model);
 							let validatorNode: null = null;
-							const methodType = GetNodeProp(method, NodeProperties.MethodType);
+							let targetValidationMethod = GetNodeProp(button, NodeProperties.ValidationMethodTarget);
+							const methodType = GetNodeProp(targetValidationMethod || method, NodeProperties.MethodType);
 							return [
 								...CreateValidatorForObject({
 									model: GetNodeTitle(modelId),

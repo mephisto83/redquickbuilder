@@ -376,6 +376,7 @@ export const NodeProperties = {
 	SelectedLayoutCell: 'SelectedLayoutCell',
 	ChainParent: 'ChainParent',
 	Navigation: 'Navigation',
+	ValidationMethodTarget: 'ValidationMethodTarget',
 	ClientMethodParameters: 'ClientMethodParameters',
 	AsOutput: 'AsOutput',
 	EntryPoint: 'EntryPoint',

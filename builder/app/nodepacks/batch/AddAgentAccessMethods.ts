@@ -7,7 +7,8 @@ import {
 	GetCurrentGraph,
 	GetLinkProperty,
 	GetNodeById,
-	updateComponentProperty
+	updateComponentProperty,
+	GetLink
 } from '../../actions/uiactions';
 import { NodeTypes, LinkType, Methods, LinkPropertyKeys, NodeProperties } from '../../constants/nodetypes';
 import { MethodFunctions, HTTP_METHODS, FunctionTypes } from '../../constants/functiontypes';
@@ -18,8 +19,12 @@ import MethodProps, {
 	MethodDescription,
 	ViewMoutingProps,
 	ViewMounting,
-	MountingDescription
+	MountingDescription,
+	EffectProps,
+	Effect,
+	EffectDescription
 } from '../../interface/methodprops';
+import { LinkProperties } from '../../components/titles';
 
 export default async function AddAgentAccessMethods(progresFunc: any) {
 	SetPause(true);
@@ -57,13 +62,18 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 				} else {
 					console.info('no mounting props: AddAgentAccessMethods');
 				}
-				// if (methodProps) {
-				// 	Object.keys(methodProps).forEach(buildFunctions(methodProps, agentAccess, agent, model));
-				// 	const progress = mindex / agentAccesses.length;
-				// 	await progresFunc(progress);
-				// } else {
-				// 	console.info('no method props: AddAgentAccessMethods');
-				// }
+
+				let effectProps: EffectProps = GetLinkProperty(agentLink, LinkPropertyKeys.EffectProps);
+				if (effectProps) {
+					let createEffects: Effect | undefined = effectProps.Create;
+					let getEffect: Effect | undefined = effectProps.Get;
+					let getAllEffect: Effect | undefined = effectProps.GetAll;
+					let updateEffect: Effect | undefined = effectProps.Update;
+					makeEffectMethods(createEffects, agentAccess, agent, model);
+					makeEffectMethods(getEffect, agentAccess, agent, model);
+					makeEffectMethods(getAllEffect, agentAccess, agent, model);
+					makeEffectMethods(updateEffect, agentAccess, agent, model);
+				}
 			} else {
 				console.info('mode link: AddAgentAccessMethods');
 			}
@@ -90,6 +100,15 @@ function makeViewMountingMethods(createMountings: ViewMounting | undefined, agen
 	}
 }
 
+function makeEffectMethods(createMountings: Effect | undefined, agentAccess: Node, agent: any, model: any) {
+	if (createMountings && createMountings.effects) {
+		createMountings.effects.forEach((effect: EffectDescription) => {
+			effect.methodDescription
+				? buildMethodDescriptionFunctions(effect.methodDescription, agentAccess, agent, model)
+				: null;
+		});
+	}
+}
 
 function buildMethodDescriptionFunctions(
 	methodDescription: MethodDescription,
@@ -142,8 +161,8 @@ function buildMethodDescriptionFunctions(
 				});
 				executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
 				if (newMethodId) {
-          updateComponentProperty(agentAccess.id, NodeProperties.Method, newMethodId);
-          methodDescription.methodId = newMethodId;
+					updateComponentProperty(agentAccess.id, NodeProperties.Method, newMethodId);
+					methodDescription.methodId = newMethodId;
 				}
 			} else {
 				console.info('no method on function: AddAgentAccessMethods');

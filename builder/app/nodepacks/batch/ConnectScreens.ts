@@ -8,18 +8,13 @@ import {
 	ScreenOptionFilter,
 	GetLinkProperty,
 	GetCurrentGraph,
-	GetNodeByProperties,
 	GetMethodProps,
 	GetNodesByProperties,
-	GetNodeTitle,
-	updateComponentProperty,
-	ComponentApiKeys,
-	ADD_NEW_NODE,
-	addInstanceFunc,
-	ADD_LINK_BETWEEN_NODES
+	GetNodeTitle
 } from '../../actions/uiactions';
-import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys, LinkProperties } from '../../constants/nodetypes';
-import { MethodFunctions, FunctionTemplateKeys, FunctionTypes } from '../../constants/functiontypes';
+
+import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys } from '../../constants/nodetypes';
+import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import ScreenConnectGet from '../screens/ScreenConnectGet';
 import ScreenConnectGetAll from '../screens/ScreenConnectGetAll';
@@ -28,29 +23,8 @@ import SetupEffect, { GetEffect } from './COnnectScreen/SetupEffect';
 import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 
 import { Node, GraphLink } from '../../methods/graph_types';
-import {
-	GetNodeLinkedTo,
-	findLink,
-	GetNodesLinkedTo,
-	TARGET,
-	SOURCE,
-	SetPause,
-	Paused
-} from '../../methods/graph_methods';
-import MethodProps, {
-	MethodDescription,
-	ViewMoutingProps,
-	ViewMounting,
-	MountingDescription,
-	Effect,
-	EffectProps
-} from '../../interface/methodprops';
-import ConnectComponentDidMount from './ConnectComponentDidMount';
-import { GetDispatch } from '../../templates/electronio/v1/app/actions/uiactions';
-import ClearScreenInstance from '../datachain/ClearScreenInstance';
-import { uuidv4 } from '../../utils/array';
-import { ComponentLifeCycleEvents } from '../../constants/componenttypes';
-import { SetupInformation } from './ConnectScreen/SetupInformation';
+import { GetNodeLinkedTo, findLink } from '../../methods/graph_methods';
+import { MethodDescription, ViewMoutingProps, ViewMounting, Effect, EffectProps } from '../../interface/methodprops';
 import SetupViewMouting, { GetViewMounting } from './ConnectScreen/SetupViewMouting';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {

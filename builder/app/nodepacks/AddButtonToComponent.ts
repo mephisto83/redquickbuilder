@@ -310,7 +310,8 @@ export default function(args: {
 		...clearPinned,
 		function() {
 			if (context.callback) {
-				context.entry = context.node0;
+        context.entry = context.node0;
+        context.event = context.node4;
 				context.eventInstance = context.node5;
 				context.callback(context);
 			}
