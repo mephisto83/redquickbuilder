@@ -1,14 +1,33 @@
 import { uuidv4 } from '../utils/array';
-import { NodeProperties } from '../constants/nodetypes';
-export default function(args: any = {}) {
+import { NodeProperties, UITypes } from '../constants/nodetypes';
+export default function(args: {
+	clearPinned?: boolean;
+	componentType?: string;
+	viewPackages?: any;
+	component: string;
+	uiType?: string;
+	callback?: Function;
+}) {
 	// node0
-
+	let { uiType } = args;
 	//
 	if (!args.component) {
 		throw 'missing component';
 	}
+	let eventName: string = '';
+	if (uiType) {
+		switch (uiType) {
+			case UITypes.ReactNative:
+				eventName = 'onPress';
+				break;
+			case UITypes.ReactWeb:
+			case UITypes.ElectronIO:
+				eventName = 'onClick';
+				break;
+		}
+	}
 
-	let context = {
+	let context: any = {
 		...args,
 		node0: args.component
 	};
@@ -172,8 +191,8 @@ export default function(args: any = {}) {
 					options: {
 						nodeType: 'EventMethod',
 						properties: {
-							EventType: 'onClick',
-							text: 'onClick',
+							EventType: eventName || 'onClick',
+							text: eventName || 'onClick',
 							...viewPackages
 						},
 						links: [
@@ -214,7 +233,7 @@ export default function(args: any = {}) {
 							}
 						},
 						properties: {
-							text: 'onClick Instance',
+							text: eventName ? `${eventName} Instance` : 'onClick Instance',
 							Pinned: false,
 							...viewPackages,
 							AutoDelete: {
@@ -292,6 +311,7 @@ export default function(args: any = {}) {
 		function() {
 			if (context.callback) {
 				context.entry = context.node0;
+				context.eventInstance = context.node5;
 				context.callback(context);
 			}
 			return [];

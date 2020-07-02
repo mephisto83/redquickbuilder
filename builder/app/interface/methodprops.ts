@@ -78,6 +78,7 @@ export enum RouteSourceType {
 }
 
 export interface MethodDescription {
+  methodId: string;
 	functionType: string;
 	properties: MethodPropsProperties;
 }

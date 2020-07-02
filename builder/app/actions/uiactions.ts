@@ -2812,7 +2812,6 @@ export function GetMethodOptions(methodProps: { [x: string]: string }) {
 export function GetLinkProperty(link: GraphLink, prop: any) {
 	return link && link.properties && link.properties[prop];
 }
-
 export function GetLink(linkId: any) {
 	const graph = GetCurrentGraph();
 
@@ -3798,7 +3797,7 @@ export function executeGraphOperations(operations: any[]) {
 		});
 	};
 }
-export function updateComponentProperty(nodeId: string, prop: string, value: string) {
+export function updateComponentProperty(nodeId: string, prop: string, value: any) {
 	graphOperation([
 		{
 			operation: CHANGE_NODE_PROPERTY,
