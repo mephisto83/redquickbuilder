@@ -1403,7 +1403,6 @@ export function GetComponentExternalApiNode(api: any, parent: any, graph?: any) 
 	}).find((v: any) => GetNodeTitle(v) === api);
 }
 
-
 export function GetComponentApiNode(api: any, parent: any, graph?: any) {
 	graph = graph || GetCurrentGraph();
 	return GraphMethods.GetNodesLinkedTo(graph, {
@@ -1839,6 +1838,7 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Map:
 			return `($a${anyType}) => ($a || []).map(${lambda})`;
 		case DataChainFunctionKeys.Lambda:
+			lambda = untransformLambda(lambda, node);
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((insert: string) => {
 				const args = insert.split('~');
 				const property = args.length > 1 ? args[1] : args[0];
@@ -2035,6 +2035,18 @@ function buildModelMethodMenu(options: { language: any }) {
     let underpages = [${subscreens.join()}].filter((v${anyType}) =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: v.parent }));
     return [...toppages, ...underpages]
 }`;
+}
+export function untransformLambda(value: string, currentNode: any): string {
+	if (currentNode) {
+		const models: Node[] = NodesByType(null, [ NodeTypes.Model, NodeTypes.Enumeration ])
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+		models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
+			var regex = new RegExp(`${GetLambdaVariableTitle(item, true)}`, 'g');
+			value = value.replace(regex, GetCodeName(item));
+		});
+	}
+	return value;
 }
 export function GetPermissionsSortedByAgent() {
 	return GetNodesSortedByAgent(NodeTypes.Permission);

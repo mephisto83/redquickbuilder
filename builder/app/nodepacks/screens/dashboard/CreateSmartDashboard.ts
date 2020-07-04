@@ -15,6 +15,7 @@ import FourColumnSection from '../../FourColumnSection';
 import { Graph } from '../../../methods/graph_types';
 import { NodeProperties } from '../../../constants/nodetypes';
 import NColumnSection from '../../NColumnSection';
+import { GetNodeProp } from '../../../methods/graph_methods';
 
 export interface ButtonDescription {
 	externalLabelApi?: string;
@@ -60,6 +61,7 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			return AddComponent({
 				component: screenOption,
 				skipLabel: true,
+				uiType: args.uiType,
 				componentName: args.componentName,
 				componentType: ComponentTypes.ReactNative[ComponentTypeKeys.View].key,
 				callback: (context: { entry: string }) => {
@@ -120,6 +122,7 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 					return AddComponent({
 						component: viewComponent,
 						skipLabel: true,
+						uiType: args.uiType,
 						componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button].key,
 						callback: (bt: { entry: string }) => {
 							button.id = bt.entry;
@@ -163,6 +166,7 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 							options: {
 								id: button.id,
 								properties: {
+									[NodeProperties.UIType]: args.uiType,
 									[NodeProperties.UIText]: `${button.title}`,
 									[NodeProperties.Target]: button.target
 								}
