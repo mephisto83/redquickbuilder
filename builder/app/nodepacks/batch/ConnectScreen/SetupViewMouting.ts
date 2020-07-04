@@ -1,17 +1,39 @@
-import { ViewMounting, MountingDescription, ViewMoutingProps } from "../../../interface/methodprops";
-import { SetupInformation } from "./SetupInformation";
-import { Node } from "../../../methods/graph_types";
-import { GetCurrentGraph, GetNodeTitle, NodeTypes, addInstanceFunc, ADD_NEW_NODE, ADD_LINK_BETWEEN_NODES, graphOperation, GetDispatchFunc, GetStateFunc, updateComponentProperty, ComponentApiKeys, GetComponentExternalApiNode } from "../../../actions/uiactions";
-import { GetNodesLinkedTo, GetNodeProp, GetNodeLinkedTo, SetPause, Paused, SOURCE } from "../../../methods/graph_methods";
-import { LinkType, NodeProperties, LinkProperties } from "../../../constants/nodetypes";
-import { MethodFunctions } from "../../../constants/functiontypes";
-import { uuidv4 } from "../../../utils/array";
-import ClearScreenInstance from "../../datachain/ClearScreenInstance";
-import { ComponentLifeCycleEvents } from "../../../constants/componenttypes";
+import { ViewMounting, MountingDescription, ViewMoutingProps } from '../../../interface/methodprops';
+import { SetupInformation } from './SetupInformation';
+import { Node } from '../../../methods/graph_types';
+import {
+	GetCurrentGraph,
+	GetNodeTitle,
+	NodeTypes,
+	addInstanceFunc,
+	ADD_NEW_NODE,
+	ADD_LINK_BETWEEN_NODES,
+	graphOperation,
+	GetDispatchFunc,
+	GetStateFunc,
+	updateComponentProperty,
+	ComponentApiKeys,
+	GetComponentExternalApiNode,
+	GetComponentExternalApiNodes
+} from '../../../actions/uiactions';
+import {
+	GetNodesLinkedTo,
+	GetNodeProp,
+	GetNodeLinkedTo,
+	SetPause,
+	Paused,
+	SOURCE
+} from '../../../methods/graph_methods';
+import { LinkType, NodeProperties, LinkProperties } from '../../../constants/nodetypes';
+import { MethodFunctions } from '../../../constants/functiontypes';
+import { uuidv4 } from '../../../utils/array';
+import ClearScreenInstance from '../../datachain/ClearScreenInstance';
+import { ComponentLifeCycleEvents } from '../../../constants/componenttypes';
 import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
-import ConnectComponentDidMount from "../ConnectComponentDidMount";
+import ConnectComponentDidMount from '../ConnectComponentDidMount';
 
 export default function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information: SetupInformation) {
+	console.log('setup view mounting');
 	viewMounting.mountings.forEach((mounting: MountingDescription) => {
 		SetupMountDescription(mounting, screen);
 		SetupMountingMethod(mounting, screen, information);
@@ -20,7 +42,6 @@ export default function SetupViewMouting(screen: Node, viewMounting: ViewMountin
 		addClearScreen(screen);
 	}
 }
-
 
 function SetupMountingMethod(mouting: MountingDescription, screen: Node, information: SetupInformation) {
 	let graph = GetCurrentGraph();
@@ -39,6 +60,7 @@ function SetupMountingMethod(mouting: MountingDescription, screen: Node, informa
 }
 
 function addClearScreen(screen: Node) {
+	console.log('add clear screen');
 	let graph = GetCurrentGraph();
 	let setup_options = GetNodesLinkedTo(graph, {
 		id: screen.id,
@@ -113,43 +135,43 @@ function addClearScreen(screen: Node) {
 					};
 				}
 			}),
-      () => ({
-        operation: ADD_LINK_BETWEEN_NODES,
-        options(gg: any) {
-          const viewModelExternalApiNode = GetComponentExternalApiNode(
-            ComponentApiKeys.ViewModel,
-            screenOption.id,
-            gg
-          );
-          return {
-            source: clearScreenContext.entry,
-            target: viewModelExternalApiNode.id,
-            properties: { ...LinkProperties.DataChainInputLink }
-          };
-        }
-      }),
-      () => ({
-        operation: ADD_LINK_BETWEEN_NODES,
-        options(gg: any) {
-          const valueExternalApiNode = GetComponentExternalApiNode(
-            ComponentApiKeys.Value,
-            screenOption.id,
-            gg
-          );
-          return {
-            source: clearScreenContext.entry,
-            target: valueExternalApiNode.id,
-            properties: { ...LinkProperties.DataChainInputLink }
-          };
-        }
-      })
+			() => ({
+				operation: ADD_LINK_BETWEEN_NODES,
+				options(gg: any) {
+					const viewModelExternalApiNode = GetComponentExternalApiNode(
+						ComponentApiKeys.ViewModel,
+						screenOption.id,
+						gg
+					);
+					return {
+						source: clearScreenContext.entry,
+						target: viewModelExternalApiNode.id,
+						properties: { ...LinkProperties.DataChainInputLink }
+					};
+				}
+			}),
+			(gg: any) => {
+				const valueExternalApiNodes = GetComponentExternalApiNodes(screenOption.id, gg);
+				return valueExternalApiNodes.map((valueExternalApiNode: Node) => {
+					return {
+						operation: ADD_LINK_BETWEEN_NODES,
+						options() {
+							return {
+								source: clearScreenContext.entry,
+								target: valueExternalApiNode.id,
+								properties: { ...LinkProperties.DataChainInputLink }
+							};
+						}
+					};
+				});
+			}
 		);
 		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	});
 }
 
-
 function SetupMountDescription(mounting: MountingDescription, screen: Node) {
+	console.log('setup mount description');
 	let graph = GetCurrentGraph();
 	let screenOptions: Node[] = GetNodesLinkedTo(graph, {
 		id: screen.id,
@@ -157,9 +179,13 @@ function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 	});
 	let { methodDescription } = mounting;
 	if (methodDescription) {
+		console.log('setup method description');
+		console.log(methodDescription);
 		let methodFunctionProperties = MethodFunctions[methodDescription.functionType];
 		if (methodFunctionProperties && methodFunctionProperties.parameters) {
 			let { parameters } = methodFunctionProperties.parameters;
+			console.log('parameters');
+			console.log(parameters);
 			if (parameters) {
 				let { template } = parameters;
 				if (template) {
@@ -219,7 +245,7 @@ function SetupApiToBottom(parent: Node, paramName: string, seen: string[]) {
 		componentType: NodeTypes.ComponentNode,
 		direction: SOURCE
 	});
-	debugger;
+
 	components
 		.filter((component: Node) => {
 			return seen.indexOf(component.id) === -1;
@@ -230,8 +256,9 @@ function SetupApiToBottom(parent: Node, paramName: string, seen: string[]) {
 		});
 }
 
-
 function SetInternalScreenOptionsParamToUrlParameter(screen: Node, paramName: string) {
+	console.log(`[${GetNodeTitle(screen)}] set interface screen options param to url parameter: ${paramName}`);
+
 	let graph = GetCurrentGraph();
 	let screenOptions = GetNodesLinkedTo(graph, {
 		id: screen.id,
@@ -249,6 +276,7 @@ function SetInternalScreenOptionsParamToUrlParameter(screen: Node, paramName: st
 	});
 }
 function SetScreenParamToUrl(screen: Node, paramName: string) {
+	console.log(`set screen param to url :${paramName}`);
 	let graph = GetCurrentGraph();
 	let externalApi = GetNodesLinkedTo(graph, {
 		id: screen.id,
@@ -261,8 +289,8 @@ function SetScreenParamToUrl(screen: Node, paramName: string) {
 	}
 }
 
-
 export function GetViewMounting(mountingProps: ViewMoutingProps, viewType: string): ViewMounting | null {
+	console.log(`get view mounting ${viewType}`);
 	let temp: any = mountingProps;
 	if (temp && temp[viewType]) {
 		return temp[viewType];
@@ -271,6 +299,7 @@ export function GetViewMounting(mountingProps: ViewMoutingProps, viewType: strin
 }
 
 function UpdateValueApiToDifferentName(screen: Node, paramName: string) {
+	console.log('update value api to different name');
 	let graph = GetCurrentGraph();
 	let screenOptions = GetNodesLinkedTo(graph, {
 		id: screen.id,
@@ -283,6 +312,8 @@ function UpdateValueApiToDifferentName(screen: Node, paramName: string) {
 }
 
 function ChangeValueApiToDifferentName(screeOrOption: Node, paramName: string) {
+	console.log('change value api to different name');
+	console.log(`paramName :${paramName}`);
 	let graph = GetCurrentGraph();
 	let externalApi = GetNodesLinkedTo(graph, {
 		id: screeOrOption.id,
@@ -302,6 +333,7 @@ function ChangeValueApiToDifferentName(screeOrOption: Node, paramName: string) {
 	}
 }
 function SetupApi(parent: Node, paramName: string, child: Node) {
+	console.log(`setup api :${paramName}`);
 	graphOperation(
 		SetupApiBetweenComponent({
 			component_a: {

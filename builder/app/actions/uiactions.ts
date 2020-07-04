@@ -1402,12 +1402,21 @@ export function GetComponentExternalApiNode(api: any, parent: any, graph?: any) 
 		link: NodeConstants.LinkType.ComponentExternalApi
 	}).find((v: any) => GetNodeTitle(v) === api);
 }
+
+
 export function GetComponentApiNode(api: any, parent: any, graph?: any) {
 	graph = graph || GetCurrentGraph();
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id: parent,
 		link: NodeConstants.LinkType.ComponentInternalApi
 	}).find((v: any) => GetNodeTitle(v) === api);
+}
+export function GetComponentApiNodes(parent: any, graph?: any) {
+	graph = graph || GetCurrentGraph();
+	return GraphMethods.GetNodesLinkedTo(graph, {
+		id: parent,
+		link: NodeConstants.LinkType.ComponentInternalApi
+	});
 }
 
 export function GetComponentExternalApiNodes(parent: any, graph?: any) {

@@ -351,7 +351,7 @@ class AgentAccessView extends Component<any, any> {
 																	<th
 																		onClick={() => {
 																			const istrue = this.state.models.some(
-																				(model, modelIndex: number) => {
+																				(model: any, modelIndex: number) => {
 																					if (
 																						this.state.agentAccess[
 																							agentIndex
@@ -368,7 +368,7 @@ class AgentAccessView extends Component<any, any> {
 																				}
 																			);
 																			this.state.models.forEach(
-																				(model, modelIndex: number) => {
+																				(model: any, modelIndex: number) => {
 																					this.setAgentAccess(
 																						modelIndex,
 																						agentIndex,
@@ -392,7 +392,7 @@ class AgentAccessView extends Component<any, any> {
 												</tr>
 											</thead>
 											<tbody>
-												{this.state.models.map((model, modelIndex: number) => {
+												{this.state.models.map((model: any, modelIndex: number) => {
 													const result = [
 														<th
 															style={{ cursor: 'pointer' }}
@@ -417,16 +417,18 @@ class AgentAccessView extends Component<any, any> {
 																		return false;
 																	}
 																);
-																this.state.agents.forEach((_, agentIndex: number) => {
-																	return Object.values(ViewTypes).some((v) => {
-																		this.setAgentAccess(
-																			modelIndex,
-																			agentIndex,
-																			v,
-																			!istrue
-																		);
-																	});
-																});
+																this.state.agents.forEach(
+																	(_: any, agentIndex: number) => {
+																		return Object.values(ViewTypes).some((v) => {
+																			this.setAgentAccess(
+																				modelIndex,
+																				agentIndex,
+																				v,
+																				!istrue
+																			);
+																		});
+																	}
+																);
 																this.setState({
 																	agentAccess: [ ...this.state.agentAccess ]
 																});
@@ -440,7 +442,7 @@ class AgentAccessView extends Component<any, any> {
 														...[].interpolate(
 															0,
 															this.state.agents.length,
-															(index, agentIndex: number) =>
+															(index: any, agentIndex: number) =>
 																Object.keys(ViewTypes).map((v) => {
 																	const accessIndex =
 																		modelIndex * this.state.agents.length +
@@ -881,7 +883,8 @@ class AgentAccessView extends Component<any, any> {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,
 							model,
-							modelIndex,
+              modelIndex,
+              outState: this.state,
 							viewType: v,
 							mounting,
 							callback: (value: ViewMounting) => {
@@ -923,6 +926,7 @@ class AgentAccessView extends Component<any, any> {
 							model,
 							modelIndex,
 							viewType: v,
+              outState: this.state,
 							effect: effect,
 							callback: (value: Effect) => {
 								this.setAgentEffectProperty(modelIndex, agentIndex, v, value);

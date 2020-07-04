@@ -139,7 +139,7 @@ export default class ModelGenerator {
 				graph: graphRoot,
 				nodeId: model.id,
 				state,
-				includeImports
+				includeImports: includeImports || false
 			});
 			result[res.id] = res;
 		});

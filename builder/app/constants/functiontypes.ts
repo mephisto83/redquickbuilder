@@ -627,6 +627,13 @@ const PERMISSION_ON_AGENT = {
 	interface_: './app/templates/permissions/permission_method_interface.tpl',
 	params: [ FunctionTemplateKeys.Agent ]
 };
+
+const PERMISSION_ON_AGENT_PARENT = {
+	implementation: './app/templates/permissions/permission_method.tpl',
+	interface_: './app/templates/permissions/permission_method_interface.tpl',
+	params: [ FunctionTemplateKeys.Agent, FunctionTemplateKeys.Parent ]
+};
+
 const VALIDATION_DEFAULTS = {
 	implementation: './app/templates/validation/validation_method.tpl',
 	interface_: './app/templates/validation/validation_method_interface.tpl',
@@ -671,8 +678,8 @@ export const QUERY_PARAMETERS = {
 };
 export const TEMPLATE_PARAMETERS = {
 	[TEMPLATE_PARAMETER_KEYS.Model]: {
-    isGuid: true,
-    defaultValue: true // When there is a value api for a component, that value should be from the model
+		isGuid: true,
+		defaultValue: true // When there is a value api for a component, that value should be from the model
 	}
 };
 export const TEMPLATE_PARENT_PARAMETERS = {
@@ -747,7 +754,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object__Object]: {
 		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} Object by ${a}`;
 		},
 		template: './app/templates/standard/create_model_agent_object.tpl',
 		interface: './app/templates/standard/create_model_agent_object_interface.tpl',
@@ -783,7 +790,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_With_User]: {
 		title: Titles.Update_Object_With_User,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a}`;
 		},
 		template: './app/templates/standard/update_model_user_object.tpl',
 		interface: './app/templates/standard/update_model_user_object_interface.tpl',
@@ -811,7 +818,7 @@ export const MethodFunctions: any = {
 		title: Titles.GetObjectsFromLIstOfIds,
 		description: 'Gets objects from a list of Ids',
 		titleTemplate: function(t: any, a: any) {
-			return `Get ${t}s With IdList by ${a}`;
+			return `Get ${t} Objects With IdList by ${a}`;
 		},
 		template: './app/templates/standard/get_agent_listobject_with_id_list.tpl',
 		interface: './app/templates/standard/get_agent_listobject_with_id_list_interface.tpl',
@@ -854,7 +861,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object_With_User]: {
 		title: Titles.Create_Object_With_User,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} by ${a} User`;
 		},
 		template: './app/templates/standard/create_model_user_object.tpl',
 		interface: './app/templates/standard/create_model_user_object_interface.tpl',
@@ -881,7 +888,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
 		title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} MtM by ${a} and Return MtM Set`;
 		},
 		template: './app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set.tpl',
 		interface: './app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set_interface.tpl',
@@ -905,7 +912,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
 		title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} Object MtM by ${a} Composite Input`;
 		},
 		template: './app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl',
 		interface: './app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl',
@@ -985,7 +992,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__IListObject]: {
 		title: Titles.Update_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a} And Return List of ${t} Objects`;
 		},
 		template: './app/templates/standard/update_model_agent_listobject.tpl',
 		interface: './app/templates/standard/update_model_agent_listobject_interface.tpl',
@@ -1006,7 +1013,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__Object]: {
 		title: Titles.Update_Object_Agent_Value__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a}`;
 		},
 		template: './app/templates/standard/update_model_agent_object.tpl',
 		interface: './app/templates/standard/update_model_agent_object_interface.tpl',
@@ -1032,7 +1039,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__Object_With_Object]: {
 		title: Titles.Update_Object_Agent_Value__Object_With_Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a} with Update Model`;
 		},
 		template: './app/templates/standard/update_model_agent_object_with_model.tpl',
 		interface: './app/templates/standard/update_model_agent_object_with_model_interface.tpl',
@@ -1059,7 +1066,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
 		title: Titles.Delete_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Delete ${t} by ${a}`;
+			return `Delete ${t} Object by ${a} Return List`;
 		},
 		template: './app/templates/standard/delete_model_agent_listobject.tpl',
 		interface: './app/templates/standard/delete_model_agent_listobject_interface.tpl',
@@ -1080,7 +1087,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Delete_M2M_By_Reference]: {
 		title: FunctionTypes.Delete_M2M_By_Reference,
 		titleTemplate: function(t: any, a: any) {
-			return `Delete ${t} by ${a}`;
+			return `Delete ${t} Object by ${a} by Reference`;
 		},
 		template: './app/templates/standard/delete_m2m_by_reference.tpl',
 		interface: './app/templates/standard/delete_m2m_by_reference_interface.tpl',
@@ -1110,7 +1117,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Get_Object_Agent_Value__IListObject]: {
 		title: Titles.Get_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Get ${t}s by ${a}`;
+			return `Get ${t}s by ${a} Return List`;
 		},
 		template: './app/templates/standard/get_model_agent_listobject.tpl',
 		interface: './app/templates/standard/get_model_agent_listobject_interface.tpl',
@@ -1205,7 +1212,7 @@ export const MethodFunctions: any = {
 		interface: './app/templates/standard/get_default_model_agent_object_with_parent_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
 		permission: {
-			...PERMISSION_ON_AGENT
+			...PERMISSION_ON_AGENT_PARENT
 		},
 		lambda: {
 			default: {
@@ -1263,13 +1270,13 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Get_Default_Object_For_Agent_With_ParentandAgent]: {
 		title: Titles.Get_Default_Object_For_Agent_With_ParentandAgent,
 		titleTemplate: function(t: any, a: any) {
-			return `Get Default ${t} by ${a} with Parent`;
+			return `Get Default ${t} by ${a} with Parent And ${a}`;
 		},
 		template: './app/templates/standard/get_default_model_agent_object_with_parentagent.tpl',
 		interface: './app/templates/standard/get_default_model_agent_object_with_parentagent_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
 		permission: {
-			...PERMISSION_ON_AGENT
+			...PERMISSION_ON_AGENT_PARENT
 		},
 		lambda: {
 			default: {

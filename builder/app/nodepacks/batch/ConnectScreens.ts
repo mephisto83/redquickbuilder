@@ -24,8 +24,17 @@ import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 
 import { Node, GraphLink } from '../../methods/graph_types';
 import { GetNodeLinkedTo, findLink } from '../../methods/graph_methods';
-import { MethodDescription, ViewMoutingProps, ViewMounting, Effect, EffectProps } from '../../interface/methodprops';
+import {
+	MethodDescription,
+	ViewMoutingProps,
+	ViewMounting,
+	Effect,
+	EffectProps,
+	RoutingProps,
+	Routing
+} from '../../interface/methodprops';
 import SetupViewMouting, { GetViewMounting } from './ConnectScreen/SetupViewMouting';
+import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -51,6 +60,12 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 					let effect: Effect | null = GetEffect(effectProps, viewType);
 					if (effect) {
 						SetupEffect(screen, effect, { agent, model, viewType, agentAccessDescription });
+					}
+
+					let routingProps: RoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.RoutingProps);
+					let route: Routing | null = GetRoute(routingProps, viewType);
+					if (route) {
+						SetupRoute(screen, route, { agent, model, viewType, agentAccessDescription });
 					}
 				} else {
 					console.log('Agent link missing, this should never happen');

@@ -4522,7 +4522,8 @@ export function CreateAgentFunction(option: any): any {
 								} else if (constraint.key === FunctionTemplateKeys.Parent) {
 									if (typeof parent === 'string') {
 										methodProps[constraint.key] = parent;
-									} else {
+									} else if (parent && parent.id) {
+                    // add parent if set.
 										methodProps[constraint.key] = parent.id;
 									}
 								} else if (constraint.key === FunctionTemplateKeys.ModelOutput && model_output) {

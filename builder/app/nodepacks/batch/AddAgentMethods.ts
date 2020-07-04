@@ -25,13 +25,13 @@ export default async function AddAgentMethods(progresFunc: any) {
 	}); //  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
 	console.log('executing add agent methods');
 	const models = NodesByType(null, NodeTypes.Model).filter((x: any) => !GetNodeProp(x, NodeProperties.IsAgent));
-	const functionTypes = [
-		FunctionTypes.Create_Object__Object,
-		FunctionTypes.Get_Objects_From_List_Of_Ids,
-		FunctionTypes.Update_Object_Agent_Value__Object,
-		FunctionTypes.Get_Agent_Value__IListObject,
-		FunctionTypes.Get_Object_Agent_Value__Object,
-		FunctionTypes.Get_Default_Object_For_Agent
+	const functionTypes: string[] = [
+		// FunctionTypes.Create_Object__Object,
+		// FunctionTypes.Get_Objects_From_List_Of_Ids,
+		// FunctionTypes.Update_Object_Agent_Value__Object,
+		// FunctionTypes.Get_Agent_Value__IListObject,
+		// FunctionTypes.Get_Object_Agent_Value__Object,
+		// FunctionTypes.Get_Default_Object_For_Agent
 	];
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 

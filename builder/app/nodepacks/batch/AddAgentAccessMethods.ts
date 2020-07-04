@@ -94,7 +94,7 @@ function makeViewMountingMethods(createMountings: ViewMounting | undefined, agen
 	if (createMountings && createMountings.mountings) {
 		createMountings.mountings.forEach((mounting: MountingDescription) => {
 			mounting.methodDescription
-				? buildMethodDescriptionFunctions(mounting.methodDescription, agentAccess, agent, model)
+				? buildMethodDescriptionFunctions(mounting.methodDescription, agentAccess, agent, model, mounting)
 				: null;
 		});
 	}
@@ -104,7 +104,7 @@ function makeEffectMethods(createMountings: Effect | undefined, agentAccess: Nod
 	if (createMountings && createMountings.effects) {
 		createMountings.effects.forEach((effect: EffectDescription) => {
 			effect.methodDescription
-				? buildMethodDescriptionFunctions(effect.methodDescription, agentAccess, agent, model)
+				? buildMethodDescriptionFunctions(effect.methodDescription, agentAccess, agent, model, effect)
 				: null;
 		});
 	}
@@ -114,12 +114,15 @@ function buildMethodDescriptionFunctions(
 	methodDescription: MethodDescription,
 	agentAccess: Node,
 	agent: any,
-	model: any
+	model: any,
+	mounting?: MountingDescription
 ) {
 	if (methodDescription && methodDescription.functionType) {
 		let functionType = methodDescription.functionType;
 		let methodProperties = MethodFunctions[methodDescription.functionType];
-		const functionName = methodProperties.titleTemplate(GetNodeTitle(agentAccess), GetNodeTitle(agent));
+		const functionName =
+			(mounting ? mounting.name : false) ||
+			methodProperties.titleTemplate(GetNodeTitle(model), GetNodeTitle(agent));
 		if (functionType && methodProperties) {
 			let httpMethod;
 			if (methodProperties.method) {

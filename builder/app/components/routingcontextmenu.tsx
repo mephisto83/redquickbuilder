@@ -9,7 +9,7 @@ import Draggable from 'react-draggable'; // The default
 import { UIConnect } from '../utils/utils';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
-import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
 import GenericPropertyContainer from './genericpropertycontainer';
 import _create_get_view_model from '../nodepacks/_create_get_view_model';
 import TreeViewMenu from './treeviewmenu';
@@ -32,6 +32,7 @@ import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
 import { MethodFunctions } from '../constants/functiontypes';
+import { GetNodesByProperties } from '../methods/graph_methods';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -134,7 +135,9 @@ class ContextMenu extends Component<any, any> {
 										key={`url-parma-k-modle`}
 										open={this.state[`${sourceModel}-model`]}
 										toggle={() => {
-											this.setState({ [`${sourceModel}-model`]: !this.state[`${sourceModel}-model`] });
+											this.setState({
+												[`${sourceModel}-model`]: !this.state[`${sourceModel}-model`]
+											});
 										}}
 									>
 										{modelPropertyOptions.map((modelPropertyOption: Node) => {
@@ -228,6 +231,12 @@ class ContextMenu extends Component<any, any> {
 								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}
+										checkError={(value: string) => {
+											let outState = mode.outState;
+											if (outState) {
+												let { agentMethod } = outState;
+											}
+										}}
 										onChange={(value: string) => {
 											route.name = value;
 											this.setState({ turn: UIA.GUID() });

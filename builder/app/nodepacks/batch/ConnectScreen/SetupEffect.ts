@@ -21,25 +21,36 @@ import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
 import { InstanceTypes } from '../../../constants/componenttypes';
 import AppendPostMethod from '../../screens/AppendPostMethod';
 import AppendValidations from '../../screens/AppendValidations';
+import { AddButtonToSubComponent } from './Shared';
 
 export default function SetupEffect(screen: Node, effect: Effect, information: SetupInformation) {
+  console.log('setup effect');
+
 	effect.effects.forEach((effectDescription: EffectDescription) => {
 		SetupEffectDescription(effectDescription, screen, information);
 	});
 }
 
+
 function SetupEffectDescription(effectDescription: EffectDescription, screen: Node, information: SetupInformation) {
+	console.log('setup effect description');
 	let graph = GetCurrentGraph();
 	let setup_options = GetNodesLinkedTo(graph, {
 		id: screen.id,
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
+    console.log('add button to sub component');
 		let { eventInstance, event, button } = AddButtonToSubComponent(screenOption);
+    console.log('get model selector node');
 		let { modelSelectorNode } = GetModelSelectorNode(screen);
+    console.log('setup model object selector');
 		let { modelDataChain } = SetupModelObjectSelector(effectDescription, screenOption, screen, information);
 
+    console.log('effectDescription');
+    console.log(effectDescription);
 		if (eventInstance && effectDescription.methodDescription && effectDescription.methodDescription.methodId) {
+      console.log('connect lifecylce method');
 			let connectSteps = ConnectLifecycleMethod({
 				target: effectDescription.methodDescription.methodId,
 				selectorNode: () => modelSelectorNode.id,
@@ -48,6 +59,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 				graph
 			});
 			graphOperation(connectSteps)(GetDispatchFunc(), GetStateFunc());
+      console.log('update component property');
 			updateComponentProperty(
 				button,
 				NodeProperties.ValidationMethodTarget,
@@ -55,7 +67,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 			);
 			let instanceType = GetNodeProp(screen, NodeProperties.InstanceType);
 			if (instanceType === InstanceTypes.ScreenInstance) {
-				SetInstanceUpdateOnLlink({
+  			SetInstanceUpdateOnLlink({
 					eventInstance,
 					eventHandler: event
 				});
@@ -69,12 +81,14 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 	});
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
+  console.log('setup validations');
 	let { screenOption, effectDescription } = args;
 	let graph = GetCurrentGraph();
 	const components = GetNodesLinkedTo(graph, {
 		id: screenOption.id,
 		link: LinkType.Component
-	});
+  });
+
 	components.forEach((component: Node) => {
 		const subcomponents = GetNodesLinkedTo(graph, {
 			id: component.id,
@@ -92,8 +106,11 @@ function SetupValidations(args: { screenOption: Node; effectDescription: EffectD
 		)(GetDispatchFunc(), GetStateFunc());
 	});
 }
+
 function SetupPostMethod(args: { eventInstance: string; method: string }) {
-	let { method, eventInstance } = args;
+  let { method, eventInstance } = args;
+  console.log('setup post method');
+
 	graphOperation(
 		AppendPostMethod({
 			method,
@@ -102,7 +119,9 @@ function SetupPostMethod(args: { eventInstance: string; method: string }) {
 	)(GetDispatchFunc(), GetStateFunc());
 }
 function SetInstanceUpdateOnLlink(args: { eventInstance: string; eventHandler: string }) {
-	let { eventInstance, eventHandler } = args;
+  let { eventInstance, eventHandler } = args;
+  console.log('set instance update on link');
+
 	graphOperation([
 		{
 			operation: UPDATE_LINK_PROPERTY,
@@ -147,45 +166,6 @@ function SetupModelObjectSelector(
 	return { modelDataChain };
 }
 
-function AddButtonToSubComponent(
-	screenOption: Node
-): {
-	button: string;
-	event: string;
-	eventInstance: string;
-} {
-	let result: string = '';
-	let eventInstance: string = '';
-	let event: string = '';
-	let graph = GetCurrentGraph();
-
-	const components = GetNodesLinkedTo(graph, {
-		id: screenOption.id,
-		link: LinkType.Component
-	});
-	let button: string = '';
-	components.subset(0, 1).forEach((component: Node) => {
-		let steps = AddButtonToComponent({
-			component: component.id,
-			clearPinned: true,
-			uiType: GetNodeProp(screenOption, NodeProperties.UIType),
-			callback: (context: { entry: string; event: string; eventInstance: string }) => {
-				button = context.entry;
-				eventInstance = context.eventInstance;
-				event = context.event;
-			}
-		});
-		graphOperation(steps)(GetDispatchFunc(), GetStateFunc());
-		updateComponentProperty(button, NodeProperties.ExecuteButton, true);
-		result = button;
-	});
-
-	return {
-		button: result,
-		event,
-		eventInstance
-	};
-}
 
 export function GetEffect(effectProps: EffectProps, viewType: string): Effect | null {
 	let temp: any = effectProps;

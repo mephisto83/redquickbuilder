@@ -22,8 +22,8 @@ import {
 	GetCurrentGraph,
 	ApplicationConfig,
 	clearPinned,
-  VISUAL_GRAPH,
-  UIC
+	VISUAL_GRAPH,
+	UIC
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -115,8 +115,8 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 					opened_graph = { ...default_graph, ...opened_graph };
 					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
 					SaveGraph(opened_graph, dispatch, true);
-          setupCache(opened_graph);
-          dispatch(UIC(VISUAL_GRAPH, opened_graph.id, createGraph()));
+					setupCache(opened_graph);
+					dispatch(UIC(VISUAL_GRAPH, opened_graph.id, createGraph()));
 					if (unpinned) {
 						clearPinned();
 					}
@@ -377,7 +377,7 @@ export function saveGraph(graph: any) {
 							fs.mkdirSync(backupFolder);
 						}
 						const files = fs.readdirSync(backupFolder);
-						const fileName = path.basename(currentGraph.graphFile);
+						let fileName = path.basename(currentGraph.graphFile);
 						let fileNumber = 0;
 						files.forEach(function(file: string) {
 							const split = file.split(`${fileName}.`);
@@ -389,7 +389,9 @@ export function saveGraph(graph: any) {
 								}
 							}
 						});
-						fs.copyFileSync(currentGraph.graphFile, path.join(backupFolder, `${fileName}.${fileNumber}`));
+						let parts = fileName.split('.');
+						 fileName = parts.subset(0, parts.length - 1).join('.');
+						fs.copyFileSync(currentGraph.graphFile, path.join(backupFolder, `${fileName}.${fileNumber}${RED_QUICK_FILE_EXT}`));
 					}
 				}
 				await StoreGraph(prune(currentGraph), currentGraph.graphFile);
