@@ -964,7 +964,7 @@ class AgentAccessView extends Component<any, any> {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
-		return this.state.agentViewMount[agentIndex][modelIndex][v];
+		return this.state.agentEffect[agentIndex][modelIndex][v];
 	}
 	private getKey(a: number, b: number, c: string) {
 		return `${a}-${b}-${c}`;

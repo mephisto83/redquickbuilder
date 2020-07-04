@@ -164,7 +164,6 @@ function buildMethodDescriptionFunctions(
 				});
 				executeGraphOperations(result)(GetDispatchFunc(), GetStateFunc());
 				if (newMethodId) {
-					updateComponentProperty(agentAccess.id, NodeProperties.Method, newMethodId);
 					methodDescription.methodId = newMethodId;
 				}
 			} else {

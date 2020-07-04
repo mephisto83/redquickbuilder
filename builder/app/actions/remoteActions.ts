@@ -380,8 +380,10 @@ export function saveGraph(graph: any) {
 						let fileName = path.basename(currentGraph.graphFile);
 						let fileNumber = 0;
 						files.forEach(function(file: string) {
+							let parts = fileName.split('.');
+							fileName = parts.subset(0, parts.length - 1).join('.');
 							const split = file.split(`${fileName}.`);
-							let num: any = split[split.length - 1];
+							let num: any = split.join('').split('').filter((x: any) => !isNaN(x)).join('');
 							if (!isNaN(num)) {
 								num = parseInt(num, 10);
 								if (num >= fileNumber) {
@@ -389,9 +391,12 @@ export function saveGraph(graph: any) {
 								}
 							}
 						});
-						let parts = fileName.split('.');
-						 fileName = parts.subset(0, parts.length - 1).join('.');
-						fs.copyFileSync(currentGraph.graphFile, path.join(backupFolder, `${fileName}.${fileNumber}${RED_QUICK_FILE_EXT}`));
+						let parts = path.basename(currentGraph.graphFile).split('.');
+						fileName = parts.subset(0, parts.length - 1).join('.');
+						fs.copyFileSync(
+							currentGraph.graphFile,
+							path.join(backupFolder, `${fileName}.${fileNumber}${RED_QUICK_FILE_EXT}`)
+						);
 					}
 				}
 				await StoreGraph(prune(currentGraph), currentGraph.graphFile);

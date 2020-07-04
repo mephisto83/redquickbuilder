@@ -22,6 +22,7 @@ import * as UIA from '../actions/uiactions';
 import ModelGenerator from '../generators/modelgenerators';
 import { Node } from '../methods/graph_types';
 import ConstantsGenerator from '../generators/constantsgenerator';
+import { GenerateModelKeys } from '../service/keyservice';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
@@ -67,6 +68,14 @@ class CodeEditor extends Component<any, any> {
 		value = this.untransformLambda(value);
 		if (value.indexOf(defs) === -1) {
 			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
+			let temps = GenerateModelKeys({
+				state,
+				codeGenerator: true
+			});
+			let modelkey_stuff = '';
+			temps.map((t: any) => {
+				if (t && t.template) modelkey_stuff += t.template + NEW_LINE;
+			});
 			const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
 				const enums_ts = GetNodeProp(node, NodeProperties.Enumeration) || [];
 				const larg_ts: any = {};
@@ -106,6 +115,9 @@ ${constants}
 //#region models
 ${modelTsScript}
 //#endregion
+//#region
+${modelkey_stuff}
+//#endregion
 //#region mocks
 export const titleService = {
   get: (str: string): string => { return ''; }
@@ -136,7 +148,7 @@ ${this.state.definitions}
 									const id = currentNode.id;
 									let lambdaValue = `${this.state.value}`.split(defs)[0] || '';
 									let _insertArgs: any;
-									lambdaValue = this.transformLambdaValue(lambdaValue, (insertArgs) => {
+									lambdaValue = this.transformLambdaValue(lambdaValue, (insertArgs: any) => {
 										_insertArgs = insertArgs;
 									});
 									this.props.graphOperation(CHANGE_NODE_PROPERTY, {

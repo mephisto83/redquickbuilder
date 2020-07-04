@@ -1131,7 +1131,8 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 						break;
 					case 'error':
 					default:
-						stateKey = 'value';
+						stateKey = GetNodeTitle(externalConnection);
+						// stateKey = 'value';
 						break;
 				}
 			}

@@ -49,14 +49,18 @@ function SetupMountingMethod(mouting: MountingDescription, screen: Node, informa
 		id: screen.id,
 		link: LinkType.ScreenOptions
 	});
-	let methodId = GetNodeProp(information.agentAccessDescription, NodeProperties.Method);
-	setup_options.forEach((screenOption: Node) => {
-		ConnectComponentDidMount({
-			screen: screen.id,
-			screenOption: screenOption.id,
-			methods: [ methodId ]
+	let methodId = mouting.methodDescription ? mouting.methodDescription.methodId : null;
+	if (methodId) {
+		setup_options.forEach((screenOption: Node) => {
+			ConnectComponentDidMount({
+				screen: screen.id,
+				screenOption: screenOption.id,
+				methods: methodId ? [ methodId ] : []
+			});
 		});
-	});
+	} else {
+		console.warn('missing reference to method: SetupViewMounting');
+	}
 }
 
 function addClearScreen(screen: Node) {
