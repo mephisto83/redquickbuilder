@@ -312,6 +312,7 @@ export default function(args: {
 			if (context.callback) {
         context.entry = context.node0;
         context.event = context.node4;
+        context.newComponent = context.node1;
 				context.eventInstance = context.node5;
 				context.callback(context);
 			}

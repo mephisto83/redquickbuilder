@@ -128,6 +128,7 @@ import AddFiltersToMethod from '../nodepacks/method/AddFilterToMethod';
 import AddMethodFilterToMethod from '../nodepacks/method/AddFilterToModelFilter';
 import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
 import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
+import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -3767,19 +3768,35 @@ class ContextMenu extends Component<any, any> {
 		const { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+		let result: any[] = [];
 		switch (currentNodeType) {
-			case NodeTypes.ComponentNode:
 			case NodeTypes.Screen:
+				result.push(...this.getScreenFunctions());
+			case NodeTypes.ComponentNode:
 			case NodeTypes.ScreenOption:
 			case NodeTypes.EventMethodInstance:
 			default:
-				return this.getGenericLinks(currentNode);
+				result.push(...this.getGenericLinks(currentNode));
 		}
-		return [];
+		return result;
 	}
 
 	getViewTypes() {
 		return <ViewTypeMenu />;
+	}
+
+	getScreenFunctions() {
+		const { state } = this.props;
+		return [
+			<TreeViewMenu
+        title={'Connect Screen'}
+        active
+				toggle={() => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					ConnectScreens(() => {}, (v: any) => v.id === currentNode.id);
+				}}
+			/>
+		];
 	}
 
 	getButtonApiMenu(currentNode) {

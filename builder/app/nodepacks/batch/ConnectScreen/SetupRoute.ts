@@ -8,12 +8,13 @@ import {
 	Connect,
 	ADD_LINK_BETWEEN_NODES,
 	GetComponentApiNodes,
-	GetNodeTitle
+	GetNodeTitle,
+	updateComponentProperty
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo } from '../../../methods/graph_methods';
-import { LinkType, LinkProperties } from '../../../constants/nodetypes';
+import { LinkType, LinkProperties, NodeProperties } from '../../../constants/nodetypes';
 import { Node } from '../../../methods/graph_types';
-import { AddButtonToSubComponent } from './Shared';
+import { AddButtonToSubComponent, AddButtonToComponentLayout } from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 
 export default function SetupRoute(screen: Node, routing: Routing, information: SetupInformation) {
@@ -31,7 +32,9 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
-		let { eventInstance, event, button } = AddButtonToSubComponent(screenOption);
+		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
+		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
+		AddButtonToComponentLayout({ button, component: subcomponent });
 		NavigateTo(routeDescription, screen, information, { eventInstance, event, button });
 	});
 }

@@ -222,9 +222,17 @@ export function GetSharedComponentFor(
 ) {
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
-		id: modelProperty.id
+		id: typeof modelProperty === 'string' ? modelProperty : modelProperty.id
 	});
-	viewTypeNodes = viewTypeNodes.filter((x: any) => GetNodeProp(x, NodeProperties.Agent) === agentId);
+	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
+	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
+	// 		id: x.id,
+	// 		componentType: NodeTypes.ComponentNode,
+	// 		link: NodeConstants.LinkType.DefaultViewType
+	// 	});
+
+	// 	return componentNodes.find((v: Node) => GetNodeProp(v, NodeProperties.Agent) === agentId);
+	// });
 
 	let isPluralComponent: any;
 	const propertyNode = GetNodeById(modelProperty.id);

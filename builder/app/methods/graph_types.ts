@@ -44,6 +44,21 @@ export interface AppConfig {
 	AppSettings: any;
 	Logging: any;
 }
+export interface ComponentLayoutContainer {
+	layout: ComponentLayout;
+	properties: ComponentProperties;
+}
+export interface ComponentProperties {
+	[key: string]: ComponentProperty;
+}
+export interface ComponentProperty {
+	properties: {
+		tags: string[];
+	};
+}
+export interface ComponentLayout {
+	[key: string]: {};
+}
 export interface Version {
 	major: number;
 	minor: number;

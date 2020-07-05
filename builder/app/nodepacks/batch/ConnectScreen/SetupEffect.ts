@@ -1,7 +1,14 @@
 import { Node, Graph } from '../../../methods/graph_types';
 import { Effect, EffectProps, EffectDescription } from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
-import { GetNodesLinkedTo, GetNodeProp, getLinkInstance } from '../../../methods/graph_methods';
+import {
+	GetNodesLinkedTo,
+	GetNodeProp,
+	getLinkInstance,
+	GetCellCount,
+	SetCellsLayout,
+	GetLastCell
+} from '../../../methods/graph_methods';
 import {
 	GetCurrentGraph,
 	graphOperation,
@@ -21,16 +28,16 @@ import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
 import { InstanceTypes } from '../../../constants/componenttypes';
 import AppendPostMethod from '../../screens/AppendPostMethod';
 import AppendValidations from '../../screens/AppendValidations';
-import { AddButtonToSubComponent } from './Shared';
+import { AddButtonToSubComponent, AddButtonToComponentLayout } from './Shared';
+import NColumnSection from '../../NColumnSection';
 
 export default function SetupEffect(screen: Node, effect: Effect, information: SetupInformation) {
-  console.log('setup effect');
+	console.log('setup effect');
 
 	effect.effects.forEach((effectDescription: EffectDescription) => {
 		SetupEffectDescription(effectDescription, screen, information);
 	});
 }
-
 
 function SetupEffectDescription(effectDescription: EffectDescription, screen: Node, information: SetupInformation) {
 	console.log('setup effect description');
@@ -40,17 +47,18 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
-    console.log('add button to sub component');
-		let { eventInstance, event, button } = AddButtonToSubComponent(screenOption);
-    console.log('get model selector node');
+		console.log('add button to sub component');
+		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
+		AddButtonToComponentLayout({ button, component: subcomponent });
+		console.log('get model selector node');
 		let { modelSelectorNode } = GetModelSelectorNode(screen);
-    console.log('setup model object selector');
+		console.log('setup model object selector');
 		let { modelDataChain } = SetupModelObjectSelector(effectDescription, screenOption, screen, information);
 
-    console.log('effectDescription');
-    console.log(effectDescription);
+		console.log('effectDescription');
+		console.log(effectDescription);
 		if (eventInstance && effectDescription.methodDescription && effectDescription.methodDescription.methodId) {
-      console.log('connect lifecylce method');
+			console.log('connect lifecylce method');
 			let connectSteps = ConnectLifecycleMethod({
 				target: effectDescription.methodDescription.methodId,
 				selectorNode: () => modelSelectorNode.id,
@@ -59,7 +67,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 				graph
 			});
 			graphOperation(connectSteps)(GetDispatchFunc(), GetStateFunc());
-      console.log('update component property');
+			console.log('update component property');
 			updateComponentProperty(
 				button,
 				NodeProperties.ValidationMethodTarget,
@@ -67,7 +75,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 			);
 			let instanceType = GetNodeProp(screen, NodeProperties.InstanceType);
 			if (instanceType === InstanceTypes.ScreenInstance) {
-  			SetInstanceUpdateOnLlink({
+				SetInstanceUpdateOnLlink({
 					eventInstance,
 					eventHandler: event
 				});
@@ -81,13 +89,13 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 	});
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
-  console.log('setup validations');
+	console.log('setup validations');
 	let { screenOption, effectDescription } = args;
 	let graph = GetCurrentGraph();
 	const components = GetNodesLinkedTo(graph, {
 		id: screenOption.id,
 		link: LinkType.Component
-  });
+	});
 
 	components.forEach((component: Node) => {
 		const subcomponents = GetNodesLinkedTo(graph, {
@@ -108,8 +116,8 @@ function SetupValidations(args: { screenOption: Node; effectDescription: EffectD
 }
 
 function SetupPostMethod(args: { eventInstance: string; method: string }) {
-  let { method, eventInstance } = args;
-  console.log('setup post method');
+	let { method, eventInstance } = args;
+	console.log('setup post method');
 
 	graphOperation(
 		AppendPostMethod({
@@ -119,8 +127,8 @@ function SetupPostMethod(args: { eventInstance: string; method: string }) {
 	)(GetDispatchFunc(), GetStateFunc());
 }
 function SetInstanceUpdateOnLlink(args: { eventInstance: string; eventHandler: string }) {
-  let { eventInstance, eventHandler } = args;
-  console.log('set instance update on link');
+	let { eventInstance, eventHandler } = args;
+	console.log('set instance update on link');
 
 	graphOperation([
 		{
@@ -165,7 +173,6 @@ function SetupModelObjectSelector(
 	)(GetDispatchFunc(), GetStateFunc());
 	return { modelDataChain };
 }
-
 
 export function GetEffect(effectProps: EffectProps, viewType: string): Effect | null {
 	let temp: any = effectProps;

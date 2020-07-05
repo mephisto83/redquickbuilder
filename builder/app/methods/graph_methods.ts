@@ -29,7 +29,7 @@ import {
 	GetNodeByProperties
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
-import { Graph, Node, GraphLink } from './graph_types';
+import { Graph, Node, GraphLink, ComponentLayoutContainer, ComponentLayout } from './graph_types';
 
 const os = require('os');
 
@@ -141,17 +141,17 @@ export function updateWorkSpace(graph: any, options: any) {
 	return graph;
 }
 
-export function CreateLayout() {
+export function CreateLayout(): ComponentLayoutContainer {
 	return {
 		layout: {},
 		properties: {}
 	};
 }
-export function FindLayoutRoot(id: any, root: any) {
+export function FindLayoutRoot(id: any, root: ComponentLayout): ComponentLayout | null {
 	if (root && root[id]) {
 		return root[id];
 	}
-	let res;
+	let res: ComponentLayout | null = null;
 	Object.keys(root).find((t) => {
 		if (root[t]) res = FindLayoutRoot(id, root[t]);
 		else {
@@ -193,7 +193,7 @@ export function GetCellProperties(setup: any, id: any) {
 	const { properties } = setup;
 	return properties[id];
 }
-export function RemoveCellLayout(setup: any, id: any) {
+export function RemoveCellLayout(setup: ComponentLayoutContainer, id: any) {
 	if (setup && setup.layout) {
 		const parent = FindLayoutRootParent(id, setup.layout);
 		if (parent) {
@@ -237,7 +237,7 @@ export function ReorderCellLayout(setup: any, id: any, dir = -1) {
 	return setup;
 }
 
-export function GetChildren(setup: any, parentId: any) {
+export function GetChildren(setup: ComponentLayoutContainer, parentId: any) {
 	const parent = FindLayoutRootParent(parentId, setup.layout);
 
 	return Object.keys(parent[parentId]);
@@ -253,7 +253,29 @@ export function GetFirstCell(setup: any) {
 
 	return keys[0] || null;
 }
-export function SetCellsLayout(setup: any, count: any, id?: any, properties = DefaultCellProperties) {
+
+export function GetLastCell(setup: ComponentLayoutContainer, cellId: string | null): string | null {
+	let { layout } = setup;
+	if (layout && cellId && layout[cellId]) {
+		let temp = Object.keys(layout[cellId]);
+		return temp[temp.length - 1];
+	}
+	return null;
+}
+
+export function GetCellCount(layoutRoot: any, cell: string) {
+	return GetChildren(layoutRoot, cell).length;
+}
+export function SetLayoutCell(layout: any, cellId: string, componentId: string) {
+	const cellProperties = GetCellProperties(layout, cellId);
+	cellProperties.children[cellId] = componentId;
+}
+export function SetCellsLayout(
+	setup: ComponentLayoutContainer,
+	count: any,
+	id?: any,
+	properties = DefaultCellProperties
+) {
 	let keys: any = [];
 	let root: any = null;
 	count = parseInt(count);
@@ -283,16 +305,18 @@ export function SetCellsLayout(setup: any, count: any, id?: any, properties = De
 
 	return setup;
 }
-export function SortCells(setup: any, parentId: any, sortFunction: any) {
+export function SortCells(setup: ComponentLayoutContainer, parentId: any, sortFunction: any) {
 	const layout = FindLayoutRoot(parentId, setup.layout);
-	const keys = Object.keys(layout);
-	const temp_layout = { ...layout };
-	keys.forEach((k) => delete layout[k]);
+	const keys = layout ? Object.keys(layout) : [];
+	const temp_layout: any = { ...layout };
+	keys.forEach((k) => {
+		if (layout && layout[k]) delete layout[k];
+	});
 	keys.sort(sortFunction).forEach((k) => {
-		layout[k] = temp_layout[k];
+		if (layout && layout[k]) layout[k] = temp_layout[k];
 	});
 }
-export function GetCellIdByTag(setup: any, tag: any) {
+export function GetCellIdByTag(setup: ComponentLayoutContainer, tag: any) {
 	if (setup && setup.properties) {
 		return Object.keys(setup.properties).find((v) => {
 			const { properties } = setup.properties[v];
