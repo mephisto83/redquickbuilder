@@ -1,1 +1,1 @@
-<Text>{{{value}}}</Text>
+<Text>{{{label}}}{{{value}}}</Text>
