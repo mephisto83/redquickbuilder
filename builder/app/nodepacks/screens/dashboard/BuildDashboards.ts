@@ -20,12 +20,6 @@ export default function BuildDashboards(filter: Function) {
 	let graph = GetCurrentGraph();
 	SetPause(true);
 	navigationScreens.forEach((navigationScreen: Node) => {
-		let buttons = GetNodesLinkedTo(graph, {
-			id: navigationScreen.id,
-			direction: SOURCE
-		}).map((targetNode: Node) => {
-			return { title: GetNodeTitle(targetNode), target: targetNode.id };
-		});
 		let types = {
 			[UITypes.ElectronIO]: true,
 			[UITypes.ReactNative]: true,
@@ -37,7 +31,12 @@ export default function BuildDashboards(filter: Function) {
 				dashboardName: GetNodeTitle(navigationScreen),
 				uiType,
 				componentName: `${GetNodeTitle(navigationScreen)} Component`,
-				buttons,
+				buttons: GetNodesLinkedTo(graph, {
+					id: navigationScreen.id,
+					direction: SOURCE
+				}).map((targetNode: Node) => {
+					return { title: GetNodeTitle(targetNode), target: targetNode.id };
+				}),
 				isHome: !!GetNodeProp(navigationScreen, NodeProperties.IsHomeLaunchView),
 				callback: (sdcontext: { entry: string }) => {
 					screenContext = sdcontext;

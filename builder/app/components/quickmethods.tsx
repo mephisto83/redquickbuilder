@@ -118,6 +118,12 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
+									title={'Build Dashboards'}
+									onClick={() => {
+										BuildDashboards(() => true);
+									}}
+								/>
+								<TreeViewMenu
 									title={'Connect Screens'}
 									onClick={() => {
 										ConnectScreens(() => {}, () => true);
@@ -125,7 +131,7 @@ class QuickMethods extends Component<any, any, any> {
 								/>
 								<TreeViewMenu
 									title={StartJob.title}
-									icon="fa fa-plus"
+									icon="fa fa-play"
 									onClick={() => {
 										this.props.setState();
 										StartJob();
