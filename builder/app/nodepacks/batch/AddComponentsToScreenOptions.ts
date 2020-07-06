@@ -20,9 +20,9 @@ import { GetNodesLinkedTo } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
 
 export default async function AddComponentsToScreenOptions(progresFunc: any, screenFilter: Function = () => true) {
-	const screenOptions = NodesByType(null, NodeTypes.Screen);
+	const screens = NodesByType(null, NodeTypes.Screen);
 	const menuTreeOption = MenuTreeOptionKeys.NavigationMenu;
-	await screenOptions.filter(ScreenOptionFilter).filter(screenFilter).forEachAsync(async (screen: Node) => {
+	await screens.filter(ScreenOptionFilter).filter(screenFilter).forEachAsync(async (screen: Node) => {
 		let screenOptions = GetNodesLinkedTo(GetCurrentGraph(), {
 			id: screen.id,
 			componentType: NodeTypes.ScreenOption

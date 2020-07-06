@@ -28,7 +28,7 @@ import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
 import { InstanceTypes } from '../../../constants/componenttypes';
 import AppendPostMethod from '../../screens/AppendPostMethod';
 import AppendValidations from '../../screens/AppendValidations';
-import { AddButtonToSubComponent, AddButtonToComponentLayout } from './Shared';
+import { AddButtonToSubComponent, AddButtonToComponentLayout, AddApiToButton } from './Shared';
 import NColumnSection from '../../NColumnSection';
 
 export default function SetupEffect(screen: Node, effect: Effect, information: SetupInformation) {
@@ -47,9 +47,12 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
+    graph = GetCurrentGraph();
 		console.log('add button to sub component');
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
 		AddButtonToComponentLayout({ button, component: subcomponent });
+		AddApiToButton({ button, component: subcomponent });
+		updateComponentProperty(button, NodeProperties.UIText, effectDescription.name || GetNodeTitle(button));
 		console.log('get model selector node');
 		let { modelSelectorNode } = GetModelSelectorNode(screen);
 		console.log('setup model object selector');
@@ -58,7 +61,8 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		console.log('effectDescription');
 		console.log(effectDescription);
 		if (eventInstance && effectDescription.methodDescription && effectDescription.methodDescription.methodId) {
-			console.log('connect lifecylce method');
+      console.log('connect lifecylce method');
+      graph = GetCurrentGraph();
 			let connectSteps = ConnectLifecycleMethod({
 				target: effectDescription.methodDescription.methodId,
 				selectorNode: () => modelSelectorNode.id,

@@ -29,8 +29,8 @@ import { MethodFunctions } from '../../../constants/functiontypes';
 import { uuidv4 } from '../../../utils/array';
 import ClearScreenInstance from '../../datachain/ClearScreenInstance';
 import { ComponentLifeCycleEvents } from '../../../constants/componenttypes';
-import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
 import ConnectComponentDidMount from '../ConnectComponentDidMount';
+import { SetupApi } from './Shared';
 
 export default function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information: SetupInformation) {
 	console.log('setup view mounting');
@@ -212,14 +212,15 @@ function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 
 						SetScreenParamToUrl(screen, paramName);
 						SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
-						updateComponentProperty(
-							screen.id,
-							NodeProperties.UIText,
-							GetNodeProp(screen, NodeProperties.UIText)
-						);
+
 						// Setup the api values all the way down to the bottom components
 						SetupApiValueDownToTheBottomComponent(screen, paramName);
-					});
+          });
+          updateComponentProperty(
+            screen.id,
+            NodeProperties.UIText,
+            GetNodeProp(screen, NodeProperties.UIText)
+          );
 				}
 			}
 		}
@@ -335,21 +336,4 @@ function ChangeValueApiToDifferentName(screeOrOption: Node, paramName: string) {
 	if (internalApi) {
 		updateComponentProperty(internalApi.id, NodeProperties.UIText, paramName);
 	}
-}
-function SetupApi(parent: Node, paramName: string, child: Node) {
-	console.log(`setup api :${paramName}`);
-	graphOperation(
-		SetupApiBetweenComponent({
-			component_a: {
-				id: parent.id,
-				external: paramName,
-				internal: paramName
-			},
-			component_b: {
-				id: child.id,
-				external: paramName,
-				internal: paramName
-			}
-		})
-	)(GetDispatchFunc(), GetStateFunc());
 }

@@ -45,7 +45,7 @@ export default function(args: {
 						parent: context.node0,
 						groupProperties: {},
 						properties: {
-							UIType: 'ElectronIO',
+							UIType: uiType || 'ElectronIO',
 							...viewPackages
 						},
 						linkProperties: {
@@ -310,9 +310,9 @@ export default function(args: {
 		...clearPinned,
 		function() {
 			if (context.callback) {
-        context.entry = context.node0;
-        context.event = context.node4;
-        context.newComponent = context.node1;
+				context.entry = context.node0;
+				context.event = context.node4;
+				context.newComponent = context.node1;
 				context.eventInstance = context.node5;
 				context.callback(context);
 			}

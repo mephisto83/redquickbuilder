@@ -3,7 +3,10 @@ import {
 	graphOperation,
 	GetDispatchFunc,
 	GetStateFunc,
-	updateComponentProperty
+	updateComponentProperty,
+  GetComponentApiNodes,
+  GetNodeById,
+  GetNodeTitle
 } from '../../../actions/uiactions';
 import {
 	GetNodesLinkedTo,
@@ -16,6 +19,7 @@ import {
 	GetFirstCell
 } from '../../../methods/graph_methods';
 import { LinkType, NodeProperties } from '../../../constants/nodetypes';
+import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
 import AddButtonToComponent from '../../AddButtonToComponent';
 import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
 
@@ -82,4 +86,29 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	SetLayoutCell(layout, lastCell, button);
 	updateComponentProperty(component, NodeProperties.Layout, layout);
 	// can add more properties to cell later.
+}
+
+export function SetupApi(parent: Node, paramName: string, child: Node) {
+	console.log(`setup api :${paramName}`);
+	graphOperation(
+		SetupApiBetweenComponent({
+			component_a: {
+				id: parent.id,
+				external: paramName,
+				internal: paramName
+			},
+			component_b: {
+				id: child.id,
+				external: paramName,
+				internal: paramName
+			}
+		})
+	)(GetDispatchFunc(), GetStateFunc());
+}
+
+export function AddApiToButton(args: { button: string; component: string }) {
+	let nodes = GetComponentApiNodes(args.component);
+	nodes.forEach((node: Node) => {
+		SetupApi(GetNodeById(args.component), GetNodeTitle(node), GetNodeById(args.button));
+	});
 }

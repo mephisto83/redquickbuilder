@@ -9,12 +9,16 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	GetComponentApiNodes,
 	GetNodeTitle,
-	updateComponentProperty
+	updateComponentProperty,
+	GetNodeByProperties,
+	GetNodeProp,
+	GetComponentInternalApiNode,
+	GetNodeById
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo } from '../../../methods/graph_methods';
-import { LinkType, LinkProperties, NodeProperties } from '../../../constants/nodetypes';
+import { LinkType, LinkProperties, NodeProperties, NodeTypes } from '../../../constants/nodetypes';
 import { Node } from '../../../methods/graph_types';
-import { AddButtonToSubComponent, AddButtonToComponentLayout } from './Shared';
+import { AddButtonToSubComponent, AddButtonToComponentLayout, SetupApi, AddApiToButton } from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 
 export default function SetupRoute(screen: Node, routing: Routing, information: SetupInformation) {
@@ -35,9 +39,18 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
 		AddButtonToComponentLayout({ button, component: subcomponent });
-		NavigateTo(routeDescription, screen, information, { eventInstance, event, button });
+		let targetScreen: Node = GetNodeByProperties({
+			[NodeProperties.NODEType]: NodeTypes.Screen,
+			[NodeProperties.Model]: routeDescription.model,
+			[NodeProperties.Agent]: GetNodeProp(screen, NodeProperties.Agent),
+			[NodeProperties.ViewType]: routeDescription.viewType
+		});
+		AddApiToButton({ button, component: subcomponent });
+		NavigateTo(routeDescription, targetScreen, information, { eventInstance, event, button });
 	});
 }
+
+
 function NavigateTo(
 	routeDescription: RouteDescription,
 	screen: Node,
@@ -50,7 +63,8 @@ function NavigateTo(
 	// this can be updated to include different types of parameters,
 	// checkout the lambda property for the arguments, setting it to the appropriate
 	// lambda string will get use the parameters in the url that we desire.
-	console.log('create navigate to screen DC ');
+  console.log('create navigate to screen DC ');
+
 	graphOperation(
 		CreateNavigateToScreenDC({
 			screen: screen.id,

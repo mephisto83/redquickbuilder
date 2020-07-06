@@ -129,6 +129,7 @@ import AddMethodFilterToMethod from '../nodepacks/method/AddFilterToModelFilter'
 import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
 import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
 import ConnectScreens from '../nodepacks/batch/ConnectScreens';
+import AddComponentsToScreenOptions from '../nodepacks/batch/AddComponentsToScreenOptions';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -3789,11 +3790,23 @@ class ContextMenu extends Component<any, any> {
 		const { state } = this.props;
 		return [
 			<TreeViewMenu
-        title={'Connect Screen'}
-        active
+				title={'Connect Screen'}
+				active
 				toggle={() => {
 					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 					ConnectScreens(() => {}, (v: any) => v.id === currentNode.id);
+				}}
+			/>,
+			<TreeViewMenu
+				title={'Add Title and Menu'}
+				toggle={() => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					AddComponentsToScreenOptions(
+						() => {},
+						(screen: Node) => {
+							return screen.id === currentNode.id;
+						}
+					);
 				}}
 			/>
 		];

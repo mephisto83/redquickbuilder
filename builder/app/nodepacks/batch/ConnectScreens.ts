@@ -35,6 +35,7 @@ import {
 } from '../../interface/methodprops';
 import SetupViewMouting, { GetViewMounting } from './ConnectScreen/SetupViewMouting';
 import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
+import { RedressScreenProperties } from './RedressProperties';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -79,6 +80,8 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 				);
 			}
 			// Setup mounting functions
+
+			RedressScreenProperties(screen.id);
 		});
 }
 

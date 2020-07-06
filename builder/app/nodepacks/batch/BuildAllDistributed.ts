@@ -27,7 +27,6 @@ import { UITypes, MAIN_CONTENT, PROGRESS_VIEW } from '../../constants/nodetypes'
 import AddChainToNavigateNextScreens from './AddChainToNavigateNextScreens';
 import CreateConfiguration from '../CreateConfiguration';
 import CreateFetchServiceIdempotently from '../CreateFetchServiceIdempotently';
-import ConnectScreens from './ConnectScreens';
 import CreateClaimService from './CreateClaimService';
 import SetupViewTypes from './SetupViewTypes';
 import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';

@@ -1,6 +1,6 @@
 import { uuidv4 } from '../utils/array';
 import { NodeProperties } from '../constants/nodetypes';
-export default function(args: any = {}) {
+export default function AddTitleToComponent(args: any = {}) {
 	// node0
 	if (!args.component) {
 		throw 'no component';
