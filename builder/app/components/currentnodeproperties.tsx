@@ -33,12 +33,13 @@ import {
 import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainContextMethods } from '../constants/datachain';
+import { Node } from '../methods/graph_types';
 
 class CurrentNodeProperties extends Component<any, any> {
 	render() {
 		var { state } = this.props;
 
-		var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+		var currentNode: Node = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		if (!currentNode) {
 			return <div />;
 		}
@@ -49,6 +50,7 @@ class CurrentNodeProperties extends Component<any, any> {
 			: null;
 		let linkProperties = currentLink ? currentLink.properties : {};
 		let nodeProperties = currentNode.properties || {};
+		let nodePropertyVersions = currentNode.propertyVersions || {};
 		return (
 			<MainSideBar active={true} relative={true}>
 				<SideBar style={{ paddingTop: 0 }}>
@@ -80,6 +82,31 @@ class CurrentNodeProperties extends Component<any, any> {
 													}
 												}
 											]);
+										}}
+										icon={
+											UIA.GetNodePropDirty(currentNode, key) ? 'fa fa-square' : 'fa fa-square-o'
+										}
+									/>
+								);
+							})}
+						</TreeViewMenu>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'CURRENT_NODE_PROPERTIES_VERSIONS')}
+							active={true}
+							title={`Versions`}
+							innerStyle={{ maxHeight: 600, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('CURRENT_NODE_PROPERTIES_VERSIONS');
+							}}
+						>
+							{Object.keys(nodeProperties).sort().map((key) => {
+								return (
+									<TreeViewMenu
+										title={`${key}: ${JSON.stringify(nodePropertyVersions[key])}`}
+										key={`component-props-${key}`}
+										hideArrow={true}
+										onClick={() => {
+											console.log(JSON.stringify(nodePropertyVersions[key]));
 										}}
 										icon={
 											UIA.GetNodePropDirty(currentNode, key) ? 'fa fa-square' : 'fa fa-square-o'

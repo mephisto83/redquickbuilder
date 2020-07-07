@@ -665,6 +665,7 @@ export const LinkType = {
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	DefaultValue: 'DefaultValue',
+	MethodArgumentSoure: 'MethodArgumentSoure',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
@@ -922,6 +923,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	MethodArgumentSoure: {
+		type: LinkType.MethodArgumentSoure
 	},
 	AccessScreen: {
 		type: LinkType.AccessScreen

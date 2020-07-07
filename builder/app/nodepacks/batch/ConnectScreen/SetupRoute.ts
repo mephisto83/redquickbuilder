@@ -13,7 +13,8 @@ import {
 	GetNodeByProperties,
 	GetNodeProp,
 	GetComponentInternalApiNode,
-	GetNodeById
+	GetNodeById,
+	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo } from '../../../methods/graph_methods';
 import { LinkType, LinkProperties, NodeProperties, NodeTypes } from '../../../constants/nodetypes';
@@ -38,7 +39,6 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 	setup_options.forEach((screenOption: Node) => {
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
-		AddButtonToComponentLayout({ button, component: subcomponent });
 		let targetScreen: Node = GetNodeByProperties({
 			[NodeProperties.NODEType]: NodeTypes.Screen,
 			[NodeProperties.Model]: routeDescription.model,
@@ -47,9 +47,9 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 		});
 		AddApiToButton({ button, component: subcomponent });
 		NavigateTo(routeDescription, targetScreen, information, { eventInstance, event, button });
+		AddButtonToComponentLayout({ button, component: subcomponent });
 	});
 }
-
 
 function NavigateTo(
 	routeDescription: RouteDescription,
@@ -63,15 +63,24 @@ function NavigateTo(
 	// this can be updated to include different types of parameters,
 	// checkout the lambda property for the arguments, setting it to the appropriate
 	// lambda string will get use the parameters in the url that we desire.
-  console.log('create navigate to screen DC ');
+	console.log('create navigate to screen DC ');
 
+	let entryNode: string | null = null;
 	graphOperation(
 		CreateNavigateToScreenDC({
 			screen: screen.id,
-			node: () => eventInstance
+			node: () => eventInstance,
+			callback: (dataChainContext: { entry: string }) => {
+				entryNode = dataChainContext.entry;
+			}
 		})
 	)(GetDispatchFunc(), GetStateFunc());
-
+	if (entryNode !== null) {
+		graphOperation(AddLinkBetweenNodes(entryNode, button, LinkProperties.MethodArgumentSoure))(
+			GetDispatchFunc(),
+			GetStateFunc()
+		);
+	}
 	console.log('adding connections to api nodes');
 	graphOperation((currentGraph: any) => {
 		let nodes = GetComponentApiNodes(button, currentGraph);

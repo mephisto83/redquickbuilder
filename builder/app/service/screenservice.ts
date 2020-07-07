@@ -24,7 +24,9 @@ import {
 	GetNodeByProperties,
 	GetNodes,
 	GetLinkProperty,
-	GetDataChainArgs
+	GetDataChainArgs,
+	GetComponentInternalApiNode,
+	GetComponentInternalApiNodes
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -1651,10 +1653,31 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				includeNameSpace: true
 			})}(this.state.${GetJSCodeName(internalApiConnection)});`;
 		}
+		let argumentSource: GraphMethods.Node = GetNodeLinkedTo(GetCurrentGraph(), {
+			id: dataChain.id,
+			link: LinkType.MethodArgumentSoure
+		});
+		if (argumentSource) {
+			let apiInternalNodes = GetComponentInternalApiNodes(argumentSource.id);
+			let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes);
+      return `DC.${GetCodeName(dataChain, {
+        includeNameSpace: true
+      })}(value, ${internalApiArgs});`;
+		}
 		return `DC.${GetCodeName(dataChain, {
 			includeNameSpace: true
-		})}(value);`;
+		})}(value/*hi*/);`;
 	}
+}
+
+function createInternalApiArgumentsCode(apiInternalNodes: GraphMethods.Node[]) {
+	let result = '';
+	result = `{ ${apiInternalNodes
+		.map((node: GraphMethods.Node) => {
+			return `${GetNodeTitle(node)}: this.state.${GetNodeTitle(node)}`;
+		})
+		.join(', ' + NEW_LINE)} }`;
+	return result;
 }
 
 export function getUpdateFunctionOption(methodId: any, methodInstanceCallId: any, addParams: string) {

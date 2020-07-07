@@ -50,7 +50,6 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
     graph = GetCurrentGraph();
 		console.log('add button to sub component');
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
-		AddButtonToComponentLayout({ button, component: subcomponent });
 		AddApiToButton({ button, component: subcomponent });
 		updateComponentProperty(button, NodeProperties.UIText, effectDescription.name || GetNodeTitle(button));
 		console.log('get model selector node');
@@ -69,7 +68,8 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 				dataChain: () => (modelDataChain ? modelDataChain.id : null),
 				source: eventInstance,
 				graph
-			});
+      });
+
 			graphOperation(connectSteps)(GetDispatchFunc(), GetStateFunc());
 			console.log('update component property');
 			updateComponentProperty(
@@ -90,6 +90,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 				SetupValidations({ screenOption, effectDescription });
 			}
 		}
+		AddButtonToComponentLayout({ button, component: subcomponent });
 	});
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
