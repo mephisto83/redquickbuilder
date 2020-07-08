@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import { NodeTypes, NodeProperties, UITypes, LinkType } from '../../../constants/nodetypes';
 import {
 	NodesByType,
@@ -28,13 +29,13 @@ export default function ConnectDashboards(
 		[UITypes.ReactWeb]: true
 	}
 ) {
-	let screens = NodesByType(null, NodeTypes.Screen).filter(filter);
-	let graph = GetCurrentGraph();
+	const screens: Node[] = NodesByType(null, NodeTypes.Screen).filter(filter);
+	const graph: Graph = GetCurrentGraph();
 	SetPause(true);
-	let result: any = [];
-	let total = screens.length;
+	const result: any = [];
+	const total = screens.length;
 	screens.forEach((screen: Node, sindex: number) => {
-		let screenOptions = GetNodesLinkedTo(graph, {
+		const screenOptions = GetNodesLinkedTo(graph, {
 			id: screen.id,
 			componentType: NodeTypes.ScreenOption
 		});
@@ -42,7 +43,7 @@ export default function ConnectDashboards(
 			if (onProgress) {
 				onProgress(sindex / total);
 			}
-			let button: ButtonDescription[] = GetNodeProp(screenOption, NodeProperties.DashboardButtons) || [];
+			const button: ButtonDescription[] = GetNodeProp(screenOption, NodeProperties.DashboardButtons) || [];
 			let clickEvent = 'onClick';
 			switch (GetNodeProp(screenOption, NodeProperties.ViewType)) {
 				case UITypes.ReactNative:
@@ -66,22 +67,40 @@ export default function ConnectDashboards(
 					};
 				});
 				result.push(function(graph: Graph) {
-					let target = GetNodeProp(btn.id, NodeProperties.Target);
+					const target = GetNodeProp(btn.id, NodeProperties.Target);
 					if (!target) {
 						throw new Error('Button needs to have target set');
 					}
-					let navScreenTarget = GetNodeById(target);
+					const navScreenTarget = GetNodeById(target);
 					let screenTarget = GetNodeProp(navScreenTarget, NodeProperties.Screen);
 					if (!screenTarget) {
-						screenTarget = GetNodeByProperties({
-							[NodeProperties.NODEType]: NodeTypes.Screen,
-							[NodeProperties.Agent]: GetNodeProp(navScreenTarget, NodeProperties.Agent),
-							[NodeProperties.Model]: GetNodeProp(navScreenTarget, NodeProperties.Model),
-							[NodeProperties.ViewType]: GetNodeProp(navScreenTarget, NodeProperties.ViewType)
-						});
+						if (btn.isDashboard) {
+							screenTarget = GetNodeLinkedTo(null, {
+								id: navScreenTarget.id,
+								link: LinkType.NavigationScreenImplementation
+							});
+						} else {
+							screenTarget = GetNodeByProperties({
+								[NodeProperties.NODEType]: NodeTypes.Screen,
+								[NodeProperties.Agent]: GetNodeProp(navScreenTarget, NodeProperties.Agent),
+								[NodeProperties.Model]: GetNodeProp(navScreenTarget, NodeProperties.Model),
+								...btn.isDashboard
+									? { [NodeProperties.IsDashboard]: true }
+									: {
+											[NodeProperties.ViewType]: GetNodeProp(
+												navScreenTarget,
+												NodeProperties.ViewType
+											)
+										}
+							});
+						}
 					}
 					if (screenTarget) {
-						return ConnectLifecycleMethod({ target: screenTarget.id, source: handleInstance.id, graph });
+						return ConnectLifecycleMethod({
+							target: screenTarget.id,
+							source: handleInstance.id,
+							graph
+						});
 					}
 					console.warn('didnt find a screen');
 					return null;

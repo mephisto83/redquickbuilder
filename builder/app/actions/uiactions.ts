@@ -1206,7 +1206,7 @@ function GetExtraArgs(id: string) {
 
 function createInternalApiArguments(apiInternalNodes: _.Node[]) {
 	let result = '';
-	result = `, $internalComponentState: { [str:string]: any, ${apiInternalNodes
+	result = `, $internalComponentState?: { [str:string]: any, ${apiInternalNodes
 		.map((node: _.Node) => {
 			return `${GetNodeTitle(node)}: string | number | null`;
 		})

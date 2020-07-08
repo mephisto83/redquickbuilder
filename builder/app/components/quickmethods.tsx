@@ -106,7 +106,7 @@ class QuickMethods extends Component<any, any, any> {
 							icon="fa fa-tag"
 						>
 							<TreeViewMenu
-								title={'Check Shared Nodes'}
+								title="Check Shared Nodes"
 								open={UIA.Visual(state, 'Check Shared Nodes')}
 								active
 								toggle={() => {
@@ -145,7 +145,7 @@ class QuickMethods extends Component<any, any, any> {
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
 									<SelectInput
-										label={'Target Model'}
+										label="Target Model"
 										value={this.state.targetModel}
 										onChange={(val: string) => {
 											this.setState({ targetModel: val });
@@ -179,7 +179,7 @@ class QuickMethods extends Component<any, any, any> {
 								</TreeViewItemContainer>
 								<TreeViewMenu title={UIA.GetNodeTitle(this.state.sharedComponentFor)} />
 								<TreeViewMenu
-									title={'Check'}
+									title="Check"
 									toggle={() => {
 										if (
 											this.state.selectedViewType &&
@@ -210,19 +210,25 @@ class QuickMethods extends Component<any, any, any> {
 								icon="fa fa-tag"
 							>
 								<TreeViewMenu
-									title={'Add Agent Access Methods'}
+									title="Add Agent Access Methods"
 									onClick={() => {
 										AddAgentAccessMethods(() => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'Build Dashboards'}
+									title="Build Dashboards"
 									onClick={() => {
 										BuildDashboards(() => true);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Connect Screens'}
+									title="Connect Dashboards"
+									onClick={() => {
+										ConnectDashboards(() => true, () => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Connect Screens"
 									onClick={() => {
 										ConnectScreens(() => {}, () => true);
 									}}
@@ -298,7 +304,7 @@ class QuickMethods extends Component<any, any, any> {
 									icon="fa fa-tag"
 								>
 									<TreeViewMenu
-										title={'Distribute Build All Jobs'}
+										title="Distribute Build All Jobs"
 										icon="fa fa-plus"
 										onClick={() => {
 											this.props.setState();
@@ -306,7 +312,7 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
-										title={'Check Access'}
+										title="Check Access"
 										icon="fa fa-plus"
 										onClick={() => {
 											let aa = UIA.GetNodeById('1f2f965e-205f-45ed-b12e-aac517cd3ed8');
@@ -318,14 +324,14 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
-										title={'Redress Properties'}
+										title="Redress Properties"
 										description={RedressProperties.description}
 										toggle={() => {
 											RedressProperties();
 										}}
 									/>
 									<TreeViewMenu
-										title={'Add user requirements'}
+										title="Add user requirements"
 										icon="fa fa-plus"
 										onClick={() => {
 											this.props.setState();
@@ -333,7 +339,7 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
-										title={'Change Input To Select'}
+										title="Change Input To Select"
 										icon="fa fa-plane"
 										onClick={() => {
 											ChangeInputToSelect();
@@ -341,7 +347,7 @@ class QuickMethods extends Component<any, any, any> {
 									/>
 
 									<TreeViewMenu
-										title={'Generate Menu Source'}
+										title="Generate Menu Source"
 										icon="fa fa-plus"
 										onClick={() => {
 											MenuGenerator.Generate({ state: this.props.state });
@@ -384,21 +390,21 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Create Smart Dashes'}
-									icon={'fa fa-plus'}
+									title="Create Smart Dashes"
+									icon="fa fa-plus"
 									onClick={() => {
 										BuildDashboards(() => true);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Connect Dashboards'}
-									icon={'fa fa-plus'}
+									title="Connect Dashboards"
+									icon="fa fa-plus"
 									onClick={() => {
 										ConnectDashboards(() => true, () => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'CreateComponentAll'}
+									title="CreateComponentAll"
 									onClick={() => {
 										CreateComponentAll(() => true);
 									}}
@@ -456,7 +462,7 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Create Job'}
+									title="Create Job"
 									icon="fa fa-plus"
 									onClick={() => {
 										this.props.setState();
@@ -465,14 +471,14 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Update Screen Urls'}
+									title="Update Screen Urls"
 									icon="fa fa-plus"
 									onClick={() => {
 										UpdateScreenUrls(() => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'CollectionConnectDataChainCollection'}
+									title="CollectionConnectDataChainCollection"
 									onClick={() => {
 										CollectionConnectDataChainCollection(() => {
 											return true;
@@ -480,41 +486,41 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Add Title Service'}
+									title="Add Title Service"
 									onClick={() => {
 										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Apply Templates'}
+									title="Apply Templates"
 									icon="fa fa-plus"
 									onClick={() => {
 										ApplyTemplates(null);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Apply Validation From Properties'}
+									title="Apply Validation From Properties"
 									icon="fa fa-plus"
 									onClick={() => {
 										ApplyValidationFromProperties(null);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Add Agent Methods'}
+									title="Add Agent Methods"
 									icon="fa fa-plus"
 									onClick={() => {
 										AddAgentMethods(() => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'Add Agent Access Methods'}
+									title="Add Agent Access Methods"
 									icon="fa fa-plus"
 									onClick={() => {
 										AddAgentAccessMethods(() => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'Update Screen Parameters'}
+									title="Update Screen Parameters"
 									icon="fa fa-plus"
 									onClick={() => {
 										UpdateScreenParameters(() => {});

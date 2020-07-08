@@ -673,6 +673,7 @@ export const LinkType = {
 	MenuLink: 'MenuLink',
 	AccessScreen: 'AccessScreen',
 	NavigationScreen: 'NavigationScreen',
+	NavigationScreenImplementation: 'NavigationScreenImplementation',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
 	ConditionTemplate: 'ConditionTemplate',
@@ -941,6 +942,9 @@ export const LinkProperties = {
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen
+	},
+	NavigationScreenImplementation: {
+		type: LinkType.NavigationScreenImplementation
 	},
 	DefaultValue: {
 		type: LinkType.DefaultValue

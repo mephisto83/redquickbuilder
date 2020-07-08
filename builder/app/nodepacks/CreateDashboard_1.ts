@@ -1,7 +1,11 @@
 /* eslint-disable func-names */
-import { uuidv4 } from "../utils/array";
-import { NodeProperties } from "../constants/nodetypes";
-import { UPDATE_NODE_PROPERTY, GetNodeByProperties, NodeTypes } from "../actions/uiactions";
+import { uuidv4 } from '../utils/array';
+import { NodeProperties } from '../constants/nodetypes';
+import {
+  UPDATE_NODE_PROPERTY,
+  GetNodeByProperties,
+  NodeTypes
+} from '../actions/uiactions';
 
 export default function CreateDashboard_1(args: any = {}) {
   // node3,node4,node5,node6,node7,node8,node9,node10,node11,node12
@@ -19,7 +23,7 @@ export default function CreateDashboard_1(args: any = {}) {
     node10: uuidv4(),
     node11: uuidv4(),
     node12: uuidv4(),
-    name: args.name || "Dashboard"
+    name: args.name || 'Dashboard'
   };
   const {
     viewPackages = {
@@ -28,19 +32,22 @@ export default function CreateDashboard_1(args: any = {}) {
   } = args;
   const result = [
     function createScreenIfNeeded(graph: any) {
-      const tempScreen = GetNodeByProperties({
-        [NodeProperties.UIText]: context.name,
-        [NodeProperties.NODEType]: NodeTypes.Screen,
-      }, graph);
+      const tempScreen = GetNodeByProperties(
+        {
+          [NodeProperties.UIText]: context.name,
+          [NodeProperties.NODEType]: NodeTypes.Screen
+        },
+        graph
+      );
       if (tempScreen) {
         context.node0 = tempScreen.id;
         return [];
       }
       return [
-        function () {
+        function() {
           return [
             {
-              operation: "NEW_NODE",
+              operation: 'NEW_NODE',
               options: {
                 callback(node: any) {
                   context.node0 = node.id;
@@ -50,10 +57,10 @@ export default function CreateDashboard_1(args: any = {}) {
           ];
         },
 
-        function () {
+        function() {
           return [
             {
-              operation: "CHANGE_NODE_TEXT",
+              operation: 'CHANGE_NODE_TEXT',
               options: {
                 id: context.node0,
                 value: `${context.name}`
@@ -62,22 +69,22 @@ export default function CreateDashboard_1(args: any = {}) {
           ];
         },
 
-        function () {
+        function() {
           return [
             {
-              operation: "CHANGE_NODE_PROPERTY",
+              operation: 'CHANGE_NODE_PROPERTY',
               options: {
-                prop: "nodeType",
+                prop: 'nodeType',
                 id: context.node0,
-                value: "screen"
+                value: 'screen'
               }
             }
           ];
         },
-        function () {
+        function() {
           return [
             {
-              operation: "CHANGE_NODE_PROPERTY",
+              operation: 'CHANGE_NODE_PROPERTY',
               options: {
                 prop: NodeProperties.IsDashboard,
                 id: context.node0,
@@ -87,31 +94,32 @@ export default function CreateDashboard_1(args: any = {}) {
           ];
         },
 
-        function () {
+        function() {
           return [
             {
-              operation: "CHANGE_NODE_PROPERTY",
+              operation: 'CHANGE_NODE_PROPERTY',
               options: {
-                prop: "Pinned",
+                prop: 'Pinned',
                 id: context.node0,
                 value: true
               }
             }
           ];
-        }]
+        }
+      ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "NEW_SCREEN_OPTIONS",
+          operation: 'NEW_SCREEN_OPTIONS',
           options: {
             parent: context.node0,
             groupProperties: {},
             linkProperties: {
               properties: {
-                type: "screen-options",
-                "screen-options": {}
+                type: 'screen-options',
+                'screen-options': {}
               }
             },
             callback(node: any, group: any) {
@@ -123,23 +131,23 @@ export default function CreateDashboard_1(args: any = {}) {
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "CHANGE_NODE_PROPERTY",
+          operation: 'CHANGE_NODE_PROPERTY',
           options: {
-            prop: "UIType",
+            prop: 'UIType',
             id: context.node1,
-            value: context.uiType || "ElectronIO"
+            value: context.uiType || 'ElectronIO'
           }
         }
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "CHANGE_NODE_TEXT",
+          operation: 'CHANGE_NODE_TEXT',
           options: {
             id: context.node1,
             value: `${context.name} IO`
@@ -148,20 +156,20 @@ export default function CreateDashboard_1(args: any = {}) {
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "NEW_COMPONENT_NODE",
+          operation: 'NEW_COMPONENT_NODE',
           options: {
             parent: context.node1,
             groupProperties: {},
             properties: {
-              UIType: context.uiType || "ElectronIO"
+              UIType: context.uiType || 'ElectronIO'
             },
             linkProperties: {
               properties: {
-                type: "component",
-                stroke: "#B7245C",
+                type: 'component',
+                stroke: '#B7245C',
                 component: {}
               }
             },
@@ -174,10 +182,10 @@ export default function CreateDashboard_1(args: any = {}) {
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "CHANGE_NODE_TEXT",
+          operation: 'CHANGE_NODE_TEXT',
           options: {
             id: context.node2,
             value: `${context.name} IO Title`
@@ -186,25 +194,25 @@ export default function CreateDashboard_1(args: any = {}) {
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "CHANGE_NODE_PROPERTY",
+          operation: 'CHANGE_NODE_PROPERTY',
           options: {
-            prop: "component-type",
+            prop: 'component-type',
             id: context.node2,
-            value: "H3"
+            value: 'H3'
           }
         }
       ];
     },
 
-    function () {
+    function() {
       return [
         {
-          operation: "CHANGE_NODE_PROPERTY",
+          operation: 'CHANGE_NODE_PROPERTY',
           options: {
-            prop: "Layout",
+            prop: 'Layout',
             id: context.node1,
             value: {
               layout: {
@@ -221,10 +229,9 @@ export default function CreateDashboard_1(args: any = {}) {
               properties: {
                 [context.node6]: {
                   style: {
-
-                    borderStyle: "solid",
+                    borderStyle: 'solid',
                     borderWidth: 1,
-                    flexDirection: "column"
+                    flexDirection: 'column'
                   },
                   children: {},
                   cellModel: {},
@@ -235,10 +242,10 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node7]: {
                   style: {
-                    display: "flex",
+                    display: 'flex',
                     flex: null,
                     height: null,
-                    borderStyle: "solid",
+                    borderStyle: 'solid',
                     borderWidth: 1,
                     width: null
                   },
@@ -247,7 +254,7 @@ export default function CreateDashboard_1(args: any = {}) {
                   },
                   cellModel: {},
                   properties: {
-                    tags: ["MainMenu", "MainHeader", "TopMenu"]
+                    tags: ['MainMenu', 'MainHeader', 'TopMenu']
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -255,8 +262,7 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node8]: {
                   style: {
-
-                    borderStyle: "solid",
+                    borderStyle: 'solid',
                     borderWidth: 1
                   },
                   children: {},
@@ -270,17 +276,17 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node9]: {
                   style: {
-                    display: "flex",
+                    display: 'flex',
                     flex: null,
-                    height: "100%",
-                    borderStyle: "solid",
+                    height: '100%',
+                    borderStyle: 'solid',
                     borderWidth: 1,
-                    width: "25%"
+                    width: '25%'
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["SideContainer", "LeftContainer"]
+                    tags: ['SideContainer', 'LeftContainer']
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -288,17 +294,17 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node10]: {
                   style: {
-                    display: "flex",
+                    display: 'flex',
                     flex: null,
-                    height: "100%",
-                    borderStyle: "solid",
+                    height: '100%',
+                    borderStyle: 'solid',
                     borderWidth: 1,
-                    width: "25%"
+                    width: '25%'
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["MainSection"]
+                    tags: ['MainSection']
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -306,17 +312,17 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node11]: {
                   style: {
-                    display: "flex",
+                    display: 'flex',
                     flex: null,
-                    height: "100%",
-                    borderStyle: "solid",
+                    height: '100%',
+                    borderStyle: 'solid',
                     borderWidth: 1,
-                    width: "25%"
+                    width: '25%'
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["SecondaryMain"]
+                    tags: ['SecondaryMain']
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -324,17 +330,17 @@ export default function CreateDashboard_1(args: any = {}) {
                 },
                 [context.node12]: {
                   style: {
-                    display: "flex",
+                    display: 'flex',
                     flex: null,
-                    height: "100%",
-                    borderStyle: "solid",
+                    height: '100%',
+                    borderStyle: 'solid',
                     borderWidth: 1,
-                    width: "25%"
+                    width: '25%'
                   },
                   children: {},
                   cellModel: {},
                   properties: {
-                    tags: ["SideContainer", "RightContainer"]
+                    tags: ['SideContainer', 'RightContainer']
                   },
                   cellModelProperty: {},
                   cellRoot: {},
@@ -349,120 +355,120 @@ export default function CreateDashboard_1(args: any = {}) {
   ];
   const clearPinned = [
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node1,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node2,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node3,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node4,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node5,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node6,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node7,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node8,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node9,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node10,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node11,
           value: false
         };
       }
     },
     {
-      operation: "CHANGE_NODE_PROPERTY",
+      operation: 'CHANGE_NODE_PROPERTY',
       options() {
         return {
-          prop: "Pinned",
+          prop: 'Pinned',
           id: context.node12,
           value: false
         };
@@ -470,7 +476,7 @@ export default function CreateDashboard_1(args: any = {}) {
     }
   ];
   const applyViewPackages = [
-    ...["node0", "node1", "node2"].map(v => ({
+    ...['node0', 'node1', 'node2'].map(v => ({
       operation: UPDATE_NODE_PROPERTY,
       options() {
         return {
@@ -484,7 +490,7 @@ export default function CreateDashboard_1(args: any = {}) {
     ...result,
     ...clearPinned,
     ...applyViewPackages,
-    function () {
+    function() {
       if (context.callback) {
         context.entry = context.node0;
         context.mainSection = context.node10;
