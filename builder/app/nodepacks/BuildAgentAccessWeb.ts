@@ -5,7 +5,20 @@ import AddAgentAccess from './AddAgentAccess';
 import { NodeProperties } from '../components/titles';
 
 export default function BuildAgentAccessWeb(args: any) {
-	const { agents, models, agentViewMount, agentRouting, agentAccess, agentMethod, agentEffect } = args;
+	const {
+		dashboardAccess,
+		dashboardRouting,
+		dashboardViewMount,
+		dashboardEffect,
+		dashboards,
+		agents,
+		models,
+		agentViewMount,
+		agentRouting,
+		agentAccess,
+		agentMethod,
+		agentEffect
+	} = args;
 
 	const graph = GetCurrentGraph();
 
@@ -20,6 +33,38 @@ export default function BuildAgentAccessWeb(args: any) {
 			}
 		}))
 	];
+	dashboards.forEach((dashboard: any) => {
+		agents.forEach((agent: any) => {
+			if (dashboardAccess && dashboardAccess[agent] && dashboardAccess[agent][dashboard]) {
+				const values = dashboardAccess[agent][dashboard];
+				const routing =
+					dashboardRouting[agent] && dashboardRouting[agent][dashboard]
+						? dashboardRouting[agent][dashboard] || {}
+						: {};
+				const mounting =
+					dashboardViewMount[agent] && dashboardViewMount[agent][dashboard]
+						? dashboardViewMount[agent][dashboard] || {}
+						: {};
+				const effects =
+					dashboardEffect[agent] && dashboardEffect[agent][dashboard]
+						? dashboardEffect[agent][dashboard] || {}
+						: {};
+				if (values && values.access) {
+					result.push(
+						...AddAgentAccess({
+							dashboardId: dashboard,
+							agentId: agent,
+							linkProps: {},
+							[LinkPropertyKeys.DashboardAccessProps]: values,
+							[LinkPropertyKeys.DashboardRoutingProps]: { ...routing },
+							[LinkPropertyKeys.DashboardViewMountProps]: { ...mounting },
+							[LinkPropertyKeys.DashboardEffectProps]: { ...effects }
+						})
+					);
+				}
+			}
+		});
+	});
 	models.forEach((model: any, modelIndex: any) => {
 		agents.forEach((agent: any, agentIndex: any) => {
 			if (agentAccess && agentAccess[agentIndex] && agentAccess[agentIndex][modelIndex]) {

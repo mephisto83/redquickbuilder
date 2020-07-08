@@ -1,3 +1,15 @@
+export interface DashboardAccessProps {
+	access: false;
+}
+export interface DashboardEffect {
+	effect: Effect;
+}
+export interface DashboardRouting {
+  routing: Routing;
+}
+export interface DashboardViewMount {
+	mount: ViewMounting;
+}
 export default interface MethodProps {
 	GetAll?: MethodDescription;
 	Get?: MethodDescription;
@@ -78,7 +90,7 @@ export enum RouteSourceType {
 }
 
 export interface MethodDescription {
-  methodId: string;
+	methodId: string;
 	functionType: string;
 	properties: MethodPropsProperties;
 }

@@ -21,7 +21,8 @@ import {
 	NodesByType,
 	ROUTING_CONTEXT_MENU,
 	MOUNTING_CONTEXT_MENU,
-	EFFECT_CONTEXT_MENU
+	EFFECT_CONTEXT_MENU,
+	isAccessNodeForDashboard
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -52,7 +53,11 @@ import MethodProps, {
 	ViewMounting,
 	MountingDescription,
 	EffectProps,
-	Effect
+	Effect,
+	DashboardAccessProps,
+	DashboardEffect,
+	DashboardViewMount,
+	DashboardRouting
 } from '../interface/methodprops';
 import { Node } from '../methods/graph_types';
 
@@ -64,6 +69,8 @@ class AgentAccessView extends Component<any, any> {
 		this.state = {
 			agents: [],
 			models: [],
+			dashboards: [],
+			dashboardAccess: {},
 			agentAccess: [],
 			agentMethod: [],
 			agentEffect: []
@@ -82,6 +89,14 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentAccess[agentIndex][modelIndex] = {};
 		}
 		this.state.agentAccess[agentIndex][modelIndex][v] = value;
+	}
+
+	setAgentDashboardAccess(model: string, agent: string, value: boolean) {
+		if (!this.state.dashboardAccess[agent]) {
+			this.state.dashboardAccess[agent] = {};
+		}
+
+		this.state.dashboardAccess[agent][model] = { access: value };
 	}
 
 	setAgentMethod(modelIndex: number, agentIndex: number, v: string, functionType: string) {
@@ -259,14 +274,41 @@ class AgentAccessView extends Component<any, any> {
 													},
 													graph
 												).map((d) => d.id),
+												dashboards: GetNodesByProperties(
+													{
+														[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+														[NodeProperties.IsDashboard]: true
+													},
+													GetCurrentGraph()
+												).map((d: Node) => d.id),
 												agentMethod: loadAgentMethods(onlyAgents, accessDescriptions, graph),
 												agentRouting: loadAgentRouting(onlyAgents, accessDescriptions, graph),
+												dashboardRouting: loadAgentDashboardRouting(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentViewMount: loadAgentViewMount(
 													onlyAgents,
 													accessDescriptions,
 													graph
 												),
+												dashboardViewMount: loadAgentDashbaordViewMount(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentEffect: loadAgentEffect(onlyAgents, accessDescriptions, graph),
+												dashboardEffect: loadAgentDashboardEffect(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
+												dashboardAccess: loadAgentDashboardAccess(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentAccess: loadAgentAccess(onlyAgents, accessDescriptions, graph)
 											});
 											return false;
@@ -498,6 +540,81 @@ class AgentAccessView extends Component<any, any> {
 																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
 															}}
 															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th
+																style={{ backgroundColor: '#FEFCAD' }}
+																key={`${index}-agent-access-th`}
+															>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.dashboards.map((dashboard: any, dashboardIndex: number) => {
+													const result = [
+														<th
+															style={{ cursor: 'pointer' }}
+															key={`${dashboard}`}
+															onClick={() => {}}
+														>
+															{GetNodeTitle(dashboard)}
+														</th>
+													];
+
+													result.push(
+														...[].interpolate(0, this.state.agents.length, (index: any) => {
+															const agent = this.state.agents[index];
+															return (
+																<td key={`${dashboard} ${dashboardIndex} - ${agent} `}>
+																	<CheckBox
+																		label={' '}
+																		title={`${GetNodeTitle(agent)} ${GetNodeTitle(
+																			dashboard
+																		)}`}
+																		style={{ height: 30, width: 30 }}
+																		onChange={(value: any) => {
+																			this.setAgentDashboardAccess(
+																				dashboard,
+																				agent,
+																				value
+																			);
+
+																			this.setState({
+																				dashboardAccess: {
+																					...this.state.dashboardAccess
+																				}
+																			});
+																		}}
+																		value={this.hasAgentDashboardAccess(
+																			agent,
+																			dashboard
+																		)}
+																	/>
+																</td>
+															);
+														})
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`dashboard - key${dashboard}`}
 														>
 															{result.flatten()}
 														</tr>
@@ -883,8 +1000,8 @@ class AgentAccessView extends Component<any, any> {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,
 							model,
-              modelIndex,
-              outState: this.state,
+							modelIndex,
+							outState: this.state,
 							viewType: v,
 							mounting,
 							callback: (value: ViewMounting) => {
@@ -926,7 +1043,7 @@ class AgentAccessView extends Component<any, any> {
 							model,
 							modelIndex,
 							viewType: v,
-              outState: this.state,
+							outState: this.state,
 							effect: effect,
 							callback: (value: Effect) => {
 								this.setAgentEffectProperty(modelIndex, agentIndex, v, value);
@@ -950,6 +1067,11 @@ class AgentAccessView extends Component<any, any> {
 	private hasAgentAccess(agentIndex: number, modelIndex: number, v: string): any {
 		return this.state.agentAccess[agentIndex] && this.state.agentAccess[agentIndex][modelIndex]
 			? this.state.agentAccess[agentIndex][modelIndex][v]
+			: false;
+	}
+	private hasAgentDashboardAccess(agent: string, dashboard: string): any {
+		return this.state.dashboardAccess[agent] && this.state.dashboardAccess[agent][dashboard]
+			? this.state.dashboardAccess[agent][dashboard] && this.state.dashboardAccess[agent][dashboard].access
 			: false;
 	}
 
@@ -1029,7 +1151,33 @@ function loadAgentAccess(onlyAgents: any[], accessDescriptions: any[], graph: an
 		});
 	});
 }
-
+function loadAgentDashboardAccess(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadDashboard<DashboardAccessProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardAccessProps
+	);
+}
+function loadAgentDashbaordViewMount(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadDashboard<DashboardViewMount>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardViewMountProps
+	);
+}
+function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadDashboard<DashboardRouting>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardRoutingProps
+	);
+}
+function loadAgentDashboardEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	return loadDashboard<DashboardEffect>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.DashboardAccessProps);
+}
 function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return onlyAgents.map((agent) => {
 		const agentAccessDescription = accessDescriptions.filter((v) =>
@@ -1117,4 +1265,44 @@ function loadAgent<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, 
 			};
 		});
 	});
+}
+
+function loadDashboard<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, propKey: string) {
+	let result: any = {};
+	onlyAgents.map((agent) => {
+		const agentAccessDescription = accessDescriptions.filter((agentAccessDescription) =>
+			existsLinkBetween(graph, {
+				source: agent.id,
+				target: agentAccessDescription.id,
+				type: LinkType.AgentAccess
+			})
+		);
+		return GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+				[NodeProperties.IsDashboard]: true
+			},
+			graph
+		).map((dashboard) => {
+			const accessDescription = agentAccessDescription.find((agentAccessDescription) =>
+				isAccessNodeForDashboard(agent, dashboard, agentAccessDescription)
+			);
+			if (accessDescription) {
+				result[agent.id] = result[agent.id] || {};
+				const link = findLink(graph, {
+					source: agent.id,
+					target: accessDescription.id
+				});
+				let routingProps: T = GetLinkProperty(link, propKey);
+				if (routingProps) {
+					result[agent.id][dashboard.id] = {
+						...routingProps
+					};
+					return;
+				}
+				result[agent.id][dashboard.id] = {};
+			}
+		});
+	});
+	return result;
 }

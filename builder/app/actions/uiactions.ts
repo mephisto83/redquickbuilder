@@ -4024,6 +4024,33 @@ export function isAccessNode(agent: any, model: any, aa: { id: any }, viewType?:
 	}
 	return false;
 }
+
+export function isAccessNodeForDashboard(agent: any, dashboard: any, aa: { id: any }, graph?: any): any {
+	graph = graph || GetCurrentGraph();
+	if (
+		GraphMethods.existsLinkBetween(graph, {
+			source: agent.id,
+			target: aa.id,
+			type: NodeConstants.LinkType.AgentAccess
+		}) &&
+		GraphMethods.existsLinkBetween(graph, {
+			source: aa.id,
+			target: dashboard.id,
+			type: NodeConstants.LinkType.DashboardAccess
+		})
+	) {
+		let link = GraphMethods.findLink(graph, {
+			source: agent.id,
+			target: aa.id
+		});
+		let methodProps = GetLinkProperty(link, NodeConstants.LinkPropertyKeys.DashboardAccessProps);
+		if (methodProps && methodProps.access) {
+			return methodProps;
+		}
+	}
+	return false;
+}
+
 export function getAccessScreen(screen: { id: string }) {
 	return (access: { id: string }) => {
 		let agent = GetNodeById(GetNodeProp(screen, NodeProperties.Agent));

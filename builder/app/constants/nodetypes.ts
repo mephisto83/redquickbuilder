@@ -670,6 +670,7 @@ export const LinkType = {
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
 	ModelAccess: 'ModelAccess',
+	DashboardAccess: 'DashboardAccess',
 	MenuLink: 'MenuLink',
 	AccessScreen: 'AccessScreen',
 	NavigationScreen: 'NavigationScreen',
@@ -916,6 +917,10 @@ export const LinkPropertyKeys = {
 	EffectProps: 'effectProps',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
+	DashboardAccessProps: 'dashboardAccessProps',
+	DashboardViewMountProps: 'dashboardViewMountProps',
+	DashboardRoutingProps: 'dashboardRoutingProps',
+	DashboardEffectProps: 'dashboardEffectProps',
 	Enumeration: 'Enumeration',
 	AsForm: 'AsForm',
 	DefaultValue: 'DefaultValue'
