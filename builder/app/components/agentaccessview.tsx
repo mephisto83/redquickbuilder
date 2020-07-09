@@ -22,7 +22,8 @@ import {
 	ROUTING_CONTEXT_MENU,
 	MOUNTING_CONTEXT_MENU,
 	EFFECT_CONTEXT_MENU,
-	isAccessNodeForDashboard
+	isAccessNodeForDashboard,
+	DASHBOARD_MOUNTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -206,6 +207,21 @@ class AgentAccessView extends Component<any, any> {
 		}
 
 		this.state.agentViewMount[agentIndex][modelIndex][v] = mounting;
+	}
+	setDashboardAgentMountingProperty(dashboard: string, agent: string, mounting: ViewMounting) {
+		if (!this.state.dashboardViewMount[agent]) {
+			this.state.dashboardViewMount[agent] = {};
+		}
+		if (!this.state.dashboardViewMount[agent][dashboard]) {
+			this.state.dashboardViewMount[agent][dashboard] = {};
+		}
+		if (typeof this.state.dashboardViewMount[agent][dashboard] === 'string') {
+			this.state.dashboardViewMount[agent][dashboard] = {
+				functionType: this.state.dashboardViewMount[agent][dashboard]
+			};
+		}
+
+		this.state.dashboardViewMount[agent][dashboard] = mounting;
 	}
 	setAgentEffectProperty(modelIndex: number, agentIndex: number, v: string, effect: Effect) {
 		if (!this.state.agentEffect[agentIndex]) {
@@ -625,7 +641,7 @@ class AgentAccessView extends Component<any, any> {
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
-									<Box maxheight={700} title={'Agent Mounting Methods'}>
+									<Box maxheight={500} title={'Agent Mounting Methods'}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -709,6 +725,78 @@ class AgentAccessView extends Component<any, any> {
 														</tr>
 													);
 												})}
+											</tbody>
+										</table>
+									</Box>
+									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.dashboards.map(
+													(dashboard: string, dashboardIndex: number) => {
+														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+														result.push(
+															...this.state.agents.map(
+																(agent: string, agentIndex: number) => {
+																	const tdkey = `${dashboard} ${dashboard} ${agent} ${agentIndex} `;
+																	if (
+																		!this.hasAgentDashboardAccess(agent, dashboard)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+
+																	let mounting: ViewMounting = this.getDashboardMountingDescription(
+																		agent,
+																		dashboard
+																	);
+																	if (!mounting) {
+																		mounting = {
+																			mountings: []
+																		};
+																		this.setDashboardAgentMountingProperty(
+																			dashboard,
+																			agent,
+																			mounting
+																		);
+																	}
+																	mounting.mountings = mounting.mountings || [];
+
+																	let mountingDescriptionButton = this.createDashboardMountingDescriptionButton(
+																		agent,
+																		dashboard,
+																		mounting
+																	);
+																	return (
+																		<td key={tdkey}>{mountingDescriptionButton}</td>
+																	);
+																}
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key${dashboardIndex}`}
+															>
+																{result.flatten()}
+															</tr>
+														);
+													}
+												)}
 											</tbody>
 										</table>
 									</Box>
@@ -1018,6 +1106,35 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
+	private createDashboardMountingDescriptionButton(agent: string, dashboard: string, mounting: ViewMounting) {
+		let hasMountings = false;
+		if (mounting && mounting.mountings) {
+			hasMountings = !!mounting.mountings.length;
+		}
+		return (
+			<div className="btn-group">
+				<button
+					className={hasMountings ? 'btn btn-warning' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(DASHBOARD_MOUNTING_CONTEXT_MENU, {
+							dashboard,
+							outState: this.state,
+							mounting,
+							callback: (value: ViewMounting) => {
+								this.setDashboardAgentMountingProperty(dashboard, agent, value);
+								this.setState({
+									dashboardViewMount: this.state.dashboardViewMount
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
 
 	private createEffectDescriptionButton(
 		agentIndex: number,
@@ -1084,6 +1201,12 @@ class AgentAccessView extends Component<any, any> {
 	}
 	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
+	}
+	private getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
+		if (this.state.dashboardViewMount && this.state.dashboardViewMount[agent]) {
+			return this.state.dashboardViewMount[agent][dashboard];
+		}
+		return null;
 	}
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
 		return this.state.agentEffect[agentIndex][modelIndex][v];
