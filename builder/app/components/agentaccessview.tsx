@@ -23,7 +23,9 @@ import {
 	MOUNTING_CONTEXT_MENU,
 	EFFECT_CONTEXT_MENU,
 	isAccessNodeForDashboard,
-	DASHBOARD_MOUNTING_CONTEXT_MENU
+	DASHBOARD_MOUNTING_CONTEXT_MENU,
+	DASHBOARD_EFFECT_CONTEXT_MENU,
+  DASHBOARD_ROUTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -193,6 +195,12 @@ class AgentAccessView extends Component<any, any> {
 
 		this.state.agentRouting[agentIndex][modelIndex][v] = routing;
 	}
+	setDashboardAgentRoutingProperty(model: string, agent: string, routing: Routing) {
+		if (!this.state.agentRouting[agent]) {
+			this.state.agentRouting[agent] = {};
+		}
+		this.state.agentRouting[agent][model] = routing;
+	}
 	setAgentMountingProperty(modelIndex: number, agentIndex: number, v: string, mounting: ViewMounting) {
 		if (!this.state.agentViewMount[agentIndex]) {
 			this.state.agentViewMount[agentIndex] = {};
@@ -237,6 +245,17 @@ class AgentAccessView extends Component<any, any> {
 		}
 
 		this.state.agentEffect[agentIndex][modelIndex][v] = effect;
+	}
+
+	setDashboardAgentEffectProperty(dashboard: string, agent: string, effect: Effect) {
+		if (!this.state.dashboardEffect[agent]) {
+			this.state.dashboardEffect[agent] = {};
+		}
+		if (!this.state.dashboardEffect[agent][dashboard]) {
+			this.state.dashboardEffect[agent][dashboard] = {};
+		}
+
+		this.state.dashboardEffect[agent][dashboard] = effect;
 	}
 
 	render() {
@@ -802,7 +821,7 @@ class AgentAccessView extends Component<any, any> {
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agenteffects')}>
-									<Box maxheight={700} title={'Agent Effect Methods'}>
+									<Box maxheight={500} title={'Agent Effect Methods'}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -886,6 +905,79 @@ class AgentAccessView extends Component<any, any> {
 														</tr>
 													);
 												})}
+											</tbody>
+										</table>
+									</Box>
+									<Box maxheight={500} title={'Dashboard Effect Methods'}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.dashboards.map(
+													(dashboard: string, dashboardIndex: number) => {
+														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+														result.push(
+															...this.state.agents.map(
+																(agent: string, agentIndex: number) => {
+																	const tdkey = `${dashboard} ${dashboardIndex} ${this
+																		.state.agents[agent]} ${agentIndex} -effects `;
+																	if (
+																		!this.hasAgentDashboardAccess(agent, dashboard)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+
+																	let effect: Effect = this.getDashboardEffectDescription(
+																		agent,
+																		dashboard
+																	);
+																	if (!effect) {
+																		effect = {
+																			effects: []
+																		};
+																		this.setDashboardAgentEffectProperty(
+																			dashboard,
+																			agent,
+																			effect
+																		);
+																	}
+																	effect.effects = effect.effects || [];
+
+																	let effectDescriptionButton = this.createDashboardEffectDescriptionButton(
+																		agent,
+																		dashboard,
+																		effect
+																	);
+																	return (
+																		<td key={tdkey}>{effectDescriptionButton}</td>
+																	);
+																}
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key - effect -${dashboard}`}
+															>
+																{result.flatten()}
+															</tr>
+														);
+													}
+												)}
 											</tbody>
 										</table>
 									</Box>
@@ -1002,6 +1094,94 @@ class AgentAccessView extends Component<any, any> {
 											</tbody>
 										</table>
 									</Box>
+									<Box title={'Dashboard Routing'} maxheight={700}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }} >
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.dashboards.map(
+													(dashboard: string, dashboardIndex: number) => {
+														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+														result.push(
+															...this.state.agents.map(
+																(agent: string, agentIndex: number) => {
+																	const tdkey = `routing- ${dashboard} ${dashboard} ${this
+																		.state.agents[agent]} ${agentIndex} s`;
+																	if (
+																		!this.hasAgentDashboardAccess(agent, dashboard)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+
+																	let routing: Routing = {
+																		routes: []
+																	};
+																	if (this.hasDashboardRouting(agent, dashboard)) {
+																		routing =
+																			this.getDashboardRoutingDescription(
+																				agent,
+																				dashboard
+																			) || routing;
+																	}
+																	let onComponentMountMethod = this.getDashboardMountingDescription(
+																		agent,
+																		dashboard
+																	);
+																	routing.routes = routing.routes || [];
+
+																	let addRoutingDescriptionBtn = this.createDashboardRoutingDescriptionButton(
+																		agent,
+																		onComponentMountMethod,
+																		dashboard,
+																		routing
+																	);
+																	let routesDom: any = null;
+																	if (routing) {
+																		routesDom = routing.routes.map(
+																			(route: RouteDescription) => {
+																				return (
+																					<i
+																						title={route.name}
+																						className={'fa fa-genderless'}
+																						style={{ color: 'orange' }}
+																					/>
+																				);
+																			}
+																		);
+																	}
+																	return (
+																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
+																	);
+																}
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key${dashboard}`}
+															>
+																{result.flatten()}
+															</tr>
+														);
+													}
+												)}
+											</tbody>
+										</table>
+									</Box>
 								</TabPane>
 							</TabContent>
 						</div>
@@ -1049,6 +1229,47 @@ class AgentAccessView extends Component<any, any> {
 								this.setAgentRoutingProperty(modelIndex, agentIndex, v, value);
 								this.setState({
 									agentRouting: this.state.agentRouting
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
+	private createDashboardRoutingDescriptionButton(
+		agent: string,
+		onComponentMountMethod: ViewMounting,
+		dashboard: string,
+		routing: Routing
+	) {
+		routing.routes.forEach((route: RouteDescription) => {
+			if (route.viewType && route.model) {
+				// let targetModelIndex = this.state.models.indexOf(route.model);
+				// let targetMethodDescription = this.getDashboardMethodDescription(agent, targetModelIndex, route.viewType);
+				// route.targetMethodDescription = targetMethodDescription;
+			}
+		});
+		return (
+			<div className="btn-group">
+				<button
+					className={routing.routes && routing.routes.length ? 'btn btn-success' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(DASHBOARD_ROUTING_CONTEXT_MENU, {
+							agent,
+							onComponentMountMethod,
+							dashboard,
+							routing,
+							getMountingDescription: (a: string, m: string): ViewMounting => {
+								return this.getDashboardMountingDescription(a, m);
+							},
+							callback: (value: Routing) => {
+								this.setDashboardAgentRoutingProperty(dashboard, agent, value);
+								this.setState({
+									dashboardRouting: this.state.dashboardRouting
 								});
 							}
 						});
@@ -1120,8 +1341,8 @@ class AgentAccessView extends Component<any, any> {
 						this.props.setVisual(DASHBOARD_MOUNTING_CONTEXT_MENU, {
 							dashboard,
 							outState: this.state,
-              mounting,
-              agent,
+							mounting,
+							agent,
 							callback: (value: ViewMounting) => {
 								this.setDashboardAgentMountingProperty(dashboard, agent, value);
 								this.setState({
@@ -1177,7 +1398,36 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
-
+	private createDashboardEffectDescriptionButton(agent: string, dashboard: string, effect: Effect) {
+		let hasEffects = false;
+		if (effect && effect.effects) {
+			hasEffects = !!effect.effects.length;
+		}
+		return (
+			<div className="btn-group">
+				<button
+					className={hasEffects ? 'btn btn-info' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(DASHBOARD_EFFECT_CONTEXT_MENU, {
+							agent,
+							dashboard,
+							outState: this.state,
+							effect: effect,
+							callback: (value: Effect) => {
+								this.setDashboardAgentEffectProperty(dashboard, agent, value);
+								this.setState({
+									dashboardEffect: this.state.dashboardEffect
+								});
+							}
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
 	private getFunctionTypeOptions(): any {
 		return GetFunctionTypeOptions();
 	}
@@ -1200,6 +1450,9 @@ class AgentAccessView extends Component<any, any> {
 	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): Routing {
 		return this.state.agentRouting[agentIndex][modelIndex][v];
 	}
+	private getDashboardRoutingDescription(agent: string, dashboard: string): Routing {
+		return this.state.dashboardRouting[agent][dashboard];
+	}
 	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
@@ -1212,6 +1465,9 @@ class AgentAccessView extends Component<any, any> {
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
 		return this.state.agentEffect[agentIndex][modelIndex][v];
 	}
+	private getDashboardEffectDescription(agent: string, dashboard: string): Effect {
+		return this.state.dashboardEffect[agent][dashboard];
+	}
 	private getKey(a: number, b: number, c: string) {
 		return `${a}-${b}-${c}`;
 	}
@@ -1221,6 +1477,9 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentMethod[agentIndex][modelIndex] &&
 			this.state.agentMethod[agentIndex][modelIndex][v]
 		);
+	}
+	private hasDashboardRouting(agent: string, dashboard: string) {
+		return this.state.dashboardRouting[agent] && this.state.dashboardRouting[agent][dashboard];
 	}
 
 	private hasFunctionKeyValue(agentIndex: number, modelIndex: number, v: string, functionKey: string) {
@@ -1300,7 +1559,7 @@ function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[],
 	);
 }
 function loadAgentDashboardEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadDashboard<DashboardEffect>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.DashboardAccessProps);
+	return loadDashboard<DashboardEffect>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.DashboardEffectProps);
 }
 function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return onlyAgents.map((agent) => {

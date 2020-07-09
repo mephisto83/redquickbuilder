@@ -94,8 +94,9 @@ import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
 import MountingContextMenu from './mountingcontextmenu';
 import ContextMenu from './contextmenu';
-import EffectContextMenu from './effectcontextmenu';
+import DashboardEffectContextMenu from './dashboardeffectcontextmenu';
 import RoutingContextMenu from './routingcontextmenu';
+import DashboardRoutingContextMenu from './dashboardroutingcontextmenu';
 import DashboardMountingContenxt from './dashboardmountingcontextmenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
@@ -2604,10 +2605,11 @@ class Dashboard extends Component<any, any> {
 					</div>
 				</div>
 				<ContextMenu />
-        <RoutingContextMenu />
-        <MountingContextMenu />
-        <EffectContextMenu />
-        <DashboardMountingContenxt />
+				<RoutingContextMenu />
+				<MountingContextMenu />
+				<DashboardEffectContextMenu />
+        <DashboardRoutingContextMenu />
+				<DashboardMountingContenxt />
 			</div>
 		);
 	}
