@@ -1120,7 +1120,8 @@ class AgentAccessView extends Component<any, any> {
 						this.props.setVisual(DASHBOARD_MOUNTING_CONTEXT_MENU, {
 							dashboard,
 							outState: this.state,
-							mounting,
+              mounting,
+              agent,
 							callback: (value: ViewMounting) => {
 								this.setDashboardAgentMountingProperty(dashboard, agent, value);
 								this.setState({

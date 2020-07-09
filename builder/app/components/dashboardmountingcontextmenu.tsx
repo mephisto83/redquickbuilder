@@ -65,7 +65,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 						mounting.mountings.push({
 							id: UIA.GUID(),
 							model: '',
-							agent: '',
+							agent,
 							name: '',
 							viewType
 						});
@@ -279,6 +279,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 							<TreeViewMenu
 								key={routeKey}
 								open={this.state[routeKey]}
+								innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
 								active
 								title={name}
 								toggle={() => {
@@ -316,8 +317,8 @@ class DashboardMountingContenxt extends Component<any, any> {
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
 									<SelectInput
-										label={Titles.Name}
-										options={models.toNodeSelect()}
+										label={Titles.Model}
+										options={models}
 										onChange={(value: string) => {
 											mountingItem.model = value;
 											this.setState({ turn: UIA.GUID() });
@@ -327,10 +328,10 @@ class DashboardMountingContenxt extends Component<any, any> {
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
 									<SelectInput
-										label={Titles.Name}
-										options={models
-											.filter((x: Node) => GetNodeProp(x, NodeProperties.IsAgent))
-											.toNodeSelect()}
+										label={Titles.Agents}
+										options={models.filter((x: { value: string }) =>
+											GetNodeProp(x.value, NodeProperties.IsAgent)
+										)}
 										onChange={(value: string) => {
 											mountingItem.agent = value;
 											this.setState({ turn: UIA.GUID() });
@@ -545,13 +546,13 @@ class DashboardMountingContenxt extends Component<any, any> {
 		);
 	}
 	getCurrentInfo(menuMode: any) {
-		let { dashboard, agent, viewType } = menuMode;
+		let { dashboard, agent } = menuMode;
 		if (dashboard && agent) {
 			return [
 				<TreeViewMenu
 					key={'current-agent'}
-					icon={'fa fa-square-o'}
-					title={`${UIA.GetNodeTitle(agent)}/${UIA.GetNodeTitle(dashboard)}/${viewType}`}
+					icon={'fa fa-briefcase'}
+					title={`${UIA.GetNodeTitle(dashboard)}/${UIA.GetNodeTitle(agent)}`}
 				/>
 			];
 		}
