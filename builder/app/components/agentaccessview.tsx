@@ -2029,7 +2029,8 @@ function loadAgentObj<T>(onlyAgents: any[], accessDescriptions: any[], graph: an
 				[ViewTypes.Delete]: false
 			};
 		});
-	});
+  });
+  return result;
 }
 
 function loadDashboard<T>(
