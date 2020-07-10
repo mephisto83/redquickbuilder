@@ -25,7 +25,7 @@ import {
 	isAccessNodeForDashboard,
 	DASHBOARD_MOUNTING_CONTEXT_MENU,
 	DASHBOARD_EFFECT_CONTEXT_MENU,
-  DASHBOARD_ROUTING_CONTEXT_MENU
+	DASHBOARD_ROUTING_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -1101,7 +1101,7 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} >
+															<th style={{ backgroundColor: '#FEFCAD' }}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -1543,12 +1543,18 @@ function loadAgentDashboardAccess(onlyAgents: any[], accessDescriptions: any[], 
 	);
 }
 function loadAgentDashbaordViewMount(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadDashboard<DashboardViewMount>(
+	let res: DashboardViewMount = loadDashboard<DashboardViewMount>(
 		onlyAgents,
 		accessDescriptions,
 		graph,
 		LinkPropertyKeys.DashboardViewMountProps
 	);
+	if (res && res.mount && res.mount.mountings) {
+		res.mount.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
+	return res;
 }
 function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadDashboard<DashboardRouting>(
@@ -1601,8 +1607,47 @@ function loadAgentMethods(onlyAgents: any[], accessDescriptions: any[], graph: a
 	});
 }
 function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadAgent<ViewMoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.MountingProps);
+	let res: ViewMoutingProps | any = loadAgent<ViewMoutingProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.MountingProps
+	);
+
+	applyDefaultPropsToViewMount(res);
+	return res;
 }
+
+function applyDefaultPropsToViewMount(res: any) {
+  if (res && res.Create && res.Create.mountings) {
+    res.Create.mountings.forEach((mount: MountingDescription) => {
+      mount.screenEffect = mount.screenEffect || [];
+    });
+  }
+  if (res && res.Delete && res.Delete.mountings) {
+    res.Delete.mountings.forEach((mount: MountingDescription) => {
+      mount.screenEffect = mount.screenEffect || [];
+    });
+  }
+  if (res && res.Get && res.Get.mountings) {
+    res.Get.mountings.forEach((mount: MountingDescription) => {
+      mount.screenEffect = mount.screenEffect || [];
+    });
+  }
+
+  if (res && res.GetAll && res.GetAll.mountings) {
+    res.GetAll.mountings.forEach((mount: MountingDescription) => {
+      mount.screenEffect = mount.screenEffect || [];
+    });
+  }
+
+  if (res && res.Update && res.Update.mountings) {
+    res.Update.mountings.forEach((mount: MountingDescription) => {
+      mount.screenEffect = mount.screenEffect || [];
+    });
+  }
+}
+
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadAgent<RoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.RoutingProps);
 }

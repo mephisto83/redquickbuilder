@@ -656,6 +656,7 @@ export const LinkType = {
 	MethodApiParameters: 'MethodApiParameters',
 	DefaultViewType: 'DefaultViewType',
 	SharedComponent: 'SharedComponent',
+	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
 	LambdaInsertArguments: 'LambdaInsertArguments',
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
@@ -787,6 +788,9 @@ export const LinkStyles = {
 	[LinkType.FunctionLink]: {
 		type: LinkType.FunctionLink,
 		stroke: NodeTypeColors[NodeTypes.Function]
+	},
+	[LinkType.ScreenEffect]: {
+		type: LinkType.ScreenEffect
 	},
 	[LinkType.ComponentInternalConnection]: {
 		stroke: NodeTypeColors[NodeTypes.ComponentApi],

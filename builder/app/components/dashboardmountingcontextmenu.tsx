@@ -39,6 +39,7 @@ import {
 } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import { GetNodeProp } from '../methods/graph_methods';
+import ScreenEffectsComponent from './screenEffectsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardMountingContenxt extends Component<any, any> {
@@ -67,6 +68,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 							model: '',
 							agent,
 							name: '',
+							screenEffect: [],
 							viewType
 						});
 						if (callback) {
@@ -123,6 +125,9 @@ class DashboardMountingContenxt extends Component<any, any> {
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription } = mountingItem;
+						if (!mountingItem.screenEffect) {
+							mountingItem.screenEffect = [];
+						}
 						let parameterConnections: any = null;
 						let methodConstraints: any = null;
 						if (methodDescription) {
@@ -359,6 +364,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
+								<ScreenEffectsComponent screenEffects={mountingItem.screenEffect} />
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
@@ -484,6 +490,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
+		const MENU_WIDTH = 300;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -491,9 +498,9 @@ class DashboardMountingContenxt extends Component<any, any> {
 					style={{
 						zIndex: 1000,
 						position: 'fixed',
-						width: this.state.secondaryMenu ? 500 : 250,
+						width: this.state.secondaryMenu ? 500 : MENU_WIDTH,
 						display,
-						top: 250,
+						top: MENU_WIDTH,
 						left: 500
 					}}
 				>

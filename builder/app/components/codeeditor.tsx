@@ -15,8 +15,8 @@ import {
 	GetLambdaVariableTitle
 } from '../actions/uiactions';
 import { UIConnect } from '../utils/utils';
-import { GetNodeProp } from '../methods/graph_methods';
-import { NodeProperties, NEW_LINE, MakeConstant } from '../constants/nodetypes';
+import { GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
+import { NodeProperties, NEW_LINE, MakeConstant, LinkType } from '../constants/nodetypes';
 import fs from 'fs';
 import * as UIA from '../actions/uiactions';
 import ModelGenerator from '../generators/modelgenerators';
@@ -68,6 +68,7 @@ class CodeEditor extends Component<any, any> {
 		value = this.untransformLambda(value);
 		if (value.indexOf(defs) === -1) {
 			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
+			let contextInterfaces = this.generateContextInterfaces();
 			let temps = GenerateModelKeys({
 				state,
 				codeGenerator: true
@@ -109,6 +110,9 @@ class CodeEditor extends Component<any, any> {
 				.join(NEW_LINE);
 			value += `
 ${defs}
+//#region
+${contextInterfaces}
+//#endregion
 //#region constants
 ${constants}
 //#endregion
@@ -191,6 +195,14 @@ ${this.state.definitions}
 				</div>
 			</TopViewer>
 		);
+	}
+	generateContextInterfaces(): string {
+		let result = '';
+		let { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
+		if (currentNode) {
+		}
+		return result;
 	}
 	untransformLambda(value: string): string {
 		let { state } = this.props;

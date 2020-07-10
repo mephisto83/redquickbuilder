@@ -5,7 +5,7 @@ export interface DashboardEffect {
 	effect: Effect;
 }
 export interface DashboardRouting {
-  routing: Routing;
+	routing: Routing;
 }
 export interface DashboardViewMount {
 	mount: ViewMounting;
@@ -55,7 +55,15 @@ export interface MountingDescription {
 	name: string;
 	methodDescription?: MethodDescription;
 	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
+	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 }
+
+export interface ScreenEffect {
+  id: string;
+	name: string;
+	dataChain: string;
+}
+
 export interface Routing {
 	routes: RouteDescription[];
 }
