@@ -27,7 +27,8 @@ import {
 	DASHBOARD_EFFECT_CONTEXT_MENU,
 	DASHBOARD_ROUTING_CONTEXT_MENU,
 	AGENT_SCREENEFFECT_CONTEXT_MENU,
-	DASHBOARD_SCREENEFFECT_CONTEXT_MENU
+	DASHBOARD_SCREENEFFECT_CONTEXT_MENU,
+	GUID
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -80,7 +81,9 @@ class AgentAccessView extends Component<any, any> {
 			dashboardAccess: {},
 			agentAccess: [],
 			agentMethod: [],
-			agentEffect: []
+			agentEffect: [],
+			agentScreenEffect: {},
+			dashboardScreenEffect: {}
 		};
 	}
 
@@ -332,6 +335,11 @@ class AgentAccessView extends Component<any, any> {
 													accessDescriptions,
 													graph
 												),
+												dashboardScreenEffect: loadDashboardScreenEffect(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentViewMount: loadAgentViewMount(
 													onlyAgents,
 													accessDescriptions,
@@ -416,7 +424,7 @@ class AgentAccessView extends Component<any, any> {
 							</TabContainer>
 							<TabContent>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}>
-									<Box title={'Agent Access'} maxheight={700}>
+									<Box title={'Agent Access'} maxheight={500}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -598,6 +606,8 @@ class AgentAccessView extends Component<any, any> {
 												})}
 											</tbody>
 										</table>
+									</Box>
+									<Box title={'Dashboard Access'} maxheight={500}>
 										<table style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
@@ -1242,6 +1252,13 @@ class AgentAccessView extends Component<any, any> {
 																	screenEffectApis =
 																		this.getScreenEffects(agent, model, v) ||
 																		screenEffectApis;
+																} else {
+																	this.setScreenEffects(
+																		agent,
+																		model,
+																		v,
+																		screenEffectApis
+																	);
 																}
 
 																let addRoutingDescriptionBtn = this.createScreenEffectButton(
@@ -1291,8 +1308,7 @@ class AgentAccessView extends Component<any, any> {
 														result.push(
 															...this.state.agents.map(
 																(agent: string, agentIndex: number) => {
-																	const tdkey = `routing- ${dashboard} ${dashboard} ${this
-																		.state.agents[agent]} ${agentIndex} s`;
+																	const tdkey = `screen- defa dashboard- ${dashboard} ${dashboard} ${agent} ${agentIndex} s`;
 																	if (
 																		!this.hasDashboardScreenEffects(
 																			agent,
@@ -1358,7 +1374,12 @@ class AgentAccessView extends Component<any, any> {
 							agent,
 							model,
 							viewType: v,
-							screenEffectApis
+							screenEffectApis,
+							callback: () => {
+								this.setState({
+									turn: GUID()
+								});
+							}
 						});
 					}}
 				>
@@ -1381,7 +1402,12 @@ class AgentAccessView extends Component<any, any> {
 						this.props.setVisual(DASHBOARD_SCREENEFFECT_CONTEXT_MENU, {
 							agent,
 							dashboard,
-							screenEffectApis
+							screenEffectApis,
+							callback: () => {
+								this.setState({
+									turn: GUID()
+								});
+							}
 						});
 					}}
 				>
@@ -1680,19 +1706,49 @@ class AgentAccessView extends Component<any, any> {
 	}
 	private hasScreenEffects(agent: string, model: string, v: string) {
 		return (
+			this.state.agentScreenEffect &&
 			this.state.agentScreenEffect[agent] &&
 			this.state.agentScreenEffect[agent][model] &&
 			this.state.agentScreenEffect[agent][model][v]
 		);
 	}
+	private setScreenEffects(agent: string, model: string, v: string, value: ScreenEffectApi[]) {
+		if (!this.state.agentScreenEffect) {
+			this.state.agentScreenEffect = {};
+		}
+		if (this.state.agentScreenEffect && !this.state.agentScreenEffect[agent]) {
+			this.state.agentScreenEffect[agent] = {};
+		}
+		if (
+			this.state.agentScreenEffect &&
+			this.state.agentScreenEffect[agent] &&
+			!this.state.agentScreenEffect[agent][model]
+		) {
+			this.state.agentScreenEffect[agent][model] = {};
+		}
+		if (this.state.agentScreenEffect)
+			if (this.state.agentScreenEffect[agent] && this.state.agentScreenEffect[agent][model]) {
+				this.state.agentScreenEffect[agent][model][v] = value;
+				this.setState({ agentScreenEffect: this.state.agentScreenEffect });
+			}
+	}
 	private getScreenEffects(agent: string, model: string, v: string): ScreenEffectApi[] {
+		this.state.agentScreenEffect[agent][model][v] = this.state.agentScreenEffect[agent][model][v] || [];
 		return this.state.agentScreenEffect[agent][model][v];
 	}
 	private hasDashboardRouting(agent: string, dashboard: string) {
-		return this.state.dashboardRouting[agent] && this.state.dashboardRouting[agent][dashboard];
+		return (
+			this.state.dashboardRouting &&
+			this.state.dashboardRouting[agent] &&
+			this.state.dashboardRouting[agent][dashboard]
+		);
 	}
 	private hasDashboardScreenEffects(agent: string, dashboard: string) {
-		return this.state.dashboardScreenEffect[agent] && this.state.dashboardScreenEffect[agent][dashboard];
+		return (
+			this.state.dashboardScreenEffect &&
+			this.state.dashboardScreenEffect[agent] &&
+			this.state.dashboardScreenEffect[agent][dashboard]
+		);
 	}
 	private getDashboardScreenEffects(agent: string, dashboard: string): ScreenEffectApi[] {
 		this.state.dashboardScreenEffect[agent][dashboard] = this.state.dashboardScreenEffect[agent][dashboard] || [];
@@ -1835,7 +1891,7 @@ function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph:
 }
 
 function loadAgentScreenEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	let res: ScreenEffectApiProps | any = loadAgent<ScreenEffectApiProps>(
+	let res: any = loadAgentObj<ScreenEffectApiProps>(
 		onlyAgents,
 		accessDescriptions,
 		graph,
@@ -1844,7 +1900,17 @@ function loadAgentScreenEffect(onlyAgents: any[], accessDescriptions: any[], gra
 
 	return res;
 }
+function loadDashboardScreenEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: any = loadDashboard<ScreenEffectApi[]>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardScreenEffectApiProps,
+		true
+	);
 
+	return res;
+}
 function applyDefaultPropsToViewMount(res: any) {
 	if (res && res.Create && res.Create.mountings) {
 		res.Create.mountings.forEach((mount: MountingDescription) => {
@@ -1922,7 +1988,57 @@ function loadAgent<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, 
 	});
 }
 
-function loadDashboard<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, propKey: string) {
+function loadAgentObj<T>(onlyAgents: any[], accessDescriptions: any[], graph: any, propKey: string) {
+	let result: any = {};
+	onlyAgents.map((agent) => {
+		const agentAccessDescription = accessDescriptions.filter((v) =>
+			existsLinkBetween(graph, {
+				source: agent.id,
+				target: v.id,
+				type: LinkType.AgentAccess
+			})
+		);
+		result[agent.id] = {};
+		return GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.Model
+			},
+			graph
+		).map((model) => {
+			const accessDescription = agentAccessDescription.find((v) => isAccessNode(agent, model, v));
+			result[agent.id][model.id] = {};
+			if (accessDescription) {
+				const link = findLink(graph, {
+					source: agent.id,
+					target: accessDescription.id
+				});
+				let routingProps: T = GetLinkProperty(link, propKey);
+				if (routingProps) {
+					result[agent.id][model.id] = {
+						...routingProps
+					};
+					return;
+				}
+			}
+
+			result[agent.id][model.id] = {
+				[ViewTypes.GetAll]: false,
+				[ViewTypes.Get]: false,
+				[ViewTypes.Create]: false,
+				[ViewTypes.Update]: false,
+				[ViewTypes.Delete]: false
+			};
+		});
+	});
+}
+
+function loadDashboard<T>(
+	onlyAgents: any[],
+	accessDescriptions: any[],
+	graph: any,
+	propKey: string,
+	asArray?: boolean
+) {
 	let result: any = {};
 	onlyAgents.map((agent) => {
 		const agentAccessDescription = accessDescriptions.filter((agentAccessDescription) =>
@@ -1932,6 +2048,7 @@ function loadDashboard<T>(onlyAgents: any[], accessDescriptions: any[], graph: a
 				type: LinkType.AgentAccess
 			})
 		);
+		result[agent.id] = result[agent.id] || {};
 		return GetNodesByProperties(
 			{
 				[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
@@ -1943,21 +2060,26 @@ function loadDashboard<T>(onlyAgents: any[], accessDescriptions: any[], graph: a
 				isAccessNodeForDashboard(agent, dashboard, agentAccessDescription)
 			);
 			if (accessDescription) {
-				result[agent.id] = result[agent.id] || {};
 				const link = findLink(graph, {
 					source: agent.id,
 					target: accessDescription.id
 				});
 				let routingProps: T = GetLinkProperty(link, propKey);
 				if (routingProps) {
-					result[agent.id][dashboard.id] = {
-						...routingProps
-					};
+					if (asArray) {
+						result[agent.id][dashboard.id] = routingProps;
+					} else {
+						result[agent.id][dashboard.id] = {
+							...routingProps
+						};
+					}
 					return;
+				} else {
 				}
-				result[agent.id][dashboard.id] = {};
 			}
+			result[agent.id][dashboard.id] = result[agent.id][dashboard.id] || (asArray ? [] : {});
 		});
 	});
+
 	return result;
 }

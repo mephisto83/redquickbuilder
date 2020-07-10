@@ -14,10 +14,12 @@ export default function AddAgentAccess(args: any = {}) {
 		routingProps,
 		mountingProps,
 		effectProps,
+		screenEffectApiProps,
 		dashboardAccessProps,
 		dashboardViewMountProps,
 		dashboardEffectProps,
-		dashboardRoutingProps
+		dashboardRoutingProps,
+		dashboardScreenEffectApiProps
 	} = args;
 	// model, agent
 	if (!args.model) {
@@ -132,8 +134,10 @@ export default function AddAgentAccess(args: any = {}) {
 							...linkProps,
 							methodProps,
 							routingProps,
-							mountingProps,
+              mountingProps,
+              screenEffectApiProps,
 							effectProps,
+							dashboardScreenEffectApiProps,
 							dashboardEffectProps,
 							dashboardAccessProps,
 							dashboardViewMountProps,

@@ -9,12 +9,14 @@ export default function BuildAgentAccessWeb(args: any) {
 		dashboardAccess,
 		dashboardRouting,
 		dashboardViewMount,
+		dashboardScreenEffect,
 		dashboardEffect,
 		dashboards,
 		agents,
 		models,
 		agentViewMount,
 		agentRouting,
+		agentScreenEffect,
 		agentAccess,
 		agentMethod,
 		agentEffect
@@ -49,12 +51,17 @@ export default function BuildAgentAccessWeb(args: any) {
 					dashboardEffect[agent] && dashboardEffect[agent][dashboard]
 						? dashboardEffect[agent][dashboard] || {}
 						: {};
+				const screenEffect =
+					dashboardScreenEffect[agent] && dashboardScreenEffect[agent][dashboard]
+						? dashboardScreenEffect[agent][dashboard] || []
+						: [];
 				if (values && values.access) {
 					result.push(
 						...AddAgentAccess({
 							dashboardId: dashboard,
 							agentId: agent,
 							linkProps: {},
+							[LinkPropertyKeys.DashboardScreenEffectApiProps]: screenEffect,
 							[LinkPropertyKeys.DashboardAccessProps]: values,
 							[LinkPropertyKeys.DashboardRoutingProps]: { ...routing },
 							[LinkPropertyKeys.DashboardViewMountProps]: { ...mounting },
@@ -77,6 +84,10 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentRouting[agentIndex] && agentRouting[agentIndex][modelIndex]
 						? agentRouting[agentIndex][modelIndex] || {}
 						: {};
+				const screenEffect =
+					agentScreenEffect[agent] && agentScreenEffect[agent][model]
+						? agentScreenEffect[agent][model] || {}
+						: {};
 				const mounting =
 					agentViewMount[agentIndex] && agentViewMount[agentIndex][modelIndex]
 						? agentViewMount[agentIndex][modelIndex] || {}
@@ -91,6 +102,7 @@ export default function BuildAgentAccessWeb(args: any) {
 							modelId: model,
 							agentId: agent,
 							linkProps: { ...values },
+							[LinkPropertyKeys.ScreenEffectApiProps]: { ...screenEffect },
 							[LinkPropertyKeys.MethodProps]: { ...methods },
 							[LinkPropertyKeys.RoutingProps]: { ...routing },
 							[LinkPropertyKeys.MountingProps]: { ...mounting },

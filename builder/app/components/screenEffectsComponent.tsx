@@ -50,7 +50,12 @@ export default class ScreenEffectsComponent extends Component<any, any> {
 				{(screenEffects || []).map((screenEffect: ScreenEffect) => {
 					return (
 						<ScreenEffectComponent
-              api={this.props.api}
+							api={this.props.api}
+							onChange={() => {
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
 							onDelete={() => {
 								let index: number = screenEffects.findIndex((v) => v.id === screenEffect.id);
 								if (index !== -1 && screenEffects) {

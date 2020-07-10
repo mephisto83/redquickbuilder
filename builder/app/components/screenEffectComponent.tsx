@@ -46,6 +46,9 @@ export default class ScreenEffectComponent extends Component<any, any> {
 								this.setState({
 									turn: UIA.GUID()
 								});
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
 							}}
 						/>
 					</TreeViewItemContainer>
@@ -60,6 +63,9 @@ export default class ScreenEffectComponent extends Component<any, any> {
 							this.setState({
 								turn: UIA.GUID()
 							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
 						}}
 					/>
 				</TreeViewItemContainer>
@@ -69,6 +75,9 @@ export default class ScreenEffectComponent extends Component<any, any> {
 						onClick={() => {
 							if (this.props.onDelete) {
 								this.props.onDelete();
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
 							}
 						}}
 						icon="fa fa-minus"

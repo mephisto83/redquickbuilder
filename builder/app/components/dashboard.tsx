@@ -98,6 +98,8 @@ import DashboardEffectContextMenu from './dashboardeffectcontextmenu';
 import RoutingContextMenu from './routingcontextmenu';
 import DashboardRoutingContextMenu from './dashboardroutingcontextmenu';
 import DashboardMountingContenxt from './dashboardmountingcontextmenu';
+import ScreenEffectContextMenu from './screeneffectcontextmenu';
+import DashboardScreenEffectContextMenu from './dashboardscreeneffectcontextmenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
@@ -2610,6 +2612,8 @@ class Dashboard extends Component<any, any> {
 				<DashboardEffectContextMenu />
         <DashboardRoutingContextMenu />
 				<DashboardMountingContenxt />
+        <DashboardScreenEffectContextMenu />
+        <ScreenEffectContextMenu />
 			</div>
 		);
 	}
