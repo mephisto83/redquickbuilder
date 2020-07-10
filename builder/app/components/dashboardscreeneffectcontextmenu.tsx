@@ -174,7 +174,7 @@ class DashboardScreenEffectContextMenu extends Component<any, any> {
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
-					className="context-menu modal-dialog modal-info"
+					className="context-menu modal-dialog modal-warning"
 					style={{
 						zIndex: 1000,
 						position: 'fixed',

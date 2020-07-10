@@ -12,6 +12,8 @@ export const NodeTypes = {
 	EventHandler: 'EventHandler',
 	ComponentApiConnector: 'component-api-connector',
 	ScreenContainer: 'screen-container',
+	ScreenEffect: 'ScreenEffect',
+	ScreenEffectApi: 'ScreenEffectApi',
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
 	NavigationAction: 'NavigationAction',
@@ -658,6 +660,8 @@ export const LinkType = {
 	SharedComponent: 'SharedComponent',
 	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
+	ScreenEffectApi: 'ScreenEffectApi', // Screen effects api link to a datachain ,with the assumption that they will be an
+	// internal component api
 	LambdaInsertArguments: 'LambdaInsertArguments',
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
@@ -935,6 +939,12 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	ScreenEffect: {
+		type: LinkType.ScreenEffect
+	},
+	ScreenEffectApi: {
+		type: LinkType.ScreenEffectApi
 	},
 	MethodArgumentSoure: {
 		type: LinkType.MethodArgumentSoure

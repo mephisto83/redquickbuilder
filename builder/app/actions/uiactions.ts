@@ -365,6 +365,20 @@ export function AddLinkBetweenNodes(source: string, target: string, properties: 
 		}
 	];
 }
+export function CreateNewNode(props: any, callback: Function) {
+	return [
+		{
+			operation: ADD_NEW_NODE,
+			options: {
+				callback,
+				nodeType: props.nodeType,
+				properties: {
+					...props
+				}
+			}
+		}
+	];
+}
 export function SetSharedComponent(args: any) {
 	const { properties, target, source, viewType, uiType, isPluralComponent, graph } = args;
 	if (
@@ -4092,7 +4106,7 @@ export function setViewPackageStamp(viewPackage: any, stamp: any) {
 	GraphMethods.setViewPackageStamp(viewPackage, stamp);
 }
 
-export function graphOperation(operation: any, options?: any, stamp?: any) {
+export function graphOperation2(operation: any, options?: any, stamp?: any) {
 	return (dispatch: Function, getState: Function) => {
 		if (stamp) {
 			const viewPackage = {
@@ -4145,6 +4159,9 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 					deepOp.forEach((op: any) => {
 						if (!op) {
 							return;
+						}
+						if (typeof op === 'function') {
+							op = op(currentGraph);
 						}
 						let { operation, options } = op;
 						if (typeof options === 'function') {
@@ -4627,3 +4644,394 @@ declare global {
 		});
 	}
 })(String.prototype);
+
+export function graphOperation(operation: any, options?: any, stamp?: any) {
+	return (dispatch: Function, getState: Function) => {
+		if (stamp) {
+			const viewPackage = {
+				[NodeProperties.ViewPackage]: uuidv4()
+			};
+			setViewPackageStamp(viewPackage, stamp);
+		}
+		const state = getState();
+		let rootGraph: any = null;
+		let graphOperationOccurences: GraphMethods.VisualOperation[] = [];
+		let currentGraph = Application(state, CURRENT_GRAPH);
+		const scope = Application(state, GRAPH_SCOPE) || [];
+		if (!currentGraph) {
+			currentGraph = GraphMethods.createGraph();
+			SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
+			rootGraph = currentGraph;
+		} else {
+			currentGraph = Graphs(state, currentGraph);
+			rootGraph = currentGraph;
+			if (scope.length) {
+				currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
+			}
+		}
+		let operations = operation;
+		if (!Array.isArray(operation)) {
+			operations = [ { operation, options } ];
+    }
+
+		currentGraph = handleArrayOperations(
+			operations,
+			currentGraph,
+			graphOperationOccurences,
+			dispatch,
+			getState,
+			state
+		);
+
+		if (scope.length) {
+			rootGraph = GraphMethods.setScopedGraph(rootGraph, {
+				scope,
+				graph: currentGraph
+			});
+		} else {
+			rootGraph = currentGraph;
+		}
+		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
+		if (stamp) setViewPackageStamp(null, stamp);
+
+		if (!GraphMethods.Paused()) {
+			let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
+			graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
+				visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
+			});
+		}
+		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
+		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
+		rootGraph.linkCount = (<Graph>rootGraph).links.length;
+		SaveGraph(rootGraph, dispatch);
+	};
+}
+
+function handleArrayOperations(
+	operations: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	operations.forEach((op: any) => {
+		currentGraph = handleOperation(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	});
+	return currentGraph;
+}
+
+function handleFunctionOperations(
+	op: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	if (typeof op === 'function') {
+		op = op(currentGraph);
+	}
+	currentGraph = handleOperation(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	return currentGraph;
+}
+
+function handleOperation(
+	op: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	if (typeof op === 'function') {
+		return handleFunctionOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	} else if (Array.isArray(op)) {
+		return handleArrayOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	}
+	let { operation, options } = op;
+	if (typeof options === 'function') {
+		options = options(currentGraph);
+	}
+	if (options) {
+		const currentLastNode =
+			currentGraph.nodes && currentGraph.nodes.length ? currentGraph.nodes[currentGraph.nodes.length - 1] : null;
+		const currentLastGroup =
+			currentGraph.groups && currentGraph.groups.length
+				? currentGraph.groups[currentGraph.groups.length - 1]
+				: null;
+		switch (operation) {
+			case NO_OP:
+				break;
+			case SET_DEPTH:
+				currentGraph = GraphMethods.setDepth(currentGraph, options);
+				break;
+			case NEW_NODE:
+				currentGraph = GraphMethods.newNode(currentGraph, options);
+				break;
+			case REMOVE_NODE:
+				currentGraph = GraphMethods.removeNode(currentGraph, options);
+				graphOperationOccurences.push({
+					command: GraphMethods.VisualCommand.REMOVE_NODE,
+					nodeId: options.id
+				});
+				break;
+			case UPDATE_GRAPH_TITLE:
+				currentGraph = GraphMethods.updateGraphTitle(currentGraph, options);
+				break;
+			case UPDATE_NODE_DIRTY:
+				currentGraph = GraphMethods.updateNodePropertyDirty(currentGraph, options);
+				break;
+			case NEW_LINK:
+				currentGraph = GraphMethods.newLink(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case ADD_LINK_BETWEEN_NODES:
+				currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case ADD_TO_GROUP:
+				currentGraph = GraphMethods.updateNodeGroup(currentGraph, options);
+				break;
+			case ADD_LINKS_BETWEEN_NODES:
+				currentGraph = GraphMethods.addLinksBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case CONNECT_TO_TITLE_SERVICE:
+				const titleService = GetTitleService();
+				if (titleService) {
+					currentGraph = GraphMethods.addLinkBetweenNodes(
+						currentGraph,
+						{
+							source: options.id,
+							target: titleService.id,
+							properties: {
+								...LinkProperties.TitleServiceLink,
+								singleLink: true,
+								nodeTypes: [ NodeTypes.TitleService ]
+							}
+						},
+						(link: GraphLink) => {
+							if (link) {
+								graphOperationOccurences.push({
+									command: GraphMethods.VisualCommand.ADD_CONNECTION,
+									linkId: link.id
+								});
+							}
+						}
+					);
+				}
+				break;
+			case REMOVE_LINK_BETWEEN_NODES:
+				let removedLink: any = null;
+				currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					removedLink = link;
+				});
+				if (removedLink) {
+					graphOperationOccurences.push({
+						command: GraphMethods.VisualCommand.REMOVE_LINK,
+						linkId: removedLink
+					});
+				}
+				break;
+			case REMOVE_LINK:
+				currentGraph = GraphMethods.removeLinkById(currentGraph, options);
+				if (options && options.id) {
+					graphOperationOccurences.push({
+						command: GraphMethods.VisualCommand.REMOVE_LINK,
+						linkId: options.id
+					});
+				}
+				break;
+			case UPDATE_GROUP_PROPERTY:
+				currentGraph = GraphMethods.updateGroupProperty(currentGraph, options);
+				break;
+			case CHANGE_NODE_TEXT:
+				currentGraph = GraphMethods.updateNodeProperty(currentGraph, {
+					...options,
+					prop: 'text'
+				});
+				break;
+			case CHANGE_NODE_PROPERTY:
+				currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
+				if (options && options.prop && options.prop === NodeProperties.Pinned) {
+					if (options.value) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_NODE,
+							nodeId: options.id
+						});
+					} else {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.REMOVE_NODE,
+							nodeId: options.id
+						});
+					}
+				}
+				break;
+			case CHANGE_APP_SETTINGS:
+				currentGraph = GraphMethods.updateAppSettings(currentGraph, options);
+				break;
+			case NEW_PROPERTY_NODE:
+				currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
+
+				break;
+			case ADD_DEFAULT_PROPERTIES:
+				currentGraph = GraphMethods.addDefaultProperties(currentGraph, options);
+				break;
+			case NEW_ATTRIBUTE_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
+
+				break;
+			case UPDATE_NODE_PROPERTY:
+				currentGraph = GraphMethods.updateNodeProperties(currentGraph, options);
+				if (options && options.properties && options.properties.hasOwnProperty(NodeProperties.Pinned)) {
+					if (options.properties[NodeProperties.Pinned]) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_NODE,
+							nodeId: options.id
+						});
+					} else {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.REMOVE_NODE,
+							nodeId: options.id
+						});
+					}
+				}
+				break;
+			case NEW_CONDITION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Condition);
+
+				break;
+			case ADD_NEW_NODE:
+				if (options && options.nodeType) {
+					currentGraph = GraphMethods.addNewNodeOfType(
+						currentGraph,
+						options,
+						options.nodeType,
+						options.callback
+					);
+					setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+				}
+				break;
+			case NEW_MODEL_ITEM_FILTER:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ModelItemFilter);
+
+				break;
+			case NEW_AFTER_METHOD:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.AfterEffect);
+
+				break;
+			case NEW_COMPONENT_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ComponentNode);
+
+				break;
+			case NEW_DATA_SOURCE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.DataSource);
+
+				break;
+			case NEW_VALIDATION_TYPE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
+
+				break;
+			case NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.PermissionDependency);
+
+				break;
+			case UPDATE_LINK_PROPERTY:
+				currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
+				break;
+			case NEW_CHOICE_TYPE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
+
+				break;
+			case NEW_PARAMETER_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Parameter);
+
+				break;
+			case NEW_FUNCTION_OUTPUT_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.FunctionOutput);
+
+				break;
+			case NEW_PERMISSION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Permission);
+
+				break;
+			case NEW_OPTION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionList);
+
+				break;
+			case NEW_CUSTOM_OPTION:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
+
+				break;
+			case NEW_SCREEN_OPTIONS:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ScreenOption);
+
+				break;
+			case ADD_NEW_REFERENCE_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ReferenceNode);
+
+				break;
+			case NEW_EXTENSION_LIST_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
+
+				break;
+			case NEW_VALIDATION_ITEM_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
+
+				break;
+			case NEW_EXTENTION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionType);
+
+				break;
+			case NEW_OPTION_ITEM_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
+
+				break;
+			case APPLY_FUNCTION_CONSTRAINTS:
+				currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
+				break;
+			case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
+				break;
+			default:
+				break;
+		}
+
+		let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
+		if (recording && Visual(state, RECORDING)) {
+			recording.push({
+				operation,
+				options,
+				callbackGroup: `group-${currentLastGroup !== currentGraph.groups[currentGraph.groups.length - 1]
+					? currentGraph.groups[currentGraph.groups.length - 1]
+					: null}`,
+				callback: nodeAdded ? currentGraph.nodes[currentGraph.nodes.length - 1] : null
+			});
+		}
+		if (nodeAdded) {
+			graphOperationOccurences.push({
+				command: GraphMethods.VisualCommand.ADD_NODE,
+				nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
+			});
+		}
+	}
+	return currentGraph;
+}

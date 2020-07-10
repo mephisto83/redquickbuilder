@@ -88,7 +88,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 		let callback: any = mode.callback;
 		if (mounting) {
 			const exit = () => {
-				this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
+				this.props.setVisual(UIA.DASHBOARD_MOUNTING_CONTEXT_MENU, null);
 			};
 
 			result.push(
@@ -124,7 +124,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 				default:
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, agent, viewType, methodDescription } = mountingItem;
+						let { name, model, agent, viewType, methodDescription, screenEffect } = mountingItem;
 						if (!mountingItem.screenEffect) {
 							mountingItem.screenEffect = [];
 						}
@@ -494,7 +494,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
-					className="context-menu modal-dialog modal-info"
+					className="context-menu modal-dialog modal-danger"
 					style={{
 						zIndex: 1000,
 						position: 'fixed',

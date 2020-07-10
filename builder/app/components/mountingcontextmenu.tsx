@@ -38,6 +38,7 @@ import {
 	FunctionConstraintKeys
 } from '../constants/functiontypes';
 import CheckBox from './checkbox';
+import ScreenEffectsComponent from './screenEffectsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -86,7 +87,7 @@ class ContextMenu extends Component<any, any> {
 		let callback: any = mode.callback;
 		if (mounting) {
 			const exit = () => {
-				this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
+				this.props.setVisual(UIA.MOUNTING_CONTEXT_MENU, null);
 			};
 
 			result.push(
@@ -123,6 +124,9 @@ class ContextMenu extends Component<any, any> {
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription } = mountingItem;
+						if (!mountingItem.screenEffect) {
+							mountingItem.screenEffect = [];
+						}
 						let parameterConnections: any = null;
 						let methodConstraints: any = null;
 						if (methodDescription) {
@@ -334,6 +338,7 @@ class ContextMenu extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
+								<ScreenEffectsComponent screenEffects={mountingItem.screenEffect} />
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
@@ -462,7 +467,7 @@ class ContextMenu extends Component<any, any> {
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
-					className="context-menu modal-dialog modal-info"
+					className="context-menu modal-dialog modal-danger"
 					style={{
 						zIndex: 1000,
 						position: 'fixed',
