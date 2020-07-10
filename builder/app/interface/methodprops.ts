@@ -32,6 +32,17 @@ export interface EffectProps {
 	Delete?: Effect;
 	Update?: Effect;
 }
+export interface ScreenEffectApiProps {
+	GetAll?: ScreenEffectApi[];
+	Get?: ScreenEffectApi[];
+	Create?: ScreenEffectApi[];
+	Delete?: ScreenEffectApi[];
+	Update?: ScreenEffectApi[];
+}
+export interface DashboardScreenEffectApiProps {
+	apis: ScreenEffectApi[];
+}
+
 export interface ViewMoutingProps {
 	GetAll?: ViewMounting;
 	Get?: ViewMounting;
@@ -58,12 +69,13 @@ export interface MountingDescription {
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 }
 
+
 export interface ScreenEffect {
-  id: string;
+	id: string;
 	name: string;
 	dataChain: string;
 }
-
+export interface ScreenEffectApi extends ScreenEffect {}
 export interface Routing {
 	routes: RouteDescription[];
 }

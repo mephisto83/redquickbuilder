@@ -917,6 +917,7 @@ export const LinkPropertyKeys = {
 	ComponentStyle: 'ComponentStyle',
 	MethodProps: 'methodProps',
 	MountingProps: 'mountingProps',
+	ScreenEffectApiProps: 'screenEffectApiProps',
 	RoutingProps: 'routingProps',
 	EffectProps: 'effectProps',
 	ComponentProperty: 'ComponentProperty',

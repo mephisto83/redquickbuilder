@@ -11,7 +11,7 @@ import SelectInput from './selectinput';
 import TextBox from './textinput';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
-import { ScreenEffect } from '../interface/methodprops';
+import { ScreenEffect, ScreenEffectApi } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -23,7 +23,7 @@ export default class ScreenEffectComponent extends Component<any, any> {
 		this.state = {};
 	}
 	render() {
-		let screenEffect: ScreenEffect = this.props.screenEffect;
+		let screenEffect: ScreenEffect | ScreenEffectApi = this.props.screenEffect;
 		if (!screenEffect) {
 			return <span />;
 		}
@@ -36,18 +36,20 @@ export default class ScreenEffectComponent extends Component<any, any> {
 				active
 				title={screenEffect.name || Titles.ScreenEffects}
 			>
-				<TreeViewItemContainer>
-					<TextInput
-						label={Titles.Name}
-						value={screenEffect.name}
-						onChange={(value: string) => {
-							screenEffect.name = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-						}}
-					/>
-				</TreeViewItemContainer>
+				{!this.props.api ? null : (
+					<TreeViewItemContainer>
+						<TextInput
+							label={Titles.Name}
+							value={screenEffect.name}
+							onChange={(value: string) => {
+								screenEffect.name = value;
+								this.setState({
+									turn: UIA.GUID()
+								});
+							}}
+						/>
+					</TreeViewItemContainer>
+				)}
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.DataChain}

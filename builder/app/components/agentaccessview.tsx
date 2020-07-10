@@ -25,7 +25,9 @@ import {
 	isAccessNodeForDashboard,
 	DASHBOARD_MOUNTING_CONTEXT_MENU,
 	DASHBOARD_EFFECT_CONTEXT_MENU,
-	DASHBOARD_ROUTING_CONTEXT_MENU
+	DASHBOARD_ROUTING_CONTEXT_MENU,
+	AGENT_SCREENEFFECT_CONTEXT_MENU,
+	DASHBOARD_SCREENEFFECT_CONTEXT_MENU
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -60,7 +62,9 @@ import MethodProps, {
 	DashboardAccessProps,
 	DashboardEffect,
 	DashboardViewMount,
-	DashboardRouting
+	DashboardRouting,
+	ScreenEffectApiProps,
+	ScreenEffectApi
 } from '../interface/methodprops';
 import { Node } from '../methods/graph_types';
 
@@ -323,6 +327,11 @@ class AgentAccessView extends Component<any, any> {
 													accessDescriptions,
 													graph
 												),
+												agentScreenEffect: loadAgentScreenEffect(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
 												agentViewMount: loadAgentViewMount(
 													onlyAgents,
 													accessDescriptions,
@@ -394,6 +403,13 @@ class AgentAccessView extends Component<any, any> {
 										title="Routing"
 										onClick={() => {
 											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'button_routes');
+										}}
+									/>
+									<Tab
+										active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'screen_effects')}
+										title="Screen Effects"
+										onClick={() => {
+											this.props.setVisual(AGENT_ACCESS_VIEW_TAB, 'screen_effects');
 										}}
 									/>
 								</Tabs>
@@ -1183,11 +1199,195 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 								</TabPane>
+								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'screen_effects')}>
+									<Box title={'Agent Screen Effects'} maxheight={500}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{this.state.agents.map((agent: string) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+																{GetNodeTitle(agent)}
+															</th>
+														);
+													})}
+												</tr>
+												<tr>
+													<th />
+													{this.state.agents
+														.map((agent: string) =>
+															Object.keys(ViewTypes).map((v) => (
+																<th onClick={() => {}}>{v}</th>
+															))
+														)
+														.flatten()}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.models.map((model: string, modelIndex: number) => {
+													const result = [ <td>{GetNodeTitle(model)}</td> ];
+
+													result.push(
+														...this.state.agents.map((agent: string, agentIndex: number) =>
+															Object.keys(ViewTypes).map((v) => {
+																const tdkey = `effects screen - ${model} ${model} ${agent} ${agentIndex} ${v}`;
+																if (!this.hasAgentAccess(agentIndex, modelIndex, v)) {
+																	return <td key={tdkey} />;
+																}
+
+																let screenEffectApis: ScreenEffectApi[] = [];
+
+																if (this.hasScreenEffects(agent, model, v)) {
+																	screenEffectApis =
+																		this.getScreenEffects(agent, model, v) ||
+																		screenEffectApis;
+																}
+
+																let addRoutingDescriptionBtn = this.createScreenEffectButton(
+																	agent,
+																	model,
+																	v,
+																	screenEffectApis
+																);
+																return <td key={tdkey}>{addRoutingDescriptionBtn}</td>;
+															})
+														)
+													);
+													return (
+														<tr
+															style={{
+																backgroundColor:
+																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+															}}
+															key={`key${model}`}
+														>
+															{result.flatten()}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</Box>
+									<Box title={'Dashboard Screen Effects'} maxheight={500}>
+										<table style={{ width: '100%', display: 'table' }}>
+											<thead>
+												<tr>
+													<th />
+													{[].interpolate(0, this.state.agents.length, (index: number) => {
+														return (
+															<th style={{ backgroundColor: '#FEFCAD' }}>
+																{GetNodeTitle(this.state.agents[index])}
+															</th>
+														);
+													})}
+												</tr>
+											</thead>
+											<tbody>
+												{this.state.dashboards.map(
+													(dashboard: string, dashboardIndex: number) => {
+														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+														result.push(
+															...this.state.agents.map(
+																(agent: string, agentIndex: number) => {
+																	const tdkey = `routing- ${dashboard} ${dashboard} ${this
+																		.state.agents[agent]} ${agentIndex} s`;
+																	if (
+																		!this.hasDashboardScreenEffects(
+																			agent,
+																			dashboard
+																		)
+																	) {
+																		return <td key={tdkey} />;
+																	}
+
+																	let screenEffects: ScreenEffectApi[] = [];
+																	if (
+																		this.hasDashboardScreenEffects(agent, dashboard)
+																	) {
+																		screenEffects =
+																			this.getDashboardScreenEffects(
+																				agent,
+																				dashboard
+																			) || screenEffects;
+																	}
+
+																	let addScreenEffectBtn = this.createDashboardScreenEffectDescriptionButton(
+																		agent,
+																		dashboard,
+																		screenEffects
+																	);
+
+																	return <td key={tdkey}>{addScreenEffectBtn}</td>;
+																}
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key${dashboard}`}
+															>
+																{result.flatten()}
+															</tr>
+														);
+													}
+												)}
+											</tbody>
+										</table>
+									</Box>
+								</TabPane>
 							</TabContent>
 						</div>
 					</div>
 				</section>
 			</TopViewer>
+		);
+	}
+	private createScreenEffectButton(agent: string, model: string, v: string, screenEffectApis: ScreenEffectApi[]) {
+		return (
+			<div className="btn-group">
+				<button
+					className={screenEffectApis && screenEffectApis.length ? 'btn btn-info' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(AGENT_SCREENEFFECT_CONTEXT_MENU, {
+							agent,
+							model,
+							viewType: v,
+							screenEffectApis
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
+		);
+	}
+	private createDashboardScreenEffectDescriptionButton(
+		agent: string,
+		dashboard: string,
+		screenEffectApis: ScreenEffectApi[]
+	) {
+		return (
+			<div className="btn-group">
+				<button
+					className={screenEffectApis && screenEffectApis.length ? 'btn btn-info' : 'btn btn-default'}
+					type="button"
+					onClick={() => {
+						this.props.setVisual(DASHBOARD_SCREENEFFECT_CONTEXT_MENU, {
+							agent,
+							dashboard,
+							screenEffectApis
+						});
+					}}
+				>
+					<i className={'fa fa-plus'} />
+				</button>
+			</div>
 		);
 	}
 	private createRoutingDescriptionButton(
@@ -1478,10 +1678,26 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentMethod[agentIndex][modelIndex][v]
 		);
 	}
+	private hasScreenEffects(agent: string, model: string, v: string) {
+		return (
+			this.state.agentScreenEffect[agent] &&
+			this.state.agentScreenEffect[agent][model] &&
+			this.state.agentScreenEffect[agent][model][v]
+		);
+	}
+	private getScreenEffects(agent: string, model: string, v: string): ScreenEffectApi[] {
+		return this.state.agentScreenEffect[agent][model][v];
+	}
 	private hasDashboardRouting(agent: string, dashboard: string) {
 		return this.state.dashboardRouting[agent] && this.state.dashboardRouting[agent][dashboard];
 	}
-
+	private hasDashboardScreenEffects(agent: string, dashboard: string) {
+		return this.state.dashboardScreenEffect[agent] && this.state.dashboardScreenEffect[agent][dashboard];
+	}
+	private getDashboardScreenEffects(agent: string, dashboard: string): ScreenEffectApi[] {
+		this.state.dashboardScreenEffect[agent][dashboard] = this.state.dashboardScreenEffect[agent][dashboard] || [];
+		return this.state.dashboardScreenEffect[agent][dashboard];
+	}
 	private hasFunctionKeyValue(agentIndex: number, modelIndex: number, v: string, functionKey: string) {
 		return (
 			this.state.agentMethod[agentIndex] &&
@@ -1618,34 +1834,45 @@ function loadAgentViewMount(onlyAgents: any[], accessDescriptions: any[], graph:
 	return res;
 }
 
+function loadAgentScreenEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: ScreenEffectApiProps | any = loadAgent<ScreenEffectApiProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.ScreenEffectApiProps
+	);
+
+	return res;
+}
+
 function applyDefaultPropsToViewMount(res: any) {
-  if (res && res.Create && res.Create.mountings) {
-    res.Create.mountings.forEach((mount: MountingDescription) => {
-      mount.screenEffect = mount.screenEffect || [];
-    });
-  }
-  if (res && res.Delete && res.Delete.mountings) {
-    res.Delete.mountings.forEach((mount: MountingDescription) => {
-      mount.screenEffect = mount.screenEffect || [];
-    });
-  }
-  if (res && res.Get && res.Get.mountings) {
-    res.Get.mountings.forEach((mount: MountingDescription) => {
-      mount.screenEffect = mount.screenEffect || [];
-    });
-  }
+	if (res && res.Create && res.Create.mountings) {
+		res.Create.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
+	if (res && res.Delete && res.Delete.mountings) {
+		res.Delete.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
+	if (res && res.Get && res.Get.mountings) {
+		res.Get.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
 
-  if (res && res.GetAll && res.GetAll.mountings) {
-    res.GetAll.mountings.forEach((mount: MountingDescription) => {
-      mount.screenEffect = mount.screenEffect || [];
-    });
-  }
+	if (res && res.GetAll && res.GetAll.mountings) {
+		res.GetAll.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
 
-  if (res && res.Update && res.Update.mountings) {
-    res.Update.mountings.forEach((mount: MountingDescription) => {
-      mount.screenEffect = mount.screenEffect || [];
-    });
-  }
+	if (res && res.Update && res.Update.mountings) {
+		res.Update.mountings.forEach((mount: MountingDescription) => {
+			mount.screenEffect = mount.screenEffect || [];
+		});
+	}
 }
 
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {

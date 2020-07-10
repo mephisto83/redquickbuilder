@@ -201,6 +201,14 @@ ${this.state.definitions}
 		let { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		if (currentNode) {
+			result = `
+let $internalComponentState: ComponentState;
+interface ComponentState {
+  viewModel: string,
+  value: string,
+  model: string
+}
+      `;
 		}
 		return result;
 	}
