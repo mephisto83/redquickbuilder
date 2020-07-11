@@ -170,7 +170,7 @@ class ContextMenu extends Component<any, any> {
 														UIA.setRouteSource(
 															route,
 															urlParameter,
-															model,
+															sourceModel,
 															RouteSourceType.Model,
 															modelPropertyOption.id
 														);

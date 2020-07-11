@@ -96,6 +96,7 @@ export interface RouteDescription {
 	id: string;
 	name: string;
 	targetMethodDescription?: MethodDescription;
+	linkId?: string; // a reference to the link
 	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 }
 export interface RouteSource {

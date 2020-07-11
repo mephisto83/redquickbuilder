@@ -33,6 +33,7 @@ export default function BuildDashboards(filter: Function) {
 				dashboardName: GetNodeTitle(navigationScreen),
 				uiType,
 				componentName: `${GetNodeTitle(navigationScreen)} Component`,
+				//buttons: [],
 				buttons: GetNodesLinkedTo(graph, {
 					id: navigationScreen.id,
 					direction: SOURCE,

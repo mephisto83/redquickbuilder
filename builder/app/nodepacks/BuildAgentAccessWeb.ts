@@ -1,5 +1,5 @@
-import { NodesByType } from '../methods/graph_methods';
-import { NodeTypes, LinkProperties, LinkPropertyKeys, NodeProperties } from '../constants/nodetypes';
+import { NodesByType, LinksByType } from '../methods/graph_methods';
+import { NodeTypes, LinkProperties, LinkPropertyKeys, NodeProperties, LinkType } from '../constants/nodetypes';
 import {
 	REMOVE_NODE,
 	graphOperation,
@@ -8,10 +8,12 @@ import {
 	GetCurrentGraph,
 	AddLinkBetweenNodes,
 	CreateNewNode,
-	GetNodeTitle
+	GetNodeTitle,
+	REMOVE_LINK
 } from '../actions/uiactions';
 import AddAgentAccess from './AddAgentAccess';
 import { ScreenEffectApi, ScreenEffect, ViewMounting, MountingDescription } from '../interface/methodprops';
+import { GraphLink } from '../methods/graph_types';
 
 export default function BuildAgentAccessWeb(args: any) {
 	const {
@@ -36,6 +38,7 @@ export default function BuildAgentAccessWeb(args: any) {
 	const agentAccesss = NodesByType(graph, NodeTypes.AgentAccessDescription);
 	const contextParams = NodesByType(graph, NodeTypes.ContextualParameters);
 	let screenEffects = NodesByType(graph, NodeTypes.ScreenEffectApi);
+	let links = LinksByType(graph, LinkType.NavigationScreen);
 	const result: any[] = [ ...contextParams, ...agentAccesss, ...screenEffects ].map((v: any) => ({
 		operation: REMOVE_NODE,
 		options() {
@@ -44,6 +47,18 @@ export default function BuildAgentAccessWeb(args: any) {
 			};
 		}
 	}));
+	result.push(
+		links.map((link: GraphLink) => {
+			return {
+				operation: REMOVE_LINK,
+				options() {
+					return {
+						id: link.id
+					};
+				}
+			};
+		})
+	);
 	dashboards.forEach((dashboard: any) => {
 		agents.forEach((agent: any) => {
 			if (dashboardAccess && dashboardAccess[agent] && dashboardAccess[agent][dashboard]) {
@@ -215,6 +230,7 @@ export default function BuildAgentAccessWeb(args: any) {
 
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 }
+
 function screenEffectGen(
 	screenEffect: any,
 	agentAccessContext: any,

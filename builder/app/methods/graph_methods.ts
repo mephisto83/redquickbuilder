@@ -26,7 +26,8 @@ import {
 	GetRootGraph,
 	GetNodeById,
 	GetCodeName,
-	GetNodeByProperties
+	GetNodeByProperties,
+	GetLink
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import { Graph, Node, GraphLink, ComponentLayoutContainer, ComponentLayout } from './graph_types';
@@ -1018,7 +1019,7 @@ export function setupCache(graph: any) {
 		Object.keys(graph.linkLib).forEach((key) => {
 			const linkType = GetLinkProperty(getLink(graph, { id: key }), LinkPropertyKeys.TYPE);
 			if (linkType) {
-				Links[linkType] = Nodes[linkType] || {};
+				Links[linkType] = Links[linkType] || {};
 				Links[linkType][key] = true;
 				AppCache.Version++;
 			}
@@ -1627,6 +1628,23 @@ export function NodesByViewPackage(graph: any, viewPackage: any) {
 	}
 
 	return [];
+}
+export function LinksByType(graph: Graph, linkType: string | string[]): GraphLink[] {
+	graph = graph || GetCurrentGraph();
+	let linkTypes: string[] = [];
+	if (!Array.isArray(linkType)) {
+		linkTypes = [ linkType ];
+	} else {
+		linkTypes = linkType;
+	}
+	let linkIds: string[] = [];
+	linkTypes.forEach((linkType: string) => {
+		linkIds.push(...Object.keys(AppCache.Links[linkType]).filter((v) => AppCache.Links[linkType][v]).map((v) => v));
+	});
+
+	return linkIds.map((id: string) => {
+		return GetLink(id);
+	});
 }
 
 export function NodesByType(graph: any, nodeType: any, options: any = {}) {
@@ -2745,7 +2763,7 @@ export function removeLinkBetweenNodes(graph: any, options: any, callback?: any)
 }
 export function removeLinkById(graph: any, options: any) {
 	const link = graph.linkLib[options.id];
-	return removeLink(graph, link);
+	return link ? removeLink(graph, link.id) : graph;
 }
 export function executeEvents(graph: any, link: any, evt: any) {
 	switch (evt) {

@@ -40,7 +40,15 @@ import Tabs from './tabs';
 import TabContent from './tabcontent';
 import TabPane from './tabpane';
 import Tab from './tab';
-import { GetNodesByProperties, existsLinkBetween, findLink, existsLinksBetween } from '../methods/graph_methods';
+import {
+	GetNodesByProperties,
+	existsLinkBetween,
+	findLink,
+	existsLinksBetween,
+	getNodeLinks,
+	SOURCE,
+	getLink
+} from '../methods/graph_methods';
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
 import SelectInput from './selectinput';
@@ -67,7 +75,7 @@ import MethodProps, {
 	ScreenEffectApiProps,
 	ScreenEffectApi
 } from '../interface/methodprops';
-import { Node } from '../methods/graph_types';
+import { Node, GraphLink } from '../methods/graph_types';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -276,13 +284,14 @@ class AgentAccessView extends Component<any, any> {
 			return <div />;
 		}
 		const { state } = this.props;
-		const onlyAgents = GetNodesByProperties(
-			{
-				[NodeProperties.NODEType]: NodeTypes.Model,
-				[NodeProperties.IsAgent]: true
-			},
-			graph
-		).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
+		const onlyAgents = GetAgentsOnly();
+		//  GetNodesByProperties(
+		// 	{
+		// 		[NodeProperties.NODEType]: NodeTypes.Model,
+		// 		[NodeProperties.IsAgent]: true
+		// 	},
+		// 	graph
+		// ).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
 		return (
 			<TopViewer active={active}>
 				<section className="content">
@@ -1683,10 +1692,7 @@ class AgentAccessView extends Component<any, any> {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
 	private getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
-		if (this.state.dashboardViewMount && this.state.dashboardViewMount[agent]) {
-			return this.state.dashboardViewMount[agent][dashboard];
-		}
-		return null;
+		return this.state.dashboardViewMount[agent][dashboard];
 	}
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
 		return this.state.agentEffect[agentIndex][modelIndex][v];
@@ -1829,13 +1835,68 @@ function loadAgentDashbaordViewMount(onlyAgents: any[], accessDescriptions: any[
 	return res;
 }
 function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadDashboard<DashboardRouting>(
+	let result = loadDashboard<DashboardRouting>(
 		onlyAgents,
 		accessDescriptions,
 		graph,
 		LinkPropertyKeys.DashboardRoutingProps
 	);
+	let agents = GetAgentsOnly();
+	let defaultAgent = agents.find((v) => GetNodeProp(v, NodeProperties.DefaultAgent));
+
+	NodesByType(null, NodeTypes.NavigationScreen)
+		.filter((node: Node) => GetNodeProp(node, NodeProperties.IsDashboard))
+		.forEach((navigationScreen: Node) => {
+			let dashboard = navigationScreen.id;
+			let screenAgent = GetNodeProp(navigationScreen, NodeProperties.Agent);
+			if (!screenAgent && defaultAgent) {
+				screenAgent = defaultAgent.id;
+			} else if (!screenAgent && agents.length) {
+				screenAgent = agents[0].id;
+			}
+			let navigationLinks: GraphLink[] = getNodeLinks(graph, navigationScreen.id, SOURCE).filter(
+				(x: GraphLink) => GetLinkProperty(x, LinkPropertyKeys.TYPE) === LinkType.NavigationScreen
+			);
+			if (screenAgent) {
+				let routing: Routing = result[screenAgent][dashboard];
+				if (routing && routing.routes) {
+					routing.routes = routing.routes.filter((v: RouteDescription) => {
+						return !(v.linkId && getLink(graph, { id: v.linkId }));
+					});
+
+					navigationLinks
+						.filter((x: GraphLink) => {
+							return !routing.routes.find((v) => v.linkId === x.id);
+						})
+						.forEach((navLink) => {
+							let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
+							routing.routes.push({
+								agent: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Agent) : '',
+								id: GUID(),
+								model: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Model) : '',
+								name: `${GetNodeTitle(navLink.source)} to ${GetNodeTitle(navLink.target)}`,
+								viewType: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.ViewType) : '',
+								isDashboard,
+								dashboard: isDashboard ? navLink.target : '',
+								linkId: navLink.id
+							});
+						});
+				}
+			}
+		});
+	return result;
 }
+
+function GetAgentsOnly() {
+	return GetNodesByProperties(
+		{
+			[NodeProperties.NODEType]: NodeTypes.Model,
+			[NodeProperties.IsAgent]: true
+		},
+		GetCurrentGraph()
+	).filter((x: Node) => !GetNodeProp(x, NodeProperties.IsUser));
+}
+
 function loadAgentDashboardEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadDashboard<DashboardEffect>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.DashboardEffectProps);
 }
@@ -1942,7 +2003,81 @@ function applyDefaultPropsToViewMount(res: any) {
 }
 
 function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: any) {
-	return loadAgent<RoutingProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.RoutingProps);
+	let result: RoutingProps[][] = loadAgent<RoutingProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.RoutingProps
+	);
+	if (result) {
+		let agents = GetAgentsOnly();
+		let defaultAgent = agents.find((v) => GetNodeProp(v, NodeProperties.DefaultAgent));
+		let models = GetNodesByProperties(
+			{
+				[NodeProperties.NODEType]: NodeTypes.Model
+			},
+			graph
+		).map((v: Node) => v.id);
+		NodesByType(null, NodeTypes.NavigationScreen)
+			.filter((node: Node) => !GetNodeProp(node, NodeProperties.IsDashboard))
+			.forEach((navigationScreen: Node) => {
+				let model = GetNodeProp(navigationScreen, NodeProperties.Model);
+				let screenAgent = GetNodeProp(navigationScreen, NodeProperties.Agent);
+				let viewType = GetNodeProp(navigationScreen, NodeProperties.ViewType);
+				if (!screenAgent && defaultAgent) {
+					screenAgent = defaultAgent.id;
+				} else if (!screenAgent && agents.length) {
+					screenAgent = agents[0].id;
+				}
+				let navigationLinks: GraphLink[] = getNodeLinks(graph, navigationScreen.id, SOURCE).filter(
+					(x: GraphLink) => GetLinkProperty(x, LinkPropertyKeys.TYPE) === LinkType.NavigationScreen
+				);
+				if (screenAgent) {
+					let screenAgentIndex = onlyAgents.map((v: Node) => v.id).indexOf(screenAgent);
+					let modelIndex = models.indexOf(model);
+					if (result[screenAgentIndex] && result[screenAgentIndex][modelIndex]) {
+						let routingProps: RoutingProps = result[screenAgentIndex][modelIndex];
+						Object.keys(routingProps)
+							.filter((v: string) => viewType === v && routingProps[v])
+							.forEach((v) => {
+								let routing: Routing = routingProps[v];
+								if (routing && routing.routes) {
+									routing.routes = routing.routes.filter((v: RouteDescription) => {
+										return !(v.linkId && !getLink(graph, { id: v.linkId }));
+									});
+
+									navigationLinks
+										.filter((x: GraphLink) => {
+											return !routing.routes.find((v) => v.linkId === x.id);
+										})
+										.forEach((navLink) => {
+											let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
+											routing.routes.push({
+												agent: !isDashboard
+													? GetNodeProp(navLink.target, NodeProperties.Agent)
+													: '',
+												id: GUID(),
+												model: !isDashboard
+													? GetNodeProp(navLink.target, NodeProperties.Model)
+													: '',
+												name: `${GetNodeTitle(navLink.source)} to ${GetNodeTitle(
+													navLink.target
+												)}`,
+												viewType: !isDashboard
+													? GetNodeProp(navLink.target, NodeProperties.ViewType)
+													: '',
+												isDashboard,
+												dashboard: isDashboard ? navLink.target : '',
+												linkId: navLink.id
+											});
+										});
+								}
+							});
+					}
+				}
+			});
+	}
+	return result;
 }
 function loadAgentEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadAgent<EffectProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.EffectProps);
@@ -2029,8 +2164,8 @@ function loadAgentObj<T>(onlyAgents: any[], accessDescriptions: any[], graph: an
 				[ViewTypes.Delete]: false
 			};
 		});
-  });
-  return result;
+	});
+	return result;
 }
 
 function loadDashboard<T>(
