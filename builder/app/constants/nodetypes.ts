@@ -936,6 +936,8 @@ export const LinkPropertyKeys = {
 	DashboardViewMountProps: 'dashboardViewMountProps',
 	DashboardRoutingProps: 'dashboardRoutingProps',
 	DashboardEffectProps: 'dashboardEffectProps',
+	AgentAccess: 'AgentAccess',
+	RoutingDescriptionId: 'RoutingDescriptionId',
 	Enumeration: 'Enumeration',
 	AsForm: 'AsForm',
 	DefaultValue: 'DefaultValue'

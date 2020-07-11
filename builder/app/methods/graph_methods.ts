@@ -2922,7 +2922,7 @@ export function removeLink(graph: any, link: any, options: any = {}) {
 	if (link) {
 		graph.links = graph.links.filter((x: any) => x !== link);
 		const del_link = graph.linkLib[link];
-		if (del_link.properties) {
+		if (del_link && del_link.properties) {
 			if (del_link.properties.on && del_link.properties.on[LinkEvents.Remove]) {
 				graph = executeEvents(graph, del_link, LinkEvents.Remove);
 			}
@@ -2936,52 +2936,53 @@ export function removeLink(graph: any, link: any, options: any = {}) {
 				delete graph.nodeLinkIds[source][target];
 			}
 		}
-		delete graph.linkLib[link];
+		if (graph.linkLib[link]) delete graph.linkLib[link];
 
-		graph.linkLib = { ...graph.linkLib };
-		graph.nodeLinks[del_link.source] = {
-			...graph.nodeLinks[del_link.source],
-			...{
-				[del_link.target]: graph.nodeLinks[del_link.source]
-					? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
-					: 0
+		if (!fast) graph.linkLib = { ...graph.linkLib };
+		if (del_link) {
+			graph.nodeLinks[del_link.source] = {
+				...graph.nodeLinks[del_link.source],
+				...{
+					[del_link.target]: graph.nodeLinks[del_link.source]
+						? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
+						: 0
+				}
+			};
+			if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
+				delete graph.nodeLinks[del_link.source][del_link.target];
+				if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
+					delete graph.nodeLinks[del_link.source];
+				}
 			}
-		};
-		if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
-			delete graph.nodeLinks[del_link.source][del_link.target];
-			if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
-				delete graph.nodeLinks[del_link.source];
+			graph.nodeLinks[del_link.target] = {
+				...graph.nodeLinks[del_link.target],
+				...{
+					[del_link.source]: graph.nodeLinks[del_link.target]
+						? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
+						: 0
+				}
+			};
+			if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
+				delete graph.nodeLinks[del_link.target][del_link.source];
+				if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
+					delete graph.nodeLinks[del_link.target];
+				}
 			}
-		}
-		graph.nodeLinks[del_link.target] = {
-			...graph.nodeLinks[del_link.target],
-			...{
-				[del_link.source]: graph.nodeLinks[del_link.target]
-					? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
-					: 0
+			// Keeps track of the links for each node.
+			if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
+				delete graph.nodeConnections[del_link.source][del_link.id];
 			}
-		};
-		if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
-			delete graph.nodeLinks[del_link.target][del_link.source];
-			if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
-				delete graph.nodeLinks[del_link.target];
+			if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
+				delete graph.nodeConnections[del_link.source];
 			}
-		}
 
-		// Keeps track of the links for each node.
-		if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
-			delete graph.nodeConnections[del_link.source][del_link.id];
-		}
-		if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
-			delete graph.nodeConnections[del_link.source];
-		}
-
-		// Keeps track of the links for each node.
-		if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
-			delete graph.nodeConnections[del_link.target][del_link.id];
-		}
-		if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
-			delete graph.nodeConnections[del_link.target];
+			// Keeps track of the links for each node.
+			if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
+				delete graph.nodeConnections[del_link.target][del_link.id];
+			}
+			if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
+				delete graph.nodeConnections[del_link.target];
+			}
 		}
 		graph = incrementMinor(graph);
 	}

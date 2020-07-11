@@ -1,4 +1,10 @@
-import { NodesByType, LinksByType } from '../methods/graph_methods';
+import {
+	NodesByType,
+	LinksByType,
+	GetNodesByProperties,
+	GetLinkBetween,
+	updateLinkProperty
+} from '../methods/graph_methods';
 import { NodeTypes, LinkProperties, LinkPropertyKeys, NodeProperties, LinkType } from '../constants/nodetypes';
 import {
 	REMOVE_NODE,
@@ -9,11 +15,23 @@ import {
 	AddLinkBetweenNodes,
 	CreateNewNode,
 	GetNodeTitle,
-	REMOVE_LINK
+	REMOVE_LINK,
+	GetNodeByProperties,
+	GetNodeById,
+	GetNodeProp,
+	UpdateLinkProperty
 } from '../actions/uiactions';
 import AddAgentAccess from './AddAgentAccess';
-import { ScreenEffectApi, ScreenEffect, ViewMounting, MountingDescription } from '../interface/methodprops';
-import { GraphLink } from '../methods/graph_types';
+import {
+	ScreenEffectApi,
+	ScreenEffect,
+	ViewMounting,
+	MountingDescription,
+	DashboardRouting,
+	Routing,
+	RouteDescription
+} from '../interface/methodprops';
+import { GraphLink, Graph } from '../methods/graph_types';
 
 export default function BuildAgentAccessWeb(args: any) {
 	const {
@@ -63,10 +81,10 @@ export default function BuildAgentAccessWeb(args: any) {
 		agents.forEach((agent: any) => {
 			if (dashboardAccess && dashboardAccess[agent] && dashboardAccess[agent][dashboard]) {
 				const values = dashboardAccess[agent][dashboard];
-				const routing =
+				const routing: DashboardRouting =
 					dashboardRouting[agent] && dashboardRouting[agent][dashboard]
 						? dashboardRouting[agent][dashboard] || {}
-						: {};
+						: null;
 				const mounting =
 					dashboardViewMount[agent] && dashboardViewMount[agent][dashboard]
 						? dashboardViewMount[agent][dashboard] || {}
@@ -87,7 +105,7 @@ export default function BuildAgentAccessWeb(args: any) {
 						linkProps: {},
 						[LinkPropertyKeys.DashboardScreenEffectApiProps]: screenEffect,
 						[LinkPropertyKeys.DashboardAccessProps]: values,
-						[LinkPropertyKeys.DashboardRoutingProps]: { ...routing },
+						[LinkPropertyKeys.DashboardRoutingProps]: { ...routing || {} },
 						[LinkPropertyKeys.DashboardViewMountProps]: { ...mounting },
 						[LinkPropertyKeys.DashboardEffectProps]: { ...effects },
 						callback: ($: { entry: string }) => {
@@ -95,7 +113,11 @@ export default function BuildAgentAccessWeb(args: any) {
 						}
 					});
 					let urlParametersForMounting: string[] = getUrlParametersForMounting(mounting);
-
+					if (routing) {
+						result.push(() => {
+							return buildDashboardRouting(dashboard, agent, routing, agentAccessContext);
+						});
+					}
 					result.push(...temp, () =>
 						screenEffectGen(screenEffect, agentAccessContext, urlParametersForMounting, dashboard, agent)
 					);
@@ -229,6 +251,54 @@ export default function BuildAgentAccessWeb(args: any) {
 	});
 
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+}
+function buildDashboardRouting(
+	dashboard: string,
+	agent: string,
+	dashboardRouting: DashboardRouting,
+	agentAccessContext: { entry: string }
+) {
+	let navigationScreen = GetNodeById(dashboard);
+	if (navigationScreen) {
+    let routing = dashboardRouting.routing;
+		let results = buildRouting(routing, navigationScreen, agent, agentAccessContext);
+
+		return results;
+	}
+	return [];
+}
+function buildRouting(
+	routing: Routing,
+	navigationScreen: any,
+	agent: string,
+	agentAccessContext: { entry: string }
+) {
+	return routing.routes.map((route: RouteDescription) => {
+		let result: any[] = [];
+		if (route.isDashboard && route.dashboard) {
+			result.push(AddLinkBetweenNodes(navigationScreen.id, route.dashboard, LinkProperties.NavigationScreen));
+		} else {
+			let targetNaviScreen = GetNodesByProperties(
+				{
+					[NodeProperties.Agent]: agent,
+					[NodeProperties.Model]: route.model,
+					[NodeProperties.ViewType]: route.viewType
+				},
+				GetCurrentGraph()
+			).find((v: Node) => !GetNodeProp(v, NodeProperties.IsDashboard));
+			result.push(AddLinkBetweenNodes(navigationScreen.id, targetNaviScreen.id, LinkProperties.NavigationScreen));
+			result.push((currentGraph: Graph) => {
+				let link = GetLinkBetween(navigationScreen.id, targetNaviScreen.id, currentGraph);
+				if (link) return UpdateLinkProperty(link.id, LinkPropertyKeys.AgentAccess, agentAccessContext.entry);
+				return [];
+			});
+			result.push((currentGraph: Graph) => {
+				let link = GetLinkBetween(navigationScreen.id, targetNaviScreen.id, currentGraph);
+				return UpdateLinkProperty(link.id, LinkPropertyKeys.RoutingDescriptionId, route.id);
+			});
+		}
+		return result;
+	});
 }
 
 function screenEffectGen(

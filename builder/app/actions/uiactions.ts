@@ -365,6 +365,14 @@ export function AddLinkBetweenNodes(source: string, target: string, properties: 
 		}
 	];
 }
+export function UpdateLinkProperty(id: string, prop: string, value: any) {
+	return [
+		{
+			operation: UPDATE_LINK_PROPERTY,
+			options: { id, value, prop }
+		}
+	];
+}
 export function CreateNewNode(props: any, callback?: Function) {
 	return [
 		{
