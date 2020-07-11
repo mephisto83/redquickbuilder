@@ -32,7 +32,8 @@ import routes from '../constants/routes';
 import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
 import { MethodFunctions } from '../constants/functiontypes';
-import { GetNodesByProperties } from '../methods/graph_methods';
+import { GetNodesByProperties, NodesByType } from '../methods/graph_methods';
+import CheckBox from './checkbox';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardRoutingContextMenu extends Component<any, any> {
@@ -244,28 +245,60 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 									/>
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
-									<SelectInput
-										options={models}
-										label={Titles.Model}
-										onChange={(value: string) => {
-											route.model = value;
+									<CheckBox
+										label={Titles.Dashboard}
+										onChange={(value: boolean) => {
+											route.isDashboard = value;
 											this.setState({ turn: UIA.GUID() });
 										}}
-										value={route.model}
+										value={route.isDashboard}
 									/>
 								</TreeViewItemContainer>
-
-								<TreeViewItemContainer>
-									<SelectInput
-										options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
-										label={Titles.ViewTypes}
-										onChange={(value: string) => {
-											route.viewType = value;
-											this.setState({ turn: UIA.GUID() });
-										}}
-										value={route.viewType}
-									/>
-								</TreeViewItemContainer>
+								{route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={models}
+											label={Titles.Model}
+											onChange={(value: string) => {
+												route.model = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.model}
+										/>
+									</TreeViewItemContainer>
+								)}
+								{!route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={GetNodesByProperties(
+												{
+													[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+													[NodeProperties.IsDashboard]: true
+												},
+												UIA.GetCurrentGraph()
+											).toNodeSelect()}
+											label={Titles.Dashboard}
+											onChange={(value: string) => {
+												route.dashboard = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.dashboard}
+										/>
+									</TreeViewItemContainer>
+								)}
+								{route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
+											label={Titles.ViewTypes}
+											onChange={(value: string) => {
+												route.viewType = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.viewType}
+										/>
+									</TreeViewItemContainer>
+								)}
 								{parameterConnections}
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton

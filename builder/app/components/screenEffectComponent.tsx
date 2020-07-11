@@ -13,9 +13,12 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import { ScreenEffect, ScreenEffectApi } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
+import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
+import { GetStateFunc, graphOperation } from '../actions/uiactions';
+import { Node } from '../methods/graph_types';
 
 export default class ScreenEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -36,23 +39,21 @@ export default class ScreenEffectComponent extends Component<any, any> {
 				active
 				title={screenEffect.name || Titles.ScreenEffects}
 			>
-				{!this.props.api ? null : (
-					<TreeViewItemContainer>
-						<TextInput
-							label={Titles.Name}
-							value={screenEffect.name}
-							onChange={(value: string) => {
-								screenEffect.name = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>
-				)}
+				<TreeViewItemContainer>
+					<TextInput
+						label={Titles.Name}
+						value={screenEffect.name}
+						onChange={(value: string) => {
+							screenEffect.name = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.DataChain}
@@ -81,6 +82,32 @@ export default class ScreenEffectComponent extends Component<any, any> {
 							}
 						}}
 						icon="fa fa-minus"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.AddDataChain}`}
+						onClick={() => {
+							graphOperation(
+								UIA.CreateNewNode(
+									{
+										[NodeProperties.UIText]: screenEffect.name || 'Unknown',
+										[NodeProperties.NODEType]: NodeTypes.DataChain,
+										[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+										[NodeProperties.DataChainEntry]: true,
+										[NodeProperties.AsOutput]: true
+									},
+									(node: Node) => {
+										UIA.updateComponentProperty(
+											node.id,
+											NodeProperties.Lambda,
+											`function ${UIA.GetJSCodeName(node.id) || 'Unknown'}($i: any) {
+
+                  }`
+										);
+									}
+								)
+							)(UIA.GetDispatchFunc(), GetStateFunc());
+						}}
+						icon="fa fa-chain"
 					/>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>

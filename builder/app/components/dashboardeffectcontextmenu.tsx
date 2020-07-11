@@ -60,6 +60,7 @@ class DashboardEffectContextMenu extends Component<any, any> {
 							id: UIA.GUID(),
 							model: '',
 							body: false,
+							screenEffect: [],
 							agent,
 							name: '',
 							viewType: ViewTypes.Get
@@ -104,7 +105,8 @@ class DashboardEffectContextMenu extends Component<any, any> {
 									let routeKey = `url-param-${urlParameter}-${index}`;
 									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
 									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = effectItem.source ? effectItem.source.model : null;
+									// let value = effectItem.source ? effectItem.source.model : null;
+									let value = UIA.ensureRouteSource(effectItem, urlParameter);
 									let options = [
 										...[ urlParameter ]
 											.filter(
@@ -118,11 +120,17 @@ class DashboardEffectContextMenu extends Component<any, any> {
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
-															effectItem.source = {
-																model: k,
-																property: null,
-																type: RouteSourceType.UrlParameter
-															};
+															// effectItem.source = {
+															// 	model: k,
+															// 	property: null,
+															// 	type: RouteSourceType.UrlParameter
+															// };
+															UIA.setRouteSource(
+																effectItem,
+																urlParameter,
+																k,
+																RouteSourceType.UrlParameter
+															);
 															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}
@@ -141,7 +149,8 @@ class DashboardEffectContextMenu extends Component<any, any> {
 											}}
 										>
 											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = effectItem.source ? effectItem.source.property : null;
+												// let value = effectItem.source ? effectItem.source.property : null;
+												let value = UIA.ensureRouteSource(effectItem, urlParameter, 'property');
 												return (
 													<TreeViewMenu
 														icon={
@@ -153,11 +162,18 @@ class DashboardEffectContextMenu extends Component<any, any> {
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
-															effectItem.source = {
+															// effectItem.source = {
+															// 	model,
+															// 	property: modelPropertyOption.id,
+															// 	type: RouteSourceType.Model
+															// };
+															UIA.setRouteSource(
+																effectItem,
+																urlParameter,
 																model,
-																property: modelPropertyOption.id,
-																type: RouteSourceType.Model
-															};
+																RouteSourceType.Model,
+																modelPropertyOption.id
+															);
 															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}
@@ -177,7 +193,8 @@ class DashboardEffectContextMenu extends Component<any, any> {
 											key={`url-parma-k-genta`}
 										>
 											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = effectItem.source ? effectItem.source.property : null;
+												// let value = effectItem.source ? effectItem.source.property : null;
+												let value = UIA.ensureRouteSource(effectItem, urlParameter, 'property');
 												return (
 													<TreeViewMenu
 														title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -189,11 +206,18 @@ class DashboardEffectContextMenu extends Component<any, any> {
 															)
 														}
 														onClick={() => {
-															effectItem.source = {
-																model: agent,
-																property: agentPropertyOption.id,
-																type: RouteSourceType.Agent
-															};
+															// effectItem.source = {
+															// 	model: agent,
+															// 	property: agentPropertyOption.id,
+															// 	type: RouteSourceType.Agent
+															// };
+															UIA.setRouteSource(
+																effectItem,
+																urlParameter,
+																agent,
+																RouteSourceType.Agent,
+																agentPropertyOption.id
+															);
 															callback(effect);
 															this.setState({ turn: UIA.GUID() });
 														}}

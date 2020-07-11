@@ -33,6 +33,7 @@ import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
 import { MethodFunctions } from '../constants/functiontypes';
 import { GetNodesByProperties } from '../methods/graph_methods';
+import CheckBox from './checkbox';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -104,7 +105,7 @@ class ContextMenu extends Component<any, any> {
 								let routeKey = `url-param-${urlParameter}-${index}`;
 								let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(sourceAgent);
 								let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(sourceModel);
-								let value = route.source ? route.source.model : null;
+								let value = UIA.ensureRouteSource(route, urlParameter);
 								let sourceParameters =
 									this.getViewMountingDescriptionParameters(sourceViewMounting) || [];
 								let options = [
@@ -116,11 +117,18 @@ class ContextMenu extends Component<any, any> {
 													title={k}
 													icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 													onClick={() => {
-														route.source = {
-															model: k,
-															property: null,
-															type: RouteSourceType.UrlParameter
-														};
+														// route.source = {
+														// 	model: k,
+														// 	property: null,
+														// 	type: RouteSourceType.UrlParameter
+														// };
+														UIA.setRouteSource(
+															route,
+															urlParameter,
+															k,
+															RouteSourceType.UrlParameter
+														);
+
 														callback(routing);
 														this.setState({ turn: UIA.GUID() });
 													}}
@@ -141,7 +149,8 @@ class ContextMenu extends Component<any, any> {
 										}}
 									>
 										{modelPropertyOptions.map((modelPropertyOption: Node) => {
-											let value = route.source ? route.source.property : null;
+											// let value = route.source ? route.source.property : null;
+											let value = UIA.ensureRouteSource(route, urlParameter, 'property');
 											return (
 												<TreeViewMenu
 													icon={
@@ -153,11 +162,18 @@ class ContextMenu extends Component<any, any> {
 													}
 													title={UIA.GetNodeTitle(modelPropertyOption)}
 													onClick={() => {
-														route.source = {
-															model: sourceModel,
-															property: modelPropertyOption.id,
-															type: RouteSourceType.Model
-														};
+														// route.source = {
+														// 	model: sourceModel,
+														// 	property: modelPropertyOption.id,
+														// 	type: RouteSourceType.Model
+														// };
+														UIA.setRouteSource(
+															route,
+															urlParameter,
+															model,
+															RouteSourceType.Model,
+															modelPropertyOption.id
+														);
 														callback(routing);
 														this.setState({ turn: UIA.GUID() });
 													}}
@@ -177,7 +193,8 @@ class ContextMenu extends Component<any, any> {
 										key={`url-parma-k-genta`}
 									>
 										{agentPropertyOptions.map((agentPropertyOption: Node) => {
-											let value = route.source ? route.source.property : null;
+											// let value = route.source ? route.source.property : null;
+											let value = UIA.ensureRouteSource(route, urlParameter, 'property');
 											return (
 												<TreeViewMenu
 													title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -189,11 +206,18 @@ class ContextMenu extends Component<any, any> {
 														)
 													}
 													onClick={() => {
-														route.source = {
-															model: agent,
-															property: agentPropertyOption.id,
-															type: RouteSourceType.Agent
-														};
+														// route.source = {
+														// 	model: agent,
+														// 	property: agentPropertyOption.id,
+														// 	type: RouteSourceType.Agent
+														// };
+														UIA.setRouteSource(
+															route,
+															urlParameter,
+															agent,
+															RouteSourceType.Agent,
+															agentPropertyOption.id
+														);
 														callback(routing);
 														this.setState({ turn: UIA.GUID() });
 													}}
@@ -245,28 +269,61 @@ class ContextMenu extends Component<any, any> {
 									/>
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
-									<SelectInput
-										options={models}
-										label={Titles.Model}
-										onChange={(value: string) => {
-											route.model = value;
+									<CheckBox
+										label={Titles.Dashboard}
+										onChange={(value: boolean) => {
+											route.isDashboard = value;
 											this.setState({ turn: UIA.GUID() });
 										}}
-										value={route.model}
+										value={route.isDashboard}
 									/>
 								</TreeViewItemContainer>
+								{!route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={GetNodesByProperties(
+												{
+													[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+													[NodeProperties.IsDashboard]: true
+												},
+												UIA.GetCurrentGraph()
+											).toNodeSelect()}
+											label={Titles.Dashboard}
+											onChange={(value: string) => {
+												route.dashboard = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.dashboard}
+										/>
+									</TreeViewItemContainer>
+								)}
+								{route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={models}
+											label={Titles.Model}
+											onChange={(value: string) => {
+												route.model = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.model}
+										/>
+									</TreeViewItemContainer>
+								)}
 
-								<TreeViewItemContainer>
-									<SelectInput
-										options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
-										label={Titles.ViewTypes}
-										onChange={(value: string) => {
-											route.viewType = value;
-											this.setState({ turn: UIA.GUID() });
-										}}
-										value={route.viewType}
-									/>
-								</TreeViewItemContainer>
+								{route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={Object.keys(ViewTypes).map((c) => ({ title: c, value: c }))}
+											label={Titles.ViewTypes}
+											onChange={(value: string) => {
+												route.viewType = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.viewType}
+										/>
+									</TreeViewItemContainer>
+								)}
 								{parameterConnections}
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton

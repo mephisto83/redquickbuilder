@@ -85,7 +85,7 @@ class EffectContextMenu extends Component<any, any> {
 		if (effect) {
 			const exit = () => {
 				this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
-      };
+			};
 			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
 			this.getRoutingApi(mode);
 			switch (mode) {
@@ -104,7 +104,10 @@ class EffectContextMenu extends Component<any, any> {
 									let routeKey = `url-param-${urlParameter}-${index}`;
 									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
 									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = effectItem.source ? effectItem.source.model : null;
+									let value =
+										effectItem.source && effectItem.source[urlParameter]
+											? effectItem.source[urlParameter].model
+											: null;
 									let options = [
 										...[ urlParameter ]
 											.filter(
@@ -118,7 +121,8 @@ class EffectContextMenu extends Component<any, any> {
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
-															effectItem.source = {
+															effectItem.source = effectItem.source || {};
+															effectItem.source[urlParameter] = {
 																model: k,
 																property: null,
 																type: RouteSourceType.UrlParameter
@@ -141,7 +145,10 @@ class EffectContextMenu extends Component<any, any> {
 											}}
 										>
 											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = effectItem.source ? effectItem.source.property : null;
+												let value =
+													effectItem.source && effectItem.source[urlParameter]
+														? effectItem.source[urlParameter].model
+														: null;
 												return (
 													<TreeViewMenu
 														icon={
@@ -153,7 +160,8 @@ class EffectContextMenu extends Component<any, any> {
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
-															effectItem.source = {
+															effectItem.source = effectItem.source || {};
+															effectItem.source[urlParameter] = {
 																model,
 																property: modelPropertyOption.id,
 																type: RouteSourceType.Model
@@ -177,7 +185,10 @@ class EffectContextMenu extends Component<any, any> {
 											key={`url-parma-k-genta`}
 										>
 											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = effectItem.source ? effectItem.source.property : null;
+												let value =
+													effectItem.source && effectItem.source[urlParameter]
+														? effectItem.source[urlParameter].model
+														: null;
 												return (
 													<TreeViewMenu
 														title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -189,7 +200,8 @@ class EffectContextMenu extends Component<any, any> {
 															)
 														}
 														onClick={() => {
-															effectItem.source = {
+															effectItem.source = effectItem.source || {};
+															effectItem.source[urlParameter] = {
 																model: agent,
 																property: agentPropertyOption.id,
 																type: RouteSourceType.Agent

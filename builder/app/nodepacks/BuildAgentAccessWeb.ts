@@ -7,10 +7,11 @@ import {
 	GetStateFunc,
 	GetCurrentGraph,
 	AddLinkBetweenNodes,
-	CreateNewNode
+	CreateNewNode,
+	GetNodeTitle
 } from '../actions/uiactions';
 import AddAgentAccess from './AddAgentAccess';
-import { ScreenEffectApi, ScreenEffect } from '../interface/methodprops';
+import { ScreenEffectApi, ScreenEffect, ViewMounting, MountingDescription } from '../interface/methodprops';
 
 export default function BuildAgentAccessWeb(args: any) {
 	const {
@@ -33,8 +34,9 @@ export default function BuildAgentAccessWeb(args: any) {
 	const graph = GetCurrentGraph();
 
 	const agentAccesss = NodesByType(graph, NodeTypes.AgentAccessDescription);
+	const contextParams = NodesByType(graph, NodeTypes.ContextualParameters);
 	let screenEffects = NodesByType(graph, NodeTypes.ScreenEffectApi);
-	const result: any[] = [ ...agentAccesss, ...screenEffects ].map((v: any) => ({
+	const result: any[] = [ ...contextParams, ...agentAccesss, ...screenEffects ].map((v: any) => ({
 		operation: REMOVE_NODE,
 		options() {
 			return {
@@ -77,40 +79,11 @@ export default function BuildAgentAccessWeb(args: any) {
 							agentAccessContext = $;
 						}
 					});
-					result.push(...temp, () => {
-						return screenEffect
-							.filter((x: ScreenEffectApi) => agentAccessContext && x.dataChain)
-							.map((effect: ScreenEffectApi) => {
-								let newnode: any;
-								let createNewNode = CreateNewNode(
-									{
-										[NodeProperties.NODEType]: NodeTypes.ScreenEffectApi,
-										[NodeProperties.DataChain]: effect.dataChain,
-										[NodeProperties.UIText]: effect.name
-									},
-									(node: any) => {
-										newnode = node;
-									}
-								);
-								return [
-									...createNewNode,
-									function() {
-										return AddLinkBetweenNodes(
-											newnode.id,
-											effect.dataChain,
-											LinkProperties.ScreenEffectApi
-										);
-									},
-									function() {
-										return AddLinkBetweenNodes(
-											newnode.id,
-											agentAccessContext.entry,
-											LinkProperties.ScreenEffectApi
-										);
-									}
-								];
-							});
-					});
+					let urlParametersForMounting: string[] = getUrlParametersForMounting(mounting);
+
+					result.push(...temp, () =>
+						screenEffectGen(screenEffect, agentAccessContext, urlParametersForMounting, dashboard, agent)
+					);
 				}
 			}
 		});
@@ -141,6 +114,7 @@ export default function BuildAgentAccessWeb(args: any) {
 						: {};
 				if (values) {
 					let agentAccessContext: any = null;
+
 					result.push(
 						...AddAgentAccess({
 							modelId: model,
@@ -156,14 +130,46 @@ export default function BuildAgentAccessWeb(args: any) {
 							}
 						}),
 						() => {
+							return Object.keys(screenEffect).filter((d) => screenEffect[d]).map((key: string) => {
+								let urlParametersForMounting = mounting[key]
+									? getUrlParametersForMounting(mounting[key])
+									: [];
+
+								return screenEffectGen(
+									screenEffect[key],
+									agentAccessContext,
+									urlParametersForMounting,
+									model,
+									agent
+								);
+							});
+						},
+						() => {
 							let result: any[] = [];
 							Object.keys(effects).filter((d) => effects[d]).forEach((key) => {
 								let _effects = effects[key];
 								if (_effects && _effects.length) {
 									_effects.forEach((_ef: ScreenEffectApi) => {
 										let newnode: any;
+										let contextualNode: any;
+										let urlParametersForMounting = mounting[key]
+											? getUrlParametersForMounting(mounting[key])
+											: [];
+										let contextualParameters = CreateNewNode(
+											{
+												[NodeProperties.NODEType]: NodeTypes.ContextualParameters,
+												[NodeProperties.ContextParams]: urlParametersForMounting,
+												[NodeProperties.DataChain]: effects[key].dataChain,
+												[NodeProperties.UIText]: `${GetNodeTitle(model)} ${GetNodeTitle(
+													agent
+												)} ${key} CP`
+											},
+											(node: any) => {
+												contextualNode = node;
+											}
+										);
 										result.push(
-											...CreateNewNode(
+											CreateNewNode(
 												{
 													[NodeProperties.NODEType]: NodeTypes.ScreenEffectApi,
 													[NodeProperties.DataChain]: _ef.dataChain,
@@ -173,6 +179,14 @@ export default function BuildAgentAccessWeb(args: any) {
 													newnode = node;
 												}
 											),
+											contextualParameters,
+											function() {
+												return AddLinkBetweenNodes(
+													contextualNode.id,
+													effects[key].dataChain,
+													LinkProperties.ContextualParameters
+												);
+											},
 											function() {
 												return AddLinkBetweenNodes(
 													newnode.id,
@@ -200,4 +214,78 @@ export default function BuildAgentAccessWeb(args: any) {
 	});
 
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+}
+function screenEffectGen(
+	screenEffect: any,
+	agentAccessContext: any,
+	urlParametersForMounting: string[],
+	dashboard: any,
+	agent: any
+): any {
+	return () => {
+		return screenEffect
+			.filter((x: ScreenEffectApi) => agentAccessContext && x.dataChain)
+			.map((effect: ScreenEffectApi) => {
+				let newnode: any;
+				let contextualNode: any;
+				let createNewNode = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.ScreenEffectApi,
+						[NodeProperties.DataChain]: effect.dataChain,
+						[NodeProperties.UIText]: effect.name
+					},
+					(node: any) => {
+						newnode = node;
+					}
+				);
+				let contextualParameters = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.ContextualParameters,
+						[NodeProperties.ContextParams]: urlParametersForMounting,
+						[NodeProperties.DataChain]: effect.dataChain,
+						[NodeProperties.UIText]: `${GetNodeTitle(dashboard)} ${GetNodeTitle(agent)} CP`
+					},
+					(node: any) => {
+						contextualNode = node;
+					}
+				);
+				return [
+					createNewNode,
+					contextualParameters,
+					function() {
+						return AddLinkBetweenNodes(
+							contextualNode.id,
+							effect.dataChain,
+							LinkProperties.ContextualParameters
+						);
+					},
+					function() {
+						return AddLinkBetweenNodes(newnode.id, effect.dataChain, LinkProperties.ScreenEffectApi);
+					},
+					function() {
+						return AddLinkBetweenNodes(
+							newnode.id,
+							agentAccessContext.entry,
+							LinkProperties.ScreenEffectApi
+						);
+					}
+				];
+			});
+	};
+}
+
+function getUrlParametersForMounting(mounting: any) {
+	let urlParametersForMounting: string[] = [];
+	if (mounting) {
+		let viewMounting: ViewMounting = mounting;
+		if (viewMounting && viewMounting.mountings) {
+			viewMounting.mountings.forEach((mounting: MountingDescription) => {
+				if (mounting.source) {
+					urlParametersForMounting.push(...Object.keys(mounting.source));
+				}
+			});
+		}
+	}
+	urlParametersForMounting = urlParametersForMounting.unique();
+	return urlParametersForMounting;
 }

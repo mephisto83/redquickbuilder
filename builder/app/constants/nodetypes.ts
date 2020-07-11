@@ -14,6 +14,7 @@ export const NodeTypes = {
 	ScreenContainer: 'screen-container',
 	ScreenEffect: 'ScreenEffect',
 	ScreenEffectApi: 'ScreenEffectApi',
+	ContextualParameters: 'ContextualParameters',
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
 	NavigationAction: 'NavigationAction',
@@ -397,6 +398,7 @@ export const NodeProperties = {
 	ScreenOption: 'ScreenOption',
 	SelectorProperty: 'SelectorProperty',
 	Value: 'Value',
+	ContextParams: 'ContextParams',
 	value: 'value',
 	Number: 'Number',
 	OnFocus: 'onFocus',
@@ -667,6 +669,7 @@ export const LinkType = {
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
 	DataChainShouldShow: 'DataChainShouldShow',
+	ContextParameters: 'ContextParameters',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	DefaultValue: 'DefaultValue',
@@ -945,6 +948,9 @@ export const LinkProperties = {
 	},
 	ScreenEffectApi: {
 		type: LinkType.ScreenEffectApi
+	},
+	ContextualParameters: {
+		type: LinkType.ContextParameters
 	},
 	MethodArgumentSoure: {
 		type: LinkType.MethodArgumentSoure

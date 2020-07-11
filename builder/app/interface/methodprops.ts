@@ -65,10 +65,9 @@ export interface MountingDescription {
 	id: string;
 	name: string;
 	methodDescription?: MethodDescription;
-	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
+	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 }
-
 
 export interface ScreenEffect {
 	id: string;
@@ -88,13 +87,15 @@ export interface Effect {
 }
 
 export interface RouteDescription {
+	isDashboard?: boolean;
+	dashboard?: string;
 	viewType: string;
 	model: string;
 	agent: string;
 	id: string;
 	name: string;
 	targetMethodDescription?: MethodDescription;
-	source?: RouteSource; // This is what the button will use to populate the parameter for navigating to the next page.
+	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 }
 export interface RouteSource {
 	model?: string;

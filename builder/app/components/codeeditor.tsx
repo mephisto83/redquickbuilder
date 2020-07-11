@@ -200,10 +200,31 @@ ${this.state.definitions}
 		let result = '';
 		let { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
+		let screenEffectApis = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+			id: currentNode.id,
+			link: LinkType.ScreenEffectApi
+		}).map((node: Node) => {
+			return UIA.GetJSCodeName(node);
+		});
+		let contextParameters: string[] = [];
+		GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+			id: currentNode.id,
+			link: LinkType.ScreenEffectApi
+		}).forEach((node: Node) => {
+			let nodeParams = GetNodeProp(node, NodeProperties.ContextParams) || [];
+			contextParameters.push(...nodeParams);
+		});
+
 		if (currentNode) {
 			result = `
 let $internalComponentState: ComponentState;
 interface ComponentState {
+  ${[ ...screenEffectApis, ...contextParameters ]
+		.unique()
+		.map((param: string) => {
+			return `${param}: string | number | null,`;
+		})
+		.join(NEW_LINE)}
   viewModel: string,
   value: string,
   model: string

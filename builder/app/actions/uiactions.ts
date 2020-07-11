@@ -365,7 +365,7 @@ export function AddLinkBetweenNodes(source: string, target: string, properties: 
 		}
 	];
 }
-export function CreateNewNode(props: any, callback: Function) {
+export function CreateNewNode(props: any, callback?: Function) {
 	return [
 		{
 			operation: ADD_NEW_NODE,
@@ -4644,7 +4644,23 @@ declare global {
 		});
 	}
 })(String.prototype);
-
+export function ensureRouteSource(mountingItem: any, urlParameter: string, key: string = 'model') {
+	return mountingItem.source && mountingItem.source[urlParameter] ? mountingItem.source[urlParameter][key] : null;
+}
+export function setRouteSource(
+	mountingItem: any,
+	urlParameter: string,
+	k: string,
+	type: string,
+	property: string | null = null
+) {
+	mountingItem.source = mountingItem.source || {};
+	mountingItem.source[urlParameter] = {
+		model: k,
+		property,
+		type
+	};
+}
 export function graphOperation(operation: any, options?: any, stamp?: any) {
 	return (dispatch: Function, getState: Function) => {
 		if (stamp) {
@@ -4672,7 +4688,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 		let operations = operation;
 		if (!Array.isArray(operation)) {
 			operations = [ { operation, options } ];
-    }
+		}
 
 		currentGraph = handleArrayOperations(
 			operations,

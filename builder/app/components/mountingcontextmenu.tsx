@@ -67,7 +67,8 @@ class ContextMenu extends Component<any, any> {
 							model,
 							agent,
 							name: '',
-							viewType
+							viewType,
+							screenEffect: []
 						});
 						if (callback) {
 							callback(mounting);
@@ -79,7 +80,6 @@ class ContextMenu extends Component<any, any> {
 			</TreeViewButtonGroup>
 		);
 	}
-	getRoutingApi(routing: Routing) {}
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let mounting: ViewMounting = mode.mounting;
@@ -118,7 +118,6 @@ class ContextMenu extends Component<any, any> {
 			);
 
 			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
-			this.getRoutingApi(mode);
 			switch (mode) {
 				default:
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
@@ -136,7 +135,11 @@ class ContextMenu extends Component<any, any> {
 									let routeKey = `url-param-${urlParameter}-${index}`;
 									let agentPropertyOptions: Node[] = UIA.GetModelCodeProperties(agent);
 									let modelPropertyOptions: Node[] = UIA.GetModelCodeProperties(model);
-									let value = mountingItem.source ? mountingItem.source.model : null;
+									// let value =
+									// 	mountingItem.source && mountingItem.source[urlParameter]
+									// 		? mountingItem.source[urlParameter].model
+									// 		: null;
+									let value = UIA.ensureRouteSource(mountingItem, urlParameter);
 									let options = [
 										...[ urlParameter ]
 											.filter(
@@ -150,11 +153,12 @@ class ContextMenu extends Component<any, any> {
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
-															mountingItem.source = {
-																model: k,
-																property: null,
-																type: RouteSourceType.UrlParameter
-															};
+															UIA.setRouteSource(
+																mountingItem,
+																urlParameter,
+																k,
+																RouteSourceType.UrlParameter
+															);
 															callback(mounting);
 															this.setState({ turn: UIA.GUID() });
 														}}
@@ -173,7 +177,11 @@ class ContextMenu extends Component<any, any> {
 											}}
 										>
 											{modelPropertyOptions.map((modelPropertyOption: Node) => {
-												let value = mountingItem.source ? mountingItem.source.property : null;
+												let value = UIA.ensureRouteSource(
+													mountingItem,
+													urlParameter,
+													'property'
+												);
 												return (
 													<TreeViewMenu
 														icon={
@@ -185,11 +193,20 @@ class ContextMenu extends Component<any, any> {
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
-															mountingItem.source = {
+															// mountingItem.source = mountingItem.source || {};
+
+															// mountingItem.source[urlParameter] = {
+															// 	model,
+															// 	property: modelPropertyOption.id,
+															// 	type: RouteSourceType.Model
+															// };
+															UIA.setRouteSource(
+																mountingItem,
+																urlParameter,
 																model,
-																property: modelPropertyOption.id,
-																type: RouteSourceType.Model
-															};
+																RouteSourceType.Model,
+																modelPropertyOption.id
+															);
 															callback(mounting);
 															this.setState({ turn: UIA.GUID() });
 														}}
@@ -209,7 +226,11 @@ class ContextMenu extends Component<any, any> {
 											key={`url-parma-k-genta`}
 										>
 											{agentPropertyOptions.map((agentPropertyOption: Node) => {
-												let value = mountingItem.source ? mountingItem.source.property : null;
+												let value = UIA.ensureRouteSource(
+													mountingItem,
+													urlParameter,
+													'property'
+												);
 												return (
 													<TreeViewMenu
 														title={UIA.GetNodeTitle(agentPropertyOption)}
@@ -221,11 +242,13 @@ class ContextMenu extends Component<any, any> {
 															)
 														}
 														onClick={() => {
-															mountingItem.source = {
-																model: agent,
-																property: agentPropertyOption.id,
-																type: RouteSourceType.Agent
-															};
+															UIA.setRouteSource(
+																mountingItem,
+																urlParameter,
+																agent,
+																RouteSourceType.Agent,
+																agentPropertyOption.id
+															);
 															callback(mounting);
 															this.setState({ turn: UIA.GUID() });
 														}}
