@@ -31,11 +31,14 @@ import {
 	Effect,
 	EffectProps,
 	RoutingProps,
-	Routing
+	Routing,
+	ScreenEffectApiProps,
+	ScreenEffectApi
 } from '../../interface/methodprops';
 import SetupViewMouting, { GetViewMounting } from './ConnectScreen/SetupViewMouting';
 import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
 import { RedressScreenProperties } from './RedressProperties';
+import SetupScreenEffects, { GetScreenEffectApi } from './ConnectScreen/SetupScreenEffects';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -67,6 +70,14 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 					let route: Routing | null = GetRoute(routingProps, viewType);
 					if (route) {
 						SetupRoute(screen, route, { agent, model, viewType, agentAccessDescription });
+					}
+					let screenEffectsProps: ScreenEffectApiProps = GetLinkProperty(
+						agentLink,
+						LinkPropertyKeys.ScreenEffectApiProps
+					);
+					let screenEffects: ScreenEffectApi[] | null = GetScreenEffectApi(screenEffectsProps, viewType);
+					if (screenEffects) {
+						SetupScreenEffects(screen, screenEffects, { agent, model, viewType, agentAccessDescription });
 					}
 				} else {
 					console.log('Agent link missing, this should never happen');

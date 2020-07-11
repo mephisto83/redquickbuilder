@@ -221,6 +221,13 @@ class DataChainActvityMenu extends Component<any, any> {
 							});
 						}}
 					/>
+					<CheckBox
+						label={Titles.UIAgnostic}
+						value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UIAgnostic)}
+						onChange={(value: any) => {
+							UIA.updateComponentProperty(currentNode.id, UIA.NodeProperties.UIAgnostic, value);
+						}}
+					/>
 					<SelectInput
 						onChange={(value: any) => {
 							const id = currentNode.id;

@@ -382,6 +382,7 @@ export const NodeProperties = {
 	ValidationMethodTarget: 'ValidationMethodTarget',
 	ClientMethodParameters: 'ClientMethodParameters',
 	AsOutput: 'AsOutput',
+	UIAgnostic: 'UIAgnostic',
 	EntryPoint: 'EntryPoint',
 	CSEntryPoint: 'CSEntryPoint',
 	CS: 'CS',

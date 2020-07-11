@@ -1,4 +1,10 @@
-import { RoutingProps, Routing, RouteDescription } from '../../../interface/methodprops';
+import {
+	RoutingProps,
+	Routing,
+	RouteDescription,
+	ScreenEffectApiProps,
+	ScreenEffectApi
+} from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import {
 	GetCurrentGraph,

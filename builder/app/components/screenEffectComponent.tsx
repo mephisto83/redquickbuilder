@@ -54,6 +54,21 @@ export default class ScreenEffectComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+        <TreeViewItemContainer>
+					<CheckBox
+						label={Titles.DeepDownTree}
+						value={screenEffect.passDeep}
+						onChange={(value: boolean) => {
+							screenEffect.passDeep = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.DataChain}
@@ -93,7 +108,8 @@ export default class ScreenEffectComponent extends Component<any, any> {
 										[NodeProperties.NODEType]: NodeTypes.DataChain,
 										[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
 										[NodeProperties.DataChainEntry]: true,
-										[NodeProperties.AsOutput]: true
+										[NodeProperties.AsOutput]: true,
+										[NodeProperties.UIAgnostic]: true
 									},
 									(node: Node) => {
 										UIA.updateComponentProperty(

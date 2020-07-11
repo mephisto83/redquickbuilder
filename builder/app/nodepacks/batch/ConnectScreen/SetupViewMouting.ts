@@ -1,4 +1,4 @@
-import { ViewMounting, MountingDescription, ViewMoutingProps } from '../../../interface/methodprops';
+import { ViewMounting, MountingDescription, ViewMoutingProps, MethodDescription } from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import { Node } from '../../../methods/graph_types';
 import {
@@ -30,7 +30,7 @@ import { uuidv4 } from '../../../utils/array';
 import ClearScreenInstance from '../../datachain/ClearScreenInstance';
 import { ComponentLifeCycleEvents } from '../../../constants/componenttypes';
 import ConnectComponentDidMount from '../ConnectComponentDidMount';
-import { SetupApi } from './Shared';
+import { SetupApi, SetupApiToBottom, SetupApiValueDownToTheBottomComponent } from './Shared';
 
 export default function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information: SetupInformation) {
 	console.log('setup view mounting');
@@ -183,83 +183,55 @@ function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 	});
 	let { methodDescription } = mounting;
 	if (methodDescription) {
-		console.log('setup method description');
-		console.log(methodDescription);
-		let methodFunctionProperties = MethodFunctions[methodDescription.functionType];
-		if (methodFunctionProperties && methodFunctionProperties.parameters) {
-			let { parameters } = methodFunctionProperties.parameters;
-			console.log('parameters');
-			console.log(parameters);
-			if (parameters) {
-				let { template } = parameters;
-				if (template) {
-					Object.keys(template).map((paramName: string) => {
-						let changeParam = false;
-						if (template[paramName].defaultValue) {
-							//change the value, to the name of the parameters
-							console.log('change the value, to the name of the parameters');
-							changeParam = true;
-						}
-						if (!changeParam) {
-							screenOptions.forEach((screenOption: Node) => {
-								if (!changeParam) {
-									SetupApi(screen, paramName, screenOption);
-								}
-							});
-						} else {
-							UpdateValueApiToDifferentName(screen, paramName);
-						}
-
-						SetScreenParamToUrl(screen, paramName);
-						SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
-
-						// Setup the api values all the way down to the bottom components
-						SetupApiValueDownToTheBottomComponent(screen, paramName);
-          });
-          updateComponentProperty(
-            screen.id,
-            NodeProperties.UIText,
-            GetNodeProp(screen, NodeProperties.UIText)
-          );
-				}
-			}
-		}
+		SetupMethodParametersForComponent(methodDescription, screenOptions, screen);
 	}
 }
 
-function SetupApiValueDownToTheBottomComponent(screen: Node, paramName: string) {
-	let graph = GetCurrentGraph();
-	let screenOptions = GetNodesLinkedTo(graph, {
-		id: screen.id,
-		link: LinkType.ScreenOptions
-	});
-	let seen: string[] = [];
-	let paused = Paused();
-	SetPause(true);
-	screenOptions.forEach((screenOption: Node) => {
-		SetupApiToBottom(screenOption, paramName, seen);
-	});
-	SetPause(paused);
+function SetupMethodParametersForComponent(methodDescription: MethodDescription, screenOptions: Node[], screen: Node) {
+  console.log('setup method description');
+  console.log(methodDescription);
+  let methodFunctionProperties = MethodFunctions[methodDescription.functionType];
+  if (methodFunctionProperties && methodFunctionProperties.parameters) {
+    let { parameters } = methodFunctionProperties.parameters;
+    console.log('parameters');
+    console.log(parameters);
+    if (parameters) {
+      let { template } = parameters;
+      if (template) {
+        Object.keys(template).map((paramName: string) => {
+          let changeParam = false;
+          if (template[paramName].defaultValue) {
+            //change the value, to the name of the parameters
+            console.log('change the value, to the name of the parameters');
+            changeParam = true;
+          }
+          if (!changeParam) {
+            screenOptions.forEach((screenOption: Node) => {
+              if (!changeParam) {
+                SetupApi(screen, paramName, screenOption);
+              }
+            });
+          }
+          else {
+            UpdateValueApiToDifferentName(screen, paramName);
+          }
+
+          SetScreenParamToUrl(screen, paramName);
+          SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
+
+          // Setup the api values all the way down to the bottom components
+          SetupApiValueDownToTheBottomComponent(screen, paramName);
+        });
+        updateComponentProperty(
+          screen.id,
+          NodeProperties.UIText,
+          GetNodeProp(screen, NodeProperties.UIText)
+        );
+      }
+    }
+  }
 }
 
-function SetupApiToBottom(parent: Node, paramName: string, seen: string[]) {
-	let graph = GetCurrentGraph();
-	seen.push(parent.id);
-	let components: Node[] = GetNodesLinkedTo(graph, {
-		id: parent.id,
-		componentType: NodeTypes.ComponentNode,
-		direction: SOURCE
-	});
-
-	components
-		.filter((component: Node) => {
-			return seen.indexOf(component.id) === -1;
-		})
-		.forEach((component: Node) => {
-			SetupApi(parent, paramName, component);
-			SetupApiToBottom(component, paramName, seen);
-		});
-}
 
 function SetInternalScreenOptionsParamToUrlParameter(screen: Node, paramName: string) {
 	console.log(`[${GetNodeTitle(screen)}] set interface screen options param to url parameter: ${paramName}`);

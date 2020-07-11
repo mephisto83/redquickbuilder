@@ -72,6 +72,7 @@ export interface MountingDescription {
 export interface ScreenEffect {
 	id: string;
 	name: string;
+	passDeep: boolean; // pass the component api down the tree to all the nodes.
 	dataChain: string;
 }
 export interface ScreenEffectApi extends ScreenEffect {}

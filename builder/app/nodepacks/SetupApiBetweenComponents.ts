@@ -11,6 +11,7 @@ export interface ComponentApiSetup {
 	id: string | any;
 	external: string | any;
 	internal: string | any;
+	skipExternal?: boolean;
 }
 let func: any = function SetupApiBetweenComponent(args: {
 	component_a: ComponentApiSetup;
@@ -32,9 +33,10 @@ let func: any = function SetupApiBetweenComponent(args: {
 	if (!args.component_b.id) {
 		throw 'missing component_b.id';
 	}
-	if (!args.component_a.external) {
-		throw 'missing component_a.external';
-	}
+	if (!args.component_a.skipExternal)
+		if (!args.component_a.external) {
+			throw 'missing component_a.external';
+		}
 	if (!args.component_a.internal) {
 		throw 'missing component_a.internal';
 	}
@@ -68,28 +70,29 @@ let func: any = function SetupApiBetweenComponent(args: {
 		let componentA_internal_node = GetComponentApiNode(a_internal_id, componentA.id, graph);
 
 		if (componentA && componentB) {
-			if (!componentA_external_node) {
-				result.push({
-					operation: ADD_NEW_NODE,
-					options: function() {
-						return {
-							nodeType: NodeTypes.ComponentExternalApi,
-							parent: componentA.id,
-							groupProperties: {},
-							properties: {
-								...viewPackages,
-								[NodeProperties.UIText]: a_external_id
-							},
-							linkProperties: {
-								properties: { ...LinkProperties.ComponentExternalApi }
-							},
-							callback: (node: any) => {
-								componentA_external_node = node;
-							}
-						};
-					}
-				});
-			}
+			if (!args.component_a.skipExternal)
+				if (!componentA_external_node) {
+					result.push({
+						operation: ADD_NEW_NODE,
+						options: function() {
+							return {
+								nodeType: NodeTypes.ComponentExternalApi,
+								parent: componentA.id,
+								groupProperties: {},
+								properties: {
+									...viewPackages,
+									[NodeProperties.UIText]: a_external_id
+								},
+								linkProperties: {
+									properties: { ...LinkProperties.ComponentExternalApi }
+								},
+								callback: (node: any) => {
+									componentA_external_node = node;
+								}
+							};
+						}
+					});
+				}
 			if (!componentA_internal_node) {
 				result.push({
 					operation: ADD_NEW_NODE,
@@ -112,22 +115,23 @@ let func: any = function SetupApiBetweenComponent(args: {
 					}
 				});
 			}
-			result.push({
-				operation: ADD_LINK_BETWEEN_NODES,
-				options: function(graph: any) {
-					let thereIsAnExistingLink = existsLinkBetween(graph, {
-						source: componentA_internal_node.id,
-						target: componentA_external_node.id
-					});
-					if (!thereIsAnExistingLink)
-						return {
+			if (!args.component_a.skipExternal)
+				result.push({
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: function(graph: any) {
+						let thereIsAnExistingLink = existsLinkBetween(graph, {
 							source: componentA_internal_node.id,
-							target: componentA_external_node.id,
-							properties: { ...LinkProperties.ComponentInternalConnection }
-						};
-					return null;
-				}
-			});
+							target: componentA_external_node.id
+						});
+						if (!thereIsAnExistingLink)
+							return {
+								source: componentA_internal_node.id,
+								target: componentA_external_node.id,
+								properties: { ...LinkProperties.ComponentInternalConnection }
+							};
+						return null;
+					}
+				});
 
 			if (!componentB_external_node) {
 				result.push({
