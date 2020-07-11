@@ -18,9 +18,9 @@ import {
 	SetLayoutCell,
 	GetChildren,
 	GetFirstCell,
-  SOURCE,
-  Paused,
-  SetPause
+	SOURCE,
+	Paused,
+	SetPause
 } from '../../../methods/graph_methods';
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from '../../../constants/nodetypes';
 import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
@@ -92,14 +92,15 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	// can add more properties to cell later.
 }
 
-export function SetupApi(parent: Node, paramName: string, child: Node) {
+export function SetupApi(parent: Node, paramName: string, child: Node, skipFirst?: boolean) {
 	console.log(`setup api :${paramName}`);
 	graphOperation(
 		SetupApiBetweenComponent({
 			component_a: {
 				id: parent.id,
 				external: paramName,
-				internal: paramName
+				internal: paramName,
+				skipExternal: skipFirst
 			},
 			component_b: {
 				id: child.id,
@@ -132,9 +133,7 @@ export function SetupApiValueDownToTheBottomComponent(screen: Node, paramName: s
 	SetPause(paused);
 }
 
-
-
-export function SetupApiToBottom(parent: Node, paramName: string, seen: string[]) {
+export function SetupApiToBottom(parent: Node, paramName: string, seen: string[], skipFirst?: boolean) {
 	let graph = GetCurrentGraph();
 	seen.push(parent.id);
 	let components: Node[] = GetNodesLinkedTo(graph, {
@@ -148,13 +147,12 @@ export function SetupApiToBottom(parent: Node, paramName: string, seen: string[]
 			return seen.indexOf(component.id) === -1;
 		})
 		.forEach((component: Node) => {
-			SetupApi(parent, paramName, component);
+			SetupApi(parent, paramName, component, skipFirst);
 			SetupApiToBottom(component, paramName, seen);
 		});
 }
 
-
-export function AddInternalComponentApi(componentB: string, b_internal_id: string) {
+export function AddInternalComponentApi(componentB: string, b_internal_id: string): string {
 	let result: any[] = [];
 	let ret: any = null;
 	result.push({
@@ -175,7 +173,7 @@ export function AddInternalComponentApi(componentB: string, b_internal_id: strin
 				}
 			};
 		}
-  });
+	});
 
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	return ret;
