@@ -39,10 +39,10 @@ function SetupScreenOptionEffects(
 			let internalComponent = AddInternalComponentApi(screenOption.id, screenEffect.name.toJavascriptName());
 			if (screenEffect.passDeep) {
 				SetupApiToBottom(screenOption, GetJSCodeName(internalComponent), [], true);
-				graphOperation(
-					AddLinkBetweenNodes(internalComponent, screenEffect.dataChain, LinkProperties.DataChainScreenEffect)
-				)(GetDispatchFunc(), GetStateFunc());
 			}
+			graphOperation(
+				AddLinkBetweenNodes(internalComponent, screenEffect.dataChain, LinkProperties.DataChainScreenEffect)
+			)(GetDispatchFunc(), GetStateFunc());
 		});
 }
 export function GetScreenEffectApi(
