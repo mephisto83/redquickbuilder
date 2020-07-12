@@ -278,6 +278,18 @@ class ContextMenu extends Component<any, any> {
 										value={route.isDashboard}
 									/>
 								</TreeViewItemContainer>
+								{mode && mode.viewType !== ViewTypes.GetAll ? null : (
+									<TreeViewItemContainer>
+										<CheckBox
+											label={Titles.OnItemSelection}
+											onChange={(value: boolean) => {
+												route.isItemized = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.isItemized}
+										/>
+									</TreeViewItemContainer>
+								)}
 								{!route.isDashboard ? null : (
 									<TreeViewItemContainer>
 										<SelectInput

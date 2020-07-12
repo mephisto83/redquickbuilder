@@ -4772,6 +4772,8 @@ function handleOperation(
 		return handleFunctionOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
 	} else if (Array.isArray(op)) {
 		return handleArrayOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	} else if (!op) {
+		return currentGraph;
 	}
 	let { operation, options } = op;
 	if (typeof options === 'function') {

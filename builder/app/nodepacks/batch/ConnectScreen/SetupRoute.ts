@@ -22,7 +22,7 @@ import {
 	GetNodeById,
 	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
-import { GetNodesLinkedTo } from '../../../methods/graph_methods';
+import { GetNodesLinkedTo, GetNodeLinkedTo } from '../../../methods/graph_methods';
 import { LinkType, LinkProperties, NodeProperties, NodeTypes } from '../../../constants/nodetypes';
 import { Node } from '../../../methods/graph_types';
 import { AddButtonToSubComponent, AddButtonToComponentLayout, SetupApi, AddApiToButton } from './Shared';
@@ -45,14 +45,30 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 	setup_options.forEach((screenOption: Node) => {
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
-		let targetScreen: Node = GetNodeByProperties({
-			[NodeProperties.NODEType]: NodeTypes.Screen,
-			[NodeProperties.Model]: routeDescription.model,
-			[NodeProperties.Agent]: GetNodeProp(screen, NodeProperties.Agent),
-			[NodeProperties.ViewType]: routeDescription.viewType
-		});
+		let targetScreen: Node | null = null;
+		if (routeDescription.isDashboard) {
+			let navigationDashboard = GetNodeById(routeDescription.dashboard);
+			let screenImpl = GetNodeLinkedTo(graph, {
+				id: navigationDashboard.id,
+				link: LinkType.NavigationScreenImplementation
+			});
+			targetScreen = screenImpl;
+		} else {
+			targetScreen = GetNodeByProperties({
+				[NodeProperties.NODEType]: NodeTypes.Screen,
+				[NodeProperties.Model]: routeDescription.model,
+				[NodeProperties.Agent]: GetNodeProp(screen, NodeProperties.Agent),
+				[NodeProperties.ViewType]: routeDescription.viewType
+			});
+		}
 		AddApiToButton({ button, component: subcomponent });
-		NavigateTo(routeDescription, targetScreen, information, { eventInstance, event, button });
+		// console.log(GetNodeProp(routeDescription.))
+		if (targetScreen) {
+			NavigateTo(routeDescription, targetScreen, information, { eventInstance, event, button });
+		} else {
+			console.log(JSON.stringify(routeDescription, null, 4));
+			throw new Error('missing targetScreen');
+		}
 		AddButtonToComponentLayout({ button, component: subcomponent });
 	});
 }

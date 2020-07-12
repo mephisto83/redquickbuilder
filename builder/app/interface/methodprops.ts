@@ -89,6 +89,7 @@ export interface Effect {
 
 export interface RouteDescription {
 	isDashboard?: boolean;
+	isItemized?: boolean;
 	dashboard?: string;
 	viewType: string;
 	model: string;

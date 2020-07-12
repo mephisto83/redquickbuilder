@@ -57,9 +57,17 @@ export default function BuildAgentAccessWeb(args: any) {
 
 	const agentAccesss = NodesByType(graph, NodeTypes.AgentAccessDescription);
 	const contextParams = NodesByType(graph, NodeTypes.ContextualParameters);
+	const navigationScreens = NodesByType(graph, NodeTypes.NavigationScreen).filter(
+		(x: Node) => !GetNodeProp(x, NodeProperties.IsDashboard)
+	);
 	let screenEffects = NodesByType(graph, NodeTypes.ScreenEffectApi);
 	let links = LinksByType(graph, LinkType.NavigationScreen);
-	const result: any[] = [ ...contextParams, ...agentAccesss, ...screenEffects ].map((v: any) => ({
+	const result: any[] = [
+		...navigationScreens,
+		...contextParams,
+		...agentAccesss,
+		...screenEffects
+	].map((v: any) => ({
 		operation: REMOVE_NODE,
 		options() {
 			return {
@@ -251,7 +259,7 @@ export default function BuildAgentAccessWeb(args: any) {
 					);
 					if (routing) {
 						result.push(() => {
-							return buildAgentModelRouting(model, agent, routing, () => agentAccessContext);
+							return buildAgentModelRouting(model, agent, routing, () => agentAccessContext, values);
 						});
 					}
 				}
@@ -266,43 +274,49 @@ function buildAgentModelRouting(
 	model: string,
 	agent: string,
 	dashboardRouting: RoutingProps,
-	agentAccessContext: () => { entry: string }
+	agentAccessContext: () => { entry: string },
+	values: any
 ) {
 	let graph = GetCurrentGraph();
-	return Object.keys(ViewTypes).filter((v) => v !== ViewTypes.Delete).map((viewType) => {
-		let result: any[] = [];
-		let navigationScreen = GetNodesByProperties(
-			{
-				[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
-				[NodeProperties.Model]: model,
-				[NodeProperties.Agent]: agent,
-				[NodeProperties.ViewType]: viewType
-			},
-			graph
-		).find((x: Node) => !GetNodeProp(x, NodeProperties.IsDashboard));
-		if (!navigationScreen) {
-			result.push(
-				CreateNewNode(
-					{
-						[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
-						[NodeProperties.Agent]: agent,
-						[NodeProperties.Model]: model,
-						[NodeProperties.ViewType]: viewType,
-						[NodeProperties.UIText]: `${GetNodeTitle(agent)} ${GetNodeTitle(model)} ${viewType}`
-					},
-					(_node: Node) => {
-						navigationScreen = _node;
-					}
-				)
-			);
-		}
-		result.push(() => {
-			let routing = dashboardRouting[viewType];
-			if (routing) return buildRouting(routing, navigationScreen, agent, agentAccessContext);
-			return [];
+	return Object.keys(ViewTypes)
+		.filter((v) => v !== ViewTypes.Delete)
+		.filter((v: string) => {
+			return values[v];
+		})
+		.map((viewType) => {
+			let result: any[] = [];
+			let navigationScreen = GetNodesByProperties(
+				{
+					[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+					[NodeProperties.Model]: model,
+					[NodeProperties.Agent]: agent,
+					[NodeProperties.ViewType]: viewType
+				},
+				graph
+			).find((x: Node) => !GetNodeProp(x, NodeProperties.IsDashboard));
+			if (!navigationScreen) {
+				result.push(
+					CreateNewNode(
+						{
+							[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+							[NodeProperties.Agent]: agent,
+							[NodeProperties.Model]: model,
+							[NodeProperties.ViewType]: viewType,
+							[NodeProperties.UIText]: `${GetNodeTitle(agent)} ${GetNodeTitle(model)} ${viewType}`
+						},
+						(_node: Node) => {
+							navigationScreen = _node;
+						}
+					)
+				);
+			}
+			result.push(() => {
+				let routing = dashboardRouting[viewType];
+				if (routing) return buildRouting(routing, navigationScreen, agent, agentAccessContext);
+				return [];
+			});
+			return result;
 		});
-		return result;
-	});
 }
 function buildDashboardRouting(
 	dashboard: string,
@@ -329,7 +343,7 @@ function buildRouting(
 		let result: any[] = [];
 		if (route.isDashboard && route.dashboard) {
 			result.push(AddLinkBetweenNodes(navigationScreen.id, route.dashboard, LinkProperties.NavigationScreen));
-		} else {
+		} else if (!route.isDashboard) {
 			let targetNaviScreen = GetNodesByProperties(
 				{
 					[NodeProperties.Agent]: agent,
@@ -347,7 +361,9 @@ function buildRouting(
 							[NodeProperties.Agent]: agent,
 							[NodeProperties.Model]: route.model,
 							[NodeProperties.ViewType]: route.viewType,
-							[NodeProperties.UIText]: `${GetNodeTitle(agent)} ${GetNodeTitle(route.model)}`
+							[NodeProperties.UIText]: `${GetNodeTitle(agent)} ${GetNodeTitle(
+								route.model
+							)} ${route.viewType}`
 						},
 						(_node: Node) => {
 							targetNaviScreen = _node;

@@ -1639,12 +1639,24 @@ export function LinksByType(graph: Graph, linkType: string | string[]): GraphLin
 	}
 	let linkIds: string[] = [];
 	linkTypes.forEach((linkType: string) => {
-		linkIds.push(...Object.keys(AppCache.Links[linkType]).filter((v) => AppCache.Links[linkType][v]).map((v) => v));
+		linkIds.push(
+			...Object.keys(AppCache.Links[linkType])
+				.filter((v) => {
+					let res = AppCache.Links[linkType][v];
+					if (!res) {
+						delete AppCache.Links[linkType][v];
+					}
+					return res;
+				})
+				.map((v) => v)
+		);
 	});
 
-	return linkIds.map((id: string) => {
-		return GetLink(id);
-	});
+	return linkIds
+		.map((id: string) => {
+			return GetLink(id);
+		})
+		.filter((x) => x);
 }
 
 export function NodesByType(graph: any, nodeType: any, options: any = {}) {

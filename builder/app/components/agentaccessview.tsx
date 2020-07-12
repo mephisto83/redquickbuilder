@@ -1498,7 +1498,10 @@ class AgentAccessView extends Component<any, any> {
 							onComponentMountMethod,
 							dashboard,
 							routing,
-							getMountingDescription: (a: string, m: string): ViewMounting => {
+							getMountingDescription: (a: string, m: string, v?: string): ViewMounting => {
+								let aI = this.state.agents.findIndex((f: string) => f === a);
+								let mI = this.state.models.findIndex((f: string) => f === m);
+								if (v) return this.getMountingDescription(aI, mI, v);
 								return this.getDashboardMountingDescription(a, m);
 							},
 							callback: (value: Routing) => {
@@ -1868,6 +1871,7 @@ function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[],
 						.filter((x: GraphLink) => {
 							return !routing.routes.find((v) => v.linkId === x.id);
 						})
+            .filter(filterRoutes(routing))
 						.forEach((navLink) => {
 							let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
 							routing.routes.push({
@@ -2050,6 +2054,7 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 										.filter((x: GraphLink) => {
 											return !routing.routes.find((v) => v.linkId === x.id);
 										})
+										.filter(filterRoutes(routing))
 										.forEach((navLink) => {
 											let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
 											routing.routes.push({
@@ -2079,6 +2084,20 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 	}
 	return result;
 }
+function filterRoutes(routing: Routing): (value: GraphLink, index: number, array: GraphLink[]) => unknown {
+  return (navLink) => {
+    return !routing.routes.find((route: RouteDescription) => {
+      if (route.isDashboard) {
+        return navLink.target === route.dashboard;
+      }
+      let res = GetNodeProp(navLink.target, NodeProperties.Model) === route.model &&
+        GetNodeProp(navLink.target, NodeProperties.ViewType) ===
+        route.viewType;
+      return res;
+    });
+  };
+}
+
 function loadAgentEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return loadAgent<EffectProps>(onlyAgents, accessDescriptions, graph, LinkPropertyKeys.EffectProps);
 }
