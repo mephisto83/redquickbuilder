@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, FlatList,Image } from "react-native";
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, navigate, GetScreenParam, fetchModelInstanceChildren  } from '{{relative_depth}}actions/uiactions';
+import { GetItems, navigate, GetScreenParam, fetchModelInstanceChildren, GetItem, GetItems  } from '{{relative_depth}}actions/uiactions';
+import Models from '{{relative_depth}}model_keys';
 import * as DC from '{{relative_depth}}actions/data-chain';
 import * as S from '{{relative_depth}}actions/selector';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';

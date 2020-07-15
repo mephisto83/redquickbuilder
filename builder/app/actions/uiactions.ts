@@ -1956,15 +1956,18 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Navigate:
 			let insert = '';
 			if (useNavigationParams) {
-				insert = `Object.keys(a).map((v${anyType})=>{
-          let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
-          if($internalComponentState && $internalComponentState.hasOwnProperty(v)) {
+        insert = `
+        if($internalComponentState) {
+          Object.keys($internalComponentState).map((v${anyType})=>{
+            let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
             route = route.replace(regex, $internalComponentState[v]);
-          }
-          else {
-            route = route.replace(regex, a[v]);
-          }
-        })`;
+          });
+        }
+
+        Object.keys(a).map((v${anyType})=>{
+          let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
+          route = route.replace(regex, a[v]);
+        });`;
 			}
 			return `(a${anyType}) => {
         if(a && typeof a === 'object' && !a.success && a.hasOwnProperty('success')) {

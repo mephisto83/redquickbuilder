@@ -1,4 +1,4 @@
-        //Templated version.
+        //Delete a model of type {{model}} and returns a list of type {{model_output}}
         public async Task<IList<{{model_output}}>> {{function_name}}({{user}} user, string modelId) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});

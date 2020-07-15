@@ -1,5 +1,5 @@
-//Templated version.
-public async Task<bool> Delete{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) { 
+//Delete a {{agent_type}} with an id.
+public async Task<bool> Delete{{agent_type}}({{user}} {{user_instance}}, {{agent_type}} {{value}}) {
 
     var {{agent}} = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
@@ -13,6 +13,6 @@ public async Task<bool> Delete{{agent_type}}({{user}} {{user_instance}}, {{agent
         // This is probably going to be pretty slow.
         return result.Value;
     }
-    
+
     return false;
 }

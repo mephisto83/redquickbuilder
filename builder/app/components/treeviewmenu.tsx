@@ -14,6 +14,9 @@ export default class TreeViewMenu extends Component<any, any> {
 	icon() {
 		return this.props.icon || (this.props.children ? 'fa fa-folder' : null) || 'fa fa-wrench';
 	}
+	error() {
+		return this.props.error ? { color: '#dd4b39', fontWeight: 'bold' } : {};
+	}
 	render() {
 		return (
 			<li title={this.props.description} className={`treeview ${this.active()} ${this.open()}`}>
@@ -25,8 +28,10 @@ export default class TreeViewMenu extends Component<any, any> {
 						}
 					}}
 				>
-					{this.props.hideIcon ? null : <i className={`${this.icon()}`} />}
-					<span title={this.props.description || this.props.title}>{this.props.title}</span>
+					{this.props.hideIcon ? null : <i style={{ ...this.error() }} className={`${this.icon()}`} />}
+					<span style={{ ...this.error() }} title={this.props.description || this.props.title}>
+						{this.props.title}
+					</span>
 					{this.props.hideArrow || !this.props.children ? null : (
 						<span className="pull-right-container">
 							<i className="fa fa-angle-left pull-right" />

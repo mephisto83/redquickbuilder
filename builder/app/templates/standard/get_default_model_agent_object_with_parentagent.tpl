@@ -1,4 +1,4 @@
-        //Templated version.
+        //Gets the default instance of a {{model}}, if the {{parent}} model type passes the permission test.
         public async Task<{{model}}> {{function_name}}({{user}} user, string parent) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});

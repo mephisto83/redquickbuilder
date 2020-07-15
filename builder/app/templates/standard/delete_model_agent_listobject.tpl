@@ -1,4 +1,4 @@
-        //Delete Templated version.
+        //Deletes a model of type {{model}} and return the list defined by a predicate.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} user, {{model}} model) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});

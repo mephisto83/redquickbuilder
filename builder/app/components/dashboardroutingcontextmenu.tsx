@@ -95,7 +95,9 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 								? mode.getMountingDescription(agent, model, route.isDashboard ? null : route.viewType)
 								: null;
 						let sourceViewMounting: ViewMounting =
-							agent && model ? mode.getMountingDescription(sourceAgent, sourceModel, null) : null;
+							agent && model
+								? mode.getMountingDescription(sourceAgent, mode.dashboard, mode.viewType)
+								: null;
 						let parameterConnections: any = null;
 						if (onComponentMountMethod && viewMounting) {
 							parameterConnections = this.getViewMountingDescriptionParameters(
@@ -256,6 +258,9 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 									this.setState({ [routeKey]: !this.state[routeKey] });
 								}}
 							>
+								{agent && model && !viewMounting ? (
+									<TreeViewMenu error title={Titles.NoUIForRoute} />
+								) : null}
 								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}

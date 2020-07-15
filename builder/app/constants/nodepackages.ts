@@ -2104,7 +2104,9 @@ export const CreateDefaultView = {
 											parent: screenNodeId,
 											properties: {
 												...viewPackage,
-												[NodeProperties.UIText]: `${viewName} ${uiType} Form`,
+												[NodeProperties.UIText]: `${viewName} ${agentId
+													? GetNodeTitle(agentId)
+													: ''} ${uiType} Form`,
 												[NodeProperties.UIType]: uiType,
 												[NodeProperties.ComponentType]: ComponentTypes[uiType].Generic.key,
 												[NodeProperties.ComponentApi]: componentProps,
@@ -4523,7 +4525,7 @@ export function CreateAgentFunction(option: any): any {
 									if (typeof parent === 'string') {
 										methodProps[constraint.key] = parent;
 									} else if (parent && parent.id) {
-                    // add parent if set.
+										// add parent if set.
 										methodProps[constraint.key] = parent.id;
 									}
 								} else if (constraint.key === FunctionTemplateKeys.ModelOutput && model_output) {

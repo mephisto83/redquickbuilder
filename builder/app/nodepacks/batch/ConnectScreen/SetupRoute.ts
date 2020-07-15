@@ -3,7 +3,9 @@ import {
 	Routing,
 	RouteDescription,
 	ScreenEffectApiProps,
-	ScreenEffectApi
+	ScreenEffectApi,
+	RouteSourceType,
+	RouteSource
 } from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import {
@@ -20,12 +22,19 @@ import {
 	GetNodeProp,
 	GetComponentInternalApiNode,
 	GetNodeById,
-	AddLinkBetweenNodes
+	AddLinkBetweenNodes,
+	CreateNewNode
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo } from '../../../methods/graph_methods';
-import { LinkType, LinkProperties, NodeProperties, NodeTypes } from '../../../constants/nodetypes';
+import { LinkType, LinkProperties, NodeProperties, NodeTypes, EventArgumentTypes } from '../../../constants/nodetypes';
 import { Node } from '../../../methods/graph_types';
-import { AddButtonToSubComponent, AddButtonToComponentLayout, SetupApi, AddApiToButton } from './Shared';
+import {
+	AddButtonToSubComponent,
+	AddButtonToComponentLayout,
+	SetupApi,
+	AddApiToButton,
+	AddInternalComponentApi
+} from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 
 export default function SetupRoute(screen: Node, routing: Routing, information: SetupInformation) {
@@ -33,6 +42,31 @@ export default function SetupRoute(screen: Node, routing: Routing, information: 
 	routing.routes.forEach((routeDescription: RouteDescription) => {
 		SetupRouteDescription(routeDescription, screen, information);
 	});
+}
+
+function AttachEventArguments(eventInstance: string, paramName: string, routeSource: RouteSource) {
+	let result: any = null;
+	graphOperation(
+		CreateNewNode(
+			{
+				[NodeProperties.NODEType]: NodeTypes.EventArgument,
+				[NodeProperties.RouteSource]: JSON.parse(JSON.stringify(routeSource)),
+				[NodeProperties.ParameterName]: paramName,
+				[NodeProperties.EventArgumentType]: EventArgumentTypes.RouteSource,
+				[NodeProperties.UIText]: `${GetNodeTitle(eventInstance)} Argument ${paramName}`
+			},
+			(_node: Node) => {
+				result = _node;
+			}
+		)
+	)(GetDispatchFunc(), GetStateFunc());
+
+	graphOperation(AddLinkBetweenNodes(eventInstance, result.id, LinkProperties.EventArgument))(
+		GetDispatchFunc(),
+		GetStateFunc()
+	);
+
+	return result;
 }
 
 function SetupRouteDescription(routeDescription: RouteDescription, screen: Node, information: SetupInformation) {
@@ -44,10 +78,14 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 	});
 	setup_options.forEach((screenOption: Node) => {
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
+
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
 		let targetScreen: Node | null = null;
 		if (routeDescription.isDashboard) {
 			let navigationDashboard = GetNodeById(routeDescription.dashboard);
+			if (!navigationDashboard) {
+				console.log(JSON.stringify(routeDescription, null, 4));
+			}
 			let screenImpl = GetNodeLinkedTo(graph, {
 				id: navigationDashboard.id,
 				link: LinkType.NavigationScreenImplementation
@@ -103,6 +141,23 @@ function NavigateTo(
 			GetStateFunc()
 		);
 	}
+
+	if (routeDescription && routeDescription.source) {
+		Object.keys(routeDescription.source).forEach((sourceKey: string) => {
+			if (routeDescription.source) {
+				let temp = routeDescription.source[sourceKey];
+				if (temp) {
+					switch (temp.type) {
+						case RouteSourceType.Model:
+						case RouteSourceType.Agent:
+							AttachEventArguments(button, sourceKey, temp);
+							break;
+					}
+				}
+			}
+		});
+	}
+
 	console.log('adding connections to api nodes');
 	graphOperation((currentGraph: any) => {
 		let nodes = GetComponentApiNodes(button, currentGraph);

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { FlatList, Image } from '{{relative_depth}}html-components';
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, navigate, GetScreenParam  } from '{{relative_depth}}actions/uiactions';
+import { GetItems, navigate, GetScreenParam, GetItem } from '{{relative_depth}}actions/uiactions';
+import Models from '{{relative_depth}}model_keys';
 import * as DC from '{{relative_depth}}actions/data-chain';
 import * as S from '{{relative_depth}}actions/selector';
 import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';

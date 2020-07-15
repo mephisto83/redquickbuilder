@@ -40,7 +40,8 @@ import {
 	LinkPropertyKeys,
 	MediaQueries,
 	StyleNodeProperties,
-	LinkProperties
+	LinkProperties,
+	EventArgumentTypes
 } from '../constants/nodetypes';
 import {
 	buildLayoutTree,
@@ -84,6 +85,7 @@ import { HandlerType } from '../components/titles';
 import { addNewLine } from '../utils/array';
 import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';
+import { RouteSource, RouteSourceType } from '../interface/methodprops';
 
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
@@ -1659,24 +1661,65 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		});
 		if (argumentSource) {
 			let apiInternalNodes = GetComponentInternalApiNodes(argumentSource.id);
-			let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes);
-      return `DC.${GetCodeName(dataChain, {
-        includeNameSpace: true
-      })}(value, ${internalApiArgs});`;
+			let calculateEventArguments = GetEventArguments(argumentSource.id);
+			let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
+			return `DC.${GetCodeName(dataChain, {
+				includeNameSpace: true
+			})}(value, ${internalApiArgs});`;
 		}
 		return `DC.${GetCodeName(dataChain, {
 			includeNameSpace: true
 		})}(value/*hi*/);`;
 	}
 }
+function GetEventArguments(buttonId: string) {
+	let eventArguments = GetNodesLinkedTo(GetCurrentGraph(), {
+		id: buttonId,
+		link: LinkType.EventArgument
+	});
 
-function createInternalApiArgumentsCode(apiInternalNodes: GraphMethods.Node[]) {
-	let result = '';
-	result = `{ ${apiInternalNodes
+	return eventArguments;
+}
+function createInternalApiArgumentsCode(
+	apiInternalNodes: GraphMethods.Node[],
+	calculateEventArguments: GraphMethods.Node[]
+) {
+	let methodParamNames: string[] = [];
+	let methodParams = (calculateEventArguments || [])
 		.map((node: GraphMethods.Node) => {
-			return `${GetNodeTitle(node)}: this.state.${GetNodeTitle(node)}`;
+			switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
+				case EventArgumentTypes.RouteSource:
+					let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
+					switch (routeSource.type) {
+						case RouteSourceType.Agent:
+						case RouteSourceType.Model:
+							methodParamNames.push(GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName());
+							return `${GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName()}: (() => {
+              let model = GetItem(Models.${GetCodeName(routeSource.model)}, this.state.value);
+              if(model) {
+                return model.${GetJSCodeName(routeSource.property)};
+              }
+              return null;
+            })()`;
+							break;
+					}
+					break;
+			}
+			return null;
 		})
-		.join(', ' + NEW_LINE)} }`;
+		.filter((x) => x);
+
+	let result = '';
+	result = `{ ${[
+		...apiInternalNodes
+			.filter((node: GraphMethods.Node) => {
+				return methodParamNames.indexOf(GetNodeTitle(node)) === -1;
+			})
+			.map((node: GraphMethods.Node) => {
+				return `${GetNodeTitle(node)}: this.state.${GetNodeTitle(node)}`;
+			}),
+		...methodParams
+	].join(', ' + NEW_LINE)} }`;
 	return result;
 }
 

@@ -1,4 +1,4 @@
-        //Templated version.
+        // Gets a list of {{model}} instances with a list of ids.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{fetch_parameter}} fetch_parameter, QueryParameters queryParameter = null) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});

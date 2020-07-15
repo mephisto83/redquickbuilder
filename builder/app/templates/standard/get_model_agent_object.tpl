@@ -1,5 +1,5 @@
-        //Templated version.
-        public async Task<{{model}}> {{function_name}}({{user}} user, string value) { 
+        // Gets a {{model}} type instance with the id.
+        public async Task<{{model}}> {{function_name}}({{user}} user, string value) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
             var model =  await arbiter{{model}}.Get<{{model}}>(value);

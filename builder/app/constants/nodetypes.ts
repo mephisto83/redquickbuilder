@@ -22,6 +22,7 @@ export const NodeTypes = {
 	Lists: 'Lists',
 	EventMethodInstance: 'EventMethodInstance',
 	LifeCylceMethod: 'LifeCylceMethod',
+	EventArgument: 'EventArgument',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	Selector: 'selector',
 	ComponentApi: 'ComponentApi',
@@ -316,6 +317,10 @@ export const DefaultPropertyValueType = {
 	Enumeration: 'Enumeration'
 };
 
+export const EventArgumentTypes = {
+	RouteSource: 'RouteSource'
+};
+
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
@@ -574,6 +579,9 @@ export const NodeProperties = {
 	DataChainReferences: 'DataChainReferences',
 	Lambda: 'Lambda',
 	LambdaInsertArguments: 'LambdaInsertArguments',
+	RouteSource: 'RouteSource',
+	ParameterName: 'ParameterName',
+	EventArgumentType: 'EventArgumentType',
 	ModelKey: 'ModelKey',
 	DataChainReference: 'DataChainReference',
 	NumberParameter: 'NumberParameter',
@@ -675,6 +683,7 @@ export const LinkType = {
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
 	DefaultValue: 'DefaultValue',
+	EventArgument: 'EventArgument',
 	MethodArgumentSoure: 'MethodArgumentSoure',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
@@ -961,6 +970,9 @@ export const LinkProperties = {
 	},
 	MethodArgumentSoure: {
 		type: LinkType.MethodArgumentSoure
+	},
+	EventArgument: {
+		type: LinkType.EventArgument
 	},
 	AccessScreen: {
 		type: LinkType.AccessScreen

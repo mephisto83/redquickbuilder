@@ -78,6 +78,7 @@ export const OnlyUntranslated = 'Only Untranslated';
 export const Properties = 'Properties';
 export const Key = 'Key';
 export const EventHandlerActivityMenu = 'Event Handlers';
+export const NoUIForRoute = 'No UI For Route';
 export const AddCondition = 'Add Condition';
 export const Style = 'Style';
 export const FormStyle = 'Form';

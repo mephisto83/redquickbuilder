@@ -252,6 +252,7 @@ class ContextMenu extends Component<any, any> {
 									this.setState({ [routeKey]: !this.state[routeKey] });
 								}}
 							>
+								{agent && model && !viewMounting ? <TreeViewMenu error title={Titles.NoUIForRoute} /> : null}
 								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}

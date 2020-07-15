@@ -73,9 +73,11 @@ import MethodProps, {
 	DashboardViewMount,
 	DashboardRouting,
 	ScreenEffectApiProps,
-	ScreenEffectApi
+	ScreenEffectApi,
+	EffectDescription
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
+import ContentInfo from './contentinfo';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -108,7 +110,89 @@ class AgentAccessView extends Component<any, any> {
 		}
 		this.state.agentAccess[agentIndex][modelIndex][v] = value;
 	}
-
+	calculateErrors() {
+		let result: any[] = [];
+		let functionNames: string[] = [];
+		if (this.state) {
+			let { agentEffect, dashboardEffect, agentMethod, agentRouting } = this.state;
+			if (agentEffect) {
+				agentEffect.forEach((array: any, aI: string) => {
+					array.forEach((item: any, mI: string) => {
+						Object.keys(item).forEach((key: string) => {
+							let parentEffect: Effect = item[key];
+							validateEffect(
+								parentEffect,
+								result,
+								functionNames,
+								`${GetNodeTitle(this.state.agents[aI])}`,
+								`${GetNodeTitle(this.state.models[mI])}`,
+								key
+							);
+						});
+					});
+				});
+			}
+			if (agentRouting) {
+				// this.getMountingDescription(aI, mI, v);
+				agentRouting.forEach((array: any, aI: number) => {
+					array.forEach((item: any, mI: number) => {
+						Object.keys(item).forEach((key: string) => {
+							let routing: Routing = item[key];
+							if (routing && routing.routes) {
+								routing.routes.forEach((_route: RouteDescription) => {
+									let messages: string[] = [];
+									if (_route.isDashboard) {
+										if (!_route.dashboard) {
+											let dash = _route.dashboard || '';
+											let viewMounting = this.getDashboardMountingDescription(_route.agent, dash);
+											if (!viewMounting) {
+												messages.push('Target dashboard not set');
+											}
+										}
+									}
+									ValidName(_route.name, messages);
+									if (messages && messages.length) {
+										result.push(
+											<ContentInfo
+												title={`${_route.name} ${GetNodeTitle(array[aI])} ${GetNodeTitle(
+													item[mI]
+												)} ${key}`}
+												type={'success'}
+												messages={messages}
+											/>
+										);
+									}
+								});
+							}
+						});
+					});
+				});
+			}
+			if (dashboardEffect) {
+				Object.keys(dashboardEffect).map((key: string, aI: number) => {
+					let dashboardLevel = dashboardEffect[key];
+					Object.keys(dashboardLevel).map((dey: string, mI: number) => {
+						let agentLevel: Effect = dashboardLevel[dey];
+						validateEffect(
+							agentLevel,
+							result,
+							functionNames,
+							`${GetNodeTitle(key)}`,
+							`${GetNodeTitle(dey)}`
+						);
+					});
+				});
+			}
+			if (agentMethod) {
+				forEachType<MethodProps>(agentMethod, validateMethodProps, result);
+			}
+		}
+		let groupedFunctionName = functionNames.groupBy((x: string) => x);
+		let moreThanOne = Object.keys(groupedFunctionName).filter((x: string) => groupedFunctionName[x].length > 1);
+		if (moreThanOne && moreThanOne.length)
+			result.unshift(<ContentInfo message={moreThanOne} title={'Duplicate Function Names'} />);
+		return result;
+	}
 	setAgentDashboardAccess(model: string, agent: string, value: boolean) {
 		if (!this.state.dashboardAccess[agent]) {
 			this.state.dashboardAccess[agent] = {};
@@ -390,6 +474,7 @@ class AgentAccessView extends Component<any, any> {
 									</a>
 								</FormControl>
 							</Box>
+							<Box title={'Errors'}>{this.calculateErrors()}</Box>
 						</div>
 						<div className="col-md-10">
 							<TabContainer>
@@ -1444,7 +1529,7 @@ class AgentAccessView extends Component<any, any> {
 		return (
 			<div className="btn-group">
 				<button
-					className={routing.routes && routing.routes.length ? 'btn btn-info' : 'btn btn-default'}
+					className={routing.routes && routing.routes.length ? 'btn btn-success' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(ROUTING_CONTEXT_MENU, {
@@ -1540,7 +1625,7 @@ class AgentAccessView extends Component<any, any> {
 		return (
 			<div className="btn-group">
 				<button
-					className={hasMountings ? 'btn btn-info' : 'btn btn-default'}
+					className={hasMountings ? 'btn btn-danger' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(MOUNTING_CONTEXT_MENU, {
@@ -1573,7 +1658,7 @@ class AgentAccessView extends Component<any, any> {
 		return (
 			<div className="btn-group">
 				<button
-					className={hasMountings ? 'btn btn-warning' : 'btn btn-default'}
+					className={hasMountings ? 'btn btn-danger' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(DASHBOARD_MOUNTING_CONTEXT_MENU, {
@@ -1775,6 +1860,49 @@ class AgentAccessView extends Component<any, any> {
 }
 
 export default UIConnect(AgentAccessView);
+function forEachType<T>(agentMethod: any, validationFunc: Function, result: any[]) {
+	Object.keys(agentMethod).map((key: string) => {
+		let dashboardLevel = agentMethod[key];
+		Object.keys(dashboardLevel).map((dey: string) => {
+			let agentLevel: T = dashboardLevel[dey];
+			validationFunc(agentLevel, result);
+		});
+	});
+}
+
+function validateEffect(
+	parentEffect: Effect,
+	result: any[],
+	functionNames: any[],
+	agentName: string,
+	modelName: string,
+	viewName = ''
+) {
+	if (parentEffect) {
+		let { effects } = parentEffect;
+		if (effects) {
+			effects.forEach((effect: EffectDescription) => {
+				let messages: string[] = [];
+				functionNames.push(effect.name);
+				ValidName(effect.name, messages);
+				if (messages.length) {
+					result.push(
+						<ContentInfo
+							type={'info'}
+							description={`${agentName} ${modelName}`}
+							title={effect.name}
+							messages={messages}
+						/>
+					);
+				}
+			});
+		}
+	}
+}
+function validateMethodProps(parentMehodProp: MethodDescription) {
+	if (parentMehodProp) {
+	}
+}
 function loadAgentAccess(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	return onlyAgents.map((agent) => {
 		const agentAccessDescription = accessDescriptions.filter((v) =>
@@ -1871,7 +1999,7 @@ function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[],
 						.filter((x: GraphLink) => {
 							return !routing.routes.find((v) => v.linkId === x.id);
 						})
-            .filter(filterRoutes(routing))
+						.filter(filterRoutes(routing))
 						.forEach((navLink) => {
 							let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
 							routing.routes.push({
@@ -2085,17 +2213,17 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 	return result;
 }
 function filterRoutes(routing: Routing): (value: GraphLink, index: number, array: GraphLink[]) => unknown {
-  return (navLink) => {
-    return !routing.routes.find((route: RouteDescription) => {
-      if (route.isDashboard) {
-        return navLink.target === route.dashboard;
-      }
-      let res = GetNodeProp(navLink.target, NodeProperties.Model) === route.model &&
-        GetNodeProp(navLink.target, NodeProperties.ViewType) ===
-        route.viewType;
-      return res;
-    });
-  };
+	return (navLink) => {
+		return !routing.routes.find((route: RouteDescription) => {
+			if (route.isDashboard) {
+				return navLink.target === route.dashboard;
+			}
+			let res =
+				GetNodeProp(navLink.target, NodeProperties.Model) === route.model &&
+				GetNodeProp(navLink.target, NodeProperties.ViewType) === route.viewType;
+			return res;
+		});
+	};
 }
 
 function loadAgentEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
@@ -2237,4 +2365,21 @@ function loadDashboard<T>(
 	});
 
 	return result;
+}
+
+function ValidName(name: string, messages: string[] = []) {
+	if (name) {
+		if (name.length > 3) {
+			if (name[0].toUpperCase() === name[0]) {
+				return true;
+			} else {
+				messages.push('name needs to be capitalize');
+			}
+		} else {
+			messages.push('name is too short');
+		}
+	} else {
+		messages.push('no name');
+	}
+	return false;
 }

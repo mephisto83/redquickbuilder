@@ -1,4 +1,4 @@
-        //Templated version.
+        //Get the default {{model}} with a parent reference of {{parent}}.
         public async Task<{{model}}> {{function_name}}({{user}} user, string parent) {
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
