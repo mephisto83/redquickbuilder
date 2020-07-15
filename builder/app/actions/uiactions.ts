@@ -1,6 +1,7 @@
 /* eslint-disable default-case */
 /* eslint-disable func-names */
 import * as GraphMethods from '../methods/graph_methods';
+import * as GraphTypes from '../methods/graph_types';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { NavigateTypes } from '../constants/nodetypes';
@@ -1173,19 +1174,27 @@ ${arbiterSets}
 export function GenerateChainFunction(id: any, options: { language: any }) {
 	const chain = GetDataChainParts(id);
 	let args: any = null;
+	let overridArg: any = null;
 	let extraArgs: string[] = [];
 	const observables: string[] = [];
 	const { language } = options;
 	let anyType = ': any';
 	if (language === NodeConstants.UITypes.ReactNative) {
 		anyType = '';
+	} else {
+		let interface_type: string = generateContextInterfaces(GetNodeById(id));
+		if (interface_type) {
+			anyType = `: ${interface_type}`;
+			overridArg = [ '$internalComponentState' ];
+		}
 	}
+
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
 	const setProcess: string[] = [];
 	chain.forEach((c: any, index: number) => {
 		if (index === 0) {
-			args = GetDataChainArgs(c);
+			args = overridArg || GetDataChainArgs(c);
 			extraArgs = GetExtraArgs(c);
 		}
 		const temp = GenerateDataChainMethod(c, options);
@@ -1207,7 +1216,7 @@ ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
 ${subscribes.join(NodeConstants.NEW_LINE)}
-${nodeName}.update($id , '$id');
+${nodeName}.update( ${(overridArg ? overridArg[0] : '') || '$id'}  , '$id');
 
 return ${lastNodeName}.value;
 }`;
@@ -1224,6 +1233,41 @@ function GetExtraArgs(id: string) {
 		return [ createInternalApiArguments(apiInternalNodes) ];
 	}
 	return [];
+}
+
+function generateContextInterfaces(currentNode: GraphTypes.Node) {
+	let result = '';
+	if (!currentNode) {
+		return '';
+	}
+	let screenEffectApis = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.ScreenEffectApi
+	}).map((node: Node) => {
+		return GetJSCodeName(node);
+	});
+	let contextParameters: string[] = [];
+	GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.ContextParameters
+	}).forEach((node: Node) => {
+		let nodeParams = GetNodeProp(node, NodeProperties.ContextParams) || [];
+		contextParameters.push(...nodeParams);
+	});
+
+	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
+		result = `{
+${[ ...screenEffectApis, ...contextParameters, 'viewModel' ]
+			.unique()
+			.map((param: string) => {
+				return `${param}?: string | number | null`;
+			})
+			.join(`,${NodeConstants.NEW_LINE}`)}
+}
+    `;
+	}
+
+	return result;
 }
 
 function createInternalApiArguments(apiInternalNodes: _.Node[]) {
@@ -1956,15 +2000,15 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Navigate:
 			let insert = '';
 			if (useNavigationParams) {
-        insert = `
+				insert = `
         if($internalComponentState) {
-          Object.keys($internalComponentState).map((v${anyType})=>{
+          Object.keys($internalComponentState).forEach((v${anyType})=>{
             let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
             route = route.replace(regex, $internalComponentState[v]);
           });
         }
 
-        Object.keys(a).map((v${anyType})=>{
+        Object.keys(a).forEach((v${anyType})=>{
           let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
           route = route.replace(regex, a[v]);
         });`;

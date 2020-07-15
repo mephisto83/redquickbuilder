@@ -51,13 +51,18 @@ function SetupMountingMethod(mouting: MountingDescription, screen: Node, informa
 	});
 	let methodId = mouting.methodDescription ? mouting.methodDescription.methodId : null;
 	if (methodId) {
+		let cycleInstances: string[] = [];
 		setup_options.forEach((screenOption: Node) => {
 			ConnectComponentDidMount({
 				screen: screen.id,
 				screenOption: screenOption.id,
-				methods: methodId ? [ methodId ] : []
+				methods: methodId ? [ methodId ] : [],
+				callback: (_cycleInstances: string[]) => {
+					cycleInstances = _cycleInstances;
+				}
 			});
-		});
+    });
+    // connect datachain to cycleInstances.
 	} else {
 		console.warn('missing reference to method: SetupViewMounting');
 	}
@@ -188,50 +193,44 @@ function SetupMountDescription(mounting: MountingDescription, screen: Node) {
 }
 
 function SetupMethodParametersForComponent(methodDescription: MethodDescription, screenOptions: Node[], screen: Node) {
-  console.log('setup method description');
-  console.log(methodDescription);
-  let methodFunctionProperties = MethodFunctions[methodDescription.functionType];
-  if (methodFunctionProperties && methodFunctionProperties.parameters) {
-    let { parameters } = methodFunctionProperties.parameters;
-    console.log('parameters');
-    console.log(parameters);
-    if (parameters) {
-      let { template } = parameters;
-      if (template) {
-        Object.keys(template).map((paramName: string) => {
-          let changeParam = false;
-          if (template[paramName].defaultValue) {
-            //change the value, to the name of the parameters
-            console.log('change the value, to the name of the parameters');
-            changeParam = true;
-          }
-          if (!changeParam) {
-            screenOptions.forEach((screenOption: Node) => {
-              if (!changeParam) {
-                SetupApi(screen, paramName, screenOption);
-              }
-            });
-          }
-          else {
-            UpdateValueApiToDifferentName(screen, paramName);
-          }
+	console.log('setup method description');
+	console.log(methodDescription);
+	let methodFunctionProperties = MethodFunctions[methodDescription.functionType];
+	if (methodFunctionProperties && methodFunctionProperties.parameters) {
+		let { parameters } = methodFunctionProperties.parameters;
+		console.log('parameters');
+		console.log(parameters);
+		if (parameters) {
+			let { template } = parameters;
+			if (template) {
+				Object.keys(template).map((paramName: string) => {
+					let changeParam = false;
+					if (template[paramName].defaultValue) {
+						//change the value, to the name of the parameters
+						console.log('change the value, to the name of the parameters');
+						changeParam = true;
+					}
+					if (!changeParam) {
+						screenOptions.forEach((screenOption: Node) => {
+							if (!changeParam) {
+								SetupApi(screen, paramName, screenOption);
+							}
+						});
+					} else {
+						UpdateValueApiToDifferentName(screen, paramName);
+					}
 
-          SetScreenParamToUrl(screen, paramName);
-          SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
+					SetScreenParamToUrl(screen, paramName);
+					SetInternalScreenOptionsParamToUrlParameter(screen, paramName);
 
-          // Setup the api values all the way down to the bottom components
-          SetupApiValueDownToTheBottomComponent(screen, paramName);
-        });
-        updateComponentProperty(
-          screen.id,
-          NodeProperties.UIText,
-          GetNodeProp(screen, NodeProperties.UIText)
-        );
-      }
-    }
-  }
+					// Setup the api values all the way down to the bottom components
+					SetupApiValueDownToTheBottomComponent(screen, paramName);
+				});
+				updateComponentProperty(screen.id, NodeProperties.UIText, GetNodeProp(screen, NodeProperties.UIText));
+			}
+		}
+	}
 }
-
 
 function SetInternalScreenOptionsParamToUrlParameter(screen: Node, paramName: string) {
 	console.log(`[${GetNodeTitle(screen)}] set interface screen options param to url parameter: ${paramName}`);

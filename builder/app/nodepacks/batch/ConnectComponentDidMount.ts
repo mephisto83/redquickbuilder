@@ -28,6 +28,7 @@ export default function ConnectComponentDidMount(args: {
 	screenOption: string;
 	viewPackages?: any;
 	methods: string[];
+	callback?: Function;
 }) {
 	let { screen, methods } = args;
 	if (!screen) {
@@ -65,6 +66,7 @@ export default function ConnectComponentDidMount(args: {
 		id: screen_option.id,
 		link: LinkType.ComponentInternalApi
 	});
+	let cycleInstances: any[] = [];
 	methods.forEach((method: string) => {
 		let result: any[] = [];
 		lifeCylcleMethods
@@ -135,8 +137,8 @@ export default function ConnectComponentDidMount(args: {
 							});
 						}
 						return [];
-          },
-          //Returns a MODEL and an instanceType[IS edit]
+					},
+					//Returns a MODEL and an instanceType[IS edit]
 					...(!returnsAList && instanceType
 						? [
 								LoadModel({
@@ -208,6 +210,9 @@ export default function ConnectComponentDidMount(args: {
 									}
 								}),
 								() => {
+									if (cycleInstance) {
+										cycleInstances.push(cycleInstance.id);
+									}
 									return [
 										{
 											operation: ADD_LINK_BETWEEN_NODES,
@@ -258,7 +263,11 @@ export default function ConnectComponentDidMount(args: {
 			});
 		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	});
+	if (args.callback) {
+		args.callback(cycleInstances);
+	}
 }
+
 export function MethodReturnsList(functionType: string): boolean {
 	let methodFunctionProperties = MethodFunctions[functionType];
 	if (methodFunctionProperties) {
@@ -266,6 +275,7 @@ export function MethodReturnsList(functionType: string): boolean {
 	}
 	return false;
 }
+
 export function GetMethodTemplateParameters(functionType: string) {
 	let methodFunctionProperties = MethodFunctions[functionType];
 	if (methodFunctionProperties && methodFunctionProperties.parameters) {

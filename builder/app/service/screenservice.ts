@@ -928,6 +928,20 @@ export function GenerateMarkupTag(node: any, language: any, parent: any) {
 			return `<${GetCodeName(node)} ${describedApi} />`;
 	}
 }
+function computeScreenEffectInputs(parent: any) {
+	const graph = GetCurrentGraph(GetState());
+	const componentInternalApis = GetNodesLinkedTo(graph, {
+		id: parent.id,
+		link: LinkType.ComponentInternalApi
+	});
+
+	return `{${componentInternalApis
+		.unique((x: GraphMethods.Node) => GetJSCodeName(x))
+		.map((node: GraphMethods.Node) => {
+			return `${GetJSCodeName(node)}: this.state.${GetJSCodeName(node)}`;
+		})
+		.join(`,${NEW_LINE}`)}}`;
+}
 function WriteDescribedStateUpdates(parent: any) {
 	let result = ``;
 	const graph = GetCurrentGraph(GetState());
@@ -945,7 +959,10 @@ function WriteDescribedStateUpdates(parent: any) {
 				id: componentInternalApi.id,
 				link: LinkType.ComponentInternalConnection
 			}).find((x: any) => x);
-
+			const dataChainScreenEffect = GetNodeLinkedTo(graph, {
+				id: componentInternalApi.id,
+				link: LinkType.DataChainScreenEffect
+			});
 			const dataChain = GetNodesLinkedTo(graph, {
 				id: componentInternalApi.id,
 				link: LinkType.DataChainLink
@@ -978,10 +995,12 @@ function WriteDescribedStateUpdates(parent: any) {
 					})}(${innerValue})`;
 				}
 				const temp_prop = GetJSCodeName(componentInternalApi);
-				result = `
-            var new_${externalKey} = ${bindTemplate(innerValue, {
+
+				let temp_prop_source_value: string = bindTemplate(innerValue, {
 					temp: `this.props.${externalKey}`
-				})};
+				});
+				result = `
+            var new_${externalKey} = ${temp_prop_source_value};
             if ( new_${externalKey} !== this.state.${temp_prop}) {
           {{step}}
         }`;
@@ -990,6 +1009,21 @@ function WriteDescribedStateUpdates(parent: any) {
 					temp: innerValue,
 					step: `updated = true;
             updates = {...updates, ${GetJSCodeName(componentInternalApi)}:  new_${externalKey} };`
+				});
+			} else if (dataChainScreenEffect) {
+        //Screen Effects
+				let internalKey = GetJSCodeName(componentInternalApi);
+				result = `
+        var new_${internalKey} = DC.${GetCodeName(dataChainScreenEffect, {
+					includeNameSpace: true
+				})}(${computeScreenEffectInputs(parent)});
+        if ( new_${internalKey} !== this.state.${internalKey}) {
+      {{step}}
+    }`;
+				return bindTemplate(result, {
+					temp: innerValue,
+					step: `updated = true;
+        updates = {...updates, ${GetJSCodeName(componentInternalApi)}:  new_${internalKey} };`
 				});
 			}
 		})
