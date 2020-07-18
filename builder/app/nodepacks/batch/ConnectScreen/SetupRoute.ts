@@ -44,7 +44,7 @@ export default function SetupRoute(screen: Node, routing: Routing, information: 
 	});
 }
 
-function AttachEventArguments(eventInstance: string, paramName: string, routeSource: RouteSource) {
+function AttachEventArguments(eventInstance: string, paramName: string, routeSource: RouteSource, screen: Node) {
 	let result: any = null;
 	graphOperation(
 		CreateNewNode(
@@ -53,7 +53,8 @@ function AttachEventArguments(eventInstance: string, paramName: string, routeSou
 				[NodeProperties.RouteSource]: JSON.parse(JSON.stringify(routeSource)),
 				[NodeProperties.ParameterName]: paramName,
 				[NodeProperties.EventArgumentType]: EventArgumentTypes.RouteSource,
-				[NodeProperties.UIText]: `${GetNodeTitle(eventInstance)} Argument ${paramName}`
+				[NodeProperties.UIText]: `${GetNodeTitle(eventInstance)} Argument ${paramName}`,
+				[NodeProperties.Screen]: screen.id
 			},
 			(_node: Node) => {
 				result = _node;
@@ -150,7 +151,9 @@ function NavigateTo(
 					switch (temp.type) {
 						case RouteSourceType.Model:
 						case RouteSourceType.Agent:
-							AttachEventArguments(button, sourceKey, temp);
+						case RouteSourceType.UrlParameter:
+						case RouteSourceType.Body:
+							AttachEventArguments(button, sourceKey, temp, screen);
 							break;
 					}
 				}

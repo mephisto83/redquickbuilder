@@ -234,6 +234,15 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
+									title="Connect Dashes only"
+									onClick={() => {
+										ConnectScreens(
+											() => {},
+											(v: Node) => GetNodeProp(v, NodeProperties.IsDashboard)
+										);
+									}}
+								/>
+								<TreeViewMenu
 									title={StartJob.title}
 									icon="fa fa-play"
 									onClick={() => {

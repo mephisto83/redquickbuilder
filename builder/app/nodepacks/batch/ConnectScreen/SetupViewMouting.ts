@@ -3,7 +3,8 @@ import {
 	MountingDescription,
 	ViewMoutingProps,
 	MethodDescription,
-	ScreenEffect
+	ScreenEffect,
+	DashboardViewMount
 } from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import { Node } from '../../../methods/graph_types';
@@ -298,7 +299,9 @@ export function GetViewMounting(mountingProps: ViewMoutingProps, viewType: strin
 	}
 	return null;
 }
-
+export function GetDashboardViewMounting(dashboardMountProps: DashboardViewMount): ViewMounting {
+	return dashboardMountProps.mount;
+}
 function UpdateValueApiToDifferentName(screen: Node, paramName: string) {
 	console.log('update value api to different name');
 	let graph = GetCurrentGraph();

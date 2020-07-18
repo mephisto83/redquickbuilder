@@ -23,7 +23,7 @@ import SetupEffect, { GetEffect } from './ConnectScreen/SetupEffect';
 import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 
 import { Node, GraphLink } from '../../methods/graph_types';
-import { GetNodeLinkedTo, findLink, SetPause, Paused } from '../../methods/graph_methods';
+import { GetNodeLinkedTo, findLink, SetPause, Paused, GetNodesLinkedTo } from '../../methods/graph_methods';
 import {
 	MethodDescription,
 	ViewMoutingProps,
@@ -33,9 +33,13 @@ import {
 	RoutingProps,
 	Routing,
 	ScreenEffectApiProps,
-	ScreenEffectApi
+	ScreenEffectApi,
+	DashboardViewMount,
+	DashboardEffect,
+	DashboardRouting,
+	DashboardScreenEffectApiProps
 } from '../../interface/methodprops';
-import SetupViewMouting, { GetViewMounting } from './ConnectScreen/SetupViewMouting';
+import SetupViewMouting, { GetViewMounting, GetDashboardViewMounting } from './ConnectScreen/SetupViewMouting';
 import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
 import { RedressScreenProperties } from './RedressProperties';
 import SetupScreenEffects, { GetScreenEffectApi } from './ConnectScreen/SetupScreenEffects';
@@ -54,6 +58,7 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 
 			// Get Agent Access Description
 			let agentAccessDescription: Node | null = GetAgentAccessDescriptionNode(agent, model, viewType);
+
 			if (agentAccessDescription) {
 				let agentLink = GetAgentAccessDescriptionAgentLink(agent, model, viewType);
 				if (agentLink) {
@@ -86,17 +91,105 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 					throw new Error('agent link missing');
 				}
 			} else {
-				console.log(
-					`No agent access description for agent: ${GetNodeTitle(agent)} model: ${GetNodeTitle(
-						agent
-					)} viewType: ${viewType}`
-				);
+				if (GetNodeProp(screen, NodeProperties.IsDashboard)) {
+					console.log('Is dashboard, find the access');
+					let navigationScreen = GetNavigationScreen(screen);
+					if (navigationScreen) {
+						let dashboardAccesses: Node[] = GetNodesLinkedTo(GetCurrentGraph(), {
+							id: navigationScreen.id,
+							link: LinkType.DashboardAccess
+						});
+						dashboardAccesses.forEach((dashboardAccess: Node) => {
+							let agent = GetNodeLinkedTo(GetCurrentGraph(), {
+								id: dashboardAccess.id,
+								link: LinkType.AgentAccess
+							});
+							if (agent) {
+								let agentLink = findLink(GetCurrentGraph(), {
+									source: agent.id,
+									target: dashboardAccess.id
+								});
+								if (agentLink) {
+									let mountingProps: ViewMounting = GetLinkProperty(
+										agentLink,
+										LinkPropertyKeys.DashboardViewMountProps
+									);
+									let viewMounting: ViewMounting = mountingProps;
+									if (viewMounting) {
+										SetupViewMouting(screen, viewMounting, {
+											agent,
+											model,
+											viewType,
+											agentAccessDescription: dashboardAccess
+										});
+									}
+
+									let effectProps: Effect = GetLinkProperty(
+										agentLink,
+										LinkPropertyKeys.DashboardEffectProps
+									);
+									let effect: Effect = effectProps;
+									if (effect) {
+										SetupEffect(screen, effect, {
+											agent,
+											model,
+											viewType,
+											agentAccessDescription: dashboardAccess
+										});
+									}
+
+									let routingProps: Routing = GetLinkProperty(
+										agentLink,
+										LinkPropertyKeys.DashboardRoutingProps
+									);
+									let route: Routing = routingProps;
+									if (route) {
+										SetupRoute(screen, route, {
+											agent,
+											model,
+											viewType,
+											agentAccessDescription: dashboardAccess
+										});
+									}
+
+									let screenEffectsProps: ScreenEffectApi[] = GetLinkProperty(
+										agentLink,
+										LinkPropertyKeys.DashboardScreenEffectApiProps
+									);
+									let screenEffects: ScreenEffectApi[] = screenEffectsProps;
+									if (screenEffects) {
+										SetupScreenEffects(screen, screenEffects, {
+											agent,
+											model,
+											viewType,
+											agentAccessDescription: dashboardAccess
+										});
+									}
+								}
+							}
+						});
+					}
+				} else {
+					console.log(
+						`No agent access description for agent: ${GetNodeTitle(agent)} model: ${GetNodeTitle(
+							agent
+						)} viewType: ${viewType}`
+					);
+				}
 			}
 			// Setup mounting functions
 
 			RedressScreenProperties(screen.id);
 		});
 	SetPause(paused);
+}
+
+function GetNavigationScreen(screen: Node) {
+	let screenImplemenetation = GetNodeLinkedTo(GetCurrentGraph(), {
+		id: screen.id,
+		link: LinkType.NavigationScreenImplementation
+	});
+	return screenImplemenetation;
 }
 
 function GetAgentAccessDescriptionNode(agentId: string, modelId: string, viewType: string): Node | null {

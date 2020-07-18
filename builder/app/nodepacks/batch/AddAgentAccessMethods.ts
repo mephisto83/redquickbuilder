@@ -42,6 +42,10 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 			id: agentAccess.id,
 			link: LinkType.AgentAccess
 		});
+		let dashboard = GetNodeLinkedTo(graph, {
+			id: agentAccess.id,
+			link: LinkType.DashboardAccess
+		});
 		if (model && agent) {
 			let agentLink = findLink(graph, {
 				target: agentAccess.id,
@@ -76,6 +80,21 @@ export default async function AddAgentAccessMethods(progresFunc: any) {
 				}
 			} else {
 				console.info('mode link: AddAgentAccessMethods');
+			}
+		} else if (agent && dashboard) {
+			let agentLink = findLink(graph, {
+				target: agentAccess.id,
+				source: agent.id
+			});
+			if (agentLink) {
+				let mountingProps: ViewMounting = GetLinkProperty(agentLink, LinkPropertyKeys.DashboardViewMountProps);
+				makeViewMountingMethods(mountingProps, agentAccess, agent, dashboard);
+
+				let effectProps: Effect = GetLinkProperty(agentLink, LinkPropertyKeys.DashboardEffectProps);
+        makeEffectMethods(effectProps, agentAccess, agent, dashboard);
+
+			} else {
+				console.info('agent dashboard link: AddAgentAccessMethods');
 			}
 		} else {
 			if (!model) {

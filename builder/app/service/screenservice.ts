@@ -1760,11 +1760,14 @@ function createInternalApiArgumentsCode(
 			switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
 				case EventArgumentTypes.RouteSource:
 					let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
+					let screen = GetNodeProp(node, NodeProperties.Screen);
+					let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+					let paramName = GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName();
 					switch (routeSource.type) {
 						case RouteSourceType.Agent:
 						case RouteSourceType.Model:
-							methodParamNames.push(GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName());
-							return `${GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName()}: (() => {
+							methodParamNames.push(paramName);
+							return `${paramName}: (() => {
               let model = GetItem(Models.${GetCodeName(routeSource.model)}, this.state.value);
               if(model) {
                 return model.${GetJSCodeName(routeSource.property)};
@@ -1772,6 +1775,36 @@ function createInternalApiArgumentsCode(
               return null;
             })()`;
 							break;
+						case RouteSourceType.UrlParameter:
+							methodParamNames.push(paramName);
+							return `${paramName}: this.state.${`${routeSource.model}`.toJavascriptName()}`;
+						case RouteSourceType.Body:
+							switch (viewType) {
+								case ViewTypes.Update:
+									return `${paramName}: (()=>{
+                let model = UIA.GetScreenModelInstance(this.state.value, this.state.viewModel);
+                return model;
+              })()`;
+								case ViewTypes.Create:
+									methodParamNames.push(paramName);
+									return `${GetNodeProp(
+										node,
+										NodeProperties.ParameterName
+									).toJavascriptName()}: (()=>{
+                    let model = UIA.GetScreenInstanceObject(this.state.viewModel);
+                    return model;
+                  })()`;
+								case ViewTypes.Get:
+								case ViewTypes.GetAll:
+									methodParamNames.push(paramName);
+									return `${GetNodeProp(
+										node,
+										NodeProperties.ParameterName
+									).toJavascriptName()}: (()=>{
+                    let model = UIA.GetModelInstanceObject(this.state.value, this.state.viewModel);
+                    return model;
+                  })()`;
+							}
 					}
 					break;
 			}
