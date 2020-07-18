@@ -19,11 +19,11 @@ import { ViewTypes } from '../../constants/viewtypes';
 import ScreenConnectGet from '../screens/ScreenConnectGet';
 import ScreenConnectGetAll from '../screens/ScreenConnectGetAll';
 import ScreenConnectCreate from '../screens/ScreenConnectCreate';
-import SetupEffect, { GetEffect } from './COnnectScreen/SetupEffect';
+import SetupEffect, { GetEffect } from './ConnectScreen/SetupEffect';
 import ScreenConnectUpdate from '../screens/ScreenConnectUpdate';
 
 import { Node, GraphLink } from '../../methods/graph_types';
-import { GetNodeLinkedTo, findLink } from '../../methods/graph_methods';
+import { GetNodeLinkedTo, findLink, SetPause, Paused } from '../../methods/graph_methods';
 import {
 	MethodDescription,
 	ViewMoutingProps,
@@ -43,6 +43,8 @@ import SetupScreenEffects, { GetScreenEffectApi } from './ConnectScreen/SetupScr
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
 	const screens = allscreens.filter(ScreenOptionFilter);
+	let paused = Paused();
+	SetPause(true);
 	await screens
 		.filter((screen: any) => (filter ? filter(screen) : true))
 		.forEachAsync(async (screen: Node, index: number, total: number) => {
@@ -94,6 +96,7 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 
 			RedressScreenProperties(screen.id);
 		});
+	SetPause(paused);
 }
 
 function GetAgentAccessDescriptionNode(agentId: string, modelId: string, viewType: string): Node | null {
@@ -116,12 +119,14 @@ function GetAgentAccessDescriptionNode(agentId: string, modelId: string, viewTyp
 						source: agent.id
 					});
 					if (agentLink) {
-						let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
-						if (methodProps) {
-							if (methodProps[viewType]) {
-								return true;
-							}
-						}
+						return GetLinkProperty(agentLink, viewType);
+
+						// let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
+						// if (methodProps) {
+						// 	if (methodProps[viewType]) {
+						// 		return true;
+						// 	}
+						// }
 					}
 				}
 			}
@@ -149,13 +154,14 @@ function GetAgentAccessDescriptionAgentLink(agentId: string, modelId: string, vi
 					source: agent.id
 				});
 				if (agentLink) {
-					let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
-					if (methodProps) {
-						if (methodProps[viewType]) {
-							result = agentLink;
-							return true;
-						}
-					}
+					return GetLinkProperty(agentLink, viewType);
+					// let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
+					// if (methodProps) {
+					// 	if (methodProps[viewType]) {
+					// 		result = agentLink;
+					// 		return true;
+					// 	}
+					// }
 				}
 			}
 		}

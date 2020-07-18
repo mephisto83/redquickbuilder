@@ -194,6 +194,28 @@ export default function BuildAgentAccessWeb(args: any) {
 							});
 						},
 						() => {
+							return Object.keys(mounting).filter((d) => mounting[d]).map((key: string) => {
+								let urlParametersForMounting = mounting[key]
+									? getUrlParametersForMounting(mounting[key])
+									: [];
+								let viewMount: ViewMounting = mounting[key];
+								if (viewMount.mountings) {
+									return viewMount.mountings.map((mounting: MountingDescription) => {
+										if (mounting.screenEffect) {
+											return screenEffectViewMountGen(
+												mounting.screenEffect,
+												agentAccessContext,
+												urlParametersForMounting,
+												model,
+												agent
+											);
+										}
+										return [];
+									});
+								}
+							});
+						},
+						() => {
 							let result: any[] = [];
 							Object.keys(effects).filter((d) => effects[d]).forEach((key) => {
 								let _effects = effects[key];
@@ -440,6 +462,42 @@ function screenEffectGen(
 							newnode.id,
 							agentAccessContext.entry,
 							LinkProperties.ScreenEffectApi
+						);
+					}
+				];
+			});
+	};
+}
+function screenEffectViewMountGen(
+	screenEffect: any,
+	agentAccessContext: any,
+	urlParametersForMounting: string[],
+	dashboard: any,
+	agent: any
+): any {
+	return () => {
+		return screenEffect
+			.filter((x: ScreenEffectApi) => agentAccessContext && x.dataChain)
+			.map((effect: ScreenEffectApi) => {
+				let contextualNode: any;
+				let contextualParameters = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.ContextualParameters,
+						[NodeProperties.ContextParams]: urlParametersForMounting,
+						[NodeProperties.DataChain]: effect.dataChain,
+						[NodeProperties.UIText]: `${GetNodeTitle(dashboard)} ${GetNodeTitle(agent)} CP`
+					},
+					(node: any) => {
+						contextualNode = node;
+					}
+				);
+				return [
+					contextualParameters,
+					function() {
+						return AddLinkBetweenNodes(
+							contextualNode.id,
+							effect.dataChain,
+							LinkProperties.ContextualParameters
 						);
 					}
 				];

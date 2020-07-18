@@ -275,13 +275,13 @@ import * as Util from './util';
 				)}, { ...parameters }, {
     loading: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'},
     objectType: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'}
-}, (result${anytypes}) => {
+}, (res${anytypes}) => {
     var { dataChain, screenEffects, screenContext } = (parameters || {});
     if (dataChain) {
-        let result = dataChain(result);
+        let result = dataChain(res);
         if(screenEffects && Array.isArray(screenEffects)) {
           screenEffects.forEach((screenEffects${anytypes}) => {
-            screenEffects(result, screenContext)
+            screenEffects(res, screenContext)
           })
         }
         return result;

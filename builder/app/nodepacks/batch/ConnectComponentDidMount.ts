@@ -210,9 +210,6 @@ export default function ConnectComponentDidMount(args: {
 									}
 								}),
 								() => {
-									if (cycleInstance) {
-										cycleInstances.push(cycleInstance.id);
-									}
 									return [
 										{
 											operation: ADD_LINK_BETWEEN_NODES,
@@ -258,6 +255,12 @@ export default function ConnectComponentDidMount(args: {
 							});
 						}
 						return false;
+					},
+					() => {
+						if (cycleInstance) {
+							cycleInstances.push(cycleInstance.id);
+						}
+						return [];
 					}
 				);
 			});

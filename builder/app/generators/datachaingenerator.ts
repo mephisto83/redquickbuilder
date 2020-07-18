@@ -254,6 +254,10 @@ ${funcs}`;
 
 export function CollectionIsInLanguage(graph: Graph, collection: any, language: any): any {
 	const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
+	const languageAgnostic = GetNodeProp(collection, NodeProperties.UIAgnostic);
+	if (languageAgnostic) {
+		return true;
+	}
 	if (itsUiType && itsUiType === language) {
 		return true;
 	}

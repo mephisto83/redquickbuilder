@@ -682,7 +682,9 @@ export const LinkType = {
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
+	DataChainScreenEffectImpl: 'DataChainScreenEffectImpl',
 	DefaultValue: 'DefaultValue',
+	ComponentNodeLink: 'ComponentNodeLink',
 	EventArgument: 'EventArgument',
 	MethodArgumentSoure: 'MethodArgumentSoure',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
@@ -965,8 +967,14 @@ export const LinkProperties = {
 	DataChainScreenEffect: {
 		type: LinkType.DataChainScreenEffect
 	},
+	DataChainScreenEffectImpl: {
+		type: LinkType.DataChainScreenEffectImpl
+	},
 	ContextualParameters: {
 		type: LinkType.ContextParameters
+	},
+	ComponentNodeLink: {
+		type: LinkType.ComponentNodeLink
 	},
 	MethodArgumentSoure: {
 		type: LinkType.MethodArgumentSoure

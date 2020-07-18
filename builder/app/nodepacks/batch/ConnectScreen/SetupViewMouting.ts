@@ -1,4 +1,10 @@
-import { ViewMounting, MountingDescription, ViewMoutingProps, MethodDescription } from '../../../interface/methodprops';
+import {
+	ViewMounting,
+	MountingDescription,
+	ViewMoutingProps,
+	MethodDescription,
+	ScreenEffect
+} from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import { Node } from '../../../methods/graph_types';
 import {
@@ -14,7 +20,8 @@ import {
 	updateComponentProperty,
 	ComponentApiKeys,
 	GetComponentExternalApiNode,
-	GetComponentExternalApiNodes
+	GetComponentExternalApiNodes,
+	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
 import {
 	GetNodesLinkedTo,
@@ -61,8 +68,26 @@ function SetupMountingMethod(mouting: MountingDescription, screen: Node, informa
 					cycleInstances = _cycleInstances;
 				}
 			});
-    });
-    // connect datachain to cycleInstances.
+			if (mouting.screenEffect && cycleInstances) {
+				mouting.screenEffect.forEach((screenEffect: ScreenEffect) => {
+					cycleInstances.forEach((cycleInstance: string) => {
+						graphOperation(
+							AddLinkBetweenNodes(
+								cycleInstance,
+								screenEffect.dataChain,
+								LinkProperties.DataChainScreenEffectImpl
+							)
+						)(GetDispatchFunc(), GetStateFunc());
+						graphOperation(
+							AddLinkBetweenNodes(screenOption.id, screenEffect.dataChain, {
+								...LinkProperties.ComponentNodeLink,
+								cycleInstance
+							})
+						)(GetDispatchFunc(), GetStateFunc());
+					});
+				});
+			}
+		});
 	} else {
 		console.warn('missing reference to method: SetupViewMounting');
 	}

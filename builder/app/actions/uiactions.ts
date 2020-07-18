@@ -1182,7 +1182,7 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	if (language === NodeConstants.UITypes.ReactNative) {
 		anyType = '';
 	} else {
-		let interface_type: string = generateContextInterfaces(GetNodeById(id));
+		let interface_type: string = generateContextInterfaces(GetNodeById(id), anyType);
 		if (interface_type) {
 			anyType = `: ${interface_type}`;
 			overridArg = [ '$internalComponentState' ];
@@ -1235,7 +1235,7 @@ function GetExtraArgs(id: string) {
 	return [];
 }
 
-function generateContextInterfaces(currentNode: GraphTypes.Node) {
+function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: string) {
 	let result = '';
 	if (!currentNode) {
 		return '';
@@ -1257,7 +1257,8 @@ function generateContextInterfaces(currentNode: GraphTypes.Node) {
 
 	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
 		result = `{
-${[ ...screenEffectApis, ...contextParameters, 'viewModel' ]
+${[ ...screenEffectApis, ...contextParameters, 'viewModel', 'value' ]
+			.filter((x: string) => x)
 			.unique()
 			.map((param: string) => {
 				return `${param}?: string | number | null`;
@@ -1370,7 +1371,12 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 	const { cs, language, collection } = options;
 	const graph = GetCurrentGraph();
 	const entryNodes = GetDataChainEntryNodes(cs)
+		.unique((x: { id: string }) => x.id)
 		.filter((x: any) => {
+			const languageAgnostic = GetNodeProp(x, NodeProperties.UIAgnostic);
+			if (languageAgnostic) {
+				return true;
+			}
 			const uiType = GetNodeProp(x, NodeProperties.UIType);
 			if (uiType) {
 				return language === uiType;

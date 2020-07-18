@@ -26,7 +26,8 @@ import {
 	GetLinkProperty,
 	GetDataChainArgs,
 	GetComponentInternalApiNode,
-	GetComponentInternalApiNodes
+	GetComponentInternalApiNodes,
+	GetComponentApiNodes
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -341,7 +342,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		: {};
 
 	let imports: any[] = [];
-	const extraimports = [];
+	const extraimports: any[] = [];
 	const css = {};
 	let layoutSrc;
 	if (!specialLayout) {
@@ -357,7 +358,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 				}).join(NEW_LINE)
 			: GetDefaultElement();
 	} else {
-		extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`);
+		// extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`);
 		if (layoutObj) {
 			buildLayoutTree({
 				layoutObj,
@@ -1011,7 +1012,7 @@ function WriteDescribedStateUpdates(parent: any) {
             updates = {...updates, ${GetJSCodeName(componentInternalApi)}:  new_${externalKey} };`
 				});
 			} else if (dataChainScreenEffect) {
-        //Screen Effects
+				//Screen Effects
 				let internalKey = GetJSCodeName(componentInternalApi);
 				result = `
         var new_${internalKey} = DC.${GetCodeName(dataChainScreenEffect, {
@@ -1567,6 +1568,10 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 			link: LinkType.DataChainLink,
 			componentType: NodeTypes.DataChain
 		});
+		const screenEffects = GetNodesLinkedTo(graph, {
+			id: methodInstanceCall.id,
+			link: LinkType.DataChainScreenEffectImpl
+		});
 
 		const preDataChain = GetNodeLinkedTo(graph, {
 			id: methodInstanceCall.id,
@@ -1676,8 +1681,28 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				includeNameSpace: true
 			})}`;
 		}
+		let screenEffectsInput = '';
+		let screenEffectContext = '';
+		if (screenEffects && screenEffects.length) {
+			screenEffectsInput = `${parts.length ? ',' : ''}screenEffects: [${screenEffects
+				.map((se: GraphMethods.Node) => {
+					return `DC.${GetCodeName(se, { includeNameSpace: true })}`;
+				})
+				.join(',' + NEW_LINE)}]`;
+			let screenEffect = screenEffects[0];
+			let componentConnectedToScreenEffect = GetNodeLinkedTo(graph, {
+				id: screenEffect.id,
+				link: LinkType.ComponentNodeLink
+			});
+			screenEffectContext = `${parts.length ? ',' : ''}screenContext:{ ${GetComponentContextScript(
+				componentConnectedToScreenEffect
+			)} }`;
+		}
+
 		const query = parts.join();
-		return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}${preDataChainInput}});`;
+		return `this.props.${GetJSCodeName(
+			method
+		)}({${query}${dataChainInput}${preDataChainInput}${screenEffectsInput}${screenEffectContext}});`;
 	}
 	if (navigationMethod) {
 		return `this.props.${GetNodeProp(navigationMethod, NodeProperties.NavigationAction)}();`;
@@ -1713,6 +1738,17 @@ function GetEventArguments(buttonId: string) {
 	});
 
 	return eventArguments;
+}
+function GetComponentContextScript(component: GraphMethods.Node) {
+	let internalNodes = GetComponentApiNodes(component.id);
+
+	let res = `${internalNodes
+		.map((internalNode: GraphMethods.Node) => {
+			return `${GetJSCodeName(internalNode)}: this.state.${GetJSCodeName(internalNode)}`;
+		})
+		.join(`,${NEW_LINE}`)}`;
+
+	return res;
 }
 function createInternalApiArgumentsCode(
 	apiInternalNodes: GraphMethods.Node[],

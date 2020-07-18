@@ -462,7 +462,7 @@ class ExecutorItem extends Component<any, any> {
         var { state } = this.props;
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 
-        let methodNode = GetMethodNode(state, currentNode.id, LinkType.ExecutorFunction);
+        let methodNode = GetMethodNode(state, currentNode.id);
         let methodNodeProperties = UIA.GetMethodProps(methodNode);
         if (validatorItem.arguments && validatorItem.arguments.method_reference) {
             return Object.keys(validatorItem.arguments.method_reference).map(ref => {
