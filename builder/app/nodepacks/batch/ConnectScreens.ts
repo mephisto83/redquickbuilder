@@ -154,7 +154,10 @@ function GetAgentAccessDescriptionAgentLink(agentId: string, modelId: string, vi
 					source: agent.id
 				});
 				if (agentLink) {
-					return GetLinkProperty(agentLink, viewType);
+					if (GetLinkProperty(agentLink, viewType)) {
+						result = agentLink;
+						return true;
+					}
 					// let methodProps: any = GetLinkProperty(agentLink, LinkPropertyKeys.MethodProps);
 					// if (methodProps) {
 					// 	if (methodProps[viewType]) {
