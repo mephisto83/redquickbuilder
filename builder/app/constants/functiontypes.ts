@@ -706,6 +706,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Unique ${t} by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/unique_model_to_agent.tpl',
 		interface: './app/templates/standard/unique_model_to_agent_interface.tpl',
 		controller: './app/templates/controller/controller_get_model_user_object.tpl', //controller_get_all_by_ids
@@ -867,6 +868,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} by ${a} User`;
 		},
+		working: true,
 		template: './app/templates/standard/create_model_user_object.tpl',
 		interface: './app/templates/standard/create_model_user_object_interface.tpl',
 		templates: {},
@@ -1214,6 +1216,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a} with Parent`;
 		},
+		working: true,
 		template: './app/templates/standard/get_default_model_agent_object_with_parent.tpl',
 		interface: './app/templates/standard/get_default_model_agent_object_with_parent_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
@@ -1491,6 +1494,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/create_agent_childparent_listchild.tpl',
 		interface: './app/templates/create_agent_childparent_listchild_interface.tpl',
 		permission: {
@@ -1541,6 +1545,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/get_agent_childparent_listchild.tpl',
 		interface: './app/templates/get_agent_childparent_listchild_interface.tpl',
 		controller: './app/templates/controller/controller_get_all_by_parent.tpl',
@@ -1719,11 +1724,16 @@ export const MethodFunctions: any = {
 		working: true,
 		template: './app/templates/standard/get_agent_self.tpl',
 		interface: './app/templates/standard/get_agent_self_interface.tpl',
+		controller: './app/templates/controller/controller_get_agent_self.tpl', //controller_get_all_by_ids
 		permission: {
 			...PERMISSION_DEFAULTS,
-      params: [ FunctionTemplateKeys.Agent ]
+			params: [ FunctionTemplateKeys.Agent ]
 		},
 		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
 			[FunctionTemplateKeys.Agent]: {
 				[NodeProperties.IsAgent]: true,
 				key: FunctionTemplateKeys.Agent,
@@ -1745,8 +1755,8 @@ export const MethodFunctions: any = {
 		},
 		output: {
 			...COMMON_OUTPUT.OBJECT,
-      [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Agent,
-    },
+			[FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Agent
+		},
 
 		parameters: {
 			body: false,

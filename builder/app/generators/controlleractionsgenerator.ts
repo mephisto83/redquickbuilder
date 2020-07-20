@@ -277,18 +277,18 @@ import * as Util from './util';
     objectType: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'}
 }, (res${anytypes}) => {
     var { dataChain, screenEffects, screenContext } = (parameters || {});
+    let result: any = null;
     if (dataChain) {
-        let result = dataChain(res);
-        if(screenEffects && Array.isArray(screenEffects)) {
-          screenEffects.forEach((screenEffects${anytypes}) => {
-            screenEffects(res, screenContext)
-          })
-        }
-        return result;
+        result = dataChain(res);
     }
-    else {
-        console.log('missing data chain');
+
+    if(screenEffects && Array.isArray(screenEffects)) {
+      screenEffects.forEach((screenEffects${anytypes}) => {
+        screenEffects(res, screenContext)
+      })
     }
+
+    return result;
 }, null, (result${anytypes}) => {
   var { preChain } = (parameters || {});
   if (preChain) {

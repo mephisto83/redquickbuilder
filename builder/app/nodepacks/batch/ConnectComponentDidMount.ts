@@ -171,44 +171,52 @@ export default function ConnectComponentDidMount(args: {
 						? [
 								(graph: Graph) => {
 									let model = GetNodeProp(screen, NodeProperties.Model, graph);
-									return StoreModelInLake({
-										modelId: model,
-										modelInsertName: GetLambdaVariableTitle(model, false, true),
-										model: GetNodeTitle(model),
-										viewPackages,
-										callback: (dcontext: { entry: string }) => {
-											datachain = dcontext.entry;
-										}
-									});
+									if (model) {
+										return StoreModelInLake({
+											modelId: model,
+											modelInsertName: GetLambdaVariableTitle(model, false, true),
+											model: GetNodeTitle(model),
+											viewPackages,
+											callback: (dcontext: { entry: string }) => {
+												datachain = dcontext.entry;
+											}
+										});
+									}
+									return [];
 								},
 								() => {
-									return [
-										{
-											operation: ADD_LINK_BETWEEN_NODES,
-											options() {
-												return {
-													properties: { ...LinkProperties.DataChainLink },
-													target: datachain,
-													source: cycleInstance ? cycleInstance.id : null
-												};
+									if (datachain) {
+										return [
+											{
+												operation: ADD_LINK_BETWEEN_NODES,
+												options() {
+													return {
+														properties: { ...LinkProperties.DataChainLink },
+														target: datachain,
+														source: cycleInstance ? cycleInstance.id : null
+													};
+												}
 											}
-										}
-									];
+										];
+									}
+									return [];
 								}
 							]
 						: []),
 					//Returns a LIST and not an instanceType[not edit]
 					...(returnsAList && !instanceType
 						? [
-								...StoreModelArrayStandard({
-									viewPackages,
-									model: GetNodeProp(screen, NodeProperties.Model),
-									modelText: GetNodeTitle(screen),
-									state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
-									callback: (context: { entry: any }) => {
-										storeModelDataChain = context.entry;
-									}
-								}),
+								!GetNodeProp(screen, NodeProperties.Model)
+									? []
+									: StoreModelArrayStandard({
+											viewPackages,
+											model: GetNodeProp(screen, NodeProperties.Model),
+											modelText: GetNodeTitle(screen),
+											state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
+											callback: (context: { entry: any }) => {
+												storeModelDataChain = context.entry;
+											}
+										}),
 								() => {
 									return [
 										{

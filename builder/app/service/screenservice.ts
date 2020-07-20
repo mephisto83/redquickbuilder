@@ -28,7 +28,7 @@ import {
 	GetComponentInternalApiNode,
 	GetComponentInternalApiNodes,
 	GetComponentApiNodes,
-  GetEventArguments
+	GetEventArguments
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -1685,7 +1685,9 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		let screenEffectsInput = '';
 		let screenEffectContext = '';
 		if (screenEffects && screenEffects.length) {
-			screenEffectsInput = `${parts.length ? ',' : ''}screenEffects: [${screenEffects
+			screenEffectsInput = `${parts.length || dataChainInput || preDataChainInput
+				? ','
+				: ''}screenEffects: [${screenEffects
 				.map((se: GraphMethods.Node) => {
 					return `DC.${GetCodeName(se, { includeNameSpace: true })}`;
 				})
@@ -1695,9 +1697,9 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				id: screenEffect.id,
 				link: LinkType.ComponentNodeLink
 			});
-			screenEffectContext = `${parts.length ? ',' : ''}screenContext:{ ${GetComponentContextScript(
-				componentConnectedToScreenEffect
-			)} }`;
+			screenEffectContext = `${parts.length || dataChainInput || preDataChainInput || screenEffectsInput
+				? ','
+				: ''}screenContext:{ ${GetComponentContextScript(componentConnectedToScreenEffect)} }`;
 		}
 
 		const query = parts.join();
@@ -1776,7 +1778,7 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Body:
 							switch (viewType) {
 								case ViewTypes.Update:
-                  methodParamNames.push(paramName);
+									methodParamNames.push(paramName);
 									return `${paramName}: (()=>{
                 let model = UIA.GetScreenModelInstance(this.state.value, this.state.viewModel);
               return model;

@@ -36,9 +36,9 @@ export default function() {
 				enumerable: false,
 				writable: true,
 				configurable: true,
-				value(othercollection: [], func: Function, output: []): any {
-					const collection = <[]>(<unknown>this);
-					const result: any[] = [];
+				value(othercollection: [], func: Function, output: any): any {
+					const collection: any = this;
+					const result: any = [];
 
 					func =
 						func ||

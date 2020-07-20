@@ -69,17 +69,7 @@ export function UISP(screen: any, property: any, value: any) {
 		value
 	};
 }
-export function GetSiteItem(key: string, id: string): any {
-	if (_getState) {
-		let state = _getState();
-		let modelDic = GetC(state, SITE, key, id);
-		if (modelDic) {
-			return modelDic[id];
-		}
-	}
 
-	return null;
-}
 export function GetItem(modelType: any, id: any) {
 	if (_getState) {
 		let state = _getState();

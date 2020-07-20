@@ -62,6 +62,7 @@ class EffectContextMenu extends Component<any, any> {
 							body: false,
 							agent,
 							name: '',
+							screenEffect: [],
 							viewType: ViewTypes.Get
 						});
 						if (callback) {
