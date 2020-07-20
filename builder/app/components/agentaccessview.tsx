@@ -78,6 +78,7 @@ import MethodProps, {
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
+import { RouterRootState } from 'connected-react-router';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -114,7 +115,7 @@ class AgentAccessView extends Component<any, any> {
 		let result: any[] = [];
 		let functionNames: string[] = [];
 		if (this.state) {
-			let { agentEffect, dashboardEffect, agentMethod, agentRouting } = this.state;
+			let { agentEffect, dashboardEffect, agentMethod, agentRouting, dashboardRouting } = this.state;
 			if (agentEffect) {
 				agentEffect.forEach((array: any, aI: string) => {
 					array.forEach((item: any, mI: string) => {
@@ -138,32 +139,37 @@ class AgentAccessView extends Component<any, any> {
 					array.forEach((item: any, mI: number) => {
 						Object.keys(item).forEach((key: string) => {
 							let routing: Routing = item[key];
-							if (routing && routing.routes) {
-								routing.routes.forEach((_route: RouteDescription) => {
-									let messages: string[] = [];
-									if (_route.isDashboard) {
-										if (!_route.dashboard) {
-											let dash = _route.dashboard || '';
-											let viewMounting = this.getDashboardMountingDescription(_route.agent, dash);
-											if (!viewMounting) {
-												messages.push('Target dashboard not set');
-											}
-										}
-									}
-									ValidName(_route.name, messages);
-									if (messages && messages.length) {
-										result.push(
-											<ContentInfo
-												title={`${_route.name} ${GetNodeTitle(array[aI])} ${GetNodeTitle(
-													item[mI]
-												)} ${key}`}
-												type={'success'}
-												messages={messages}
-											/>
-										);
-									}
-								});
-							}
+							let messages = validateRoute(routing, this);
+							messages.forEach((message: { _route: RouteDescription; text: string[] }) => {
+								let { _route, text } = message;
+								result.push(
+									<ContentInfo
+										title={`${_route.name} ${GetNodeTitle(array[aI])} ${GetNodeTitle(
+											item[mI]
+										)} ${key}`}
+										type={'success'}
+										messages={text}
+									/>
+								);
+							});
+						});
+					});
+				});
+			}
+			if (dashboardRouting) {
+				Object.keys(dashboardRouting).forEach((key: string) => {
+					Object.keys(dashboardRouting[key]).forEach((k2: string) => {
+						let routing: Routing = dashboardRouting[key][k2];
+						let messages = validateRoute(routing, this);
+						messages.forEach((message: { _route: RouteDescription; text: string[] }) => {
+							let { _route, text } = message;
+							result.push(
+								<ContentInfo
+									title={`${_route.name} ${GetNodeTitle(key)} ${GetNodeTitle(k2)} ${key}`}
+									type={'success'}
+									messages={text}
+								/>
+							);
 						});
 					});
 				});
@@ -1779,7 +1785,7 @@ class AgentAccessView extends Component<any, any> {
 	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
-	private getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
+	public getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
 		return this.state.dashboardViewMount[agent][dashboard];
 	}
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
@@ -1860,6 +1866,32 @@ class AgentAccessView extends Component<any, any> {
 }
 
 export default UIConnect(AgentAccessView);
+function validateRoute(routing: Routing, view: AgentAccessView): { _route: RouteDescription; text: string[] }[] {
+	if (routing && routing.routes) {
+		let res: { _route: RouteDescription; text: string }[] = [];
+
+		let result: { _route: RouteDescription; text: string[] }[] = [];
+		routing.routes.forEach((_route: RouteDescription) => {
+			let messages: string[] = [];
+			if (_route.isDashboard) {
+				if (!_route.dashboard) {
+					let dash = _route.dashboard || '';
+					let viewMounting = view.getDashboardMountingDescription(_route.agent, dash);
+					if (!viewMounting) {
+						messages.push('Target dashboard not set');
+					}
+				}
+			}
+			ValidName(_route.name, messages);
+			if (messages && messages.length) {
+				result.push({ _route, text: messages });
+			}
+		});
+		return result;
+	}
+	return [];
+}
+
 function forEachType<T>(agentMethod: any, validationFunc: Function, result: any[]) {
 	Object.keys(agentMethod).map((key: string) => {
 		let dashboardLevel = agentMethod[key];

@@ -17,6 +17,7 @@ import { GraphLink, Graph } from '../methods/graph_types';
 import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject } from '../jobs/interfaces';
+import { RouteSourceType, RouteSource } from '../interface/methodprops';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -1223,6 +1224,14 @@ return ${lastNodeName}.value;
 
 	return method;
 }
+export function GetEventArguments(buttonId: string): _.Node[] {
+	let eventArguments = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: buttonId,
+		link: NodeConstants.LinkType.EventArgument
+	});
+
+	return eventArguments;
+}
 function GetExtraArgs(id: string) {
 	let argumentSource = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
 		id,
@@ -1230,7 +1239,11 @@ function GetExtraArgs(id: string) {
 	});
 	if (argumentSource) {
 		let apiInternalNodes = GetComponentInternalApiNodes(argumentSource.id);
-		return [ createInternalApiArguments(apiInternalNodes) ];
+
+		let calculateEventArguments = GetEventArguments(argumentSource.id);
+		// let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
+
+		return [ createInternalApiArguments(apiInternalNodes, calculateEventArguments) ];
 	}
 	return [];
 }
@@ -1240,11 +1253,25 @@ function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: strin
 	if (!currentNode) {
 		return '';
 	}
-	let screenEffectApis = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+	let graph = GetCurrentGraph();
+	let screenEffectApis = GraphMethods.GetNodesLinkedTo(graph, {
 		id: currentNode.id,
 		link: NodeConstants.LinkType.ScreenEffectApi
 	}).map((node: Node) => {
 		return GetJSCodeName(node);
+	});
+	let possibleDataChainParams: string[] = [];
+	let dataScreenEffects = GraphMethods.GetNodesLinkedTo(graph, {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.DataChainScreenEffect
+	});
+	dataScreenEffects.forEach((temp: _.Node) => {
+		let componentOrScreenOption = GraphMethods.GetNodeLinkedTo(graph, {
+			id: temp.id,
+			link: NodeConstants.LinkType.ComponentInternalApi
+		});
+		let internalNodes = GetComponentInternalApiNodes(componentOrScreenOption.id, graph);
+		possibleDataChainParams.push(...internalNodes.map((v: _.Node) => GetJSCodeName(v)));
 	});
 	let contextParameters: string[] = [];
 	GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
@@ -1254,10 +1281,18 @@ function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: strin
 		let nodeParams = GetNodeProp(node, NodeProperties.ContextParams) || [];
 		contextParameters.push(...nodeParams);
 	});
-
+	let argumentSource = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.MethodArgumentSoure
+	});
+	let eventArgNames: string[] = [];
+	if (argumentSource) {
+		let calculateEventArguments = GetEventArguments(argumentSource.id);
+		eventArgNames = getEventArgumentNames(calculateEventArguments);
+	}
 	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
 		result = `{
-${[ ...screenEffectApis, ...contextParameters, 'viewModel', 'value' ]
+${[ ...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value' ]
 			.filter((x: string) => x)
 			.unique()
 			.map((param: string) => {
@@ -1271,14 +1306,44 @@ ${[ ...screenEffectApis, ...contextParameters, 'viewModel', 'value' ]
 	return result;
 }
 
-function createInternalApiArguments(apiInternalNodes: _.Node[]) {
+function createInternalApiArguments(apiInternalNodes: _.Node[], eventArguments: _.Node[]) {
 	let result = '';
-	result = `, $internalComponentState?: { [str:string]: any, ${apiInternalNodes
-		.map((node: _.Node) => {
-			return `${GetNodeTitle(node)}: string | number | null`;
+	let argNames = getEventArgumentNames(eventArguments);
+	result = `, $internalComponentState?: { [str:string]: any, ${[
+		...apiInternalNodes.map((node: _.Node) => {
+			return GetNodeTitle(node);
+		}),
+		...argNames
+	]
+		.unique()
+		.map((name: string) => {
+			return `${name}: string | number | null`;
 		})
 		.join(', ' + NodeConstants.NEW_LINE)} }`;
 	return result;
+}
+
+function getEventArgumentNames(calculateEventArguments: _.Node[]): string[] {
+	let methodParamNames: string[] = [];
+	(calculateEventArguments || []).forEach((node: _.Node) => {
+		switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
+			case NodeConstants.EventArgumentTypes.RouteSource:
+				let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
+				let screen = GetNodeProp(node, NodeProperties.Screen);
+				let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+				let paramName = GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName();
+				switch (routeSource.type) {
+					case RouteSourceType.Agent:
+					case RouteSourceType.Model:
+					case RouteSourceType.UrlParameter:
+					case RouteSourceType.Body:
+						methodParamNames.push(paramName);
+						break;
+				}
+				break;
+		}
+	});
+	return methodParamNames.unique();
 }
 
 export function GenerateSetProcess(id: any, parts: string | any[], options: any) {

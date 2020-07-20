@@ -54,7 +54,7 @@ export default class ScreenEffectComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-        <TreeViewItemContainer>
+				<TreeViewItemContainer>
 					<CheckBox
 						label={Titles.DeepDownTree}
 						value={screenEffect.passDeep}
@@ -109,7 +109,8 @@ export default class ScreenEffectComponent extends Component<any, any> {
 										[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
 										[NodeProperties.DataChainEntry]: true,
 										[NodeProperties.AsOutput]: true,
-										[NodeProperties.UIAgnostic]: true
+										[NodeProperties.UIAgnostic]: true,
+										[NodeProperties.EntryPoint]: true
 									},
 									(node: Node) => {
 										UIA.updateComponentProperty(
@@ -125,6 +126,38 @@ export default class ScreenEffectComponent extends Component<any, any> {
 						}}
 						icon="fa fa-chain"
 					/>
+					{this.props.agent ? (
+						<TreeViewGroupButton
+							title={`Store Self`}
+							onClick={() => {
+								graphOperation(
+									UIA.CreateNewNode(
+										{
+											[NodeProperties.UIText]:
+												screenEffect.name || `Store ${UIA.GetNodeTitle(this.props.agent)} Self`,
+											[NodeProperties.NODEType]: NodeTypes.DataChain,
+											[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+											[NodeProperties.DataChainEntry]: true,
+											[NodeProperties.AsOutput]: true,
+											[NodeProperties.UIAgnostic]: true,
+											[NodeProperties.EntryPoint]: true
+										},
+										(node: Node) => {
+											UIA.updateComponentProperty(
+												node.id,
+												NodeProperties.Lambda,
+												`function Store${UIA.GetCodeName(this.props.agent)}Self($i: any) {
+                        let dispatch = GetDispatch();
+                        dispatch(UIC('site', Models.${UIA.GetCodeName(this.props.agent)}, $i));
+                      }`
+											);
+										}
+									)
+								)(UIA.GetDispatchFunc(), GetStateFunc());
+							}}
+							icon="fa  fa-dot-circle-o"
+						/>
+					) : null}
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);

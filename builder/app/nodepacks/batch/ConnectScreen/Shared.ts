@@ -43,7 +43,10 @@ export function AddButtonToSubComponent(
 	const components = GetNodesLinkedTo(graph, {
 		id: screenOption.id,
 		link: LinkType.Component
-	});
+	}).filter((component: Node) => {
+		return GetNodeProp(component, NodeProperties.Layout);
+  });
+
 	let button: string = '';
 	components.subset(0, 1).forEach((component: Node) => {
 		let steps = AddButtonToComponent({

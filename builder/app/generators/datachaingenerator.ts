@@ -198,8 +198,8 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = [], 
     GetItems,UI_MODELS,
     GetK, updateScreenInstance,
     UIKeys,
-    clearScreenInstance
-
+    clearScreenInstance,
+    SITE
   } from '../${rel}actions/uiactions';
 ${model_imports}
 import {

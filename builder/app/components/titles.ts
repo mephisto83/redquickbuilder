@@ -16,6 +16,7 @@ export const Load = 'Load';
 export const DeleteType = 'Delete Type';
 export const AddServiceInterfaceMenu = 'Add Interface Method';
 export const AddDefaults = 'Add Defaults';
+export const GetSelf= 'Get Self';
 export const BatchMenu = 'Batch Menu';
 export const AddEffect = 'Add Effect';
 export const BuildLowerMenu = 'Build Lower Menu';

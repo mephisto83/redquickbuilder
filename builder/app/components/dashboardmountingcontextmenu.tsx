@@ -388,7 +388,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
-								<ScreenEffectsComponent screenEffects={mountingItem.screenEffect} />
+								<ScreenEffectsComponent agent={agent} screenEffects={mountingItem.screenEffect} />
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {

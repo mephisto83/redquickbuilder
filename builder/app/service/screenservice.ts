@@ -27,7 +27,8 @@ import {
 	GetDataChainArgs,
 	GetComponentInternalApiNode,
 	GetComponentInternalApiNodes,
-	GetComponentApiNodes
+	GetComponentApiNodes,
+  GetEventArguments
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -1731,18 +1732,12 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		})}(value/*hi*/);`;
 	}
 }
-function GetEventArguments(buttonId: string) {
-	let eventArguments = GetNodesLinkedTo(GetCurrentGraph(), {
-		id: buttonId,
-		link: LinkType.EventArgument
-	});
 
-	return eventArguments;
-}
 function GetComponentContextScript(component: GraphMethods.Node) {
 	let internalNodes = GetComponentApiNodes(component.id);
 
 	let res = `${internalNodes
+		.unique((v: GraphMethods.Node) => GetJSCodeName(v))
 		.map((internalNode: GraphMethods.Node) => {
 			return `${GetJSCodeName(internalNode)}: this.state.${GetJSCodeName(internalNode)}`;
 		})
@@ -1768,7 +1763,7 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Model:
 							methodParamNames.push(paramName);
 							return `${paramName}: (() => {
-              let model = GetItem(Models.${GetCodeName(routeSource.model)}, this.state.value);
+              let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
               if(model) {
                 return model.${GetJSCodeName(routeSource.property)};
               }
@@ -1781,9 +1776,10 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Body:
 							switch (viewType) {
 								case ViewTypes.Update:
+                  methodParamNames.push(paramName);
 									return `${paramName}: (()=>{
                 let model = UIA.GetScreenModelInstance(this.state.value, this.state.viewModel);
-                return model;
+              return model;
               })()`;
 								case ViewTypes.Create:
 									methodParamNames.push(paramName);

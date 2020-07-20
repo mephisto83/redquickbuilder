@@ -3,6 +3,8 @@ import fs from 'fs';
 import { Methods, NodeTypes, NodeProperties } from './nodetypes';
 
 export const FunctionTypes = {
+	// Get Self
+	GetSelf: 'Get/Self',
 	//Functions with List<Child> result
 	Create_ManyToMany_Agent_Value__IListChild: 'Create/ManyToMany/Agent/Value => IList<Child>',
 	Update_ManyToMany_Agent_Value__IListChild: 'Update/ManyToMany/Agent/Value => IList<Child>',
@@ -756,6 +758,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} Object by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/create_model_agent_object.tpl',
 		interface: './app/templates/standard/create_model_agent_object_interface.tpl',
 		templates: {},
@@ -820,6 +823,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} Objects With IdList by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_agent_listobject_with_id_list.tpl',
 		interface: './app/templates/standard/get_agent_listobject_with_id_list_interface.tpl',
 		controller: './app/templates/controller/controller_get_all_by_ids.tpl', //controller_get_all_by_ids
@@ -1015,6 +1019,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Update ${t} Object by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/update_model_agent_object.tpl',
 		interface: './app/templates/standard/update_model_agent_object_interface.tpl',
 		permission: {
@@ -1157,6 +1162,7 @@ export const MethodFunctions: any = {
 		permission: {
 			...PERMISSION_ON_AGENT
 		},
+		working: true,
 		lambda: {
 			default: {
 				user: 'user',
@@ -1335,6 +1341,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t}s List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_agent_listobject.tpl',
 		interface: './app/templates/standard/get_agent_listobject_interface.tpl',
 		controller: './app/templates/standard/get_agent_listobjects_controller.tpl',
@@ -1659,6 +1666,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_model_agent_object.tpl',
 		interface: './app/templates/standard/get_model_agent_object_interface.tpl',
 		permission: {
@@ -1703,6 +1711,51 @@ export const MethodFunctions: any = {
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
 
+	[FunctionTypes.GetSelf]: {
+		title: Titles.GetSelf,
+		titleTemplate: function(t: any, a: any) {
+			return `Get ${a} Self`;
+		},
+		working: true,
+		template: './app/templates/standard/get_agent_self.tpl',
+		interface: './app/templates/standard/get_agent_self_interface.tpl',
+		permission: {
+			...PERMISSION_DEFAULTS,
+      params: [ FunctionTemplateKeys.Agent ]
+		},
+		constraints: {
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT,
+      [FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Agent,
+    },
+
+		parameters: {
+			body: false,
+			parameters: false
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
 	[FunctionTypes.Get_Object_User_Object]: {
 		title: FunctionTypes.Get_Object_User_Object,
 		titleTemplate: function(t: any, a: any) {
@@ -2042,6 +2095,13 @@ export function bindReferenceTemplate(templateString: any, data: any) {
 
 export function GetFunctionTypeOptions() {
 	return Object.keys(FunctionTypes)
+		.filter((d) => {
+			let functionType = FunctionTypes[d];
+			if (MethodFunctions[functionType]) {
+				return MethodFunctions[functionType].working;
+			}
+			return false;
+		})
 		.map((d) => {
 			let functionType = FunctionTypes[d];
 			if (MethodFunctions[functionType] && MethodFunctions[functionType].title) {
