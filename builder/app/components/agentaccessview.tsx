@@ -74,11 +74,14 @@ import MethodProps, {
 	DashboardRouting,
 	ScreenEffectApiProps,
 	ScreenEffectApi,
-	EffectDescription
+	EffectDescription,
+	RouteSourceType
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
 import { RouterRootState } from 'connected-react-router';
+import { multiple } from './editor.main.css';
+import { mount } from 'enzyme';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -115,7 +118,17 @@ class AgentAccessView extends Component<any, any> {
 		let result: any[] = [];
 		let functionNames: string[] = [];
 		if (this.state) {
-			let { agentEffect, dashboardEffect, agentMethod, agentRouting, dashboardRouting } = this.state;
+			let {
+				agentViewMount,
+				dashboardViewMount,
+				agentEffect,
+				dashboardEffect,
+				agentMethod,
+				agentRouting,
+				dashboardRouting,
+				agentScreenEffect,
+				dashboardScreenEffect
+			} = this.state;
 			if (agentEffect) {
 				agentEffect.forEach((array: any, aI: string) => {
 					array.forEach((item: any, mI: string) => {
@@ -133,6 +146,52 @@ class AgentAccessView extends Component<any, any> {
 					});
 				});
 			}
+			if (agentScreenEffect) {
+				Object.keys(agentScreenEffect).forEach((agentId: string) => {
+					Object.keys(agentScreenEffect[agentId]).forEach((modelId: string) => {
+						Object.keys(agentScreenEffect[agentId][modelId]).forEach((key: string) => {
+							let screenEffect: ScreenEffectApi[] = agentScreenEffect[agentId][modelId][key];
+							validateScreenEffect(
+								screenEffect,
+								result,
+								`${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}/${key}`
+							);
+						});
+					});
+				});
+			}
+			if (dashboardScreenEffect) {
+				Object.keys(dashboardScreenEffect).forEach((agentId: string) => {
+					Object.keys(dashboardScreenEffect[agentId]).forEach((modelId: string) => {
+						let screenEffect: ScreenEffectApi[] = dashboardScreenEffect[agentId][modelId];
+						validateScreenEffect(screenEffect, result, `${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}`);
+					});
+				});
+			}
+			if (agentViewMount) {
+				agentViewMount.forEach((array: any, aI: string) => {
+					array.forEach((item: any, mI: string) => {
+						Object.keys(item).forEach((key: string) => {
+							let viewMount: ViewMounting = item[key];
+							if (viewMount)
+								validateViewMount(
+									viewMount,
+									result,
+									`${GetNodeTitle(this.state.agents[aI])} ${GetNodeTitle(this.state.models[mI])}`
+								);
+						});
+					});
+				});
+			}
+			if (dashboardViewMount) {
+				Object.keys(dashboardViewMount).forEach((dashboardKey: any) => {
+					Object.keys(dashboardViewMount[dashboardKey]).forEach((key: string) => {
+						let viewMount: ViewMounting = dashboardViewMount[dashboardKey][key];
+						if (viewMount)
+							validateViewMount(viewMount, result, `${GetNodeTitle(dashboardKey)} ${GetNodeTitle(key)}`);
+					});
+				});
+			}
 			if (agentRouting) {
 				// this.getMountingDescription(aI, mI, v);
 				agentRouting.forEach((array: any, aI: number) => {
@@ -144,9 +203,9 @@ class AgentAccessView extends Component<any, any> {
 								let { _route, text } = message;
 								result.push(
 									<ContentInfo
-										title={`${_route.name} ${GetNodeTitle(array[aI])} ${GetNodeTitle(
-											item[mI]
-										)} ${key}`}
+										title={`${_route ? _route.name : 'Unknown'} ${GetNodeTitle(
+											array[aI]
+										)} ${GetNodeTitle(item[mI])} ${key}`}
 										type={'success'}
 										messages={text}
 									/>
@@ -165,7 +224,9 @@ class AgentAccessView extends Component<any, any> {
 							let { _route, text } = message;
 							result.push(
 								<ContentInfo
-									title={`${_route.name} ${GetNodeTitle(key)} ${GetNodeTitle(k2)} ${key}`}
+									title={`${_route ? _route.name : 'Unknown'} ${GetNodeTitle(key)} ${GetNodeTitle(
+										k2
+									)} ${key}`}
 									type={'success'}
 									messages={text}
 								/>
@@ -386,7 +447,7 @@ class AgentAccessView extends Component<any, any> {
 			<TopViewer active={active}>
 				<section className="content">
 					<div className="row">
-						<div className="col-md-2">
+						<div className="col-md-3">
 							<Box maxheight={600} title={Titles.Style}>
 								<FormControl>
 									<CheckBox
@@ -482,7 +543,7 @@ class AgentAccessView extends Component<any, any> {
 							</Box>
 							<Box title={'Errors'}>{this.calculateErrors()}</Box>
 						</div>
-						<div className="col-md-10">
+						<div className="col-md-9">
 							<TabContainer>
 								<Tabs>
 									<Tab
@@ -1882,7 +1943,9 @@ function validateRoute(routing: Routing, view: AgentAccessView): { _route: Route
 					}
 				}
 			}
+
 			ValidName(_route.name, messages);
+			validateRouteDescription(_route, messages);
 			if (messages && messages.length) {
 				result.push({ _route, text: messages });
 			}
@@ -1900,6 +1963,132 @@ function forEachType<T>(agentMethod: any, validationFunc: Function, result: any[
 			validationFunc(agentLevel, result);
 		});
 	});
+}
+function validateRouteDescription(routing: RouteDescription, messages: string[]) {
+	if (routing.source) {
+		Object.keys(routing.source).forEach((key: string) => {
+			if (routing.source && routing.source[key]) {
+				switch (routing.source[key].type) {
+					case RouteSourceType.Agent:
+					case RouteSourceType.Model:
+						if (!routing.isDashboard && !routing.source[key].model) {
+							messages.push(`Missing ${routing.source[key].type}`);
+						}
+						if (!routing.source[key].property) {
+							messages.push(`Missing property of ${routing.source[key].type}`);
+						}
+						break;
+					case RouteSourceType.UrlParameter:
+						if (!routing.source[key].model) {
+							messages.push(`Missing urlParameter`);
+						}
+						break;
+					case RouteSourceType.Body:
+						break;
+					default:
+						if (routing.source[key].type) {
+							messages.push('missing screen to api value');
+						} else if (typeof routing.source[key] === 'string') {
+							delete routing.source[key];
+						}
+						break;
+				}
+			} else {
+				messages.push(`missing screen to api ${key}.`);
+				if (routing.source) {
+					delete routing.source[key];
+				}
+			}
+		});
+	}
+	if (!routing.isDashboard && !routing.model) {
+		messages.push('Routing model not set');
+	}
+	if (routing.isDashboard && !routing.dashboard) {
+		messages.push('Routing dashboard not set');
+	}
+	if (!routing.isDashboard && !routing.agent) {
+		messages.push('Routing agent not set');
+	}
+}
+function validateScreenEffect(screenEffects: ScreenEffectApi[], result: any[], title: string) {
+	if (screenEffects) {
+		screenEffects.forEach((screenEffect: ScreenEffectApi) => {
+			let messages: string[] = [];
+			ValidName(screenEffect.name, messages, { lowerCase: true });
+
+			if (!screenEffect.dataChain) {
+				messages.push('no datachain selected.');
+			}
+			if (messages.length) {
+				result.push(
+					<ContentInfo
+						type={'danger'}
+						description={`${title}`}
+						title={screenEffect.name}
+						messages={messages}
+					/>
+				);
+			}
+		});
+	}
+}
+function validateViewMount(viewMount: ViewMounting, result: any[], title: string) {
+	if (viewMount && viewMount.mountings)
+		viewMount.mountings.forEach((mounting: MountingDescription) => {
+			let messages: string[] = [];
+			ValidName(mounting.name, messages);
+
+			if (mounting.source) {
+				Object.keys(mounting.source).forEach((key: string) => {
+					if (mounting.source && mounting.source[key]) {
+						switch (mounting.source[key].type) {
+							case RouteSourceType.Agent:
+							case RouteSourceType.Model:
+								if (!mounting.source[key].model) {
+									messages.push(`Missing ${mounting.source[key].type}`);
+								}
+								if (!mounting.source[key].property) {
+									messages.push(`Missing property of ${mounting.source[key].type}`);
+								}
+								break;
+							case RouteSourceType.UrlParameter:
+								if (!mounting.source[key].model) {
+									messages.push(`Missing urlParameter`);
+								}
+								break;
+							case RouteSourceType.Body:
+								break;
+							default:
+								if (mounting.source[key].type) {
+									messages.push('missing screen to api value');
+								} else if (typeof mounting.source[key] === 'string') {
+									delete mounting.source[key];
+								}
+								break;
+						}
+					} else {
+						messages.push(`missing screen to api ${key}.`);
+						if (mounting.source) {
+							delete mounting.source[key];
+						}
+					}
+				});
+			}
+
+			if (!mounting.model) {
+				messages.push('Mounting model not set');
+			}
+			if (!mounting.agent) {
+				messages.push('Mounting agent not set');
+			}
+
+			if (messages.length) {
+				result.push(
+					<ContentInfo type={'danger'} description={`${title}`} title={mounting.name} messages={messages} />
+				);
+			}
+		});
 }
 
 function validateEffect(
@@ -2399,13 +2588,21 @@ function loadDashboard<T>(
 	return result;
 }
 
-function ValidName(name: string, messages: string[] = []) {
+function ValidName(name: string, messages: string[] = [], options: { lowerCase?: boolean } = {}) {
 	if (name) {
-		if (name.length > 3) {
-			if (name[0].toUpperCase() === name[0]) {
-				return true;
+		if (name.length >= 3) {
+			if (options && options.lowerCase) {
+				if (name[0].toLowerCase() === name[0]) {
+					return true;
+				} else {
+					messages.push('name needs to be lowercase');
+				}
 			} else {
-				messages.push('name needs to be capitalize');
+				if (name[0].toUpperCase() === name[0]) {
+					return true;
+				} else {
+					messages.push('name needs to be capitalize');
+				}
 			}
 		} else {
 			messages.push('name is too short');

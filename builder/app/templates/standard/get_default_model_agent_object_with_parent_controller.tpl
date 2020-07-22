@@ -1,5 +1,5 @@
 
-        [Route("{{http_route}}")]
+        [Route("{{http_route}}/{parent}")]
         [{{http_method}}]
         public async Task<ActionResult<{{output_type}}>> {{functionName}}(string parent)
         {

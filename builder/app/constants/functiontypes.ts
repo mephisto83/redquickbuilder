@@ -1126,6 +1126,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t}s by ${a} Return List`;
 		},
+		working: true,
 		template: './app/templates/standard/get_model_agent_listobject.tpl',
 		interface: './app/templates/standard/get_model_agent_listobject_interface.tpl',
 		controller_parameters: {

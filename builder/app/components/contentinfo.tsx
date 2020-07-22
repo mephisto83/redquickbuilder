@@ -29,12 +29,12 @@ export default class ContentInfo extends Component<any, any> {
 						marginLeft: 26
 					}}
 				>
-					<span className="info-box-text">{this.props.title}</span>
-					<span className="info-box-text">{this.props.description}</span>
+					<span className="info-box-text" title={this.props.title}>{this.props.title}</span>
+					<span className="info-box-text" title={this.props.description}>{this.props.description}</span>
 					<span className="info-box-number">{(this.props.messages || []).length}</span>
 
 					<div className="progress">
-						<div className="progress-bar" style={{ width: '70%' }} />
+						<div className="progress-bar" style={{ width: '100%' }} />
 					</div>
 					{(this.props.messages || []).map((message: string) => {
 						return (

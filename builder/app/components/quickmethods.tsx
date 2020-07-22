@@ -57,6 +57,7 @@ import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
 import { NodesByType, GetNodeProp } from '../methods/graph_methods';
+import CreateClaimService from '../nodepacks/batch/CreateClaimService';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -213,6 +214,12 @@ class QuickMethods extends Component<any, any, any> {
 									title="Add Agent Access Methods"
 									onClick={() => {
 										AddAgentAccessMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Create Claim Service"
+									onClick={() => {
+										CreateClaimService();
 									}}
 								/>
 								<TreeViewMenu

@@ -53,6 +53,7 @@ export const GetItem = (a: any, b: any) => {
 export const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
 export const RECORDING = 'RECORDING';
 export const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
+export const SITE = 'SITE';
 
 export const ValidationPropName = {
 	Email: 'email',

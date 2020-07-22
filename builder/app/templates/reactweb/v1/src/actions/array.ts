@@ -38,15 +38,13 @@ export default function() {
 				configurable: true,
 				value(othercollection: [], func: Function, output: any): any {
 					const collection: any = this;
-					const result: any = [];
-
+					let result: any = [];
 					func =
 						func ||
 						function(x: any, y: any) {
 							return x === y;
 						};
 					for (let i = collection.length; i-- /**/; ) {
-						// function (x) { return x == collection[i]; }
 						if (!othercollection.some(func.bind(null, collection[i]))) {
 							result.push(collection[i]);
 						} else if (output) {
