@@ -1594,7 +1594,7 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 					const addiontionalParams = getUpdateFunctionOption(
 						methodInstanceSource ? methodInstanceSource.id : null,
 						methodInstanceCall ? methodInstanceCall.id : null,
-						`, { update: true }/*m => mi*/`
+						``
 					);
 
 					innervalue = `S.${GetJSCodeName(
@@ -1823,7 +1823,7 @@ export function getUpdateFunctionOption(methodId: any, methodInstanceCallId: any
 		if (linkBetweenNodes) {
 			const instanceUpdate = GetLinkProperty(linkBetweenNodes, LinkPropertyKeys.InstanceUpdate);
 			if (instanceUpdate) {
-				addiontionalParams = addParams || `/*getUpdateFunctionOption*/`;
+				addiontionalParams = addParams || ``;
 			}
 		}
 	}
@@ -2141,8 +2141,8 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 			}
 		),
 		relative: './src/actions',
-		relativeFilePath: `./screenInstances.js`,
-		name: ``
+		relativeFilePath: `./screenInstances.ts`,
+		name: `screenInstances.ts`
 	});
 	moreresults.push({
 		template: bindTemplate(
@@ -2173,8 +2173,8 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 			}
 		),
 		relative: './src/actions',
-		relativeFilePath: `./screenInfo.js`,
-		name: ``
+		relativeFilePath: `./screenInfo.ts`,
+		name: `screenInfo.ts`
 	});
 
 	return [ ...result, ...moreresults ];
