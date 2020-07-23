@@ -702,7 +702,7 @@ export function GetConstraints(functionType: string) {
 }
 export const MethodFunctions: any = {
 	[FunctionTypes.Get_Unique_Object_To_Agent]: {
-		title: Titles.Create_Object__Object,
+		title: Titles.Get_Unique_Object_To_Agent,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Unique ${t} by ${a}`;
 		},

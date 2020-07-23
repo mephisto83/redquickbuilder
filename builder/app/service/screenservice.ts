@@ -980,11 +980,7 @@ function WriteDescribedStateUpdates(parent: any) {
 			innerValue = externalKey;
 			if (innerValue) {
 				if (selector) {
-					const addiontionalParams = getUpdateFunctionOption(
-						selector.id,
-						externalApiNode.id,
-						`, { update: true }/*s => e*/`
-					);
+					const addiontionalParams = getUpdateFunctionOption(selector.id, externalApiNode.id, `/*s => e*/`);
 					innerValue = `S.${GetJSCodeName(
 						selector
 					)}({{temp}}, this.state.viewModel${addiontionalParams} /* state update */)`;
@@ -1224,16 +1220,12 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 			if (!noSelector && selector) {
 				addiontionalParams =
 					componentExternalApi && externalConnection
-						? getUpdateFunctionOption(
-								componentExternalApi.id,
-								externalConnection.id,
-								`, { update: true }/*c => e*/`
-							)
+						? getUpdateFunctionOption(componentExternalApi.id, externalConnection.id, ``)
 						: '';
 				if (isViewType) {
 					addiontionalParams =
 						componentExternalApi && node
-							? getUpdateFunctionOption(node.id, componentExternalApi.id, `, { update: true }/*n => c*/`)
+							? getUpdateFunctionOption(node.id, componentExternalApi.id, ``)
 							: '';
 
 					innerValue = `S.${GetJSCodeName(
@@ -1831,7 +1823,7 @@ export function getUpdateFunctionOption(methodId: any, methodInstanceCallId: any
 		if (linkBetweenNodes) {
 			const instanceUpdate = GetLinkProperty(linkBetweenNodes, LinkPropertyKeys.InstanceUpdate);
 			if (instanceUpdate) {
-				addiontionalParams = addParams || `, { update: true }/*getUpdateFunctionOption*/`;
+				addiontionalParams = addParams || `/*getUpdateFunctionOption*/`;
 			}
 		}
 	}
@@ -2131,14 +2123,57 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 	});
 
 	moreresults.push({
-		template: bindTemplate(`{{source}}`, {
-			source: NodesByType(GetState(), [ NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode ])
-				.map((t: any) => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`)
-				.unique()
-				.join(NEW_LINE)
-		}),
+		template: bindTemplate(
+			`{{source}}
+  `,
+			{
+				source: NodesByType(GetState(), [ NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode ])
+					.filter((node: GraphMethods.Node) => {
+						switch (GetNodeProp(node, NodeProperties.NODEType)) {
+							case NodeTypes.ComponentNode:
+								return GetNodeProp(node, NodeProperties.IsShared);
+						}
+						return true;
+					})
+					.map((t: any) => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`)
+					.unique()
+					.join(NEW_LINE)
+			}
+		),
 		relative: './src/actions',
 		relativeFilePath: `./screenInstances.js`,
+		name: ``
+	});
+	moreresults.push({
+		template: bindTemplate(
+			`
+    export const $CreateModels = {
+      {{create_viewmodels}}
+    };
+    export const $UpdateModels = {
+        {{update_viewmodels}}
+    };`,
+			{
+				update_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+					.filter((a: GraphMethods.Node) => {
+						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Update;
+					})
+					.map((t: GraphMethods.Graph) => {
+						return `${GetCodeName(t)}: '${GetCodeName(t)}'`;
+					})
+					.join(',' + NEW_LINE),
+				create_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+					.filter((a: GraphMethods.Node) => {
+						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Create;
+					})
+					.map((t: GraphMethods.Graph) => {
+						return `${GetCodeName(t)}: '${GetCodeName(t)}'`;
+					})
+					.join(',' + NEW_LINE)
+			}
+		),
+		relative: './src/actions',
+		relativeFilePath: `./screenInfo.js`,
 		name: ``
 	});
 
