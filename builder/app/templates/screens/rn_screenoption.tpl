@@ -33,6 +33,9 @@ this.state = {};
 {{component_did_update}}
 render() {
 let { state } = this.props;
+let props = {...this.props};
+delete props.children;
+
 {{screen_options}}
 return (
 <StyleProvider style={getTheme(material)}>

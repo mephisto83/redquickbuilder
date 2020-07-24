@@ -1,1 +1,1 @@
-            Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{model}} {{value}}, QueryParameters queryParameter = null);
+            Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, QueryParameters queryParameter = null);

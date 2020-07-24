@@ -141,7 +141,7 @@ export function GenerateScreenOptionSource(node: any, parent: any, language: str
 }
 
 export function GetDefaultElement(language?: string) {
-	return '<View><Text>DE</Text></View>';
+	return '<View ...props><Text>DE</Text></View>';
 }
 export function GetItemRender(node: { id: any }, imports: (string | undefined)[], language: any) {
 	const listItemNode = GetListItemNode(node.id);

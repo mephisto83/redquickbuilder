@@ -1129,14 +1129,13 @@ export const MethodFunctions: any = {
 		working: true,
 		template: './app/templates/standard/get_model_agent_listobject.tpl',
 		interface: './app/templates/standard/get_model_agent_listobject_interface.tpl',
-		controller_parameters: {
-			params: [ FunctionTemplateKeys.Model ]
-		},
+		controller: './app/templates/standard/get_agent_listobjects_controller.tpl',
 		permission: {
-			...PERMISSION_DEFAULTS
+			...PERMISSION_ON_AGENT
 		},
 		filter: {
-			...FILTER_DEFAULTS
+			...FILTER_DEFAULTS,
+			params: [ FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true } ]
 		},
 		constraints: {
 			...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD

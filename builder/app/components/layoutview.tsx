@@ -33,6 +33,7 @@ import LayoutCreator from './layoutcreator';
 import { getComponentApiList } from '../methods/component_api_methods';
 import { InstanceTypes, HandlerTypes, ComponentTags } from '../constants/componenttypes';
 import FormControl from './formcontrol';
+import StyleLayout from './stylelayout';
 import { StyleLib } from '../constants/styles';
 import Typeahead from './typeahead';
 
@@ -344,6 +345,7 @@ class LayoutView extends Component<any, any> {
 		let cellModel = null;
 		let cellModelProperty = null;
 		let cellRoot = null;
+		let cellStyleArray = null;
 		let cellEvents = null;
 		let selectedLayoutRoot = null;
 		if (nodeLayout && this.state.selectedCell) {
@@ -362,6 +364,12 @@ class LayoutView extends Component<any, any> {
 
 				cellProperties.cellRoot = cellProperties.cellRoot || {};
 				cellRoot = cellProperties.cellRoot;
+
+				cellProperties.cellStyleArray = cellProperties.cellStyleArray || [];
+				if (!Array.isArray(cellProperties.cellStyleArray)) {
+					cellProperties.cellStyleArray = [];
+				}
+				cellStyleArray = cellProperties.cellStyleArray;
 
 				cellProperties.cellEvents = cellProperties.cellEvents || {};
 				cellEvents = cellProperties.cellEvents;
@@ -682,6 +690,7 @@ class LayoutView extends Component<any, any> {
 									/>
 								) : null}
 							</Box>
+							<StyleLayout />
 						</div>
 						<div className="col-md-2">
 							<Box maxheight={350} title={Titles.Properties}>
