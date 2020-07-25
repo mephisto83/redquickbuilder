@@ -33,7 +33,7 @@ import LayoutCreator from './layoutcreator';
 import { getComponentApiList } from '../methods/component_api_methods';
 import { InstanceTypes, HandlerTypes, ComponentTags } from '../constants/componenttypes';
 import FormControl from './formcontrol';
-import StyleLayout from './stylelayout';
+import CellStyleLayout from './cellstylelayout';
 import { StyleLib } from '../constants/styles';
 import Typeahead from './typeahead';
 
@@ -690,7 +690,22 @@ class LayoutView extends Component<any, any> {
 									/>
 								) : null}
 							</Box>
-							<StyleLayout />
+							{cellProperties && cellProperties.cellStyleArray ? (
+								<CellStyleLayout
+                  parentId={currentNode.id}
+									onChange={() => {
+										let layout =
+											UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();
+										layout = RemoveCellLayout(layout, this.state.selectedCell);
+										this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+											prop: UIA.NodeProperties.Layout,
+											id: currentNode.id,
+											value: layout
+										});
+									}}
+									componentStyles={cellProperties.cellStyleArray}
+								/>
+							) : null}
 						</div>
 						<div className="col-md-2">
 							<Box maxheight={350} title={Titles.Properties}>

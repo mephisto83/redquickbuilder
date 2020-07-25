@@ -172,7 +172,12 @@ class ScreenEffectContextMenu extends Component<any, any> {
 									className={this.state.secondaryMenu ? '' : 'col-md-12'}
 									style={this.state.secondaryMenu ? { width: '50%' } : {}}
 								>
-									<GenericPropertyContainer active title="asdf" subTitle="afaf" nodeType={nodeType}>
+									<GenericPropertyContainer
+										active
+										title="asdf"
+										subTitle="afaf"
+										nodeType={nodeType}
+									>
 										{currentInfo}
 										{menuitems}
 									</GenericPropertyContainer>

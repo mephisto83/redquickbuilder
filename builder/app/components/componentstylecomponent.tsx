@@ -4,18 +4,21 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import * as Titles from './titles';
-import { GUID, NodeTypes } from '../actions/uiactions';
+import { GUID, NodeTypes, GetNodeTitle } from '../actions/uiactions';
 import CheckBox from './checkbox';
-import { NodesByType } from '../methods/graph_methods';
+import { NodesByType, GetNodesLinkedTo } from '../methods/graph_methods';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import SelectInput from './selectinput';
+import ComponentStyle from './componentstyle';
 export default class ComponentStyleComponent extends Component<any, any> {
 	constructor(props: any) {
-		super(props);
+    super(props);
+    this.state = {};
 	}
 	render() {
-    let componentStyle = this.props.componentStyle;
+		let componentStyle: ComponentStyle = this.props.componentStyle;
+		let parentId: string = this.props.parentId;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -23,14 +26,21 @@ export default class ComponentStyleComponent extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				title={componentStyle.name || Titles.ComponentType}
+				title={
+					`${GetNodeTitle(componentStyle.componentApi)}: ${GetNodeTitle(componentStyle.styleComponent)}` ||
+					Titles.ComponentType
+				}
 			>
 				<TreeViewItemContainer>
-					<TextInput
-						label={Titles.Name}
-						value={componentStyle.name}
+					<SelectInput
+						label={Titles.ComponentApi}
+						options={GetNodesLinkedTo(this.props.state, {
+							id: parentId,
+							componentType: NodeTypes.ComponentApi
+						}).toNodeSelect()}
+						value={componentStyle.componentApi}
 						onChange={(value: string) => {
-							componentStyle.name = value;
+							componentStyle.componentApi = value;
 							this.setState({
 								turn: GUID()
 							});
@@ -40,28 +50,16 @@ export default class ComponentStyleComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer>
-					<CheckBox
-						label={Titles.DeepDownTree}
-						value={componentStyle.passDeep}
-						onChange={(value: boolean) => {
-							componentStyle.passDeep = value;
-							this.setState({
-								turn:  GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
-				<TreeViewItemContainer>
+        <TreeViewItemContainer>
 					<SelectInput
-						label={Titles.DataChain}
-						options={NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={componentStyle.dataChain}
+						label={Titles.Style}
+						options={GetNodesLinkedTo(this.props.state, {
+							id: parentId,
+							componentType: NodeTypes.Style
+						}).toNodeSelect()}
+						value={componentStyle.styleComponent}
 						onChange={(value: string) => {
-							componentStyle.dataChain = value;
+							componentStyle.componentApi = value;
 							this.setState({
 								turn: GUID()
 							});
@@ -86,7 +84,6 @@ export default class ComponentStyleComponent extends Component<any, any> {
 					/>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
-
 		);
 	}
 }

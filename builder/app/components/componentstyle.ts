@@ -1,18 +1,20 @@
 import { GUID } from '../actions/uiactions';
 export enum ComponentStyleType {
-	DataChain = 'DataChain'
+	ComponentApi = 'ComponentApi'
 }
 
 export default interface ComponentStyle {
 	id: string;
-	dataChain: string;
+	componentApi: string;
+	styleComponent: string;
 	componentStyleType: ComponentStyleType;
 };
 
 export function CreateComponentStyle(): ComponentStyle {
 	return {
 		id: GUID(),
-		dataChain: '',
-		componentStyleType: ComponentStyleType.DataChain
+    componentApi: '',
+    styleComponent: '',
+		componentStyleType: ComponentStyleType.ComponentApi
 	};
 }
