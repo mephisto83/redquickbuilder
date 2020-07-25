@@ -20,7 +20,7 @@ class CellStyleLayout extends Component<any, any> {
 		return (
 			<GenericPropertyContainer sideBarStyle={{ right: 0 }} active title="asdf" subTitle="afaf">
 				<TreeViewMenu
-					open={this.state.open}
+					open
 					active
 					onClick={() => {
 						this.setState({ open: !this.state.open });

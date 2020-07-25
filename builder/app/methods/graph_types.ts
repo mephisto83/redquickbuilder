@@ -55,6 +55,12 @@ export interface ComponentProperty {
 	properties: {
 		tags: string[];
 	};
+	style: { [key: string]: any };
+	children: { [key: string]: any };
+	cellModel: { [key: string]: any };
+	cellRoot: { [key: string]: any };
+	cellModelProperty: { [key: string]: any };
+	cellStyleArray: any[];
 }
 export interface ComponentLayout {
 	[key: string]: {};

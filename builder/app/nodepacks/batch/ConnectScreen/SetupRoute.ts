@@ -25,15 +25,17 @@ import {
 	AddLinkBetweenNodes,
 	CreateNewNode
 } from '../../../actions/uiactions';
-import { GetNodesLinkedTo, GetNodeLinkedTo } from '../../../methods/graph_methods';
+import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties } from '../../../methods/graph_methods';
 import { LinkType, LinkProperties, NodeProperties, NodeTypes, EventArgumentTypes } from '../../../constants/nodetypes';
-import { Node } from '../../../methods/graph_types';
+import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
 import {
 	AddButtonToSubComponent,
 	AddButtonToComponentLayout,
 	SetupApi,
 	AddApiToButton,
-	AddInternalComponentApi
+	AddInternalComponentApi,
+	GetHideStyle,
+  AddComponentAutoStyles
 } from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 
@@ -108,7 +110,8 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 			console.log(JSON.stringify(routeDescription, null, 4));
 			throw new Error('missing targetScreen');
 		}
-		AddButtonToComponentLayout({ button, component: subcomponent });
+		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
+		AddComponentAutoStyles(subcomponent, routeDescription, cellId);
 	});
 }
 

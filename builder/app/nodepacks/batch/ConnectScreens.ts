@@ -43,6 +43,7 @@ import SetupViewMouting, { GetViewMounting, GetDashboardViewMounting } from './C
 import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
 import { RedressScreenProperties } from './RedressProperties';
 import SetupScreenEffects, { GetScreenEffectApi } from './ConnectScreen/SetupScreenEffects';
+import AddDefaultAgentExistsDatachains from './AddDefaultAgentExistsDatachains';
 
 export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	const allscreens = NodesByType(null, NodeTypes.Screen);
@@ -58,10 +59,10 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 
 			// Get Agent Access Description
 			let agentAccessDescription: Node | null = GetAgentAccessDescriptionNode(agent, model, viewType);
-
 			if (agentAccessDescription) {
 				let agentLink = GetAgentAccessDescriptionAgentLink(agent, model, viewType);
 				if (agentLink) {
+					AddDefaultAgentExistsDatachains(screen);
 					let mountingProps: ViewMoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.MountingProps);
 					let viewMounting: ViewMounting | null = GetViewMounting(mountingProps, viewType);
 					if (viewMounting) {
@@ -93,6 +94,7 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 			} else {
 				if (GetNodeProp(screen, NodeProperties.IsDashboard)) {
 					console.log('Is dashboard, find the access');
+					AddDefaultAgentExistsDatachains(screen);
 					let navigationScreen = GetNavigationScreen(screen);
 					if (navigationScreen) {
 						let dashboardAccesses: Node[] = GetNodesLinkedTo(GetCurrentGraph(), {

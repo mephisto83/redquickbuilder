@@ -692,11 +692,10 @@ class LayoutView extends Component<any, any> {
 							</Box>
 							{cellProperties && cellProperties.cellStyleArray ? (
 								<CellStyleLayout
-                  parentId={currentNode.id}
+									parentId={currentNode.id}
 									onChange={() => {
 										let layout =
 											UIA.GetNodeProp(currentNode, NodeProperties.Layout) || CreateLayout();
-										layout = RemoveCellLayout(layout, this.state.selectedCell);
 										this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
 											prop: UIA.NodeProperties.Layout,
 											id: currentNode.id,

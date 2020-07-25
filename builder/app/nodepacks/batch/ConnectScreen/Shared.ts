@@ -7,7 +7,9 @@ import {
 	GetComponentApiNodes,
 	GetNodeById,
 	GetNodeTitle,
-	ADD_NEW_NODE
+	ADD_NEW_NODE,
+	GetNodeByProperties,
+	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
 import {
 	GetNodesLinkedTo,
@@ -20,12 +22,16 @@ import {
 	GetFirstCell,
 	SOURCE,
 	Paused,
-	SetPause
+	SetPause,
+	GetCellProperties
 } from '../../../methods/graph_methods';
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from '../../../constants/nodetypes';
 import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
 import AddButtonToComponent from '../../AddButtonToComponent';
 import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
+import CreateHideComponentStyle from '../../screens/CreateHideComponentStyle';
+import { CreateComponentStyle } from '../../../components/componentstyle';
+import { RouteDescription } from '../../../interface/methodprops';
 
 export function AddButtonToSubComponent(
 	screenOption: Node
@@ -45,7 +51,7 @@ export function AddButtonToSubComponent(
 		link: LinkType.Component
 	}).filter((component: Node) => {
 		return GetNodeProp(component, NodeProperties.Layout);
-  });
+	});
 
 	let button: string = '';
 	components.subset(0, 1).forEach((component: Node) => {
@@ -72,7 +78,51 @@ export function AddButtonToSubComponent(
 	};
 }
 
-export function AddButtonToComponentLayout(args: { button: string; component: string }) {
+export function GetHideStyle(): Node {
+	let hideNode = GetNodeByProperties({
+		[NodeProperties.HideStyle]: true
+	});
+	if (!hideNode) {
+		let hideStyle = CreateHideComponentStyle({
+			callback: (_node: Node) => {
+				hideNode = _node;
+			}
+		});
+		graphOperation(hideStyle)(GetDispatchFunc(), GetStateFunc());
+	}
+
+	return hideNode;
+}
+
+export function AddComponentAutoStyles(subcomponent: string, routeDescription: RouteDescription, cellId: string) {
+	let layout: ComponentLayoutContainer = GetNodeProp(subcomponent, NodeProperties.Layout);
+	let hiddenNode = GetHideStyle();
+	graphOperation(AddLinkBetweenNodes(subcomponent, hiddenNode.id, LinkProperties.Style))(
+		GetDispatchFunc(),
+		GetStateFunc()
+	);
+	GetNodesLinkedTo(GetCurrentGraph(), {
+		id: subcomponent,
+		componentType: NodeTypes.ComponentApi
+	})
+		.filter((component: Node) => {
+			return (
+				GetNodeProp(component, NodeProperties.UserOfAgent) &&
+				GetNodeProp(component, NodeProperties.Model) === routeDescription.agent
+			);
+		})
+		.forEach((internalApi: Node) => {
+			let cellProperties = GetCellProperties(layout, cellId);
+			if (cellProperties) {
+				cellProperties.cellStyleArray = cellProperties.cellStyleArray || [];
+				cellProperties.cellStyleArray.push(CreateComponentStyle(internalApi.id, hiddenNode.id, true));
+			}
+		});
+
+	updateComponentProperty(subcomponent, NodeProperties.Layout, layout);
+}
+
+export function AddButtonToComponentLayout(args: { button: string; component: string }): string {
 	let { component, button } = args;
 	let result: any[] = [];
 	if (!component) {
@@ -82,6 +132,7 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	if (!layout) {
 		throw new Error('no layout found: Setup Effect');
 	}
+
 	let root = GetFirstCell(layout);
 	let rootChildren = GetChildren(layout, root);
 	let cellCount = rootChildren.length;
@@ -93,25 +144,37 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	SetLayoutCell(layout, lastCell, button);
 	updateComponentProperty(component, NodeProperties.Layout, layout);
 	// can add more properties to cell later.
+	return lastCell;
 }
 
-export function SetupApi(parent: Node, paramName: string, child: Node, skipFirst?: boolean) {
+export function SetupApi(parent: Node, paramName: string, child: Node, skipFirst?: boolean): SetupApiResult {
 	console.log(`setup api :${paramName}`);
+	let result: SetupApiResult = {
+		external: [],
+		internal: []
+	};
 	graphOperation(
-		SetupApiBetweenComponent({
-			component_a: {
-				id: parent.id,
-				external: paramName,
-				internal: paramName,
-				skipExternal: skipFirst
+		SetupApiBetweenComponent(
+			{
+				component_a: {
+					id: parent.id,
+					external: paramName,
+					internal: paramName,
+					skipExternal: skipFirst
+				},
+				component_b: {
+					id: child.id,
+					external: paramName,
+					internal: paramName
+				}
 			},
-			component_b: {
-				id: child.id,
-				external: paramName,
-				internal: paramName
+			(res: SetupApiResult) => {
+				result = res;
 			}
-		})
+		)
 	)(GetDispatchFunc(), GetStateFunc());
+
+	return result;
 }
 
 export function AddApiToButton(args: { button: string; component: string }) {
@@ -135,9 +198,16 @@ export function SetupApiValueDownToTheBottomComponent(screen: Node, paramName: s
 	});
 	SetPause(paused);
 }
-
-export function SetupApiToBottom(parent: Node, paramName: string, seen: string[], skipFirst?: boolean) {
+export interface SetupApiResult {
+	internal: string[];
+	external: string[];
+}
+export function SetupApiToBottom(parent: Node, paramName: string, seen: string[], skipFirst?: boolean): SetupApiResult {
 	let graph = GetCurrentGraph();
+	let result: SetupApiResult = {
+		internal: [],
+		external: []
+	};
 	seen.push(parent.id);
 	let components: Node[] = GetNodesLinkedTo(graph, {
 		id: parent.id,
@@ -150,9 +220,15 @@ export function SetupApiToBottom(parent: Node, paramName: string, seen: string[]
 			return seen.indexOf(component.id) === -1;
 		})
 		.forEach((component: Node) => {
-			SetupApi(parent, paramName, component, skipFirst);
-			SetupApiToBottom(component, paramName, seen);
+			let temp = SetupApi(parent, paramName, component, skipFirst);
+			result.external.push(...temp.external);
+			result.internal.push(...temp.internal);
+			temp = SetupApiToBottom(component, paramName, seen);
+			result.external.push(...temp.external);
+			result.internal.push(...temp.internal);
 		});
+
+	return result;
 }
 
 export function AddInternalComponentApi(componentB: string, b_internal_id: string): string {

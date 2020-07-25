@@ -5,6 +5,7 @@ export const NodeTypes = {
 	Model: 'model',
 	DataSource: 'data-source',
 	Property: 'model-property',
+	UserOfAgentType: 'UserOfAgentType',
 	StateKey: 'StateKey',
 	ModelFilter: 'model-filter',
 	Struct: 'struct',
@@ -324,8 +325,10 @@ export const EventArgumentTypes = {
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
+	HideStyle: 'HideStyle',
 	IsFetchParameter: 'IsFetchParameter',
 	ViewModelKey: 'ViewModelKey',
+	UserOfAgent: 'UserOfAgent',
 	StateKey: 'StateKey',
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
@@ -391,6 +394,7 @@ export const NodeProperties = {
 	EntryPoint: 'EntryPoint',
 	CSEntryPoint: 'CSEntryPoint',
 	CS: 'CS',
+	IsUserOfAgentType: 'IsUserOfAgentType',
 	Property: 'Property',
 	DataChainEntry: 'DataChainEntry',
 	MergeChain: 'MergeChain',
@@ -677,6 +681,7 @@ export const LinkType = {
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
+	UserOfAgentType: 'UserOfAgentType',
 	DataChainShouldShow: 'DataChainShouldShow',
 	ContextParameters: 'ContextParameters',
 	DataChainIsDisabled: 'DataChainIsDisabled',
@@ -957,6 +962,9 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	UserOfAgentType: {
+		type: LinkType.UserOfAgentType
 	},
 	ScreenEffect: {
 		type: LinkType.ScreenEffect

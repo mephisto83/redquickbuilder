@@ -13,8 +13,8 @@ import SelectInput from './selectinput';
 import ComponentStyle from './componentstyle';
 export default class ComponentStyleComponent extends Component<any, any> {
 	constructor(props: any) {
-    super(props);
-    this.state = {};
+		super(props);
+		this.state = {};
 	}
 	render() {
 		let componentStyle: ComponentStyle = this.props.componentStyle;
@@ -50,7 +50,7 @@ export default class ComponentStyleComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-        <TreeViewItemContainer>
+				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.Style}
 						options={GetNodesLinkedTo(this.props.state, {
@@ -59,7 +59,37 @@ export default class ComponentStyleComponent extends Component<any, any> {
 						}).toNodeSelect()}
 						value={componentStyle.styleComponent}
 						onChange={(value: string) => {
-							componentStyle.componentApi = value;
+							componentStyle.styleComponent = value;
+							this.setState({
+								turn: GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.ComponentApi}
+						value={componentStyle.onComponent}
+						onChange={(value: boolean) => {
+							componentStyle.onComponent = value;
+							this.setState({
+								turn: GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+        <TreeViewItemContainer>
+					<CheckBox
+						label={Titles.Negate}
+						value={componentStyle.negate}
+						onChange={(value: boolean) => {
+							componentStyle.negate = value;
 							this.setState({
 								turn: GUID()
 							});

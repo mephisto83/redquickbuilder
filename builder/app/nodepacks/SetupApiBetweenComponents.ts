@@ -13,11 +13,14 @@ export interface ComponentApiSetup {
 	internal: string | any;
 	skipExternal?: boolean;
 }
-let func: any = function SetupApiBetweenComponent(args: {
-	component_a: ComponentApiSetup;
-	viewPackages?: any;
-	component_b: ComponentApiSetup;
-}) {
+let func: any = function SetupApiBetweenComponent(
+	args: {
+		component_a: ComponentApiSetup;
+		viewPackages?: any;
+		component_b: ComponentApiSetup;
+	},
+	callback?: Function
+) {
 	//
 	let result = [];
 
@@ -210,6 +213,21 @@ let func: any = function SetupApiBetweenComponent(args: {
 					return null;
 				}
 			});
+			if (callback) {
+				result.push(function() {
+					callback({
+						internal: [
+							componentA_internal_node ? componentA_internal_node.id : null,
+							componentB_internal_node ? componentB_internal_node.id : null
+						].filter((x: string | null) => x),
+						external: [
+							componentA_external_node ? componentA_external_node.id : null,
+							componentB_external_node ? componentB_external_node.id : null
+						].filter((x: string | null) => x)
+					});
+					return [];
+				});
+			}
 		}
 		return result;
 	});

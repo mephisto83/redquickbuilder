@@ -88,6 +88,7 @@ import { addNewLine } from '../utils/array';
 import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';
 import { RouteSource, RouteSourceType } from '../interface/methodprops';
+import { constructCellStyles } from './sharedservice';
 
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
@@ -106,6 +107,7 @@ export function GenerateScreenMarkup(id: string, language: string) {
 	const screenOption = GetScreenOption(id, language);
 	if (screenOption) {
 		const imports: any = GetScreenImports(id, language);
+
 		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
 		let template = null;
 		switch (language) {
@@ -141,7 +143,7 @@ export function GenerateScreenOptionSource(node: any, parent: any, language: str
 }
 
 export function GetDefaultElement(language?: string) {
-	return '<View ...props><Text>DE</Text></View>';
+	return '<View ...props ><Text>DE</Text></View>';
 }
 export function GetItemRender(node: { id: any }, imports: (string | undefined)[], language: any) {
 	const listItemNode = GetListItemNode(node.id);
@@ -903,7 +905,7 @@ export function ConvertViewTypeToComponentNode(node: any, language: string) {
 	}
 	return node;
 }
-export function GenerateMarkupTag(node: any, language: any, parent: any) {
+export function GenerateMarkupTag(node: any, language: any, parent: any, cellStyleArray: any[] = []) {
 	let viewTypeNode = null;
 	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
 		viewTypeNode = node;
@@ -927,7 +929,20 @@ export function GenerateMarkupTag(node: any, language: any, parent: any) {
 					});
 				}
 			}
-			return `<${GetCodeName(node)} ${describedApi} />`;
+			let {
+				cellStyles,
+				cellStylesReact
+			}: { cellStyles: string; cellStylesReact: string[] } = constructCellStyles(cellStyleArray, true);
+			let styleOrCss: string = '';
+			switch (language) {
+				case UITypes.ReactNative:
+					if (cellStylesReact.length) styleOrCss = `style={${cellStylesReact.join()}}`;
+					break;
+				default:
+					if (cellStyles) styleOrCss = `className={\`${cellStyles} \`}`;
+					break;
+			}
+			return `<${GetCodeName(node)} ${styleOrCss} ${describedApi} />`;
 	}
 }
 function computeScreenEffectInputs(parent: any) {

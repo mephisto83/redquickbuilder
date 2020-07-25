@@ -28,8 +28,9 @@ import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
 import { InstanceTypes } from '../../../constants/componenttypes';
 import AppendPostMethod from '../../screens/AppendPostMethod';
 import AppendValidations from '../../screens/AppendValidations';
-import { AddButtonToSubComponent, AddButtonToComponentLayout, AddApiToButton } from './Shared';
+import { AddButtonToSubComponent, AddButtonToComponentLayout, AddApiToButton, AddComponentAutoStyles } from './Shared';
 import NColumnSection from '../../NColumnSection';
+import CreateHideComponentStyle from '../../screens/CreateHideComponentStyle';
 
 export default function SetupEffect(screen: Node, effect: Effect, information: SetupInformation) {
 	console.log('setup effect');
@@ -38,7 +39,6 @@ export default function SetupEffect(screen: Node, effect: Effect, information: S
 		SetupEffectDescription(effectDescription, screen, information);
 	});
 }
-
 function SetupEffectDescription(effectDescription: EffectDescription, screen: Node, information: SetupInformation) {
 	console.log('setup effect description');
 	let graph = GetCurrentGraph();
@@ -47,28 +47,30 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
-    graph = GetCurrentGraph();
+		graph = GetCurrentGraph();
 		console.log('add button to sub component');
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
 		AddApiToButton({ button, component: subcomponent });
 		updateComponentProperty(button, NodeProperties.UIText, effectDescription.name || GetNodeTitle(button));
+
 		console.log('get model selector node');
 		let { modelSelectorNode } = GetModelSelectorNode(screen);
+
 		console.log('setup model object selector');
 		let { modelDataChain } = SetupModelObjectSelector(effectDescription, screenOption, screen, information);
 
 		console.log('effectDescription');
 		console.log(effectDescription);
 		if (eventInstance && effectDescription.methodDescription && effectDescription.methodDescription.methodId) {
-      console.log('connect lifecylce method');
-      graph = GetCurrentGraph();
+			console.log('connect lifecylce method');
+			graph = GetCurrentGraph();
 			let connectSteps = ConnectLifecycleMethod({
 				target: effectDescription.methodDescription.methodId,
 				selectorNode: () => modelSelectorNode.id,
 				dataChain: () => (modelDataChain ? modelDataChain.id : null),
 				source: eventInstance,
 				graph
-      });
+			});
 
 			graphOperation(connectSteps)(GetDispatchFunc(), GetStateFunc());
 			console.log('update component property');
@@ -90,7 +92,8 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 				SetupValidations({ screenOption, effectDescription });
 			}
 		}
-		AddButtonToComponentLayout({ button, component: subcomponent });
+		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
+		AddComponentAutoStyles(subcomponent, effectDescription, cellId);
 	});
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {

@@ -16,9 +16,10 @@ import {
 	SelectorPropertyKeys,
 	NavigateTypes,
 	CODE_EDITOR,
-	MAIN_CONTENT
+	MAIN_CONTENT,
+	LinkProperties
 } from '../constants/nodetypes';
-import { GetNodesLinkedTo } from '../methods/graph_methods';
+import { GetNodesLinkedTo, NodesByType, GetNodeProp, GetNodeLinkedTo } from '../methods/graph_methods';
 import { MethodFunctions } from '../constants/functiontypes';
 import { DataChainFunctions, DataChainContextMethods } from '../constants/datachain';
 import ButtonList from './buttonlist';
@@ -178,7 +179,10 @@ class DataChainActvityMenu extends Component<any, any> {
 			title: v,
 			value: SelectorPropertyKeys[v]
 		}));
-
+		let userOfAgentType: Node | null = GetNodeLinkedTo(UIA.GetCurrentGraph(), {
+			id: currentNode.id,
+			componentType: NodeTypes.UserOfAgentType
+		});
 		const node_inputs = UIA.NodesByType(state, NodeTypes.DataChain)
 			.filter((x) => {
 				return (
@@ -227,6 +231,59 @@ class DataChainActvityMenu extends Component<any, any> {
 						onChange={(value: any) => {
 							UIA.updateComponentProperty(currentNode.id, UIA.NodeProperties.UIAgnostic, value);
 						}}
+					/>
+					<CheckBox
+						label={Titles.IsUserOfAgentType}
+						value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUserOfAgentType)}
+						onChange={(value: any) => {
+							UIA.updateComponentProperty(currentNode.id, UIA.NodeProperties.IsUserOfAgentType, value);
+						}}
+					/>
+					<SelectInput
+						onChange={(value: any) => {
+							let createdNode: any;
+							let componentTypeNode = GetNodeLinkedTo(UIA.GetCurrentGraph(), {
+								id: currentNode.id,
+								componentType: NodeTypes.UserOfAgentType
+							});
+
+							this.props.graphOperation([
+								{
+									operation: UIA.REMOVE_NODE,
+									options() {
+										if (componentTypeNode) return { id: componentTypeNode.id };
+										return null;
+									}
+								},
+								UIA.CreateNewNode(
+									{
+										[NodeProperties.Agent]: value,
+										[NodeProperties.NODEType]: NodeTypes.UserOfAgentType,
+										[NodeProperties.UIText]: `${UIA.GetNodeTitle(value)} as agent`,
+									},
+									(newNode: Node) => {
+										createdNode = newNode;
+									}
+								),
+								function() {
+									return [
+										UIA.AddLinkBetweenNodes(createdNode.id, value, LinkProperties.UserOfAgentType),
+										UIA.AddLinkBetweenNodes(
+											createdNode.id,
+											currentNode.id,
+											LinkProperties.UserOfAgentType
+										)
+									];
+								}
+							]);
+						}}
+						label={Titles.UserOfAgentType}
+						value={userOfAgentType ? GetNodeProp(userOfAgentType, NodeProperties.Agent) : null}
+						options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
+							.filter((x: Node) => {
+								return GetNodeProp(x, NodeProperties.IsAgent);
+							})
+							.toNodeSelect()}
 					/>
 					<SelectInput
 						onChange={(value: any) => {
