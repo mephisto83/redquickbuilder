@@ -39,6 +39,7 @@ import ClearScreenInstance from '../../datachain/ClearScreenInstance';
 import { ComponentLifeCycleEvents } from '../../../constants/componenttypes';
 import ConnectComponentDidMount from '../ConnectComponentDidMount';
 import { SetupApi, SetupApiToBottom, SetupApiValueDownToTheBottomComponent } from './Shared';
+import { ViewTypes } from '../../../constants/viewtypes';
 
 export default function SetupViewMouting(screen: Node, viewMounting: ViewMounting, information: SetupInformation) {
 	console.log('setup view mounting');
@@ -109,11 +110,17 @@ function addClearScreen(screen: Node) {
 		let clearScreenContext: any = null;
 		let componentDidMountInstance: any = null;
 		let componentDidMount: any = null;
+		let isUpdate = false;
+		switch (GetNodeProp(screen, NodeProperties.ViewType)) {
+			case ViewTypes.Update:
+				isUpdate = true;
+				break;
+		}
 		let result: any[] = [];
 		result.push(
 			...ClearScreenInstance({
 				viewPackages,
-				update: true,
+				update: isUpdate,
 				screen: screen.id,
 				title: `Clear ${GetNodeTitle(screen)} State`,
 				model: GetNodeProp(screen, NodeProperties.Model),

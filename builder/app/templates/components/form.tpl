@@ -1,3 +1,3 @@
-<Form>
+<Form {...props}>
 {{elements}}
 </Form>

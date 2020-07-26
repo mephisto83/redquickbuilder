@@ -1,1 +1,1 @@
-<Text>{{{label}}}{{{value}}}</Text>
+<Text {...props}>{{{label}}}{{{value}}}</Text>

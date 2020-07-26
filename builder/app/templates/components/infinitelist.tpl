@@ -1,4 +1,4 @@
-<InfiniteList
+<InfiniteList {...props}
     {{apiProperties}}
     data={{{data}}}
     renderItem={{{item_render}}}

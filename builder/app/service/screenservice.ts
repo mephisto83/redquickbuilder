@@ -143,7 +143,7 @@ export function GenerateScreenOptionSource(node: any, parent: any, language: str
 }
 
 export function GetDefaultElement(language?: string) {
-	return '<View ...props ><Text>DE</Text></View>';
+	return '<View><Text>DE</Text></View>';
 }
 export function GetItemRender(node: { id: any }, imports: (string | undefined)[], language: any) {
 	const listItemNode = GetListItemNode(node.id);
@@ -905,6 +905,7 @@ export function ConvertViewTypeToComponentNode(node: any, language: string) {
 	}
 	return node;
 }
+
 export function GenerateMarkupTag(node: any, language: any, parent: any, cellStyleArray: any[] = []) {
 	let viewTypeNode = null;
 	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
@@ -947,9 +948,10 @@ export function GenerateMarkupTag(node: any, language: any, parent: any, cellSty
 					if (cellStyles) styleOrCss = `${stylization} className={\`${cellStyles} \`}`;
 					break;
 			}
-			return `<${GetCodeName(node)} {...props} ${styleOrCss} ${describedApi} />`;
+			return `<${GetCodeName(node)} ${styleOrCss} ${describedApi} />`;
 	}
 }
+
 function computeScreenEffectInputs(parent: any) {
 	const graph = GetCurrentGraph(GetState());
 	const componentInternalApis = GetNodesLinkedTo(graph, {

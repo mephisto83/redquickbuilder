@@ -1,4 +1,4 @@
-<MultiSelectList
+<MultiSelectList {...props}
     {{apiProperties}}
     data={{{data}}}
     renderItem={{{item_render}}}

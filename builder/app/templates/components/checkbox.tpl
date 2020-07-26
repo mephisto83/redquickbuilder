@@ -1,4 +1,4 @@
-<Item {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
+<Item {...props} {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
     <Label {{style_label}}>{{{label}}}</Label>
     <CheckBox value={{{value}}}  {{style_input}} success={{{success}}} error={{{error}}} placeholder={{{placeholder}}}
         onBlur={()=>{

@@ -1,4 +1,4 @@
-<MultiViewList
+<MultiViewList {...props}
     {{apiProperties}}
     data={{{data}}}
     renderItem={{{item_render}}}
