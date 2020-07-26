@@ -934,15 +934,20 @@ export function GenerateMarkupTag(node: any, language: any, parent: any, cellSty
 				cellStylesReact
 			}: { cellStyles: string; cellStylesReact: string[] } = constructCellStyles(cellStyleArray, true);
 			let styleOrCss: string = '';
+			let stylization = '';
+			if (cellStyleArray && cellStylesReact.length) {
+				stylization = `style={{${cellStylesReact.join()}}}`;
+			}
+
 			switch (language) {
 				case UITypes.ReactNative:
-					if (cellStylesReact.length) styleOrCss = `style={${cellStylesReact.join()}}`;
+					if (cellStylesReact.length) styleOrCss = stylization;
 					break;
 				default:
-					if (cellStyles) styleOrCss = `className={\`${cellStyles} \`}`;
+					if (cellStyles) styleOrCss = `${stylization} className={\`${cellStyles} \`}`;
 					break;
 			}
-			return `<${GetCodeName(node)} ${styleOrCss} ${describedApi} />`;
+			return `<${GetCodeName(node)} {...props} ${styleOrCss} ${describedApi} />`;
 	}
 }
 function computeScreenEffectInputs(parent: any) {
@@ -1922,10 +1927,8 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
         ${options.skipSetGetState ? '' : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
-        // ${screenOption.id}
-
         ${invocations}
-        ${chainInvocations}//asdf
+        ${chainInvocations}
 {{handles}}
 }
 `;

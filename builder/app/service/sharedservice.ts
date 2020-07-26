@@ -7,25 +7,25 @@ export function constructCellStyles(cellStyleArray: any, onComponent = false) {
 	let onCellStyles: ComponentStyle[] = cellStyleArray.filter((x: ComponentStyle) => {
 		return x && x.onComponent == onComponent;
 	});
-	let cellStylesReact: string[] = [];
+  let cellStylesReact: string[] = [];
+
 	let cellStyles = onCellStyles
 		.map((cs: ComponentStyle) => {
 			switch (cs.componentStyleType) {
 				case ComponentStyleType.ComponentApi:
+					let { negate } = cs;
 					if (cs.styleComponent) {
 						let styleText = GetNodeProp(cs.styleComponent, NodeProperties.Style);
 						if (styleText) {
 							cellStylesReact.push(
-								` ...(this.state.${GetJSCodeName(cs.componentApi)} ? ${JSON.stringify(
-									styleText,
-									null,
-									4
-								)} : {})`
+								` ...(${negate ? '!' : ''}this.state.${GetJSCodeName(
+									cs.componentApi
+								)} ? ${JSON.stringify(styleText, null, 4)} : {})`
 							);
 						}
-						return `$\{(this.state.${GetJSCodeName(cs.componentApi)} ? ${GetJSCodeName(
+						return `$\{(${negate ? '!' : ''}this.state.${GetJSCodeName(cs.componentApi)} ?'${GetJSCodeName(
 							cs.styleComponent
-						)} : '')}`;
+						)}' : '')}`;
 					}
 					break;
 			}

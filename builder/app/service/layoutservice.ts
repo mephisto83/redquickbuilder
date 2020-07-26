@@ -290,7 +290,10 @@ export function createSection(args: {
 				cellStyles,
 				cellStylesReact
 			}: { cellStyles: string; cellStylesReact: string[] } = constructCellStyles(cellStyleArray);
-
+			let stylization = '';
+			if (cellStyleArray && cellStylesReact.length) {
+				stylization = `style={{${cellStylesReact.join()}}}`;
+			}
 			if (UITypes.ReactNative !== language) {
 				if (layoutProperties && layoutProperties.tags && Object.keys(layoutProperties.tags).length) {
 					tagclasses = layoutProperties.tags.join(' ');
@@ -300,13 +303,13 @@ export function createSection(args: {
 						.join(' ');
 				}
 				if (UITypes.ReactWeb === language) {
-					className = `className={\`${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
+					className = `${stylization} className={\`${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				} else {
-					className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
+					className = `${stylization} className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				}
 			} else {
 				cellStylesReact.push(JSON.stringify({ ..._style }, null, 4));
-				className = `style={${cellStylesReact.join()}}`;
+				className = `${stylization}`;
 			}
 			return `
 <${control} ${className} >
