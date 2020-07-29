@@ -1,1 +1,1 @@
-<Image {...props} source={{uri: {{data}} }}/>
+<Image  style={props.style || {}} source={{uri: {{data}} }}/>

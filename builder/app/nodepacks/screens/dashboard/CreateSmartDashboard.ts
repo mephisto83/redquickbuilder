@@ -21,9 +21,11 @@ import {
 	SCREEN_COMPONENT_EVENTS,
 	ComponentLifeCycleEvents
 } from '../../../constants/componenttypes';
-import { Graph } from '../../../methods/graph_types';
+import { Graph, Node } from '../../../methods/graph_types';
 import { NodeProperties, LinkProperties } from '../../../constants/nodetypes';
 import NColumnSection from '../../NColumnSection';
+import { AddComponentAutoStyles } from '../../batch/ConnectScreen/Shared';
+import { GetNodeProp } from '../../../methods/graph_methods';
 
 export interface ButtonDescription {
 	externalLabelApi?: string;
@@ -61,206 +63,238 @@ export default function CreateSmartDashboard(args: SmartDashbordParmater) {
 			}
 		})
 	)(GetDispatchFunc(), GetStateFunc());
-
-	if (args.buttons && args.buttons.length) {
-		result.push(function() {
-			if (!screenOption) {
-				throw new Error('no screenOption in createsmartdashboard');
+	result.push(function() {
+		if (!screenOption) {
+			throw new Error('no screenOption in createsmartdashboard');
+		}
+		return AddComponent({
+			component: screenOption,
+			skipLabel: true,
+			uiType: args.uiType,
+			componentName: args.componentName,
+			componentType: ComponentTypes.ReactNative[ComponentTypeKeys.View].key,
+			callback: (context: { entry: string }) => {
+				viewComponent = context.entry;
 			}
-			return AddComponent({
-				component: screenOption,
-				skipLabel: true,
-				uiType: args.uiType,
-				componentName: args.componentName,
-				componentType: ComponentTypes.ReactNative[ComponentTypeKeys.View].key,
-				callback: (context: { entry: string }) => {
-					viewComponent = context.entry;
-				}
-			});
 		});
-		result.push(() => {
-			return SCREEN_COMPONENT_EVENTS.map((t) => ({
-				operation: ADD_NEW_NODE,
-				options() {
-					return {
-						nodeType: NodeTypes.LifeCylceMethod,
-						properties: {
-							[NodeProperties.EventType]: t,
-							[NodeProperties.Pinned]: false,
-							[NodeProperties.UIText]: `${t}`
-						},
-						callback: (lifeCycle: any) => {},
-						links: [
-							{
-								target: screenOption,
-								linkProperties: {
-									properties: {
-										...LinkProperties.LifeCylceMethod
+	});
+	let buttons: ButtonDescription[] = [];
+	if (true) {
+		if (buttons) {
+			result.push(() => {
+				return SCREEN_COMPONENT_EVENTS.map((t) => ({
+					operation: ADD_NEW_NODE,
+					options() {
+						return {
+							nodeType: NodeTypes.LifeCylceMethod,
+							properties: {
+								[NodeProperties.EventType]: t,
+								[NodeProperties.Pinned]: false,
+								[NodeProperties.UIText]: `${t}`
+							},
+							callback: (lifeCycle: any) => {},
+							links: [
+								{
+									target: screenOption,
+									linkProperties: {
+										properties: {
+											...LinkProperties.LifeCylceMethod
+										}
 									}
 								}
-							}
-						]
-					};
-				}
-			}));
-		});
-		result.push(function() {
-			if (!viewComponent) {
-				throw new Error('no viewComponent in createsmartdashboard');
-			}
-			return NColumnSection({
-				component: viewComponent,
-				count: args.buttons.length,
-				callback: (buttonContext: { containers: [] }) => {
-					if (args.buttons.length !== buttonContext.containers.length) {
-						throw new Error('produced the wrong number of buttons');
+							]
+						};
 					}
-					buttonContext.containers.forEach((id: string, index: number) => {
-						args.buttons[index].buttonId = id;
-					});
-				}
+				}));
 			});
-		});
-
-		result.push(function(graph: Graph) {
-			if (!screenOption) {
-				throw new Error('missing screenOption');
-			}
-			if (!mainSection) {
-				throw new Error('missing mainSection');
-			}
-			if (!viewComponent) {
-				throw new Error('missing viewComponent');
-			}
-			args.buttons.forEach((btnInfo: ButtonDescription) => {
-				if (!btnInfo.buttonId) {
-					throw new Error('missing button Id');
+			result.push(function() {
+				if (!viewComponent) {
+					throw new Error('no viewComponent in createsmartdashboard');
 				}
-			});
-			const layout: any = SetLayoutComponent(GetNodeById(screenOption, graph), mainSection, viewComponent);
-
-			return {
-				operation: UPDATE_NODE_PROPERTY,
-				options() {
-					return {
-						id: screenOption,
-						properties: { [NodeProperties.Layout]: layout }
-					};
-				}
-			};
-		});
-
-		result.push(
-			...args.buttons.map((button: ButtonDescription) => {
-				return function() {
-					return AddComponent({
-						component: viewComponent,
-						skipLabel: true,
-						uiType: args.uiType,
-						componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button].key,
-						callback: (bt: { entry: string }) => {
-							button.id = bt.entry;
+				return NColumnSection({
+					component: viewComponent,
+					count: buttons.length,
+					callback: (buttonContext: { containers: [] }) => {
+						if (buttons.length !== buttonContext.containers.length) {
+							throw new Error('produced the wrong number of buttons');
 						}
-					});
-				};
-			})
-		);
-		result.push(
-			...args.buttons.map((button: ButtonDescription) => {
-				return function() {
-					if (button.id)
-						return $addComponentApiNodes(button.id, 'label', null, {}, (inner: { externalApi: string }) => {
-							button.externalLabelApi = inner.externalApi;
+						buttonContext.containers.forEach((id: string, index: number) => {
+							buttons[index].buttonId = id;
 						});
-					throw new Error('missing button id in create smart dashboards');
-				};
-			})
-		);
-		result.push(
-			...args.buttons.map((button: ButtonDescription) => {
-				return function() {
-					if (button.externalLabelApi) {
+					}
+				});
+			});
+
+			result.push(function(graph: Graph) {
+				if (!screenOption) {
+					throw new Error('missing screenOption');
+				}
+				if (!mainSection) {
+					throw new Error('missing mainSection');
+				}
+				if (!viewComponent) {
+					throw new Error('missing viewComponent');
+				}
+				buttons.forEach((btnInfo: ButtonDescription) => {
+					if (!btnInfo.buttonId) {
+						throw new Error('missing button Id');
+					}
+				});
+				const layout: any = SetLayoutComponent(GetNodeById(screenOption, graph), mainSection, viewComponent);
+
+				return {
+					operation: UPDATE_NODE_PROPERTY,
+					options() {
 						return {
-							operation: CONNECT_TO_TITLE_SERVICE,
-							options: {
-								id: button.externalLabelApi
-							}
+							id: screenOption,
+							properties: { [NodeProperties.Layout]: layout }
 						};
 					}
-					throw new Error('external label api is missing in create smart dashboards');
 				};
-			})
-		);
-		result.push(
-			...args.buttons.map((button: ButtonDescription) => {
-				return function() {
-					if (button.externalLabelApi) {
-						return {
-							operation: UPDATE_NODE_PROPERTY,
-							options: {
-								id: button.id,
-								properties: {
-									[NodeProperties.UIType]: args.uiType,
-									[NodeProperties.UIText]: `${button.title}`,
-									[NodeProperties.Target]: button.target
+			});
+
+			result.push(
+				...buttons.map((button: ButtonDescription) => {
+					return function() {
+						return AddComponent({
+							component: viewComponent,
+							skipLabel: true,
+							uiType: args.uiType,
+							componentType: ComponentTypes.ReactNative[ComponentTypeKeys.Button].key,
+							callback: (bt: { entry: string }) => {
+								button.id = bt.entry;
+							}
+						});
+					};
+				})
+			);
+			result.push(
+				...buttons.map((button: ButtonDescription) => {
+					return function() {
+						if (button.id)
+							return $addComponentApiNodes(
+								button.id,
+								'label',
+								null,
+								{},
+								(inner: { externalApi: string }) => {
+									button.externalLabelApi = inner.externalApi;
 								}
+							);
+						throw new Error('missing button id in create smart dashboards');
+					};
+				})
+			);
+			result.push(
+				...buttons.map((button: ButtonDescription) => {
+					return function() {
+						if (button.externalLabelApi) {
+							return {
+								operation: CONNECT_TO_TITLE_SERVICE,
+								options: {
+									id: button.externalLabelApi
+								}
+							};
+						}
+						throw new Error('external label api is missing in create smart dashboards');
+					};
+				})
+			);
+			result.push(
+				...buttons.map((button: ButtonDescription) => {
+					return function() {
+						if (button.externalLabelApi) {
+							return {
+								operation: UPDATE_NODE_PROPERTY,
+								options: {
+									id: button.id,
+									properties: {
+										[NodeProperties.UIType]: args.uiType,
+										[NodeProperties.UIText]: `${button.title}`,
+										[NodeProperties.Target]: button.target
+									}
+								}
+							};
+						}
+						throw new Error('external label api is missing in create smart dashboards');
+					};
+				})
+			);
+			result.push(function(graph: Graph) {
+				let layout: any = GetNodeProp(viewComponent, NodeProperties.Layout);
+				buttons.forEach((button: ButtonDescription, index: number) => {
+					if (button.id && button.buttonId) {
+						layout = SetLayoutComponent(GetNodeById(viewComponent, graph), button.buttonId, button.id);
+					} else {
+						throw new Error('button no found, in create smart dashboard');
+					}
+				});
+				return {
+					operation: UPDATE_NODE_PROPERTY,
+					options() {
+						return {
+							id: viewComponent,
+							properties: { [NodeProperties.Layout]: layout }
+						};
+					}
+				};
+			});
+			result.push(function() {
+				return {
+					operation: UPDATE_NODE_PROPERTY,
+					options: () => {
+						return {
+							id: screenOption,
+							properties: {
+								[NodeProperties.DashboardButtons]: buttons
 							}
 						};
 					}
-					throw new Error('external label api is missing in create smart dashboards');
 				};
-			})
-		);
-		result.push(function(graph: Graph) {
-			let layout: any;
-			args.buttons.forEach((button: ButtonDescription, index: number) => {
-				if (button.id && button.buttonId) {
-					layout = SetLayoutComponent(GetNodeById(viewComponent, graph), button.buttonId, button.id);
-				} else {
-					throw new Error('button no found, in create smart dashboard');
+			});
+			result.push(function() {
+				return {
+					operation: UPDATE_NODE_PROPERTY,
+					options: () => {
+						return {
+							id: screenOption,
+							properties: {
+								[NodeProperties.DashboardViewComponent]: viewComponent
+							}
+						};
+					}
+				};
+			});
+			result.push(function() {
+				return {
+					operation: UPDATE_NODE_PROPERTY,
+					options: () => {
+						return {
+							id: dashboardScreen,
+							properties: {
+								[NodeProperties.IsHomeLaunchView]: !!args.isHome
+							}
+						};
+					}
+				};
+			});
+			result.push(function() {
+				if (args.callback) {
+					args.callback({
+						entry: dashboardScreen,
+						viewComponent,
+						buttons: buttons
+					});
 				}
 			});
-			return {
-				operation: UPDATE_NODE_PROPERTY,
-				options() {
-					return {
-						id: viewComponent,
-						properties: { [NodeProperties.Layout]: layout }
-					};
-				}
-			};
-		});
-		result.push(function() {
-			return {
-				operation: UPDATE_NODE_PROPERTY,
-				options: () => {
-					return {
-						id: screenOption,
-						properties: {
-							[NodeProperties.DashboardButtons]: args.buttons
-						}
-					};
-				}
-			};
-		});
-		result.push(function() {
-			return {
-				operation: UPDATE_NODE_PROPERTY,
-				options: () => {
-					return {
-						id: dashboardScreen,
-						properties: {
-							[NodeProperties.IsHomeLaunchView]: !!args.isHome
-						}
-					};
-				}
-			};
-		});
+		}
+	} else {
 		result.push(function() {
 			if (args.callback) {
 				args.callback({
 					entry: dashboardScreen,
-					buttons: args.buttons
+					viewComponent,
+					buttons: [] // args.buttons
 				});
 			}
 		});

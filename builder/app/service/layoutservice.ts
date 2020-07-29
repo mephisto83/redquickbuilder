@@ -1,12 +1,11 @@
 import { UITypes, NEW_LINE, NodeTypes } from '../constants/nodetypes';
-import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName, GetJSCodeName } from '../actions/uiactions';
+import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName, GetJSCodeName, GetCssName } from '../actions/uiactions';
 import { GenerateMarkupTag, ConvertViewTypeToComponentNode, GetStylesFor } from './screenservice';
 import { GetCellProperties, getComponentProperty } from '../methods/graph_methods';
 import { InstanceTypes } from '../constants/componenttypes';
 import { addNewLine } from '../utils/array';
 import * as GraphMethods from '../methods/graph_methods';
 import { ComponentLayoutContainer } from '../methods/graph_types';
-import ComponentStyle, { ComponentStyleType } from '../components/componentstyle';
 import { constructCellStyles } from './sharedservice';
 
 export function GetPropertyConsts(id: string, language = UITypes.ReactNative) {
@@ -207,6 +206,7 @@ export function createSection(args: {
 	const layoutProperties: any = properties[item].properties || {};
 	const cellModelProperty: any = properties[item].cellModelProperty || {};
 	const cellStyleArray: any = properties[item].cellStyleArray || [];
+	let root = GraphMethods.GetFirstCell(layoutObj);
 	let tree = Object.keys(currentRoot).length
 		? buildLayoutTree({
 				layoutObj,
@@ -261,6 +261,10 @@ export function createSection(args: {
 	css[section] = { style: { ..._style } };
 	let control = 'View';
 	let className = '';
+	let toplevelCls = '';
+	if (root === item) {
+		toplevelCls = GetCssName(node) || GetCodeName(node);
+	}
 	let tagclasses = '';
 	let tagBasedStyles = '';
 	switch (language) {
@@ -303,14 +307,15 @@ export function createSection(args: {
 						.join(' ');
 				}
 				if (UITypes.ReactWeb === language) {
-					className = `${stylization} className={\`${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
+					className = `${stylization} className={\`${toplevelCls} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				} else {
-					className = `${stylization} className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
+					className = `${stylization} className={\`${toplevelCls} $\{styles.${section}} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				}
 			} else {
 				cellStylesReact.push(JSON.stringify({ ..._style }, null, 4));
 				className = `${stylization}`;
 			}
+
 			return `
 <${control} ${className} >
 ${addNewLine(tree.tightenPs())}

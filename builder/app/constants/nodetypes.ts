@@ -389,6 +389,7 @@ export const NodeProperties = {
 	Navigation: 'Navigation',
 	ValidationMethodTarget: 'ValidationMethodTarget',
 	ClientMethodParameters: 'ClientMethodParameters',
+	DashboardViewComponent: 'DashboardViewComponent',
 	AsOutput: 'AsOutput',
 	UIAgnostic: 'UIAgnostic',
 	EntryPoint: 'EntryPoint',
@@ -605,6 +606,7 @@ export const NodeProperties = {
 	Groups: 'groups',
 	GroupParent: 'groupParent',
 	CodeName: 'codeName',
+	CssName: 'cssName',
 	ValueName: 'valueName', //The name of the instance variable to be used
 	AgentName: 'agentName', //The name of the instance variable to be used
 	CodePropertyType: 'codeProperty',

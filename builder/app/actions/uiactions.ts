@@ -733,6 +733,13 @@ export function GetLambdaVariableTitle(node: any, escape?: boolean, shortKey?: b
 	}
 	return `#{${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}}`;
 }
+export function GetCssName(node: any): string {
+	const graph = GetCurrentGraph(GetState());
+	if (typeof node === 'string') {
+		node = GraphMethods.GetNode(graph, node);
+	}
+	return GetNodeProp(node, NodeProperties.CssName) || GetJSCodeName(node);
+}
 export function GetCodeName(node: any, options?: any): string {
 	const graph = GetCurrentGraph(GetState());
 	if (typeof node === 'string') {
@@ -1873,6 +1880,8 @@ export function GetOutputTypeInCSDataChainMethod(id: string) {
 						const vari = temp[0].split(' ').filter((x: any) => x);
 						const lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
 						if (lambdaNode) result = lambdaNode;
+						else {
+						}
 					}
 				}
 			});

@@ -28,7 +28,8 @@ import {
 	GetComponentInternalApiNode,
 	GetComponentInternalApiNodes,
 	GetComponentApiNodes,
-	GetEventArguments
+	GetEventArguments,
+	GetCssName
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -278,6 +279,7 @@ export function buildStyle(node: any) {
 	if (typeof node === 'string') {
 		node = GetNodeById(node, graph);
 	}
+	let topCssStyle = GetCssName(node) || GetCodeName(node);
 	const styleNodes = GetNodesLinkedTo(graph, {
 		id: node.id,
 		link: LinkType.Style
@@ -314,9 +316,62 @@ export function buildStyle(node: any) {
 			return stylesheet;
 		})
 		.join(NEW_LINE);
-	return styleSheetRules;
+	return `.${topCssStyle} {
+    ${styleSheetRules}
+  }`;
 }
 
+export function buildStyleJS(node: any) {
+	const graph = GetCurrentGraph();
+	if (typeof node === 'string') {
+		node = GetNodeById(node, graph);
+	}
+	let topCssStyle = GetCssName(node) || GetCodeName(node);
+	const styleNodes = GetNodesLinkedTo(graph, {
+		id: node.id,
+		link: LinkType.Style
+	});
+
+	const styleSheetRules = styleNodes
+		.map((styleNode: GraphMethods.Node) => {
+			const style = GetNodeProp(styleNode, NodeProperties.Style);
+			const styleSelectors = StyleNodeProperties.filter((x) => GetNodeProp(styleNode, x)).map(
+				(styleProp) => styleProp
+			);
+			const areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
+			const gridRowCount = parseInt(GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1, 10);
+			const gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
+			const styleObj = GetNodeProp(styleNode, NodeProperties.Style);
+			const useMediaQuery = GetNodeProp(style, NodeProperties.UseMediaQuery);
+			let mediaquery_start = '';
+			let mediaquery_end = '';
+			if (useMediaQuery) {
+				mediaquery_start = MediaQueries[GetNodeProp(styleNode, NodeProperties.MediaQuery)];
+				if (mediaquery_start) {
+					mediaquery_start = `${mediaquery_start} {`;
+					mediaquery_end = `}`;
+				}
+			}
+			const styleName = GetJSCodeName(styleNode);
+			const stylesSelectorsName = styleSelectors.map((styleSelector) => `${styleName}${styleSelector}`).join();
+			const stylesheet = `
+    ${stylesSelectorsName || styleName}: ()=> {
+
+      ${mediaquery_start}
+        return {    ${Object.keys(styleObj).map((s) => `${s}: '${styleObj[s]}',`).join(NEW_LINE)}
+      };
+       ${mediaquery_end}
+    }
+    `;
+
+			return stylesheet;
+		})
+		.unique()
+		.join(`,${NEW_LINE}`);
+	return `export default {
+    ${styleSheetRules}
+  }`;
+}
 export function GetItemData(node: any) {
 	const dataSourceNode = GetDataSourceNode(node.id);
 	const connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
@@ -401,6 +456,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 	}
 
 	let cssFile = null;
+	let cssJsFile = null;
 	let cssImport = null;
 	let templateStr = null;
 	let ending = '.js';
@@ -419,10 +475,13 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			ending = '.tsx';
 			templateStr = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
 			styleRules = buildStyle(node);
-			cssFile = constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
+			cssFile = ''; // constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 			cssFile += styleRules;
 
-			cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'`;
+			cssJsFile = buildStyleJS(node);
+
+      cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
+      import styles from './${(GetCodeName(node) || '').toJavascriptName()}_css'`;
 			break;
 		case UITypes.ReactNative:
 		default:
@@ -460,6 +519,14 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}${ending}`,
 			name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}${ending}`
 		},
+		cssJsFile
+			? {
+					template: cssJsFile,
+					relative: relativePath || './src/components',
+					relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+					name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}_css.ts`
+				}
+			: null,
 		cssFile
 			? {
 					template: cssFile,
@@ -771,6 +838,7 @@ export function GenerateRNComponents(
 				}
 				const css = {};
 				let cssFile = '';
+				let cssJsFile = '';
 				let cssImport = '';
 				let styleRules = null;
 				const component_did_update = GetComponentDidUpdate(node);
@@ -784,10 +852,11 @@ export function GenerateRNComponents(
 						break;
 					case UITypes.ReactWeb:
 						styleRules = buildStyle(node);
-						cssFile = constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
+						cssFile = ''; // constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 						cssFile += styleRules;
-
-						cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'`;
+						cssJsFile = buildStyleJS(node);
+						cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
+            import styles from './${(GetCodeName(node) || '').toJavascriptName()}_css'`;
 						break;
 					default:
 						break;
@@ -812,6 +881,15 @@ export function GenerateRNComponents(
 								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
 								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
 									.toJavascriptName()}.scss`
+							}
+						: null,
+					cssJsFile
+						? {
+								template: cssJsFile,
+								relative: relative || './src/components',
+								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
+									.toJavascriptName()}_css.ts`
 							}
 						: null,
 					{
@@ -945,7 +1023,7 @@ export function GenerateMarkupTag(node: any, language: any, parent: any, cellSty
 					if (cellStylesReact.length) styleOrCss = stylization;
 					break;
 				default:
-					if (cellStyles) styleOrCss = `${stylization} className={\`${cellStyles} \`}`;
+					if (cellStyles) styleOrCss = `${stylization}`;
 					break;
 			}
 			return `<${GetCodeName(node)} ${styleOrCss} ${describedApi} />`;

@@ -198,7 +198,7 @@ class AgentAccessView extends Component<any, any> {
 					array.forEach((item: any, mI: number) => {
 						Object.keys(item).forEach((key: string) => {
 							let routing: Routing = item[key];
-							let messages = validateRoute(routing, this);
+							let messages = validateRoute(routing, this, (this.state.agents || [])[aI]);
 							messages.forEach((message: { _route: RouteDescription; text: string[] }) => {
 								let { _route, text } = message;
 								result.push(
@@ -219,7 +219,7 @@ class AgentAccessView extends Component<any, any> {
 				Object.keys(dashboardRouting).forEach((key: string) => {
 					Object.keys(dashboardRouting[key]).forEach((k2: string) => {
 						let routing: Routing = dashboardRouting[key][k2];
-						let messages = validateRoute(routing, this);
+						let messages = validateRoute(routing, this, key);
 						messages.forEach((message: { _route: RouteDescription; text: string[] }) => {
 							let { _route, text } = message;
 							result.push(
@@ -1822,7 +1822,7 @@ class AgentAccessView extends Component<any, any> {
 		return GetFunctionTypeOptions();
 	}
 
-	private hasAgentAccess(agentIndex: number, modelIndex: number, v: string): any {
+	public hasAgentAccess(agentIndex: number, modelIndex: number, v: string): any {
 		return this.state.agentAccess[agentIndex] && this.state.agentAccess[agentIndex][modelIndex]
 			? this.state.agentAccess[agentIndex][modelIndex][v]
 			: false;
@@ -1927,13 +1927,20 @@ class AgentAccessView extends Component<any, any> {
 }
 
 export default UIConnect(AgentAccessView);
-function validateRoute(routing: Routing, view: AgentAccessView): { _route: RouteDescription; text: string[] }[] {
+function validateRoute(
+	routing: Routing,
+	view: AgentAccessView,
+	agent: string
+): { _route: RouteDescription; text: string[] }[] {
 	if (routing && routing.routes) {
 		let res: { _route: RouteDescription; text: string }[] = [];
 
 		let result: { _route: RouteDescription; text: string[] }[] = [];
 		routing.routes.forEach((_route: RouteDescription) => {
 			let messages: string[] = [];
+			if (_route.agent !== agent) {
+				messages.push('Agent doesnt match target');
+			}
 			if (_route.isDashboard) {
 				if (!_route.dashboard) {
 					let dash = _route.dashboard || '';
@@ -1942,6 +1949,16 @@ function validateRoute(routing: Routing, view: AgentAccessView): { _route: Route
 						messages.push('Target dashboard not set');
 					}
 				}
+			} else {
+				if (
+					!view.hasAgentAccess(
+						view.state.agents.indexOf(_route.agent),
+						view.state.models.indexOf(_route.model),
+						_route.viewType
+					)
+				) {
+          messages.push('The screen wont exist');
+        }
 			}
 
 			ValidName(_route.name, messages);
@@ -2222,17 +2239,17 @@ function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[],
 						})
 						.filter(filterRoutes(routing))
 						.forEach((navLink) => {
-							let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
-							routing.routes.push({
-								agent: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Agent) : '',
-								id: GUID(),
-								model: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Model) : '',
-								name: `${GetNodeTitle(navLink.source)} to ${GetNodeTitle(navLink.target)}`,
-								viewType: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.ViewType) : '',
-								isDashboard,
-								dashboard: isDashboard ? navLink.target : '',
-								linkId: navLink.id
-							});
+							// let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
+							// routing.routes.push({
+							// 	agent: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Agent) : '',
+							// 	id: GUID(),
+							// 	model: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Model) : '',
+							// 	name: `${GetNodeTitle(navLink.source)} to ${GetNodeTitle(navLink.target)}`,
+							// 	viewType: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.ViewType) : '',
+							// 	isDashboard,
+							// 	dashboard: isDashboard ? navLink.target : '',
+							// 	linkId: navLink.id
+							// });
 						});
 				}
 			}

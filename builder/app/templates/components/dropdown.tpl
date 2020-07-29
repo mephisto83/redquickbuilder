@@ -1,4 +1,4 @@
-<Item {...props} {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
+<Item  style={props.style || {}} {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
     <Label {{style_label}}>{{{label}}}</Label>
     <Dropdown value={{{value}}} options={{{options}}}  {{style_input}} success={{{success}}} error={{{error}}} placeholder={{{placeholder}}}
         onBlur={()=>{

@@ -22,6 +22,10 @@
             {
                 return StatusCode(RedActionResult.PermissionError(), permissionException);
             }
+            catch (InvalidAgentException invalidAgentException)
+            {
+                return StatusCode(RedActionResult.InvalidAgentError(), invalidAgentException);
+            }
             catch(Exception)
             {
                 return StatusCode(500);

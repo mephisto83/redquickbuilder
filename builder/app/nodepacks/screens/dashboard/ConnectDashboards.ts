@@ -16,9 +16,10 @@ import {
 	GetNodeByProperties
 } from '../../../actions/uiactions';
 import { Node, Graph } from '../../../methods/graph_types';
-import CreateSmartDashboard, { ButtonDescription } from './CreateSmartDashboard';
+import { ButtonDescription } from './CreateSmartDashboard';
 import { GetNodesLinkedTo, SOURCE, SetPause, GetNodeLinkedTo } from '../../../methods/graph_methods';
 import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
+import { AddComponentAutoStyles } from '../../batch/ConnectScreen/Shared';
 
 export default function ConnectDashboards(
 	filter: Function,
@@ -43,14 +44,15 @@ export default function ConnectDashboards(
 			if (onProgress) {
 				onProgress(sindex / total);
 			}
-			const button: ButtonDescription[] = GetNodeProp(screenOption, NodeProperties.DashboardButtons) || [];
+			const buttons: ButtonDescription[] = GetNodeProp(screenOption, NodeProperties.DashboardButtons) || [];
+			const viewComponent: string = GetNodeProp(screenOption, NodeProperties.DashboardViewComponent);
 			let clickEvent = 'onClick';
 			switch (GetNodeProp(screenOption, NodeProperties.ViewType)) {
 				case UITypes.ReactNative:
 					clickEvent = 'onPress';
 					break;
 			}
-			button.forEach((btn: ButtonDescription) => {
+			buttons.forEach((btn: ButtonDescription) => {
 				let clickHandle: Node;
 				let handleInstance: Node;
 				result.push(
@@ -106,8 +108,24 @@ export default function ConnectDashboards(
 					return null;
 				});
 			});
+			AddStylesToScreenOptionButtons(buttons, viewComponent);
 		});
 	});
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 	SetPause(false);
 }
+function AddStylesToScreenOptionButtons(buttons: ButtonDescription[], viewComponent: string) {
+  let layout: any;
+  buttons.forEach((button: ButtonDescription, index: number) => {
+    if (button.id && button.buttonId) {
+      layout = GetNodeProp(viewComponent, NodeProperties.Layout); // SetLayoutComponent(GetNodeById(viewComponent, graph), button.buttonId, button.id);
+      let targetScreenAgent: string = GetNodeProp(button.target, NodeProperties.Agent);
+      if (targetScreenAgent)
+        AddComponentAutoStyles(viewComponent, { agent: targetScreenAgent }, button.buttonId);
+    }
+    else {
+      throw new Error('button no found, in create smart dashboard');
+    }
+  });
+}
+

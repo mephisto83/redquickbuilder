@@ -1,3 +1,3 @@
-<Form {...props}>
+<Form  style={props.style || {}}>
 {{elements}}
 </Form>

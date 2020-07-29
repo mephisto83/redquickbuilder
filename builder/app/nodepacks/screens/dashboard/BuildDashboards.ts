@@ -12,8 +12,9 @@ import {
 	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
 import { Node, Graph } from '../../../methods/graph_types';
-import CreateSmartDashboard from './CreateSmartDashboard';
+import CreateSmartDashboard, { ButtonDescription } from './CreateSmartDashboard';
 import { GetNodesLinkedTo, SOURCE, SetPause } from '../../../methods/graph_methods';
+import { AddComponentAutoStyles } from '../../batch/ConnectScreen/Shared';
 
 export default function BuildDashboards(filter: Function) {
 	const navigationScreens: Node[] = NodesByType(null, NodeTypes.NavigationScreen)
@@ -29,6 +30,7 @@ export default function BuildDashboards(filter: Function) {
 		};
 		let screenContext: { entry: string } | any = null;
 		Object.keys(types).forEach((uiType: string) => {
+			let viewComponent: string = '';
 			CreateSmartDashboard({
 				dashboardName: GetNodeTitle(navigationScreen),
 				uiType,
@@ -46,10 +48,12 @@ export default function BuildDashboards(filter: Function) {
 					};
 				}),
 				isHome: !!GetNodeProp(navigationScreen, NodeProperties.IsHomeLaunchView),
-				callback: (sdcontext: { entry: string }) => {
+				callback: (sdcontext: { viewComponent: string; entry: string; buttons: ButtonDescription[] }) => {
 					screenContext = sdcontext;
+					viewComponent = sdcontext.viewComponent;
 				}
 			});
+
 		});
 		if (screenContext) {
 			graphOperation(

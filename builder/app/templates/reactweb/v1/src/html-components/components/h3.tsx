@@ -4,7 +4,7 @@ import StyleProvider from './styleprovider';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class H3 extends React.Component {
+export default class H3 extends React.Component<any, any> {
 	constructor(props: any) {
 		super(props);
 

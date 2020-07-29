@@ -42,7 +42,6 @@ import {
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
-import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDashboard';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
 import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';

@@ -1,1 +1,1 @@
- <Thumbnail {...props} square large source={{uri:  {{data}} }} />
+ <Thumbnail  style={props.style || {}} square large source={{uri:  {{data}} }} />

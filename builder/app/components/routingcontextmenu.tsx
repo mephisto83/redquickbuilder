@@ -85,6 +85,12 @@ class ContextMenu extends Component<any, any> {
 				this.props.setVisual(UIA.ROUTING_CONTEXT_MENU, null);
 			};
 			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
+			let agents = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model)
+				.filter(
+					(x: Node) =>
+						UIA.GetNodeProp(x, NodeProperties.IsAgent) && !UIA.GetNodeProp(x, NodeProperties.IsUser)
+				)
+				.toNodeSelect();
 			this.getRoutingApi(mode);
 			switch (mode) {
 				default:
@@ -252,7 +258,9 @@ class ContextMenu extends Component<any, any> {
 									this.setState({ [routeKey]: !this.state[routeKey] });
 								}}
 							>
-								{agent && model && !viewMounting ? <TreeViewMenu error title={Titles.NoUIForRoute} /> : null}
+								{agent && model && !viewMounting ? (
+									<TreeViewMenu error title={Titles.NoUIForRoute} />
+								) : null}
 								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}
@@ -323,6 +331,20 @@ class ContextMenu extends Component<any, any> {
 										/>
 									</TreeViewItemContainer>
 								)}
+								{route.isDashboard ? null : (
+									<TreeViewItemContainer>
+										<SelectInput
+											options={agents}
+											label={Titles.Agents}
+											onChange={(value: string) => {
+												route.agent = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={route.agent}
+										/>
+									</TreeViewItemContainer>
+								)}
+
 
 								{route.isDashboard ? null : (
 									<TreeViewItemContainer>

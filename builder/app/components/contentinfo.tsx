@@ -29,8 +29,12 @@ export default class ContentInfo extends Component<any, any> {
 						marginLeft: 26
 					}}
 				>
-					<span className="info-box-text" title={this.props.title}>{this.props.title}</span>
-					<span className="info-box-text" title={this.props.description}>{this.props.description}</span>
+					<span className="info-box-text" style={{ whiteSpace: 'normal' }} title={this.props.title}>
+						{this.props.title}
+					</span>
+					<span className="info-box-text" title={this.props.description}>
+						{this.props.description}
+					</span>
 					<span className="info-box-number">{(this.props.messages || []).length}</span>
 
 					<div className="progress">

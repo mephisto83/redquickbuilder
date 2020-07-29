@@ -249,7 +249,7 @@ export function GetChild(setup: any, parentId: any) {
 	}
 	return null;
 }
-export function GetFirstCell(setup: any) {
+export function GetFirstCell(setup: any): string | null {
 	const keys = setup ? Object.keys(setup.layout) : [];
 
 	return keys[0] || null;
@@ -3069,6 +3069,17 @@ function codeTypeWord(x: any) {
 	}
 	return x;
 }
+function cssTypeWord(x: any) {
+	if (typeof x === 'string') {
+		return x
+			.split('')
+			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_ '.indexOf(y.toLowerCase()) !== -1)
+			.join('')
+			.split(' ')
+			.join('-').toLowerCase();
+	}
+	return x;
+}
 
 export function GetComponentExternalApiNodes(parent: any, graph?: any) {
 	graph = graph || GetCurrentGraph();
@@ -3125,6 +3136,10 @@ export const NodePropertiesDirtyChain = {
 		{
 			chainProp: NodeProperties.ValueName,
 			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.CssName,
+			chainFunc: cssTypeWord
 		},
 		{
 			chainProp: NodeProperties.HttpRoute,

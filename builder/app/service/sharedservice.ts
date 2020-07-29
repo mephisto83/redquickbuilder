@@ -7,7 +7,7 @@ export function constructCellStyles(cellStyleArray: any, onComponent = false) {
 	let onCellStyles: ComponentStyle[] = cellStyleArray.filter((x: ComponentStyle) => {
 		return x && x.onComponent == onComponent;
 	});
-  let cellStylesReact: string[] = [];
+	let cellStylesReact: string[] = [];
 
 	let cellStyles = onCellStyles
 		.map((cs: ComponentStyle) => {
@@ -20,12 +20,12 @@ export function constructCellStyles(cellStyleArray: any, onComponent = false) {
 							cellStylesReact.push(
 								` ...(${negate ? '!' : ''}this.state.${GetJSCodeName(
 									cs.componentApi
-								)} ? ${JSON.stringify(styleText, null, 4)} : {})`
+								)} ? styles.${GetJSCodeName(cs.styleComponent)}() : {})`
 							);
 						}
-						return `$\{(${negate ? '!' : ''}this.state.${GetJSCodeName(cs.componentApi)} ?'${GetJSCodeName(
-							cs.styleComponent
-						)}' : '')}`;
+						return `$\{(${negate ? '!' : ''}this.state.${GetJSCodeName(
+							cs.componentApi
+						)} ? styles.${GetJSCodeName(cs.styleComponent)}() : '')}`;
 					}
 					break;
 			}

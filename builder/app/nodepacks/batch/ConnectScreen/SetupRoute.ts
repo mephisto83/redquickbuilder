@@ -98,7 +98,7 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 			targetScreen = GetNodeByProperties({
 				[NodeProperties.NODEType]: NodeTypes.Screen,
 				[NodeProperties.Model]: routeDescription.model,
-				[NodeProperties.Agent]: GetNodeProp(screen, NodeProperties.Agent),
+				[NodeProperties.Agent]: routeDescription.agent,
 				[NodeProperties.ViewType]: routeDescription.viewType
 			});
 		}

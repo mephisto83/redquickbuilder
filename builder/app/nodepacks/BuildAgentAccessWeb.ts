@@ -355,6 +355,7 @@ function buildDashboardRouting(
 	}
 	return [];
 }
+
 function buildRouting(
 	routing: Routing,
 	navigationScreen: any,
@@ -368,7 +369,8 @@ function buildRouting(
 		} else if (!route.isDashboard) {
 			let targetNaviScreen = GetNodesByProperties(
 				{
-					[NodeProperties.Agent]: agent,
+					[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+					[NodeProperties.Agent]: route.agent,
 					[NodeProperties.Model]: route.model,
 					[NodeProperties.ViewType]: route.viewType
 				},
@@ -376,22 +378,34 @@ function buildRouting(
 			).find((v: Node) => !GetNodeProp(v, NodeProperties.IsDashboard));
 			let entry = agentAccessContext().entry;
 			if (entry && !targetNaviScreen) {
-				result.push(
-					CreateNewNode(
+				result.push(() => {
+					targetNaviScreen = GetNodesByProperties(
 						{
 							[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
-							[NodeProperties.Agent]: agent,
+							[NodeProperties.Agent]: route.agent,
+							[NodeProperties.Model]: route.model,
+							[NodeProperties.ViewType]: route.viewType
+						},
+						GetCurrentGraph()
+					).find((v: Node) => !GetNodeProp(v, NodeProperties.IsDashboard));
+					if (targetNaviScreen) {
+						return [];
+					}
+					return CreateNewNode(
+						{
+							[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
+							[NodeProperties.Agent]: route.agent,
 							[NodeProperties.Model]: route.model,
 							[NodeProperties.ViewType]: route.viewType,
-							[NodeProperties.UIText]: `${GetNodeTitle(agent)} ${GetNodeTitle(
-								route.model
-							)} ${route.viewType}`
+							[NodeProperties.UIText]:
+								route.name ||
+								`${GetNodeTitle(route.agent)} ${GetNodeTitle(route.model)} ${route.viewType}`
 						},
 						(_node: Node) => {
 							targetNaviScreen = _node;
 						}
-					)
-				);
+					);
+				});
 			}
 			result.push(() => {
 				return AddLinkBetweenNodes(navigationScreen.id, targetNaviScreen.id, LinkProperties.NavigationScreen);

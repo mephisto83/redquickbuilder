@@ -94,7 +94,7 @@ export function GetHideStyle(): Node {
 	return hideNode;
 }
 
-export function AddComponentAutoStyles(subcomponent: string, routeDescription: RouteDescription, cellId: string) {
+export function AddComponentAutoStyles(subcomponent: string, routeDescription: { agent: string }, cellId: string) {
 	let layout: ComponentLayoutContainer = GetNodeProp(subcomponent, NodeProperties.Layout);
 	let hiddenNode = GetHideStyle();
 	graphOperation(AddLinkBetweenNodes(subcomponent, hiddenNode.id, LinkProperties.Style))(

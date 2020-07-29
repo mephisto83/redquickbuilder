@@ -1,6 +1,10 @@
         // Gets a list of {{model}} instances with a list of ids.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, {{fetch_parameter}} fetch_parameter, QueryParameters queryParameter = null) {
 
+            if(user.{{agent_type}} == null) {
+              throw new InvalidAgentException();
+            }
+
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 
             if(await {{agent_type#lower}}Permissions.{{permission_function}}(agent).ConfigureAwait(false)) {

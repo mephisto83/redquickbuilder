@@ -84,7 +84,12 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 				this.props.setVisual(UIA.DASHBOARD_ROUTING_CONTEXT_MENU, null);
 			};
 			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
-
+			let agents = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model)
+				.filter(
+					(x: Node) =>
+						UIA.GetNodeProp(x, NodeProperties.IsAgent) && !UIA.GetNodeProp(x, NodeProperties.IsUser)
+				)
+				.toNodeSelect();
 			switch (mode) {
 				default:
 					routing.routes.forEach((route: RouteDescription, index: number) => {
@@ -312,6 +317,19 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 										/>
 									</TreeViewItemContainer>
 								)}
+
+								<TreeViewItemContainer>
+									<SelectInput
+										options={agents}
+										label={Titles.Agents}
+										onChange={(value: string) => {
+											route.agent = value;
+											this.setState({ turn: UIA.GUID() });
+										}}
+										value={route.agent}
+									/>
+								</TreeViewItemContainer>
+
 								{!route.isDashboard ? null : (
 									<TreeViewItemContainer>
 										<SelectInput

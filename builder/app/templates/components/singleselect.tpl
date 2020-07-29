@@ -1,4 +1,4 @@
-<SingleSelect {...props} error={this.state.error || null}
+<SingleSelect  style={props.style || {}} error={this.state.error || null}
     {{apiProperties}}
     data={{{data}}}
     renderItem={{{item_render}}}

@@ -1,5 +1,9 @@
         public async Task<{{model}}> {{function_name}}({{user}} user) {
 
+            if(user.{{agent_type}} == null) {
+              throw new InvalidAgentException();
+            }
+
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
 
             var value = {{model}}.Create();
