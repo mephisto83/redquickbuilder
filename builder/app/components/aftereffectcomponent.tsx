@@ -93,8 +93,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 						options={(methods || [])
 							.map((v: MountingDescription | EffectDescription) => ({ title: v.name, value: v.id }))}
 						value={afterEffect.targetType}
-						onChange={(value: TargetMethodType) => {
-							afterEffect.targetType = value;
+						onChange={(value: string) => {
+							afterEffect.target = value;
 							this.setState({
 								turn: UIA.GUID()
 							});

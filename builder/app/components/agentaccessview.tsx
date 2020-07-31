@@ -1689,20 +1689,7 @@ class AgentAccessView extends Component<any, any> {
 			// 	}
 			// });
 			hasMountings = !!mounting.mountings.length;
-			if (hasMountings) {
-				for (let agentIndex = 0; agentIndex < this.state.agents.length; agentIndex++) {
-					for (let modelIndex = 0; modelIndex < this.state.models.length; modelIndex++) {
-						Object.values(ViewTypes).map((v: string) => {
-							if (this.hasMountingDescription(agentIndex, modelIndex, v)) {
-								let mounting: ViewMounting = this.getMountingDescription(agentIndex, modelIndex, v);
-								if (mounting && mounting.mountings && mounting.mountings.length) {
-									methods.push(...mounting.mountings);
-								}
-							}
-						});
-					}
-				}
-			}
+			this.collectMethods(agentIndex, methods);
 		}
 
 		return (
@@ -1734,6 +1721,42 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
+	private collectMethods(agentIndex: number, methods: any[]) {
+		for (let modelIndex = 0; modelIndex < this.state.models.length; modelIndex++) {
+			Object.values(ViewTypes).map((v: string) => {
+				if (this.hasMountingDescription(agentIndex, modelIndex, v)) {
+					let mounting: ViewMounting = this.getMountingDescription(agentIndex, modelIndex, v);
+					if (mounting && mounting.mountings && mounting.mountings.length) {
+						methods.push(...mounting.mountings);
+					}
+				}
+				if (this.hasEffectDescription(agentIndex, modelIndex, v)) {
+					let mounting: Effect = this.getEffectDescription(agentIndex, modelIndex, v);
+					if (mounting && mounting.effects && mounting.effects.length) {
+						methods.push(...mounting.effects);
+					}
+				}
+			});
+		}
+		this.state.dashboards.forEach((dashboard: string) => {
+			if (this.hasDashboardMountingDescription(this.state.agents[agentIndex], dashboard)) {
+				let mounting: ViewMounting = this.getDashboardMountingDescription(
+					this.state.agents[agentIndex],
+					dashboard
+				);
+				if (mounting && mounting.mountings && mounting.mountings.length) {
+					methods.push(...mounting.mountings);
+				}
+			}
+			if (this.hasDashboardEffectDescription(this.state.agents[agentIndex], dashboard)) {
+				let effect: Effect = this.getDashboardEffectDescription(this.state.agents[agentIndex], dashboard);
+				if (effect && effect.effects && effect.effects) {
+					methods.push(...effect.effects);
+				}
+			}
+		});
+	}
+
 	private createDashboardMountingDescriptionButton(agent: string, dashboard: string, mounting: ViewMounting) {
 		let hasMountings = false;
 		if (mounting && mounting.mountings) {
@@ -1773,9 +1796,11 @@ class AgentAccessView extends Component<any, any> {
 		v: string,
 		effect: Effect
 	) {
+		let methods: any[] = [];
 		let hasEffects = false;
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
+			this.collectMethods(agentIndex, methods);
 		}
 		return (
 			<div className="btn-group">
@@ -1789,6 +1814,7 @@ class AgentAccessView extends Component<any, any> {
 							model,
 							modelIndex,
 							viewType: v,
+							methods,
 							outState: this.state,
 							effect: effect,
 							callback: (value: Effect) => {
@@ -1807,8 +1833,10 @@ class AgentAccessView extends Component<any, any> {
 	}
 	private createDashboardEffectDescriptionButton(agent: string, dashboard: string, effect: Effect) {
 		let hasEffects = false;
+		let methods: any[] = [];
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
+			this.collectMethods(this.state.agents.indexOf(agent), methods);
 		}
 		return (
 			<div className="btn-group">
@@ -1817,7 +1845,8 @@ class AgentAccessView extends Component<any, any> {
 					type="button"
 					onClick={() => {
 						this.props.setVisual(DASHBOARD_EFFECT_CONTEXT_MENU, {
-							agent,
+              agent,
+              methods,
 							dashboard,
 							outState: this.state,
 							effect: effect,
@@ -1871,14 +1900,31 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentViewMount[agentIndex][modelIndex][v]
 		);
 	}
+	public hasDashboardMountingDescription(agent: string, dashboard: string): boolean {
+		return (
+			this.state.dashboardViewMount &&
+			this.state.dashboardViewMount[agent] &&
+			this.state.dashboardViewMount[agent][dashboard]
+		);
+	}
 	public getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
 		return this.state.dashboardViewMount[agent][dashboard];
 	}
 	private getEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
 		return this.state.agentEffect[agentIndex][modelIndex][v];
 	}
+	private hasEffectDescription(agentIndex: number, modelIndex: number, v: string): Effect {
+		return this.state.agentEffect[agentIndex][modelIndex][v];
+	}
 	private getDashboardEffectDescription(agent: string, dashboard: string): Effect {
 		return this.state.dashboardEffect[agent][dashboard];
+	}
+	private hasDashboardEffectDescription(agent: string, dashboard: string): boolean {
+		return (
+			this.state.dashboardEffect &&
+			this.state.dashboardEffect[agent] &&
+			this.state.dashboardEffect[agent][dashboard]
+		);
 	}
 	private getKey(a: number, b: number, c: string) {
 		return `${a}-${b}-${c}`;

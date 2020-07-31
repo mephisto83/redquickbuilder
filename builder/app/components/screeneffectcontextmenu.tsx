@@ -27,7 +27,8 @@ import {
 	MountingDescription,
 	Effect,
 	EffectDescription,
-	ScreenEffectApi
+	ScreenEffectApi,
+  AfterEffect
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -37,6 +38,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
+import AfterEffectsComponent from './aftereffectscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ScreenEffectContextMenu extends Component<any, any> {
@@ -49,7 +51,9 @@ class ScreenEffectContextMenu extends Component<any, any> {
 
 	getMenuMode(mode: any) {
 		const result: any = [];
+		let { agent } = mode;
 		let screenEffectApis: ScreenEffectApi[] = mode.screenEffectApis;
+		let afterEffects: AfterEffect[] = mode.afterEffects;
 		if (screenEffectApis) {
 			const exit = () => {
 				this.props.setVisual(UIA.AGENT_SCREENEFFECT_CONTEXT_MENU, null);
@@ -67,6 +71,9 @@ class ScreenEffectContextMenu extends Component<any, any> {
 							api
 							screenEffects={screenEffectApis}
 						/>
+					);
+					result.push(
+						<AfterEffectsComponent agent={agent} methods={mode.methods} afterEffects={afterEffects} />
 					);
 					break;
 			}
@@ -172,12 +179,7 @@ class ScreenEffectContextMenu extends Component<any, any> {
 									className={this.state.secondaryMenu ? '' : 'col-md-12'}
 									style={this.state.secondaryMenu ? { width: '50%' } : {}}
 								>
-									<GenericPropertyContainer
-										active
-										title="asdf"
-										subTitle="afaf"
-										nodeType={nodeType}
-									>
+									<GenericPropertyContainer active title="asdf" subTitle="afaf" nodeType={nodeType}>
 										{currentInfo}
 										{menuitems}
 									</GenericPropertyContainer>

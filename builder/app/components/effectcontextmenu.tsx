@@ -35,6 +35,7 @@ import TextInput from './textinput';
 import { Node } from '../methods/graph_types';
 import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
+import AfterEffectsComponent from './aftereffectscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -94,7 +95,7 @@ class EffectContextMenu extends Component<any, any> {
 					effect.effects.forEach((effectItem: EffectDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription, source } = effectItem;
-
+						effectItem.afterEffects = effectItem.afterEffects || [];
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;
 						let methodConstraints: any = null;
@@ -327,6 +328,11 @@ class EffectContextMenu extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
+								<AfterEffectsComponent
+									agent={agent}
+									methods={mode.methods}
+									afterEffects={effectItem.afterEffects}
+								/>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {

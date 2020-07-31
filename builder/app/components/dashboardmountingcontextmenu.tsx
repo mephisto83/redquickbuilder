@@ -40,6 +40,7 @@ import {
 import CheckBox from './checkbox';
 import { GetNodeProp } from '../methods/graph_methods';
 import ScreenEffectsComponent from './screenEffectsComponent';
+import AfterEffectsComponent from './aftereffectscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardMountingContenxt extends Component<any, any> {
@@ -389,6 +390,11 @@ class DashboardMountingContenxt extends Component<any, any> {
 									{methodConstraints}
 								</TreeViewMenu>
 								<ScreenEffectsComponent agent={agent} screenEffects={mountingItem.screenEffect} />
+								<AfterEffectsComponent
+									agent={agent}
+									methods={mode.methods}
+									afterEffects={mountingItem.afterEffects}
+								/>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
