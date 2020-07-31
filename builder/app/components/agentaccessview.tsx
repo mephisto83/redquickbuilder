@@ -1680,6 +1680,7 @@ class AgentAccessView extends Component<any, any> {
 		mounting: ViewMounting
 	) {
 		let hasMountings = false;
+		let methods: any[] = [];
 		if (mounting && mounting.mountings) {
 			// mounting.mountings.forEach((mounting: MountingDescription) => {
 			// 	if (mounting.viewType && mounting.model) {
@@ -1688,7 +1689,22 @@ class AgentAccessView extends Component<any, any> {
 			// 	}
 			// });
 			hasMountings = !!mounting.mountings.length;
+			if (hasMountings) {
+				for (let agentIndex = 0; agentIndex < this.state.agents.length; agentIndex++) {
+					for (let modelIndex = 0; modelIndex < this.state.models.length; modelIndex++) {
+						Object.values(ViewTypes).map((v: string) => {
+							if (this.hasMountingDescription(agentIndex, modelIndex, v)) {
+								let mounting: ViewMounting = this.getMountingDescription(agentIndex, modelIndex, v);
+								if (mounting && mounting.mountings && mounting.mountings.length) {
+									methods.push(...mounting.mountings);
+								}
+							}
+						});
+					}
+				}
+			}
 		}
+
 		return (
 			<div className="btn-group">
 				<button
@@ -1699,6 +1715,7 @@ class AgentAccessView extends Component<any, any> {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,
 							model,
+							methods,
 							modelIndex,
 							outState: this.state,
 							viewType: v,
@@ -1846,6 +1863,14 @@ class AgentAccessView extends Component<any, any> {
 	private getMountingDescription(agentIndex: number, modelIndex: number, v: string): ViewMounting {
 		return this.state.agentViewMount[agentIndex][modelIndex][v];
 	}
+	private hasMountingDescription(agentIndex: number, modelIndex: number, v: string): boolean {
+		return (
+			this.state.agentViewMount &&
+			this.state.agentViewMount[agentIndex] &&
+			this.state.agentViewMount[agentIndex][modelIndex] &&
+			this.state.agentViewMount[agentIndex][modelIndex][v]
+		);
+	}
 	public getDashboardMountingDescription(agent: string, dashboard: string): ViewMounting {
 		return this.state.dashboardViewMount[agent][dashboard];
 	}
@@ -1957,8 +1982,8 @@ function validateRoute(
 						_route.viewType
 					)
 				) {
-          messages.push('The screen wont exist');
-        }
+					messages.push('The screen wont exist');
+				}
 			}
 
 			ValidName(_route.name, messages);

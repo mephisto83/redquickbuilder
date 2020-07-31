@@ -111,6 +111,7 @@ export const UserOfAgentType = 'User of agent type';
 export const FontStyle = 'Font Style';
 export const FontVariant = 'Font Variant';
 export const IsUserOfAgentType = 'Is User Of Agent Type';
+export const TargetType = 'Target Type';
 export const RemoveScrenEffect = 'Remove Screen Effect';
 export const ComponentPropertyMenu = 'Component Properties';
 export const ComponentAPIMenu = 'Component API';
@@ -419,7 +420,7 @@ export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child 
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 export const Hover = 'Hover';
 export const UseNavigationParams = 'Use Navigation Params';
-export const DataChainAfterEffectConverter= 'After Effect Converter'
+export const DataChainAfterEffectConverter = 'After Effect Converter';
 export const Create_Object_Agent_Value__IListObject = 'Create Object by Agent => IList<Object>';
 export const Update_Object_Agent_Value__IListObject = 'Update Object by Agent => IList<Object>';
 export const Delete_Object_Agent_Value__IListObject = 'Delete Object by Agent => IList<Object>';
@@ -427,6 +428,7 @@ export const Get_Object_Agent_Value__IListObject = 'Get Object by Agent => IList
 export const Get_Agent_Value__IListObject = 'Get Objects for an Agent';
 export const Can_Execute_Agent_Parent_In_Valid_List = 'Can Execute Agent Parent In Valid List';
 export const AddButtonToComponent = 'Add Button';
+export const AfterEffects = 'After Effects';
 export const AddMenu = 'AddMenu';
 export const AddTitleToComponent = 'Add Title';
 export const Get_Object_Agent_Value__Object = 'Get Object by Agent';

@@ -67,6 +67,21 @@ export interface MountingDescription {
 	methodDescription?: MethodDescription;
 	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
+	afterEffects: AfterEffect[];
+	excludeFromController: boolean;
+}
+
+export interface AfterEffect {
+	id: string;
+	name: string;
+	dataChain: string;
+	targetType: TargetMethodType;
+	target: string;
+}
+
+export enum TargetMethodType {
+	Mounting = 'Mounting',
+	Effect = 'Effect'
 }
 
 export interface ScreenEffect {

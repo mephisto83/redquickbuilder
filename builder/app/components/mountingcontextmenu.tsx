@@ -39,6 +39,7 @@ import {
 } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
+import AfterEffectsComponent from './aftereffectscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -125,6 +126,9 @@ class ContextMenu extends Component<any, any> {
 						let { name, model, agent, viewType, methodDescription } = mountingItem;
 						if (!mountingItem.screenEffect) {
 							mountingItem.screenEffect = [];
+						}
+						if (!mountingItem.afterEffects) {
+							mountingItem.afterEffects = [];
 						}
 						let parameterConnections: any = null;
 						let methodConstraints: any = null;
@@ -362,6 +366,11 @@ class ContextMenu extends Component<any, any> {
 									{methodConstraints}
 								</TreeViewMenu>
 								<ScreenEffectsComponent agent={agent} screenEffects={mountingItem.screenEffect} />
+								<AfterEffectsComponent
+									agent={agent}
+									methods={mode.methods}
+									afterEffects={mountingItem.afterEffects}
+								/>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
