@@ -683,6 +683,8 @@ export const LinkType = {
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
+	DataChainAfterEffectConverter: 'DataChainAfterEffectConverter',
+	DataChainAfterEffectConverterTarget: 'DataChainAfterEffectConverterTarget',
 	UserOfAgentType: 'UserOfAgentType',
 	DataChainShouldShow: 'DataChainShouldShow',
 	ContextParameters: 'ContextParameters',
@@ -967,6 +969,12 @@ export const LinkProperties = {
 	},
 	UserOfAgentType: {
 		type: LinkType.UserOfAgentType
+	},
+	DataChainAfterEffectConverter: {
+		type: LinkType.DataChainAfterEffectConverter
+	},
+	DataChainAfterEffectConverterTarget: {
+		type: LinkType.DataChainAfterEffectConverterTarget
 	},
 	ScreenEffect: {
 		type: LinkType.ScreenEffect

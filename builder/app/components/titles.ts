@@ -419,7 +419,7 @@ export const Update_Parent$Child_Agent_Value__IListChild = 'Update Parent/Child 
 export const Get_Parent$Child_Agent_Value__IListChild = 'Get Parent/Child => IList<Child>';
 export const Hover = 'Hover';
 export const UseNavigationParams = 'Use Navigation Params';
-
+export const DataChainAfterEffectConverter= 'After Effect Converter'
 export const Create_Object_Agent_Value__IListObject = 'Create Object by Agent => IList<Object>';
 export const Update_Object_Agent_Value__IListObject = 'Update Object by Agent => IList<Object>';
 export const Delete_Object_Agent_Value__IListObject = 'Delete Object by Agent => IList<Object>';

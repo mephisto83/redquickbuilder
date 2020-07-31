@@ -267,11 +267,17 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
 };
 
 const AfterEffectsTemplate = {
+	DataChained: 'Data chained',
 	GenerateM2M_From_Result_and_Input: 'Generate Many 2 Many from result and input',
 	ExecuteStreamProcess: 'Execute stream process',
 	ExecuteStreamProcessUpdate: 'Execute stream process update'
 };
 export const AFTER_EFFECTS: any = {
+	[AfterEffectsTemplate.DataChained]: {
+		template: './app/templates/aftereffects/generate_m2m_from_result_and_input.tpl',
+		template_call: '                    await {{function_name}}(agent, data, result);',
+		templateKeys: {}
+	},
 	[AfterEffectsTemplate.GenerateM2M_From_Result_and_Input]: {
 		template: './app/templates/aftereffects/generate_m2m_from_result_and_input.tpl',
 		template_call: '                    await {{function_name}}(agent, data, result);',

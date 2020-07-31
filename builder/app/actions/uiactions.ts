@@ -1132,7 +1132,10 @@ export function GenerateDataChainArguments(id: string) {
 export function GenerateCSChainFunction(id: string) {
 	const lastNodeName = GenerateCDDataChainMethod(id);
 	const arbiters = GetArbitersInCSDataChainMethod(id);
-	const outputType = GetOutputTypeInCSDataChainMethod(id);
+	let alternateOutputType = null;
+	const outputType = GetOutputTypeInCSDataChainMethod(id, (v: string) => {
+		alternateOutputType = v;
+	});
 	const arbiterInterfaces = arbiters
 		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
 		.join(', ');
@@ -1173,7 +1176,7 @@ ${arbiterProperties}
     public ${GetCodeName(id)}(${arbiterInterfaces}) {
 ${arbiterSets}
     }
-    public async Task<${GetCodeName(outputType)}> Execute(${_arguments}) {
+    public async Task<${alternateOutputType || GetCodeName(outputType)}> Execute(${_arguments}) {
       ${lastNodeName}
     }
 }`;
@@ -1865,7 +1868,7 @@ export function GetArbitersInCSDataChainMethod(id: string) {
 	return result;
 }
 
-export function GetOutputTypeInCSDataChainMethod(id: string) {
+export function GetOutputTypeInCSDataChainMethod(id: string, callback?: any) {
 	const node = GetNodeById(id);
 	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
 	const lambda = GetNodeProp(node, NodeProperties.Lambda);
@@ -1878,6 +1881,23 @@ export function GetOutputTypeInCSDataChainMethod(id: string) {
 				if (temp.length > 1) {
 					if (temp[0].indexOf('return') === 0) {
 						const vari = temp[0].split(' ').filter((x: any) => x);
+						if (temp[1].indexOf('|') !== -1) {
+							//   #{return@sm|ChangeBy|agent }
+							//   #{return@sm|}
+							//   #{return@agent|}
+							let res = '';
+							temp.subset(1).join('').split('|').map((v: string) => v.trim()).forEach((v: string) => {
+								let temp = GetNodeProp(id, NodeProperties.LambdaInsertArguments);
+								if (temp && temp[v]) {
+									res += `${GetCodeName(temp[v])}`;
+								} else {
+									res += v;
+								}
+							});
+							if (res && callback) {
+								callback(res);
+							}
+						}
 						const lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
 						if (lambdaNode) result = lambdaNode;
 						else {

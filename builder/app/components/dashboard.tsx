@@ -225,6 +225,9 @@ class Dashboard extends Component<any, any> {
 						result.push(...this.getAgentContext());
 					}
 					return result;
+				case NodeTypes.AfterEffect:
+					result.push(...this.getAfterEffectsContext());
+					break;
 				case NodeTypes.PermissionTemplate:
 					result.push(...this.getPermissionTemplateContent());
 					break;
@@ -1350,6 +1353,35 @@ class Dashboard extends Component<any, any> {
 		}
 		return result;
 	}
+	getAfterEffectsContext() {
+		const result = [];
+		const { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainAfterEffectConverter,
+					nodeTypes: [ NodeTypes.DataChain ]
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `${Titles.DataChainAfterEffectConverter}`
+		});
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainAfterEffectConverterTarget,
+					nodeTypes: [ NodeTypes.Method ]
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `After Effect Target`
+		});
+
+		return result;
+	}
+
 	getAgentContext() {
 		const result = [];
 		const { state } = this.props;
@@ -2610,12 +2642,12 @@ class Dashboard extends Component<any, any> {
 				<ContextMenu />
 				<RoutingContextMenu />
 				<MountingContextMenu />
-        <EffectContextMenu />
+				<EffectContextMenu />
 				<DashboardEffectContextMenu />
-        <DashboardRoutingContextMenu />
+				<DashboardRoutingContextMenu />
 				<DashboardMountingContenxt />
-        <DashboardScreenEffectContextMenu />
-        <ScreenEffectContextMenu />
+				<DashboardScreenEffectContextMenu />
+				<ScreenEffectContextMenu />
 			</div>
 		);
 	}
