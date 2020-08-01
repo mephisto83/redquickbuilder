@@ -70,8 +70,11 @@ export interface MountingDescription {
 	afterEffects: AfterEffect[];
 	excludeFromController: boolean;
 }
+export interface AfterEffectDataChainConfiguration {
 
+}
 export interface AfterEffect {
+	dataChainOptions: AfterEffectDataChainConfiguration;
 	id: string;
 	name: string;
 	dataChain: string;

@@ -27,6 +27,7 @@ import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
+import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
 
 export default class AfterEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -39,10 +40,13 @@ export default class AfterEffectComponent extends Component<any, any> {
 		if (!afterEffect) {
 			return <span />;
 		}
+		let currentDescription: MountingDescription = (this.props.methods || []).find((method: MountingDescription) => {
+			return afterEffect && method.id === afterEffect.target;
+		});
 		return (
 			<TreeViewMenu
-        open={this.state.open}
-        icon={'fa fa-circle-o'}
+				open={this.state.open}
+				icon={'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -113,6 +117,15 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+				{afterEffect && afterEffect.dataChain ? (
+					<AfterEffectDataChainOptions
+						methods={this.props.methods}
+            methodDescription={this.props.methodDescription}
+            currentDescription={currentDescription}
+						previousEffect={this.props.previousEffect}
+						afterEffect={afterEffect}
+					/>
+				) : null}
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.RemoveScrenEffect}`}
@@ -144,11 +157,6 @@ export default class AfterEffectComponent extends Component<any, any> {
 						title={`Build Datachain`}
 						onClick={() => {
 							if (afterEffect && afterEffect.target) {
-								let currentDescription: MountingDescription = this.props.methods.find(
-									(method: MountingDescription) => {
-										return method.id === afterEffect.target;
-									}
-								);
 								if (currentDescription) {
 									if (this.props.methodDescription) {
 										let methodDescription: MethodDescription = this.props.methodDescription;
@@ -157,9 +165,9 @@ export default class AfterEffectComponent extends Component<any, any> {
 												{
 													name: afterEffect.name,
 													from: methodDescription,
-                          to: currentDescription.methodDescription,
-                          afterEffectChild: afterEffect.name,
-                          afterEffectParent:  this.props.mountingItem.name
+													to: currentDescription.methodDescription,
+													afterEffectChild: afterEffect.name,
+													afterEffectParent: this.props.mountingItem.name
 												},
 												(dataChain: Node) => {
 													afterEffect.dataChain = dataChain.id;
@@ -187,8 +195,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 														name: afterEffect.name,
 														from: description.methodDescription,
 														to: currentDescription.methodDescription,
-                            afterEffectChild: afterEffect.name,
-                            afterEffectParent:  this.props.mountingItem.name
+														afterEffectChild: afterEffect.name,
+														afterEffectParent: this.props.mountingItem.name
 													},
 													(dataChain: Node) => {
 														afterEffect.dataChain = dataChain.id;

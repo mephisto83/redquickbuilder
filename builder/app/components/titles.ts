@@ -15,6 +15,7 @@ export const DefaultViewModel = 'Default View Model';
 export const Load = 'Load';
 export const DeleteType = 'Delete Type';
 export const AddServiceInterfaceMenu = 'Add Interface Method';
+export const Configuration = 'Configuration';
 export const AddDefaults = 'Add Defaults';
 export const GetSelf = 'Get Self';
 export const BatchMenu = 'Batch Menu';
