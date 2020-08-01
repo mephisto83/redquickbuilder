@@ -94,7 +94,8 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		}
 		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
 		AddComponentAutoStyles(subcomponent, effectDescription, cellId);
-	});
+  });
+
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
 	console.log('setup validations');

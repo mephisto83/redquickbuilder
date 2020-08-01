@@ -28,7 +28,8 @@ import {
 	DASHBOARD_ROUTING_CONTEXT_MENU,
 	AGENT_SCREENEFFECT_CONTEXT_MENU,
 	DASHBOARD_SCREENEFFECT_CONTEXT_MENU,
-	GUID
+	GUID,
+	GetNodeById
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -75,7 +76,8 @@ import MethodProps, {
 	ScreenEffectApiProps,
 	ScreenEffectApi,
 	EffectDescription,
-	RouteSourceType
+	RouteSourceType,
+	AfterEffect
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
@@ -1845,8 +1847,8 @@ class AgentAccessView extends Component<any, any> {
 					type="button"
 					onClick={() => {
 						this.props.setVisual(DASHBOARD_EFFECT_CONTEXT_MENU, {
-              agent,
-              methods,
+							agent,
+							methods,
 							dashboard,
 							outState: this.state,
 							effect: effect,
@@ -2194,6 +2196,17 @@ function validateEffect(
 				let messages: string[] = [];
 				functionNames.push(effect.name);
 				ValidName(effect.name, messages);
+				if (effect.afterEffects && effect.afterEffects.length) {
+					effect.afterEffects.forEach((afterEffect: AfterEffect) => {
+						ValidName(afterEffect.name, messages);
+						if (!afterEffect.dataChain || !GetNodeById(afterEffect.dataChain)) {
+							messages.push(`Missing datachain for ${afterEffect.name || 'AfterEffect'} A.E.`);
+						}
+						if (!afterEffect.target) {
+							messages.push(`Missing method target for ${afterEffect.name}.`);
+            }
+					});
+				}
 				if (messages.length) {
 					result.push(
 						<ContentInfo

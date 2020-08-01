@@ -26,6 +26,7 @@ import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachai
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { mount } from 'enzyme';
 
 export default class AfterEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -40,7 +41,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 		}
 		return (
 			<TreeViewMenu
-				open={this.state.open}
+        open={this.state.open}
+        icon={'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -138,48 +140,71 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 						icon="fa fa-arrow-down"
 					/>
-					{afterEffect.dataChain ? null : (
-						<TreeViewGroupButton
-							title={`Build Datachain`}
-							onClick={() => {
-								if (afterEffect && afterEffect.target) {
-									let currentDescription: MountingDescription = this.props.methods.find(
-										(method: MountingDescription) => {
-											return method.id === afterEffect.target;
+					<TreeViewGroupButton
+						title={`Build Datachain`}
+						onClick={() => {
+							if (afterEffect && afterEffect.target) {
+								let currentDescription: MountingDescription = this.props.methods.find(
+									(method: MountingDescription) => {
+										return method.id === afterEffect.target;
+									}
+								);
+								if (currentDescription) {
+									if (this.props.methodDescription) {
+										let methodDescription: MethodDescription = this.props.methodDescription;
+										if (methodDescription && currentDescription.methodDescription) {
+											BuildDataChainAfterEffectConverter(
+												{
+													name: afterEffect.name,
+													from: methodDescription,
+                          to: currentDescription.methodDescription,
+                          afterEffectChild: afterEffect.name,
+                          afterEffectParent:  this.props.mountingItem.name
+												},
+												(dataChain: Node) => {
+													afterEffect.dataChain = dataChain.id;
+													this.setState({
+														turn: UIA.GUID()
+													});
+												}
+											);
 										}
-									);
-									if (currentDescription) {
-										if (this.props.methodDescription) {
-											let methodDescription: MethodDescription = this.props.methodDescription;
-										} else if (this.props.previousEffect) {
-											let previousEffect: AfterEffect = this.props.previousEffect;
-											if (previousEffect && previousEffect.target && this.props.methods) {
-												let description: MountingDescription = this.props.methods.find(
-													(method: MountingDescription) => {
-														return method.id === previousEffect.target;
+									} else if (this.props.previousEffect) {
+										let previousEffect: AfterEffect = this.props.previousEffect;
+										if (previousEffect && previousEffect.target && this.props.methods) {
+											let description: MountingDescription = this.props.methods.find(
+												(method: MountingDescription) => {
+													return method.id === previousEffect.target;
+												}
+											);
+											if (
+												description &&
+												currentDescription.methodDescription &&
+												description.methodDescription
+											) {
+												BuildDataChainAfterEffectConverter(
+													{
+														name: afterEffect.name,
+														from: description.methodDescription,
+														to: currentDescription.methodDescription,
+                            afterEffectChild: afterEffect.name,
+                            afterEffectParent:  this.props.mountingItem.name
+													},
+													(dataChain: Node) => {
+														afterEffect.dataChain = dataChain.id;
+														this.setState({
+															turn: UIA.GUID()
+														});
 													}
 												);
-												if (
-													description &&
-													currentDescription.methodDescription &&
-													description.methodDescription
-												) {
-													BuildDataChainAfterEffectConverter(
-														{
-															from: description.methodDescription,
-															to: currentDescription.methodDescription
-														},
-														(dataChain: Node) => {}
-													);
-												}
 											}
 										}
 									}
 								}
-							}}
-							icon="fa fa-gears"
-						/>
-					)}
+							}
+						}}
+						icon="fa fa-gears"
+					/>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);

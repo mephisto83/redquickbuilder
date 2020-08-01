@@ -330,9 +330,10 @@ class EffectContextMenu extends Component<any, any> {
 								</TreeViewMenu>
 								<AfterEffectsComponent
 									agent={agent}
+									mountingItem={effectItem}
 									methods={mode.methods}
-                  afterEffects={effectItem.afterEffects}
-                  methodDescription={effectItem.methodDescription}
+									afterEffects={effectItem.afterEffects}
+									methodDescription={effectItem.methodDescription}
 								/>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
@@ -466,7 +467,7 @@ class EffectContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
-    const menu_width = 350;
+		const menu_width = 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

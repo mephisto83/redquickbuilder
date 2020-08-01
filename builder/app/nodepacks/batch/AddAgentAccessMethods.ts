@@ -134,7 +134,7 @@ function buildMethodDescriptionFunctions(
 	agentAccess: Node,
 	agent: any,
 	model: any,
-	mounting?: MountingDescription
+	mounting: MountingDescription
 ) {
 	if (methodDescription && methodDescription.functionType) {
 		let functionType = methodDescription.functionType;

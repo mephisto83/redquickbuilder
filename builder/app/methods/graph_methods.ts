@@ -3060,7 +3060,7 @@ export function updateNodePropertyDirty(graph: any, options: any) {
 	}
 	return graph;
 }
-function codeTypeWord(x: any) {
+export function codeTypeWord(x: any) {
 	if (typeof x === 'string') {
 		return x
 			.split('')

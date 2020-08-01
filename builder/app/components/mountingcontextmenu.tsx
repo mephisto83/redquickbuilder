@@ -388,7 +388,8 @@ class ContextMenu extends Component<any, any> {
 								<AfterEffectsComponent
 									agent={agent}
 									methods={mode.methods}
-                  methodDescription={mountingItem.methodDescription}
+									mountingItem={mountingItem}
+									methodDescription={mountingItem.methodDescription}
 									afterEffects={mountingItem.afterEffects}
 								/>
 								<TreeViewButtonGroup>
@@ -515,8 +516,8 @@ class ContextMenu extends Component<any, any> {
 		const menuMode = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) || {};
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
-    const defaultMenus = this.getDefaultMenu(menuMode);
-    const menu_width = 350;
+		const defaultMenus = this.getDefaultMenu(menuMode);
+		const menu_width = 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

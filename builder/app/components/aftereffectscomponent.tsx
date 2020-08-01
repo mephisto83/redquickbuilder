@@ -49,6 +49,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 							methodDescription={index ? null : this.props.methodDescription}
 							previousEffect={index ? afterEffects[index - 1] : null}
 							api={this.props.api}
+							mountingItem={this.props.mountingItem}
 							methods={this.props.methods}
 							onChange={() => {
 								if (this.props.onChange) {
