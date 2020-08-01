@@ -342,6 +342,7 @@ export const NodeProperties = {
 	UseDefaultValue: 'UseDefaultValue',
 	DefaultValue: 'DefaultValue',
 	HoverStyle: ':hover',
+	AfterEffectMethodChain: 'AfterEffectMethodChain',
 	IsHomeView: 'IsHomeView',
 	AsLocalContext: 'AsLocalContext',
 	DataChainName: 'DataChainName',

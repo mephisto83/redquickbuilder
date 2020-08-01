@@ -77,6 +77,7 @@ export interface AfterEffect {
 	dataChain: string;
 	targetType: TargetMethodType;
 	target: string;
+	afterEffectNode?: string;
 }
 
 export enum TargetMethodType {
