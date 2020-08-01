@@ -28,7 +28,7 @@ import {
 	Effect,
 	EffectDescription,
 	ScreenEffectApi,
-  AfterEffect
+	AfterEffect
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -53,7 +53,6 @@ class ScreenEffectContextMenu extends Component<any, any> {
 		const result: any = [];
 		let { agent } = mode;
 		let screenEffectApis: ScreenEffectApi[] = mode.screenEffectApis;
-		let afterEffects: AfterEffect[] = mode.afterEffects;
 		if (screenEffectApis) {
 			const exit = () => {
 				this.props.setVisual(UIA.AGENT_SCREENEFFECT_CONTEXT_MENU, null);
@@ -71,9 +70,6 @@ class ScreenEffectContextMenu extends Component<any, any> {
 							api
 							screenEffects={screenEffectApis}
 						/>
-					);
-					result.push(
-						<AfterEffectsComponent agent={agent} methods={mode.methods} afterEffects={afterEffects} />
 					);
 					break;
 			}

@@ -346,6 +346,25 @@ class ContextMenu extends Component<any, any> {
 									/>
 								</TreeViewItemContainer>
 								<TreeViewMenu
+									title={'Method Props'}
+									open={this.state.methodProps}
+									active
+									onClick={() => {
+										this.setState({ methodProps: !this.state.methodProps });
+									}}
+								>
+									<TreeViewItemContainer>
+										<CheckBox
+											label={Titles.ExcludeFromController}
+											onChange={(value: boolean) => {
+												mountingItem.excludeFromController = value;
+												this.setState({ turn: UIA.GUID() });
+											}}
+											value={mountingItem.excludeFromController}
+										/>
+									</TreeViewItemContainer>
+								</TreeViewMenu>
+								<TreeViewMenu
 									title={'Screen to API'}
 									open={this.state.screenToApi}
 									active
@@ -369,6 +388,7 @@ class ContextMenu extends Component<any, any> {
 								<AfterEffectsComponent
 									agent={agent}
 									methods={mode.methods}
+                  methodDescription={mountingItem.methodDescription}
 									afterEffects={mountingItem.afterEffects}
 								/>
 								<TreeViewButtonGroup>
@@ -495,7 +515,8 @@ class ContextMenu extends Component<any, any> {
 		const menuMode = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) || {};
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
-		const defaultMenus = this.getDefaultMenu(menuMode);
+    const defaultMenus = this.getDefaultMenu(menuMode);
+    const menu_width = 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -503,7 +524,7 @@ class ContextMenu extends Component<any, any> {
 					style={{
 						zIndex: 1000,
 						position: 'fixed',
-						width: this.state.secondaryMenu ? 500 : 250,
+						width: this.state.secondaryMenu ? 500 : menu_width,
 						display,
 						top: 250,
 						left: 500

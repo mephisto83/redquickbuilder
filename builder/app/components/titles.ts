@@ -109,6 +109,7 @@ export const Color = 'Color';
 export const FontWeight = 'Font Weight';
 export const UserOfAgentType = 'User of agent type';
 export const FontStyle = 'Font Style';
+export const Target = 'Target';
 export const FontVariant = 'Font Variant';
 export const IsUserOfAgentType = 'Is User Of Agent Type';
 export const TargetType = 'Target Type';

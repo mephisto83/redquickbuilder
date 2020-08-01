@@ -393,6 +393,7 @@ class DashboardMountingContenxt extends Component<any, any> {
 								<AfterEffectsComponent
 									agent={agent}
 									methods={mode.methods}
+                  methodDescription={effectItem.methodDescription}
 									afterEffects={mountingItem.afterEffects}
 								/>
 								<TreeViewButtonGroup>

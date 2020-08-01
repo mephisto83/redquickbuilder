@@ -18,6 +18,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -41,15 +42,29 @@ export default class AfterEffectsComponent extends Component<any, any> {
 						icon="fa fa-plus"
 					/>
 				</TreeViewButtonGroup>
-				{(afterEffects || []).map((afterEffect: AfterEffect) => {
+				{(afterEffects || []).map((afterEffect: AfterEffect, index: number) => {
 					return (
 						<AfterEffectComponent
 							key={afterEffect.id}
-              api={this.props.api}
-              methods={this.props.methods}
+							methodDescription={index ? null : this.props.methodDescription}
+							previousEffect={index ? afterEffects[index - 1] : null}
+							api={this.props.api}
+							methods={this.props.methods}
 							onChange={() => {
 								if (this.props.onChange) {
 									this.props.onChange();
+								}
+							}}
+							onDirection={(direction: number) => {
+								let index: number = afterEffects.findIndex((v) => v.id === afterEffect.id);
+								if (index !== -1 && afterEffects) {
+									let moveme: AfterEffect[] = afterEffects.splice(index, 1);
+									if (index > 0) {
+										afterEffects.splice(index + direction, 0, ...moveme);
+									} else {
+										afterEffects.push(...moveme);
+									}
+									this.setState({ turn: UIA.GUID() });
 								}
 							}}
 							agent={this.props.agent}

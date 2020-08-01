@@ -11,7 +11,13 @@ import SelectInput from './selectinput';
 import TextBox from './textinput';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
-import { AfterEffect, TargetMethodType, EffectDescription, MountingDescription } from '../interface/methodprops';
+import {
+	AfterEffect,
+	TargetMethodType,
+	EffectDescription,
+	MountingDescription,
+	MethodDescription
+} from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -19,6 +25,7 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
+import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 
 export default class AfterEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -57,22 +64,6 @@ export default class AfterEffectComponent extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
-						label={Titles.DataChain}
-						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={afterEffect.dataChain}
-						onChange={(value: string) => {
-							afterEffect.dataChain = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
-				<TreeViewItemContainer>
-					<SelectInput
 						label={Titles.TargetType}
 						options={Object.values(TargetMethodType).map((v) => ({ title: v, value: v }))}
 						value={afterEffect.targetType}
@@ -89,12 +80,28 @@ export default class AfterEffectComponent extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
-						label={Titles.TargetType}
+						label={Titles.Target}
 						options={(methods || [])
 							.map((v: MountingDescription | EffectDescription) => ({ title: v.name, value: v.id }))}
-						value={afterEffect.targetType}
+						value={afterEffect.target}
 						onChange={(value: string) => {
 							afterEffect.target = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<SelectInput
+						label={Titles.DataChain}
+						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
+						value={afterEffect.dataChain}
+						onChange={(value: string) => {
+							afterEffect.dataChain = value;
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -117,6 +124,62 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 						icon="fa fa-minus"
 					/>
+					<TreeViewGroupButton
+						title={`Up`}
+						onClick={() => {
+							if (this.props.onDirection) this.props.onDirection(1);
+						}}
+						icon="fa fa-arrow-up"
+					/>
+					<TreeViewGroupButton
+						title={`Down`}
+						onClick={() => {
+							if (this.props.onDirection) this.props.onDirection(-1);
+						}}
+						icon="fa fa-arrow-down"
+					/>
+					{afterEffect.dataChain ? null : (
+						<TreeViewGroupButton
+							title={`Build Datachain`}
+							onClick={() => {
+								if (afterEffect && afterEffect.target) {
+									let currentDescription: MountingDescription = this.props.methods.find(
+										(method: MountingDescription) => {
+											return method.id === afterEffect.target;
+										}
+									);
+									if (currentDescription) {
+										if (this.props.methodDescription) {
+											let methodDescription: MethodDescription = this.props.methodDescription;
+										} else if (this.props.previousEffect) {
+											let previousEffect: AfterEffect = this.props.previousEffect;
+											if (previousEffect && previousEffect.target && this.props.methods) {
+												let description: MountingDescription = this.props.methods.find(
+													(method: MountingDescription) => {
+														return method.id === previousEffect.target;
+													}
+												);
+												if (
+													description &&
+													currentDescription.methodDescription &&
+													description.methodDescription
+												) {
+													BuildDataChainAfterEffectConverter(
+														{
+															from: description.methodDescription,
+															to: currentDescription.methodDescription
+														},
+														(dataChain: Node) => {}
+													);
+												}
+											}
+										}
+									}
+								}
+							}}
+							icon="fa fa-gears"
+						/>
+					)}
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
