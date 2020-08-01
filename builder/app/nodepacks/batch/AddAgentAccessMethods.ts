@@ -237,22 +237,29 @@ function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescr
 					newAfterEffect = createAfterEffect(methodDescription.methodId);
 					afterEffect.afterEffectNode = newAfterEffect.id;
 				}
-				AddLinkBetweenNodes(
-					newAfterEffect.id,
-					afterEffect.dataChain,
-					LinkProperties.DataChainAfterEffectConverter
-				);
+				graphOperation(
+					AddLinkBetweenNodes(
+						newAfterEffect.id,
+						afterEffect.dataChain,
+						LinkProperties.DataChainAfterEffectConverter
+					)
+				)(GetDispatchFunc(), GetStateFunc());
+
 				let targetDescription = collectedMountingDescriptions.find(
 					(d: MountingDescription) => d.id === afterEffect.target
 				);
 				if (targetDescription && targetDescription.methodDescription) {
-					AddLinkBetweenNodes(
-						newAfterEffect.id,
-						targetDescription.methodDescription.methodId,
-						LinkProperties.DataChainAfterEffectConverterTarget
-					);
+					graphOperation(
+						AddLinkBetweenNodes(
+							newAfterEffect.id,
+							targetDescription.methodDescription.methodId,
+							LinkProperties.DataChainAfterEffectConverterTarget
+						)
+					)(GetDispatchFunc(), GetStateFunc());
 				} else {
-					throw new Error('missing mounting description for target node: AddAgentAccessMethods.ts(SetupAfterEffects)');
+					throw new Error(
+						'missing mounting description for target node: AddAgentAccessMethods.ts(SetupAfterEffects)'
+					);
 				}
 			});
 			updateComponentProperty(
