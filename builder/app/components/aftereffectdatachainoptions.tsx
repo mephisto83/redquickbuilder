@@ -27,6 +27,8 @@ import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
+import AfterEffectCheckExistanceConfig from './aftereffectcheckexistanceconfig';
+import AfterEffectGetExistanceConfig from './aftereffectgetexistanceconfig';
 
 export default class AfterEffectDataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -63,9 +65,8 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 		if (!previousMethodDescription || !currentDescription || !currentDescription.methodDescription) {
 			return <span />;
 		}
-    let currentMethodDescription: MethodDescription = currentDescription.methodDescription;
+		let currentMethodDescription: MethodDescription = currentDescription.methodDescription;
 
-		debugger;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -76,22 +77,16 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 				active
 				title={Titles.Configuration}
 			>
-				<TreeViewItemContainer>
-					<SelectInput
-						label={Titles.DataChain}
-						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={afterEffect.dataChain}
-						onChange={(value: string) => {
-							afterEffect.dataChain = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
+				<AfterEffectCheckExistanceConfig
+					previousMethodDescription={previousMethodDescription}
+					currentMethodDescription={currentMethodDescription}
+					dataChainOptions={afterEffect.dataChainOptions}
+				/>
+				<AfterEffectGetExistanceConfig
+					previousMethodDescription={previousMethodDescription}
+					currentMethodDescription={currentMethodDescription}
+					dataChainOptions={afterEffect.dataChainOptions}
+				/>
 				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);

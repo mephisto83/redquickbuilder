@@ -71,8 +71,100 @@ export interface MountingDescription {
 	excludeFromController: boolean;
 }
 export interface AfterEffectDataChainConfiguration {
-
+	checkExistence?: AfterEffectCheckExistence;
+	getExisting?: AfterEffectGetExisting;
+	setProperties?: AfterEffectSetProperties;
 }
+
+export interface AfterEffectSetProperties {
+	properties: AfterEffectSetProperty[];
+}
+export function CreateSetProperties(): AfterEffectSetProperties {
+	return {
+		properties: []
+	};
+}
+export interface AfterEffectSetProperty {
+	relationType: SetPropertyType;
+	agentProperty: string; // The property used to find the model.
+	modelProperty: string; // The property used to find the model
+	targetProperty: string;
+	floatValue: string;
+	doubleValue: string;
+	integerValue: string;
+	stringValue: string;
+	enumerationValue: string;
+}
+export enum SetPropertyType {
+	Property = 'Property',
+	Enumeration = 'Enumeration',
+	String = 'String',
+	Integer = 'Integer',
+	Float = 'Float',
+	Double = 'Double'
+}
+
+export function CreateCheckExistence(): AfterEffectCheckExistence {
+	return {
+		relationType: RelationType.Agent,
+		agentProperty: '',
+		modelProperty: '',
+		targetProperty: '',
+		enabled: false,
+		skipSettings: SkipSettings.DontSkip
+	};
+}
+export function CreateGetExistence(): AfterEffectGetExisting {
+	return {
+		relationType: RelationType.Agent,
+		agentProperty: '',
+		modelProperty: '',
+		targetProperty: '',
+		enabled: false
+	};
+}
+export interface AfterEffectRelations extends AfterEffectConfigItem {
+	relationType: RelationType;
+	agentProperty: string; // The property used to find the model.
+	modelProperty: string; // The property used to find the model
+	targetProperty: string;
+}
+export interface AfterEffectCheckExistence extends AfterEffectRelations {
+	skipSettings: SkipSettings;
+}
+export interface AfterEffectGetExisting extends AfterEffectRelations {}
+/**
+ * Describes how the model will be found
+ */
+export enum RelationType {
+	Agent = 'Agent',
+	Model = 'Model'
+}
+export enum SkipSettings {
+	SkipIfTrue = 'Skip If True',
+	SkipIfFlase = 'Skip If False',
+	DontSkip = 'Dont Skip'
+}
+export interface AfterEffectConfigItem {
+	enabled: boolean;
+}
+
+export function CheckIsExisting(isExisting: AfterEffectCheckExistence) {
+	return isExisting.enabled &&
+	isExisting.targetProperty &&
+	(isExisting.relationType === RelationType.Agent ? isExisting.agentProperty : isExisting.modelProperty)
+		? true
+		: false;
+}
+
+export function CheckGetExisting(getExisting: AfterEffectGetExisting) {
+	return getExisting.enabled &&
+	getExisting.targetProperty &&
+	(getExisting.relationType === RelationType.Agent ? getExisting.agentProperty : getExisting.modelProperty)
+		? true
+		: false;
+}
+
 export interface AfterEffect {
 	dataChainOptions: AfterEffectDataChainConfiguration;
 	id: string;
