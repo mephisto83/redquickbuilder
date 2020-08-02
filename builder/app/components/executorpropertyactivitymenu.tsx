@@ -15,6 +15,7 @@ import { Validator, Node } from '../methods/graph_types';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctions, DataChainFunctionKeys } from '../constants/datachain';
+import BuildLambda, { LambdaTypes } from './lambda/BuildLambda';
 
 class ExecutorPropertyActivityMenu extends Component<any, any> {
 	render() {
@@ -114,7 +115,10 @@ class ExecutorPropertyActivityMenu extends Component<any, any> {
 														[NodeProperties.CSEntryPoint]: true,
 														[NodeProperties.AsOutput]: true,
 														[NodeProperties.DataChainFunctionType]:
-															DataChainFunctionKeys.Lambda
+															DataChainFunctionKeys.Lambda,
+														[NodeProperties.Lambda]: BuildLambda({
+															lambdaType: LambdaTypes.ExecutorItem
+														})
 													},
 													(newNode: Node) => {
 														value = newNode.id;
@@ -122,7 +126,8 @@ class ExecutorPropertyActivityMenu extends Component<any, any> {
 												)
 											])(UIA.GetDispatchFunc(), UIA.GetStateFunc());
 											if (value) {
-												item.node = value;
+                        item.node = value;
+                        UIA.AddInsertArgumentsForDataChain(value);
 												UIA.updateComponentProperty(value, NodeProperties.Pinned, true);
 											}
 											this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

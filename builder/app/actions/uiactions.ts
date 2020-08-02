@@ -8,7 +8,7 @@ import { NavigateTypes } from '../constants/nodetypes';
 import { MethodFunctions, bindTemplate, bindReferenceTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4, addNewLine } from '../utils/array';
-import { getReferenceInserts } from '../utils/utilservice';
+import { getReferenceInserts, getJSONReferenceInserts } from '../utils/utilservice';
 import { buildValidation } from '../service/validation_js_service';
 import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
@@ -18,6 +18,7 @@ import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject } from '../jobs/interfaces';
 import { RouteSourceType, RouteSource } from '../interface/methodprops';
+import { ReferenceInsert } from '../components/lambda/BuildLambda';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -389,6 +390,54 @@ export function CreateNewNode(props: any, callback?: Function) {
 			}
 		}
 	];
+}
+
+export function AddInsertArgumentsForDataChain(id: string) {
+	let lambdaText = GetNodeProp(id, NodeProperties.Lambda);
+	const value = GetNodeProp(id, NodeProperties.LambdaInsertArguments) || {};
+	getJSONReferenceInserts(lambdaText || '')
+		.map((v) => v.substr(2, v.length - 4))
+		.map((v: string) => {
+			return JSON.parse(v);
+		})
+		.unique((_insert: ReferenceInsert) => {
+			return _insert.key;
+		})
+		.map((_insert: ReferenceInsert) => {
+			// const temp = _insert.split('@');
+			// const insert = temp.length > 1 ? temp[1] : temp[0];
+			// const args = insert.split('~');
+			// const model = args[0];
+			// const property = args[1];
+			// let types = args.subset(1);
+			// if (!types.length) {
+			//   types = [ NodeTypes.Model, NodeTypes.Enumeration ];
+			// }
+			if (_insert.model) {
+				if (_insert.property) {
+					value[_insert.key] = _insert.property;
+				} else {
+					value[_insert.key] = _insert.model;
+				}
+			}
+			// const nodes = property
+			//   ? GetNodesLinkedTo(null, {
+			//       id: value[model],
+			//       link: LinkType.PropertyLink
+			//     })
+			//   : NodesByType(state, types); //  NodesByType(null, NodeTypes.Property);
+			// return (
+			//   <SelectInputProperty
+			//     label={property ? `${model}.${property}` : model}
+			//     model={property || model}
+			//     valueObj={value}
+			//     value={property ? value[property] : value[model]}
+			//     node={currentNode}
+			//     options={nodes.toNodeSelect()}
+			//   />
+			// );
+		});
+	updateComponentProperty(id, NodeProperties.LambdaInsertArguments, value);
 }
 export function SetSharedComponent(args: any) {
 	const { properties, target, source, viewType, uiType, isPluralComponent, graph } = args;

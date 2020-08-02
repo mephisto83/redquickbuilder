@@ -103,6 +103,31 @@ export function getReferenceInserts(str = "") {
 
   return result;
 }
+export function getJSONReferenceInserts(str = "") {
+  ///\${[a-zA-Z0-9]*}
+  const regex = /\#{[a-zA-Z0-9_@|\-\'\" ~]*}\#/gm;
+
+  let m;
+  let result: string[] = [];
+  let regexes = [regex];
+  regexes.map(regex => {
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach((match, groupIndex) => {
+        if (match) {
+          result.push(match);
+        }
+      });
+    }
+  });
+
+  return result;
+}
 export function getGuids(str = "") {
   const regex = /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/gm;
   let m;
