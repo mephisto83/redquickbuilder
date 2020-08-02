@@ -2184,15 +2184,20 @@ export const ExecutorRules = {
 	DataChain: 'data-chain'
 };
 export const ExecutorUI: any = {
-  [ExecutorRules.DataChain]: {
+	[ExecutorRules.DataChain]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'DataChain'
 		},
 		arguments: {
-			...COMMON_STRING_ARGS,
-			nodeType: NodeTypes.Model,
+      nodeType: NodeTypes.DataChain,
 			reference: {
-				types: [ NodeTypes.Model ]
+				types: [ NodeTypes.DataChain ],
+        title: NodeTypes.DataChain,
+				properties: {
+					[NodeProperties.CS]: true,
+					[NodeProperties.NODEType]: NodeTypes.DataChain,
+					[NodeProperties.CSEntryPoint]: true
+				}
 			}
 		}
 	},

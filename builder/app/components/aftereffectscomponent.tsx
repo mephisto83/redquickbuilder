@@ -34,7 +34,8 @@ export default class AfterEffectsComponent extends Component<any, any> {
 								name: '',
 								dataChain: '',
 								targetType: TargetMethodType.Effect,
-								target: ''
+								target: '',
+								dataChainOptions: {}
 							});
 
 							this.setState({ turn: UIA.GUID() });

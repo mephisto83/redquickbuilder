@@ -30,7 +30,15 @@ import {
 	GetLink
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
-import { Graph, Node, GraphLink, ComponentLayoutContainer, ComponentLayout } from './graph_types';
+import {
+	Graph,
+	Node,
+	GraphLink,
+	ComponentLayoutContainer,
+	ComponentLayout,
+	Validator,
+	ValidatorItem
+} from './graph_types';
 
 const os = require('os');
 
@@ -593,7 +601,7 @@ export function clearGroup(graph: any, ops: any) {
 
 	return graph;
 }
-export function createValidator() {
+export function createValidator(): Validator {
 	return {
 		properties: {}
 	};
@@ -697,7 +705,10 @@ export function hasValidator(validator: any, options: any) {
 
 	return false;
 }
-export function addValidatator(validator: any, options: any) {
+export function addValidatator(
+	validator: Validator,
+	options: { id: string; validator: string; validatorArgs: ValidatorItem }
+): Validator {
 	validator.properties[options.id] = validator.properties[options.id] || createValidatorProperty();
 	if (options.validator) validator.properties[options.id].validators[options.validator] = options.validatorArgs;
 
@@ -714,7 +725,7 @@ export function removeValidator(validator: any, options: any) {
 	return validator;
 }
 
-export function getValidatorItem(item: any, options: any) {
+export function getValidatorItem(item: Validator, options: { property: string; validator: string }): ValidatorItem {
 	const { property, validator } = options;
 	return item.properties[property].validators[validator];
 }
@@ -1253,6 +1264,7 @@ function updateNode(node: Node, options: { node: { properties: any } }) {
 		Object.keys(options.node.properties).forEach((propKey) => {
 			if (node.properties[propKey] !== options.node.properties[propKey]) {
 				node.properties[propKey] = options.node.properties[propKey];
+				node.propertyVersions = node.propertyVersions || {};
 				node.propertyVersions[propKey] = (node.propertyVersions[propKey] || 0) + 1;
 			}
 		});
@@ -2802,7 +2814,7 @@ export function executeRemoveEvents(graph: any, link: { properties: { on: { [x: 
 	}
 	return graph;
 }
-export function isUIExtensionEnumerable(node: any) {
+export function isUIExtensionEnumerable(node: string) {
 	const _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
 	if (_node && _node.config) {
 		return _node.config.isEnumeration;
@@ -3076,7 +3088,8 @@ function cssTypeWord(x: any) {
 			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_ '.indexOf(y.toLowerCase()) !== -1)
 			.join('')
 			.split(' ')
-			.join('-').toLowerCase();
+			.join('-')
+			.toLowerCase();
 	}
 	return x;
 }
