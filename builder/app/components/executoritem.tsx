@@ -78,8 +78,7 @@ class ExecutorItem extends Component<any, any> {
 								UIA.GetNodeProp(x, NodeProperties.NODEType) === UIA.NodeTypes.ExtensionType
 									? isUIExtensionEnumerable(x)
 									: true
-						)
-						.filter((v: Node) => {});
+						);
 
 					validator = validator || UIA.GetNodeProp(currentNode, NodeProperties.Executor) || createValidator();
 					let item = getValidatorItem(validator, {
