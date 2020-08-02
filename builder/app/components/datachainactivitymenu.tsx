@@ -29,6 +29,7 @@ import CheckBoxProperty from './checkboxproperty';
 import Typeahead from './typeahead';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
+import { GetJSONReferenceInserts, ReferenceInsert } from './lambda/BuildLambda';
 
 class DataChainActvityMenu extends Component<any, any> {
 	getLambdaVariableTree() {
@@ -81,47 +82,78 @@ class DataChainActvityMenu extends Component<any, any> {
 		let inserts = [];
 
 		if (lambda) {
-			const lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda);
-			inserts = getReferenceInserts(lambdaText || '')
-				.map((v) => v.substr(2, v.length - 3))
-				.unique((_insert) => {
-					const temp = _insert.split('@');
-					const insert = temp.length > 1 ? temp[1] : temp[0];
-					const args = insert.split('~').filter((x) => x);
-					const property = args[0];
-					if (args.length > 1) {
-						return args[1];
-					}
-					return property || _insert;
-				})
-				.map((_insert) => {
-					const temp = _insert.split('@');
-					const insert = temp.length > 1 ? temp[1] : temp[0];
-					const args = insert.split('~');
-					const model = args[0];
-					const property = args[1];
-					let types = args.subset(1);
-					if (!types.length) {
+			const lambdaText = UIA.GetNodeProp(currentNode, NodeProperties.Lambda) || '';
+			let temp = GetJSONReferenceInserts(lambdaText);
+			const lambdaInsertArgumentValues = UIA.GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
+			if (temp && temp.length) {
+				inserts = temp.map((refInsert: ReferenceInsert) => {
+					let { property, model, types } = refInsert;
+
+					if (!types || !types.length) {
 						types = [ NodeTypes.Model, NodeTypes.Enumeration ];
 					}
-					const value = UIA.GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
-					const nodes = property
-						? GetNodesLinkedTo(null, {
-								id: value[model],
-								link: LinkType.PropertyLink
-							})
-						: UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
+					const nodes =
+						property && model
+							? GetNodesLinkedTo(null, {
+									id: lambdaInsertArgumentValues[model],
+									link: LinkType.PropertyLink
+								})
+							: UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
+
 					return (
 						<SelectInputProperty
 							label={property ? `${model}.${property}` : model}
 							model={property || model}
-							valueObj={value}
-							value={property ? value[property] : value[model]}
+							valueObj={lambdaInsertArgumentValues}
+							value={property ? lambdaInsertArgumentValues[property] : lambdaInsertArgumentValues[model]}
 							node={currentNode}
 							options={nodes.toNodeSelect()}
 						/>
 					);
 				});
+			} else {
+				inserts = getReferenceInserts(lambdaText)
+					.map((v) => v.substr(2, v.length - 3))
+					.unique((_insert: any) => {
+						const temp = _insert.split('@');
+						const insert = temp.length > 1 ? temp[1] : temp[0];
+						const args = insert.split('~').filter((x) => x);
+						const property = args[0];
+						if (args.length > 1) {
+							return args[1];
+						}
+						return property || _insert;
+					})
+					.map((_insert: any) => {
+						const temp = _insert.split('@');
+						const insert = temp.length > 1 ? temp[1] : temp[0];
+						const args = insert.split('~');
+						const model = args[0];
+						const property = args[1];
+						let types = args.subset(1);
+						if (!types.length) {
+							types = [ NodeTypes.Model, NodeTypes.Enumeration ];
+						}
+						const nodes = property
+							? GetNodesLinkedTo(null, {
+									id: lambdaInsertArgumentValues[model],
+									link: LinkType.PropertyLink
+								})
+							: UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
+						return (
+							<SelectInputProperty
+								label={property ? `${model}.${property}` : model}
+								model={property || model}
+								valueObj={lambdaInsertArgumentValues}
+								value={
+									property ? lambdaInsertArgumentValues[property] : lambdaInsertArgumentValues[model]
+								}
+								node={currentNode}
+								options={nodes.toNodeSelect()}
+							/>
+						);
+					});
+			}
 		}
 		const showDataChainRef = DataChainFunctions[dataChainFuncType]
 			? DataChainFunctions[dataChainFuncType].ui.dataref
@@ -259,7 +291,7 @@ class DataChainActvityMenu extends Component<any, any> {
 									{
 										[NodeProperties.Agent]: value,
 										[NodeProperties.NODEType]: NodeTypes.UserOfAgentType,
-										[NodeProperties.UIText]: `${UIA.GetNodeTitle(value)} as agent`,
+										[NodeProperties.UIText]: `${UIA.GetNodeTitle(value)} as agent`
 									},
 									(newNode: Node) => {
 										createdNode = newNode;

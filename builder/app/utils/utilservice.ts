@@ -105,7 +105,7 @@ export function getReferenceInserts(str = "") {
 }
 export function getJSONReferenceInserts(str = "") {
   ///\${[a-zA-Z0-9]*}
-  const regex = /\#{[a-zA-Z0-9_@|\-\'\" ~]*}\#/gm;
+  const regex = /\#{[a-zA-Z0-9_@|\-\{\}\:\'\" ~]*}\#/gm;
 
   let m;
   let result: string[] = [];

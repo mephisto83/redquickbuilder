@@ -130,3 +130,7 @@ export interface Enumeration {
 	value: string;
 	id: string;
 }
+
+export interface LambdaInserts {
+	[str: string]: string;
+}
