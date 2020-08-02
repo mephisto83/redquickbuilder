@@ -9,6 +9,7 @@ import TabPane from './tabpane';
 import * as Titles from './titles';
 import SelectInputProperty from './selectinputproperty';
 import CheckBox from './checkbox';
+import SelectLambdaInsertProperty from './selectlambdainsertproperty';
 import {
 	NodeProperties,
 	NodeTypes,
@@ -17,7 +18,9 @@ import {
 	NavigateTypes,
 	CODE_EDITOR,
 	MAIN_CONTENT,
-	LinkProperties
+	LinkProperties,
+	NodePropertyTypesByLanguage,
+  ProgrammingLanguages
 } from '../constants/nodetypes';
 import { GetNodesLinkedTo, NodesByType, GetNodeProp, GetNodeLinkedTo } from '../methods/graph_methods';
 import { MethodFunctions } from '../constants/functiontypes';
@@ -29,7 +32,7 @@ import CheckBoxProperty from './checkboxproperty';
 import Typeahead from './typeahead';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import { GetJSONReferenceInserts, ReferenceInsert } from './lambda/BuildLambda';
+import { GetJSONReferenceInserts, ReferenceInsert, ReferenceInsertType } from './lambda/BuildLambda';
 
 class DataChainActvityMenu extends Component<any, any> {
 	getLambdaVariableTree() {
@@ -87,27 +90,38 @@ class DataChainActvityMenu extends Component<any, any> {
 			const lambdaInsertArgumentValues = UIA.GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
 			if (temp && temp.length) {
 				inserts = temp.map((refInsert: ReferenceInsert) => {
-					let { property, model, types } = refInsert;
+					let { types, key, model, type = ReferenceInsertType.Model } = refInsert;
 
 					if (!types || !types.length) {
 						types = [ NodeTypes.Model, NodeTypes.Enumeration ];
 					}
-					const nodes =
-						property && model
-							? GetNodesLinkedTo(null, {
-									id: lambdaInsertArgumentValues[model],
-									link: LinkType.PropertyLink
-								})
-							: UIA.NodesByType(state, types); //  UIA.NodesByType(null, NodeTypes.Property);
+					lambdaInsertArgumentValues[key] = lambdaInsertArgumentValues[key] || {};
+					let nodes: any[] = [];
+					switch (type) {
+						case ReferenceInsertType.Property:
+							nodes = GetNodesLinkedTo(null, {
+								id: model ? lambdaInsertArgumentValues[model][ReferenceInsertType.Model] : null,
+								link: LinkType.PropertyLink
+							}).toNodeSelect();
+							break;
+						case ReferenceInsertType.Type:
+							nodes = Object.values(
+								NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP]
+							).map((v: string) => ({ title: v, value: v }));
+							break;
+						default:
+							nodes = UIA.NodesByType(state, types).toNodeSelect(); //  UIA.NodesByType(null, NodeTypes.Property);
+							break;
+					}
 
 					return (
-						<SelectInputProperty
-							label={property ? `${model}.${property}` : model}
-							model={property || model}
-							valueObj={lambdaInsertArgumentValues}
-							value={property ? lambdaInsertArgumentValues[property] : lambdaInsertArgumentValues[model]}
+						<SelectLambdaInsertProperty
+							label={key}
+							type={type}
+							valueKey={key}
+							value={lambdaInsertArgumentValues}
 							node={currentNode}
-							options={nodes.toNodeSelect()}
+							options={nodes}
 						/>
 					);
 				});

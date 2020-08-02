@@ -10,7 +10,13 @@ export interface ReferenceInsert {
 	key: string;
 	model?: string;
 	property?: string;
+	type?: ReferenceInsertType;
 	types?: string[];
+}
+export enum ReferenceInsertType {
+	Model = 'model',
+	Property = 'property',
+	Type = 'type'
 }
 export function executorItemType(args: LambdaBuildArgs) {
 	return `

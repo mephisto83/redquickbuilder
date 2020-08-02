@@ -11,13 +11,11 @@ import {
 	GetNodeProp
 } from '../actions/uiactions';
 import { NodeProperties } from '../constants/nodetypes';
-class SelectInputProperty extends Component<any, any> {
+class SelectLambdaInsertProperty extends Component<any, any> {
 	render() {
-		let { state, value, model, valueObj } = this.props;
+		let { value, type, valueKey } = this.props;
 		let currentNode = this.props.node;
-		if (typeof valueObj === 'object') {
-			value = valueObj;
-		}
+
 		return (
 			<SelectInput
 				onChange={(_value: string) => {
@@ -26,8 +24,8 @@ class SelectInputProperty extends Component<any, any> {
 						target: GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments),
 						source: id
 					});
-
-					value[model] = _value;
+					value[valueKey] = value[valueKey] || {};
+					value[valueKey][type] = _value;
 					this.props.graphOperation(CHANGE_NODE_PROPERTY, {
 						prop: NodeProperties.LambdaInsertArguments,
 						id,
@@ -40,11 +38,11 @@ class SelectInputProperty extends Component<any, any> {
 					});
 				}}
 				label={this.props.label}
-				value={this.props.value}
+				value={value && value[valueKey] ? value[valueKey][type] : null}
 				options={this.props.options}
 			/>
 		);
 	}
 }
 
-export default UIConnect(SelectInputProperty);
+export default UIConnect(SelectLambdaInsertProperty);
