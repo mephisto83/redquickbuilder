@@ -44,10 +44,10 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 		if (!dataChainOptions) {
 			return <span />;
 		}
-		dataChainOptions.CheckExistence = dataChainOptions.CheckExistence || CreateCheckExistence();
+		dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 		let previousMethodDescription: MethodDescription = this.props.previousMethodDescription;
 		let currentMethodDescription: MethodDescription = this.props.currentMethodDescription;
-		let checkExistence = dataChainOptions.CheckExistence;
+		let checkExistence = dataChainOptions.checkExistence;
 		let properties: any[] = [];
 		let targetProperties: any[] = [];
 		if (previousMethodDescription && checkExistence && checkExistence.relationType) {

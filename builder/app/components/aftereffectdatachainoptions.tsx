@@ -16,7 +16,8 @@ import {
 	TargetMethodType,
 	EffectDescription,
 	MountingDescription,
-	MethodDescription
+	MethodDescription,
+  CheckAfterEffectDataChainConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -29,6 +30,7 @@ import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildData
 import { mount } from 'enzyme';
 import AfterEffectCheckExistanceConfig from './aftereffectcheckexistanceconfig';
 import AfterEffectGetExistanceConfig from './aftereffectgetexistanceconfig';
+import AfterEffectSetPropertiesConfig from './aftereffectsetpropertiesconfig';
 
 export default class AfterEffectDataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -66,11 +68,18 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 			return <span />;
 		}
 		let currentMethodDescription: MethodDescription = currentDescription.methodDescription;
-
+		let onchange = () => {
+			this.setState({
+				turn: UIA.GUID()
+			});
+			if (this.props.onChange) {
+				this.props.onChange();
+			}
+		};
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={'fa fa-circle-o'}
+				icon={CheckAfterEffectDataChainConfiguration(afterEffect.dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -81,11 +90,19 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
 					dataChainOptions={afterEffect.dataChainOptions}
+					onChange={onchange}
 				/>
 				<AfterEffectGetExistanceConfig
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
 					dataChainOptions={afterEffect.dataChainOptions}
+					onChange={onchange}
+				/>
+				<AfterEffectSetPropertiesConfig
+					previousMethodDescription={previousMethodDescription}
+					currentMethodDescription={currentMethodDescription}
+					dataChainOptions={afterEffect.dataChainOptions}
+					onChange={onchange}
 				/>
 				<TreeViewButtonGroup />
 			</TreeViewMenu>

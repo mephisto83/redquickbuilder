@@ -308,7 +308,10 @@ export default class ExecutorGenerator {
 									template = `result.Deleted = true;`;
 									break;
 								case ExecutorRules.Copy:
-									break;
+                  break;
+                case ExecutorRules.DataChain:
+                  template = `result{{model_property}} = await DataChainThing.Execute(agent, data, change);`;
+                  break;
 								case ExecutorRules.AddModelReference:
 									template = fs.readFileSync(
 										`app/templates/executor/snippets/add-model-reference.tpl`,

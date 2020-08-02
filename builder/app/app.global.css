@@ -15,3 +15,7 @@
 .control-sidebar .treeview-menu .form-group {
 	margin-left: 12px;
 }
+
+.treeview-menu .treeview-menu {
+	padding-left: 5px;
+}

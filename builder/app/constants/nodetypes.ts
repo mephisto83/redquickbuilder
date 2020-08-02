@@ -2180,9 +2180,22 @@ export const ExecutorRules = {
 	AgentReference: 'agent-reference',
 	ParentReference: 'parent-reference',
 	AddModelReference: 'add-model-reference',
-	SetToDeleted: 'set-to-deleted'
+	SetToDeleted: 'set-to-deleted',
+	DataChain: 'data-chain'
 };
 export const ExecutorUI: any = {
+  [ExecutorRules.DataChain]: {
+		code: {
+			[ProgrammingLanguages.CSHARP]: 'DataChain'
+		},
+		arguments: {
+			...COMMON_STRING_ARGS,
+			nodeType: NodeTypes.Model,
+			reference: {
+				types: [ NodeTypes.Model ]
+			}
+		}
+	},
 	[ExecutorRules.ModelReference]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'ModelReference'

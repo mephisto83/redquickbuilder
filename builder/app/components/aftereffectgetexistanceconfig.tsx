@@ -44,10 +44,10 @@ export default class AfterEffectGetExistanceConfig extends Component<any, any> {
 		if (!dataChainOptions) {
 			return <span />;
 		}
-		dataChainOptions.GetExisting = dataChainOptions.GetExisting || CreateGetExistence();
+		dataChainOptions.getExisting = dataChainOptions.getExisting || CreateGetExistence();
 		let previousMethodDescription: MethodDescription = this.props.previousMethodDescription;
 		let currentMethodDescription: MethodDescription = this.props.currentMethodDescription;
-		let getExisting = dataChainOptions.GetExisting;
+		let getExisting = dataChainOptions.getExisting;
 		let properties: any[] = [];
 		let targetProperties: any[] = [];
 		if (previousMethodDescription && getExisting && getExisting.relationType) {
