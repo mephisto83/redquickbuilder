@@ -167,7 +167,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 													from: methodDescription,
 													to: currentDescription.methodDescription,
 													afterEffectChild: afterEffect.name,
-													afterEffectParent: this.props.mountingItem.name
+													afterEffectParent: this.props.mountingItem.name,
+                          afterEffectOptions: afterEffect.dataChainOptions
 												},
 												(dataChain: Node) => {
 													afterEffect.dataChain = dataChain.id;
@@ -196,7 +197,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 														from: description.methodDescription,
 														to: currentDescription.methodDescription,
 														afterEffectChild: afterEffect.name,
-														afterEffectParent: this.props.mountingItem.name
+                            afterEffectParent: this.props.mountingItem.name,
+                            afterEffectOptions: afterEffect.dataChainOptions
 													},
 													(dataChain: Node) => {
 														afterEffect.dataChain = dataChain.id;

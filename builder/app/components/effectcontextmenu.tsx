@@ -36,6 +36,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import AfterEffectsComponent from './aftereffectscomponent';
+import MountingItemConfig from './mountingitemconfig';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -297,6 +298,7 @@ class EffectContextMenu extends Component<any, any> {
 										value={effectItem.name}
 									/>
 								</TreeViewItemContainer>
+								<MountingItemConfig mountingDescription={effectItem} />
 								<TreeViewItemContainer>
 									<SelectInput
 										onChange={(c: string) => {

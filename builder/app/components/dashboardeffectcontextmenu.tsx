@@ -36,6 +36,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import AfterEffectsComponent from './aftereffectscomponent';
+import MountingItemConfig from './mountingitemconfig';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardEffectContextMenu extends Component<any, any> {
@@ -64,7 +65,9 @@ class DashboardEffectContextMenu extends Component<any, any> {
 							screenEffect: [],
 							agent,
 							name: '',
-							viewType: ViewTypes.Get
+							viewType: ViewTypes.Get,
+							afterEffects: [],
+							excludeFromController: false
 						});
 						if (callback) {
 							callback(effect);
@@ -308,6 +311,7 @@ class DashboardEffectContextMenu extends Component<any, any> {
 										value={effectItem.name}
 									/>
 								</TreeViewItemContainer>
+								<MountingItemConfig mountingDescription={effectItem} />
 								<TreeViewItemContainer>
 									<SelectInput
 										onChange={(c: string) => {
@@ -353,7 +357,7 @@ class DashboardEffectContextMenu extends Component<any, any> {
 								<AfterEffectsComponent
 									agent={agent}
 									methods={mode.methods}
-                  methodDescription={effectItem.methodDescription}
+									methodDescription={effectItem.methodDescription}
 									afterEffects={effectItem.afterEffects}
 								/>
 								<TreeViewButtonGroup>
@@ -487,8 +491,8 @@ class DashboardEffectContextMenu extends Component<any, any> {
 		const menuMode = UIA.Visual(state, UIA.DASHBOARD_EFFECT_CONTEXT_MENU) || {};
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
-    const defaultMenus = this.getDefaultMenu(menuMode);
-    const menu_width = 350;
+		const defaultMenus = this.getDefaultMenu(menuMode);
+		const menu_width = 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

@@ -144,6 +144,7 @@ export interface AfterEffectSetProperty {
 	targetProperty: string;
 	floatValue: string;
 	doubleValue: string;
+	booleanValue: string;
 	integerValue: string;
 	stringValue: string;
 	enumeration: string;
@@ -155,6 +156,7 @@ export enum SetPropertyType {
 	String = 'String',
 	Integer = 'Integer',
 	Float = 'Float',
+	Boolean = 'Boolean',
 	Double = 'Double'
 }
 

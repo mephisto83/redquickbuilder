@@ -40,6 +40,7 @@ import {
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
 import AfterEffectsComponent from './aftereffectscomponent';
+import MountingItemConfig from './mountingitemconfig';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -345,25 +346,7 @@ class ContextMenu extends Component<any, any> {
 										value={mountingItem.name}
 									/>
 								</TreeViewItemContainer>
-								<TreeViewMenu
-									title={'Method Props'}
-									open={this.state.methodProps}
-									active
-									onClick={() => {
-										this.setState({ methodProps: !this.state.methodProps });
-									}}
-								>
-									<TreeViewItemContainer>
-										<CheckBox
-											label={Titles.ExcludeFromController}
-											onChange={(value: boolean) => {
-												mountingItem.excludeFromController = value;
-												this.setState({ turn: UIA.GUID() });
-											}}
-											value={mountingItem.excludeFromController}
-										/>
-									</TreeViewItemContainer>
-								</TreeViewMenu>
+								<MountingItemConfig mountingDescription={mountingItem} />
 								<TreeViewMenu
 									title={'Screen to API'}
 									open={this.state.screenToApi}
