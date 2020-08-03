@@ -20,7 +20,7 @@ import {
 	MAIN_CONTENT,
 	LinkProperties,
 	NodePropertyTypesByLanguage,
-  ProgrammingLanguages
+	ProgrammingLanguages
 } from '../constants/nodetypes';
 import { GetNodesLinkedTo, NodesByType, GetNodeProp, GetNodeLinkedTo } from '../methods/graph_methods';
 import { MethodFunctions } from '../constants/functiontypes';
@@ -100,7 +100,10 @@ class DataChainActvityMenu extends Component<any, any> {
 					switch (type) {
 						case ReferenceInsertType.Property:
 							nodes = GetNodesLinkedTo(null, {
-								id: model ? lambdaInsertArgumentValues[model][ReferenceInsertType.Model] : null,
+								id:
+									model && lambdaInsertArgumentValues[model]
+										? lambdaInsertArgumentValues[model][ReferenceInsertType.Model]
+										: null,
 								link: LinkType.PropertyLink
 							}).toNodeSelect();
 							break;

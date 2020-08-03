@@ -120,8 +120,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 				{afterEffect && afterEffect.dataChain ? (
 					<AfterEffectDataChainOptions
 						methods={this.props.methods}
-            methodDescription={this.props.methodDescription}
-            currentDescription={currentDescription}
+						methodDescription={this.props.methodDescription}
+						currentDescription={currentDescription}
 						previousEffect={this.props.previousEffect}
 						afterEffect={afterEffect}
 					/>
@@ -165,10 +165,11 @@ export default class AfterEffectComponent extends Component<any, any> {
 												{
 													name: afterEffect.name,
 													from: methodDescription,
+													dataChain: afterEffect.dataChain,
 													to: currentDescription.methodDescription,
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
-                          afterEffectOptions: afterEffect.dataChainOptions
+													afterEffectOptions: afterEffect.dataChainOptions
 												},
 												(dataChain: Node) => {
 													afterEffect.dataChain = dataChain.id;
@@ -195,10 +196,11 @@ export default class AfterEffectComponent extends Component<any, any> {
 													{
 														name: afterEffect.name,
 														from: description.methodDescription,
+                            dataChain: afterEffect.dataChain,
 														to: currentDescription.methodDescription,
 														afterEffectChild: afterEffect.name,
-                            afterEffectParent: this.props.mountingItem.name,
-                            afterEffectOptions: afterEffect.dataChainOptions
+														afterEffectParent: this.props.mountingItem.name,
+														afterEffectOptions: afterEffect.dataChainOptions
 													},
 													(dataChain: Node) => {
 														afterEffect.dataChain = dataChain.id;

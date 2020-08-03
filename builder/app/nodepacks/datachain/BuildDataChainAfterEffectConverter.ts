@@ -35,8 +35,11 @@ export interface AfterEffectConvertArgs {
 export default function BuildDataChainAfterEffectConverter(args: AfterEffectConvertArgs, callback: Function) {
 	let { from, to, dataChain, afterEffectOptions, afterEffectParent, afterEffectChild, name } = args;
 	let checking_existence: string = '';
-	let get_existing: string = '';
+	let get_existing: string = '#{{"key":"tomodel"}}.Create()';
 	let set_properties: string = '';
+	let tempLambdaInsertArgumentValues: any = {};
+	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
+	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
 	if (afterEffectOptions) {
 		if (afterEffectOptions.checkExistence && afterEffectOptions.checkExistence.enabled) {
 			let {
@@ -46,6 +49,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				targetProperty,
 				skipSettings
 			} = afterEffectOptions.checkExistence;
+			tempLambdaInsertArgumentValues['agent.prop'] = { property: agentProperty };
+			tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
 			switch (relationType) {
 				case RelationType.Agent:
 				case RelationType.Model:
@@ -54,10 +59,10 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						checking_existence = `
           var exists = false;
           var checkModel = await arbiter#{{"key":"agent"}}#.GetBy(x => x.#{{"key":"agent.prop","type":"property","model":"${relationType}"}}#);
-          if(${ifvalue}checkModel.Any()) {
+          exists  = checkModel.Any();
+          if(${ifvalue}exists) {
             return;
           }
-          exists  = checkModel.Any();
         `;
 					}
 					break;
@@ -67,7 +72,15 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			if (afterEffectOptions.checkExistence && afterEffectOptions.checkExistence.enabled) {
 				get_existing = 'checkModel.FirstOrDefault()';
 			} else {
-				let { relationType } = afterEffectOptions.getExisting;
+				let { relationType, modelProperty, agentProperty } = afterEffectOptions.getExisting;
+
+				tempLambdaInsertArgumentValues['agent.prop'] = tempLambdaInsertArgumentValues['agent.prop'] || {
+					property: agentProperty
+				};
+				tempLambdaInsertArgumentValues['model.prop'] = tempLambdaInsertArgumentValues['model.prop'] || {
+					property: modelProperty
+				};
+
 				switch (relationType) {
 					case RelationType.Model:
 					case RelationType.Agent:
@@ -93,9 +106,14 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					relationType
 				} = afterEffectSetupProperty;
 
+				tempLambdaInsertArgumentValues['agent.prop'] = { property: agentProperty };
+				tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
 				let prop_string = `value.#{{"key":"tomodel.${GetJSCodeName(
 					targetProperty
 				)}","type":"property","model":"tomodel"}}#`;
+				tempLambdaInsertArgumentValues[`tomodel.${GetJSCodeName(targetProperty)}`] = {
+					property: targetProperty
+				};
 				switch (setPropertyType) {
 					case SetPropertyType.Integer:
 						return `${prop_string} = ${integerValue};`;
@@ -109,19 +127,27 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						let enumProp: { value: string; id: string } = enumprops.find(
 							(v: { value: string }) => v.value === enumerationValue
 						);
+						tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
+						tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
+							enumerationvalue: enumerationValue
+						};
 						return `${prop_string} = #{{"key":"${GetCodeName(
 							enumeration
 						)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 							enumeration
-						)}.${enumProp.value}","type":"enumeration-value"}}#;`;
+						)}.${enumProp.value}","type":"enumerationvalue"}}#;`;
 					case SetPropertyType.String:
-						return `${prop_string} = ${stringValue};`;
+						// TODO: Escape string value for C#;
+						return `${prop_string} = ${stringValue ? `"${stringValue}"` : 'strin.Empty'};`;
 					case SetPropertyType.Boolean:
 						return `${prop_string} = ${booleanValue};`;
 					case SetPropertyType.Property:
-						return `${prop_string} = ${relationType === RelationType.Agent
+						let fromPropModel = relationType === RelationType.Agent ? 'agent' : 'fromModel';
+						return `${prop_string} = ${fromPropModel}.#{{"key":"${relationType === RelationType.Agent
 							? 'agent'
-							: 'fromModel'}.#{{"key":"${relationType}.prop","type":"property","model":"${relationType}"}}#;`;
+							: 'fromModel'}.${relationType === RelationType.Agent
+							? GetCodeName(agentProperty)
+							: GetCodeName(modelProperty)}","type":"property","model":"${fromPropModel}"}}#;`;
 				}
 			});
 		}
@@ -157,7 +183,13 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	if (to && to.functionType) {
 		if (from && from.functionType) {
 			let methodFunction = MethodFunctions[from.functionType];
+			const lambdaInsertArgumentValues = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments) || {};
+
 			if (dataChain) {
+				updateComponentProperty(dataChain, NodeProperties.LambdaInsertArguments, {
+					...tempLambdaInsertArgumentValues,
+					...lambdaInsertArgumentValues
+				});
 				updateComponentProperty(dataChain, NodeProperties.Lambda, from_parameter_template);
 				updateComponentProperty(dataChain, NodeProperties.UIText, name);
 			} else if (methodFunction) {
@@ -169,6 +201,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 							[NodeProperties.CS]: true,
 							[NodeProperties.CSEntryPoint]: true,
 							[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+							[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
 							[NodeProperties.Lambda]: from_parameter_template
 						},
 						(res: Node) => {
