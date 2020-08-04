@@ -1,5 +1,6 @@
 import { Config } from 'electron';
 import { GetModelPropertyChildren } from '../actions/uiactions';
+import datachainactivitymenu from '../components/datachainactivitymenu';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -84,6 +85,7 @@ export interface DataChainConfiguration {
 	setInteger?: SetInteger;
 	incrementInteger?: IncrementInteger;
 	incrementDouble?: IncrementDouble;
+	compareEnumeration?: CompareEnumeration;
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 }
@@ -244,6 +246,9 @@ export function CreateIncrementInteger(): IncrementInteger {
 	return { ...CreateHalf(), value: '1' };
 }
 
+export function CreateCompareEnumeration(): CompareEnumeration {
+	return { ...CreateHalf(), enumeration: '', value: '' };
+}
 export function CreateSimpleValidation(): SimpleValidationConfig {
 	return {
 		relationType: RelationType.Agent,
@@ -281,7 +286,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.setBoolean = dataChainOptions.setBoolean || CreateSetBoolean();
 	dataChainOptions.incrementDouble = dataChainOptions.incrementDouble || CreateIncrementDouble();
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
-
+	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -317,7 +322,8 @@ export function SetupConfigInstanceInformation(
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
 		setBoolean: dataChainOptions.setBoolean,
-		setInteger: dataChainOptions.setInteger
+		setInteger: dataChainOptions.setInteger,
+		compareEnumeration: dataChainOptions.compareEnumeration
 	};
 }
 
@@ -337,6 +343,10 @@ export interface HalfRelation extends ConfigItem {
 }
 export interface AfterEffectRelations extends HalfRelation {
 	targetProperty: string;
+}
+export interface CompareEnumeration extends HalfRelation {
+	enumeration: string;
+	value: string;
 }
 export interface CheckExistenceConfig extends AfterEffectRelations {
 	skipSettings: SkipSettings;

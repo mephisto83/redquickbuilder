@@ -19,6 +19,7 @@ import SetIntegerComponent from './setinteger';
 import SetBooleanComponent from './setbooleancomponent';
 import IncrementIntegerComponent from './incrementinteger';
 import IncrementDoubleComponent from './incrementdouble';
+import CompareEnumeration from './compareenumeration';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -70,6 +71,12 @@ export default class DataChainOptions extends Component<any, any> {
 					onChange={onchange}
 				/>
 				<SetIntegerComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<CompareEnumeration
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

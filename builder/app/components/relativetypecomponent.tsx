@@ -53,6 +53,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		let ok = false;
 		let isValidation = false;
 		switch (this.props.dataChainType) {
+			case DataChainType.Permission:
 			case DataChainType.Validation:
 			case DataChainType.Execution:
 				isValidation = true;
@@ -87,7 +88,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				greyed={!this.props.enabled}
 				title={Titles.RelationType}
 			>
-				<TreeViewItemContainer  hide={this.props.hideModelAgent}>
+				<TreeViewItemContainer hide={this.props.hideModelAgent}>
 					<SelectInput
 						label={
 							relations.relationType === RelationType.Agent ? (
@@ -111,7 +112,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer  hide={this.props.hideModelAgent}>
+				<TreeViewItemContainer hide={this.props.hideModelAgent}>
 					<SelectInput
 						label={Titles.Property}
 						options={properties}
