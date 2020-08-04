@@ -90,7 +90,14 @@ class DataChainActvityMenu extends Component<any, any> {
 			const lambdaInsertArgumentValues = UIA.GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
 			if (temp && temp.length) {
 				inserts = temp.map((refInsert: ReferenceInsert) => {
-					let { types, key, model, type = ReferenceInsertType.Model } = refInsert;
+					let {
+						types,
+						key,
+						model,
+						enumerationvalue,
+						enumeration,
+						type = ReferenceInsertType.Model
+					} = refInsert;
 
 					if (!types || !types.length) {
 						types = [ NodeTypes.Model, NodeTypes.Enumeration ];
@@ -112,8 +119,24 @@ class DataChainActvityMenu extends Component<any, any> {
 								NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP]
 							).map((v: string) => ({ title: v, value: v }));
 							break;
+						case ReferenceInsertType.Enumeration:
+							nodes = UIA.NodesByType(state, NodeTypes.Enumeration).toNodeSelect();
+							break;
+						case ReferenceInsertType.EnumerationValue:
+							nodes = (GetNodeProp(
+								lambdaInsertArgumentValues[key]
+									? lambdaInsertArgumentValues[key][ReferenceInsertType.Enumeration]
+									: null,
+								NodeProperties.Enumeration
+							) || [])
+								.map((v: { value: string; id: string }) => ({
+									...v,
+									value: v.id,
+									title: v.value
+								}));
+							break;
 						default:
-							nodes = UIA.NodesByType(state, types).toNodeSelect(); //  UIA.NodesByType(null, NodeTypes.Property);
+							nodes = UIA.NodesByType(state, types).toNodeSelect();
 							break;
 					}
 

@@ -33,13 +33,13 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
-import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import BuildDataChainAfterEffectConverter, { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
 import AfterEffectSetProperty from './aftereffectsetproperty';
 import AfterEffectSetupProperty from './aftereffectsetproperty';
 import { NodesByType } from '../methods/graph_methods';
 
-export default class AfterEffectSetPropertiesConfig extends Component<any, any> {
+export default class SetPropertiesConfig extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -47,41 +47,46 @@ export default class AfterEffectSetPropertiesConfig extends Component<any, any> 
 
 	render() {
 		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
-		if (!dataChainOptions) {
+		let ok = false;
+		switch (this.props.dataChainType) {
+			case DataChainType.AfterEffect:
+				ok = true;
+				break;
+		}
+		if (!dataChainOptions || !ok) {
 			return <span />;
 		}
 		dataChainOptions.setProperties = dataChainOptions.setProperties || CreateSetProperties();
-		let previousMethodDescription: MethodDescription = this.props.previousMethodDescription;
-		let currentMethodDescription: MethodDescription = this.props.currentMethodDescription;
+		let methodDescription: MethodDescription = this.props.methodDescription;
 		let setProperties = dataChainOptions.setProperties;
 		let agentProperties: any[] = [];
 		let modelProperties: any[] = [];
 		let targetProperties: any[] = [];
 		let enumerations: any[] = NodesByType(UIA.GetCurrentGraph(), NodeTypes.Enumeration).toNodeSelect();
-		if (previousMethodDescription) {
-			if (previousMethodDescription.properties && previousMethodDescription.properties.agent) {
+		if (methodDescription) {
+			if (methodDescription.properties && methodDescription.properties.agent) {
 				agentProperties = UIA.GetModelPropertyChildren(
-					previousMethodDescription.properties.agent
+					methodDescription.properties.agent
 				).toNodeSelect();
 			}
 			if (
-				previousMethodDescription.properties &&
-				(previousMethodDescription.properties.model_output || previousMethodDescription.properties.model)
+				methodDescription.properties &&
+				(methodDescription.properties.model_output || methodDescription.properties.model)
 			) {
 				modelProperties = UIA.GetModelPropertyChildren(
-					previousMethodDescription.properties.model_output ||
-						previousMethodDescription.properties.model ||
+					methodDescription.properties.model_output ||
+						methodDescription.properties.model ||
 						''
 				).toNodeSelect();
 			}
 		}
 
 		if (
-			currentMethodDescription &&
-			currentMethodDescription.properties &&
-			currentMethodDescription.properties.model
+			methodDescription &&
+			methodDescription.properties &&
+			methodDescription.properties.model
 		) {
-			targetProperties = UIA.GetModelPropertyChildren(currentMethodDescription.properties.model).toNodeSelect();
+			targetProperties = UIA.GetModelPropertyChildren(methodDescription.properties.model).toNodeSelect();
 		}
 		let onchange = () => {
 			this.setState({

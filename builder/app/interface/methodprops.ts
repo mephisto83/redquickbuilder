@@ -1,3 +1,6 @@
+import { Config } from 'electron';
+import { GetModelPropertyChildren } from '../actions/uiactions';
+
 export interface DashboardAccessProps {
 	access: false;
 }
@@ -68,31 +71,33 @@ export interface MountingDescription {
 	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 	afterEffects: AfterEffect[];
+	validations: ValidationConfig[];
 	excludeFromController: boolean;
 }
-export interface AfterEffectDataChainConfiguration {
-	checkExistence?: AfterEffectCheckExistence;
-	getExisting?: AfterEffectGetExisting;
-	setProperties?: AfterEffectSetProperties;
+export interface DataChainConfiguration {
+	checkExistence?: CheckExistenceConfig;
+	simpleValidation?: SimpleValidationConfig;
+	getExisting?: GetExistingConfig;
+	setProperties?: SetPropertiesConfig;
 }
 
-export interface AfterEffectSetProperties extends AfterEffectConfigItem {
-	properties: AfterEffectSetProperty[];
+export interface SetPropertiesConfig extends ConfigItem {
+	properties: SetProperty[];
 }
-export function CreateSetProperties(): AfterEffectSetProperties {
+export function CreateSetProperties(): SetPropertiesConfig {
 	return {
 		enabled: false,
 		properties: []
 	};
 }
-export function CheckAfterEffectDataChainConfiguration(options: AfterEffectDataChainConfiguration) {
+export function CheckAfterEffectDataChainConfiguration(options: DataChainConfiguration) {
 	return (
 		(!options.getExisting || CheckGetExisting(options.getExisting)) &&
 		(!options.checkExistence || CheckIsExisting(options.checkExistence)) &&
 		(!options.setProperties || CheckSetProperties(options.setProperties))
 	);
 }
-export function CreateSetProperty(): AfterEffectSetProperty {
+export function CreateSetProperty(): SetProperty {
 	return {
 		agentProperty: '',
 		doubleValue: '',
@@ -104,10 +109,11 @@ export function CreateSetProperty(): AfterEffectSetProperty {
 		setPropertyType: SetPropertyType.String,
 		stringValue: '',
 		targetProperty: '',
-		enumerationValue: ''
+		enumerationValue: '',
+		booleanValue: 'false'
 	};
 }
-export function CheckSetProperties(setProperties: AfterEffectSetProperties) {
+export function CheckSetProperties(setProperties: SetPropertiesConfig) {
 	if (!setProperties.enabled) {
 		return true;
 	}
@@ -117,7 +123,7 @@ export function CheckSetProperties(setProperties: AfterEffectSetProperties) {
 	}
 	return false;
 }
-export function CheckSetProperty(setProperty: AfterEffectSetProperty): boolean {
+export function CheckSetProperty(setProperty: SetProperty): boolean {
 	switch (setProperty.setPropertyType) {
 		case SetPropertyType.Double:
 			return isNaN(parseFloat(setProperty.doubleValue));
@@ -136,7 +142,7 @@ export function CheckSetProperty(setProperty: AfterEffectSetProperty): boolean {
 	}
 	return false;
 }
-export interface AfterEffectSetProperty {
+export interface SetProperty {
 	setPropertyType: SetPropertyType;
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
@@ -160,17 +166,87 @@ export enum SetPropertyType {
 	Double = 'Double'
 }
 
-export function CreateCheckExistence(): AfterEffectCheckExistence {
+export function CreateCheckExistence(): CheckExistenceConfig {
 	return {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
 		targetProperty: '',
 		enabled: false,
-		skipSettings: SkipSettings.DontSkip
+		skipSettings: SkipSettings.DontSkip,
+		returnSetting: {
+			enabled: false,
+			setting: ReturnSetting.ReturnFalse
+		}
 	};
 }
-export function CreateGetExistence(): AfterEffectGetExisting {
+export function CreateSimpleValidation(): SimpleValidationConfig {
+	return {
+		relationType: RelationType.Agent,
+		agentProperty: '',
+		modelProperty: '',
+		targetProperty: '',
+		enabled: false,
+		alphaOnlyWithSpaces: {
+			enabled: false
+		},
+		isNotNull: {
+			enabled: false
+		},
+		isNull: {
+			enabled: false
+		},
+		maxLength: {
+			enabled: false,
+			value: '500'
+		},
+		minLength: {
+			enabled: false,
+			value: '1'
+		}
+	};
+}
+export function SetupConfigInstanceInformation(
+	dataChainOptions: DataChainConfiguration,
+	methodDescription: MethodDescription
+) {
+	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
+	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
+	let checkExistence = dataChainOptions.checkExistence;
+	let properties: any[] = [];
+	let targetProperties: any[] = [];
+	if (methodDescription && checkExistence && checkExistence.relationType) {
+		switch (checkExistence.relationType) {
+			case RelationType.Agent:
+				if (methodDescription.properties && methodDescription.properties.agent) {
+					properties = GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
+				}
+				break;
+			case RelationType.Model:
+				if (
+					methodDescription.properties &&
+					(methodDescription.properties.model_output || methodDescription.properties.model)
+				) {
+					properties = GetModelPropertyChildren(
+						methodDescription.properties.model_output || methodDescription.properties.model || ''
+					).toNodeSelect();
+				}
+				break;
+		}
+	}
+	if (methodDescription && methodDescription.properties && methodDescription.properties.model) {
+		targetProperties = GetModelPropertyChildren(methodDescription.properties.model).toNodeSelect();
+	}
+	return {
+		checkExistence,
+		methodDescription,
+		properties,
+		targetProperties,
+		simpleValidation: dataChainOptions.simpleValidation
+	};
+}
+
+export function CreateGetExistence(): GetExistingConfig {
 	return {
 		relationType: RelationType.Agent,
 		agentProperty: '',
@@ -179,16 +255,30 @@ export function CreateGetExistence(): AfterEffectGetExisting {
 		enabled: false
 	};
 }
-export interface AfterEffectRelations extends AfterEffectConfigItem {
+export interface AfterEffectRelations extends ConfigItem {
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
 	modelProperty: string; // The property used to find the model
 	targetProperty: string;
 }
-export interface AfterEffectCheckExistence extends AfterEffectRelations {
+export interface CheckExistenceConfig extends AfterEffectRelations {
 	skipSettings: SkipSettings;
+	returnSetting: ReturnSettingConfig;
 }
-export interface AfterEffectGetExisting extends AfterEffectRelations {}
+
+export interface SimpleValidationConfig extends AfterEffectRelations {
+	minLength: NumberConfig;
+	maxLength: NumberConfig;
+	alphaOnlyWithSpaces: BooleanConfig;
+	isNotNull: BooleanConfig;
+	isNull: BooleanConfig;
+}
+
+export interface BooleanConfig extends ConfigItem {}
+export interface NumberConfig extends ConfigItem {
+	value: string;
+}
+export interface GetExistingConfig extends AfterEffectRelations {}
 /**
  * Describes how the model will be found
  */
@@ -196,16 +286,35 @@ export enum RelationType {
 	Agent = 'Agent',
 	Model = 'Model'
 }
+export interface ReturnSettingConfig extends ConfigItem {
+	setting: ReturnSetting;
+}
+export function createReturnSetting(): ReturnSettingConfig {
+	return {
+		setting: ReturnSetting.ReturnTrue,
+		enabled: false
+	};
+}
+export enum ReturnSetting {
+	ReturnTrue = 'ReturnTrue',
+	ReturnFalse = 'ReturnFalse',
+	ReturnOther = 'ReturnOther'
+}
 export enum SkipSettings {
 	SkipIfTrue = 'Skip If True',
 	SkipIfFlase = 'Skip If False',
 	DontSkip = 'Dont Skip'
 }
-export interface AfterEffectConfigItem {
+export interface ConfigItem {
 	enabled: boolean;
 }
-
-export function CheckIsExisting(isExisting: AfterEffectCheckExistence) {
+export function CheckSimpleValidation(isvalidation: SimpleValidationConfig) {
+	if (!isvalidation.enabled) {
+		return true;
+  }
+  return true;
+}
+export function CheckIsExisting(isExisting: CheckExistenceConfig) {
 	if (!isExisting.enabled) {
 		return true;
 	}
@@ -216,7 +325,7 @@ export function CheckIsExisting(isExisting: AfterEffectCheckExistence) {
 		: false;
 }
 
-export function CheckGetExisting(getExisting: AfterEffectGetExisting) {
+export function CheckGetExisting(getExisting: GetExistingConfig) {
 	if (!getExisting.enabled) {
 		return true;
 	}
@@ -228,13 +337,20 @@ export function CheckGetExisting(getExisting: AfterEffectGetExisting) {
 }
 
 export interface AfterEffect {
-	dataChainOptions: AfterEffectDataChainConfiguration;
+	dataChainOptions: DataChainConfiguration;
 	id: string;
 	name: string;
 	dataChain: string;
 	targetType: TargetMethodType;
 	target: string;
 	afterEffectNode?: string;
+}
+
+export interface ValidationConfig {
+	id: string;
+	name: string;
+	dataChain: string;
+	dataChainOptions: DataChainConfiguration;
 }
 
 export enum TargetMethodType {

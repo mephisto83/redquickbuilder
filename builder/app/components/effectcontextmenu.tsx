@@ -37,6 +37,7 @@ import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '.
 import CheckBox from './checkbox';
 import AfterEffectsComponent from './aftereffectscomponent';
 import MountingItemConfig from './mountingitemconfig';
+import ValidationComponent from './validationcomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -65,7 +66,10 @@ class EffectContextMenu extends Component<any, any> {
 							agent,
 							name: '',
 							screenEffect: [],
-							viewType: ViewTypes.Get
+							viewType: ViewTypes.Get,
+							validations: [],
+							afterEffects: [],
+							excludeFromController: false
 						});
 						if (callback) {
 							callback(effect);
@@ -97,6 +101,7 @@ class EffectContextMenu extends Component<any, any> {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription, source } = effectItem;
 						effectItem.afterEffects = effectItem.afterEffects || [];
+						effectItem.validations = effectItem.validations || [];
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;
 						let methodConstraints: any = null;
@@ -330,6 +335,12 @@ class EffectContextMenu extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
+								<ValidationComponent
+									agent={agent}
+									mountingItem={effectItem}
+									methods={mode.methods}
+									methodDescription={effectItem.methodDescription}
+								/>
 								<AfterEffectsComponent
 									agent={agent}
 									mountingItem={effectItem}

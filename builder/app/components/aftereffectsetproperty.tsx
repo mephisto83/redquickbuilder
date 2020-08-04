@@ -8,7 +8,7 @@ import { ViewTypes } from '../constants/viewtypes';
 import TreeViewMenu from './treeviewmenu';
 import {
 	CheckSetProperty,
-	AfterEffectSetProperty,
+	SetProperty,
 	SetPropertyType,
 	TargetMethodType,
 	RelationType
@@ -28,7 +28,7 @@ export default class AfterEffectSetupProperty extends Component<any, any> {
 	}
 
 	render() {
-		let setProperty: AfterEffectSetProperty = this.props.setProperty;
+		let setProperty: SetProperty = this.props.setProperty;
 		if (!setProperty) {
 			return <span />;
 		}
@@ -164,7 +164,7 @@ export default class AfterEffectSetupProperty extends Component<any, any> {
 						/>
 					</TreeViewItemContainer>
 				) : null}
-				{showSetProperty ? (
+				{showSetProperty || showEnumeration ? (
 					<TreeViewItemContainer>
 						<SelectInput
 							label={Titles.Property}

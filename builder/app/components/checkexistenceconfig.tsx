@@ -21,7 +21,9 @@ import {
 	CreateCheckExistence,
 	RelationType,
 	SkipSettings,
-	CheckIsExisting
+	CheckIsExisting,
+	CheckExistenceConfig,
+	SetupConfigInstanceInformation
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -30,10 +32,14 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
-import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import BuildDataChainAfterEffectConverter, {
+	DataChainType
+} from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
+import ReturnSettings from './returnsettings';
+import DataChainOptions from './datachainoptions';
 
-export default class AfterEffectCheckExistanceConfig extends Component<any, any> {
+export default class CheckExistanceConfig extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -41,46 +47,33 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 
 	render() {
 		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
-		if (!dataChainOptions) {
+		let ok = false;
+		let isValidation = false;
+		switch (this.props.dataChainType) {
+			case DataChainType.Validation:
+				isValidation = true;
+				ok = true;
+				break;
+			case DataChainType.AfterEffect:
+				ok = true;
+				break;
+		}
+		if (!dataChainOptions || !ok) {
 			return <span />;
 		}
-		dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
-		let previousMethodDescription: MethodDescription = this.props.previousMethodDescription;
-		let currentMethodDescription: MethodDescription = this.props.currentMethodDescription;
-		let checkExistence = dataChainOptions.checkExistence;
-		let properties: any[] = [];
-		let targetProperties: any[] = [];
-		if (previousMethodDescription && checkExistence && checkExistence.relationType) {
-			switch (checkExistence.relationType) {
-				case RelationType.Agent:
-					if (previousMethodDescription.properties && previousMethodDescription.properties.agent) {
-						properties = UIA.GetModelPropertyChildren(
-							previousMethodDescription.properties.agent
-						).toNodeSelect();
-					}
-					break;
-				case RelationType.Model:
-					if (
-						previousMethodDescription.properties &&
-						(previousMethodDescription.properties.model_output ||
-							previousMethodDescription.properties.model)
-					) {
-						properties = UIA.GetModelPropertyChildren(
-							previousMethodDescription.properties.model_output ||
-								previousMethodDescription.properties.model ||
-								''
-						).toNodeSelect();
-					}
-					break;
-			}
-		}
-		if (
-			currentMethodDescription &&
-			currentMethodDescription.properties &&
-			currentMethodDescription.properties.model
-		) {
-			targetProperties = UIA.GetModelPropertyChildren(currentMethodDescription.properties.model).toNodeSelect();
-		}
+
+		let {
+			checkExistence,
+			methodDescription,
+			properties,
+			targetProperties
+		}: {
+			checkExistence: CheckExistenceConfig;
+			methodDescription: MethodDescription;
+			properties: any[];
+			targetProperties: any[];
+		} = this.setupInstanceInfo(dataChainOptions);
+
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -89,6 +82,7 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				greyed={checkExistence.enabled}
 				title={Titles.ChexkExistence}
 			>
 				<TreeViewItemContainer>
@@ -107,23 +101,24 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 					/>
 				</TreeViewItemContainer>
 				<TreeViewMenu
+					hide={!checkExistence || !checkExistence.enabled}
 					open={this.state.config && checkExistence.enabled}
 					icon={CheckIsExisting(checkExistence) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 					onClick={() => {
 						this.setState({ config: !this.state.config });
 					}}
-					active={checkExistence.enabled}
+					active
+					greyed={checkExistence.enabled}
 					title={Titles.RelationType}
 				>
 					<TreeViewItemContainer>
 						<SelectInput
 							label={
 								checkExistence.relationType === RelationType.Agent ? (
-									UIA.GetNodeTitle(previousMethodDescription.properties.agent)
+									UIA.GetNodeTitle(methodDescription.properties.agent)
 								) : (
 									UIA.GetNodeTitle(
-										previousMethodDescription.properties.model_output ||
-											previousMethodDescription.properties.model
+										methodDescription.properties.model_output || methodDescription.properties.model
 									)
 								)
 							}
@@ -171,7 +166,7 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 					</TreeViewItemContainer>
 					<TreeViewItemContainer>
 						<SelectInput
-							label={UIA.GetNodeTitle(currentMethodDescription.properties.model)}
+							label={UIA.GetNodeTitle(methodDescription.properties.model)}
 							options={targetProperties}
 							value={checkExistence.targetProperty}
 							onChange={(value: string) => {
@@ -186,24 +181,53 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 						/>
 					</TreeViewItemContainer>
 				</TreeViewMenu>
-				<TreeViewItemContainer>
-					<SelectInput
-						label={Titles.SkipSetting}
-						options={Object.values(SkipSettings).map((v: string) => ({ title: v, value: v }))}
-						value={checkExistence.skipSettings}
-						onChange={(value: SkipSettings) => {
-							checkExistence.skipSettings = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
+				<ReturnSettings
+					checkExistence={checkExistence}
+					onChange={() => {
+						this.setState({
+							turn: UIA.GUID()
+						});
+						if (this.props.onChange) {
+							this.props.onChange();
+						}
+					}}
+				/>
+				<TreeViewMenu
+					open={this.state.skipopen}
+					icon={CheckIsExisting(checkExistence) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+					onClick={() => {
+						this.setState({ skipopen: !this.state.skipopen });
+					}}
+					hide={!checkExistence || !checkExistence.enabled}
+					active={isValidation && (!checkExistence.returnSetting || !checkExistence.returnSetting.enabled)}
+					greyed={checkExistence.enabled}
+					title={Titles.SkipSettings}
+				>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={Titles.SkipSetting}
+							options={Object.values(SkipSettings).map((v: string) => ({ title: v, value: v }))}
+							value={checkExistence.skipSettings}
+							onChange={(value: SkipSettings) => {
+								checkExistence.skipSettings = value;
+								this.setState({
+									turn: UIA.GUID()
+								});
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
+						/>
+					</TreeViewItemContainer>
+				</TreeViewMenu>
 				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
+	}
+
+	private setupInstanceInfo(dataChainOptions: DataChainConfiguration) {
+		dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
+		let methodDescription: MethodDescription = this.props.methodDescription;
+		return SetupConfigInstanceInformation(dataChainOptions, methodDescription);
 	}
 }

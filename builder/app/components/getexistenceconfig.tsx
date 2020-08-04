@@ -1,39 +1,22 @@
 // @flow
 import React, { Component } from 'react';
-import { UIConnect } from '../utils/utils';
-import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
 import * as UIA from '../actions/uiactions';
-import TabPane from './tabpane';
 import * as Titles from './titles';
-import FormControl from './formcontrol';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
-import TextBox from './textinput';
-import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import {
-	AfterEffect,
-	TargetMethodType,
-	EffectDescription,
-	MountingDescription,
 	MethodDescription,
 	DataChainConfiguration,
-	CreateCheckExistence,
 	RelationType,
 	CreateGetExistence,
 	CheckGetExisting
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
-import TreeViewGroupButton from './treeviewgroupbutton';
-import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
-import { GetStateFunc, graphOperation } from '../actions/uiactions';
-import { Node } from '../methods/graph_types';
-import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
-import { mount } from 'enzyme';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 
-export default class AfterEffectGetExistanceConfig extends Component<any, any> {
+export default class GetExistanceConfig extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -41,45 +24,42 @@ export default class AfterEffectGetExistanceConfig extends Component<any, any> {
 
 	render() {
 		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
-		if (!dataChainOptions) {
+		let ok = false;
+		switch (this.props.dataChainType) {
+			case DataChainType.AfterEffect:
+				ok = true;
+				break;
+		}
+		if (!dataChainOptions || !ok) {
 			return <span />;
 		}
+
 		dataChainOptions.getExisting = dataChainOptions.getExisting || CreateGetExistence();
-		let previousMethodDescription: MethodDescription = this.props.previousMethodDescription;
-		let currentMethodDescription: MethodDescription = this.props.currentMethodDescription;
+		let methodDescription: MethodDescription = this.props.methodDescription;
 		let getExisting = dataChainOptions.getExisting;
 		let properties: any[] = [];
 		let targetProperties: any[] = [];
-		if (previousMethodDescription && getExisting && getExisting.relationType) {
+		if (methodDescription && getExisting && getExisting.relationType) {
 			switch (getExisting.relationType) {
 				case RelationType.Agent:
-					if (previousMethodDescription.properties && previousMethodDescription.properties.agent) {
-						properties = UIA.GetModelPropertyChildren(
-							previousMethodDescription.properties.agent
-						).toNodeSelect();
+					if (methodDescription.properties && methodDescription.properties.agent) {
+						properties = UIA.GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
 					}
 					break;
 				case RelationType.Model:
 					if (
-						previousMethodDescription.properties &&
-						(previousMethodDescription.properties.model_output ||
-							previousMethodDescription.properties.model)
+						methodDescription.properties &&
+						(methodDescription.properties.model_output || methodDescription.properties.model)
 					) {
 						properties = UIA.GetModelPropertyChildren(
-							previousMethodDescription.properties.model_output ||
-								previousMethodDescription.properties.model ||
-								''
+							methodDescription.properties.model_output || methodDescription.properties.model || ''
 						).toNodeSelect();
 					}
 					break;
 			}
 		}
-		if (
-			currentMethodDescription &&
-			currentMethodDescription.properties &&
-			currentMethodDescription.properties.model
-		) {
-			targetProperties = UIA.GetModelPropertyChildren(currentMethodDescription.properties.model).toNodeSelect();
+		if (methodDescription && methodDescription.properties && methodDescription.properties.model) {
+			targetProperties = UIA.GetModelPropertyChildren(methodDescription.properties.model).toNodeSelect();
 		}
 		return (
 			<TreeViewMenu
@@ -119,11 +99,10 @@ export default class AfterEffectGetExistanceConfig extends Component<any, any> {
 						<SelectInput
 							label={
 								getExisting.relationType === RelationType.Agent ? (
-									UIA.GetNodeTitle(previousMethodDescription.properties.agent)
+									UIA.GetNodeTitle(methodDescription.properties.agent)
 								) : (
 									UIA.GetNodeTitle(
-										previousMethodDescription.properties.model_output ||
-											previousMethodDescription.properties.model
+										methodDescription.properties.model_output || methodDescription.properties.model
 									)
 								)
 							}
@@ -171,7 +150,7 @@ export default class AfterEffectGetExistanceConfig extends Component<any, any> {
 					</TreeViewItemContainer>
 					<TreeViewItemContainer>
 						<SelectInput
-							label={UIA.GetNodeTitle(currentMethodDescription.properties.model)}
+							label={UIA.GetNodeTitle(methodDescription.properties.model)}
 							options={targetProperties}
 							value={getExisting.targetProperty}
 							onChange={(value: string) => {
